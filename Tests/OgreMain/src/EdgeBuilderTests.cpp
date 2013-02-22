@@ -38,6 +38,7 @@ void EdgeBuilderTests::setUp()
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
     //mLogMgr = OGRE_NEW LogManager();
     LogManager::getSingleton().createLog("EdgeBuilderTests.log", true);
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 }
 void EdgeBuilderTests::tearDown()
 {

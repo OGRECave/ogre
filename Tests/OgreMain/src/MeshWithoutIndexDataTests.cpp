@@ -40,7 +40,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
+    LogManager::getSingleton().setLogDetail(LL_LOW);
+	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();

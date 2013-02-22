@@ -32,7 +32,19 @@ CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
 void PageCoreTests::setUp()
 {
+    // set up silent logging to not pollute output
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("testPageCore.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
+
 	mRoot = OGRE_NEW Root();
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 	mPageManager = OGRE_NEW PageManager();
 
 	// make certain the resource location is NOT read-only
