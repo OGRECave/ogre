@@ -423,16 +423,11 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
         SubMesh* subMesh = mesh->getSubMesh(i);
         // According to generateExtremes, extremes are built based upon the bounding box indices.
         // But it also creates indices for all bbox's even if the mesh does not have any.
-        // So...there should always be NUM_EXTREMES extremity points.
-//        if (subMesh->indexData->indexCount > 0)
-//        {
+        // So...there should always be some extremity points. The number of which may vary
+        if (subMesh->indexData->indexCount > 0)
+        {
             CPPUNIT_ASSERT(subMesh->extremityPoints.size() == NUM_EXTREMES);
-//        }
-//        else
-//        {
-//            // FAIL: size == 4
-//            CPPUNIT_ASSERT(subMesh->extremityPoints.size() == 0);
-//        }
+        }
     }
 
     mMeshMgr->remove( fileName );
