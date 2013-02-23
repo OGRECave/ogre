@@ -121,6 +121,8 @@ if (OGRE_BUILD_TESTS)
             ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/materials
             COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media/models
             ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/models
+            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/misc
             COMMAND ditto 
             ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
 		)
