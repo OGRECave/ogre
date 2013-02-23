@@ -44,7 +44,7 @@ class MeshWithoutIndexDataTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testCreateMesh);
     CPPUNIT_TEST(testCloneMesh);
     CPPUNIT_TEST(testEdgeList);
-//    CPPUNIT_TEST(testGenerateExtremes);
+    CPPUNIT_TEST(testGenerateExtremes);
     CPPUNIT_TEST(testBuildTangentVectors);
     CPPUNIT_TEST(testGenerateLodLevels);
     CPPUNIT_TEST_SUITE_END();
