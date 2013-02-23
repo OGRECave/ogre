@@ -485,7 +485,8 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
             }
             else
             {
-                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount == 0);
+                // Should be 3 because of the dummy triangle being generated
+                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount == 3);
             }
         }
     }
