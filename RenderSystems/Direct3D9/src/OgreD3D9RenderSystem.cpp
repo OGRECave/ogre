@@ -2844,16 +2844,6 @@ namespace Ogre
 		//no effect in directX9 rendersystem
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-	{
-		//no effect in directX9 rendersystem
-	}
-	//---------------------------------------------------------------------
-	void D3D9RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-	{
-		//no effect in directX9 rendersystem
-	}
-	//---------------------------------------------------------------------
 	DWORD D3D9RenderSystem::_getCurrentAnisotropy(size_t unit)
 	{
 		DWORD oldVal;

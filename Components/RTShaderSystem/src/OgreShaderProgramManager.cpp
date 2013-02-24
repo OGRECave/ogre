@@ -381,31 +381,15 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const String& cachePath)
 {
     stringstream sourceCodeStringStream;
+	String programName;
 
 	// Generate source code.
 	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
     String source = sourceCodeStringStream.str();
 
-
-    HighLevelGpuProgramPtr pGpuProgram;
-     String programName;
-
-    ProgramSourceToNameMap::iterator foundName = mProgramSourceToNameMap.find(source) ;
-    if(foundName != mProgramSourceToNameMap.end())
-    {
-        programName = foundName->second;
-        pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
-    }
-    else
-    {
-        _StringHash stringHash;
-        uint32 programHashCode;
-        
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 	
-        while(true)
-        {
-            // Generate program name.
+	// Generate program name.
 	programName = generateGUID(source);
 
 #else // Disable caching on android devices 
@@ -415,34 +399,18 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     programName = "RTSS_"  + StringConverter::toString(++gpuProgramID);
    
 #endif
+	
+	if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+	{
+		programName += "_VS";
+	}
+	else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+	{
+		programName += "_FS";
+	}
 
-            if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
-            {
-                programName += "_VS";
-            }
-            else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
-            {
-                programName += "_FS";
-            }
-
+	// Try to get program by name.
 	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
-
-            if (pGpuProgram.isNull() || pGpuProgram->getSource() == source)
-            {
-                // meaning we don't have the double hash problem
-                // add to the list - and continue
-                mProgramSourceToNameMap[source] = programName;
-                break;
-            }
-
-            // if the source of the shader we found isn't equal to the new shader source
-            // it mean that the hash code is equal - but not the source, so - we add
-            // one to programHashCode to make is possibly unique
-            programHashCode++;
-        }
-
-    }
-
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())

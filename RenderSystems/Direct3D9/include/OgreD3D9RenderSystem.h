@@ -350,15 +350,6 @@ namespace Ogre
 		/// Tells whether the system is initialized with DirectX 9Ex driver
 		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
 		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
-		
-		/*
-		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
-		*/
-		virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-
-		/// Tells whether the system is initialized with DirectX 9Ex driver
-		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
-		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
 
 		static D3D9ResourceManager* getResourceManager();
 		static D3D9DeviceManager* getDeviceManager();
@@ -385,9 +376,6 @@ namespace Ogre
 		unsigned int getDisplayMonitorCount() const;
 		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
 		virtual bool hasAnisotropicMipMapFilter() const { return false; }  	
-
-		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
-		virtual bool hasAnisotropicMipMapFilter() const { return false; }
 
 		/// @copydoc RenderSystem::beginProfileEvent
         virtual void beginProfileEvent( const String &eventName );

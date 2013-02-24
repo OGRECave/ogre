@@ -225,6 +225,7 @@ namespace Ogre {
                     params->setNamedConstant(i->first, i->second);
             }
             mDelegate->load();
+        }
 	}
     //-----------------------------------------------------------------------
     void CgProgram::getMicrocodeFromCache(void)
@@ -344,8 +345,6 @@ namespace Ogre {
                     mOutputOp = cgGetProgramOutput(cgProgram);
                 }
             }
-
-  
 
 			// Unload Cg Program - we don't need it anymore
 			cgDestroyProgram(cgProgram);

@@ -103,7 +103,9 @@
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
-     PlayPenPlugin* playPenPlugin = 0;
+#    include "PlayPenTestPlugin.h"
+	PlayPenPlugin* playPenPlugin = 0;
+    PlaypenTestPlugin* playPenTestPlugin = 0;
 #   endif
 #   ifdef USE_RTSHADER_SYSTEM
 #       include "OgreRTShaderSystem.h"

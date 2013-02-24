@@ -469,19 +469,6 @@ if (OGRE_BUILD_PLATFORM_NACL)
 elseif (WIN32)
   if (OGRE_BUILD_PLATFORM_WINRT)
     include_directories("include/WIN32")
-    set(PLATFORM_HEADER_FILES
-      include/WIN32/OgreConfigDialogImpWinRT.h
-      include/WIN32/OgreErrorDialogImpWinRT.h
-      include/WIN32/OgreTimerImp.h
-    )
-    set(PLATFORM_SOURCE_FILES
-      src/WIN32/OgreConfigDialogWinRT.cpp
-      src/WIN32/OgreErrorDialogWinRT.cpp
-      src/WIN32/OgreTimer.cpp
-    )  
-    set(PLATFORM_HEADER_INSTALL "WIN32")
-  else ()
-    include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
       include/WIN32/OgreErrorDialogImpWinRT.h

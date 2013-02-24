@@ -518,7 +518,7 @@ namespace Ogre
 		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
 		presentParams->Windowed					= !mIsFullScreen;
 		
-		// triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
+		DWORD version = GetVersion();
 		DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
 		DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
 		bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));

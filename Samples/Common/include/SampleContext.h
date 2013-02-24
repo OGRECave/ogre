@@ -206,6 +206,10 @@ namespace OgreBites
 
 				s->_setup(mWindow, mInputContext, mFSLayer, mOverlaySystem);   // start new sample
 			}
+#if OGRE_PROFILING
+            if (prof)
+                prof->setEnabled(true);
+#endif
 
 			mCurrentSample = s;
 		}

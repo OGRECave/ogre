@@ -145,14 +145,6 @@ namespace Ogre {
                     "D3D9 does not support atomic counter buffers",
                     "D3D9HardwareBufferManagerBase::createCounterBuffer");
 	}
-	//---------------------------------------------------------------------
-	HardwareUniformBufferSharedPtr 
-		D3D9HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-	{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Uniform buffer not supported in Direct3D 9 RenderSystem.",
-				"D3D9HardwareBufferManagerBase::createUniformBuffer");
-	}
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {
