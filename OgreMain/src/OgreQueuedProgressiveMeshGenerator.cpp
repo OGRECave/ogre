@@ -1,4 +1,4 @@
-﻿/*
+/*
  * -----------------------------------------------------------------------------
  * This source file is part of OGRE
  * (Object-oriented Graphics Rendering Engine)
@@ -38,8 +38,27 @@
 namespace Ogre
 {
 
+//-----------------------------------------------------------------------
 template<> PMWorker* Singleton<PMWorker>::msSingleton = 0;
+PMWorker* PMWorker::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+PMWorker& PMWorker::getSingleton(void)
+{  
+    assert( msSingleton );  return ( *msSingleton );  
+}
+
+//-----------------------------------------------------------------------
 template<> PMInjector* Singleton<PMInjector>::msSingleton = 0;
+PMInjector* PMInjector::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+PMInjector& PMInjector::getSingleton(void)
+{  
+    assert( msSingleton );  return ( *msSingleton );  
+}
 
 PMGenRequest::~PMGenRequest()
 {
