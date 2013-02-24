@@ -103,7 +103,6 @@ namespace Ogre  {
             case PF_A8B8G8R8:
                 return GL_RGBA;
 #else
-#else
 			case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
             case PF_A8B8G8R8:
@@ -337,6 +336,7 @@ namespace Ogre  {
 					return GL_SRGB8;
 				else
 					return GL_RGB8;
+            case PF_A8R8G8B8:
             case PF_B8G8R8A8:
             case PF_A8B8G8R8:
             case PF_R8G8B8A8:
@@ -449,7 +449,7 @@ namespace Ogre  {
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
 #endif
-                
+
             case PF_A4L4:
             case PF_R3G3B2:
             case PF_SHORT_RGBA:
