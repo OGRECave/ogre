@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -417,11 +417,19 @@ namespace Ogre
 			if (mAllowDirectX9Ex && !mIsDirectX9Ex)
 			{
 				SAFE_RELEASE(mD3D);
-				IDirect3D9Ex* d3dEx = NULL;
-				if (S_OK == Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dEx))
+				HMODULE hD3D = LoadLibrary(TEXT("d3d9.dll"));
+				if (hD3D)
 				{
-					mD3D = d3dEx;
-					mIsDirectX9Ex = true;
+					typedef HRESULT (WINAPI *DIRECT3DCREATE9EXFUNCTION)(UINT, IDirect3D9Ex**);
+					DIRECT3DCREATE9EXFUNCTION pfnCreate9Ex = (DIRECT3DCREATE9EXFUNCTION)GetProcAddress(hD3D, "Direct3DCreate9Ex");
+					if (pfnCreate9Ex)
+					{
+						IDirect3D9Ex* d3dEx = NULL;
+						(*pfnCreate9Ex)(D3D_SDK_VERSION, &d3dEx);
+						d3dEx->QueryInterface(__uuidof(IDirect3D9), reinterpret_cast<void **>(&mD3D));
+						mIsDirectX9Ex = true;
+					}
+					FreeLibrary(hD3D);
 				}
 			}
 			if ((mD3D == NULL) || (!mAllowDirectX9Ex && mIsDirectX9Ex))
@@ -909,6 +917,7 @@ namespace Ogre
 		rsc->setCapability(RSC_HWOCCLUSION);		
 		rsc->setCapability(RSC_USER_CLIP_PLANES);			
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);			
+		rsc->setCapability(RSC_TEXTURE_1D);			
 		rsc->setCapability(RSC_TEXTURE_3D);			
 		rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 		rsc->setNonPOW2TexturesLimited(false);
@@ -2216,7 +2225,7 @@ namespace Ogre
 			{
 				/* FIXME: The actually input texture coordinate dimensions should
 				be determine by texture coordinate vertex element. Now, just trust
-				user supplied texture type matchs texture coordinate vertex element.
+				user supplied texture type matches texture coordinate vertex element.
 				*/
 				if (mTexStageDesc[stage].texType == D3D9Mappings::D3D_TEX_TYPE_NORMAL)
 				{
@@ -2721,7 +2730,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setStencilBufferParams(CompareFunction func, 
-		uint32 refValue, uint32 mask, StencilOperation stencilFailOp, 
+		uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
 		StencilOperation depthFailOp, StencilOperation passOp, 
 		bool twoSidedOperation)
 	{
@@ -2783,10 +2792,16 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer reference value.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
-		// mask
-		hr = __SetRenderState(D3DRS_STENCILMASK, mask);
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILMASK, compareMask);
 		if (FAILED(hr))
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer mask.",
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer compare mask.",
+			"D3D9RenderSystem::setStencilBufferParams");
+
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+		if (FAILED(hr))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer write mask.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
 		// fail op
@@ -2817,6 +2832,16 @@ namespace Ogre
 			D3D9Mappings::get(ftype, filter, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps(), texType));
 		if (FAILED(hr))
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture filter ", "D3D9RenderSystem::_setTextureUnitFiltering");
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
+	{
+		//no effect in directX9 rendersystem
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
+	{
+		//no effect in directX9 rendersystem
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
@@ -3426,7 +3451,7 @@ namespace Ogre
 		   ) 
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to render using the fixed pipeline when it is diabled.",
+				"Attempted to render using the fixed pipeline when it is disabled.",
 				"D3D9RenderSystem::_render");
 		}
 #endif
@@ -4438,6 +4463,9 @@ namespace Ogre
 						// ran out of options, no FSAA
 						fsaa = 0;
 						ok = true;
+
+						*outMultisampleType = D3DMULTISAMPLE_NONE;
+						*outMultisampleQuality = 0;
 					}
 				}
 			}

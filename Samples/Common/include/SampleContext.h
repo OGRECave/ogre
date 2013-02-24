@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,11 @@
 #ifndef __SampleContext_H__
 #define __SampleContext_H__
 
+#include "OgreBuildSettings.h"
 #include "OgreLogManager.h"
 #include "OgrePlugin.h"
-#include "FileSystemLayerImpl.h"
+#include "OgreFileSystemLayer.h"
+#include "OgreOverlaySystem.h"
 
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
@@ -47,11 +49,11 @@
 #    define USE_RTSHADER_SYSTEM
 #    define OGRE_STATIC_GLES2
 #  endif
-#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
 #		define OGRE_STATIC_Direct3D9
 #    endif
-// dx11 will only work on vista, so be careful about statically linking
+// dx11 will only work on vista and above, so be careful about statically linking
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
 #      define OGRE_STATIC_Direct3D11
 #    endif
@@ -118,10 +120,11 @@ namespace OgreBites
 
 		SampleContext()
 		{
-			mFSLayer = OGRE_NEW_T(FileSystemLayerImpl, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
+			mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 			mRoot = 0;
 			mWindow = 0;
 			mCurrentSample = 0;
+			mOverlaySystem = 0;
 			mSamplePaused = false;
 			mFirstRun = true;
 			mLastRun = false;
@@ -201,7 +204,7 @@ namespace OgreBites
 				// test system capabilities against sample requirements
 				s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
 
-				s->_setup(mWindow, mInputContext, mFSLayer);   // start new sample
+				s->_setup(mWindow, mInputContext, mFSLayer, mOverlaySystem);   // start new sample
 			}
 
 			mCurrentSample = s;
@@ -276,12 +279,15 @@ namespace OgreBites
 #else
 			mRoot->saveConfig();
 			shutdown();
-			if (mRoot) OGRE_DELETE mRoot;
+			if (mRoot)
+			{
+				OGRE_DELETE mOverlaySystem;
+				OGRE_DELETE mRoot;
+			}
 #ifdef OGRE_STATIC_LIB
 			mStaticPluginLoader.unload();
 #endif
 #endif
-
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -296,6 +302,8 @@ namespace OgreBites
 			if (!oneTimeConfig()) return;
 
             if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+
+            mLastRun = true;  // assume this is our last run
 
             setup();
 
@@ -559,6 +567,10 @@ namespace OgreBites
 		}
 #endif
 
+        bool isFirstRun() { return mFirstRun; }
+        void setFirstRun(bool flag) { mFirstRun = flag; }
+        bool isLastRun() { return mLastRun; }
+        void setLastRun(bool flag) { mLastRun = flag; }
 	protected:
 
         /*-----------------------------------------------------------------------------
@@ -599,7 +611,7 @@ namespace OgreBites
             mStaticPluginLoader.load();
 #   endif
 #endif
-
+			mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -699,11 +711,11 @@ namespace OgreBites
 #else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            cf.load(openAPKFile("resources.cfg"));
-#else
+#	if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
+#	else
 			cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
-#endif
+#	endif
 			Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 			Ogre::String sec, type, arch;
 
@@ -730,7 +742,70 @@ namespace OgreBites
 					Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
 				}
 			}
-#endif
+
+#	if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+#		if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            arch = Ogre::macBundlePath() + "/Contents/Resources/";
+#		elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            arch = Ogre::macBundlePath() + "/";
+#		else
+            arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
+#		endif
+            type = "FileSystem";
+            sec = "Popular";
+
+            // Add locations for supported shader languages
+            if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSLES", type, sec);
+            }
+            else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+            {
+                if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+                {
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL150", type, sec);
+                }
+                else
+                {
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL", type, sec);
+                }
+
+                if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl400"))
+                {
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL400", type, sec);
+                }
+            }
+            else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/HLSL", type, sec);
+            }
+#		ifdef OGRE_BUILD_PLUGIN_CG
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/Cg", type, sec);
+#		endif
+
+#		ifdef USE_RTSHADER_SYSTEM
+            if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSLES", type, sec);
+            }
+            else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSL", type, sec);
+                if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+                {
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSL150", type, sec);
+                }
+            }
+            else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/HLSL", type, sec);
+            }
+#			ifdef OGRE_BUILD_PLUGIN_CG
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/Cg", type, sec);
+#			endif
+#		endif /* USE_RTSHADER_SYSTEM */
+#	endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
+#endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -876,10 +951,11 @@ namespace OgreBites
         AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
 #endif
 
-		FileSystemLayer* mFSLayer; 		// File system abstraction layer
+        Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
 		Ogre::Root* mRoot;              // OGRE root
 		OIS::InputManager* mInputMgr;   // OIS input manager
 		InputContext mInputContext;		// all OIS devices are here
+		Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
 #ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
 #endif

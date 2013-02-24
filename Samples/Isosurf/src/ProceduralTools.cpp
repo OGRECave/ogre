@@ -35,7 +35,7 @@ void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPos)
     pPos[2] = index & 1;
     index >>= 1;
 
-    // Treat the rest of the index like a row, collumn, depth array
+    // Treat the rest of the index like a row, column, depth array
     // Each dimension needs to grab sizeLog2 - 1 bits
     // This will make the blocks traverse the grid in a raster style order
     index <<= 1;

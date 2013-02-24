@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreAnimable.h"
 #include "OgreAny.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -410,10 +411,10 @@ namespace Ogre {
 		static uint32 getDefaultQueryFlags() { return msDefaultQueryFlags; }
 
 		
-        /** Sets the visiblity flags for this object.
+        /** Sets the visibility flags for this object.
         @remarks
 			As well as a simple true/false value for visibility (as seen in setVisible), 
-			you can also set visiblity flags which when 'and'ed with the SceneManager's
+			you can also set visibility flags which when 'and'ed with the SceneManager's
 			visibility mask can also make an object invisible.
         */
         virtual void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
@@ -631,11 +632,14 @@ namespace Ogre {
 			A type flag is like a query flag, except that it applies to all instances
 			of a certain type of object.
 		*/
-		uint32 getTypeFlags(void) const { return mTypeFlag; }
+		unsigned long getTypeFlags(void) const { return mTypeFlag; }
 
 	};
 	/** @} */
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,47 @@ namespace Ogre {
         return stream.str();
 #endif
     }
+#if OGRE_DOUBLE_PRECISION == 1
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(float val, unsigned short precision,
+                                     unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		static char buffer[128] = "";
+		int n = snprintf(buffer, 128, "%f", val);
+		return String(buffer, n);
+#else
+        stringstream stream;
+        stream.precision(precision);
+        stream.width(width);
+        stream.fill(fill);
+        if (flags)
+            stream.setf(flags);
+        stream << val;
+        return stream.str();
+#endif
+    }
+#else
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(double val, unsigned short precision,
+                                     unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		static char buffer[128] = "";
+		int n = snprintf(buffer, 128, "%f", val);
+		return String(buffer, n);
+#else
+        stringstream stream;
+        stream.precision(precision);
+        stream.width(width);
+        stream.fill(fill);
+        if (flags)
+            stream.setf(flags);
+        stream << val;
+        return stream.str();
+#endif
+    }
+#endif
     //-----------------------------------------------------------------------
     String StringConverter::toString(int val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
@@ -361,6 +402,17 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		unsigned long ret = defaultValue;
+        if( !(str >> ret) )
+            return defaultValue;
+
+		return ret;
+    }
+    //-----------------------------------------------------------------------
+    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
+    {
+		// Use istringstream for direct correspondence with toString
+		StringStream str(val);
+		size_t ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
 

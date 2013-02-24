@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1442,7 +1442,7 @@ namespace Ogre {
 			e->clear();
         }
 
-		// Dont leave any references behind
+		// Don't leave any references behind
 		mEmittedEmitterPool.clear();
 		mFreeEmittedEmitters.clear();
 		mActiveEmittedEmitters.clear();
@@ -1489,7 +1489,7 @@ namespace Ogre {
 	void ParticleSystem::_notifyReorganiseEmittedEmitterData (void)
 	{
 		removeAllEmittedEmitters();
-		mEmittedEmitterPoolInitialised = false; // Dont rearrange immediately; it will be performed in the regular flow
+		mEmittedEmitterPoolInitialised = false; // Don't rearrange immediately; it will be performed in the regular flow
 	}
     //-----------------------------------------------------------------------
     String ParticleSystem::CmdCull::doGet(const void* target) const

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -138,12 +138,12 @@ namespace Ogre {
                 }
                 else
                 {
-                    /* Find the first seperator character and split the string there */
+                    /* Find the first separator character and split the string there */
 					Ogre::String::size_type separator_pos = line.find_first_of(separators, 0);
                     if (separator_pos != Ogre::String::npos)
                     {
                         optName = line.substr(0, separator_pos);
-                        /* Find the first non-seperator character following the name */
+                        /* Find the first non-separator character following the name */
                         Ogre::String::size_type nonseparator_pos = line.find_first_not_of(separators, separator_pos);
                         /* ... and extract the value */
                         /* Make sure we don't crash on an empty setting (it might be a valid value) */

@@ -10,8 +10,15 @@ fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
 	source GrayScale.glsles
 }
 
+fragment_program Ogre/Compositor/B&W_GLSL_FP glsl
+{
+	source GrayScale.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/B&W_FP unified
 {
+	delegate Ogre/Compositor/B&W_GLSL_FP
 	delegate Ogre/Compositor/B&W_GLSLES_FP
 	delegate Ogre/Compositor/B&W_Cg_FP
 }
@@ -24,8 +31,9 @@ material Ogre/Compositor/BlackAndWhite
 		pass
 		{
 			depth_check off
+            polygon_mode_overrideable false
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 

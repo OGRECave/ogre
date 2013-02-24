@@ -64,7 +64,9 @@ protected:
 		mTrayMgr->createCheckBox(TL_BOTTOM, ACTIVATE_SKY_BUTTON, "Sky Box Active")->setChecked(true,false);
 		mTrayMgr->createThickSlider(TL_BOTTOM, FOG_DISTANCE_SLIDER, "Fog Distance", 240, 80, 20, 2000, 100)->setValue(1000, false);
 		mTrayMgr->createThickSlider(TL_BOTTOM, FOG_BACKGROUND_SLIDER, "Background", 240, 80, 0, 3, 4)->setValue(0, false);
-		
+
+        setupShaderGenerator();
+
 		mSceneMgr->setFog(FOG_LINEAR, ColourValue::White, 0, 500, 1000);
 		
 		mCamera->setPosition(0, -20, 470);
@@ -89,12 +91,9 @@ protected:
 		addHead(Vector3(-100,0,-200));
 		addHead(Vector3(-100,0,0));
 		addHead(Vector3(-100,0,200));
-		
 
 		//We will set the sky box far away so it will render with the color of the background
 		mSceneMgr->setSkyBox(true,"BaseWhite",2000);
-
-		setupShaderGenerator();
 	}
 
    void addHead(const Vector3& pos)
@@ -111,8 +110,7 @@ protected:
 	void setupShaderGenerator()
 	{
 		RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-		mGen->setTargetLanguage("cg");
-		
+
 		RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
 		pMainRenderState->reset();

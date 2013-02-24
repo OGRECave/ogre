@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreController.h"
 #include "OgreFrameListener.h"
 #include "OgreGpuProgram.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -181,7 +182,7 @@ namespace Ogre {
 		*/
 		PassthroughControllerFunction(bool deltaInput = false);
 
-		/** Overriden function.
+		/** Overridden function.
 		*/
 		Real calculate(Real source);
 	};
@@ -253,7 +254,7 @@ namespace Ogre {
         @par
             output = (waveoutput + 1) * 0.5
         @par
-            Hence a wave output of -1 becomes 0, a wave ouput of 1 becomes 1, and a wave output of 0 becomes 0.5.
+            Hence a wave output of -1 becomes 0, a wave output of 1 becomes 1, and a wave output of 0 becomes 0.5.
     */
     class _OgreExport WaveformControllerFunction : public ControllerFunction<Real>
     {
@@ -288,5 +289,7 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

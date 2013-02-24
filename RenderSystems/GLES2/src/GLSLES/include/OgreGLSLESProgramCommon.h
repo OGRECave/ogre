@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareUniformBuffer.h"
 
 namespace Ogre {
 
@@ -49,6 +50,9 @@ namespace Ogre {
 
 	typedef vector<GLUniformReference>::type GLUniformReferenceList;
 	typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
+    typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
+
+    typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 
 	/** C++ encapsulation of GLSL ES Program Object
      
@@ -59,6 +63,8 @@ namespace Ogre {
 	protected:
 		/// Container of uniform references that are active in the program object
 		GLUniformReferenceList mGLUniformReferences;
+		/// Container of uniform buffer references that are active in the program object
+		GLUniformBufferList mGLUniformBufferReferences;
 
 		/// Linked vertex program
 		GLSLESGpuProgram* mVertexProgram;
@@ -113,6 +119,10 @@ namespace Ogre {
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
          */
 		virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+		/** Updates program object uniform blocks using data from GpuProgramParameters.
+         normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+         */
+		virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
 		/** Updates program object uniforms using data from pass iteration GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
          */

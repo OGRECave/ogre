@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,13 @@
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
 #include "Android/OgreAndroidEGLWindow.h"
-#include "OgreRTShaderSystem.h"
+
+#ifdef USE_RTSHADER_SYSTEM
+#   include "OgreRTShaderSystem.h"
+#endif
 
 #ifdef OGRE_STATIC_LIB
-#  include "OgreStaticPluginLoader.h"
+#   include "OgreStaticPluginLoader.h"
 #endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
@@ -227,6 +230,7 @@ namespace OgreBites
             mStaticPluginLoader = new Ogre::StaticPluginLoader();
             mStaticPluginLoader->load();
 #endif
+            mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
             mRoot->initialise(false);
             mInit = true;
         }
@@ -360,8 +364,9 @@ namespace OgreBites
                         return;
                 }
                 
-                if(mRenderWnd != NULL)
+                if(mRenderWnd != NULL && mRenderWnd->isActive())
                 {
+                    mRenderWnd->windowMovedOrResized();
                     mRoot->renderOneFrame();
                 }
             }

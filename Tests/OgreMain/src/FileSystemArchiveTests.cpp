@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreException.h"
 
-// Regsiter the suite
+// Register the suite
 //CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
 
 void FileSystemArchiveTests::setUp()
@@ -47,7 +47,7 @@ void FileSystemArchiveTests::tearDown()
 void FileSystemArchiveTests::testListNonRecursive()
 {
 	try {
-		FileSystemArchive arch(testPath, "FileSystem");
+		FileSystemArchive arch(testPath, "FileSystem", true);
 		arch.load();
 		StringVectorPtr vec = arch.list(false);
 
@@ -63,7 +63,7 @@ void FileSystemArchiveTests::testListNonRecursive()
 }
 void FileSystemArchiveTests::testListRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.list(true);
 
@@ -77,7 +77,7 @@ void FileSystemArchiveTests::testListRecursive()
 }
 void FileSystemArchiveTests::testListFileInfoNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.listFileInfo(false);
 
@@ -98,7 +98,7 @@ void FileSystemArchiveTests::testListFileInfoNonRecursive()
 }
 void FileSystemArchiveTests::testListFileInfoRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.listFileInfo(true);
 
@@ -148,7 +148,7 @@ void FileSystemArchiveTests::testListFileInfoRecursive()
 }
 void FileSystemArchiveTests::testFindNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.find("*.txt", false);
 
@@ -158,7 +158,7 @@ void FileSystemArchiveTests::testFindNonRecursive()
 }
 void FileSystemArchiveTests::testFindRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.find("*.material", true);
 
@@ -170,7 +170,7 @@ void FileSystemArchiveTests::testFindRecursive()
 }
 void FileSystemArchiveTests::testFindFileInfoNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
 
@@ -191,7 +191,7 @@ void FileSystemArchiveTests::testFindFileInfoNonRecursive()
 }
 void FileSystemArchiveTests::testFindFileInfoRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.findFileInfo("*.material", true);
 
@@ -228,7 +228,7 @@ void FileSystemArchiveTests::testFindFileInfoRecursive()
 }
 void FileSystemArchiveTests::testFileRead()
 {
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
 
     DataStreamPtr stream = arch.open("rootfile.txt");
@@ -245,7 +245,7 @@ void FileSystemArchiveTests::testReadInterleave()
 {
     // Test overlapping reads from same archive
 
-    FileSystemArchive arch(testPath, "FileSystem");
+    FileSystemArchive arch(testPath, "FileSystem", true);
     arch.load();
 
     // File 1
@@ -279,7 +279,7 @@ void FileSystemArchiveTests::testReadInterleave()
 
 void FileSystemArchiveTests::testCreateAndRemoveFile()
 {
-	FileSystemArchive arch("./", "FileSystem");
+	FileSystemArchive arch("./", "FileSystem", false);
 	arch.load();
 
 	CPPUNIT_ASSERT(!arch.isReadOnly());

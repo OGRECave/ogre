@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ namespace Ogre {
 		void populateParameterNames(GpuProgramParametersSharedPtr params);
 
 		// Recursive utility method for populateParameterNames
-		void processParamElement(String prefix, LPCSTR pName, size_t paramIndex, ID3D11ShaderReflectionType* varRefType);
+		void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);
 
 		void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
@@ -131,13 +131,6 @@ namespace Ogre {
 
 		struct ShaderVarWithPosInBuf
 		{
-		/*	bool wasInit;
-			bool isFloat;
-			size_t physicalIndex;
-			void * src;
-			String name;
-
-			D3D11_SHADER_VARIABLE_DESC var;*/
 			mutable String name;
 			size_t size;
 			size_t startOffset;
@@ -153,6 +146,91 @@ namespace Ogre {
 		typedef vector<ShaderVarWithPosInBuf>::type ShaderVars;
 		typedef ShaderVars::iterator ShaderVarsIter;
 		typedef ShaderVars::const_iterator ShaderVarsConstIter; 
+
+		// A hack for cg to get the "original name" of the var in the "auto comments"
+		// that cg adds to the hlsl 4 output. This is to solve the issue that
+		// in some cases cg changes the name of the var to a new name.
+		void fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar);
+		//ShaderVars mShaderVars;
+		
+		// HACK: Multi-index emulation container to store constant buffer information by index and name at same time
+		// using tips from http://www.boost.org/doc/libs/1_35_0/libs/multi_index/doc/performance.html
+		// and http://cnx.org/content/m35767/1.2/
+#define INVALID_IDX (unsigned int)-1
+		struct BufferInfo
+		{
+			static _StringHash mHash;
+			unsigned int mIdx;
+			String mName;
+			mutable HardwareUniformBufferSharedPtr mUniformBuffer;
+			mutable ShaderVars mShaderVars;
+				
+			// Default constructor
+			BufferInfo() : mIdx(0), mName("") { mUniformBuffer.setNull(); }
+			BufferInfo(unsigned int index, const String& name)
+				: mIdx(index), mName(name)
+			{
+				mUniformBuffer.setNull();
+			}
+			
+			// Copy constructor
+			BufferInfo(const BufferInfo& info) 
+				: mIdx(info.mIdx)
+				, mName(info.mName)
+				, mUniformBuffer(info.mUniformBuffer)
+				, mShaderVars(info.mShaderVars)
+			{
+
+			}
+
+			// Copy operator
+			BufferInfo& operator=(const BufferInfo& info)
+			{
+				this->mIdx = info.mIdx;
+				this->mName = info.mName;
+				mUniformBuffer = info.mUniformBuffer;
+				mShaderVars = info.mShaderVars;
+				return *this;
+			}
+			
+			// Constructors and operators used for search
+			BufferInfo(unsigned int index) : mIdx(index), mName("") { }
+			BufferInfo(const String& name) : mIdx(INVALID_IDX), mName(name) { }
+			BufferInfo& operator=(unsigned int index) { this->mIdx = index; return *this; }
+			BufferInfo& operator=(const String& name) { this->mName = name; return *this; }	
+			
+			bool operator==(const BufferInfo& other) const
+			{
+				return mName == other.mName && mIdx == other.mIdx;
+			}
+			bool operator<(const BufferInfo& other) const
+			{
+				if (mIdx == INVALID_IDX || other.mIdx == INVALID_IDX) 
+				{
+					return mName < other.mName;
+				}
+				else if (mName == "" || other.mName == "")
+				{
+					return mIdx < other.mIdx;
+				}
+				else 
+				{
+					if (mName == other.mName)
+					{
+						return mIdx < other.mIdx;
+					}
+					else
+					{
+						return mName < other.mName;
+					}
+				}
+			}
+		};
+
+		// Make sure that objects have index and name, or some search will fail
+		typedef std::set<BufferInfo> BufferInfoMap;
+		typedef std::set<BufferInfo>::iterator BufferInfoIterator;
+		BufferInfoMap mBufferInfoMap;
 
 		// A hack for cg to get the "original name" of the var in the "auto comments"
 		// that cg adds to the hlsl 4 output. This is to solve the issue that

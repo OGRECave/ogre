@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -98,10 +98,10 @@ namespace Ogre {
 		};
     protected:
         Technique* mParent;
-        unsigned short mIndex; // pass index
-        String mName; // optional name for the pass
-        uint32 mHash; // pass hash
-		bool mHashDirtyQueued; // needs to be dirtied when next loaded
+        unsigned short mIndex; /// Pass index
+        String mName; /// Optional name for the pass
+        uint32 mHash; /// Pass hash
+		bool mHashDirtyQueued; /// Needs to be dirtied when next loaded
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
@@ -127,7 +127,7 @@ namespace Ogre {
 		SceneBlendOperation mBlendOperation;
 		SceneBlendOperation mAlphaBlendOperation;
 
-		// Determines if we should use separate blending operations for color and alpha channels
+		/// Determines if we should use separate blending operations for color and alpha channels
 		bool mSeparateBlendOperation;
 
         //-------------------------------------------------------------------------
@@ -141,7 +141,7 @@ namespace Ogre {
 		float mDepthBiasSlopeScale;
 		float mDepthBiasPerIteration;
 
-        // Colour buffer settings
+        /// Colour buffer settings
         bool mColourWrite;
 
 		// Alpha reject settings
@@ -149,9 +149,9 @@ namespace Ogre {
 		unsigned char mAlphaRejectVal;
 		bool mAlphaToCoverageEnabled;
 
-		// Transparent depth sorting
+		/// Transparent depth sorting
 		bool mTransparentSorting;
-		// Transparent depth sorting forced
+		/// Transparent depth sorting forced
 		bool mTransparentSortingForced;
         //-------------------------------------------------------------------------
 
@@ -171,10 +171,10 @@ namespace Ogre {
 		bool mIteratePerLight;
 		/// Iterate per how many lights?
 		unsigned short mLightsPerIteration;
-        // Should it only be run for a certain light type?
+        /// Should it only be run for a certain light type?
         bool mRunOnlyForOneLightType;
         Light::LightTypes mOnlyLightType;
-		// With a specific light mask?
+		/// With a specific light mask?
 		uint32 mLightMask;
 
         /// Shading options
@@ -198,37 +198,37 @@ namespace Ogre {
         typedef vector<TextureUnitState*>::type TextureUnitStates;
         TextureUnitStates mTextureUnitStates;
 
-		// Vertex program details
+		/// Vertex program details
 		GpuProgramUsage *mVertexProgramUsage;
-        // Vertex program details
+        /// Vertex program details
         GpuProgramUsage *mShadowCasterVertexProgramUsage;
-        // Fragment program details
+        /// Fragment program details
         GpuProgramUsage *mShadowCasterFragmentProgramUsage;
-        // Vertex program details
+        /// Vertex program details
         GpuProgramUsage *mShadowReceiverVertexProgramUsage;
-		// Fragment program details
+		/// Fragment program details
 		GpuProgramUsage *mFragmentProgramUsage;
-		// Fragment program details
+		/// Fragment program details
 		GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
-		// Geometry program details
+		/// Geometry program details
 		GpuProgramUsage *mGeometryProgramUsage;
-		// Tesselation hull program details
+		/// Tesselation hull program details
 		GpuProgramUsage *mTesselationHullProgramUsage;
-		// Tesselation domain program details
+		/// Tesselation domain program details
 		GpuProgramUsage *mTesselationDomainProgramUsage;
-		// Compute program details
+		/// Compute program details
 		GpuProgramUsage *mComputeProgramUsage;
-        // Is this pass queued for deletion?
+        /// Is this pass queued for deletion?
         bool mQueuedForDeletion;
-        // number of pass iterations to perform
+        /// Number of pass iterations to perform
         size_t mPassIterationCount;
-		// point size, applies when not using per-vertex point size
+		/// Point size, applies when not using per-vertex point size
 		Real mPointSize;
 		Real mPointMinSize;
 		Real mPointMaxSize;
 		bool mPointSpritesEnabled;
 		bool mPointAttenuationEnabled;
-		// constant, linear, quadratic coeffs
+		/// Constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
 		typedef vector<unsigned short>::type ContentTypeLookup;
@@ -240,11 +240,11 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
-		// User objects binding.
+		/// User objects binding.
 		UserObjectBindings	mUserObjectBindings;
 		
 
-		// Used to get scene blending flags from a blending type
+		/// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
 	public:
@@ -303,7 +303,7 @@ namespace Ogre {
         from another material and only want to modify a particular pass.
         */
         void setName(const String& name);
-        /// get the name of the pass
+        /// Get the name of the pass
         const String& getName(void) const { return mName; }
 
         /** Sets the ambient colour reflectance properties of this pass.

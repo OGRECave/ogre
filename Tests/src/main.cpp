@@ -3,8 +3,8 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
-
 #include <cppunit/TestRunner.h>
+#include <cppunit/XmlOutputter.h>
 
 #include <OgrePlatform.h>
 
@@ -39,16 +39,12 @@ int main(int argc, char *argv[])
     runner.run( controller );
 
     // Print test results to a file
-	std::ofstream ofile("OgreTestResults.log");
+	std::ofstream ofile("OgreTestResults.xml");
 	
-    CPPUNIT_NS::CompilerOutputter* outputter =
-        CPPUNIT_NS::CompilerOutputter::defaultOutputter(&result, ofile);
-    outputter->write();
-    delete outputter;
-
+    CPPUNIT_NS::XmlOutputter xmlOut(&result, ofile);
+    xmlOut.write();
 
     tearDownSuite();
 
-    return result.wasSuccessful() ? 0 : 1;
-
+    return 0;
 }

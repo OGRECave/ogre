@@ -11,8 +11,20 @@ fragment_program Ogre/Compositor/Dither_GLSLES_FP glsles
 	source DitherFP.glsles
 }
 
+fragment_program Ogre/Compositor/Dither_GLSL_FP glsl
+{
+	source DitherFP.glsl
+	syntax glsl150
+    default_params
+   	{
+   		param_named RT int 0
+   		param_named noise int 1
+   	}
+}
+
 fragment_program Ogre/Compositor/DitherFP unified
 {
+	delegate Ogre/Compositor/Dither_GLSL_FP
 	delegate Ogre/Compositor/Dither_GLSLES_FP
 	delegate Ogre/Compositor/Dither_Cg_FP
 }
@@ -27,6 +39,7 @@ material Ogre/Compositor/Dither
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{

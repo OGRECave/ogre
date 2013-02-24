@@ -10,8 +10,15 @@ fragment_program Ogre/Compositor/Posterize_GLSLES_FP glsles
 	source PosterizeFP.glsles
 }
 
+fragment_program Ogre/Compositor/Posterize_GLSL_FP glsl
+{
+	source PosterizeFP.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/PosterizeFP unified
 {
+	delegate Ogre/Compositor/Posterize_GLSL_FP
 	delegate Ogre/Compositor/Posterize_GLSLES_FP
 	delegate Ogre/Compositor/Posterize_Cg_FP
 }
@@ -25,6 +32,7 @@ material Ogre/Compositor/Posterize
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{

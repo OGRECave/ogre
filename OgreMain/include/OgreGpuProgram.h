@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreSerializer.h"
 #include "OgreRenderOperation.h"
 #include "OgreGpuProgramParams.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -159,6 +160,11 @@ namespace Ogre {
 			This is a shared pointer because if the program is recompiled and the parameters
 			change, this definition will alter, but previous params may reference the old def. */
 		mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
+		/** Record of logical to physical buffer maps. Mandatory for low-level
+         programs or high-level programs which set their params the same way.
+         This is a shared pointer because if the program is recompiled and the parameters
+         change, this definition will alter, but previous params may reference the old def. */
+		mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
 		/** Record of logical to physical buffer maps. Mandatory for low-level
 			programs or high-level programs which set their params the same way. 
 			This is a shared pointer because if the program is recompiled and the parameters
@@ -486,5 +492,7 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

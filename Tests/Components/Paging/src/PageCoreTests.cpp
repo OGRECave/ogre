@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,24 @@ CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
 void PageCoreTests::setUp()
 {
+    // set up silent logging to not pollute output
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("testPageCore.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
+
 	mRoot = OGRE_NEW Root();
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 	mPageManager = OGRE_NEW PageManager();
 
-	mRoot->addResourceLocation("./", "FileSystem");
+	// make certain the resource location is NOT read-only
+	ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
+	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
 	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 
@@ -64,12 +78,10 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	SimplePageContentCollection* coll = static_cast<SimplePageContentCollection*>(
 		p->createContentCollection("Simple"));
 
-
 	world->save(filename);
 
 	mPageManager->destroyWorld(world);
 	world = 0;
-
 	world = mPageManager->loadWorld(filename);
 
 	CPPUNIT_ASSERT_EQUAL(worldName, world->getName());

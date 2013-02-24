@@ -1,3 +1,30 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
 #include "SampleBrowserWinRT.h"
 #include "BasicTimer.h"
 
@@ -24,11 +51,15 @@ void SampleBrowserWinRT::Initialize(CoreApplicationView^ applicationView)
 
     CoreApplication::Resuming +=
         ref new EventHandler<Platform::Object^>(this, &SampleBrowserWinRT::OnResuming);
+
+	m_inputManager.Initialize();
 }
 
 void SampleBrowserWinRT::SetWindow(CoreWindow^ window)
 {
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_PC_APP)
 	window->PointerCursor = nullptr;
+#endif
 
     window->SizeChanged += 
         ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>(this, &SampleBrowserWinRT::OnWindowSizeChanged);
@@ -56,6 +87,11 @@ void SampleBrowserWinRT::SetWindow(CoreWindow^ window)
 
     window->PointerWheelChanged +=
         ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &SampleBrowserWinRT::OnPointerWheelChanged);
+
+#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+	Windows::Phone::UI::Input::HardwareButtons::BackPressed +=
+		ref new EventHandler<Windows::Phone::UI::Input::BackPressedEventArgs^>(this, &SampleBrowserWinRT::OnBackPressed);
+#endif
 }
 
 void SampleBrowserWinRT::Load(Platform::String^ entryPoint)
@@ -75,6 +111,7 @@ void SampleBrowserWinRT::Run()
     {
         timer->Update();
         CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+		m_inputManager.Update(timer->Total, timer->Delta);
         if(!Ogre::Root::getSingleton().renderOneFrame(timer->Delta))
 			break;
     }
@@ -153,6 +190,17 @@ void SampleBrowserWinRT::OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ se
 {
     if(m_inputManager.OnPointerAction(args->CurrentPoint, OgreBites::InputManagerWinRT::PointerWheelChanged)) args->Handled = true;
 }
+
+#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+void SampleBrowserWinRT::OnBackPressed( Platform::Object ^sender, Windows::Phone::UI::Input::BackPressedEventArgs^ args)
+{
+    // Send the back to main menu event unless we are already there in which case we exit all the way.
+	Windows::System::VirtualKey vkey = Windows::System::VirtualKey::Back;
+	Windows::UI::Core::CorePhysicalKeyStatus keystatus;
+	keystatus.ScanCode = OIS::KC_ESCAPE; // Imitate the 'esc' being pressed.
+	if(m_inputManager.OnKeyAction( vkey, keystatus, true)) args->Handled = true;
+}
+#endif
 
 IFrameworkView^ Direct3DApplicationSource::CreateView()
 {

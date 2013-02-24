@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,11 @@ namespace Ogre {
         strncpy(extension, filename.substr(pos + 1, filename.length() - pos).c_str(), 5);
 		extension[5] = 0;
 
-        if (stricmp(extension, "bsp"))
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+		if (_stricmp(extension, "bsp"))
+#else
+		if (stricmp(extension, "bsp"))
+#endif
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"Unable to load world geometry. Invalid extension (must be .bsp).",
             "BspSceneManager::setWorldGeometry");

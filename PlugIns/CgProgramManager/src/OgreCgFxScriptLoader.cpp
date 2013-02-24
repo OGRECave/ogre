@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2812,6 +2812,10 @@ namespace Ogre {
 		case GPT_GEOMETRY_PROGRAM:
 			stateName = "GeometryProgram";
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 		CGstateassignment cgStateAssignment = cgGetNamedStateAssignment(cgPass, stateName);
 		if (!cgStateAssignment)
@@ -2826,6 +2830,10 @@ namespace Ogre {
 				break;
             case GPT_GEOMETRY_PROGRAM:
                 stateName = "GeometryShader";
+                break;
+            case GPT_COMPUTE_PROGRAM:
+            case GPT_DOMAIN_PROGRAM:
+            case GPT_HULL_PROGRAM:
                 break;
 			}
 

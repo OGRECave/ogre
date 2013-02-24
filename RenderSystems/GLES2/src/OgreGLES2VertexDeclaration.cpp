@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,8 @@ namespace Ogre {
 	{
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
 #   if GL_OES_vertex_array_object
-        glGenVertexArraysOES(1, &mVAO);
+        OGRE_CHECK_GL_ERROR(glGenVertexArraysOES(1, &mVAO));
 //        LogManager::getSingleton().logMessage("Created VAO " + StringConverter::toString(mVAO));
-
-        GL_CHECK_ERROR
 
         if (!mVAO)
         {
@@ -61,8 +59,7 @@ namespace Ogre {
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
 #   if GL_OES_vertex_array_object
 //        LogManager::getSingleton().logMessage("Deleting VAO " + StringConverter::toString(mVAO));
-        glDeleteVertexArraysOES(1, &mVAO);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &mVAO));
 #   endif
 #endif
 	}
@@ -73,11 +70,8 @@ namespace Ogre {
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
 #   if GL_OES_vertex_array_object
 //        LogManager::getSingleton().logMessage("Binding VAO " + StringConverter::toString(mVAO));
-        glBindVertexArrayOES(mVAO);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(mVAO));
 #   endif
 #endif
     }
 }
-
-

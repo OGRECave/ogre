@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreStringInterface.h"
 #include "OgreParticleEmitterCommands.h"
 #include "OgreParticle.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -113,7 +114,7 @@ namespace Ogre {
 		// When true, mDirPositionRef is used instead of mDirection to generate particles
 		bool mUseDirPositionRef;
 		// Center position to tell in which direction will particles be emitted according to their position,
-		// usefull for explosions & implosions, some emitters (i.e. point emitter) may not need it.
+		// useful for explosions & implosions, some emitters (i.e. point emitter) may not need it.
         Vector3 mDirPositionRef;
         /// Angle around direction which particles may be emitted, internally radians but angleunits for interface
         Radian mAngle;
@@ -546,6 +547,7 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

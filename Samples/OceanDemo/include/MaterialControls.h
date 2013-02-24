@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -100,7 +100,7 @@ typedef MaterialControlsContainer::iterator MaterialControlsIterator;
     <material display name> is what is displayed in the material combo box.
     <material name> is the name of the material in the material script.
     control is the shader control associated with the material. The order
-    of the contol definions in the .controls file determins their order
+    of the contol definitions in the .controls file determines their order
     when displayed in the controls window.
 
     you can have multiple .controls files or put them all in one.

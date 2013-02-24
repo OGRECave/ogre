@@ -16,7 +16,7 @@
 #   FEATURE: name of the feature, e.g. "libjpeg"
 #   DESCRIPTION: description what this feature provides
 #   URL: home page
-#   REQUIRED: TRUE or FALSE, indicating whether the featue is required
+#   REQUIRED: TRUE or FALSE, indicating whether the feature is required
 #   MIN_VERSION: minimum version number. empty string if unneeded
 #   COMMENTS: More info you may want to provide.  empty string if unnecessary
 #

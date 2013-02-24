@@ -14,7 +14,7 @@ rm -rf $SDKBUILDDIR/sdk_contents
 # Configure with CMake
 mkdir -p $SDKBUILDDIR/build
 pushd $SDKBUILDDIR/build
-cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=FALSE -G Xcode ../../..
 
 # Read version number
 OGRE_VERSION=`cat version.txt`
@@ -22,13 +22,13 @@ OGRE_VERSION=`cat version.txt`
 echo Building API docs...
 
 # Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx ARCHS=i386 MACOSX_DEPLOYMENT_TARGET=10.5
+# xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx ARCHS=i386 MACOSX_DEPLOYMENT_TARGET=10.6
 
-pushd api/html
+# pushd api/html
 
 # Delete unnecessary files
-rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
-popd
+# rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
+# popd
 
 # Build the Xcode docset and zip it up to save space
 #make
@@ -41,7 +41,7 @@ popd
 echo API generation done.
 
 # Invoke Xcode build
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx ARCHS="i386 x86_64" MACOSX_DEPLOYMENT_TARGET=10.5 ONLY_ACTIVE_ARCH="NO"
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx ARCHS="i386 x86_64" MACOSX_DEPLOYMENT_TARGET=10.6 ONLY_ACTIVE_ARCH="NO"
 # Just release mode, debug is too big
 #xcodebuild -project OGRE.xcodeproj -target install -configuration Debug -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,6 +74,12 @@ namespace Ogre {
 		/// Static method to shutdown and unregister the PVRTC codec
 		static void shutdown(void);
 
+	private:
+		/// Decode PVRTCV2 image format
+		DecodeResult decodeV2(DataStreamPtr& stream) const;
+
+		/// Decode PVRTCV3 image format
+		DecodeResult decodeV3(DataStreamPtr& stream) const;
     };
 	/** @} */
 	/** @} */

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>								
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreShadowCameraSetupFocused.h"
-
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre 
 {
@@ -173,7 +173,7 @@ namespace Ogre
 
 		/** Builds a frustum matrix.
 		@remarks
-		Builds a standard frustum matrix out of the distance infos of the six frustum 
+		Builds a standard frustum matrix out of the distance info of the six frustum 
 		clipping planes.
 		*/
 		Matrix4 buildFrustumProjection(Real left, Real right, Real bottom, 
@@ -249,6 +249,8 @@ namespace Ogre
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif
 

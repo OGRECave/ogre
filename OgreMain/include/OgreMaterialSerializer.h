@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgram.h"
 #include "OgreStringVector.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -260,7 +261,7 @@ namespace Ogre {
 			const String& commandName, const String& identifier, 
 			const GpuProgramParameters::AutoConstantEntry* autoEntry, 
 			const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-			bool isFloat, size_t physicalIndex, size_t physicalSize,
+			bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
 			const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
 			const unsigned short level, const bool useMainBuffer);
 		void writeTextureUnit(const TextureUnitState *pTex);
@@ -444,4 +445,7 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

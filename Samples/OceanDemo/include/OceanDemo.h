@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -383,7 +383,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
 											mActiveVertexParameters : mActiveFragmentParameters;
 									if(!activeParameters.isNull())
 									{
-										// use param name to get index : use appropriate paramters ptr
+										// use param name to get index : use appropriate parameters ptr
 										const Ogre::GpuConstantDefinition& def = 
 											activeParameters->getConstantDefinition(ActiveShaderDef.ParamName);
 										ActiveShaderDef.PhysicalIndex = def.physicalIndex;

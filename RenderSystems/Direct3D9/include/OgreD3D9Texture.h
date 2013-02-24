@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -140,15 +140,15 @@ namespace Ogre {
 		/// mipmap level. This method must be called after the D3D texture object was created
 		void _createSurfaceList(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
-        /// overriden from Resource
+        /// overridden from Resource
         void loadImpl();		 
 		/// Loads this texture into the specified device.
 		void loadImpl(IDirect3DDevice9* d3d9Device);
-        /// overriden from Resource
+        /// overridden from Resource
         void prepareImpl();
-        /// overriden from Resource
+        /// overridden from Resource
         void unprepareImpl();
-		/// overriden from Resource
+		/// overridden from Resource
 		void postLoadImpl();
 
 		/// gets the texture resources attached to the given device.

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ namespace Ogre
 		size_t offset				= 0;
 		unsigned short nextTexCoord	= thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate();
 		const unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		for( int i=0; i<3; ++i )
+		for( unsigned char i=0; i<3 + mCreator->getNumCustomParams(); ++i )
 		{
 			thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4,
 															VES_TEXTURE_COORDINATES, nextTexCoord++ );
@@ -165,6 +165,17 @@ namespace Ogre
 														"least 3 free TEXCOORDs",
 						"InstanceBatchHW::checkSubMeshCompatibility");
 		}
+		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() >
+			8-2-mCreator->getNumCustomParams() ||
+			3 + mCreator->getNumCustomParams() >= 8 )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "There are not enough free TEXCOORDs to hold the "
+														"custom parameters (required: " +
+														Ogre::StringConverter::toString( 3 + mCreator->
+														getNumCustomParams() ) + "). See InstanceManager"
+														"::setNumCustomParams documentation",
+						"InstanceBatchHW::checkSubMeshCompatibility");
+		}
 
 		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
 	}
@@ -181,6 +192,9 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
+		unsigned char numCustomParams			= mCreator->getNumCustomParams();
+		size_t customParamIdx					= 0;
+
 		while( itor != end )
 		{
 			//Cull on an individual basis, the less entities are visible, the less instances we draw.
@@ -194,9 +208,20 @@ namespace Ogre
 
 				pDest += floatsWritten;
 
+				//Write custom parameters, if any
+				for( unsigned char i=0; i<numCustomParams; ++i )
+				{
+					*pDest++ = mCustomParams[customParamIdx+i].x;
+					*pDest++ = mCustomParams[customParamIdx+i].y;
+					*pDest++ = mCustomParams[customParamIdx+i].z;
+					*pDest++ = mCustomParams[customParamIdx+i].w;
+				}
+
 				++retVal;
 			}
 			++itor;
+
+			customParamIdx += numCustomParams;
 		}
 
 		mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
@@ -246,7 +271,7 @@ namespace Ogre
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
 			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		else
 		{
@@ -259,7 +284,7 @@ namespace Ogre
 
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 	}
 }

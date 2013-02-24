@@ -23,7 +23,7 @@ The following example shows a different approach to rendering lights in RTSS. A 
 	- Sample requires shader model 3 or higher to run in order
 	- The world is divided into a grid of 9x9 cells (can be easily increased). Each cell receives it's own list of lights appropriate 
 		only for it. This can be increased depending on your situation.
-	- The information of the lights in the grid is transfered onto a texture. Which is sent to the shader.
+	- The information of the lights in the grid is transferred onto a texture. Which is sent to the shader.
 	- The list of lights is iterated over in the shader through a dynamic loop.
 
 
@@ -50,9 +50,9 @@ class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
 public:
 
 	Sample_ShaderSystemMultiLight() :
-		mPathNameGen("RTPath"),
+        mTwirlLights(false),
 		mSRSSegLightFactory(NULL),
-		mTwirlLights(false)
+        mPathNameGen("RTPath")
 	{
 		mInfo["Title"] = "ShaderSystem - Multi Light";
 		mInfo["Description"] = "Shows a possible way to support a large varying amount of spot lights in the RTSS using a relatively simple system."
@@ -115,9 +115,10 @@ protected:
         if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0") &&
 			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_0") &&
 			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_1") &&
-			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0"))
+			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0") &&
+			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("glsl"))
 		{
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in cg type shader language, your graphic card must support shader 3 profile or above."
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in Cg or GLSL type shader language, your graphic card must support Shader Profile 3 or above."
                 " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
         }
     }
@@ -159,8 +160,7 @@ protected:
 		SegmentedDynamicLightManager::getSingleton().setSceneManager(mSceneMgr);
 
 		RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-		mGen->setTargetLanguage("cg");
-		
+
 		RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
 		pMainRenderState->reset();

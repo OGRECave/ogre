@@ -23,9 +23,10 @@ include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
+ogre_add_component_include_dir(Overlay)
 
-add_library(PlayPenTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
-target_link_libraries(PlayPenTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+add_library(PlayPenTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries(PlayPenTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay)
 ogre_config_sample_lib(PlayPenTests)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

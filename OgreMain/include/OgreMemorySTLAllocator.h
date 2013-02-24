@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -156,12 +156,14 @@ namespace Ogre
 			return AllocPolicy::getMaxAllocationSize();
 		}
 
+        // FIXME: Really this is a C++11 issue. This function is only supported in C++03 and earlier but since there is no good way to check the all compilers for support we'll just go with a libc++ check for now.
+#if OGRE_NO_LIBCPP_SUPPORT == 1
 		void construct(pointer p)
 		{
 			// call placement new
 			new(static_cast<void*>(p)) T();
 		}
-
+#endif
 		void construct(pointer p, const T& val)
 		{
 			// call placement new
@@ -174,7 +176,6 @@ namespace Ogre
 			// some articles suggest yes, some no
 			p->~T();
 		}
-
 	};
 
 	/// determine equality, can memory from another allocator
@@ -220,6 +221,8 @@ namespace Ogre
 
 }// namespace Ogre
 
+
 #include "OgreHeaderSuffix.h"
+
 #endif // _MemorySTLAllocator_H__
 

@@ -27,6 +27,7 @@
 import bpy, mathutils
 
 from ogre_mesh_exporter.log_manager import LogManager, Message
+from operator import attrgetter
 
 # Mesh export settings class to define how we are going to export the mesh.
 class MeshExportSettings():
@@ -49,12 +50,18 @@ class MeshExportSettings():
 			skeletonNameFollowMesh = meshSettings.skeletonNameFollowMesh if (meshSettings.skeletonNameFollowMesh_override) else globalSettings.skeletonNameFollowMesh,
 			runOgreXMLConverter = globalSettings.runOgreXMLConverter)
 
+class BoneWeight():
+	def __init__(self, boneIndex, boneWeight):
+		self.mBoneIndex = boneIndex
+		self.mBoneWeight = boneWeight
+
 class Vertex():
-	def __init__(self, pos, norm, uvs = list(), colors = list()):
+	def __init__(self, pos, norm, uvs = list(), colors = list(), boneWeights = list()):
 		self.mPosition = pos
 		self.mNormal = norm
 		self.mUVs = uvs
 		self.mColors = colors
+		self.mBoneWeights = boneWeights
 
 	def match(self, norm, uvs, colors):
 		# Test normal.
@@ -73,20 +80,22 @@ class Vertex():
 		return True
 
 class VertexBuffer():
-	def __init__(self, uvLayers = 0, colorLayers = 0):
+	def __init__(self, uvLayers = 0, colorLayers = 0, hasBoneWeights = False):
 		# Vertex data.
 		self.mVertexData = list()
 		self.mUVLayers = uvLayers
 		self.mColorLayers = colorLayers
+		self.mHasBoneWeights = hasBoneWeights
 
 		# Blender mesh -> vertex index link.
 		# Only useful when exporting.
 		self.mMeshVertexIndexLink = dict()
 
-	def reset(self, uvLayers, colorLayers):
+	def reset(self, uvLayers, colorLayers, hasBoneWeights = False):
 		self.mVertexData = list()
 		self.mUVLayers = uvLayers
 		self.mColorLayers = colorLayers
+		self.mHasBoneWeights = hasBoneWeights
 
 	def vertexCount(self):
 		return len(self.mVertexData)
@@ -94,7 +103,7 @@ class VertexBuffer():
 	# This method adds a vertex from the given blend mesh index into the buffer.
 	# If the uv information does not match the recorded vertex, it will automatically
 	# clone a new vertex for use.
-	def addVertex(self, index, pos, norm, uvs, colors, fixUpAxisToY):
+	def addVertex(self, index, pos, norm, uvs, colors, boneWeights = list(), fixUpAxisToY = True):
 		# Fix Up axis to Y (swap Y and Z and negate Z)
 		if (fixUpAxisToY):
 			pos = [pos[0], pos[2], -pos[1]]
@@ -116,7 +125,7 @@ class VertexBuffer():
 		localIndex = len(self.mVertexData)
 		if (index not in self.mMeshVertexIndexLink): self.mMeshVertexIndexLink[index] = list()
 		self.mMeshVertexIndexLink[index].append(localIndex)
-		self.mVertexData.append(Vertex(pos, norm, uvs, colors))
+		self.mVertexData.append(Vertex(pos, norm, uvs, colors, boneWeights))
 		return localIndex
 
 	def serialize(self, file, indent = ''):
@@ -159,6 +168,22 @@ class VertexBuffer():
 
 		file.write('%s</vertexbuffer>\n' % indent)
 
+	def serializeBoneAssignments(self, file, indent = ''):
+		file.write('%s\t<boneassignments>\n' % indent)
+
+		vertexWithNoBoneAssignements = 0;
+
+		for i, vertex in enumerate(self.mVertexData):
+			if (len(vertex.mBoneWeights) == 0): vertexWithNoBoneAssignements += 1
+			for boneWeight in vertex.mBoneWeights:
+				file.write('%s\t\t<vertexboneassignment vertexindex="%d" boneindex="%d" weight="%.6f" />\n' %
+					(indent, i, boneWeight.mBoneIndex, boneWeight.mBoneWeight))
+
+		if (vertexWithNoBoneAssignements > 0):
+			LogManager.logMessage("There are %d vertices with no bone assignements!" % vertexWithNoBoneAssignements, Message.LVL_WARNING)
+
+		file.write('%s\t</boneassignments>\n' % indent)
+
 class SubMesh():
 	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None, name = None):
 		# True if submesh is sharing vertex buffer.
@@ -177,7 +202,7 @@ class SubMesh():
 		if ((vertexBuffer is not None) and (meshVertexIndexLink is not None)):
 			self.mShareVertexBuffer = True
 
-	def insertPolygon(self, blendMesh, polygon, fixUpAxisToY):
+	def insertPolygon(self, blendMesh, polygon, blendVertexGroups = None, ogreSkeleton = None, fixUpAxisToY = True):
 		polygonVertices = polygon.vertices
 		polygonVertexCount = polygon.loop_total
 
@@ -209,7 +234,24 @@ class SubMesh():
 		for index, uvs, colors in zip(polygonVertices, polygonVertUVs, polygonVertColors):
 			vertex = blendMesh.vertices[index]
 			norm = vertex.normal if (useSmooth) else polygon.normal
-			localIndices.append(self.mVertexBuffer.addVertex(index, vertex.co, norm, uvs, colors, fixUpAxisToY))
+
+			# grab bone weights.
+			boneWeights = list()
+			if (ogreSkeleton is not None):
+				for groupElement in vertex.groups:
+					groupName = blendVertexGroups[groupElement.group].name
+					boneIndex = ogreSkeleton.getBoneIndex(groupName)
+					if (boneIndex == -1 or abs(groupElement.weight) < 0.000001): continue
+					boneWeight = groupElement.weight
+					boneWeights.append(BoneWeight(boneIndex, boneWeight))
+
+			# trim bone weight count if too many defined.
+			if (len(boneWeights) > 4):
+				LogManager.logMessage("More than 4 bone weights are defined for a vertex! Best 4 will be used.", Message.LVL_WARNING)
+				boneWeights.sort(key=attrgetter('mBoneWeight'), reverse=True)
+				while (len(boneWeights) > 4): del boneWeights[-1]
+
+			localIndices.append(self.mVertexBuffer.addVertex(index, vertex.co, norm, uvs, colors, boneWeights, fixUpAxisToY))
 
 		# construct triangle index data.
 		if (polygonVertexCount is 3):
@@ -226,22 +268,26 @@ class SubMesh():
 			(materialAttribute, 'true' if self.mShareVertexBuffer else 'false',
 			'true' if (vertexCount > 65536) else 'false'))
 
-		# write submesh vertex buffer if not shared.
-		if (not self.mShareVertexBuffer):
-			file.write('\t\t\t<geometry vertexcount="%d">\n' % vertexCount)
-			self.mVertexBuffer.serialize(file, '\t\t\t\t')
-			file.write('\t\t\t</geometry>\n')
-
 		# write face data.
 		file.write('\t\t\t<faces count="%d">\n' % len(self.mFaceData))
 		for face in self.mFaceData:
 			file.write('\t\t\t\t<face v1="%d" v2="%d" v3="%d" />\n' % tuple(face))
 		file.write('\t\t\t</faces>\n')
 
+		# write submesh vertex buffer if not shared.
+		if (not self.mShareVertexBuffer):
+			file.write('\t\t\t<geometry vertexcount="%d">\n' % vertexCount)
+			self.mVertexBuffer.serialize(file, '\t\t\t\t')
+			file.write('\t\t\t</geometry>\n')
+
+			# write bone assignments
+			if (self.mShareVertexBuffer.mHasBoneWeights):
+				self.mSharedVertexBuffer.serializeBoneAssignments(file, '\t\t\t')
+
 		file.write('\t\t</submesh>\n')
 
 class Mesh():
-	def __init__(self, blendMesh = None, exportSettings = MeshExportSettings()):
+	def __init__(self, blendMesh = None, blendVertexGroups = None, ogreSkeleton = None, exportSettings = MeshExportSettings()):
 		# shared vertex buffer.
 		self.mSharedVertexBuffer = VertexBuffer()
 		# Blender mesh -> shared vertex index link.
@@ -251,6 +297,8 @@ class Mesh():
 
 		# skip blend mesh conversion if no blend mesh passed in.
 		if (blendMesh is None): return
+		self.mOgreSkeleton = ogreSkeleton
+		hasBoneWeights = ogreSkeleton is not None
 
 		# Lets do some pre checking to show warnings if needed.
 		uvLayerCount = len(blendMesh.uv_layers)
@@ -259,7 +307,7 @@ class Mesh():
 		if (colorLayerCount > 2): LogManager.logMessage("More than 2 color layers in this mesh. Only 2 will be exported.", Message.LVL_WARNING)
 
 		# setup shared vertex buffer.
-		self.mSharedVertexBuffer.reset(uvLayerCount, colorLayerCount)
+		self.mSharedVertexBuffer.reset(uvLayerCount, colorLayerCount, hasBoneWeights)
 
 		# split up the mesh into submeshes by materials.
 		# we first get sub mesh shared vertices option.
@@ -280,7 +328,7 @@ class Mesh():
 				if (subMeshProperty.useSharedVertices):
 					subMesh = SubMesh(self.mSharedVertexBuffer, self.mSharedMeshVertexIndexLink, subMeshProperty.name)
 				else:
-					subMesh = SubMesh(VertexBuffer(uvLayerCount, colorLayerCount), name = subMeshProperty.name)
+					subMesh = SubMesh(VertexBuffer(uvLayerCount, colorLayerCount, hasBoneWeights), name = subMeshProperty.name)
 
 				subMesh.mMaterial = None if (len(materialList) == 0) else materialList[polygon.material_index]
 				if (exportSettings.requireMaterials and subMesh.mMaterial == None):
@@ -289,7 +337,7 @@ class Mesh():
 				self.mSubMeshDict[polygon.material_index] = subMesh
 
 			# insert polygon.
-			subMesh.insertPolygon(blendMesh, polygon, exportSettings.fixUpAxisToY)
+			subMesh.insertPolygon(blendMesh, polygon, blendVertexGroups, ogreSkeleton, exportSettings.fixUpAxisToY)
 
 	def serialize(self, file):
 		file.write('<mesh>\n')
@@ -300,6 +348,10 @@ class Mesh():
 			file.write('\t<sharedgeometry vertexcount="%d">\n' % sharedVertexCount)
 			self.mSharedVertexBuffer.serialize(file, '\t\t')
 			file.write('\t</sharedgeometry>\n')
+
+			# write bone assignments
+			if (self.mSharedVertexBuffer.mHasBoneWeights):
+				self.mSharedVertexBuffer.serializeBoneAssignments(file, '\t\t')
 
 		subMeshNames = list()
 
@@ -321,5 +373,9 @@ class Mesh():
 			for index, name in enumerate(subMeshNames):
 				file.write('\t\t<submeshname name="%s" index="%d" />\n' % (name, index))
 			file.write('\t</submeshnames>\n')
+
+		# write skeleton link
+		if (self.mOgreSkeleton is not None):
+			file.write('\t<skeletonlink name="%s.skeleton" />\n' % self.mOgreSkeleton.mName)
 
 		file.write('</mesh>\n')

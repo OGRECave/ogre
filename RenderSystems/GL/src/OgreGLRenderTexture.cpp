@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,8 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
         case PCT_FLOAT16: format = PF_FLOAT16_RGBA; break;
         case PCT_FLOAT32: format = PF_FLOAT32_RGBA; break;
         case PCT_COUNT: break;
+        case PCT_SINT: break;
+        case PCT_UINT: break;
         }
         if(checkFormat(format))
             return format;
