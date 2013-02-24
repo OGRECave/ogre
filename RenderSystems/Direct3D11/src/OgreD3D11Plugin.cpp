@@ -47,10 +47,6 @@ namespace Ogre
 	{
 		// Create the DirectX 11 rendering api
 		mRenderSystem = new D3D11RenderSystem();
-#	if OGRE_DEBUG_MODE == 1
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11_d.dll" );
-#	else
-
 		// Register the render system
 		Root::getSingleton().addRenderSystem( mRenderSystem );
 	}

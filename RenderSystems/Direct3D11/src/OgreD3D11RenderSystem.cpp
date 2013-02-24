@@ -492,10 +492,6 @@ bail:
         }
 
 
-#endif
-        }
-
-
 		if( name == "VSync Interval" )
 		{
 			mVSyncInterval = StringConverter::parseUnsignedInt(value);
@@ -695,12 +691,10 @@ bail:
             {
                 deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
             }
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 			if (!OGRE_THREAD_SUPPORT)
 			{
 				deviceFlags |= D3D11_CREATE_DEVICE_SINGLETHREADED;
 			}
-#endif
 			D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_UNKNOWN ;
 
 			// Search for a PerfHUD adapter
@@ -1296,10 +1290,6 @@ bail:
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
-            rsc->addShaderProfile("ps_4_0_level_9_3");
-        }
-        if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-        {
             rsc->addShaderProfile("ps_4_0");
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1)
@@ -1326,9 +1316,6 @@ bail:
     }
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::convertHullShaderCaps(RenderSystemCapabilities* rsc) const
-    {
-		// Only for shader model 5.0
-		if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
     {
 		// Only for shader model 5.0
 		if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
@@ -1861,6 +1848,7 @@ bail:
 				mBlendDesc.AlphaToCoverageEnable = false;
 			else
 				mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
+
 			mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
 		}  
 	}
@@ -2034,16 +2022,6 @@ bail:
 	{
 		mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(function);
 	}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-	{
-		CompareEnabled = compare;
-	}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-	{
-		mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(function);
-	}
     //---------------------------------------------------------------------
 	DWORD D3D11RenderSystem::_getCurrentAnisotropy(size_t unit)
 	{
@@ -2090,61 +2068,6 @@ bail:
 			uint numberOfViews;
 			target->getCustomAttribute( "numberOfViews", &numberOfViews );
 
-			while (pRTView[numberOfViews] != NULL)
-			{
-				numberOfViews++;
-			}
-
-			//Retrieve depth buffer
-			D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
-
-			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
-			{
-				//Depth is automatically managed and there is no depth buffer attached to this RT
-				//or the Current D3D device doesn't match the one this Depth buffer was created
-				setDepthBufferFor( target );
-			}
-
-			//Retrieve depth buffer again (it may have changed)
-			depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());*/
-
-					"D3D11RenderSystem::_setRenderTarget");
-			}
-
-			/*// now switch to the new render target
-			mDevice.GetImmediateContext()->OMSetRenderTargets(
-				numberOfViews,
-				pRTView,
-				depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
-
-			if (mDevice.isError())
-			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"D3D11 device cannot set render target\nError Description:" + errorDescription,
-			}*/
-
-			_setRenderTargetViews();
-		}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_setRenderTargetViews()
-	{
-		RenderTarget *target = mActiveRenderTarget;
-		if (target)
-		{
-			ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-			memset(pRTView, 0, sizeof(pRTView));
-
-			target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
-
-			uint numberOfViews;
-			target->getCustomAttribute( "numberOfViews", &numberOfViews );
-
-			while (pRTView[numberOfViews] != NULL)
-			{
-				numberOfViews++;
-			}
-
 			//Retrieve depth buffer
 			D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
@@ -2157,6 +2080,7 @@ bail:
 
 			//Retrieve depth buffer again (it may have changed)
 			depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
 			// now switch to the new render target
 			mDevice.GetImmediateContext()->OMSetRenderTargets(
 				numberOfViews,
@@ -2424,6 +2348,7 @@ bail:
 
 				stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
 								FilterMips[n],false );
+				stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
 				stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 				stage.samplerDesc.MinLOD = 0;
 				stage.samplerDesc.MipLODBias = 0.f;
@@ -3022,38 +2947,6 @@ bail:
 
 			}
 			break;
-		case GPT_DOMAIN_PROGRAM:
-			{
-				mBoundTesselationDomainProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*				ID3D11DomainShader* gsShaderToSet = mBoundTesselationDomainProgram->getDomainShader();
-
-				mDevice.GetImmediateContext()->DSSetShader(gsShaderToSet, NULL, 0);
-				if (mDevice.isError())
-				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D11 device cannot set domain shader\nError Description:" + errorDescription,
-						"D3D11RenderSystem::bindGpuProgram");
-				}*/		
-
-			}
-			break;
-		case GPT_COMPUTE_PROGRAM:
-			{
-				mBoundComputeProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*				ID3D11ComputeShader* gsShaderToSet = mBoundComputeProgram->getComputeShader();
-
-				mDevice.GetImmediateContext()->CSSetShader(gsShaderToSet, NULL, 0);
-				if (mDevice.isError())
-				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D11 device cannot set compute shader\nError Description:" + errorDescription,
-						"D3D11RenderSystem::bindGpuProgram");
-				}*/		
-
-			}
-			break;
 		};
 
 		RenderSystem::bindGpuProgram(prg);
@@ -3219,23 +3112,6 @@ bail:
 				}
 			}
 			break;
-		case GPT_DOMAIN_PROGRAM:
-			{
-				if (mBoundTesselationDomainProgram)
-				{
-					pBuffers[0] = mBoundTesselationDomainProgram->getConstantBuffer(params, mask);
-					mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
-					if (mDevice.isError())
-					{
-						String errorDescription = mDevice.getErrorDescription();
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot set Domain shader constant buffers\nError Description:" + errorDescription,
-							"D3D11RenderSystem::bindGpuProgramParameters");
-					}		
-
-				}
-			}
-			break;
 		case GPT_COMPUTE_PROGRAM:
 			{
 				if (mBoundComputeProgram)
@@ -3315,7 +3191,7 @@ bail:
 								"D3D11RenderSystem::setSubroutineName");
 				}
 			}
-		
+
 			// Store class instance
 			mInstanceMap.insert(std::make_pair(subroutineName, instance));
 		}
@@ -3429,12 +3305,6 @@ bail:
 				// Clear all views
 				uint numberOfViews;
 				mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
-
-				while (pRTView[numberOfViews] != NULL)
-				{
-					numberOfViews++;
-				}
-
 				if( numberOfViews == 1 )
 					mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
 				else

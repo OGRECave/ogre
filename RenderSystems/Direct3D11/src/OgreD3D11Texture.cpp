@@ -355,7 +355,6 @@ namespace Ogre
 
 		// determine total number of mipmaps including main one (d3d11 convention)
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > mSrcWidth) ? 0 : mNumRequestedMipmaps + 1;
-		//UINT numMips = static_cast<UINT>(mNumRequestedMipmaps);
 
 		D3D11_TEXTURE1D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -366,7 +365,7 @@ namespace Ogre
 		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
 		desc.MiscFlags		= D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
-		
+
 		// create the texture
 		hr = mDevice->CreateTexture1D(	
 			&desc,
@@ -441,8 +440,6 @@ namespace Ogre
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumRequestedMipmaps + 1;
 		if(isBinaryCompressedFormat && numMips > 1)
 			numMips = std::max(1U, numMips - 2);
-
-		/*if (mNumRequestedMipmaps == MIP_UNLIMITED)
 
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -574,7 +571,7 @@ namespace Ogre
 			}
 			break;
 		}
-		
+
 		hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
 		{
@@ -598,7 +595,7 @@ namespace Ogre
 
 		// determine total number of mipmaps including main one (d3d11 convention)
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumRequestedMipmaps + 1;
-		//UINT numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+
 		D3D11_TEXTURE3D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
 		desc.Height			= static_cast<UINT>(mSrcHeight);
@@ -624,26 +621,7 @@ namespace Ogre
 		// create the texture
 		hr = mDevice->CreateTexture3D(	
 			&desc,
-			NULL,  if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX))
-    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    # add GCC visibility flags to shared library build
-    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
-    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
-    #set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
-  endif()
-
-  if(OGRE_BUILD_PLATFORM_WINRT)
-    # enable WinRT features, support available since CMake 2.8.8
-    set_target_properties(${TARGETNAME} PROPERTIES VS_WINRT_EXTENSIONS "YES")
-    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/bigobj")
-
-    # WinRT uses precompiled headers by default, that needs to be overriden, but unfortunately CMake can`t do this
-    #if(NOT ${TARGET_NAME} STREQUAL "OgreMain")
-    #  set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/Y-")
-    #endif(NOT ${TARGET_NAME} STREQUAL "OgreMain")
-  endif(OGRE_BUILD_PLATFORM_WINRT)
-
+			NULL,
 			&mp3DTex);						// data pointer
 		// check result and except if failed
 		if (FAILED(hr) || mDevice.isError())
