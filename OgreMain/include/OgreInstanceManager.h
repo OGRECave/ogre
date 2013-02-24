@@ -141,7 +141,7 @@ namespace Ogre
             for a specific material */
         void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
 								vector<Ogre::Vector4>::type &usedParams,
-                                InstanceBatchVec &fragmentedBatches );
+								InstanceBatchVec &fragmentedBatches );
 
         /** @see setSetting. This function helps it by setting the given parameter to all batches
             in container.
