@@ -476,6 +476,11 @@ endif ()
 # Setup samples
 add_subdirectory(Samples)
 
+#Add android JNI binding
+if(ANDROID)
+  include(toolchain/AndroidJNI)
+endif()
+
 # Setup command-line tools
 if (OGRE_BUILD_TOOLS)
   add_subdirectory(Tools)

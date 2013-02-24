@@ -90,13 +90,9 @@ if(ANDROID)
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
-    else()
-      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-    endif()
-
-    if(APPLE OR WIN32)
       SET(NDK_BUILD_EXECUTABLE "ndk-build")
     else()
+      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
       SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
     endif()
 
@@ -123,9 +119,17 @@ if(ANDROID)
     file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
 
+	SET(ANDROID_MOD_NAME "OgreSampleBrowser")
+	SET(JNI_SRC "LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src\n")
+    SET(JNI_SRC "${JNI_SRC}\tLOCAL_SRC_FILES := SampleBrowser.cpp\n")
+	
     if(NOT ANDROID_GLES_ONLY)
-     configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+	 SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_CelShading -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_CubeMapping -lSample_DynTex\n")
+     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Fresnel -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_MeshLod -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
+	 configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
     else()
+     SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_DynTex\n")
+	 SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
      configure_file("${OGRE_TEMPLATES_DIR}/AndroidGLES1.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
     endif()
 
