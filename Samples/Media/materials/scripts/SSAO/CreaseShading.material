@@ -1,8 +1,8 @@
 fragment_program SSAO/CreaseShading_fp_hlsl hlsl
 {
-    source CreaseShading.cg
+    source CreaseShading.hlsl
     entry_point CreaseShading_fp
-    target ps_3_0 
+    target ps_4_0 ps_3_0 
 }
 
 fragment_program SSAO/CreaseShading_fp_cg cg

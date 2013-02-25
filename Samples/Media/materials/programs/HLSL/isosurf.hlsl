@@ -4,19 +4,18 @@ cbuffer cBuffer0
     float4x4 origWorldViewIT;
 	float4 Metaballs[2];
 	float IsoValue = 1.0;
-
 }
 
 struct SampleData
 {
-	float4 Pos   : POSITION;
+	float4 Pos   : SV_POSITION;
 	float3 N     : TEXCOORD0;
 	float2 Field : TEXCOORD1;
 };
 
 struct SurfaceVertex
 {
-	float4 Pos	: POSITION;
+	float4 Pos	: SV_POSITION;
 	float3 N	: TEXCOORD0;
 };
 
@@ -57,6 +56,7 @@ SampleData mainVS(float4 pos : POSITION)
 	float3x3 WorldViewIT = { origWorldViewIT[0].xyz, origWorldViewIT[1].xyz, origWorldViewIT[2].xyz };
 	
 	// Transform position and normals
+	pos.w = 1.0f;
 	o.Pos = mul(WorldViewProj, pos);
 	o.N = mul(WorldViewIT, Field.xyz);	// we want normals in world space
 	o.Field.x = Field.w;
@@ -141,5 +141,6 @@ float4 mainPS(SurfaceVertex surfaceVertex) : SV_TARGET
 	//return float4(N*0.5+0.5, 1);
 	float3 materials[2] = { float3(1, 1, 1), float3(0, 0, 0.5)};
     float nDotL = dot( N, L);
-	return float4(abs(nDotL) * materials[nDotL < 0.0], 0.1);
+	float4 color = float4(abs(nDotL) * materials[nDotL < 0.0], 0.1);
+	return color;
 }

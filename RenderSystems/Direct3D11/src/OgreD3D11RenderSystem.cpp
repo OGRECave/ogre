@@ -2750,7 +2750,7 @@ bail:
                             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                                 "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
                                 "Active OGRE vertex shader name: " + mBoundVertexProgram->getName() +
-                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName() ,
+                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName(),
                                 "D3D11RenderSystem::_render");
 						}
 					}
