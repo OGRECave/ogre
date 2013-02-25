@@ -63,9 +63,8 @@ endif ()
 
 
 # install 
-ogre_config_component(OgrePaging)
-
 ogre_config_framework(OgrePaging)
+ogre_config_component(OgrePaging)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Paging

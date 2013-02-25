@@ -265,13 +265,8 @@ if (APPLE)
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)
 	
-	if(OGRE_SDK_BUILD)
-	  set(OGRE_OSX_BUILD_CONFIGURATION "")
-	  set(OGRE_BUILT_FRAMEWORK "Release/")
-	else()
-	  set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
-	  set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
-	endif()
+    set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
+    set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
 	set (OGRE_SAMPLE_CONTENTS_PATH 
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
@@ -282,6 +277,23 @@ if (APPLE)
 		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 		)
 	# now cfg files
+	if(OGRE_SDK_BUILD)
+	add_custom_command(TARGET SampleBrowser POST_BUILD
+		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/plugins.cfg 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/resources.cfg 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/samples.cfg 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/quakemap.cfg 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Media
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+        COMMAND ditto 
+		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+		)
+	else()
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg 
@@ -297,6 +309,7 @@ if (APPLE)
         COMMAND ditto 
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
+	endif()
 
 	# now plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD
@@ -387,10 +400,13 @@ if (APPLE)
 	endif()
 
 	# Add links for the sample plugins
+    foreach(SAMPLE_PLUGIN ${OGRE_SAMPLES_LIST})
 	add_custom_command(TARGET SampleBrowser POST_BUILD
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Sample_*.dylib 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${SAMPLE_PLUGIN}.dylib
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
+    endforeach(SAMPLE_PLUGIN)
+
 	if (OGRE_BUILD_TESTS)
 	  add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/PlayPen.dylib 
