@@ -100,7 +100,8 @@ endif ()
 find_package(OGRE REQUIRED)
 find_package(OIS REQUIRED)
 
-if (NOT OGRE_RenderSystem_GLES2_FOUND AND NOT OGRE_RenderSystem_GLES_FOUND)
+# Need to get the Cg path for OS X post build scripts.
+if (APPLE AND NOT OGRE_RenderSystem_GLES2_FOUND AND NOT OGRE_RenderSystem_GLES_FOUND)
   find_package(Cg REQUIRED)
 endif()
 
