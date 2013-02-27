@@ -1,0 +1,22 @@
+
+material SimpleMaterial
+{
+	technique
+	{
+		pass
+		{			
+			vertex_program_ref SimpleMaterial_vs
+			{
+			}
+			
+			fragment_program_ref SimpleMaterial_ps
+			{
+			}
+			
+			texture_unit 
+			{
+				texture floor_diffuse.PNG
+			}
+		}
+	}
+}

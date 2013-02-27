@@ -88,6 +88,7 @@
 #   include "Grass.h"
 #   include "Lighting.h"
 #   include "ParticleFX.h"
+#	include "PNTrianglesTessellation.h"
 #   include "Shadows.h"
 #   include "SkeletalAnimation.h"
 #   include "SkyBox.h"
@@ -1067,6 +1068,7 @@ protected:
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
+			mPluginNameMap["Sample_PNTrianglesTessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_PNTrianglesTessellation();
 #			ifdef OGRE_BUILD_COMPONENT_VOLUME
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
@@ -1358,6 +1360,7 @@ protected:
             sampleList.push_back("Sample_SkyPlane"); 
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
+			sampleList.push_back("Sample_PNTrianglesTessellation");
 			sampleList.push_back("Sample_Tesselation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");

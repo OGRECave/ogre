@@ -1,0 +1,37 @@
+
+
+material Knot
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0.5 0.5 0.5 1.0
+			specular 0.5 0.5 0.5 1 10
+			iteration once_per_light
+			
+			vertex_program_ref color_vs
+			{
+			}
+			
+			fragment_program_ref color_ps
+			{
+			}
+			
+			texture_unit 
+			{
+				texture floor_diffuse.PNG
+			}
+			
+			texture_unit 
+			{
+				texture floor_bump.PNG
+			}
+			
+			texture_unit 
+			{
+				texture floor_ao.PNG
+			}
+		}
+	}
+}

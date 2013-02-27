@@ -1,0 +1,41 @@
+Texture2D g_baseTexture : register( t0 );    // Base color texture
+SamplerState g_samLinear : register( s0 );
+
+cbuffer LightBuffer
+{
+    float4 lightAmbientColor;
+	float4 lightDiffuseColor;
+    float4 lightSpecularColor;
+    float3 lightDirection;
+	float4 lightPosition;
+	float4 lightAttenuation;
+	float4 surfaceDiffuseColour;
+	float4 surfaceSpecularColour;
+	float  surfaceShininess;
+	float3 cameraPosition;
+};
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position 		: SV_POSITION;
+    float2 texCoord			: TEXCOORD0;
+    float3 normal  		   	: TEXCOORD1;
+};
+
+float4 color_ps(PixelInputType input) : SV_TARGET
+{
+	float4 color;
+	float lightIntensity;
+
+	float4 texColor = g_baseTexture.Sample( g_samLinear, input.texCoord );
+	
+	lightIntensity =  saturate(dot(input.normal, lightDirection));
+	
+	color = saturate(surfaceDiffuseColour * lightIntensity);
+	color = color * texColor;
+		
+	return color;
+}

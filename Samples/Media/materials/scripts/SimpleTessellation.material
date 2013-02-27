@@ -1,0 +1,42 @@
+
+
+material SimpleTessellation
+{
+	technique
+	{
+		pass
+		{
+			iteration once_per_light
+			vertex_program_ref color_tessellation_vs
+			{
+			
+			}
+			
+			tesselation_hull_program_ref color_tessellation_hs
+			{
+			
+			}
+			
+			tesselation_domain_program_ref color_tessellation_ds
+			{
+			
+			}
+			
+			fragment_program_ref color_tessellation_ps hlsl
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+				texture floor_diffuse.PNG
+			}
+			
+			texture_unit 
+			{
+				texture floor_bump.PNG
+				binding_type vertex
+			}
+		}
+	}
+}
