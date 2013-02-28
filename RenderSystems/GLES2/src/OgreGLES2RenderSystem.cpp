@@ -2172,14 +2172,16 @@ namespace Ogre {
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {
 #if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        glPushGroupMarkerEXT(0, eventName.c_str());
+        IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            glPushGroupMarkerEXT(0, eventName.c_str());
 #endif
     }
     //---------------------------------------------------------------------
     void GLES2RenderSystem::endProfileEvent( void )
     {
 #if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        glPopGroupMarkerEXT();
+        IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            glPopGroupMarkerEXT();
 #endif
     }
     //---------------------------------------------------------------------
@@ -2189,7 +2191,8 @@ namespace Ogre {
             return;
 
 #if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        glInsertEventMarkerEXT(0, eventName.c_str());
+        IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            glInsertEventMarkerEXT(0, eventName.c_str());
 #endif
     }  
 	//---------------------------------------------------------------------

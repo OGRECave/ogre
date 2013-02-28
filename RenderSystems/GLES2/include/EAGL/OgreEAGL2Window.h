@@ -63,7 +63,6 @@ namespace Ogre {
             // iOS 4 content scaling
             bool mIsContentScalingSupported;
             float mContentScalingFactor;
-            float mCurrentOSVersion;
 
             EAGL2Support* mGLSupport;
             EAGLES2Context* mContext;

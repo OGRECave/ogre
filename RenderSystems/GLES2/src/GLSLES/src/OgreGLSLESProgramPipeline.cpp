@@ -35,6 +35,7 @@
 #include "OgreGLES2UniformCache.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre
 {
@@ -44,7 +45,8 @@ namespace Ogre
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
+        IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
 #endif
     }
 
@@ -159,7 +161,8 @@ namespace Ogre
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(mVertexProgram && mFragmentProgram)
-                glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
+                IF_OS_VERSION_IS_GREATER_THAN(5.0)
+                    glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
                                  (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
 #endif
 		}
