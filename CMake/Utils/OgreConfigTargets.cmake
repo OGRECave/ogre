@@ -9,6 +9,12 @@
 
 # Configure settings and install targets
 if(APPLE)
+  macro(set_xcode_property targ xc_prop_name xc_prop_val)
+    set_property( TARGET ${targ} PROPERTY XCODE_ATTRIBUTE_${xc_prop_name} ${xc_prop_val} )
+  endmacro(set_xcode_property)
+
+  set(MIN_IOS_VERSION "4.3")
+
   if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(PLATFORM_NAME "macosx")
   elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
@@ -166,6 +172,7 @@ function(ogre_config_common TARGETNAME)
     RUNTIME_OUTPUT_DIRECTORY ${OGRE_RUNTIME_OUTPUT}
   )
   if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set_xcode_property( ${TARGETNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
@@ -209,6 +216,10 @@ function(ogre_config_lib LIBNAME EXPORT)
   endif (OGRE_STATIC)
   ogre_install_target(${LIBNAME} "" ${EXPORT})
   
+  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set_xcode_property( ${LIBNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
+  endif()
+
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
     if (OGRE_STATIC)
@@ -265,6 +276,7 @@ function(ogre_config_plugin PLUGINNAME)
     set_target_properties(${PLUGINNAME} PROPERTIES OUTPUT_NAME ${PLUGINNAME}Static)
 
     if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+      set_xcode_property( ${PLUGINNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
@@ -324,7 +336,9 @@ function(ogre_config_sample_common SAMPLENAME)
           LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
         )
       endif()
-    endif(NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    else()
+      set_xcode_property( ${SAMPLENAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
+    endif()
   endif (APPLE)
   if (NOT OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
