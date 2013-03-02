@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
+#include "OgreCommon.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
