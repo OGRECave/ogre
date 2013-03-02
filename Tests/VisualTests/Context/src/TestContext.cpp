@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
-#include "OgreCommon.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -65,7 +64,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     binOpt["-o"] = "NONE";      // path to output a summary file to (default: don't output a file)
 
     // parse
-    findCommandLineOpts(argc, argv, unOpt, binOpt);
+    Ogre::findCommandLineOpts(argc, argv, unOpt, binOpt);
 
     mReferenceSet = unOpt["-r"];
     mTestSetName = binOpt["-ts"];
