@@ -126,7 +126,7 @@ class IteratorWrapper
 
 /** 
  * 
- * \brief Prepiared IteratorWrapper for container like std::vector 
+ * \brief Prepared IteratorWrapper for container like std::vector 
  *
  * 
  * \param T = Container eg vector 
@@ -244,7 +244,7 @@ class ConstVectorIterator : public VectorIteratorWrapper<T,  typename T::const_i
 
 /** 
  * 
- * \brief Prepiared IteratorWrapper for key-value container
+ * \brief Prepared IteratorWrapper for key-value container
  *
  * 
  * \param T  Container  (map - or also set )
