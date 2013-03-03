@@ -68,6 +68,24 @@ using namespace Ogre;
     if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
         return;
 
+    // Check if orientation is supported
+    NSString *rotateToOrientation = @"";
+    if(deviceOrientation == UIInterfaceOrientationPortrait)
+        rotateToOrientation = @"UIInterfaceOrientationPortrait";
+    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
+
+    NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+    BOOL supported = [supportedOrientations containsObject:rotateToOrientation];
+
+    if (!supported)
+        return;
+
     // Get the window using the name that we saved
     RenderWindow *window = static_cast<RenderWindow *>(Root::getSingleton().getRenderSystem()->getRenderTarget(mWindowName));
 
