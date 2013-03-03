@@ -274,7 +274,7 @@ namespace Ogre {
 
 		typedef std::pair<String, String> StringPair;
 		typedef map<TextureDef, TexturePtr, TextureDefLess>::type TextureDefMap;
-		typedef std::map<StringPair, TextureDefMap> ChainTexturesByDef;
+		typedef map<StringPair, TextureDefMap>::type ChainTexturesByDef;
 		
 		ChainTexturesByDef mChainTexturesByDef;
 

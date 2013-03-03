@@ -351,7 +351,7 @@ namespace Ogre {
                     itOperand = pFuncInvoc->getOperandList().begin();
 
                     // Local string stream
-                    std::stringstream localOs;
+                    StringStream localOs;
 
                     // Write function name			
                     localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
