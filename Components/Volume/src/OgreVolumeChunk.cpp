@@ -80,21 +80,16 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    bool Chunk::contributesToVolumeMesh(const Vector3 &from, const Vector3 &to, const Source *src) const
     {
-        // Set to invisible for now.
-        mInvisible = true;
-        mVisible  = false;
-        
-        // Don't generate this chunk if it doesn't contribute to the whole volume.
-        Real centralValue = parameters->src->getValue((to - from) / (Real)2.0 + from);
-        if (Math::Abs(centralValue) > (to - from).length() * (Real)1.5)
-        {
-            return;
-        }
+        Real centralValue = src->getValue((to - from) / (Real)2.0 + from);
+        return Math::Abs(centralValue) <= (to - from).length() * (Real)1.5;
+    }
+
+    //-----------------------------------------------------------------------
     
-        loadChunk(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
-    
+    void Chunk::loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    {
         // Now recursively create the more detailed children
         if (level > 2)
         {
@@ -127,6 +122,25 @@ namespace Volume {
             mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels, parameters);
             mChildren[1] = 0; // Indicator that there are no more children.
         }
+    }
+
+    //-----------------------------------------------------------------------
+    
+    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    {
+        // Set to invisible for now.
+        mInvisible = true;
+        mVisible  = false;
+        
+        // Don't generate this chunk if it doesn't contribute to the whole volume.
+        if (!contributesToVolumeMesh(from, to, parameters->src))
+        {
+            return;
+        }
+    
+        loadChunk(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
+        
+        loadChildren(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
     }
     
     //-----------------------------------------------------------------------

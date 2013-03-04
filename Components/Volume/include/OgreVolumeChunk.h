@@ -207,6 +207,39 @@ namespace Volume {
         */
         virtual void loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
                 
+        /** Whether the center of the given cube (from -> to) will contribute something
+        to the total volume mesh.
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param src
+            The density source to contour.
+        @return
+            true if triangles might be generated
+        */
+        virtual bool contributesToVolumeMesh(const Vector3 &from, const Vector3 &to, const Source *src) const;
+        
+        /** Loads the tree children of the current node.
+        @param parent
+            The parent scene node for the volume
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param totalFrom
+            The back lower left corner of the world.
+        @param totalTo
+            The front upper rightcorner of the world.
+        @param level
+            The current LOD level.
+        @param maxLevels
+            The maximum amount of levels.
+        @param parameters
+            The parameters to use while loading.
+        */
+        virtual void loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
+
         /** Actually loads the volume tree with all LODs.
         @param parent
             The parent scene node for the volume
