@@ -186,8 +186,28 @@ namespace Volume {
 
         /// Another visibility flag to be user setable.
         bool mVolumeVisible;
+        
+        /** Loads a single chunk of the tree.
+        @param parent
+            The parent scene node for the volume
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param totalFrom
+            The back lower left corner of the world.
+        @param totalTo
+            The front upper rightcorner of the world.
+        @param level
+            The current LOD level.
+        @param maxLevels
+            The maximum amount of levels.
+        @param parameters
+            The parameters to use while loading.
+        */
+        virtual void loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
                 
-        /** Actually Loads the volume mesh with all LODs.
+        /** Actually loads the volume tree with all LODs.
         @param parent
             The parent scene node for the volume
         @param from

@@ -46,19 +46,8 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    void Chunk::loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
     {
-        // Set to invisible for now.
-        mInvisible = true;
-        mVisible  = false;
-        
-        // Don't generate this chunk if it doesn't contribute to the whole volume.
-        Real centralValue = parameters->src->getValue((to - from) / (Real)2.0 + from);
-        if (Math::Abs(centralValue) > (to - from).length() * (Real)1.5)
-        {
-            return;
-        }
-    
         mNode = parent->createChildSceneNode();
         if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
         {
@@ -87,6 +76,24 @@ namespace Volume {
         {
             mInvisible = false;
         }
+    }
+
+    //-----------------------------------------------------------------------
+
+    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    {
+        // Set to invisible for now.
+        mInvisible = true;
+        mVisible  = false;
+        
+        // Don't generate this chunk if it doesn't contribute to the whole volume.
+        Real centralValue = parameters->src->getValue((to - from) / (Real)2.0 + from);
+        if (Math::Abs(centralValue) > (to - from).length() * (Real)1.5)
+        {
+            return;
+        }
+    
+        loadChunk(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
     
         // Now recursively create the more detailed children
         if (level > 2)
