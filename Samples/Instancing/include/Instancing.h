@@ -260,6 +260,10 @@ protected:
 
 		MaterialPtr originalMaterial = MaterialManager::getSingleton ().getByName (originalMaterialName);
 
+#if defined(USE_RTSHADER_SYSTEM)
+        originalMaterial->getBestTechnique()->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
+
 		// if originalMat doesn't exists use "Instancing" material name
 		const String instancedMaterialName (originalMaterial.isNull() ? "Instancing" : originalMaterialName + "/Instanced");
 		MaterialPtr  instancedMaterial = MaterialManager::getSingleton ().getByName (instancedMaterialName);
