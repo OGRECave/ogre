@@ -6,7 +6,10 @@ in vec4 uv0;
 in float uv1;
 
 out vec4 oColor_0;
+#if SHADOW_CASTER
+#else
 out vec2 oTexcoord2_0;
+#endif
 
 uniform mat4x3 worldMatrix3x4Array[80];
 uniform mat4 viewProjectionMatrix;
@@ -16,6 +19,15 @@ uniform vec4 lightDiffuseColour;
 
 void main()
 {
+#if SHADOW_CASTER
+	// transform by indexed matrix
+	vec4 transformedPos = vec4((worldMatrix3x4Array[int(uv1)] * position).xyz, 1.0);
+
+	// view / projection
+	gl_Position = viewProjectionMatrix * transformedPos;
+	
+	oColor_0 = ambient;
+#else
 	// transform by indexed matrix
 	vec4 transformedPos = vec4((worldMatrix3x4Array[int(uv1)] * position).xyz, 1.0);
 	
@@ -29,5 +41,6 @@ void main()
 		lightPos.xyz -  (transformedPos.xyz * lightPos.w));
 
 	oColor_0 = ambient + clamp(dot(lightDir, norm), 0.0, 1.0) * lightDiffuseColour;
+#endif
 }
 
