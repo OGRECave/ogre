@@ -368,13 +368,6 @@ namespace Ogre {
             // If this is a volumetric texture set the texture type flag accordingly.
             if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
-
-            // If compressed, disable auto mip generation
-			if (PixelUtil::isCompressed((*loadedImages)[0].getFormat()))
-			{
-                // Disable flag for auto mip generation
-                mUsage &= ~TU_AUTOMIPMAP;
-			}
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
@@ -439,6 +432,13 @@ namespace Ogre {
         }
 
         _loadImages(imagePtrs);
+
+        // Generate mipmaps after all texture levels have been loaded
+        // This is required for compressed formats such as DXT
+        if (mUsage & TU_AUTOMIPMAP)
+        {
+            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
+        }
     }
 
     void GL3PlusTexture::freeInternalResourcesImpl()

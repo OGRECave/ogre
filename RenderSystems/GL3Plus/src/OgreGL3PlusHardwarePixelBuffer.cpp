@@ -438,11 +438,6 @@ namespace Ogre {
                                     data.data));
                     break;
             }	
-
-            if (mUsage & TU_AUTOMIPMAP)
-            {
-                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-            }
         }
         // Restore defaults
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
