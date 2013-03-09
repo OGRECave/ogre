@@ -162,8 +162,12 @@ if (NOT Boost_FOUND)
 endif()
 
 if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+    if(Boost_VERSION GREATER 105300)
+        set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
+    else()
         set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
-        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+    endif()
+    find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
