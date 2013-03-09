@@ -451,13 +451,6 @@ namespace Ogre {
     {
         mSurfaceList.clear();
 
-        // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
-        bool wantGeneratedMips = (mUsage & TU_AUTOMIPMAP)!=0;
-
-        // Do mipmapping in software? For some cards, this is still needed. Of course,
-        // only when mipmap generation is desired.
-        bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
-
         for (size_t face = 0; face < getNumFaces(); face++)
         {
             for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
@@ -468,7 +461,7 @@ namespace Ogre {
                                                                             face,
                                                                             mip,
                                                                             static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                            doSoftware && mip==0, mHwGamma, mFSAA);
+                                                                            mHwGamma, mFSAA);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 

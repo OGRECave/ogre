@@ -225,10 +225,10 @@ namespace Ogre {
     
     // TextureBuffer
     GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id, 
-                                       GLint face, GLint level, Usage usage, bool crappyCard, 
+                                       GLint face, GLint level, Usage usage, 
                                        bool writeGamma, uint fsaa)
     : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-    mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard), mSliceTRT(0)
+    mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSliceTRT(0)
     {
         // devise mWidth, mHeight and mDepth and mFormat
         GLint value = 0;
@@ -386,18 +386,6 @@ namespace Ogre {
                     break;
             }
 
-        } 
-        else if(mSoftwareMipmap)
-        {
-            if(data.getWidth() != data.rowPitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-            if(data.getHeight()*data.getWidth() != data.slicePitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if(data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-            buildMipmaps(data);
         } 
         else
         {
@@ -853,7 +841,7 @@ namespace Ogre {
         }
         
         // GL texture buffer
-        GL3PlusTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
+        GL3PlusTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
         
         // Upload data to 0,0,0 in temporary texture
         Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
@@ -872,92 +860,7 @@ namespace Ogre {
         assert(zoffset < mDepth);
         return mSliceTRT[zoffset];
     }
-    
-    void GL3PlusTextureBuffer::buildMipmaps(const PixelBox &data)
-    {
-        PixelBox scaled = data;
-        scaled.data = data.data;
-        scaled.left = data.left;
-        scaled.right = data.right;
-        scaled.top = data.top;
-        scaled.bottom = data.bottom;
-        scaled.front = data.front;
-        scaled.back = data.back;
-        
-        int width = data.getWidth();
-        int height = data.getHeight();
-        int depth = data.getDepth();
 
-        int logW = computeLog(width);
-        int logH = computeLog(height);
-        int level = (logW > logH ? logW : logH);
-        
-        for (int mip = 0; mip <= level; mip++)
-        {
-            GLenum glFormat = GL3PlusPixelUtil::getGLOriginFormat(scaled.format);
-            GLenum dataType = GL3PlusPixelUtil::getGLOriginDataType(scaled.format);
-            
-            switch(mTarget)
-            {
-                case GL_TEXTURE_1D:
-                    OGRE_CHECK_GL_ERROR(glTexImage1D(mFaceTarget,
-                                 mip,
-                                 GL_RGBA,
-                                 width,
-                                 0,
-                                 glFormat,
-                                 dataType,
-                                 scaled.data));
-                    break;
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                case GL_TEXTURE_RECTANGLE:
-                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                                 mip,
-                                 GL_RGBA,
-                                 width, height,
-                                 0,
-                                 glFormat,
-                                 dataType,
-                                 scaled.data));
-                    break;		
-                case GL_TEXTURE_3D:
-                case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                 mip,
-                                 GL_RGBA,
-                                 width, height, depth,
-                                 0,
-                                 glFormat,
-                                 dataType,
-                                 scaled.data));
-                    break;
-            }
-
-            if (mip != 0)
-            {
-                delete[] (uint8*) scaled.data;
-                scaled.data = 0;
-            }
-            
-            if (width > 1)
-            {
-                width = width / 2;
-            }
-            
-            if (height > 1)
-            {
-                height = height / 2;
-            }
-            
-            int sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
-                                                       data.format);
-            scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = new uint8[sizeInBytes];
-            Image::scale(data, scaled, Image::FILTER_LINEAR);
-        }
-    }
-    
     //********* GL3PlusRenderBuffer
     //----------------------------------------------------------------------------- 
     GL3PlusRenderBuffer::GL3PlusRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):

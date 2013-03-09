@@ -86,7 +86,7 @@ namespace Ogre {
         public:
             /** Texture constructor */
             GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id, GLint face, 
-                             GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
+                             GLint level, Usage usage, bool writeGamma, uint fsaa);
             ~GL3PlusTextureBuffer();
 
             /// @copydoc HardwarePixelBuffer::bindToFramebuffer
@@ -124,12 +124,9 @@ namespace Ogre {
             GLuint mTextureID;
             GLint mFace;
             GLint mLevel;
-            bool mSoftwareMipmap;
 
             typedef vector<RenderTexture*>::type SliceTRT;
             SliceTRT mSliceTRT;
-
-            void buildMipmaps(const PixelBox &data);
     };
 
      /** Renderbuffer surface.  Needs FBO extension.

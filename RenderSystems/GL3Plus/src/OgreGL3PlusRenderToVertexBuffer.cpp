@@ -131,7 +131,13 @@ namespace Ogre {
 			reallocateBuffer(targetBufferIndex);
 		}
 
+        // Disable rasterization
+        OGRE_CHECK_GL_ERROR(glEnable(GL_RASTERIZER_DISCARD));
+
 		GL3PlusHardwareVertexBuffer* vertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
+		// Bind the target buffer
+		OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer->getGLBufferId()));
+
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLProgramPipeline* programPipeline =
@@ -266,16 +272,27 @@ namespace Ogre {
             // Note: 64 is the minimum number of interleaved attributes allowed by GL_EXT_transform_feedback
             // So we are using it. Otherwise we could query during rendersystem initialisation and use a dynamic sized array.
             // But that would require C99.
-            const GLchar *names[64];
-			for (unsigned short e = 0; e < elemCount; e++)
-			{
-				const VertexElement* element = declaration->getElement(e);
-				String varyingName = getSemanticVaryingName(element->getSemantic(), element->getIndex());
-                names[e] = varyingName.c_str();
-			}
+//            const GLchar *names[64];
+            const GLchar *names[1] = {"gl_Position"};//, "oUv0", "oUv1", "oUv2" };
+//			vector<const GLchar*>::type names;
+//			for (unsigned short e = 0; e < elemCount; e++)
+//			{
+//				const VertexElement* element = declaration->getElement(e);
+//				String varyingName = getSemanticVaryingName(element->getSemantic(), element->getIndex());
+//                names[e] = varyingName.c_str();
+////                names.push_back(varyingName.c_str());
+//			}
 
 			OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
             OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
+            GLint didLink = 0;
+            OGRE_CHECK_GL_ERROR(glGetProgramiv( linkProgramId, GL_LINK_STATUS, &didLink ));
+            logObjectInfo( String("RVB GLSL link result : "), linkProgramId );
+            if(glIsProgram(linkProgramId))
+            {
+                glValidateProgram(linkProgramId);
+            }
+            logObjectInfo( String("RVB  GLSL validation result : "), linkProgramId );
 		}
 	}
 }
