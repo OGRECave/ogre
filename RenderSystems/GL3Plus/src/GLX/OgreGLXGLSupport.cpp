@@ -38,8 +38,8 @@ THE SOFTWARE.
 
 #include <X11/extensions/Xrandr.h>
 
-static Display *_currentDisplay;
-static Display *_getCurrentDisplay(void) { return _currentDisplay; }
+//static Display *_currentDisplay;
+//static Display *_getCurrentDisplay(void) { return _currentDisplay; }
 
 namespace Ogre
 {
@@ -812,13 +812,29 @@ namespace Ogre
 	::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
 	{
 		::GLXContext glxContext;
-        int context_attribs[] =
-        {
-            GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB, 
-            None
-        };
-        
-        glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+		int context_attribs[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 5,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB, 
+			None
+		};
+
+        // Try to get the best core profile context possible. Working backwards by versions until we find one that is acceptable.
+		glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+		while(!glxContext)
+		{
+			if(context_attribs[3] == 0)
+			{
+				context_attribs[1] -= 1;
+				context_attribs[3] = 5;
+			}
+			else
+			{
+				context_attribs[3] -= 1;
+			}
+			glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+		}
 
 		return glxContext;
 	}
@@ -855,8 +871,8 @@ namespace Ogre
 
 		for(mode = mVideoModes.begin(); mode != end; size++)
 		{
-			if (mode->first.first >= static_cast<int>(width) &&
-				mode->first.second >= static_cast<int>(height))
+			if (mode->first.first >= width &&
+				mode->first.second >= height)
 			{
 				if (! newMode ||
 					mode->first.first < newMode->first.first ||
