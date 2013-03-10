@@ -71,9 +71,6 @@ namespace Volume {
 
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file)
     {
-     
-        Timer t;
-
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
@@ -123,8 +120,6 @@ namespace Volume {
         {
             ser.write<uint16>(buffer, bufferI);
         }
-        LogManager::getSingleton().stream() << "Time for serialization: " << t.getMilliseconds() << "ms";
-
         ser.writeChunkEnd(VOLUME_CHUNK_ID);
         
     }
