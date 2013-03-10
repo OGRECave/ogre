@@ -41,14 +41,17 @@ namespace Volume {
 
     const String Chunk::MOVABLE_TYPE_NAME = "VolumeChunk";
     const uint16 Chunk::WORKQUEUE_LOAD_REQUEST = 1;
-    size_t Chunk::mGeneratedTriangles = 0;
     size_t Chunk::mChunksBeingProcessed = 0;
     
     //-----------------------------------------------------------------------
 
     void Chunk::loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
     {
-        mNode = parent->createChildSceneNode();
+        // This might already exist on update
+        if (!mNode)
+        {
+            mNode = parent->createChildSceneNode();
+        }
         if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
         {
             mChunksBeingProcessed++;
@@ -62,6 +65,7 @@ namespace Volume {
             req.parameters = parameters;
             req.level = level;
             req.maxLevels = maxLevels;
+            req.isUpdate = parameters->updateFrom != Vector3::ZERO || parameters->updateTo != Vector3::ZERO;
 
             req.origin = this;
             req.root = OGRE_NEW OctreeNode(from, to);
@@ -95,32 +99,38 @@ namespace Volume {
         {
             Vector3 newCenter, xWidth, yWidth, zWidth;
             OctreeNode::getChildrenDimensions(from, to, newCenter, xWidth, yWidth, zWidth);
-            mChildren = new Chunk*[OctreeNode::OCTREE_CHILDREN_COUNT];
-            mChildren[0] = createInstance();
+            if (!mChildren)
+            {
+                mChildren = new Chunk*[OctreeNode::OCTREE_CHILDREN_COUNT];
+                mChildren[0] = createInstance();
+                mChildren[1] = createInstance();
+                mChildren[2] = createInstance();
+                mChildren[3] = createInstance();
+                mChildren[4] = createInstance();
+                mChildren[5] = createInstance();
+                mChildren[6] = createInstance();
+                mChildren[7] = createInstance();
+            }
             mChildren[0]->doLoad(mNode, from, newCenter, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[1] = createInstance();
             mChildren[1]->doLoad(mNode, from + xWidth, newCenter + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[2] = createInstance();
             mChildren[2]->doLoad(mNode, from + xWidth + zWidth, newCenter + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[3] = createInstance();
             mChildren[3]->doLoad(mNode, from + zWidth, newCenter + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[4] = createInstance();
             mChildren[4]->doLoad(mNode, from + yWidth, newCenter + yWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[5] = createInstance();
             mChildren[5]->doLoad(mNode, from + yWidth + xWidth, newCenter + yWidth + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[6] = createInstance();
             mChildren[6]->doLoad(mNode, from + yWidth + xWidth + zWidth, newCenter + yWidth + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[7] = createInstance();
             mChildren[7]->doLoad(mNode, from + yWidth + zWidth, newCenter + yWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
         }
         // Just load one child of the same size as the parent for the leafes because they actually don't need to be subdivided as they
         // are all rendered anyway.
         else if (level > 1)
         {
-            mChildren = new Chunk*[2];
-            mChildren[0] = createInstance();
+            if (!mChildren)
+            {
+                mChildren = new Chunk*[2];
+                mChildren[0] = createInstance();
+                mChildren[1] = 0; // Indicator that there are no more children.
+            }
             mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[1] = 0; // Indicator that there are no more children.
         }
     }
 
@@ -128,6 +138,30 @@ namespace Volume {
     
     void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
     {
+
+        // Handle the situation where we update an existing tree
+        if (parameters->updateFrom != Vector3::ZERO || parameters->updateTo != Vector3::ZERO)
+        {
+            // Early out if an update of a part of the tree volume is going on and this chunk is outside of the area.
+            AxisAlignedBox chunkCube(from, to);
+            AxisAlignedBox updatedCube(parameters->updateFrom, parameters->updateTo);
+            if (!chunkCube.intersects(updatedCube))
+            {
+                return;
+            }
+            // Free memory from old mesh version
+            if (mRenderOp.vertexData)
+            {
+                OGRE_DELETE mRenderOp.vertexData;
+                mRenderOp.vertexData = 0;
+            }
+            if (mRenderOp.indexData)
+            {
+                OGRE_DELETE mRenderOp.indexData;
+                mRenderOp.indexData = 0;
+            }
+        }
+
         // Set to invisible for now.
         mInvisible = true;
         mVisible  = false;
@@ -162,7 +196,6 @@ namespace Volume {
     void Chunk::loadGeometry(const ChunkRequest *chunkRequest)
     {
         size_t chunkTriangles = chunkRequest->mb->generateBuffers(mRenderOp);
-        chunkRequest->origin->mGeneratedTriangles += chunkTriangles;
         chunkRequest->origin->mInvisible = chunkTriangles == 0;
 
         if (!mInvisible && chunkRequest->parameters->lodCallback && chunkRequest->parameters->lodCallbackLod  == chunkRequest->maxLevels - chunkRequest->level + 1)
@@ -174,9 +207,14 @@ namespace Volume {
 
         if (!mInvisible)
         {
+            if (chunkRequest->isUpdate)
+            {
+                mNode->detachObject(this);
+            }
             mNode->attachObject(this);
         }
-        mVisible = false ;
+
+        mVisible = false;
 
         if (chunkRequest->parameters->createDualGridVisualization)
         {
@@ -199,7 +237,7 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     Chunk::Chunk(void) : mDualGrid(0), mOctree(0), mChildren(0), mOctreeVisible(false),
-        mDualGridVisible(false), mInvisible(false), mVolumeVisible(true)
+        mDualGridVisible(false), mInvisible(false), mVolumeVisible(true), mNode(0)
     {
     }
     
@@ -259,11 +297,14 @@ namespace Volume {
                 "Invalid parameters given!",
                 __FUNCTION__);
         }
-        mGeneratedTriangles = 0;
-        Timer t;
+        mChunksBeingProcessed = 0;
 
-        mScale = parameters->scale;
-        parent->scale(Vector3(parameters->scale));
+        // Don't scale on update
+        if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
+        {
+            mScale = parameters->scale;
+            parent->scale(Vector3(parameters->scale));
+        }
 
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
         uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
@@ -282,13 +323,16 @@ namespace Volume {
         wq->removeRequestHandler(workQueueChannel, this);
         wq->removeResponseHandler(workQueueChannel, this);
     
-        LogManager::getSingleton().stream() << "Loaded chunks in " << t.getMilliseconds() << "ms, generated " << mGeneratedTriangles << " triangles";
-        Root::getSingleton().addFrameListener(this);
+        // Just add the frame listener on initial load
+        if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
+        {
+            Root::getSingleton().addFrameListener(this);
+        }
     }
     
     //-----------------------------------------------------------------------
 
-    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
+    ChunkParameters Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
     {
         ConfigFile config;
         config.loadFromResourceSystem(filename, resourceGroup);
@@ -345,6 +389,8 @@ namespace Volume {
                 setMaterialOfLevel(i, materialOfLevel);
             }
         }
+        parameters.src = 0;
+        return parameters;
     }
     
     //-----------------------------------------------------------------------

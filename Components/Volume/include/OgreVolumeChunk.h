@@ -84,11 +84,18 @@ namespace Volume {
         /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
         size_t createGeometryFromLevel;
 
+        /// If an existing chunktree is to be partially updated, set this to the back lower left point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
+        Vector3 updateFrom;
+        
+        /// If an existing chunktree is to be partially updated, set this to the front upper right point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
+        Vector3 updateTo;
+
         /** Constructor.
         */
         ChunkParameters(void) :
             sceneManager(0), src(0), baseError((Real)0.0), errorMultiplicator((Real)1.0), createOctreeVisualization(false),
-            createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0)
+            createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0),
+            updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO)
         {
         }
     } ChunkParameters;
@@ -129,6 +136,9 @@ namespace Volume {
         /// The chunk which created this request.
         Chunk *origin;
 
+        /// Whether this is an update of an existing tree
+        bool isUpdate;
+
         /** Stream operator <<.
         @param o
             The used stream.
@@ -147,10 +157,7 @@ namespace Volume {
         
         /// The workqueue load request.
         static const uint16 WORKQUEUE_LOAD_REQUEST;
-
-        /// Holds the amount of generated triangles.
-        static size_t mGeneratedTriangles;
-
+        
         /// The maximum accepted screen space error.
         Real mMaxScreenSpaceError;
         
@@ -368,8 +375,10 @@ namespace Volume {
             On which LOD level the callback should be called.
         @param resourceGroup
             The resource group where to search for the configuration file.
+        @return
+            The read parameters, but with null source, use the sourceResult to get it.
         */
-        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual ChunkParameters load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         
         /** Shows the debug visualization entity of the dualgrid.
         @param visible

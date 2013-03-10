@@ -27,6 +27,9 @@ THE SOFTWARE.
 #include "SamplePlugin.h"
 #include "VolumeTerrain.h"
 
+#include "OgreVolumeTextureSource.h"
+#include "OgreVolumeCSGSource.h"
+
 #include "OgreRay.h"
 
 using namespace Ogre;
@@ -49,9 +52,11 @@ void Sample_VolumeTerrain::setupContent(void)
    
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
-    SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
-    mVolumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg", &mSource);
-
+    mVolumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
+    Source *source;
+    mParameters = mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", &source);
+    mParameters.src = source;
+    
     // Camera
     mCamera->setPosition((Real)(2560 - 384), (Real)2000, (Real)(2560 - 384));
     mCamera->lookAt((Real)0, (Real)100, (Real)0);
@@ -73,7 +78,7 @@ void Sample_VolumeTerrain::setupControls(void)
     mTrayMgr->showFrameStats(TL_TOPRIGHT);
     mTrayMgr->toggleAdvancedFrameStats();
 
-    mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "Usage:\n\nHold the left mouse button,\n press wasd for movement\nand move the mouse for\n the direction.\nYou can place white spheres\nwith the middle mouse\nbutton like in an ego-shooter.", 265, 160);
+    mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "Usage:\n\nHold the left mouse button, press\nwasd for movement and move the\nmouse for the direction.\nYou can add spheres with the\nmiddle mouse button and remove\nspheres with the right one.", 310, 150);
 }
     
 //-----------------------------------------------------------------------
@@ -81,7 +86,7 @@ void Sample_VolumeTerrain::setupControls(void)
 void Sample_VolumeTerrain::cleanupContent(void)
 {   
     OGRE_DELETE mVolumeRoot;
-    delete mSource;
+    delete mParameters.src;
     mVolumeRoot = 0;
 }
     
@@ -90,7 +95,7 @@ void Sample_VolumeTerrain::cleanupContent(void)
 Sample_VolumeTerrain::Sample_VolumeTerrain(void) : mVolumeRoot(0), mHideAll(false)
 {
     mInfo["Title"] = "Volume Terrain";
-    mInfo["Description"] = "Demonstrates a volumetric terrain defined by an 3D texture and ray intersection with a volume.";
+    mInfo["Description"] = "Demonstrates a volumetric terrain defined by an 3D texture and manipulation of the volume. The middle mouse button adds a sphere, a rightclick removes one.";
     mInfo["Thumbnail"] = "thumb_volumeterrain.png";
     mInfo["Category"] = "Geometry";
 }
@@ -128,19 +133,29 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
 
 //-----------------------------------------------------------------------
 
-void Sample_VolumeTerrain::shootRay(Ray ray)
+void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 {
         Vector3 intersection;
-        bool intersects = mSource->getFirstRayIntersection(ray, intersection);
-        static int intersectionName = 0;
+        bool intersects = mParameters.src->getFirstRayIntersection(ray, intersection, mVolumeRoot->getScale());
         if (intersects)
         {
-            intersectionName++;
-            SceneNode *n = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-            n->translate(intersection * mVolumeRoot->getScale());
-            n->scale(Vector3((Real)0.05));
-            Entity * mcSphere = mSceneMgr->createEntity("intersection" + StringConverter::toString(intersectionName), "sphere.mesh");
-            n->attachObject(mcSphere);
+            Real radius = (Real)2.5;
+            CSGSphereSource sphere(radius, intersection);
+            // ? : doesn't work here somehow?
+            CSGOperationSource *operation;
+            if (doUnion)
+            {
+                operation = new CSGUnionSource();
+            }
+            else
+            {
+                operation = new CSGDifferenceSource();
+            }
+            static_cast<TextureSource*>(mParameters.src)->combineWithSource(operation, &sphere, intersection, radius * (Real)2.0);
+            mParameters.updateFrom = intersection - radius * (Real)2.0;
+            mParameters.updateTo = intersection + radius * (Real)2.0;
+            mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, &mParameters);
+            delete operation;
         }
 }
 
@@ -159,10 +174,12 @@ bool Sample_VolumeTerrain::touchPressed(const OIS::MultiTouchEvent& evt)
 
 bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 {
-    if (id == OIS::MB_Middle)
+    if (id == OIS::MB_Middle || id == OIS::MB_Right)
     {
-        Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
-        shootRay(ray);
+        Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
+        Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
+        Ray ray = mCamera->getCameraToViewportRay(x, y);
+        shootRay(ray, id == OIS::MB_Middle);
     }
 
     return SdkSample::mousePressed(evt, id);

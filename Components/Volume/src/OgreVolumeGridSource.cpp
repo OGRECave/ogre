@@ -240,15 +240,18 @@ namespace Volume {
         int yEnd = Math::Clamp((int)(center.y + radius), 0, mHeight);
         int zStart = Math::Clamp((int)(center.z - radius), 0, mDepth);
         int zEnd = Math::Clamp((int)(center.z + radius), 0, mDepth);
-
+        Vector3 pos;
         for (int z = zStart; z < zEnd; ++z)
         {
             for (y = yStart; y < yEnd; ++y)
             {
                 for (x = xStart; x < xEnd; ++x)
                 {
-                    value = operation->getValue(Vector3(x * worldWidthScale, y * worldHeightScale, z * worldDepthScale));
-                    setVolumeGridValue(x, z, y, value);
+                    pos.x = x * worldWidthScale;
+                    pos.y =  y * worldHeightScale;
+                    pos.z = z * worldDepthScale;
+                    value = operation->getValue(pos);
+                    setVolumeGridValue(x, y, z, value);
                 }
             }
         }
