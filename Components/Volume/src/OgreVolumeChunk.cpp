@@ -55,8 +55,6 @@ namespace Volume {
         if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
         {
             mChunksBeingProcessed++;
-            mScale = parameters->scale;
-            mMaxScreenSpaceError = parameters->maxScreenSpaceError;
 
             // Call worker
             ChunkRequest req;
@@ -110,6 +108,14 @@ namespace Volume {
                 mChildren[5] = createInstance();
                 mChildren[6] = createInstance();
                 mChildren[7] = createInstance();
+                mChildren[0]->shared = shared;
+                mChildren[1]->shared = shared;
+                mChildren[2]->shared = shared;
+                mChildren[3]->shared = shared;
+                mChildren[4]->shared = shared;
+                mChildren[5]->shared = shared;
+                mChildren[6]->shared = shared;
+                mChildren[7]->shared = shared;
             }
             mChildren[0]->doLoad(mNode, from, newCenter, totalFrom, totalTo, level - 1, maxLevels, parameters);
             mChildren[1]->doLoad(mNode, from + xWidth, newCenter + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
@@ -128,6 +134,7 @@ namespace Volume {
             {
                 mChildren = new Chunk*[2];
                 mChildren[0] = createInstance();
+                mChildren[0]->shared = shared;
                 mChildren[1] = 0; // Indicator that there are no more children.
             }
             mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels, parameters);
@@ -236,8 +243,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Chunk::Chunk(void) : mDualGrid(0), mOctree(0), mChildren(0), mOctreeVisible(false),
-        mDualGridVisible(false), mInvisible(false), mVolumeVisible(true), mNode(0)
+    Chunk::Chunk(void) : mDualGrid(0), mOctree(0), mChildren(0), mNode(0), isRoot(false)
     {
     }
     
@@ -263,6 +269,10 @@ namespace Volume {
             }
         }
         delete[] mChildren;
+        if (isRoot)
+        {
+            delete shared;
+        }
     }
     
     //-----------------------------------------------------------------------
@@ -276,14 +286,14 @@ namespace Volume {
 
     Real Chunk::getSquaredViewDepth(const Camera* camera) const
     {
-        return (mBox.getCenter() * mScale).squaredDistance(camera->getPosition());
+        return (mBox.getCenter() * shared->scale).squaredDistance(camera->getPosition());
     }
     
     //-----------------------------------------------------------------------
 
     Real Chunk::getBoundingRadius() const
     {
-        return mBox.getMinimum().distance(mBox.getCenter()) * mScale;
+        return mBox.getMinimum().distance(mBox.getCenter()) * shared->scale;
     }
     
     //-----------------------------------------------------------------------
@@ -299,10 +309,14 @@ namespace Volume {
         }
         mChunksBeingProcessed = 0;
 
-        // Don't scale on update
+        isRoot = true;
+
+        // Don't recreate the shared parameters on update.
         if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
         {
-            mScale = parameters->scale;
+            shared = new ChunkTreeSharedData();
+            shared->maxScreenSpaceError = parameters->maxScreenSpaceError;
+            shared->scale = parameters->scale;
             parent->scale(Vector3(parameters->scale));
         }
 
@@ -397,7 +411,7 @@ namespace Volume {
 
     void Chunk::setDualGridVisible(const bool visible)
     {
-        mDualGridVisible = visible;
+        shared->dualGridVisible = visible;
         if (mChildren)
         {
             mChildren[0]->setDualGridVisible(visible);
@@ -418,14 +432,14 @@ namespace Volume {
 
     bool Chunk::getDualGridVisible(void) const
     {
-        return mDualGridVisible;
+        return shared->dualGridVisible;
     }
     
     //-----------------------------------------------------------------------
 
     void Chunk::setOctreeVisible(const bool visible)
     {
-        mOctreeVisible = visible;
+        shared->octreeVisible = visible;
         if (mChildren)
         {
             mChildren[0]->setOctreeVisible(visible);
@@ -446,14 +460,14 @@ namespace Volume {
 
     bool Chunk::getOctreeVisible(void) const
     {
-        return mOctreeVisible;
+        return shared->octreeVisible;
     }
     
     //-----------------------------------------------------------------------
 
     bool Chunk::getVolumeVisible(void) const
     {
-        return mVolumeVisible;
+        return shared->volumeVisible;
     }
     
     //-----------------------------------------------------------------------
@@ -494,7 +508,7 @@ namespace Volume {
         
         // Get the distance to the center.
         Vector3 camPos = mCamera->getRealPosition();
-        Real d = (mBox.getCenter() * mScale).distance(camPos);
+        Real d = (mBox.getCenter() * shared->scale).distance(camPos);
         if (d < 1.0)
         {
             d = 1.0;
@@ -502,7 +516,7 @@ namespace Volume {
 
         Real screenSpaceError = mError / d * k;
 
-        if (screenSpaceError <= mMaxScreenSpaceError / mScale)
+        if (screenSpaceError <= shared->maxScreenSpaceError / shared->scale)
         {
             setChunkVisible(true, false);
             if (mChildren)
@@ -658,14 +672,14 @@ namespace Volume {
 
     Real Chunk::getScale(void) const
     {
-        return mScale;
+        return shared->scale;
     }
     
     //-----------------------------------------------------------------------
 
     void Chunk::setVolumeVisible(bool visible)
     {
-        mVolumeVisible = visible;
+        shared->volumeVisible = visible;
         mVisible = visible;
         if (mChildren)
         {

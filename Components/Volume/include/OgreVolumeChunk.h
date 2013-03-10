@@ -149,6 +149,33 @@ namespace Volume {
         { return o; }
     } ChunkRequest;
 
+    /** Internal shared values of the chunks which are equal in the whole tree.
+    */
+    typedef struct ChunkTreeSharedData
+    {
+        /// The maximum accepted screen space error.
+        Real maxScreenSpaceError;
+        
+        /// The scale.
+        Real scale;
+
+        /// Flag whether the octree is visible or not.
+        bool octreeVisible;
+        
+        /// Flag whether the dualgrid is visible or not.
+        bool dualGridVisible;
+
+        /// Another visibility flag to be user setable.
+        bool volumeVisible;
+
+        /** Constructor.
+        */
+        ChunkTreeSharedData(void) : octreeVisible(false), dualGridVisible(false), volumeVisible(true)
+        {
+        }
+
+    } ChunkTreeSharedData;
+
     /** A single volume chunk mesh.
     */
     class _OgreVolumeExport Chunk : public SimpleRenderable, public FrameListener, public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler
@@ -158,12 +185,6 @@ namespace Volume {
         /// The workqueue load request.
         static const uint16 WORKQUEUE_LOAD_REQUEST;
         
-        /// The maximum accepted screen space error.
-        Real mMaxScreenSpaceError;
-        
-        /// The scale.
-        Real mScale;
-
         /// The amount of chunks currently being processed.
         static size_t mChunksBeingProcessed;
 
@@ -182,18 +203,15 @@ namespace Volume {
         /// The more detailed children chunks.
         Chunk **mChildren;
 
-        /// Flag whether the octree is visible or not.
-        bool mOctreeVisible;
-        
-        /// Flag whether the dualgrid is visible or not.
-        bool mDualGridVisible;
-
         /// Flag whether this node will never be shown.
         bool mInvisible;
-
-        /// Another visibility flag to be user setable.
-        bool mVolumeVisible;
         
+        /// Whether this chunk is the root of the tree.
+        bool isRoot;
+
+        /// Holds some shared data among all chunks of the tree.
+        ChunkTreeSharedData *shared;
+
         /** Loads a single chunk of the tree.
         @param parent
             The parent scene node for the volume
@@ -291,17 +309,17 @@ namespace Volume {
             {
                 return;
             }
-            if (mVolumeVisible)
+            if (shared->volumeVisible)
             {
                 mVisible = visible;
             }
             if (mOctree)
             {
-                mOctree->setVisible(mOctreeVisible && visible);
+                mOctree->setVisible(shared->octreeVisible && visible);
             }
             if (mDualGrid)
             {
-                mDualGrid->setVisible(mDualGridVisible && visible);
+                mDualGrid->setVisible(shared->dualGridVisible && visible);
             }
             if (applyToChildren && mChildren)
             {
