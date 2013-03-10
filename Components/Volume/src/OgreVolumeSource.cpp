@@ -71,9 +71,6 @@ namespace Volume {
 
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file)
     {
-     
-        Timer t;
-
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
@@ -123,28 +120,27 @@ namespace Volume {
         {
             ser.write<uint16>(buffer, bufferI);
         }
-        LogManager::getSingleton().stream() << "Time for serialization: " << t.getMilliseconds() << "ms";
-
         ser.writeChunkEnd(VOLUME_CHUNK_ID);
         
     }
 
     //-----------------------------------------------------------------------
 
-    bool Source::getFirstRayIntersection(const Ray &ray, Vector3 &result, size_t maxIterations, Real maxDistance) const
+    bool Source::getFirstRayIntersection(const Ray &ray, Vector3 &result, Real scale, size_t maxIterations, Real maxDistance) const
     {
-        Vector3 start = getIntersectionStart(ray, maxDistance);
+        Ray scaledRay(ray.getOrigin() / scale, ray.getDirection());
+        Vector3 start = getIntersectionStart(scaledRay, maxDistance);
         Vector3 cur = start;
-        Vector3 end = getIntersectionEnd(ray, maxDistance);
+        Vector3 end = getIntersectionEnd(scaledRay, maxDistance);
      
         Vector4 startVal = getValueAndGradient(start);
         Vector3 scaleSampleGradient(startVal.x, startVal.y, startVal.z);
         Vector3 scaleSampleEnd = start + scaleSampleGradient.normalisedCopy();
         Real scaleSample = getValue(scaleSampleEnd);
-        Real scale = (Real)1.0 / Math::Abs(scaleSample - startVal.w) * (Real)2.0;
+        Real densityScale = (Real)1.0 / Math::Abs(scaleSample - startVal.w) * (Real)2.0;
 
         Real densityCur = getValue(cur);
-        Vector3 dir = ray.getDirection().normalisedCopy();
+        Vector3 dir = scaledRay.getDirection().normalisedCopy();
 
         size_t count = 0;
         Vector3 prev, prevPrev;
@@ -152,12 +148,12 @@ namespace Volume {
         Real totalLength = (start - end).length();
         while (Math::Abs(densityCur) > (Real)0.01 && !atEnd)
         {
-            cur += dir * (Real)-1.0 * (densityCur / scale);
+            cur += dir * (Real)-1.0 * (densityCur / densityScale);
             
             // Increase the scaling a bit if we jump forth and back due to bad depth data.
             if ((cur - prevPrev).length() < (Real)0.0001)
             {
-                scale *= (Real)2.0;
+                densityScale *= (Real)2.0;
             }
             prevPrev = prev;
             prev = cur;
