@@ -257,11 +257,6 @@ namespace Ogre {
 			if(PixelUtil::isCompressed((PixelFormat)x))
 				continue;
 
-			int depths[4];
-			PixelUtil::getBitDepths((PixelFormat)x, depths);
-			if(fmt!=GL_NONE && (!depths[0] || !depths[1] || !depths[2]))
-				continue;
-
             // Create and attach framebuffer
             glGenFramebuffers(1, &fb);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
@@ -380,7 +375,7 @@ namespace Ogre {
             // desirability == 1000...2000  if no depth, stencil
             // desirability == 2000...3000  if depth, no stencil
             // desirability == 3000+        if depth and stencil
-            // beyond this, the total numer of bits (stencil+depth) is maximised
+            // beyond this, the total number of bits (stencil+depth) is maximised
             if(props.modes[mode].stencil && !requestDepthOnly)
                 desirability += 1000;
             if(props.modes[mode].depth)
