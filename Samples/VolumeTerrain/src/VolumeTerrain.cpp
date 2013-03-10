@@ -135,28 +135,28 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
 
 void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 {
-        Vector3 intersection;
-        bool intersects = mParameters.src->getFirstRayIntersection(ray, intersection, mVolumeRoot->getScale());
-        if (intersects)
+    Vector3 intersection;
+    bool intersects = mParameters.src->getFirstRayIntersection(ray, intersection, mVolumeRoot->getScale());
+    if (intersects)
+    {
+        Real radius = (Real)2.5;
+        CSGSphereSource sphere(radius, intersection);
+        // ? : doesn't work here somehow?
+        CSGOperationSource *operation;
+        if (doUnion)
         {
-            Real radius = (Real)2.5;
-            CSGSphereSource sphere(radius, intersection);
-            // ? : doesn't work here somehow?
-            CSGOperationSource *operation;
-            if (doUnion)
-            {
-                operation = new CSGUnionSource();
-            }
-            else
-            {
-                operation = new CSGDifferenceSource();
-            }
-            static_cast<TextureSource*>(mParameters.src)->combineWithSource(operation, &sphere, intersection, radius * (Real)2.0);
-            mParameters.updateFrom = intersection - radius * (Real)2.0;
-            mParameters.updateTo = intersection + radius * (Real)2.0;
-            mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, &mParameters);
-            delete operation;
+            operation = new CSGUnionSource();
         }
+        else
+        {
+            operation = new CSGDifferenceSource();
+        }
+        static_cast<TextureSource*>(mParameters.src)->combineWithSource(operation, &sphere, intersection, radius * (Real)2.0);
+        mParameters.updateFrom = intersection - radius * (Real)2.0;
+        mParameters.updateTo = intersection + radius * (Real)2.0;
+        mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, &mParameters);
+        delete operation;
+    }
 }
 
 //-----------------------------------------------------------------------
