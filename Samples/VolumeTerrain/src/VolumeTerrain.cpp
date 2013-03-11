@@ -165,7 +165,7 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 bool Sample_VolumeTerrain::touchPressed(const OIS::MultiTouchEvent& evt)
 {
     Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
-    shootRay(ray);
+    shootRay(ray, false);
 
     return SdkSample::touchPressed(evt);
 }
