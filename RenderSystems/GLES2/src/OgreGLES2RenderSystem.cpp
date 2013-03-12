@@ -385,7 +385,7 @@ namespace Ogre {
 		rsc->setCapability(RSC_TEXTURE_1D);			
 #if OGRE_NO_GLES3_SUPPORT == 0
         rsc->setCapability(RSC_TEXTURE_3D);
-
+#endif
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
@@ -1585,16 +1585,6 @@ namespace Ogre {
         elemEnd = decl.end();
         GLES2VertexDeclaration* gles2decl = 
             static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
-
-        // Use a little shorthand
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
-        bool useVAO = (gles2decl && gles2decl->isInitialised());
-#else
-        bool useVAO = false;
-#endif
-
-        if(useVAO)
-            setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
 
         // Use a little shorthand
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0

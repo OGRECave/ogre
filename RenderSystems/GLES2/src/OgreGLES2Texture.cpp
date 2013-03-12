@@ -315,12 +315,6 @@ namespace Ogre {
 #endif
         }
     }
-    }
-    
-    // Creation / loading methods
-    void GLES2Texture::createInternalResourcesImpl(void)
-    {
-		_createGLTexResource();
     
     // Creation / loading methods
     void GLES2Texture::createInternalResourcesImpl(void)
@@ -452,22 +446,7 @@ namespace Ogre {
         mSurfaceList.clear();
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
         mTextureID = 0;
-        mTextureID = 0;
     }
-    
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    void GLES2Texture::notifyOnContextLost()
-    {
-        if (!mIsManual) 
-        {
-            freeInternalResources();
-        }
-        else
-        {
-            glDeleteTextures(1, &mTextureID);
-            GL_CHECK_ERROR;
-            mTextureID = 0;
-        }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLES2Texture::notifyOnContextLost()

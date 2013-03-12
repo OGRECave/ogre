@@ -95,7 +95,6 @@ namespace Ogre {
             size_t getGLMapBufferThreshold() const;
             void setGLMapBufferThreshold( const size_t value );
 			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
-                createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
 
     };
 

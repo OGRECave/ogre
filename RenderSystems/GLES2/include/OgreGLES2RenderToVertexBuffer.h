@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreRenderToVertexBuffer.h"
 #include "OgreGLES2Prerequisites.h"
 
+#if OGRE_NO_GLES3_SUPPORT == 0
+
 namespace Ogre {
     /**
         An object which renders geometry to a vertex.
@@ -69,4 +71,5 @@ namespace Ogre {
     };
 }
 
+#endif
 #endif
