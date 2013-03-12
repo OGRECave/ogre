@@ -40,6 +40,7 @@ namespace Ogre {
 
     EAGL2Support::EAGL2Support()
     {
+        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     }
 
     EAGL2Support::~EAGL2Support()

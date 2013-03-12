@@ -783,7 +783,7 @@ namespace Ogre {
 		String generate()
 		{
 			OGRE_LOCK_AUTO_MUTEX
-			std::ostringstream s;
+			StringStream s;
 			s << mPrefix << mNext++;
 			return s.str();
 		}

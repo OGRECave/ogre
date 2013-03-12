@@ -143,7 +143,7 @@ namespace Ogre {
 
 		/// The list of per-scheme (and general) material listeners
 		typedef list<Listener*>::type ListenerList;
-		typedef std::map<String, ListenerList> ListenerMap;
+		typedef map<String, ListenerList>::type ListenerMap;
 		ListenerMap mListenerMap;
 
     public:

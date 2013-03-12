@@ -229,7 +229,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set build variables
   set(CMAKE_OSX_SYSROOT iphoneos)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")

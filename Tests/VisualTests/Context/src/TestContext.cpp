@@ -64,7 +64,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     binOpt["-o"] = "NONE";      // path to output a summary file to (default: don't output a file)
 
     // parse
-    findCommandLineOpts(argc, argv, unOpt, binOpt);
+    Ogre::findCommandLineOpts(argc, argv, unOpt, binOpt);
 
     mReferenceSet = unOpt["-r"];
     mTestSetName = binOpt["-ts"];

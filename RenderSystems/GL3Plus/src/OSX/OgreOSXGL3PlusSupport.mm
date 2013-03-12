@@ -331,7 +331,7 @@ void* OSXGL3PlusSupport::getProcAddress( const char* name )
     void *symbol;
     symbol = NULL;
     
-    std::string fullPath = macPluginPath() + "RenderSystem_GL3Plus.dylib";
+    String fullPath = macPluginPath() + "RenderSystem_GL3Plus.dylib";
     void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if(handle) {
         symbol = dlsym (handle, name);

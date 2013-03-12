@@ -70,7 +70,7 @@ namespace Ogre
 	class _OgreExport WorkQueue : public UtilityAlloc
 	{
 	protected:
-		typedef std::map<String, uint16> ChannelMap;
+		typedef map<String, uint16>::type ChannelMap;
 		ChannelMap mChannelMap;
 		uint16 mNextChannel;
 		OGRE_MUTEX(mChannelMapMutex)

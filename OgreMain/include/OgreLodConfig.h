@@ -104,7 +104,7 @@ struct LodLevel {
 struct LodConfig {
 	MeshPtr mesh;
 	LodStrategy* strategy;
-	typedef std::vector<LodLevel> LodLevelList;
+	typedef vector<LodLevel>::type LodLevelList;
 	LodLevelList levels;
 };
 }

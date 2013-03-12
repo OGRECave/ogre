@@ -53,8 +53,11 @@ private:
     /// Holds the volume root.
     Chunk *mVolumeRoot;
 
-    /// Holds the volume source for later ray intersections.
-    Source *mSource;
+    /// Holds the read volume parameters.
+    ChunkParameters mParameters;
+
+    /// The node on which the terrain is attached.
+    SceneNode *mVolumeRootNode;
 
 protected:
     
@@ -72,6 +75,14 @@ protected:
     /** Is called when the sample is stopped.
     */
     virtual void cleanupContent(void);
+
+    /** Intersects a ray with the volume and adds a sphere at the intersection.
+    @param ray
+        The ray.
+    @param doUnion
+        Whether to add or subtract a sphere
+    */
+    void shootRay(Ray ray, bool doUnion);
 public:
 
     /** Constructor.
@@ -81,12 +92,6 @@ public:
     /** Overridden from SdkSample.
     */
     virtual bool keyPressed(const OIS::KeyEvent& evt);
-
-    /** Intersects a ray with the volume and adds a sphere at the intersection.
-    @param ray
-        The ray.
-    */
-    void shootRay(Ray ray);
     
     /** Overridden from SdkSample.
     */

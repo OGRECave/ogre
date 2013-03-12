@@ -31,6 +31,13 @@
 
 #include "OgreEAGL2Support.h"
 
+#if defined(__APPLE__)
+#define IF_OS_VERSION_IS_GREATER_THAN(vers) \
+    if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
+#else
+#define IF_OS_VERSION_IS_GREATER_THAN(vers)
+#endif
+
 namespace Ogre {
     inline GLES2Support* getGLSupport()
     {

@@ -53,6 +53,7 @@ endif ()
 
 if (APPLE)
   set(INST_FILES ${INST_FILES}
+    Packages/FindCg.cmake
     Packages/FindIOKit.cmake
     Packages/FindCarbon.cmake
     Packages/FindCocoa.cmake

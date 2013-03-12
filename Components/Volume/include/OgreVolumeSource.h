@@ -137,12 +137,14 @@ namespace Volume {
             The ray.
         @param result
             Will hold the intersection point if there is an intersection.
+        @param scale
+            The scaling of the volume compared to the world.
         @param maxIterations
             The maximum amount of iterations on the ray before giving up.
         @param maxDistance
             The maximum distance of the intersection point.
         */
-        bool getFirstRayIntersection(const Ray &ray, Vector3 &result, size_t maxIterations = 5000, Real maxDistance = (Real)10000.0) const;
+        bool getFirstRayIntersection(const Ray &ray, Vector3 &result, Real scale = (Real)1.0, size_t maxIterations = 5000, Real maxDistance = (Real)10000.0) const;
 
     };
 

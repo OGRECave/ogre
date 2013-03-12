@@ -436,11 +436,6 @@ namespace Ogre {
                             GLES2PixelUtil::getGLOriginDataType(data.format),
                             data.data));
         }
-        
-        if (mUsage & TU_AUTOMIPMAP)
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-        }
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));

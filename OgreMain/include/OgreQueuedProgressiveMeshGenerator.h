@@ -55,15 +55,15 @@ struct PMGenRequest {
 			indexBuffer(0) { }
 	};
 	struct SubmeshInfo {
-		std::vector<IndexBuffer> genIndexBuffers; // order: lodlevel/generated index buffer
+		vector<IndexBuffer>::type genIndexBuffers; // order: lodlevel/generated index buffer
 		IndexBuffer indexBuffer;
 		VertexBuffer vertexBuffer;
 		bool useSharedVertexBuffer;
 	};
-	std::vector<SubmeshInfo> submesh;
+	vector<SubmeshInfo>::type submesh;
 	VertexBuffer sharedVertexBuffer;
 	LodConfig config;
-	std::string meshName;
+	String meshName;
 	~PMGenRequest();
 };
 
