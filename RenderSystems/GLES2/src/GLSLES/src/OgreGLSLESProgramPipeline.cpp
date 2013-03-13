@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -138,7 +138,7 @@ namespace Ogre
 				GLint binaryLength = 0;
 
 #if GL_OES_get_program_binary
-				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
+				glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
                 GL_CHECK_ERROR;
 #endif
 
@@ -148,7 +148,7 @@ namespace Ogre
 
 #if GL_OES_get_program_binary
 				// Get binary
-				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
+				glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
                 GL_CHECK_ERROR;
 #endif
 
@@ -169,8 +169,9 @@ namespace Ogre
             // Validate pipeline
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
-                             (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
+            if(mVertexProgram && mFragmentProgram)
+                glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
+                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
 #endif
 		}
 #endif

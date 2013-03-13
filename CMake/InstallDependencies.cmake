@@ -180,7 +180,6 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "asio" EXCLUDE
       PATTERN "assign" EXCLUDE
       PATTERN "bimap" EXCLUDE
-      PATTERN "chrono" EXCLUDE
       PATTERN "circular_buffer" EXCLUDE
       PATTERN "compatibility" EXCLUDE
       PATTERN "concept_check" EXCLUDE
@@ -189,7 +188,6 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "filesystem" EXCLUDE
       PATTERN "flyweight" EXCLUDE
       PATTERN "format" EXCLUDE
-      PATTERN "functional" EXCLUDE
       PATTERN "fusion" EXCLUDE
       PATTERN "geometry" EXCLUDE
       PATTERN "gil" EXCLUDE
@@ -214,18 +212,15 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "ptr_container" EXCLUDE
       PATTERN "python" EXCLUDE
       PATTERN "random" EXCLUDE
-      PATTERN "ratio" EXCLUDE
       PATTERN "regex" EXCLUDE
       PATTERN "serialization" EXCLUDE
       PATTERN "signals" EXCLUDE
       PATTERN "signals2" EXCLUDE
       PATTERN "spirit" EXCLUDE
       PATTERN "statechart" EXCLUDE
-      PATTERN "system" EXCLUDE
       PATTERN "test" EXCLUDE
       PATTERN "timer" EXCLUDE
       PATTERN "tr1" EXCLUDE
-      PATTERN "typeof" EXCLUDE
       PATTERN "units" EXCLUDE
       PATTERN "unordered" EXCLUDE
       PATTERN "uuid" EXCLUDE

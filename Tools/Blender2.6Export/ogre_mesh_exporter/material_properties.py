@@ -29,7 +29,8 @@ class MaterialProperties(bpy.types.PropertyGroup):
 	materialExportMode_override = BoolProperty(
 		name = "Material Export Mode Override",
 		description = "Override global setting.",
-		default = True
+		default = True,
+		options = set()
 	)
 	materialExportMode = EnumProperty(
 		name= "Material Export Mode",
@@ -38,9 +39,11 @@ class MaterialProperties(bpy.types.PropertyGroup):
 				("game", "Game Engine Materials", "Export using game engine materials."),
 				("custom",  "Custom Materials", "Export using custom template based materials."),
 				),
-		default= "rend"
+		default= "rend",
+		options = set()
 	)
 	template_name = StringProperty(
 		name = "Template Name",
-		description = "Name of material template."
+		description = "Name of material template.",
+		options = set()
 	)

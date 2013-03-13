@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -151,6 +152,20 @@ namespace Ogre {
         mTriedToLinkAndFailed = !mLinked;
 
         logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
+
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                glIsProgramPipelineEXT(mGLProgramHandle))
+        {
+            glValidateProgramPipelineEXT(mGLProgramHandle);
+        }
+#endif
+        else if(glIsProgram(mGLProgramHandle))
+        {
+            glValidateProgram(mGLProgramHandle);
+        }
+
+		logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
 
 		if(mLinked)
 		{

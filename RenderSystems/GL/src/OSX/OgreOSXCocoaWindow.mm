@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -491,7 +491,7 @@ namespace Ogre {
             NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 
             GLint bufferRect[4];
-            bufferRect[0] = viewFrame.origin.x; // 0 = left edge
+            bufferRect[0] = viewFrame.origin.x; // 0 = left edge 
             bufferRect[1] = windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height); // 0 = bottom edge 
             bufferRect[2] = viewFrame.size.width; // width of buffer rect 
             bufferRect[3] = viewFrame.size.height; // height of buffer rect 
@@ -500,8 +500,8 @@ namespace Ogre {
             [mGLContext update];
 
             
-            mLeft = windowFrame.origin.x; 
-            mTop = screenFrame.size.height - windowFrame.size.height;
+            mLeft = viewFrame.origin.x; 
+            mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
         
@@ -521,13 +521,14 @@ namespace Ogre {
     {
         if(!mIsFullScreen)
         {
-            NSRect frame = [mWindow frame];
+            NSRect winFrame = [mWindow frame];
+            NSRect viewFrame = [mView frame];
             NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
-            mWidth = (unsigned int)frame.size.width;
-            mHeight = (unsigned int)frame.size.height;
-            mLeft = (int)frame.origin.x;
-            mTop = screenFrame.size.height - frame.size.height;
-		
+            mWidth = (unsigned int)viewFrame.size.width;
+            mHeight = (unsigned int)viewFrame.size.height;
+            mLeft = (int)winFrame.origin.x;
+            mTop = screenFrame.size.height - winFrame.size.height;
+
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
 
@@ -644,7 +645,7 @@ namespace Ogre {
             {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
-                GLint backingStoreDimensions[2] = { mWidth, mHeight };
+                GLint backingStoreDimensions[2] = { (GLint)mWidth, (GLint)mHeight };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 

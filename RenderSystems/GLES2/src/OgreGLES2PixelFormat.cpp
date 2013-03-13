@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -266,6 +266,10 @@ namespace Ogre  {
                 {
                     case GL_UNSIGNED_SHORT_5_6_5:
                         return PF_B5G6R5;
+                    case GL_HALF_FLOAT_OES:
+                        return PF_FLOAT16_RGB;
+                    case GL_FLOAT:
+                        return PF_FLOAT32_RGB;
                     default:
                         return PF_R8G8B8;
                 }
@@ -276,6 +280,10 @@ namespace Ogre  {
                         return PF_A1R5G5B5;
                     case GL_UNSIGNED_SHORT_4_4_4_4:
                         return PF_A4R4G4B4;
+                    case GL_HALF_FLOAT_OES:
+                        return PF_FLOAT16_RGBA;
+                    case GL_FLOAT:
+                        return PF_FLOAT32_RGBA;
                     default:
                         return PF_A8B8G8R8;
                 }
