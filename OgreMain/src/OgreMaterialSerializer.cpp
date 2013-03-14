@@ -1238,9 +1238,11 @@ namespace Ogre
             context.pass->setTransparentSortingEnabled(true);
         else if (params == "off")
             context.pass->setTransparentSortingEnabled(false);
+        else if (params == "force")
+            context.pass->setTransparentSortingForced(true);
         else
             logParseError(
-            "Bad transparent_sorting attribute, valid parameters are 'on' or 'off'.",
+            "Bad transparent_sorting attribute, valid parameters are 'on', 'off' or 'force'.",
             context);
 
         return false;
@@ -4103,10 +4105,12 @@ namespace Ogre
 			}
 			// transparent_sorting
 			if (mDefaults ||
+				pPass->getTransparentSortingForced() == true ||
 				pPass->getTransparentSortingEnabled() != true)
 			{
 				writeAttribute(3, "transparent_sorting");
-                writeValue(pPass->getTransparentSortingEnabled() ? "on" : "off");
+				writeValue(pPass->getTransparentSortingForced() ? "force" :
+					(pPass->getTransparentSortingEnabled() ? "on" : "off"));
 			}
 
 
