@@ -59,11 +59,11 @@ protected:
 		mCameraMan->setTopSpeed(10);
 
 		MaterialPtr lmaterialPtr1 = MaterialManager::getSingleton().createOrRetrieve(
-			"Knot", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+			"Ogre/NoTessellation", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
 		lmaterialPtr1->compile();
 
 		Pass *lpass1 = lmaterialPtr1->getBestTechnique()->getPass(0);
-		Entity *tentity1 = mSceneMgr->createEntity("knot.mesh");
+		Entity *tentity1 = mSceneMgr->createEntity("Knot1","knot.mesh");
 
 		unsigned short src, dest;
 		if( tentity1->getMesh()->suggestTangentVectorBuildParams(Ogre::VES_TANGENT, src, dest) )
@@ -76,12 +76,12 @@ protected:
 		tnode1->attachObject(tentity1);
 
 		MaterialPtr lmaterialPtr2 = MaterialManager::getSingleton().createOrRetrieve(
-			"SimpleTessellation", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+			"Ogre/AdaptivePNTrianglesTessellation", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
 
 		lmaterialPtr2->compile();
 
 		Pass *lpass2 = lmaterialPtr2->getBestTechnique()->getPass(0);
-		Entity *tentity2 = mSceneMgr->createEntity("knot.mesh");
+		Entity *tentity2 = mSceneMgr->createEntity("Knot2","knot.mesh");
 
 		if( tentity2->getMesh()->suggestTangentVectorBuildParams(Ogre::VES_TANGENT, src, dest) )
 			tentity2->getMesh()->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
