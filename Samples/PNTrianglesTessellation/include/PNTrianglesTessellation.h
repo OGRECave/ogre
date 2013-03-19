@@ -1,5 +1,5 @@
-#ifndef __PNTrianglesTesselation_H__
-#define __PNTrianglesTesselation_H__
+#ifndef __PNTriangles_H__
+#define __PNTriangles_H__
 
 #include "SdkSample.h"
 #include "OgreImage.h"
@@ -7,13 +7,13 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class _OgreSampleClassExport Sample_PNTrianglesTessellation : public SdkSample
+class _OgreSampleClassExport Sample_PNTriangles : public SdkSample
 {
 public:
 
-	Sample_PNTrianglesTessellation()
+	Sample_PNTriangles()
 	{
-		mInfo["Title"] = "PNTrianglesTesselation";
+		mInfo["Title"] = "PNTriangles";
 		mInfo["Description"] = "Sample for parametric PN-Triangles tessellation algorithm";
 		mInfo["Thumbnail"] = "thumb_tesselation.png";
 		mInfo["Category"] = "Unsorted";
@@ -116,11 +116,11 @@ protected:
 		mTrayMgr->toggleAdvancedFrameStats();
 
 		// create a menu to choose the model displayed
-		mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
-		mMeshMenu->addItem("KNOT");
+		// mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
+		// mMeshMenu->addItem("KNOT");
 
 		// create a menu to choose the material used by the model
-		mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
+		//mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
 
 		// create checkboxes to toggle lights
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
@@ -132,11 +132,11 @@ protected:
 		names.push_back("Help");
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
 
-		mMeshMenu->selectItem(0);  // select first mesh
+		// mMeshMenu->selectItem(0);  // select first mesh
 	}
 
-	SelectMenu* mMeshMenu;
-	SelectMenu* mMaterialMenu;
+	//SelectMenu* mMeshMenu;
+	//SelectMenu* mMaterialMenu;
 };
 
 #endif

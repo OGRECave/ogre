@@ -2,12 +2,20 @@
 // GLOBALS //
 /////////////
 
+cbuffer TessellationBuffer
+{
+    float4 tessellationAmounts; //Tessellation factors: x=edge, y=inside, z=MinDistance, w=range
+	float4 cameraPosition;
+};
+
 cbuffer MatrixBuffer
 {
     matrix worldviewprojMatrix;
     matrix worldMatrix;
     matrix viewMatrix;
     matrix projectionMatrix;
+	//float4 cameraPosition;
+	float  fDisplacementScale;
 };
 
 //////////////
@@ -27,45 +35,7 @@ struct HullInputType
     float3 normal 			: TEXCOORD1;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// Vertex Shader
-////////////////////////////////////////////////////////////////////////////////
-HullInputType color_tessellation_vs(VertexInputType input)
-{
-    HullInputType output;
-	
-	// Pass the vertex position into the hull shader.
-    output.position = input.position;
-    output.normal = normalize( mul(input.normal, (float3x3)worldMatrix ) );
-	output.texCoord = input.texCoord;
-    
-    return output;
-}
-
-/////////////
-// GLOBALS //
-/////////////
-cbuffer TessellationBuffer
-{
-    float4 tessellationAmounts; //Tessellation factors: x=edge, y=inside, z=MinDistance, w=range
-	float4 cameraPosition;
-};
-
-//////////////
-// TYPEDEFS //
-//////////////
-
-//The HullInputType structure is the same as the output structure from the vertex shader.
-
-struct HullInputType
-{
-    float3 position : POSITION;
-    float2 texCoord : TEXCOORD0;
-    float3 normal 	: TEXCOORD1;
-};
-
 //The ConstantOutputType structure is what will be the output from the patch constant function.
-
 struct ConstantOutputType
 {
     float edges[3]  : SV_TessFactor;
@@ -93,6 +63,43 @@ struct HullOutputType
     float2 texCoord : TEXCOORD0;
     float3 normal 	: TEXCOORD1;
 };
+
+//The output of the domain shader goes to the pixel shader. This was previously in the vertex shader.
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 texCoord : TEXCOORD0;
+    float3 normal 	: TEXCOORD1;
+};
+
+cbuffer LightBuffer
+{
+    float4 lightAmbientColor;
+	float4 lightDiffuseColor;
+    float4 lightSpecularColor;
+    float3 lightDirection;
+	float4 lightPosition;
+	float4 lightAttenuation;
+	float4 surfaceDiffuseColour;
+	float4 surfaceSpecularColour;
+	float  surfaceShininess;
+//	float3 cameraPosition;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Vertex Shader
+////////////////////////////////////////////////////////////////////////////////
+HullInputType color_tessellation_vs(VertexInputType input)
+{
+    HullInputType output;
+	
+	// Pass the vertex position into the hull shader.
+    output.position = input.position;
+    output.normal = normalize( mul(input.normal, (float3x3)worldMatrix ) );
+	output.texCoord = input.texCoord;
+    
+    return output;
+}
 
 //--------------------------------------------------------------------------------------
 // Returns a distance adaptive tessellation scale factor (0.0f -> 1.0f) 
@@ -204,58 +211,6 @@ SamplerState g_samLinear0 : register( s0 );
 Texture2D g_baseTexture1 : register( t1 );
 SamplerState g_samLinear1 : register( s1 );
 
-/////////////
-// GLOBALS //
-/////////////
-
-cbuffer MatrixBuffer
-{
-    matrix worldviewprojMatrix;
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
-	float4 cameraPosition;
-	float  fDisplacementScale;
-};
-
-
-//////////////
-// TYPEDEFS //
-//////////////
-struct ConstantOutputType
-{
-    float edges[3]  : SV_TessFactor;
-    float inside 	: SV_InsideTessFactor;
-	
-	// Geometry cubic generated control points
-    float3 f3B210    : POSITION3;
-    float3 f3B120    : POSITION4;
-    float3 f3B021    : POSITION5;
-    float3 f3B012    : POSITION6;
-    float3 f3B102    : POSITION7;
-    float3 f3B201    : POSITION8;
-    float3 f3B111    : CENTER;
-    
-    // Normal quadratic generated control points
-    float3 f3N110    : NORMAL3;      
-    float3 f3N011    : NORMAL4;
-    float3 f3N101    : NORMAL5;
-};
-
-struct HullOutputType
-{
-    float3 position : POSITION;
-    float2 texCoord : TEXCOORD0;
-    float3 normal 	: TEXCOORD1;
-};
-
-//The output of the domain shader goes to the pixel shader. This was previously in the vertex shader.
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float2 texCoord : TEXCOORD0;
-    float3 normal 	: TEXCOORD1;
-};
 
 //The inputs to the domain shader are the outputs from the hull shader and constant function.
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,37 +266,6 @@ PixelInputType color_tessellation_ds(ConstantOutputType input, float3 barycentri
 
     return output;
 }
-
-Texture2D g_baseTexture0 : register( t0 );
-SamplerState g_samLinear0 : register( s0 );
-
-Texture2D g_baseTexture1 : register( t1 );
-SamplerState g_samLinear1 : register( s1 );
-
-cbuffer LightBuffer
-{
-    float4 lightAmbientColor;
-	float4 lightDiffuseColor;
-    float4 lightSpecularColor;
-    float3 lightDirection;
-	float4 lightPosition;
-	float4 lightAttenuation;
-	float4 surfaceDiffuseColour;
-	float4 surfaceSpecularColour;
-	float  surfaceShininess;
-	float3 cameraPosition;
-};
-
-//////////////
-// TYPEDEFS //
-//////////////
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float2 texCoord : TEXCOORD0;
-    float3 normal 	: TEXCOORD1;
-};
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
