@@ -4,14 +4,14 @@ set(HEADER_FILES include/PNTrianglesTessellation.h)
 set(SOURCE_FILES src/PNTrianglesTessellation.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(Sample_PNTrianglesTessellation ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+add_library(Sample_PNTriangles ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(Sample_PNTrianglesTessellation ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_lib(Sample_PNTrianglesTessellation)
+target_link_libraries(Sample_PNTriangles ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_PNTriangles)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
-    set_target_properties(Sample_PNTrianglesTessellation
+    set_target_properties(Sample_PNTriangles
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
        INSTALL_NAME_DIR "@executable_path/../Plugins"
     )

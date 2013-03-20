@@ -12,6 +12,7 @@ class _OgreSampleClassExport Sample_PNTriangles : public SdkSample
 public:
 
 	Sample_PNTriangles()
+		: mMoveLights (true)
 	{
 		mInfo["Title"] = "PNTriangles";
 		mInfo["Description"] = "Sample for parametric PN-Triangles tessellation algorithm";
@@ -43,71 +44,164 @@ public:
 		}
 	}
 
+	bool frameRenderingQueued(const FrameEvent& evt)
+	{
+		if (mMoveLights)
+		{
+			// rotate the light pivots
+			mLightPivot1->roll(Degree(evt.timeSinceLastFrame * 30));
+			mLightPivot2->roll(Degree(evt.timeSinceLastFrame * 10));
+		}
+
+		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
+	}
+
+	void itemSelected(SelectMenu* menu)
+	{
+		if (menu == mMeshMenu)
+		{
+			// change to the selected entity
+			mObjectNode->detachAllObjects();
+			mObjectNode->attachObject(mSceneMgr->getEntity(mMeshMenu->getSelectedItem()));
+
+			// remember which material is currently selected
+			int index = std::max<int>(0, mMaterialMenu->getSelectionIndex());
+
+			// update the material menu's options
+			mMaterialMenu->setItems(mPossibilities[mMeshMenu->getSelectedItem()]);
+
+			mMaterialMenu->selectItem(index);   // select the material with the saved index
+		}
+		else
+		{
+			// set the selected material for the active mesh
+			((Entity*)mObjectNode->getAttachedObject(0))->setMaterialName(menu->getSelectedItem());
+		}
+	}
+
+	void checkBoxToggled(CheckBox* box)
+	{
+		if (StringUtil::startsWith(box->getName(), "Light", false))
+		{
+			// get the light pivot that corresponds to this checkbox
+			SceneNode* pivot = box->getName() == "Light1" ? mLightPivot1 : mLightPivot2;
+			SceneNode::ObjectIterator it = pivot->getAttachedObjectIterator();
+
+			while (it.hasMoreElements())  // toggle visibility of light and billboard set
+			{
+				MovableObject* o = it.getNext();
+				o->setVisible(box->isChecked());
+			}
+
+		}
+		else if (box->getName() == "MoveLights")
+		{
+			mMoveLights = !mMoveLights;
+		}
+	}
+
 protected:
 
 	void setupContent()
 	{
+		// create our main node to attach our entities to
+		mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
+		setupModels();
+		setupLights();
+		setupControls();
+
 		// set our camera
-		mTrayMgr->showCursor();
 		mCamera->setFOVy(Ogre::Degree(50.0));
 		mCamera->setFOVy(Ogre::Degree(50.0));
 		mCamera->setNearClipDistance(0.01f);
 		mCamera->lookAt(Ogre::Vector3(0,0,0));
 		mCamera->setPolygonMode(PM_WIREFRAME);
+		mCamera->setPosition(0, 0, 500);
 
 		mCameraMan->setStyle(OgreBites::CS_FREELOOK);
 		mCameraMan->setTopSpeed(10);
+	}
 
-		MaterialPtr lmaterialPtr1 = MaterialManager::getSingleton().createOrRetrieve(
-			"Ogre/NoTessellation", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
-		lmaterialPtr1->compile();
+	void unloadResources()
+	{
 
-		Pass *lpass1 = lmaterialPtr1->getBestTechnique()->getPass(0);
-		Entity *tentity1 = mSceneMgr->createEntity("Knot1","knot.mesh");
+	}
 
-		unsigned short src, dest;
-		if( tentity1->getMesh()->suggestTangentVectorBuildParams(Ogre::VES_TANGENT, src, dest) )
-			tentity1->getMesh()->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+	void setupModels()
+	{
+		StringVector matNames;
 
-		tentity1->setMaterialName(lmaterialPtr1->getName());
-		Ogre::SceneNode* tnode1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		tnode1->setScale(0.5f, 0.5f, 0.5f);
-		tnode1->setPosition(-100.0f, 0.0f, 0.0f);
-		tnode1->attachObject(tentity1);
+		matNames.push_back("Ogre/NoTessellation");
+		matNames.push_back("Ogre/TesselationExample");
+		matNames.push_back("Ogre/SimpleTessellation");
+		matNames.push_back("Ogre/AdaptiveTessellation");
+		matNames.push_back("Ogre/AdaptivePNTrianglesTessellation");
+		
+		mPossibilities["ogrehead.mesh"] = matNames;
+		mPossibilities["knot.mesh"] = matNames;
 
-		MaterialPtr lmaterialPtr2 = MaterialManager::getSingleton().createOrRetrieve(
-			"Ogre/AdaptivePNTrianglesTessellation", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+		for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
+		{
+			// load each mesh with non-default hardware buffer usage options
+			MeshPtr mesh = MeshManager::getSingleton().load(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+				HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
-		lmaterialPtr2->compile();
+            // build tangent vectors for our mesh
+            unsigned short src, dest;
+            if (!mesh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
+            {
+                mesh->buildTangentVectors(VES_TANGENT, src, dest);
+				// this version cleans mirrored and rotated UVs but requires quality models
+				// mesh->buildTangentVectors(VES_TANGENT, src, dest, true, true);
+            }
 
-		Pass *lpass2 = lmaterialPtr2->getBestTechnique()->getPass(0);
-		Entity *tentity2 = mSceneMgr->createEntity("Knot2","knot.mesh");
+			// create an entity from the mesh and set the first available material
+			Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());
+			ent->setMaterialName(it->second.front());
+		}
+	}
 
-		if( tentity2->getMesh()->suggestTangentVectorBuildParams(Ogre::VES_TANGENT, src, dest) )
-			tentity2->getMesh()->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+	void setupLights()
+	{
+		mSceneMgr->setAmbientLight(ColourValue::Black);   // disable ambient lighting
 
-		tentity2->setMaterialName(lmaterialPtr2->getName());
-		Ogre::SceneNode* tnode2 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		tnode2->setScale(0.5f, 0.5f, 0.5f);
-		tnode2->setPosition(100.0f, 0.0f, 0.0f);
-		tnode2->attachObject(tentity2);
+		// create pivot nodes
+		mLightPivot1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		mLightPivot2 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
-		Ogre::Light *lpointLight1 = mSceneMgr->createLight();
-		lpointLight1->setType(Ogre::Light::LT_POINT);
-		lpointLight1->setDiffuseColour(1.0, 1.0, 1.0);
-		lpointLight1->setSpecularColour(1.0, 1.0, 1.0);
-		lpointLight1->setPosition(Ogre::Vector3(-50.0f, 0.0f, -50.0f));
+		Light* l;
+		BillboardSet* bbs;
 
-		Ogre::Light *lpointLight2 = mSceneMgr->createLight();
-		lpointLight2->setType(Ogre::Light::LT_POINT);
-		lpointLight2->setDiffuseColour(1.0, 1.0, 1.0);
-		lpointLight2->setSpecularColour(1.0, 1.0, 1.0);
-		lpointLight2->setPosition(Ogre::Vector3(50.0f, 0.0f, -50.0f));
+		// create white light
+		l = mSceneMgr->createLight();
+		l->setPosition(200, 0, 0);
+		l->setDiffuseColour(1, 1, 1);
+		l->setSpecularColour(1, 1, 1);
+		// create white flare
+		bbs = mSceneMgr->createBillboardSet();
+		bbs->setMaterialName("Examples/Flare");
+		bbs->createBillboard(200, 0, 0)->setColour(ColourValue::White);
 
-		Ogre::SceneNode* tlightsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("lightsNode");
-		tlightsNode->attachObject(lpointLight1);
-		tlightsNode->attachObject(lpointLight2);
+		mLightPivot1->attachObject(l);
+		mLightPivot1->attachObject(bbs);
 
+		// create red light
+		l = mSceneMgr->createLight();
+		l->setPosition(40, 200, 50);
+		l->setDiffuseColour(1, 0, 0);
+		l->setSpecularColour(1, 0.8, 0.8);
+		// create white flare
+		bbs = mSceneMgr->createBillboardSet();
+		bbs->setMaterialName("Examples/Flare");
+		bbs->createBillboard(50, 200, 50)->setColour(ColourValue::Red);
+
+		mLightPivot2->attachObject(l);
+		mLightPivot2->attachObject(bbs);
+	}
+
+	void setupControls()
+	{
 		mTrayMgr->showCursor();
 
 		// make room for the controls
@@ -116,11 +210,12 @@ protected:
 		mTrayMgr->toggleAdvancedFrameStats();
 
 		// create a menu to choose the model displayed
-		// mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
-		// mMeshMenu->addItem("KNOT");
+		mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
+		for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
+			mMeshMenu->addItem(it->first);
 
 		// create a menu to choose the material used by the model
-		//mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
+		mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
 
 		// create checkboxes to toggle lights
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
@@ -132,11 +227,25 @@ protected:
 		names.push_back("Help");
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
 
-		// mMeshMenu->selectItem(0);  // select first mesh
+		mMeshMenu->selectItem(0);  // select first mesh
 	}
 
-	//SelectMenu* mMeshMenu;
-	//SelectMenu* mMaterialMenu;
+	void cleanupContent()
+	{
+		// clean up properly to avoid interfering with subsequent samples
+		for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
+			MeshManager::getSingleton().unload(it->first);
+		mPossibilities.clear();
+	}
+
+	std::map<String, StringVector> mPossibilities;
+	SceneNode* mObjectNode;
+	SceneNode* mLightPivot1;
+	SceneNode* mLightPivot2;
+	bool mMoveLights;
+	SelectMenu* mMeshMenu;
+	SelectMenu* mMaterialMenu;
+
 };
 
 #endif
