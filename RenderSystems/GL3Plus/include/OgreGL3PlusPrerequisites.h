@@ -94,6 +94,9 @@ namespace Ogre {
 #    define _OgreGL3PlusExport
 #endif
 
+// Convenience macro from ARB_vertex_buffer_object spec
+#define GL_BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define __PRETTY_FUNCTION__ __FUNCTION__
 #endif

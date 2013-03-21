@@ -57,9 +57,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 
-// Convenience macro from ARB_vertex_buffer_object spec
-#define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
-
 static void APIENTRY GLDebugCallback(GLenum source,
                             GLenum type,
                             GLuint id,
@@ -1788,7 +1785,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                              static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
 
-            void *pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
+            void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                             op.indexData->indexBuffer->getIndexSize());
 
             GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
@@ -2644,7 +2641,7 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId()));
-            pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
+            pBufferData = GL_BUFFER_OFFSET(elem.getOffset());
 
             if (vertexStart)
             {
