@@ -1,6 +1,6 @@
 vertex_program Ogre/NoTessellation_vs hlsl
 {
-	source  simple_tessellation.hlsl
+	source  NoTessellation.hlsl
 	entry_point color_vs
 	target vs_5_0
 	default_params
@@ -13,7 +13,7 @@ vertex_program Ogre/NoTessellation_vs hlsl
  
 fragment_program Ogre/NoTessellation_ps hlsl
 {
-	source simple_tessellation.hlsl
+	source NoTessellation.hlsl
 	entry_point color_ps
 	target ps_5_0
 	default_params
@@ -104,8 +104,8 @@ tesselation_domain_program Ogre/PNTrianglesTessellation/simple_tessellation_ds h
 	default_params
 	{
 		param_named_auto worldViewprojMatrix worldviewproj_matrix
-		param_named_auto worldMatrix world_matrix
-		param_named_auto projectionMatrix projection_matrix
+		//param_named_auto worldMatrix world_matrix
+		//param_named_auto projectionMatrix projection_matrix
 	}
 }
 
@@ -117,14 +117,14 @@ fragment_program Ogre/PNTrianglesTessellation/simple_tessellation_ps hlsl
 	
 	default_params
 	{
-		//param_named_auto lightDiffuseColor light_diffuse_colour 0
-        //param_named_auto lightSpecularColor light_specular_colour 0
-		//param_named_auto lightDirection light_direction 0
-        //param_named_auto lightPosition light_position 0
-        //param_named_auto lightAttenuation light_attenuation 0
-        //param_named_auto surfaceDiffuseColour surface_diffuse_colour
-        //param_named_auto surfaceSpecularColour surface_specular_colour
-        //param_named_auto surfaceShininess surface_shininess
+		param_named_auto lightDiffuseColor light_diffuse_colour 0
+        param_named_auto lightSpecularColor light_specular_colour 0
+		param_named_auto lightDirection light_direction 0
+        param_named_auto lightPosition light_position 0
+        param_named_auto lightAttenuation light_attenuation 0
+        param_named_auto surfaceDiffuseColour surface_diffuse_colour
+        param_named_auto surfaceSpecularColour surface_specular_colour
+        param_named_auto surfaceShininess surface_shininess
         //param_named_auto cameraPosition camera_position
 	}	
 }

@@ -110,7 +110,7 @@ protected:
 		setupModels();
 		setupLights();
 		setupControls();
-
+		
 		// set our camera
 		mCamera->setFOVy(Ogre::Degree(50.0));
 		mCamera->setFOVy(Ogre::Degree(50.0));
@@ -120,7 +120,38 @@ protected:
 		mCamera->setPosition(0, 0, 500);
 
 		mCameraMan->setStyle(OgreBites::CS_FREELOOK);
-		mCameraMan->setTopSpeed(10);
+		mCameraMan->setTopSpeed(100);
+	}
+
+	void CreateGrid()
+	{
+		Ogre::SceneNode *m_Grid = mSceneMgr->getRootSceneNode()->createChildSceneNode("m_Grid"); 
+
+		Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material", "General"); 
+		myManualObjectMaterial->setReceiveShadows(false); 
+		myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
+		myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0.5f, 0.5f, 0.5f,0); 
+		myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0.5f, 0.5f, 0.5f); 
+		myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0.5f, 0.5f, 0.5f); 
+	
+		for(int i = 0; i < 201; i+=5)
+		{
+			Ogre::ManualObject* xLines =  mSceneMgr->createManualObject(
+				Ogre::String("xline_").append(Ogre::StringConverter::toString(i))); 
+			xLines->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
+			xLines->position(-100, 0.0f, -100 + i);
+			xLines->position( 100, 0.0f,  -100 + i); 
+			xLines->end(); 
+			m_Grid->attachObject(xLines);
+		
+			Ogre::ManualObject* zLines =  mSceneMgr->createManualObject(
+				Ogre::String("zline_").append(Ogre::StringConverter::toString(i))); 
+			zLines->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
+			zLines->position(-100 + i, 0.0f, -100);
+			zLines->position(-100 + i, 0.0f,  100); 
+			zLines->end(); 
+			m_Grid->attachObject(zLines);
+		}
 	}
 
 	void unloadResources()

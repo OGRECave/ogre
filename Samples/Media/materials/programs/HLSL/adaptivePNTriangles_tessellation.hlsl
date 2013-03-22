@@ -205,13 +205,6 @@ HullOutputType color_tessellation_hs(InputPatch<HullInputType, 3> patch, uint po
     return output;
 }
 
-Texture2D g_baseTexture0 : register( t0 );
-SamplerState g_samLinear0 : register( s0 );
-
-Texture2D g_baseTexture1 : register( t1 );
-SamplerState g_samLinear1 : register( s1 );
-
-
 //The inputs to the domain shader are the outputs from the hull shader and constant function.
 ////////////////////////////////////////////////////////////////////////////////
 // Domain Shader
@@ -267,6 +260,12 @@ PixelInputType color_tessellation_ds(ConstantOutputType input, float3 barycentri
     return output;
 }
 
+Texture2D g_baseTexture0 : register( t0 );
+SamplerState g_samLinear0 : register( s0 );
+
+Texture2D g_baseTexture1 : register( t1 );
+SamplerState g_samLinear1 : register( s1 );
+
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,3 +283,49 @@ float4 color_tessellation_ps(PixelInputType input) : SV_TARGET
 		
 	return color;
 }
+
+/*
+Texture2D shaderTextures[2];
+SamplerState SampleType;
+
+float4 color_tessellation_ps(PixelInputType input) : SV_TARGET
+{
+	float4 texDiffuseColor;
+	float4 texBumpMap;
+    float3 bumpNormal;
+    float3 lightIntensity;
+	float3 diffuseContribution;
+    float4 color;
+	half lightDistance;
+	half iluminationLightAttenuation;
+	half calculatedLightAttenuation;
+	
+	texDiffuseColor  = shaderTextures[0].Sample(SampleType, input.texCoord);
+	texBumpMap 		 = shaderTextures[1].Sample(SampleType, input.texCoord);
+	
+	// Expand the range of the normal value from (0, +1) to (-1, +1).
+    texBumpMap = (texBumpMap * 2.0f) - 1.0f;
+	
+	// Calculate the normal from the data in the bump map.
+    bumpNormal = texBumpMap.x * input.normal + texBumpMap.y * input.normal;
+	
+	 // Normalize the resulting bump normal.
+    bumpNormal = normalize(bumpNormal);
+		
+	 // Calculate the amount of light on this pixel based on the bump map normal value.
+    lightIntensity = max(dot(bumpNormal, lightDirection), 0);
+	
+	//Ilumination Light Attenuation
+	lightDistance = length( lightPosition.xyz) / lightAttenuation.r;
+	iluminationLightAttenuation = lightDistance * lightDistance; // quadratic falloff
+	calculatedLightAttenuation = 1.0 - iluminationLightAttenuation;
+	
+	// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+	diffuseContribution  = (lightIntensity * lightDiffuseColor.rgb * texDiffuseColor.rgb);// * surfaceDiffuseColour.rgb);
+	float3 lightContributtion = (diffuseContribution) * calculatedLightAttenuation;
+	
+     // Combine the final bump light color with the texture color.
+	color = float4(lightContributtion, texDiffuseColor.a);
+	
+    return color;
+}*/
