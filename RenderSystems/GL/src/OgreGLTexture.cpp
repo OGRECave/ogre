@@ -372,7 +372,7 @@ namespace Ogre {
         // This is required for compressed formats such as DXT
         if (mUsage & TU_AUTOMIPMAP)
         {
-            glGenerateMipmap(getGLTextureTarget());
+            glGenerateMipmapEXT(getGLTextureTarget());
         }
     }
 
