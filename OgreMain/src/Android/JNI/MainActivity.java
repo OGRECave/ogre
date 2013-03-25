@@ -49,7 +49,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private Runnable renderer = null;
 	private boolean paused = false;
 	private boolean initOGRE = false;
-
+	private AssetManager assetMgr = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,7 +79,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 			public void run() {
 				if (!initOGRE) {
 					initOGRE = true;
-					OgreActivityJNI.create();
+					
+					if(assetMgr == null) {
+						assetMgr = getResources().getAssets();
+					}
+					
+					OgreActivityJNI.create(assetMgr);
 
 					renderer = new Runnable() {
 						public void run() {
