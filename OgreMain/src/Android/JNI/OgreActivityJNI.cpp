@@ -30,13 +30,28 @@ THE SOFTWARE.
 #include <EGL/egl.h>
 #include <android/api-level.h>
 #include <android/native_window_jni.h>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
 #include "OgrePlatform.h"
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
+#include "OgreArchiveManager.h"
 #include "Android/OgreAndroidEGLWindow.h"
+#include "Android/OgreAPKFileSystemArchive.h"
+#include "Android/OgreAPKZipArchive.h"
 
-#include "OgreOctreePlugin.h"
-#include "OgreParticleFXPlugin.h"
+#ifdef OGRE_BUILD_PLUGIN_OCTREE
+#	include "OgreOctreePlugin.h"
+#endif
+
+#ifdef OGRE_BUILD_PLUGIN_PFX
+#	include "OgreParticleFXPlugin.h"
+#endif
+
+#ifdef OGRE_BUILD_COMPONENT_OVERLAY
+#	include "OgreOverlaySystem.h"
+#endif
+
 #include "OgreConfigFile.h"
 
 #ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
@@ -52,8 +67,19 @@ using namespace Ogre;
 static bool gInit = false;
 static Ogre::Root* gRoot = NULL;
 static Ogre::RenderWindow* gRenderWnd = NULL;
+
+#ifdef OGRE_BUILD_PLUGIN_OCTREE
 static Ogre::OctreePlugin* gOctreePlugin = NULL;
+#endif
+
+#ifdef OGRE_BUILD_PLUGIN_PFX
 static Ogre::ParticleFXPlugin* gParticleFXPlugin = NULL;
+#endif
+
+#ifdef OGRE_BUILD_COMPONENT_OVERLAY
+static Ogre::OverlaySystem* gOverlaySystem = NULL; 
+#endif
+
 static Ogre::GLESRS* gGLESPlugin = NULL;
 
 static Ogre::SceneManager* pSceneMgr = NULL;
@@ -63,17 +89,11 @@ extern "C"
 {
 	JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) 
 	{
-        JNIEnv *env;
-        jclass k;
-        jint r;
-
 		gVM = vm;
-        r = vm->GetEnv ((void **) &env, JNI_VERSION_1_4);
-        k = env->FindClass ("org/ogre3d/android/OgreActivityJNI");
 		return JNI_VERSION_1_4;
 	}
 
-	JNIEXPORT void JNICALL 	Java_org_ogre3d_android_OgreActivityJNI_create(JNIEnv * env, jobject obj)
+	JNIEXPORT void JNICALL 	Java_org_ogre3d_android_OgreActivityJNI_create(JNIEnv * env, jobject obj, jobject assetManager)
 	{
         if(gInit)
 			return;
@@ -83,15 +103,30 @@ extern "C"
 		gGLESPlugin = OGRE_NEW GLESRS();
 		gRoot->installPlugin(gGLESPlugin);
 			
+#ifdef OGRE_BUILD_PLUGIN_OCTREE
 		gOctreePlugin = OGRE_NEW OctreePlugin();
 		gRoot->installPlugin(gOctreePlugin);
+#endif
 			
+#ifdef OGRE_BUILD_PLUGIN_PFX
 		gParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
 		gRoot->installPlugin(gParticleFXPlugin);
-			
-        gRoot->setRenderSystem(gRoot->getAvailableRenderers().at(0));
+#endif
+
+#ifdef OGRE_BUILD_COMPONENT_OVERLAY
+		gOverlaySystem = OGRE_NEW OverlaySystem(); 
+#endif
+		
+		gRoot->setRenderSystem(gRoot->getAvailableRenderers().at(0));
         gRoot->initialise(false);
         gInit = true;
+		
+		AAssetManager* assetMgr = AAssetManager_fromJava(env, assetManager);
+		if (assetMgr) 
+		{
+			ArchiveManager::getSingleton().addArchiveFactory( new APKFileSystemArchiveFactory(assetMgr) );
+			ArchiveManager::getSingleton().addArchiveFactory( new APKZipArchiveFactory(assetMgr) );
+		}
 	}
 	
 	JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_destroy(JNIEnv * env, jobject obj)
@@ -105,12 +140,21 @@ extern "C"
         gRoot = NULL;
         gRenderWnd = NULL;
             
+#ifdef OGRE_BUILD_COMPONENT_OVERLAY
+		OGRE_DELETE gOverlaySystem; 
+		gOverlaySystem = NULL;
+#endif
+
+#ifdef OGRE_BUILD_PLUGIN_PFX
 		OGRE_DELETE gParticleFXPlugin;
 		gParticleFXPlugin = NULL;
-		
+#endif
+
+#ifdef OGRE_BUILD_PLUGIN_OCTREE
 		OGRE_DELETE gOctreePlugin;
 		gOctreePlugin = NULL;
-		
+#endif
+
 		OGRE_DELETE gGLESPlugin;
 		gGLESPlugin = NULL;
 	}
