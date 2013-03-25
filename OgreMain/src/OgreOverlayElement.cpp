@@ -379,6 +379,13 @@ namespace Ogre {
             break;
 
         default:
+        case GMM_RELATIVE :
+            mPixelScaleX = 1.0;
+            mPixelScaleY = 1.0;
+            mPixelLeft = mLeft;
+            mPixelTop = mTop;
+            mPixelWidth = mWidth;
+            mPixelHeight = mHeight;
             break;
         }
 
@@ -591,6 +598,7 @@ namespace Ogre {
             }
             break;
 
+        default:
         case GMM_RELATIVE :
             mPixelScaleX = 1.0;
             mPixelScaleY = 1.0;
@@ -738,6 +746,7 @@ namespace Ogre {
             }
             break;
 
+        default:
         case GMM_RELATIVE :
             mPixelScaleX = 1.0;
             mPixelScaleY = 1.0;
