@@ -107,7 +107,7 @@ namespace Ogre
 		{
 			LodInfo& lodinfo = getLodInfo(level);
 			// skip re-assign
-			if(lastTreeStart != lodinfo.treeStart)
+			if(lastTreeStart != (int)lodinfo.treeStart)
 			{
 				mTerrain->getQuadTree()->assignVertexData(lodinfo.treeStart, lodinfo.treeEnd,
 						lodinfo.resolution, lodinfo.size);
@@ -138,7 +138,7 @@ namespace Ogre
 				{
 					LodInfo& lodinfo = getLodInfo(level);
 					// skip re-load
-					if(lastTreeStart != lodinfo.treeStart)
+					if(lastTreeStart != (int)lodinfo.treeStart)
 					{
 						mTerrain->getQuadTree()->load(lodinfo.treeStart, lodinfo.treeEnd);
 						lastTreeStart = lodinfo.treeStart;

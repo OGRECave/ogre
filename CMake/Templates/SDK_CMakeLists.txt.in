@@ -70,7 +70,6 @@ endif ()
 # Boost is included
 set (BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost")
 
-
 #####################################################################
 # Set up the basic build environment
 #####################################################################
@@ -100,6 +99,11 @@ endif ()
 # Find dependencies
 find_package(OGRE REQUIRED)
 find_package(OIS REQUIRED)
+
+# Need to get the Cg path for OS X post build scripts.
+if (APPLE AND NOT OGRE_RenderSystem_GLES2_FOUND AND NOT OGRE_RenderSystem_GLES_FOUND)
+  find_package(Cg REQUIRED)
+endif()
 
 if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 	if (WIN32 OR APPLE)
@@ -137,7 +141,7 @@ if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 	add_definitions(-DBOOST_ALL_NO_LIB)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
 else()
-	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/release")
+	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/iOSDependencies/lib/Release")
 	set(Boost_USE_STATIC_LIBS TRUE)
     set(Boost_ADDITIONAL_VERSIONS "1.54" "1.54.0" "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
     # Components that need linking (NB does not include header-only components like bind)
@@ -274,6 +278,5 @@ if (OGRE_STATIC)
     set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_RenderSystem_GLES2_LIBRARIES})
   endif ()
 endif ()
-
 
 add_subdirectory(Samples)

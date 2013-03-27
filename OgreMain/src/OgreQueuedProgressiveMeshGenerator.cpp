@@ -1,4 +1,4 @@
-﻿/*
+/*
  * -----------------------------------------------------------------------------
  * This source file is part of OGRE
  * (Object-oriented Graphics Rendering Engine)
@@ -38,18 +38,37 @@
 namespace Ogre
 {
 
+//-----------------------------------------------------------------------
 template<> PMWorker* Singleton<PMWorker>::msSingleton = 0;
+PMWorker* PMWorker::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+PMWorker& PMWorker::getSingleton(void)
+{  
+    assert( msSingleton );  return ( *msSingleton );  
+}
+
+//-----------------------------------------------------------------------
 template<> PMInjector* Singleton<PMInjector>::msSingleton = 0;
+PMInjector* PMInjector::getSingletonPtr(void)
+{
+    return msSingleton;
+}
+PMInjector& PMInjector::getSingleton(void)
+{  
+    assert( msSingleton );  return ( *msSingleton );  
+}
 
 PMGenRequest::~PMGenRequest()
 {
-	std::vector<SubmeshInfo>::iterator it = submesh.begin();
-	std::vector<SubmeshInfo>::iterator itEnd = submesh.end();
+	vector<SubmeshInfo>::iterator it = submesh.begin();
+	vector<SubmeshInfo>::iterator itEnd = submesh.end();
 	for (; it != itEnd; it++) {
 		delete [] it->indexBuffer.indexBuffer;
 		delete [] it->vertexBuffer.vertexBuffer;
-		std::vector<IndexBuffer>::iterator it2 = it->genIndexBuffers.begin();
-		std::vector<IndexBuffer>::iterator it2End = it->genIndexBuffers.end();
+		vector<IndexBuffer>::iterator it2 = it->genIndexBuffers.begin();
+		vector<IndexBuffer>::iterator it2End = it->genIndexBuffers.end();
 		for (; it2 != it2End; it2++) {
 			delete [] it2->indexBuffer;
 		}
@@ -226,7 +245,7 @@ void PMWorker::bakeLods()
 
 	// Create buffers.
 	for (unsigned short i = 0; i < submeshCount; i++) {
-		std::vector<PMGenRequest::IndexBuffer>& lods = mRequest->submesh[i].genIndexBuffers;
+		vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
 		int indexCount = mIndexBufferInfoList[i].indexCount;
 		OgreAssert(indexCount >= 0, "");
 
@@ -330,7 +349,7 @@ void PMInjector::inject(PMGenRequest* request)
 	mesh->removeLodLevels();
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		SubMesh::LODFaceList& lods = mesh->getSubMesh(i)->mLodFaceList;
-		typedef std::vector<PMGenRequest::IndexBuffer> GenBuffers;
+		typedef vector<PMGenRequest::IndexBuffer>::type GenBuffers;
 		GenBuffers& buffers = request->submesh[i].genIndexBuffers;
 		GenBuffers::iterator it = buffers.begin();
 		GenBuffers::iterator itEnd = buffers.end();

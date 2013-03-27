@@ -39,6 +39,7 @@ void setUpSuite()
 {
     logMgr = new Ogre::LogManager();
     logMgr->createLog("OgreTest.log", true, true);
+    Ogre::LogManager::getSingleton().setLogDetail(Ogre::LL_LOW);
 }
 
 void tearDownSuite()

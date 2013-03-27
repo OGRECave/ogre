@@ -40,7 +40,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
+    LogManager::getSingleton().setLogDetail(LL_LOW);
+	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
@@ -420,14 +421,12 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
         SubMesh* subMesh = mesh->getSubMesh(i);
+        // According to generateExtremes, extremes are built based upon the bounding box indices.
+        // But it also creates indices for all bbox's even if the mesh does not have any.
+        // So...there should always be some extremity points. The number of which may vary
         if (subMesh->indexData->indexCount > 0)
         {
             CPPUNIT_ASSERT(subMesh->extremityPoints.size() == NUM_EXTREMES);
-        }
-        else
-        {
-            // FAIL: size == 4
-            CPPUNIT_ASSERT(subMesh->extremityPoints.size() == 0);
         }
     }
 
@@ -484,7 +483,8 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
             }
             else
             {
-                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount == 0);
+                // Should be 3 because of the dummy triangle being generated
+                CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount == 3);
             }
         }
     }

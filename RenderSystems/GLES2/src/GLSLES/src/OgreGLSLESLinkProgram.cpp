@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
 
@@ -175,10 +176,13 @@ namespace Ogre {
         logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
-                glIsProgramPipelineEXT(mGLProgramHandle))
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            glValidateProgramPipelineEXT(mGLProgramHandle);
+            IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            {
+                if(glIsProgramPipelineEXT(mGLProgramHandle))
+                    glValidateProgramPipelineEXT(mGLProgramHandle);
+            }
         }
         else if(glIsProgram(mGLProgramHandle))
 #else

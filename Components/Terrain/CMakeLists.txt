@@ -73,9 +73,8 @@ endif ()
 
 
 # install 
-ogre_config_component(OgreTerrain)
-
 ogre_config_framework(OgreTerrain)
+ogre_config_component(OgreTerrain)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Terrain

@@ -752,8 +752,9 @@ namespace OgreBites
             arch = Ogre::macBundlePath() + "/Contents/Resources/";
 #		elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             arch = Ogre::macBundlePath() + "/";
-#		else
-            arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
+#		else       
+            arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");  
+            arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", ""); 
 #		endif
             type = "FileSystem";
             sec = "Popular";

@@ -1,9 +1,9 @@
 #version 100
 
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
-uniform vec4 worldMatrix3x4Array[240];
+uniform mat4 worldMatrixArray[80];
 uniform mat4 viewProjectionMatrix;
 uniform vec4 lightPos;
 uniform vec4 ambient;
@@ -12,40 +12,37 @@ uniform vec4 lightDiffuseColour;
 attribute vec4 position;
 attribute vec3 normal;
 attribute vec4 uv0;
-attribute vec4 uv1;
+attribute float uv1;
 
-varying vec4 colour;
-varying vec4 oUv0;
-varying vec4 oUv1;
+varying vec4 oColor_0;
+#if SHADOW_CASTER
+#else
+varying vec2 oTexcoord2_0;
+#endif
 
 void main()
 {
-
-	// transform by indexed matrix
-	// perform matrix multiplication manually since no 3x4 matrices
-	vec3 transformedPos;
-	vec3 transformedNorm;
-	int instanceOffset = int(uv1.x) * 3;
-	for (int row = 0; row < 3; ++row)
-	{
-		vec4 matrixRow = worldMatrix3x4Array[instanceOffset + row];
-		transformedPos[row] = dot(matrixRow, position);
 #if SHADOW_CASTER
+	// transform by indexed matrix
+	vec4 transformedPos = vec4((worldMatrixArray[int(uv1)] * position).xyz, 1.0);
+
+	// view / projection
+	gl_Position = viewProjectionMatrix * transformedPos;
+	
+	oColor_0 = ambient;
 #else
-		transformedNorm[row] = dot(matrixRow.xyz, normal);
-#endif
-	}
+	// transform by indexed matrix
+	vec4 transformedPos = vec4((worldMatrixArray[int(uv1)] * position).xyz, 1.0);
 	
 	// view / projection
-	gl_Position = viewProjectionMatrix * vec4(transformedPos, 1.0);
-    colour = vec4(0);
+	gl_Position = viewProjectionMatrix * transformedPos;
+	oTexcoord2_0 = uv0.xy;
+
+	vec3 norm = mat3(worldMatrixArray[int(uv1)]) * normal;
 	
-#if SHADOW_CASTER
-	colour = ambient;
-#else
-	vec3 lightDir = normalize(
+	vec3 lightDir = 	normalize(
 		lightPos.xyz -  (transformedPos.xyz * lightPos.w));
-	colour = ambient + clamp(dot(lightDir, transformedNorm),0.0,1.0) * lightDiffuseColour;
+
+	oColor_0 = ambient + clamp(dot(lightDir, norm), 0.0, 1.0) * lightDiffuseColour;
 #endif
-	
 }

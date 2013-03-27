@@ -54,8 +54,8 @@ namespace Ogre  {
                 return GL_RED;
             case PF_L16:
                 return GL_RED;
-//			case PF_BYTE_LA:
-//				return GL_RG;
+			case PF_BYTE_LA:
+				return GL_RG;
 			case PF_R3G3B2:
 				return GL_RGB;
 			case PF_A1R5G5B5:
@@ -296,16 +296,14 @@ namespace Ogre  {
         switch(mFormat)
         {
             case PF_DEPTH:
-                return GL_DEPTH_COMPONENT;
+                return GL_DEPTH_COMPONENT16;
             case PF_L8:
             case PF_A8:
                 return GL_R8;
             case PF_L16:
                 return GL_R16;
-//            case PF_A4L4:
-//                return GL_LUMINANCE4_ALPHA4;
-//			case PF_BYTE_LA:
-//				return GL_RG16;
+			case PF_BYTE_LA:
+				return GL_RG8;
 			case PF_R3G3B2:
 				return GL_R3_G3_B2;
 			case PF_A1R5G5B5:
@@ -480,19 +478,18 @@ namespace Ogre  {
 	{
 		switch(fmt) 
 		{
+        case GL_DEPTH_COMPONENT16:
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32:
+        case GL_DEPTH_COMPONENT32F:
         case GL_DEPTH_COMPONENT:
             return PF_DEPTH;
 		case GL_R8:
 			return PF_L8;
 		case GL_R16:
 			return PF_L16;
-//		case GL_R8:
-//			return PF_A8;
-//		case GL_LUMINANCE4_ALPHA4:
-//			// Unsupported by GL as input format, use the byte packed format
-//			return PF_BYTE_LA;
-//		case GL_RG8:
-//			return PF_BYTE_LA;
+		case GL_RG8:
+			return PF_BYTE_LA;
 		case GL_R3_G3_B2:
 			return PF_R3G3B2;
 		case GL_RGB5_A1:

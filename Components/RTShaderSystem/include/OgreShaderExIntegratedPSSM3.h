@@ -59,7 +59,7 @@ class _OgreRTSSExport IntegratedPSSM3 : public SubRenderState
 
 	// Interface.
 public:
-	typedef std::vector<Real> SplitPointList;
+	typedef vector<Real>::type SplitPointList;
 
 	/** Class default constructor */	
 	IntegratedPSSM3();
@@ -125,7 +125,7 @@ protected:
 
 	};
 
-	typedef std::vector<ShadowTextureParams>			ShadowTextureParamsList;
+	typedef vector<ShadowTextureParams>::type			ShadowTextureParamsList;
 	typedef ShadowTextureParamsList::iterator			ShadowTextureParamsIterator;
 	typedef ShadowTextureParamsList::const_iterator		ShadowTextureParamsConstIterator;
 

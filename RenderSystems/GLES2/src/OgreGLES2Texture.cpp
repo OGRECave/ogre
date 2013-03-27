@@ -433,6 +433,11 @@ namespace Ogre {
         }
 
         _loadImages(imagePtrs);
+
+        if (mUsage & TU_AUTOMIPMAP)
+        {
+            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGLES2TextureTarget()));
+        }
     }
 
     void GLES2Texture::freeInternalResourcesImpl()

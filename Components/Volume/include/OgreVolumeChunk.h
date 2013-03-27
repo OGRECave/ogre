@@ -84,11 +84,18 @@ namespace Volume {
         /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
         size_t createGeometryFromLevel;
 
+        /// If an existing chunktree is to be partially updated, set this to the back lower left point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
+        Vector3 updateFrom;
+        
+        /// If an existing chunktree is to be partially updated, set this to the front upper right point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
+        Vector3 updateTo;
+
         /** Constructor.
         */
         ChunkParameters(void) :
             sceneManager(0), src(0), baseError((Real)0.0), errorMultiplicator((Real)1.0), createOctreeVisualization(false),
-            createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0)
+            createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0),
+            updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO)
         {
         }
     } ChunkParameters;
@@ -129,6 +136,9 @@ namespace Volume {
         /// The chunk which created this request.
         Chunk *origin;
 
+        /// Whether this is an update of an existing tree
+        bool isUpdate;
+
         /** Stream operator <<.
         @param o
             The used stream.
@@ -139,6 +149,33 @@ namespace Volume {
         { return o; }
     } ChunkRequest;
 
+    /** Internal shared values of the chunks which are equal in the whole tree.
+    */
+    typedef struct ChunkTreeSharedData
+    {
+        /// The maximum accepted screen space error.
+        Real maxScreenSpaceError;
+        
+        /// The scale.
+        Real scale;
+
+        /// Flag whether the octree is visible or not.
+        bool octreeVisible;
+        
+        /// Flag whether the dualgrid is visible or not.
+        bool dualGridVisible;
+
+        /// Another visibility flag to be user setable.
+        bool volumeVisible;
+
+        /** Constructor.
+        */
+        ChunkTreeSharedData(void) : octreeVisible(false), dualGridVisible(false), volumeVisible(true)
+        {
+        }
+
+    } ChunkTreeSharedData;
+
     /** A single volume chunk mesh.
     */
     class _OgreVolumeExport Chunk : public SimpleRenderable, public FrameListener, public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler
@@ -147,16 +184,7 @@ namespace Volume {
         
         /// The workqueue load request.
         static const uint16 WORKQUEUE_LOAD_REQUEST;
-
-        /// Holds the amount of generated triangles.
-        static size_t mGeneratedTriangles;
-
-        /// The maximum accepted screen space error.
-        Real mMaxScreenSpaceError;
         
-        /// The scale.
-        Real mScale;
-
         /// The amount of chunks currently being processed.
         static size_t mChunksBeingProcessed;
 
@@ -175,19 +203,69 @@ namespace Volume {
         /// The more detailed children chunks.
         Chunk **mChildren;
 
-        /// Flag whether the octree is visible or not.
-        bool mOctreeVisible;
-        
-        /// Flag whether the dualgrid is visible or not.
-        bool mDualGridVisible;
-
         /// Flag whether this node will never be shown.
         bool mInvisible;
+        
+        /// Whether this chunk is the root of the tree.
+        bool isRoot;
 
-        /// Another visibility flag to be user setable.
-        bool mVolumeVisible;
+        /// Holds some shared data among all chunks of the tree.
+        ChunkTreeSharedData *shared;
+
+        /** Loads a single chunk of the tree.
+        @param parent
+            The parent scene node for the volume
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param totalFrom
+            The back lower left corner of the world.
+        @param totalTo
+            The front upper rightcorner of the world.
+        @param level
+            The current LOD level.
+        @param maxLevels
+            The maximum amount of levels.
+        @param parameters
+            The parameters to use while loading.
+        */
+        virtual void loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
                 
-        /** Actually Loads the volume mesh with all LODs.
+        /** Whether the center of the given cube (from -> to) will contribute something
+        to the total volume mesh.
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param src
+            The density source to contour.
+        @return
+            true if triangles might be generated
+        */
+        virtual bool contributesToVolumeMesh(const Vector3 &from, const Vector3 &to, const Source *src) const;
+        
+        /** Loads the tree children of the current node.
+        @param parent
+            The parent scene node for the volume
+        @param from
+            The back lower left corner of the cell.
+        @param to
+            The front upper right corner of the cell.
+        @param totalFrom
+            The back lower left corner of the world.
+        @param totalTo
+            The front upper rightcorner of the world.
+        @param level
+            The current LOD level.
+        @param maxLevels
+            The maximum amount of levels.
+        @param parameters
+            The parameters to use while loading.
+        */
+        virtual void loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
+
+        /** Actually loads the volume tree with all LODs.
         @param parent
             The parent scene node for the volume
         @param from
@@ -231,17 +309,17 @@ namespace Volume {
             {
                 return;
             }
-            if (mVolumeVisible)
+            if (shared->volumeVisible)
             {
                 mVisible = visible;
             }
             if (mOctree)
             {
-                mOctree->setVisible(mOctreeVisible && visible);
+                mOctree->setVisible(shared->octreeVisible && visible);
             }
             if (mDualGrid)
             {
-                mDualGrid->setVisible(mDualGridVisible && visible);
+                mDualGrid->setVisible(shared->dualGridVisible && visible);
             }
             if (applyToChildren && mChildren)
             {
@@ -315,8 +393,10 @@ namespace Volume {
             On which LOD level the callback should be called.
         @param resourceGroup
             The resource group where to search for the configuration file.
+        @return
+            The read parameters, but with null source, use the sourceResult to get it.
         */
-        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual ChunkParameters load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         
         /** Shows the debug visualization entity of the dualgrid.
         @param visible

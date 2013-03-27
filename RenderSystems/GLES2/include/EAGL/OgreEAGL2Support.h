@@ -52,7 +52,6 @@ namespace Ogre {
 
     class _OgrePrivate EAGL2Support : public GLES2Support
     {
-        protected:
         public:
             EAGL2Support();
             virtual ~EAGL2Support();
@@ -64,6 +63,7 @@ namespace Ogre {
             virtual String getDisplayName(void);
 			CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
+            float getCurrentOSVersion(void) { return mCurrentOSVersion; }
             void * getProcAddress(const Ogre::String& name);
             RenderWindow * createWindow(bool autoCreateWindow,
                                            GLES2RenderSystem *renderSystem,
@@ -83,6 +83,8 @@ namespace Ogre {
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
 			CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
+        protected:
+            float mCurrentOSVersion;
 	};
 }
 

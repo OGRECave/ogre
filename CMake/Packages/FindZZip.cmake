@@ -32,7 +32,7 @@ clear_if_changed(ZZip_PREFIX_PATH
   ZZip_INCLUDE_DIR
 )
 
-set(ZZip_LIBRARY_NAMES zzip zziplib)
+set(ZZip_LIBRARY_NAMES zziplib zzip)
 get_debug_names(ZZip_LIBRARY_NAMES)
 
 use_pkgconfig(ZZip_PKGC zziplib)

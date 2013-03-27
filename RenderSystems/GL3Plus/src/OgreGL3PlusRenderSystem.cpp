@@ -532,8 +532,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::shutdown(void)
     {
-		RenderSystem::shutdown();
-
         // Deleting the GLSL program factory
 		if (mGLSLProgramFactory)
 		{
@@ -573,6 +571,8 @@ namespace Ogre {
 		mStopRendering = true;
 
         mGLInitialised = 0;
+		
+		RenderSystem::shutdown();
     }
 
 	bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 

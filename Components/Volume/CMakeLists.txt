@@ -67,9 +67,8 @@ endif ()
 
 
 # install 
-ogre_config_component(OgreVolume)
-
 ogre_config_framework(OgreVolume)
+ogre_config_component(OgreVolume)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Volume

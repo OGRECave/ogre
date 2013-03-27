@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareOcclusionQuery.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
 
@@ -54,7 +55,8 @@ void GLES2HardwareOcclusionQuery::createQuery()
 {
 	// Check for hardware occlusion support
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mQueryID ));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mQueryID ));
 #else
     OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                 "Cannot allocate a Hardware query. This video card doesn't support it, sorry.", 
@@ -65,40 +67,44 @@ void GLES2HardwareOcclusionQuery::createQuery()
 void GLES2HardwareOcclusionQuery::destroyQuery()
 {
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mQueryID));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mQueryID));
 #endif        
 }
 //------------------------------------------------------------------
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 void GLES2HardwareOcclusionQuery::notifyOnContextLost()
 {
-        destroyQuery();
+    destroyQuery();
 }
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::notifyOnContextReset()
 {
-        createQuery();
+    createQuery();
 }
 #endif
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::beginOcclusionQuery() 
 { 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
 #endif
 }
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::endOcclusionQuery() 
 { 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT));
 #endif
 }
 //------------------------------------------------------------------
 bool GLES2HardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
     mPixelCount = *NumOfFragments;
     return true;
 #else
@@ -111,7 +117,8 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
     GLuint available = GL_FALSE;
 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
+    IF_OS_VERSION_IS_GREATER_THAN(5.0)
+        OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
 #endif
 
 	// GL_TRUE means a wait would occur

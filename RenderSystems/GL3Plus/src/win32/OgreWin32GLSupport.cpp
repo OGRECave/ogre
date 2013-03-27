@@ -45,6 +45,7 @@ namespace Ogre {
         , mHasPixelFormatARB(false)
         , mHasMultisample(false)
 		, mHasHardwareGamma(false)
+		, mWglChoosePixelFormat(0)
     {
 		// immediately test WGL_ARB_pixel_format and FSAA support
 		// so we can set configuration options appropriately
@@ -579,10 +580,10 @@ namespace Ogre {
                 // when a valid GL context does not exist and glew is not initialized yet.
 				PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
 
-				PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+				mWglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 
 
-                if (wglChoosePixelFormat(hdc, iattr, 0, 256, formats, &count))
+                if (mWglChoosePixelFormat(hdc, iattr, 0, 256, formats, &count))
                 {
                     // determine what multisampling levels are offered
                     int query = WGL_SAMPLES_ARB, samples;
@@ -634,7 +635,7 @@ namespace Ogre {
 		if (hwGamma && !mHasHardwareGamma)
 			return false;
 		
-		if ((multisample || hwGamma))// && WGLEW_GET_FUN(__wglewChoosePixelFormatARB))
+		if ((multisample || hwGamma) && mWglChoosePixelFormat)
 		{
 
 			// Use WGL to test extended caps (multisample, sRGB)
@@ -660,11 +661,7 @@ namespace Ogre {
 			UINT nformats;
 			// ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
 			// since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
-//			if (!WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
-			PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-
-
-			if (!wglChoosePixelFormat(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
+			if (!mWglChoosePixelFormat(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
 				return false;
 		}
 		else

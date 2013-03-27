@@ -64,9 +64,8 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 # install 
-ogre_config_component(OgreOverlay)
-
 ogre_config_framework(OgreOverlay)
+ogre_config_component(OgreOverlay)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Overlay

@@ -172,7 +172,7 @@ vertex_program InstancingGLSLES glsles
 		param_named_auto lightDiffuseColour light_diffuse_colour 0
 		param_named_auto lightPos light_position 0
 		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto worldMatrixArray world_matrix_array
 	}
 }
 vertex_program InstancingShadowCasterGLSLES glsles
@@ -183,7 +183,7 @@ vertex_program InstancingShadowCasterGLSLES glsles
 	{
 		param_named_auto ambient ambient_light_colour
 		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto worldMatrixArray world_matrix_array
 	}
 }
 vertex_program CrowdGLSLES glsles

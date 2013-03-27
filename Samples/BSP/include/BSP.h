@@ -24,6 +24,20 @@ public:
 		mInfo["Category"] = "Geometry";
 	}
 
+    void testCapabilities(const RenderSystemCapabilities* caps)
+	{
+        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
+        {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
+                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
+        }
+		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"))
+		{
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
+						"so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
+		}
+	}
+
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;

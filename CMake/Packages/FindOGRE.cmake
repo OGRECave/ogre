@@ -95,6 +95,12 @@ elseif (UNIX)
     $ENV{HOME}/ogre
     $ENV{HOME}/OGRE
   )
+  if (APPLE)
+    set(OGRE_PREFIX_GUESSES 
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/macosx
+      ${OGRE_PREFIX_GUESSES}
+    )
+  endif ()
 endif ()
 set(OGRE_PREFIX_PATH
   ${OGRE_HOME} ${OGRE_SDK} ${ENV_OGRE_HOME} ${ENV_OGRE_SDK}
@@ -380,7 +386,7 @@ ogre_find_component(Property OgreProperty.h)
 # look for RTShaderSystem component
 ogre_find_component(RTShaderSystem OgreRTShaderSystem.h)
 # look for Volume component
-ogre_find_component(Volume OgreVolume.h)
+ogre_find_component(Volume OgreVolumePrerequisites.h)
 # look for Overlay component
 ogre_find_component(Overlay OgreOverlaySystem.h)
 

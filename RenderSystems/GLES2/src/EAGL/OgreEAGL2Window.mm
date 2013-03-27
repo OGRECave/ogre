@@ -44,7 +44,6 @@ namespace Ogre {
             mUsingExternalViewController(false),
             mIsContentScalingSupported(false),
             mContentScalingFactor(1.0),
-            mCurrentOSVersion(0.0),
             mGLSupport(glsupport),
             mContext(NULL),
             mWindow(nil),
@@ -56,8 +55,7 @@ namespace Ogre {
         mHwGamma = false;
 
         // Check for content scaling.  iOS 4 or later
-        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-        if(mCurrentOSVersion >= 4.0)
+        if(mGLSupport->getCurrentOSVersion() >= 4.0)
             mIsContentScalingSupported = true;
     }
 
