@@ -83,7 +83,7 @@ endif ()
 
 # Make work queue options available for MSVC 10 +
 #MSVC_VERSION is empty
-if (OGRE_CONFIG_THREADS AND MSVC10)
+if (OGRE_CONFIG_THREADS AND (MSVC AND MSVC_VERSION GREATER 1500))
 	set(OGRE_CONFIG_THREAD_WORKQUEUE_PROVIDER ${OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER} CACHE STRING
 		"Select the default WorkQueue implementation. Possible values:
 		standard - Default workqueue for the chosen thread provider.

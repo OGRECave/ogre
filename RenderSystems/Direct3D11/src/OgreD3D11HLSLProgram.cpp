@@ -449,7 +449,7 @@ namespace Ogre {
                 static_cast<const char*>(errors->GetBufferPointer());
             errors->Release();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
-                "D3D11HLSLProgram::loadFromSource");
+                "D3D11HLSLProgram::compileMicroCode");
         }
         else
         {
@@ -469,7 +469,7 @@ namespace Ogre {
                 String message = "Cannot reflect D3D11 high-level shader " + mName + " Errors:\n" +
                     static_cast<const char*>(errors->GetBufferPointer());
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
-                    "D3D11HLSLProgram::loadFromSource");
+                    "D3D11HLSLProgram::compileMicroCode");
             }
 
             D3D11_SHADER_DESC shaderDesc;
