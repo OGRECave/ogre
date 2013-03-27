@@ -497,7 +497,7 @@ namespace Ogre {
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;
 		ResourceWithGroupMap mResourcesWithGroup;
-        ResourceHandle mNextHandle;
+        AtomicScalar<ResourceHandle> mNextHandle;
         size_t mMemoryBudget; // In bytes
         AtomicScalar<size_t> mMemoryUsage; // In bytes
 
