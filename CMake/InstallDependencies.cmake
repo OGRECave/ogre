@@ -124,8 +124,8 @@ if (OGRE_INSTALL_DEPENDENCIES)
       install_release(OIS.dll)
       if (OGRE_BUILD_RENDERSYSTEM_D3D11 AND MSVC11)
         # Install d3dcompiler found in Windows SDK
-        install_debug()
-        install_release()
+        #install_debug()
+        #install_release()
       endif()
     endif()
 
