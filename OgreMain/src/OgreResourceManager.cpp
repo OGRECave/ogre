@@ -463,8 +463,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourceHandle ResourceManager::getNextHandle(void)
     {
-		OGRE_LOCK_AUTO_MUTEX
-
+        // This is an atomic operation and hence needs no locking
         return mNextHandle++;
     }
     //-----------------------------------------------------------------------
