@@ -38,7 +38,7 @@ THE SOFTWARE.
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
 
-@implementation OgreWindow
+@implementation OgreGL3PlusWindow
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -261,8 +261,8 @@ namespace Ogre {
                 NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
             } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreView*");
-                OgreView *view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
+                OgreGL3PlusView *view = (OgreGL3PlusView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             
@@ -638,14 +638,14 @@ namespace Ogre {
         else
             windowRect = NSMakeRect(0.0, 0.0, width, height);
 
-        mWindow = [[OgreWindow alloc] initWithContentRect:windowRect
+        mWindow = [[OgreGL3PlusWindow alloc] initWithContentRect:windowRect
                                               styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
         mWindowTitle = title;
 
-        mView = [[OgreView alloc] initWithGLOSXWindow:this];
+        mView = [[OgreGL3PlusView alloc] initWithGLOSXWindow:this];
 
         _setWindowParameters();
 
