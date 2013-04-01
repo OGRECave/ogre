@@ -32,6 +32,9 @@ if(NOT TINYXML_FOUND)
   list(APPEND HEADER_FILES
     include/tinystr.h
     include/tinyxml.h)
+
+  set(TINYXML_INCLUDE_DIR "")
+  set(TINYXML_LIBRARIES "")
 endif(NOT TINYXML_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
