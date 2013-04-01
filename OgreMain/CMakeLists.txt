@@ -751,7 +751,7 @@ if(WIN32 AND MSVC10 AND CMAKE_CL_64)
                         LINK_FLAGS "/INCREMENTAL:NO"
                       )
 else()
-  set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION})
+  set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
 if (APPLE)
