@@ -838,7 +838,7 @@ namespace Ogre {
                 OIS::Interface* queryInterface(OIS::Interface::IType) {return NULL;};
                 void _initialize(){};
                 bool isKeyDown(OIS::KeyCode){return false;};
-                const std::string& getAsString(OIS::KeyCode){return "";};
+                const std::string& getAsString(OIS::KeyCode){static const std::string res; return res;};
                 void copyKeyStates(char*){};
                 bool HandleInputEvent(const pp::InputEvent& event)
                 {
