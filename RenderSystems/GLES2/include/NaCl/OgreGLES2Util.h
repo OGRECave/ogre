@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 #include "OgreNaClGLSupport.h"
 
+#define IF_OS_VERSION_IS_GREATER_THAN(vers)
+
 namespace Ogre {
     inline GLES2Support* getGLSupport()
     {
