@@ -120,8 +120,13 @@ if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
   foreach(dir ${OGRE_PREFIX_BUILD})
     set(OGRE_INC_SEARCH_PATH ${dir}/include ${OGRE_INC_SEARCH_PATH})
     set(OGRE_LIB_SEARCH_PATH ${dir}/lib ${OGRE_LIB_SEARCH_PATH})
+
+    if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+        set(OGRE_LIB_SEARCH_PATH ${dir}/lib/iphoneos ${dir}/lib/iphonesimulator ${OGRE_LIB_SEARCH_PATH})
+    endif()
+
     set(OGRE_BIN_SEARCH_PATH ${dir}/bin ${OGRE_BIN_SEARCH_PATH})
-	set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
+    set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
   endforeach(dir)
   
   if (OGRE_PREFIX_DEPENDENCIES_DIR)
