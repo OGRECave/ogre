@@ -91,6 +91,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_SURFACE_SPECULAR_COLOUR,         "surface_specular_colour",          4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SURFACE_EMISSIVE_COLOUR,         "surface_emissive_colour",          4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SURFACE_SHININESS,               "surface_shininess",                1, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_SURFACE_ALPHA_REJECTION_VALUE,   "surface_alpha_rejection_value",    1, ET_REAL, ACDT_NONE),
 
 		AutoConstantDefinition(ACT_LIGHT_COUNT,                   "light_count",                  1, ET_REAL, ACDT_NONE),
 
@@ -1066,6 +1067,7 @@ namespace Ogre
 		case ACT_SURFACE_SPECULAR_COLOUR:
 		case ACT_SURFACE_EMISSIVE_COLOUR:
 		case ACT_SURFACE_SHININESS:
+		case ACT_SURFACE_ALPHA_REJECTION_VALUE:
 		case ACT_CAMERA_POSITION:
 		case ACT_TIME:
 		case ACT_TIME_0_X:
@@ -1934,6 +1936,9 @@ namespace Ogre
 					break;
 				case ACT_SURFACE_SHININESS:
 					_writeRawConstant(i->physicalIndex, source->getSurfaceShininess());
+					break;
+				case ACT_SURFACE_ALPHA_REJECTION_VALUE:
+					_writeRawConstant(i->physicalIndex, source->getSurfaceAlphaRejectionValue());
 					break;
 
 				case ACT_CAMERA_POSITION:
