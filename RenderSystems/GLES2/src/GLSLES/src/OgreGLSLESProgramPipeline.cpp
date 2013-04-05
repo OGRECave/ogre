@@ -123,31 +123,6 @@ namespace Ogre
         
 		if(mLinked)
 		{
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-			{
-				// Add to the microcode to the cache
-				String name;
-				name = getCombinedName();
-
-				// Get buffer size
-				GLint binaryLength = 0;
-
-#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
-				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-#endif
-
-                // Create microcode
-                GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
-
-#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
-				// Get binary
-				OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
-#endif
-
-        		// Add to the microcode to the cache
-				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-			}
             if(mVertexProgram && mVertexProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
@@ -218,35 +193,27 @@ namespace Ogre
 		{
 			glGetError(); // Clean up the error. Otherwise will flood log.
             
-			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
-			{
-				getMicrocodeFromCache();
-			}
-			else
-			{
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
-                // Check CmdParams for each shader type to see if we should optimise
-                if(mVertexProgram)
+            // Check CmdParams for each shader type to see if we should optimise
+            if(mVertexProgram)
+            {
+                String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
+                if((paramStr == "true") || paramStr.empty())
                 {
-                    String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
-                    if((paramStr == "true") || paramStr.empty())
-                    {
-                        GLSLESProgramPipelineManager::getSingleton().optimiseShaderSource(mVertexProgram);
-                    }
+                    GLSLESProgramPipelineManager::getSingleton().optimiseShaderSource(mVertexProgram);
                 }
+            }
 
-                if(mFragmentProgram)
+            if(mFragmentProgram)
+            {
+                String paramStr = mFragmentProgram->getGLSLProgram()->getParameter("use_optimiser");
+                if((paramStr == "true") || paramStr.empty())
                 {
-                    String paramStr = mFragmentProgram->getGLSLProgram()->getParameter("use_optimiser");
-                    if((paramStr == "true") || paramStr.empty())
-                    {
-                        GLSLESProgramPipelineManager::getSingleton().optimiseShaderSource(mFragmentProgram);
-                    }
+                    GLSLESProgramPipelineManager::getSingleton().optimiseShaderSource(mFragmentProgram);
                 }
+            }
 #endif
-				compileAndLink();
-			}
+            compileAndLink();
 
             extractLayoutQualifiers();
 
