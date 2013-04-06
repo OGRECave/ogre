@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreRenderWindow.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
 #pragma warning( disable : 4451 ) // http://social.msdn.microsoft.com/Forums/en-US/winappswithnativecode/thread/314b5826-0a66-4307-abfe-87b8052c3c07/
 
 #    include <agile.h>
