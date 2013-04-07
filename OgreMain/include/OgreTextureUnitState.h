@@ -576,7 +576,7 @@ namespace Ogre {
             Default is 0 for all layers. Only change this if you have provided multiple texture co-ords per
             vertex.
         @note
-            Applies to both fixed-function and programmable pipeline.
+            Has no effect if a fragment program is used.
         */
         void setTextureCoordSet(unsigned int set);
 
