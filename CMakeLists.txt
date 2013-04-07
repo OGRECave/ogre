@@ -227,9 +227,15 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos)
-  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
+  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+    string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+  else()
+    set(CMAKE_OSX_SYSROOT iphoneos)
+  endif()
+
+  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
@@ -282,7 +288,12 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.6 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
-  set(CMAKE_OSX_SYSROOT macosx)
+  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+    string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+  else()
+    set(CMAKE_OSX_SYSROOT macosx)
+  endif()
 
   if (NOT CMAKE_OSX_ARCHITECTURES)
     if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
