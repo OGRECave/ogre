@@ -555,7 +555,7 @@ namespace Ogre {
 
         /** Gets the index of the set of texture co-ords this layer uses.
         @note
-        Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         unsigned int getTextureCoordSet(void) const;
 
@@ -564,7 +564,7 @@ namespace Ogre {
         Default is 0 for all layers. Only change this if you have provided multiple texture co-ords per
         vertex.
         @note
-        Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         void setTextureCoordSet(unsigned int set);
 
