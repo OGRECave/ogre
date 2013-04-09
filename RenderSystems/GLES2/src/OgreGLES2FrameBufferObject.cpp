@@ -79,20 +79,7 @@ namespace Ogre {
 		if (mMultisampleFB)
 			OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
     }
-    
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    void GLES2FrameBufferObject::notifyOnContextLost()
-    {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
-		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
-        
-		if (mMultisampleFB)
-			OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
-    }
-    
+     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLES2FrameBufferObject::notifyOnContextLost()
     {
