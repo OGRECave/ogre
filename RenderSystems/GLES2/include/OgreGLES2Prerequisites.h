@@ -76,6 +76,7 @@ THE SOFTWARE.
 #		include "ppapi/gles2/gl2ext_ppapi.h"
 #       undef GL_OES_get_program_binary
 #       undef GL_OES_mapbuffer
+#       undef GL_OES_vertex_array_object
 #	endif
 #else
 #	undef  GL_GLEXT_PROTOTYPES

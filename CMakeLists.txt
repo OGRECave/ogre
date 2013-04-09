@@ -102,8 +102,7 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
   endif ()
   # This is a set of sensible warnings that provide meaningful output
-  # TheSHEEEP: Removed "-Wctor-dtor-privacy" as it was going mad with uneccessary warnings when using boost.
-  set(OGRE_WARNING_FLAGS "-Wno-deprecated -Wall -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
+  set(OGRE_WARNING_FLAGS "-Wall -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
   if (NOT APPLE)
       set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-unused-but-set-parameter")
   endif ()
@@ -228,9 +227,15 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos)
-  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
+  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+    string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+  else()
+    set(CMAKE_OSX_SYSROOT iphoneos)
+  endif()
+
+  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
@@ -283,7 +288,12 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.6 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
-  set(CMAKE_OSX_SYSROOT macosx)
+  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+    string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+  else()
+    set(CMAKE_OSX_SYSROOT macosx)
+  endif()
 
   if (NOT CMAKE_OSX_ARCHITECTURES)
     if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
@@ -306,10 +316,6 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 elseif (OGRE_BUILD_PLATFORM_WINRT)
   set(OGRE_BUILD_RENDERSYSTEM_D3D11 TRUE CACHE BOOL "Forcing Direct3D11 RenderSystem for WinRT" FORCE)
 endif ()
-
-if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-  set(OGRE_BUILD_RENDERSYSTEM_GL FALSE)
-endif()
 
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)

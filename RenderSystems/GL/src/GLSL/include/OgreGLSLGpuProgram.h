@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    namespace GLSL {
     /** GLSL low level compiled shader object - this class is used to get at the linked program object 
 		and provide an interface for GLRenderSystem calls.  GLSL does not provide access to the
 		low level code of the shader so this class is really just a dummy place holder.
@@ -97,7 +97,7 @@ namespace Ogre {
 
     };
 
-
+    }
 }
 
 

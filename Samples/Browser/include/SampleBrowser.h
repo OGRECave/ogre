@@ -1071,7 +1071,7 @@ protected:
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
-#			ifdef OGRE_BUILD_COMPONENT_VOLUME
+#			if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #			endif
@@ -1348,6 +1348,7 @@ protected:
             sampleList.push_back("Sample_CameraTrack");
             sampleList.push_back("Sample_CelShading");
             sampleList.push_back("Sample_Character");     
+            sampleList.push_back("Sample_Compositor");     
             sampleList.push_back("Sample_CubeMapping");    
             sampleList.push_back("Sample_Dot3Bump");
             sampleList.push_back("Sample_DynTex");      
@@ -1364,7 +1365,6 @@ protected:
             sampleList.push_back("Sample_SkyPlane"); 
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
-			sampleList.push_back("Sample_Tesselation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
 #else
