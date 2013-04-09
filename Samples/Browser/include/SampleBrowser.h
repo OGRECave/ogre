@@ -98,7 +98,6 @@
 #   include "Smoke.h"
 #   include "SphereMapping.h"
 #	include "Tesselation.h"
-#include "Tesselation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
@@ -1072,7 +1071,7 @@ protected:
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
-#			ifdef OGRE_BUILD_COMPONENT_VOLUME
+#			if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #			endif
@@ -1349,7 +1348,8 @@ protected:
             sampleList.push_back("Sample_BezierPatch");
             sampleList.push_back("Sample_CameraTrack");
             sampleList.push_back("Sample_CelShading");
-            sampleList.push_back("Sample_Character");     
+            sampleList.push_back("Sample_Character");   
+			sampleList.push_back("Sample_Compositor");     			
             sampleList.push_back("Sample_CubeMapping");    
             sampleList.push_back("Sample_Dot3Bump");
             sampleList.push_back("Sample_DynTex");      
