@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
+    namespace GLSL {
 
     //-----------------------------------------------------------------------
 	GLSLProgram::CmdPreprocessorDefines GLSLProgram::msCmdPreprocessorDefines;
@@ -523,5 +524,5 @@ namespace Ogre {
 		t->setMaxOutputVertices(StringConverter::parseInt(val));
 	}
 
-  
+}
 }

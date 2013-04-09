@@ -32,7 +32,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre {
-    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
+    namespace GLSL {
+    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL
         Shader Language (GLSL).
     @remarks
 		GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
@@ -210,6 +211,7 @@ namespace Ogre {
         bool mColumnMajorMatrices;
 
     };
+    }
 }
 
 #endif // __GLSLProgram_H__

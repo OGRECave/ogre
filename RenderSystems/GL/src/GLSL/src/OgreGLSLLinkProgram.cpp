@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 
 namespace Ogre {
+    namespace GLSL {
 
 	//  a  builtin				custom attrib name
 	// ----------------------------------------------
@@ -624,4 +625,5 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+} // namespace GLSL
 } // namespace Ogre

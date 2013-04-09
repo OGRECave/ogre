@@ -830,7 +830,7 @@ namespace Ogre {
 		if(caps->isShaderProfileSupported("glsl"))
 		{
 			// NFZ - check for GLSL vertex and fragment shader support successful
-			mGLSLProgramFactory = new GLSLProgramFactory();
+			mGLSLProgramFactory = new GLSL::GLSLProgramFactory();
 			HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLProgramFactory);
 			LogManager::getSingleton().logMessage("GLSL support detected");
 		}

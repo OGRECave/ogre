@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0502
 #endif
 #include "OgreWin32Context.h"
 #include "OgreException.h"

@@ -6,31 +6,207 @@
 	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
 	<key>Identifier</key>
 	<string>org.ogre3d.osxApplication</string>
-	<key>Ancestors</key>
-	<array>
-		<string>org.ogre3d.macBase</string>
-		<string>org.ogre3d.objectiveCApplication</string>
-	</array>
 	<key>Description</key>
 	<string>This template builds an Ogre based project for Mac OS X using the Basic Ogre Framework.</string>
 	<key>Concrete</key>
 	<true/>
+    <key>Platforms</key>
+    <array>
+        <string>com.apple.platform.macosx</string>
+    </array>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Identifier</key>
+			<string>productName</string>
+			<key>Required</key>
+			<true/>
+			<key>Name</key>
+			<string>Product Name</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Description</key>
+			<string>Your new product&apos;s name.</string>
+			<key>EmptyReplacement</key>
+			<string>ProductName</string>
+			<key>Type</key>
+			<string>text</string>
+        </dict>
+		<dict>
+			<key>Identifier</key>
+			<string>bundleIdentifierPrefix</string>
+			<key>Required</key>
+			<true/>
+			<key>Name</key>
+			<string>Company Identifier</string>
+			<key>Description</key>
+			<string>Your company&apos;s bundle identifier prefix.</string>
+			<key>EmptyReplacement</key>
+			<string>com.yourcompany</string>
+			<key>Type</key>
+			<string>text</string>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>bundleIdentifier</string>
+			<key>Name</key>
+			<string>Bundle Identifier</string>
+			<key>Description</key>
+			<string>Your new product&apos;s bundle identifier.</string>
+			<key>Default</key>
+			<string>___VARIABLE_bundleIdentifierPrefix:bundleIdentifier___.___VARIABLE_productName:RFC1034Identifier___</string>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Description</key>
+			<string>The category for your application in the Mac App Store.</string>
+			<key>Identifier</key>
+			<string>applicationCategory</string>
+			<key>Name</key>
+			<string>App Store Category</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Placeholder</key>
+			<string>None</string>
+			<key>SpecialType</key>
+			<string>LSApplicationCategoryType</string>
+			<key>Type</key>
+			<string>popup</string>
+			<key>Units</key>
+			<dict>
+				<key></key>
+				<array>
+					<dict>
+						<key>Definitions</key>
+						<dict>
+							<key>___PACKAGENAME___-Info.plist:ApplicationCategory</key>
+							<string></string>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+		</dict>
+	</array>
 	<key>Definitions</key>
 	<dict>
-		<key>___PACKAGENAME___-Info.plist:ApplicationCategory</key>
-		<string>&lt;key&gt;LSApplicationCategoryType&lt;/key&gt;
-&lt;string&gt;___VARIABLE_applicationCategory___&lt;/string&gt;
-		</string>
+		<key>*:*:importCocoa</key>
+		<string>#import &lt;Cocoa/Cocoa.h&gt;
+</string>
+		<key>*:comments</key>
+		<string>//
+//  ___FILENAME___
+//  ___PACKAGENAME___
+//
+//  Created by ___FULLUSERNAME___ on ___DATE___.
+//  Copyright ___YEAR___ ___ORGANIZATIONNAME___. All rights reserved.
+//
+</string>
+		<key>*:import:*</key>
+		<string>#import &quot;___*___&quot;
+</string>
+		<key>___PACKAGENAME___-Prefix.pch</key>
+		<dict>
+			<key>Beginning</key>
+			<string>//
+// Prefix header for all source files of the &apos;___PACKAGENAME___&apos; target in the &apos;___PACKAGENAME___&apos; project
+//
+</string>
+			<key>Group</key>
+			<string>Supporting Files</string>
+			<key>TargetIndices</key>
+			<array/>
+		</dict>
+		<key>___PACKAGENAME___-Prefix.pch:objC</key>
+		<dict>
+			<key>Beginning</key>
+			<string>#ifdef __OBJC__</string>
+			<key>End</key>
+			<string>#endif</string>
+			<key>Indent</key>
+			<integer>1</integer>
+		</dict>
+		<key>en.lproj/InfoPlist.strings</key>
+		<dict>
+			<key>Group</key>
+			<string>Resources</string>
+		</dict>
+		<key>en.lproj/InfoPlist.strings</key>
+		<string>/* Localized versions of Info.plist keys */</string>
+		<key>___PACKAGENAME___-Info.plist</key>
+		<dict>
+			<key>Beginning</key>
+			<string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+</string>
+			<key>End</key>
+			<string>&lt;/dict&gt;
+&lt;/plist&gt;</string>
+			<key>Indent</key>
+			<integer>1</integer>
+			<key>Group</key>
+			<string>Supporting Files</string>
+			<key>TargetIndices</key>
+			<array/>
+			<key>SubstituteMacros</key>
+			<true/>
+		</dict>
+		<key>___PACKAGENAME___-Info.plist</key>
+		<dict>
+			<key>Beginning</key>
+			<string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+</string>
+			<key>End</key>
+			<string>&lt;/dict&gt;
+&lt;/plist&gt;</string>
+			<key>Indent</key>
+			<integer>1</integer>
+			<key>Group</key>
+			<string>Supporting Files</string>
+			<key>TargetIndices</key>
+			<array/>
+			<key>SubstituteMacros</key>
+			<true/>
+		</dict>
+		<key>___PACKAGENAME___-Info.plist:CFBundleIdentifier</key>
+		<string>&lt;key&gt;CFBundleIdentifier&lt;/key&gt;
+&lt;string&gt;___VARIABLE_bundleIdentifierPrefix:bundleIdentifier___.${PRODUCT_NAME:rfc1034identifier}&lt;/string&gt;
+        </string>
+		<key>___PACKAGENAME___-Info.plist:NSHumanReadableCopyright</key>
+		<string>&lt;key&gt;NSHumanReadableCopyright&lt;/key&gt;
+&lt;string&gt;Copyright © ___YEAR___ ___ORGANIZATIONNAME___. All rights reserved.&lt;/string&gt;
+        </string>
+		<key>___PACKAGENAME___-Info.plist:Basics</key>
+		<string>&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;
+&lt;string&gt;en&lt;/string&gt;
+&lt;key&gt;CFBundleExecutable&lt;/key&gt;
+&lt;string&gt;${EXECUTABLE_NAME}&lt;/string&gt;
+&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;
+&lt;string&gt;6.0&lt;/string&gt;
+&lt;key&gt;CFBundleName&lt;/key&gt;
+&lt;string&gt;${PRODUCT_NAME}&lt;/string&gt;
+&lt;key&gt;CFBundlePackageType&lt;/key&gt;
+&lt;string&gt;APPL&lt;/string&gt;
+&lt;key&gt;CFBundleSignature&lt;/key&gt;
+&lt;string&gt;????&lt;/string&gt;
+</string>
 		<key>___PACKAGENAME___-Info.plist:Mac</key>
-		<string>&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
+		<string>&lt;key&gt;CFBundleIconFile&lt;/key&gt;
+&lt;string&gt;&lt;/string&gt;
+&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
 &lt;string&gt;1.0&lt;/string&gt;
 &lt;key&gt;LSMinimumSystemVersion&lt;/key&gt;
 &lt;string&gt;${MACOSX_DEPLOYMENT_TARGET}&lt;/string&gt;
 &lt;key&gt;CFBundleVersion&lt;/key&gt;
-&lt;string&gt;1.0&lt;/string&gt;
+&lt;string&gt;1&lt;/string&gt;
 &lt;key&gt;NSPrincipalClass&lt;/key&gt;
 &lt;string&gt;NSApplication&lt;/string&gt;
-		</string>
+</string>
 		<key>main.mm</key>
 		<dict>
 			<key>Path</key>
@@ -77,6 +253,8 @@
 			<string>media</string>
 			<key>Group</key>
 			<string>Resources</string>
+			<key>PathType</key>
+			<string>ProjectDir</string>
             <key>TargetIndices</key>
             <array/>
 		</dict>
@@ -104,8 +282,11 @@
 	</dict>
 	<key>Nodes</key>
 	<array>
+		<string>___PACKAGENAME___-Prefix.pch:objC:importCocoa</string>
+		<string>___PACKAGENAME___-Info.plist:NSHumanReadableCopyright</string>
+		<string>___PACKAGENAME___-Info.plist:Basics</string>
 		<string>___PACKAGENAME___-Info.plist:Mac</string>
-		<string>___PACKAGENAME___-Info.plist:ApplicationCategory</string>
+		<string>en.lproj/InfoPlist.strings</string>
 		<string>main.mm</string>
 		<string>AppDelegate.h</string>
 		<string>OgreDemoApp.cpp</string>
@@ -117,73 +298,115 @@
 		<string>plugins.cfg</string>
 		<string>resources.cfg</string>
 	</array>
-	<key>Options</key>
-	<array>
-		<dict>
-			<key>Description</key>
-			<string>The location of your Mac OS X Ogre3D SDK installation.</string>
-			<key>Identifier</key>
-			<string>ogrePathOSX</string>
-			<key>Name</key>
-			<string>Ogre Mac OS X SDK Path</string>
-			<key>NotPersisted</key>
-			<false/>
-			<key>Placeholder</key>
-			<string>None</string>
-			<key>Type</key>
-			<string>text</string>
-		</dict>
-		<dict>
-			<key>Description</key>
-			<string>The category for your application in the Mac App Store.</string>
-			<key>Identifier</key>
-			<string>applicationCategory</string>
-			<key>Name</key>
-			<string>App Store Category</string>
-			<key>NotPersisted</key>
-			<true/>
-			<key>Placeholder</key>
-			<string>None</string>
-			<key>SpecialType</key>
-			<string>LSApplicationCategoryType</string>
-			<key>Type</key>
-			<string>popup</string>
-			<key>Units</key>
-			<dict>
-				<key></key>
-				<array>
-					<dict>
-						<key>Definitions</key>
-						<dict>
-							<key>___PACKAGENAME___-Info.plist:ApplicationCategory</key>
-							<string></string>
-						</dict>
-					</dict>
-				</array>
-			</dict>
-		</dict>
-	</array>
 	<key>Project</key>
 	<dict>
+		<key>Configurations</key>
+		<dict>
+            <key>Debug</key>
+            <dict>
+                <key>COPY_PHASE_STRIP</key>
+                <string>NO</string>
+            </dict>
+            <key>Release</key>
+            <dict>
+                <key>COPY_PHASE_STRIP</key>
+                <string>YES</string>
+                <key>DEBUG_INFORMATION_FORMAT</key>
+                <string>dwarf-with-dsym</string>
+            </dict>
+		</dict>
 		<key>SDK</key>
 		<string>macosx</string>
 		<key>SharedSettings</key>
 		<dict>
+            <key>PRODUCT_NAME</key>
+            <string>$(TARGET_NAME)</string>
+            <key>INFOPLIST_FILE</key>
+            <string>___PACKAGENAME___/___PACKAGENAME___-Info.plist</string>
+            <key>GCC_PREFIX_HEADER</key>
+            <string>___PACKAGENAME___/___PACKAGENAME___-Prefix.pch</string>
+            <key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+            <string>YES</string>
 			<key>ARCHS</key>
 			<string>$(ARCHS_STANDARD_32_64_BIT)</string>
 			<key>HEADER_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/include/OGRE" "___VARIABLE_ogrePathOSX___/include/OGRE/OSX" "___VARIABLE_ogrePathOSX___/include/OIS" "___VARIABLE_ogrePathOSX___/Dependencies/include" "___VARIABLE_ogrePathOSX___/boost"</string>
+			<string>"$(OGRE_SDK_ROOT)/include/OGRE" "$(OGRE_SDK_ROOT)/include/OGRE/OSX" "$(OGRE_SDK_ROOT)/include/OIS" "$(OGRE_SDK_ROOT)/Dependencies/include" "$(OGRE_SDK_ROOT)/boost"</string>
 			<key>LIBRARY_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/lib" "___VARIABLE_ogrePathOSX___/Dependencies/lib/Release"</string>
+			<string>"$(OGRE_SDK_ROOT)/lib" "$(OGRE_SDK_ROOT)/Dependencies/lib/Release" /opt/local/lib</string>
 			<key>FRAMEWORK_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/lib/release" "___VARIABLE_ogrePathOSX___/Dependencies"</string>
+			<string>"$(OGRE_SDK_ROOT)/lib/release" "$(OGRE_SDK_ROOT)/Dependencies"</string>
 			<key>OTHER_LDFLAGS</key>
-			<string>-lOIS</string>
+			<string>-lOIS -framework Ogre</string>
+            <key>WRAPPER_EXTENSION</key>
+            <string>app</string>
 		</dict>
 	</dict>
 	<key>Targets</key>
 	<array>
 		<dict>
+			<key>BuildPhases</key>
+			<array>
+				<dict>
+					<key>Class</key>
+					<string>Sources</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Frameworks</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Resources</string>
+				</dict>
+<!-- 
+			 <dict>
+                <key>Class</key>
+                <string>CopyFiles</string> <!~~ Add Build Phase Copy File ~~>
+                <key>DstPath</key>
+                <string/>
+                <key>DstSubfolderSpec</key>
+                <string>13</string> <!~~ Plugins ~~>
+                <key>RunOnlyForDeploymentPostprocessing</key>
+                <string>NO</string>
+            </dict>
+			 <dict>
+                <key>Class</key>
+                <string>CopyFiles</string> <!~~ Add Build Phase Copy File ~~>
+                <key>DstPath</key>
+                <string/>
+                <key>DstSubfolderSpec</key>
+                <string>10</string> <!~~ Frameworks ~~>
+                <key>RunOnlyForDeploymentPostprocessing</key>
+                <string>NO</string>
+	            </dict>
+			 <dict>
+                <key>Class</key>
+                <string>CopyFiles</string> <!~~ Add Build Phase Copy File ~~>
+                <key>DstPath</key>
+                <string>media</string>
+                <key>DstSubfolderSpec</key>
+                <string>7</string> <!~~ Resources ~~>
+                <key>RunOnlyForDeploymentPostprocessing</key>
+                <string>NO</string>
+            </dict>
+ -->
+            				<dict>
+					<key>Class</key>
+					<string>ShellScript</string>
+					<key>ShellPath</key>
+					<string>/bin/bash</string>
+					<key>ShellScript</key>
+					<string># This shell script simply copies resources into their respective locations
+mkdir -p &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks&quot;
+mkdir -p &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins&quot;
+ditto &quot;$OGRE_SDK_ROOT/lib/release/Ogre.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/Ogre.framework&quot;
+ditto &quot;$OGRE_SDK_ROOT/lib/RenderSystem_GL.dylib&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins/&quot;
+ditto &quot;$PROJECT_DIR/$PROJECT_NAME/media/&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/media/&quot;
+ditto $PROJECT_DIR/$PROJECT_NAME/*.cfg &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/&quot;
+</string>
+				</dict>
+
+			</array>
 			<key>ProductType</key>
 			<string>com.apple.product-type.application</string>
 			<key>Frameworks</key>
@@ -191,26 +414,8 @@
 				<string>Carbon</string>
 				<string>Cocoa</string>
 				<string>IOKit</string>
-				<string>Ogre</string>
 				<string>OpenGL</string>
 				<string>QuartzCore</string>
-			</array>
-			<key>BuildPhases</key>
-			<array>
-				<dict>
-					<key>Class</key>
-					<string>ShellScript</string>
-					<key>ShellPath</key>
-					<string>/bin/sh</string>
-					<key>ShellScript</key>
-					<string># This shell script simply copies resources into their respective locations
-
-ditto &quot;___VARIABLE_ogrePathOSX___/lib/release/Ogre.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/Ogre.framework&quot;
-ditto &quot;___VARIABLE_ogrePathOSX___/lib/RenderSystem_GL.dylib&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins/&quot;
-ditto &quot;$PROJECT_DIR/$PROJECT_NAME/media/&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/media/&quot;
-ditto $PROJECT_DIR/$PROJECT_NAME/*.cfg &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/&quot;
-</string>
-				</dict>
 			</array>
 		</dict>
 	</array>

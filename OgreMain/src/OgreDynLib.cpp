@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreException.h"
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #  define WIN32_LEAN_AND_MEAN
@@ -75,8 +76,13 @@ namespace Ogre {
 		String name = mName;
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_NACL
         // dlopen() does not add .so to the filename, like windows does for .dll
-	if (name.find(".so") == String::npos)
-           name += ".so";
+        if (name.find(".so") == String::npos)
+        {
+            name += ".so.";
+            name += StringConverter::toString(OGRE_VERSION_MAJOR) + ".";
+            name += StringConverter::toString(OGRE_VERSION_MINOR) + ".";
+            name += StringConverter::toString(OGRE_VERSION_PATCH);
+        }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // dlopen() does not add .dylib to the filename, like windows does for .dll
         if (name.substr(name.length() - 6, 6) != ".dylib")
