@@ -62,16 +62,30 @@ namespace Ogre {
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
         
-        // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
-        // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
-        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+        // Get the screen mode.  On all iPhones and iPod Touches this will always be the mode when in portrait
+        // because the dock does not change orientations. 
+        CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
+        uint w = modeSize.width / [UIScreen mainScreen].scale;
+        uint h = modeSize.height / [UIScreen mainScreen].scale;
+
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+
+        if(UIInterfaceOrientationIsPortrait(orientation))
+           std::swap(w, h);
 
         optVideoMode.name = "Video Mode";
-        optVideoMode.possibleValues.push_back("320 x 480");
-        optVideoMode.possibleValues.push_back("320 x 568");
-        optVideoMode.possibleValues.push_back("768 x 1024");
-        optVideoMode.currentValue = StringConverter::toString(screenSize.width) + " x " + 
-                                    StringConverter::toString(screenSize.height);
+        optVideoMode.possibleValues.push_back("320 x 480");     // iPhones/iPod Touches
+        optVideoMode.possibleValues.push_back("640 x 960");     // iPhones/iPod Touches - retina 3.5"
+        optVideoMode.possibleValues.push_back("640 x 1136");    // iPhones/iPod Touches - retina 4"
+        optVideoMode.possibleValues.push_back("320 x 568");     // iPad Mini - portrait
+        optVideoMode.possibleValues.push_back("568 x 320");     // iPad Mini - landscape
+        optVideoMode.possibleValues.push_back("1024 x 768");    // iPad - landscape
+        optVideoMode.possibleValues.push_back("768 x 1024");    // iPad - portrait
+        optVideoMode.possibleValues.push_back("1536 x 2048");   // iPad - retina portrait
+        optVideoMode.possibleValues.push_back("2048 x 1536");   // iPad - retina landscape
+        optVideoMode.possibleValues.push_back("1280 x 720");    // Apple TV over AirPlay 720p
+        optVideoMode.currentValue = StringConverter::toString(w) + " x " +
+                                    StringConverter::toString(h);
         optVideoMode.immutable = false;
 
         optDisplayFrequency.name = "Display Frequency";
@@ -234,9 +248,9 @@ namespace Ogre {
             ConfigOptionMap::iterator end = mOptions.end();
             NameValuePairList miscParams;
 
-            CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+            CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
             bool fullscreen = false;
-            uint w = (uint)screenSize.width, h = (uint)screenSize.height;
+            uint w = (uint)modeSize.width, h = (uint)modeSize.height;
 
             if ((opt = mOptions.find("Full Screen")) != end)
             {

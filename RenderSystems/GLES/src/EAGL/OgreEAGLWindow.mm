@@ -134,9 +134,6 @@ namespace Ogre {
         if(mWidth == w && mHeight == h)
             return;
         
-        // Destroy and recreate the framebuffer with new dimensions 
-        mContext->destroyFramebuffer();
-        
         mWidth = w;
         mHeight = h;
         
@@ -223,6 +220,9 @@ namespace Ogre {
         OgreAssert(mView != nil, "EAGLWindow: Failed to create view");
 
         [mView setMWindowName:mName];
+
+        // Set the view to not clip. This helps with smoother transitions when rotating.
+        mView.clipsToBounds = NO;
 
         OgreAssert([mView.layer isKindOfClass:[CAEAGLLayer class]], "EAGLWindow: View's Core Animation layer is not a CAEAGLLayer. This is a requirement for using OpenGL ES for drawing.");
         
