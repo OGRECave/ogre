@@ -1055,7 +1055,9 @@ protected:
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
             const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
+#if defined(USE_RTSHADER_SYSTEM)
             bool hasProgrammableGPU = (profiles.size() != 0);
+#endif
 
 //            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
