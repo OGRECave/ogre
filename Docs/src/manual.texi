@@ -1468,6 +1468,8 @@ Example: content_type compositor DepthCompositor OutputTexture @*@*
 
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.@*@*
 
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
+
 Format: tex_coord_set <set_num>@*@*
 
 Example: tex_coord_set 2@*@*
