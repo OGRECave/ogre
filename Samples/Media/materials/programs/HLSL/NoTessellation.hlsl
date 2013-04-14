@@ -1,126 +1,128 @@
+/**
+*	Modified by: Juan Camilo Acosta Arango (ja0335 )
+*	Date: 09-04-2013
+*	Note: This shaders are based one my study over the 
+* 	Eat3D course, "Shader Production - Writing Custom Shaders with CGFX"
+*	http://eat3d.com/shaders_intro
+**/
+
 /////////////
 // GLOBALS //
 /////////////
-cbuffer cbPerFrame
+Texture2D g_NormalTxt : register( t0 ); // normal
+Texture2D g_DiffuseTxt : register( t1 ); // diffuse
+Texture2D g_SpecularTxt : register( t2 ); // specular
+SamplerState g_samLinear : register( s0 );
+
+cbuffer cbVertexBuffer
 {
-    matrix worldViewprojMatrix;
-    matrix worldMatrix;
+    matrix g_WorldViewprojMatrix;
+    matrix g_WorldInverseTranspose;
+    matrix g_World;
+    matrix g_InverseView;
 };
+
+cbuffer cbPixelBuffer
+{
+	float4 g_AmbientLightColour;
+	float3 g_LightDirection;
+	float3 g_LightDiffuseColour;
+	float3 g_DiffuseColour;
+	float3 g_SpecularColor;
+	float3 g_FresnelColor;
+	float g_SpecularPower;
+	float g_FresnelPower;
+};
+
 
 //////////////
 // TYPEDEFS //
 //////////////
-struct VertexInputType
+struct ambient_a2v
 {
     float4 position 		: POSITION;
-    float3 normal 			: NORMAL;
-    float3 tangent 			: TANGENT;
-    float2 tex0				: TEXCOORD0;
 };
 
-struct PixelInputType
+struct ambient_v2p
 {
     float4 position 		: SV_POSITION;
-    float3 tangent 			: TANGENT;
-    float2 tex0				: TEXCOORD0;
-    float4 worldPosition   	: TEXCOORD1;
-    float3 binormal 		: TEXCOORD2;
-    float3 normal 			: TEXCOORD3;
 };
 
-cbuffer LightBuffer
+struct perlight_a2v
 {
-    float4 lightAmbientColor;
-	float4 lightDiffuseColor;
-    float4 lightSpecularColor;
-    float3 lightDirection;
-	float4 lightPosition;
-	float4 lightAttenuation;
-	float4 surfaceDiffuseColour;
-	float4 surfaceSpecularColour;
-	float  surfaceShininess;
-	float3 cameraPosition;
+    float4 position 		: POSITION;
+	float2 texCoord  		: TEXCOORD0;
+	float4 normal    		: NORMAL;
+    float4 binormal  		: BINORMAL;
+    float4 tangent   		: TANGENT;	
 };
 
-PixelInputType color_vs(VertexInputType input) //: SV_Position
+struct perlight_v2p
 {
-	PixelInputType output;
-    
-    // Change the position vector to be 4 units for proper matrix calculations.
-    input.position.w = 1.0f;
+    float4 position 		: SV_POSITION;
+	float2 texCoord		   	: TEXCOORD0;
+	float3 worldNormal     	: TEXCOORD1;
+	float3 worldBinormal   	: TEXCOORD2;
+	float3 worldTangent    	: TEXCOORD3;		
+	float3 eyeVector 	   	: TEXCOORD4;
+};
 
-    // Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position 	 = mul(worldViewprojMatrix, input.position);
-	output.worldPosition = mul(worldMatrix, input.position);
-    
-    // Store the input color for the pixel shader to use.
-    output.tex0 = input.tex0;
+//===============================================================
+// AMBIENT
+ambient_v2p ambient_color_vs(ambient_a2v In)
+{
+	ambient_v2p Out;
 	
-	output.normal = mul(input.normal, (float3x3)worldMatrix);
-	output.normal = normalize(output.normal);
+	Out.position = mul(g_WorldViewprojMatrix, In.position);
 	
-	output.tangent = mul(input.tangent, (float3x3)worldMatrix);
-	output.tangent = normalize(output.tangent);
-	
-	output.binormal = cross(input.tangent, input.normal);
-	output.binormal = mul(output.binormal, (float3x3)worldMatrix);
-	output.binormal = normalize(output.binormal);
-    
-    return output;
+	return Out;
 }
 
-Texture2D shaderTextures[3];
-SamplerState SampleType;
-
-float4 color_ps(PixelInputType input) : SV_TARGET
+float4 ambient_color_ps(ambient_v2p In) : SV_TARGET
 {
-	float4 texDiffuseColor;
-	float4 texBumpMap;
-	float4 texSpecularColor;
-    float3 bumpNormal;
-    float3 lightIntensity;
-	float3 diffuseContribution;
-    float4 color;
-	float3 cameraDirection;
-	float3 halfVector;
-	float3 specular;
-	float3 specularContribution;
-	half lightDistance;
-	half iluminationLightAttenuation;
-	half calculatedLightAttenuation;
+	return g_AmbientLightColour;
+}
+
+//===============================================================
+// PER-LIGHT
+perlight_v2p perlight_color_vs(perlight_a2v In)
+{
+	perlight_v2p Out;
 	
-	texDiffuseColor  = shaderTextures[0].Sample(SampleType, input.tex0);
-	texBumpMap 		 = shaderTextures[1].Sample(SampleType, input.tex0);
-	texSpecularColor = shaderTextures[2].Sample(SampleType, input.tex0);
+	Out.position 		= mul(g_WorldViewprojMatrix, In.position);
+	Out.worldNormal 	= mul(g_WorldInverseTranspose, In.normal).xyz;
+	Out.worldBinormal   = mul(g_WorldInverseTranspose, In.binormal).xyz;
+    Out.worldTangent    = mul(g_WorldInverseTranspose, In.tangent).xyz;
 	
-	// Expand the range of the normal value from (0, +1) to (-1, +1).
-    texBumpMap = (texBumpMap * 2.0f) - 1.0f;
+	float3 worldSpacePos 	= mul(g_World, In.position);
+	float3 worldCameraPos	= float3(g_InverseView[0].w, g_InverseView[1].w, g_InverseView[2].w);
 	
-	// Calculate the normal from the data in the bump map.
-    bumpNormal = input.normal + texBumpMap.x * input.tangent + texBumpMap.y * input.binormal;
+	Out.eyeVector 	= worldCameraPos - worldSpacePos;
+	Out.texCoord 	= In.texCoord;
 	
-	 // Normalize the resulting bump normal.
-    bumpNormal = normalize(bumpNormal);
-		
-	 // Calculate the amount of light on this pixel based on the bump map normal value.
-    lightIntensity = max(dot(bumpNormal, lightDirection), 0);
+	return Out;
+}
+
+float4 perlight_color_ps(perlight_v2p In) : SV_TARGET
+{
+	float4 outColor;
+	float3 worldNormal = g_NormalTxt.Sample( g_samLinear, In.texCoord ) * 2 - 1;
+	worldNormal = normalize((worldNormal.x*In.worldTangent)+(worldNormal.y*In.worldBinormal)+(worldNormal.z*In.worldNormal));
 	
-	//Ilumination Light Attenuation
-	lightDistance = length( lightPosition.xyz - input.worldPosition.xyz) / lightAttenuation.r;
-	iluminationLightAttenuation = lightDistance * lightDistance; // quadratic falloff
-	calculatedLightAttenuation = 1.0 - iluminationLightAttenuation;
+	float3 lightDir = normalize(-g_LightDirection);
+	float3 eyeVector = normalize(In.eyeVector);
+	float3 reflectionVector = reflect(eyeVector, worldNormal)*-1;
 	
-	cameraDirection = normalize(cameraPosition - input.worldPosition.xyz);
-	halfVector = normalize( lightDirection + cameraDirection);
-	specular = pow(max(dot(bumpNormal, halfVector), 0), surfaceShininess);
+	float4 diffuseMap = g_DiffuseTxt.Sample( g_samLinear, In.texCoord );
+	float3 lambert = saturate(dot(lightDir, worldNormal)) * g_LightDiffuseColour;
 	
-	// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-	diffuseContribution  = (lightIntensity * lightDiffuseColor.rgb * texDiffuseColor.rgb);// * surfaceDiffuseColour.rgb);
-	specularContribution = (specular * lightSpecularColor.rgb * texSpecularColor.rgb * surfaceSpecularColour.rgb);
-	float3 lightContributtion = (diffuseContribution + specularContribution) * calculatedLightAttenuation;
+	float4 specularMap = g_SpecularTxt.Sample( g_samLinear, In.texCoord );
+	float3 specular = pow(saturate(dot(reflectionVector, lightDir)), g_SpecularPower) * g_SpecularColor;
+	float3 fresnel = pow(1- saturate(dot(eyeVector, worldNormal)), g_FresnelPower) * g_FresnelColor;	
+	float3 totalSpec = (fresnel * specularMap.r) + (specular * specularMap.g) ;
 	
-     // Combine the final bump light color with the texture color.
-	color = float4(lightContributtion, texDiffuseColor.a);
+	outColor.rgb = (lambert + g_AmbientLightColour) * (diffuseMap.rgb * g_DiffuseColour) + totalSpec;
+	outColor.a = 1.0f;
 	
-    return color;
+	return outColor;
 }

@@ -1,3 +1,8 @@
+/**
+*	Modified by: Juan Camilo Acosta Arango (ja0335 )
+*	Date: 09-04-2013
+**/
+
 #ifndef __PNTriangles_H__
 #define __PNTriangles_H__
 
@@ -49,8 +54,8 @@ public:
 		if (mMoveLights)
 		{
 			// rotate the light pivots
-			mLightPivot1->roll(Degree(evt.timeSinceLastFrame * 30));
-			mLightPivot2->roll(Degree(evt.timeSinceLastFrame * 10));
+			mLightPivot1->roll(Degree(evt.timeSinceLastFrame * 10));
+			mLightPivot2->roll(Degree(evt.timeSinceLastFrame * 15));
 		}
 
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
@@ -81,7 +86,14 @@ public:
 
 	void checkBoxToggled(CheckBox* box)
 	{
-		if (StringUtil::startsWith(box->getName(), "Light", false))
+		if (box->getName() == "Wire")
+		{
+			if( mCamera->getPolygonMode() == PM_WIREFRAME )
+				mCamera->setPolygonMode(PM_SOLID);
+			else
+				mCamera->setPolygonMode(PM_WIREFRAME);
+		}
+		else if (StringUtil::startsWith(box->getName(), "Light", false))
 		{
 			// get the light pivot that corresponds to this checkbox
 			SceneNode* pivot = box->getName() == "Light1" ? mLightPivot1 : mLightPivot2;
@@ -115,43 +127,15 @@ protected:
 		mCamera->setFOVy(Ogre::Degree(50.0));
 		mCamera->setFOVy(Ogre::Degree(50.0));
 		mCamera->setNearClipDistance(0.01f);
-		mCamera->lookAt(Ogre::Vector3(0,0,0));
-		mCamera->setPolygonMode(PM_WIREFRAME);
+		mCamera->lookAt(Ogre::Vector3::ZERO);
 		mCamera->setPosition(0, 0, 500);
-
-		mCameraMan->setStyle(OgreBites::CS_FREELOOK);
-		mCameraMan->setTopSpeed(100);
-	}
-
-	void CreateGrid()
-	{
-		Ogre::SceneNode *m_Grid = mSceneMgr->getRootSceneNode()->createChildSceneNode("m_Grid"); 
-
-		Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material", "General"); 
-		myManualObjectMaterial->setReceiveShadows(false); 
-		myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
-		myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0.5f, 0.5f, 0.5f,0); 
-		myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0.5f, 0.5f, 0.5f); 
-		myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0.5f, 0.5f, 0.5f); 
-	
-		for(int i = 0; i < 201; i+=5)
-		{
-			Ogre::ManualObject* xLines =  mSceneMgr->createManualObject(
-				Ogre::String("xline_").append(Ogre::StringConverter::toString(i))); 
-			xLines->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
-			xLines->position(-100, 0.0f, -100 + i);
-			xLines->position( 100, 0.0f,  -100 + i); 
-			xLines->end(); 
-			m_Grid->attachObject(xLines);
 		
-			Ogre::ManualObject* zLines =  mSceneMgr->createManualObject(
-				Ogre::String("zline_").append(Ogre::StringConverter::toString(i))); 
-			zLines->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
-			zLines->position(-100 + i, 0.0f, -100);
-			zLines->position(-100 + i, 0.0f,  100); 
-			zLines->end(); 
-			m_Grid->attachObject(zLines);
-		}
+
+		// Set our camera to orbit around the origin at a suitable distance
+		mCameraMan->setStyle(CS_ORBIT);
+		mCameraMan->setYawPitchDist(Radian(0), Radian(0), 400);
+
+		mTrayMgr->showCursor();
 	}
 
 	void unloadResources()
@@ -171,6 +155,7 @@ protected:
 		
 		mPossibilities["ogrehead.mesh"] = matNames;
 		mPossibilities["knot.mesh"] = matNames;
+		mPossibilities["uv_sphere.mesh"] = matNames;
 
 		for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
 		{
@@ -195,7 +180,7 @@ protected:
 
 	void setupLights()
 	{
-		mSceneMgr->setAmbientLight(ColourValue::Black);   // disable ambient lighting
+		mSceneMgr->setAmbientLight(ColourValue::Black); 
 
 		// create pivot nodes
 		mLightPivot1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -206,9 +191,10 @@ protected:
 
 		// create white light
 		l = mSceneMgr->createLight();
+		l->setDiffuseColour(1.0f, 1.0f, 1.0f);
+		l->setSpecularColour(1.0f, 1.0f, 1.0f);
+		l->setDirection(Ogre::Vector3::UNIT_X*-1.0f);
 		l->setPosition(200, 0, 0);
-		l->setDiffuseColour(1, 1, 1);
-		l->setSpecularColour(1, 1, 1);
 		// create white flare
 		bbs = mSceneMgr->createBillboardSet();
 		bbs->setMaterialName("Examples/Flare");
@@ -219,13 +205,14 @@ protected:
 
 		// create red light
 		l = mSceneMgr->createLight();
-		l->setPosition(40, 200, 50);
-		l->setDiffuseColour(1, 0, 0);
-		l->setSpecularColour(1, 0.8, 0.8);
+		l->setDiffuseColour(1.0f, 0.0f, 0.0f);
+		l->setSpecularColour(1.0f, 0.0f, 0.0f);
+		l->setDirection(Ogre::Vector3::UNIT_X);
+		l->setPosition(-200, 0, 0);
 		// create white flare
 		bbs = mSceneMgr->createBillboardSet();
 		bbs->setMaterialName("Examples/Flare");
-		bbs->createBillboard(50, 200, 50)->setColour(ColourValue::Red);
+		bbs->createBillboard(-200, 0, 0)->setColour(ColourValue::Red);
 
 		mLightPivot2->attachObject(l);
 		mLightPivot2->attachObject(bbs);
@@ -247,7 +234,8 @@ protected:
 
 		// create a menu to choose the material used by the model
 		mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
-
+		
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "Wire", "Wire Frame")->setChecked(false, false);
 		// create checkboxes to toggle lights
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light2", "Light B")->setChecked(true, false);

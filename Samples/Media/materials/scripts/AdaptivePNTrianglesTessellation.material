@@ -1,66 +1,111 @@
-vertex_program Ogre/NoTessellation_vs hlsl
+//===============================================================
+// AMBIENT
+vertex_program Ogre/AmbientNoTessellation_vs hlsl
 {
 	source  NoTessellation.hlsl
-	entry_point color_vs
+	entry_point ambient_color_vs
 	target vs_5_0
+	
 	default_params
 	{
-		param_named_auto worldViewprojMatrix worldviewproj_matrix
-		param_named_auto worldMatrix world_matrix
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
 	}
 }
 
- 
-fragment_program Ogre/NoTessellation_ps hlsl
+fragment_program Ogre/AmbientNoTessellation_ps hlsl
 {
 	source NoTessellation.hlsl
-	entry_point color_ps
+	entry_point ambient_color_ps
 	target ps_5_0
+	
 	default_params
 	{
-		param_named_auto lightDiffuseColor light_diffuse_colour 0
-        param_named_auto lightSpecularColor light_specular_colour 0
-		param_named_auto lightDirection light_direction 0
-        param_named_auto lightPosition light_position 0
-        param_named_auto lightAttenuation light_attenuation 0
-        param_named_auto surfaceDiffuseColour surface_diffuse_colour
-        param_named_auto surfaceSpecularColour surface_specular_colour
-        param_named_auto surfaceShininess surface_shininess
-        param_named_auto cameraPosition camera_position
+        param_named_auto g_AmbientLightColour ambient_light_colour
+	}
+}
+//===============================================================
+// PER-LIGHT
+vertex_program Ogre/PerLightNoTessellation_vs hlsl
+{
+	source  NoTessellation.hlsl
+	entry_point perlight_color_vs
+	target vs_5_0
+	
+	default_params
+	{
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+		param_named_auto g_WorldInverseTranspose inverse_transpose_world_matrix
+		param_named_auto g_World world_matrix
+		param_named_auto g_InverseView inverse_view_matrix
 	}
 }
 
+fragment_program Ogre/PerLightNoTessellation_ps hlsl
+{
+	source NoTessellation.hlsl
+	entry_point perlight_color_ps
+	target ps_5_0
+	
+	default_params
+	{
+        param_named_auto g_AmbientLightColour ambient_light_colour
+		param_named_auto g_LightDirection light_direction 0
+		param_named_auto g_LightDiffuseColour light_diffuse_colour 0
+		param_named_auto g_DiffuseColour surface_diffuse_colour
+		param_named_auto g_SpecularColor surface_specular_colour
+		param_named g_FresnelColor float3 0.172f, 0.172f, 0.172f
+		param_named g_SpecularPower float 10.0f
+		param_named g_FresnelPower float 10.0f
+	}
+}
+
+//==============================================================
 material Ogre/NoTessellation
 {
 	technique
 	{
-		pass
+		pass ambient
 		{
-			diffuse 0.5 0.5 0.5 1.0
-			specular 0.5 0.5 0.5 1 10
+			ambient 0 0 0
+			
+			vertex_program_ref Ogre/AmbientNoTessellation_vs
+			{
+			}
+			
+			fragment_program_ref Ogre/AmbientNoTessellation_ps
+			{
+			}
+		}
+		
+		pass perlight
+		{
+			diffuse 0.4 0.4 0.4 1
+			specular 0.561 0.561 0.561 1
+			
 			iteration once_per_light
+			scene_blend add
 			
-			vertex_program_ref Ogre/NoTessellation_vs
+			vertex_program_ref Ogre/PerLightNoTessellation_vs
 			{
 			}
 			
-			fragment_program_ref Ogre/NoTessellation_ps
+			fragment_program_ref Ogre/PerLightNoTessellation_ps
 			{
 			}
 			
-			texture_unit 
+			texture_unit normal
 			{
-				texture floor_diffuse.PNG
+				texture Rocks_Normal.tga
 			}
 			
-			texture_unit 
+			texture_unit diffuse
 			{
-				texture floor_bump.PNG
+				texture Rocks_Diffuse.tga
 			}
 			
-			texture_unit 
+			texture_unit specular
 			{
-				texture floor_ao.PNG
+				texture Rocks_Spec.tga
 			}
 		}
 	}
