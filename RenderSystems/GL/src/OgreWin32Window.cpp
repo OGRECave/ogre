@@ -621,6 +621,7 @@ namespace Ogre {
 
 		// Unregister and destroy OGRE GLContext
 		delete mContext;
+        mContext = 0;
 
 		if (!mIsExternalGLContext && mGlrc)
 		{
