@@ -1,33 +1,65 @@
+/**
+*	Modified by: Juan Camilo Acosta Arango (ja0335 )
+*	Date: 14-04-2013
+*	Note: This shaders are based one my study over the 
+* 	Eat3D course, "Shader Production - Writing Custom Shaders with CGFX"
+*	http://eat3d.com/shaders_intro
+**/
+
 /////////////
 // GLOBALS //
 /////////////
-cbuffer cbPerFrame : register( b0 )
+Texture2D g_DiffuseTxt : register( t0 ); // diffuse
+SamplerState g_samLinear : register( s0 );
+
+cbuffer cbVertexBuffer
 {
-    matrix worldViewprojMatrix;
+    matrix g_WorldViewprojMatrix;
+	matrix g_WorldMatrix;
+	matrix g_ViewMatrix;
+	matrix g_ProjectionMatrix;
 };
 
-cbuffer TessellationBuffer
+cbuffer cbTessellationBuffer
 {
-    float tessellationAmount;
-    //float3 padding;
+    float g_tessellationAmount;
 };
-
 //////////////
 // TYPEDEFS //
 //////////////
 
-struct VertexInputType2
+// application to vertex
+struct a2v
 {
-    float3 position 		: POSITION;
-    float2 texCoord     	: TEXCOORD0;
-    float4 color 			: COLOR;
+    float4 position 		: POSITION;
+	float2 texCoord  		: TEXCOORD0;
 };
 
-struct HullInputType
+// vertex to hull
+struct v2h
 {
-    float3 position 		: POSITION;
+    float4 position 		: POSITION;
+	float2 texCoord		   	: TEXCOORD0;
+};
+
+// hull to domain
+struct h2d
+{
+    float4 position 		: POSITION;
+    float2 texCoord 		: TEXCOORD0;
+};
+
+// domain to pixel
+struct d2p
+{
+    float4 position 		: SV_POSITION;
     float2 texCoord     	: TEXCOORD0;
-    float4 color 			: COLOR;
+};
+
+struct v2p
+{
+    float4 position 		: SV_POSITION;
+    float2 texCoord     	: TEXCOORD0;
 };
 
 struct ConstantOutputType
@@ -36,188 +68,79 @@ struct ConstantOutputType
     float inside 	: SV_InsideTessFactor;
 };
 
-//The HullOutputType structure is what will be the output from the hull shader.
 
-struct HullOutputType
+//===============================================================
+// PER-LIGHT
+v2h simple_tessellation_vs(a2v In)
 {
-    float3 position : POSITION;
-    float2 texCoord : TEXCOORD0;
-    float4 color 	: COLOR;
-};
-
-struct PixelInputType2
-{
-    float4 position : SV_POSITION;
-    float2 texCoord : TEXCOORD0;
-    float4 color : COLOR;
-};
-
-cbuffer LightBuffer
-{
-    float4 lightAmbientColor;
-	float4 lightDiffuseColor;
-    float4 lightSpecularColor;
-    float3 lightDirection;
-	float4 lightPosition;
-	float4 lightAttenuation;
-	float4 surfaceDiffuseColour;
-	float4 surfaceSpecularColour;
-	float  surfaceShininess;
-	float3 cameraPosition;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Vertex Shader
-////////////////////////////////////////////////////////////////////////////////
-HullInputType color_tessellation_vs(VertexInputType2 input)
-{
-    HullInputType output;
+	v2h Out;
+	//v2p Out;
 	
-	// Pass the vertex position into the hull shader.
-    output.position = input.position;
-    
-	output.texCoord = input.texCoord;
-    // Pass the input color into the hull shader.
-    output.color = input.color;
-    
-    return output;
+	Out.position 		= In.position;//mul(g_WorldViewprojMatrix, In.position);
+	Out.texCoord 		= In.texCoord;
+	
+	return Out;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Patch Constant Function
 ////////////////////////////////////////////////////////////////////////////////
-ConstantOutputType ColorPatchConstantFunction(InputPatch<HullInputType, 3> inputPatch, uint patchId : SV_PrimitiveID)
+ConstantOutputType ColorPatchConstantFunction(InputPatch<v2h, 3> inputPatch, uint patchId : SV_PrimitiveID)
 {    
     ConstantOutputType output;
-
-
     // Set the tessellation factors for the three edges of the triangle.
-    output.edges[0] = tessellationAmount;
-    output.edges[1] = tessellationAmount;
-    output.edges[2] = tessellationAmount;
+    output.edges[0] = g_tessellationAmount;
+    output.edges[1] = g_tessellationAmount;
+    output.edges[2] = g_tessellationAmount;
 
     // Set the tessellation factor for tessallating inside the triangle.
-    output.inside = tessellationAmount;
+    output.inside = g_tessellationAmount;
 
     return output;
 }
 
-//The inputs to the domain shader are the outputs from the hull shader and constant function.
-////////////////////////////////////////////////////////////////////////////////
-// Hull Shader
-////////////////////////////////////////////////////////////////////////////////
 [domain("tri")]
 [partitioning("integer")]
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("ColorPatchConstantFunction")]
-HullOutputType color_tessellation_hs(InputPatch<HullInputType, 3> patch, uint pointId : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
+h2d simple_tessellation_hs(InputPatch<v2h, 3> patch, uint pointId : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
 {
-    HullOutputType output;
-
-
-    // Set the position for this control point as the output position.
-    output.position = patch[pointId].position;
+    h2d output;
 	
+    output.position = patch[pointId].position;	
 	output.texCoord = patch[pointId].texCoord;
-    // Set the input color as the output color.
-    output.color = patch[pointId].color;
 
     return output;
 }
 
-//The inputs to the domain shader are the outputs from the hull shader and constant function.
-////////////////////////////////////////////////////////////////////////////////
-// Domain Shader
-////////////////////////////////////////////////////////////////////////////////
 [domain("tri")]
-PixelInputType2 color_tessellation_ds(ConstantOutputType input, float3 barycentricCoordinates : SV_DomainLocation, const OutputPatch<HullOutputType, 3> patch)
+d2p simple_tessellation_ds(ConstantOutputType input, float3 barycentricCoordinates : SV_DomainLocation, const OutputPatch<h2d, 3> patch)
 {
     float3 vertexPosition;
-    PixelInputType2 output;
+    d2p output;
  
 
     // Determine the position of the new vertex.
-    vertexPosition = barycentricCoordinates.x * patch[0].position + barycentricCoordinates.y * patch[1].position + barycentricCoordinates.z * patch[2].position;
+    vertexPosition = barycentricCoordinates.x * patch[0].position.xyz + 
+					 barycentricCoordinates.y * patch[1].position.xyz + 
+					 barycentricCoordinates.z * patch[2].position.xyz;
     
+	
 	output.texCoord = barycentricCoordinates.x * patch[0].texCoord + 
                       barycentricCoordinates.y * patch[1].texCoord + 
                       barycentricCoordinates.z * patch[2].texCoord;
 	
-    // Calculate the position of the new vertex against the world, view, and projection matrices.
-    /*output.position = mul(float4(vertexPosition, 1.0f), worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);*/
-	output.position = mul( worldViewprojMatrix, float4(vertexPosition, 1.0f) );
-    // Send the input color into the pixel shader.
-    output.color = patch[0].color;
+	output.position = mul(g_WorldViewprojMatrix, float4(vertexPosition, 1.0f));
 
     return output;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Pixel Shader
-////////////////////////////////////////////////////////////////////////////////
-
-Texture2D g_baseTexture0 : register( t0 );
-SamplerState g_samLinear0 : register( s0 );
-
-Texture2D g_baseTexture1 : register( t1 );
-SamplerState g_samLinear1 : register( s1 );
-
-float4 color_tessellation_ps(PixelInputType2 input) : SV_TARGET
+float4 simple_tessellation_ps(d2p In) : SV_TARGET
 {
-	float4 color;
-
-	float4 texColor = g_baseTexture0.Sample( g_samLinear0, input.texCoord );
-  
-	color = saturate(surfaceDiffuseColour);
-	color = color * texColor * lightDiffuseColor;
-		
-	return color;
+	float4 outColor;
+	outColor.rgb = g_DiffuseTxt.Sample( g_samLinear, In.texCoord );
+	outColor.a = 1.0f;
+	
+	return outColor;
 }
-
-/*Texture2D shaderTextures[2];
-SamplerState SampleType;
-
-float4 color_tessellation_ps(PixelInputType2 input) : SV_TARGET
-{
-	float4 texDiffuseColor;
-	float4 texBumpMap;
-    float3 bumpNormal;
-    float3 lightIntensity;
-	float3 diffuseContribution;
-    float4 color;
-	half lightDistance;
-	half iluminationLightAttenuation;
-	half calculatedLightAttenuation;
-	
-	texDiffuseColor  = shaderTextures[0].Sample(SampleType, input.texCoord);
-	texBumpMap 		 = shaderTextures[1].Sample(SampleType, input.texCoord);
-	
-	// Expand the range of the normal value from (0, +1) to (-1, +1).
-    texBumpMap = (texBumpMap * 2.0f) - 1.0f;
-	
-	// Calculate the normal from the data in the bump map.
-    bumpNormal = texBumpMap.x + texBumpMap.y;
-	
-	 // Normalize the resulting bump normal.
-    bumpNormal = normalize(bumpNormal);
-		
-	 // Calculate the amount of light on this pixel based on the bump map normal value.
-    lightIntensity = max(dot(bumpNormal, lightDirection), 0);
-	
-	//Ilumination Light Attenuation
-	lightDistance = length( lightPosition.xyz) / lightAttenuation.r;
-	iluminationLightAttenuation = lightDistance * lightDistance; // quadratic falloff
-	calculatedLightAttenuation = 1.0 - iluminationLightAttenuation;
-	
-	// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-	diffuseContribution  = (lightIntensity * lightDiffuseColor.rgb * texDiffuseColor.rgb);// * surfaceDiffuseColour.rgb);
-	float3 lightContributtion = (diffuseContribution) * calculatedLightAttenuation;
-	
-     // Combine the final bump light color with the texture color.
-	color = float4(lightContributtion, texDiffuseColor.a);
-	
-    return color;
-}*/

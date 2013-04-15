@@ -81,6 +81,11 @@ public:
 		{
 			// set the selected material for the active mesh
 			((Entity*)mObjectNode->getAttachedObject(0))->setMaterialName(menu->getSelectedItem());
+
+			if( menu->getSelectionIndex() == 2 )
+				mTessellationAmount->show();
+			else
+				mTessellationAmount->hide();
 		}
 	}
 
@@ -109,6 +114,15 @@ public:
 		else if (box->getName() == "MoveLights")
 		{
 			mMoveLights = !mMoveLights;
+		}
+	}
+
+	void sliderMoved(Slider* slider)
+	{
+		if( slider->getName() == "tessellationAmount" )
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( mMaterialMenu->getSelectedItem() );
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
 		}
 	}
 
@@ -181,6 +195,7 @@ protected:
 	void setupLights()
 	{
 		mSceneMgr->setAmbientLight(ColourValue::Black); 
+		mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
 
 		// create pivot nodes
 		mLightPivot1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -240,6 +255,9 @@ protected:
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light2", "Light B")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLights", "Move Lights")->setChecked(true, false);
+		
+		mTessellationAmount = mTrayMgr->createThickSlider(TL_TOPLEFT, "tessellationAmount", "Tessellation Amount", 200, 40, 1, 8, 8);
+		mTessellationAmount->hide();
 
 		// a friendly reminder
 		StringVector names;
@@ -264,6 +282,7 @@ protected:
 	bool mMoveLights;
 	SelectMenu* mMeshMenu;
 	SelectMenu* mMaterialMenu;
+	Slider*		mTessellationAmount;
 
 };
 

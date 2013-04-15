@@ -116,61 +116,50 @@ material Ogre/NoTessellation
 vertex_program Ogre/PNTrianglesTessellation/simple_tessellation_vs hlsl
 {
 	source simple_tessellation.hlsl
-	entry_point color_tessellation_vs
+	entry_point simple_tessellation_vs
 	target vs_5_0
 	
 	default_params
 	{
-		//param_named_auto worldViewprojMatrix worldviewproj_matrix
-		//param_named_auto worldMatrix world_matrix
-		//param_named_auto projectionMatrix projection_matrix
-		//param_named normal float3 1 0 0
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
 	}	
 }
 
 tesselation_hull_program Ogre/PNTrianglesTessellation/simple_tessellation_hs hlsl
 {
 	source simple_tessellation.hlsl
-	entry_point color_tessellation_hs
+	entry_point simple_tessellation_hs
 	target hs_5_0
 
 	default_params
 	{
-		param_named tessellationAmount float 2
+		param_named g_tessellationAmount float 1
 	}
 }
 
 tesselation_domain_program Ogre/PNTrianglesTessellation/simple_tessellation_ds hlsl
 {
 	source simple_tessellation.hlsl
-	entry_point color_tessellation_ds
+	entry_point simple_tessellation_ds
 	target ds_5_0
 
 	default_params
 	{
-		param_named_auto worldViewprojMatrix worldviewproj_matrix
-		//param_named_auto worldMatrix world_matrix
-		//param_named_auto projectionMatrix projection_matrix
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+		param_named_auto g_WorldMatrix world_matrix
+		param_named_auto g_ViewMatrix view_matrix
+		param_named_auto g_ProjectionMatrix projection_matrix
 	}
 }
 
 fragment_program Ogre/PNTrianglesTessellation/simple_tessellation_ps hlsl
 {
 	source simple_tessellation.hlsl
-	entry_point color_tessellation_ps
+	entry_point simple_tessellation_ps
 	target ps_5_0
 	
 	default_params
 	{
-		param_named_auto lightDiffuseColor light_diffuse_colour 0
-        param_named_auto lightSpecularColor light_specular_colour 0
-		param_named_auto lightDirection light_direction 0
-        param_named_auto lightPosition light_position 0
-        param_named_auto lightAttenuation light_attenuation 0
-        param_named_auto surfaceDiffuseColour surface_diffuse_colour
-        param_named_auto surfaceSpecularColour surface_specular_colour
-        param_named_auto surfaceShininess surface_shininess
-        //param_named_auto cameraPosition camera_position
 	}	
 }
 
@@ -178,39 +167,28 @@ material Ogre/SimpleTessellation
 {
 	technique
 	{
-		pass
+		pass tessellation
 		{			
-			iteration once_per_light
 			vertex_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_vs
 			{
-			
 			}
-			
+						
 			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_hs
 			{
-			
 			}
 			
 			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
 			{
-			
 			}
 			
-			fragment_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ps hlsl
+			fragment_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ps
 			{
-			
-			}	
-			
-			texture_unit 
-			{
-				texture floor_diffuse.PNG
 			}
 			
-			texture_unit 
+			texture_unit diffuse
 			{
-				texture floor_bump.PNG
-				binding_type vertex
-			}			
+				texture Rocks_Diffuse.tga
+			}
 		}
 	}
 }
