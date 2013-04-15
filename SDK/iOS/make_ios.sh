@@ -6,7 +6,7 @@
 LIPO=lipo
 SDKBUILDDIR=`pwd`
 
-set IPHONEOS_DEPLOYMENT_TARGET 4.0
+set IPHONEOS_DEPLOYMENT_TARGET 4.3
 
 # Clean up files from previous builds
 echo Cleaning previous builds...
@@ -81,7 +81,7 @@ echo Frameworks copied.
 echo Generating Samples Project...
 
 pushd sdk
-cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -G Xcode .
+cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -DOGRE_DEPENDENCIES_DIR=../../../../iOSDependencies -G Xcode .
 #sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
 #mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 rm CMakeCache.txt
