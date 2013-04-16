@@ -409,7 +409,6 @@ namespace Ogre {
 			{
 				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
                 PixelBox box;
-				PixelBox box;
 				_map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
 				void *data = box.data; 
 
