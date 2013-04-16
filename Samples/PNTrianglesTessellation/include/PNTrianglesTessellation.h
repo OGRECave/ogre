@@ -164,7 +164,7 @@ protected:
 		matNames.push_back("Ogre/NoTessellation");
 		matNames.push_back("Ogre/TesselationExample");
 		matNames.push_back("Ogre/SimpleTessellation");
-		matNames.push_back("Ogre/AdaptiveTessellation");
+		//matNames.push_back("Ogre/AdaptiveTessellation");
 		matNames.push_back("Ogre/AdaptivePNTrianglesTessellation");
 		
 		mPossibilities["ogrehead.mesh"] = matNames;
