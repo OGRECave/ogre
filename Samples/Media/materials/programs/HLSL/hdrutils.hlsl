@@ -54,10 +54,10 @@ float4 toneMap(float4 inColour, float lum)
     inColour.rgb *= MIDDLE_GREY / (FUDGE + lum);
 
 	// Control white out (equation 4 nom)
-    inColour.rgb *= (1.0f + inColour / L_WHITE);
+    inColour.rgb *= (1.0f + inColour.rgb / L_WHITE);
 
 	// Final mapping (equation 4 denom)
-	inColour.rgb /= (1.0f + inColour);
+	inColour.rgb /= (1.0f + inColour.rgb);
 	
 	return inColour;
 
