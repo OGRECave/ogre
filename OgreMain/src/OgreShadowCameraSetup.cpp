@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ namespace Ogre
 
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane
-			// 0.5 is a litle too close for angles
+			// 0.5 is a little too close for angles
 			Vector3 target = cam->getDerivedPosition() + 
 				(cam->getDerivedDirection() * shadowOffset);
 
@@ -155,7 +155,7 @@ namespace Ogre
 
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane
-			// 0.5 is a litle too close for angles
+			// 0.5 is a little too close for angles
 			Vector3 target = cam->getDerivedPosition() + 
 				(cam->getDerivedDirection() * shadowOffset);
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -609,10 +609,16 @@ namespace Ogre {
         const VertexDeclaration::VertexElementList& elems =
             vertexData->vertexDeclaration->getElements();
 
+        // Vertex declaration
+		size += MSTREAM_OVERHEAD_SIZE + elems.size() * (MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5);
+
         VertexDeclaration::VertexElementList::const_iterator i, iend;
         iend = elems.end();
         for (i = elems.begin(); i != iend; ++i)
         {
+            // Vertex element header
+            size += MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5;
+
             const VertexElement& elem = *i;
             // Vertex element
             size += VertexElement::getTypeSize(elem.getType()) * vertexData->vertexCount;
@@ -1543,8 +1549,20 @@ namespace Ogre {
 					case VET_FLOAT1:
 						typeSize = sizeof(float);
 						break;
+					case VET_DOUBLE1:
+						typeSize = sizeof(double);
+						break;
 					case VET_SHORT1:
 						typeSize = sizeof(short);
+						break;
+					case VET_USHORT1:
+						typeSize = sizeof(unsigned short);
+						break;
+					case VET_INT1:
+						typeSize = sizeof(int);
+						break;
+					case VET_UINT1:
+						typeSize = sizeof(unsigned int);
 						break;
 					case VET_COLOUR:
 					case VET_COLOUR_ABGR:

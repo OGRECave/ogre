@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    namespace GLSL {
     /** GLSL low level compiled shader object - this class is used to get at the linked program object 
 		and provide an interface for GLRenderSystem calls.  GLSL does not provide access to the
 		low level code of the shader so this class is really just a dummy place holder.
@@ -97,7 +97,7 @@ namespace Ogre {
 
     };
 
-
+    }
 }
 
 

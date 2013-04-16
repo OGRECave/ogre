@@ -74,14 +74,14 @@ if (MINGW)
   list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreMinGWSupport.cpp)
 endif ()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX_INCLUDE_DIR})
-link_directories(${DirectX_LIBRARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX9_INCLUDE_DIR})
+link_directories(${DirectX9_LIBRARY_DIR})
 add_definitions(-D_USRDLL)
 
 ogre_add_library(RenderSystem_Direct3D9 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D9
   OgreMain
-  ${DirectX_LIBRARIES}
+  ${DirectX9_LIBRARIES}
 )
 
 if (NOT OGRE_STATIC)
@@ -90,7 +90,7 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_Direct3D9 ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_Direct3D9 ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_plugin(RenderSystem_Direct3D9)

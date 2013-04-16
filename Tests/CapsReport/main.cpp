@@ -6,13 +6,6 @@
 
 using namespace Ogre;
 
-
-#if OGRE_DEBUG_MODE
-#	define LIB_SUFFIX "_d"
-#else
-#	define LIB_SUFFIX ""
-#endif
-
 int main(char argc, char** argv)
 {
 
@@ -22,7 +15,7 @@ int main(char argc, char** argv)
 	{
 		Root root("", "", "OgreCapsReportD3D9.log");
 		StringUtil::StrStreamType str;
-		str << "RenderSystem_Direct3D9" << LIB_SUFFIX;
+		str << "RenderSystem_Direct3D9" << OGRE_LIB_SUFFIX;
 		root.loadPlugin(str.str());
 
 		RenderSystem* rs = root.getAvailableRenderers()->at(0);
@@ -48,7 +41,7 @@ int main(char argc, char** argv)
 	{
 		Root root("", "", "OgreCapsReportGL.log");
 		StringUtil::StrStreamType str;
-		str << "RenderSystem_GL" << LIB_SUFFIX;
+		str << "RenderSystem_GL" << OGRE_LIB_SUFFIX;
 		root.loadPlugin(str.str());
 
 		RenderSystem* rs = root.getAvailableRenderers()->at(0);

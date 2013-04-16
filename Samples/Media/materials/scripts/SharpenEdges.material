@@ -17,9 +17,16 @@ fragment_program Ogre/Compositor/SharpenEdgesFP_glsles glsles
 	source SharpenEdgesFP.glsles
 }
 
+fragment_program Ogre/Compositor/SharpenEdgesFP_glsl glsl
+{
+	source SharpenEdgesFP.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/SharpenEdgesFP unified
 {
 	delegate Ogre/Compositor/SharpenEdgesFP_ps_2_a
+	delegate Ogre/Compositor/SharpenEdgesFP_glsl
 	delegate Ogre/Compositor/SharpenEdgesFP_glsles
 	delegate Ogre/Compositor/SharpenEdgesFP_cg
 
@@ -39,6 +46,7 @@ material Ogre/Compositor/SharpenEdges
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			//DirectX 9.0 HLSL Vertex Shader vs_1_1
 			//vertex_program_ref PostFilters/SharpenEdgesVP

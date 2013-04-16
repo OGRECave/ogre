@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,8 +52,16 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void CgPlugin::initialise()
 	{
-        // check for gles2 by the glsles factory (this plugin is not supported on embedded systems for now)
+        // Cg is also not supported on OpenGL 3+
+        if(Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
+        {
+            LogManager::getSingleton().logMessage("Disabling Cg Plugin for GL3+");
+            return;
+        }
+
+        // Check for gles2 by the glsles factory (this plugin is not supported on embedded systems for now)
         if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles") == false)
+
         {
             // Create new factory
             mCgProgramFactory = OGRE_NEW CgProgramFactory();

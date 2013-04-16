@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgrePlane.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -76,7 +77,7 @@ namespace Ogre
 		/// Projective texture
 		TEXCALC_PROJECTIVE_TEXTURE
 	};
-	/// Enum describing the various actions which can be taken onthe stencil buffer
+	/// Enum describing the various actions which can be taken on the stencil buffer
 	enum StencilOperation
 	{
 		/// Leave the stencil buffer unchanged
@@ -269,7 +270,7 @@ namespace Ogre
 		*/
 		void setWBufferEnabled(bool enabled);
 
-		/** Returns true if the renderer will try to use W-buffers when avalible.
+		/** Returns true if the renderer will try to use W-buffers when available.
 		*/
 		bool getWBufferEnabled(void) const;
 
@@ -800,7 +801,7 @@ namespace Ogre
 		*/
 		virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
-		/** Sets wether the compare func is enabled or not for this texture unit 
+		/** Sets whether the compare func is enabled or not for this texture unit 
 		@param unit The texture unit to set the filtering options for
 		@param compare The state (enabled/disabled)
 		*/
@@ -1157,8 +1158,11 @@ namespace Ogre
 		start up too.
 		@param func The comparison function applied.
 		@param refValue The reference value used in the comparison
-		@param mask The bitmask applied to both the stencil value and the reference value 
+		@param compareMask The bitmask applied to both the stencil value and the reference value 
 		before comparison
+		@param writeMask The bitmask the controls which bits from refValue will be written to 
+		stencil buffer (valid for operations such as SOP_REPLACE).
+		the stencil
 		@param stencilFailOp The action to perform when the stencil check fails
 		@param depthFailOp The action to perform when the stencil check passes, but the
 		depth buffer check still fails
@@ -1168,7 +1172,7 @@ namespace Ogre
 		and the inverse of them will happen for back faces (keep remains the same).
 		*/
 		virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-			uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
+			uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
 			StencilOperation stencilFailOp = SOP_KEEP, 
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
@@ -1217,7 +1221,7 @@ namespace Ogre
 
         /** Returns the default material scheme used by the render system.
             Systems that use the RTSS to emulate a fixed function pipeline 
-            (e.g. OpenGL ES 2, DX11) need to override this function to return
+            (e.g. OpenGL ES 2, GL3+, DX11) need to override this function to return
             the default material scheme of the RTSS ShaderGenerator.
          
             This is currently only used to set the default material scheme for
@@ -1251,6 +1255,13 @@ namespace Ogre
 
 		/** Returns whether or not a Gpu program of the given type is currently bound. */
 		virtual bool isGpuProgramBound(GpuProgramType gptype);
+
+        /**
+         * Gets the native shading language version for this render system.
+         * Formatted so that it can be used within a shading program. 
+         * For example, OpenGL 3.2 would return 150, while 3.3 would return 330
+         */
+        uint16 getNativeShadingLanguageVersion() const { return mNativeShadingLanguageVersion; }
 
 		/** Sets the user clipping region.
 		*/
@@ -1496,7 +1507,6 @@ namespace Ogre
         */
         virtual void markProfileEvent( const String &eventName ) = 0;
 
-
 	protected:
 
 		/** DepthBuffers to be attached to render targets */
@@ -1608,6 +1618,7 @@ namespace Ogre
 
 
 		DriverVersion mDriverVersion;
+        uint16 mNativeShadingLanguageVersion;
 
 		bool mTexProjRelative;
 		Vector3 mTexProjRelativeOrigin;
@@ -1618,5 +1629,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

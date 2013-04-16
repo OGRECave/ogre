@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -98,7 +98,7 @@ namespace Ogre {
 		rval.data = lrect.pBits;
 	}
 //-----------------------------------------------------------------------------
-	void *D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags)
+	void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
 	{
 		mDevice.clearStoredErrorMessages();
 
@@ -161,7 +161,9 @@ namespace Ogre {
 			break;
 		}
 
-		return pMappedResource.pData;
+		box.data = pMappedResource.pData;
+        box.rowPitch = pMappedResource.RowPitch;
+        box.slicePitch = pMappedResource.DepthPitch;
 	}
 	//-----------------------------------------------------------------------------  
 	void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -195,7 +197,9 @@ namespace Ogre {
 		else if(flags == D3D11_MAP_WRITE_DISCARD)
 			flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-		return _map(mStagingBuffer, flags);
+        PixelBox box;
+        _map(mStagingBuffer, flags, box);
+		return box.data;
 	}
 	//-----------------------------------------------------------------------------  
 	PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
@@ -241,7 +245,7 @@ namespace Ogre {
 			if(mUsage == HBU_STATIC || options == HBL_READ_ONLY || options == HBL_NORMAL || options == HBL_WRITE_ONLY)
 				rval.data = _mapstagingbuffer(flags);
 			else
-				rval.data = _map(mParentTexture->getTextureResource(), flags);
+				_map(mParentTexture->getTextureResource(), flags, rval);
 
 			// calculate the offset in bytes
 			offset = D3D11Mappings::_getSizeInBytes(rval.format, rval.left, rval.front);
@@ -397,29 +401,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------  
 	void D3D11HardwarePixelBuffer::unlockImpl(void)
 	{
-		/*if(mUsage == HBU_STATIC || mUsage & HBU_DYNAMIC)
-		{
-			if(mUsage == HBU_STATIC || mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
-			{
-//				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-// 
-// 				void *data = _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD);
-// 
-// 				memcpy(data, mCurrentLock.data, sizeinbytes);
-// 
-// 				// unmap the texture and the staging buffer
-// 				_unmap(mParentTexture->getTextureResource());
-
-				_unmapstagingbuffer();
- 			}
-			else
-				_unmap(mParentTexture->getTextureResource());
-
-		}
-		else
-			_unmapstaticbuffer();
-		
-		_genMipmaps();*/
 		if(mUsage == HBU_STATIC)
 			_unmapstagingbuffer();
 		else if(mUsage & HBU_DYNAMIC)
@@ -427,8 +408,9 @@ namespace Ogre {
 			if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
 			{
 				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-
-				void *data = _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD);
+                PixelBox box;
+                _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
+				void *data = box.data; 
 
 				memcpy(data, mCurrentLock.data, sizeinbytes);
 
@@ -661,23 +643,26 @@ namespace Ogre {
 			switch(mParentTexture->getTextureType()) {
 			case TEX_TYPE_1D:
  				{
-
-					mDevice.GetImmediateContext()->UpdateSubresource( 
-						mParentTexture->GetTex1D(), 
-						0,
-						&dstBoxDx11,
-						converted.data,
-						rowWidth,
-						0 );
-					if (mDevice.isError())
+					D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+					if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
 					{
-						String errorDescription = mDevice.getErrorDescription();
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot update 1d subresource\nError Description:" + errorDescription,
-							"D3D11HardwarePixelBuffer::blitFromMemory");
-					}
- 				}
-				break;
+						mDevice.GetImmediateContext()->UpdateSubresource( 
+							mParentTexture->GetTex1D(), 
+							0,
+							&dstBoxDx11,
+							converted.data,
+							rowWidth,
+							0 );
+						if (mDevice.isError())
+						{
+							String errorDescription = mDevice.getErrorDescription();
+							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+								"D3D11 device cannot update 1d subresource\nError Description:" + errorDescription,
+								"D3D11HardwarePixelBuffer::blitFromMemory");
+						}
+						break; // For Feature levels that do not support 1D textures, revert to creating a 2D texture.
+ 					}
+				}
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
  				{
@@ -760,7 +745,19 @@ namespace Ogre {
  
 			if (!isDds)
 			{
-				_genMipmaps();
+#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+                // A workaround for a D3D11 bug when running an old feature set without WinRT.
+                // The bug is an internal crash in D3D11 when you call context->GenerateMips.
+                D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+                if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
+                {
+                    _genSoftwareMipmaps(src, buf);
+                }
+                else
+#endif
+                {
+                    _genMipmaps();
+                }
  			}
 		}	
 
@@ -909,5 +906,58 @@ namespace Ogre {
 			break;
 		}
 	}
+    //-----------------------------------------------------------------------------    
+    void D3D11HardwarePixelBuffer::_genSoftwareMipmaps( const PixelBox &src, const MemoryDataStreamPtr & buf )
+    {
+        if(mParentTexture->HasAutoMipMapGenerationEnabled())
+        {
+            int mipWidth = src.getWidth();
+            int mipHeight = src.getHeight();
+            int elementJump = 1;
+            for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
+            {
+                mipWidth /= 2;
+                mipHeight /= 2;
+                elementJump *= 2;
+                size_t mipImageSize = PixelUtil::getMemorySize(mipWidth, mipHeight, src.getDepth(),
+                    mFormat);
+
+                MemoryDataStreamPtr bufMip;
+                bufMip.bind(new MemoryDataStream(mipImageSize));
+
+                size_t elemSize = PixelUtil::getNumElemBytes(mFormat);
+                for(int x = 0 ; x < mipWidth; x++)
+                {
+                    for(int y = 0 ; y < mipHeight  ; y++)
+                    {
+                        memcpy(bufMip->getPtr() + (x + y * mipWidth) * elemSize, buf->getPtr()  + (x + y * mipWidth * elementJump) * elemSize * elementJump, elemSize);
+                    }
+                }
+
+                D3D11_BOX dstBoxDx11mip = OgreImageBoxToDx11Box(mLockBox);
+                dstBoxDx11mip.front = 0;
+                dstBoxDx11mip.back = mLockBox.getDepth();
+                dstBoxDx11mip.right = mipWidth;
+                dstBoxDx11mip.bottom = mipHeight;
+                size_t mipRowWidth = elemSize * mipWidth;
+
+                mDevice.GetImmediateContext()->UpdateSubresource( 
+                    mParentTexture->GetTex2D(), 
+                    i,
+                    &dstBoxDx11mip,
+                    bufMip->getPtr(),
+                    mipRowWidth,
+                    0 );
+                if (mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                        "D3D11 device cannot update 2d subresource\nError Description:" + errorDescription,
+                        "D3D11HardwarePixelBuffer::blitFromMemory");
+                }
+
+            }
+        }
+    }
 
 };

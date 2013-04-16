@@ -10,8 +10,15 @@ fragment_program Ogre/Compositor/Embossed_GLSLES_FP glsles
 	source EmbossedFp.glsles
 }
 
+fragment_program Ogre/Compositor/Embossed_GLSL_FP glsl
+{
+	source EmbossedFp.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/Embossed_FP unified
 {
+    delegate Ogre/Compositor/Embossed_GLSL_FP
     delegate Ogre/Compositor/Embossed_GLSLES_FP
     delegate Ogre/Compositor/Embossed_Cg_FP
 }
@@ -24,8 +31,9 @@ material Ogre/Compositor/Embossed
 		pass
 		{
 			depth_check off
+            polygon_mode_overrideable false
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 

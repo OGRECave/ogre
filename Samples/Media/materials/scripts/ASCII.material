@@ -1,4 +1,4 @@
-fragment_program Ogre/Compositor/ASCIIFP cg
+fragment_program Ogre/Compositor/ASCIIFPCg cg
 {
 	source ASCIIFP.cg
 	entry_point ASCII_ps
@@ -14,6 +14,29 @@ fragment_program Ogre/Compositor/ASCIIFP cg
 	}
 }
 
+fragment_program Ogre/Compositor/ASCIIFPGLSL glsl
+{
+	source ASCIIFP.glsl
+	syntax glsl150
+	
+	default_params
+	{
+	    param_named iNumTiles float2 0.010 0.02
+	    param_named iNumTiles2 float2 0.005 0.01
+	    param_named numTiles float2 100 50
+	    param_named lum float4 0.30 0.59 0.11 0.0
+	    param_named charBias float 0.734375
+   		param_named RT int 0
+   		param_named chars int 1
+	}
+}
+
+fragment_program Ogre/Compositor/ASCIIFP unified
+{
+	delegate Ogre/Compositor/ASCIIFPGLSL
+	delegate Ogre/Compositor/ASCIIFPCg
+}
+
 material Ogre/Compositor/ASCII
 {
     technique
@@ -24,6 +47,7 @@ material Ogre/Compositor/ASCII
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{

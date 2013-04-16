@@ -7,14 +7,14 @@ vertex_program Fury/HeatVision/HeatCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/HeatCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/HeatCaster_GLSLES_vp glsles
@@ -27,14 +27,28 @@ fragment_program Fury/HeatVision/HeatCaster_GLSLES_fp glsles
    source HeatCasterFp.glsles
 }
 
+vertex_program Fury/HeatVision/HeatCaster_GLSL_vp glsl
+{
+   source HeatCasterVp.glsl
+   syntax glsl150
+}
+
+fragment_program Fury/HeatVision/HeatCaster_GLSL_fp glsl
+{
+   source HeatCasterFp.glsl
+   syntax glsl150
+}
+
 vertex_program Fury/HeatVision/HeatCaster_vp unified
 {
+    delegate Fury/HeatVision/HeatCaster_GLSL_vp
     delegate Fury/HeatVision/HeatCaster_GLSLES_vp
     delegate Fury/HeatVision/HeatCaster_Cg_vp
 }
 
 fragment_program Fury/HeatVision/HeatCaster_fp unified
 {
+    delegate Fury/HeatVision/HeatCaster_GLSL_fp
     delegate Fury/HeatVision/HeatCaster_GLSLES_fp
     delegate Fury/HeatVision/HeatCaster_Cg_fp
 }
@@ -45,6 +59,7 @@ material Fury/HeatVision/HeatCaster
     {
         pass
         {
+            polygon_mode_overrideable false
             vertex_program_ref Fury/HeatVision/HeatCaster_vp
             {
                 param_named_auto eyePosition camera_position_object_space
@@ -67,14 +82,14 @@ vertex_program Fury/HeatVision/ColdCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/ColdCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/ColdCaster_GLSLES_vp glsles
@@ -87,14 +102,28 @@ fragment_program Fury/HeatVision/ColdCaster_GLSLES_fp glsles
    source ColdCasterFp.glsles
 }
 
+vertex_program Fury/HeatVision/ColdCaster_GLSL_vp glsl
+{
+   source ColdCasterVp.glsl
+   syntax glsl150
+}
+
+fragment_program Fury/HeatVision/ColdCaster_GLSL_fp glsl
+{
+   source ColdCasterFp.glsl
+   syntax glsl150
+}
+
 vertex_program Fury/HeatVision/ColdCaster_vp unified
 {
+    delegate Fury/HeatVision/ColdCaster_GLSL_vp
     delegate Fury/HeatVision/ColdCaster_GLSLES_vp
     delegate Fury/HeatVision/ColdCaster_Cg_vp
 }
 
 fragment_program Fury/HeatVision/ColdCaster_fp unified
 {
+    delegate Fury/HeatVision/ColdCaster_GLSL_fp
     delegate Fury/HeatVision/ColdCaster_GLSLES_fp
     delegate Fury/HeatVision/ColdCaster_Cg_fp
 }
@@ -105,6 +134,7 @@ material Fury/HeatVision/ColdCaster
     {
         pass
         {
+            polygon_mode_overrideable false
             vertex_program_ref Fury/HeatVision/ColdCaster_vp
             {
                 param_named_auto eyePosition camera_position_object_space
@@ -127,7 +157,7 @@ vertex_program Fury/HeatVision/LightToHeat_Cg_vp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 
     default_params
     {
@@ -139,7 +169,7 @@ fragment_program Fury/HeatVision/LightToHeat_Cg_fp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/LightToHeat_GLSLES_vp glsles
@@ -163,14 +193,39 @@ fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
    	}
 }
 
+vertex_program Fury/HeatVision/LightToHeat_GLSL_vp glsl
+{
+    source LightToHeatVp.glsl
+    syntax glsl150
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl
+{
+   	source LightToHeatFp.glsl
+    syntax glsl150
+   	default_params
+   	{
+   		param_named Input int 0
+   		param_named NoiseMap int 1
+	   	param_named HeatLookup int 2
+   	}
+}
+
 vertex_program Fury/HeatVision/LightToHeat_vp unified
 {
+    delegate Fury/HeatVision/LightToHeat_GLSL_vp
     delegate Fury/HeatVision/LightToHeat_GLSLES_vp
     delegate Fury/HeatVision/LightToHeat_Cg_vp
 }
 
 fragment_program Fury/HeatVision/LightToHeat_fp unified
 {
+    delegate Fury/HeatVision/LightToHeat_GLSL_fp
     delegate Fury/HeatVision/LightToHeat_GLSLES_fp
     delegate Fury/HeatVision/LightToHeat_Cg_fp
 }
@@ -185,6 +240,7 @@ material Fury/HeatVision/LightToHeat
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/LightToHeat_vp
             {
@@ -238,7 +294,7 @@ vertex_program Fury/HeatVision/Blur_Cg_vp cg
 {
    source HeatVision.cg
    entry_point Blur_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 
     default_params
     {
@@ -250,7 +306,7 @@ fragment_program Fury/HeatVision/Blur_Cg_fp cg
 {
    source HeatVision.cg
    entry_point Blur_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/Blur_GLSLES_vp glsles
@@ -272,14 +328,37 @@ fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
   	}
 }
 
+vertex_program Fury/HeatVision/Blur_GLSL_vp glsl
+{
+    source HeatBlurVp.glsl
+    syntax glsl150
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/Blur_GLSL_fp glsl
+{
+  	source HeatBlurFp.glsl
+    syntax glsl150
+  	default_params
+  	{
+  		param_named Input int 0
+  	}
+}
+
 vertex_program Fury/HeatVision/Blur_vp unified
 {
+    delegate Fury/HeatVision/Blur_GLSL_vp
     delegate Fury/HeatVision/Blur_GLSLES_vp
     delegate Fury/HeatVision/Blur_Cg_vp
 }
 
 fragment_program Fury/HeatVision/Blur_fp unified
 {
+    delegate Fury/HeatVision/Blur_GLSL_fp
     delegate Fury/HeatVision/Blur_GLSLES_fp
     delegate Fury/HeatVision/Blur_Cg_fp
 }
@@ -294,6 +373,7 @@ material Fury/HeatVision/Blur
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/Blur_vp
             {

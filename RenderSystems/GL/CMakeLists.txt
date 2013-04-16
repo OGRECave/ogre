@@ -110,22 +110,23 @@ set(NVPARSE_FILES
   src/nvparse/vsp1.0_impl.cpp
 )
 
-set(GLSL_FILES
+set(GLSL_HEADERS
   src/GLSL/include/OgreGLSLExtSupport.h
   src/GLSL/include/OgreGLSLGpuProgram.h
   src/GLSL/include/OgreGLSLLinkProgram.h
   src/GLSL/include/OgreGLSLLinkProgramManager.h
   src/GLSL/include/OgreGLSLPreprocessor.h
   src/GLSL/include/OgreGLSLProgramFactory.h
-  src/GLSL/include/OgreGLSLProgram.h
+  src/GLSL/include/OgreGLSLProgram.h)
+
+set(GLSL_SOURCE
   src/GLSL/src/OgreGLSLExtSupport.cpp
   src/GLSL/src/OgreGLSLGpuProgram.cpp
   src/GLSL/src/OgreGLSLLinkProgram.cpp
   src/GLSL/src/OgreGLSLLinkProgramManager.cpp
   src/GLSL/src/OgreGLSLPreprocessor.cpp
   src/GLSL/src/OgreGLSLProgram.cpp
-  src/GLSL/src/OgreGLSLProgramFactory.cpp
-)
+  src/GLSL/src/OgreGLSLProgramFactory.cpp)
 
 set(ATIFS_FILES
   src/atifs/include/ATI_FS_GLGpuProgram.h
@@ -155,7 +156,7 @@ if (WIN32)
   include_directories(src/nvparse/winheaders src/win32)
   source_group(NVparse FILES ${NVPARSE_FILES})
   source_group(ATIFS FILES ${ATIFS_FILES})
-  source_group(GLSL FILES ${GLSL_FILES})
+  source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
   set(PLATFORM_HEADER_INSTALL "")
 elseif (APPLE)
   set(PLATFORM_HEADERS
@@ -208,6 +209,29 @@ elseif (UNIX)
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
+list(APPEND HEADER_FILES
+  ${GLSL_HEADERS}
+  src/atifs/include/ATI_FS_GLGpuProgram.h
+  src/atifs/include/Compiler2Pass.h
+  src/atifs/include/ps_1_4.h
+  src/nvparse/macro.h
+  src/nvparse/nvparse_errors.h
+  src/nvparse/nvparse_externs.h
+  src/nvparse/nvparse.h
+  src/nvparse/_ps1.0_parser.h
+  src/nvparse/ps1.0_program.h
+  src/nvparse/rc1.0_combiners.h
+  src/nvparse/rc1.0_final.h
+  src/nvparse/rc1.0_general.h
+  src/nvparse/_rc1.0_parser.h
+  src/nvparse/rc1.0_register.h
+  src/nvparse/ts1.0_inst.h
+  src/nvparse/ts1.0_inst_list.h
+  src/nvparse/_ts1.0_parser.h
+  src/nvparse/vs1.0_inst.h
+  src/nvparse/vs1.0_inst_list.h
+  src/nvparse/_vs1.0_parser.h
+)
 
 include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -221,7 +245,7 @@ include_directories(
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
-ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_FILES} ${ATIFS_FILES} ${NVPARSE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
+ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_FILES} ${NVPARSE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -230,16 +254,10 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
 endif ()
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    # Set the INSTALL_PATH so that Plugins can be installed in the application package
-    set_target_properties(RenderSystem_GL
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Plugins"
-    )
-endif()
+ogre_config_framework(RenderSystem_GL)
 
 ogre_config_plugin(RenderSystem_GL)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GL)

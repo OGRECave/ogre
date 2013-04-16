@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -195,7 +195,7 @@ namespace Ogre {
             index < mActiveBillboards.size() &&
             "Billboard index out of bounds." );
 
-        /* We can't access it directly, so we check wether it's in the first
+        /* We can't access it directly, so we check whether it's in the first
            or the second half, then we start either from the beginning or the
            end of the list
         */
@@ -220,7 +220,7 @@ namespace Ogre {
             index < mActiveBillboards.size() &&
             "Billboard index out of bounds." );
 
-        /* We can't access it directly, so we check wether it's in the first
+        /* We can't access it directly, so we check whether it's in the first
            or the second half, then we start either from the beginning or the
            end of the list.
            We then remove the billboard form the 'used' list and add it to

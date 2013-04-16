@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,8 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
-
+#include "OgreLodConfig.h"
+#include "OgrePixelCountLodStrategy.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -729,15 +730,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void  Mesh::_compileBoneAssignments(void)
     {
-        unsigned short maxBones =
-            _rationaliseBoneAssignments(sharedVertexData->vertexCount, mBoneAssignments);
+		if (sharedVertexData)
+		{
+			unsigned short maxBones = _rationaliseBoneAssignments(sharedVertexData->vertexCount, mBoneAssignments);
 
-        if (maxBones != 0)
-        {
-            compileBoneAssignments(mBoneAssignments, maxBones, 
-                sharedBlendIndexToBoneIndexMap, sharedVertexData);
-        }
-
+			if (maxBones != 0)
+			{
+				compileBoneAssignments(mBoneAssignments, maxBones, 
+					sharedBlendIndexToBoneIndexMap, sharedVertexData);
+			}
+		}
         mBoneAssignmentsOutOfDate = false;
     }
     //---------------------------------------------------------------------
@@ -923,7 +925,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
-        assert(index < mMeshLodUsageList.size());
+        index = std::min(index, (ushort)(mMeshLodUsageList.size() - 1));
         if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
@@ -1095,6 +1097,70 @@ namespace Ogre {
 	{
 		mIndexBufferUsage = vbUsage;
 		mIndexBufferShadowBuffer = shadowBuffer;
+	}
+	//---------------------------------------------------------------------
+	void Mesh::mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
+										unsigned short texCoordSetToDestroy )
+	{
+		if( sharedVertexData )
+			mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData );
+
+		SubMeshList::const_iterator itor = mSubMeshList.begin();
+		SubMeshList::const_iterator end  = mSubMeshList.end();
+
+		while( itor != end )
+		{
+			if( !(*itor)->useSharedVertices )
+				mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, (*itor)->vertexData );
+			++itor;
+		}
+	}
+	//---------------------------------------------------------------------
+	void Mesh::mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
+										unsigned short texCoordSetToDestroy,
+										VertexData *vertexData )
+	{
+		VertexDeclaration *vDecl	= vertexData->vertexDeclaration;
+
+	    const VertexElement *uv0 = vDecl->findElementBySemantic( VES_TEXTURE_COORDINATES,
+																	finalTexCoordSet );
+		const VertexElement *uv1 = vDecl->findElementBySemantic( VES_TEXTURE_COORDINATES,
+																	texCoordSetToDestroy );
+
+		if( uv0 && uv1 )
+		{
+			//Check that both base types are compatible (mix floats w/ shorts) and there's enough space
+			VertexElementType baseType0 = VertexElement::getBaseType( uv0->getType() );
+			VertexElementType baseType1 = VertexElement::getBaseType( uv1->getType() );
+
+			unsigned short totalTypeCount = VertexElement::getTypeCount( uv0->getType() ) +
+											VertexElement::getTypeCount( uv1->getType() );
+			if( baseType0 == baseType1 && totalTypeCount <= 4 )
+			{
+				const VertexDeclaration::VertexElementList &veList = vDecl->getElements();
+				VertexDeclaration::VertexElementList::const_iterator uv0Itor = std::find( veList.begin(),
+																					veList.end(), *uv0 );
+				unsigned short elem_idx		= std::distance( veList.begin(), uv0Itor );
+				VertexElementType newType	= VertexElement::multiplyTypeCount( baseType0,
+																				totalTypeCount );
+
+				if( ( uv0->getOffset() + uv0->getSize() == uv1->getOffset() ||
+					  uv1->getOffset() + uv1->getSize() == uv0->getOffset() ) &&
+					uv0->getSource() == uv1->getSource() )
+				{
+					//Special case where they adjacent, just change the declaration & we're done.
+					size_t newOffset		= std::min( uv0->getOffset(), uv1->getOffset() );
+					unsigned short newIdx	= std::min( uv0->getIndex(), uv1->getIndex() );
+
+					vDecl->modifyElement( elem_idx, uv0->getSource(), newOffset, newType,
+											VES_TEXTURE_COORDINATES, newIdx );
+					vDecl->removeElement( VES_TEXTURE_COORDINATES, texCoordSetToDestroy );
+					uv1 = 0;
+				}
+
+				vDecl->closeGapsInSource();
+			}
+		}
 	}
     //---------------------------------------------------------------------
     void Mesh::organiseTangentsBuffer(VertexData *vertexData,
@@ -2226,7 +2292,43 @@ namespace Ogre {
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
     }
-    //---------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
+    {
+        // In theory every mesh should have a submesh.
+        assert(getNumSubMeshes() > 0);
+        setLodStrategy(lodConfig.strategy);
+        SubMesh* submesh = getSubMesh(0);
+        mNumLods = submesh->mLodFaceList.size() + 1;
+        mMeshLodUsageList.resize(mNumLods);
+        for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
+            // Record usages. First Lod usage is the mesh itself.
 
+            // Skip lods, which have the same amount of vertices. No buffer generated for them.
+            if (!lodConfig.levels[i].outSkipped) {
+                // Generated buffers are less then the reported by ProgressiveMesh.
+                // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before lod generation completes.
+                assert(mMeshLodUsageList.size() > n + 1);
+                MeshLodUsage& lod = mMeshLodUsageList[++n];
+                lod.userValue = lodConfig.levels[i].distance;
+                lod.value = getLodStrategy()->transformUserValue(lod.userValue);
+                lod.edgeData = 0;
+                lod.manualMesh.setNull();
+            }
+        }
+
+        // TODO: Fix this in PixelCountLodStrategy::getIndex()
+        // Fix bug in Ogre with pixel count Lod strategy.
+        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
+        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
+        if (lodConfig.strategy == PixelCountLodStrategy::getSingletonPtr()) {
+            mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
+            mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
+        } else {
+            mMeshLodUsageList[0].userValue = 0;
+            mMeshLodUsageList[0].value = 0;
+        }
+    }
+    //---------------------------------------------------------------------
 }
 

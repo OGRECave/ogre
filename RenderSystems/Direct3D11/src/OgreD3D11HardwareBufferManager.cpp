@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,23 +84,6 @@ namespace Ogre {
 		HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		assert (numIndexes > 0);
-#if OGRE_D3D_MANAGE_BUFFERS
-		// Override shadow buffer setting; managed buffers are automatically
-		// backed by system memory
-		if (useShadowBuffer)
-		{
-			useShadowBuffer = false;
-			// Also drop any WRITE_ONLY so we can read direct
-			if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_DYNAMIC;
-			}
-			else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_STATIC;
-			}
-		}
-#endif
 		D3D11HardwareIndexBuffer* idx = new D3D11HardwareIndexBuffer(
 			this, itype, numIndexes, usage, mlpD3DDevice, false, useShadowBuffer);
 		{
@@ -153,6 +136,15 @@ namespace Ogre {
 
 		return HardwareUniformBufferSharedPtr(uni);
 	}	
+    //-----------------------------------------------------------------------
+	HardwareCounterBufferSharedPtr
+    D3D11HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	{
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "*** not implemented ***",
+                    "D3D11HardwareBufferManagerBase::createCounterBuffer");
+	}
 	//-----------------------------------------------------------------------
 	VertexDeclaration* D3D11HardwareBufferManagerBase::createVertexDeclarationImpl(void)
 	{

@@ -1,13 +1,13 @@
 For a list of known bugs refer to our bugtracker: 
-- http://www.ogre3d.org/mantis/
-To submit patches, please use the tracker at SourceForge:
-- http://sourceforge.net/tracker/?group_id=2997&atid=302997
+- https://ogre3d.atlassian.net/browse/OGRE
+To submit patches, please use Pull-Requests as explained in our guidelines:
+- http://www.ogre3d.org/developers/submit-patch
 
 -----
 
 OGRE (www.ogre3d.org) is made available under the MIT License.
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

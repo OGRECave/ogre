@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -427,7 +427,7 @@ void* OSXGLSupport::getProcAddress( const char* name )
     void *symbol;
     symbol = NULL;
     
-    std::string fullPath = macPluginPath() + "RenderSystem_GL.dylib";
+    String fullPath = macPluginPath() + "RenderSystem_GL.dylib";
     void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if(handle) {
         symbol = dlsym (handle, name);

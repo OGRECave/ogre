@@ -55,28 +55,16 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 ogre_add_library(OgrePaging ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_SOVERSION})
+set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgrePaging ${Boost_LIBRARIES})
+  target_link_libraries(OgrePaging ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 
 # install 
+ogre_config_framework(OgrePaging)
 ogre_config_component(OgrePaging)
-
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    # Set the INSTALL_PATH so that Components can be installed in the application package
-    set_target_properties(OgrePaging
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Components"
-    )
-
-	# Copy headers into the main Ogre framework
-	add_custom_command(TARGET OgrePaging POST_BUILD
-	  COMMAND ditto ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/
-	)
-endif()
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Paging

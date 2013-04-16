@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -92,20 +92,20 @@ namespace Ogre {
     #       define HashSet ::std::tr1::unordered_set
     #    endif
     #else
-    #   if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    #       if OGRE_COMP_VER >= 1600 // VC++ 10.0
-	#			define HashMap ::std::tr1::unordered_map
-	#           define HashSet ::std::tr1::unordered_set
-	#		elif OGRE_COMP_VER > 1300 && !defined(_STLP_MSVC)
-    #           define HashMap ::stdext::hash_map
-	#           define HashSet ::stdext::hash_set
+    #   if OGRE_COMPILER == OGRE_COMPILER_MSVC && !defined(_STLP_MSVC)
+    #       if _MSC_FULL_VER >= 150030729 // VC++ 9.0 SP1+
+    #           define HashMap ::std::tr1::unordered_map
+    #           define HashSet ::std::tr1::unordered_set
+    #       elif OGRE_THREAD_PROVIDER == 1
+    #           define HashMap ::boost::unordered_map
+    #           define HashSet ::boost::unordered_set
     #       else
-    #           define HashMap ::std::hash_map
-	#           define HashSet ::std::hash_set
+    #           define HashMap ::std::unordered_map
+    #           define HashSet ::std::unordered_set
     #       endif
     #   else
-    #       define HashMap ::std::hash_map
-	#       define HashSet ::std::hash_set
+    #       define HashMap ::std::unordered_map
+	#       define HashSet ::std::unordered_set
     #   endif
     #endif
 
@@ -159,9 +159,6 @@ namespace Ogre {
     class ErrorDialog;
     class ExternalTextureSourceManager;
     class Factory;
-    class Font;
-    class FontPtr;
-    class FontManager;
     struct FrameEvent;
     class FrameListener;
     class Frustum;
@@ -215,11 +212,6 @@ namespace Ogre {
 	class NodeKeyFrame;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
@@ -235,9 +227,11 @@ namespace Ogre {
     class PixelBox;
     class Plane;
     class PlaneBoundedVolume;
-	class Plugin;
+    class Plugin;
+    class PMWorker;
+    class PMInjector;
     class Pose;
-    class ProgressiveMesh;
+    class ProgressiveMeshGenerator;
     class Profile;
 	class Profiler;
     class Quaternion;

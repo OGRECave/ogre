@@ -55,13 +55,15 @@
 #       include <tr1/unordered_map>
 #       include <tr1/unordered_set>
 #   endif
-#else
-#   if (OGRE_COMPILER == OGRE_COMPILER_MSVC) && !defined(STLPORT) && OGRE_COMP_VER >= 1600 // VC++ 10.0
+#elif !defined(STLPORT)
+#   if (OGRE_COMPILER == OGRE_COMPILER_MSVC) && _MSC_FULL_VER >= 150030729 // VC++ 9.0 SP1+
 #    	include <unordered_map>
 #    	include <unordered_set>
-#	else
-#   	include <hash_set>
-#   	include <hash_map>
+#   elif OGRE_THREAD_PROVIDER == 1
+#       include <boost/unordered_set.hpp>
+#       include <boost/unordered_set.hpp>
+#   else
+#   	error "Your compiler doesn't support unordered_set and unordered_map. Try to compile Ogre with Boost or STLPort."
 #	endif
 #endif 
 

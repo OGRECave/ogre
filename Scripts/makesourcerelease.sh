@@ -18,13 +18,13 @@ pushd $foldername
 # delete repo, we only want working copy
 rm -rf .hg
 # Gen docs
-cd Docs/src
-. makedocs.sh
+cd Docs
+bash ./src/makedocs.sh
 # remove unnecessary files
 cd ../api/html
 rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist *.xml ../*.tmp
 popd
 # tarball for Linux
 rm -f $foldername.tar.bz2
-/bin/tar -cvhjf $foldername.tar.bz2 $foldername
+tar -cvhjf $foldername.tar.bz2 $foldername
 

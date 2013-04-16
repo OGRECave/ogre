@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>								
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -117,7 +117,7 @@ namespace Ogre
 
 		mCurrentIteration = iteration;
 
-		// Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM / Focussed
+		// Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM / Focused
 		// functionality right now without major changes
 		Camera* _cam = const_cast<Camera*>(cam);
 		Real oldNear = _cam->getNearClipDistance();

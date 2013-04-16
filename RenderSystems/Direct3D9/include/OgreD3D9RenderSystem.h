@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -248,7 +248,7 @@ namespace Ogre
 		VertexElementType getColourVertexElementType() const;
 		void setStencilCheckEnabled(bool enabled);
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
+            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
@@ -341,12 +341,12 @@ namespace Ogre
 		void unregisterThread();
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();		
-		
+				
 		/*
 		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
 		*/
 		virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-
+		
 		/// Tells whether the system is initialized with DirectX 9Ex driver
 		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
 		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
@@ -385,14 +385,14 @@ namespace Ogre
 
 		/// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
-		
-		/// fires a device releated event
+		 	
+		/// Fires a device related event
 		void fireDeviceEvent( D3D9Device* device, const String & name );
 
 		/// Returns how multihead should be activated
 		MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
 	protected:	
-		///returns the sampler id for a given unit texture number
+		/// Returns the sampler id for a given unit texture number
 		DWORD getSamplerId(size_t unit);
 
 		/// Notify when a device has been lost.

@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
     GLESTextureManager::GLESTextureManager(GLESSupport& support)
         : TextureManager(), mGLSupport(support), mWarningTextureID(0)
-    {        
+    {
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
@@ -72,7 +72,7 @@ namespace Ogre {
         {
             for(size_t x = 0; x < width; ++x)
             {
-                data[y * width + x] = (((x + y) % 8) < 4) ? 0x000000 : 0xFFFF00;
+                data[y * width + x] = (((x + y) % 8) < 4) ? 0x0000 : 0xFFF0;
             }
         }
 

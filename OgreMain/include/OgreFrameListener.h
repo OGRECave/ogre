@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,11 +73,8 @@ namespace Ogre {
             Root::addFrameListener passing an instance of this class.
             There is no limit to the number of frame listeners you can register,
             allowing you to register multiple listeners for different purposes.
-            Frame events only occur when Ogre is in continuous rendering mode,
-            i.e. after Root::startRendering is called. If the application is
-            doing ad-hoc rendering without entering a rendering loop, frame
-            events are not generated. Note that a frame event occurs once for
-            all rendering targets, not once per target.
+            Note that a frame event occurs once for all rendering targets,
+            not once per target.
     */
     class _OgreExport FrameListener
     {

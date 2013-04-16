@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -468,34 +468,34 @@ namespace Ogre {
 		/** Resize a 2D image, applying the appropriate filter. */
 		void resize(ushort width, ushort height, Filter filter = FILTER_BILINEAR);
 		
-        // Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
+        /// Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
         static size_t calculateSize(size_t mipmaps, size_t faces, size_t width, size_t height, size_t depth, PixelFormat format);
 
 		/// Static function to get an image type string from a stream via magic numbers
 		static String getFileExtFromMagic(DataStreamPtr stream);
 
     protected:
-        // The width of the image in pixels
-	size_t mWidth;
-        // The height of the image in pixels
-	size_t mHeight;
-        // The depth of the image
-	size_t mDepth;
-        // The size of the image buffer
-	size_t mBufSize;
-        // The number of mipmaps the image contains
-	size_t mNumMipmaps;
-        // Image specific flags.
-	int mFlags;
+        /// The width of the image in pixels
+		size_t mWidth;
+        /// The height of the image in pixels
+		size_t mHeight;
+        /// The depth of the image
+		size_t mDepth;
+        /// The size of the image buffer
+		size_t mBufSize;
+        /// The number of mipmaps the image contains
+		size_t mNumMipmaps;
+        /// Image specific flags.
+		int mFlags;
 
-        // The pixel format of the image
-	PixelFormat mFormat;
+        /// The pixel format of the image
+		PixelFormat mFormat;
 
-        // The number of bytes per pixel
-	uchar mPixelSize;
-	uchar* mBuffer;
+        /// The number of bytes per pixel
+		uchar mPixelSize;
+		uchar* mBuffer;
 
-		// A bool to determine if we delete the buffer or the calling app does
+		/// A bool to determine if we delete the buffer or the calling app does
 		bool mAutoDelete;
     };
 

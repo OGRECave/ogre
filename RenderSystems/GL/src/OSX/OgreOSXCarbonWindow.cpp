@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,11 +69,15 @@ namespace Ogre
 
         if( miscParams )
         {
-            NameValuePairList::const_iterator opt(NULL);
+#if OGRE_NO_LIBCPP_SUPPORT == 0
+            NameValuePairList::const_iterator opt{};
+#else
+            NameValuePairList::const_iterator opt;
+#endif
             NameValuePairList::const_iterator end = miscParams->end();
 
             // Full screen anti aliasing
-            if((opt = miscParams->find("FSAA")) != end) 
+            if((opt = miscParams->find("FSAA")) != end)
                 fsaa_samples = StringConverter::parseUnsignedInt( opt->second );
 
             if((opt = miscParams->find("left")) != end) 
@@ -112,7 +116,11 @@ namespace Ogre
         {
             createAGLContext(fsaa_samples, depth);
 
-            NameValuePairList::const_iterator opt(NULL);
+#if OGRE_NO_LIBCPP_SUPPORT == 0
+            NameValuePairList::const_iterator opt{};
+#else
+            NameValuePairList::const_iterator opt;
+#endif
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");
 

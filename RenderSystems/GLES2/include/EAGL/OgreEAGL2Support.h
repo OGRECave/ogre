@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,6 @@ namespace Ogre {
 
     class _OgrePrivate EAGL2Support : public GLES2Support
     {
-        protected:
         public:
             EAGL2Support();
             virtual ~EAGL2Support();
@@ -64,6 +63,7 @@ namespace Ogre {
             virtual String getDisplayName(void);
 			CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
+            float getCurrentOSVersion(void) { return mCurrentOSVersion; }
             void * getProcAddress(const Ogre::String& name);
             RenderWindow * createWindow(bool autoCreateWindow,
                                            GLES2RenderSystem *renderSystem,
@@ -83,6 +83,8 @@ namespace Ogre {
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
 			CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
+        protected:
+            float mCurrentOSVersion;
 	};
 }
 

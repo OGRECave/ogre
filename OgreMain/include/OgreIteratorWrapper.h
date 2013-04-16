@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Iterator_Wrapper_H__
 #define __Ogre_Iterator_Wrapper_H__
 
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre{
 
@@ -125,7 +126,7 @@ class IteratorWrapper
 
 /** 
  * 
- * \brief Prepiared IteratorWrapper for container like std::vector 
+ * \brief Prepared IteratorWrapper for container like std::vector 
  *
  * 
  * \param T = Container eg vector 
@@ -243,7 +244,7 @@ class ConstVectorIterator : public VectorIteratorWrapper<T,  typename T::const_i
 
 /** 
  * 
- * \brief Prepiared IteratorWrapper for key-value container
+ * \brief Prepared IteratorWrapper for key-value container
  *
  * 
  * \param T  Container  (map - or also set )
@@ -378,6 +379,6 @@ class ConstMapIterator : public MapIteratorWrapper<T,  typename T::const_iterato
 
 }
 
-
+#include "OgreHeaderSuffix.h"
 
 #endif

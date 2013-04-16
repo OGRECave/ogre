@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,6 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreSkeletonManager.h"
-#include "OgreOverlayElementFactory.h"
-#include "OgreOverlayManager.h"
 #include "OgreProfiler.h"
 #include "OgreErrorDialog.h"
 #include "OgreConfigDialog.h"
@@ -66,7 +64,8 @@ THE SOFTWARE.
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "Threading/OgreDefaultWorkQueue.h"
-	
+#include "OgreQueuedProgressiveMeshGenerator.h"
+
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
 #endif
@@ -77,17 +76,11 @@ THE SOFTWARE.
 #include "OgreZip.h"
 #endif
 
-#include "OgreFontManager.h"
 #include "OgreHardwareBufferManager.h"
-
-#include "OgreOverlay.h"
 #include "OgreHighLevelGpuProgramManager.h"
-
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreCompositorManager.h"
-
 #include "OgreScriptCompiler.h"
-
 #include "OgreWindowEventUtilities.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -210,22 +203,14 @@ namespace Ogre {
 
         mTimer = OGRE_NEW Timer();
 
-        // Overlay manager
-        mOverlayManager = OGRE_NEW OverlayManager();
-
-        mPanelFactory = OGRE_NEW PanelOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mPanelFactory);
-
-        mBorderPanelFactory = OGRE_NEW BorderPanelOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mBorderPanelFactory);
-
-        mTextAreaFactory = OGRE_NEW TextAreaOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mTextAreaFactory);
-        // Font manager
-        mFontManager = OGRE_NEW FontManager();
-
         // Lod strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
+
+        // Queued Progressive Mesh Generator Worker
+        mPMWorker = OGRE_NEW PMWorker();
+
+        // Queued Progressive Mesh Generator Injector
+        mPMInjector = OGRE_NEW PMInjector();
 
 #if OGRE_PROFILING
         // Profiler
@@ -282,7 +267,7 @@ namespace Ogre {
 		addMovableObjectFactory(mBillboardChainFactory);
 		mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
 		addMovableObjectFactory(mRibbonTrailFactory);
-     
+
 		// Load plugins
         if (!pluginFileName.empty())
             loadPlugins(pluginFileName);
@@ -324,9 +309,11 @@ namespace Ogre {
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;
 #endif
-        OGRE_DELETE mOverlayManager;
-        OGRE_DELETE mFontManager;
+
 		OGRE_DELETE mLodStrategyManager;
+		OGRE_DELETE mPMWorker;
+		OGRE_DELETE mPMInjector;
+
         OGRE_DELETE mArchiveManager;
         
 #   if OGRE_NO_ZIP_ARCHIVE == 0
@@ -343,10 +330,6 @@ namespace Ogre {
             OGRE_DELETE mControllerManager;
         if (mHighLevelGpuProgramManager)
             OGRE_DELETE mHighLevelGpuProgramManager;
-
-        OGRE_DELETE mTextAreaFactory;
-        OGRE_DELETE mBorderPanelFactory;
-        OGRE_DELETE mPanelFactory;
 
         unloadPlugins();
         OGRE_DELETE mMaterialManager;
@@ -1035,6 +1018,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::shutdown(void)
     {
+		if(mActiveRenderer)
+			mActiveRenderer->_setViewport(NULL);
+
 		// Since background thread might be access resources,
 		// ensure shutdown before destroying resource manager.
 		mResourceBackgroundQueue->shutdown();

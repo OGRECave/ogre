@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -198,9 +198,9 @@ private:
 
 	};
 
-	#define R_BASE  (sid_R0 - GL_REG_0_ATI)
-	#define C_BASE  (sid_C0 - GL_CON_0_ATI)
-	#define T_BASE  (sid_1T0 - GL_REG_0_ATI)
+	#define R_BASE  static_cast<unsigned int>((sid_R0 - GL_REG_0_ATI))
+	#define C_BASE  static_cast<unsigned int>((sid_C0 - GL_CON_0_ATI))
+	#define T_BASE  static_cast<unsigned int>((sid_1T0 - GL_REG_0_ATI))
 
 	// static library database for tokens and BNF rules
 	static SymbolDef PS_1_4_SymbolTypeLib[];
@@ -252,7 +252,6 @@ private:
 	MachineInstContainer mPhase2TEX_mi; /// machine instructions for phase two texture section
 	MachineInstContainer mPhase2ALU_mi; /// machine instructions for phase two ALU section
 
-	MachineInstContainer* mActivePhaseMachineInstructions;
 	// vars used during pass 2
 	MachineInstID mOpType;
 	uint mOpInst;

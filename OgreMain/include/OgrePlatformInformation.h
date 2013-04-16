@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ namespace Ogre {
 #	define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #	define OGRE_CPU OGRE_CPU_X86
-#elif defined(__arm__)
+#elif defined(__arm__) || defined(_M_ARM)
 #	define OGRE_CPU OGRE_CPU_ARM
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN

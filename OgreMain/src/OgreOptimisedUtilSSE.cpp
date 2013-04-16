@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -897,7 +897,7 @@ namespace Ogre {
     {
         assert(_isAlignedForSSE(pSrcPos));
 
-        // Instantiating two version only, since other alignement combination not that important.
+        // Instantiating two version only, since other alignment combination not that important.
         if (_isAlignedForSSE(pSrcNorm) && _isAlignedForSSE(pDestPos) && _isAlignedForSSE(pDestNorm))
         {
             SoftwareVertexSkinning_SSE_PosNorm_Separated_Packed<true, true, true, true>::apply(
@@ -1015,7 +1015,7 @@ namespace Ogre {
     {
         assert(_isAlignedForSSE(pSrcPos));
 
-        // Instantiating two version only, since other alignement combination not that important.
+        // Instantiating two version only, since other alignment combination not that important.
         if (_isAlignedForSSE(pDestPos))
         {
             SoftwareVertexSkinning_SSE_PosOnly_Packed<true, true>::apply(

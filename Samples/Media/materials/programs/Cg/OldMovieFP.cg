@@ -1,0 +1,55 @@
+sampler2D RT : register(s0);
+sampler2D SplotchesTx : register(s1);
+sampler1D Texture2 : register(s2);
+sampler1D SepiaTx : register(s3);
+
+float2 calcSpriteAddr(float2 texCoord, float DirtFrequency1, float period)
+{
+   return texCoord + tex1D(Texture2, period  * DirtFrequency1).xy;
+}
+
+float4 getSplotches(float2 spriteAddr)
+{
+   // get sprite address into paged texture coords space
+   spriteAddr = spriteAddr / 6.3f;
+   //spriteAddr = spriteAddr - frac(spriteAddr);
+   spriteAddr = spriteAddr - (spriteAddr /33.3f);
+
+   return float4(1,1,1,1) * tex2D(SplotchesTx, spriteAddr).r;
+}
+
+float4 OldMovie_ps (float4 pos : POSITION, 
+        float2 texCoord  : TEXCOORD0,
+				uniform float time_cycle_period,
+				uniform float flicker,
+				uniform float DirtFrequency,
+				uniform float3 luminance,
+				uniform float frameJitter,
+				uniform float lumiShift
+				) : COLOR
+{
+
+   // get sprite address
+   float2 spriteAddr = calcSpriteAddr(texCoord, DirtFrequency, time_cycle_period);
+
+    // add some dark and light splotches to the film
+   float4 splotches = getSplotches(spriteAddr);
+   float4 specs = 1.0f - getSplotches(spriteAddr / 3.0f);
+
+   // convert color to base luminance
+   float4 base = tex2D(RT, texCoord + float2(0, spriteAddr.y * frameJitter));
+   float lumi = dot(base.rgb, luminance);
+   // randomly shift luminance
+   lumi -= spriteAddr.x * lumiShift;
+   // tone map luminance
+   base.rgb = tex1D(SepiaTx, lumi ).rgb;
+
+   // calc flicker speed
+   float darken = frac(flicker * time_cycle_period);
+
+   // we want darken to cycle between 0.6 and 1.0
+   darken = abs(darken - 0.5f) * 0.4f + 0.6f;
+   // composite dirt onto film
+   return base * splotches * darken + specs;
+}
+

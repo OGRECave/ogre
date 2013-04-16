@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetup.h"
 #include "OgrePolygon.h"
 #include "OgreConvexBody.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -215,6 +216,7 @@ namespace Ogre {
             of the currently active scene node.
         @param out_LVS
             Intersection body LVS (world coordinates).
+	@param light: current light
         */
         void calculateLVS(const SceneManager& sm, const Camera& cam, const Light& light,
             const AxisAlignedBox& sceneBB, PointListBody *out_LVS) const;
@@ -309,5 +311,7 @@ namespace Ogre {
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __ShadowCameraSetupFocused_H__

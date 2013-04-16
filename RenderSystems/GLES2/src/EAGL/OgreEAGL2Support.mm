@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ namespace Ogre {
 
     EAGL2Support::EAGL2Support()
     {
+        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     }
 
     EAGL2Support::~EAGL2Support()
@@ -60,13 +61,14 @@ namespace Ogre {
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
-
+        
         // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
         // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
-        CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
+        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
 
         optVideoMode.name = "Video Mode";
         optVideoMode.possibleValues.push_back("320 x 480");
+        optVideoMode.possibleValues.push_back("320 x 568");
         optVideoMode.possibleValues.push_back("768 x 1024");
         optVideoMode.currentValue = StringConverter::toString(screenSize.width) + " x " + 
                                     StringConverter::toString(screenSize.height);
@@ -104,6 +106,17 @@ namespace Ogre {
         mOptions[optContentScalingFactor.name] = optContentScalingFactor;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optRTTMode.name] = optRTTMode;
+        
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+        ConfigOption optOrientation;
+        optOrientation.name = "Orientation";
+        optOrientation.possibleValues.push_back("Portrait");
+        optOrientation.possibleValues.push_back("Landscape Left");
+        optOrientation.possibleValues.push_back("Landscape Right");
+        optOrientation.currentValue = "Portrait";
+        optOrientation.immutable = false;
+        mOptions[optOrientation.name] = optOrientation;
+#endif
         
         // Set the shader cache path
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -221,7 +234,7 @@ namespace Ogre {
             ConfigOptionMap::iterator end = mOptions.end();
             NameValuePairList miscParams;
 
-            CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
+            CGSize screenSize = [[UIScreen mainScreen] bounds].size;
             bool fullscreen = false;
             uint w = (uint)screenSize.width, h = (uint)screenSize.height;
 

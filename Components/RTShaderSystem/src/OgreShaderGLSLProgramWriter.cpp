@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,25 +28,26 @@ THE SOFTWARE.
 #include "OgreShaderGLSLProgramWriter.h"
 #include "OgreStringConverter.h"
 #include "OgreShaderGenerator.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 namespace RTShader {
 
-String GLSLProgramWriter::TargetLanguage =  "glsl";
+String GLSLProgramWriter::TargetLanguage = "glsl";
 
 // Uniform comparer
 struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
 {
 	bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
 	{
-			return uniform->getName() == name;
+        return uniform->getName() == name;
 	}
 };
 
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter()
 {
-	mGLSLVersion = 120;
+	mGLSLVersion = Ogre::Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
 	initializeStringMaps();
 }
 
@@ -69,6 +70,8 @@ void GLSLProgramWriter::initializeStringMaps()
 	mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
 	mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
 	mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
+	mGpuConstTypeMap[GCT_SAMPLER1DSHADOW] = "sampler1DShadow";
+	mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2DShadow";
 	mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
 	mGpuConstTypeMap[GCT_MATRIX_2X3] = "mat2x3";
 	mGpuConstTypeMap[GCT_MATRIX_2X4] = "mat2x4";
@@ -98,7 +101,7 @@ void GLSLProgramWriter::initializeStringMaps()
 	mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
 	mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";	
 
-	if (mGLSLVersion == 130)
+	if (mGLSLVersion >= 130)
 	{
 		mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
 		mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
@@ -173,7 +176,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		writeOutParameters(os, curFunction, gpuType);
 					
 		// The function name must always main.
-		os << "void main() {" << std::endl;
+		os << "void main(void) {" << std::endl;
 
 		// Write local parameters.
 		const ShaderParameterList& localParams = curFunction->getLocalParameters();
@@ -202,7 +205,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
 
 			// Local string stream
-			std::stringstream localOs;
+			StringStream localOs;
 
 			// Write function name			
 			localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
@@ -515,14 +518,14 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 			paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
 			mInputToGLStatesMap[pParam->getName()] = paramName;
 
-			// After glsl 120 varying is deprecated
-			if(mGLSLVersion <=  120)
+			// After GLSL 1.20 varying is deprecated
+			if(mGLSLVersion <= 120)
 			{
 				os << "varying\t";
 			}
 			else
 			{
-				os << "out\t";
+				os << "in\t";
 			}
 
 			os << mGpuConstTypeMap[pParam->getType()];
@@ -536,7 +539,16 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 			// Due the fact that glsl does not have register like cg we have to rename the params
 			// according there content.
 			mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
-			os << "attribute\t"; 
+
+			// After GLSL 1.40 attribute is deprecated
+            if (mGLSLVersion >= 140)
+            {
+                os << "in\t";
+            }
+            else
+            {
+                os << "attribute\t";
+            }
 
 			// all uv texcoords passed by ogre are vec4
 			if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
@@ -598,8 +610,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 			}
 			else
 			{
-				// After glsl 120 varying is deprecated
-				if(mGLSLVersion <=  120)
+				// After GLSL 1.20 varying is deprecated
+				if(mGLSLVersion <= 120)
 				{
 					os << "varying\t";
 				}
@@ -622,9 +634,18 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 				pParam->getSemantic() == Parameter::SPS_COLOR)
 		{					
 			// GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
-			mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";						
-		}
-	}
+            // Always add gl_FragColor as an output.  The name is for compatibility.
+            if(mGLSLVersion <= 130)
+            {
+                mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
+            }
+            else
+            {
+                os << "out vec4 fragColour;" << std::endl;
+                mInputToGLStatesMap[pParam->getName()] = "fragColour";
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------

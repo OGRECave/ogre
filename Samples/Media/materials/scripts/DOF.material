@@ -24,6 +24,7 @@ material Ogre/Compositor/DOF_Blur0
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref DOF_Blur_ps
 			{
@@ -67,6 +68,7 @@ material Ogre/Compositor/DOF_Blend
     {
         pass
         {
+            polygon_mode_overrideable false
 			fragment_program_ref DOF_Blend_ps
 			{
 			    param_named focus float 0.66

@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -55,6 +55,8 @@ Torus Knot Software Ltd.
 #include "OgreLodListener.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreHeaderPrefix.h"
+
 namespace Ogre {
 	/** \addtogroup Core
 	*  @{
@@ -747,7 +749,7 @@ namespace Ogre {
 		bool mShadowUseInfiniteFarPlane;
 		bool mShadowCasterRenderBackFaces;
 		bool mShadowAdditiveLightClip;
-		/// Struct for cacheing light clipping information for re-use in a frame
+		/// Struct for caching light clipping information for re-use in a frame
 		struct LightClippingInfo
 		{
 			RealRect scissorRect;
@@ -1722,7 +1724,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual ViewPoint getSuggestedViewpoint(bool random = false);
 
@@ -1737,7 +1739,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual bool setOption( const String& strKey, const void* pValue )
         { (void)strKey; (void)pValue; return false; }
@@ -1753,12 +1755,12 @@ namespace Ogre {
                 On success, true is returned and pDestValue points to the value of the given
                 option.
             @par
-                On failiure, false is returned and pDestValue is set to NULL.
+                On failure, false is returned and pDestValue is set to NULL.
         */
         virtual bool getOption( const String& strKey, void* pDestValue )
         { (void)strKey; (void)pDestValue; return false; }
 
-        /** Method for verifying wether the scene manager has an implementation-specific
+        /** Method for verifying whether the scene manager has an implementation-specific
             option.
             @param
                 strKey The name of the option to check for.
@@ -1791,7 +1793,7 @@ namespace Ogre {
             @param
                 refKeys A reference to a list that will be filled with all the available options.
             @return
-                On success, true is returned. On failiure, false is returned.
+                On success, true is returned. On failure, false is returned.
         */
         virtual bool getOptionKeys( StringVector& refKeys )
         { (void)refKeys; return false; }
@@ -3542,6 +3544,8 @@ namespace Ogre {
 
         /** Handle lod events. */
         void _handleLodEvents();
+
+		IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
     };
 
     /** Default implementation of IntersectionSceneQuery. */
@@ -3665,6 +3669,6 @@ namespace Ogre {
 
 } // Namespace
 
-
+#include "OgreHeaderSuffix.h"
 
 #endif

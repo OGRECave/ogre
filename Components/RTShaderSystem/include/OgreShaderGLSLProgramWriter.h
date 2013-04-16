@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -87,10 +87,10 @@ protected:
 	void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 protected:
-	typedef	std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef	std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
-	typedef	std::map<Parameter::Content, const char*>	ParamContentToStringMap;
-	typedef	std::map<String, String>					StringMap;
+	typedef	map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
+	typedef	map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
+	typedef	map<Parameter::Content, const char*>::type	ParamContentToStringMap;
+	typedef	map<String, String>::type					StringMap;
 
 	// Attributes.
 protected:

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, GLSupport& support) 
         : Texture(creator, name, handle, group, isManual, loader),
-        mTextureID(0), mGLSupport(support)
+        mTextureID(0)
     {
     }
 
@@ -135,7 +135,7 @@ namespace Ogre {
         
 		// This needs to be set otherwise the texture doesn't get rendered
 		if (GLEW_VERSION_1_2)
-			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );
+			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
         glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -149,20 +149,7 @@ namespace Ogre {
 		// If we can do automip generation and the user desires this, do so
 		mMipmapsHardwareGenerated = 
 			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
-		// NVIDIA 175.16 drivers break hardware mip generation for non-compressed
-		// textures - disable until fixed
-		// Leave hardware gen on compressed textures since that's the only way we
-		// can realistically do it since GLU doesn't support DXT
-		// However DON'T do this on Apple, their drivers aren't subject to this
-		// problem yet and in fact software generation appears to cause a crash 
-		// in some cases which I've yet to track down
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
-		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_NVIDIA
-			&& !PixelUtil::isCompressed(mFormat))
-		{
-			mMipmapsHardwareGenerated = false;
-		}
-#endif
+
 		if((mUsage & TU_AUTOMIPMAP) &&
 		    mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
@@ -214,6 +201,8 @@ namespace Ogre {
 								size, tmpdata);
 						}
 						break;
+                    case TEX_TYPE_2D_RECT:
+                        break;
 				};
 				if(width>1)
                     width = width/2;
@@ -256,6 +245,8 @@ namespace Ogre {
 								GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						}
 						break;
+                    case TEX_TYPE_2D_RECT:
+                        break;
 				};
 				if(width>1)
                     width = width/2;
@@ -317,7 +308,6 @@ namespace Ogre {
             // If this is a volumetric texture set the texture type flag accordingly.
             if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
-
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
@@ -377,6 +367,13 @@ namespace Ogre {
 
         _loadImages(imagePtrs);
 
+
+        // Generate mipmaps after all texture levels have been loaded
+        // This is required for compressed formats such as DXT
+        if (mUsage & TU_AUTOMIPMAP)
+        {
+            glGenerateMipmapEXT(getGLTextureTarget());
+        }
     }
 
 	//*************************************************************************

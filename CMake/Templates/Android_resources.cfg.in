@@ -9,12 +9,14 @@ APKFileSystem=/thumbnails
 [Popular]
 APKFileSystem=/fonts
 APKFileSystem=/materials/programs
+APKFileSystem=/materials/programs/GLSLES
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
 APKFileSystem=/materials/textures/nvidia
 APKFileSystem=/models
 APKFileSystem=/particle
 APKFileSystem=/RTShaderLib
+APKFileSystem=/RTShaderLib/GLSLES
 APKFileSystem=/RTShaderLib/materials
 APKFileSystem=/materials/scripts/SSAO
 APKFileSystem=/materials/textures/SSAO

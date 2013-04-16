@@ -34,6 +34,7 @@ set (HEADER_FILES
   include/OgreShaderExNormalMapLighting.h
   include/OgreShaderExPerPixelLighting.h
   include/OgreShaderExIntegratedPSSM3.h
+  include/OgreShaderExTriplanarTexturing.h
   include/OgreShaderScriptTranslator.h
   include/OgreShaderMaterialSerializerListener.h
   include/OgreShaderProgramProcessor.h
@@ -74,6 +75,7 @@ set (SOURCE_FILES
   src/OgreShaderExNormalMapLighting.cpp
   src/OgreShaderExPerPixelLighting.cpp
   src/OgreShaderExIntegratedPSSM3.cpp
+  src/OgreShaderExTriplanarTexturing.cpp
   src/OgreShaderScriptTranslator.cpp
   src/OgreShaderMaterialSerializerListener.cpp
   src/OgreShaderProgramProcessor.cpp
@@ -98,24 +100,11 @@ set (SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 ogre_add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION})
+set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreRTShaderSystem OgreMain)
 
+ogre_config_framework(OgreRTShaderSystem)
 ogre_config_component(OgreRTShaderSystem)
-
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    # Set the INSTALL_PATH so that Components can be installed in the application package
-    set_target_properties(OgreRTShaderSystem
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Components"
-    )
-
-	# Copy headers into the main Ogre framework
-	add_custom_command(TARGET OgreRTShaderSystem POST_BUILD
-	  COMMAND ditto ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/
-	)
-endif()
-
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/RTShaderSystem

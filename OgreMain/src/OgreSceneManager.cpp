@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,8 +43,6 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgreOverlay.h"
-#include "OgreOverlayManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"
@@ -92,6 +90,7 @@ SceneManager::SceneManager(const String& name) :
 mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
+mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
 mSceneRoot(0),
 mSkyPlaneEntity(0),
@@ -936,6 +935,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			pass = lateTech->getPass(pass->getIndex());
 		}
+		else
+        {
+            pass = lateTech->getPass(0);
+        }
 		//Should we warn or throw an exception if an illegal state was achieved?
 	}
 
@@ -1395,6 +1398,22 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		// Lock scene graph mutex, no more changes until we're ready to render
 		OGRE_LOCK_MUTEX(sceneGraphMutex)
 
+		// Update scene graph for this camera (can happen multiple times per frame)
+		{
+			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
+			_updateSceneGraph(camera);
+
+			// Auto-track nodes
+			AutoTrackingSceneNodes::iterator atsni, atsniend;
+			atsniend = mAutoTrackingSceneNodes.end();
+			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+			{
+				(*atsni)->_autoTrack();
+			}
+			// Auto-track camera if required
+			camera->_autoTrack();
+		}
+
 		if (mIlluminationStage != IRS_RENDER_TO_TEXTURE && mFindVisibleObjects)
 		{
 			// Locate any lights which could be affecting the frustum
@@ -1423,22 +1442,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 					mCurrentViewport = vp;
 				}
 			}
-		}
-
-		// Update scene graph for this camera (can happen multiple times per frame)
-		{
-			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
-			_updateSceneGraph(camera);
-
-			// Auto-track nodes
-			AutoTrackingSceneNodes::iterator atsni, atsniend;
-			atsniend = mAutoTrackingSceneNodes.end();
-			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
-			{
-				(*atsni)->_autoTrack();
-			}
-			// Auto-track camera if required
-			camera->_autoTrack();
 		}
 
 		// Invert vertex winding?
@@ -1508,11 +1511,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 			firePostFindVisibleObjects(vp);
 
 			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-		}
-		// Add overlays, if viewport deems it
-		if (vp->getOverlaysEnabled() && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
-		{
-			OverlayManager::getSingleton()._queueOverlaysForRendering(camera, getRenderQueue(), vp);
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
@@ -5807,7 +5805,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+            0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? incrOp : SOP_KEEP, // back face depth fail
             zfail ? SOP_KEEP : decrOp, // back face pass
@@ -5820,7 +5819,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+			0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? decrOp : SOP_KEEP, // front face depth fail
             zfail ? SOP_KEEP : incrOp, // front face pass

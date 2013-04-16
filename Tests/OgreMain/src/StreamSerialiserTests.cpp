@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( StreamSerialiserTests );
 
 void StreamSerialiserTests::setUp()
@@ -45,7 +45,7 @@ void StreamSerialiserTests::tearDown()
 
 void StreamSerialiserTests::testWriteBasic()
 {
-	FileSystemArchive arch("./", "FileSystem");
+	FileSystemArchive arch("./", "FileSystem", false);
 	arch.load();
 
 	String fileName = "testSerialiser.dat";

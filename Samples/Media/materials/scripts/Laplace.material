@@ -10,8 +10,15 @@ fragment_program Ogre/Compositor/Laplace_GLSLES_FP glsles
 	source LaplaceFP.glsles
 }
 
+fragment_program Ogre/Compositor/Laplace_GLSL_FP glsl
+{
+	source LaplaceFP.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/LaplaceFP unified
 {
+	delegate Ogre/Compositor/Laplace_GLSL_FP
 	delegate Ogre/Compositor/Laplace_GLSLES_FP
 	delegate Ogre/Compositor/Laplace_Cg_FP
 }
@@ -26,6 +33,7 @@ material Ogre/Compositor/Laplace
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{

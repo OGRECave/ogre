@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,6 +66,24 @@ using namespace Ogre;
 
     // Return if the orientation is not a valid interface orientation(face up, face down)
     if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
+        return;
+
+    // Check if orientation is supported
+    NSString *rotateToOrientation = @"";
+    if(deviceOrientation == UIInterfaceOrientationPortrait)
+        rotateToOrientation = @"UIInterfaceOrientationPortrait";
+    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
+
+    NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+    BOOL supported = [supportedOrientations containsObject:rotateToOrientation];
+
+    if (!supported)
         return;
 
     // Get the window using the name that we saved

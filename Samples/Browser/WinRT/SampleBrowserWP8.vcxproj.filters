@@ -1,0 +1,1661 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>17b52f90-9b33-4188-8a0e-808582bbabbc</UniqueIdentifier>
+      <Extensions>ico;bmp;dlg;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;resw;resjson</Extensions>
+    </Filter>
+    <Filter Include="Assets\for WMAppManifest">
+      <UniqueIdentifier>{280d73fa-b6d5-4b44-b995-ed59864820dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\cfg">
+      <UniqueIdentifier>{4e08b79f-d84c-44be-b8c4-f524f99638ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\media">
+      <UniqueIdentifier>{90fe3add-170c-4665-a567-9ea52e841064}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="WMAppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SampleBrowserWinRT.cpp" />
+    <ClCompile Include="..\..\..\OgreMain\src\WIN32\OgreFileSystemLayer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Logo.png">
+      <Filter>Assets\for WMAppManifest</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Assets\for WMAppManifest</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.png">
+      <Filter>Assets\for WMAppManifest</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OGRE.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="OGRE_D.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="PLUGINS.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="PLUGINS_D.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="RESOURCES.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="RESOURCES_D.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="SAMPLES.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="SAMPLES_D.CFG">
+      <Filter>Assets\cfg</Filter>
+    </None>
+    <None Include="cache.bin">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="cache_d.bin">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowDS_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowNormal_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\vs.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\ASCII.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\BlackAndWhite.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Bloom.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Bloom2.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CreaseShading.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Crytek.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Dither.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\DOF.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\DualQuaternion.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Embossed.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Example_FresnelPS.asm">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Example_TextureArrayPS.asm">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Example_TextureArrayPS.hlsl4">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples-Advanced.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GBuffer.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GBuffer.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GBufferFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Glass.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Halftone.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\hdr.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\HeatVision.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HemisphereMC.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HorizonBased.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\instancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Instancing.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Invert.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\IsoSurf.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Laplace.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Modulate.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Modulate.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ModulateFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\MotionBlur.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\MRTtest.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\NightVision.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Ocean.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\OffsetMapping.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\OffsetMapping_specular.asm">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Ogre.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\OldMovie.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\OldTV.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\ParticleGS.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Posterize.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\pssm.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\RadialBlur.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\RasterizationOrder.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\shadows.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SharpenEdges.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowDepth.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowNormals.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowViewPos.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\SSAO.compositor">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\SSAOPost.compositor">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\SSAOPost.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\StdQuad_vp.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Swizzle.gp">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Tesselation.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Tiling.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReference.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReference.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReferencePS.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReferencePS.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReferenceVS.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\triplanarReferenceVS.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\UnsharpMask.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\UnsharpMask.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\UnsharpMaskFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\volumeTerrain.cfg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Volumetric.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\depthshadowobject.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Grass.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\GrayScale.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\HalftoneFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\hdr.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\HeatVision.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\HW_VTFInstancing.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\HWBasicInstancing.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\instancing.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Instancing_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\InstancingMisc.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\InstancingVertexInterpolators.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\InvertFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\isosurf.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\LaplaceFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\NightVisionFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Ocean2HLSL_Cg.frag">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Ocean2HLSL_Cg.vert">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\oceanHLSL_Cg.frag">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\oceanHLSL_Cg.vert">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\OffsetMapping.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\OldMovieFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\OldTV.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\ParticleGS.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\PassthroughFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\PassthroughFP_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\PosterizeFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\pssm.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Radial_Blur_FP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\ShaderInstancing.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\shadows.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\SharpenEdgesFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\StdQuad_vp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\SwizzleGP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\TilingFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\varianceshadowcasterfp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\varianceshadowcastervp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\varianceshadowreceiverfp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\varianceshadowreceivervp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\VTFInstancing.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\ASCIIFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Combine_fp.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Common.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\DitherFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\DOF_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\DualQuaternion.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\DualQuaternion_Common.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_Basic.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_Basic_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_BumpMapping.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_CelShading.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_Fresnel.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_Projection.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\Example_TextureArrayVS.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\Cg\GlassFP.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao_blury_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao_vs.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\materials\TriplanarTexturing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\Ambient_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\deferred_post.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_vs.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster_fp.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster_vp.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowColour_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowDS_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowNormal_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao_blurx_ps.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\vs.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\volumeTerrain\volumeTerrainBig.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\Ambient_ps_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\BoxFilterFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CreaseShadingFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CrossBilateralFilterXFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CrossBilateralFilterYFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CrytekFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GaussianBlurXFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GaussianBlurYFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GBuffer.program">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\GBufferVP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HemisphereMCFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HorizonBasedFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_ps_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_vs_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\NoFilterFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowColour_ps_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowDepthFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowDS_ps_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowNormal_ps_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowNormalsFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowViewPosFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\SmartBoxFilterFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ssao_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\VolumetricFP.glsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\vs_sm4.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\cubemap.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\cubemapsJS.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\dragon.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\particle\emitted_emitter.particle">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\particle\Examples.particle">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\particle\Examples-Water.particle">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\fresneldemo.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\ogredance.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\ogretestmap.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\profiler.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\skybox.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\particle\smoke.particle">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\terrain.cfg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\athene.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\Barrel.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\chiropteraDM.pk3">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\column.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\cornell.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\cube.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\facial.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\fish.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\fish.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\geosphere4500.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\geosphere8000.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\jaiqua.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\jaiqua.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\knot.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\ninja.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\ninja.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\ogrehead.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\penguin.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\penguin.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\razor.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\robot.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\robot.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\RZR-002.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\SdkTrays.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\ShaderSystem.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\sibenik.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\Sinbad.zip">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\sphere.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\spine.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\spine.mesh.skeleton">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\tudorhouse.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\models\WoodPallet.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogregui.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\rockwall.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\rockwall_NH.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\facial.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\grassWalpha.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\HeatLookup.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\HeatNoise.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NPRMetallic.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Sepia1D.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\ShaderInstancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\ShaderSystem.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\sibenik.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\smoke.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\TextureAtlasSampleOrg.tai">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\TextureAtlasSampleWrap.tai">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\VarianceShadowmap.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Volumetric.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\VTFInstancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\WaterNormal1.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\WaterNormal2.tga">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\ASMSwizzle.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\CGSwizzle.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\CompositorDemo.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\CreaseShading.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\Crytek.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\DepthShadowmap.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\DualQuaternion.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples.compositor">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples-DynTex.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Examples-Water.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Example-Water.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\GLSLSwizzle.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HemisphereMC.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\HorizonBased.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Hurt.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\HW_VTF_LUTInstancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\HW_VTFInstancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\HWInstancing.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\InstancingMisc.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Ocean.controls">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\Penguin.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\RZR-002.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowDepth.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowNormals.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\ShowViewPos.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\scripts\SSAO\SSAOPost.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\materials\DualQuaternionSkinning_Shadow.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\materials\HardwareSkinningShadow.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nzpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_pxnynz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_pxpynz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_pxpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\materials\RTShaderSystem.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\terrain2.cfg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\Ambient_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\building_exterior.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\COPYING">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\deferred.compositor">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\deferred_post.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\deferred_post_minilight.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\deferreddemo.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\LightMaterial_vs.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_NX.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxnynz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpx.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpxnypynzpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpxnz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpxnzpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpxpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpynz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nxpz.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_NY.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nypy.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\room_nypy_4y.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_NZ.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_PX.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_PY.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\ROOM_PZ.mesh">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\ShadowCaster.material">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\DeferredShadingMedia\DeferredShading\post\ShowColour_ps.cg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\WoodPallet.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\10points.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\1d_debug.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\1D_Noise.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\1D_Noise2.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\1d_SPIRAL.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\4InterleavedKMeansDisk8x4.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\8x8PagesSplotches2.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ASCII.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\atheneNormalMap.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\aureola.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\basic_droplet.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\BeachStones.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Bloom2_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Bloom2_ps40.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Bloom_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Bloom_vs11.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\blue_jaiqua.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur0_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur0_vs11.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur1_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur1_vs11.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur_vs11.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Blur_vs40.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BlurH_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BlurH_ps40.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BlurV_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BlurV_ps40.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BrightBloom2_ps20.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\BrightBloom2_ps40.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\BumpyMetal.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Carpet_Diamond_Olive.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\cel_shading_diffuse.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\cel_shading_edge.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\cel_shading_specular.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\checker.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\packs\chiropteraDM.txt">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Chrome.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\circuit.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\clouds.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\CMakeLists.txt">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\cursor.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\dark_grid.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\DepthShadowmap.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Dirt.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\dirt01.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\dirt_grayrocky_diffusespecular.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\dirt_grayrocky_normalheight.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\dkyellow.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Dr_Bunsen_Head.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\droplet.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\cache\dummy.txt">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\egyptrockyfull.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Example_Basic.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\FFPLib_Common.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\FFPLib_Fog.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\FFPLib_Lighting.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\FFPLib_Texturing.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\FFPLib_Transform.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\flare.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\flare_alpha.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\flaretrail.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\frost.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\fw12b.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\GLX_icon.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\gras_02.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\grass_1024.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\grass_green-01_diffusespecular.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\grass_green-01_normalheight.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\gray256.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\GreenSkin.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\growth_weirdfungus-03_diffusespecular.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\growth_weirdfungus-03_normalheight.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\hdr.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\hdrutils.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\img1.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\img2.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\importance4InterleavedSphereHemisphere8x4.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\isosurf.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\KAMEN-stup.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\KAMEN320x240-bump.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\KAMEN320x240.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\leaf.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\LowRes.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Brass_Ceiling.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Embossed.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Rusted.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Rusted1.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Steel_Textured.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Metal_Steel_Textured_White.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\MRAMOR-bump.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\MRAMOR6X6.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\mrttestfp.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\MtlPlat2.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_bk.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_dn.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_fr.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_lf.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_rt.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nm_up.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NMBalls.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NMBumpsOut.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NMHollyBumps.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NMStripes.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\NoiseVolume.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\normalNoiseColor.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nskingr.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\OffsetMapping.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogreborder.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogrebordercenter.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogreborderUp.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogrelogo-small.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ogrelogo.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Panels_Diffuse.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Panels_Normal_Obj.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Panels_Normal_Tangent.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Panels_reflection.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Panels_refmask.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\particle.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\ParticleGS.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\particlesgs.fx">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\penguin.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\perlinvolume.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\pssm.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\r2skin.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\radial.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Radial_Blur_FP.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\rand1x32.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\randCosSinJitter4x4.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\random.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Random3D.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SSAO\regularSphereJittered4.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\ribbonband.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Roofing_Tile_Spanish.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\RustedMetal.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\RustyBarrel.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\RustySteel.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\RZR-002.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SampleLib_InstancedViewports.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SampleLib_ReflectionMap.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-back.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-down-p.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-down.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-thumb.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-up-p.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\scr-up.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SegmentedPerPixelLighting.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_IntegratedPSSM.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_LayeredBlending.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_NormalMapLighting.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_PerPixelLighting.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_TextureAtlas.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\RTShaderLib\HLSL\SGXLib_TriplanarTexturing.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\SmallLeaf_BP.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\smoke.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\smokecolors.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\snow_1024.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\spacesky.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\spheremap.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\spine_strips.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\spotlight_image.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\StdQuad_vp.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\steelhead.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\strugotine.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terr_dirt-grass.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terr_rock-dirt.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terr_rock6.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terrain.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\terrain2.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terrain_detail.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\terrain_texture.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\programs\HLSL\Tesselation.hlsl">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\texmap2.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\TextureAtlasSampleOrg0.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\TextureAtlasSampleWrap0.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\nvidia\TextureUsageAgreement.txt">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_bezier.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_bsp.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_bump.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_camtrack.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_cel.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_char.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_comp.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_cubemap.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_deferred.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_dualquaternionskinning.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_dyntex.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_error.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_facial.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_fresnel.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_grass.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_instancing.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_isosurf.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_lighting.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_meshlod.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_newinstancing.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_ocean.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_particlegs.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_particles.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_playpen.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_shadersystem.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_shadersystemmultilight.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_shadows.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_skelanim.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_skybox.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_skydome.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_skyplane.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_smoke.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_spheremap.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_ssao.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_terrain.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_tesselation.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_texarray.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_texfx.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_texturedfog.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_trans.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_visual_tests.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_voltex.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_volumecsg.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_volumeterrain.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\thumbnails\thumb_water.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Translucent_Glass_Tinted.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Translucent_Glass_Tinted1.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\tusk.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Water01.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\Water02.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\waveNM.png">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\waves2.dds">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\materials\textures\white.bmp">
+      <Filter>Assets\media</Filter>
+    </None>
+    <None Include="..\..\Media\PCZAppMedia\Wood_Floor.jpg">
+      <Filter>Assets\media</Filter>
+    </None>
+  </ItemGroup>
+</Project>

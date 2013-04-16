@@ -2,7 +2,7 @@
 #define __BSP_H__
 
 #include "SdkSample.h"
-#include "FileSystemLayer.h"
+#include "OgreFileSystemLayer.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -22,6 +22,20 @@ public:
 			"Also demonstrates how to load BSP maps from Quake 3.";
 		mInfo["Thumbnail"] = "thumb_bsp.png";
 		mInfo["Category"] = "Geometry";
+	}
+
+    void testCapabilities(const RenderSystemCapabilities* caps)
+	{
+        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
+        {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
+                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
+        }
+		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"))
+		{
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
+						"so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
+		}
 	}
 
 	StringVector getRequiredPlugins()
@@ -57,6 +71,11 @@ protected:
 	void createSceneManager()
 	{
 		mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
+#ifdef USE_RTSHADER_SYSTEM
+		mShaderGenerator->addSceneManager(mSceneMgr);
+#endif
+		if(mOverlaySystem)
+			mSceneMgr->addRenderQueueListener(mOverlaySystem);
 	}
 
 	void loadResources()

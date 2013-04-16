@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -223,7 +223,12 @@ namespace Ogre {
 
         String startOfThis = str.substr(0, patternLen);
         if (lowerCase)
+		{
+			String lowerCasePattern = pattern;
+            StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(startOfThis);
+			return (startOfThis == lowerCasePattern);
+		}
 
         return (startOfThis == pattern);
     }
@@ -237,7 +242,12 @@ namespace Ogre {
 
         String endOfThis = str.substr(thisLen - patternLen, patternLen);
         if (lowerCase)
+		{
+			String lowerCasePattern = pattern;
+            StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(endOfThis);
+			return (endOfThis == lowerCasePattern);
+		}
 
         return (endOfThis == pattern);
     }

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
+    namespace GLSL {
 
     //-----------------------------------------------------------------------
 	GLSLProgram::CmdPreprocessorDefines GLSLProgram::msCmdPreprocessorDefines;
@@ -160,6 +161,10 @@ namespace Ogre {
 			case GPT_GEOMETRY_PROGRAM:
 				shaderType = GL_GEOMETRY_SHADER_EXT;
 				break;
+            case GPT_COMPUTE_PROGRAM:
+            case GPT_DOMAIN_PROGRAM:
+            case GPT_HULL_PROGRAM:
+                break;
 			}
 			mGLHandle = glCreateShaderObjectARB(shaderType);
 		}
@@ -209,7 +214,9 @@ namespace Ogre {
 	{
 		if (isSupported())
 		{
-			glDeleteObjectARB(mGLHandle);
+			glDeleteObjectARB(mGLHandle);			
+			mCompiled = 0;
+			mGLHandle = 0;
 		}
 	}
 
@@ -517,5 +524,5 @@ namespace Ogre {
 		t->setMaxOutputVertices(StringConverter::parseInt(val));
 	}
 
-  
+}
 }

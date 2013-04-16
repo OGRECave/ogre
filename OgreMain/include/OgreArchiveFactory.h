@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define _ArchiveFactory_H__
 
 #include "OgrePrerequisites.h"
-
 #include "OgreFactoryObj.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -60,11 +60,21 @@ namespace Ogre {
     {
     public:
         virtual ~ArchiveFactory() {}
-        // No methods, must just override all methods inherited from FactoryObj
+        /** Creates a new object.
+        @param name Name of the object to create
+        @return
+            An object created by the factory. The type of the object depends on
+            the factory.
+        */
+        virtual Archive* createInstance(const String& name, bool readOnly) = 0;
+
+        virtual Archive* createInstance(const String& name) { return createInstance(name, true); }
     };
 	/** @} */
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

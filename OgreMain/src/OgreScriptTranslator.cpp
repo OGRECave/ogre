@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDepthBuffer.h"
+#include "OgreRoot.h"
 
 namespace Ogre{
 	
@@ -427,6 +428,19 @@ namespace Ogre{
 				return false;
 
 			*op = (GpuConstantType)(GCT_FLOAT1 + count - 1);
+		}
+		else if(val.find("double") != String::npos)
+		{
+			int count = 1;
+			if (val.size() == 6)
+				count = StringConverter::parseInt(val.substr(5));
+			else if (val.size() > 6)
+				return false;
+
+			if (count > 4 || count == 0)
+				return false;
+
+			*op = (GpuConstantType)(GCT_DOUBLE1 + count - 1);
 		}
 		else if(val.find("int") != String::npos)
 		{
@@ -2717,9 +2731,17 @@ namespace Ogre{
 									switch(atom->id)
 									{
 									case ID_1D:
-										texType = TEX_TYPE_1D;
-										break;
-									case ID_2D:
+										// fallback to 2d texture if 1d is not supported
+										{
+											// Use the current render system
+											RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+											if (rs->getCapabilities()->hasCapability(RSC_TEXTURE_1D))
+											{
+												texType = TEX_TYPE_1D;
+												break;
+											}
+										}									case ID_2D:
 										texType = TEX_TYPE_2D;
 										break;
 									case ID_3D:
@@ -3176,7 +3198,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							bool enabled;
+							bool enabled = false;
 							switch(atom->id)
 							{
 							case ScriptCompiler::ID_ON:
@@ -3208,7 +3230,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							CompareFunction func;
+							CompareFunction func = CMPF_GREATER_EQUAL;
 							switch(atom->id)
 							{
 							case ID_ALWAYS_FAIL:
@@ -4666,13 +4688,37 @@ namespace Ogre{
 										"incorrect subroutine declaration");
 								}
 							}
+							else if (atom1->value == "atomic_counter")
+							{
+//								String s;
+//								if (getString(*k, &s))
+//								{
+//									try
+//									{
+//										if (named)
+//											params->setNamedSubroutine(name, s);
+//										else
+//											params->setSubroutine(index, s);
+//									}
+//									catch(...)
+//									{
+//										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+//                                                           "setting subroutine parameter failed");
+//									}
+//								}
+//								else
+//								{
+//									compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+//                                                       "incorrect subroutine declaration");
+//								}
+							}
 							else
 							{
 								// Find the number of parameters
 								bool isValid = true;
 								GpuProgramParameters::ElementType type = GpuProgramParameters::ET_REAL;
 								int count = 0;
-								if(atom1->value.find("float") != String::npos)
+								if(atom1->value.find("float") != String::npos || atom1->value.find("double") != String::npos)
 								{
 									type = GpuProgramParameters::ET_REAL;
 									if(atom1->value.size() >= 6)

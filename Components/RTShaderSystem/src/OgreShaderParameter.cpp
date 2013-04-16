@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -237,6 +237,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR,        		"surface_specular_colour",				GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR,        		"surface_emissive_colour",				GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_SHININESS,              		"surface_shininess",					GCT_FLOAT1),
+		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE,         "surface_alpha_rejection_value",		GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_COUNT,                   			"light_count",                  		GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR,          			"ambient_light_colour",         		GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR,          			"light_diffuse_colour",         		GCT_FLOAT4),

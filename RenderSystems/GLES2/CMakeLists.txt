@@ -22,17 +22,20 @@ set(HEADER_FILES
   include/OgreGLES2HardwareIndexBuffer.h
   include/OgreGLES2HardwareOcclusionQuery.h
   include/OgreGLES2HardwarePixelBuffer.h
+  include/OgreGLES2HardwareUniformBuffer.h
   include/OgreGLES2HardwareVertexBuffer.h
   include/OgreGLES2PixelFormat.h
   include/OgreGLES2Plugin.h
   include/OgreGLES2Prerequisites.h
   include/OgreGLES2RenderSystem.h
   include/OgreGLES2RenderTexture.h
+  include/OgreGLES2RenderToVertexBuffer.h
+  include/OgreGLES2StateCacheManager.h
   include/OgreGLES2Support.h
   include/OgreGLES2Texture.h
   include/OgreGLES2TextureManager.h
+  include/OgreGLES2UniformCache.h
   include/OgreGLES2VertexDeclaration.h
-  include/OgreGLES2Context.h
 )
 
 set(SOURCE_FILES
@@ -49,16 +52,45 @@ set(SOURCE_FILES
   src/OgreGLES2HardwareIndexBuffer.cpp
   src/OgreGLES2HardwareOcclusionQuery.cpp
   src/OgreGLES2HardwarePixelBuffer.cpp
+  src/OgreGLES2HardwareUniformBuffer.cpp
   src/OgreGLES2HardwareVertexBuffer.cpp
   src/OgreGLES2PixelFormat.cpp
   src/OgreGLES2Plugin.cpp
   src/OgreGLES2RenderSystem.cpp
   src/OgreGLES2RenderTexture.cpp
+  src/OgreGLES2RenderToVertexBuffer.cpp
+  src/OgreGLES2StateCacheManager.cpp
   src/OgreGLES2Support.cpp
   src/OgreGLES2Texture.cpp
   src/OgreGLES2TextureManager.cpp
+  src/OgreGLES2UniformCache.cpp
   src/OgreGLES2VertexDeclaration.cpp
 )
+
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
+  set(HEADER_FILES
+      ${HEADER_FILES}
+      src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
+      src/StateCacheManager/OgreGLES2UniformCacheImp.h
+  )
+  set(SOURCE_FILES
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
+  )
+else()
+  set(HEADER_FILES
+      ${HEADER_FILES}
+      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
+  )
+  set(SOURCE_FILES
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
+  )
+endif()
 
 set(GLSLES_FILES
   src/GLSLES/include/OgreGLSLESExtSupport.h
@@ -86,16 +118,20 @@ set(GLSLES_FILES
 )
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
-  set(GLSLES_FILES 
+  set(GLSLES_FILES
     src/GLSLES/src/OgreGLSLESCgProgram.cpp
     src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
     ${GLSLES_FILES}
   )
 endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
+if(NOT OPENGLES3_FOUND)
+  set(OPENGLES3_INCLUDE_DIR "")
+endif()
+
 # Add system specific settings
 if (OGRE_BUILD_PLATFORM_NACL)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/NaCl/OgreGLES2Util.h
     include/NaCl/OgreNaClGLContext.h
     include/NaCl/OgreNaClGLSupport.h
@@ -109,7 +145,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   include_directories(src/NaCl include/NaCl)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EGL/WIN32/OgreWin32EGLContext.h
     include/EGL/WIN32/OgreWin32EGLSupport.h
     include/EGL/WIN32/OgreWin32EGLRenderTexture.h
@@ -131,10 +167,14 @@ elseif (WIN32)
     src/EGL/OgreEGLWindow.cpp
   )
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
-  link_directories(${OPENGLES2_LIBRARY_PATH})
+  if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+    link_directories(${OPENGLES3_LIBRARY_PATH})
+  else()
+    link_directories(${OPENGLES2_LIBRARY_PATH})
+  endif()
   set(PLATFORM_HEADER_INSTALL "WIN32")
 elseif (ANDROID)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EGL/Android/OgreAndroidEGLContext.h
     include/EGL/Android/OgreAndroidEGLSupport.h
     include/EGL/Android/OgreAndroidEGLWindow.h
@@ -159,10 +199,14 @@ elseif (ANDROID)
   )
 
   include_directories(src/EGL/Android include/EGL/Android)
-  link_directories(${OPENGLES2_LIBRARY_PATH})
+  if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+    link_directories(${OPENGLES3_LIBRARY_PATH})
+  else()
+    link_directories(${OPENGLES2_LIBRARY_PATH})
+  endif()
   set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (APPLE)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EAGL/OgreEAGLES2Context.h
     include/EAGL/OgreEAGL2Support.h
     include/EAGL/OgreEAGL2View.h
@@ -216,11 +260,11 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include
   ${CMAKE_SOURCE_DIR}/Components/RTShaderSystem/include
-  ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
+  ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
 ogre_add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSLES_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
-target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_GLES2 PROPERTIES
@@ -229,7 +273,7 @@ if (NOT OGRE_STATIC)
 endif ()
 
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GLES2 ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GLES2 ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_plugin(RenderSystem_GLES2)

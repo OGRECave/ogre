@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,20 @@ namespace Ogre {
         return NULL;
     }
 
-    std::string macBundlePath()
+    String macTempFileName()
+    {
+        NSString *tempFilePath;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        for (;;) {
+            NSString *baseName = [NSString stringWithFormat:@"tmp-%x", arc4random()];
+            tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:baseName];
+            if (![fileManager fileExistsAtPath:tempFilePath])
+                break;
+        }
+        return String([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
+    }
+
+    String macBundlePath()
     {
         char path[PATH_MAX];
         CFBundleRef mainBundle = CFBundleGetMainBundle();
@@ -57,18 +70,18 @@ namespace Ogre {
         CFRelease(mainBundleURL);
         CFRelease(cfStringRef);
         
-        return std::string(path);
+        return String(path);
     }
     
-    std::string iOSDocumentsDirectory()
+    String iOSDocumentsDirectory()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         
-        return std::string([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
+        return String([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
     }
 
-    std::string macCachePath()
+    String macCachePath()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];

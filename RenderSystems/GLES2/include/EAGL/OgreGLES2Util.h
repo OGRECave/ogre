@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,13 @@
 #define __GLES2Util_H__
 
 #include "OgreEAGL2Support.h"
+
+#if defined(__APPLE__)
+#define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
+    if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
+#else
+#define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers)
+#endif
 
 namespace Ogre {
     inline GLES2Support* getGLSupport()

@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreGLESPixelFormat.h"
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESHardwarePixelBuffer.h"
-
+#include "OgreGLESStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -83,20 +83,30 @@ namespace Ogre {
 
     GLenum GLESTexture::getGLESTextureTarget(void) const
     {
-        return GL_TEXTURE_2D;
+        switch(mTextureType)
+        {
+            case TEX_TYPE_1D:
+            case TEX_TYPE_2D:
+                return GL_TEXTURE_2D;
+#ifdef GL_OES_texture_cube_map
+            case TEX_TYPE_CUBE_MAP:
+                return GL_TEXTURE_CUBE_MAP_OES;
+#endif
+            default:
+                return 0;
+        };
     }
 
-    // Creation / loading methods
-    void GLESTexture::createInternalResourcesImpl(void)
+    void GLESTexture::_createGLTexResource()
     {
-		// Convert to nearest power-of-two size if required
+        // Convert to nearest power-of-two size if required
         mWidth = GLESPixelUtil::optionalPO2(mWidth);
         mHeight = GLESPixelUtil::optionalPO2(mHeight);
         mDepth = GLESPixelUtil::optionalPO2(mDepth);
-
+        
 		// Adjust format if required
-        mFormat = TextureManager::getSingleton().getNativeFormat(TEX_TYPE_2D, mFormat, mUsage);
-
+        mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
+        
 		// Check requested number of mipmaps
         size_t maxMips = GLESPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
         
@@ -106,40 +116,38 @@ namespace Ogre {
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
-
+        
 		// Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
-
+        
 		// Set texture type
-        glBindTexture(GL_TEXTURE_2D, mTextureID);
-        GL_CHECK_ERROR;
-
+        mGLSupport.getStateCacheManager()->bindGLTexture(getGLESTextureTarget(), mTextureID);
+        
         // Set some misc default parameters, these can of course be changed later
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
-
+        Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+        
         if ((mUsage & TU_AUTOMIPMAP) &&
             mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
-            glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+            glTexParameteri(getGLESTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE);
             GL_CHECK_ERROR;
         }
-
+        
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLESPixelUtil::getGLOriginFormat(mFormat);
@@ -148,45 +156,63 @@ namespace Ogre {
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
-
+        
         if (PixelUtil::isCompressed(mFormat))
         {
-//            LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
-//                                                  " Width: " + StringConverter::toString(width) +
-//                                                  " Height: " + StringConverter::toString(height) +
-//                                                  " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
-//                                                  " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
-//                                                  " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
-//                                                  );
-
+            //            LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
+            //                                                  " Width: " + StringConverter::toString(width) +
+            //                                                  " Height: " + StringConverter::toString(height) +
+            //                                                  " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
+            //                                                  " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
+            //                                                  " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
+            //                                                  );
+            
             // Compressed formats
             size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
+            
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
-
+            
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
-
-                glCompressedTexImage2D(GL_TEXTURE_2D,
-                                       mip,
-                                       internalformat,
-                                       width, height,
-                                       0,
-                                       size,
-                                       tmpdata);
-                GL_CHECK_ERROR;
-
-//                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(format)
-//                                                      );
-
+                
+                switch(mTextureType)
+				{
+					case TEX_TYPE_1D:
+					case TEX_TYPE_2D:
+                        glCompressedTexImage2D(GL_TEXTURE_2D,
+                                               mip,
+                                               internalformat,
+                                               width, height,
+                                               0,
+                                               size,
+                                               tmpdata);
+                        GL_CHECK_ERROR;
+                        break;
+#ifdef GL_OES_texture_cube_map
+                    case TEX_TYPE_CUBE_MAP:
+						for(int face = 0; face < 6; face++) {
+							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
+                                                   width, height, 0,
+                                                   size, tmpdata);
+                            GL_CHECK_ERROR;
+						}
+						break;
+#endif
+                    default:
+                        break;
+                };
+                
+                //                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
+                //                                                      " Width: " + StringConverter::toString(width) +
+                //                                                      " Height: " + StringConverter::toString(height) +
+                //                                                      " Internal Format: " + StringConverter::toString(format)
+                //                                                      );
+                
                 if(width > 1)
                 {
                     width = width / 2;
@@ -207,15 +233,32 @@ namespace Ogre {
             // Run through this process to pregenerate mipmap pyramid
             for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
-                glTexImage2D(GL_TEXTURE_2D,
-                             mip,
-                             internalformat,
-                             width, height,
-                             0,
-                             format,
-                             datatype, 0);
-                GL_CHECK_ERROR;
-
+                switch(mTextureType)
+				{
+					case TEX_TYPE_1D:
+					case TEX_TYPE_2D:
+                        glTexImage2D(GL_TEXTURE_2D,
+                                     mip,
+                                     internalformat,
+                                     width, height,
+                                     0,
+                                     format,
+                                     datatype, 0);
+                        GL_CHECK_ERROR;
+                        break;
+#ifdef GL_OES_texture_cube_map
+					case TEX_TYPE_CUBE_MAP:
+						for(int face = 0; face < 6; face++) {
+							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
+                                         width, height, 0,
+                                         format, datatype, 0);
+						}
+						break;
+#endif
+                    default:
+                        break;
+                };
+                
                 if (width > 1)
                 {
                     width = width / 2;
@@ -226,7 +269,13 @@ namespace Ogre {
                 }
             }
         }
-
+    }
+    
+    // Creation / loading methods
+    void GLESTexture::createInternalResourcesImpl(void)
+    {
+		_createGLTexResource();
+        
         _createSurfaceList();
 
         // Get final internal format
@@ -255,17 +304,23 @@ namespace Ogre {
 
         LoadedImages loadedImages = LoadedImages(new std::vector<Image>());
 
-        if (mTextureType == TEX_TYPE_2D)
+        if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D)
         {
             doImageIO(mName, mGroup, ext, *loadedImages, this);
-
+            
             // If this is a volumetric texture set the texture type flag accordingly.
+            // If this is a cube map, set the texture type flag accordingly.
+#ifdef GL_OES_texture_cube_map
+            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
+                mTextureType = TEX_TYPE_CUBE_MAP;
+#else
             if ((*loadedImages)[0].getDepth() > 1)
             {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                             "**** Unsupported 3D texture type ****",
                             "GLESTexture::prepare" );
             }
+#endif
             
 			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
             PixelFormat imageFormat = (*loadedImages)[0].getFormat();
@@ -281,6 +336,33 @@ namespace Ogre {
                 }
 			}
         }
+#ifdef GL_OES_texture_cube_map
+        else if (mTextureType == TEX_TYPE_CUBE_MAP)
+        {
+            if(getSourceFileType() == "dds")
+            {
+                // XX HACK there should be a better way to specify whether
+                // all faces are in the same file or not
+                doImageIO(mName, mGroup, ext, *loadedImages, this);
+            }
+            else
+            {
+                vector<Image>::type images(6);
+                ConstImagePtrList imagePtrs;
+                static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
+                
+                for(size_t i = 0; i < 6; i++)
+                {
+                    String fullName = baseName + suffixes[i];
+                    if (!ext.empty())
+                        fullName = fullName + "." + ext;
+                    // find & load resource data intro stream to allow resource
+                    // group changes if required
+                    doImageIO(fullName, mGroup, ext, *loadedImages, this);
+                }
+            }
+        }
+#endif
         else
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
@@ -327,6 +409,48 @@ namespace Ogre {
         glDeleteTextures(1, &mTextureID);
         GL_CHECK_ERROR;
     }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESTexture::notifyOnContextLost()
+    {
+        if (!mIsManual)
+        {
+            freeInternalResources();
+        }
+        else
+        {
+            glDeleteTextures(1, &mTextureID);
+            GL_CHECK_ERROR;
+            mTextureID = 0;
+        }
+    }
+    
+    void GLESTexture::notifyOnContextReset()
+    {
+        if (!mIsManual)
+        {
+            reload();
+        }
+        else
+        {
+            preLoadImpl();
+            
+            _createGLTexResource();
+            
+            for(size_t i = 0; i < mSurfaceList.size(); i++)
+            {
+                static_cast<GLESTextureBuffer*>(mSurfaceList[i].getPointer())->updateTextureId(mTextureID);
+            }
+            
+            if (mLoader)
+            {
+                mLoader->loadResource(this);
+            }
+            
+            postLoadImpl();
+        }
+    }
+#endif
 
     void GLESTexture::_createSurfaceList()
     {

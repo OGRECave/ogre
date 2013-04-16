@@ -6,12 +6,11 @@ void UnsharpMask_fp
     
     uniform sampler blurred: register(s0),
     uniform sampler mrt0: register(s1),
-    uniform sampler mrt1: register(s2),
     uniform float cLambda
 )
 {
-    float spacialImportance = tex2D(blurred, iTexCoord).w - tex2D(mrt1, iTexCoord).w;
-    float4 color = tex2D(mrt0, iTexCoord);
+    float spacialImportance = tex2D(blurred, iTexCoord).w - tex2D(mrt0, iTexCoord).w;
+    float4 color = float4(1,1,1,1);
     if (spacialImportance < 0) // darkening only
     {
         oColor0 = float4(color.rgb + (cLambda * spacialImportance), 1);

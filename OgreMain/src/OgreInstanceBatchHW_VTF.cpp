@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -431,7 +431,7 @@ namespace Ogre
 		
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		
-		std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
+		vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
 
 		size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
 		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
@@ -536,7 +536,7 @@ namespace Ogre
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			if( (mRenderOperation.numberOfInstances = updateVertexTexture( mCurrentCamera )) )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		else
 		{
@@ -549,7 +549,7 @@ namespace Ogre
 
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 	}
 }

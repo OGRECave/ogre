@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreCommon.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreRenderWindow.h"
 #include "OgreLogManager.h"
@@ -40,7 +41,7 @@ void GLXProc( Ogre::RenderWindow *win, const XEvent &event );
 //using namespace Ogre;
 
 Ogre::WindowEventUtilities::WindowEventListeners Ogre::WindowEventUtilities::_msListeners;
-Ogre::WindowEventUtilities::Windows Ogre::WindowEventUtilities::_msWindows;
+Ogre::RenderWindowList Ogre::WindowEventUtilities::_msWindows;
 
 namespace Ogre {
 //--------------------------------------------------------------------------------//
@@ -56,8 +57,8 @@ void WindowEventUtilities::messagePump()
 	}
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 	//GLX Message Pump
-	Windows::iterator win = _msWindows.begin();
-	Windows::iterator end = _msWindows.end();
+	RenderWindowList::iterator win = _msWindows.begin();
+	RenderWindowList::iterator end = _msWindows.end();
 
 	Display* xDisplay = 0; // same for all windows
 	
@@ -92,7 +93,7 @@ void WindowEventUtilities::messagePump()
     if( !targetWindow ) return;
     
     // Grab the next event, process it if it is a window event
-	if( ReceiveNextEvent( 0, NULL, kEventDurationNoWait, true, &event ) == noErr )
+	while( ReceiveNextEvent( 0, NULL, kEventDurationNoWait, true, &event ) == noErr )
 	{
         // Dispatch the event
 		SendEventToEventTarget( event, targetWindow );
@@ -131,7 +132,7 @@ void WindowEventUtilities::_addRenderWindow(RenderWindow* window)
 //--------------------------------------------------------------------------------//
 void WindowEventUtilities::_removeRenderWindow(RenderWindow* window)
 {
-	Windows::iterator i = std::find(_msWindows.begin(), _msWindows.end(), window);
+	RenderWindowList::iterator i = std::find(_msWindows.begin(), _msWindows.end(), window);
 	if( i != _msWindows.end() )
 		_msWindows.erase( i );
 }
@@ -370,7 +371,7 @@ namespace Ogre {
 OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHandler, EventRef event, void* wnd)
 {
     OSStatus status = noErr;
-    
+
     // Only events from our window should make it here
     // This ensures that our user data is our WindowRef
     RenderWindow* curWindow = (RenderWindow*)wnd;

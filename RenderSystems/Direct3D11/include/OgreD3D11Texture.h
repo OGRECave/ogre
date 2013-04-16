@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -143,9 +143,9 @@ namespace Ogre {
         void prepareImpl(void);
         /// @copydoc Resource::unprepareImpl
         void unprepareImpl(void);
-		/// overriden from Resource
+		/// overridden from Resource
 		void loadImpl();
-		/// overriden from Resource
+		/// overridden from Resource
 		void postLoadImpl();
 
         /** Vector of pointers to streams that were pulled from disk by
@@ -164,9 +164,9 @@ namespace Ogre {
 		/// destructor
 		~D3D11Texture();
 
-		/// overriden from Texture
+		/// overridden from Texture
 		void copyToTexture( TexturePtr& target );
-		/// overriden from Texture
+		/// overridden from Texture
 		void loadImage( const Image &img );
 
 

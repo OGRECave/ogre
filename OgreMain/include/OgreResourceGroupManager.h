@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreArchive.h"
 #include "OgreIteratorWrappers.h"
 #include <ctime>
+#include "OgreHeaderPrefix.h"
 
 // If X11/Xlib.h gets included before this header (for example it happens when
 // including wxWidgets and FLTK), Status is defined as an int which we don't
@@ -623,7 +624,7 @@ namespace Ogre {
 			this allows duplicate names in alternate paths.
         */
         void addResourceLocation(const String& name, const String& locType, 
-            const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME, bool recursive = false);
+            const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME, bool recursive = false, bool readOnly = true);
         /** Removes a resource location from the search path. */ 
         void removeResourceLocation(const String& name, 
 			const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME);
@@ -1086,5 +1087,7 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

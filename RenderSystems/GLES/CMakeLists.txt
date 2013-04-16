@@ -31,6 +31,8 @@ set(HEADER_FILES
   include/OgreGLESSupport.h
   include/OgreGLESTexture.h
   include/OgreGLESTextureManager.h
+  include/OgreGLESManagedResource.h
+  include/OgreGLESStateCacheManager.h
 )
 
 
@@ -55,11 +57,33 @@ set(SOURCE_FILES
   src/OgreGLESSupport.cpp
   src/OgreGLESTexture.cpp
   src/OgreGLESTextureManager.cpp
+  src/OgreGLESStateCacheManager.cpp
 )
+
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GLES_STATE_CACHE_SUPPORT)
+  set(HEADER_FILES
+      ${HEADER_FILES}
+      src/StateCacheManager/OgreGLESStateCacheManagerImp.h
+  )
+  set(SOURCE_FILES
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLESStateCacheManagerImp.cpp
+  )
+else()
+  set(HEADER_FILES
+      ${HEADER_FILES}
+      src/StateCacheManager/OgreGLESNullStateCacheManagerImp.h
+  )
+  set(SOURCE_FILES
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLESNullStateCacheManagerImp.cpp
+  )
+endif()
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EGL/WIN32/OgreWin32EGLContext.h
     include/EGL/WIN32/OgreWin32EGLSupport.h
     include/EGL/WIN32/OgreWin32EGLRenderTexture.h
@@ -85,7 +109,7 @@ if (WIN32)
   set(PLATFORM_HEADER_INSTALL "WIN32")
 # Add system specific settings
 elseif (APPLE)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EAGL/OgreEAGLESContext.h
     include/EAGL/OgreEAGLSupport.h
     include/EAGL/OgreEAGLRenderTexture.h
@@ -106,6 +130,31 @@ elseif (APPLE)
   link_directories(${OPENGLES_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "APPLE")
 elseif(ANDROID)
+  set(PLATFORM_HEADERS
+    include/EGL/Android/OgreAndroidEGLContext.h
+    include/EGL/Android/OgreAndroidEGLSupport.h
+    include/EGL/Android/OgreAndroidEGLWindow.h
+    include/EGL/Android/OgreGLESUtil.h
+    include/EGL/Android/OgreAndroidResourceManager.h
+    include/EGL/Android/OgreAndroidResource.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/EGL/Android/OgreAndroidEGLContext.cpp
+    src/EGL/Android/OgreAndroidEGLSupport.cpp
+    src/EGL/Android/OgreAndroidEGLWindow.cpp
+    src/EGL/Android/OgreAndroidResourceManager.cpp
+    src/EGL/Android/OgreAndroidResource.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
+  )
+
+  include_directories(src/EGL/Android include/EGL/Android)
   link_directories(${OPENGLES_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (UNIX)
@@ -152,7 +201,7 @@ if (NOT OGRE_STATIC)
 endif ()
 
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GLES ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GLES ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_plugin(RenderSystem_GLES)

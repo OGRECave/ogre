@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -259,4 +259,20 @@ namespace Ogre {
 	{
 		mMapBufferThreshold = value;
 	}
+    //---------------------------------------------------------------------
+    HardwareUniformBufferSharedPtr GLESHardwareBufferManagerBase::
+        createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                            bool useShadowBuffer, const String& name)
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "GLES does not support uniform buffer objects",
+                    "GLESHardwareBufferManagerBase::createUniformBuffer");
+    }
+    //---------------------------------------------------------------------
+    Ogre::HardwareCounterBufferSharedPtr GLESHardwareBufferManagerBase::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name /*= ""*/ )
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "GLES does not support atomic counter buffers",
+                    "GLESHardwareBufferManagerBase::createCounterBuffer");
+    }
 }

@@ -2,7 +2,7 @@
 fragment_program Radial_Blur_Cg_ps cg
 {
 	source Radial_Blur_FP.cg
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 	entry_point main
 }
 
@@ -11,8 +11,15 @@ fragment_program Radial_Blur_GLSLES_ps glsles
 	source Radial_Blur_FP.glsles
 }
 
+fragment_program Radial_Blur_GLSL_ps glsl
+{
+	source Radial_Blur_FP.glsl
+	syntax glsl150
+}
+
 fragment_program Radial_Blur_ps unified
 {
+	delegate Radial_Blur_GLSL_ps
 	delegate Radial_Blur_GLSLES_ps
 	delegate Radial_Blur_Cg_ps
 }
@@ -28,13 +35,14 @@ material Ogre/Compositor/Radial_Blur
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Radial_Blur_ps
 			{
 	            param_named sampleDist float 1.0
 	            param_named sampleStrength float 2.2
 			}
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 			

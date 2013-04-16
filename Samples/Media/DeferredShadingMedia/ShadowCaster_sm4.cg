@@ -1,0 +1,26 @@
+void ShadowCasterVP(
+    float4 iPosition : POSITION,
+        
+    out float4 oPosition : SV_POSITION,
+    out float3 oViewPos : TEXCOORD0,
+       
+    uniform float4x4 cWorldViewProj,
+    uniform float4x4 cWorldView
+    )
+{
+    oPosition = mul(cWorldViewProj, iPosition);
+    oViewPos = mul(cWorldView, iPosition).xyz;
+}
+
+void ShadowCasterFP(
+    float4 oPosition : SV_POSITION,
+    float3 iViewPos : TEXCOORD0,
+		
+    out float4 oColor : COLOR,
+        
+    uniform float cFarDistance
+    )
+{
+	float depth = length(iViewPos) / cFarDistance;
+    oColor.rgba = float4(depth, depth, depth, 1);
+}

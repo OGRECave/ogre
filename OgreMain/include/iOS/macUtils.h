@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,8 @@ THE SOFTWARE.
 
 namespace Ogre {
     void* mac_loadDylib(const char* name);
-    _OgreExport std::string macCachePath();
-    _OgreExport std::string macBundlePath(void);
-    _OgreExport std::string iOSDocumentsDirectory(void);
+    _OgreExport String macCachePath();
+    _OgreExport String macBundlePath(void);
+    _OgreExport String macTempFileName(void);
+    _OgreExport String iOSDocumentsDirectory(void);
 }

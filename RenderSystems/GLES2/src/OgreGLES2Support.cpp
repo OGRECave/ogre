@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ namespace Ogre {
         }
 
     		// Get function pointers on platforms that don't have prototypes
-#ifndef GL_GLEXT_PROTOTYPES
+#if !defined(GL_GLEXT_PROTOTYPES) && OGRE_NO_GLES3_SUPPORT == 1
 
 		// define the GL types if they are not defined
 #	ifndef PFNGLMAPBUFFEROES
@@ -116,12 +116,19 @@ namespace Ogre {
 #   endif
         glMapBufferOES = (PFNGLMAPBUFFEROES)getProcAddress("glMapBufferOES");
         glUnmapBufferOES = (PFNGLUNMAPBUFFEROES)getProcAddress("glUnmapBufferOES");
+#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
         glDrawBuffersARB = (PFNGLDRAWBUFFERSARB)getProcAddress("glDrawBuffersARB");
         glReadBufferNV = (PFNGLREADBUFFERNV)getProcAddress("glReadBufferNV");
         glGetTexImageNV = (PFNGLGETTEXIMAGENV)getProcAddress("glGetTexImageNV");
         glGetCompressedTexImageNV = (PFNGLGETCOMPRESSEDTEXIMAGENV)getProcAddress("glGetCompressedTexImageNV");
         glGetTexLevelParameterfvNV = (PFNGLGETTEXLEVELPARAMETERFVNV)getProcAddress("glGetTexLevelParameterfvNV");
         glGetTexLevelParameterivNV = (PFNGLGETTEXLEVELPARAMETERiVNV)getProcAddress("glGetTexLevelParameterivNV");
+#		else
+		glBindVertexArrayOES = (PFNGLBINDVERTEXARRAYOES) getProcAddress("glBindVertexArrayOES");
+		glDeleteVertexArraysOES = (PFNGLDELETEVERTEXARRAYSOES) getProcAddress("glDeleteVertexArraysOES");
+		glGenVertexArraysOES = (PFNGLGENVERTEXARRAYSOES) getProcAddress("glGenVertexArraysOES");
+		glIsVertexArrayOES = (PFNGLISVERTEXARRAYOES) getProcAddress("glIsVertexArrayOES");
+#		endif
 #endif
 }
 
