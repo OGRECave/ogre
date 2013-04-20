@@ -411,12 +411,13 @@ namespace Ogre {
 			return ;
 		}
 
+		ResourceResponse resresp = any_cast<ResourceResponse>(res->getData());
+
+		// Complete full loading in main thread if semithreading
+		const ResourceRequest& req = resresp.request;
+
 		if (res->succeeded())
 		{
-			ResourceResponse resresp = any_cast<ResourceResponse>(res->getData());
-
-			// Complete full loading in main thread if semithreading
-			const ResourceRequest& req = resresp.request;
 #if OGRE_THREAD_SUPPORT == 2
 			// These load commands would have been downgraded to prepare() for the background
 			if (req.type == RT_LOAD_RESOURCE)
@@ -444,13 +445,11 @@ namespace Ogre {
 				{
 					resresp.resource->_firePreparingComplete( true );
 				}
-			} 
-
-			// Call queue listener
-			if (req.listener)
-				req.listener->operationCompleted(res->getRequest()->getID(), req.result);
-
+			}
 		}
+        // Call queue listener
+        if (req.listener)
+            req.listener->operationCompleted(res->getRequest()->getID(), req.result);
 	}
 	//------------------------------------------------------------------------
 
