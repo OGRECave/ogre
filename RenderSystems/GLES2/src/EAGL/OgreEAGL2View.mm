@@ -60,23 +60,17 @@ using namespace Ogre;
     // Change the viewport orientation based upon the current device orientation.
     // Note: This only operates on the main viewport, usually the main view.
 
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-
-    // Return if the orientation is not a valid interface orientation(face up, face down)
-    if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
-        return;
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
 
     // Check if orientation is supported
     NSString *rotateToOrientation = @"";
-    if(deviceOrientation == UIInterfaceOrientationPortrait)
+    if(orientation == UIInterfaceOrientationPortrait)
         rotateToOrientation = @"UIInterfaceOrientationPortrait";
-    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+    else if(orientation == UIInterfaceOrientationPortraitUpsideDown)
         rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
+    else if(orientation == UIInterfaceOrientationLandscapeLeft)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
+    else if(orientation == UIInterfaceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
 
     NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
@@ -96,7 +90,7 @@ using namespace Ogre;
         unsigned int width = (uint)self.bounds.size.width;
         unsigned int height = (uint)self.bounds.size.height;
 
-        if (UIDeviceOrientationIsLandscape(deviceOrientation))
+        if (UIDeviceOrientationIsLandscape(orientation))
         {
             w = std::max(width, height);
             h = std::min(width, height);

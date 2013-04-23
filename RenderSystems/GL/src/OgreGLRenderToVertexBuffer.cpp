@@ -307,7 +307,7 @@ namespace Ogre {
 		if (useVaryingAttributes)
 		{
 			//Have GLSL shaders, using varying attributes
-			GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+			GLSL::GLSLLinkProgram* linkProgram = GLSL::GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
 			GLhandleARB linkProgramId = linkProgram->getGLHandle();
 			
 			vector<GLint>::type locations;

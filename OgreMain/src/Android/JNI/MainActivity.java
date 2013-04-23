@@ -40,6 +40,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.content.res.AssetManager;
 
 public class MainActivity extends Activity implements SensorEventListener {
 	protected Handler handler = null;

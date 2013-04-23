@@ -37,7 +37,7 @@ clear_if_changed(Cg_PREFIX_PATH
   Cg_INCLUDE_DIR
 )
 
-set(Cg_LIBRARY_NAMES Cg)
+set(Cg_LIBRARY_NAMES Cg cg)
 get_debug_names(Cg_LIBRARY_NAMES)
 
 use_pkgconfig(Cg_PKGC Cg)
@@ -45,8 +45,8 @@ use_pkgconfig(Cg_PKGC Cg)
 findpkg_framework(Cg)
 
 find_path(Cg_INCLUDE_DIR NAMES cg.h HINTS ${Cg_FRAMEWORK_INCLUDES} ${Cg_INC_SEARCH_PATH} ${Cg_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Cg)
-find_library(Cg_LIBRARY_REL NAMES ${Cg_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" release relwithdebinfo minsizerel)
-find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" debug)
+find_library(Cg_LIBRARY_REL NAMES ${Cg_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
+find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Debug)
 make_library_set(Cg_LIBRARY)
 
 findpkg_finish(Cg)

@@ -44,9 +44,12 @@ Add the path of
 [your build directory]\include ex: c:\ogre\build6\include
 [your dependencies dir]\include ex: C:\ogre\dep\include
 [your dependencies dir]\include\ois
-26.	Compile.
-27.	Before you run for the first time make sure you have a shader cache for the project you are running - as you can't compile shader on the phone. (TODO - explain more)  
-28. In Windows Phone and (Store versions of WinRT) you don't have the shader compiler, meaning you have to use the shader cache, they tricky part is that you need to create the shader cache, to do that, compile OGRE for WinRT and add ENABLE_SHADERS_CACHE_SAVE to the preprocessor definitions in the config, run the project, act out all the use cases you are going to do in the final version, then go to the home directory of the  WinRT (I find the home directory by putting a breakpoint in FileSystemLayerImpl_WIN32.cpp line 138) and copy the file cache.bin from the OGRE dir there to Samples\Browser\WinRT. 
+26. Select only RenderSystem_Direct3D11 project in the solution tree, right click, properties, select all configs and "win32" platform in the combos at the top of the properties window, select "configuration properties"->"C++"->"Command line" on the tree on the left of that window, add 
+/ZW /AI "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Blend\WinMD"
+To the command line
+27.	Compile.
+28.	Before you run for the first time make sure you have a shader cache for the project you are running - as you can't compile shader on the phone. (TODO - explain more)  
+29. In Windows Phone and (Store versions of WinRT) you don't have the shader compiler, meaning you have to use the shader cache, they tricky part is that you need to create the shader cache, to do that, compile OGRE for WinRT and add ENABLE_SHADERS_CACHE_SAVE to the preprocessor definitions in the config, run the project, act out all the use cases you are going to do in the final version, then go to the home directory of the  WinRT (I find the home directory by putting a breakpoint in FileSystemLayerImpl_WIN32.cpp line 138) and copy the file cache.bin from the OGRE dir there to Samples\Browser\WinRT. 
 
 
 Note about adding resources - you must right click each resource you want to be copied as part of the release, select "properties", select all configurations and all platforms, set "exclude from build" to "No", "Content" to "Yes", "Item type" to "Does not participate in build" and press the "OK" button. You can also multi select a group of resource and set the properties for all of them together. Note that if the file is under the path of project file - the file will be copied with the relative path to the project file, else it will be at the root of the resources folder of the deployed project. 

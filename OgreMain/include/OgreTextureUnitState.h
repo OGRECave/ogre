@@ -567,7 +567,7 @@ namespace Ogre {
 
         /** Gets the index of the set of texture co-ords this layer uses.
         @note
-            Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         unsigned int getTextureCoordSet(void) const;
 
@@ -576,7 +576,7 @@ namespace Ogre {
             Default is 0 for all layers. Only change this if you have provided multiple texture co-ords per
             vertex.
         @note
-            Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         void setTextureCoordSet(unsigned int set);
 
@@ -692,6 +692,9 @@ namespace Ogre {
         /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
         @note
             The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+		@note This is a shortcut method which sets the addressing mode for all
+			coordinates at once; you can also call the more specific method
+			to set the addressing mode per coordinate.
         @note
             This is a shortcut method which sets the addressing mode for all
             coordinates at once; you can also call the more specific method

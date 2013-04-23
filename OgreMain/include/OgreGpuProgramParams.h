@@ -578,7 +578,7 @@ namespace Ogre {
 		/// Get a pointer to the 'nth' item in the float buffer
 		const float* getFloatPointer(size_t pos) const { return &mFloatConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
-		double* geDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
+		double* getDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
 		const double* getDoublePointer(size_t pos) const { return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the int buffer
@@ -820,6 +820,8 @@ namespace Ogre {
 			ACT_SURFACE_EMISSIVE_COLOUR,
 			/// Surface shininess, as set in Pass::setShininess
 			ACT_SURFACE_SHININESS,
+			/// Surface alpha rejection value, not as set in Pass::setAlphaRejectionValue, but a floating number between 0.0f and 1.0f instead (255.0f / Pass::getAlphaRejectionValue())
+			ACT_SURFACE_ALPHA_REJECTION_VALUE,
 
 
 			/// The number of active light sources (better than gl_MaxLights)

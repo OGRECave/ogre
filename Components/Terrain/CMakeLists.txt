@@ -62,7 +62,7 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 ogre_add_library(OgreTerrain ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-set_target_properties(OgreTerrain PROPERTIES VERSION ${OGRE_SOVERSION})
+set_target_properties(OgreTerrain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreTerrain OgreMain)
 if (OGRE_BUILD_COMPONENT_PAGING)
 	target_link_libraries(OgreTerrain OgrePaging)

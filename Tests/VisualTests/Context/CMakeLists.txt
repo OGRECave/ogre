@@ -40,7 +40,7 @@ target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${O
 ogre_config_common(TestContext)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    set(OGRE_OSX_BUILD_CONFIGURATION "$(CONFIGURATION)/")
+    set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)

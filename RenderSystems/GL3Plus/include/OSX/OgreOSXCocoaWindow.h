@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 @class CocoaWindowDelegate;
 
-@interface OgreWindow : NSWindow
+@interface OgreGL3PlusWindow : NSWindow
 
 @end
 
@@ -73,7 +73,7 @@ namespace Ogre {
 		NSView* ogreView() const { return mView; };
 		NSWindow* ogreWindow() const { return mWindow; };
 		NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
-		void createWithView(OgreView *view);
+		void createWithView(OgreGL3PlusView *view);
 
 		void create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams);

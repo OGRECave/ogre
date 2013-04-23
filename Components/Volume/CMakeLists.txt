@@ -59,7 +59,7 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 ogre_add_library(OgreVolume ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-set_target_properties(OgreVolume PROPERTIES VERSION ${OGRE_SOVERSION})
+set_target_properties(OgreVolume PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreVolume OgreMain)
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreVolume ${OGRE_THREAD_LIBRARIES})

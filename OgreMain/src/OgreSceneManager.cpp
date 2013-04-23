@@ -3117,10 +3117,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     RenderOperation ro;
 
     OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
-    // Set up rendering operation
-    // I know, I know, const_cast is nasty but otherwise it requires all internal
-    // state of the Renderable assigned to the rop to be mutable
-    const_cast<Renderable*>(rend)->getRenderOperation(ro);
     ro.srcRenderable = rend;
 
 	GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
@@ -3475,6 +3471,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Finalise GPU parameter bindings
 				updateGpuProgramParameters(pass);
 
+                rend->getRenderOperation(ro);
+
 				if (rend->preRender(this, mDestRenderSystem))
 					mDestRenderSystem->_render(ro);
 				rend->postRender(this, mDestRenderSystem);
@@ -3541,6 +3539,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// Finalise GPU parameter bindings
 					updateGpuProgramParameters(pass);
 
+                    rend->getRenderOperation(ro);
+
 					if (rend->preRender(this, mDestRenderSystem))
 						mDestRenderSystem->_render(ro);
 					rend->postRender(this, mDestRenderSystem);
@@ -3560,7 +3560,21 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 		// Just render
 		mDestRenderSystem->setCurrentPassIterationCount(1);
 		if (rend->preRender(this, mDestRenderSystem))
-			mDestRenderSystem->_render(ro);
+		{
+			rend->getRenderOperation(ro);
+			try
+			{
+				mDestRenderSystem->_render(ro);
+			}
+			catch (RenderingAPIException& e)
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
+                            "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
+                            "SceneManager::renderSingleObject");
+                
+			}
+		}
 		rend->postRender(this, mDestRenderSystem);
 	}
 	

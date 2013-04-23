@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0502
 #endif
 #include "OgreWin32Window.h"
 #include "OgreRoot.h"
@@ -621,6 +621,7 @@ namespace Ogre {
 
 		// Unregister and destroy OGRE GL3PlusContext
 		delete mContext;
+        mContext = 0;
 
 		if (!mIsExternalGLContext && mGlrc)
 		{

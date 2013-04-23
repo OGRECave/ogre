@@ -33,7 +33,9 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-	/// Structure used to keep track of named uniforms in the linked program object
+    namespace GLSL {
+
+    /// Structure used to keep track of named uniforms in the linked program object
 	struct GLUniformReference
 	{
 		/// GL location handle
@@ -144,6 +146,7 @@ namespace Ogre {
 
 	};
 
+    }
 }
 
 #endif // __GLSLLinkProgram_H__

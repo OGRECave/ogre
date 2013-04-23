@@ -830,7 +830,7 @@ namespace Ogre {
 		if(caps->isShaderProfileSupported("glsl"))
 		{
 			// NFZ - check for GLSL vertex and fragment shader support successful
-			mGLSLProgramFactory = new GLSLProgramFactory();
+			mGLSLProgramFactory = new GLSL::GLSLProgramFactory();
 			HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLProgramFactory);
 			LogManager::getSingleton().logMessage("GLSL support detected");
 		}
@@ -1962,7 +1962,10 @@ namespace Ogre {
 		else
 		{
 			glEnable(GL_BLEND);
-			glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+			if(GLEW_VERSION_1_4)
+				glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+			else if(GLEW_EXT_blend_func_separate)
+				glBlendFuncSeparateEXT(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
 		}
 
 		GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;

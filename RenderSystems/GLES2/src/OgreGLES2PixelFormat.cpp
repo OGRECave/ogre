@@ -39,6 +39,8 @@ namespace Ogre  {
         {
             case PF_A8:
                 return GL_ALPHA;
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT;
 
 #if GL_OES_texture_half_float && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_FLOAT16_RGB:
@@ -77,9 +79,9 @@ namespace Ogre  {
 #endif                
 #if GL_IMG_texture_compression_pvrtc2 && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC2_2BPP:
-                return GL_COMPRESSED_PVRTC_2BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG;
             case PF_PVRTC2_4BPP:
-                return GL_COMPRESSED_PVRTC_4BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
 #if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
@@ -186,6 +188,8 @@ namespace Ogre  {
     {
         switch (mFormat)
         {
+            case PF_DEPTH:
+                return GL_UNSIGNED_INT;
             case PF_A8:
             case PF_L8:
             case PF_L16:
@@ -298,6 +302,8 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT;
 #if GL_IMG_texture_compression_pvrtc && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC_RGB2:
                 return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -310,9 +316,9 @@ namespace Ogre  {
 #endif
 #if GL_IMG_texture_compression_pvrtc2 && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC2_2BPP:
-                return GL_COMPRESSED_PVRTC_2BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG;
             case PF_PVRTC2_4BPP:
-                return GL_COMPRESSED_PVRTC_4BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
 #if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
@@ -519,6 +525,8 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+            case GL_DEPTH_COMPONENT:
+                return PF_DEPTH;
 #if GL_IMG_texture_compression_pvrtc
             case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
                 return PF_PVRTC_RGB2;
@@ -531,9 +539,9 @@ namespace Ogre  {
 #endif
 
 #if GL_IMG_texture_compression_pvrtc2
-            case GL_COMPRESSED_PVRTC_2BPPV2_IMG:
+            case GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG:
                 return PF_PVRTC2_2BPP;
-            case GL_COMPRESSED_PVRTC_4BPPV2_IMG:
+            case GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG:
                 return PF_PVRTC2_4BPP;
 #endif
 

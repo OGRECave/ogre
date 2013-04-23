@@ -618,13 +618,27 @@ namespace Ogre {
 				for (ushort t = 0; t < dims; ++t)
 					*pFloat++ = mTempVertex.texCoord[elem.getIndex()][t];
 				break;
-			case VES_DIFFUSE:
-				rs = Root::getSingleton().getRenderSystem();
-				if (rs)
-					rs->convertColourValue(mTempVertex.colour, pRGBA++);
-				else
-					*pRGBA++ = mTempVertex.colour.getAsRGBA(); // pick one!
-				break;
+            case VES_DIFFUSE:
+                rs = Root::getSingleton().getRenderSystem();
+                if (rs)
+                {
+                    rs->convertColourValue(mTempVertex.colour, pRGBA++);
+                }
+                else
+                {
+                    switch(elem.getType())
+                    {
+                        case VET_COLOUR_ABGR:
+                            *pRGBA++ = mTempVertex.colour.getAsABGR();
+                            break;
+                        case VET_COLOUR_ARGB:
+                            *pRGBA++ = mTempVertex.colour.getAsARGB();
+                            break;
+                        default:
+                            *pRGBA++ = mTempVertex.colour.getAsRGBA();
+                    }
+                }
+                break;
 			default:
 				// nop ?
 				break;

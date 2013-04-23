@@ -212,6 +212,10 @@ namespace Ogre
 
 		refreshConfig();
 
+        optVSync.possibleValues.push_back("No");
+        optVSync.possibleValues.push_back("Yes");
+        optVSync.currentValue = optVSync.possibleValues[0];
+
 		optRTTMode.possibleValues.push_back("FBO");
 		optRTTMode.currentValue = optRTTMode.possibleValues[0];
 
