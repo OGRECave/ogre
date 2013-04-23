@@ -29,7 +29,7 @@ clear_if_changed(GLSL_Optimizer_PREFIX_PATH
   GLSL_Optimizer_INCLUDE_DIR
 )
 
-set(GLSL_Optimizer_LIBRARY_NAMES mesaglsl2)
+set(GLSL_Optimizer_LIBRARY_NAMES mesaglsl2 glsl_optimizer)
 get_debug_names(GLSL_Optimizer_LIBRARY_NAMES)
 
 use_pkgconfig(GLSL_Optimizer_PKGC GLSL_Optimizer)
