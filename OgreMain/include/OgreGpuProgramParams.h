@@ -578,7 +578,7 @@ namespace Ogre {
 		/// Get a pointer to the 'nth' item in the float buffer
 		const float* getFloatPointer(size_t pos) const { return &mFloatConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
-		double* geDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
+		double* getDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
 		const double* getDoublePointer(size_t pos) const { return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the int buffer
