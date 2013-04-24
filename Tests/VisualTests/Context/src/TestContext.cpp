@@ -26,6 +26,14 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreBuildSettings.h"
+
+#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
+#  define USE_RTSHADER_SYSTEM
+#endif
+
+#define _RTSS_WRITE_SHADERS_TO_DISK
+
 #include "TestContext.h"
 #include "VisualTest.h"
 #include "SamplePlugin.h"
@@ -33,8 +41,8 @@ THE SOFTWARE.
 #include "HTMLWriter.h"
 #include "SimpleResultWriter.h"
 #include "OgreConfigFile.h"
-
 #include "OgrePlatform.h"
+
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -45,7 +53,12 @@ THE SOFTWARE.
 #include <AppKit/AppKit.h>
 #endif
 
-TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0) 
+#ifdef OGRE_STATIC_LIB
+#include "VTestPlugin.h"
+#include "PlayPenTestPlugin.h"
+#endif
+
+TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -89,10 +102,35 @@ TestContext::~TestContext()
 void TestContext::setup()
 {
     // standard setup
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
+    uint w = modeSize.width / [UIScreen mainScreen].scale;
+    uint h = modeSize.height / [UIScreen mainScreen].scale;
+
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+
+    if(UIInterfaceOrientationIsPortrait(orientation))
+        std::swap(w, h);
+
+    mRoot->initialise(false, "OGRE Sample Browser");
+    NameValuePairList miscParams;
+    miscParams["retainedBacking"] = StringConverter::toString(true);
+    mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, true, &miscParams);
+#else
     mWindow = createWindow();
+#endif
+
     mWindow->setDeactivateOnFocusChange(false);
     setupInput(false);// grab input, since moving the window seemed to change the results (in Linux anyways)
     locateResources();
+    createDummyScene();
+#ifdef USE_RTSHADER_SYSTEM
+    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
+    {
+        Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
+    }
+#endif // USE_RTSHADER_SYSTEM
+
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
     mRoot->addFrameListener(this);
@@ -120,6 +158,11 @@ void TestContext::setup()
                 mTestSets[setName].push_back(it->second);
         }
     }
+
+#ifdef OGRE_STATIC_LIB
+    mPluginNameMap["VTests"]       = (OgreBites::SamplePlugin *) OGRE_NEW VTestPlugin();
+    mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
+#endif
 
     // timestamp for the filename
     char temp[25];
@@ -156,6 +199,8 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
     OgreBites::Sample* startSample = 0;
     Ogre::StringVector sampleList;
 
+    // Need support for static loading in here!!!!
+    
     // load all of the plugins in the set
     for (Ogre::StringVector::iterator it = mTestSets[set].begin(); it != 
         mTestSets[set].end(); ++it)
@@ -165,7 +210,22 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
         // try loading up the test plugin
         try
         {
+#ifdef OGRE_STATIC_LIB
+            // in debug, remove any suffix
+            if(StringUtil::endsWith(plugin, "_d"))
+                plugin = plugin.substr(0, plugin.length()-2);
+
+            OgreBites::SamplePlugin *pluginInstance = (OgreBites::SamplePlugin *) mPluginNameMap[plugin];
+            if(pluginInstance)
+            {
+//                OgreBites::SamplePlugin* sp = OGRE_NEW OgreBites::SamplePlugin(pluginInstance->getInfo()["Title"]);
+
+//                sp->addSample(pluginInstance);
+                mRoot->installPlugin(pluginInstance);
+            }
+#else
             mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
+#endif
         }
         // if it fails, just return right away
         catch (Ogre::Exception e)
@@ -328,6 +388,9 @@ void TestContext::runSample(OgreBites::Sample* s)
         Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
     }
 
+    if(mCurrentTest)
+        LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
+
     SampleContext::runSample(sampleToRun);
 }
 //-----------------------------------------------------------------------
@@ -430,6 +493,12 @@ void TestContext::setupDirectories(Ogre::String batchName)
     mOutputDir += "/";
     static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
 
+    if(mSummaryOutputDir != "NONE")
+    {
+        mSummaryOutputDir = mFSLayer->getWritablePath(mSummaryOutputDir);
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mSummaryOutputDir);
+    }
+
     // and finally a directory for the test batch itself
     static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir
         + batchName + "/");
@@ -496,7 +565,7 @@ void TestContext::finishedTests()
                 for(size_t i = 0; i < mRenderSystemName.size(); ++i)
                     if(mRenderSystemName[i]!=' ')
                         rs += mRenderSystemName[i];
-                
+
                 SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
                 simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
             }
@@ -522,6 +591,158 @@ void TestContext::setTimestep(Ogre::Real timestep)
     mTimestep = timestep >= 0.f ? timestep : mTimestep;
 }
 //-----------------------------------------------------------------------
+
+void TestContext::createDummyScene()
+{
+    mWindow->removeAllViewports();
+    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+    sm->addRenderQueueListener(mOverlaySystem);
+    Ogre::Camera* cam = sm->createCamera("DummyCamera");
+    mWindow->addViewport(cam);
+#ifdef USE_RTSHADER_SYSTEM
+    // Initialize shader generator.
+    // Must be before resource loading in order to allow parsing extended material attributes.
+    bool success = initializeRTShaderSystem(sm);
+    if (!success)
+    {
+        OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
+					"Shader Generator Initialization failed - Core shader libs path not found",
+					"SampleBrowser::createDummyScene");
+    }
+    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
+    {
+        //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+        // creates shaders for base material BaseWhite using the RTSS
+        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        baseWhite->setLightingEnabled(false);
+        mShaderGenerator->createShaderBasedTechnique(
+                                                     "BaseWhite",
+                                                     Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+                                                     Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                                           "BaseWhite");
+        if(baseWhite->getNumTechniques() > 1)
+        {
+            baseWhite->getTechnique(0)->getPass(0)->setVertexProgram(
+                                                                     baseWhite->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
+            baseWhite->getTechnique(0)->getPass(0)->setFragmentProgram(
+                                                                       baseWhite->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+        }
+
+        // creates shaders for base material BaseWhiteNoLighting using the RTSS
+        mShaderGenerator->createShaderBasedTechnique(
+                                                     "BaseWhiteNoLighting",
+                                                     Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+                                                     Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                                           "BaseWhiteNoLighting");
+        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        if(baseWhite->getNumTechniques() > 1)
+        {
+            baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
+                                                                               baseWhiteNoLighting->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
+            baseWhiteNoLighting->getTechnique(0)->getPass(0)->setFragmentProgram(
+                                                                                 baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+        }
+    }
+#endif // USE_RTSHADER_SYSTEM
+}
+
+#ifdef USE_RTSHADER_SYSTEM
+
+/*-----------------------------------------------------------------------------
+ | Initialize the RT Shader system.
+ -----------------------------------------------------------------------------*/
+bool TestContext::initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
+{
+    if (Ogre::RTShader::ShaderGenerator::initialize())
+    {
+        mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+
+        mShaderGenerator->addSceneManager(sceneMgr);
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+        // Setup core libraries and shader cache path.
+        Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+        Ogre::StringVector::iterator itGroup = groupVector.begin();
+        Ogre::StringVector::iterator itGroupEnd = groupVector.end();
+        Ogre::String shaderCoreLibsPath;
+        Ogre::String shaderCachePath;
+
+        for (; itGroup != itGroupEnd; ++itGroup)
+        {
+            Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
+            Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+            Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+            bool coreLibsFound = false;
+
+            // Try to find the location of the core shader lib functions and use it
+            // as shader cache path as well - this will reduce the number of generated files
+            // when running from different directories.
+            for (; it != itEnd; ++it)
+            {
+                if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+                {
+                    shaderCoreLibsPath = (*it)->archive->getName() + "/cache/";
+                    shaderCachePath = shaderCoreLibsPath;
+                    coreLibsFound = true;
+                    break;
+                }
+            }
+            // Core libs path found in the current group.
+            if (coreLibsFound)
+                break;
+        }
+
+        // Core shader libs not found -> shader generating will fail.
+        if (shaderCoreLibsPath.empty())
+            return false;
+
+#ifdef _RTSS_WRITE_SHADERS_TO_DISK
+        // Set shader cache path.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        shaderCachePath = Ogre::macCachePath();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        shaderCachePath = Ogre::macCachePath() + "/org.ogre3d.RTShaderCache";
+#endif
+        mShaderGenerator->setShaderCachePath(shaderCachePath);
+#endif
+#endif
+        // Create and register the material manager listener if it doesn't exist yet.
+        if (mMaterialMgrListener == NULL) {
+            mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
+            Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+        }
+    }
+
+    return true;
+}
+
+/*-----------------------------------------------------------------------------
+ | Finalize the RT Shader system.
+ -----------------------------------------------------------------------------*/
+void TestContext::finalizeRTShaderSystem()
+{
+    // Restore default scheme.
+    Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+
+    // Unregister the material manager listener.
+    if (mMaterialMgrListener != NULL)
+    {
+        Ogre::MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
+        delete mMaterialMgrListener;
+        mMaterialMgrListener = NULL;
+    }
+    
+    // Finalize RTShader system.
+    if (mShaderGenerator != NULL)
+    {				
+        Ogre::RTShader::ShaderGenerator::finalize();
+        mShaderGenerator = NULL;
+    }
+}
+#endif // USE_RTSHADER_SYSTEM
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 
