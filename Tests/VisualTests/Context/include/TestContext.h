@@ -29,6 +29,16 @@ THE SOFTWARE.
 #ifndef __TestContext_H__
 #define __TestContext_H__
 
+// These need to be included prior to everything else to prevent name clashes.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
+
+#import <AppKit/AppKit.h>
+#include <crt_externs.h>
+
+extern int *_NSGetArgc(void);
+extern char ***_NSGetArgv(void);
+#endif
+
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 #include "VisualTest.h"
@@ -242,12 +252,6 @@ protected:
 };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
-
-#import <Cocoa/Cocoa.h>
-#include <crt_externs.h>
-
-extern int *_NSGetArgc(void);
-extern char ***_NSGetArgv(void);
 
 // All this does is suppress some messages in the run log.  NSApplication does not
 // implement buttonPressed and apps without a NIB have no target for the action.

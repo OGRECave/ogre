@@ -32,7 +32,7 @@ THE SOFTWARE.
 #  define USE_RTSHADER_SYSTEM
 #endif
 
-#define _RTSS_WRITE_SHADERS_TO_DISK
+//#define _RTSS_WRITE_SHADERS_TO_DISK
 
 #include "TestContext.h"
 #include "VisualTest.h"
