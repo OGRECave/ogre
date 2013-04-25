@@ -76,18 +76,6 @@ using namespace Ogre;
     [super viewDidUnload];
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-    self.view.clipsToBounds = NO;
-    UIWindow *window = self.view.window;
-    [window bringSubviewToFront:window.rootViewController.view];
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [self.view setNeedsDisplay];
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     NSString *rotateToOrientation = @"";
@@ -100,7 +88,13 @@ using namespace Ogre;
     else if(interfaceOrientation == UIInterfaceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
 
-    return mGLSupport->interfaceOrientationIsSupported(rotateToOrientation);
+    // Inform the view that it needs to call layoutSubviews
+    [self.view setNeedsDisplay];
+
+    if(mGLSupport->interfaceOrientationIsSupported(rotateToOrientation))
+        return YES;
+    else
+        return NO;
 }
 
 @end

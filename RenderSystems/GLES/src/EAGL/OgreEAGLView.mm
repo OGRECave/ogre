@@ -60,17 +60,23 @@ using namespace Ogre;
     // Change the viewport orientation based upon the current device orientation.
     // Note: This only operates on the main viewport, usually the main view.
 
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
+    // Return if the orientation is not a valid interface orientation(face up, face down)
+    if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
+        return;
 
     // Check if orientation is supported
     NSString *rotateToOrientation = @"";
-    if(orientation == UIInterfaceOrientationPortrait)
+    if(deviceOrientation == UIInterfaceOrientationPortrait)
         rotateToOrientation = @"UIInterfaceOrientationPortrait";
-    else if(orientation == UIInterfaceOrientationPortraitUpsideDown)
+    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
         rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
-    else if(orientation == UIInterfaceOrientationLandscapeLeft)
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
-    else if(orientation == UIInterfaceOrientationLandscapeRight)
+    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
 
     NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
@@ -87,10 +93,12 @@ using namespace Ogre;
     {
         // Get the window size and initialize temp variables
         unsigned int w = 0, h = 0;
-        unsigned int width = (uint)self.bounds.size.width;
-        unsigned int height = (uint)self.bounds.size.height;
+        unsigned int width = self.bounds.size.width;
+        unsigned int height = self.bounds.size.height;
 
-        if (UIDeviceOrientationIsLandscape(orientation))
+        Ogre::Viewport *viewPort = window->getViewport(0);
+
+        if (UIDeviceOrientationIsLandscape(deviceOrientation))
         {
             w = std::max(width, height);
             h = std::min(width, height);
@@ -108,11 +116,7 @@ using namespace Ogre;
         window->resize(width, height);
 
         // After rotation the aspect ratio of the viewport has changed, update that as well.
-        if(window->getNumViewports() > 0)
-        {
-            Ogre::Viewport *viewPort = window->getViewport(0);
-            viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
-        }
+        viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
     }
 }
 

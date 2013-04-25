@@ -198,24 +198,16 @@ namespace Ogre {
                         "Failed to make context current",
                         __FUNCTION__);
         }
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mViewFramebuffer));
-        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mViewRenderbuffer));
     }
 
     void EAGLES2Context::endCurrent()
     {
-        BOOL ret = [EAGLContext setCurrentContext:0];
-        if (!ret)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to end current context",
-                        __FUNCTION__);
-        }
+        // Do nothing
     }
 
     GLES2Context * EAGLES2Context::clone() const
     {
-		return new EAGLES2Context(getDrawable(), getContext().sharegroup);
+        return const_cast<EAGLES2Context *>(this);
     }
 
 	CAEAGLLayer * EAGLES2Context::getDrawable() const
