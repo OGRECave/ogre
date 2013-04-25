@@ -652,38 +652,18 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 1)
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesBoost.h
 		include/Threading/OgreThreadHeadersBoost.h
+    include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	
-	# Include either standard or concrt implementation of WorkQueue
-	if (OGRE_THREAD_WORKQUEUE_PROVIDER EQUAL 1)
-		list(APPEND THREAD_HEADER_FILES
-			include/Threading/OgreDefaultWorkQueueConcrt.h)
-		set(THREAD_SOURCE_FILES
-			src/Threading/OgreDefaultWorkQueueConcrt.cpp)
-	else ()
-		list(APPEND THREAD_HEADER_FILES
-			include/Threading/OgreDefaultWorkQueueStandard.h)
-		set(THREAD_SOURCE_FILES
-			src/Threading/OgreDefaultWorkQueueStandard.cpp)
-	endif ()
+  set(THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueStandard.cpp)
 elseif (OGRE_THREAD_PROVIDER EQUAL 2)
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesPoco.h
 		include/Threading/OgreThreadHeadersPoco.h
+    include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	
-	# Include either standard or concrt implementation of WorkQueue
-	if (OGRE_THREAD_WORKQUEUE_PROVIDER EQUAL 1)
-		list(APPEND THREAD_HEADER_FILES
-			include/Threading/OgreDefaultWorkQueueConcrt.h)
-		set(THREAD_SOURCE_FILES
-			src/Threading/OgreDefaultWorkQueueConcrt.cpp)
-	else ()
-		list(APPEND THREAD_HEADER_FILES
-			include/Threading/OgreDefaultWorkQueueStandard.h)
-		set(THREAD_SOURCE_FILES
-			src/Threading/OgreDefaultWorkQueueStandard.cpp)
-	endif ()
+  set(THREAD_SOURCE_FILES
+    src/Threading/OgreDefaultWorkQueueStandard.cpp)
 elseif (OGRE_THREAD_PROVIDER EQUAL 3)
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesTBB.h
