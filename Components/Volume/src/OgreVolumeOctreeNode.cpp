@@ -73,7 +73,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    OctreeNode::OctreeNode(const Vector3 from, const Vector3 to) : mFrom(from), mTo(to),
+    OctreeNode::OctreeNode(const Vector3 &from, const Vector3 &to) : mFrom(from), mTo(to),
         mChildren(0), mOctreeGrid(0), mCenterValue(0.0, 0.0, 0.0, 0.0)
     {
     }

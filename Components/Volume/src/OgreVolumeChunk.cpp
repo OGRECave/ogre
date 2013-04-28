@@ -243,7 +243,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Chunk::Chunk(void) : mDualGrid(0), mOctree(0), mChildren(0), mNode(0), isRoot(false)
+    Chunk::Chunk(void) : mNode(0), mDualGrid(0), mOctree(0), mChildren(0), isRoot(false)
     {
     }
     
