@@ -124,10 +124,10 @@ public:
     */
     virtual bool mouseMoved(const OIS::MouseEvent& evt);
     
-    /** Overridden from SdkSample.
-    */
-    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 #endif
+    /** Overridden from SdkSample.
+     */
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 };
 
 #endif
