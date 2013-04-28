@@ -84,7 +84,10 @@ namespace Volume {
         /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
         size_t createGeometryFromLevel;
 
-        /// If an existing chunktree is to be partially updated, set this to the back lower left point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
+        /// When generating the octree, a node performs a check whether to split or not by checking his diagonal against the isosurface distance. This factor performs a correction for density sources where the distances do not match roughly world units.
+        Real octreeNodeDistanceCheckDiagonalFactor;
+
+        /// If an existing chunktree is to be partially updated, set this to the back lower left point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load). 1.5 is the default.
         Vector3 updateFrom;
         
         /// If an existing chunktree is to be partially updated, set this to the front upper right point of the (sub-)cube to be reloaded. Else, set both update vectors to zero (initial load).
@@ -95,7 +98,7 @@ namespace Volume {
         ChunkParameters(void) :
             sceneManager(0), src(0), baseError((Real)0.0), errorMultiplicator((Real)1.0), createOctreeVisualization(false),
             createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0),
-            updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO)
+            octreeNodeDistanceCheckDiagonalFactor((Real)1.5), updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO)
         {
         }
     } ChunkParameters;
