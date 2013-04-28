@@ -1,0 +1,23 @@
+void main_vs(float4 position : POSITION,
+			 float3 uv		  : TEXCOORD0,
+			 out float4 oPosition : POSITION,
+			 out float3 oUv	   : TEXCOORD0,
+			 uniform float4x4 worldViewProj)
+{
+	position.w = 1.0f;
+	oPosition = mul(worldViewProj, position);
+	oUv = uv;
+}
+
+void main_fp(float4 position          : POSITION, 
+			 float2 uv                : TEXCOORD0,
+			 out float4 colour        : COLOR,
+			 uniform sampler2D Image : register(s0),
+			 uniform sampler2D Thaw : register(s1))
+{
+	float4 l_color0 = tex2D(Image,uv);
+	float4 l_color1 = tex2D(Thaw,uv);
+	 	
+	colour = l_color0 * l_color1;
+	//colour = l_color1;	
+}

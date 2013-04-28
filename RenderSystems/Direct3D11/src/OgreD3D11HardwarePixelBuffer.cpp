@@ -162,8 +162,8 @@ namespace Ogre {
 		}
 
 		box.data = pMappedResource.pData;
-        box.rowPitch = pMappedResource.RowPitch;
-        box.slicePitch = pMappedResource.DepthPitch;
+		box.rowPitch = pMappedResource.RowPitch;
+		box.slicePitch = pMappedResource.DepthPitch;
 	}
 	//-----------------------------------------------------------------------------  
 	void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -197,8 +197,8 @@ namespace Ogre {
 		else if(flags == D3D11_MAP_WRITE_DISCARD)
 			flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-        PixelBox box;
-        _map(mStagingBuffer, flags, box);
+		PixelBox box;
+		_map(mStagingBuffer, flags, box);
 		return box.data;
 	}
 	//-----------------------------------------------------------------------------  
@@ -408,8 +408,9 @@ namespace Ogre {
 			if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
 			{
 				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-                PixelBox box;
-                _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
+
+				PixelBox box;
+				_map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
 				void *data = box.data; 
 
 				memcpy(data, mCurrentLock.data, sizeinbytes);

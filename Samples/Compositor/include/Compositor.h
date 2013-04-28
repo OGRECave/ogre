@@ -649,7 +649,7 @@ void Sample_Compositor::createTextures(void)
 		64,64,64,
 		0,
 		PF_L8, 
-        TU_DYNAMIC_WRITE_ONLY
+		TU_DYNAMIC_WRITE_ONLY
 	);
 
     if(!tex.isNull())
@@ -683,7 +683,6 @@ void Sample_Compositor::createTextures(void)
         }
         ptr->unlock();
     }
-
 	Ogre::Viewport *vp = mWindow->getViewport(0); 
 
 	TexturePtr tex2 = TextureManager::getSingleton().createManual(

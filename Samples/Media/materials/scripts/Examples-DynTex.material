@@ -1,20 +1,128 @@
+vertex_program Ogre/Dyn_Text_VS_CG cg
+{
+	source Dyn-Text.cg
+	entry_point main_vs
+	profiles vs_2_0 vs_1_1 arbvp1
+	
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Dyn_Text_VS_GLSL glsl
+{
+	source Dyn-TextVP.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Dyn_Text_VS_GLSLES glsles
+{
+	source Dyn-TextVP.glsles
+	profiles glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Dyn_Text_VS_HLSL hlsl
+{
+	source Dyn-Text.hlsl
+	entry_point main_vs
+	target vs_5_0
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+
+fragment_program Ogre/Dyn_Text_PS_CG cg
+{
+	source Dyn-Text.cg
+	entry_point main_fp
+	profiles ps_2_0 arbfp1
+}
+
+fragment_program Ogre/Dyn_Text_PS_GLSL glsl
+{
+	source Dyn-TextFP.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named Image int 0
+		param_named Thaw int 1
+	}
+}
+
+fragment_program Ogre/Dyn_Text_PS_GLSLES glsles
+{
+	source Dyn-TextFP.glsles
+	profiles glsles
+	default_params
+	{
+		param_named Image int 0
+		param_named Thaw int 1
+	}
+}
+
+fragment_program Ogre/Dyn_Text_PS_HLSL hlsl
+{
+	source Dyn-Text.hlsl
+	entry_point main_ps
+	target ps_5_0
+}
+
+vertex_program Ogre/Dyn_Text_VS unified
+{
+	delegate Ogre/Dyn_Text_VS_HLSL
+	delegate Ogre/Dyn_Text_VS_GLSL
+	delegate Ogre/Dyn_Text_VS_GLSLES
+	delegate Ogre/Dyn_Text_VS_CG
+}
+
+fragment_program Ogre/Dyn_Text_PS unified
+{
+	delegate Ogre/Dyn_Text_PS_HLSL
+	delegate Ogre/Dyn_Text_PS_GLSL
+	delegate Ogre/Dyn_Text_PS_GLSLES
+	delegate Ogre/Dyn_Text_PS_CG	
+}
+
+
 material Examples/Frost
 {
 	technique
 	{
 		pass
 		{
+		
+			vertex_program_ref Ogre/Dyn_Text_VS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/Dyn_Text_PS
+			{
+			
+			}
+		
 			lighting off
 			depth_write off
 			scene_blend colour_blend
 			
-			texture_unit
+			texture_unit 0
 			{
 				texture frost.png
 				scale 0.5 0.5
 			}
 
-			texture_unit
+			texture_unit 1
 			{
 				texture thaw
 			}

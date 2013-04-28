@@ -1,0 +1,352 @@
+//===============================================================
+// AMBIENT
+vertex_program Ogre/AmbientNoTessellation_vs hlsl
+{
+	source  NoTessellation.hlsl
+	entry_point ambient_color_vs
+	target vs_5_0
+	
+	default_params
+	{
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+	}
+}
+
+fragment_program Ogre/AmbientNoTessellation_ps hlsl
+{
+	source NoTessellation.hlsl
+	entry_point ambient_color_ps
+	target ps_5_0
+	
+	default_params
+	{
+        param_named_auto g_AmbientLightColour ambient_light_colour
+	}
+}
+//===============================================================
+// PER-LIGHT
+vertex_program Ogre/PerLightNoTessellation_vs hlsl
+{
+	source  NoTessellation.hlsl
+	entry_point perlight_color_vs
+	target vs_5_0
+	
+	default_params
+	{
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+		param_named_auto g_WorldInverseTranspose inverse_transpose_world_matrix
+		param_named_auto g_World world_matrix
+		param_named_auto g_InverseView inverse_view_matrix
+	}
+}
+
+fragment_program Ogre/PerLightNoTessellation_ps hlsl
+{
+	source NoTessellation.hlsl
+	entry_point perlight_color_ps
+	target ps_5_0
+	
+	default_params
+	{
+        param_named_auto g_AmbientLightColour ambient_light_colour
+		param_named_auto g_LightDirection light_direction 0
+		param_named_auto g_LightDiffuseColour light_diffuse_colour 0
+		param_named_auto g_DiffuseColour surface_diffuse_colour
+		param_named_auto g_SpecularColor surface_specular_colour
+		param_named g_FresnelColor float3 0.172f, 0.172f, 0.172f
+		param_named g_SpecularPower float 10.0f
+		param_named g_FresnelPower float 10.0f
+	}
+}
+
+//==============================================================
+material Ogre/NoTessellation
+{
+	technique
+	{
+		pass ambient
+		{
+			ambient 0 0 0
+			
+			vertex_program_ref Ogre/AmbientNoTessellation_vs
+			{
+			}
+			
+			fragment_program_ref Ogre/AmbientNoTessellation_ps
+			{
+			}
+		}
+		
+		pass perlight
+		{
+			diffuse 0.4 0.4 0.4 1
+			specular 0.561 0.561 0.561 1
+			
+			iteration once_per_light
+			scene_blend add
+			
+			vertex_program_ref Ogre/PerLightNoTessellation_vs
+			{
+			}
+			
+			fragment_program_ref Ogre/PerLightNoTessellation_ps
+			{
+			}
+			
+			texture_unit normal
+			{
+				texture Rocks_Normal.tga
+			}
+			
+			texture_unit diffuse
+			{
+				texture Rocks_Diffuse.tga
+			}
+			
+			texture_unit specular
+			{
+				texture Rocks_Spec.tga
+			}
+		}
+	}
+}
+
+// Simple tessellation - new shaders
+
+vertex_program Ogre/PNTrianglesTessellation/simple_tessellation_vs hlsl
+{
+	source simple_tessellation.hlsl
+	entry_point simple_tessellation_vs
+	target vs_5_0
+	
+	default_params
+	{
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+	}	
+}
+
+tesselation_hull_program Ogre/PNTrianglesTessellation/simple_tessellation_hs hlsl
+{
+	source simple_tessellation.hlsl
+	entry_point simple_tessellation_hs
+	target hs_5_0
+
+	default_params
+	{
+		param_named g_tessellationAmount float 1
+	}
+}
+
+tesselation_domain_program Ogre/PNTrianglesTessellation/simple_tessellation_ds hlsl
+{
+	source simple_tessellation.hlsl
+	entry_point simple_tessellation_ds
+	target ds_5_0
+
+	default_params
+	{
+		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+		param_named_auto g_WorldMatrix world_matrix
+		param_named_auto g_ViewMatrix view_matrix
+		param_named_auto g_ProjectionMatrix projection_matrix
+	}
+}
+
+fragment_program Ogre/PNTrianglesTessellation/simple_tessellation_ps hlsl
+{
+	source simple_tessellation.hlsl
+	entry_point simple_tessellation_ps
+	target ps_5_0
+	
+	default_params
+	{
+	}	
+}
+
+material Ogre/SimpleTessellation
+{
+	technique
+	{
+		pass tessellation
+		{			
+			vertex_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_vs
+			{
+			}
+						
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_hs
+			{
+			}
+			
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
+			{
+			}
+			
+			fragment_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ps
+			{
+			}
+			
+			texture_unit diffuse
+			{
+				texture Rocks_Diffuse.tga
+			}
+		}
+	}
+}
+
+// Adaptive tessellation - new shaders
+// just the hull shader is different from the simple tessellation
+
+tesselation_hull_program Ogre/PNTrianglesTessellation/adaptive_tessellation_hs hlsl
+{
+	source adaptive_tessellation.hlsl
+	entry_point color_tessellation_hs
+	target hs_5_0
+
+	default_params
+	{
+		//Tessellation factors: x=edge, y=inside, z=MinDistance, w=range
+		param_named tessellationAmounts float4 16 16 100 200
+		param_named_auto cameraPosition camera_position
+	}
+}
+
+material Ogre/AdaptiveTessellation
+{
+	technique
+	{
+		pass
+		{	
+			iteration once_per_light
+			vertex_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_vs
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/adaptive_tessellation_hs
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ps
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+				texture floor_diffuse.PNG
+			}
+		}
+	}
+}
+
+// Adaptive PN-Triangles tessellation - new shaders
+
+vertex_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_vs hlsl
+{
+	source adaptivePNTriangles_tessellation.hlsl
+	entry_point color_tessellation_vs
+	target vs_5_0
+
+	default_params
+	{
+		param_named_auto worldviewprojMatrix worldviewproj_matrix
+		param_named_auto worldMatrix world_matrix
+		param_named_auto projectionMatrix projection_matrix
+		//param_named normal float3 1 0 0
+	}
+}
+
+tesselation_hull_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs hlsl
+{
+	source adaptivePNTriangles_tessellation.hlsl
+	entry_point color_tessellation_hs
+	target hs_5_0
+
+	default_params
+	{
+		//Tessellation factors: x=edge, y=inside, z=MinDistance, w=range
+		param_named tessellationAmounts float4 16 16 100 200
+		param_named_auto cameraPosition camera_position
+	}
+}
+
+tesselation_domain_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds hlsl
+{
+	source adaptivePNTriangles_tessellation.hlsl
+	entry_point color_tessellation_ds
+	target ds_5_0
+
+	default_params
+	{
+		param_named_auto worldviewprojMatrix worldviewproj_matrix
+		param_named_auto worldMatrix world_matrix
+		param_named_auto projectionMatrix projection_matrix
+	}
+}
+
+fragment_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ps hlsl
+{
+	source adaptivePNTriangles_tessellation.hlsl
+	entry_point color_tessellation_ps
+	target ps_5_0
+	
+	default_params
+	{
+		param_named_auto lightDiffuseColor light_diffuse_colour 0
+        param_named_auto lightSpecularColor light_specular_colour 0
+		param_named_auto lightDirection light_direction 0
+        param_named_auto lightPosition light_position 0
+        param_named_auto lightAttenuation light_attenuation 0
+        param_named_auto surfaceDiffuseColour surface_diffuse_colour
+        param_named_auto surfaceSpecularColour surface_specular_colour
+        param_named_auto surfaceShininess surface_shininess
+        //param_named_auto cameraPosition camera_position
+	}	
+}
+
+material Ogre/AdaptivePNTrianglesTessellation
+{
+	technique
+	{
+		pass
+		{		
+			iteration once_per_light
+			vertex_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_vs
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ps
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+				texture floor_diffuse.PNG
+			}
+			
+			texture_unit 
+			{
+				texture floor_bump.PNG
+				binding_type vertex
+			}
+		}
+	}
+}
