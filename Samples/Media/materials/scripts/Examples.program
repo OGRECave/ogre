@@ -38,7 +38,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
     source Example_Basic.hlsl
     entry_point ambientOneTexture_vp
-    target vs_4_0 vs_1_1
+    target vs_4_0
 
     default_params
     {
@@ -199,7 +199,7 @@ vertex_program Ogre/HardwareSkinningOneWeightShadowCaster cg
 {
     source Example_Basic.cg
     entry_point hardwareSkinningOneWeightCaster_vp
-    profiles vs_1_1 arbvp1
+    profiles vs_4_0 vs_1_1 arbvp1
     includes_skeletal_animation true
 }
 // Basic hardware skinning using one indexed weight per vertex
@@ -207,7 +207,7 @@ vertex_program Ogre/HardwareSkinningOneWeight cg
 {
    source Example_Basic.cg
    entry_point hardwareSkinningOneWeight_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
    includes_skeletal_animation true   
 }
 // Same as below, but for use when rendering texture shadows
@@ -224,7 +224,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
 {
     source Example_Basic.hlsl
     entry_point hardwareSkinningTwoWeightsCaster_vp
-    target vs_1_1
+    target vs_4_0
     includes_skeletal_animation true
     column_major_matrices false
 }
@@ -255,7 +255,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
     source Example_Basic.hlsl
     entry_point hardwareSkinningTwoWeights_vp
-    target vs_1_1 
+    target vs_4_0
     includes_skeletal_animation true
     column_major_matrices false
 }
@@ -298,7 +298,7 @@ vertex_program Ogre/HardwareSkinningTwoWeights unified
         param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
         param_named_auto ambient ambient_light_colour
         //This property isn't relevant for GLSL, uses the GLSL material state instead
-        param_named_auto diffuse surface_diffuse_colour
+        //param_named_auto diffuse surface_diffuse_colour
     }
 }
 
@@ -307,7 +307,7 @@ vertex_program Ogre/HardwareSkinningFourWeights cg
 {
    source Example_Basic.cg
    entry_point hardwareSkinningFourWeights_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
    includes_skeletal_animation true
 
    default_params
@@ -327,7 +327,7 @@ vertex_program Ogre/HardwareMorphAnimation cg
 {
     source Example_Basic.cg
     entry_point hardwareMorphAnimation
-    profiles vs_1_1 arbvp1
+    profiles vs_4_0 vs_1_1 arbvp1
 
     includes_morph_animation true
     default_params
@@ -341,7 +341,7 @@ vertex_program Ogre/HardwarePoseAnimation cg
 {
     source Example_Basic.cg
     entry_point hardwarePoseAnimation
-    profiles vs_1_1 arbvp1
+    profiles vs_4_0 vs_1_1 arbvp1
 
     includes_pose_animation 2
     default_params
@@ -356,7 +356,7 @@ vertex_program Ogre/HardwareMorphAnimationWithNormals cg
 {
     source Example_Basic.cg
     entry_point hardwareMorphAnimationWithNormals
-    profiles vs_1_1 arbvp1
+    profiles vs_4_0 vs_1_1 arbvp1
 
     includes_morph_animation true
     default_params
@@ -372,7 +372,7 @@ vertex_program Ogre/HardwarePoseAnimationWithNormals cg
 {
     source Example_Basic.cg
     entry_point hardwarePoseAnimationWithNormals
-    profiles vs_1_1 arbvp1
+    profiles vs_4_0 vs_1_1 arbvp1
 
     includes_pose_animation 2
     default_params

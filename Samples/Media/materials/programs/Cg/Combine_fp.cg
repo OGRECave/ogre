@@ -2,8 +2,8 @@ float4 Combine_fp
 (
     in float2 texCoord: TEXCOORD0,
     
-    uniform sampler RT : register(s0),
-    uniform sampler Sum : register(s1),
+    uniform sampler2D RT : register(s0),
+    uniform sampler2D Sum : register(s1),
 
     uniform float blur
 ) : COLOR

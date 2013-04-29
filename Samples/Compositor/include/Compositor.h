@@ -649,41 +649,38 @@ void Sample_Compositor::createTextures(void)
 		64,64,64,
 		0,
 		PF_L8, 
-        TU_DYNAMIC_WRITE_ONLY
+		TU_DYNAMIC_WRITE_ONLY
 	);
 
-    if(!tex.isNull())
-    {
-        HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
-        ptr->lock(HardwareBuffer::HBL_DISCARD);
-        const PixelBox &pb = ptr->getCurrentLock();
-        Ogre::uint8 *data = static_cast<Ogre::uint8*>(pb.data);
+	HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
+	ptr->lock(HardwareBuffer::HBL_DISCARD);
+	const PixelBox &pb = ptr->getCurrentLock();
+	Ogre::uint8 *data = static_cast<Ogre::uint8*>(pb.data);
 
-        size_t height = pb.getHeight();
-        size_t width = pb.getWidth();
-        size_t depth = pb.getDepth();
-        size_t rowPitch = pb.rowPitch;
-        size_t slicePitch = pb.slicePitch;
+	size_t height = pb.getHeight();
+	size_t width = pb.getWidth();
+	size_t depth = pb.getDepth();
+	size_t rowPitch = pb.rowPitch;
+	size_t slicePitch = pb.slicePitch;
 
-        for (size_t z = 0; z < depth; ++z)
-        {
-            for (size_t y = 0; y < height; ++y)
-            {
-                for(size_t x = 0; x < width; ++x)
-                {
-                    float fx = 32-(float)x+0.5f;
-                    float fy = 32-(float)y+0.5f;
-                    float fz = 32-((float)z)/3+0.5f;
-                    float distanceSquare = fx*fx+fy*fy+fz*fz;
-                    data[slicePitch*z + rowPitch*y + x] =  0x00;
-                    if (distanceSquare < 1024.0f)
-                        data[slicePitch*z + rowPitch*y + x] +=  0xFF;
-                }
-            }
-        }
-        ptr->unlock();
-    }
-
+	for (size_t z = 0; z < depth; ++z)
+	{
+		for (size_t y = 0; y < height; ++y)
+		{
+			for(size_t x = 0; x < width; ++x)
+			{
+				float fx = 32-(float)x+0.5f;
+				float fy = 32-(float)y+0.5f;
+				float fz = 32-((float)z)/3+0.5f;
+				float distanceSquare = fx*fx+fy*fy+fz*fz;
+				data[slicePitch*z + rowPitch*y + x] =  0x00;
+				if (distanceSquare < 1024.0f)
+					data[slicePitch*z + rowPitch*y + x] +=  0xFF;
+			}
+		}
+	}
+	ptr->unlock();
+    
 	Ogre::Viewport *vp = mWindow->getViewport(0); 
 
 	TexturePtr tex2 = TextureManager::getSingleton().createManual(
@@ -692,8 +689,7 @@ void Sample_Compositor::createTextures(void)
 		TEX_TYPE_2D,
 		vp->getActualWidth(),vp->getActualHeight(),1,
 		0,
-		PF_L8,
-        TU_DYNAMIC_WRITE_ONLY
+		PF_A8
 	);
 
 	HardwarePixelBufferSharedPtr ptr2 = tex2->getBuffer(0,0);

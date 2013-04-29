@@ -449,6 +449,7 @@ namespace Ogre {
                 static_cast<const char*>(errors->GetBufferPointer());
             errors->Release();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+                "D3D11HLSLProgram::loadFromSource");
                 "D3D11HLSLProgram::compileMicroCode");
         }
         else
@@ -1062,7 +1063,7 @@ namespace Ogre {
 
 	}
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType)
+	void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType)
     {
         D3D11_SHADER_TYPE_DESC varRefTypeDesc;
         HRESULT hr = varRefType->GetDesc(&varRefTypeDesc);
@@ -1107,9 +1108,8 @@ namespace Ogre {
                 mSerStrings.push_back(name);
                 def.Name = &(*name)[0]; 
 
-                GpuConstantDefinitionWithName* prev_def = mD3d11ShaderVariableSubparts.empty() ? NULL : &mD3d11ShaderVariableSubparts.back();
-                def.logicalIndex = prev_def ? prev_def->logicalIndex + prev_def->elementSize / 4 : 0;
-
+				GpuConstantDefinitionWithName* prev_def = mD3d11ShaderVariableSubparts.empty() ? NULL : &mD3d11ShaderVariableSubparts.back();
+				def.logicalIndex = prev_def ? prev_def->logicalIndex + prev_def->elementSize / 4 : 0;
                 // populate type, array size & element size
                 populateDef(varRefTypeDesc, def);
 
@@ -1312,27 +1312,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        static const String
-			vs_4_0			 = "vs_4_0",
-			vs_4_0_level_9_3 = "vs_4_0_level_9_3",
-			vs_4_0_level_9_1 = "vs_4_0_level_9_1",
-			ps_4_0			 = "ps_4_0",
-			ps_4_0_level_9_3 = "ps_4_0_level_9_3",
-			ps_4_0_level_9_1 = "ps_4_0_level_9_1";
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0") return vs_4_0_level_9_1;
-            if(mTarget == "vs_2_a") return vs_4_0_level_9_3;
-            if(mTarget == "vs_2_x") return vs_4_0_level_9_3;
-            if(mTarget == "vs_3_0") return vs_4_0;
-
-            if(mTarget == "ps_2_0") return ps_4_0_level_9_1;
-            if(mTarget == "ps_2_a") return ps_4_0_level_9_3;
-            if(mTarget == "ps_2_b") return ps_4_0_level_9_3;
-            if(mTarget == "ps_2_x") return ps_4_0_level_9_3;
-            if(mTarget == "ps_3_0") return ps_4_0;
-            if(mTarget == "ps_3_x") return ps_4_0;
         }
 
         return mTarget;
