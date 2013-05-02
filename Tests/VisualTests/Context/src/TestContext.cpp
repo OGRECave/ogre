@@ -35,7 +35,6 @@ THE SOFTWARE.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
 
 #include "TestContext.h"
-#include "VisualTest.h"
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
 #include "HTMLWriter.h"
