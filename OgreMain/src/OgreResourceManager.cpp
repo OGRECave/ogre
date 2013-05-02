@@ -470,9 +470,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::checkUsage(void)
     {
-		OGRE_LOCK_AUTO_MUTEX
 		if (getMemoryUsage() > mMemoryBudget)
 		{
+			OGRE_LOCK_AUTO_MUTEX
 			// unload unreferenced resources until we are within our budget again
 			const bool reloadableOnly = true;
 			ResourceMap::iterator i, iend;
