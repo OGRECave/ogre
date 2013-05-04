@@ -55,7 +55,7 @@ namespace Volume {
         @return
             The interpolated position.
         */
-        inline Vector3 interpolate(const Vector3 &v0, const Vector3 &v1, const Vector4 val0, const Vector4 val1, Vector3 &normal) const
+        inline Vector3 interpolate(const Vector3 &v0, const Vector3 &v1, const Vector4 &val0, const Vector4 &val1, Vector3 &normal) const
         {
             // Don't use Math::RealEqual here as it isn't inlined and this function is performance critical.
             if (fabs(val0.w - ISO_LEVEL) <= FLT_EPSILON)
