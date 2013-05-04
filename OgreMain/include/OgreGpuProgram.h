@@ -194,9 +194,6 @@ namespace Ogre {
         */
         bool isRequiredCapabilitiesSupported(void) const;
 
-		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // TODO 
-
 		/// @copydoc Resource::loadImpl
 		void loadImpl(void);
 
@@ -424,6 +421,8 @@ namespace Ogre {
 		*/
 		virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
+		/// @copydoc Resource::calculateSize
+		virtual size_t calculateSize(void) const;
 
     protected:
         /// Virtual method which must be implemented by subclasses, load from mSource

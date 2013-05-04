@@ -398,6 +398,8 @@ namespace Ogre {
 		*/
 		void load(DataStreamPtr& stream);
 
+        size_t calculateSize(void) const;
+
 	protected:
 		/** Indicates whether all array entries will be generated and added to the definitions map
 		@remarks
@@ -529,6 +531,8 @@ namespace Ogre {
 			changes have occurred. 
 		*/
 		unsigned long getVersion() const { return mVersion; }
+
+        size_t calculateSize(void) const;
 
 		/** Mark the shared set as being dirty (values modified).
 		@remarks
@@ -1984,6 +1988,7 @@ namespace Ogre {
 		*/
 		void _copySharedParams();
 
+		size_t calculateSize(void) const;
 
 		/** Set subroutine name by slot name
 		 */

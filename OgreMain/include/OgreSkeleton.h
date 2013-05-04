@@ -457,7 +457,7 @@ namespace Ogre {
         */
         void unloadImpl(void);
 		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // TODO 
+		size_t calculateSize(void) const;
 
     };
 

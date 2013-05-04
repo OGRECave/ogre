@@ -1025,5 +1025,19 @@ namespace Ogre {
         }
     }
 
+    size_t Skeleton::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(SkeletonAnimationBlendMode);
+        memSize += mBoneList.size() * sizeof(Bone);
+        memSize += mRootBones.size() * sizeof(Bone);
+        memSize += mBoneListByName.size() * (sizeof(String) + sizeof(Bone*));
+        memSize += mAnimationsList.size() * (sizeof(String) + sizeof(Animation*));
+        memSize += mManualBones.size() * sizeof(Bone*);
+        memSize += mLinkedSkeletonAnimSourceList.size() * sizeof(LinkedSkeletonAnimationSource);
+        memSize += sizeof(bool);
+
+        return memSize;
+    }
 }
 

@@ -294,6 +294,7 @@ namespace Ogre {
         /// Returns true if this pass uses a shadow receiver fragment program
         bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
 
+        size_t calculateSize(void) const;
 
         /// Gets the index of this Pass in the parent Technique
         unsigned short getIndex(void) const { return mIndex; }

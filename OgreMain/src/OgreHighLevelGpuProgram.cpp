@@ -100,6 +100,18 @@ namespace Ogre
 			params->copyConstantsFrom(*(mDefaultParams.get()));
         return params;
     }
+    size_t HighLevelGpuProgram::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(bool);
+        if(!mAssemblerProgram.isNull())
+            memSize += mAssemblerProgram->calculateSize();
+
+        memSize += GpuProgram::calculateSize();
+
+        return memSize;
+    }
+
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::loadHighLevel(void)
     {

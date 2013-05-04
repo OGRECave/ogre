@@ -127,7 +127,7 @@ namespace Ogre {
                 is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
                 next used.
         */
-        virtual void setMemoryBudget( size_t bytes);
+        virtual void setMemoryBudget(size_t bytes);
 
         /** Get the limit on the amount of memory this resource handler may use.
         */
