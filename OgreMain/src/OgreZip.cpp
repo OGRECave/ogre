@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
+#if OGRE_NO_ZIP_ARCHIVE == 0
+
 #include "OgreZip.h"
 
 #include "OgreLogManager.h"
@@ -651,3 +653,5 @@ namespace Ogre {
         EmbeddedZipArchiveFactory_mFileNameToIndexMap->erase(name);
     }
 }
+
+#endif

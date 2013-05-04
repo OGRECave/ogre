@@ -73,8 +73,12 @@ namespace Volume {
     {
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
+#if OGRE_NO_ZIP_ARCHIVE == 0
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
         StreamSerialiser ser(compressStream);
+#else
+        StreamSerialiser ser(stream);
+#endif
         ser.writeChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION);
 
         // Write Metadata
