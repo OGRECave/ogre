@@ -345,7 +345,7 @@ namespace Ogre {
 		// Wrap memory, be sure not to delete when stream destroyed
 		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
-		pCodec->codeToFile(wrapper, filename, codeDataPtr);
+		pCodec->encodeToFile(wrapper, filename, codeDataPtr);
 	}
 	//---------------------------------------------------------------------
 	DataStreamPtr Image::encode(const String& formatextension)
@@ -373,7 +373,7 @@ namespace Ogre {
 		// Wrap memory, be sure not to delete when stream destroyed
 		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
-		return pCodec->code(wrapper, codeDataPtr);
+		return pCodec->encode(wrapper, codeDataPtr);
 	}
 	//-----------------------------------------------------------------------------
 	Image & Image::load(DataStreamPtr& stream, const String& type )
