@@ -887,36 +887,17 @@ namespace Ogre {
 				}
 				else
 				{
-					// Final data - trim incoming pitch
-					size_t srcPitch;
-					if (header.flags & DDSD_PITCH)
-					{
-						srcPitch = header.sizeOrPitch / 
-							std::max((size_t)1, mip * 2);
-					}
-					else
-					{
-						// assume same as final pitch
-						srcPitch = dstPitch;
-					}
-					assert (dstPitch <= srcPitch);
-					long srcAdvance = static_cast<long>(srcPitch) - static_cast<long>(dstPitch);
-
+                    // Note: We assume the source and destination have the same pitch
 					for (size_t z = 0; z < imgData->depth; ++z)
 					{
 						for (size_t y = 0; y < imgData->height; ++y)
 						{
 							stream->read(destPtr, dstPitch);
-							if (srcAdvance > 0)
-								stream->skip(srcAdvance);
-
 							destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dstPitch);
 						}
 					}
-
 				}
 
-				
 				/// Next mip
 				if(width!=1) width /= 2;
 				if(height!=1) height /= 2;
