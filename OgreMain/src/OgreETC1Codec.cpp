@@ -77,7 +77,7 @@ namespace Ogre {
 	{
 		if(msInstance)
 		{
-			Codec::unRegisterCodec(msInstance);
+			Codec::unregisterCodec(msInstance);
 			OGRE_DELETE msInstance;
 			msInstance = 0;
 		}
@@ -88,19 +88,19 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ETC1Codec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
+    DataStreamPtr ETC1Codec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC1 encoding not supported",
-                    "ETC1Codec::code" ) ;
+                    "ETC1Codec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void ETC1Codec::codeToFile(MemoryDataStreamPtr& input, 
+    void ETC1Codec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC1 encoding not supported",
-                    "ETC1Codec::codeToFile" ) ;
+                    "ETC1Codec::encodeToFile" ) ;
 	}
     //---------------------------------------------------------------------
     Codec::DecodeResult ETC1Codec::decode(DataStreamPtr& stream) const
