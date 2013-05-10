@@ -153,19 +153,19 @@ protected:
 	struct _OgrePrivate PMVertex {
 		Vector3 position;
 		VEdges edges;
-		VTriangles triangles; // Triangle ID set, which are using this vertex.
+		VTriangles triangles; /// Triangle ID set, which are using this vertex.
 
 		PMVertex* collapseTo;
 		bool seam;
-		CollapseCostHeap::iterator costHeapPosition; // Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
+		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
 	};
 
 	struct _OgrePrivate PMTriangle {
 		PMVertex* vertex[3];
 		Vector3 normal;
 		bool isRemoved;
-		unsigned short submeshID; // ID of the submesh. Usable with mMesh.getSubMesh() function.
-		unsigned int vertexID[3]; // Vertex ID in the buffer associated with the submeshID.
+		unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+		unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
 		void computeNormal();
 		bool hasVertex(const PMVertex* v) const;

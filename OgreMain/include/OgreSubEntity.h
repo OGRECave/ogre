@@ -83,7 +83,7 @@ namespace Ogre {
         /// Cached pointer to material.
         MaterialPtr mMaterial;
 
-        // Pointer to the SubMesh defining geometry.
+        /// Pointer to the SubMesh defining geometry.
         SubMesh* mSubMesh;
 
         /// Is this SubEntity visible?

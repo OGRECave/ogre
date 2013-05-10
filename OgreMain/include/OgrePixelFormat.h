@@ -253,22 +253,22 @@ namespace Ogre {
      * Flags defining some on/off properties of pixel formats
      */
     enum PixelFormatFlags {
-        // This format has an alpha channel
+        /// This format has an alpha channel
         PFF_HASALPHA        = 0x00000001,      
-        // This format is compressed. This invalidates the values in elemBytes,
-        // elemBits and the bit counts as these might not be fixed in a compressed format.
+        /** This format is compressed. This invalidates the values in elemBytes,
+            elemBits and the bit counts as these might not be fixed in a compressed format. */
         PFF_COMPRESSED    = 0x00000002,
-        // This is a floating point format
+        /// This is a floating point format
         PFF_FLOAT           = 0x00000004,         
-        // This is a depth format (for depth textures)
+        /// This is a depth format (for depth textures)
         PFF_DEPTH           = 0x00000008,
-        // Format is in native endian. Generally true for the 16, 24 and 32 bits
-        // formats which can be represented as machine integers.
+        /** Format is in native endian. Generally true for the 16, 24 and 32 bits
+            formats which can be represented as machine integers. */
         PFF_NATIVEENDIAN    = 0x00000010,
-        // This is an intensity format instead of a RGB one. The luminance
-        // replaces R,G and B. (but not A)
+        /** This is an intensity format instead of a RGB one. The luminance
+            replaces R,G and B. (but not A) */
         PFF_LUMINANCE       = 0x00000020,
-        // This is an integer format
+        /// This is an integer format
         PFF_INTEGER         = 0x00000040
     };
     

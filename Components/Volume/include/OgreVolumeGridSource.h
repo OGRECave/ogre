@@ -61,10 +61,10 @@ namespace Volume {
         /// The texture depth.
         int mDepth;
 
-        // Whether to use trilinear filtering or not for the value.
+        /// Whether to use trilinear filtering or not for the value.
         bool mTrilinearValue;
         
-        // Whether to use trilinear filtering or not for the gradient.
+        /// Whether to use trilinear filtering or not for the gradient.
         const bool mTrilinearGradient;
 
         /// Whether to blur the gradient a bit Sobel like.

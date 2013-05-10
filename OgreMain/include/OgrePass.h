@@ -1487,7 +1487,7 @@ namespace Ogre {
 		void _load(void);
 		/** Internal method for unloading this pass. */
 		void _unload(void);
-        // Is this loaded?
+        /// Is this loaded?
         bool isLoaded(void) const;
 
         /** Gets the 'hash' of this pass, ie a precomputed number to use for sorting

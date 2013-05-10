@@ -46,16 +46,11 @@ namespace Ogre {
     class _OgreParticleFXExport EllipsoidEmitter : public AreaEmitter
     {
     public:
-        // See AreaEmitter
-
+        /** See AreaEmitter. */
         EllipsoidEmitter(ParticleSystem* psys);
 
         /** See ParticleEmitter. */
         void _initParticle(Particle* pParticle);
-
-    protected:
-        
-
     };
 
 }

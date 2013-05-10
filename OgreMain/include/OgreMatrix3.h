@@ -111,7 +111,7 @@ namespace Ogre
 			std::swap(m[2][2], other.m[2][2]);
 		}
 
-        // member access, allows use of construct mat[r][c]
+        /// Member access, allows use of construct mat[r][c]
         inline Real* operator[] (size_t iRow) const
 		{
 			return const_cast<Real*>(m[iRow]);
@@ -124,7 +124,7 @@ namespace Ogre
         void SetColumn(size_t iCol, const Vector3& vec);
         void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
 
-        // assignment and comparison
+        /// Assignment and comparison
         inline Matrix3& operator= (const Matrix3& rkMatrix)
 		{
 			memcpy(m,rkMatrix.m,9*sizeof(Real));
@@ -175,7 +175,7 @@ namespace Ogre
         Matrix3 Inverse (Real fTolerance = 1e-06) const;
         Real Determinant () const;
 
-        // singular value decomposition
+        /// Singular value decomposition
         void SingularValueDecomposition (Matrix3& rkL, Vector3& rkS,
             Matrix3& rkR) const;
         void SingularValueComposition (const Matrix3& rkL,
@@ -190,7 +190,7 @@ namespace Ogre
 
         Real SpectralNorm () const;
 
-        // matrix must be orthonormal
+        /// Note: Matrix must be orthonormal
         void ToAngleAxis (Vector3& rkAxis, Radian& rfAngle) const;
 		inline void ToAngleAxis (Vector3& rkAxis, Degree& rfAngle) const {
 			Radian r;
@@ -199,9 +199,9 @@ namespace Ogre
 		}
         void FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians);
 
-        // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
-        // where yaw is rotation about the Up vector, pitch is rotation about the
-        // Right axis, and roll is rotation about the Direction axis.
+        /** The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
+            where yaw is rotation about the Up vector, pitch is rotation about the
+            Right axis, and roll is rotation about the Direction axis. */
         bool ToEulerAnglesXYZ (Radian& rfYAngle, Radian& rfPAngle,
             Radian& rfRAngle) const;
         bool ToEulerAnglesXZY (Radian& rfYAngle, Radian& rfPAngle,

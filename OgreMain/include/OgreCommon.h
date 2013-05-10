@@ -102,7 +102,7 @@ namespace Ogre {
     /** Filtering options for textures / mipmaps. */
     enum FilterOptions
     {
-        /// No filtering, used for FILT_MIP to turn off mipmapping
+        /// No filtering, used for FT_MIP to turn off mipmapping
         FO_NONE,
         /// Use the closest pixel
         FO_POINT,
