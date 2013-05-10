@@ -187,7 +187,7 @@ namespace Ogre {
 	{
 		if(msInstance)
 		{
-			Codec::unRegisterCodec(msInstance);
+			Codec::unregisterCodec(msInstance);
 			OGRE_DELETE msInstance;
 			msInstance = 0;
 		}
@@ -199,14 +199,14 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr DDSCodec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
+    DataStreamPtr DDSCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 			"DDS encoding not supported",
-			"DDSCodec::code" ) ;
+			"DDSCodec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void DDSCodec::codeToFile(MemoryDataStreamPtr& input, 
+    void DDSCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
 		// Unwrap codecDataPtr - data is cleaned by calling function
@@ -273,7 +273,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 				"DDS encoding for" + notImplementedString + " not supported",
-				"DDSCodec::codeToFile" ) ;
+				"DDSCodec::encodeToFile" ) ;
 		}
 		else
 		{
@@ -399,7 +399,7 @@ namespace Ogre {
             default:
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                             "Unsupported DirectX format found in DDS file",
-                            "DDSCodec::decode");
+                            "DDSCodec::convertDXToOgreFormat");
         }
     }
 	//---------------------------------------------------------------------
@@ -444,7 +444,7 @@ namespace Ogre {
 		default:
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 				"Unsupported FourCC format found in DDS file", 
-				"DDSCodec::decode");
+				"DDSCodec::convertFourCCFormat");
 		};
 
 	}
