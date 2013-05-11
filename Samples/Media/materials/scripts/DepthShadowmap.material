@@ -469,7 +469,6 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
 // **-- End Unified Section --**
 
 
-
 // Generic Shadow caster material (floating point shadowmap)
 material Ogre/DepthShadowmap/Caster/Float
 {
@@ -477,6 +476,7 @@ material Ogre/DepthShadowmap/Caster/Float
     {
         pass 
         {
+            colour_write off
             vertex_program_ref Ogre/DepthShadowmap/CasterVP
             {
             }

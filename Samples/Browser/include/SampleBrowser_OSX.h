@@ -40,7 +40,6 @@
 #define USE_DISPLAYLINK 0
 
 #import "OgreOSXCocoaWindow.h"
-#import <Cocoa/Cocoa.h>
 #import <QuartzCore/CVDisplayLink.h>
 
 using namespace Ogre;
