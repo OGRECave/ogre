@@ -560,6 +560,11 @@ namespace Ogre {
         */
         bool getIsAlpha(void) const;
 
+        /// @copydoc Texture::getGamma
+        Real getGamma() const { return mGamma; }
+        /// @copydoc Texture::setGamma
+        void setGamma(Real gamma) { mGamma = gamma; }
+
         /// @copydoc Texture::setHardwareGammaEnabled
         void setHardwareGammaEnabled(bool enabled);
         /// @copydoc Texture::isHardwareGammaEnabled
@@ -1229,6 +1234,7 @@ protected:
         mutable bool mTextureLoadFailed;
         bool mIsAlpha;
         bool mHwGamma;
+        Real mGamma;
 
         mutable bool mRecalcTexMatrix;
         Real mUMod, mVMod;
