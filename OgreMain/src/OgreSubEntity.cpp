@@ -42,10 +42,10 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::SubEntity (Entity* parent, SubMesh* subMeshBasis)
-        : Renderable(), mParentEntity(parent), mMaterialName("BaseWhite"),
+        : Renderable(), mParentEntity(parent), //mMaterialName("BaseWhite"),
 		mSubMesh(subMeshBasis), mCachedCamera(0)
     {
-        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
+        //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mVisible = true;
         mRenderQueueIDSet = false;
@@ -76,7 +76,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& SubEntity::getMaterialName(void) const
     {
-        return mMaterialName;
+		return !mMaterialPtr.isNull() ? mMaterialPtr->getName() : StringUtil::BLANK;
+        //return mMaterialName;
     }
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
@@ -108,18 +109,18 @@ namespace Ogre {
 
 	void SubEntity::setMaterial( const MaterialPtr& material )
 	{
-		mMaterial = material;
+		mMaterialPtr = material;
 		
-        if (mMaterial.isNull())
+        if (mMaterialPtr.isNull())
         {
 			LogManager::getSingleton().logMessage("Can't assign material "  
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
 			
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+            mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
 			
-            if (mMaterial.isNull())
+            if (mMaterialPtr.isNull())
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
                     "to SubEntity of " + mParentEntity->getName() + ". Did "
@@ -128,25 +129,22 @@ namespace Ogre {
             }
         }
 		
-		mMaterialName = mMaterial->getName();
-
         // Ensure new material loaded (will not load again if already loaded)
-        mMaterial->load();
+        mMaterialPtr->load();
 
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
-
 	}
 
     //-----------------------------------------------------------------------
     const MaterialPtr& SubEntity::getMaterial(void) const
     {
-        return mMaterial;
+        return mMaterialPtr;
     }
     //-----------------------------------------------------------------------
     Technique* SubEntity::getTechnique(void) const
     {
-        return mMaterial->getBestTechnique(mMaterialLodIndex, this);
+        return mMaterialPtr->getBestTechnique(mMaterialLodIndex, this);
     }
     //-----------------------------------------------------------------------
     void SubEntity::getRenderOperation(RenderOperation& op)
