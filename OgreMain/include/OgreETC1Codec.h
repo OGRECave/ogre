@@ -52,10 +52,11 @@ namespace Ogre {
 	    void flipEndian(void * pData, size_t size) const;
 
 		/// Single registered codec instance
-		static ETC1Codec* msInstance;
+		static ETC1Codec* msPKMInstance;
+		static ETC1Codec* msKTXInstance;
 
 	public:
-        ETC1Codec();
+        ETC1Codec(const String &type);
         virtual ~ETC1Codec() { }
 
         /// @copydoc Codec::encode
@@ -74,6 +75,9 @@ namespace Ogre {
 		/// Static method to shutdown and unregister the PVRTC codec
 		static void shutdown(void);
 
+	private:
+		bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
+		bool decodeKTX(DataStreamPtr& input, DecodeResult& result) const;
     };
 	/** @} */
 	/** @} */
