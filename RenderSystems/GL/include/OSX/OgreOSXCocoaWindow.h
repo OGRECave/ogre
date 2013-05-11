@@ -31,7 +31,8 @@ THE SOFTWARE.
 
 #include "OgreOSXCocoaContext.h"
 
-#include <Cocoa/Cocoa.h>
+#include <AppKit/NSWindow.h>
+#include <QuartzCore/CVDisplayLink.h>
 #include "OgreOSXCocoaView.h"
 #include "OgreOSXCocoaWindowDelegate.h"
 
