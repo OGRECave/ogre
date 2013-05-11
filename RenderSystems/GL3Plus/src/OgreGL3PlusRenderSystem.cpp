@@ -1698,7 +1698,7 @@ namespace Ogre {
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
-        bool updateVAO = false;
+        bool updateVAO = true;
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLProgramPipeline* programPipeline =
@@ -1780,7 +1780,57 @@ namespace Ogre {
 
         // TODO: Bind atomic counter buffers here
 
-        if (op.useIndexes)
+        // Do tessellation rendering. Note: Only evaluation(domain) shaders are required.
+        if(mCurrentDomainProgram)
+		{
+            GLuint primCount = 0;
+			// Useful primitives for tessellation
+			switch( op.operationType )
+			{
+                case RenderOperation::OT_LINE_LIST:
+                    primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
+                    break;
+
+                case RenderOperation::OT_LINE_STRIP:
+                    primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
+                    break;
+
+                case RenderOperation::OT_TRIANGLE_LIST:
+                    primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
+                    break;
+
+                case RenderOperation::OT_TRIANGLE_STRIP:
+                    primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
+                    break;
+                default:
+                    break;
+			}
+
+            // These are set via shader in DX11, SV_InsideTessFactor and SV_OutsideTessFactor
+            // Hardcoding for the sample
+            float patchLevel(16.f);
+            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &patchLevel);
+            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel);
+            OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
+
+            if(op.useIndexes)
+            {
+                OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
+                void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
+                                                     op.indexData->indexBuffer->getIndexSize());
+                GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
+                GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+                OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
+            }
+            else
+            {
+                OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
+//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
+            }
+		}
+        else if (op.useIndexes)
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                              static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
@@ -1825,40 +1875,6 @@ namespace Ogre {
 				}
             } while (updatePassIterationRenderState());
         }
-        else if(mCurrentHullProgram && mCurrentDomainProgram)
-		{
-            GLuint primCount = 0;
-			// useful primitives for tessellation
-			switch( op.operationType )
-			{
-			case RenderOperation::OT_LINE_LIST:
-				primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
-				break;
-
-			case RenderOperation::OT_LINE_STRIP:
-				primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
-				break;
-
-			case RenderOperation::OT_TRIANGLE_LIST:
-				primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
-				break;
-
-			case RenderOperation::OT_TRIANGLE_STRIP:
-				primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
-				break;
-            default:
-                break;
-			}
-
-            if(op.useIndexes)
-            {
-                OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
-            }
-
-            OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
-            OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
-		}
         else
         {
             do
