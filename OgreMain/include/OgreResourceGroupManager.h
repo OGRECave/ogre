@@ -397,6 +397,14 @@ namespace Ogre {
 		void fireResourcePrepareEnded(void);
 		/// Internal event firing method
 		void fireResourceGroupPrepareEnded(const String& groupName);
+		/** Internal modification time retrieval */
+		time_t resourceModifiedTime(ResourceGroup* group, const String& filename);
+
+        /** Find out if the named file exists in a group. Internal use only
+         @param group Pointer to the resource group
+         @param filename Fully qualified name of the file to test for
+         */
+        bool resourceExists(ResourceGroup* group, const String& filename);
 
 		/// Stored current group - optimisation for when bulk loading a group
 		ResourceGroup* mCurrentGroup;
@@ -797,12 +805,6 @@ namespace Ogre {
         @param filename Fully qualified name of the file to test for
         */
         bool resourceExists(const String& group, const String& filename);
-
-        /** Find out if the named file exists in a group. 
-        @param group Pointer to the resource group
-        @param filename Fully qualified name of the file to test for
-        */
-        bool resourceExists(ResourceGroup* group, const String& filename);
 		
         /** Find out if the named file exists in any group. 
         @param filename Fully qualified name of the file to test for
@@ -844,9 +846,6 @@ namespace Ogre {
         @return A list of resource locations matching the criteria
         */
         StringVectorPtr findResourceLocation(const String& groupName, const String& pattern);
-
-		/** Retrieve the modification time of a given file */
-		time_t resourceModifiedTime(ResourceGroup* group, const String& filename); 
 
 		/** Create a new resource file in a given group.
 		@remarks
