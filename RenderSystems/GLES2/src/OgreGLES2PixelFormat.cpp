@@ -93,13 +93,13 @@ namespace Ogre  {
             case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
+            case PF_SHORT_RGB:
                 return GL_RGB;
                 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             case PF_A1R5G5B5:
             case PF_A4R4G4B4:
             case PF_X8R8G8B8:
-            case PF_A8R8G8B8:
             case PF_B8G8R8A8:
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
@@ -107,7 +107,6 @@ namespace Ogre  {
 #else
 			case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
-            case PF_A8B8G8R8:
             case PF_B8G8R8A8:
             case PF_A2R10G10B10:
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
@@ -117,7 +116,9 @@ namespace Ogre  {
             case PF_A1R5G5B5:
             case PF_X8B8G8R8:
 			case PF_R8G8B8A8:
+            case PF_A8B8G8R8:
             case PF_A2B10G10R10:
+            case PF_SHORT_RGBA:
                 return GL_RGBA;
 #endif
             case PF_DXT1:
@@ -201,6 +202,8 @@ namespace Ogre  {
             case PF_B5G6R5:
                 return GL_UNSIGNED_SHORT_5_6_5;
             case PF_A4R4G4B4:
+            case PF_SHORT_RGB:
+            case PF_SHORT_RGBA:
 				return GL_UNSIGNED_SHORT_4_4_4_4;
             case PF_A1R5G5B5:
                 return GL_UNSIGNED_SHORT_5_5_5_1;
@@ -223,6 +226,7 @@ namespace Ogre  {
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
 #endif
+
             case PF_FLOAT16_R:
             case PF_FLOAT16_GR:
             case PF_FLOAT16_RGB:
@@ -441,6 +445,7 @@ namespace Ogre  {
             case PF_B8G8R8A8:
             case PF_A1R5G5B5:
             case PF_A4R4G4B4:
+            case PF_SHORT_RGBA:
                 return GL_RGBA;
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
@@ -450,6 +455,7 @@ namespace Ogre  {
             case PF_X8R8G8B8:
             case PF_R8G8B8:
             case PF_B8G8R8:
+            case PF_SHORT_RGB:
                 return GL_RGB;
             case PF_FLOAT32_RGBA:
             case PF_A2R10G10B10:
@@ -458,8 +464,6 @@ namespace Ogre  {
 
             case PF_A4L4:
             case PF_R3G3B2:
-            case PF_SHORT_RGBA:
-            case PF_SHORT_RGB:
             case PF_SHORT_GR:
 			case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
@@ -588,9 +592,9 @@ namespace Ogre  {
                 return PF_A8R8G8B8;
 #endif
             case GL_RGB8_OES:
-                return PF_X8R8G8B8;
+                return PF_X8B8G8R8;
             case GL_RGBA8_OES:
-                return PF_A8R8G8B8;
+                return PF_A8B8G8R8;
                 
 #if GL_EXT_texture_compression_dxt1
             case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:

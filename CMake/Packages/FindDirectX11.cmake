@@ -38,17 +38,14 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
 	)
 
-	if(OGRE_BUILD_PLATFORM_WINRT OR (MSVC AND MSVC_VERSION GREATER 1600))
+	if(OGRE_BUILD_PLATFORM_WINRT)
 		# Windows 8 SDK has custom layout
 		set(DirectX11_INC_SEARCH_PATH 
-      "C:/Program Files (x86)/Windows Kits/8.0/Include/shared"
-      "C:/Program Files (x86)/Windows Kits/8.0/Include/um"
-      "C:/Program Files/Windows Kits/8.0/Include/shared"
-      "C:/Program Files/Windows Kits/8.0/Include/um"
+		"C:/Program Files (x86)/Windows Kits/8.0/Include/shared"
+		"C:/Program Files (x86)/Windows Kits/8.0/Include/um"
 		)
 		set(DirectX11_LIB_SEARCH_PATH 
-      "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um"
-      "C:/Program Files/Windows Kits/8.0/Lib/win8/um"
+		"C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um"
 		)
 	endif()
 

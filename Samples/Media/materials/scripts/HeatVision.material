@@ -75,6 +75,7 @@ material Fury/HeatVision/HeatCaster
     {
         pass
         {
+            polygon_mode_overrideable false
             vertex_program_ref Fury/HeatVision/HeatCaster_vp
             {
                 param_named_auto eyePosition camera_position_object_space
@@ -165,6 +166,7 @@ material Fury/HeatVision/ColdCaster
     {
         pass
         {
+            polygon_mode_overrideable false
             vertex_program_ref Fury/HeatVision/ColdCaster_vp
             {
                 param_named_auto eyePosition camera_position_object_space
@@ -291,6 +293,7 @@ material Fury/HeatVision/LightToHeat
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/LightToHeat_vp
             {
@@ -444,6 +447,7 @@ material Fury/HeatVision/Blur
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/Blur_vp
             {

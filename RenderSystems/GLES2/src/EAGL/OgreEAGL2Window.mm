@@ -127,7 +127,10 @@ namespace Ogre {
         // Check if the window size really changed
         if(mWidth == w && mHeight == h)
             return;
-
+        
+        // Destroy and recreate the framebuffer with new dimensions 
+        mContext->destroyFramebuffer();
+        
         mWidth = w;
         mHeight = h;
         
@@ -213,9 +216,6 @@ namespace Ogre {
         OgreAssert(mView != nil, "EAGL2Window: Failed to create view");
         
         [mView setMWindowName:mName];
-
-        // Set the view to not clip. This helps with smoother transitions when rotating.
-        mView.clipsToBounds = NO;
 
         OgreAssert([mView.layer isKindOfClass:[CAEAGLLayer class]], "EAGL2Window: View's Core Animation layer is not a CAEAGLLayer. This is a requirement for using OpenGL ES for drawing.");
         
@@ -502,27 +502,31 @@ namespace Ogre {
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));
+
         // The following code is adapted from Apple Technical Q & A QA1704
         // http://developer.apple.com/library/ios/#qa/qa1704/_index.html
         NSInteger width = dst.getWidth(), height = dst.getHeight();
-        NSInteger dataLength = width * height * 4;
+        NSInteger dataLength = width * height * PixelUtil::getComponentCount(dst.format);
         GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
         // Read pixel data from the framebuffer
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
-
 		OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
-                                         (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                                         GL_RGBA, GL_UNSIGNED_BYTE, data));
+                                         (GLsizei)width, (GLsizei)height,
+                                         format, type, data));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
 
         // Create a CGImage with the pixel data
         // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
         // otherwise, use kCGImageAlphaPremultipliedLast
         CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, data, dataLength, NULL);
         CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
-        CGImageRef iref = CGImageCreate(width, height, 8, 32, width * 4, colorspace,
-                                        kCGBitmapByteOrder32Big | PixelUtil::hasAlpha(dst.format) ? kCGImageAlphaPremultipliedLast : kCGImageAlphaNoneSkipLast,
-                                        ref, NULL, true, kCGRenderingIntentDefault);
+        CGImageRef iref = CGImageCreate(width, height, 8, PixelUtil::getNumElemBits(dst.format),
+                                        width * PixelUtil::getComponentCount(dst.format), colorspace,
+                                        kCGBitmapByteOrderDefault,
+                                        ref, NULL, YES, kCGRenderingIntentDefault);
 
         // OpenGL ES measures data in PIXELS
         // Create a graphics context with the target size measured in POINTS
@@ -536,11 +540,11 @@ namespace Ogre {
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(widthInPoints, heightInPoints), NO, scale);
 
         CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSetBlendMode(context, kCGBlendModeCopy);
         CGContextDrawImage(context, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
 
         // Retrieve the UIImage from the current context
-        size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-        memcpy(dst.data, CGBitmapContextGetData(context), rowSpan * dst.getHeight());
+        memcpy(dst.data, CGBitmapContextGetData(context), CGBitmapContextGetBytesPerRow(context) * height);
         UIGraphicsEndImageContext();
 
         // Clean up

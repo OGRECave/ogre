@@ -1781,6 +1781,9 @@ material Examples/HardwareMorphAnimation
 			{
 				// all default
 			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
 
 			texture_unit
 			{
@@ -1802,6 +1805,9 @@ material Examples/HardwarePoseAnimation
 			vertex_program_ref Ogre/HardwarePoseAnimation
 			{
 				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
 			}
 			texture_unit
 			{
@@ -1826,6 +1832,9 @@ material Examples/HardwareMorphAnimationWithNormals
 			{
 				// all default
 			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
 
 			texture_unit
 			{
@@ -1847,6 +1856,9 @@ material Examples/HardwarePoseAnimationWithNormals
 			vertex_program_ref Ogre/HardwarePoseAnimationWithNormals
 			{
 				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
 			}
 			texture_unit
 			{

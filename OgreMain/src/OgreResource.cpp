@@ -267,6 +267,23 @@ namespace Ogre
 
 
 	}
+    //---------------------------------------------------------------------
+    size_t Resource::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(ResourceManager);
+        memSize += sizeof(ManualResourceLoader);
+        memSize += sizeof(ResourceHandle);
+        memSize += mName.size() * sizeof(char);
+        memSize += mGroup.size() * sizeof(char);
+        memSize += mOrigin.size() * sizeof(char);
+        memSize += sizeof(size_t) * 2;
+        memSize += sizeof(bool) * 2;
+        memSize += sizeof(Listener) * mListenerList.size();
+        memSize += sizeof(AtomicScalar<LoadingState>);
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	void Resource::_dirtyState()
 	{

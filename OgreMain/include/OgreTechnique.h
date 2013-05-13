@@ -166,7 +166,7 @@ namespace Ogre {
 		bool checkHardwareSupport(bool autoManageTextureUnits, StringUtil::StrStreamType& compileErrors);
         /** Internal method for splitting the passes into illumination passes. */        
         void _compileIlluminationPasses(void);
-
+		size_t calculateSize(void) const;
 
         /** Creates a new Pass for this Technique.
         @remarks

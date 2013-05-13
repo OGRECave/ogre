@@ -89,7 +89,7 @@ namespace Ogre {
         void setReferenceViewEnabled(bool value);
 
         /** Determine if use of the reference view is enabled */
-        bool getReferenceViewEnabled() const;
+        bool isReferenceViewEnabled() const;
 
         /** Override standard Singleton retrieval.
         @remarks

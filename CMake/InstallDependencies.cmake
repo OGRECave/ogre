@@ -85,49 +85,44 @@ if (OGRE_INSTALL_DEPENDENCIES)
   if (OGRE_STATIC)
     # for static builds, projects must link against all Ogre dependencies themselves, so copy full include and lib dir
     if (EXISTS ${OGRE_DEP_DIR}/include/)
-      install(DIRECTORY ${OGRE_DEP_DIR}/include/ DESTINATION include)
-    endif ()
-    if (EXISTS ${OGRE_DEP_DIR}/lib/)
-        install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
-    endif ()
-    else ()
-        # for non-static builds, we only need OIS for the samples
-    if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
-          install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
-    endif ()
-    if(WIN32)
-      if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
-          install(FILES
-            ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
-            DESTINATION lib/debug CONFIGURATIONS Debug
-          )
-      endif ()
-      if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
-          install(FILES
-            ${OGRE_DEP_DIR}/lib/release/OIS.lib
-            DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-          )
-      endif ()
-      if (MINGW)
-        install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
-        install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-        install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
-        install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
-      endif ()
-    endif ()
-  endif ()
+	  install(DIRECTORY ${OGRE_DEP_DIR}/include/ DESTINATION include)
+	endif ()
+	if (EXISTS ${OGRE_DEP_DIR}/lib/)
+      install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
+	endif ()
+  else ()
+	    # for non-static builds, we only need OIS for the samples
+	if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
+	      install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
+	endif ()
+	if(WIN32)
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
+	      install(FILES
+	        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
+	        DESTINATION lib/debug CONFIGURATIONS Debug
+	      )
+	  endif ()
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
+	      install(FILES
+	        ${OGRE_DEP_DIR}/lib/release/OIS.lib
+	        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+	      )
+	  endif ()
+	  if (MINGW)
+		install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
+		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
+		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
+	  endif ()
+	endif ()
+	  endif ()
     
   if(WIN32)
     # copy the dependency DLLs to the right places
     if(NOT OGRE_BUILD_PLATFORM_WINRT)
-      install_debug(OIS_d.dll)
-      install_release(OIS.dll)
-      if (OGRE_BUILD_RENDERSYSTEM_D3D11 AND MSVC11)
-        # Install d3dcompiler found in Windows SDK
-        #install_debug()
-        #install_release()
-      endif()
-    endif()
+        install_debug(OIS_d.dll)
+        install_release(OIS.dll)
+    endif ()
 
     if (OGRE_BUILD_PLUGIN_CG)
 	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one

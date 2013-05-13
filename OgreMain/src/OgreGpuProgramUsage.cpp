@@ -123,6 +123,22 @@ namespace Ogre
         mParameters = mProgram->createParameters();
     }
     //-----------------------------------------------------------------------------
+    size_t GpuProgramUsage::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(GpuProgramType);
+        memSize += sizeof(bool);
+
+        // Tally up passes
+        if(!mProgram.isNull())
+            memSize += mProgram->calculateSize();
+        if(!mParameters.isNull())
+            memSize += mParameters->calculateSize();
+
+        return memSize;
+    }
+    //-----------------------------------------------------------------------------
     void GpuProgramUsage::_load(void)
     {
         if (!mProgram->isLoaded())

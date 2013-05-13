@@ -1982,7 +1982,7 @@ namespace Ogre {
 		{
 			String lcase = filename;
 			StringUtil::toLowerCase(lcase);
-			i = this->resourceIndexCaseInsensitive.find(filename);
+			i = this->resourceIndexCaseInsensitive.find(lcase);
 			if (i != this->resourceIndexCaseInsensitive.end() && i->second == arch)
 				this->resourceIndexCaseInsensitive.erase(i);
 		}

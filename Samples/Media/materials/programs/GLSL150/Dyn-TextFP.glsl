@@ -7,12 +7,8 @@ out vec4 fragColour;
 
 void main(void)
 {
-	vec4 texcoord;
-	texcoord = oUv;
-	texcoord.z = floor(texcoord.z);
-	
-    vec4 c0 = texture(Image, texcoord.xyz);
-    vec4 c1 = texture(Thaw, texcoord.xyz);
+    vec4 c0 = texture(Image, oUv.xy);
+    vec4 c1 = texture(Thaw, oUv.xy);
 
-	fragColour = c1;//mix(c0, c1, fract(oUv.z));
+	fragColour = c0 * c1;
 }

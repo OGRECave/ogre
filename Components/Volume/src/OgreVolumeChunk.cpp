@@ -188,7 +188,7 @@ namespace Volume {
 
     void Chunk::prepareGeometry(const ChunkRequest *chunkRequest)
     {
-        OctreeNodeSplitPolicy policy(chunkRequest->parameters->src, chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError);
+        OctreeNodeSplitPolicy policy(chunkRequest->parameters->src, chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError, chunkRequest->parameters->octreeNodeDistanceCheckDiagonalFactor);
         mError = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError;
         chunkRequest->root->split(&policy, chunkRequest->parameters->src, mError);
         Real maxMSDistance = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError * chunkRequest->parameters->skirtFactor;

@@ -248,6 +248,19 @@ namespace Ogre
 		GpuNamedConstantsSerializer ser;
 		ser.importNamedConstants(stream, this);
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuNamedConstants::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        // Buffer size refs
+        memSize += 3 * sizeof(size_t);
+
+        // Tally up constant defs
+        memSize += sizeof(GpuConstantDefinition) * map.size();
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	//  GpuNamedConstantsSerializer methods
 	//---------------------------------------------------------------------
@@ -365,6 +378,21 @@ namespace Ogre
 	{
 
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuSharedParameters::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(float) * mFloatConstants.size();
+        memSize += sizeof(double) * mDoubleConstants.size();
+        memSize += sizeof(int) * mIntConstants.size();
+        memSize += mName.size() * sizeof(char);
+        memSize += sizeof(Any);
+        memSize += sizeof(size_t);
+        memSize += sizeof(unsigned long);
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	void GpuSharedParameters::addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize)
 	{
@@ -789,6 +817,34 @@ namespace Ogre
 		}
 
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuProgramParameters::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(float) * mFloatConstants.size();
+        memSize += sizeof(double) * mDoubleConstants.size();
+        memSize += sizeof(int) * mIntConstants.size();
+        memSize += sizeof(Any);
+        memSize += sizeof(size_t);
+        memSize += sizeof(bool) * 2;
+        memSize += sizeof(uint16);
+
+        for (AutoConstantList::const_iterator i = mAutoConstants.begin();
+             i != mAutoConstants.end(); ++i)
+        {
+            memSize += sizeof((*i));
+        }
+
+        if(!mFloatLogicalToPhysical.isNull())
+            memSize += mFloatLogicalToPhysical->bufferSize;
+        if(!mDoubleLogicalToPhysical.isNull())
+            memSize += mDoubleLogicalToPhysical->bufferSize;
+        if(!mIntLogicalToPhysical.isNull())
+            memSize += mIntLogicalToPhysical->bufferSize;
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::_setNamedConstants(
 		const GpuNamedConstantsPtr& namedConstants)

@@ -160,12 +160,24 @@ vertex_program Examples/BumpMapVP unified
 }
 
 // Bump map vertex program, with tangent parity support for this is required
-vertex_program Examples/BumpMapVPTangentParity cg
+vertex_program Examples/BumpMapVPTangentParityCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
 	compile_arguments -DTANGENTS_HAVE_PARITY=1
+}
+
+// Bump map vertex program, with tangent parity support for this is required
+vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
+{
+	source BumpMapVPTangentParity.glsles
+}
+
+vertex_program Examples/BumpMapVPTangentParity unified
+{
+	delegate Examples/BumpMapVPTangentParityGLSLES
+	delegate Examples/BumpMapVPTangentParityCg
 }
 
 // Bump map fragment program, support for this is optional
