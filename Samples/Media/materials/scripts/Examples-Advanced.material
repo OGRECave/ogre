@@ -174,8 +174,19 @@ vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
 	source BumpMapVPTangentParity.glsles
 }
 
+vertex_program Examples/BumpMapVPTangentParityGLSL glsl
+{
+	source BumpMapVPTangentParity.glsl
+	syntax glsl150
+	default_params
+	{
+        param_named_auto lightDiffuse light_diffuse_colour 0 
+    }
+}
+
 vertex_program Examples/BumpMapVPTangentParity unified
 {
+	delegate Examples/BumpMapVPTangentParityGLSL
 	delegate Examples/BumpMapVPTangentParityGLSLES
 	delegate Examples/BumpMapVPTangentParityCg
 }

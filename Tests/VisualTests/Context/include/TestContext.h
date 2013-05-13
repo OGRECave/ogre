@@ -162,6 +162,7 @@ public:
     virtual void finishedTests();
 
     void createDummyScene();
+    void destroyDummyScene();
     bool initializeRTShaderSystem(SceneManager* sceneMgr);
     void finalizeRTShaderSystem();
 
