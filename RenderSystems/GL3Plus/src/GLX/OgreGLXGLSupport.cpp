@@ -38,8 +38,12 @@ THE SOFTWARE.
 
 #include <X11/extensions/Xrandr.h>
 
-//static Display *_currentDisplay;
-//static Display *_getCurrentDisplay(void) { return _currentDisplay; }
+static bool ctxErrorOccurred = false;
+static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
+{
+    ctxErrorOccurred = true;
+    return 0;
+}
 
 namespace Ogre
 {
@@ -824,21 +828,41 @@ namespace Ogre
 			None
 		};
 
-        // Try to get the best core profile context possible. Working backwards by versions until we find one that is acceptable.
-		glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
-		while(!glxContext)
-		{
-			if(context_attribs[3] == 0)
-			{
-				context_attribs[1] -= 1;
-				context_attribs[3] = 5;
-			}
-			else
-			{
-				context_attribs[3] -= 1;
-			}
-			glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
-		}
+        ctxErrorOccurred = false;
+        int (*oldHandler)(Display*, XErrorEvent*) =
+        XSetErrorHandler(&ctxErrorHandler);
+
+        while(!glxContext && (context_attribs[1] >= 3))
+        {
+            ctxErrorOccurred = false;
+            glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+            // Sync to ensure any errors generated are processed.
+            XSync( mGLDisplay, False );
+            if ( !ctxErrorOccurred && glxContext )
+            {
+                LogManager::getSingleton().logMessage("Created GL " + StringConverter::toString(context_attribs[1]) + "." + StringConverter::toString(context_attribs[3]) + " context" );
+            }
+            else
+            {
+                if(context_attribs[3] == 0)
+                {
+                    context_attribs[1] -= 1;
+                    context_attribs[3] = 5;
+                }
+                else
+                {
+                    context_attribs[3] -= 1;
+                }
+            }
+        }
+        // Sync to ensure any errors generated are processed.
+        XSync( mGLDisplay, False );
+
+        // Restore the original error handler
+        XSetErrorHandler( oldHandler );
+
+        if ( ctxErrorOccurred || !glxContext )
+            LogManager::getSingleton().logMessage("Failed to create an OpenGL 3+ context");
 
 		return glxContext;
 	}

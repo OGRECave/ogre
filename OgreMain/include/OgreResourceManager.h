@@ -497,9 +497,9 @@ namespace Ogre {
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;
 		ResourceWithGroupMap mResourcesWithGroup;
-        size_t mMemoryBudget; // In bytes
+        size_t mMemoryBudget; /// In bytes
         AtomicScalar<ResourceHandle> mNextHandle;
-        AtomicScalar<size_t> mMemoryUsage; // In bytes
+        AtomicScalar<size_t> mMemoryUsage; /// In bytes
 
         bool mVerbose;
 

@@ -946,7 +946,7 @@ protected:
 	ProgramManager* mProgramManager;
 	// Shader program writer manager.
 	ProgramWriterManager* mProgramWriterManager;
-        // File system layer manager.
+    // File system layer manager.
 	FileSystemLayer* mFSLayer;
 	// Fixed Function Render state builder.
 	FFPRenderStateBuilder* mFFPRenderStateBuilder;

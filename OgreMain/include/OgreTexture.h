@@ -404,7 +404,7 @@ namespace Ogre {
 
         TextureType mTextureType;
 		PixelFormat mFormat;
-        int mUsage; // Bit field, so this can't be TextureUsage
+        int mUsage; /// Bit field, so this can't be TextureUsage
 
         PixelFormat mSrcFormat;
         size_t mSrcWidth, mSrcHeight, mSrcDepth;

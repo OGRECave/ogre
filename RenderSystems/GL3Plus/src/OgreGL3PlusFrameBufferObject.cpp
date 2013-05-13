@@ -155,14 +155,7 @@ namespace Ogre {
             else
             {
                 // Detach
-                if(getFormat() == PF_DEPTH)
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
-                }
+                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
             }
         }
 
@@ -210,7 +203,8 @@ namespace Ogre {
 		}
 
         // Drawbuffer extension supported, use it
-        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        if(getFormat() != PF_DEPTH)
+            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
 		if (mMultisampleFB)
 		{

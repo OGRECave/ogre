@@ -55,16 +55,16 @@ namespace Ogre {
 		static RegisteredCodecList msCodecList;
 
 		/** Common encoding routine. */
-		FIBITMAP* encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
+		FIBITMAP* encodeBitmap(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
 
     public:
         FreeImageCodec(const String &type, unsigned int fiType);
         virtual ~FreeImageCodec() { }
 
-        /// @copydoc Codec::code
-        DataStreamPtr code(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
-        /// @copydoc Codec::codeToFile
-        void codeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
+        /// @copydoc Codec::encode
+        DataStreamPtr encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
+        /// @copydoc Codec::encodeToFile
+        void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
 

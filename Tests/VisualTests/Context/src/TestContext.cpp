@@ -332,8 +332,15 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 
         if (mCurrentTest->isDone())
         {
+#ifdef USE_RTSHADER_SYSTEM
+            mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
+#endif
+
+            createDummyScene();
+
             // continue onto the next test
             runSample(0);
+
             return true;
         }
 
@@ -359,6 +366,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     Ogre::ControllerManager::getSingleton().setFrameDelay(0);
     Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
     mCurrentFrame = 0;
+    destroyDummyScene();
 
     OgreBites::Sample* sampleToRun = s;
 
@@ -389,6 +397,10 @@ void TestContext::runSample(OgreBites::Sample* s)
 
     if(mCurrentTest)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
+
+#ifdef USE_RTSHADER_SYSTEM
+    sampleToRun->setShaderGenerator(mShaderGenerator);
+#endif
 
     SampleContext::runSample(sampleToRun);
 }
@@ -646,6 +658,17 @@ void TestContext::createDummyScene()
         }
     }
 #endif // USE_RTSHADER_SYSTEM
+}
+
+void TestContext::destroyDummyScene()
+{
+    Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
+#ifdef USE_RTSHADER_SYSTEM
+    mShaderGenerator->removeSceneManager(dummyScene);
+#endif
+    dummyScene->removeRenderQueueListener(mOverlaySystem);
+    mWindow->removeAllViewports();
+    mRoot->destroySceneManager(dummyScene);
 }
 
 #ifdef USE_RTSHADER_SYSTEM

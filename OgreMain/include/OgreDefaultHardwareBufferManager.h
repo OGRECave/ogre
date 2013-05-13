@@ -152,7 +152,7 @@ namespace Ogre {
 		You might want to instantiate this class if you want to utilise
 		classes like MeshSerializer without having initialised the 
 		rendering system (which is required to create a 'real' hardware
-		buffer manager.
+		buffer manager).
 	*/
 	class _OgreExport DefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
 	{
@@ -163,7 +163,7 @@ namespace Ogre {
 		HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, 
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a hardware vertex buffer
+		/// Create a hardware index buffer
 		HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);

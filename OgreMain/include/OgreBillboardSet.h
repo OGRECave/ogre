@@ -143,7 +143,7 @@ namespace Ogre {
         /// Flag indicating whether the billboards has to be sorted
         bool mSortingEnabled;
 
-        // Use 'true' billboard to cam position facing, rather than camera direcion
+        /// Use 'true' billboard to cam position facing, rather than camera direcion
         bool mAccurateFacing;
 
         bool mAllDefaultRotation;
@@ -190,19 +190,18 @@ namespace Ogre {
         Vector3 mVOffset[4];
         /// Current camera
         Camera* mCurrentCamera;
-        // Parametric offsets of origin
+        /// Parametric offsets of origin
         Real mLeftOff, mRightOff, mTopOff, mBottomOff;
-        // Camera axes in billboard space
+        /// Camera axes in billboard space
         Vector3 mCamX, mCamY;
-        // Camera direction in billboard space
+        /// Camera direction in billboard space
         Vector3 mCamDir;
-        // Camera orientation in billboard space
+        /// Camera orientation in billboard space
         Quaternion mCamQ;
-        // Camera position in billboard space
+        /// Camera position in billboard space
         Vector3 mCamPos;
 
         /// The vertex index data for all billboards in this set (1 set only)
-        //unsigned short* mIndexes;
         IndexData* mIndexData;
 
         /// Flag indicating whether each billboard should be culled separately (default: false)
@@ -222,7 +221,7 @@ namespace Ogre {
         /// Internal method for culling individual billboards
         inline bool billboardVisible(Camera* cam, const Billboard& bill);
 
-        // Number of visible billboards (will be == getNumBillboards if mCullIndividual == false)
+        /// Number of visible billboards (will be == getNumBillboards if mCullIndividual == false)
         unsigned short mNumVisibleBillboards;
 
         /// Internal method for increasing pool size

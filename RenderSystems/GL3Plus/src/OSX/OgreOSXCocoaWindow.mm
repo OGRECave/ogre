@@ -285,7 +285,8 @@ namespace Ogre {
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[CocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
-        [mView setWantsBestResolutionOpenGLSurface:YES];
+        if(mContentScalingFactor > 1.0)
+            [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
@@ -321,13 +322,21 @@ namespace Ogre {
 
     unsigned int CocoaWindow::getWidth() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
     }
 
     unsigned int CocoaWindow::getHeight() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
     }
 

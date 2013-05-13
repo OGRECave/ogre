@@ -297,7 +297,6 @@ namespace Ogre {
 		|/    |/
 		6-----7
 		</pre>
-		@remarks as this implementation uses a static member, make sure to use your own copy !
 		*/
 		inline const Vector3* getAllCorners(void) const
 		{
@@ -325,7 +324,7 @@ namespace Ogre {
 			return mCorners;
 		}
 
-		/** gets the position of one of the corners
+		/** Gets the position of one of the corners
 		*/
 		Vector3 getCorner(CornerEnum cornerToGet) const
 		{

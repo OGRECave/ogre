@@ -67,7 +67,7 @@ namespace Ogre {
         /// Global predefined controller
         ControllerFunctionRealPtr mPassthroughFunction;
 
-        // Last frame number updated
+        /// Last frame number updated
         unsigned long mLastFrameNumber;
 
     public:

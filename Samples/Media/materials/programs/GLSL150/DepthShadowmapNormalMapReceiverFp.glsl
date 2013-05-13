@@ -11,6 +11,8 @@ uniform sampler2D shadowMap;
 uniform sampler2D normalMap;
 
 in vec3 tangentLightDir;
+in vec4 oUv0;
+in vec4 oUv1;
 out vec4 fragColour;
 
 // Expand a range-compressed vector
@@ -21,14 +23,12 @@ vec3 expand(vec3 v)
 
 void main()
 {
-
 	// get the new normal and diffuse values
-	vec3 normal = normalize(expand(texture(normalMap, gl_TexCoord[1].xy).xyz));
+	vec3 normal = normalize(expand(texture(normalMap, oUv1.xy).xyz));
 	
 	vec4 vertexColour = clamp(dot(normal, tangentLightDir),0.0,1.0) * lightColour;
 
-
-	vec4 shadowUV = gl_TexCoord[0];
+	vec4 shadowUV = oUv0;
 	// point on shadowmap
 #if LINEAR_RANGE
 	shadowUV.xy = shadowUV.xy / shadowUV.w;
@@ -75,12 +75,8 @@ void main()
 	final *= 0.2;
 
 	fragColour = vec4(vertexColour.xyz * final, 1);
-	
 #else
 	fragColour = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0,0,0,1);
 #endif
-
 #endif
-   
 }
-

@@ -41,7 +41,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    const uint32 ETC1_MAGIC = FOURCC('P', 'K', 'M', ' ');
+    const uint32 PKM_MAGIC = FOURCC('P', 'K', 'M', ' ');
+	const uint32 KTX_MAGIC = FOURCC(0xAB, 0x4B, 0x54, 0x58);
 
     typedef struct {
         int8   aName[6];
@@ -54,105 +55,98 @@ namespace Ogre {
         uint8  iWidthLSB;
         uint8  iHeightMSB;
         uint8  iHeightLSB;
-    } ETCHeader;
-	
+    } PKMHeader;
+
+	typedef struct {
+		uint8     identifier[12];
+		uint32    endianness;
+		uint32    glType;
+		uint32    glTypeSize;
+		uint32    glFormat;
+		uint32    glInternalFormat;
+		uint32    glBaseInternalFormat;
+		uint32    pixelWidth;
+		uint32    pixelHeight;
+		uint32    pixelDepth;
+		uint32    numberOfArrayElements;
+		uint32    numberOfFaces;
+		uint32    numberOfMipmapLevels;
+		uint32    bytesOfKeyValueData;
+	} KTXHeader;
 
 	//---------------------------------------------------------------------
-	ETC1Codec* ETC1Codec::msInstance = 0;
+	ETC1Codec* ETC1Codec::msPKMInstance = 0;
+	ETC1Codec* ETC1Codec::msKTXInstance = 0;
 	//---------------------------------------------------------------------
 	void ETC1Codec::startup(void)
 	{
-		if (!msInstance)
+		if (!msPKMInstance)
 		{
-			LogManager::getSingleton().logMessage(
-				LML_NORMAL,
-				"ETC1 codec registering");
-
-			msInstance = OGRE_NEW ETC1Codec();
-			Codec::registerCodec(msInstance);
+			msPKMInstance = OGRE_NEW ETC1Codec("pkm");
+			Codec::registerCodec(msPKMInstance);
 		}
+
+		if (!msKTXInstance)
+		{
+			msKTXInstance = OGRE_NEW ETC1Codec("ktx");
+			Codec::registerCodec(msKTXInstance);
+		}
+        
+        LogManager::getSingleton().logMessage(
+            LML_NORMAL,
+            "ETC1 codec registering");
 	}
 	//---------------------------------------------------------------------
 	void ETC1Codec::shutdown(void)
 	{
-		if(msInstance)
+		if(msPKMInstance)
 		{
-			Codec::unRegisterCodec(msInstance);
-			OGRE_DELETE msInstance;
-			msInstance = 0;
+			Codec::unregisterCodec(msPKMInstance);
+			OGRE_DELETE msPKMInstance;
+			msPKMInstance = 0;
 		}
-	}
+
+		if(msKTXInstance)
+		{
+			Codec::unregisterCodec(msKTXInstance);
+			OGRE_DELETE msKTXInstance;
+			msKTXInstance = 0;
+		}
+    }
 	//---------------------------------------------------------------------
-    ETC1Codec::ETC1Codec():
-        mType("pkm")
-    { 
+    ETC1Codec::ETC1Codec(const String &type):
+        mType(type)
+    {
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ETC1Codec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
+    DataStreamPtr ETC1Codec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC1 encoding not supported",
-                    "ETC1Codec::code" ) ;
+                    "ETC1Codec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void ETC1Codec::codeToFile(MemoryDataStreamPtr& input, 
+    void ETC1Codec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC1 encoding not supported",
-                    "ETC1Codec::codeToFile" ) ;
+                    "ETC1Codec::encodeToFile" ) ;
 	}
     //---------------------------------------------------------------------
     Codec::DecodeResult ETC1Codec::decode(DataStreamPtr& stream) const
     {
-        ETCHeader header;
-
-        ImageData *imgData = OGRE_NEW ImageData();
-		MemoryDataStreamPtr output;
-
-        // Read the ETC1 header
-        stream->read(&header, sizeof(ETCHeader));
-
-        if (ETC1_MAGIC != FOURCC(header.aName[0], header.aName[1], header.aName[2], header.aName[3]) ) // "PKM 10"
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                    "This is not a ETC1 file!", "ETC1Codec::decode");
-        }
-        
-        // TODO add endian awareness
-        uint16 width = (header.iWidthMSB << 8) | header.iWidthLSB;
-        uint16 height = (header.iHeightMSB << 8) | header.iHeightLSB;
-        uint16 paddedWidth = (header.iPaddedWidthMSB << 8) | header.iPaddedWidthLSB;
-        uint16 paddedHeight = (header.iPaddedHeightMSB << 8) | header.iPaddedHeightLSB;
-    
-        imgData->depth = 1;
-        imgData->width = width;
-        imgData->height = height;
-        imgData->format = PF_ETC1_RGB8;
-        
-        // ETC1 has no support for mipmaps - malideveloper.com has a example 
-        // where the load mipmap levels from different external files
-        imgData->num_mipmaps = 0; 
-        
-        // ETC1 is a compressed format
-        imgData->flags |= IF_COMPRESSED;
-        
-
-        // Calculate total size from number of mipmaps, faces and size
-		imgData->size = (paddedWidth * paddedHeight) >> 1;
-
-		// Bind output buffer
-		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
-
-		// Now deal with the data
-		void *destPtr = output->getPtr();
-        stream->read(destPtr, imgData->size);
-        destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
-
 		DecodeResult ret;
-		ret.first = output;
-		ret.second = CodecDataPtr(imgData);
-
+		if (!decodePKM(stream, ret))
+		{
+			stream->seek(0);
+			if (!decodeKTX(stream, ret))
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "This is not a ETC1 file!", "ETC1Codec::decode");
+			}
+		}
+        
 		return ret;
     }
     //---------------------------------------------------------------------    
@@ -192,12 +186,111 @@ namespace Ogre {
 			memcpy(&fileType, magicNumberPtr, sizeof(uint32));
 			flipEndian(&fileType, sizeof(uint32), 1);
 
-			if (ETC1_MAGIC == fileType)
+			if (PKM_MAGIC == fileType)
 			{
 				return String("pkm");
 			}
+			else if (KTX_MAGIC == fileType)
+            {
+                return String("ktx");
+            }
 		}
-
+        
 		return StringUtil::BLANK;
+	}
+
+    //---------------------------------------------------------------------
+	bool ETC1Codec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const
+	{
+        PKMHeader header;
+        // Read the ETC1 header
+        stream->read(&header, sizeof(PKMHeader));
+
+        if (PKM_MAGIC != FOURCC(header.aName[0], header.aName[1], header.aName[2], header.aName[3]) ) // "PKM 10"
+			return false;
+
+        // TODO add endian awareness
+        uint16 width = (header.iWidthMSB << 8) | header.iWidthLSB;
+        uint16 height = (header.iHeightMSB << 8) | header.iHeightLSB;
+        uint16 paddedWidth = (header.iPaddedWidthMSB << 8) | header.iPaddedWidthLSB;
+        uint16 paddedHeight = (header.iPaddedHeightMSB << 8) | header.iPaddedHeightLSB;
+
+        ImageData *imgData = OGRE_NEW ImageData();
+        imgData->depth = 1;
+        imgData->width = width;
+        imgData->height = height;
+        imgData->format = PF_ETC1_RGB8;
+
+        // ETC1 has no support for mipmaps - malideveloper.com has a example
+        // where the load mipmap levels from different external files
+        imgData->num_mipmaps = 0;
+
+        // ETC1 is a compressed format
+        imgData->flags |= IF_COMPRESSED;
+
+        // Calculate total size from number of mipmaps, faces and size
+		imgData->size = (paddedWidth * paddedHeight) >> 1;
+
+		// Bind output buffer
+		MemoryDataStreamPtr output;
+		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+
+		// Now deal with the data
+		void *destPtr = output->getPtr();
+        stream->read(destPtr, imgData->size);
+        destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
+
+		result.first = output;
+		result.second = CodecDataPtr(imgData);
+
+		return true;
+	}
+
+    //---------------------------------------------------------------------
+	bool ETC1Codec::decodeKTX(DataStreamPtr& stream, DecodeResult& result) const
+	{
+        KTXHeader header;
+        // Read the ETC1 header
+        stream->read(&header, sizeof(KTXHeader));
+
+		const uint8 KTXFileIdentifier[12] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
+		if (memcmp(KTXFileIdentifier, &header.identifier, sizeof(KTXFileIdentifier)) != 0 )
+			return false;
+
+        ImageData *imgData = OGRE_NEW ImageData();
+        imgData->depth = 1;
+        imgData->width = header.pixelWidth;
+        imgData->height = header.pixelHeight;
+        imgData->format = PF_ETC1_RGB8;
+		imgData->num_mipmaps = static_cast<ushort>(header.numberOfMipmapLevels - 1);
+
+		// ETC1 is a compressed format
+        imgData->flags |= IF_COMPRESSED;
+
+		size_t numFaces = 1; // Assume one face until we know otherwise
+		// Calculate total size from number of mipmaps, faces and size
+		imgData->size = Image::calculateSize(imgData->num_mipmaps, 1,
+                                             imgData->width, imgData->height, imgData->depth, imgData->format);
+
+		stream->skip(header.bytesOfKeyValueData);
+
+		// Bind output buffer
+		MemoryDataStreamPtr output;
+		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+
+		// Now deal with the data
+		uchar* destPtr = output->getPtr();
+		for (uint32 level = 0; level < header.numberOfMipmapLevels; ++level)
+		{
+			uint32 imageSize = 0;
+			stream->read(&imageSize, sizeof(uint32));
+			stream->read(destPtr, imageSize);
+			destPtr += imageSize;
+		}
+        
+		result.first = output;
+		result.second = CodecDataPtr(imgData);
+        
+		return true;
 	}
 }

@@ -51,6 +51,7 @@ namespace Ogre {
 		, mTextureLoadFailed(false)
 		, mIsAlpha(false)
 		, mHwGamma(false)
+		, mGamma(1)
 		, mRecalcTexMatrix(false)
 		, mUMod(0)
 		, mVMod(0)
@@ -108,6 +109,7 @@ namespace Ogre {
 		, mTextureLoadFailed(false)
 		, mIsAlpha(false)
 		, mHwGamma(false)
+		, mGamma(1)
 		, mRecalcTexMatrix(false)
 		, mUMod(0)
 		, mVMod(0)
@@ -1157,7 +1159,7 @@ namespace Ogre {
 					mFramePtrs[frame] = 
 						TextureManager::getSingleton().prepare(mFrames[frame], 
 							mParent->getResourceGroup(), mTextureType, 
-							mTextureSrcMipmaps, 1.0f, mIsAlpha, mDesiredFormat, mHwGamma);
+							mTextureSrcMipmaps, mGamma, mIsAlpha, mDesiredFormat, mHwGamma);
 				}
 				catch (Exception &e) {
 					String msg;
@@ -1189,7 +1191,7 @@ namespace Ogre {
 					mFramePtrs[frame] = 
 						TextureManager::getSingleton().load(mFrames[frame], 
 							mParent->getResourceGroup(), mTextureType, 
-							mTextureSrcMipmaps, 1.0f, mIsAlpha, mDesiredFormat, mHwGamma);
+							mTextureSrcMipmaps, mGamma, mIsAlpha, mDesiredFormat, mHwGamma);
 				}
 				catch (Exception &e) {
 					String msg;
@@ -1199,7 +1201,7 @@ namespace Ogre {
 						+ e.getFullDescription();
 					LogManager::getSingleton().logMessage(msg);
 					mTextureLoadFailed = true;
-				}	
+				}
 			}
 			else
 			{
