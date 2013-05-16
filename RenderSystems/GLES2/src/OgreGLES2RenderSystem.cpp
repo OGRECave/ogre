@@ -1691,7 +1691,7 @@ namespace Ogre {
 				else
                 {
                     GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                 }
 #else
                 OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
@@ -1934,6 +1934,11 @@ namespace Ogre {
     {
 		mStateCacheManager->setDisabled(GL_DITHER);
         static_cast<GLES2TextureManager*>(mTextureManager)->createWarningTexture();
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+		// Enable primitive restarting with fixed indices depending upon the data type
+		OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
+#endif
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)

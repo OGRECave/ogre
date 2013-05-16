@@ -907,6 +907,26 @@ fragment_program Examples/TextureArrayPSglsl glsl
 	}
 }
 
+vertex_program Examples/TextureArrayVSglsles glsles
+{
+	source Example_TextureArrayVS.glsles
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program Examples/TextureArrayPSglsles glsles
+{
+	source Example_TextureArrayPS.glsles
+
+	default_params
+	{
+		param_named TextureArrayTex int 0
+	}
+}
+
 fragment_program Examples/TextureArrayPShlsl4 hlsl
 {
 	entry_point textureArray_p
@@ -957,6 +977,27 @@ material Examples/TextureArray
 			}
 
 			fragment_program_ref Examples/TextureArrayPSglsl
+			{
+			}
+
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture TextureArrayTex
+				tex_address_mode clamp
+			}
+		}
+	}
+
+	technique GLSLES
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVSglsles
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPSglsles
 			{
 			}
 

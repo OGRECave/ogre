@@ -57,6 +57,8 @@ void GLES2HardwareOcclusionQuery::createQuery()
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mQueryID ));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glGenQueries(1, &mQueryID ));
 #else
     OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                 "Cannot allocate a Hardware query. This video card doesn't support it, sorry.", 
@@ -69,6 +71,8 @@ void GLES2HardwareOcclusionQuery::destroyQuery()
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mQueryID));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mQueryID));
 #endif        
 }
 //------------------------------------------------------------------
@@ -89,6 +93,8 @@ void GLES2HardwareOcclusionQuery::beginOcclusionQuery()
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glBeginQuery(GL_ANY_SAMPLES_PASSED, mQueryID));
 #endif
 }
 //------------------------------------------------------------------
@@ -97,6 +103,8 @@ void GLES2HardwareOcclusionQuery::endOcclusionQuery()
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glEndQuery(GL_ANY_SAMPLES_PASSED));
 #endif
 }
 //------------------------------------------------------------------
@@ -105,6 +113,10 @@ bool GLES2HardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragmen
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
+    mPixelCount = *NumOfFragments;
+    return true;
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT, (GLuint*)NumOfFragments));
     mPixelCount = *NumOfFragments;
     return true;
 #else
@@ -119,6 +131,8 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
 #ifdef GL_EXT_occlusion_query_boolean
     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+    OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT_AVAILABLE, &available));
 #endif
 
 	// GL_TRUE means a wait would occur
