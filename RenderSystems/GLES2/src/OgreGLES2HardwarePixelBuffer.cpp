@@ -577,11 +577,11 @@ namespace Ogre {
 #else
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
-            LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                                  " Target: " + StringConverter::toString(mTarget) +
-                                                  " Format: " + PixelUtil::getFormatName(data.format) +
-                                                  " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                                  " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+//        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+//                                              " Target: " + StringConverter::toString(mTarget) +
+//                                              " Format: " + PixelUtil::getFormatName(data.format) +
+//                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+//                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
         if (PixelUtil::isCompressed(data.format))
