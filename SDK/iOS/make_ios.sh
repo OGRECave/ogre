@@ -72,9 +72,7 @@ do
 done
 
 # Remove some unnecessary files. Single arch libs and duplicate headers.
-rm -rf $SDKBUILDDIR/build/sdk/lib/iphoneos $SDKBUILDDIR/build/sdk/lib/iphonesimulator
-rm -rf $SDKBUILDDIR/build/sdk/lib/Debug
-rm -rf $SDKBUILDDIR/build/sdk/include/boost
+rm -rf $SDKBUILDDIR/build/sdk/lib/iphoneos $SDKBUILDDIR/build/sdk/lib/iphonesimulator $SDKBUILDDIR/build/sdk/lib/Debug
 
 echo Frameworks copied.
 
