@@ -232,6 +232,8 @@ namespace Ogre {
         GpuProgramManager::Microcode cacheMicrocode = 
             GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 
+		cacheMicrocode->seek(0);
+
 #define READ_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
     uint16 length = 0;          \
     cacheMicrocode->read(&length, sizeof(uint16));  \

@@ -63,7 +63,7 @@
       <PreprocessorDefinitions>_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);C:\OGRE_SDK_1.9\Windows Phone 8\dep\include;C:\OGRE_SDK_1.9\Windows Phone 8\dep\include\OIS;C:\OGRE_SDK_1.9\Windows Phone 8\Build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsWinRT>true</CompileAsWinRT>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -78,7 +78,7 @@
       <PreprocessorDefinitions>NDEBUG;USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);C:\OGRE_SDK_1.9\Windows Phone 8\dep\include;C:\OGRE_SDK_1.9\Windows Phone 8\dep\include\OIS;C:\OGRE_SDK_1.9\Windows Phone 8\Build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsWinRT>true</CompileAsWinRT>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);C:\OGRE_SDK_1.9\Windows Phone 8\dep\include;C:\OGRE_SDK_1.9\Windows Phone 8\dep\include\OIS;C:\OGRE_SDK_1.9\Windows Phone 8\Build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsWinRT>true</CompileAsWinRT>
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>NDEBUG;USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\EndlessWorld\include;..\..\MeshLod\include;..\..\..\OgreMain/include;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\Components/Terrain/include;..\..\..\Components/Paging/include;..\..\..\Components/Volume/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);C:\OGRE_SDK_1.9\Windows Phone 8\dep\include;C:\OGRE_SDK_1.9\Windows Phone 8\dep\include\OIS;C:\OGRE_SDK_1.9\Windows Phone 8\Build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsWinRT>true</CompileAsWinRT>
     </ClCompile>
     <Link>
@@ -4228,206 +4228,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\wp8\build\Components\Overlay\OgreOverlay.vcxproj">
-      <Project>{6ad1c30e-7267-4c71-927a-d3ef397eed1d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Components\Paging\OgrePaging.vcxproj">
-      <Project>{047b7b04-f648-468f-a7ed-d0f2f4935089}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Components\RTShaderSystem\OgreRTShaderSystem.vcxproj">
-      <Project>{aa5818d2-902c-4292-8a52-1798fedd1b5a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Components\Terrain\OgreTerrain.vcxproj">
-      <Project>{967740e3-ae33-41bf-adff-70aa3aa59eb9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Components\Volume\OgreVolume.vcxproj">
-      <Project>{86e80087-5d9c-47a2-bbab-18ac80e5b766}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\OgreMain\OgreMain.vcxproj">
-      <Project>{d0559e68-ad79-433c-8225-c03a375a4470}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\PlugIns\BSPSceneManager\Plugin_BSPSceneManager.vcxproj">
-      <Project>{a49df68b-4e3a-4ced-8d72-d290b412cf42}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\PlugIns\OctreeSceneManager\Plugin_OctreeSceneManager.vcxproj">
-      <Project>{2967ee13-de03-40b5-a908-18b2ccd675a3}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\PlugIns\OctreeZone\Plugin_OctreeZone.vcxproj">
-      <Project>{2f886581-4426-4f9b-865f-78e331b06544}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\PlugIns\ParticleFX\Plugin_ParticleFX.vcxproj">
-      <Project>{ddf2eacb-d0a2-4413-8f8c-6796aafc3db6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\PlugIns\PCZSceneManager\Plugin_PCZSceneManager.vcxproj">
-      <Project>{22023def-4d10-4560-bc94-c6c106980cee}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\RenderSystems\Direct3D11\RenderSystem_Direct3D11.vcxproj">
-      <Project>{54a7b944-d0c2-4706-a24c-786cc3f949e2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\BezierPatch\Sample_BezierPatch.vcxproj">
-      <Project>{b8458e97-8a19-4c7d-8d7d-67d8a1fb86d2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\BSP\Sample_BSP.vcxproj">
-      <Project>{9fce5eec-3474-43fe-bf3e-1042a1491d9e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\CameraTrack\Sample_CameraTrack.vcxproj">
-      <Project>{855ea80e-0e8f-48c0-88f0-bb2e7ab37e3f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\CelShading\Sample_CelShading.vcxproj">
-      <Project>{b2058362-0551-4734-a8ca-97e2517125ff}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Character\Sample_Character.vcxproj">
-      <Project>{14423453-63d6-4cd4-aab6-1aa3bf54e883}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Compositor\Sample_Compositor.vcxproj">
-      <Project>{3d9a3b88-f1e7-4f56-9b91-e91c81f69bc9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\CubeMapping\Sample_CubeMapping.vcxproj">
-      <Project>{1903399f-e225-4b1e-b096-3f3038f4ebf0}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\DeferredShading\Sample_DeferredShading.vcxproj">
-      <Project>{a2a276dc-b613-4a05-b090-4945bffa2a77}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Dot3Bump\Sample_Dot3Bump.vcxproj">
-      <Project>{ea39c42e-6c4d-4595-9e05-d1dc76d6bfb0}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\DualQuaternion\Sample_DualQuaternion.vcxproj">
-      <Project>{447fad17-74a6-4e04-bd4f-abb9ac79e263}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\DynTex\Sample_DynTex.vcxproj">
-      <Project>{d015f183-7453-4573-a81c-197a15e2080c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\EndlessWorld\Sample_EndlessWorld.vcxproj">
-      <Project>{f900f735-787a-4020-95f0-70d37edb2d73}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\FacialAnimation\Sample_FacialAnimation.vcxproj">
-      <Project>{a449043a-fdab-4c15-9eb9-26db929cfa4d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Fresnel\Sample_Fresnel.vcxproj">
-      <Project>{09b36966-eacc-47cc-bb67-44620cd9157b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Grass\Sample_Grass.vcxproj">
-      <Project>{bd6c97e0-0753-4317-ac5e-2c3926760239}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Instancing\Sample_Instancing.vcxproj">
-      <Project>{adee8203-110d-4cfe-b6cd-bdf13066fc06}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Isosurf\Sample_Isosurf.vcxproj">
-      <Project>{abe86d58-f790-4ec3-86c0-1cef8c18e94a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Lighting\Sample_Lighting.vcxproj">
-      <Project>{d3218f62-dc13-4641-b88b-6842b0cf34b5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\NewInstancing\Sample_NewInstancing.vcxproj">
-      <Project>{8de74055-0897-4e67-92e6-363e80adf150}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\OceanDemo\Sample_Ocean.vcxproj">
-      <Project>{87e38b10-a0f8-43fc-8bcf-8503434128f1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\ParticleFX\Sample_ParticleFX.vcxproj">
-      <Project>{ac7bf9f5-a6ea-4230-91cb-f1716047f8ac}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\ParticleGS\Sample_ParticleGS.vcxproj">
-      <Project>{fc1872ce-51ee-4a6e-8b60-300677121cf3}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\ShaderSystemMultiLight\Sample_ShaderSystemMultiLight.vcxproj">
-      <Project>{4c5ad069-6ce6-489c-990e-1e12b8e38002}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\ShaderSystemTexturedFog\Sample_ShaderSystemTexturedFog.vcxproj">
-      <Project>{f827c279-005c-420b-8b4f-ea336451705a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\ShaderSystem\Sample_ShaderSystem.vcxproj">
-      <Project>{b52ca214-5112-400f-844d-f14aa31930ab}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Shadows\Sample_Shadows.vcxproj">
-      <Project>{17f55456-e7aa-450e-b23c-d4244183d83b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SkeletalAnimation\Sample_SkeletalAnimation.vcxproj">
-      <Project>{7bed137e-f4b1-4875-83de-21eabcbf2d7d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SkyBox\Sample_SkyBox.vcxproj">
-      <Project>{8b1a4b1a-1438-4d27-88fb-6d1211165e8c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SkyDome\Sample_SkyDome.vcxproj">
-      <Project>{6b3c1638-57c8-4442-975d-5bc115c88680}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SkyPlane\Sample_SkyPlane.vcxproj">
-      <Project>{4f75699e-4c9b-4e32-aec7-dae429dc3370}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Smoke\Sample_Smoke.vcxproj">
-      <Project>{34235b66-5d89-4bb8-b991-c8aed6ad927e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SphereMapping\Sample_SphereMapping.vcxproj">
-      <Project>{0120f974-f60c-40b9-b9f9-272391072fc5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\SSAO\Sample_SSAO.vcxproj">
-      <Project>{ac9952d8-465a-42e9-be25-795303a3fe91}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Terrain\Sample_Terrain.vcxproj">
-      <Project>{4f171ce3-788f-4b46-8827-ea4d051658d3}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Tesselation\Sample_Tesselation.vcxproj">
-      <Project>{0f387d9b-0eb3-4e71-b6d7-1f63ecdff3ff}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\TextureArray\Sample_TextureArray.vcxproj">
-      <Project>{0e0f38ae-6807-47c3-9408-5d1d49d7b3f9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\TextureFX\Sample_TextureFX.vcxproj">
-      <Project>{35b7ee39-9b9b-44be-8266-6f616005077d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Transparency\Sample_Transparency.vcxproj">
-      <Project>{0f418e10-f460-4c48-9046-57f1675d5eb7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\VolumeCSG\Sample_VolumeCSG.vcxproj">
-      <Project>{3037a8e4-6d43-42bb-a47b-ded6d3b7bf7e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\VolumeTerrain\Sample_VolumeTerrain.vcxproj">
-      <Project>{22567381-e402-4d5d-941f-c9112acffd85}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\VolumeTex\Sample_VolumeTex.vcxproj">
-      <Project>{a4e180d5-32ac-495e-be6b-61f85da16a59}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\build\Samples\Water\Sample_Water.vcxproj">
-      <Project>{b978e56e-8674-4c40-8173-a21d1aeb1a34}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\FreeImageLib\FreeImageLib.2012.WinRT.vcxproj">
-      <Project>{9e219df2-315d-478e-8a07-8960c377ce1e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibJPEG\LibJPEG.2012.WinRT.vcxproj">
-      <Project>{5e1d4e5f-e10c-4ba3-b663-f33014fd21d9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibMNG\LibMNG.2012.WinRT.vcxproj">
-      <Project>{912a2d43-35a3-4af2-b2eb-0d81effda6dc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibOpenJPEG\LibOpenJPEG.2012.WinRT.vcxproj">
-      <Project>{e3536c28-a7f1-4b53-8e52-7d2232f9e098}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibPNG\LibPNG.2012.WinRT.vcxproj">
-      <Project>{7db10b50-ce00-4d7a-b322-6824f05d2fcb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibRawLite\LibRawLite.2012.WinRT.vcxproj">
-      <Project>{07f662c1-1323-42ab-b6af-fbfd34a7437a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\LibTIFF\LibTIFF.2012.WinRT.vcxproj">
-      <Project>{431e3f3f-7c4d-430a-b8f1-4f165db64edc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\OpenEXR\OpenEXR.2012.WinRT.vcxproj">
-      <Project>{17a4874b-0606-4687-90b6-f91f8cb3b8af}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\FreeImage-3.13.1\Source\ZLib\ZLib.FreeImage.2012.WinRT.vcxproj">
-      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\freetype-2.3.11\builds\win32\vc2005\freetype.2012.WinRT.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\zlib-1.2.3\projects\visualc6\zlib.2012.WinRT.vcxproj">
-      <Project>{e2c146f9-f840-4c21-9ca9-e1dd9649ab7a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\wp8\dep\src\zziplib-0.13.57\msvc8\zziplib.2012.WinRT.vcxproj">
-      <Project>{cb440073-2ed3-48ce-a1a1-b6eacb3a44bd}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Media\materials\programs\HLSL\Bloom2_ps20.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
@@ -4888,6 +4688,209 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Components\Overlay\OgreOverlay.vcxproj">
+      <Project>{804c6ed2-bd21-4de0-be69-57d240210e0e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Components\Paging\OgrePaging.vcxproj">
+      <Project>{39cfe260-b37e-41b8-9f71-3c610b8ea03d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Components\RTShaderSystem\OgreRTShaderSystem.vcxproj">
+      <Project>{117454fd-3e0f-4132-ba60-ab58b60d62dd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Components\Terrain\OgreTerrain.vcxproj">
+      <Project>{7613abad-24da-47ac-9e0f-cc001ea6be15}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Components\Volume\OgreVolume.vcxproj">
+      <Project>{c033fe0b-a7dd-4fbe-a851-f588221c4866}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\OgreMain\OgreMain.vcxproj">
+      <Project>{8ec3c3f6-d55a-4bd1-8c7d-916ee7f68801}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\PlugIns\BSPSceneManager\Plugin_BSPSceneManager.vcxproj">
+      <Project>{e39eec33-8c3d-4f23-9536-dad1c9f4be03}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\PlugIns\OctreeSceneManager\Plugin_OctreeSceneManager.vcxproj">
+      <Project>{40a375f0-2e14-437a-acd5-d5ef6de7ea07}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\PlugIns\OctreeZone\Plugin_OctreeZone.vcxproj">
+      <Project>{f77823ac-1785-49c8-9c61-6f2b33a2ab9d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\PlugIns\ParticleFX\Plugin_ParticleFX.vcxproj">
+      <Project>{2e4e5102-25b6-428c-838d-390e707e9f91}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\PlugIns\PCZSceneManager\Plugin_PCZSceneManager.vcxproj">
+      <Project>{abd7eb6b-4dab-4eb7-8cf5-01ac0ccc10bf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\RenderSystems\Direct3D11\RenderSystem_Direct3D11.vcxproj">
+      <Project>{d12ced68-b8f4-4dd9-9bc1-e00c072c997e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\BezierPatch\Sample_BezierPatch.vcxproj">
+      <Project>{ec1bf0f9-8fda-440d-a3ec-982f16f96625}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\BSP\Sample_BSP.vcxproj">
+      <Project>{69f54577-ddad-4497-9e15-1b8dce41d30a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\CameraTrack\Sample_CameraTrack.vcxproj">
+      <Project>{88f8dbf5-3f7c-47e8-b082-f54a436b6efd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\CelShading\Sample_CelShading.vcxproj">
+      <Project>{4464ca63-9233-4286-ba6e-7e3b56877c64}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Character\Sample_Character.vcxproj">
+      <Project>{c1118d54-9ec7-4614-a2b8-36206524da9e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Compositor\Sample_Compositor.vcxproj">
+      <Project>{ca575c40-6066-47b0-9ae2-9edbc689f60f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\CubeMapping\Sample_CubeMapping.vcxproj">
+      <Project>{7385e79c-ac28-4645-a51a-421db7da1aab}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\DeferredShading\Sample_DeferredShading.vcxproj">
+      <Project>{b3a1c09a-c151-4fa0-bae9-15d4277d5684}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Dot3Bump\Sample_Dot3Bump.vcxproj">
+      <Project>{6af5e7f3-9f13-474f-98a7-b94216acf00a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\DualQuaternion\Sample_DualQuaternion.vcxproj">
+      <Project>{77afd141-5b4f-4628-a04c-e707ac0485dd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\DynTex\Sample_DynTex.vcxproj">
+      <Project>{765345e5-98fc-4c98-b4b1-86e3a7e9de7a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\EndlessWorld\Sample_EndlessWorld.vcxproj">
+      <Project>{71b6a236-9e31-4ea5-aa5a-b94200463c5b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\FacialAnimation\Sample_FacialAnimation.vcxproj">
+      <Project>{fa9d7ade-c136-4a88-9b51-81123678d2a2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Fresnel\Sample_Fresnel.vcxproj">
+      <Project>{67728853-9982-4e61-81eb-62fc7925a93d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Grass\Sample_Grass.vcxproj">
+      <Project>{5180e50a-0ee1-466b-8ac5-199fd911fbb5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Instancing\Sample_Instancing.vcxproj">
+      <Project>{5c4d16fc-9083-4528-956e-26fc1ed34630}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Isosurf\Sample_Isosurf.vcxproj">
+      <Project>{312a4efe-e676-4692-b36a-149e42ec5227}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Lighting\Sample_Lighting.vcxproj">
+      <Project>{5684eb3d-977e-472e-af8e-1756fd75cc23}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\MeshLod\Sample_MeshLod.vcxproj">
+      <Project>{075d60be-1940-4c57-996f-9b401e768017}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\NewInstancing\Sample_NewInstancing.vcxproj">
+      <Project>{6fc92993-7e6a-4f5d-9e4e-e3560f7e8a70}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\OceanDemo\Sample_Ocean.vcxproj">
+      <Project>{95f3db53-ee7a-4eef-a570-fff65762a4cf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\ParticleFX\Sample_ParticleFX.vcxproj">
+      <Project>{422f5224-f5d9-4b6f-a78a-5929db4a7c24}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\ParticleGS\Sample_ParticleGS.vcxproj">
+      <Project>{530107b0-a04b-4d3e-bb7f-1a2f9fd01189}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\ShaderSystemMultiLight\Sample_ShaderSystemMultiLight.vcxproj">
+      <Project>{79acd00f-34fd-4d0e-8782-4ff7ca481fbe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\ShaderSystemTexturedFog\Sample_ShaderSystemTexturedFog.vcxproj">
+      <Project>{0bdf4d33-18bb-414b-8983-53339fb67fb6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\ShaderSystem\Sample_ShaderSystem.vcxproj">
+      <Project>{7fa6b7cc-78b9-44d4-b089-881e5b269285}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Shadows\Sample_Shadows.vcxproj">
+      <Project>{d6c835cf-314c-4f4c-a59a-af273960cf95}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SkeletalAnimation\Sample_SkeletalAnimation.vcxproj">
+      <Project>{bbb19cb3-c1be-4b54-8281-fcbbe0f53626}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SkyBox\Sample_SkyBox.vcxproj">
+      <Project>{45d4e123-039e-4e4b-9915-c169cb0bc90a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SkyDome\Sample_SkyDome.vcxproj">
+      <Project>{1cd538ab-c3cb-466b-9d5b-553ccfeadaa4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SkyPlane\Sample_SkyPlane.vcxproj">
+      <Project>{01f45b11-06ab-4629-bf80-ceedcdfc6507}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Smoke\Sample_Smoke.vcxproj">
+      <Project>{2e385651-0851-4d64-90bb-d7726cb93c46}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SphereMapping\Sample_SphereMapping.vcxproj">
+      <Project>{64bcd68e-4215-4cd7-b8f0-843c32d24fb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\SSAO\Sample_SSAO.vcxproj">
+      <Project>{2c758487-1652-4f4b-81c7-002f0f5e7794}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Terrain\Sample_Terrain.vcxproj">
+      <Project>{bc2e83c5-7958-4f2c-bf73-fe1eef26367a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Tesselation\Sample_Tesselation.vcxproj">
+      <Project>{b8811e01-4598-4269-9cc3-66b716e8e5f2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\TextureArray\Sample_TextureArray.vcxproj">
+      <Project>{f374df62-1edf-452e-830c-0b9958eb4541}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\TextureFX\Sample_TextureFX.vcxproj">
+      <Project>{83cc5ad6-fe61-4f12-8b6f-558eb0c9cf62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Transparency\Sample_Transparency.vcxproj">
+      <Project>{030869cb-b30b-43c3-96b1-40f9b9914bb8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\VolumeCSG\Sample_VolumeCSG.vcxproj">
+      <Project>{9a09e8d0-9c82-4c0f-a0e7-1bc3a6198589}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\VolumeTerrain\Sample_VolumeTerrain.vcxproj">
+      <Project>{fdf927fd-797e-46fb-ae6f-6e04cdcde4a3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\VolumeTex\Sample_VolumeTex.vcxproj">
+      <Project>{2b156c48-1e20-47ee-ac4c-1bdedf42a24f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\Build\Samples\Water\Sample_Water.vcxproj">
+      <Project>{1ec3cce2-19af-47e5-9200-f861c0ff7b92}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\FreeImageLib\FreeImageLib.2012.WinRT.vcxproj">
+      <Project>{9e219df2-315d-478e-8a07-8960c377ce1e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibJPEG\LibJPEG.2012.WinRT.vcxproj">
+      <Project>{5e1d4e5f-e10c-4ba3-b663-f33014fd21d9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibMNG\LibMNG.2012.WinRT.vcxproj">
+      <Project>{912a2d43-35a3-4af2-b2eb-0d81effda6dc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibOpenJPEG\LibOpenJPEG.2012.WinRT.vcxproj">
+      <Project>{e3536c28-a7f1-4b53-8e52-7d2232f9e098}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibPNG\LibPNG.2012.WinRT.vcxproj">
+      <Project>{7db10b50-ce00-4d7a-b322-6824f05d2fcb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibRawLite\LibRawLite.2012.WinRT.vcxproj">
+      <Project>{07f662c1-1323-42ab-b6af-fbfd34a7437a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\LibTIFF\LibTIFF.2012.WinRT.vcxproj">
+      <Project>{431e3f3f-7c4d-430a-b8f1-4f165db64edc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\OpenEXR\OpenEXR.2012.WinRT.vcxproj">
+      <Project>{17a4874b-0606-4687-90b6-f91f8cb3b8af}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\FreeImage-3.13.1\Source\ZLib\ZLib.FreeImage.2012.WinRT.vcxproj">
+      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\freetype-2.3.11\builds\win32\vc2005\freetype.2012.WinRT.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\zlib-1.2.3\projects\visualc6\zlib.2012.WinRT.vcxproj">
+      <Project>{e2c146f9-f840-4c21-9ca9-e1dd9649ab7a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Windows Phone 8\dep\src\zziplib-0.13.57\msvc8\zziplib.2012.WinRT.vcxproj">
+      <Project>{cb440073-2ed3-48ce-a1a1-b6eacb3a44bd}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsPhone\v$(TargetPlatformVersion)\Microsoft.Cpp.WindowsPhone.$(TargetPlatformVersion).targets" />
