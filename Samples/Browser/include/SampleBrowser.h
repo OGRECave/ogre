@@ -1123,6 +1123,9 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
+#if defined(ENABLE_SHADERS_CACHE_SAVE) 
+			Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+#endif
 #if	defined(ENABLE_SHADERS_CACHE_LOAD)
 			// Load for a package version of the shaders.
 			Ogre::String path = getShaderCacheFileName();
