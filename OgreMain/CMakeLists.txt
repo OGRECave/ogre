@@ -467,7 +467,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
-  if (OGRE_BUILD_PLATFORM_WINRT)
+  if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
@@ -477,7 +477,6 @@ elseif (WIN32)
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
-      src/WIN32/OgreTimer.cpp
       src/WIN32/OgreTimer.cpp
 	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
@@ -737,7 +736,7 @@ endif ()
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
-if (OGRE_BUILD_PLATFORM_WINRT)
+if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
 	# exclude OgreTimer.cpp from unity builds; causes problem
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
 else ()

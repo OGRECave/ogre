@@ -58,26 +58,58 @@ THE SOFTWARE.
 Ogre::AndroidResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #	include "OgreNaClWindow.h"
-#elif OGRE_NO_GLES3_SUPPORT == 1
+#else
 #   include "OgreEGLWindow.h"
-#	ifndef GL_GLEXT_PROTOTYPES && OGRE_NO_GLES3_SUPPORT == 1
-    PFNGLMAPBUFFEROESPROC glMapBufferOES = NULL;
-    PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES = NULL;
-#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-    PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB = NULL;
-    PFNGLREADBUFFERNVPROC glReadBufferNV = NULL;
-    PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV = NULL;
-    PFNGLGETTEXIMAGENVPROC glGetTexImageNV = NULL;
-    PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV = NULL;
-    PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV = NULL;
-#		else
-	PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES = NULL;
-	PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES = NULL;
-	PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES = NULL;
-	PFNGLISVERTEXARRAYOES glIsVertexArrayOES = NULL;
-#		endif
-#	endif
-
+#   if OGRE_NO_GLES3_SUPPORT == 1
+PFNGLGENQUERIESEXTPROC glGenQueriesEXT = NULL;
+PFNGLDELETEQUERIESEXTPROC glDeleteQueriesEXT = NULL;
+PFNGLISQUERYEXTPROC glIsQueryEXT = NULL;
+PFNGLBEGINQUERYEXTPROC glBeginQueryEXT = NULL;
+PFNGLENDQUERYEXTPROC glEndQueryEXT = NULL;
+PFNGLGETQUERYIVEXTPROC glGetQueryivEXT = NULL;
+PFNGLGETQUERYOBJECTUIVEXTPROC glGetQueryObjectuivEXT = NULL;
+PFNGLINSERTEVENTMARKEREXTPROC glInsertEventMarkerEXT = NULL;
+PFNGLPUSHGROUPMARKEREXTPROC glPushGroupMarkerEXT = NULL;
+PFNGLPOPGROUPMARKEREXTPROC glPopGroupMarkerEXT = NULL;
+PFNGLLABELOBJECTEXTPROC glLabelObjectEXT = NULL;
+PFNGLGETOBJECTLABELEXTPROC glGetObjectLabelEXT = NULL;
+PFNGLUSEPROGRAMSTAGESEXTPROC glUseProgramStagesEXT = NULL;
+PFNGLACTIVESHADERPROGRAMEXTPROC glActiveShaderProgramEXT = NULL;
+PFNGLCREATESHADERPROGRAMVEXTPROC glCreateShaderProgramvEXT = NULL;
+PFNGLBINDPROGRAMPIPELINEEXTPROC glBindProgramPipelineEXT = NULL;
+PFNGLDELETEPROGRAMPIPELINESEXTPROC glDeleteProgramPipelinesEXT = NULL;
+PFNGLGENPROGRAMPIPELINESEXTPROC glGenProgramPipelinesEXT = NULL;
+PFNGLISPROGRAMPIPELINEEXTPROC glIsProgramPipelineEXT = NULL;
+PFNGLPROGRAMPARAMETERIEXTPROC glProgramParameteriEXT = NULL;
+PFNGLGETPROGRAMPIPELINEIVEXTPROC glGetProgramPipelineivEXT = NULL;
+PFNGLPROGRAMUNIFORM1IEXTPROC glProgramUniform1iEXT = NULL;
+PFNGLPROGRAMUNIFORM2IEXTPROC glProgramUniform2iEXT = NULL;
+PFNGLPROGRAMUNIFORM3IEXTPROC glProgramUniform3iEXT = NULL;
+PFNGLPROGRAMUNIFORM4IEXTPROC glProgramUniform4iEXT = NULL;
+PFNGLPROGRAMUNIFORM1FEXTPROC glProgramUniform1fEXT = NULL;
+PFNGLPROGRAMUNIFORM2FEXTPROC glProgramUniform2fEXT = NULL;
+PFNGLPROGRAMUNIFORM3FEXTPROC glProgramUniform3fEXT = NULL;
+PFNGLPROGRAMUNIFORM4FEXTPROC glProgramUniform4fEXT = NULL;
+PFNGLPROGRAMUNIFORM1IVEXTPROC glProgramUniform1ivEXT = NULL;
+PFNGLPROGRAMUNIFORM2IVEXTPROC glProgramUniform2ivEXT = NULL;
+PFNGLPROGRAMUNIFORM3IVEXTPROC glProgramUniform3ivEXT = NULL;
+PFNGLPROGRAMUNIFORM4IVEXTPROC glProgramUniform4ivEXT = NULL;
+PFNGLPROGRAMUNIFORM1FVEXTPROC glProgramUniform1fvEXT = NULL;
+PFNGLPROGRAMUNIFORM2FVEXTPROC glProgramUniform2fvEXT = NULL;
+PFNGLPROGRAMUNIFORM3FVEXTPROC glProgramUniform3fvEXT = NULL;
+PFNGLPROGRAMUNIFORM4FVEXTPROC glProgramUniform4fvEXT = NULL;
+PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC glProgramUniformMatrix2fvEXT = NULL;
+PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC glProgramUniformMatrix3fvEXT = NULL;
+PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC glProgramUniformMatrix4fvEXT = NULL;
+PFNGLVALIDATEPROGRAMPIPELINEEXTPROC glValidateProgramPipelineEXT = NULL;
+PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC glGetProgramPipelineInfoLogEXT = NULL;
+PFNGLMAPBUFFEROESPROC glMapBufferOES = NULL;
+PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES = NULL;
+PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES = NULL;
+PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES = NULL;
+PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES = NULL;
+PFNGLISVERTEXARRAYOES glIsVertexArrayOES = NULL;
+#    endif
 #endif
 
 // Convenience macro from ARB_vertex_buffer_object spec
@@ -1551,7 +1583,7 @@ namespace Ogre {
 			maxAnisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy() ? 
 			static_cast<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy()) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-			OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
+			OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)maxAnisotropy));
 #endif
 		mStateCacheManager->activateGLTextureUnit(0);
     }
@@ -1691,7 +1723,7 @@ namespace Ogre {
 				else
                 {
                     GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                 }
 #else
                 OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
@@ -1934,6 +1966,11 @@ namespace Ogre {
     {
 		mStateCacheManager->setDisabled(GL_DITHER);
         static_cast<GLES2TextureManager*>(mTextureManager)->createWarningTexture();
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+		// Enable primitive restarting with fixed indices depending upon the data type
+		OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
+#endif
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)

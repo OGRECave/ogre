@@ -30,7 +30,7 @@ IF (WIN32)
     IF(BORLAND)
       SET (OPENGLES3_gl_LIBRARY import32 CACHE STRING "OpenGL ES 3.x library for win32")
     ELSE(BORLAND)
-		SET(POWERVR_SDK_PATH "C:/Imagination/PowerVR/GraphicsSDK/SDK_3.0/Builds/OGLES3")
+		SET(POWERVR_SDK_PATH "C:/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/")
 		FIND_PATH(OPENGLES3_INCLUDE_DIR GLES3/gl3.h
 			${POWERVR_SDK_PATH}/Include
 		)
@@ -41,12 +41,12 @@ IF (WIN32)
 		
 		FIND_LIBRARY(OPENGLES3_gl_LIBRARY
 			NAMES libGLESv2
-			PATHS ${POWERVR_SDK_PATH}/Windows_x86_32/Lib
+			PATHS ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
 		)
 		    
 		FIND_LIBRARY(EGL_egl_LIBRARY
 			NAMES libEGL
-			PATHS ${POWERVR_SDK_PATH}/Windows_x86_32/Lib
+			PATHS ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
 		)
     ENDIF(BORLAND)
 

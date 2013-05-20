@@ -241,6 +241,14 @@ void FFP_SampleTexture(in sampler2D s,
 }
 
 //-----------------------------------------------------------------------------
+void FFP_SampleTexture(in sampler3D s, 
+				   in vec3 f,
+				   out vec4 t)
+{
+	t = texture3D(s, f);
+}
+
+//-----------------------------------------------------------------------------
 void FFP_SampleTextureProj(in sampler2D s, 
 				   in vec3 f,
 				   out vec4 t)

@@ -42,7 +42,16 @@ namespace Ogre {
 	*  @{
 	*/
 
-    /** Level of detail strategy based on distance from camera. */
+    /** Level of detail strategy based on distance from camera.
+        @remarks
+            The purpose of the reference view is to ensure a consistent experience for all users. Monitors of different resolutions and aspect ratios will each have different results for the distance queries.
+        @par
+            It depends on gameplay testing. If all testers had 16:9 monitors and 110° FOV, then that's the value you should enter (to ensure as much as possible the experience stays consistent for all other users who don't have a 16:9 monitor and/or use a different FOV).
+        @par
+            If all your testers had 4:3 monitors, then enter a 4:3 resolution.
+        @par
+            If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
+     */
     class _OgreExport DistanceLodStrategy : public LodStrategy, public Singleton<DistanceLodStrategy>
     {
     protected:
