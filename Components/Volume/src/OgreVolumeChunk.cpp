@@ -41,7 +41,6 @@ namespace Volume {
 
     const String Chunk::MOVABLE_TYPE_NAME = "VolumeChunk";
     const uint16 Chunk::WORKQUEUE_LOAD_REQUEST = 1;
-    size_t Chunk::mChunksBeingProcessed = 0;
     
     //-----------------------------------------------------------------------
 
@@ -54,7 +53,7 @@ namespace Volume {
         }
         if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
         {
-            mChunksBeingProcessed++;
+            shared->chunksBeingProcessed++;
 
             // Call worker
             ChunkRequest req;
@@ -170,8 +169,8 @@ namespace Volume {
         }
 
         // Set to invisible for now.
+        mVisible = false;
         mInvisible = true;
-        mVisible  = false;
         
         // Don't generate this chunk if it doesn't contribute to the whole volume.
         if (!contributesToVolumeMesh(from, to, parameters->src))
@@ -286,14 +285,14 @@ namespace Volume {
 
     Real Chunk::getSquaredViewDepth(const Camera* camera) const
     {
-        return (mBox.getCenter() * shared->scale).squaredDistance(camera->getPosition());
+        return (mBox.getCenter() * shared->parameters->scale).squaredDistance(camera->getPosition());
     }
     
     //-----------------------------------------------------------------------
 
     Real Chunk::getBoundingRadius() const
     {
-        return mBox.getMinimum().distance(mBox.getCenter()) * shared->scale;
+        return mBox.getMinimum().distance(mBox.getCenter()) * shared->parameters->scale;
     }
     
     //-----------------------------------------------------------------------
@@ -307,35 +306,35 @@ namespace Volume {
                 "Invalid parameters given!",
                 __FUNCTION__);
         }
-        mChunksBeingProcessed = 0;
-
+        
         isRoot = true;
 
         // Don't recreate the shared parameters on update.
         if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
         {
-            shared = new ChunkTreeSharedData();
-            shared->maxScreenSpaceError = parameters->maxScreenSpaceError;
-            shared->scale = parameters->scale;
+            shared = new ChunkTreeSharedData(parameters);
             parent->scale(Vector3(parameters->scale));
         }
+
+        shared->chunksBeingProcessed = 0;
 
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
         uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
         wq->addResponseHandler(workQueueChannel, this);
         wq->addRequestHandler(workQueueChannel, this);
 
-        doLoad(parent, from, to, from, to, level, level, parameters);
+        doLoad(parent, from, to, from, to, level, level, shared->parameters);
 
         // Wait for the threads.
-        while(mChunksBeingProcessed)
+        if (!parameters->async)
         {
-            OGRE_THREAD_SLEEP(0);
-            wq->processResponses();
+            while(shared->chunksBeingProcessed)
+            {
+                OGRE_THREAD_SLEEP(0);
+                wq->processResponses();
+            }
         }
-    
-        wq->removeRequestHandler(workQueueChannel, this);
-        wq->removeResponseHandler(workQueueChannel, this);
+        
     
         // Just add the frame listener on initial load
         if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
@@ -346,7 +345,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    ChunkParameters Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
+    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, bool validSourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
     {
         ConfigFile config;
         config.loadFromResourceSystem(filename, resourceGroup);
@@ -381,11 +380,7 @@ namespace Volume {
     
         load(parent, from, to, level, &parameters);
         
-        if (sourceResult)
-        {
-            *sourceResult = textureSource;
-        }
-        else
+        if (!validSourceResult)
         {
             delete textureSource;
         }
@@ -403,8 +398,6 @@ namespace Volume {
                 setMaterialOfLevel(i, materialOfLevel);
             }
         }
-        parameters.src = 0;
-        return parameters;
     }
     
     //-----------------------------------------------------------------------
@@ -475,6 +468,15 @@ namespace Volume {
     bool Chunk::frameStarted(const FrameEvent& evt)
     {
     
+        if (isRoot && shared->chunksBeingProcessed == 0)
+        {
+            shared->chunksBeingProcessed = -1;
+            WorkQueue* wq = Root::getSingleton().getWorkQueue();
+            uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
+            wq->removeRequestHandler(workQueueChannel, this);
+            wq->removeResponseHandler(workQueueChannel, this);
+        }
+
         if (mInvisible)
         {
             return true;
@@ -508,7 +510,7 @@ namespace Volume {
         
         // Get the distance to the center.
         Vector3 camPos = mCamera->getRealPosition();
-        Real d = (mBox.getCenter() * shared->scale).distance(camPos);
+        Real d = (mBox.getCenter() * shared->parameters->scale).distance(camPos);
         if (d < 1.0)
         {
             d = 1.0;
@@ -516,7 +518,7 @@ namespace Volume {
 
         Real screenSpaceError = mError / d * k;
 
-        if (screenSpaceError <= shared->maxScreenSpaceError / shared->scale)
+        if (screenSpaceError <= shared->parameters->maxScreenSpaceError / shared->parameters->scale)
         {
             setChunkVisible(true, false);
             if (mChildren)
@@ -664,15 +666,8 @@ namespace Volume {
             OGRE_DELETE cReq.root;
             OGRE_DELETE cReq.dualGridGenerator;
             OGRE_DELETE cReq.mb;
-            mChunksBeingProcessed--;
+            shared->chunksBeingProcessed--;
         }
-    }
-    
-    //-----------------------------------------------------------------------
-
-    Real Chunk::getScale(void) const
-    {
-        return shared->scale;
     }
     
     //-----------------------------------------------------------------------
@@ -696,6 +691,12 @@ namespace Volume {
             }
         }
     }
+    
+    //-----------------------------------------------------------------------
 
+    ChunkParameters* Chunk::getChunkParameters(void)
+    {
+        return shared->parameters;
+    }
 }
 }
