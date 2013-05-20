@@ -37,10 +37,8 @@
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-// For the phone we only support running from the cache file.
-#	if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+// For WinRT we only support running from the cache file.
 #       define ENABLE_SHADERS_CACHE_LOAD 1
-#   endif
 #endif
 
 #define ENABLE_SHADERS_CACHE_SAVE 1
