@@ -147,8 +147,12 @@ namespace Volume {
             Contains the vertices of the triangles.
         @param indices
             Contains the indices of the triangles.
+        @param level
+            The LOD level of this mesh.
+        @param inProcess
+            The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        virtual void trianglesReady(const VecVertex &vertices, const VecIndices &indices) = 0;
+        virtual void ready(const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
     };
 
     /** Class to build up a mesh with vertices and indices.
@@ -343,8 +347,12 @@ namespace Volume {
         /** Executes a MeshBuilderCallback on this instance.
          @param callback
             The callback to execute.
+        @param level
+            The LOD level of this mesh.
+        @param inProcess
+            The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        void executeCallback(MeshBuilderCallback *callback) const;
+        void executeCallback(MeshBuilderCallback *callback, size_t level, int inProcess) const;
 
     };
 }

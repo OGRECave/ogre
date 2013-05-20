@@ -203,9 +203,9 @@ namespace Volume {
         size_t chunkTriangles = chunkRequest->mb->generateBuffers(mRenderOp);
         chunkRequest->origin->mInvisible = chunkTriangles == 0;
 
-        if (!mInvisible && mShared->parameters->lodCallback && mShared->parameters->lodCallbackLod  == chunkRequest->maxLevels - chunkRequest->level + 1)
+        if (mShared->parameters->lodCallback)
         {
-            chunkRequest->mb->executeCallback(mShared->parameters->lodCallback);
+            chunkRequest->mb->executeCallback(mShared->parameters->lodCallback, chunkRequest->level, mShared->chunksBeingProcessed);
         }
 
         chunkRequest->origin->mBox = chunkRequest->mb->getBoundingBox();
@@ -344,7 +344,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, bool validSourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
+    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, bool validSourceResult, MeshBuilderCallback *lodCallback, const String& resourceGroup)
     {
         ConfigFile config;
         config.loadFromResourceSystem(filename, resourceGroup);
@@ -366,7 +366,6 @@ namespace Volume {
         ChunkParameters parameters;
         parameters.sceneManager = sceneManager;
         parameters.lodCallback = lodCallback;
-        parameters.lodCallbackLod = lodCallbackLod;
         parameters.src = textureSource;
         parameters.scale = scale;
         parameters.maxScreenSpaceError = maxScreenSpaceError;
@@ -661,11 +660,11 @@ namespace Volume {
         if (res->succeeded())
         {
             ChunkRequest cReq = any_cast<ChunkRequest>(res->getRequest()->getData());
+            mShared->chunksBeingProcessed--;
             cReq.origin->loadGeometry(&cReq);
             OGRE_DELETE cReq.root;
             OGRE_DELETE cReq.dualGridGenerator;
             OGRE_DELETE cReq.mb;
-            mShared->chunksBeingProcessed--;
         }
     }
     
