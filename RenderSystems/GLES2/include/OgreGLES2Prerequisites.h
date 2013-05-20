@@ -91,18 +91,101 @@ THE SOFTWARE.
 
 #	ifndef GL_GLEXT_PROTOTYPES
 #       if OGRE_NO_GLES3_SUPPORT == 1
+
+typedef void (GL_APIENTRYP PFNGLGENQUERIESEXTPROC) (GLsizei n, GLuint *ids);
+typedef void (GL_APIENTRYP PFNGLDELETEQUERIESEXTPROC) (GLsizei n, const GLuint *ids);
+typedef GLboolean (GL_APIENTRYP PFNGLISQUERYEXTPROC) (GLuint id);
+typedef void (GL_APIENTRYP PFNGLBEGINQUERYEXTPROC) (GLenum target, GLuint id);
+typedef void (GL_APIENTRYP PFNGLENDQUERYEXTPROC) (GLenum target);
+typedef void (GL_APIENTRYP PFNGLGETQUERYIVEXTPROC) (GLenum target, GLenum pname, GLint *params);
+typedef void (GL_APIENTRYP PFNGLGETQUERYOBJECTUIVEXTPROC) (GLuint id, GLenum pname, GLuint *params);
+extern PFNGLGENQUERIESEXTPROC glGenQueriesEXT;
+extern PFNGLDELETEQUERIESEXTPROC glDeleteQueriesEXT;
+extern PFNGLISQUERYEXTPROC glIsQueryEXT;
+extern PFNGLBEGINQUERYEXTPROC glBeginQueryEXT;
+extern PFNGLENDQUERYEXTPROC glEndQueryEXT;
+extern PFNGLGETQUERYIVEXTPROC glGetQueryivEXT;
+extern PFNGLGETQUERYOBJECTUIVEXTPROC glGetQueryObjectuivEXT;
+
+typedef void (GL_APIENTRYP PFNGLINSERTEVENTMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (GL_APIENTRYP PFNGLPUSHGROUPMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (GL_APIENTRYP PFNGLPOPGROUPMARKEREXTPROC) (void);
+
+extern PFNGLINSERTEVENTMARKEREXTPROC glInsertEventMarkerEXT;
+extern PFNGLPUSHGROUPMARKEREXTPROC glPushGroupMarkerEXT;
+extern PFNGLPOPGROUPMARKEREXTPROC glPopGroupMarkerEXT;
+
+typedef void (GL_APIENTRYP PFNGLLABELOBJECTEXTPROC) (GLenum type, GLuint object, GLsizei length, const GLchar *label);
+typedef void (GL_APIENTRYP PFNGLGETOBJECTLABELEXTPROC) (GLenum type, GLuint object, GLsizei bufSize, GLsizei *length, GLchar *label);
+
+extern PFNGLLABELOBJECTEXTPROC glLabelObjectEXT;
+extern PFNGLGETOBJECTLABELEXTPROC glGetObjectLabelEXT;
+
+typedef void (GL_APIENTRYP PFNGLUSEPROGRAMSTAGESEXTPROC) (GLuint pipeline, GLbitfield stages, GLuint program);
+typedef void (GL_APIENTRYP PFNGLACTIVESHADERPROGRAMEXTPROC) (GLuint pipeline, GLuint program);
+typedef GLuint (GL_APIENTRYP PFNGLCREATESHADERPROGRAMVEXTPROC) (GLenum type, GLsizei count, const GLchar **strings);
+typedef void (GL_APIENTRYP PFNGLBINDPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRYP PFNGLDELETEPROGRAMPIPELINESEXTPROC) (GLsizei n, const GLuint *pipelines);
+typedef void (GL_APIENTRYP PFNGLGENPROGRAMPIPELINESEXTPROC) (GLsizei n, GLuint *pipelines);
+typedef GLboolean (GL_APIENTRYP PFNGLISPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRYP PFNGLPROGRAMPARAMETERIEXTPROC) (GLuint program, GLenum pname, GLint value);
+typedef void (GL_APIENTRYP PFNGLGETPROGRAMPIPELINEIVEXTPROC) (GLuint pipeline, GLenum pname, GLint *params);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1IEXTPROC) (GLuint program, GLint location, GLint x);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2IEXTPROC) (GLuint program, GLint location, GLint x, GLint y);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z, GLint w);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1FEXTPROC) (GLuint program, GLint location, GLfloat x);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRYP PFNGLVALIDATEPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRYP PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC) (GLuint pipeline, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+extern PFNGLUSEPROGRAMSTAGESEXTPROC glUseProgramStagesEXT;
+extern PFNGLACTIVESHADERPROGRAMEXTPROC glActiveShaderProgramEXT;
+extern PFNGLCREATESHADERPROGRAMVEXTPROC glCreateShaderProgramvEXT;
+extern PFNGLBINDPROGRAMPIPELINEEXTPROC glBindProgramPipelineEXT;
+extern PFNGLDELETEPROGRAMPIPELINESEXTPROC glDeleteProgramPipelinesEXT;
+extern PFNGLGENPROGRAMPIPELINESEXTPROC glGenProgramPipelinesEXT;
+extern PFNGLISPROGRAMPIPELINEEXTPROC glIsProgramPipelineEXT;
+extern PFNGLPROGRAMPARAMETERIEXTPROC glProgramParameteriEXT;
+extern PFNGLGETPROGRAMPIPELINEIVEXTPROC glGetProgramPipelineivEXT;
+extern PFNGLPROGRAMUNIFORM1IEXTPROC glProgramUniform1iEXT;
+extern PFNGLPROGRAMUNIFORM2IEXTPROC glProgramUniform2iEXT;
+extern PFNGLPROGRAMUNIFORM3IEXTPROC glProgramUniform3iEXT;
+extern PFNGLPROGRAMUNIFORM4IEXTPROC glProgramUniform4iEXT;
+extern PFNGLPROGRAMUNIFORM1FEXTPROC glProgramUniform1fEXT;
+extern PFNGLPROGRAMUNIFORM2FEXTPROC glProgramUniform2fEXT;
+extern PFNGLPROGRAMUNIFORM3FEXTPROC glProgramUniform3fEXT;
+extern PFNGLPROGRAMUNIFORM4FEXTPROC glProgramUniform4fEXT;
+extern PFNGLPROGRAMUNIFORM1IVEXTPROC glProgramUniform1ivEXT;
+extern PFNGLPROGRAMUNIFORM2IVEXTPROC glProgramUniform2ivEXT;
+extern PFNGLPROGRAMUNIFORM3IVEXTPROC glProgramUniform3ivEXT;
+extern PFNGLPROGRAMUNIFORM4IVEXTPROC glProgramUniform4ivEXT;
+extern PFNGLPROGRAMUNIFORM1FVEXTPROC glProgramUniform1fvEXT;
+extern PFNGLPROGRAMUNIFORM2FVEXTPROC glProgramUniform2fvEXT;
+extern PFNGLPROGRAMUNIFORM3FVEXTPROC glProgramUniform3fvEXT;
+extern PFNGLPROGRAMUNIFORM4FVEXTPROC glProgramUniform4fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC glProgramUniformMatrix2fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC glProgramUniformMatrix3fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC glProgramUniformMatrix4fvEXT;
+extern PFNGLVALIDATEPROGRAMPIPELINEEXTPROC glValidateProgramPipelineEXT;
+extern PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC glGetProgramPipelineInfoLogEXT;
+
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
-#       endif
-#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-extern PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB;
-extern PFNGLREADBUFFERNVPROC glReadBufferNV;
-extern PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV;
-extern PFNGLGETTEXIMAGENVPROC glGetTexImageNV;
-extern PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV;
-extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
-#		else
-#           if OGRE_NO_GLES3_SUPPORT == 1
+
 typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOES) (GLuint vertexarray);
 typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOES) (GLsizei n, const GLuint *vertexarrays);
 typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOES) (GLsizei n, GLuint *vertexarrays);
@@ -112,7 +195,6 @@ extern PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES;
 extern PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES;
 extern PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES;
 extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
-#           endif
 #		endif
 #	endif
 
@@ -130,6 +212,12 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 
 #endif
 
+#if defined(__APPLE__)
+#define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
+    if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
+#else
+#define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers)
+#endif
 
 // Copy this definition from desktop GL.  Used for polygon modes.
 #ifndef GL_FILL
@@ -190,7 +278,7 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 0
+#define ENABLE_GL_CHECK 1
 
 #if ENABLE_GL_CHECK
 #define OGRE_CHECK_GL_ERROR(glFunc) \
