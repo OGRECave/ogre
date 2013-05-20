@@ -53,7 +53,7 @@ namespace Volume {
         }
         if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
         {
-            shared->chunksBeingProcessed++;
+            mShared->chunksBeingProcessed++;
 
             // Call worker
             ChunkRequest req;
@@ -107,14 +107,14 @@ namespace Volume {
                 mChildren[5] = createInstance();
                 mChildren[6] = createInstance();
                 mChildren[7] = createInstance();
-                mChildren[0]->shared = shared;
-                mChildren[1]->shared = shared;
-                mChildren[2]->shared = shared;
-                mChildren[3]->shared = shared;
-                mChildren[4]->shared = shared;
-                mChildren[5]->shared = shared;
-                mChildren[6]->shared = shared;
-                mChildren[7]->shared = shared;
+                mChildren[0]->mShared = mShared;
+                mChildren[1]->mShared = mShared;
+                mChildren[2]->mShared = mShared;
+                mChildren[3]->mShared = mShared;
+                mChildren[4]->mShared = mShared;
+                mChildren[5]->mShared = mShared;
+                mChildren[6]->mShared = mShared;
+                mChildren[7]->mShared = mShared;
             }
             mChildren[0]->doLoad(mNode, from, newCenter, totalFrom, totalTo, level - 1, maxLevels, parameters);
             mChildren[1]->doLoad(mNode, from + xWidth, newCenter + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
@@ -133,7 +133,7 @@ namespace Volume {
             {
                 mChildren = new Chunk*[2];
                 mChildren[0] = createInstance();
-                mChildren[0]->shared = shared;
+                mChildren[0]->mShared = mShared;
                 mChildren[1] = 0; // Indicator that there are no more children.
             }
             mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels, parameters);
@@ -270,7 +270,7 @@ namespace Volume {
         delete[] mChildren;
         if (isRoot)
         {
-            delete shared;
+            delete mShared;
         }
     }
     
@@ -285,14 +285,14 @@ namespace Volume {
 
     Real Chunk::getSquaredViewDepth(const Camera* camera) const
     {
-        return (mBox.getCenter() * shared->parameters->scale).squaredDistance(camera->getPosition());
+        return (mBox.getCenter() * mShared->parameters->scale).squaredDistance(camera->getPosition());
     }
     
     //-----------------------------------------------------------------------
 
     Real Chunk::getBoundingRadius() const
     {
-        return mBox.getMinimum().distance(mBox.getCenter()) * shared->parameters->scale;
+        return mBox.getMinimum().distance(mBox.getCenter()) * mShared->parameters->scale;
     }
     
     //-----------------------------------------------------------------------
@@ -312,23 +312,23 @@ namespace Volume {
         // Don't recreate the shared parameters on update.
         if (parameters->updateFrom == Vector3::ZERO && parameters->updateTo == Vector3::ZERO)
         {
-            shared = new ChunkTreeSharedData(parameters);
+            mShared = new ChunkTreeSharedData(parameters);
             parent->scale(Vector3(parameters->scale));
         }
 
-        shared->chunksBeingProcessed = 0;
+        mShared->chunksBeingProcessed = 0;
 
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
         uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
         wq->addResponseHandler(workQueueChannel, this);
         wq->addRequestHandler(workQueueChannel, this);
 
-        doLoad(parent, from, to, from, to, level, level, shared->parameters);
+        doLoad(parent, from, to, from, to, level, level, mShared->parameters);
 
         // Wait for the threads.
         if (!parameters->async)
         {
-            while(shared->chunksBeingProcessed)
+            while(mShared->chunksBeingProcessed)
             {
                 OGRE_THREAD_SLEEP(0);
                 wq->processResponses();
@@ -404,7 +404,7 @@ namespace Volume {
 
     void Chunk::setDualGridVisible(const bool visible)
     {
-        shared->dualGridVisible = visible;
+        mShared->dualGridVisible = visible;
         if (mChildren)
         {
             mChildren[0]->setDualGridVisible(visible);
@@ -425,14 +425,14 @@ namespace Volume {
 
     bool Chunk::getDualGridVisible(void) const
     {
-        return shared->dualGridVisible;
+        return mShared->dualGridVisible;
     }
     
     //-----------------------------------------------------------------------
 
     void Chunk::setOctreeVisible(const bool visible)
     {
-        shared->octreeVisible = visible;
+        mShared->octreeVisible = visible;
         if (mChildren)
         {
             mChildren[0]->setOctreeVisible(visible);
@@ -453,14 +453,14 @@ namespace Volume {
 
     bool Chunk::getOctreeVisible(void) const
     {
-        return shared->octreeVisible;
+        return mShared->octreeVisible;
     }
     
     //-----------------------------------------------------------------------
 
     bool Chunk::getVolumeVisible(void) const
     {
-        return shared->volumeVisible;
+        return mShared->volumeVisible;
     }
     
     //-----------------------------------------------------------------------
@@ -468,9 +468,9 @@ namespace Volume {
     bool Chunk::frameStarted(const FrameEvent& evt)
     {
     
-        if (isRoot && shared->chunksBeingProcessed == 0)
+        if (isRoot && mShared->chunksBeingProcessed == 0)
         {
-            shared->chunksBeingProcessed = -1;
+            mShared->chunksBeingProcessed = -1;
             WorkQueue* wq = Root::getSingleton().getWorkQueue();
             uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
             wq->removeRequestHandler(workQueueChannel, this);
@@ -510,7 +510,7 @@ namespace Volume {
         
         // Get the distance to the center.
         Vector3 camPos = mCamera->getRealPosition();
-        Real d = (mBox.getCenter() * shared->parameters->scale).distance(camPos);
+        Real d = (mBox.getCenter() * mShared->parameters->scale).distance(camPos);
         if (d < 1.0)
         {
             d = 1.0;
@@ -518,7 +518,7 @@ namespace Volume {
 
         Real screenSpaceError = mError / d * k;
 
-        if (screenSpaceError <= shared->parameters->maxScreenSpaceError / shared->parameters->scale)
+        if (screenSpaceError <= mShared->parameters->maxScreenSpaceError / mShared->parameters->scale)
         {
             setChunkVisible(true, false);
             if (mChildren)
@@ -666,7 +666,7 @@ namespace Volume {
             OGRE_DELETE cReq.root;
             OGRE_DELETE cReq.dualGridGenerator;
             OGRE_DELETE cReq.mb;
-            shared->chunksBeingProcessed--;
+            mShared->chunksBeingProcessed--;
         }
     }
     
@@ -674,7 +674,7 @@ namespace Volume {
 
     void Chunk::setVolumeVisible(bool visible)
     {
-        shared->volumeVisible = visible;
+        mShared->volumeVisible = visible;
         mVisible = visible;
         if (mChildren)
         {
@@ -696,7 +696,7 @@ namespace Volume {
 
     ChunkParameters* Chunk::getChunkParameters(void)
     {
-        return shared->parameters;
+        return mShared->parameters;
     }
 }
 }

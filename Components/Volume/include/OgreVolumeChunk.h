@@ -221,7 +221,7 @@ namespace Volume {
         bool isRoot;
 
         /// Holds some shared data among all chunks of the tree.
-        ChunkTreeSharedData *shared;
+        ChunkTreeSharedData *mShared;
 
         /** Loads a single chunk of the tree.
         @param parent
@@ -320,17 +320,17 @@ namespace Volume {
             {
                 return;
             }
-            if (shared->volumeVisible)
+            if (mShared->volumeVisible)
             {
                 mVisible = visible;
             }
             if (mOctree)
             {
-                mOctree->setVisible(shared->octreeVisible && visible);
+                mOctree->setVisible(mShared->octreeVisible && visible);
             }
             if (mDualGrid)
             {
-                mDualGrid->setVisible(shared->dualGridVisible && visible);
+                mDualGrid->setVisible(mShared->dualGridVisible && visible);
             }
             if (applyToChildren && mChildren)
             {
