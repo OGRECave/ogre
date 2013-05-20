@@ -239,7 +239,7 @@ namespace Ogre {
 		OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
 		// Check for compile errors
-		glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled);
+		OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
         if(!mCompiled && checkErrors)
 		{
             String message = logObjectInfo("GLSL compile log: " + mName, mGLShaderHandle);

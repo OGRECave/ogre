@@ -419,7 +419,7 @@ namespace Ogre {
             fbo->bind();
         else
             // Old style context (window/pbuffer) or copying render texture
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
     
     GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)

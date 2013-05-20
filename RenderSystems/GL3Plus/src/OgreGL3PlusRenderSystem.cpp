@@ -261,7 +261,7 @@ namespace Ogre {
 
         // Multitexturing support and set number of texture units
         GLint units;
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
         rsc->setNumTextureUnits(units);
 
         // Check for Anisotropy support
@@ -318,7 +318,7 @@ namespace Ogre {
         // Probe number of draw buffers
         // Only makes sense with FBO support, so probe here
         GLint buffers;
-        glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers));
         rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
         rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
@@ -362,7 +362,7 @@ namespace Ogre {
 
         // Point size
         GLfloat psRange[2] = {0.0, 0.0};
-        glGetFloatv(GL_POINT_SIZE_RANGE, psRange);
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_POINT_SIZE_RANGE, psRange));
         rsc->setMaxPointSize(psRange[1]);
 
         // GLSL is always supported in GL
@@ -395,14 +395,14 @@ namespace Ogre {
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
         GLfloat floatConstantCount = 0;
-        glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount);
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount));
         rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
         rsc->setVertexProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
         rsc->setVertexProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Fragment Program Properties
         floatConstantCount = 0;
-        glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &floatConstantCount);
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &floatConstantCount));
         rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
         rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
@@ -410,11 +410,11 @@ namespace Ogre {
         // Geometry Program Properties
         rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
-        glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount);
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
         rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
         
         GLint maxOutputVertices;
-        glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
         rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 
         rsc->setGeometryProgramConstantBoolCount(0);
@@ -426,7 +426,7 @@ namespace Ogre {
             rsc->setCapability(RSC_TESSELATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELATION_DOMAIN_PROGRAM);
         
-            glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
 
             // 16 boolean params allowed
             rsc->setTesselationHullProgramConstantBoolCount(floatConstantCount);
@@ -435,7 +435,7 @@ namespace Ogre {
             // float params, always 4D
             rsc->setTesselationHullProgramConstantFloatCount(floatConstantCount);
 
-            glGetFloatv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &floatConstantCount));
             // 16 boolean params allowed
             rsc->setTesselationDomainProgramConstantBoolCount(floatConstantCount);
             // 16 integer params allowed, 4D
@@ -447,6 +447,9 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+
+            // Enable microcache
+            mGpuProgramManager->setSaveMicrocodesToCache(true);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
@@ -505,9 +508,6 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
         mRTTManager = new GL3PlusFBOManager();
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
-
-		// Enable microcache
-		mGpuProgramManager->setSaveMicrocodesToCache(caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER));
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
 		if (defaultLog)
@@ -1645,8 +1645,8 @@ namespace Ogre {
 	void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
 	{
         // TODO: Sampler objects, GL 3.3 or GL_ARB_sampler_objects required. For example:
-//        glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-//        glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
+//        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
+//        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_FUNC, GL_NEVER));
 	}
 
 	void GL3PlusRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
@@ -1809,8 +1809,8 @@ namespace Ogre {
             // These are set via shader in DX11, SV_InsideTessFactor and SV_OutsideTessFactor
             // Hardcoding for the sample
             float patchLevel(16.f);
-            glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &patchLevel);
-            glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel);
+            OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &patchLevel));
+            OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel));
             OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
 
             if(op.useIndexes)
@@ -2239,7 +2239,7 @@ namespace Ogre {
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())
             {
-                glEnable(GL_FRAMEBUFFER_SRGB);
+                OGRE_CHECK_GL_ERROR(glEnable(GL_FRAMEBUFFER_SRGB));
                 
                 // Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE here before
                 // enabling, but GL spec says incapable surfaces ignore the setting
@@ -2247,7 +2247,7 @@ namespace Ogre {
             }
             else
             {
-                glDisable(GL_FRAMEBUFFER_SRGB);
+                OGRE_CHECK_GL_ERROR(glDisable(GL_FRAMEBUFFER_SRGB));
             }
         }
     }
@@ -2591,7 +2591,7 @@ namespace Ogre {
     {
         markProfileEvent("Begin Event: " + eventName);
         if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
-            glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, eventName.length(), eventName.c_str());
+            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, eventName.length(), eventName.c_str()));
     }
 
     //---------------------------------------------------------------------
@@ -2599,7 +2599,7 @@ namespace Ogre {
     {
         markProfileEvent("End Event");
         if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
-            glPopDebugGroup();
+            OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
     //---------------------------------------------------------------------

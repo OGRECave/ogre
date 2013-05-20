@@ -253,7 +253,7 @@ namespace Ogre {
 		if (mMultisampleFB)
 		{
             GLint oldfb = 0;
-            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
 			// Blit from multisample buffer to final buffer, triggers resolve
 			size_t width = mColour[0].buffer->getWidth();
