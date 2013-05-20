@@ -187,6 +187,7 @@ namespace Ogre {
         // Detach and destroy
         glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         if (depthRB)
             glDeleteRenderbuffers(1, &depthRB);

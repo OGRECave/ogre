@@ -190,6 +190,8 @@ static const size_t depthBits[] =
         // Detach and destroy
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
         if (depthRB)
             glDeleteRenderbuffersEXT(1, &depthRB);
         if (stencilRB)
