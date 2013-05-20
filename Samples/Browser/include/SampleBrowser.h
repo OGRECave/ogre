@@ -38,7 +38,9 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 // For the phone we only support running from the cache file.
-#    define ENABLE_SHADERS_CACHE_LOAD 1
+#	if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+#       define ENABLE_SHADERS_CACHE_LOAD 1
+#   endif
 #endif
 
 #define ENABLE_SHADERS_CACHE_SAVE 1
@@ -1125,8 +1127,9 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
-#if defined(ENABLE_SHADERS_CACHE_SAVE) 
-			Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+#if defined(ENABLE_SHADERS_CACHE_SAVE)
+            if(Ogre::GpuProgramManager::getSingleton().canGetCompiledShaderBuffer())
+                Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 #endif
 #if	defined(ENABLE_SHADERS_CACHE_LOAD)
 			// Load for a package version of the shaders.
