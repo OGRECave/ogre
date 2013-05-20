@@ -44,14 +44,14 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    void Chunk::loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels)
     {
         // This might already exist on update
         if (!mNode)
         {
             mNode = parent->createChildSceneNode();
         }
-        if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
+        if (mShared->parameters->createGeometryFromLevel == 0 || level <= mShared->parameters->createGeometryFromLevel)
         {
             mShared->chunksBeingProcessed++;
 
@@ -59,10 +59,9 @@ namespace Volume {
             ChunkRequest req;
             req.totalFrom = totalFrom;
             req.totalTo = totalTo;
-            req.parameters = parameters;
             req.level = level;
             req.maxLevels = maxLevels;
-            req.isUpdate = parameters->updateFrom != Vector3::ZERO || parameters->updateTo != Vector3::ZERO;
+            req.isUpdate = mShared->parameters->updateFrom != Vector3::ZERO || mShared->parameters->updateTo != Vector3::ZERO;
 
             req.origin = this;
             req.root = OGRE_NEW OctreeNode(from, to);
@@ -81,15 +80,15 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    bool Chunk::contributesToVolumeMesh(const Vector3 &from, const Vector3 &to, const Source *src) const
+    bool Chunk::contributesToVolumeMesh(const Vector3 &from, const Vector3 &to) const
     {
-        Real centralValue = src->getValue((to - from) / (Real)2.0 + from);
+        Real centralValue = mShared->parameters->src->getValue((to - from) / (Real)2.0 + from);
         return Math::Abs(centralValue) <= (to - from).length() * (Real)1.5;
     }
 
     //-----------------------------------------------------------------------
     
-    void Chunk::loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    void Chunk::loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels)
     {
         // Now recursively create the more detailed children
         if (level > 2)
@@ -116,14 +115,14 @@ namespace Volume {
                 mChildren[6]->mShared = mShared;
                 mChildren[7]->mShared = mShared;
             }
-            mChildren[0]->doLoad(mNode, from, newCenter, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[1]->doLoad(mNode, from + xWidth, newCenter + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[2]->doLoad(mNode, from + xWidth + zWidth, newCenter + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[3]->doLoad(mNode, from + zWidth, newCenter + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[4]->doLoad(mNode, from + yWidth, newCenter + yWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[5]->doLoad(mNode, from + yWidth + xWidth, newCenter + yWidth + xWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[6]->doLoad(mNode, from + yWidth + xWidth + zWidth, newCenter + yWidth + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
-            mChildren[7]->doLoad(mNode, from + yWidth + zWidth, newCenter + yWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels, parameters);
+            mChildren[0]->doLoad(mNode, from, newCenter, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[1]->doLoad(mNode, from + xWidth, newCenter + xWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[2]->doLoad(mNode, from + xWidth + zWidth, newCenter + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[3]->doLoad(mNode, from + zWidth, newCenter + zWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[4]->doLoad(mNode, from + yWidth, newCenter + yWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[5]->doLoad(mNode, from + yWidth + xWidth, newCenter + yWidth + xWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[6]->doLoad(mNode, from + yWidth + xWidth + zWidth, newCenter + yWidth + xWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels);
+            mChildren[7]->doLoad(mNode, from + yWidth + zWidth, newCenter + yWidth + zWidth, totalFrom, totalTo, level - 1, maxLevels);
         }
         // Just load one child of the same size as the parent for the leafes because they actually don't need to be subdivided as they
         // are all rendered anyway.
@@ -136,21 +135,21 @@ namespace Volume {
                 mChildren[0]->mShared = mShared;
                 mChildren[1] = 0; // Indicator that there are no more children.
             }
-            mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels, parameters);
+            mChildren[0]->doLoad(mNode, from, to, totalFrom, totalTo, level - 1, maxLevels);
         }
     }
 
     //-----------------------------------------------------------------------
     
-    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters)
+    void Chunk::doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels)
     {
 
         // Handle the situation where we update an existing tree
-        if (parameters->updateFrom != Vector3::ZERO || parameters->updateTo != Vector3::ZERO)
+        if (mShared->parameters->updateFrom != Vector3::ZERO || mShared->parameters->updateTo != Vector3::ZERO)
         {
             // Early out if an update of a part of the tree volume is going on and this chunk is outside of the area.
             AxisAlignedBox chunkCube(from, to);
-            AxisAlignedBox updatedCube(parameters->updateFrom, parameters->updateTo);
+            AxisAlignedBox updatedCube(mShared->parameters->updateFrom, mShared->parameters->updateTo);
             if (!chunkCube.intersects(updatedCube))
             {
                 return;
@@ -173,27 +172,27 @@ namespace Volume {
         mInvisible = true;
         
         // Don't generate this chunk if it doesn't contribute to the whole volume.
-        if (!contributesToVolumeMesh(from, to, parameters->src))
+        if (!contributesToVolumeMesh(from, to))
         {
             return;
         }
     
-        loadChunk(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
+        loadChunk(parent, from, to, totalFrom, totalTo, level, maxLevels);
         
-        loadChildren(parent, from, to, totalFrom, totalTo, level, maxLevels, parameters);
+        loadChildren(parent, from, to, totalFrom, totalTo, level, maxLevels);
     }
     
     //-----------------------------------------------------------------------
 
     void Chunk::prepareGeometry(const ChunkRequest *chunkRequest)
     {
-        OctreeNodeSplitPolicy policy(chunkRequest->parameters->src, chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError, chunkRequest->parameters->octreeNodeDistanceCheckDiagonalFactor);
-        mError = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError;
-        chunkRequest->root->split(&policy, chunkRequest->parameters->src, mError);
-        Real maxMSDistance = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError * chunkRequest->parameters->skirtFactor;
-        IsoSurface *is = OGRE_NEW IsoSurfaceMC(chunkRequest->parameters->src);
+        OctreeNodeSplitPolicy policy(mShared->parameters->src, mShared->parameters->errorMultiplicator * mShared->parameters->baseError, mShared->parameters->octreeNodeDistanceCheckDiagonalFactor);
+        mError = (Real)chunkRequest->level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError;
+        chunkRequest->root->split(&policy, mShared->parameters->src, mError);
+        Real maxMSDistance = (Real)chunkRequest->level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError * mShared->parameters->skirtFactor;
+        IsoSurface *is = OGRE_NEW IsoSurfaceMC(mShared->parameters->src);
         chunkRequest->dualGridGenerator->generateDualGrid(chunkRequest->root, is, chunkRequest->mb, maxMSDistance,
-            chunkRequest->totalFrom, chunkRequest->totalTo, chunkRequest->parameters->createDualGridVisualization);
+            chunkRequest->totalFrom, chunkRequest->totalTo, mShared->parameters->createDualGridVisualization);
         OGRE_DELETE is;
     }
     
@@ -204,9 +203,9 @@ namespace Volume {
         size_t chunkTriangles = chunkRequest->mb->generateBuffers(mRenderOp);
         chunkRequest->origin->mInvisible = chunkTriangles == 0;
 
-        if (!mInvisible && chunkRequest->parameters->lodCallback && chunkRequest->parameters->lodCallbackLod  == chunkRequest->maxLevels - chunkRequest->level + 1)
+        if (!mInvisible && mShared->parameters->lodCallback && mShared->parameters->lodCallbackLod  == chunkRequest->maxLevels - chunkRequest->level + 1)
         {
-            chunkRequest->mb->executeCallback(chunkRequest->parameters->lodCallback);
+            chunkRequest->mb->executeCallback(mShared->parameters->lodCallback);
         }
 
         chunkRequest->origin->mBox = chunkRequest->mb->getBoundingBox();
@@ -222,9 +221,9 @@ namespace Volume {
 
         mVisible = false;
 
-        if (chunkRequest->parameters->createDualGridVisualization)
+        if (mShared->parameters->createDualGridVisualization)
         {
-            mDualGrid = chunkRequest->dualGridGenerator->getDualGrid(chunkRequest->parameters->sceneManager);
+            mDualGrid = chunkRequest->dualGridGenerator->getDualGrid(mShared->parameters->sceneManager);
             if (mDualGrid)
             {
                 mNode->attachObject(mDualGrid);
@@ -232,9 +231,9 @@ namespace Volume {
             }
         }
 
-        if (chunkRequest->parameters->createOctreeVisualization)
+        if (mShared->parameters->createOctreeVisualization)
         {
-            mOctree = chunkRequest->root->getOctreeGrid(chunkRequest->parameters->sceneManager);
+            mOctree = chunkRequest->root->getOctreeGrid(mShared->parameters->sceneManager);
             mNode->attachObject(mOctree);
             mOctree->setVisible(false);
         }
@@ -323,7 +322,7 @@ namespace Volume {
         wq->addResponseHandler(workQueueChannel, this);
         wq->addRequestHandler(workQueueChannel, this);
 
-        doLoad(parent, from, to, from, to, level, level, mShared->parameters);
+        doLoad(parent, from, to, from, to, level, level);
 
         // Wait for the threads.
         if (!parameters->async)

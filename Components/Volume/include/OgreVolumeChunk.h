@@ -121,9 +121,6 @@ namespace Volume {
         /// The front upper rightcorner of the world.
         Vector3 totalTo;
 
-        /// The parameters to use while loading.
-        const ChunkParameters *parameters;
-
         /// The current LOD level.
         size_t level;
 
@@ -238,10 +235,8 @@ namespace Volume {
             The current LOD level.
         @param maxLevels
             The maximum amount of levels.
-        @param parameters
-            The parameters to use while loading.
         */
-        virtual void loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
+        virtual void loadChunk(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels);
                 
         /** Whether the center of the given cube (from -> to) will contribute something
         to the total volume mesh.
@@ -249,12 +244,10 @@ namespace Volume {
             The back lower left corner of the cell.
         @param to
             The front upper right corner of the cell.
-        @param src
-            The density source to contour.
         @return
             true if triangles might be generated
         */
-        virtual bool contributesToVolumeMesh(const Vector3 &from, const Vector3 &to, const Source *src) const;
+        virtual bool contributesToVolumeMesh(const Vector3 &from, const Vector3 &to) const;
         
         /** Loads the tree children of the current node.
         @param parent
@@ -271,10 +264,8 @@ namespace Volume {
             The current LOD level.
         @param maxLevels
             The maximum amount of levels.
-        @param parameters
-            The parameters to use while loading.
         */
-        virtual void loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
+        virtual void loadChildren(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels);
 
         /** Actually loads the volume tree with all LODs.
         @param parent
@@ -291,10 +282,8 @@ namespace Volume {
             The current LOD level.
         @param maxLevels
             The maximum amount of levels.
-        @param parameters
-            The parameters to use while loading.
         */
-        virtual void doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels, const ChunkParameters *parameters);
+        virtual void doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels);
         
         /** Prepares the geometry of the chunk request. To be called in a different thread.
         @param chunkRequest
