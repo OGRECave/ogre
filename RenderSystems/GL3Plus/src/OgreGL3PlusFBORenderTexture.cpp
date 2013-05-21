@@ -337,6 +337,20 @@ namespace Ogre {
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
                         }
+                        else
+                        {
+                            // There is a small edge case that FBO is trashed during the test
+                            // on some drivers resulting in undefined behavior
+                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                            glDeleteFramebuffers(1, &fb);
+
+                            // Workaround for NVIDIA / Linux 169.21 driver problem
+                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                            glFinish();
+
+                            glGenFramebuffers(1, &fb);
+                            glBindFramebuffer(GL_FRAMEBUFFER, fb);
+                        }
                     }
                 }
                 LogManager::getSingleton().logMessage(str.str());
