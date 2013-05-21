@@ -170,9 +170,9 @@ namespace Volume {
 
         /** Constructor.
         */
-        ChunkTreeSharedData(const ChunkParameters *parameters) : octreeVisible(false), dualGridVisible(false), volumeVisible(true), chunksBeingProcessed(0)
+        ChunkTreeSharedData(const ChunkParameters *params) : octreeVisible(false), dualGridVisible(false), volumeVisible(true), chunksBeingProcessed(0)
         {
-            this->parameters = new ChunkParameters(*parameters);
+            this->parameters = new ChunkParameters(*params);
         }
 
         /** Destructor.

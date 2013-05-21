@@ -31,7 +31,7 @@ namespace Ogre {
 namespace Volume {
     
     OctreeNodeSplitPolicy::OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize, const Real minSplitDistanceDiagonalFactor) :
-        mSrc(src), mMaxCellSize(maxCellSize), mMinSplitDistanceDiagonalFactor(minSplitDistanceDiagonalFactor)
+        mMinSplitDistanceDiagonalFactor(minSplitDistanceDiagonalFactor), mSrc(src), mMaxCellSize(maxCellSize)
     {
     }
 
