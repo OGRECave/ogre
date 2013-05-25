@@ -720,10 +720,11 @@ namespace Ogre
 		{
 			// add to the global list of zones
 			mZones[instanceName] = newZone;
-		}
-		if (newZone->requiresZoneSpecificNodeData())
-		{
-			createZoneSpecificNodeData(newZone);
+
+            if (newZone->requiresZoneSpecificNodeData())
+            {
+                createZoneSpecificNodeData(newZone);
+            }
 		}
 		return newZone;
 	}
