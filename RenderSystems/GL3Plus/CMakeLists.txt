@@ -158,7 +158,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
 )
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
   # Separate GLSupport and Window out to fix Unity builds
   ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES} SEPARATE "src/GLX/OgreGLXWindow.cpp" "src/GLX/OgreGLXGLSupport.cpp")
 else()
