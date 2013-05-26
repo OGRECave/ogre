@@ -104,7 +104,7 @@ namespace Ogre
     {
         size_t memSize = 0;
         memSize += sizeof(bool);
-        if(!mAssemblerProgram.isNull())
+        if(!mAssemblerProgram.isNull() && (mAssemblerProgram.getPointer() != this) )
             memSize += mAssemblerProgram->calculateSize();
 
         memSize += GpuProgram::calculateSize();
