@@ -198,7 +198,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, boolean isUpdate)
+    void Chunk::loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, bool isUpdate)
     {
         size_t chunkTriangles = meshBuilder->generateBuffers(mRenderOp);
         mInvisible = chunkTriangles == 0;
