@@ -40,7 +40,7 @@ namespace Ogre {
 namespace Volume {
 
     const String Chunk::MOVABLE_TYPE_NAME = "VolumeChunk";
-    const uint16 Chunk::WORKQUEUE_LOAD_REQUEST = 1;
+    ChunkHandler Chunk::mChunkHandler;
     
     //-----------------------------------------------------------------------
 
@@ -65,12 +65,10 @@ namespace Volume {
 
             req.origin = this;
             req.root = OGRE_NEW OctreeNode(from, to);
-            req.mb = OGRE_NEW MeshBuilder();
+            req.meshBuilder = OGRE_NEW MeshBuilder();
             req.dualGridGenerator = OGRE_NEW DualGridGenerator();
 
-            WorkQueue* wq = Root::getSingleton().getWorkQueue();
-            uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
-            wq->addRequest(workQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
+            mChunkHandler.addRequest(req);
         }
         else
         {
@@ -184,35 +182,37 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::prepareGeometry(const ChunkRequest *chunkRequest)
+    void Chunk::prepareGeometry(size_t level, OctreeNode *root, DualGridGenerator *dualGridGenerator, MeshBuilder *meshBuilder, const Vector3 &totalFrom, const Vector3 &totalTo)
     {
-        OctreeNodeSplitPolicy policy(mShared->parameters->src, mShared->parameters->errorMultiplicator * mShared->parameters->baseError, mShared->parameters->octreeNodeDistanceCheckDiagonalFactor);
-        mError = (Real)chunkRequest->level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError;
-        chunkRequest->root->split(&policy, mShared->parameters->src, mError);
-        Real maxMSDistance = (Real)chunkRequest->level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError * mShared->parameters->skirtFactor;
+        OctreeNodeSplitPolicy policy(mShared->parameters->src,
+            mShared->parameters->errorMultiplicator * mShared->parameters->baseError,
+            mShared->parameters->octreeNodeDistanceCheckDiagonalFactor);
+        mError = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError;
+        root->split(&policy, mShared->parameters->src, mError);
+        Real maxMSDistance = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError * mShared->parameters->skirtFactor;
         IsoSurface *is = OGRE_NEW IsoSurfaceMC(mShared->parameters->src);
-        chunkRequest->dualGridGenerator->generateDualGrid(chunkRequest->root, is, chunkRequest->mb, maxMSDistance,
-            chunkRequest->totalFrom, chunkRequest->totalTo, mShared->parameters->createDualGridVisualization);
+        dualGridGenerator->generateDualGrid(root, is, meshBuilder, maxMSDistance, totalFrom, totalTo,
+            mShared->parameters->createDualGridVisualization);
         OGRE_DELETE is;
     }
     
     //-----------------------------------------------------------------------
 
-    void Chunk::loadGeometry(const ChunkRequest *chunkRequest)
+    void Chunk::loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, boolean isUpdate)
     {
-        size_t chunkTriangles = chunkRequest->mb->generateBuffers(mRenderOp);
-        chunkRequest->origin->mInvisible = chunkTriangles == 0;
+        size_t chunkTriangles = meshBuilder->generateBuffers(mRenderOp);
+        mInvisible = chunkTriangles == 0;
 
         if (mShared->parameters->lodCallback)
         {
-            chunkRequest->mb->executeCallback(mShared->parameters->lodCallback, chunkRequest->level, mShared->chunksBeingProcessed);
+            meshBuilder->executeCallback(mShared->parameters->lodCallback, level, mShared->chunksBeingProcessed);
         }
 
-        chunkRequest->origin->mBox = chunkRequest->mb->getBoundingBox();
+        mBox = meshBuilder->getBoundingBox();
 
         if (!mInvisible)
         {
-            if (chunkRequest->isUpdate)
+            if (isUpdate)
             {
                 mNode->detachObject(this);
             }
@@ -223,7 +223,7 @@ namespace Volume {
 
         if (mShared->parameters->createDualGridVisualization)
         {
-            mDualGrid = chunkRequest->dualGridGenerator->getDualGrid(mShared->parameters->sceneManager);
+            mDualGrid = dualGridGenerator->getDualGrid(mShared->parameters->sceneManager);
             if (mDualGrid)
             {
                 mNode->attachObject(mDualGrid);
@@ -233,10 +233,11 @@ namespace Volume {
 
         if (mShared->parameters->createOctreeVisualization)
         {
-            mOctree = chunkRequest->root->getOctreeGrid(mShared->parameters->sceneManager);
+            mOctree = root->getOctreeGrid(mShared->parameters->sceneManager);
             mNode->attachObject(mOctree);
             mOctree->setVisible(false);
         }
+        mShared->chunksBeingProcessed--;
     }
     
     //-----------------------------------------------------------------------
@@ -316,12 +317,7 @@ namespace Volume {
         }
 
         mShared->chunksBeingProcessed = 0;
-
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
-        wq->addResponseHandler(workQueueChannel, this);
-        wq->addRequestHandler(workQueueChannel, this);
-
+        
         doLoad(parent, from, to, from, to, level, level);
 
         // Wait for the threads.
@@ -330,10 +326,8 @@ namespace Volume {
             while(mShared->chunksBeingProcessed)
             {
                 OGRE_THREAD_SLEEP(0);
-                wq->processResponses();
+                mChunkHandler.processWorkQueue();
             }
-            wq->removeRequestHandler(workQueueChannel, this);
-            wq->removeResponseHandler(workQueueChannel, this);
         }
         
     
@@ -468,15 +462,6 @@ namespace Volume {
     bool Chunk::frameStarted(const FrameEvent& evt)
     {
     
-        if (isRoot && mShared->chunksBeingProcessed == 0)
-        {
-            mShared->chunksBeingProcessed = -1;
-            WorkQueue* wq = Root::getSingleton().getWorkQueue();
-            uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
-            wq->removeRequestHandler(workQueueChannel, this);
-            wq->removeResponseHandler(workQueueChannel, this);
-        }
-
         if (mInvisible)
         {
             return true;
@@ -644,32 +629,7 @@ namespace Volume {
             }
         }
     }
-    
-    //-----------------------------------------------------------------------
-  
-    WorkQueue::Response* Chunk::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
-    {
-        ChunkRequest cReq = any_cast<ChunkRequest>(req->getData());
-        cReq.origin->prepareGeometry(&cReq);
-        return OGRE_NEW WorkQueue::Response(req, true, Any());
-    }
-    
-    //-----------------------------------------------------------------------
-
-    void Chunk::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
-    {
-        // Fill up the buffers
-        if (res->succeeded())
-        {
-            ChunkRequest cReq = any_cast<ChunkRequest>(res->getRequest()->getData());
-            mShared->chunksBeingProcessed--;
-            cReq.origin->loadGeometry(&cReq);
-            OGRE_DELETE cReq.root;
-            OGRE_DELETE cReq.dualGridGenerator;
-            OGRE_DELETE cReq.mb;
-        }
-    }
-    
+        
     //-----------------------------------------------------------------------
 
     void Chunk::setVolumeVisible(bool visible)
