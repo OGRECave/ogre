@@ -332,6 +332,8 @@ namespace Volume {
                 OGRE_THREAD_SLEEP(0);
                 wq->processResponses();
             }
+            wq->removeRequestHandler(workQueueChannel, this);
+            wq->removeResponseHandler(workQueueChannel, this);
         }
         
     
