@@ -350,6 +350,7 @@ namespace Volume {
         bool trilinearValue = StringConverter::parseBool(config.getSetting("trilinearValue"));
         bool trilinearGradient = StringConverter::parseBool(config.getSetting("trilinearGradient"));
         bool sobelGradient = StringConverter::parseBool(config.getSetting("sobelGradient"));
+        bool async = StringConverter::parseBool(config.getSetting("async"));
 
         TextureSource *textureSource = new TextureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
     
@@ -371,6 +372,7 @@ namespace Volume {
         parameters.createOctreeVisualization = StringConverter::parseBool(config.getSetting("createOctreeVisualization"));
         parameters.createDualGridVisualization = StringConverter::parseBool(config.getSetting("createDualGridVisualization"));
         parameters.skirtFactor = StringConverter::parseReal(config.getSetting("skirtFactor"));
+        parameters.async = async;
     
         load(parent, from, to, level, &parameters);
         
