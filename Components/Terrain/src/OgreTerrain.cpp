@@ -3634,7 +3634,7 @@ namespace Ogre
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
-				PF_BYTE_RGB, TU_STATIC);
+				PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
 			if (mCpuColourMapStorage)
 			{
