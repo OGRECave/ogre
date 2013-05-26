@@ -32,9 +32,9 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreFrameListener.h"
-#include "OgreWorkQueue.h"
 
 #include "OgreVolumePrerequisites.h"
+#include "OgreVolumeChunkHandler.h"
 #include "OgreVolumeSource.h"
 #include "OgreVolumeOctreeNode.h"
 #include "OgreVolumeDualGridGenerator.h"
@@ -43,7 +43,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-    
+        
     /** Parameters for loading the volume.
     */
     typedef struct ChunkParameters
@@ -103,52 +103,6 @@ namespace Volume {
         }
     } ChunkParameters;
     
-    /** Forward declaration.
-    */
-    class Chunk;
-
-    /** Data being passed around while loading.
-    */
-    typedef struct ChunkRequest
-    {
-
-        /// The back lower left corner of the world.
-        Vector3 totalFrom;
-
-        /// The front upper rightcorner of the world.
-        Vector3 totalTo;
-
-        /// The current LOD level.
-        size_t level;
-
-        /// The maximum amount of levels.
-        size_t maxLevels;
-
-        /// The MeshBuilder to use.
-        MeshBuilder *mb;
-
-        /// The DualGridGenerator to use.
-        DualGridGenerator *dualGridGenerator;
-
-        /// The octree node to use.
-        OctreeNode *root;
-
-        /// The chunk which created this request.
-        Chunk *origin;
-
-        /// Whether this is an update of an existing tree
-        bool isUpdate;
-
-        /** Stream operator <<.
-        @param o
-            The used stream.
-        @param r
-            The streamed ChunkRequest.
-        */
-        _OgreVolumeExport friend std::ostream& operator<<(std::ostream& o, const ChunkRequest& r)
-        { return o; }
-    } ChunkRequest;
-
     /** Internal shared values of the chunks which are equal in the whole tree.
     */
     typedef struct ChunkTreeSharedData
@@ -186,13 +140,17 @@ namespace Volume {
 
     /** A single volume chunk mesh.
     */
-    class _OgreVolumeExport Chunk : public SimpleRenderable, public FrameListener, public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler
+    class _OgreVolumeExport Chunk : public SimpleRenderable, public FrameListener
     {
+    
+    /// So the actual loading functions can be called.
+    friend class ChunkHandler;
+
     protected:
-        
-        /// The workqueue load request.
-        static const uint16 WORKQUEUE_LOAD_REQUEST;
-        
+
+        /// To handle the WorkQueue.
+        static ChunkHandler mChunkHandler;
+                
         /// To attach this node to.
         SceneNode *mNode;
 
@@ -283,16 +241,34 @@ namespace Volume {
         virtual void doLoad(SceneNode *parent, const Vector3 &from, const Vector3 &to, const Vector3 &totalFrom, const Vector3 &totalTo, const size_t level, const size_t maxLevels);
         
         /** Prepares the geometry of the chunk request. To be called in a different thread.
-        @param chunkRequest
-            The chunk loading request with the data to be prepared.
+        @param level
+            The current LOD level.
+        @param root
+            The root of the upcoming Octree (in here) of the chunk.
+        @param dualGridGenerator
+            The DualGrid.
+        @param meshBuilder
+            The MeshBuilder which will contain the geometry.
+        @param totalFrom
+            The back lower left corner of the world.
+        @param totalTo
+            The front upper rightcorner of the world.
         */
-        virtual void prepareGeometry(const ChunkRequest *chunkRequest);
+        virtual void prepareGeometry(size_t level, OctreeNode *root, DualGridGenerator *dualGridGenerator, MeshBuilder *meshBuilder, const Vector3 &totalFrom, const Vector3 &totalTo);
 
         /** Loads the actual geometry when the processing is done.
-        @param chunkRequest
-            The chunk loading request with the processed data.
+        @param meshBuilder
+            The MeshBuilder holding the geometry.
+        @param dualGridGenerator
+            The DualGridGenerator to build up the debug visualization of the DualGrid.
+        @param root
+            The root node of the Octree to build up the debug visualization of the Otree.
+        @param level
+            The current LOD level.
+        @param isUpdate
+            Whether this loading is updating an existing ChunkTree.
         */
-        virtual void loadGeometry(const ChunkRequest *chunkRequest);
+        virtual void loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, boolean isUpdate);
 
         /** Sets the visibility of this chunk.
         @param visible
@@ -466,13 +442,7 @@ namespace Volume {
             Vector where the chunks will be added to.
         */
         virtual void getChunksOfLevel(const size_t level, VecChunk &result) const;
-
-        /// Implementation for WorkQueue::RequestHandler
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-        
-        /// Implementation for WorkQueue::ResponseHandler
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
-        
+                
         /** Gets the parameters with which the chunktree got loaded.
         @return
             The parameters.
