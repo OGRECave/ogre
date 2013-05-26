@@ -184,10 +184,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">ENABLE_SHADERS_CACHE_SAVE=1;USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">ENABLE_SHADERS_CACHE_SAVE=1;USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">ENABLE_SHADERS_CACHE_SAVE=1;WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">ENABLE_SHADERS_CACHE_SAVE=1;WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">platform.winmd</ForcedUsingFiles>
@@ -198,9 +198,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">NotUsing</PrecompiledHeader>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">false</CompileAsManaged>
@@ -210,6 +210,18 @@
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">false</CompileAsManaged>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">/ZW /AI "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcpackages" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">/ZW /AI "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcpackages" %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">ENABLE_SHADERS_CACHE_SAVE=1;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|ARM'">ENABLE_SHADERS_CACHE_SAVE=1;USE_RTSHADER_SYSTEM;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|ARM'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
     </ClCompile>
     <CustomBuildStep>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -345,6 +357,9 @@
       <Inputs Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|ARM'">
       </Inputs>
     </CustomBuildStep>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">uuid.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d2d1.lib;d3d11.lib;dxgi.lib;ole32.lib;windowscodecs.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' or '$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
@@ -390,7 +405,7 @@
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">platform.winmd</ForcedUsingFiles>
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">platform.winmd</ForcedUsingFiles>
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">platform.winmd</ForcedUsingFiles>
-      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
@@ -422,7 +437,7 @@
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">Disabled</InlineFunctionExpansion>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</InlineFunctionExpansion>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">Disabled</InlineFunctionExpansion>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug with shader compiler|x64'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
@@ -440,11 +455,11 @@
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">platform.winmd</ForcedUsingFiles>
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">platform.winmd</ForcedUsingFiles>
       <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">platform.winmd</ForcedUsingFiles>
-      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VSInstallDir)\VC\vcpackages</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release with shader compiler|x64'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
@@ -9046,6 +9061,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\WinRT\Build\Components\Overlay\OgreOverlay.vcxproj">
+      <Project>{60c9430e-69b7-4da9-95bc-b6c232ac8740}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\WinRT\Build\Components\Paging\OgrePaging.vcxproj">
       <Project>{e4a50a2c-5c24-4611-a83b-aaf42247f457}</Project>
     </ProjectReference>
