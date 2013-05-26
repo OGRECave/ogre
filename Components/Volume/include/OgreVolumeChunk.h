@@ -268,7 +268,7 @@ namespace Volume {
         @param isUpdate
             Whether this loading is updating an existing ChunkTree.
         */
-        virtual void loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, boolean isUpdate);
+        virtual void loadGeometry(MeshBuilder *meshBuilder, DualGridGenerator *dualGridGenerator, OctreeNode *root, size_t level, bool isUpdate);
 
         /** Sets the visibility of this chunk.
         @param visible
