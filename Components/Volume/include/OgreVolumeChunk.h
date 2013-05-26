@@ -43,7 +43,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-        
+
+    class ChunkHandler;
+
     /** Parameters for loading the volume.
     */
     typedef struct ChunkParameters
