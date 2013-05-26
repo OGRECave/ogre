@@ -704,7 +704,7 @@ namespace Ogre {
 #define SIZE_OF_DATA_END )
 
 #define SIZE_OF_DATA_UINT(member) + sizeof(uint32)
-#define	SIZE_OF_DATA_ENUM SIZE_OF_DATA_UINT
+#define	SIZE_OF_DATA_ENUM(member, memberType) SIZE_OF_DATA_UINT(member)
 
 #define SIZE_OF_DATA_BYTE(member) +  sizeof(BYTE)
 
@@ -874,7 +874,7 @@ namespace Ogre {
 	newMicrocode->write(&tmpVal, sizeof(uint32));					\
 	}
 
-#define	WRITE_ENUM WRITE_UINT
+#define	WRITE_ENUM(member, memberType) WRITE_UINT(member)
 
 #define WRITE_BYTE(member) {										\
 	newMicrocode->write(&curItem.member, sizeof(BYTE));	\
