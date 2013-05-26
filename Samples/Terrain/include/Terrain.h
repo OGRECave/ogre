@@ -675,7 +675,6 @@ protected:
 				mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
 				mSceneMgr->setShadowTextureSelfShadow(true);
 				mSceneMgr->setShadowCasterRenderBackFaces(true);
-				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 
 				MaterialPtr houseMat = buildDepthShadowMaterial("fw12b.jpg");
 				for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
