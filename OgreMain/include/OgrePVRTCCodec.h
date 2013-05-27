@@ -58,10 +58,10 @@ namespace Ogre {
         PVRTCCodec();
         virtual ~PVRTCCodec() { }
 
-        /// @copydoc Codec::code
-        DataStreamPtr code(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
-        /// @copydoc Codec::codeToFile
-        void codeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
+        /// @copydoc Codec::encode
+        DataStreamPtr encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
+        /// @copydoc Codec::encodeToFile
+        void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
 		/// @copydoc Codec::magicNumberToFileExt
@@ -74,6 +74,12 @@ namespace Ogre {
 		/// Static method to shutdown and unregister the PVRTC codec
 		static void shutdown(void);
 
+	private:
+		/// Decode PVRTCV2 image format
+		DecodeResult decodeV2(DataStreamPtr& stream) const;
+
+		/// Decode PVRTCV3 image format
+		DecodeResult decodeV3(DataStreamPtr& stream) const;
     };
 	/** @} */
 	/** @} */

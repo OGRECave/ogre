@@ -147,16 +147,16 @@ namespace Ogre {
         struct Brush
         {
 			list<Plane>::type planes;
-            SceneQuery::WorldFragment fragment; // For query reporting
+            SceneQuery::WorldFragment fragment; /// For query reporting
         };
-		typedef vector<Brush*>::type NodeBrushList; // Main brush memory held on level
+		typedef vector<Brush*>::type NodeBrushList; /// Main brush memory held on level
 
         /** Get the list of solid Brushes for this node.
         @remarks Only applicable for leaf nodes. 
         */
         const NodeBrushList& getSolidBrushes(void) const;
     protected:
-        BspLevel* mOwner; // Back-reference to containing level
+        BspLevel* mOwner; /// Back-reference to containing level
         bool mIsLeaf;
 
         // Node-only members

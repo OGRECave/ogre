@@ -27,7 +27,7 @@ vertex_program Ogre/Instancing/HWBasic_cg_vs cg
 {
 	source HWBasicInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 }
@@ -36,7 +36,7 @@ vertex_program Ogre/Instancing/HWBasic/shadow_caster_cg_vs cg
 {
 	source HWBasicInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER
 }

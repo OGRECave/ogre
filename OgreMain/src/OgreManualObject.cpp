@@ -183,6 +183,28 @@ namespace Ogre {
 				"You cannot call begin() again until after you call end()",
 				"ManualObject::begin");
 		}
+
+        // Check that a valid material was provided
+        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
+
+		if( material.isNull() )
+		{
+			LogManager::getSingleton().logMessage("Can't assign material " + materialName +
+                                                  " to the ManualObject " + mName + " because this "
+                                                  "Material does not exist. Have you forgotten to define it in a "
+                                                  ".material script?");
+
+			material = MaterialManager::getSingleton().getByName("BaseWhite");
+
+			if (material.isNull())
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
+                            "to the ManualObject " + mName + ". Did "
+                            "you forget to call MaterialManager::initialise()?",
+                            "ManualObject::begin");
+			}
+		}
+
 		mCurrentSection = OGRE_NEW ManualObjectSection(this, materialName, opType, groupName);
 		mCurrentUpdating = false;
 		mCurrentSection->setUseIdentityProjection(mUseIdentityProjection);
@@ -596,13 +618,27 @@ namespace Ogre {
 				for (ushort t = 0; t < dims; ++t)
 					*pFloat++ = mTempVertex.texCoord[elem.getIndex()][t];
 				break;
-			case VES_DIFFUSE:
-				rs = Root::getSingleton().getRenderSystem();
-				if (rs)
-					rs->convertColourValue(mTempVertex.colour, pRGBA++);
-				else
-					*pRGBA++ = mTempVertex.colour.getAsRGBA(); // pick one!
-				break;
+            case VES_DIFFUSE:
+                rs = Root::getSingleton().getRenderSystem();
+                if (rs)
+                {
+                    rs->convertColourValue(mTempVertex.colour, pRGBA++);
+                }
+                else
+                {
+                    switch(elem.getType())
+                    {
+                        case VET_COLOUR_ABGR:
+                            *pRGBA++ = mTempVertex.colour.getAsABGR();
+                            break;
+                        case VET_COLOUR_ARGB:
+                            *pRGBA++ = mTempVertex.colour.getAsARGB();
+                            break;
+                        default:
+                            *pRGBA++ = mTempVertex.colour.getAsRGBA();
+                    }
+                }
+                break;
 			default:
 				// nop ?
 				break;

@@ -249,10 +249,10 @@ namespace Ogre {
     public:
         IndexData();
         ~IndexData();
-		/// pointer to the HardwareIndexBuffer to use, must be specified if useIndexes = true
+		/// Pointer to the HardwareIndexBuffer to use, must be specified if useIndexes = true
 		HardwareIndexBufferSharedPtr indexBuffer;
 
-		/// index in the buffer to start from for this operation
+		/// Index in the buffer to start from for this operation
 		size_t indexStart;
 
 		/// The number of indexes to use from the buffer

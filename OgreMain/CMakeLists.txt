@@ -110,6 +110,7 @@ set (HEADER_FILES
   include/OgreIteratorWrappers.h
   include/OgreKeyFrame.h
   include/OgreLight.h
+  include/OgreLodConfig.h
   include/OgreLodListener.h
   include/OgreLodStrategy.h
   include/OgreLodStrategyManager.h
@@ -167,8 +168,9 @@ set (HEADER_FILES
   include/OgrePrefabFactory.h
   include/OgrePrerequisites.h
   include/OgreProfiler.h
-  include/OgreProgressiveMesh.h
+  include/OgreProgressiveMeshGenerator.h
   include/OgreQuaternion.h
+  include/OgreQueuedProgressiveMeshGenerator.h
   include/OgreRadixSort.h
   include/OgreRay.h
   include/OgreRectangle2D.h
@@ -224,6 +226,7 @@ set (HEADER_FILES
   include/OgreSkeletonInstance.h
   include/OgreSkeletonManager.h
   include/OgreSkeletonSerializer.h
+  include/OgreSmallVector.h
   include/OgreSphere.h
   include/OgreSpotShadowFadePng.h
   include/OgreStableHeaders.h
@@ -374,8 +377,9 @@ set (SOURCE_FILES
   src/OgrePredefinedControllers.cpp
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
-  src/OgreProgressiveMesh.cpp
+  src/OgreProgressiveMeshGenerator.cpp
   src/OgreQuaternion.cpp
+  src/OgreQueuedProgressiveMeshGenerator.cpp
   src/OgreRectangle2D.cpp
   src/OgreRenderQueue.cpp
   src/OgreRenderQueueInvocation.cpp
@@ -418,6 +422,7 @@ set (SOURCE_FILES
   src/OgreSkeletonInstance.cpp
   src/OgreSkeletonManager.cpp
   src/OgreSkeletonSerializer.cpp
+  src/OgreSmallVector.cpp
   src/OgreStaticGeometry.cpp
   src/OgreStreamSerialiser.cpp
   src/OgreString.cpp
@@ -462,7 +467,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
-  if (OGRE_BUILD_PLATFORM_WINRT)
+  if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
@@ -472,7 +477,6 @@ elseif (WIN32)
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
-      src/WIN32/OgreTimer.cpp
       src/WIN32/OgreTimer.cpp
 	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
@@ -732,7 +736,7 @@ endif ()
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
-if (OGRE_BUILD_PLATFORM_WINRT)
+if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
 	# exclude OgreTimer.cpp from unity builds; causes problem
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
 else ()
@@ -746,7 +750,7 @@ if(WIN32 AND MSVC10 AND CMAKE_CL_64)
                         LINK_FLAGS "/INCREMENTAL:NO"
                       )
 else()
-  set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION})
+  set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
 if (APPLE)

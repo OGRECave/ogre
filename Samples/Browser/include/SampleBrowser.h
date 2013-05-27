@@ -37,8 +37,8 @@
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-// For the phone we only support running from the cache file.
-#    define ENABLE_SHADERS_CACHE_LOAD 1
+// For WinRT we only support running from the cache file.
+#       define ENABLE_SHADERS_CACHE_LOAD 1
 #endif
 
 #define ENABLE_SHADERS_CACHE_SAVE 1
@@ -88,7 +88,9 @@
 #   include "FacialAnimation.h"
 #   include "Grass.h"
 #   include "Lighting.h"
+#   include "MeshLod.h"
 #   include "ParticleFX.h"
+#	include "PNTrianglesTessellation.h"
 #   include "Shadows.h"
 #   include "SkeletalAnimation.h"
 #   include "SkyBox.h"
@@ -206,7 +208,7 @@ protected:
 
 	/*=============================================================================
 	| The OGRE Sample Browser. Features a menu accessible from all samples,
-	| dynamic configuration, resource reloading, node labelling, and more.
+	| dynamic configuration, resource reloading, node labeling, and more.
 	=============================================================================*/
 	class SampleBrowser : public SampleContext, public SdkTrayListener
 	{
@@ -326,7 +328,9 @@ protected:
 		{
 			if (mCurrentSample)  // sample quitting
 			{
+#ifdef USE_RTSHADER_SYSTEM
                 mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
+#endif
 				mCurrentSample->_shutdown();
 				mCurrentSample = 0;
 				mSamplePaused = false;     // don't pause next sample
@@ -1052,7 +1056,9 @@ protected:
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
             const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
+#if defined(USE_RTSHADER_SYSTEM)
             bool hasProgrammableGPU = (profiles.size() != 0);
+#endif
 
 //            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
@@ -1068,13 +1074,15 @@ protected:
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
-#			ifdef OGRE_BUILD_COMPONENT_VOLUME
+			mPluginNameMap["Sample_PNTriangles"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
+#			if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #			endif
 #		endif // OGRE_PLATFORM_ANDROID
             mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
+            mPluginNameMap["Sample_MeshLod"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_MeshLod();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
 #	endif // OGRE_PLATFORM_WINRT
@@ -1117,6 +1125,10 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
+#if defined(ENABLE_SHADERS_CACHE_SAVE)
+            if(Ogre::GpuProgramManager::getSingleton().canGetCompiledShaderBuffer())
+                Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+#endif
 #if	defined(ENABLE_SHADERS_CACHE_LOAD)
 			// Load for a package version of the shaders.
 			Ogre::String path = getShaderCacheFileName();
@@ -1344,6 +1356,7 @@ protected:
             sampleList.push_back("Sample_CameraTrack");
             sampleList.push_back("Sample_CelShading");
             sampleList.push_back("Sample_Character");     
+            sampleList.push_back("Sample_Compositor");     
             sampleList.push_back("Sample_CubeMapping");    
             sampleList.push_back("Sample_Dot3Bump");
             sampleList.push_back("Sample_DynTex");      
@@ -1353,12 +1366,14 @@ protected:
 #   ifdef USE_RTSHADER_SYSTEM
             sampleList.push_back("Sample_ShaderSystem");
 #	endif
-            sampleList.push_back("Sample_Lighting");       
+            sampleList.push_back("Sample_Lighting");
+            sampleList.push_back("Sample_MeshLod");
             sampleList.push_back("Sample_SkyBox"); 
             sampleList.push_back("Sample_SkyDome"); 
             sampleList.push_back("Sample_SkyPlane"); 
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
+			sampleList.push_back("Sample_PNTriangles");
 			sampleList.push_back("Sample_Tesselation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
@@ -1532,7 +1547,9 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void unloadSamples()
 		{
+#ifdef USE_RTSHADER_SYSTEM
             mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
+#endif
 #ifdef OGRE_STATIC_LIB
             const Ogre::Root::PluginInstanceList pluginList = mRoot->getInstalledPlugins();
             for(unsigned int i = 0; i < pluginList.size(); i++)

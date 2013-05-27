@@ -77,7 +77,7 @@ namespace Ogre
 		/// Projective texture
 		TEXCALC_PROJECTIVE_TEXTURE
 	};
-	/// Enum describing the various actions which can be taken onthe stencil buffer
+	/// Enum describing the various actions which can be taken on the stencil buffer
 	enum StencilOperation
 	{
 		/// Leave the stencil buffer unchanged
@@ -270,7 +270,7 @@ namespace Ogre
 		*/
 		void setWBufferEnabled(bool enabled);
 
-		/** Returns true if the renderer will try to use W-buffers when avalible.
+		/** Returns true if the renderer will try to use W-buffers when available.
 		*/
 		bool getWBufferEnabled(void) const;
 
@@ -801,7 +801,7 @@ namespace Ogre
 		*/
 		virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
-		/** Sets wether the compare func is enabled or not for this texture unit 
+		/** Sets whether the compare func is enabled or not for this texture unit 
 		@param unit The texture unit to set the filtering options for
 		@param compare The state (enabled/disabled)
 		*/

@@ -1,9 +1,11 @@
 # Configure Samples build
 
-if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT (OGRE_BUILD_PLATFORM_WINRT AND OIS_INCLUDE_DIRS))
+if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
   message(STATUS "Could not find dependency: OIS")
   message(STATUS "Skipping samples build")
   set(OGRE_BUILD_SAMPLES 0)
+ else()
+	include_directories(${OIS_INCLUDE_DIR})
 endif()
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND OGRE_BUILD_SAMPLES AND NOT IOKit_FOUND)
   message(STATUS "Could not find dependency: IOKit")
@@ -90,16 +92,20 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
-  	include_directories(
-		${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		)
-  	include_directories(
-		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
-		)
+    if (OGRE_BUILD_RENDERSYSTEM_GL)
+      	include_directories(
+	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/include
+		    ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
+    		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
+	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
+		    )
+	endif()
+    if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
+      	include_directories(
+	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
+		    ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
+    		)
+    endif()
 
 	# Link to all enabled plugins
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
@@ -134,9 +140,11 @@ if (OGRE_BUILD_SAMPLES)
   add_subdirectory(Grass)
   add_subdirectory(Instancing)
   add_subdirectory(Lighting)
+  add_subdirectory(MeshLod)
   add_subdirectory(NewInstancing)
   add_subdirectory(OceanDemo)
   add_subdirectory(ParticleFX)
+  add_subdirectory(PNTrianglesTessellation)
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     add_subdirectory(ShaderSystem)
 	add_subdirectory(ShaderSystemTexturedFog)
@@ -176,7 +184,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(SSAO)
 endif ()
 
-if (NOT OGRE_BUILD_PLATFORM_WINRT)
+if (NOT (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE))
   # Add browser last
   add_subdirectory(Browser)
 else ()

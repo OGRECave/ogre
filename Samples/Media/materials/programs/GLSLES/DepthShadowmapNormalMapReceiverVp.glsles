@@ -1,6 +1,6 @@
 #version 100
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 attribute vec3 tangent;
 attribute vec4 position;
@@ -21,12 +21,13 @@ attribute vec4 uv1;
 
 void main()
 {
-	gl_Position = position * worldViewProj;
+	gl_Position = worldViewProj * position;
 	
 	vec4 worldPos = world * position;
+vec4 lightPos = vec4(300.0, 750.0, -700.0, 1.0);
 
 	// Get object space light direction 
-    vec3 lightDir = normalize(lightPosition.xyz -  (position.xyz * lightPosition.w));
+    vec3 lightDir = normalize(lightPos.xyz -  (position.xyz * lightPos.w));
 
 	// calculate shadow map coords
 	vUv0 = texViewProj * worldPos;

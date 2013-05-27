@@ -897,7 +897,7 @@ namespace Ogre {
     {
         assert(_isAlignedForSSE(pSrcPos));
 
-        // Instantiating two version only, since other alignement combination not that important.
+        // Instantiating two version only, since other alignment combination not that important.
         if (_isAlignedForSSE(pSrcNorm) && _isAlignedForSSE(pDestPos) && _isAlignedForSSE(pDestNorm))
         {
             SoftwareVertexSkinning_SSE_PosNorm_Separated_Packed<true, true, true, true>::apply(
@@ -1015,7 +1015,7 @@ namespace Ogre {
     {
         assert(_isAlignedForSSE(pSrcPos));
 
-        // Instantiating two version only, since other alignement combination not that important.
+        // Instantiating two version only, since other alignment combination not that important.
         if (_isAlignedForSSE(pDestPos))
         {
             SoftwareVertexSkinning_SSE_PosOnly_Packed<true, true>::apply(

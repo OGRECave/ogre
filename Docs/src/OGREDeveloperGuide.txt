@@ -132,15 +132,12 @@ Because Windows handles line endings differently to Linux and OS X, you will nee
 
 ------------------------------------------------------------
 # inside [extensions]
-hgext.win32text=
+eol=
 
-[encode]
-** = cleverencode:
-[decode]
-** = cleverdecode:
-[hooks]
-# Reject commits which would introduce windows-style text files
-pretxncommit.crlf = python:hgext.win32text.forbidcrlf
+[eol]
+native = LF
+only-consistent = False
+
 ------------------------------------------------------------
 
 This is 'very important' - by default Mercurial performs no line-ending conversion. By enabling the win32text 

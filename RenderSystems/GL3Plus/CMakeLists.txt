@@ -96,7 +96,7 @@ set(GLSL_SOURCE
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/win32/OgreWin32Context.h
     include/win32/OgreWin32GLSupport.h
     include/win32/OgreWin32Prerequisites.h
@@ -158,7 +158,12 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
 )
 
-ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
+if (UNIX AND NOT APPLE)
+  # Separate GLSupport and Window out to fix Unity builds
+  ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES} SEPARATE "src/GLX/OgreGLXWindow.cpp" "src/GLX/OgreGLXGLSupport.cpp")
+else()
+  ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
+endif()
 target_link_libraries(RenderSystem_GL3Plus OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -167,7 +172,7 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL3Plus ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_framework(RenderSystem_GL3Plus)

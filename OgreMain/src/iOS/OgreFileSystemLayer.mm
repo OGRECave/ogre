@@ -28,6 +28,7 @@
 #include "OgreFileSystemLayer.h"
 #include "macUtils.h"
 #import <Foundation/NSPathUtilities.h>
+#import <Foundation/NSFileManager.h>
 
 namespace Ogre
 {
@@ -51,6 +52,16 @@ namespace Ogre
     //---------------------------------------------------------------------
 	bool FileSystemLayer::createDirectory(const Ogre::String& path)
 	{
-		return false;
+        NSString *directoryPath = [NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding];
+        NSError *error;
+
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:directoryPath
+                                       withIntermediateDirectories:NO
+                                                        attributes:nil
+                                                             error:&error])
+        {
+            return false;
+        }
+        return true;
 	}
 }

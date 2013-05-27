@@ -37,8 +37,11 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-    
-	class GLSLProgramFactory;
+
+
+    namespace GLSL {
+        class GLSLProgramFactory;
+    }
 
 	/**
       Implementation of GL as a rendering system.
@@ -113,7 +116,7 @@ namespace Ogre {
 
         HardwareBufferManager* mHardwareBufferManager;
         GLGpuProgramManager* mGpuProgramManager;
-		GLSLProgramFactory* mGLSLProgramFactory;
+        GLSL::GLSLProgramFactory* mGLSLProgramFactory;
 
         unsigned short mCurrentLights;
 

@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreVertexIndexData.h"
 #include "OgreEdgeListBuilder.h"
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( EdgeBuilderTests );
 
 void EdgeBuilderTests::setUp()
@@ -38,6 +38,7 @@ void EdgeBuilderTests::setUp()
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
     //mLogMgr = OGRE_NEW LogManager();
     LogManager::getSingleton().createLog("EdgeBuilderTests.log", true);
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 }
 void EdgeBuilderTests::tearDown()
 {

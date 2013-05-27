@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "macUtils.h"
 #endif
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
 
 void UseCustomCapabilitiesTests::setUp()
@@ -56,6 +56,7 @@ void UseCustomCapabilitiesTests::setUp()
 		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
 	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 
 	
 	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
@@ -200,8 +201,9 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
 	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 
-	Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+	Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -260,8 +262,9 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
 	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 
-    Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{

@@ -50,6 +50,10 @@ namespace Volume {
         */
         virtual float getVolumeGridValue(int x, int y, int z) const;
 
+        /** Overridden from GridSource.
+        */
+        virtual void setVolumeGridValue(int x, int y, int z, float value);
+
     public:
 
         /** Constructur.

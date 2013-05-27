@@ -639,7 +639,7 @@ namespace Ogre
 				ObjectAbstractNode *obj = (ObjectAbstractNode*)(*i).get();
 
 				// Overlay base classes in order.
-                for (std::vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
+                for (vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
 				{
                     const String& base = *baseIt;
 					// Check the top level first, then check the import table

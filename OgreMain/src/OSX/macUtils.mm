@@ -94,9 +94,9 @@ namespace Ogre {
         return 1;
     }
 
-    void* mac_loadFramework(std::string name)
+    void* mac_loadFramework(String name)
 	{
-		std::string fullPath=name + ".framework";
+		String fullPath=name + ".framework";
 		if(name[0]!='/')
 			fullPath = macFrameworksPath()+"/"+fullPath+"/"+name;
 
@@ -105,14 +105,14 @@ namespace Ogre {
 
 	void* mac_loadDylib(const char* name)
 	{
-		std::string fullPath=name;
+		String fullPath=name;
 		if(name[0]!='/')
 			fullPath = macPluginPath()+"/"+fullPath;
 		
 		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 	}
 	
-    std::string macBundlePath()
+    String macBundlePath()
     {
         char path[1024];
         CFBundleRef mainBundle = CFBundleGetMainBundle();
@@ -129,15 +129,15 @@ namespace Ogre {
         CFRelease(mainBundleURL);
         CFRelease(cfStringRef);
         
-        return std::string(path);
+        return String(path);
     }
     
-    std::string macPluginPath()
+    String macPluginPath()
 	{
 		return macBundlePath() + "/Contents/Plugins/";
 	}
 
-    std::string macCachePath()
+    String macCachePath()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];
@@ -145,8 +145,21 @@ namespace Ogre {
         return [cachesDirectory cStringUsingEncoding:NSASCIIStringEncoding];
     }
 
-    std::string macFrameworksPath()
+    String macFrameworksPath()
 	{
 		return macBundlePath() + "/Contents/Frameworks/";
 	}
+
+    String macTempFileName()
+    {
+        NSString *tempFilePath;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        for (;;) {
+            NSString *baseName = [NSString stringWithFormat:@"tmp-%x", arc4random()];
+            tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:baseName];
+            if (![fileManager fileExistsAtPath:tempFilePath])
+                break;
+        }
+        return String([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
+    }
 }

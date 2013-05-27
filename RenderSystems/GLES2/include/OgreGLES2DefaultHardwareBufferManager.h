@@ -90,6 +90,7 @@ namespace Ogre {
             void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
+#if OGRE_NO_GLES3_SUPPORT == 0
     /// Specialisation of HardwareUniformBuffer for emulation
     class _OgreGLES2Export GLES2DefaultHardwareUniformBuffer : public HardwareUniformBuffer
     {
@@ -117,6 +118,7 @@ namespace Ogre {
 
         void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
+#endif
 
     /** Specialisation of HardwareBufferManager to emulate hardware buffers.
     @remarks

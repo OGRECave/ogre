@@ -48,15 +48,31 @@ using namespace Ogre::Volume;
 */
 class _OgreSampleClassExport Sample_VolumeTerrain : public SdkSample
 {
-private:
-    
-    /// Holds the volume root.
-    Chunk *mVolumeRoot;
-
 protected:
     
+    /// Min. time when the mouse is painting
+    static const Real MOUSE_MODIFIER_TIME_LIMIT;
+
+    /// Holds the volume root.
+    Chunk *mVolumeRoot;
+    
+    /// The node on which the terrain is attached.
+    SceneNode *mVolumeRootNode;
+
     /// To show or hide everything.
     bool mHideAll;
+
+    /// Whether we bevel, emboss or do nothing with the mouse.
+    int mMouseState;
+
+    /// A countdown when the next mouse modifier update will happen.
+    Real mMouseCountdown;
+
+    /// Current mouse position, X-part.
+    Real mMouseX;
+    
+    /// Current mouse position, Y-part.
+    Real mMouseY;
 
     /** Sets up the sample.
     */
@@ -69,13 +85,46 @@ protected:
     /** Is called when the sample is stopped.
     */
     virtual void cleanupContent(void);
+
+    /** Intersects a ray with the volume and adds a sphere at the intersection.
+    @param ray
+        The ray.
+    @param doUnion
+        Whether to add or subtract a sphere
+    */
+    void shootRay(Ray ray, bool doUnion);
 public:
 
     /** Constructor.
     */
     Sample_VolumeTerrain(void);
     
+    /** Overridden from SdkSample.
+    */
     virtual bool keyPressed(const OIS::KeyEvent& evt);
+    
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+    /** Overridden from SdkSample.
+    */
+    virtual bool touchPressed(const OIS::MultiTouchEvent& evt);
+#else
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseMoved(const OIS::MouseEvent& evt);
+    
+#endif
+    /** Overridden from SdkSample.
+     */
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 };
 
 #endif

@@ -91,6 +91,7 @@ namespace Ogre
 		bool mHasPixelFormatARB;
         bool mHasMultisample;
 		bool mHasHardwareGamma;
+		PFNWGLCHOOSEPIXELFORMATARBPROC mWglChoosePixelFormat;
 
 		struct DisplayMonitorInfo
 		{

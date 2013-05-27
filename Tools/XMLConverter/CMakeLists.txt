@@ -13,22 +13,32 @@ set(HEADER_FILES
   include/OgreXMLMeshSerializer.h
   include/OgreXMLPrerequisites.h
   include/OgreXMLSkeletonSerializer.h
-  include/tinystr.h
-  include/tinyxml.h
 )
 
 set(SOURCE_FILES 
   src/main.cpp
   src/OgreXMLMeshSerializer.cpp
   src/OgreXMLSkeletonSerializer.cpp
-  src/tinystr.cpp
-  src/tinyxml.cpp
-  src/tinyxmlerror.cpp
-  src/tinyxmlparser.cpp
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+# If TinyXML is not found on the system use the embedded version.
+if(NOT TINYXML_FOUND)
+  list(APPEND SOURCE_FILES
+    src/tinystr.cpp
+    src/tinyxml.cpp
+    src/tinyxmlerror.cpp
+    src/tinyxmlparser.cpp)
+
+  list(APPEND HEADER_FILES
+    include/tinystr.h
+    include/tinyxml.h)
+
+  set(TINYXML_INCLUDE_DIR "")
+  set(TINYXML_LIBRARIES "")
+endif(NOT TINYXML_FOUND)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
 add_definitions(-DTIXML_USE_STL)
 ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES})
+target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES})
 ogre_config_tool(OgreXMLConverter)

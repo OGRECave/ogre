@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -65,7 +65,21 @@ namespace Volume {
 
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
-    
+
+    //-----------------------------------------------------------------------
+
+    void HalfFloatGridSource::setVolumeGridValue(int x, int y, int z, float value)
+    {
+
+        // Clamp if wanted.
+        if (mMaxClampedAbsoluteDensity != (Real)0.0 && Math::Abs(value) > mMaxClampedAbsoluteDensity)
+        {
+            value = mMaxClampedAbsoluteDensity;
+        }
+        
+        mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y] = Bitwise::floatToHalf(value);
+    }
+
     //-----------------------------------------------------------------------
     
     HalfFloatGridSource::HalfFloatGridSource(const String &serializedVolumeFile, const bool trilinearValue, const bool trilinearGradient, const bool sobelGradient) :
@@ -74,8 +88,12 @@ namespace Volume {
     
         Timer t;
         DataStreamPtr streamRead = Root::getSingleton().openFileStream(serializedVolumeFile);
+#if OGRE_NO_ZIP_ARCHIVE == 0
         DataStreamPtr uncompressStream(OGRE_NEW DeflateStream(serializedVolumeFile, streamRead));
         StreamSerialiser ser(uncompressStream);
+#else
+        StreamSerialiser ser(streamRead);
+#endif
         if (!ser.readChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION))
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
@@ -113,6 +131,21 @@ namespace Volume {
         LogManager::getSingleton().stream() << "Processed serialization in " << t.getMilliseconds() << "ms.";
     }
         
+    //-----------------------------------------------------------------------
+
+    void HalfFloatGridSource::setMaxClampedAbsoluteDensity(Real maxClampedAbsoluteDensity)
+    {
+        mMaxClampedAbsoluteDensity = maxClampedAbsoluteDensity;
+    }
+
+    //-----------------------------------------------------------------------
+
+
+    Real HalfFloatGridSource::getMaxClampedAbsoluteDensity(void) const
+    {
+        return mMaxClampedAbsoluteDensity;
+    }
+
     //-----------------------------------------------------------------------
 
     HalfFloatGridSource::~HalfFloatGridSource(void)

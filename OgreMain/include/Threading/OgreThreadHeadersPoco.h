@@ -36,6 +36,7 @@ THE SOFTWARE
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include <Poco/RWLock.h>
+#include <Poco/Environment.h>
 
 #endif
 

@@ -1,5 +1,3 @@
-#version 120
-
 /*
 ** layered blending & misc math
 ** Blending modes, RGB/HSL/Contrast/Desaturate, levels control

@@ -117,7 +117,7 @@ namespace Ogre
 
 		mCurrentIteration = iteration;
 
-		// Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM / Focussed
+		// Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM / Focused
 		// functionality right now without major changes
 		Camera* _cam = const_cast<Camera*>(cam);
 		Real oldNear = _cam->getNearClipDistance();

@@ -134,6 +134,7 @@ namespace Ogre {
             RBFormat(GLenum inFormat, size_t inWidth, size_t inHeight, uint fsaa):
                 format(inFormat), width(inWidth), height(inHeight), samples(fsaa)
             {}
+            RBFormat() {}
             GLenum format;
             size_t width;
             size_t height;
@@ -155,11 +156,11 @@ namespace Ogre {
                     {
                         if(height < other.height)
                             return true;
-						else if (height == other.height)
-						{
-							if (samples < other.samples)
-								return true;
-						}
+                        else if (height == other.height)
+                        {
+                            if (samples < other.samples)
+                                return true;
+                        }
                     }
                 }
                 return false;

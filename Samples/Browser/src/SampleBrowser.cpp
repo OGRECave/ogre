@@ -27,6 +27,11 @@
  */
 #include "OgrePlatform.h"
 
+// Sadly we needed to add this #if to solve a NACL compiler bug...
+#if (OGRE_PLATFORM == OGRE_PLATFORM_NACL) 
+#include "ppapi/utility/completion_callback_factory.h"
+#endif
+
 #include "SampleBrowser.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

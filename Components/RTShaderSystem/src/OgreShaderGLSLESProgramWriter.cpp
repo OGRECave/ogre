@@ -210,9 +210,19 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
             mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler2D";
             mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
+            mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
+        	mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
             mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
+            mGpuConstTypeMap[GCT_SAMPLER1DSHADOW] = "sampler1DShadow";
+            mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2DShadow";
             mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
+            mGpuConstTypeMap[GCT_MATRIX_2X3] = "mat2x3";
+            mGpuConstTypeMap[GCT_MATRIX_2X4] = "mat2x4";
+            mGpuConstTypeMap[GCT_MATRIX_3X2] = "mat3x2";
             mGpuConstTypeMap[GCT_MATRIX_3X3] = "mat3";
+            mGpuConstTypeMap[GCT_MATRIX_3X4] = "mat3x4";
+            mGpuConstTypeMap[GCT_MATRIX_4X2] = "mat4x2";
+            mGpuConstTypeMap[GCT_MATRIX_4X3] = "mat4x3";
             mGpuConstTypeMap[GCT_MATRIX_4X4] = "mat4";
             mGpuConstTypeMap[GCT_INT1] = "int";
             mGpuConstTypeMap[GCT_INT2] = "int2";
@@ -260,7 +270,13 @@ namespace Ogre {
             UniformParameterConstIterator itUniformParam = parameterList.begin();
             
             // Write the current version (this forces the driver to fulfill the glsl es standard)
-            os << "#version "<< mGLSLVersion << std::endl;
+            os << "#version "<< mGLSLVersion;
+
+            // Starting with ES 3.0 the version must contain the string "es" after the version number with a space separating them
+            if(mGLSLVersion > 100)
+                os << " es";
+
+            os << std::endl;
 
             // Default precision declaration is required in fragment and vertex shaders.
             os << "precision highp float;" << std::endl;
@@ -312,6 +328,15 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << std::endl;
 
+				if (gpuType == GPT_FRAGMENT_PROGRAM)
+				{
+					os << "\tvec4 outputColor;" << std::endl;
+				}
+				else if (gpuType == GPT_VERTEX_PROGRAM)
+				{
+					os << "\tvec4 outputPosition;" << std::endl;
+				}
+
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
                 ShaderParameterConstIterator itParam = localParams.begin();
@@ -342,7 +367,7 @@ namespace Ogre {
                     itOperand = pFuncInvoc->getOperandList().begin();
 
                     // Local string stream
-                    std::stringstream localOs;
+                    StringStream localOs;
 
                     // Write function name			
                     localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
@@ -514,7 +539,16 @@ namespace Ogre {
                     localOs << std::endl;
                     os << localOs.str();
                 }
-
+				
+				if (gpuType == GPT_FRAGMENT_PROGRAM)
+				{
+					os << "\tgl_FragColor = outputColor;" << std::endl;
+				}
+				else if (gpuType == GPT_VERTEX_PROGRAM)
+				{
+					os << "\tgl_Position = outputPosition;" << std::endl;
+				}
+				
                 os << "}" << std::endl;
             }
             os << std::endl;
@@ -614,7 +648,7 @@ namespace Ogre {
                     // GLSL vertex program has to write always gl_Position
                     if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
                     {
-                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
+                        mInputToGLStatesMap[pParam->getName()] = "outputPosition";
                     }
                     else
                     {
@@ -633,7 +667,7 @@ namespace Ogre {
                         pParam->getSemantic() == Parameter::SPS_COLOR)
                 {					
                     // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
+                    mInputToGLStatesMap[pParam->getName()] = "outputColor";
                 }
             }
         }

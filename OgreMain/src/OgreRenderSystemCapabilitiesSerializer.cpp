@@ -80,7 +80,7 @@ namespace Ogre
         file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
         file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
         file << "\t" << "tesselation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM)) << endl;
-        file << "\t" << "tessellation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
+        file << "\t" << "tesselation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
         file << "\t" << "compute_program " << StringConverter::toString(caps->hasCapability(RSC_COMPUTE_PROGRAM)) << endl;
         file << "\t" << "scissor_test " << StringConverter::toString(caps->hasCapability(RSC_SCISSOR_TEST)) << endl;
         file << "\t" << "two_sided_stencil " << StringConverter::toString(caps->hasCapability(RSC_TWO_SIDED_STENCIL)) << endl;

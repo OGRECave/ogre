@@ -509,11 +509,11 @@ namespace Ogre {
         /// Cached light information, used to tracking light's changes
         struct _OgreExport LightInfo
         {
-            Light* light;       // Just a pointer for comparison, the light might destroyed for some reason
-            int type;           // Use int instead of Light::LightTypes to avoid header file dependence
-            Real range;         // Sets to zero if directional light
-            Vector3 position;   // Sets to zero if directional light
-			uint32 lightMask;   // Light mask
+            Light* light;       /// Just a pointer for comparison, the light might destroyed for some reason
+            int type;           /// Use int instead of Light::LightTypes to avoid header file dependence
+            Real range;         /// Sets to zero if directional light
+            Vector3 position;   /// Sets to zero if directional light
+			uint32 lightMask;   /// Light mask
 
             bool operator== (const LightInfo& rhs) const
             {
@@ -630,7 +630,7 @@ namespace Ogre {
             int xsegments, int ysegments, int ySegmentsToKeep, 
             const String& groupName);
 
-        // Flag indicating whether SceneNodes will be rendered as a set of 3 axes
+        /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
         bool mDisplayNodes;
 
         /// Storage of animations, lookup by name
@@ -749,7 +749,7 @@ namespace Ogre {
 		bool mShadowUseInfiniteFarPlane;
 		bool mShadowCasterRenderBackFaces;
 		bool mShadowAdditiveLightClip;
-		/// Struct for cacheing light clipping information for re-use in a frame
+		/// Struct for caching light clipping information for re-use in a frame
 		struct LightClippingInfo
 		{
 			RealRect scissorRect;
@@ -852,9 +852,9 @@ namespace Ogre {
         AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
         Real mDefaultShadowFarDist;
         Real mDefaultShadowFarDistSquared;
-        Real mShadowTextureOffset; // proportion of texture offset in view direction e.g. 0.4
-        Real mShadowTextureFadeStart; // as a proportion e.g. 0.6
-        Real mShadowTextureFadeEnd; // as a proportion e.g. 0.9
+        Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
+        Real mShadowTextureFadeStart; /// As a proportion e.g. 0.6
+        Real mShadowTextureFadeEnd; /// As a proportion e.g. 0.9
 		bool mShadowTextureSelfShadow;
 		Pass* mShadowTextureCustomCasterPass;
 		Pass* mShadowTextureCustomReceiverPass;
@@ -1724,7 +1724,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual ViewPoint getSuggestedViewpoint(bool random = false);
 
@@ -1739,7 +1739,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual bool setOption( const String& strKey, const void* pValue )
         { (void)strKey; (void)pValue; return false; }
@@ -1755,12 +1755,12 @@ namespace Ogre {
                 On success, true is returned and pDestValue points to the value of the given
                 option.
             @par
-                On failiure, false is returned and pDestValue is set to NULL.
+                On failure, false is returned and pDestValue is set to NULL.
         */
         virtual bool getOption( const String& strKey, void* pDestValue )
         { (void)strKey; (void)pDestValue; return false; }
 
-        /** Method for verifying wether the scene manager has an implementation-specific
+        /** Method for verifying whether the scene manager has an implementation-specific
             option.
             @param
                 strKey The name of the option to check for.
@@ -1793,7 +1793,7 @@ namespace Ogre {
             @param
                 refKeys A reference to a list that will be filled with all the available options.
             @return
-                On success, true is returned. On failiure, false is returned.
+                On success, true is returned. On failure, false is returned.
         */
         virtual bool getOptionKeys( StringVector& refKeys )
         { (void)refKeys; return false; }

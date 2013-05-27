@@ -192,6 +192,7 @@ namespace Ogre {
         virtual const ColourValue& getSurfaceSpecularColour(void) const;
         virtual const ColourValue& getSurfaceEmissiveColour(void) const;
         virtual Real getSurfaceShininess(void) const;
+        virtual Real getSurfaceAlphaRejectionValue(void) const;
         virtual ColourValue getDerivedAmbientLightColour(void) const;
         virtual ColourValue getDerivedSceneColour(void) const;
         virtual void setFog(FogMode mode, const ColourValue& colour, Real expDensity, Real linearStart, Real linearEnd);

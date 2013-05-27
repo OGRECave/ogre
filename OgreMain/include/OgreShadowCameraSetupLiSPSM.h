@@ -173,7 +173,7 @@ namespace Ogre
 
 		/** Builds a frustum matrix.
 		@remarks
-		Builds a standard frustum matrix out of the distance infos of the six frustum 
+		Builds a standard frustum matrix out of the distance info of the six frustum 
 		clipping planes.
 		*/
 		Matrix4 buildFrustumProjection(Real left, Real right, Real bottom, 

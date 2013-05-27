@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include <stdlib.h>
 
 namespace Ogre {
+    namespace GLSL {
 
 /**
  * This is a simplistic C/C++-like preprocessor.
@@ -519,6 +520,7 @@ public:
     void *ErrorData;
 };
 
+} // namespace GLSL
 } // namespace Ogre
 
 #endif // __OGRE_CPREPROCESSOR_H__

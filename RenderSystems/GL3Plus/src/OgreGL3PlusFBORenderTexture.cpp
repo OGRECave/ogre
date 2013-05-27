@@ -257,11 +257,6 @@ namespace Ogre {
 			if(PixelUtil::isCompressed((PixelFormat)x))
 				continue;
 
-			int depths[4];
-			PixelUtil::getBitDepths((PixelFormat)x, depths);
-			if(fmt!=GL_NONE && (!depths[0] || !depths[1] || !depths[2]))
-				continue;
-
             // Create and attach framebuffer
             glGenFramebuffers(1, &fb);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
@@ -342,6 +337,20 @@ namespace Ogre {
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
                         }
+                        else
+                        {
+                            // There is a small edge case that FBO is trashed during the test
+                            // on some drivers resulting in undefined behavior
+                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                            glDeleteFramebuffers(1, &fb);
+
+                            // Workaround for NVIDIA / Linux 169.21 driver problem
+                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                            glFinish();
+
+                            glGenFramebuffers(1, &fb);
+                            glBindFramebuffer(GL_FRAMEBUFFER, fb);
+                        }
                     }
                 }
                 LogManager::getSingleton().logMessage(str.str());
@@ -380,7 +389,7 @@ namespace Ogre {
             // desirability == 1000...2000  if no depth, stencil
             // desirability == 2000...3000  if depth, no stencil
             // desirability == 3000+        if depth and stencil
-            // beyond this, the total numer of bits (stencil+depth) is maximised
+            // beyond this, the total number of bits (stencil+depth) is maximised
             if(props.modes[mode].stencil && !requestDepthOnly)
                 desirability += 1000;
             if(props.modes[mode].depth)
@@ -424,7 +433,7 @@ namespace Ogre {
             fbo->bind();
         else
             // Old style context (window/pbuffer) or copying render texture
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
     
     GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)

@@ -53,7 +53,7 @@ namespace Ogre {
         if (createParamDictionary("DeflectorPlaneAffector"))
         {
             addBaseParameters();
-            // Add extra paramaters
+            // Add extra parameters
             ParamDictionary* dict = getParamDictionary();
             dict->addParameter(ParameterDef("plane_point",
                 "A point on the deflector plane. Together with the normal vector it defines the plane.",

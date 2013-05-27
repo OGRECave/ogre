@@ -100,12 +100,11 @@ set (SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 ogre_add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION})
+set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreRTShaderSystem OgreMain)
 
-ogre_config_component(OgreRTShaderSystem)
-
 ogre_config_framework(OgreRTShaderSystem)
+ogre_config_component(OgreRTShaderSystem)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/RTShaderSystem

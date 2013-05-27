@@ -398,6 +398,8 @@ namespace Ogre {
 		*/
 		void load(DataStreamPtr& stream);
 
+        size_t calculateSize(void) const;
+
 	protected:
 		/** Indicates whether all array entries will be generated and added to the definitions map
 		@remarks
@@ -530,6 +532,8 @@ namespace Ogre {
 		*/
 		unsigned long getVersion() const { return mVersion; }
 
+        size_t calculateSize(void) const;
+
 		/** Mark the shared set as being dirty (values modified).
 		@remarks
 		You do not need to call this yourself, set is marked as dirty whenever
@@ -578,7 +582,7 @@ namespace Ogre {
 		/// Get a pointer to the 'nth' item in the float buffer
 		const float* getFloatPointer(size_t pos) const { return &mFloatConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
-		double* geDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
+		double* getDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
 		const double* getDoublePointer(size_t pos) const { return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the int buffer
@@ -820,6 +824,8 @@ namespace Ogre {
 			ACT_SURFACE_EMISSIVE_COLOUR,
 			/// Surface shininess, as set in Pass::setShininess
 			ACT_SURFACE_SHININESS,
+			/// Surface alpha rejection value, not as set in Pass::setAlphaRejectionValue, but a floating number between 0.0f and 1.0f instead (255.0f / Pass::getAlphaRejectionValue())
+			ACT_SURFACE_ALPHA_REJECTION_VALUE,
 
 
 			/// The number of active light sources (better than gl_MaxLights)
@@ -1871,7 +1877,14 @@ namespace Ogre {
 		and return std::numeric_limits<size_t>::max() 
 		*/
 		size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-		/** Gets the physical buffer index associated with a logical int constant index. 
+		/** Gets the physical buffer index associated with a logical double constant index.
+         @note Only applicable to low-level programs.
+         @param logicalIndex The logical parameter index
+         @param requestedSize The requested size - pass 0 to ignore missing entries
+         and return std::numeric_limits<size_t>::max()
+         */
+		size_t _getDoubleConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
+		/** Gets the physical buffer index associated with a logical int constant index.
 		@note Only applicable to low-level programs.
 		@param logicalIndex The logical parameter index
 		@param requestedSize The requested size - pass 0 to ignore missing entries
@@ -1975,6 +1988,7 @@ namespace Ogre {
 		*/
 		void _copySharedParams();
 
+		size_t calculateSize(void) const;
 
 		/** Set subroutine name by slot name
 		 */

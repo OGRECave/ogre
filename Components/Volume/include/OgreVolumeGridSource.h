@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,9 @@ THE SOFTWARE.
 
 #include "OgreVector4.h"
 
-#include "OgreVolumeSource.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreVolumeSource.h"
+#include "OgreVolumeCSGSource.h"
 
 namespace Ogre {
 namespace Volume {
@@ -60,14 +61,22 @@ namespace Volume {
         /// The texture depth.
         int mDepth;
 
-        // Whether to use trilinear filtering or not for the value.
-        const bool mTrilinearValue;
+        /// Whether to use trilinear filtering or not for the value.
+        bool mTrilinearValue;
         
-        // Whether to use trilinear filtering or not for the gradient.
+        /// Whether to use trilinear filtering or not for the gradient.
         const bool mTrilinearGradient;
 
         /// Whether to blur the gradient a bit Sobel like.
         const bool mSobelGradient;
+        
+        /** Overridden from VolumeSource.
+        */
+        virtual Vector3 getIntersectionStart(const Ray &ray, Real maxDistance) const;
+        
+        /** Overridden from VolumeSource.
+        */
+        virtual Vector3 getIntersectionEnd(const Ray &ray, Real maxDistance) const;
 
         /** Gets the volume value of a position.
         @param x
@@ -80,6 +89,18 @@ namespace Volume {
             The density.
         */
         virtual float getVolumeGridValue(int x, int y, int z) const = 0;
+        
+        /** Sets the volume value of a position.
+        @param x
+            The x position.
+        @param y
+            The y position.
+        @param z
+            The z position.
+        @param value
+            The density to be set.
+        */
+        virtual void setVolumeGridValue(int x, int y, int z, float value) = 0;
 
         /** Gets a gradient of a point with optional sobel blurring.
         @param x
@@ -145,6 +166,22 @@ namespace Volume {
             The depth of the texture.
         */
         size_t getDepth(void) const;
+
+        /** Updates this grid with another source in a certain area. Use
+        it for example to add spheres as a brush.
+        @param operation
+            The operation to use, will use this source and the other given one as operands. Beware that
+            this function overrides the maybe existing sources in the operation.
+        @param source
+            The other source to combine this one with.
+        @param center
+            The rough center of the affected area by the operation. If the other source is a sphere, take
+            its center for example.
+        @param radius
+            The radius of the affected area. For the example sphere, you might use its radius times two
+            because the density outside of the sphere is needed, too.
+        */
+        virtual void combineWithSource(CSGOperationSource *operation, Source *source, const Vector3 &center, Real radius);
     };
 
 }

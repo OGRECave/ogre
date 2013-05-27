@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace GLSL
+    {
 
     //-----------------------------------------------------------------------------
     void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog, const bool forceException)
@@ -97,5 +99,5 @@ namespace Ogre
 
 	}
 
-
+    } // namespace GLSL
 } // namespace Ogre

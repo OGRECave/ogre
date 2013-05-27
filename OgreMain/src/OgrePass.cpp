@@ -436,6 +436,40 @@ namespace Ogre {
 
 		return *this;
     }
+    //-----------------------------------------------------------------------------
+    size_t Pass::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        // Tally up TU states
+        TextureUnitStates::const_iterator i, iend;
+        iend = mTextureUnitStates.end();
+        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        {
+            memSize += (*i)->calculateSize();
+        }
+        if(mVertexProgramUsage)
+            memSize += mVertexProgramUsage->calculateSize();
+        if(mShadowCasterVertexProgramUsage)
+            memSize += mShadowCasterVertexProgramUsage->calculateSize();
+        if(mShadowCasterFragmentProgramUsage)
+            memSize += mShadowCasterFragmentProgramUsage->calculateSize();
+        if(mShadowReceiverVertexProgramUsage)
+            memSize += mShadowReceiverVertexProgramUsage->calculateSize();
+        if(mFragmentProgramUsage)
+            memSize += mFragmentProgramUsage->calculateSize();
+        if(mShadowReceiverFragmentProgramUsage)
+            memSize += mShadowReceiverFragmentProgramUsage->calculateSize();
+        if(mGeometryProgramUsage)
+            memSize += mGeometryProgramUsage->calculateSize();
+        if(mTesselationHullProgramUsage)
+            memSize += mTesselationHullProgramUsage->calculateSize();
+        if(mTesselationDomainProgramUsage)
+            memSize += mTesselationDomainProgramUsage->calculateSize();
+        if(mComputeProgramUsage)
+            memSize += mComputeProgramUsage->calculateSize();
+        return memSize;
+    }
     //-----------------------------------------------------------------------
     void Pass::setName(const String& name)
     {

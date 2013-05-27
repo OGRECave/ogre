@@ -223,7 +223,12 @@ namespace Ogre {
 
         String startOfThis = str.substr(0, patternLen);
         if (lowerCase)
+		{
+			String lowerCasePattern = pattern;
+            StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(startOfThis);
+			return (startOfThis == lowerCasePattern);
+		}
 
         return (startOfThis == pattern);
     }
@@ -237,7 +242,12 @@ namespace Ogre {
 
         String endOfThis = str.substr(thisLen - patternLen, patternLen);
         if (lowerCase)
+		{
+			String lowerCasePattern = pattern;
+            StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(endOfThis);
+			return (endOfThis == lowerCasePattern);
+		}
 
         return (endOfThis == pattern);
     }

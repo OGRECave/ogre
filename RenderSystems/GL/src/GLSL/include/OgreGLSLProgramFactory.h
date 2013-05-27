@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace GLSL {
+
     /** Factory class for GLSL programs. */
     class _OgreGLExport GLSLProgramFactory : public HighLevelGpuProgramFactory
     {
@@ -55,6 +57,7 @@ namespace Ogre
 		GLSLLinkProgramManager* mLinkProgramManager;
 
     };
+    }
 }
 
 #endif // __GLSLProgramFactory_H__

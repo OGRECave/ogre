@@ -375,7 +375,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 	} 
 	else if(mSoftwareMipmap)
 	{
-		GLint components = PixelUtil::getComponentCount(mFormat);
+		GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat);
 		if(data.getWidth() != data.rowPitch)
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
 		if(data.getHeight()*data.getWidth() != data.slicePitch)
@@ -388,7 +388,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 		{
 		case GL_TEXTURE_1D:
 			gluBuild1DMipmaps(
-				GL_TEXTURE_1D, components,
+				GL_TEXTURE_1D, format,
 				dest.getWidth(),
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
 				data.data);
@@ -397,7 +397,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 		case GL_TEXTURE_CUBE_MAP:
 			gluBuild2DMipmaps(
 				mFaceTarget,
-				components, dest.getWidth(), dest.getHeight(), 
+				format, dest.getWidth(), dest.getHeight(), 
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format), 
 				data.data);
 			break;		
@@ -412,7 +412,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 				data.data);
 			*/
 			glTexImage3D(
-				mTarget, 0, components, 
+				mTarget, 0, format, 
 				dest.getWidth(), dest.getHeight(), dest.getDepth(), 0, 
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
 				data.data );

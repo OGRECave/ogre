@@ -38,8 +38,9 @@ THE SOFTWARE.
 //
 namespace Ogre
 {
+    namespace GLSL {
 
-	// forward declarations
+    // forward declarations
 	class GLSLProgram;
 	class GLSLGpuProgram;
 	class GLSLLinkProgram;
@@ -60,7 +61,7 @@ namespace Ogre
 	*/
 	String logObjectInfo(const String& msg, const GLhandleARB obj);
 
-
+    }
 } // namespace Ogre
 
 #endif // __GLSLExtSupport_H__

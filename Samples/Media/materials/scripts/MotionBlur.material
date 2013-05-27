@@ -33,11 +33,24 @@ fragment_program Ogre/Compositor/Combine_GLSL_fp glsl
 	}
 }
 
+fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
+{
+	source Combine_fp_ps40.hlsl
+	target ps_4_0
+	entry_point Combine_fp_ps40
+
+	default_params
+	{
+		param_named blur float 0.8
+	}
+}
+
 fragment_program Ogre/Compositor/Combine_fp unified
 {
-	delegate Ogre/Compositor/Combine_GLSL_fp
-	delegate Ogre/Compositor/Combine_GLSLES_fp
-	delegate Ogre/Compositor/Combine_Cg_fp
+	//delegate Ogre/Compositor/Combine_GLSL_fp
+	//delegate Ogre/Compositor/Combine_GLSLES_fp
+	delegate Ogre/Compositor/Combine_HLSL_fp
+	//delegate Ogre/Compositor/Combine_Cg_fp
 }
 
 material Ogre/Compositor/Combine
@@ -47,6 +60,7 @@ material Ogre/Compositor/Combine
 		pass
 		{
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Ogre/Compositor/Combine_fp
 			{
@@ -81,6 +95,7 @@ material Ogre/Compositor/Copyback
 		{
 			lighting off
 			depth_check off
+            polygon_mode_overrideable false
 
 			texture_unit Temp
 			{
@@ -101,6 +116,7 @@ material Ogre/Compositor/MotionBlur
 		{
 			lighting off
 			depth_check off
+            polygon_mode_overrideable false
 
 			texture_unit Sum
 			{

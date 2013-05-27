@@ -38,8 +38,12 @@ THE SOFTWARE.
 
 #include <X11/extensions/Xrandr.h>
 
-static Display *_currentDisplay;
-static Display *_getCurrentDisplay(void) { return _currentDisplay; }
+static bool ctxErrorOccurred = false;
+static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
+{
+    ctxErrorOccurred = true;
+    return 0;
+}
 
 namespace Ogre
 {
@@ -211,6 +215,10 @@ namespace Ogre
 		optVideoMode.currentValue = StringConverter::toString(mCurrentMode.first.first,4) + " x " + StringConverter::toString(mCurrentMode.first.second,4);
 
 		refreshConfig();
+
+        optVSync.possibleValues.push_back("No");
+        optVSync.possibleValues.push_back("Yes");
+        optVSync.currentValue = optVSync.possibleValues[0];
 
 		optRTTMode.possibleValues.push_back("FBO");
 		optRTTMode.currentValue = optRTTMode.possibleValues[0];
@@ -812,13 +820,49 @@ namespace Ogre
 	::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
 	{
 		::GLXContext glxContext;
-        int context_attribs[] =
+		int context_attribs[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 5,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB, 
+			None
+		};
+
+        ctxErrorOccurred = false;
+        int (*oldHandler)(Display*, XErrorEvent*) =
+        XSetErrorHandler(&ctxErrorHandler);
+
+        while(!glxContext && (context_attribs[1] >= 3))
         {
-            GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB, 
-            None
-        };
-        
-        glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+            ctxErrorOccurred = false;
+            glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+            // Sync to ensure any errors generated are processed.
+            XSync( mGLDisplay, False );
+            if ( !ctxErrorOccurred && glxContext )
+            {
+                LogManager::getSingleton().logMessage("Created GL " + StringConverter::toString(context_attribs[1]) + "." + StringConverter::toString(context_attribs[3]) + " context" );
+            }
+            else
+            {
+                if(context_attribs[3] == 0)
+                {
+                    context_attribs[1] -= 1;
+                    context_attribs[3] = 5;
+                }
+                else
+                {
+                    context_attribs[3] -= 1;
+                }
+            }
+        }
+        // Sync to ensure any errors generated are processed.
+        XSync( mGLDisplay, False );
+
+        // Restore the original error handler
+        XSetErrorHandler( oldHandler );
+
+        if ( ctxErrorOccurred || !glxContext )
+            LogManager::getSingleton().logMessage("Failed to create an OpenGL 3+ context");
 
 		return glxContext;
 	}
@@ -855,8 +899,8 @@ namespace Ogre
 
 		for(mode = mVideoModes.begin(); mode != end; size++)
 		{
-			if (mode->first.first >= static_cast<int>(width) &&
-				mode->first.second >= static_cast<int>(height))
+			if (mode->first.first >= width &&
+				mode->first.second >= height)
 			{
 				if (! newMode ||
 					mode->first.first < newMode->first.first ||

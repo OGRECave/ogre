@@ -54,6 +54,7 @@
             <File Source='..\bin\release\Sample_DynTex.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_FacialAnimation.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_Fresnel.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_MeshLod.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_Grass.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_Instancing.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_Isosurf.dll' Vital='yes' />

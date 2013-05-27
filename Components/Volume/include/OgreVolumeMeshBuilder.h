@@ -39,7 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    /** Leightweight struct to represent a mesh vertex.
+    /** Lightweight struct to represent a mesh vertex.
     */
     typedef struct _OgreVolumeExport Vertex
     {
@@ -61,7 +61,7 @@ namespace Volume {
         /// Z component of the normal
         Real nZ;
 
-        /** Convinience constructor.
+        /** Convenience constructor.
         @param v
             The vertex position.
         @param n
@@ -72,9 +72,12 @@ namespace Volume {
             nX(n.x), nY(n.y), nZ(n.z)
         {
         }
+        Vertex()
+        {
+        }
     } Vertex;
 
-    /** Leightweight triangle.
+    /** Lightweight triangle.
     */
     typedef struct _OgreVolumeExport Triangle
     {
@@ -87,7 +90,7 @@ namespace Volume {
         /// The third triangle corner.
         const Vertex mV2;
         
-        /** Convinience constructor.
+        /** Convenience constructor.
         @param v0
             The first vertex of the triangle.
         @param n0
@@ -144,8 +147,12 @@ namespace Volume {
             Contains the vertices of the triangles.
         @param indices
             Contains the indices of the triangles.
+        @param level
+            The LOD level of this mesh.
+        @param inProcess
+            The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        virtual void trianglesReady(const VecVertex &vertices, const VecIndices &indices) = 0;
+        virtual void ready(const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
     };
 
     /** Class to build up a mesh with vertices and indices.
@@ -340,8 +347,12 @@ namespace Volume {
         /** Executes a MeshBuilderCallback on this instance.
          @param callback
             The callback to execute.
+        @param level
+            The LOD level of this mesh.
+        @param inProcess
+            The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        void executeCallback(MeshBuilderCallback *callback) const;
+        void executeCallback(MeshBuilderCallback *callback, size_t level, int inProcess) const;
 
     };
 }

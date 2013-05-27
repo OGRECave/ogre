@@ -1,6 +1,4 @@
-#version 100
-precision mediump int;
-precision mediump float;
+#version 150
 
 uniform vec4 lightDiffuse;
 uniform vec4 scaleBias;

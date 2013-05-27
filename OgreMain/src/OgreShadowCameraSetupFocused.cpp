@@ -611,7 +611,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------	
 	void FocusedShadowCameraSetup::PointListBody::addPoint(const Vector3& point)
 	{
-		// dont check for doubles, simply add
+		// don't check for doubles, simply add
 		mBodyPoints.push_back(point);
 
 		// update AAB

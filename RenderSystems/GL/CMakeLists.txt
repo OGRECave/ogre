@@ -254,7 +254,7 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_framework(RenderSystem_GL)

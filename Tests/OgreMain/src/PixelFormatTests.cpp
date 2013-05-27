@@ -39,7 +39,7 @@ void PixelFormatTests::setUp()
     temp2 = new uint8[size];
     // Generate reproducible random data
     srand(0);
-    for(unsigned int x=0; x<size; x++)
+    for(unsigned int x=0; x<(unsigned int)size; x++)
         randomData[x] = (uint8)rand();
 }
 

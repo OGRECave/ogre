@@ -450,7 +450,7 @@ namespace Ogre {
             This method translates the node by a vector which is relative to
             a custom set of axes.
         @param axes
-            A 3x3 Matrix containg 3 column vectors each representing the
+            A 3x3 Matrix containing 3 column vectors each representing the
             axes X, Y and Z respectively. In this format the standard cartesian
             axes would be expressed as:
             <pre>
@@ -470,7 +470,7 @@ namespace Ogre {
             This method translates the node by a vector which is relative to
             a custom set of axes.
         @param axes
-            A 3x3 Matrix containg 3 column vectors each representing the
+            A 3x3 Matrix containing 3 column vectors each representing the
             axes X, Y and Z respectively. In this format the standard cartesian
             axes would be expressed as
             <pre>

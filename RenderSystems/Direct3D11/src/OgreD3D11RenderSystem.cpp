@@ -68,6 +68,14 @@ THE SOFTWARE.
 
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
+
+#ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
+#	define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
+#endif
+
+#ifndef D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT
+#	define D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT 1
+#endif
 //---------------------------------------------------------------------
 #include <d3d10.h>
 
@@ -871,7 +879,7 @@ bail:
 				temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
 
 				// In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
-				// match exacly, but in windowed mode we can allow for arbitrary window sized, so we only need
+				// match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
 				// to match the colour values
 				if(fullScreen && (temp == opt->second.currentValue) ||
 				  !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
@@ -1061,6 +1069,8 @@ bail:
 			if(!mUseCustomCapabilities)
 				mCurrentCapabilities = mRealCapabilities;
 
+			fireEvent("RenderSystemCapabilitiesCreated");
+
 			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
 
 		}
@@ -1182,7 +1192,15 @@ bail:
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
 		rsc->setCapability(RSC_TEXTURE_FLOAT);
 
-		rsc->setNumMultiRenderTargets(std::min(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, (int)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
+#ifdef D3D_FEATURE_LEVEL_9_3
+		int numMultiRenderTargets = (mFeatureLevel > D3D_FEATURE_LEVEL_9_3) ? D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT :		// 8
+									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? 4/*D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT*/ :	// 4
+									1/*D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT*/;												// 1
+#else
+        int numMultiRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;		// 8
+#endif
+
+		rsc->setNumMultiRenderTargets(std::min(numMultiRenderTargets, (int)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
 		rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
 		rsc->setCapability(RSC_POINT_SPRITES);
@@ -1211,7 +1229,7 @@ bail:
 		if(caps->getRenderSystemName() != getName())
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Trying to initialize GLRenderSystem from RenderSystemCapabilities that do not support Direct3D11",
+				"Trying to initialize D3D11RenderSystem from RenderSystemCapabilities that do not support Direct3D11",
 				"D3D11RenderSystem::initialiseFromRenderSystemCapabilities");
 		}
 		
@@ -1734,7 +1752,7 @@ bail:
 	{
 		static D3D11TexturePtr dt;
 		dt = tex;
-		if (enabled && dt->getSize() > 0)
+		if (enabled && !dt.isNull() && dt->getSize() > 0)
 		{
 			// note used
 			dt->touch();
@@ -1875,6 +1893,8 @@ bail:
 	void D3D11RenderSystem::_setCullingMode( CullingMode mode )
 	{
 		mCullingMode = mode;
+
+		// TODO: invert culling mode based on mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
 		mRasterizerDesc.CullMode = D3D11Mappings::get(mode);
 	}
 	//---------------------------------------------------------------------
@@ -1888,7 +1908,6 @@ bail:
 	void D3D11RenderSystem::_setDepthBufferCheckEnabled( bool enabled )
 	{
 		mDepthStencilDesc.DepthEnable = enabled;
-		//mRasterizerDesc.DepthClipEnable = enabled;
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setDepthBufferWriteEnabled( bool enabled )
@@ -1951,6 +1970,8 @@ bail:
         StencilOperation depthFailOp, StencilOperation passOp, 
         bool twoSidedOperation)
     {
+		bool flip = false; // TODO: determine from mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
+
 		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
 
@@ -1958,14 +1979,14 @@ bail:
 		mDepthStencilDesc.StencilReadMask = compareMask;
 		mDepthStencilDesc.StencilWriteMask = writeMask;
 
-		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
-		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
-
-		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp);
-		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp);
-
-		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp);
-		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp);
+		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flip);
+		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, !flip);
+		
+		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flip);
+		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, !flip);
+		
+		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flip);
+		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, !flip);
 
 		if (!twoSidedOperation)
 		{
@@ -2743,7 +2764,7 @@ bail:
                             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                                 "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
                                 "Active OGRE vertex shader name: " + mBoundVertexProgram->getName() +
-                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName() ,
+                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName(),
                                 "D3D11RenderSystem::_render");
 						}
 					}

@@ -92,6 +92,13 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
+        /// Command object for setting matrix packing in column-major order
+        class CmdColumnMajorMatrices : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 		/** Returns the operation type that this geometry program expects to
 			receive as input
 		*/
@@ -146,6 +153,11 @@ namespace Ogre {
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
+        /** Sets whether matrix packing in column-major order. */
+        void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
+        /** Gets whether matrix packed in column-major order. */
+        bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
+
 		/// Overridden from GpuProgram
 		GpuProgramParametersSharedPtr createParameters(void);
 
@@ -155,6 +167,7 @@ namespace Ogre {
 	protected:
 		static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdAttach msCmdAttach;
+        static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
 		static CmdInputOperationType msInputOperationTypeCmd;
 		static CmdOutputOperationType msOutputOperationTypeCmd;
 		static CmdMaxOutputVertices msMaxOutputVerticesCmd;
@@ -203,6 +216,8 @@ namespace Ogre {
 		typedef vector< GLSLProgram* >::type GLSLProgramContainer;
 		typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
 		GLSLProgramContainer mAttachedGLSLPrograms;
+        /// Matrix in column major pack format?
+        bool mColumnMajorMatrices;
     };
 }
 

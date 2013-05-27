@@ -1,18 +1,19 @@
 #version 100
 
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 uniform float inverseShadowmapSize;
 uniform float fixedDepthBias;
 uniform float gradientClamp;
 uniform float gradientScaleBias;
+#if FUZZY_TEST
 uniform float shadowFuzzyWidth;
+#endif
 uniform sampler2D shadowMap;
 
 varying vec4 shadowUV;
-varying vec4 vColor;
-varying vec4 oColour;
+varying vec4 vColour;
 
 void main()
 {
@@ -42,7 +43,7 @@ void main()
 	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
 	float visibility = saturate(1.0 + (finalCenterDepth - shadowUV.z) * shadowFuzzyWidth * shadowUV.w);
 
-	gl_FragColor = vertexColour * visibility;
+	gl_FragColor = vColour * visibility;
 #else
 	// Hard test
 #if PCF
@@ -56,12 +57,13 @@ void main()
 	
 	final *= 0.2;
 
-	gl_FragColor = vec4(oColour.xyz * final, 1.0);
+	gl_FragColor = vec4(vColour.xyz * final, 1.0);
 	
 #else
-	gl_FragColor = (finalCenterDepth > shadowUV.z) ? oColour : vec4(0.0, 0.0, 0.0, 1.0);
+	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vColour : vec4(0.0, 0.0, 0.0, 1.0);
 #endif
 
 #endif
    
+	gl_FragColor = vec4(1.0,1.0,0.0, 1.0);
 }

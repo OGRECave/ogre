@@ -113,6 +113,19 @@ namespace Ogre
 		mChosenDelegate.setNull();
 
 	}
+    //-----------------------------------------------------------------------------
+    size_t UnifiedHighLevelGpuProgram::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += HighLevelGpuProgram::calculateSize();
+
+        // Delegate Names
+		for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
+            memSize += (*i).size() * sizeof(char);
+
+        return memSize;
+    }
     //-----------------------------------------------------------------------
     const String& UnifiedHighLevelGpuProgram::getLanguage(void) const
     {

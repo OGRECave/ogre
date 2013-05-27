@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreGLSLProgram.h"
 
 namespace Ogre {
-
+    namespace GLSL {
 	GLuint GLSLGpuProgram::mVertexShaderCount = 0;
 	GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
 	GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
@@ -186,7 +186,7 @@ namespace Ogre {
 		}
 	}
 
-
+}
 
 }
 

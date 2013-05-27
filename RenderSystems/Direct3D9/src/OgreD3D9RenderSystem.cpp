@@ -417,11 +417,19 @@ namespace Ogre
 			if (mAllowDirectX9Ex && !mIsDirectX9Ex)
 			{
 				SAFE_RELEASE(mD3D);
-				IDirect3D9Ex* d3dEx = NULL;
-				if (S_OK == Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dEx))
+				HMODULE hD3D = LoadLibrary(TEXT("d3d9.dll"));
+				if (hD3D)
 				{
-					mD3D = d3dEx;
-					mIsDirectX9Ex = true;
+					typedef HRESULT (WINAPI *DIRECT3DCREATE9EXFUNCTION)(UINT, IDirect3D9Ex**);
+					DIRECT3DCREATE9EXFUNCTION pfnCreate9Ex = (DIRECT3DCREATE9EXFUNCTION)GetProcAddress(hD3D, "Direct3DCreate9Ex");
+					if (pfnCreate9Ex)
+					{
+						IDirect3D9Ex* d3dEx = NULL;
+						(*pfnCreate9Ex)(D3D_SDK_VERSION, &d3dEx);
+						d3dEx->QueryInterface(__uuidof(IDirect3D9), reinterpret_cast<void **>(&mD3D));
+						mIsDirectX9Ex = true;
+					}
+					FreeLibrary(hD3D);
 				}
 			}
 			if ((mD3D == NULL) || (!mAllowDirectX9Ex && mIsDirectX9Ex))
@@ -2217,7 +2225,7 @@ namespace Ogre
 			{
 				/* FIXME: The actually input texture coordinate dimensions should
 				be determine by texture coordinate vertex element. Now, just trust
-				user supplied texture type matchs texture coordinate vertex element.
+				user supplied texture type matches texture coordinate vertex element.
 				*/
 				if (mTexStageDesc[stage].texType == D3D9Mappings::D3D_TEX_TYPE_NORMAL)
 				{
@@ -3433,7 +3441,7 @@ namespace Ogre
 		   ) 
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to render using the fixed pipeline when it is diabled.",
+				"Attempted to render using the fixed pipeline when it is disabled.",
 				"D3D9RenderSystem::_render");
 		}
 #endif
@@ -4445,6 +4453,9 @@ namespace Ogre
 						// ran out of options, no FSAA
 						fsaa = 0;
 						ok = true;
+
+						*outMultisampleType = D3DMULTISAMPLE_NONE;
+						*outMultisampleQuality = 0;
 					}
 				}
 			}

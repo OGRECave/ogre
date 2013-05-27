@@ -98,7 +98,7 @@ namespace Ogre {
 		rval.data = lrect.pBits;
 	}
 //-----------------------------------------------------------------------------
-	void *D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags)
+	void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
 	{
 		mDevice.clearStoredErrorMessages();
 
@@ -161,7 +161,9 @@ namespace Ogre {
 			break;
 		}
 
-		return pMappedResource.pData;
+		box.data = pMappedResource.pData;
+        box.rowPitch = pMappedResource.RowPitch;
+        box.slicePitch = pMappedResource.DepthPitch;
 	}
 	//-----------------------------------------------------------------------------  
 	void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -195,7 +197,9 @@ namespace Ogre {
 		else if(flags == D3D11_MAP_WRITE_DISCARD)
 			flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-		return _map(mStagingBuffer, flags);
+        PixelBox box;
+        _map(mStagingBuffer, flags, box);
+		return box.data;
 	}
 	//-----------------------------------------------------------------------------  
 	PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
@@ -241,7 +245,7 @@ namespace Ogre {
 			if(mUsage == HBU_STATIC || options == HBL_READ_ONLY || options == HBL_NORMAL || options == HBL_WRITE_ONLY)
 				rval.data = _mapstagingbuffer(flags);
 			else
-				rval.data = _map(mParentTexture->getTextureResource(), flags);
+				_map(mParentTexture->getTextureResource(), flags, rval);
 
 			// calculate the offset in bytes
 			offset = D3D11Mappings::_getSizeInBytes(rval.format, rval.left, rval.front);
@@ -404,8 +408,9 @@ namespace Ogre {
 			if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
 			{
 				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-
-				void *data = _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD);
+                PixelBox box;
+                _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
+				void *data = box.data; 
 
 				memcpy(data, mCurrentLock.data, sizeinbytes);
 
@@ -740,16 +745,18 @@ namespace Ogre {
  
 			if (!isDds)
 			{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
                 // A workaround for a D3D11 bug when running an old feature set without WinRT.
                 // The bug is an internal crash in D3D11 when you call context->GenerateMips.
                 D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+                if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+#else
                 if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
+#endif
                 {
                     _genSoftwareMipmaps(src, buf);
                 }
                 else
-#endif
                 {
                     _genMipmaps();
                 }
@@ -911,9 +918,15 @@ namespace Ogre {
             int elementJump = 1;
             for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
             {
-                mipWidth /= 2;
-                mipHeight /= 2;
-                elementJump *= 2;
+				if(mipHeight > 1)
+				{
+	                mipHeight /= 2;
+				}
+				if(mipWidth > 1)
+				{
+					mipWidth /= 2;
+					elementJump *= 2;
+				}
                 size_t mipImageSize = PixelUtil::getMemorySize(mipWidth, mipHeight, src.getDepth(),
                     mFormat);
 

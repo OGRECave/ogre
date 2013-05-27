@@ -307,6 +307,8 @@ namespace OgreBites
 
             if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
 
+            mLastRun = true;  // assume this is our last run
+
             setup();
 
             if (!mFirstRun) recoverLastSample();
@@ -569,6 +571,10 @@ namespace OgreBites
 		}
 #endif
 
+        bool isFirstRun() { return mFirstRun; }
+        void setFirstRun(bool flag) { mFirstRun = flag; }
+        bool isLastRun() { return mLastRun; }
+        void setLastRun(bool flag) { mLastRun = flag; }
 	protected:
 
         /*-----------------------------------------------------------------------------
@@ -709,11 +715,11 @@ namespace OgreBites
 #else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#	if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
-#else
+#	else
 			cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
-#endif
+#	endif
 			Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 			Ogre::String sec, type, arch;
 
@@ -741,70 +747,73 @@ namespace OgreBites
 				}
 			}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-            arch = Ogre::macBundlePath() + "/Contents/Resources/";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            arch = Ogre::macBundlePath() + "/";
-#else
-            arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
-#endif
 
+        const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList("General");
+        arch = genLocs.front()->archive->getName();
+#	if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+#		if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            arch = Ogre::macBundlePath() + "/Contents/Resources/Media";
+#		elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            arch = Ogre::macBundlePath() + "/Media";
+#		else       
+            arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");  
+            arch = Ogre::StringUtil::replaceAll(arch, "media/../../Tests/Media", ""); 
+#		endif
             type = "FileSystem";
             sec = "Popular";
 
             // Add locations for supported shader languages
             if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
             {
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSLES", type, sec);
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
             }
             else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
             {
                 if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
                 {
-                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL150", type, sec);
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
                 }
                 else
                 {
-                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL", type, sec);
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
                 }
 
                 if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl400"))
                 {
-                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/GLSL400", type, sec);
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);
                 }
             }
             else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             {
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/HLSL", type, sec);
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
             }
+#		ifdef OGRE_BUILD_PLUGIN_CG
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
+#		endif
 
-#ifdef OGRE_BUILD_PLUGIN_CG
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/materials/programs/Cg", type, sec);
-#endif
-#endif
-
-#ifdef USE_RTSHADER_SYSTEM
+#		ifdef USE_RTSHADER_SYSTEM
             if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
             {
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSLES", type, sec);
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSLES", type, sec);
             }
             else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
             {
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSL", type, sec);
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL", type, sec);
                 if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
                 {
-                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/GLSL150", type, sec);
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL150", type, sec);
                 }
             }
             else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             {
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/HLSL", type, sec);
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/HLSL", type, sec);
             }
-#ifdef OGRE_BUILD_PLUGIN_CG
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "Media/RTShaderLib/Cg", type, sec);
-#endif
-
-#endif
+#			ifdef OGRE_BUILD_PLUGIN_CG
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/Cg", type, sec);
+#			endif
+#		endif /* USE_RTSHADER_SYSTEM */
+#	endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
+#endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 		}
 
 		/*-----------------------------------------------------------------------------

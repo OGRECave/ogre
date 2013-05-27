@@ -39,6 +39,8 @@ namespace Ogre  {
         {
             case PF_A8:
                 return GL_ALPHA;
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT;
 
 #if GL_OES_texture_half_float && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_FLOAT16_RGB:
@@ -77,9 +79,9 @@ namespace Ogre  {
 #endif                
 #if GL_IMG_texture_compression_pvrtc2 && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC2_2BPP:
-                return GL_COMPRESSED_PVRTC_2BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG;
             case PF_PVRTC2_4BPP:
-                return GL_COMPRESSED_PVRTC_4BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
 #if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
@@ -91,6 +93,7 @@ namespace Ogre  {
             case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
+            case PF_SHORT_RGB:
                 return GL_RGB;
                 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -116,6 +119,7 @@ namespace Ogre  {
             case PF_X8B8G8R8:
 			case PF_R8G8B8A8:
             case PF_A2B10G10R10:
+            case PF_SHORT_RGBA:
                 return GL_RGBA;
 #endif
             case PF_DXT1:
@@ -186,6 +190,8 @@ namespace Ogre  {
     {
         switch (mFormat)
         {
+            case PF_DEPTH:
+                return GL_UNSIGNED_INT;
             case PF_A8:
             case PF_L8:
             case PF_L16:
@@ -197,6 +203,8 @@ namespace Ogre  {
             case PF_B5G6R5:
                 return GL_UNSIGNED_SHORT_5_6_5;
             case PF_A4R4G4B4:
+            case PF_SHORT_RGB:
+            case PF_SHORT_RGBA:
 				return GL_UNSIGNED_SHORT_4_4_4_4;
             case PF_A1R5G5B5:
                 return GL_UNSIGNED_SHORT_5_5_5_1;
@@ -219,6 +227,7 @@ namespace Ogre  {
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
 #endif
+
             case PF_FLOAT16_R:
             case PF_FLOAT16_GR:
             case PF_FLOAT16_RGB:
@@ -298,6 +307,8 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+            case PF_DEPTH:
+                return GL_DEPTH_COMPONENT;
 #if GL_IMG_texture_compression_pvrtc && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC_RGB2:
                 return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -310,9 +321,9 @@ namespace Ogre  {
 #endif
 #if GL_IMG_texture_compression_pvrtc2 && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC2_2BPP:
-                return GL_COMPRESSED_PVRTC_2BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG;
             case PF_PVRTC2_4BPP:
-                return GL_COMPRESSED_PVRTC_4BPPV2_IMG;
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
 #if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
@@ -435,6 +446,7 @@ namespace Ogre  {
             case PF_B8G8R8A8:
             case PF_A1R5G5B5:
             case PF_A4R4G4B4:
+            case PF_SHORT_RGBA:
                 return GL_RGBA;
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
@@ -444,6 +456,7 @@ namespace Ogre  {
             case PF_X8R8G8B8:
             case PF_R8G8B8:
             case PF_B8G8R8:
+            case PF_SHORT_RGB:
                 return GL_RGB;
             case PF_FLOAT32_RGBA:
             case PF_A2R10G10B10:
@@ -452,8 +465,6 @@ namespace Ogre  {
 
             case PF_A4L4:
             case PF_R3G3B2:
-            case PF_SHORT_RGBA:
-            case PF_SHORT_RGB:
             case PF_SHORT_GR:
 			case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
@@ -519,6 +530,8 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+            case GL_DEPTH_COMPONENT:
+                return PF_DEPTH;
 #if GL_IMG_texture_compression_pvrtc
             case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
                 return PF_PVRTC_RGB2;
@@ -531,9 +544,9 @@ namespace Ogre  {
 #endif
 
 #if GL_IMG_texture_compression_pvrtc2
-            case GL_COMPRESSED_PVRTC_2BPPV2_IMG:
+            case GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG:
                 return PF_PVRTC2_2BPP;
-            case GL_COMPRESSED_PVRTC_4BPPV2_IMG:
+            case GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG:
                 return PF_PVRTC2_4BPP;
 #endif
 

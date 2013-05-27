@@ -383,7 +383,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
 											mActiveVertexParameters : mActiveFragmentParameters;
 									if(!activeParameters.isNull())
 									{
-										// use param name to get index : use appropriate paramters ptr
+										// use param name to get index : use appropriate parameters ptr
 										const Ogre::GpuConstantDefinition& def = 
 											activeParameters->getConstantDefinition(ActiveShaderDef.ParamName);
 										ActiveShaderDef.PhysicalIndex = def.physicalIndex;

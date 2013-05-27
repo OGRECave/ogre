@@ -63,7 +63,6 @@ namespace Ogre {
             // iOS 4 content scaling
             bool mIsContentScalingSupported;
             float mContentScalingFactor;
-            float mCurrentOSVersion;
 
             EAGL2Support* mGLSupport;
             EAGLES2Context* mContext;
@@ -98,6 +97,7 @@ namespace Ogre {
             void setClosed(bool closed) { mClosed = closed; }
             void swapBuffers(bool waitForVSync);
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+            PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
 
             /**
                @remarks

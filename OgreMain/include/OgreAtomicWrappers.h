@@ -172,22 +172,22 @@ namespace Ogre {
             
         T operator++ (void)
         {
-            __sync_add_and_fetch (&mField, 1);
+            return __sync_add_and_fetch (&mField, 1);
         }
             
         T operator-- (void)
         {
-            __sync_add_and_fetch (&mField, -1);
+            return __sync_add_and_fetch (&mField, -1);
         }
 
         T operator++ (int)
         {
-            __sync_fetch_and_add (&mField, 1);
+            return __sync_fetch_and_add (&mField, 1);
         }
             
         T operator-- (int)
         {
-            __sync_fetch_and_add (&mField, -1);
+            return __sync_fetch_and_add (&mField, -1);
         }
 
 		T operator+=(const T &add)
@@ -278,7 +278,7 @@ namespace Ogre {
         T operator++ (void)
         {
             if (sizeof(T)==2) {
-                return InterlockedIncrement16((SHORT*)&mField);
+                return _InterlockedIncrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField);
             } else if (sizeof(T)==8) {
@@ -291,7 +291,7 @@ namespace Ogre {
         T operator-- (void)
         {
             if (sizeof(T)==2) {
-                return InterlockedDecrement16((SHORT*)&mField);
+                return _InterlockedDecrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField);
             } else if (sizeof(T)==8) {
@@ -304,7 +304,7 @@ namespace Ogre {
         T operator++ (int)
         {
             if (sizeof(T)==2) {
-                return InterlockedIncrement16((SHORT*)&mField)-1;
+                return _InterlockedIncrement16((SHORT*)&mField)-1;
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField)-1;
             } else if (sizeof(T)==8) {
@@ -317,7 +317,7 @@ namespace Ogre {
         T operator-- (int)
         {
             if (sizeof(T)==2) {
-                return InterlockedDecrement16((SHORT*)&mField)+1;
+                return _InterlockedDecrement16((SHORT*)&mField)+1;
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField)+1;
             } else if (sizeof(T)==8) {

@@ -609,10 +609,16 @@ namespace Ogre {
         const VertexDeclaration::VertexElementList& elems =
             vertexData->vertexDeclaration->getElements();
 
+        // Vertex declaration
+		size += MSTREAM_OVERHEAD_SIZE + elems.size() * (MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5);
+
         VertexDeclaration::VertexElementList::const_iterator i, iend;
         iend = elems.end();
         for (i = elems.begin(); i != iend; ++i)
         {
+            // Vertex element header
+            size += MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5;
+
             const VertexElement& elem = *i;
             // Vertex element
             size += VertexElement::getTypeSize(elem.getType()) * vertexData->vertexCount;

@@ -79,7 +79,7 @@ namespace Ogre
         String mVersion;
 		String mConfigFileName;
 	    bool mQueuedEnd;
-        // In case multiple render windows are created, only once are the resources loaded.
+        /// In case multiple render windows are created, only once are the resources loaded.
         bool mFirstTimePostWindowInit;
 
         // Singletons
@@ -107,8 +107,10 @@ namespace Ogre
 		ResourceBackgroundQueue* mResourceBackgroundQueue;
 		ShadowTextureManager* mShadowTextureManager;
 		RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;
-		ScriptCompilerManager *mCompilerManager;
+        ScriptCompilerManager *mCompilerManager;
         LodStrategyManager *mLodStrategyManager;
+        PMWorker* mPMWorker;
+        PMInjector* mPMInjector;
 
         Timer* mTimer;
         RenderWindow* mAutoWindow;
@@ -175,7 +177,7 @@ namespace Ogre
         */
         void unloadPlugins();
 
-        // Internal method for one-time tasks after first window creation
+        /// Internal method for one-time tasks after first window creation
         void oneTimePostWindowInit(void);
 
         /** Set of registered frame listeners */
@@ -660,7 +662,7 @@ namespace Ogre
         /** Retrieves a pointer to the window that was created automatically
             @remarks
                 When Root is initialised an optional window is created. This
-                method retreives a pointer to that window.
+                method retrieves a pointer to that window.
             @note
                 returns a null pointer when Root has not been initialised with
                 the option of creating a window.

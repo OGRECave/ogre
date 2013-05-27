@@ -38,7 +38,7 @@ THE SOFTWARE.
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
 
-@implementation OgreWindow
+@implementation OgreGL3PlusWindow
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -122,7 +122,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
-        NameValuePairList::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt;
 		
         mIsFullScreen = fullScreen;
 
@@ -247,7 +247,7 @@ namespace Ogre {
         }
         else
         {
-            NameValuePairList::const_iterator param_useNSView_pair(NULL);
+            NameValuePairList::const_iterator param_useNSView_pair;
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
             
             if(param_useNSView_pair != miscParams->end())
@@ -261,8 +261,8 @@ namespace Ogre {
                 NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
             } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreView*");
-                OgreView *view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
+                OgreGL3PlusView *view = (OgreGL3PlusView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             
@@ -285,7 +285,8 @@ namespace Ogre {
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[CocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
-        [mView setWantsBestResolutionOpenGLSurface:YES];
+        if(mContentScalingFactor > 1.0)
+            [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
@@ -321,13 +322,21 @@ namespace Ogre {
 
     unsigned int CocoaWindow::getWidth() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
     }
 
     unsigned int CocoaWindow::getHeight() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
     }
 
@@ -437,15 +446,15 @@ namespace Ogre {
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
-            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
         }
         
-        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data);
+                     format, type, dst.data));
         
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         
         //vertical flip
         {
@@ -638,14 +647,14 @@ namespace Ogre {
         else
             windowRect = NSMakeRect(0.0, 0.0, width, height);
 
-        mWindow = [[OgreWindow alloc] initWithContentRect:windowRect
+        mWindow = [[OgreGL3PlusWindow alloc] initWithContentRect:windowRect
                                               styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
         mWindowTitle = title;
 
-        mView = [[OgreView alloc] initWithGLOSXWindow:this];
+        mView = [[OgreGL3PlusView alloc] initWithGLOSXWindow:this];
 
         _setWindowParameters();
 
@@ -691,7 +700,7 @@ namespace Ogre {
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
                 NSRect backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
-                GLint backingStoreDimensions[2] = { backingRect.size.width, backingRect.size.height };
+                GLint backingStoreDimensions[2] = { static_cast<GLint>(backingRect.size.width), static_cast<GLint>(backingRect.size.height) };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 
@@ -706,7 +715,6 @@ namespace Ogre {
                 [mWindow setContentView:mView];
                 [mWindow setFrameOrigin:NSZeroPoint];
                 [mWindow setLevel:NSMainMenuWindowLevel+1];
-                [NSApp activateIgnoringOtherApps:YES];
                 
                 mWindowOrigin = mWindow.frame.origin;
                 mLeft = mTop = 0;
@@ -737,6 +745,7 @@ namespace Ogre {
             
             // Even though OgreCocoaView doesn't accept first responder, it will get passed onto the next in the chain
             [mWindow makeFirstResponder:mView];
+            [NSApp activateIgnoringOtherApps:YES];
         }
     }
 

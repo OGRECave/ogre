@@ -120,6 +120,7 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("usampler2DMSArray", GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY));
 
         // GL 4.0
+		mTypeEnumMap.insert(StringToEnumMap::value_type("double", GL_DOUBLE));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("dmat2", GL_DOUBLE_MAT2));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("dmat3", GL_DOUBLE_MAT3));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("dmat4", GL_DOUBLE_MAT4));

@@ -53,7 +53,7 @@ namespace Ogre {
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-        // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
+        /// Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
         GLenum getGLTextureTarget(void) const;
 
         GLuint getGLID() const
@@ -94,7 +94,6 @@ namespace Ogre {
 
     private:
         GLuint mTextureID;
-        GLSupport& mGLSupport;
 		
 		/// Vector of pointers to subsurfaces
 		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;

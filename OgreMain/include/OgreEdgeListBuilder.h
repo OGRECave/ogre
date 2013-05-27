@@ -62,9 +62,11 @@ namespace Ogre {
             size_t indexSet; 
             /** The vertex set these vertices came from. */
             size_t vertexSet;
-            size_t vertIndex[3];/// Vertex indexes, relative to the original buffer
-            size_t sharedVertIndex[3]; /// Vertex indexes, relative to a shared vertex buffer with 
-                                        // duplicates eliminated (this buffer is not exposed)
+            /// Vertex indexes, relative to the original buffer
+            size_t vertIndex[3];
+            /** Vertex indexes, relative to a shared vertex buffer with
+                duplicates eliminated (this buffer is not exposed) */
+            size_t sharedVertIndex[3];
 
 			Triangle() :indexSet(0), vertexSet(0) {}
         };
@@ -83,14 +85,14 @@ namespace Ogre {
             bool degenerate;
         };
 
-        // Array of 4D vector of triangle face normal, which is unit vector orthogonal
-        // to the triangles, plus distance from origin.
-        // Use aligned policy here because we are intended to use in SIMD optimised routines .
+        /** Array of 4D vector of triangle face normal, which is unit vector orthogonal
+            to the triangles, plus distance from origin.
+            Use aligned policy here because we are intended to use in SIMD optimised routines. */
         typedef std::vector<Vector4, STLAllocator<Vector4, CategorisedAlignAllocPolicy<MEMCATEGORY_GEOMETRY> > > TriangleFaceNormalList;
 
-        // Working vector used when calculating the silhouette.
-        // Use std::vector<char> instead of std::vector<bool> which might implemented
-        // similar bit-fields causing loss performance.
+        /** Working vector used when calculating the silhouette.
+            Use std::vector<char> instead of std::vector<bool> which might implemented
+            similar bit-fields causing loss performance. */
         typedef vector<char>::type TriangleLightFacingList;
 
         typedef vector<Triangle>::type TriangleList;
@@ -150,7 +152,7 @@ namespace Ogre {
 
 
 
-        // Debugging method
+        /// Debugging method
         void log(Log* log);
         
     };
@@ -205,18 +207,18 @@ namespace Ogre {
 		and the faces hold the detail of the duplicated vertices.
 		*/
         struct CommonVertex {
-            Vector3  position;  // location of point in euclidean space
-	        size_t index;       // place of vertex in common vertex list
-            size_t vertexSet;   // The vertex set this came from
-            size_t indexSet;    // The index set this was referenced (first) from
-            size_t originalIndex; // place of vertex in original vertex set
+            Vector3  position;  /// Location of point in euclidean space
+	        size_t index;       /// Place of vertex in common vertex list
+            size_t vertexSet;   /// The vertex set this came from
+            size_t indexSet;    /// The index set this was referenced (first) from
+            size_t originalIndex; /// Place of vertex in original vertex set
         };
         /** A set of indexed geometry data */
         struct Geometry {
-            size_t vertexSet;           // The vertex data set this geometry data refers to
-            size_t indexSet;            // The index data set this geometry data refers to
-            const IndexData* indexData; // The index information which describes the triangles.
-            RenderOperation::OperationType opType;  // The operation type used to render this geometry
+            size_t vertexSet;           /// The vertex data set this geometry data refers to
+            size_t indexSet;            /// The index data set this geometry data refers to
+            const IndexData* indexData; /// The index information which describes the triangles.
+            RenderOperation::OperationType opType;  /// The operation type used to render this geometry
         };
         /** Comparator for sorting geometries by vertex set */
         struct geometryLess {

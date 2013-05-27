@@ -2971,14 +2971,14 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
+	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index) const
 	{
 		assert(index < mBlendTextureList.size());
 
 		return mBlendTextureList[index];
 	}
 	//---------------------------------------------------------------------
-	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex)
+	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex) const
 	{
 		assert(layerIndex > 0 && layerIndex < mLayers.size());
 		uint8 idx = layerIndex - 1;
@@ -3634,7 +3634,7 @@ namespace Ogre
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
-				PF_BYTE_RGB, TU_STATIC);
+				PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
 			if (mCpuColourMapStorage)
 			{

@@ -91,6 +91,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_SURFACE_SPECULAR_COLOUR,         "surface_specular_colour",          4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SURFACE_EMISSIVE_COLOUR,         "surface_emissive_colour",          4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SURFACE_SHININESS,               "surface_shininess",                1, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_SURFACE_ALPHA_REJECTION_VALUE,   "surface_alpha_rejection_value",    1, ET_REAL, ACDT_NONE),
 
 		AutoConstantDefinition(ACT_LIGHT_COUNT,                   "light_count",                  1, ET_REAL, ACDT_NONE),
 
@@ -247,6 +248,19 @@ namespace Ogre
 		GpuNamedConstantsSerializer ser;
 		ser.importNamedConstants(stream, this);
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuNamedConstants::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        // Buffer size refs
+        memSize += 3 * sizeof(size_t);
+
+        // Tally up constant defs
+        memSize += sizeof(GpuConstantDefinition) * map.size();
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	//  GpuNamedConstantsSerializer methods
 	//---------------------------------------------------------------------
@@ -364,6 +378,21 @@ namespace Ogre
 	{
 
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuSharedParameters::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(float) * mFloatConstants.size();
+        memSize += sizeof(double) * mDoubleConstants.size();
+        memSize += sizeof(int) * mIntConstants.size();
+        memSize += mName.size() * sizeof(char);
+        memSize += sizeof(Any);
+        memSize += sizeof(size_t);
+        memSize += sizeof(unsigned long);
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	void GpuSharedParameters::addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize)
 	{
@@ -631,8 +660,7 @@ namespace Ogre
 
 				// Deal with matrix transposition here!!!
 				// transposition is specific to the dest param set, shared params don't do it
-				if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4 ||
-                                                        e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
+				if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4))
 				{
                     // for each matrix that needs to be transposed and copied,
                     for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
@@ -662,6 +690,49 @@ namespace Ogre
 						for (size_t l = 0; l < iterations; ++l)
 						{
 							memcpy(pDst, pSrc, sizeof(float) * valsPerIteration);
+							pSrc += valsPerIteration;
+							pDst += 4;
+						}
+					}
+				}
+			}
+			else if (e.dstDefinition->isDouble())
+			{
+				const double* pSrc = mSharedParams->getDoublePointer(e.srcDefinition->physicalIndex);
+				double* pDst = mParams->getDoublePointer(e.dstDefinition->physicalIndex);
+
+				// Deal with matrix transposition here!!!
+				// transposition is specific to the dest param set, shared params don't do it
+				if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
+				{
+                    // for each matrix that needs to be transposed and copied,
+                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
+                    {
+                        for (int row = 0; row < 4; ++row)
+                            for (int col = 0; col < 4; ++col)
+                                pDst[row * 4 + col] = pSrc[col * 4 + row];
+                        pSrc += 16;
+                        pDst += 16;
+                    }
+				}
+				else
+				{
+					if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
+					{
+						// simple copy
+						memcpy(pDst, pSrc, sizeof(double) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
+					}
+					else
+					{
+						// target params may be padded to 4 elements, shared params are packed
+						assert(e.dstDefinition->elementSize % 4 == 0);
+						size_t iterations = e.dstDefinition->elementSize / 4
+                        * e.dstDefinition->arraySize;
+                        assert(iterations > 0);
+						size_t valsPerIteration = e.srcDefinition->elementSize;
+						for (size_t l = 0; l < iterations; ++l)
+						{
+							memcpy(pDst, pSrc, sizeof(double) * valsPerIteration);
 							pSrc += valsPerIteration;
 							pDst += 4;
 						}
@@ -746,6 +817,34 @@ namespace Ogre
 		}
 
 	}
+    //-----------------------------------------------------------------------------
+    size_t GpuProgramParameters::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(float) * mFloatConstants.size();
+        memSize += sizeof(double) * mDoubleConstants.size();
+        memSize += sizeof(int) * mIntConstants.size();
+        memSize += sizeof(Any);
+        memSize += sizeof(size_t);
+        memSize += sizeof(bool) * 2;
+        memSize += sizeof(uint16);
+
+        for (AutoConstantList::const_iterator i = mAutoConstants.begin();
+             i != mAutoConstants.end(); ++i)
+        {
+            memSize += sizeof((*i));
+        }
+
+        if(!mFloatLogicalToPhysical.isNull())
+            memSize += mFloatLogicalToPhysical->bufferSize;
+        if(!mDoubleLogicalToPhysical.isNull())
+            memSize += mDoubleLogicalToPhysical->bufferSize;
+        if(!mIntLogicalToPhysical.isNull())
+            memSize += mIntLogicalToPhysical->bufferSize;
+
+        return memSize;
+    }
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::_setNamedConstants(
 		const GpuNamedConstantsPtr& namedConstants)
@@ -1024,6 +1123,7 @@ namespace Ogre
 		case ACT_SURFACE_SPECULAR_COLOUR:
 		case ACT_SURFACE_EMISSIVE_COLOUR:
 		case ACT_SURFACE_SHININESS:
+		case ACT_SURFACE_ALPHA_REJECTION_VALUE:
 		case ACT_CAMERA_POSITION:
 		case ACT_TIME:
 		case ACT_TIME_0_X:
@@ -1260,6 +1360,113 @@ namespace Ogre
 		return indexUse;
 
 	}
+	//---------------------------------------------------------------------
+	GpuLogicalIndexUse* GpuProgramParameters::_getDoubleConstantLogicalIndexUse(
+                   size_t logicalIndex, size_t requestedSize, uint16 variability)
+	{
+		if (mDoubleLogicalToPhysical.isNull())
+			return 0;
+
+		GpuLogicalIndexUse* indexUse = 0;
+		OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex)
+
+        GpuLogicalIndexUseMap::iterator logi = mDoubleLogicalToPhysical->map.find(logicalIndex);
+		if (logi == mDoubleLogicalToPhysical->map.end())
+		{
+			if (requestedSize)
+			{
+				size_t physicalIndex = mDoubleConstants.size();
+
+				// Expand at buffer end
+				mDoubleConstants.insert(mDoubleConstants.end(), requestedSize, 0.0f);
+
+				// Record extended size for future GPU params re-using this information
+				mDoubleLogicalToPhysical->bufferSize = mDoubleConstants.size();
+
+				// low-level programs will not know about mapping ahead of time, so
+				// populate it. Other params objects will be able to just use this
+				// accepted mapping since the constant structure will be the same
+
+				// Set up a mapping for all items in the count
+				size_t currPhys = physicalIndex;
+				size_t count = requestedSize / 4;
+				GpuLogicalIndexUseMap::iterator insertedIterator;
+
+				for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
+				{
+					GpuLogicalIndexUseMap::iterator it =
+                    mDoubleLogicalToPhysical->map.insert(
+                        GpuLogicalIndexUseMap::value_type(
+                          logicalIndex + logicalNum,
+                          GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
+					currPhys += 4;
+
+					if (logicalNum == 0)
+						insertedIterator = it;
+				}
+
+				indexUse = &(insertedIterator->second);
+			}
+			else
+			{
+				// no match & ignore
+				return 0;
+			}
+
+		}
+		else
+		{
+			size_t physicalIndex = logi->second.physicalIndex;
+			indexUse = &(logi->second);
+			// check size
+			if (logi->second.currentSize < requestedSize)
+			{
+				// init buffer entry wasn't big enough; could be a mistake on the part
+				// of the original use, or perhaps a variable length we can't predict
+				// until first actual runtime use e.g. world matrix array
+				size_t insertCount = requestedSize - logi->second.currentSize;
+				DoubleConstantList::iterator insertPos = mDoubleConstants.begin();
+				std::advance(insertPos, physicalIndex);
+				mDoubleConstants.insert(insertPos, insertCount, 0.0f);
+				// shift all physical positions after this one
+				for (GpuLogicalIndexUseMap::iterator i = mDoubleLogicalToPhysical->map.begin();
+                     i != mDoubleLogicalToPhysical->map.end(); ++i)
+				{
+					if (i->second.physicalIndex > physicalIndex)
+						i->second.physicalIndex += insertCount;
+				}
+				mDoubleLogicalToPhysical->bufferSize += insertCount;
+				for (AutoConstantList::iterator i = mAutoConstants.begin();
+                     i != mAutoConstants.end(); ++i)
+				{
+                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
+					if (i->physicalIndex > physicalIndex &&
+						def && def->elementType == ET_REAL)
+					{
+						i->physicalIndex += insertCount;
+					}
+				}
+				if (!mNamedConstants.isNull())
+				{
+					for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
+                         i != mNamedConstants->map.end(); ++i)
+					{
+						if (i->second.isDouble() && i->second.physicalIndex > physicalIndex)
+							i->second.physicalIndex += insertCount;
+					}
+					mNamedConstants->doubleBufferSize += insertCount;
+				}
+                
+				logi->second.currentSize += insertCount;
+			}
+		}
+        
+		if (indexUse)
+			indexUse->variability = variability;
+        
+		return indexUse;
+        
+	}
 	//---------------------------------------------------------------------()
 	GpuLogicalIndexUse* GpuProgramParameters::_getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
 	{
@@ -1375,6 +1582,13 @@ namespace Ogre
 		return indexUse ? indexUse->physicalIndex : 0;
 	}
 	//-----------------------------------------------------------------------------
+	size_t GpuProgramParameters::_getDoubleConstantPhysicalIndex(
+        size_t logicalIndex, size_t requestedSize, uint16 variability)
+	{
+		GpuLogicalIndexUse* indexUse = _getDoubleConstantLogicalIndexUse(logicalIndex, requestedSize, variability);
+		return indexUse ? indexUse->physicalIndex : 0;
+	}
+	//-----------------------------------------------------------------------------
 	size_t GpuProgramParameters::_getIntConstantPhysicalIndex(
 		size_t logicalIndex, size_t requestedSize, uint16 variability)
 	{
@@ -1393,6 +1607,18 @@ namespace Ogre
 		}
 		return std::numeric_limits<size_t>::max();
 
+	}
+	//-----------------------------------------------------------------------------
+	size_t GpuProgramParameters::getDoubleLogicalIndexForPhysicalIndex(size_t physicalIndex)
+	{
+		// perhaps build a reverse map of this sometime (shared in GpuProgram)
+		for (GpuLogicalIndexUseMap::iterator i = mDoubleLogicalToPhysical->map.begin();
+             i != mDoubleLogicalToPhysical->map.end(); ++i)
+		{
+			if (i->second.physicalIndex == physicalIndex)
+				return i->first;
+		}
+		return std::numeric_limits<size_t>::max();
 	}
 	//-----------------------------------------------------------------------------
 	size_t GpuProgramParameters::getIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
@@ -1766,6 +1992,9 @@ namespace Ogre
 					break;
 				case ACT_SURFACE_SHININESS:
 					_writeRawConstant(i->physicalIndex, source->getSurfaceShininess());
+					break;
+				case ACT_SURFACE_ALPHA_REJECTION_VALUE:
+					_writeRawConstant(i->physicalIndex, source->getSurfaceAlphaRejectionValue());
 					break;
 
 				case ACT_CAMERA_POSITION:
@@ -2490,6 +2719,18 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------------
+	const GpuProgramParameters::AutoConstantEntry*
+    GpuProgramParameters::findDoubleAutoConstantEntry(size_t logicalIndex)
+	{
+		if (mDoubleLogicalToPhysical.isNull())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "This is not a low-level parameter parameter object",
+                        "GpuProgramParameters::findDoubleAutoConstantEntry");
+
+		return _findRawAutoConstantEntryDouble(
+              _getDoubleConstantPhysicalIndex(logicalIndex, 0, GPV_GLOBAL));
+	}
+	//---------------------------------------------------------------------------
 	const GpuProgramParameters::AutoConstantEntry* 
 		GpuProgramParameters::findIntAutoConstantEntry(size_t logicalIndex)
 	{
@@ -2541,6 +2782,24 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------------
+	const GpuProgramParameters::AutoConstantEntry*
+    GpuProgramParameters::_findRawAutoConstantEntryDouble(size_t physicalIndex)
+	{
+		for(AutoConstantList::iterator i = mAutoConstants.begin();
+			i != mAutoConstants.end(); ++i)
+		{
+			AutoConstantEntry& ac = *i;
+			// should check that auto is double and not int or float so that physicalIndex
+			// doesn't have any ambiguity
+			// However, all autos are float I think so no need
+			if (ac.physicalIndex == physicalIndex)
+				return &ac;
+		}
+
+		return 0;
+        
+	}
+	//---------------------------------------------------------------------------
 	const GpuProgramParameters::AutoConstantEntry* 
 		GpuProgramParameters::_findRawAutoConstantEntryInt(size_t physicalIndex)
 	{
@@ -2581,6 +2840,13 @@ namespace Ogre
 						memcpy(getFloatPointer(newdef->physicalIndex), 
 							source.getFloatPointer(olddef.physicalIndex),
 							sz * sizeof(float));
+					}
+					else if (newdef->isDouble())
+					{
+
+						memcpy(getDoublePointer(newdef->physicalIndex),
+                               source.getDoublePointer(olddef.physicalIndex),
+                               sz * sizeof(double));
 					}
 					else
 					{

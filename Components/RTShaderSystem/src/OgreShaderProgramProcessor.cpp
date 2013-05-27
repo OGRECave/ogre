@@ -441,10 +441,10 @@ bool ProgramProcessor::mergeParametersByCombination(const MergeCombination& comb
 									MergeParameter* mergedParameter)
 {
 	// Make sure we have enough parameters to combine.
-	if (combination.srcParamterTypeCount[0] > paramsTable[0].size() ||
-		combination.srcParamterTypeCount[1] > paramsTable[1].size() ||
-		combination.srcParamterTypeCount[2] > paramsTable[2].size() ||
-		combination.srcParamterTypeCount[3] > paramsTable[3].size())
+	if (combination.srcParameterTypeCount[0] > paramsTable[0].size() ||
+		combination.srcParameterTypeCount[1] > paramsTable[1].size() ||
+		combination.srcParameterTypeCount[2] > paramsTable[2].size() ||
+		combination.srcParameterTypeCount[3] > paramsTable[3].size())
 	{
 		return false;
 	}
@@ -453,7 +453,7 @@ bool ProgramProcessor::mergeParametersByCombination(const MergeCombination& comb
 	for (int i=0; i < 4; ++i)
 	{
 		ShaderParameterList& curParamList = paramsTable[i];		
-		int srcParameterTypeCount = combination.srcParamterTypeCount[i];
+		int srcParameterTypeCount = combination.srcParameterTypeCount[i];
 		int srcParameterCount = 0;
 
 		while (srcParameterTypeCount > 0)

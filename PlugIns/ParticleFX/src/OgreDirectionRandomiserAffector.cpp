@@ -53,7 +53,7 @@ namespace Ogre {
         if (createParamDictionary("DirectionRandomiserAffector"))
         {
             addBaseParameters();
-            // Add extra paramaters
+            // Add extra parameters
             ParamDictionary* dict = getParamDictionary();
             dict->addParameter(ParameterDef("randomness",
                 "The amount of randomness (chaos) to apply to the particle movement.",

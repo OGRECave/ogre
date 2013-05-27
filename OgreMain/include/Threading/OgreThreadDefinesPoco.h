@@ -60,7 +60,7 @@ THE SOFTWARE
 #define OGRE_THREAD_TYPE Poco::Thread
 #define OGRE_THREAD_CREATE(name, worker) Poco::Thread* name = OGRE_NEW_T(Poco::Thread, MEMCATEGORY_GENERAL)(); name->start(worker); 
 #define OGRE_THREAD_DESTROY(name) OGRE_DELETE_T(name, Thread, MEMCATEGORY_GENERAL)
-#define OGRE_THREAD_HARDWARE_CONCURRENCY 2
+#define OGRE_THREAD_HARDWARE_CONCURRENCY Poco::Environment::processorCount()
 #define OGRE_THREAD_CURRENT_ID (size_t)Poco::Thread::current()
 #define OGRE_THREAD_WORKER_INHERIT : public Poco::Runnable
 // (hardware concurrency is not accessible via POCO atm)

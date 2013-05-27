@@ -30,17 +30,37 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 
 void TerrainTests::setUp()
 {
+    // set up silent logging to not pollute output
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("testTerrain.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
+
 	mRoot = OGRE_NEW Root();
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
 	ConfigFile cf;
-	cf.load("resources" OGRE_LIB_SUFFIX ".cfg");
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+	cf.load("bin/release/resources.cfg");
+#else
+	cf.load("resources.cfg");
+#endif
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();

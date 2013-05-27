@@ -18,6 +18,8 @@ include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
+    ${OGRE_DEPENDENCIES_DIR}
+    ${ENV_OGRE_DEPENDENCIES_DIR}
     "${OGRE_BINARY_DIR}/iOSDependencies"
     "${OGRE_SOURCE_DIR}/iOSDependencies"
     "${OGRE_BINARY_DIR}/../iOSDependencies"
@@ -118,7 +120,10 @@ macro_log_feature(OPENGLES3_FOUND "OpenGL ES 3.x" "Support for the OpenGL ES 2.x
 # Find DirectX
 if(WIN32)
 	find_package(DirectX)
-	macro_log_feature(DirectX_FOUND "DirectX" "Support for the DirectX render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
+	macro_log_feature(DirectX9_FOUND "DirectX9" "Support for the DirectX render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
+	
+	find_package(DirectX11)
+	macro_log_feature(DirectX11_FOUND "DirectX11" "Support for the DirectX11 render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
 endif()
 
 #######################################################################
@@ -142,7 +147,7 @@ endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(Boost_USE_MULTITHREADED OFF)
 endif()
-set(Boost_ADDITIONAL_VERSIONS "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
+set(Boost_ADDITIONAL_VERSIONS "1.54" "1.54.0" "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
 # Components that need linking (NB does not include header-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
@@ -157,8 +162,12 @@ if (NOT Boost_FOUND)
 endif()
 
 if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+    if(Boost_VERSION GREATER 105300)
+        set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
+    else()
         set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
-        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+    endif()
+    find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
@@ -213,6 +222,9 @@ macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" 
 # Find Softimage SDK
 find_package(Softimage)
 macro_log_feature(Softimage_FOUND "Softimage" "Softimage SDK needed for building XSIExporter" FALSE "6.0" "")
+
+find_package(TinyXML)
+macro_log_feature(TINYXML_FOUND "TinyXML" "TinyXML needed for building OgreXMLConverter" FALSE "" "")
 
 #######################################################################
 # Tests

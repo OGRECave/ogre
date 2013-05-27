@@ -12,6 +12,8 @@ if "%COMPILER%" == "vc9" set GENERATOR="Visual Studio 9 2008"
 if "%COMPILER%" == "vc9_x64" set GENERATOR="Visual Studio 9 2008 Win64"
 if "%COMPILER%" == "vc10" set GENERATOR="Visual Studio 10"
 if "%COMPILER%" == "vc10_x64" set GENERATOR="Visual Studio 10 Win64"
+if "%COMPILER%" == "vc11" set GENERATOR="Visual Studio 11"
+if "%COMPILER%" == "vc11_x64" set GENERATOR="Visual Studio 11 Win64"
 
 if %GENERATOR% == "" goto paramErr
 
@@ -92,7 +94,7 @@ echo Done! Test %SDKNAME%.exe and then release
 goto end
 
 :paramErr
-echo Required: Build tool (vc71, vc8, vc8x64, vc9, vc9x64, vc10, vc10x64)
+echo Required: Build tool (vc71, vc8, vc8x64, vc9, vc9x64, vc10, vc10x64, vc11, vc11x64)
 set errorlevel=1
 goto end
 

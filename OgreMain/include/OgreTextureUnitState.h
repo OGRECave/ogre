@@ -560,6 +560,11 @@ namespace Ogre {
         */
         bool getIsAlpha(void) const;
 
+        /// @copydoc Texture::getGamma
+        Real getGamma() const { return mGamma; }
+        /// @copydoc Texture::setGamma
+        void setGamma(Real gamma) { mGamma = gamma; }
+
         /// @copydoc Texture::setHardwareGammaEnabled
         void setHardwareGammaEnabled(bool enabled);
         /// @copydoc Texture::isHardwareGammaEnabled
@@ -567,7 +572,7 @@ namespace Ogre {
 
         /** Gets the index of the set of texture co-ords this layer uses.
         @note
-            Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         unsigned int getTextureCoordSet(void) const;
 
@@ -576,7 +581,7 @@ namespace Ogre {
             Default is 0 for all layers. Only change this if you have provided multiple texture co-ords per
             vertex.
         @note
-            Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         void setTextureCoordSet(unsigned int set);
 
@@ -692,6 +697,9 @@ namespace Ogre {
         /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
         @note
             The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+		@note This is a shortcut method which sets the addressing mode for all
+			coordinates at once; you can also call the more specific method
+			to set the addressing mode per coordinate.
         @note
             This is a shortcut method which sets the addressing mode for all
             coordinates at once; you can also call the more specific method
@@ -919,7 +927,7 @@ namespace Ogre {
             is a 'fish-eye' lens view of a scene, or a 3D cubic environment map which requires 6 textures
             for each side of the inside of a cube. The type depends on what texture you set up - if you use the
             setTextureName method then a 2D fisheye lens texture is required, whereas if you used setCubicTextureName
-            then a cubic environemnt map will be used.
+            then a cubic environment map will be used.
         @par
             This effect works best if the object has lots of gradually changing normals. The texture also
             has to be designed for this effect - see the example spheremap.png included with the sample
@@ -1195,6 +1203,8 @@ namespace Ogre {
         /** Set the texture pointer for a given frame (internal use only!). */
         void _setTexturePtr(const TexturePtr& texptr, size_t frame);
 
+		size_t calculateSize(void) const;
+
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
         */
@@ -1206,11 +1216,11 @@ protected:
 
         /// Duration of animation in seconds.
         Real mAnimDuration;
-        bool mCubic; ///< Is this a series of 6 2D textures to make up a cube?
+        bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
         
         TextureType mTextureType; 
         PixelFormat mDesiredFormat;
-        int mTextureSrcMipmaps; ///< Request number of mipmaps.
+        int mTextureSrcMipmaps; /// Request number of mipmaps.
 
         unsigned int mTextureCoordSetIndex;
         UVWAddressingMode mAddressMode;
@@ -1224,6 +1234,7 @@ protected:
         mutable bool mTextureLoadFailed;
         bool mIsAlpha;
         bool mHwGamma;
+        Real mGamma;
 
         mutable bool mRecalcTexMatrix;
         Real mUMod, mVMod;
@@ -1238,7 +1249,7 @@ protected:
         /// Texture filtering - mipmapping.
         FilterOptions mMipFilter;
 
-		bool			mCompareEnabled;
+		bool mCompareEnabled;
 		CompareFunction mCompareFunc;
 
         /// Texture anisotropy.

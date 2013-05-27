@@ -97,7 +97,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT
 
@@ -108,7 +108,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT
 
@@ -119,7 +119,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION
 
@@ -130,7 +130,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION
 
@@ -141,7 +141,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -152,7 +152,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vp40
+	profiles  vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 

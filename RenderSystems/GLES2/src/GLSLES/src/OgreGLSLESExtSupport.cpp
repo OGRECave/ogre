@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLSLESExtSupport.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre
 {
@@ -46,10 +47,13 @@ namespace Ogre
                 OGRE_CHECK_GL_ERROR(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
-                    glIsProgramPipelineEXT(obj))
+            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
+                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                {
+                    if(glIsProgramPipelineEXT(obj))
+                        OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
+                }
             }
 #endif
             else if(glIsProgram(obj))
@@ -69,10 +73,13 @@ namespace Ogre
                     OGRE_CHECK_GL_ERROR(glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog));
                 }
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
-                        glIsProgramPipelineEXT(obj))
+                else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
-                    OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
+                    OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                    {
+                        if(glIsProgramPipelineEXT(obj))
+                            OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
+                    }
                 }
 #endif
                 else if(glIsProgram(obj))

@@ -70,22 +70,22 @@ set(SOURCE_FILES
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
   set(HEADER_FILES
-      ${HEADER_FILES} 
+      ${HEADER_FILES}
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
       src/StateCacheManager/OgreGLES2UniformCacheImp.h
   )
-  set(SOURCE_FILES 
+  set(SOURCE_FILES
       ${SOURCE_FILES}
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
       src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
   )
 else()
-  set(HEADER_FILES 
-      ${HEADER_FILES} 
+  set(HEADER_FILES
+      ${HEADER_FILES}
       src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
       src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
   )
-  set(SOURCE_FILES 
+  set(SOURCE_FILES
       ${SOURCE_FILES}
       src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
       src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
@@ -118,16 +118,20 @@ set(GLSLES_FILES
 )
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
-  set(GLSLES_FILES 
+  set(GLSLES_FILES
     src/GLSLES/src/OgreGLSLESCgProgram.cpp
     src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
     ${GLSLES_FILES}
   )
 endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
+if(NOT OPENGLES3_FOUND)
+  set(OPENGLES3_INCLUDE_DIR "")
+endif()
+
 # Add system specific settings
 if (OGRE_BUILD_PLATFORM_NACL)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/NaCl/OgreGLES2Util.h
     include/NaCl/OgreNaClGLContext.h
     include/NaCl/OgreNaClGLSupport.h
@@ -141,7 +145,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   include_directories(src/NaCl include/NaCl)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EGL/WIN32/OgreWin32EGLContext.h
     include/EGL/WIN32/OgreWin32EGLSupport.h
     include/EGL/WIN32/OgreWin32EGLRenderTexture.h
@@ -170,7 +174,7 @@ elseif (WIN32)
   endif()
   set(PLATFORM_HEADER_INSTALL "WIN32")
 elseif (ANDROID)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EGL/Android/OgreAndroidEGLContext.h
     include/EGL/Android/OgreAndroidEGLSupport.h
     include/EGL/Android/OgreAndroidEGLWindow.h
@@ -202,7 +206,7 @@ elseif (ANDROID)
   endif()
   set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (APPLE)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/EAGL/OgreEAGLES2Context.h
     include/EAGL/OgreEAGL2Support.h
     include/EAGL/OgreEAGL2View.h
@@ -269,7 +273,7 @@ if (NOT OGRE_STATIC)
 endif ()
 
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GLES2 ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GLES2 ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_plugin(RenderSystem_GLES2)

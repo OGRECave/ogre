@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 
 namespace Ogre {
+    namespace GLSL {
 
 	//  a  builtin				custom attrib name
 	// ----------------------------------------------
@@ -497,7 +498,7 @@ namespace Ogre {
                             foundAttr = true;
                         }
 					}
-                    // Find the position of the next occurance if needed
+                    // Find the position of the next occurrence if needed
                     pos = vpSource.find(a.name, pos + a.name.length());
 				}
 			}
@@ -603,4 +604,5 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+} // namespace GLSL
 } // namespace Ogre

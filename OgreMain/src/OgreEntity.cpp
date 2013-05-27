@@ -434,7 +434,7 @@ namespace Ogre {
             for (i = mSubEntityList.begin(); i != iend; ++i)
             {
                 // Get sub-entity material
-                const MaterialPtr& material = (*i)->mMaterial;
+                const MaterialPtr& material = (*i)->getMaterial();
                 
                 // Get material lod strategy
                 const LodStrategy *materialStrategy = material->getLodStrategy();
@@ -2073,7 +2073,7 @@ namespace Ogre {
             (normalsAlso && mSoftwareAnimationNormalsRequests == 0))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Attempt to remove nonexistant request.",
+                        "Attempt to remove nonexistent request.",
                         "Entity::removeSoftwareAnimationRequest");
         }
         mSoftwareAnimationRequests--;

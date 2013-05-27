@@ -114,11 +114,6 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
 		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
 	  endif ()
-	elseif(APPLE)
-        install(FILES
-          ${OGRE_DEP_DIR}/lib/$(PLATFORM_NAME)/$(CONFIGURATION)/libOIS.a
-          DESTINATION lib/$(PLATFORM_NAME)/$(CONFIGURATION)
-        )
 	endif ()
 	  endif ()
     
@@ -154,19 +149,10 @@ if (OGRE_INSTALL_DEPENDENCIES)
       install_debug(libGLESv2.dll)
 	  install_release(libEGL.dll)
     endif ()
-  elseif(APPLE)
-    # copy the dependency libs to the right places
-    install_debug(libOIS.a)
-    install_release(libOIS.a)
-
-    if (OGRE_BUILD_PLUGIN_CG)
-      install_debug(Cg.framework)
-      install_release(Cg.framework)
-    endif ()
   endif ()
   
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
-  if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND)
     # headers (try to exclude things we don't need)
     install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost"
       PATTERN "accumulators" EXCLUDE
@@ -281,16 +267,6 @@ if (OGRE_COPY_DEPENDENCIES)
       copy_debug(libGLESv2.dll)
       copy_release(libEGL.dll)
       copy_release(libGLESv2.dll)
-    endif ()
-
-  elseif(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    # copy the required libs and frameworks to the build directory (configure_file is the only copy-like op I found in CMake)
-    copy_debug(libOIS.a)
-    copy_release(libOIS.a)
-
-    if (OGRE_BUILD_PLUGIN_CG)
-      copy_debug(Cg.framework)
-      copy_release(Cg.framework)
     endif ()
   endif ()
 

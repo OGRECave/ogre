@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
+    namespace GLSL {
 
     //-----------------------------------------------------------------------
 	GLSLProgram::CmdPreprocessorDefines GLSLProgram::msCmdPreprocessorDefines;
@@ -160,6 +161,10 @@ namespace Ogre {
 			case GPT_GEOMETRY_PROGRAM:
 				shaderType = GL_GEOMETRY_SHADER_EXT;
 				break;
+            case GPT_COMPUTE_PROGRAM:
+            case GPT_DOMAIN_PROGRAM:
+            case GPT_HULL_PROGRAM:
+                break;
 			}
 			mGLHandle = glCreateShaderObjectARB(shaderType);
 		}
@@ -519,5 +524,5 @@ namespace Ogre {
 		t->setMaxOutputVertices(StringConverter::parseInt(val));
 	}
 
-  
+}
 }

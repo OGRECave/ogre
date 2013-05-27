@@ -387,13 +387,13 @@ namespace Ogre
 		/// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
 		 	
-		/// fires a device releated event
+		/// Fires a device related event
 		void fireDeviceEvent( D3D9Device* device, const String & name );
 
 		/// Returns how multihead should be activated
 		MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
 	protected:	
-		///returns the sampler id for a given unit texture number
+		/// Returns the sampler id for a given unit texture number
 		DWORD getSamplerId(size_t unit);
 
 		/// Notify when a device has been lost.

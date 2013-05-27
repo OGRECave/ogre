@@ -65,7 +65,7 @@ namespace Ogre {
     {
     protected:
 
-        // World geometry
+        /// World geometry
         BspLevelPtr mLevel;
 
         // State variables for rendering WIP
@@ -146,7 +146,7 @@ namespace Ogre {
 
         const BspLevelPtr& getLevel(void) {return mLevel; }
 
-        /** Overriden from SceneManager. */
+        /** Overridden from SceneManager. */
         void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, 
 			bool onlyShadowCasters);
 

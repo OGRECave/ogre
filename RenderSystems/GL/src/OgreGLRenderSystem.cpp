@@ -830,7 +830,7 @@ namespace Ogre {
 		if(caps->isShaderProfileSupported("glsl"))
 		{
 			// NFZ - check for GLSL vertex and fragment shader support successful
-			mGLSLProgramFactory = new GLSLProgramFactory();
+			mGLSLProgramFactory = new GLSL::GLSLProgramFactory();
 			HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLProgramFactory);
 			LogManager::getSingleton().logMessage("GLSL support detected");
 		}
@@ -1962,7 +1962,10 @@ namespace Ogre {
 		else
 		{
 			glEnable(GL_BLEND);
-			glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+			if(GLEW_VERSION_1_4)
+				glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+			else if(GLEW_EXT_blend_func_separate)
+				glBlendFuncSeparateEXT(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
 		}
 
 		GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
@@ -3163,6 +3166,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				mCurrentGeometryProgram = glprg;
 			}
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 
 		// Bind the program
@@ -3220,6 +3227,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			mActiveFragmentGpuProgramParameters = params;
 			mCurrentFragmentProgram->bindProgramParameters(params, mask);
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3236,6 +3247,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		case GPT_FRAGMENT_PROGRAM:
 			mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 	}
 	//---------------------------------------------------------------------

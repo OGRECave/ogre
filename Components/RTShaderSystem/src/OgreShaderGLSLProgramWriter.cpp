@@ -205,7 +205,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
 
 			// Local string stream
-			std::stringstream localOs;
+			StringStream localOs;
 
 			// Write function name			
 			localOs << "\t" << pFuncInvoc->getFunctionName() << "(";

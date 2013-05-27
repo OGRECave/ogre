@@ -219,7 +219,7 @@ Default: only_initial off@*@*
 
 @anchor{visibility_mask}
 @subheading visibility_mask
-Sets the visibility mask for any render_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to SceneManager::setVisibilityMask.
+Sets the visibility mask for any render_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Viewport::setVisibilityMask.
 Format: visibility_mask <mask>@*@*
 Default: visibility_mask 4294967295@*@*
 

@@ -75,10 +75,10 @@ namespace Ogre
     protected:
         GpuProgramType mType;
 		Pass* mParent;
-        // The program link
+        /// The program link
         GpuProgramPtr mProgram;
 
-        /// program parameters
+        /// Program parameters
         GpuProgramParametersSharedPtr mParameters;
 		
 		/// Whether to recreate parameters next load
@@ -137,6 +137,8 @@ namespace Ogre
         void _load(void);
         /// Unload this usage 
         void _unload(void);
+
+        size_t calculateSize(void) const;
 
 		// Resource Listener
 		void unloadingComplete(Resource* prog);

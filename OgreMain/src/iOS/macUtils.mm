@@ -40,7 +40,7 @@ namespace Ogre {
         return NULL;
     }
 
-    std::string macTempFileName()
+    String macTempFileName()
     {
         NSString *tempFilePath;
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -50,10 +50,10 @@ namespace Ogre {
             if (![fileManager fileExistsAtPath:tempFilePath])
                 break;
         }
-        return std::string([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
+        return String([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
     }
 
-    std::string macBundlePath()
+    String macBundlePath()
     {
         char path[PATH_MAX];
         CFBundleRef mainBundle = CFBundleGetMainBundle();
@@ -70,18 +70,18 @@ namespace Ogre {
         CFRelease(mainBundleURL);
         CFRelease(cfStringRef);
         
-        return std::string(path);
+        return String(path);
     }
     
-    std::string iOSDocumentsDirectory()
+    String iOSDocumentsDirectory()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         
-        return std::string([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
+        return String([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
     }
 
-    std::string macCachePath()
+    String macCachePath()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];

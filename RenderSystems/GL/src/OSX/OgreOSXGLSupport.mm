@@ -427,7 +427,7 @@ void* OSXGLSupport::getProcAddress( const char* name )
     void *symbol;
     symbol = NULL;
     
-    std::string fullPath = macPluginPath() + "RenderSystem_GL.dylib";
+    String fullPath = macPluginPath() + "RenderSystem_GL.dylib";
     void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if(handle) {
         symbol = dlsym (handle, name);

@@ -190,6 +190,7 @@ static const size_t depthBits[] =
         // Detach and destroy
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
+
         if (depthRB)
             glDeleteRenderbuffersEXT(1, &depthRB);
         if (stencilRB)
@@ -335,6 +336,20 @@ static const size_t depthBits[] =
                                 mode.depth = depth;
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
+                            }
+                            else
+                            {
+                                // There is a small edge case that FBO is trashed during the test
+                                // on some drivers resulting in undefined behavior
+                                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); 
+                                glDeleteFramebuffersEXT(1, &fb);
+
+                                // Workaround for NVIDIA / Linux 169.21 driver problem
+                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                glFinish();
+
+                                glGenFramebuffersEXT(1, &fb); 
+                                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
                             }
                         }
                     }
