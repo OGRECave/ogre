@@ -193,16 +193,22 @@ namespace Ogre {
 			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
+            if(getGLSupport()->checkExtension("GL_EXT_debug_label"))
+            {
+               OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                    glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
+            }
 #endif
 
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                    glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
+                if(getGLSupport()->checkExtension("GL_EXT_debug_label"))
+                {
+                    OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
+                }
 #endif
             }
 		}
