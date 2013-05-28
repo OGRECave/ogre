@@ -62,19 +62,19 @@ namespace Ogre {
 
         T get (void) const
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return mField;
         }
 
         void set (const T &v)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             mField = v;
         }
 
         bool cas (const T &old, const T &nu)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             if (mField != old) return false;
             mField = nu;
             return true;
@@ -82,39 +82,39 @@ namespace Ogre {
 
         T operator++ (void)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return ++mField;
         }
 
         T operator++ (int)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return mField++;
         }
 
         T operator-- (int)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return mField--;
         }
 
 		T operator+=(const T &add)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mField += add;
 			return mField;
 		}
 
 		T operator-=(const T &sub)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mField -= sub;
 			return mField;
 		}
 
         protected:
 
-        OGRE_AUTO_MUTEX
+                OGRE_AUTO_MUTEX;
 
         volatile T mField;
 
@@ -392,7 +392,7 @@ namespace Ogre {
 
         void operator= (const AtomicScalar<T> &cousin)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             mField = cousin.mField;
         }
 
@@ -406,13 +406,13 @@ namespace Ogre {
 
         void set (const T &v)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             mField = v;
         }
 
         bool cas (const T &old, const T &nu)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             if (mField != old) return false;
             mField = nu;
             return true;
@@ -420,45 +420,45 @@ namespace Ogre {
 
         T operator++ (void)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return ++mField;
         }
 
         T operator-- (void)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return --mField;
         }
 
         T operator++ (int)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return mField++;
         }
 
         T operator-- (int)
         {
-            OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
             return mField--;
         }
 
 		T operator+=(const T &add)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mField += add;
 			return mField;
 		}
 
 		T operator-=(const T &sub)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mField -= sub;
 			return mField;
 		}
 
         protected:
 
-        OGRE_AUTO_MUTEX
+                OGRE_AUTO_MUTEX;
 
         volatile T mField;
 

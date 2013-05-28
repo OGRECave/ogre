@@ -162,7 +162,7 @@ namespace Ogre {
     class _OgreExport StringInterface 
     {
     private:
-		OGRE_STATIC_MUTEX( msDictionaryMutex )
+        OGRE_STATIC_MUTEX( msDictionaryMutex );
 
         /// Dictionary of parameters
         static ParamDictionaryMap msDictionary;
@@ -184,7 +184,7 @@ namespace Ogre {
         */
         bool createParamDictionary(const String& className)
         {
-			OGRE_LOCK_MUTEX( msDictionaryMutex )
+            OGRE_LOCK_MUTEX( msDictionaryMutex );
 
 			ParamDictionaryMap::iterator it = msDictionary.find(className);
 

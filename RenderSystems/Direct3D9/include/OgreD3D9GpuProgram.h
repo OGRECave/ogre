@@ -179,8 +179,8 @@ namespace Ogre {
         D3D9GpuProgramPtr(const ResourcePtr& r) : SharedPtr<D3D9GpuProgram>()
         {
 			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
             pRep = static_cast<D3D9GpuProgram*>(r.getPointer());
             pUseCount = r.useCountPointer();
             if (pUseCount)
@@ -196,8 +196,8 @@ namespace Ogre {
                 return *this;
             release();
 			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
             pRep = static_cast<D3D9GpuProgram*>(r.getPointer());
             pUseCount = r.useCountPointer();
             if (pUseCount)

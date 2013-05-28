@@ -1091,7 +1091,7 @@ namespace Ogre {
 			{
 				const VisibleObjectsBoundsInfo& info = 
 					mCurrentSceneManager->getVisibleObjectsBoundsInfo(
-						(Camera*)mCurrentTextureProjector[index]);
+						(const Camera*)mCurrentTextureProjector[index]);
 
 				Real depthRange = info.maxDistanceInFrustum - info.minDistanceInFrustum;
 				if (depthRange > std::numeric_limits<Real>::epsilon())

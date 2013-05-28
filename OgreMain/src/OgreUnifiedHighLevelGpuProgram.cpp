@@ -63,7 +63,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgram::chooseDelegate() const
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		mChosenDelegate.setNull();
 
@@ -96,7 +96,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgram::addDelegateProgram(const String& name)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		mDelegateNames.push_back(name);
 
@@ -107,7 +107,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgram::clearDelegatePrograms()
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		mDelegateNames.clear();
 		mChosenDelegate.setNull();

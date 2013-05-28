@@ -80,7 +80,7 @@ namespace Ogre
 
 		if (mWorkerRenderSystemAccess)
 		{
-			OGRE_LOCK_MUTEX_NAMED(mInitMutex, initLock)
+                    OGRE_LOCK_MUTEX_NAMED(mInitMutex, initLock);
 			// have to wait until all threads are registered with the render system
 			while (mNumThreadsRegisteredWithRS < mWorkerThreadCount)
 				OGRE_THREAD_WAIT(mInitSync, mInitMutex, initLock);
@@ -95,7 +95,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void DefaultWorkQueue::notifyThreadRegistered()
 	{
-		OGRE_LOCK_MUTEX(mInitMutex)
+            OGRE_LOCK_MUTEX(mInitMutex);
 
 		++mNumThreadsRegisteredWithRS;
 
@@ -122,7 +122,7 @@ namespace Ogre
 		abortAllRequests();
 #if OGRE_THREAD_SUPPORT
 		// wake all threads (they should check shutting down as first thing after wait)
-		OGRE_THREAD_NOTIFY_ALL(mRequestCondition)
+		OGRE_THREAD_NOTIFY_ALL(mRequestCondition);
 
 		// all our threads should have been woken now, so join
 		for (WorkerThreadList::iterator i = mWorkers.begin(); i != mWorkers.end(); ++i)
@@ -148,7 +148,7 @@ namespace Ogre
 	void DefaultWorkQueue::notifyWorkers()
 	{
 		// wake up waiting thread
-		OGRE_THREAD_NOTIFY_ONE(mRequestCondition)
+            OGRE_THREAD_NOTIFY_ONE(mRequestCondition);
 	}
 
 	//---------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace Ogre
 	{
 #if OGRE_THREAD_SUPPORT
 		// Lock; note that OGRE_THREAD_WAIT will free the lock
-		OGRE_LOCK_MUTEX_NAMED(mRequestMutex, queueLock);
+            OGRE_LOCK_MUTEX_NAMED(mRequestMutex, queueLock);
 		if (mRequestQueue.empty())
 		{
 			// frees lock and suspends the thread

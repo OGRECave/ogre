@@ -445,12 +445,13 @@ namespace Ogre {
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
 	struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
 	{
-		OGRE_MUTEX(mutex)
-			/// Map from logical index to physical buffer location
-			GpuLogicalIndexUseMap map;
-		/// Shortcut to know the buffer size needs
-		size_t bufferSize;
-		GpuLogicalBufferStruct() : bufferSize(0) {}
+            OGRE_MUTEX(mutex);
+            
+            /// Map from logical index to physical buffer location
+            GpuLogicalIndexUseMap map;
+            /// Shortcut to know the buffer size needs
+            size_t bufferSize;
+            GpuLogicalBufferStruct() : bufferSize(0) {}
 	};
 	typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
 

@@ -772,7 +772,7 @@ namespace Ogre {
 	protected:
 		String mPrefix;
 		unsigned long long int mNext;
-		OGRE_AUTO_MUTEX
+		OGRE_AUTO_MUTEX;
 	public:
 		NameGenerator(const NameGenerator& rhs)
 			: mPrefix(rhs.mPrefix), mNext(rhs.mNext) {}
@@ -782,7 +782,7 @@ namespace Ogre {
 		/// Generate a new name
 		String generate()
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			StringStream s;
 			s << mPrefix << mNext++;
 			return s.str();
@@ -791,14 +791,14 @@ namespace Ogre {
 		/// Reset the internal counter
 		void reset()
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mNext = 1ULL;
 		}
 
 		/// Manually set the internal counter (use caution)
 		void setNext(unsigned long long int val)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mNext = val;
 		}
 
@@ -806,7 +806,7 @@ namespace Ogre {
 		unsigned long long int getNext() const
 		{
 			// lock even on get because 64-bit may not be atomic read
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			return mNext;
 		}
 
@@ -823,7 +823,7 @@ namespace Ogre {
 	protected:
 		typedef typename list<T>::type ItemList;
 		ItemList mItems;
-		OGRE_AUTO_MUTEX
+		OGRE_AUTO_MUTEX;
 	public:
 		Pool() {} 
 		virtual ~Pool() {}
@@ -833,7 +833,7 @@ namespace Ogre {
 		*/
 		virtual std::pair<bool, T> removeItem()
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			std::pair<bool, T> ret;
 			if (mItems.empty())
 			{
@@ -852,13 +852,13 @@ namespace Ogre {
 		*/
 		virtual void addItem(const T& i)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mItems.push_front(i);
 		}
 		/// Clear the pool
 		virtual void clear()
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			mItems.clear();
 		}
 

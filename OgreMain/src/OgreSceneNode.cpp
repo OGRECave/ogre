@@ -135,7 +135,8 @@ namespace Ogre {
             mObjectsByName.insert(ObjectMap::value_type(obj->getName(), obj));
         assert(insresult.second && "Object was not attached because an object of the "
             "same name was already attached to this node.");
-
+        (void)insresult;
+        
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
     }

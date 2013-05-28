@@ -101,7 +101,7 @@ namespace Ogre {
 		// Scope lock for actual loading
 		try
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			vector<const Image*>::type imagePtrs;
 			imagePtrs.push_back(&img);
 			_loadImages( imagePtrs );

@@ -34,8 +34,8 @@ THE SOFTWARE.
 #endif
 
 #if OGRE_THREAD_SUPPORT
-#define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
-#define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock();
+#define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock()
+#define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock()
 #else
 #define OGRE_LOCK_RECURSIVE_MUTEX(name) 
 #define OGRE_UNLOCK_RECURSIVE_MUTEX(name)
