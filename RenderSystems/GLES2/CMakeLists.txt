@@ -67,6 +67,12 @@ set(SOURCE_FILES
   src/OgreGLES2VertexDeclaration.cpp
 )
 
+if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+  list(APPEND SOURCE_FILES src/gles3w.cpp)
+else()
+  list(APPEND SOURCE_FILES src/gles2w.cpp)
+endif()
+
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
   set(HEADER_FILES

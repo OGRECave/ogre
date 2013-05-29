@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Util.h"
 #include "OgreGLES2StateCacheManager.h"
 
 namespace Ogre {
@@ -134,42 +135,44 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer::lock");
         }
 
-#if GL_OES_mapbuffer || (OGRE_NO_GLES3_SUPPORT == 0)
-        if (!retPtr)
-		{
-            GLenum access = 0;
-			// Use glMapBuffer
-			static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
+        if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
+        {
+            if (!retPtr)
+            {
+                GLenum access = 0;
+                // Use glMapBuffer
+                static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-            if(options == HBL_DISCARD)
-			{
-				// Discard the buffer
-				OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
-                                                 GLES2HardwareBufferManager::getGLUsage(mUsage)));
-			}
-			if (mUsage & HBU_WRITE_ONLY)
-				access = GL_WRITE_ONLY_OES;
+                if(options == HBL_DISCARD)
+                {
+                    // Discard the buffer
+                    OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
+                                                     GLES2HardwareBufferManager::getGLUsage(mUsage)));
+                }
+                if (mUsage & HBU_WRITE_ONLY)
+                    access = GL_WRITE_ONLY_OES;
 
-			void* pBuffer;
+                void* pBuffer;
 #if OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
+                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
 #else
-            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ARRAY_BUFFER, access));
+                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ARRAY_BUFFER, access));
 #endif
 
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
-			}
+                if(pBuffer == 0)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
+                }
+                
+                // return offsetted
+                retPtr = static_cast<void*>(
+                                            static_cast<unsigned char*>(pBuffer) + offset);
+                
+                mLockedToScratch = false;
+            }
+        }
 
-			// return offsetted
-			retPtr = static_cast<void*>(
-				static_cast<unsigned char*>(pBuffer) + offset);
-
-			mLockedToScratch = false;
-		}
-#endif
 		mIsLocked = true;
         return retPtr;
     }
@@ -192,28 +195,31 @@ namespace Ogre {
         }
         else
         {
-#if GL_OES_mapbuffer || (OGRE_NO_GLES3_SUPPORT == 0)
-			static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
+            if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
+            {
+                static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-            if (mUsage & HBU_WRITE_ONLY)
-            {
-                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
+                if (mUsage & HBU_WRITE_ONLY)
+                {
+                    OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
+                }
+#endif
+                GLboolean mapped;
+                OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
+                if(!mapped)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Buffer data corrupted, please reload", 
+                                "GLES2HardwareVertexBuffer::unlock");
+                }
             }
-#endif
-            GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
-			if(!mapped)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Buffer data corrupted, please reload", 
-					"GLES2HardwareVertexBuffer::unlock");
-			}
-#else
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only locking to scratch is supported",
-                        "GLES2HardwareVertexBuffer::unlockImpl");
-#endif
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                            "Only locking to scratch is supported",
+                            "GLES2HardwareVertexBuffer::unlockImpl");
+            }
         }
 
         mIsLocked = false;
