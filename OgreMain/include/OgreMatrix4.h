@@ -78,6 +78,7 @@ namespace Ogre
     class _OgreExport Matrix4
     {
     protected:
+		friend class ArrayMatrix4;
         /// The matrix entries, indexed by [row][col].
         union {
             Real m[4][4];

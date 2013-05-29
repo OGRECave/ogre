@@ -31,6 +31,11 @@ THE SOFTWARE.
 
 #include "OgreString.h"
 
+#if OGRE_CPU == OGRE_CPU_X86
+	#include <xmmintrin.h>
+	#include <emmintrin.h>
+#endif
+
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility push(default)
 #endif
@@ -867,6 +872,74 @@ namespace Ogre {
 	};
 	/** @} */
 	/** @} */
+
+	/** Used for efficient removal in std::vector and std::deque (like an std::list)
+		However it assumes the order of elements in container is not important or
+		something external to the container holds the index of an element in it
+		(but still should be kept deterministically across machines)
+		Basically it swaps the iterator with the last iterator, and pops back
+		Returns the next iterator
+	*/
+	template<typename T>
+	typename T::iterator efficientVectorRemove( T& container, typename T::iterator& iterator )
+	{
+		const size_t idx = iterator - container.begin();
+		*iterator = container.back();
+		container.pop_back();
+
+		return container.begin() + idx;
+	}
+
+#if OGRE_CPU == OGRE_CPU_X86
+	//VS 2012 translates this to a single maxss/maxpd instruction! :)
+	//(plus some memory loading if arguments weren't loaded)
+	inline const float min( const float &left, const float &right )
+	{
+		float retVal;
+		_mm_store_ss( &retVal, _mm_min_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+		return retVal;
+	}
+	inline const float max( const float &left, const float &right )
+	{
+		float retVal;
+		_mm_store_ss( &retVal, _mm_max_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+		return retVal;
+	}
+	inline const double min( const double &left, const double &right )
+	{
+		double retVal;
+		_mm_store_sd( &retVal, _mm_min_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+		return retVal;
+	}
+	inline const double max( const double &left, const double &right )
+	{
+		double retVal;
+		_mm_store_sd( &retVal, _mm_max_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+		return retVal;
+	}
+#else
+	//At least VS 2012 translates this to conditional moves. Using
+	//"const float" instead of "const float&" and becomes a jump
+	inline const float& min( const float &a, const float &b )
+	{
+		return a < b ? a : b;
+	}
+
+	inline const float& max( const float &a, const float &b )
+	{
+		return a > b ? a : b;
+	}
+
+	inline const double& min( const double &a, const double &b )
+	{
+		return a < b ? a : b;
+	}
+
+	inline const double& max( const double &a, const double &b )
+	{
+		return a > b ? a : b;
+	}
+#endif
 }
 
 #include "OgreHeaderSuffix.h"

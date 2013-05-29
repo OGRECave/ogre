@@ -28,6 +28,20 @@ set (HEADER_FILES
   include/OgreArchive.h
   include/OgreArchiveFactory.h
   include/OgreArchiveManager.h
+  include/Math/Array/OgreArrayAabb.h
+  include/Math/Array/OgreArrayConfig.h
+  include/Math/Array/OgreArrayMatrix4.h
+  include/Math/Array/OgreArrayMemoryManager.h
+  include/Math/Array/OgreArraySphere.h
+  include/Math/Array/OgreArrayQuaternion.h
+  include/Math/Array/OgreArrayVector3.h
+  include/Math/Array/OgreBooleanMask.h
+  include/Math/Array/OgreMathlib.h
+  include/Math/Array/OgreNodeMemoryManager.h
+  include/Math/Array/OgreObjectData.h
+  include/Math/Array/OgreObjectMemoryManager.h
+  include/Math/Array/OgreTransform.h
+  include/Math/Simple/OgreAabb.h
   include/OgreAtomicWrappers.h
   include/OgreAutoParamDataSource.h
   include/OgreAxisAlignedBox.h
@@ -94,6 +108,7 @@ set (HEADER_FILES
   include/OgreHeaderSuffix.h
   include/OgreHighLevelGpuProgram.h
   include/OgreHighLevelGpuProgramManager.h
+  include/OgreId.h
   include/OgreImage.h
   include/OgreImageCodec.h
   src/OgreImageResampler.h
@@ -268,6 +283,17 @@ set (SOURCE_FILES
   src/OgreAnimationState.cpp
   src/OgreAnimationTrack.cpp
   src/OgreArchiveManager.cpp
+  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
+  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
+  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
+  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
+  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp
+  src/Math/Array/OgreArrayMemoryManager.cpp
+  src/Math/Array/OgreNodeArrayMemoryManager.cpp
+  src/Math/Array/OgreNodeMemoryManager.cpp
+  src/Math/Array/OgreObjectDataArrayMemoryManager.cpp
+  src/Math/Array/OgreObjectMemoryManager.cpp
+  src/Math/Simple/C/OgreAabb.cpp
   src/OgreAutoParamDataSource.cpp
   src/OgreAxisAlignedBox.cpp
   src/OgreBillboard.cpp

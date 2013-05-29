@@ -125,11 +125,16 @@ namespace Ogre {
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
+	struct Aabb;
     class Angle;
     class Animation;
     class AnimationState;
     class AnimationStateSet;
     class AnimationTrack;
+	class ArrayMatrix4;
+	class ArrayQuaternion;
+	class ArrayVector3;
+	class ArrayMemoryManager;
     class Archive;
     class ArchiveFactory;
     class ArchiveManager;
@@ -210,8 +215,11 @@ namespace Ogre {
     class Node;
 	class NodeAnimationTrack;
 	class NodeKeyFrame;
+	class NodeMemoryManager;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
+	struct ObjectData;
+	class ObjectMemoryManager;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
@@ -297,6 +305,7 @@ namespace Ogre {
     class Texture;
     class TexturePtr;
     class TextureManager;
+	struct Transform;
     class TransformKeyFrame;
 	class Timer;
 	class UserObjectBindings;
