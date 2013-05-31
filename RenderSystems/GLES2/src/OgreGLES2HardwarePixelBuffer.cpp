@@ -156,11 +156,16 @@ namespace Ogre {
         else
         {
             allocateBuffer();
+
             // No scaling or conversion needed
-            scaled = src;
+            scaled = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, src.data);
+
             if (src.format == PF_R8G8B8)
             {
+                size_t srcSize = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), src.format);
                 scaled.format = PF_B8G8R8;
+                scaled.data = new uint8[srcSize];
+                memcpy(scaled.data, src.data, srcSize);
                 PixelUtil::bulkPixelConversion(src, scaled);
             }
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
@@ -617,30 +622,18 @@ namespace Ogre {
         {
             if (data.getWidth() != data.rowPitch)
             {
-#if OGRE_NO_GLES3_SUPPORT == 0
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-#else
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
                             "GLES2TextureBuffer::upload");
-#endif
             }
 
             if (data.getHeight() * data.getWidth() != data.slicePitch)
             {
-#if OGRE_NO_GLES3_SUPPORT == 0
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-#else
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
                             "GLES2TextureBuffer::upload");
-#endif
             }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-            if(data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-#endif
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             buildMipmaps(data);
         }
@@ -648,30 +641,17 @@ namespace Ogre {
         {
             if (data.getWidth() != data.rowPitch)
             {
-#if OGRE_NO_GLES3_SUPPORT == 0
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-#else
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
                             "GLES2TextureBuffer::upload");
-#endif
             }
 
             if (data.getHeight() * data.getWidth() != data.slicePitch)
             {
-#if OGRE_NO_GLES3_SUPPORT == 0
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-#else
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
                             "GLES2TextureBuffer::upload");
-#endif
             }
-
-#if OGRE_NO_GLES3_SUPPORT == 0
-            if(data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-#endif
 
             if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
@@ -690,26 +670,9 @@ namespace Ogre {
                                     GLES2PixelUtil::getGLOriginDataType(data.format),
                                     data.data));
                 break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_3D:
-        		case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexSubImage3D(mFaceTarget,
-                                    mLevel,
-                                    dest.left, dest.top, dest.front,
-                                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                                    GLES2PixelUtil::getGLOriginFormat(data.format),
-                                    GLES2PixelUtil::getGLOriginDataType(data.format),
-                                    data.data));
-                break;
-#endif
             }
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
-#endif
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
@@ -738,23 +701,10 @@ namespace Ogre {
             case GL_TEXTURE_CUBE_MAP:
                 texBinding = GL_TEXTURE_BINDING_CUBE_MAP;
                 break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-            case GL_TEXTURE_3D:
-                texBinding = GL_TEXTURE_BINDING_3D;
-                break;
-#endif
             default:
                 return;
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if(data.getWidth() != data.rowPitch)
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch));
-        if(data.getHeight()*data.getWidth() != data.slicePitch)
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-        if(data.left > 0 || data.top > 0 || data.front > 0)
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-#endif
         if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
             // Standard alignment of 4 is not right
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
@@ -766,6 +716,12 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, tempFBO));
 
+        // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
+        // guaranteed to work on all platforms.
+        int sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
+        PixelBox tempBox = PixelBox(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
+        tempBox.data = new uint8[sizeInBytes];
+
         switch (mTarget)
         {
             case GL_TEXTURE_2D:
@@ -773,27 +729,19 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureID, 0));
                 OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
                 OGRE_CHECK_GL_ERROR(glReadPixels(0, 0, data.getWidth(), data.getHeight(),
-                                                 GLES2PixelUtil::getGLOriginFormat(data.format),
-                                                 GLES2PixelUtil::getGLOriginDataType(data.format), data.data));
+                                                 GL_RGBA,
+                                                 GL_UNSIGNED_BYTE,
+                                                 tempBox.data));
                 break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-//            case GL_TEXTURE_3D:
-//                for (int i = 0; i < desc.depth; i++) {
-//                    OGRE_CHECK_GL_ERROR(glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, mTextureID, mLevel, i));
-//                    OGRE_CHECK_GL_ERROR(glReadPixels(0, 0, data.getWidth(), data.getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pixels + 4 * i * data.getWidth() * data.getHeight()));
-//                }
-//                break;
-#endif
         }
 
-        // Restore defaults
-#if OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, 0));
-#endif
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        PixelUtil::bulkPixelConversion(tempBox, data);
 
+        delete[] (uint8*) tempBox.data;
+        tempBox.data = 0;
+
+        // Restore defaults
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &tempFBO));
     }
