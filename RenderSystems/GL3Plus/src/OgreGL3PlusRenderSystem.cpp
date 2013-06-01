@@ -447,9 +447,6 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
-
-            // Enable microcache
-            mGpuProgramManager->setSaveMicrocodesToCache(true);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
@@ -517,6 +514,12 @@ namespace Ogre {
 
         // Create the texture manager        
         mTextureManager = new GL3PlusTextureManager(*mGLSupport);
+
+        if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
+		{
+            // Enable microcache
+            mGpuProgramManager->setSaveMicrocodesToCache(true);
+		}
 
         mGLInitialised = true;
     }
