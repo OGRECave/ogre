@@ -196,20 +196,6 @@ material Examples/StormySkyBox
 	}
 }
 
-vertex_program	 skyboxShader_vertex	glsl
-{
-source	SkyBoxVp.glsl
-
-}
-
-
-
-fragment_program	skyboxShader_fragment	glsl
-{
-source	SkyBoxFp.glsl
-
-}
-
 material Examples/EarlyMorningSkyBox
 {
 	technique
@@ -218,17 +204,6 @@ material Examples/EarlyMorningSkyBox
 		{
 			lighting off
 			depth_write off
-
-vertex_program_ref	skyboxShader_vertex
-{
-param_named_auto	MVP	worldviewproj_matrix	
-}
-
-fragment_program_ref	skyboxShader_fragment
-{
-param_named	CubeMapTex	int	0
-
-}
 
 			texture_unit
 			{
