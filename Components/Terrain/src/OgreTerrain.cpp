@@ -616,6 +616,7 @@ namespace Ogre
 
 		freeTemporaryResources();
 		freeCPUResources();
+        mLodManager = OGRE_NEW TerrainLodManager( this );
 
 		copyGlobalOptions();
 
