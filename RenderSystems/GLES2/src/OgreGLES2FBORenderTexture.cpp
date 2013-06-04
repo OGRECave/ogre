@@ -191,7 +191,43 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
-    
+
+    void GLES2FBOManager::_createTempFramebuffer(GLuint internalFormat, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid)
+    {
+        // Create and attach framebuffer
+        glGenFramebuffers(1, &fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, fb);
+        if (internalFormat != GL_NONE)
+        {
+            // Create and attach texture
+            glGenTextures(1, &tid);
+            glBindTexture(GL_TEXTURE_2D, tid);
+
+            // Set some default parameters
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+#elif OGRE_NO_GLES3_SUPPORT == 0
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+#endif
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, type, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                   GL_TEXTURE_2D, tid, 0);
+        }
+#if 0//OGRE_NO_GLES3_SUPPORT == 0
+        else
+        {
+            // Draw to nowhere -- stencil/depth only
+            glDrawBuffers(1, GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
+#endif
+    }
+
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
                  false   if this combo is not supported
@@ -293,7 +329,6 @@ namespace Ogre {
     {
         // Try all formats, and report which ones work as target
         GLuint fb, tid;
-        GLenum target = GL_TEXTURE_2D;
 
         for(size_t x=0; x<PF_COUNT; ++x)
         {
@@ -302,6 +337,7 @@ namespace Ogre {
 			// Fetch GL format token
 			GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
             GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             if(internalFormat == GL_NONE)
@@ -315,37 +351,8 @@ namespace Ogre {
                 continue;
 
             // Create and attach framebuffer
-            glGenFramebuffers(1, &fb);
-            glBindFramebuffer(GL_FRAMEBUFFER, fb);
-            if (internalFormat != GL_NONE)
-            {
-				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
+            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
 
-                // Set some default parameters
-#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-#elif OGRE_NO_GLES3_SUPPORT == 0
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-#endif
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-				glTexImage2D(target, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, GLES2PixelUtil::getGLOriginDataType((PixelFormat)x), 0);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                target, tid, 0);
-            }
-#if 0//OGRE_NO_GLES3_SUPPORT == 0
-			else
-			{
-				// Draw to nowhere -- stencil/depth only
-				glDrawBuffers(1, GL_NONE);
-				glReadBuffer(GL_NONE);
-            }
-#endif
             // Check status
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -388,6 +395,19 @@ namespace Ogre {
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
                             }
+                            else
+                            {
+                                // There is a small edge case that FBO is trashed during the test
+                                // on some drivers resulting in undefined behavior
+                                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                                glDeleteFramebuffers(1, &fb);
+
+                                // Workaround for NVIDIA / Linux 169.21 driver problem
+                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                glFinish();
+
+                                _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
+                            }
                         }
                     }
                     else
@@ -402,6 +422,19 @@ namespace Ogre {
                             mode.depth = depth;
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
+                        }
+                        else
+                        {
+                            // There is a small edge case that FBO is trashed during the test
+                            // on some drivers resulting in undefined behavior
+                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                            glDeleteFramebuffers(1, &fb);
+
+                            // Workaround for NVIDIA / Linux 169.21 driver problem
+                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                            glFinish();
+
+                            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
                         }
                     }
                 }
