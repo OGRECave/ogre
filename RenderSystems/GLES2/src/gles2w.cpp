@@ -27,17 +27,33 @@ static void *get_proc(const char *proc)
 	return res;
 }
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
-#include <CoreFoundation/CoreFoundation.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <UIKit/UIDevice.h>
 
 CFBundleRef bundle;
 CFURLRef bundleURL;
 
 static void open_libgl(void)
 {
+    CFStringRef frameworkPath = CFSTR("/System/Library/Frameworks/OpenGLES.framework");
+    NSString *sysVersion = [UIDevice currentDevice].systemVersion;
+    BOOL isSimulator = ([[UIDevice currentDevice].model rangeOfString:@"Simulator"].location != NSNotFound);
+    if(isSimulator)
+    {
+        if([sysVersion isEqualToString:@"6.1"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"6.0"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.0.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"5.1"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"5.0"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.0.sdk/System/Library/Frameworks/OpenGLES.framework");
+    }
+
 	bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                              CFSTR("/System/Library/Frameworks/OpenGLES.framework"),
+                                              frameworkPath,
                                               kCFURLPOSIXPathStyle, true);
-    
+
 	bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
 	assert(bundle != NULL);
 }
@@ -260,7 +276,6 @@ PFNGLVERTEXATTRIB4FPROC gleswVertexAttrib4f;
 PFNGLVERTEXATTRIB4FVPROC gleswVertexAttrib4fv;
 PFNGLVERTEXATTRIBPOINTERPROC gleswVertexAttribPointer;
 PFNGLVIEWPORTPROC gleswViewport;
-
 PFNGLEGLIMAGETARGETTEXTURE2DOESPROC gleswEGLImageTargetTexture2DOES;
 PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC gleswEGLImageTargetRenderbufferStorageOES;
 PFNGLGETPROGRAMBINARYOESPROC gleswGetProgramBinaryOES;
@@ -564,7 +579,6 @@ static void load_procs(void)
 	gleswVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC) get_proc("glVertexAttrib4fv");
 	gleswVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) get_proc("glVertexAttribPointer");
 	gleswViewport = (PFNGLVIEWPORTPROC) get_proc("glViewport");
-
 	gleswEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) get_proc("glEGLImageTargetTexture2DOES");
 	gleswEGLImageTargetRenderbufferStorageOES = (PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) get_proc("glEGLImageTargetRenderbufferStorageOES");
 	gleswGetProgramBinaryOES = (PFNGLGETPROGRAMBINARYOESPROC) get_proc("glGetProgramBinaryOES");
@@ -646,13 +660,6 @@ static void load_procs(void)
 	gleswGetIntegeri_vEXT = (PFNGLGETINTEGERI_VEXTPROC) get_proc("glGetIntegeri_vEXT");
 	gleswMultiDrawArraysEXT = (PFNGLMULTIDRAWARRAYSEXTPROC) get_proc("glMultiDrawArraysEXT");
 	gleswMultiDrawElementsEXT = (PFNGLMULTIDRAWELEMENTSEXTPROC) get_proc("glMultiDrawElementsEXT");
-	gleswGenQueriesEXT = (PFNGLGENQUERIESEXTPROC) get_proc("glGenQueriesEXT");
-	gleswDeleteQueriesEXT = (PFNGLDELETEQUERIESEXTPROC) get_proc("glDeleteQueriesEXT");
-	gleswIsQueryEXT = (PFNGLISQUERYEXTPROC) get_proc("glIsQueryEXT");
-	gleswBeginQueryEXT = (PFNGLBEGINQUERYEXTPROC) get_proc("glBeginQueryEXT");
-	gleswEndQueryEXT = (PFNGLENDQUERYEXTPROC) get_proc("glEndQueryEXT");
-	gleswGetQueryivEXT = (PFNGLGETQUERYIVEXTPROC) get_proc("glGetQueryivEXT");
-	gleswGetQueryObjectuivEXT = (PFNGLGETQUERYOBJECTUIVEXTPROC) get_proc("glGetQueryObjectuivEXT");
 	gleswGetGraphicsResetStatusEXT = (PFNGLGETGRAPHICSRESETSTATUSEXTPROC) get_proc("glGetGraphicsResetStatusEXT");
 	gleswReadnPixelsEXT = (PFNGLREADNPIXELSEXTPROC) get_proc("glReadnPixelsEXT");
 	gleswGetnUniformfvEXT = (PFNGLGETNUNIFORMFVEXTPROC) get_proc("glGetnUniformfvEXT");

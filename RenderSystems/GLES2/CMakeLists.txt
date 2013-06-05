@@ -69,8 +69,14 @@ set(SOURCE_FILES
 
 if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
   list(APPEND SOURCE_FILES src/gles3w.cpp)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set_source_files_properties(src/gles3w.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+  endif()
 else()
   list(APPEND SOURCE_FILES src/gles2w.cpp)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set_source_files_properties(src/gles2w.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+  endif()
 endif()
 
 include_directories(src/StateCacheManager)

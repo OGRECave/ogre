@@ -27,17 +27,33 @@ static void *get_proc(const char *proc)
 	return res;
 }
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
-#include <CoreFoundation/CoreFoundation.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <UIKit/UIDevice.h>
 
 CFBundleRef bundle;
 CFURLRef bundleURL;
 
 static void open_libgl(void)
 {
+    CFStringRef frameworkPath = CFSTR("/System/Library/Frameworks/OpenGLES.framework");
+    NSString *sysVersion = [UIDevice currentDevice].systemVersion;
+    BOOL isSimulator = ([[UIDevice currentDevice].model rangeOfString:@"Simulator"].location != NSNotFound);
+    if(isSimulator)
+    {
+        if([sysVersion isEqualToString:@"6.1"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"6.0"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.0.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"5.1"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/OpenGLES.framework");
+        else if([sysVersion isEqualToString:@"5.0"])
+            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.0.sdk/System/Library/Frameworks/OpenGLES.framework");
+    }
+
 	bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                              CFSTR("/System/Library/Frameworks/OpenGLES.framework"),
+                                              frameworkPath,
                                               kCFURLPOSIXPathStyle, true);
-    
+
 	bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
 	assert(bundle != NULL);
 }
@@ -370,7 +386,6 @@ PFNGLTEXSTORAGE2DPROC gleswTexStorage2D;
 PFNGLTEXSTORAGE3DPROC gleswTexStorage3D;
 PFNGLGETINTERNALFORMATIVPROC gleswGetInternalformativ;
 
-
 static void load_procs(void)
 {
 	gleswActiveTexture = (PFNGLACTIVETEXTUREPROC) get_proc("glActiveTexture");
@@ -619,5 +634,4 @@ static void load_procs(void)
 	gleswTexStorage2D = (PFNGLTEXSTORAGE2DPROC) get_proc("glTexStorage2D");
 	gleswTexStorage3D = (PFNGLTEXSTORAGE3DPROC) get_proc("glTexStorage3D");
 	gleswGetInternalformativ = (PFNGLGETINTERNALFORMATIVPROC) get_proc("glGetInternalformativ");
-
 }
