@@ -253,9 +253,6 @@ typedef void (GL_APIENTRY* PFNGLDRAWBUFFERSINDEXEDEXTPROC) (GLint n, const GLenu
 typedef void (GL_APIENTRY* PFNGLGETINTEGERI_VEXTPROC) (GLenum target, GLuint index, GLint *data);
 typedef void (GL_APIENTRY* PFNGLMULTIDRAWARRAYSEXTPROC) (GLenum, const GLint *, const GLsizei *, GLsizei);
 typedef void (GL_APIENTRY* PFNGLMULTIDRAWELEMENTSEXTPROC) (GLenum, const GLsizei *, GLenum, const GLvoid* *, GLsizei);
-typedef void (GL_APIENTRY* PFNGLDELETEQUERIESEXTPROC) (GLsizei n, const GLuint *ids);
-typedef void (GL_APIENTRY* PFNGLBEGINQUERYEXTPROC) (GLenum target, GLuint id);
-typedef void (GL_APIENTRY* PFNGLGETQUERYIVEXTPROC) (GLenum target, GLenum pname, GLint *params);
 typedef GLenum (GL_APIENTRY* PFNGLGETGRAPHICSRESETSTATUSEXTPROC) (void);
 typedef void (GL_APIENTRY* PFNGLREADNPIXELSEXTPROC) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLsizei bufSize, void *data);
 typedef void (GL_APIENTRY* PFNGLGETNUNIFORMFVEXTPROC) (GLuint program, GLint location, GLsizei bufSize, float *params);
@@ -557,9 +554,6 @@ extern PFNGLDRAWBUFFERSINDEXEDEXTPROC gleswDrawBuffersIndexedEXT;
 extern PFNGLGETINTEGERI_VEXTPROC gleswGetIntegeri_vEXT;
 extern PFNGLMULTIDRAWARRAYSEXTPROC gleswMultiDrawArraysEXT;
 extern PFNGLMULTIDRAWELEMENTSEXTPROC gleswMultiDrawElementsEXT;
-extern PFNGLDELETEQUERIESEXTPROC gleswDeleteQueriesEXT;
-extern PFNGLBEGINQUERYEXTPROC gleswBeginQueryEXT;
-extern PFNGLGETQUERYIVEXTPROC gleswGetQueryivEXT;
 extern PFNGLGETGRAPHICSRESETSTATUSEXTPROC gleswGetGraphicsResetStatusEXT;
 extern PFNGLREADNPIXELSEXTPROC gleswReadnPixelsEXT;
 extern PFNGLGETNUNIFORMFVEXTPROC gleswGetnUniformfvEXT;
@@ -861,9 +855,6 @@ extern PFNGLENDTILINGQCOMPROC gleswEndTilingQCOM;
 #define glGetIntegeri_vEXT		gleswGetIntegeri_vEXT
 #define glMultiDrawArraysEXT		gleswMultiDrawArraysEXT
 #define glMultiDrawElementsEXT		gleswMultiDrawElementsEXT
-#define glDeleteQueriesEXT		gleswDeleteQueriesEXT
-#define glBeginQueryEXT		gleswBeginQueryEXT
-#define glGetQueryivEXT		gleswGetQueryivEXT
 #define glGetGraphicsResetStatusEXT		gleswGetGraphicsResetStatusEXT
 #define glReadnPixelsEXT		gleswReadnPixelsEXT
 #define glGetnUniformfvEXT		gleswGetnUniformfvEXT

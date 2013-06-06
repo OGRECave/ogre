@@ -29,6 +29,24 @@ static void *get_proc(const char *proc)
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIDevice.h>
+#import <string>
+#import <iostream>
+#import <stdio.h>
+
+// Routine to run a system command and retrieve the output.
+// From http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c
+std::string exec(const char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe)) {
+    	if(fgets(buffer, 128, pipe) != NULL)
+    		result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
 
 CFBundleRef bundle;
 CFURLRef bundleURL;
@@ -40,19 +58,26 @@ static void open_libgl(void)
     BOOL isSimulator = ([[UIDevice currentDevice].model rangeOfString:@"Simulator"].location != NSNotFound);
     if(isSimulator)
     {
-        if([sysVersion isEqualToString:@"6.1"])
-            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/System/Library/Frameworks/OpenGLES.framework");
-        else if([sysVersion isEqualToString:@"6.0"])
-            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.0.sdk/System/Library/Frameworks/OpenGLES.framework");
-        else if([sysVersion isEqualToString:@"5.1"])
-            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/OpenGLES.framework");
-        else if([sysVersion isEqualToString:@"5.0"])
-            frameworkPath = CFSTR("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.0.sdk/System/Library/Frameworks/OpenGLES.framework");
+        // Ask where Xcode is installed
+        std::string xcodePath = exec("/usr/bin/xcode-select -print-path");
+
+        // The result contains an end line character. Remove it.
+        size_t pos = xcodePath.find("\n");
+        xcodePath.erase(pos);
+
+        char tempPath[PATH_MAX];
+        sprintf(tempPath,
+                "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.sdk/System/Library/Frameworks/OpenGLES.framework",
+                xcodePath.c_str(),
+                [sysVersion cStringUsingEncoding:NSUTF8StringEncoding]);
+        frameworkPath = CFStringCreateWithCString(kCFAllocatorDefault, tempPath, kCFStringEncodingUTF8);
     }
 
 	bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
                                               frameworkPath,
                                               kCFURLPOSIXPathStyle, true);
+
+    CFRelease(frameworkPath);
 
 	bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
 	assert(bundle != NULL);
