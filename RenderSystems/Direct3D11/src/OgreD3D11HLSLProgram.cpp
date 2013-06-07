@@ -1209,7 +1209,7 @@ namespace Ogre {
             if (def.isFloat())
             {
                 def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
                     mFloatLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -1219,7 +1219,7 @@ namespace Ogre {
             else
             {
                 def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
                     mIntLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));

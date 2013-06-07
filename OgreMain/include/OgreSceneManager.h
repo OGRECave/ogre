@@ -539,8 +539,8 @@ namespace Ogre {
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
 		struct MovableObjectCollection
 		{
-			MovableObjectMap map;
-			OGRE_MUTEX(mutex)
+                    MovableObjectMap map;
+                    OGRE_MUTEX(mutex);
 		};
 		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
 		MovableObjectCollectionMap mMovableObjectCollectionMap;
@@ -556,7 +556,7 @@ namespace Ogre {
 		*/
 		const MovableObjectCollection* getMovableObjectCollection(const String& typeName) const;
 		/// Mutex over the collection of MovableObject types
-		OGRE_MUTEX(mMovableObjectCollectionMapMutex)
+		OGRE_MUTEX(mMovableObjectCollectionMapMutex);
 
         /** Internal method for initialising the render queue.
         @remarks
@@ -636,7 +636,7 @@ namespace Ogre {
         /// Storage of animations, lookup by name
         typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
-		OGRE_MUTEX(mAnimationsListMutex)
+        OGRE_MUTEX(mAnimationsListMutex);
         AnimationStateSet mAnimationStates;
 
 
@@ -1057,7 +1057,7 @@ namespace Ogre {
 			locking required during rendering lower than to make update locks
 			more granular.
 		*/
-		OGRE_MUTEX(sceneGraphMutex)
+        OGRE_MUTEX(sceneGraphMutex);
 
 		/** Return the instance name of this SceneManager. */
 		const String& getName(void) const { return mName; }

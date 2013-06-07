@@ -78,7 +78,7 @@ namespace Ogre {
 	class _OgreExport Resource : public StringInterface, public ResourceAlloc
     {
 	public:
-		OGRE_AUTO_MUTEX // public to allow external locking
+        OGRE_AUTO_MUTEX; // public to allow external locking
 		class Listener
 		{
 		public:
@@ -164,7 +164,7 @@ namespace Ogre {
 
 		typedef set<Listener*>::type ListenerList;
 		ListenerList mListenerList;
-		OGRE_MUTEX(mListenerListMutex)
+		OGRE_MUTEX(mListenerListMutex);
 
 		/** Protected unnamed constructor to prevent default construction. 
 		*/

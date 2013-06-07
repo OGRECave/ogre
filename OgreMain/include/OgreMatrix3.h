@@ -112,10 +112,18 @@ namespace Ogre
 		}
 
         /// Member access, allows use of construct mat[r][c]
-        inline Real* operator[] (size_t iRow) const
-		{
-			return const_cast<Real*>(m[iRow]);
-		}
+        inline const Real* operator[] (size_t iRow) const
+        {
+            return m[iRow];
+        }
+
+        inline Real* operator[] (size_t iRow)
+        {
+            return m[iRow];
+        }
+
+
+
         /*inline operator Real* ()
 		{
 			return (Real*)m[0];

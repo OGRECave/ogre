@@ -43,7 +43,7 @@ namespace Ogre {
     {
         protected:
             char* mScratchBufferPool;
-            OGRE_MUTEX(mScratchMutex)
+            OGRE_MUTEX(mScratchMutex);
             size_t mMapBufferThreshold;
 			GLES2StateCacheManager* mStateCacheManager;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs

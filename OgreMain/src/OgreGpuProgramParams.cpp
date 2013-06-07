@@ -306,8 +306,8 @@ namespace Ogre
 
 		writeFileHeader();
 
-		writeInts(((uint32*)&pConsts->floatBufferSize), 1);
-		writeInts(((uint32*)&pConsts->intBufferSize), 1);
+		writeInts(((const uint32*)&pConsts->floatBufferSize), 1);
+		writeInts(((const uint32*)&pConsts->intBufferSize), 1);
 
 		// simple export of all the named constants, no chunks
 		// name, physical index
@@ -318,12 +318,12 @@ namespace Ogre
 			const GpuConstantDefinition& def = i->second;
 
 			writeString(name);
-			writeInts(((uint32*)&def.physicalIndex), 1);
-			writeInts(((uint32*)&def.logicalIndex), 1);
+			writeInts(((const uint32*)&def.physicalIndex), 1);
+			writeInts(((const uint32*)&def.logicalIndex), 1);
 			uint32 constType = static_cast<uint32>(def.constType);
 			writeInts(&constType, 1);
-			writeInts(((uint32*)&def.elementSize), 1);
-			writeInts(((uint32*)&def.arraySize), 1);		
+			writeInts(((const uint32*)&def.elementSize), 1);
+			writeInts(((const uint32*)&def.arraySize), 1);		
 		}
 
 	}
@@ -1272,7 +1272,7 @@ namespace Ogre
 			return 0;
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
 
 			GpuLogicalIndexUseMap::iterator logi = mFloatLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mFloatLogicalToPhysical->map.end())
@@ -1379,7 +1379,7 @@ namespace Ogre
 			return 0;
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex);
 
         GpuLogicalIndexUseMap::iterator logi = mDoubleLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mDoubleLogicalToPhysical->map.end())
@@ -1487,7 +1487,7 @@ namespace Ogre
 			"GpuProgramParameters::_getIntConstantPhysicalIndex");
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
 
 			GpuLogicalIndexUseMap::iterator logi = mIntLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mIntLogicalToPhysical->map.end())

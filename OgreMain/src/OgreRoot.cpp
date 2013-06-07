@@ -1099,7 +1099,10 @@ namespace Ogre {
         for (PluginLibList::reverse_iterator i = mPluginLibs.rbegin(); i != mPluginLibs.rend(); ++i)
         {
             // Call plugin shutdown
-            DLL_STOP_PLUGIN pFunc = (DLL_STOP_PLUGIN)(*i)->getSymbol("dllStopPlugin");
+            #ifdef __GNUC__
+            __extension__
+            #endif
+            DLL_STOP_PLUGIN pFunc = reinterpret_cast<DLL_STOP_PLUGIN>((*i)->getSymbol("dllStopPlugin"));
 			// this will call uninstallPlugin
             pFunc();
             // Unload library & destroy
@@ -1345,6 +1348,9 @@ namespace Ogre {
 			mPluginLibs.push_back(lib);
 
 			// Call startup function
+                        #ifdef __GNUC__
+                        __extension__
+                        #endif
 			DLL_START_PLUGIN pFunc = (DLL_START_PLUGIN)lib->getSymbol("dllStartPlugin");
 
 			if (!pFunc)
@@ -1367,6 +1373,9 @@ namespace Ogre {
 			if ((*i)->getName() == pluginName)
 			{
 				// Call plugin shutdown
+                                #ifdef __GNUC__
+                                __extension__
+                                #endif
 				DLL_STOP_PLUGIN pFunc = (DLL_STOP_PLUGIN)(*i)->getSymbol("dllStopPlugin");
 				// this must call uninstallPlugin
 				pFunc();
