@@ -2537,7 +2537,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::registerThread()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// This is only valid once we've created the main context
 		if (!mMainContext)
 		{
@@ -2570,7 +2570,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::preExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// free context, we'll need this to share lists
         if(mCurrentContext)
 		mCurrentContext->endCurrent();
@@ -2578,7 +2578,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::postExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// reacquire context
         if(mCurrentContext)
 		mCurrentContext->setCurrent();
