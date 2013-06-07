@@ -81,7 +81,7 @@ namespace Ogre
     {
 		// Lock mutex before allowing this since this is a top-level method
 		// called outside of the load()
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 
         // Make sure param defs are loaded
         GpuProgramParametersSharedPtr params = GpuProgramManager::getSingleton().createParameters();
@@ -100,6 +100,18 @@ namespace Ogre
 			params->copyConstantsFrom(*(mDefaultParams.get()));
         return params;
     }
+    size_t HighLevelGpuProgram::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(bool);
+        if(!mAssemblerProgram.isNull() && (mAssemblerProgram.getPointer() != this) )
+            memSize += mAssemblerProgram->calculateSize();
+
+        memSize += GpuProgram::calculateSize();
+
+        return memSize;
+    }
+
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::loadHighLevel(void)
     {
@@ -198,8 +210,8 @@ namespace Ogre
 		// lock & copy other mutex pointer
         OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
         {
-		    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-		    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
 		    pRep = static_cast<HighLevelGpuProgram*>(r.getPointer());
 		    pUseCount = r.useCountPointer();
 		    if (pUseCount)

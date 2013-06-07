@@ -1,10 +1,8 @@
-
-
 sampler2D Image: register(s0);
 sampler3D Rand: register(s1);
 sampler3D Noise: register(s2);
 
-float4 OldTV_ps(float4 posIn : POSITION , float2 img: TEXCOORD0,
+float4 OldTV_ps(float4 posIn: POSITION, float2 img: TEXCOORD0,
     uniform float distortionFreq: register(c3),
     uniform float distortionScale: register(c4),
     uniform float distortionRoll: register(c5),
@@ -16,17 +14,18 @@ float4 OldTV_ps(float4 posIn : POSITION , float2 img: TEXCOORD0,
     uniform float sin_time_0_X: register(c6)
 
 ) : COLOR {
-
-   float2 pos = abs((img - 0.5) * 2.0) ;
    // Define a frame shape
+   float2 pos = abs((img - 0.5) * 2.0);
    float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);
    float frame = saturate(frameSharpness * (pow(f, frameShape) - frameLimit));
 
    // Interference ... just a texture filled with rand()
-   float4 rand = tex3D(Rand, float3(1.5 * pos, time_0_X)) - 0.2;
+   float4 rand = tex3D(Rand, float3(1.5 * pos, time_0_X));
+   rand -= float4(0.2,0.2,0.2,0.2);
 
    // Some signed noise for the distortion effect
-   float4 noisy = tex3D(Noise, float3(0, 0.5 * pos.y, 0.1 * time_0_X)) - 0.5;
+   float4 noisy = tex3D(Noise, float3(0, 0.5 * pos.y, 0.1 * time_0_X));
+   noisy -= float4(0.5,0.5,0.5,0.5);
 
    // Repeat a 1 - x^2 (0 < x < 1) curve and roll it with sinus.
    float dst = frac(pos.y * distortionFreq + distortionRoll * sin_time_0_X);

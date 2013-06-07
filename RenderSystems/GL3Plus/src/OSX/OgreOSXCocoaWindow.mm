@@ -38,7 +38,7 @@ THE SOFTWARE.
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
 
-@implementation OgreWindow
+@implementation OgreGL3PlusWindow
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -261,8 +261,8 @@ namespace Ogre {
                 NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
             } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreView*");
-                OgreView *view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
+                OgreGL3PlusView *view = (OgreGL3PlusView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             
@@ -285,7 +285,8 @@ namespace Ogre {
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[CocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
-        [mView setWantsBestResolutionOpenGLSurface:YES];
+        if(mContentScalingFactor > 1.0)
+            [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
@@ -321,13 +322,21 @@ namespace Ogre {
 
     unsigned int CocoaWindow::getWidth() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
     }
 
     unsigned int CocoaWindow::getHeight() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
     }
 
@@ -437,15 +446,15 @@ namespace Ogre {
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
-            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
         }
         
-        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data);
+                     format, type, dst.data));
         
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         
         //vertical flip
         {
@@ -638,14 +647,14 @@ namespace Ogre {
         else
             windowRect = NSMakeRect(0.0, 0.0, width, height);
 
-        mWindow = [[OgreWindow alloc] initWithContentRect:windowRect
+        mWindow = [[OgreGL3PlusWindow alloc] initWithContentRect:windowRect
                                               styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
         mWindowTitle = title;
 
-        mView = [[OgreView alloc] initWithGLOSXWindow:this];
+        mView = [[OgreGL3PlusView alloc] initWithGLOSXWindow:this];
 
         _setWindowParameters();
 

@@ -1445,7 +1445,7 @@ namespace Ogre
 		@param index The blend texture index (note: not layer index; derive
 		the texture index from getLayerBlendTextureIndex)
 		*/
-		const TexturePtr& getLayerBlendTexture(uint8 index);
+		const TexturePtr& getLayerBlendTexture(uint8 index) const;
 
 		/** Get the texture index and colour channel of the blend information for 
 			a given layer. 
@@ -1453,7 +1453,7 @@ namespace Ogre
 		@return A pair in which the first value is the texture index, and the 
 			second value is the colour channel (RGBA)
 		*/
-		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex);
+		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex) const;
 
 		/** Request internal implementation options for the terrain material to use, 
 			in this case vertex morphing information. 
@@ -1744,7 +1744,8 @@ namespace Ogre
 		Rect mDirtyGeometryRectForNeighbours;
 		Rect mDirtyLightmapFromNeighboursRect;
 		bool mDerivedDataUpdateInProgress;
-		uint8 mDerivedUpdatePendingMask; // if another update is requested while one is already running
+        /// If another update is requested while one is already running
+		uint8 mDerivedUpdatePendingMask;
 
 		bool mGenerateMaterialInProgress;
 		/// Don't release Height/DeltaData when preparing
@@ -1765,15 +1766,15 @@ namespace Ogre
 		struct DerivedDataResponse
 		{
 			Terrain* terrain;
-			// remaining types not yet processed
+			/// Remaining types not yet processed
 			uint8 remainingTypeMask;
-			// The area of deltas that was updated
+			/// The area of deltas that was updated
 			Rect deltaUpdateRect;
-			// the area of normals that was updated
+			/// The area of normals that was updated
 			Rect normalUpdateRect;
-			// the area of lightmap that was updated
+			/// The area of lightmap that was updated
 			Rect lightmapUpdateRect;
-			// all CPU-side data, independent of textures; to be blitted in main thread
+			/// All CPU-side data, independent of textures; to be blitted in main thread
 			PixelBox* normalMapBox;
 			PixelBox* lightMapBox;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
@@ -1828,7 +1829,7 @@ namespace Ogre
 		Rect mCompositeMapDirtyRect;
 		unsigned long mCompositeMapUpdateCountdown;
 		unsigned long mLastMillis;
-		/// true if the updates included lightmap changes (widen)
+		/// True if the updates included lightmap changes (widen)
 		bool mCompositeMapDirtyRectLightmapUpdate;
 		mutable MaterialPtr mCompositeMapMaterial;
 

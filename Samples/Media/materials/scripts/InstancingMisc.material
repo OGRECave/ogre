@@ -23,7 +23,7 @@ vertex_program Ogre/Instancing/Misc_cg_vs cg
 {
 	source InstancingMisc.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 }

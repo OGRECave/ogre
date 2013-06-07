@@ -745,16 +745,18 @@ namespace Ogre {
  
 			if (!isDds)
 			{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
                 // A workaround for a D3D11 bug when running an old feature set without WinRT.
                 // The bug is an internal crash in D3D11 when you call context->GenerateMips.
                 D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+                if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+#else
                 if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
+#endif
                 {
                     _genSoftwareMipmaps(src, buf);
                 }
                 else
-#endif
                 {
                     _genMipmaps();
                 }
@@ -916,9 +918,15 @@ namespace Ogre {
             int elementJump = 1;
             for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
             {
-                mipWidth /= 2;
-                mipHeight /= 2;
-                elementJump *= 2;
+				if(mipHeight > 1)
+				{
+	                mipHeight /= 2;
+				}
+				if(mipWidth > 1)
+				{
+					mipWidth /= 2;
+					elementJump *= 2;
+				}
                 size_t mipImageSize = PixelUtil::getMemorySize(mipWidth, mipHeight, src.getDepth(),
                     mFormat);
 

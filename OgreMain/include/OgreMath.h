@@ -213,8 +213,8 @@ namespace Ogre
        };
 
     protected:
-       // angle units used by the api
-       static AngleUnit msAngleUnit;
+        /// Angle units used by the api
+        static AngleUnit msAngleUnit;
 
         /// Size of the trig tables as determined by constructor.
         static int mTrigTableSize;
@@ -224,7 +224,7 @@ namespace Ogre
         static Real* mSinTable;
         static Real* mTanTable;
 
-        // A random value provider. overriding the default random number generator.
+        /// A random value provider. overriding the default random number generator.
         static RandomValueProvider* mRandProvider;
 
         /** Private function to build trig tables.

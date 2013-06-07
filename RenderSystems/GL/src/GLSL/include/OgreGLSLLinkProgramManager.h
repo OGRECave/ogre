@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    namespace GLSL {
 
 	/** Ogre assumes that there are separate vertex and fragment programs to deal with but
 		GLSL has one program object that represents the active vertex and fragment shader objects
@@ -139,6 +140,7 @@ namespace Ogre {
 
 	};
 
+    }
 }
 
 #endif // __GLSLLinkProgramManager_H__

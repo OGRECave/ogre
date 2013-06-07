@@ -41,18 +41,18 @@ namespace Ogre {
 		/// Unlock a box
 		void unlockImpl(void);
         
-		// Internal buffer; either on-card or in system memory, freed/allocated on demand
-		// depending on buffer usage
+		/** Internal buffer; either on-card or in system memory, freed/allocated on demand
+         depending on buffer usage */
 		PixelBox mBuffer;
-        GLenum mGLInternalFormat; // GL internal format
+        GLenum mGLInternalFormat; /// GL internal format
 		LockOptions mCurrentLockOptions;
 		
-		// Buffer allocation/freeage
+		/// Buffer allocation/freeage
 		void allocateBuffer();
 		void freeBuffer();
-		// Upload a box of pixels to this buffer on the card
+		/// Upload a box of pixels to this buffer on the card
 		virtual void upload(const PixelBox &data, const Image::Box &dest);
-		// Download a box of pixels from the card
+		/// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
 	public:
         /// Should be called by HardwareBufferManager
@@ -105,7 +105,7 @@ namespace Ogre {
         void copyFromFramebuffer(size_t zoffset);
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
-        // Blitting implementation
+        /// Blitting implementation
         void blitFromTexture(GLTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
     protected:
         // In case this is a texture level
@@ -131,7 +131,7 @@ namespace Ogre {
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
     protected:
-        // In case this is a render buffer
+        /// In case this is a render buffer
         GLuint mRenderbufferID;
     };
 }

@@ -1325,7 +1325,7 @@ namespace Ogre {
 					emitter->setEmitted(true);
 					break;
 				}
-				else
+				else if(emitter)
 				{
 					// Set explicitly to 'false' although the default value is already 'false'
 					emitter->setEmitted(false);

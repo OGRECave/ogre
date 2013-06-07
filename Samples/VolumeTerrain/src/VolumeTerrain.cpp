@@ -36,6 +36,8 @@ using namespace Ogre;
 using namespace OgreBites;
 using namespace Ogre::Volume;
 
+const Real Sample_VolumeTerrain::MOUSE_MODIFIER_TIME_LIMIT = (Real)0.033333;
+
 void Sample_VolumeTerrain::setupContent(void)
 {
     setupControls();
@@ -53,10 +55,8 @@ void Sample_VolumeTerrain::setupContent(void)
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
     mVolumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
-    Source *source;
-    mParameters = mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", &source);
-    mParameters.src = source;
-    
+    mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
+
     // Camera
     mCamera->setPosition((Real)(2560 - 384), (Real)2000, (Real)(2560 - 384));
     mCamera->lookAt((Real)0, (Real)100, (Real)0);
@@ -68,6 +68,7 @@ void Sample_VolumeTerrain::setupContent(void)
 
 void Sample_VolumeTerrain::setupControls(void)
 {
+    mMouseState = 0;
     mTrayMgr->showCursor();
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         setDragLook(true);
@@ -85,8 +86,8 @@ void Sample_VolumeTerrain::setupControls(void)
 
 void Sample_VolumeTerrain::cleanupContent(void)
 {   
+    delete mVolumeRoot->getChunkParameters()->src;
     OGRE_DELETE mVolumeRoot;
-    delete mParameters.src;
     mVolumeRoot = 0;
 }
     
@@ -136,7 +137,8 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
 void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 {
     Vector3 intersection;
-    bool intersects = mParameters.src->getFirstRayIntersection(ray, intersection, mVolumeRoot->getScale());
+    Real scale = mVolumeRoot->getChunkParameters()->scale;
+    bool intersects = mVolumeRoot->getChunkParameters()->src->getFirstRayIntersection(ray, intersection, scale);
     if (intersects)
     {
         Real radius = (Real)2.5;
@@ -151,10 +153,11 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
         {
             operation = new CSGDifferenceSource();
         }
-        static_cast<TextureSource*>(mParameters.src)->combineWithSource(operation, &sphere, intersection, radius * (Real)2.0);
-        mParameters.updateFrom = intersection - radius * (Real)2.0;
-        mParameters.updateTo = intersection + radius * (Real)2.0;
-        mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, &mParameters);
+        static_cast<TextureSource*>(mVolumeRoot->getChunkParameters()->src)->combineWithSource(operation, &sphere, intersection, radius * (Real)2.0);
+        
+        mVolumeRoot->getChunkParameters()->updateFrom = intersection - radius * (Real)2.0;
+        mVolumeRoot->getChunkParameters()->updateTo = intersection + radius * (Real)2.0;
+        mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, mVolumeRoot->getChunkParameters());
         delete operation;
     }
 }
@@ -164,27 +167,78 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 bool Sample_VolumeTerrain::touchPressed(const OIS::MultiTouchEvent& evt)
 {
-    Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
-    shootRay(ray, false);
+    Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
+    Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
+    Ray ray = mCamera->getCameraToViewportRay(x, y);
+    shootRay(ray, true);
 
     return SdkSample::touchPressed(evt);
 }
 
 #else
 
+//-----------------------------------------------------------------------
+
 bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 {
-    if (id == OIS::MB_Middle || id == OIS::MB_Right)
+    if (mMouseState == 0)
     {
-        Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
-        Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
-        Ray ray = mCamera->getCameraToViewportRay(x, y);
-        shootRay(ray, id == OIS::MB_Middle);
+        if (id == OIS::MB_Middle)
+        {
+            mMouseState = 1;
+            mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
+        }
+        if (id == OIS::MB_Right)
+        {
+            mMouseState = 2;
+            mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
+        }
     }
 
     return SdkSample::mousePressed(evt, id);
 }
+
+//-----------------------------------------------------------------------
+
+bool Sample_VolumeTerrain::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+{
+    
+    if (id == OIS::MB_Middle || id == OIS::MB_Right)
+    {
+        mMouseState = 0;
+    }
+
+    return SdkSample::mouseReleased(evt, id);
+}
+
+//-----------------------------------------------------------------------
+
+bool Sample_VolumeTerrain::mouseMoved(const OIS::MouseEvent& evt)
+{
+    mMouseX = (Real)evt.state.X.abs / (Real)evt.state.width;
+    mMouseY = (Real)evt.state.Y.abs / (Real)evt.state.height;
+    return SdkSample::mouseMoved(evt);
+}
+
 #endif
+
+//-----------------------------------------------------------------------
+
+bool Sample_VolumeTerrain::frameRenderingQueued(const Ogre::FrameEvent& evt)
+{
+    if (mMouseState != 0)
+    {
+        mMouseCountdown -= evt.timeSinceLastEvent;
+        if (mMouseCountdown <= (Real)0.0)
+        {
+            mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
+            Ray ray = mCamera->getCameraToViewportRay(mMouseX, mMouseY);
+            shootRay(ray, mMouseState == 1);
+        }
+    }
+    return SdkSample::frameRenderingQueued(evt);
+}
+
 //-----------------------------------------------------------------------
 
 #ifndef OGRE_STATIC_LIB

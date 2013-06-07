@@ -347,6 +347,10 @@ function(ogre_config_sample_common SAMPLENAME)
     endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   endif()
 
+  if (NOT WIN32)
+    set_target_properties(${SAMPLENAME} PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
+  endif()
+
   if (OGRE_INSTALL_SAMPLES)
 	ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
   endif()

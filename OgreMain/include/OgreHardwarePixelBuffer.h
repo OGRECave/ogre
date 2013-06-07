@@ -53,27 +53,24 @@ namespace Ogre {
     class _OgreExport HardwarePixelBuffer : public HardwareBuffer
     {
     protected: 
-        // Extents
+        /// Extents
         size_t mWidth, mHeight, mDepth;
-        // Pitches (offsets between rows and slices)
+        /// Pitches (offsets between rows and slices)
         size_t mRowPitch, mSlicePitch;
-        // Internal format
+        /// Internal format
         PixelFormat mFormat;
-        // Currently locked region (local coords)
+        /// Currently locked region (local coords)
         PixelBox mCurrentLock;
-		// The current locked box of this surface (entire surface coords)
+		/// The current locked box of this surface (entire surface coords)
 		Image::Box mLockedBox;
 
         
         /// Internal implementation of lock(), must be overridden in subclasses
         virtual PixelBox lockImpl(const Image::Box lockBox,  LockOptions options) = 0;
 
-        /// Internal implementation of lock(), do not OVERRIDE or CALL this
-        /// for HardwarePixelBuffer implementations, but override the previous method
+        /** Internal implementation of lock(), do not OVERRIDE or CALL this
+            for HardwarePixelBuffer implementations, but override the previous method */
         virtual void* lockImpl(size_t offset, size_t length, LockOptions options);
-
-        /// Internal implementation of unlock(), must be overridden in subclasses
-        // virtual void unlockImpl(void) = 0;
 
 		/** Notify TextureBuffer of destruction of render target.
 			Called by RenderTexture when destroyed.

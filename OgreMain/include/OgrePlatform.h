@@ -165,6 +165,16 @@ namespace Ogre {
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
+// For marking functions as deprecated
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#   define OGRE_DEPRECATED(func) __declspec(deprecated) func
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#   define OGRE_DEPRECATED(func) func __attribute__ ((deprecated))
+#else
+#   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
+#   define OGRE_DEPRECATED(func) func
+#endif
+
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -242,14 +252,6 @@ namespace Ogre {
 #   else
 #       define OGRE_DEBUG_MODE 0
 #   endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    #define OGRE_PLATFORM_LIB "OgrePlatform.a"
-#else //OGRE_PLATFORM_LINUX
-    #define OGRE_PLATFORM_LIB "libOgrePlatform.so"
-#endif
 
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary

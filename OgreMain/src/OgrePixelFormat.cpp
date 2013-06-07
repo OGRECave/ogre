@@ -1841,63 +1841,63 @@ namespace Ogre {
             switch(pf)
             {
             case PF_FLOAT32_R:
-                *r = *g = *b = ((float*)src)[0];
+                *r = *g = *b = ((const float*)src)[0];
                 *a = 1.0f;
                 break;
 			case PF_FLOAT32_GR:
-				*g = ((float*)src)[0];
-				*r = *b = ((float*)src)[1];
+				*g = ((const float*)src)[0];
+				*r = *b = ((const float*)src)[1];
 				*a = 1.0f;
 				break;
             case PF_FLOAT32_RGB:
-                *r = ((float*)src)[0];
-                *g = ((float*)src)[1];
-                *b = ((float*)src)[2];
+                *r = ((const float*)src)[0];
+                *g = ((const float*)src)[1];
+                *b = ((const float*)src)[2];
                 *a = 1.0f;
                 break;
             case PF_FLOAT32_RGBA:
-                *r = ((float*)src)[0];
-                *g = ((float*)src)[1];
-                *b = ((float*)src)[2];
-                *a = ((float*)src)[3];
+                *r = ((const float*)src)[0];
+                *g = ((const float*)src)[1];
+                *b = ((const float*)src)[2];
+                *a = ((const float*)src)[3];
                 break;
             case PF_FLOAT16_R:
-                *r = *g = *b = Bitwise::halfToFloat(((uint16*)src)[0]);
+                *r = *g = *b = Bitwise::halfToFloat(((const uint16*)src)[0]);
                 *a = 1.0f;
                 break;
-			case PF_FLOAT16_GR:
-				*g = Bitwise::halfToFloat(((uint16*)src)[0]);
-				*r = *b = Bitwise::halfToFloat(((uint16*)src)[1]);
-				*a = 1.0f;
-				break;
+            case PF_FLOAT16_GR:
+                *g = Bitwise::halfToFloat(((const uint16*)src)[0]);
+                *r = *b = Bitwise::halfToFloat(((const uint16*)src)[1]);
+                *a = 1.0f;
+                break;
             case PF_FLOAT16_RGB:
-                *r = Bitwise::halfToFloat(((uint16*)src)[0]);
-                *g = Bitwise::halfToFloat(((uint16*)src)[1]);
-                *b = Bitwise::halfToFloat(((uint16*)src)[2]);
+                *r = Bitwise::halfToFloat(((const uint16*)src)[0]);
+                *g = Bitwise::halfToFloat(((const uint16*)src)[1]);
+                *b = Bitwise::halfToFloat(((const uint16*)src)[2]);
                 *a = 1.0f;
                 break;
             case PF_FLOAT16_RGBA:
-                *r = Bitwise::halfToFloat(((uint16*)src)[0]);
-                *g = Bitwise::halfToFloat(((uint16*)src)[1]);
-                *b = Bitwise::halfToFloat(((uint16*)src)[2]);
-                *a = Bitwise::halfToFloat(((uint16*)src)[3]);
+                *r = Bitwise::halfToFloat(((const uint16*)src)[0]);
+                *g = Bitwise::halfToFloat(((const uint16*)src)[1]);
+                *b = Bitwise::halfToFloat(((const uint16*)src)[2]);
+                *a = Bitwise::halfToFloat(((const uint16*)src)[3]);
                 break;
-			case PF_SHORT_RGB:
-				*r = Bitwise::fixedToFloat(((uint16*)src)[0], 16);
-                *g = Bitwise::fixedToFloat(((uint16*)src)[1], 16);
-				*b = Bitwise::fixedToFloat(((uint16*)src)[2], 16);
-				*a = 1.0f;
-				break;
-			case PF_SHORT_RGBA:
-				*r = Bitwise::fixedToFloat(((uint16*)src)[0], 16);
-                *g = Bitwise::fixedToFloat(((uint16*)src)[1], 16);
-				*b = Bitwise::fixedToFloat(((uint16*)src)[2], 16);
-				*a = Bitwise::fixedToFloat(((uint16*)src)[3], 16);
-				break;
-			case PF_BYTE_LA:
-				*r = *g = *b = Bitwise::fixedToFloat(((uint8*)src)[0], 8);
-				*a = Bitwise::fixedToFloat(((uint8*)src)[1], 8);
-				break;
+            case PF_SHORT_RGB:
+                *r = Bitwise::fixedToFloat(((const uint16*)src)[0], 16);
+                *g = Bitwise::fixedToFloat(((const uint16*)src)[1], 16);
+                *b = Bitwise::fixedToFloat(((const uint16*)src)[2], 16);
+                *a = 1.0f;
+                break;
+            case PF_SHORT_RGBA:
+                *r = Bitwise::fixedToFloat(((const uint16*)src)[0], 16);
+                *g = Bitwise::fixedToFloat(((const uint16*)src)[1], 16);
+                *b = Bitwise::fixedToFloat(((const uint16*)src)[2], 16);
+                *a = Bitwise::fixedToFloat(((const uint16*)src)[3], 16);
+                break;
+            case PF_BYTE_LA:
+                *r = *g = *b = Bitwise::fixedToFloat(((const uint8*)src)[0], 8);
+                *a = Bitwise::fixedToFloat(((const uint8*)src)[1], 8);
+                break;
             default:
                 // Not yet supported
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,

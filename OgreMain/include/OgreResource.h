@@ -78,7 +78,7 @@ namespace Ogre {
 	class _OgreExport Resource : public StringInterface, public ResourceAlloc
     {
 	public:
-		OGRE_AUTO_MUTEX // public to allow external locking
+        OGRE_AUTO_MUTEX; // public to allow external locking
 		class Listener
 		{
 		public:
@@ -164,7 +164,7 @@ namespace Ogre {
 
 		typedef set<Listener*>::type ListenerList;
 		ListenerList mListenerList;
-		OGRE_MUTEX(mListenerListMutex)
+		OGRE_MUTEX(mListenerListMutex);
 
 		/** Protected unnamed constructor to prevent default construction. 
 		*/
@@ -215,8 +215,6 @@ namespace Ogre {
 			whether this resource is being loaded from a ManualResourceLoader. 
 		*/
 		virtual void unloadImpl(void) = 0;
-		/** Calculate the size of a resource; this will only be called after 'load' */
-		virtual size_t calculateSize(void) const = 0;
 
     public:
 		/** Standard constructor.
@@ -466,6 +464,8 @@ namespace Ogre {
 		*/
 		virtual void _fireUnloadingComplete(void);
 
+		/** Calculate the size of a resource; this will only be called after 'load' */
+		virtual size_t calculateSize(void) const;
 
     };
 

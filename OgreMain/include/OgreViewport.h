@@ -388,9 +388,9 @@ namespace Ogre {
     protected:
         Camera* mCamera;
         RenderTarget* mTarget;
-        // Relative dimensions, irrespective of target dimensions (0..1)
+        /// Relative dimensions, irrespective of target dimensions (0..1)
         float mRelLeft, mRelTop, mRelWidth, mRelHeight;
-        // Actual dimensions, based on target dimensions
+        /// Actual dimensions, based on target dimensions
         int mActLeft, mActTop, mActWidth, mActHeight;
         /// ZOrder
         int mZOrder;

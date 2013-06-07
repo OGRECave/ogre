@@ -54,11 +54,11 @@ namespace Ogre {
         */
         enum PassType
         {
-            PT_CLEAR,           // Clear target to one colour
-			PT_STENCIL,			// Set stencil operation
-            PT_RENDERSCENE,     // Render the scene or part of it
-            PT_RENDERQUAD,      // Render a full screen quad
-			PT_RENDERCUSTOM		// Render a custom sequence
+            PT_CLEAR,           /// Clear target to one colour
+			PT_STENCIL,			/// Set stencil operation
+            PT_RENDERSCENE,     /// Render the scene or part of it
+            PT_RENDERQUAD,      /// Render a full screen quad
+			PT_RENDERCUSTOM		/// Render a custom sequence
         };
         
         /** Set the type of composition pass */
@@ -324,8 +324,8 @@ namespace Ogre {
 		Real mClearDepth;
 		/// Clear stencil value (in case of PT_CLEAR)
 		uint32 mClearStencil;
-        /// Inputs (for material used for rendering the quad)
-        /// An empty string signifies that no input is used
+        /** Inputs (for material used for rendering the quad).
+            An empty string signifies that no input is used */
         InputTex mInputs[OGRE_MAX_TEXTURE_LAYERS];
 		/// Stencil operation parameters
 		bool mStencilCheck;
@@ -337,7 +337,7 @@ namespace Ogre {
 		StencilOperation mStencilPassOp;
 		bool mStencilTwoSidedOperation;
 
-        /// true if quad should not cover whole screen
+        /// True if quad should not cover whole screen
         bool mQuadCornerModified;
         /// quad positions in normalised coordinates [-1;1]x[-1;1] (in case of PT_RENDERQUAD)
         Real mQuadLeft;
@@ -346,7 +346,7 @@ namespace Ogre {
         Real mQuadBottom;
 
 		bool mQuadFarCorners, mQuadFarCornersViewSpace;
-		//The type name of the custom composition pass.
+		/// The type name of the custom composition pass.
 		String mCustomType;
     };
 	/** @} */

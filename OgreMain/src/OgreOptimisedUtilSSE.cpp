@@ -514,7 +514,6 @@ namespace Ogre {
     }
 
 
-
     //---------------------------------------------------------------------
     // General SSE version skinning positions, and optional skinning normals.
     static void softwareVertexSkinning_SSE_General(
@@ -1369,8 +1368,8 @@ namespace Ogre {
                 // 6 floating-point values
                 src01 = __MM_LOAD_PS(pSrc1 + 0);
                 src02 = __MM_LOAD_PS(pSrc2 + 0);
-                src11 = _mm_loadl_pi(t4, (__m64*)(pSrc1 + 4));  // t4 is meaningless here
-                src12 = _mm_loadl_pi(t4, (__m64*)(pSrc2 + 4));  // t4 is meaningless here
+                src11 = _mm_loadl_pi(t4, (const __m64*)(pSrc1 + 4));  // t4 is meaningless here
+                src12 = _mm_loadl_pi(t4, (const __m64*)(pSrc2 + 4));  // t4 is meaningless here
 
                 dst0 = __MM_LERP_PS(t4, src01, src02);
                 dst1 = __MM_LERP_PS(t4, src11, src12);
@@ -1383,8 +1382,8 @@ namespace Ogre {
                 // 3 floating-point values
                 src01 = _mm_load_ss(pSrc1 + 2);
                 src02 = _mm_load_ss(pSrc2 + 2);
-                src01 = _mm_loadh_pi(src01, (__m64*)(pSrc1 + 0));
-                src02 = _mm_loadh_pi(src02, (__m64*)(pSrc2 + 0));
+                src01 = _mm_loadh_pi(src01, (const __m64*)(pSrc1 + 0));
+                src02 = _mm_loadh_pi(src02, (const __m64*)(pSrc2 + 0));
 
                 dst0 = __MM_LERP_PS(t4, src01, src02);
 
@@ -1448,8 +1447,8 @@ namespace Ogre {
                 // 6 floating-point values
                 src01 = _mm_loadu_ps(pSrc1 + 0);
                 src02 = _mm_loadu_ps(pSrc2 + 0);
-                src11 = _mm_loadl_pi(t4, (__m64*)(pSrc1 + 4));  // t4 is meaningless here
-                src12 = _mm_loadl_pi(t4, (__m64*)(pSrc2 + 4));  // t4 is meaningless here
+                src11 = _mm_loadl_pi(t4, (const __m64*)(pSrc1 + 4));  // t4 is meaningless here
+                src12 = _mm_loadl_pi(t4, (const __m64*)(pSrc2 + 4));  // t4 is meaningless here
 
                 dst0 = __MM_LERP_PS(t4, src01, src02);
                 dst1 = __MM_LERP_PS(t4, src11, src12);
@@ -1462,8 +1461,8 @@ namespace Ogre {
                 // 3 floating-point values
                 src01 = _mm_load_ss(pSrc1 + 2);
                 src02 = _mm_load_ss(pSrc2 + 2);
-                src01 = _mm_loadh_pi(src01, (__m64*)(pSrc1 + 0));
-                src02 = _mm_loadh_pi(src02, (__m64*)(pSrc2 + 0));
+                src01 = _mm_loadh_pi(src01, (const __m64*)(pSrc1 + 0));
+                src02 = _mm_loadh_pi(src02, (const __m64*)(pSrc2 + 0));
 
                 dst0 = __MM_LERP_PS(t4, src01, src02);
 
@@ -1595,7 +1594,7 @@ namespace Ogre {
         assert(_isAlignedForSSE(faceNormals));
 
 // Load Vector3 as: (x, 0, y, z)
-#define __LOAD_VECTOR3(p)   _mm_loadh_pi(_mm_load_ss(p), (__m64*)((p)+1))
+#define __LOAD_VECTOR3(p)   _mm_loadh_pi(_mm_load_ss(p), (const __m64*)((p)+1))
 
         // Mask used to changes sign of single precision floating point values.
         OGRE_SIMD_ALIGNED_DECL(static const uint32, msSignMask[4]) =
@@ -1796,8 +1795,13 @@ namespace Ogre {
             bitmask = _mm_movemask_ps(_mm_cmpnle_ps(dp, zero));
 
             // Convert 4-bits mask to 4 bytes, and store results.
+            /*
             *reinterpret_cast<uint32*>(lightFacings) =
                 *reinterpret_cast<const uint32*>(msMaskMapping[bitmask]);
+                */
+            memcpy(lightFacings, msMaskMapping[bitmask], sizeof(uint32));
+            
+            
             lightFacings += 4;
         }
 
@@ -1949,7 +1953,7 @@ namespace Ogre {
             case 2:
                 // 6 floating-point values
                 s0 = SrcAccessor::load(pSrcPos + 0);
-                s1 = _mm_loadl_pi(dir1, (__m64*)(pSrcPos + 4)); // dir1 is meaningless here
+                s1 = _mm_loadl_pi(dir1, (const __m64*)(pSrcPos + 4)); // dir1 is meaningless here
 
                 // The extrusion direction is inverted, use subtract instruction here
                 d0 = _mm_sub_ps(s0, dir0);                      // X0 Y0 Z0 X1
@@ -1961,7 +1965,7 @@ namespace Ogre {
 
             case 1:
                 // 3 floating-point values
-                s0 = _mm_loadl_pi(dir0, (__m64*)(pSrcPos + 0)); // dir0 is meaningless here
+                s0 = _mm_loadl_pi(dir0, (const __m64*)(pSrcPos + 0)); // dir0 is meaningless here
                 s1 = _mm_load_ss(pSrcPos + 2);
 
                 // The extrusion direction is inverted, use subtract instruction here
@@ -2043,7 +2047,7 @@ namespace Ogre {
             for (size_t j = 0; j  < numVertices; ++j)
             {
                 // Load source position
-                __m128 src = _mm_loadh_pi(_mm_load_ss(pSrcPos + 0), (__m64*)(pSrcPos + 1)); // x 0 y z
+                __m128 src = _mm_loadh_pi(_mm_load_ss(pSrcPos + 0), (const __m64*)(pSrcPos + 1)); // x 0 y z
                 pSrcPos += 3;
 
                 // Calculate unnormalised extrusion direction

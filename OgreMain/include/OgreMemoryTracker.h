@@ -79,7 +79,7 @@ namespace Ogre
 	class _OgreExport MemoryTracker
 	{
 	protected:
-		OGRE_AUTO_MUTEX
+            OGRE_AUTO_MUTEX;
 
 		// Allocation record
 		struct Alloc

@@ -593,6 +593,11 @@ namespace Ogre {
         return mCurrentPass->getShininess();
     }
     //-----------------------------------------------------------------------------
+    Real AutoParamDataSource::getSurfaceAlphaRejectionValue(void) const
+    {
+        return static_cast<Real>(static_cast<unsigned int>(mCurrentPass->getAlphaRejectValue())) / 255.0f;
+    }
+    //-----------------------------------------------------------------------------
     ColourValue AutoParamDataSource::getDerivedAmbientLightColour(void) const
     {
         return getAmbientLightColour() * getSurfaceAmbientColour();
@@ -1086,7 +1091,7 @@ namespace Ogre {
 			{
 				const VisibleObjectsBoundsInfo& info = 
 					mCurrentSceneManager->getVisibleObjectsBoundsInfo(
-						(Camera*)mCurrentTextureProjector[index]);
+						(const Camera*)mCurrentTextureProjector[index]);
 
 				Real depthRange = info.maxDistanceInFrustum - info.minDistanceInFrustum;
 				if (depthRange > std::numeric_limits<Real>::epsilon())

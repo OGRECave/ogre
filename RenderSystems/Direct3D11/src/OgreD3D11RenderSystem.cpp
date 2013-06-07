@@ -1194,8 +1194,8 @@ bail:
 
 #ifdef D3D_FEATURE_LEVEL_9_3
 		int numMultiRenderTargets = (mFeatureLevel > D3D_FEATURE_LEVEL_9_3) ? D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT :		// 8
-									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT :	// 4
-									D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT;												// 1
+									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? 4/*D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT*/ :	// 4
+									1/*D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT*/;												// 1
 #else
         int numMultiRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;		// 8
 #endif
@@ -1981,10 +1981,10 @@ bail:
 
 		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flip);
 		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, !flip);
-
+		
 		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flip);
 		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, !flip);
-
+		
 		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flip);
 		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, !flip);
 
@@ -2764,7 +2764,7 @@ bail:
                             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                                 "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
                                 "Active OGRE vertex shader name: " + mBoundVertexProgram->getName() +
-                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName() ,
+                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName(),
                                 "D3D11RenderSystem::_render");
 						}
 					}

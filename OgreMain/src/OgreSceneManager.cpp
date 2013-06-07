@@ -198,7 +198,7 @@ SceneManager::~SceneManager()
 
 	// clear down movable object collection map
 	{
-		OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+            OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 		for (MovableObjectCollectionMap::iterator i = mMovableObjectCollectionMap.begin();
 			i != mMovableObjectCollectionMap.end(); ++i)
 		{
@@ -1396,7 +1396,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
-		OGRE_LOCK_MUTEX(sceneGraphMutex)
+            OGRE_LOCK_MUTEX(sceneGraphMutex);
 
 		// Update scene graph for this camera (can happen multiple times per frame)
 		{
@@ -3117,10 +3117,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     RenderOperation ro;
 
     OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
-    // Set up rendering operation
-    // I know, I know, const_cast is nasty but otherwise it requires all internal
-    // state of the Renderable assigned to the rop to be mutable
-    const_cast<Renderable*>(rend)->getRenderOperation(ro);
     ro.srcRenderable = rend;
 
 	GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
@@ -3475,6 +3471,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Finalise GPU parameter bindings
 				updateGpuProgramParameters(pass);
 
+                rend->getRenderOperation(ro);
+
 				if (rend->preRender(this, mDestRenderSystem))
 					mDestRenderSystem->_render(ro);
 				rend->postRender(this, mDestRenderSystem);
@@ -3541,6 +3539,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// Finalise GPU parameter bindings
 					updateGpuProgramParameters(pass);
 
+                    rend->getRenderOperation(ro);
+
 					if (rend->preRender(this, mDestRenderSystem))
 						mDestRenderSystem->_render(ro);
 					rend->postRender(this, mDestRenderSystem);
@@ -3560,7 +3560,21 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 		// Just render
 		mDestRenderSystem->setCurrentPassIterationCount(1);
 		if (rend->preRender(this, mDestRenderSystem))
-			mDestRenderSystem->_render(ro);
+		{
+			rend->getRenderOperation(ro);
+			try
+			{
+				mDestRenderSystem->_render(ro);
+			}
+			catch (RenderingAPIException& e)
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
+                            "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
+                            "SceneManager::renderSingleObject");
+                
+			}
+		}
 		rend->postRender(this, mDestRenderSystem);
 	}
 	
@@ -3665,7 +3679,7 @@ void SceneManager::setDisplaySceneNodes(bool display)
 //-----------------------------------------------------------------------
 Animation* SceneManager::createAnimation(const String& name, Real length)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
     // Check name not used
     if (mAnimationsList.find(name) != mAnimationsList.end())
@@ -3683,7 +3697,7 @@ Animation* SceneManager::createAnimation(const String& name, Real length)
 //-----------------------------------------------------------------------
 Animation* SceneManager::getAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	AnimationList::const_iterator i = mAnimationsList.find(name);
     if (i == mAnimationsList.end())
@@ -3697,13 +3711,13 @@ Animation* SceneManager::getAnimation(const String& name) const
 //-----------------------------------------------------------------------
 bool SceneManager::hasAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 	return (mAnimationsList.find(name) != mAnimationsList.end());
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAnimation(const String& name)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	// Also destroy any animation states referencing this animation
 	mAnimationStates.removeAnimationState(name);
@@ -3725,7 +3739,7 @@ void SceneManager::destroyAnimation(const String& name)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllAnimations(void)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
     // Destroy all states too, since they cannot reference destroyed animations
     destroyAllAnimationStates();
 
@@ -3772,7 +3786,7 @@ void SceneManager::destroyAllAnimationStates(void)
 void SceneManager::_applySceneAnimations(void)
 {
 	// manual lock over states (extended duration required)
-	OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME)
+    OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME);
 
 	// Iterate twice, once to reset, once to apply, to allow blending
     ConstEnabledAnimationStateIterator stateIt = mAnimationStates.getEnabledAnimationStateIterator();
@@ -4394,7 +4408,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 
 
 	{
-		OGRE_LOCK_MUTEX(lights->mutex)
+            OGRE_LOCK_MUTEX(lights->mutex);
 
 		// Pre-allocate memory
 		mTestLightInfos.clear();
@@ -6750,7 +6764,7 @@ SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName)
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6771,7 +6785,7 @@ const SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName) const
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::const_iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6801,7 +6815,7 @@ MovableObject* SceneManager::createMovableObject(const String& name,
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		if (objectMap->map.find(name) != objectMap->map.end())
 		{
@@ -6837,7 +6851,7 @@ void SceneManager::destroyMovableObject(const String& name, const String& typeNa
 		Root::getSingleton().getMovableObjectFactory(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		MovableObjectMap::iterator mi = objectMap->map.find(name);
 		if (mi != objectMap->map.end())
@@ -6861,7 +6875,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 		Root::getSingleton().getMovableObjectFactory(typeName);
 	
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::iterator i = objectMap->map.begin();
 		for (; i != objectMap->map.end(); ++i)
 		{
@@ -6878,7 +6892,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 void SceneManager::destroyAllMovableObjects(void)
 {
 	// Lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin();
 
@@ -6887,7 +6901,7 @@ void SceneManager::destroyAllMovableObjects(void)
 		MovableObjectCollection* coll = ci->second;
 
 		// lock map mutex
-		OGRE_LOCK_MUTEX(coll->mutex)
+		OGRE_LOCK_MUTEX(coll->mutex);
 
 		if (Root::getSingleton().hasMovableObjectFactory(ci->first))
 		{
@@ -6919,7 +6933,7 @@ MovableObject* SceneManager::getMovableObject(const String& name, const String& 
 	const MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::const_iterator mi = objectMap->map.find(name);
 		if (mi == objectMap->map.end())
 		{
@@ -6939,7 +6953,7 @@ bool SceneManager::hasMovableObject(const String& name, const String& typeName) 
 	{
 		return hasCamera(name);
 	}
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::const_iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6947,7 +6961,7 @@ bool SceneManager::hasMovableObject(const String& name, const String& typeName) 
 		return false;
 	
 	{
-		OGRE_LOCK_MUTEX(i->second->mutex)
+            OGRE_LOCK_MUTEX(i->second->mutex);
 		return (i->second->map.find(name) != i->second->map.end());
 	}
 }
@@ -6970,7 +6984,7 @@ void SceneManager::injectMovableObject(MovableObject* m)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		objectMap->map[m->getName()] = m;
 	}
@@ -6980,7 +6994,7 @@ void SceneManager::extractMovableObject(const String& name, const String& typeNa
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::iterator mi = objectMap->map.find(name);
 		if (mi != objectMap->map.end())
 		{
@@ -7000,7 +7014,7 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		// no deletion
 		objectMap->map.clear();
 	}

@@ -1,6 +1,6 @@
 #version 100
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 uniform mat4 worldViewProj;
 uniform vec4 texelOffsets;
@@ -12,7 +12,7 @@ attribute vec4 position;
 
 void main()
 {
-	gl_Position = position * worldViewProj;
+	gl_Position = worldViewProj * position;
 
 	// fix pixel / texel alignment
 	gl_Position.xy += texelOffsets.zw * gl_Position.w;

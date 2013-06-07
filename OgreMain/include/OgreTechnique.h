@@ -53,7 +53,7 @@ namespace Ogre {
 	class _OgreExport Technique : public TechniqueAlloc
     {
     protected:
-        // illumination pass state type
+        /// Illumination pass state type
         enum IlluminationPassesState
         {
             IPS_COMPILE_DISABLED = -1,
@@ -66,7 +66,8 @@ namespace Ogre {
         Passes mPasses;
         /// List of derived passes, categorised into IlluminationStage (ordered)
         IlluminationPassList mIlluminationPasses;
-        Material* mParent; // raw pointer since we don't want child to stop parent's destruction
+        // Raw pointer since we don't want child to stop parent's destruction
+        Material* mParent;
         bool mIsSupported;
         IlluminationPassesState mIlluminationPassesCompilationPhase;
 		/// LOD level
@@ -75,7 +76,8 @@ namespace Ogre {
 			MaterialManager, for speed an index is used here.
 		*/
 		unsigned short mSchemeIndex;
-        String mName; // optional name for the technique
+        /// Optional name for the technique
+        String mName;
 
         /// Internal method for clearing illumination pass list
         void clearIlluminationPasses(void);
@@ -166,7 +168,7 @@ namespace Ogre {
 		bool checkHardwareSupport(bool autoManageTextureUnits, StringUtil::StrStreamType& compileErrors);
         /** Internal method for splitting the passes into illumination passes. */        
         void _compileIlluminationPasses(void);
-
+		size_t calculateSize(void) const;
 
         /** Creates a new Pass for this Technique.
         @remarks
@@ -243,7 +245,7 @@ namespace Ogre {
         /** Internal unload method, derived from call to Material::unload. */
         void _unload(void);
 
-        // Is this loaded?
+        /// Is this loaded?
         bool isLoaded(void) const;
 
         /** Tells the technique that it needs recompilation. */

@@ -74,7 +74,7 @@ namespace Ogre {
 		const NameValuePairList* params)
 	{
 		// Lock for the whole get / insert
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePtr res = getByName(name, group);
 		bool created = false;
@@ -104,12 +104,13 @@ namespace Ogre {
         ResourcePtr r = createOrRetrieve(name,group,isManual,loader,loadParams).first;
 		// ensure loaded
         r->load(backgroundThread);
+
         return r;
     }
     //-----------------------------------------------------------------------
 	void ResourceManager::addImpl( ResourcePtr& res )
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 			std::pair<ResourceMap::iterator, bool> result;
 		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
@@ -182,7 +183,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::removeImpl( ResourcePtr& res )
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
 		{
@@ -257,7 +258,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::unloadAll(bool reloadableOnly)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourceMap::iterator i, iend;
 		iend = mResources.end();
@@ -273,7 +274,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::reloadAll(bool reloadableOnly)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourceMap::iterator i, iend;
 		iend = mResources.end();
@@ -289,7 +290,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::unloadUnreferencedResources(bool reloadableOnly)
     {
-        OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 
         ResourceMap::iterator i, iend;
         iend = mResources.end();
@@ -310,7 +311,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::reloadUnreferencedResources(bool reloadableOnly)
     {
-        OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 
         ResourceMap::iterator i, iend;
         iend = mResources.end();
@@ -356,7 +357,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::removeAll(void)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		mResources.clear();
 		mResourcesWithGroup.clear();
@@ -367,7 +368,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::removeUnreferencedResources(bool reloadableOnly)
     {
-        OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 
         ResourceMap::iterator i, iend;
         iend = mResources.end();
@@ -397,7 +398,7 @@ namespace Ogre {
 		// if not in the global pool - get it from the grouped pool 
 		if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
 
 			if( itGroup != mResourcesWithGroup.end())
@@ -414,7 +415,7 @@ namespace Ogre {
 		// if didn't find it the grouped pool - get it from the global pool 
 		if (res.isNull())
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 
 			ResourceMap::iterator it = mResources.find(name);
 
@@ -448,7 +449,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 
         ResourceHandleMap::iterator it = mResourcesByHandle.find(handle);
         if (it == mResourcesByHandle.end())
@@ -463,15 +464,34 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourceHandle ResourceManager::getNextHandle(void)
     {
-		OGRE_LOCK_AUTO_MUTEX
-
+        // This is an atomic operation and hence needs no locking
         return mNextHandle++;
     }
     //-----------------------------------------------------------------------
     void ResourceManager::checkUsage(void)
     {
-        // TODO Page out here?
-    }
+		if (getMemoryUsage() > mMemoryBudget)
+		{
+                    OGRE_LOCK_AUTO_MUTEX;
+			// unload unreferenced resources until we are within our budget again
+			const bool reloadableOnly = true;
+			ResourceMap::iterator i, iend;
+			iend = mResources.end();
+			for (i = mResources.begin(); i != iend && getMemoryUsage() > mMemoryBudget; ++i)
+			{
+				// A use count of 3 means that only RGM and RM have references
+				// RGM has one (this one) and RM has 2 (by name and by handle)
+				if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+				{
+					Resource* res = i->second.get();
+					if (!reloadableOnly || res->isReloadable())
+					{
+						res->unload();
+					}
+				}
+			}
+		}
+	}
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceTouched(Resource* res)
 	{
@@ -481,6 +501,7 @@ namespace Ogre {
 	void ResourceManager::_notifyResourceLoaded(Resource* res)
 	{
 		mMemoryUsage += res->getSize();
+		checkUsage();
 	}
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceUnloaded(Resource* res)
@@ -490,7 +511,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
 		if (i == mResourcePoolMap.end())
@@ -504,7 +525,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyResourcePool(ResourcePool* pool)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(pool->getName());
 		if (i != mResourcePoolMap.end())
@@ -516,7 +537,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyResourcePool(const String& name)
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
 		if (i != mResourcePoolMap.end())
@@ -529,7 +550,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyAllResourcePools()
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 
 		for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
 			i != mResourcePoolMap.end(); ++i)
@@ -557,7 +578,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::ResourcePool::clear()
 	{
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 		for (ItemList::iterator i = mItems.begin(); i != mItems.end(); ++i)
 		{
 			(*i)->getCreator()->remove((*i)->getHandle());

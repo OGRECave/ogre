@@ -404,7 +404,7 @@ namespace Ogre {
 
         TextureType mTextureType;
 		PixelFormat mFormat;
-        int mUsage; // Bit field, so this can't be TextureUsage
+        int mUsage; /// Bit field, so this can't be TextureUsage
 
         PixelFormat mSrcFormat;
         size_t mSrcWidth, mSrcHeight, mSrcDepth;
@@ -455,8 +455,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
                 pRep = static_cast<Texture*>(r.getPointer());
                 pUseCount = r.useCountPointer();
                 if (pUseCount)
@@ -475,8 +475,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
                 pRep = static_cast<Texture*>(r.getPointer());
                 pUseCount = r.useCountPointer();
                 if (pUseCount)

@@ -37,4 +37,4 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@
 
 # Materials for visual tests
 [Tests]
-FileSystem=@OGRE_MEDIA_DIR_REL@/../../Tests/Media
+FileSystem=@OGRE_TEST_MEDIA_DIR_DBG@

@@ -152,7 +152,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
   endif ()
   
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
-  if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND)
     # headers (try to exclude things we don't need)
     install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost"
       PATTERN "accumulators" EXCLUDE

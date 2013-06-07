@@ -37,14 +37,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
     
-    /** == operator for two vectors.
-    @param a
-        The first vector to test.
-    @param b
-        The second vector to test.
-    */
-    bool _OgreVolumeExport operator==(Vector3 const& a, Vector3 const& b);
-    
     /** A less operator. 
     @note
         This operator is needed so that Vertex can serve as the key in a map structrue 

@@ -178,7 +178,7 @@ namespace Ogre {
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            IF_OS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             {
                 if(glIsProgramPipelineEXT(mGLProgramHandle))
                     glValidateProgramPipelineEXT(mGLProgramHandle);

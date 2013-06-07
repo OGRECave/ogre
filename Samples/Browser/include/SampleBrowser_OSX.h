@@ -40,7 +40,6 @@
 #define USE_DISPLAYLINK 0
 
 #import "OgreOSXCocoaWindow.h"
-#import <Cocoa/Cocoa.h>
 #import <QuartzCore/CVDisplayLink.h>
 
 using namespace Ogre;
@@ -93,11 +92,19 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
     {
         NSOpenGLContext *ctx = static_cast<OSXCocoaWindow *>(sb.mWindow)->nsopenGLContext();
         CGLContextObj cglContext = (CGLContextObj)[ctx CGLContextObj];
-        CGLLockContext(cglContext); 
+
+        // Lock the context before we render into it.
+        CGLLockContext(cglContext);
+
+        // Calculate the time since we last rendered.
         Real deltaTime = 1.0 / (outputTime->rateScalar * (Real)outputTime->videoTimeScale / (Real)outputTime->videoRefreshPeriod);
 
+        // Make the context current and dispatch the render.
         [ctx makeCurrentContext];
-        Ogre::Root::getSingleton().renderOneFrame(deltaTime);
+        dispatch_async(dispatch_get_main_queue(), ^(void)
+                       {
+                           Ogre::Root::getSingleton().renderOneFrame(deltaTime);
+                       });
 
         CGLUnlockContext(cglContext); 
     }
@@ -171,11 +178,6 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 	mTimer = [[NSTimer timerWithTimeInterval: 0.001 target:self selector:@selector(renderOneFrame:) userInfo:self repeats:true] retain];
 	[[NSRunLoop currentRunLoop] addTimer:mTimer forMode: NSDefaultRunLoopMode];
 	[[NSRunLoop currentRunLoop] addTimer:mTimer forMode: NSEventTrackingRunLoopMode]; // Ensure timer fires during resize
-//    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
-//                                              target:self
-//                                            selector:@selector(renderOneFrame:)
-//                                            userInfo:nil
-//                                             repeats:YES];
 #endif
     [pool release];
 }

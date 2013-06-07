@@ -74,7 +74,7 @@ namespace Ogre {
 	class _OgreExport ResourceManager : public ScriptLoader, public ResourceAlloc
     {
     public:
-		OGRE_AUTO_MUTEX // public to allow external locking
+        OGRE_AUTO_MUTEX; // public to allow external locking
         ResourceManager();
         virtual ~ResourceManager();
 
@@ -127,7 +127,7 @@ namespace Ogre {
                 is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
                 next used.
         */
-        virtual void setMemoryBudget( size_t bytes);
+        virtual void setMemoryBudget(size_t bytes);
 
         /** Get the limit on the amount of memory this resource handler may use.
         */
@@ -484,7 +484,7 @@ namespace Ogre {
 		virtual void addImpl( ResourcePtr& res );
 		/** Remove a resource from this manager; remove it from the lists. */
 		virtual void removeImpl( ResourcePtr& res );
-		/** Checks memory usage and pages out if required.
+		/** Checks memory usage and pages out if required. This is automatically done after a new resource is loaded.
 		*/
 		virtual void checkUsage(void);
 
@@ -497,9 +497,9 @@ namespace Ogre {
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;
 		ResourceWithGroupMap mResourcesWithGroup;
-        ResourceHandle mNextHandle;
-        size_t mMemoryBudget; // In bytes
-        AtomicScalar<size_t> mMemoryUsage; // In bytes
+        size_t mMemoryBudget; /// In bytes
+        AtomicScalar<ResourceHandle> mNextHandle;
+        AtomicScalar<size_t> mMemoryUsage; /// In bytes
 
         bool mVerbose;
 

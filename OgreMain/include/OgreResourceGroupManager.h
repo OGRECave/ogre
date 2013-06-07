@@ -261,7 +261,7 @@ namespace Ogre {
     class _OgreExport ResourceGroupManager : public Singleton<ResourceGroupManager>, public ResourceAlloc
     {
     public:
-		OGRE_AUTO_MUTEX // public to allow external locking
+        OGRE_AUTO_MUTEX; // public to allow external locking
 		/// Default resource group name
 		static String DEFAULT_RESOURCE_GROUP_NAME;
         /// Internal resource group name (should be used by OGRE internal only)
@@ -323,9 +323,9 @@ namespace Ogre {
 				LOADED = 4
 			};
 			/// General mutex for dealing with group content
-			OGRE_AUTO_MUTEX
+                    OGRE_AUTO_MUTEX;
 			/// Status-specific mutex, separate from content-changing mutex
-			OGRE_MUTEX(statusMutex)
+                    OGRE_MUTEX(statusMutex);
 			/// Group name
 			String name;
 			/// Group status
@@ -411,6 +411,14 @@ namespace Ogre {
 		void fireResourceCreated(const ResourcePtr& resource);
 		/// Internal event firing method
 		void fireResourceRemove(const ResourcePtr& resource);
+		/** Internal modification time retrieval */
+		time_t resourceModifiedTime(ResourceGroup* group, const String& filename);
+
+        /** Find out if the named file exists in a group. Internal use only
+         @param group Pointer to the resource group
+         @param filename Fully qualified name of the file to test for
+         */
+        bool resourceExists(ResourceGroup* group, const String& filename);
 
 		/// Stored current group - optimisation for when bulk loading a group
 		ResourceGroup* mCurrentGroup;
@@ -811,12 +819,6 @@ namespace Ogre {
         @param filename Fully qualified name of the file to test for
         */
         bool resourceExists(const String& group, const String& filename);
-
-        /** Find out if the named file exists in a group. 
-        @param group Pointer to the resource group
-        @param filename Fully qualified name of the file to test for
-        */
-        bool resourceExists(ResourceGroup* group, const String& filename);
 		
         /** Find out if the named file exists in any group. 
         @param filename Fully qualified name of the file to test for
@@ -858,9 +860,6 @@ namespace Ogre {
         @return A list of resource locations matching the criteria
         */
         StringVectorPtr findResourceLocation(const String& groupName, const String& pattern);
-
-		/** Retrieve the modification time of a given file */
-		time_t resourceModifiedTime(ResourceGroup* group, const String& filename); 
 
 		/** Create a new resource file in a given group.
 		@remarks

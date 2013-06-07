@@ -616,6 +616,7 @@ namespace Ogre
 
 		freeTemporaryResources();
 		freeCPUResources();
+        mLodManager = OGRE_NEW TerrainLodManager( this );
 
 		copyGlobalOptions();
 
@@ -623,7 +624,8 @@ namespace Ogre
 		if (!mainChunk)
 			return false;
 
-		stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
+        if(mainChunk->version > 1)
+            stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
 		uint8 align;
 		stream.read(&align);
 		mAlign = (Alignment)align;
@@ -636,7 +638,9 @@ namespace Ogre
 		mRootNode->setPosition(mPos);
 		updateBaseScale();
 		determineLodLevels();
-		stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
+
+        if(mainChunk->version > 1)
+            stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
 
 		size_t numVertices = mSize * mSize;
 		mHeightData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
@@ -645,15 +649,22 @@ namespace Ogre
 		memset(mHeightData, 0.0f, sizeof(float)*numVertices);
 		memset(mDeltaData, 0.0f, sizeof(float)*numVertices);
 
-		// skip height/delta data
-		for (int i = 0; i < mNumLodLevels; i++)
-		{
-			stream.readChunkBegin(TerrainLodManager::TERRAINLODDATA_CHUNK_ID, TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION);
-			stream.readChunkEnd(TerrainLodManager::TERRAINLODDATA_CHUNK_ID);
-		}
+        if(mainChunk->version > 1)
+        {
+            // skip height/delta data
+            for (int i = 0; i < mNumLodLevels; i++)
+            {
+                stream.readChunkBegin(TerrainLodManager::TERRAINLODDATA_CHUNK_ID, TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION);
+                stream.readChunkEnd(TerrainLodManager::TERRAINLODDATA_CHUNK_ID);
+            }
 
-		// start uncompressing
-		stream.startDeflate( mainChunk->length - stream.getOffsetFromChunkStart() );
+            // start uncompressing
+            stream.startDeflate( mainChunk->length - stream.getOffsetFromChunkStart() );
+        }
+        else
+        {
+            stream.read(mHeightData, numVertices);
+        }
 
 		// Layer declaration
 		if (!readLayerDeclaration(stream, mLayerDecl))
@@ -728,12 +739,20 @@ namespace Ogre
 
 		}
 
+        if(mainChunk->version == 1)
+        {
+            // Load delta data
+            mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+            stream.read(mDeltaData, numVertices);
+        }
+
 		// Create & load quadtree
 		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare(stream);
 
 		// stop uncompressing
-		stream.stopDeflate();
+        if(mainChunk->version > 1)
+            stream.stopDeflate();
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -2711,7 +2730,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureCount(uint8 numLayers) const
 	{
-		return ((numLayers - 1) / 4) + 1;
+		return ((numLayers - 2) / 4) + 1;
 	}
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureCount() const
@@ -2971,14 +2990,14 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
+	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index) const
 	{
 		assert(index < mBlendTextureList.size());
 
 		return mBlendTextureList[index];
 	}
 	//---------------------------------------------------------------------
-	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex)
+	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex) const
 	{
 		assert(layerIndex > 0 && layerIndex < mLayers.size());
 		uint8 idx = layerIndex - 1;
@@ -3634,7 +3653,7 @@ namespace Ogre
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
-				PF_BYTE_RGB, TU_STATIC);
+				PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
 			if (mCpuColourMapStorage)
 			{

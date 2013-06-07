@@ -194,9 +194,6 @@ namespace Ogre {
         */
         bool isRequiredCapabilitiesSupported(void) const;
 
-		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // TODO 
-
 		/// @copydoc Resource::loadImpl
 		void loadImpl(void);
 
@@ -424,6 +421,8 @@ namespace Ogre {
 		*/
 		virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
+		/// @copydoc Resource::calculateSize
+		virtual size_t calculateSize(void) const;
 
     protected:
         /// Virtual method which must be implemented by subclasses, load from mSource
@@ -449,8 +448,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
 			    pRep = static_cast<GpuProgram*>(r.getPointer());
 			    pUseCount = r.useCountPointer();
 			    if (pUseCount)
@@ -469,8 +468,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
 			    pRep = static_cast<GpuProgram*>(r.getPointer());
 			    pUseCount = r.useCountPointer();
 			    if (pUseCount)

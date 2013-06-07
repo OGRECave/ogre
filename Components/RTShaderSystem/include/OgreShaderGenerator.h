@@ -913,7 +913,8 @@ protected:
     /** Used to check if finalizing */
     bool getIsFinalizing() const;
 protected:	
-	OGRE_AUTO_MUTEX													// Auto mutex.
+        // Auto mutex.
+        OGRE_AUTO_MUTEX;
 	// The active scene manager.
 	SceneManager* mActiveSceneMgr;
 	// A map of all scene managers this generator is bound to.
@@ -946,7 +947,7 @@ protected:
 	ProgramManager* mProgramManager;
 	// Shader program writer manager.
 	ProgramWriterManager* mProgramWriterManager;
-        // File system layer manager.
+    // File system layer manager.
 	FileSystemLayer* mFSLayer;
 	// Fixed Function Render state builder.
 	FFPRenderStateBuilder* mFFPRenderStateBuilder;

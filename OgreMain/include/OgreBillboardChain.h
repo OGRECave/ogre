@@ -61,7 +61,7 @@ namespace Ogre {
 		chain segments in a single render operation, provided they all use the
 		same material. To clarify the terminology: a 'segment' is a separate 
 		sub-part of the chain with its own start and end (called the 'head'
-		and the 'tail'. An 'element' is a single position / colour / texcoord
+		and the 'tail'). An 'element' is a single position / colour / texcoord
 		entry in a segment. You can add items to the head of a chain, and 
 		remove them from the tail, very efficiently. Each segment has a max
 		size, and if adding an element to the segment would exceed this size, 
@@ -349,7 +349,7 @@ namespace Ogre {
 		virtual void setupChainContainers(void);
 		/// Setup vertex declaration
 		virtual void setupVertexDeclaration(void);
-		// Setup buffers
+		/// Setup buffers
 		virtual void setupBuffers(void);
 		/// Update the contents of the vertex buffer
 		virtual void updateVertexBuffer(Camera* cam);

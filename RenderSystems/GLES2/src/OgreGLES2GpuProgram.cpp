@@ -63,4 +63,18 @@ GLES2GpuProgram::~GLES2GpuProgram()
     unload(); 
 }
 
+//-----------------------------------------------------------------------------
+size_t GLES2GpuProgram::calculateSize(void) const
+{
+    size_t memSize = 0;
+
+    // Delegate Names
+    memSize += sizeof(GLuint);
+    memSize += sizeof(GLenum);
+    memSize += GpuProgram::calculateSize();
+
+    return memSize;
+}
+
+
 	

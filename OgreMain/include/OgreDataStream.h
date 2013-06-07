@@ -182,7 +182,7 @@ namespace Ogre {
 			WRITE = 2
 		};
 	protected:
-		/// The name (e.g. resource name) that can be used to identify the source fot his data (optional)
+		/// The name (e.g. resource name) that can be used to identify the source for this data (optional)
 		String mName;		
         /// Size of the data in the stream (may be 0 if size cannot be determined)
         size_t mSize;
@@ -331,9 +331,9 @@ namespace Ogre {
 		@param pMem Pointer to the existing memory
 		@param size The size of the memory chunk in bytes
 		@param freeOnClose If true, the memory associated will be destroyed
-			when the stream is destroyed. Note: it's important that if you set
+			when the stream is closed. Note: it's important that if you set
 			this option to true, that you allocated the memory using OGRE_ALLOC_T
-			with a category of MEMCATEGORY_GENERAL ensure the freeing of memory 
+			with a category of MEMCATEGORY_GENERAL to ensure the freeing of memory 
 			matches up.
 		@param readOnly Whether to make the stream on this memory read-only once created
 		*/
@@ -372,7 +372,7 @@ namespace Ogre {
 			This constructor can be used to intentionally read in the entire
 			contents of another stream, copying them to the internal buffer
 			and thus making them available in memory as a single unit.
-		@param sourceStream Weak reference to another DataStream which will provide the source
+		@param sourceStream Another DataStream which will provide the source
 			of data
 		@param freeOnClose If true, the memory associated will be destroyed
 			when the stream is destroyed.

@@ -302,7 +302,7 @@ protected:
         String strPPD;
 
         //Get the type of light
-        uint lightType;
+        Ogre::uint lightType = 0;
         if (permutation & LightMaterialGenerator::MI_POINT)
         {
             lightType = 1;

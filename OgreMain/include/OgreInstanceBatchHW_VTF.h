@@ -87,7 +87,7 @@ namespace Ogre
 		*/
 		size_t updateVertexTexture( Camera *currentCamera );
 
-		virtual bool matricesToghetherPerRow() const { return true; }
+		virtual bool matricesTogetherPerRow() const { return true; }
 	public:
 		InstanceBatchHW_VTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,

@@ -1288,7 +1288,7 @@ The default type which is assumed if you omit it, your texture has a width and a
 @item 3d
 A 3 dimensional texture i.e. volume texture. Your texture has a width, a height, both of which should be powers of 2, and has depth. These can be addressed with 3d texture coordinates i.e. through a pixel shader.
 @item cubic
-This texture is made up of 6 2D textures which are pasted around the inside of a cube. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
+This texture is made up of 6 2D textures which are pasted around the inside of a cube.  Alternatively 1 cube texture can be used if supported by the texture format(DDS for example) and rendersystem. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
 @end table
 The 'numMipMaps' option allows you to specify the number of mipmaps to generate for this texture. The default is 'unlimited' which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture_unit used to load the texture - so be consistent with your usage.@*@*
 
@@ -1413,7 +1413,7 @@ Default: none@*@*
 @anchor{cubic_texture}
 @subheading cubic_texture
 
-Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.@*@*
+Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube or 1 cube texture if supported by the texture format(DDS for example) and rendersystem.. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.@*@*
 
 Format1 (short): cubic_texture <base_name> <combinedUVW|separateUV>@*@*
 
@@ -1467,6 +1467,8 @@ Example: content_type compositor DepthCompositor OutputTexture @*@*
 @subheading tex_coord_set
 
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.@*@*
+
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
 
 Format: tex_coord_set <set_num>@*@*
 

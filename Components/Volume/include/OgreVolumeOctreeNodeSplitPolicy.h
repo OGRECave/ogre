@@ -47,8 +47,8 @@ namespace Volume {
     {
     protected:
 
-        /// The factor on the diagonal used to decide as min distance to the isosurface whether to proceed with the splitting decision.
-        static const Real MIN_SPLIT_DISTANCE_DIAGONAL_FACTOR;
+        /// The factor on the diagonal use to decide as min distance to the isosurface whether to proceed with the splitting decision.
+        const Real mMinSplitDistanceDiagonalFactor;
 
         /// Holds the volume source to decide something.
         const Source *mSrc;
@@ -103,8 +103,11 @@ namespace Volume {
             The volume source to decide something.
         @param maxCellSize
             The maximum size when the splitting will stop anyway.
+        @param minSplitDistanceDiagonalFactor
+            The factor on the diagonal use to decide as min distance to the
+            isosurface whether to proceed with the splitting decision.
         */
-        OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize);
+        OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize, const Real minSplitDistanceDiagonalFactor);
                 
         /** Decider for the splitting.
         @param node

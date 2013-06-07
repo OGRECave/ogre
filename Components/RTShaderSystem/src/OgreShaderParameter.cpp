@@ -237,6 +237,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR,        		"surface_specular_colour",				GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR,        		"surface_emissive_colour",				GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_SHININESS,              		"surface_shininess",					GCT_FLOAT1),
+		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE,         "surface_alpha_rejection_value",		GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_COUNT,                   			"light_count",                  		GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR,          			"ambient_light_colour",         		GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR,          			"light_diffuse_colour",         		GCT_FLOAT4),

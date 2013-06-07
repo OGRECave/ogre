@@ -98,6 +98,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11_TEXTURE_ADDRESS_MODE D3D11Mappings::get(TextureUnitState::TextureAddressingMode tam)
 	{
+        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+			return D3D11_TEXTURE_ADDRESS_WRAP;
+
 		switch( tam )
 		{
 		case TextureUnitState::TAM_WRAP:
@@ -720,7 +724,7 @@ namespace Ogre
 		{
 		case PF_L8:				return DXGI_FORMAT_R8_UNORM;
 		case PF_L16:			return DXGI_FORMAT_R16_UNORM;
-		case PF_A8:				return DXGI_FORMAT_UNKNOWN;
+		case PF_A8:				return DXGI_FORMAT_A8_UNORM;
 		case PF_A4L4:			return DXGI_FORMAT_UNKNOWN;
 		case PF_BYTE_LA:		return DXGI_FORMAT_UNKNOWN; 
 		case PF_R3G3B2:			return DXGI_FORMAT_UNKNOWN;
@@ -728,7 +732,7 @@ namespace Ogre
 		case PF_R5G6B5:			return DXGI_FORMAT_UNKNOWN;
 		case PF_A4R4G4B4:		return DXGI_FORMAT_UNKNOWN;
 		case PF_R8G8B8:			return DXGI_FORMAT_UNKNOWN;
-		case PF_A8R8G8B8:		return DXGI_FORMAT_UNKNOWN;
+		case PF_A8R8G8B8:		return DXGI_FORMAT_B8G8R8A8_UNORM;
 		case PF_A8B8G8R8:		return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case PF_X8R8G8B8:		return DXGI_FORMAT_UNKNOWN;
 		case PF_X8B8G8R8:		return DXGI_FORMAT_UNKNOWN;

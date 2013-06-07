@@ -65,3 +65,15 @@ GL3PlusGpuProgram::~GL3PlusGpuProgram()
     // since calling virtual methods in base destructors causes crash
     unload(); 
 }
+
+size_t GL3PlusGpuProgram::calculateSize(void) const
+{
+    size_t memSize = 0;
+
+    // Delegate Names
+    memSize += sizeof(GLuint);
+    memSize += sizeof(GLenum);
+    memSize += GpuProgram::calculateSize();
+
+    return memSize;
+}

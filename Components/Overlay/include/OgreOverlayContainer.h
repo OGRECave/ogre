@@ -61,9 +61,9 @@ namespace Ogre {
         typedef map<String, OverlayContainer*>::type ChildContainerMap;
         typedef MapIterator<ChildContainerMap> ChildContainerIterator;
     protected:
-        // Map of all children
+        /// Map of all children
         ChildMap mChildren;
-        // Map of container children (subset of mChildren)
+        /// Map of container children (subset of mChildren)
         ChildContainerMap mChildContainers;
 
 		bool mChildrenProcessEvents;

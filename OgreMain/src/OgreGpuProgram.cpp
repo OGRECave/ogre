@@ -89,8 +89,31 @@ namespace Ogre
         mLoadFromFile = false;
 		mCompileError = false;
     }
-		
+    size_t GpuProgram::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(bool) * 7;
+        memSize += mManualNamedConstantsFile.size() * sizeof(char);
+        memSize += mFilename.size() * sizeof(char);
+        memSize += mSource.size() * sizeof(char);
+        memSize += mSyntaxCode.size() * sizeof(char);
+        memSize += sizeof(GpuProgramType);
+        memSize += sizeof(ushort);
 
+        size_t paramsSize = 0;
+        if(!mDefaultParams.isNull())
+            paramsSize += mDefaultParams.getPointer()->calculateSize();
+        if(!mFloatLogicalToPhysical.isNull())
+            paramsSize += mFloatLogicalToPhysical.getPointer()->bufferSize;
+        if(!mDoubleLogicalToPhysical.isNull())
+            paramsSize += mDoubleLogicalToPhysical.getPointer()->bufferSize;
+        if(!mIntLogicalToPhysical.isNull())
+            paramsSize += mIntLogicalToPhysical.getPointer()->bufferSize;
+        if(!mConstantDefs.isNull())
+            paramsSize += mConstantDefs->calculateSize();
+
+        return memSize + paramsSize;
+    }
     //-----------------------------------------------------------------------------
     void GpuProgram::loadImpl(void)
     {
@@ -466,8 +489,8 @@ namespace Ogre
 		// lock & copy other mutex pointer
         OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
         {
-		    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-		    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
             pRep = r.getPointer();
             pUseCount = r.useCountPointer();
             if (pUseCount)

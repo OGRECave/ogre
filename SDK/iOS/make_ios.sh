@@ -6,7 +6,7 @@
 LIPO=lipo
 SDKBUILDDIR=`pwd`
 
-set IPHONEOS_DEPLOYMENT_TARGET 4.0
+set IPHONEOS_DEPLOYMENT_TARGET 4.3
 
 # Clean up files from previous builds
 echo Cleaning previous builds...
@@ -23,26 +23,26 @@ cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -DOGRE_INSTALL_SAMPLES_SOURCE:BO
 # Read version number
 OGRE_VERSION=`cat version.txt`
 
-echo Building API docs...
-
-# Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
-
-pushd api/html
-
-# Delete unnecessary files
-rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
-popd
-
+# echo Building API docs...
+# 
+# # Build docs explicitly since INSTALL doesn't include it
+# xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
+# 
+# pushd api/html
+# 
+# # Delete unnecessary files
+# rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
+# popd
+# 
 # Build the Xcode docset and zip it up to save space
 #make
 #zip -9 -r org.ogre3d.documentation.Reference1_7.docset.zip org.ogre3d.documentation.Reference1_7.docset
-
+# 
 # Copy the docset to the disc image.  Disabled to reduce the size of the disc image.
 #cp -R api $SDKBUILDDIR/sdk_contents/docs/
 #cp org.ogre3d.documentation.Reference1_7.docset.zip $SDKBUILDDIR/sdk_contents/docs/
-
-echo API generation done.
+# 
+# echo API generation done.
 
 # Invoke Xcode build for device and simulator
 
@@ -72,16 +72,14 @@ do
 done
 
 # Remove some unnecessary files. Single arch libs and duplicate headers.
-rm -rf $SDKBUILDDIR/build/sdk/lib/iphoneos $SDKBUILDDIR/build/sdk/lib/iphonesimulator
-rm -rf $SDKBUILDDIR/build/sdk/lib/Debug
-rm -rf $SDKBUILDDIR/build/sdk/include/boost
+rm -rf $SDKBUILDDIR/build/sdk/lib/iphoneos $SDKBUILDDIR/build/sdk/lib/iphonesimulator $SDKBUILDDIR/build/sdk/lib/Debug
 
 echo Frameworks copied.
 
 echo Generating Samples Project...
 
 pushd sdk
-cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -G Xcode .
+cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -DOGRE_DEPENDENCIES_DIR=../../../../iOSDependencies -G Xcode .
 #sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
 #mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 rm CMakeCache.txt

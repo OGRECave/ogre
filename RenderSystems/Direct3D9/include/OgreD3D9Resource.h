@@ -70,7 +70,7 @@ namespace Ogre {
 		virtual ~D3D9Resource	();
 
 	protected:
-		OGRE_STATIC_MUTEX(msDeviceAccessMutex)		
+		OGRE_STATIC_MUTEX(msDeviceAccessMutex);
 	};
 }
 #endif

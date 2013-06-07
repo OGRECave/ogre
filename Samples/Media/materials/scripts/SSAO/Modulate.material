@@ -1,8 +1,8 @@
 fragment_program SSAO/Post/Modulate_fp_hlsl hlsl
 {
-    source Modulate.cg
+    source Modulate.hlsl
     entry_point Modulate_fp
-    target ps_3_0 
+    target ps_4_0
 }
 
 fragment_program SSAO/Post/Modulate_fp_cg cg
