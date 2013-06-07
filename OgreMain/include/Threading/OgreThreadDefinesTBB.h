@@ -26,12 +26,14 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesTBB_H__
 #define __OgreThreadDefinesTBB_H__
 
+#define OGRE_TOKEN_PASTE(x, y) x ## y
+#define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
 #define OGRE_AUTO_MUTEX mutable tbb::recursive_mutex OGRE_AUTO_MUTEX_NAME
 #define OGRE_LOCK_AUTO_MUTEX tbb::recursive_mutex::scoped_lock ogreAutoMutexLock(OGRE_AUTO_MUTEX_NAME)
 #define OGRE_MUTEX(name) mutable tbb::recursive_mutex name
 #define OGRE_STATIC_MUTEX(name) static tbb::recursive_mutex name
 #define OGRE_STATIC_MUTEX_INSTANCE(name) tbb::recursive_mutex name
-#define OGRE_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock ogrenameLock(name)
+#define OGRE_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
 #define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName) tbb::recursive_mutex::scoped_lock lockName(mutexName)
 // like OGRE_AUTO_MUTEX but mutex held by pointer
 #define OGRE_AUTO_SHARED_MUTEX mutable tbb::recursive_mutex *OGRE_AUTO_MUTEX_NAME

@@ -26,12 +26,14 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesPoco_H__
 #define __OgreThreadDefinesPoco_H__
 
+#define OGRE_TOKEN_PASTE(x, y) x ## y
+#define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
 #define OGRE_AUTO_MUTEX mutable Poco::Mutex OGRE_AUTO_MUTEX_NAME
 #define OGRE_LOCK_AUTO_MUTEX Poco::Mutex::ScopedLock ogreAutoMutexLock(OGRE_AUTO_MUTEX_NAME)
 #define OGRE_MUTEX(name) mutable Poco::Mutex name
 #define OGRE_STATIC_MUTEX(name) static Poco::Mutex name
 #define OGRE_STATIC_MUTEX_INSTANCE(name) Poco::Mutex name
-#define OGRE_LOCK_MUTEX(name) Poco::Mutex::ScopedLock ogrenameLock(name)
+#define OGRE_LOCK_MUTEX(name) Poco::Mutex::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
 #define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName) Poco::Mutex::ScopedLock lockName(mutexName)
 // like OGRE_AUTO_MUTEX but mutex held by pointer
 #define OGRE_AUTO_SHARED_MUTEX mutable Poco::Mutex *OGRE_AUTO_MUTEX_NAME
