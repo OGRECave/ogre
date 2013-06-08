@@ -559,6 +559,7 @@ set(OGRE_MEDIA_SEARCH_SUFFIX
   Media
   media
   share/OGRE/media
+  share/OGRE/Media
 )
 
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)
