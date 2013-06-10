@@ -649,7 +649,7 @@ namespace Ogre
                 // Blend textures - sampler definitions
                 for (uint i = 0; i < numBlendTextures; ++i)
                 {
-                    params->setNamedConstant("blendTex", (int)numSamplers++);
+                    params->setNamedConstant("blendTex" + StringConverter::toString(i), (int)numSamplers++);
                 }
 
                 // Layer textures - sampler definitions & UV multipliers

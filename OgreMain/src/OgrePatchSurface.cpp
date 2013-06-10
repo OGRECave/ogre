@@ -76,7 +76,7 @@ namespace Ogre {
         float* pFloat;
         for (size_t i = 0; i < mCtlCount; ++i)
         {
-            elem->baseVertexPointerToElement((void*)pVert, &pFloat);
+            elem->baseVertexPointerToElement(const_cast<unsigned char*>(pVert), &pFloat);
             mVecCtlPoints.push_back(Vector3(pFloat[0], pFloat[1], pFloat[2]));
             pVert += vertSize;
         }

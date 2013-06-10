@@ -42,7 +42,7 @@ namespace Ogre {
     {
         protected:
             char* mScratchBufferPool;
-            OGRE_MUTEX(mScratchMutex)
+            OGRE_MUTEX(mScratchMutex);
             size_t mMapBufferThreshold;
 
         public:

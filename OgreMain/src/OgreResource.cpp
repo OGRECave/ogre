@@ -69,7 +69,7 @@ namespace Ogre
 		{
 			while( mLoadingState.get() == LOADSTATE_PREPARING )
 			{
-				OGRE_LOCK_AUTO_MUTEX
+                            OGRE_LOCK_AUTO_MUTEX;
 			}
 
 			LoadingState state = mLoadingState.get();
@@ -85,7 +85,7 @@ namespace Ogre
         try
 		{
 
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 
 			if (mIsManual)
 			{
@@ -159,7 +159,7 @@ namespace Ogre
 			{
 				while( mLoadingState.get() == LOADSTATE_PREPARING )
 				{
-					OGRE_LOCK_AUTO_MUTEX
+                                    OGRE_LOCK_AUTO_MUTEX;
 				}
 				old = mLoadingState.get();
 			}
@@ -172,7 +172,7 @@ namespace Ogre
 			{
 				while( mLoadingState.get() == LOADSTATE_LOADING )
 				{
-					OGRE_LOCK_AUTO_MUTEX
+                                    OGRE_LOCK_AUTO_MUTEX;
 				}
 
 				LoadingState state = mLoadingState.get();
@@ -195,7 +195,7 @@ namespace Ogre
         try
 		{
 
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 
 
 
@@ -314,7 +314,7 @@ namespace Ogre
 
 		// Scope lock for actual unload
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
             if (old==LOADSTATE_PREPARED) {
                 unprepareImpl();
             } else {
@@ -339,7 +339,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void Resource::reload(void) 
 	{ 
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 		if (mLoadingState.get() == LOADSTATE_LOADED)
 		{
 			unload();
@@ -358,21 +358,21 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void Resource::addListener(Resource::Listener* lis)
 	{
-		OGRE_LOCK_MUTEX(mListenerListMutex)
+            OGRE_LOCK_MUTEX(mListenerListMutex);
 		mListenerList.insert(lis);
 	}
 	//-----------------------------------------------------------------------
 	void Resource::removeListener(Resource::Listener* lis)
 	{
 		// O(n) but not called very often
-		OGRE_LOCK_MUTEX(mListenerListMutex)
+            OGRE_LOCK_MUTEX(mListenerListMutex);
 		mListenerList.erase(lis);
 	}
 	//-----------------------------------------------------------------------
 	void Resource::_fireLoadingComplete(bool wasBackgroundLoaded)
 	{
 		// Lock the listener list
-		OGRE_LOCK_MUTEX(mListenerListMutex)
+            OGRE_LOCK_MUTEX(mListenerListMutex);
 		for (ListenerList::iterator i = mListenerList.begin();
 			i != mListenerList.end(); ++i)
 		{
@@ -387,7 +387,7 @@ namespace Ogre
 	void Resource::_firePreparingComplete(bool wasBackgroundLoaded)
 	{
 		// Lock the listener list
-		OGRE_LOCK_MUTEX(mListenerListMutex)
+            OGRE_LOCK_MUTEX(mListenerListMutex);
 		for (ListenerList::iterator i = mListenerList.begin();
 			i != mListenerList.end(); ++i)
 		{
@@ -403,7 +403,7 @@ namespace Ogre
 	void Resource::_fireUnloadingComplete(void)
 	{
 		// Lock the listener list
-		OGRE_LOCK_MUTEX(mListenerListMutex)
+            OGRE_LOCK_MUTEX(mListenerListMutex);
 			for (ListenerList::iterator i = mListenerList.begin();
 				i != mListenerList.end(); ++i)
 			{

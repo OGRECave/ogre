@@ -88,7 +88,7 @@ namespace Ogre {
         GL3PlusHardwareVertexBuffer* buf =
             OGRE_NEW GL3PlusHardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
         {
-            OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+            OGRE_LOCK_MUTEX(mVertexBuffersMutex);
             mVertexBuffers.insert(buf);
         }
         return HardwareVertexBufferSharedPtr(buf);
@@ -102,7 +102,7 @@ namespace Ogre {
         GL3PlusHardwareIndexBuffer* buf =
             new GL3PlusHardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
         {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
             mIndexBuffers.insert(buf);
         }
         return HardwareIndexBufferSharedPtr(buf);
@@ -113,7 +113,7 @@ namespace Ogre {
         GL3PlusHardwareUniformBuffer* buf =
         new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
         {
-            OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+            OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf);
         }
         return HardwareUniformBufferSharedPtr(buf);
@@ -124,7 +124,7 @@ namespace Ogre {
         GL3PlusHardwareCounterBuffer* buf =
         new GL3PlusHardwareCounterBuffer(this, name);
         {
-            OGRE_LOCK_MUTEX(mCounterBuffersMutex)
+            OGRE_LOCK_MUTEX(mCounterBuffersMutex);
             mCounterBuffers.insert(buf);
         }
         return HardwareCounterBufferSharedPtr(buf);
@@ -201,7 +201,7 @@ namespace Ogre {
         // simple forward link search based on alloc sizes
         // not that fast but the list should never get that long since not many
         // locks at once (hopefully)
-        OGRE_LOCK_MUTEX(mScratchMutex)
+        OGRE_LOCK_MUTEX(mScratchMutex);
 
         // Alignment - round up the size to 32 bits
         // control blocks are 32 bits too so this packs nicely
@@ -247,7 +247,7 @@ namespace Ogre {
 
     void GL3PlusHardwareBufferManagerBase::deallocateScratch(void* ptr)
     {
-        OGRE_LOCK_MUTEX(mScratchMutex)
+        OGRE_LOCK_MUTEX(mScratchMutex);
 
         // Simple linear search dealloc
         uint32 bufferPos = 0;

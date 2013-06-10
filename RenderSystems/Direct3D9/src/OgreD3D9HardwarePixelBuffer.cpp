@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-OGRE_STATIC_MUTEX_INSTANCE(D3D9HardwarePixelBuffer::msDeviceAccessMutex)
+    OGRE_STATIC_MUTEX_INSTANCE(D3D9HardwarePixelBuffer::msDeviceAccessMutex);
 //-----------------------------------------------------------------------------  
 
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 

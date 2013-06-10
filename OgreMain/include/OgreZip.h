@@ -65,7 +65,7 @@ namespace Ogre {
         /// A pointer to file io alternative implementation 
         zzip_plugin_io_handlers* mPluginIo;
 
-		OGRE_AUTO_MUTEX
+        OGRE_AUTO_MUTEX;
     public:
         ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
         ~ZipArchive();

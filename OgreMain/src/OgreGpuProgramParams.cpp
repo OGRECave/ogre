@@ -134,6 +134,7 @@ namespace Ogre
 
 		AutoConstantDefinition(ACT_LIGHT_NUMBER,   					  "light_number",  1, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_LIGHT_CASTS_SHADOWS, 			  "light_casts_shadows",  1, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_LIGHT_CASTS_SHADOWS_ARRAY,     "light_casts_shadows_array",  1, ET_REAL, ACDT_INT),
 
 		AutoConstantDefinition(ACT_SHADOW_EXTRUSION_DISTANCE,     "shadow_extrusion_distance",    1, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_CAMERA_POSITION,               "camera_position",              3, ET_REAL, ACDT_NONE),
@@ -145,6 +146,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_SPOTLIGHT_VIEWPROJ_MATRIX,       "spotlight_viewproj_matrix",     16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY, "spotlight_viewproj_matrix_array", 16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,  "spotlight_worldviewproj_matrix",16, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,  "spotlight_worldviewproj_matrix_array",16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_CUSTOM,                        "custom",                       4, ET_REAL, ACDT_INT),  // *** needs to be tested
 		AutoConstantDefinition(ACT_TIME,                               "time",                               1, ET_REAL, ACDT_REAL),
 		AutoConstantDefinition(ACT_TIME_0_X,                      "time_0_x",                     4, ET_REAL, ACDT_REAL),
@@ -181,6 +183,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_TEXEL_OFFSETS,               "texel_offsets",				  4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SCENE_DEPTH_RANGE,           "scene_depth_range",			  4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_SHADOW_SCENE_DEPTH_RANGE,    "shadow_scene_depth_range",		  4, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY,    "shadow_scene_depth_range_array",		  4, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SHADOW_COLOUR,				"shadow_colour",				  4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_TEXTURE_SIZE,                "texture_size",                   4, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_INVERSE_TEXTURE_SIZE,        "inverse_texture_size",           4, ET_REAL, ACDT_INT),
@@ -303,8 +306,8 @@ namespace Ogre
 
 		writeFileHeader();
 
-		writeInts(((uint32*)&pConsts->floatBufferSize), 1);
-		writeInts(((uint32*)&pConsts->intBufferSize), 1);
+		writeInts(((const uint32*)&pConsts->floatBufferSize), 1);
+		writeInts(((const uint32*)&pConsts->intBufferSize), 1);
 
 		// simple export of all the named constants, no chunks
 		// name, physical index
@@ -315,12 +318,12 @@ namespace Ogre
 			const GpuConstantDefinition& def = i->second;
 
 			writeString(name);
-			writeInts(((uint32*)&def.physicalIndex), 1);
-			writeInts(((uint32*)&def.logicalIndex), 1);
+			writeInts(((const uint32*)&def.physicalIndex), 1);
+			writeInts(((const uint32*)&def.logicalIndex), 1);
 			uint32 constType = static_cast<uint32>(def.constType);
 			writeInts(&constType, 1);
-			writeInts(((uint32*)&def.elementSize), 1);
-			writeInts(((uint32*)&def.arraySize), 1);		
+			writeInts(((const uint32*)&def.elementSize), 1);
+			writeInts(((const uint32*)&def.arraySize), 1);		
 		}
 
 	}
@@ -1009,6 +1012,11 @@ namespace Ogre
 		_writeRawConstants(physicalIndex, &val, 1);
 	}
 	//-----------------------------------------------------------------------------
+	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, Real val, size_t count)
+	{
+		_writeRawConstants(physicalIndex, &val, count);
+	}
+	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, int val)
 	{
 		_writeRawConstants(physicalIndex, &val, 1);
@@ -1197,6 +1205,7 @@ namespace Ogre
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
 		case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
+        case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
 		case ACT_SHADOW_EXTRUSION_DISTANCE:
 
 			// These depend on BOTH lights and objects
@@ -1210,12 +1219,14 @@ namespace Ogre
 		case ACT_LIGHT_POSITION_VIEW_SPACE:
 		case ACT_LIGHT_DIRECTION_VIEW_SPACE:
 		case ACT_SHADOW_SCENE_DEPTH_RANGE:
+        case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
 		case ACT_SHADOW_COLOUR:
 		case ACT_LIGHT_POWER_SCALE:
 		case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED:
 		case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED:
 		case ACT_LIGHT_NUMBER:
 		case ACT_LIGHT_CASTS_SHADOWS:
+        case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
 		case ACT_LIGHT_ATTENUATION:
 		case ACT_SPOTLIGHT_PARAMS:
 		case ACT_LIGHT_DIFFUSE_COLOUR_ARRAY:
@@ -1261,7 +1272,7 @@ namespace Ogre
 			return 0;
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
 
 			GpuLogicalIndexUseMap::iterator logi = mFloatLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mFloatLogicalToPhysical->map.end())
@@ -1368,7 +1379,7 @@ namespace Ogre
 			return 0;
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex);
 
         GpuLogicalIndexUseMap::iterator logi = mDoubleLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mDoubleLogicalToPhysical->map.end())
@@ -1476,7 +1487,7 @@ namespace Ogre
 			"GpuProgramParameters::_getIntConstantPhysicalIndex");
 
 		GpuLogicalIndexUse* indexUse = 0;
-		OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+		OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
 
 			GpuLogicalIndexUseMap::iterator logi = mIntLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mIntLogicalToPhysical->map.end())
@@ -2144,6 +2155,10 @@ namespace Ogre
 				case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
 					_writeRawConstant(i->physicalIndex, source->getSpotlightWorldViewProjMatrix(i->data),i->elementCount);
 					break;
+                case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
+                    for (size_t l = 0; l < i->data; ++l)
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(i->data), i->elementCount);
+                    break;
 				case ACT_LIGHT_POSITION_OBJECT_SPACE:
 					_writeRawConstant(i->physicalIndex, 
 						source->getInverseWorldMatrix().transformAffine(
@@ -2353,6 +2368,10 @@ namespace Ogre
 				case ACT_SHADOW_SCENE_DEPTH_RANGE:
 					_writeRawConstant(i->physicalIndex, source->getShadowSceneDepthRange(i->data));
 					break;
+                case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
+                    for (size_t l = 0; l < i->data; ++l)
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(i->data), i->elementCount);
+                    break;
 				case ACT_SHADOW_COLOUR:
 					_writeRawConstant(i->physicalIndex, source->getShadowColour(), i->elementCount);
 					break;
@@ -2371,6 +2390,10 @@ namespace Ogre
 				case ACT_LIGHT_CASTS_SHADOWS:
 					_writeRawConstant(i->physicalIndex, source->getLightCastsShadows(i->data));
 					break;
+                case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
+                    for (size_t l = 0; l < i->data; ++l)
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(i->data), i->elementCount);
+                    break;
 				case ACT_LIGHT_ATTENUATION:
 					_writeRawConstant(i->physicalIndex, source->getLightAttenuation(i->data), i->elementCount);
 					break;

@@ -148,8 +148,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
                 pRep = static_cast<HighLevelGpuProgram*>(r.getPointer());
                 pUseCount = r.useCountPointer();
                 if (pUseCount)
@@ -168,8 +168,8 @@ namespace Ogre {
 			// lock & copy other mutex pointer
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
                 pRep = static_cast<HighLevelGpuProgram*>(r.getPointer());
                 pUseCount = r.useCountPointer();
                 if (pUseCount)

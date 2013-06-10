@@ -197,7 +197,7 @@ THE SOFTWARE.
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 
 #if ENABLE_GL_CHECK
 #define OGRE_CHECK_GL_ERROR(glFunc) \

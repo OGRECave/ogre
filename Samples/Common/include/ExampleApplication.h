@@ -24,7 +24,6 @@ Description: Base class for all the OGRE examples
 #include "Ogre.h"
 #include "OgreConfigFile.h"
 #include "ExampleFrameListener.h"
-#include "OgreOverlaySystem.h"
 
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
