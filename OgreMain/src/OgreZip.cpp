@@ -85,7 +85,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipArchive::load()
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         if (!mZzipDir)
         {
             zzip_error_t zzipError;
@@ -123,7 +123,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipArchive::unload()
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         if (mZzipDir)
         {
             zzip_dir_close(mZzipDir);
@@ -136,7 +136,7 @@ namespace Ogre {
 	DataStreamPtr ZipArchive::open(const String& filename, bool readOnly) const
     {
 		// zziplib is not threadsafe
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         String lookUpFileName = filename;
 
         // Format not used here (always binary)
@@ -187,7 +187,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         FileInfoList::iterator i, iend;
@@ -202,7 +202,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
@@ -216,7 +216,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
@@ -237,7 +237,7 @@ namespace Ogre {
 	FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
         bool recursive, bool dirs) const
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
@@ -258,7 +258,7 @@ namespace Ogre {
 	bool ZipArchive::exists(const String& filename)
 	{
 		// zziplib is not threadsafe
-		OGRE_LOCK_AUTO_MUTEX
+            OGRE_LOCK_AUTO_MUTEX;
 		ZZIP_STAT zstat;
 		int res = zzip_dir_stat(mZzipDir, filename.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
 

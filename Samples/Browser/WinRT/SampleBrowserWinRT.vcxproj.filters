@@ -19,6 +19,18 @@
     <Filter Include="Assets\media">
       <UniqueIdentifier>{e257aff9-3c3e-4c1f-ac7f-35337988adb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="d3dcompiler_dll">
+      <UniqueIdentifier>{a5b83f18-a2aa-4ea9-95a2-3dd260d9c1d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="d3dcompiler_dll\x64">
+      <UniqueIdentifier>{cfaaaa6f-fae4-4ea7-aa64-46bee267d33e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="d3dcompiler_dll\arm">
+      <UniqueIdentifier>{c87e05ca-fbb1-418f-af40-1a9ce6474553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="d3dcompiler_dll\win32">
+      <UniqueIdentifier>{ddb3cee9-b99a-4fbc-abeb-1c3b9360f19d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SampleBrowserWinRT.cpp">
@@ -73,7 +85,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="D3DCompiler_46.dll" />
     <None Include="SampleBrowserWinRT_2012_08_31_18_35_59.sap" />
     <None Include="OGRE.CFG">
       <Filter>Assets\cfg</Filter>
@@ -1727,6 +1738,21 @@
     </None>
     <None Include="..\..\Media\materials\textures\WoodPallet.png">
       <Filter>Assets\media</Filter>
+    </None>
+    <None Include="cache_d.bin">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\..\..\..\..\Program Files (x86)\Windows Kits\8.0\Redist\D3D\x86\d3dcompiler_46.dll">
+      <Filter>d3dcompiler_dll\win32</Filter>
+    </None>
+    <None Include="..\..\..\..\..\Program Files (x86)\Windows Kits\8.0\Redist\D3D\x64\d3dcompiler_46.dll">
+      <Filter>d3dcompiler_dll\x64</Filter>
+    </None>
+    <None Include="..\..\..\..\..\Program Files (x86)\Windows Kits\8.0\Redist\D3D\arm\d3dcompiler_46.dll">
+      <Filter>d3dcompiler_dll\arm</Filter>
+    </None>
+    <None Include="cache.bin">
+      <Filter>Assets</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

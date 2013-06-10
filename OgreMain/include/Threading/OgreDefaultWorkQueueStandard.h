@@ -65,11 +65,11 @@ namespace Ogre
 
 		size_t mNumThreadsRegisteredWithRS;
 		/// Init notification mutex (must lock before waiting on initCondition)
-		OGRE_MUTEX(mInitMutex)
+		OGRE_MUTEX(mInitMutex);
 		/// Synchroniser token to wait / notify on thread init 
-		OGRE_THREAD_SYNCHRONISER(mInitSync)
+		OGRE_THREAD_SYNCHRONISER(mInitSync);
 
-		OGRE_THREAD_SYNCHRONISER(mRequestCondition)
+		OGRE_THREAD_SYNCHRONISER(mRequestCondition);
 #if OGRE_THREAD_SUPPORT
 		typedef vector<OGRE_THREAD_TYPE*>::type WorkerThreadList;
 		WorkerThreadList mWorkers;

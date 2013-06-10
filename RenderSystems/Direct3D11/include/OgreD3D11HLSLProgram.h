@@ -358,6 +358,8 @@ namespace Ogre {
 		unsigned int getNumInputs(void)const;
 		unsigned int getNumOutputs(void)const;
 
+		String getNameForMicrocodeCache();
+
 		const D3D11_SIGNATURE_PARAMETER_DESC & getInputParamDesc(unsigned int index) const;
 		const D3D11_SIGNATURE_PARAMETER_DESC & getOutputParamDesc(unsigned int index) const;	
 	};

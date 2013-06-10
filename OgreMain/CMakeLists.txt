@@ -757,6 +757,35 @@ if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
   else ()
+
+    set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
+  
+  	add_custom_command(TARGET OgreMain POST_BUILD
+		COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
+        COMMAND ditto 
+		${OGRE_SOURCE_DIR}/OgreMain/include/Threading/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
+		COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
+        COMMAND ditto 
+		${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/OSX
+		COMMAND cd ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers
+		)
+
+    foreach(HEADER_PATH ${THREAD_HEADER_FILES})
+        get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
+        set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
+        add_custom_command(TARGET OgreMain POST_BUILD
+            COMMAND rm -f ${FWK_HEADER_PATH}
+            )
+    endforeach()
+
+    foreach(HEADER_PATH ${PLATFORM_HEADERS})
+        get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
+        set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
+        add_custom_command(TARGET OgreMain POST_BUILD
+            COMMAND rm -f ${FWK_HEADER_PATH}
+            )
+    endforeach()
+
     ogre_config_framework(OgreMain)
   endif ()
 

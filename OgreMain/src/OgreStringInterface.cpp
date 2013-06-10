@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStringInterface.h"
 
 namespace Ogre {
-	OGRE_STATIC_MUTEX_INSTANCE( StringInterface::msDictionaryMutex )
+    OGRE_STATIC_MUTEX_INSTANCE( StringInterface::msDictionaryMutex );
     ParamDictionaryMap StringInterface::msDictionary;
 
 
@@ -76,7 +76,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void StringInterface::cleanupDictionary ()
 	{
-		OGRE_LOCK_MUTEX( msDictionaryMutex )
+            OGRE_LOCK_MUTEX( msDictionaryMutex );
 
 		msDictionary.clear();
 	}

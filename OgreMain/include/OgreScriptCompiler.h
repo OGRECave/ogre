@@ -384,7 +384,7 @@ namespace Ogre
 	class _OgreExport ScriptCompilerManager : public Singleton<ScriptCompilerManager>, public ScriptLoader, public ScriptCompilerAlloc
 	{
 	private:
-		OGRE_AUTO_MUTEX
+            OGRE_AUTO_MUTEX;
 
 		// A list of patterns loaded by this compiler manager
 		StringVector mScriptPatterns;

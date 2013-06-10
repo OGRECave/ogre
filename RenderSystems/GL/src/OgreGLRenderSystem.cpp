@@ -3669,7 +3669,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::registerThread()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// This is only valid once we've created the main context
 		if (!mMainContext)
 		{
@@ -3705,7 +3705,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::preExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// free context, we'll need this to share lists
         if(mCurrentContext)
             mCurrentContext->endCurrent();
@@ -3713,7 +3713,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::postExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// reacquire context
         if(mCurrentContext)
             mCurrentContext->setCurrent();

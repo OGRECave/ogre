@@ -16,6 +16,8 @@ PROJECT(OgreVolume)
 # define header and source files for the library
 set (HEADER_FILES
 	include/OgreVolumeCacheSource.h
+	include/OgreVolumeChunk.h
+	include/OgreVolumeChunkHandler.h
 	include/OgreVolumeCSGSource.h
 	include/OgreVolumeDualGridGenerator.h
 	include/OgreVolumeGridSource.h
@@ -25,7 +27,6 @@ set (HEADER_FILES
 	include/OgreVolumeIsoSurfaceTablesMC.h
 	include/OgreVolumeMeshBuilder.h
 	include/OgreVolumeTextureSource.h
-	include/OgreVolumeChunk.h
 	include/OgreVolumeOctreeNode.h
 	include/OgreVolumeOctreeNodeSplitPolicy.h
 	include/OgreVolumeSimplexNoise.h
@@ -34,6 +35,8 @@ set (HEADER_FILES
 )
 set(SOURCE_FILES
 	src/OgreVolumeCacheSource.cpp
+	src/OgreVolumeChunk.cpp
+	src/OgreVolumeChunkHandler.cpp
 	src/OgreVolumeCSGSource.cpp
 	src/OgreVolumeDualGridGenerator.cpp
 	src/OgreVolumeGridSource.cpp
@@ -42,7 +45,6 @@ set(SOURCE_FILES
 	src/OgreVolumeIsoSurfaceMC.cpp
 	src/OgreVolumeMeshBuilder.cpp
 	src/OgreVolumeTextureSource.cpp
-	src/OgreVolumeChunk.cpp
 	src/OgreVolumeOctreeNode.cpp
 	src/OgreVolumeOctreeNodeSplitPolicy.cpp
 	src/OgreVolumeSimplexNoise.cpp

@@ -64,14 +64,14 @@ namespace Ogre {
 		unsigned int* pUseCount;
 		SharedPtrFreeMethod useFreeMethod; /// If we should use OGRE_FREE instead of OGRE_DELETE
 	public:
-		OGRE_AUTO_SHARED_MUTEX // public to allow external locking
+		OGRE_AUTO_SHARED_MUTEX; // public to allow external locking
 		/** Constructor, does not initialise the SharedPtr.
 			@remarks
 				<b>Dangerous!</b> You have to call bind() before using the SharedPtr.
 		*/
 		SharedPtr() : pRep(0), pUseCount(0), useFreeMethod(SPFM_DELETE)
         {
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+            OGRE_SET_AUTO_SHARED_MUTEX_NULL;
         }
 
 		/** Constructor.
@@ -84,10 +84,10 @@ namespace Ogre {
 			, pUseCount(rep ? OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1) : 0)
 			, useFreeMethod(inFreeMethod)
 		{
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+                    OGRE_SET_AUTO_SHARED_MUTEX_NULL;
 			if (rep)
 			{
-				OGRE_NEW_AUTO_SHARED_MUTEX
+                            OGRE_NEW_AUTO_SHARED_MUTEX;
 			}
 		}
 		SharedPtr(const SharedPtr& r)
@@ -95,11 +95,11 @@ namespace Ogre {
 		{
 			// lock & copy other mutex pointer
             
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+                    OGRE_SET_AUTO_SHARED_MUTEX_NULL;
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
 			    pRep = r.pRep;
 			    pUseCount = r.pUseCount; 
 				useFreeMethod = r.useFreeMethod;
@@ -126,11 +126,11 @@ namespace Ogre {
 		{
 			// lock & copy other mutex pointer
 
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+                    OGRE_SET_AUTO_SHARED_MUTEX_NULL;
             OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
+                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
 			    pRep = r.getPointer();
 			    pUseCount = r.useCountPointer();
 				useFreeMethod = r.freeMethod();
@@ -166,15 +166,15 @@ namespace Ogre {
 		*/
 		void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
 			assert(!pRep && !pUseCount);
-            OGRE_NEW_AUTO_SHARED_MUTEX
-			OGRE_LOCK_AUTO_SHARED_MUTEX
+                        OGRE_NEW_AUTO_SHARED_MUTEX;
+			OGRE_LOCK_AUTO_SHARED_MUTEX;
 			pUseCount = OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1);
 			pRep = rep;
 			useFreeMethod = inFreeMethod;
 		}
 
-		inline bool unique() const { OGRE_LOCK_AUTO_SHARED_MUTEX assert(pUseCount); return *pUseCount == 1; }
-		inline unsigned int useCount() const { OGRE_LOCK_AUTO_SHARED_MUTEX assert(pUseCount); return *pUseCount; }
+		inline bool unique() const { OGRE_LOCK_AUTO_SHARED_MUTEX; assert(pUseCount); return *pUseCount == 1; }
+		inline unsigned int useCount() const { OGRE_LOCK_AUTO_SHARED_MUTEX; assert(pUseCount); return *pUseCount; }
 		inline unsigned int* useCountPointer() const { return pUseCount; }
 
 		inline T* getPointer() const { return pRep; }
@@ -205,7 +205,7 @@ namespace Ogre {
             OGRE_MUTEX_CONDITIONAL(OGRE_AUTO_MUTEX_NAME)
 			{
 				// lock own mutex in limited scope (must unlock before destroy)
-				OGRE_LOCK_AUTO_SHARED_MUTEX
+                            OGRE_LOCK_AUTO_SHARED_MUTEX;
 				if (pUseCount)
 				{
 					if (--(*pUseCount) == 0) 
@@ -217,7 +217,7 @@ namespace Ogre {
 			if (destroyThis)
 				destroy();
 
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+                        OGRE_SET_AUTO_SHARED_MUTEX_NULL;
         }
 
         /** IF YOU GET A CRASH HERE, YOU FORGOT TO FREE UP POINTERS
@@ -241,7 +241,7 @@ namespace Ogre {
 			// use OGRE_FREE instead of OGRE_DELETE_T since 'unsigned int' isn't a destructor
 			// we only used OGRE_NEW_T to be able to use constructor
             OGRE_FREE(pUseCount, MEMCATEGORY_GENERAL);
-			OGRE_DELETE_AUTO_SHARED_MUTEX
+			OGRE_DELETE_AUTO_SHARED_MUTEX;
         }
 
 		virtual void swap(SharedPtr<T> &other) 

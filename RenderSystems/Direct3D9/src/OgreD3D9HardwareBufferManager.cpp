@@ -77,7 +77,7 @@ namespace Ogre {
 		D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
 			this, vertexSize, numVerts, usage, false, useShadowBuffer);
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 			mVertexBuffers.insert(vbuf);
 		}
         return HardwareVertexBufferSharedPtr(vbuf);
@@ -114,7 +114,7 @@ namespace Ogre {
 		D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
 			this, itype, numIndexes, usage, false, useShadowBuffer);
 		{
-			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 			mIndexBuffers.insert(idx);
 		}
 		return HardwareIndexBufferSharedPtr(idx);

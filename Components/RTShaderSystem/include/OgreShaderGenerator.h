@@ -913,7 +913,8 @@ protected:
     /** Used to check if finalizing */
     bool getIsFinalizing() const;
 protected:	
-	OGRE_AUTO_MUTEX													// Auto mutex.
+        // Auto mutex.
+        OGRE_AUTO_MUTEX;
 	// The active scene manager.
 	SceneManager* mActiveSceneMgr;
 	// A map of all scene managers this generator is bound to.

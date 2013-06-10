@@ -269,7 +269,7 @@ namespace Ogre
 		
 		size_t texWidth			= std::min<size_t>( mNumWorldMatrices * mRowLength, c_maxTexWidth );
 		size_t maxUsableWidth	= texWidth;
-		if( matricesToghetherPerRow() )
+		if( matricesTogetherPerRow() )
 		{
 			//The technique requires all matrices from the same instance in the same row
 			//i.e. 4094 -> 4095 -> skip 4096 -> 0 (next row) contains data from a new instance 
