@@ -60,7 +60,7 @@ THE SOFTWARE
 #define OGRE_THREAD_SLEEP(ms) tbb::this_tbb_thread::sleep(tbb::tick_count::interval_t(double(ms)/1000))
 #define OGRE_THREAD_WORKER_INHERIT
 #define OGRE_THREAD_ID_TYPE tbb::tbb_thread::id
-#define OGRE_THREAD_YIELD tbb::this_tbb_thread::yield();
+#define OGRE_THREAD_YIELD tbb::this_tbb_thread::yield()
 
 #endif
 

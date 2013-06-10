@@ -68,6 +68,6 @@ THE SOFTWARE
 // Utility
 #define OGRE_THREAD_SLEEP(ms) boost::this_thread::sleep(boost::posix_time::millisec(ms))
 #define OGRE_THREAD_ID_TYPE boost::thread::id
-#define OGRE_THREAD_YIELD boost::this_thread::yield();
+#define OGRE_THREAD_YIELD boost::this_thread::yield()
 
 #endif
