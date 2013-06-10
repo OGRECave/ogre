@@ -200,7 +200,16 @@ namespace Ogre {
 			return __sync_sub_and_fetch (&mField, sub);
 		}
 
+        // Need special alignment for atomic functions on ARM CPU's
+#if OGRE_CPU == OGRE_CPU_ARM
+#   if OGRE_COMPILER == OGRE_COMPILER_MSVC
+        __declspec(align(16)) volatile T mField;
+#   elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+        volatile T mField __attribute__((__aligned__(16)));
+#   endif
+#else
         volatile T mField;
+#endif
 
     };
 	/** @} */
