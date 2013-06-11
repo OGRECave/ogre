@@ -379,7 +379,7 @@ namespace Ogre {
 		// No point sprites, so no size
 		rsc->setMaxPointSize(0.f);
         
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object"))
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
             rsc->setCapability(RSC_VAO);
 
 		if (mGLSupport->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
@@ -388,9 +388,12 @@ namespace Ogre {
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+        if (mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+        {
+            rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+        }
 
+#if OGRE_NO_GLES3_SUPPORT == 0
 		// Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 #endif
@@ -1534,20 +1537,26 @@ namespace Ogre {
         // Call super class
         RenderSystem::_render(op);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
-        || op.vertexData->vertexBufferBinding->getHasInstanceData();
-
-		size_t numberOfInstances = op.numberOfInstances;
-
-        if (op.useGlobalInstancingVertexBufferIsAvailable)
+        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
+        VertexDeclaration* globalVertexDeclaration;
+        bool hasInstanceData;
+        size_t numberOfInstances;
+        if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
         {
-            numberOfInstances *= getGlobalNumberOfInstances();
+            globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+            globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+            hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
+                                    !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
+                                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+
+            numberOfInstances = op.numberOfInstances;
+
+            if (op.useGlobalInstancingVertexBufferIsAvailable)
+            {
+                numberOfInstances *= getGlobalNumberOfInstances();
+            }
         }
-#endif
+
         void* pBufferData = 0;
 
         const VertexDeclaration::VertexElementList& decl =
@@ -1585,19 +1594,20 @@ namespace Ogre {
 //            boundAttrCount++;
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
+        if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
         {
-            elemEnd = globalVertexDeclaration->getElements().end();
-            for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
+            if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
             {
-                const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
-                                       mRenderAttribsBound, mRenderInstanceAttribsBound, true);
-                continue;
+                elemEnd = globalVertexDeclaration->getElements().end();
+                for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
+                {
+                    const VertexElement & elem = *elemIter;
+                    bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
+                                           mRenderAttribsBound, mRenderInstanceAttribsBound, true);
+                    continue;
+                }
             }
         }
-#endif
 
         // Sort the list of bound attributes
 //        std::sort(mRenderAttribsBound.begin(), mRenderAttribsBound.end());
@@ -1656,19 +1666,23 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
-#if OGRE_NO_GLES3_SUPPORT == 0
-                if(hasInstanceData)
-				{
-                    OGRE_CHECK_GL_ERROR(glDrawElementsInstanced((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
-				}
-				else
+
+                if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
                 {
-                    GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
-                }
-#else
-                OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
+                    if(hasInstanceData)
+                    {
+                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedAPPLE((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
+                    }
+#if OGRE_NO_GLES3_SUPPORT == 0
+                    else
+                    {
+                        GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
+                        OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                    }
 #endif
+                }
+                else
+                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
 
             } while (updatePassIterationRenderState());
         }
@@ -1683,13 +1697,12 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
-#if OGRE_NO_GLES3_SUPPORT == 0
-                if(hasInstanceData)
+
+                if((mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
 				{
-					OGRE_CHECK_GL_ERROR(glDrawArraysInstanced((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
+					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedAPPLE((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
 				}
 				else
-#endif
 				{
                     OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount));
 				}
@@ -1702,10 +1715,9 @@ namespace Ogre {
         }
 
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
-#   if GL_OES_vertex_array_object
-        // Unbind the vertex array object.  Marks the end of what state will be included.
-        OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
-#   endif
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
+            // Unbind the vertex array object.  Marks the end of what state will be included.
+            OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
 #endif
 
  		// Unbind all attributes
@@ -2274,16 +2286,18 @@ namespace Ogre {
                 attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
             }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-            if (mCurrentVertexProgram)
+            if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
             {
-                if (hwGlBuffer->getIsInstanceData())
+                if (mCurrentVertexProgram)
                 {
-                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
-                    instanceAttribsBound.push_back(attrib);
+                    if (hwGlBuffer->getIsInstanceData())
+                    {
+                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorAPPLE(attrib, hwGlBuffer->getInstanceDataStepRate()));
+                        instanceAttribsBound.push_back(attrib);
+                    }
                 }
             }
-#endif
+
             switch(elem.getType())
             {
                 case VET_COLOUR:

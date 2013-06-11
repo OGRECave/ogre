@@ -1274,6 +1274,18 @@ typedef void (GL_APIENTRYP PFNGLDRAWELEMENTSINSTANCEDANGLEPROC) (GLenum mode, GL
 typedef void (GL_APIENTRYP PFNGLVERTEXATTRIBDIVISORANGLEPROC) (GLuint index, GLuint divisor);
 #endif
 
+#ifndef GL_APPLE_instanced_arrays
+#define GL_APPLE_instanced_arrays 1
+#ifdef GL_GLEXT_PROTOTYPES
+GL_APICALL void GL_APIENTRY glDrawArraysInstancedAPPLE (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+GL_APICALL void GL_APIENTRY glDrawElementsInstancedAPPLE (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
+GL_APICALL void GL_APIENTRY glVertexAttribDivisorAPPLE (GLuint index, GLuint divisor);
+#endif
+typedef void (GL_APIENTRYP PFNGLDRAWARRAYSINSTANCEDAPPLEPROC) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+typedef void (GL_APIENTRYP PFNGLDRAWELEMENTSINSTANCEDAPPLEPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
+typedef void (GL_APIENTRYP PFNGLVERTEXATTRIBDIVISORAPPLEPROC) (GLuint index, GLuint divisor);
+#endif
+
 /* GL_ANGLE_pack_reverse_row_order */
 #ifndef GL_ANGLE_pack_reverse_row_order 
 #define GL_ANGLE_pack_reverse_row_order 1

@@ -169,6 +169,9 @@ THE SOFTWARE.
 #define GL_ANY_SAMPLES_PASSED_EXT GL_ANY_SAMPLES_PASSED
 #define GL_QUERY_RESULT_EXT GL_QUERY_RESULT
 #define GL_QUERY_RESULT_AVAILABLE_EXT GL_QUERY_RESULT_AVAILABLE
+#define glDrawElementsInstancedAPPLE glDrawElementsInstanced
+#define glDrawArraysInstancedAPPLE glDrawArraysInstanced
+#define glVertexAttribDivisorAPPLE glVertexAttribDivisor
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
