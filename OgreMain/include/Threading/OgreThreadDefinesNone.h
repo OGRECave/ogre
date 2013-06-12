@@ -55,5 +55,6 @@ THE SOFTWARE
 #define OGRE_THREAD_POINTER_DELETE(var) do { OGRE_DELETE var; var = 0; } while (0)
 #define OGRE_THREAD_SLEEP(ms)
 #define OGRE_THREAD_WORKER_INHERIT
+#define OGRE_THREAD_YIELD
 
 #endif

@@ -68,6 +68,7 @@ THE SOFTWARE
 // (hardware concurrency is not accessible via POCO atm)
 // Utility
 #define OGRE_THREAD_SLEEP(ms) Poco::Thread::sleep(ms)
+#define OGRE_THREAD_ID_TYPE size_t
+#define OGRE_THREAD_YIELD Poco::Thread::yield()
 
 #endif
-
