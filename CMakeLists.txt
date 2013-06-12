@@ -415,6 +415,13 @@ cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
+if (WIN32)
+	option(OGRE_INSTALL_VSPROPS "Install Visual Studio Property Page." FALSE)
+	if (OGRE_INSTALL_VSPROPS)
+		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${OGRE_BINARY_DIR}/OGRE.props)
+		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
+	endif ()
+endif ()
 
 # Unity build options
 # A Unity build includes all sources files in just a few actual compilation units
