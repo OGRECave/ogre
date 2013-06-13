@@ -212,6 +212,19 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 
 #endif
 
+#if (OGRE_NO_ETC_CODEC == 0)
+#   ifndef GL_OES_compressed_ETC1_RGB8_texture
+#       define GL_OES_compressed_ETC1_RGB8_texture 1
+#       define GL_ETC1_RGB8_OES                                         0x8D64
+#   endif
+#   define GL_COMPRESSED_RGB8_ETC2                                      0x9274
+#   define GL_COMPRESSED_SRGB8_ETC2                                     0x9275
+#   define GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2                  0x9276
+#   define GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2                 0x9277
+#   define GL_COMPRESSED_RGBA8_ETC2_EAC                                 0x9278
+#   define GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC                          0x9279
+#endif
+
 #if defined(__APPLE__)
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
     if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)

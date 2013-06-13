@@ -469,7 +469,7 @@ namespace Ogre
 		ResponseQueue mResponseQueue; // Guarded by mResponseMutex
 
 		/// Thread function
-		struct WorkerFunc OGRE_THREAD_WORKER_INHERIT
+		struct _OgreExport WorkerFunc OGRE_THREAD_WORKER_INHERIT
 		{
 			DefaultWorkQueueBase* mQueue;
 
@@ -477,6 +477,8 @@ namespace Ogre
 				: mQueue(q) {}
 
 			void operator()();
+			
+			void operator()() const;
 
 			void run();
 		};

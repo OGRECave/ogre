@@ -176,6 +176,12 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
             case PF_BC7_UNORM_SRGB:
                 return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
+            case PF_ETC2_RGB8:
+                return GL_COMPRESSED_RGB8_ETC2;
+            case PF_ETC2_RGBA8:
+                return GL_COMPRESSED_RGBA8_ETC2_EAC;
+            case PF_ETC2_RGB8A1:
+                return GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
 
             default:
                 return 0;
@@ -453,6 +459,12 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
             case PF_BC7_UNORM_SRGB:
                 return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
+            case PF_ETC2_RGB8:
+                return GL_COMPRESSED_RGB8_ETC2;
+            case PF_ETC2_RGBA8:
+                return GL_COMPRESSED_RGBA8_ETC2_EAC;
+            case PF_ETC2_RGB8A1:
+                return GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
 
             default:
                 return GL_NONE;
@@ -625,6 +637,12 @@ namespace Ogre  {
             return PF_BC7_UNORM;
         case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:
             return PF_BC7_UNORM_SRGB;
+        case GL_COMPRESSED_RGB8_ETC2:
+            return PF_ETC2_RGB8;
+        case GL_COMPRESSED_RGBA8_ETC2_EAC:
+            return PF_ETC2_RGBA8;
+        case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+            return PF_ETC2_RGB8A1;
 
 		default:
 			return PF_A8R8G8B8;
