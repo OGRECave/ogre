@@ -73,6 +73,10 @@ void UseCustomCapabilitiesTests::setUp()
 	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+
+#if OGRE_STATIC
+        mStaticPluginLoader = new Ogre::StaticPluginLoader();
+#endif
 }
 
 void UseCustomCapabilitiesTests::tearDown()
@@ -203,7 +207,14 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
+#ifdef OGRE_STATIC_LIB
+	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
+
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -264,7 +275,14 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
-    Root* root = OGRE_NEW Root("plugins.cfg");
+#ifdef OGRE_STATIC_LIB
+	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
+	Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
+
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{
