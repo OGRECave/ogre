@@ -995,6 +995,7 @@ namespace Ogre
 		glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)getProcAddress("glXGetCurrentDisplay");
 	}
 
+#if OGRE_THREAD_SUPPORT == 1
 	GLXEWContext* glxewGetContext()
 	{
 		using namespace Ogre;
@@ -1010,5 +1011,6 @@ namespace Ogre
 		}
 		return currentGLXEWContextsPtr;
 	}
+#endif
 }
 
