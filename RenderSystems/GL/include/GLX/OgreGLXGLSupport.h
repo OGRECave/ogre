@@ -194,6 +194,8 @@ namespace Ogre {
 		
 		StringVector mSampleLevels;
 	};
+
+        GLXEWContext* glxewGetContext();
 }
 
 #endif // OGRE_GLXGLSupport_H
