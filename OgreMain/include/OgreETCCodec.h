@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __OgreETC1Codec_H__
-#define __OgreETC1Codec_H__
+#ifndef __OgreETCCodec_H__
+#define __OgreETCCodec_H__
 
 #include "OgreImageCodec.h"
 
@@ -38,12 +38,12 @@ namespace Ogre {
 	*  @{
 	*/
 
-    /** Codec specialized in loading ETC1 (Ericsson Texture Compression) images.
+    /** Codec specialized in loading ETC (Ericsson Texture Compression) images.
 	@remarks
-		We implement our own codec here since we need to be able to keep ETC1
+		We implement our own codec here since we need to be able to keep ETC
 		data compressed if the card supports it.
     */
-    class _OgreExport ETC1Codec : public ImageCodec
+    class _OgreExport ETCCodec : public ImageCodec
     {
     protected:
         String mType;
@@ -52,12 +52,12 @@ namespace Ogre {
 	    void flipEndian(void * pData, size_t size) const;
 
 		/// Single registered codec instance
-		static ETC1Codec* msPKMInstance;
-		static ETC1Codec* msKTXInstance;
+        static ETCCodec* msPKMInstance;
+        static ETCCodec* msKTXInstance;
 
 	public:
-        ETC1Codec(const String &type);
-        virtual ~ETC1Codec() { }
+        ETCCodec(const String &type);
+        virtual ~ETCCodec() { }
 
         /// @copydoc Codec::encode
         DataStreamPtr encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
@@ -74,10 +74,10 @@ namespace Ogre {
 		static void startup(void);
 		/// Static method to shutdown and unregister the PVRTC codec
 		static void shutdown(void);
+    private:
+        bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
+        bool decodeKTX(DataStreamPtr& input, DecodeResult& result) const;
 
-	private:
-		bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
-		bool decodeKTX(DataStreamPtr& input, DecodeResult& result) const;
     };
 	/** @} */
 	/** @} */

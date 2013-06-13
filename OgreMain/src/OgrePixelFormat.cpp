@@ -466,9 +466,9 @@ namespace Ogre {
         /* Flags */
         PFF_DEPTH,
         /* Component type and count */
-        PCT_FLOAT32, 1, // ?
+        PCT_FLOAT16, 1, // ?
         /* rbits, gbits, bbits, abits */
-        0, 0, 0, 0,
+        16, 0, 0, 0,
         /* Masks and shifts */
 		0, 0, 0, 0, 0, 0, 0, 0
         },
@@ -536,7 +536,7 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 0, 0,
         /* Masks and shifts */
-        0x0000FFFF, 0xFFFF0000, 0, 0, 
+        0x0000FFFF, 0xFFFF0000, 0, 0,
 		0, 16, 0, 0
         },
 	//-----------------------------------------------------------------------
@@ -1277,6 +1277,45 @@ namespace Ogre {
         0, 0, 0, 0,
         /* Masks and shifts */
         0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ETC2_RGB8",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ETC2_RGBA8",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ETC2_RGB8A1",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
         }
     };
     //-----------------------------------------------------------------------
@@ -1370,10 +1409,13 @@ namespace Ogre {
                 case PF_PVRTC_RGBA4:
                 case PF_PVRTC2_4BPP:
                     return (std::max((int)width, 8) * std::max((int)height, 8) * 4 + 7) / 8;
-                    
+
                 case PF_ETC1_RGB8:
+                case PF_ETC2_RGB8:
+                case PF_ETC2_RGBA8:
+                case PF_ETC2_RGB8A1:
                     return ((width * height) >> 1);
-                    
+
 				default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",
 					"PixelUtil::getMemorySize");
@@ -1724,6 +1766,7 @@ namespace Ogre {
                 ((float*)dest)[2] = b;
                 ((float*)dest)[3] = a;
                 break;
+            case PF_DEPTH:
             case PF_FLOAT16_R:
                 ((uint16*)dest)[0] = Bitwise::floatToHalf(r);
                 break;
@@ -1861,6 +1904,7 @@ namespace Ogre {
                 *b = ((const float*)src)[2];
                 *a = ((const float*)src)[3];
                 break;
+            case PF_DEPTH:
             case PF_FLOAT16_R:
                 *r = *g = *b = Bitwise::halfToFloat(((const uint16*)src)[0]);
                 *a = 1.0f;

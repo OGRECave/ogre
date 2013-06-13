@@ -706,9 +706,9 @@ if (OGRE_CONFIG_ENABLE_PVRTC)
   list(APPEND SOURCE_FILES src/OgrePVRTCCodec.cpp)
 endif ()
 
-if (OGRE_CONFIG_ENABLE_ETC1)
-  list(APPEND HEADER_FILES include/OgreETC1Codec.h)
-  list(APPEND SOURCE_FILES src/OgreETC1Codec.cpp)
+if (OGRE_CONFIG_ENABLE_ETC)
+  list(APPEND HEADER_FILES include/OgreETCCodec.h)
+  list(APPEND SOURCE_FILES src/OgreETCCodec.cpp)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
