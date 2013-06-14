@@ -37,6 +37,7 @@
 
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
+#import "SampleBrowser.h"
 
 #ifdef __OBJC__
 
