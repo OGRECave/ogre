@@ -32,7 +32,7 @@
 #include "ppapi/utility/completion_callback_factory.h"
 #endif
 
-#include "SampleBrowser.h"
+using namespace Ogre;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -46,17 +46,18 @@
 #include "SampleBrowser_NaCl.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "SampleBrowser_Android.h"
+#include "SampleBrowser.h"
 
 SampleBrowser* OgreAndroidBridge::mBrowser = NULL;
 AndroidInputInjector* OgreAndroidBridge::mInputInjector = NULL;
 AndroidMultiTouch* OgreAndroidBridge::mTouch = NULL;
 AndroidKeyboard* OgreAndroidBridge::mKeyboard = NULL;
-Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
-Ogre::Root* OgreAndroidBridge::mRoot = NULL;
+RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
+Root* OgreAndroidBridge::mRoot = NULL;
 bool OgreAndroidBridge::mInit = false;
 
 #   ifdef OGRE_STATIC_LIB
-Ogre::StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
+StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
 #   endif
 
 #endif
@@ -98,24 +99,24 @@ int main(int argc, char *argv[]) {
 	try
 	{
         bool nograb = false;
-        if (argc >= 2 && Ogre::String(argv[1]) == "nograb")
+        if (argc >= 2 && String(argv[1]) == "nograb")
             nograb = true;
 
         int startUpSampleIdx = -1;
         if (argc >= 3)
         {
-            startUpSampleIdx = Ogre::StringConverter::parseInt(Ogre::String(argv[2]), -1);
+            startUpSampleIdx = StringConverter::parseInt(String(argv[2]), -1);
         }
         else if (argc >= 2)
         {
             // first parameter can be either nograb or index. in the former case, we'll just
             // get -1, which is fine.
-            startUpSampleIdx = Ogre::StringConverter::parseInt(Ogre::String(argv[1]), -1);
+            startUpSampleIdx = StringConverter::parseInt(String(argv[1]), -1);
         }
 		OgreBites::SampleBrowser brows (nograb, startUpSampleIdx);
 		brows.go();
 	}
-	catch (Ogre::Exception& e)
+	catch (Exception& e)
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
