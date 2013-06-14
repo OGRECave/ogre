@@ -42,8 +42,9 @@
 #import "OgreOSXCocoaWindow.h"
 #import <QuartzCore/CVDisplayLink.h>
 
-using namespace Ogre;
 #include "SampleBrowser.h"
+
+using namespace Ogre;
 
 // All this does is suppress some messages in the run log.  NSApplication does not
 // implement buttonPressed and apps without a NIB have no target for the action.
