@@ -59,11 +59,11 @@ void TerrainTests::setUp()
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	cf.load("bin/release/resources.cfg");
 #else
-#ifdef OGRE_STATIC_LIB
+	#ifdef OGRE_STATIC_LIB
 	cf.load("bin/resources.cfg");
-#else
+	#else
 	cf.load("resources.cfg");
-#endif
+	#endif
 #endif
 
 	// Go through all sections & settings in the file

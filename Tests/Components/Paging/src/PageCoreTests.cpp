@@ -43,7 +43,18 @@ void PageCoreTests::setUp()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
+#if OGRE_STATIC
+        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+#endif
+
+#ifdef OGRE_STATIC_LIB
+	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	mRoot = OGRE_NEW Root();
+#endif
+
     LogManager::getSingleton().setLogDetail(LL_LOW);
 	mPageManager = OGRE_NEW PageManager();
 
@@ -59,6 +70,9 @@ void PageCoreTests::tearDown()
 {
 	OGRE_DELETE mPageManager;
 	OGRE_DELETE mRoot;
+#if OGRE_STATIC
+        OGRE_DELETE mStaticPluginLoader;
+#endif
 }
 
 

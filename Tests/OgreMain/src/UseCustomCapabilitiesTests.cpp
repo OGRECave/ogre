@@ -75,7 +75,7 @@ void UseCustomCapabilitiesTests::setUp()
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
 #if OGRE_STATIC
-        mStaticPluginLoader = new Ogre::StaticPluginLoader();
+        mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
 #endif
 }
 
@@ -86,6 +86,9 @@ void UseCustomCapabilitiesTests::tearDown()
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
+#if OGRE_STATIC
+        OGRE_DELETE mStaticPluginLoader;
+#endif
 }
 
 void checkCaps(const Ogre::RenderSystemCapabilities* caps)
