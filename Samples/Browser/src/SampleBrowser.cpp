@@ -32,6 +32,10 @@
 #include "ppapi/utility/completion_callback_factory.h"
 #endif
 
+#if !defined(OGRE_STATIC_LIB) && (OGRE_PLATFORM != OGRE_PLATFORM_APPLE && __LP64__)
+#include "SampleBrowser.h"
+#endif
+
 using namespace Ogre;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -46,7 +50,6 @@ using namespace Ogre;
 #include "SampleBrowser_NaCl.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "SampleBrowser_Android.h"
-#include "SampleBrowser.h"
 
 SampleBrowser* OgreAndroidBridge::mBrowser = NULL;
 AndroidInputInjector* OgreAndroidBridge::mInputInjector = NULL;
