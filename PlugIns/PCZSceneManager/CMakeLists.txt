@@ -9,45 +9,8 @@
 
 # Configure PCZ SceneManager build
 
-set (HEADER_FILES
-  include/OgreAntiPortal.h
-  include/OgreCapsule.h
-  include/OgreDefaultZone.h
-  include/OgrePCPlane.h
-  include/OgrePCZCamera.h
-  include/OgrePCZFrustum.h
-  include/OgrePCZLight.h
-  include/OgrePCZoneFactory.h
-  include/OgrePCZone.h
-  include/OgrePCZPlugin.h
-  include/OgrePCZPrerequisites.h
-  include/OgrePCZSceneManager.h
-  include/OgrePCZSceneNode.h
-  include/OgrePCZSceneQuery.h
-  include/OgrePortal.h
-  include/OgrePortalBase.h
-  include/OgreSegment.h
-)
-
-set (SOURCE_FILES
-  src/OgreAntiPortal.cpp
-  src/OgreCapsule.cpp
-  src/OgreDefaultZone.cpp
-  src/OgrePCPlane.cpp
-  src/OgrePCZCamera.cpp
-  src/OgrePCZFrustum.cpp
-  src/OgrePCZLight.cpp
-  src/OgrePCZone.cpp
-  src/OgrePCZoneFactory.cpp
-  src/OgrePCZPlugin.cpp
-  src/OgrePCZSceneManager.cpp
-  src/OgrePCZSceneManagerDll.cpp
-  src/OgrePCZSceneNode.cpp
-  src/OgrePCZSceneQuery.cpp
-  src/OgrePortal.cpp
-  src/OgrePortalBase.cpp
-  src/OgreSegment.cpp
-)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)

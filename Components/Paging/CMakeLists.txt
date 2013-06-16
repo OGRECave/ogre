@@ -14,37 +14,8 @@
 PROJECT(OgrePaging)
 
 # define header and source files for the library
-set (HEADER_FILES
-	include/OgreGrid2DPageStrategy.h
-	include/OgreGrid3DPageStrategy.h
-	include/OgrePage.h
-	include/OgrePageConnection.h
-	include/OgrePageContent.h
-	include/OgrePageContentCollection.h
-	include/OgrePageContentCollectionFactory.h
-	include/OgrePageContentFactory.h
-	include/OgrePagedWorld.h
-	include/OgrePagedWorldSection.h
-	include/OgrePageFileFormats.h
-	include/OgrePageManager.h
-	include/OgrePageStrategy.h
-	include/OgrePaging.h
-	include/OgrePagingPrerequisites.h
-	include/OgreSimplePageContentCollection.h
-)
-
-set (SOURCE_FILES
-	src/OgreGrid2DPageStrategy.cpp
-	src/OgreGrid3DPageStrategy.cpp
-	src/OgrePage.cpp
-	src/OgrePageContent.cpp
-	src/OgrePageContentCollection.cpp
-	src/OgrePagedWorld.cpp
-	src/OgrePagedWorldSection.cpp
-	src/OgrePageManager.cpp
-	src/OgreSimplePageContentCollection.cpp
-)
-
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # Add needed definitions 
 add_definitions(-DOGRE_PAGING_EXPORTS -D_MT -D_USRDLL)
@@ -61,7 +32,6 @@ if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgrePaging ${OGRE_THREAD_LIBRARIES})
 endif ()
 
-
 # install 
 ogre_config_framework(OgrePaging)
 ogre_config_component(OgrePaging)
@@ -69,4 +39,3 @@ ogre_config_component(OgrePaging)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Paging
 )
-
