@@ -819,7 +819,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------------------------------//
 	::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
 	{
-		::GLXContext glxContext;
+		::GLXContext glxContext = NULL;
 		int context_attribs[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 5,
