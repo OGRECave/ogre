@@ -145,7 +145,6 @@ elseif (UNIX)
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/GLX/*.h"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/GLX_backdrop.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm"
       src/OgreSearchOps.cpp)
 
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
