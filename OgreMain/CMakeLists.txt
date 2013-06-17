@@ -15,14 +15,34 @@ PROJECT(OgreMain)
 
 include(PrecompiledHeader)
 
-# define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
-    src/OgreImageResampler.h
-    src/OgrePixelConversions.h
-    src/OgreSIMDHelper.h)
+if(NOT OGRE_UNITY_BUILD)
+    # define header and source files for the library
+    file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+    list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+        src/OgreImageResampler.h
+        src/OgrePixelConversions.h
+        src/OgreSIMDHelper.h)
   
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+    file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+    # Remove optional header files
+    list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreDDSCodec.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePVRTCCodec.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreZip.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreAPKZipArchive.h"
+    )
+
+    # Remove optional source files
+    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAPKZipArchive.cpp"
+    )
+endif()
 
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
