@@ -17,6 +17,13 @@ PROJECT(OgreTerrain)
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreTerrainPagedWorldSection.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreTerrainPaging.h"
+)
+list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTerrainPagedWorldSection.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTerrainPaging.cpp"
+)
+
 # Add needed definitions 
 add_definitions(-DOGRE_TERRAIN_EXPORTS -D_MT -D_USRDLL)
 
