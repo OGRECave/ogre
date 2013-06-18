@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "OgreGLXUtils.h"
 #include "OgreGLXWindow.h"
 
+#ifndef Status
+#define Status int
+#endif
+
+#include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
 static bool ctxErrorOccurred = false;
