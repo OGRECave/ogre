@@ -17,8 +17,8 @@ file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/src/*.cpp")
 
 # Add system specific settings
 if (WIN32)
-  file(GLOB PLATFORM_HEADERS "include/win32/*.h" "src/win32/*.h")
-  file(GLOB PLATFORM_SOURCES "src/win32/*.cpp")
+  file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
+  file(GLOB PLATFORM_SOURCES "src/Win32/*.cpp")
 
   include_directories(src/win32 include/win32)
   source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})

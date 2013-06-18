@@ -30,8 +30,8 @@ source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
 # Add system specific settings
 if (WIN32)
-  file(GLOB PLATFORM_HEADERS "include/Win32/OgreWin32*.h" "src/Win32/*.h")
-  file(GLOB PLATFORM_SOURCES "src/Win32/OgreWin32*.cpp" "src/Win32/*.cpp")
+  file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
+  file(GLOB PLATFORM_SOURCES "src/Win32/*.cpp")
 
   include_directories(src/nvparse/winheaders include/Win32 src/Win32)
   set(PLATFORM_HEADER_INSTALL "")
