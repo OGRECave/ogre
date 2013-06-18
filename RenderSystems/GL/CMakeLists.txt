@@ -33,7 +33,7 @@ if (WIN32)
   file(GLOB PLATFORM_HEADERS "include/Win32/OgreWin32*.h" "src/Win32/*.h")
   file(GLOB PLATFORM_SOURCES "src/Win32/OgreWin32*.cpp" "src/Win32/*.cpp")
 
-  include_directories(src/nvparse/winheaders src/Win32)
+  include_directories(src/nvparse/winheaders include/Win32 src/Win32)
   set(PLATFORM_HEADER_INSTALL "")
 elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/OSX/*.h" "src/OSX/*.h")
