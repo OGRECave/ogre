@@ -67,7 +67,7 @@ namespace Ogre {
     {
 		GpuProgramPtr prg;
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			prg = getByName(name);
 			if (prg.isNull())
 			{
@@ -85,7 +85,7 @@ namespace Ogre {
     {
 		GpuProgramPtr prg;
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 			prg = getByName(name);
 			if (prg.isNull())
 			{

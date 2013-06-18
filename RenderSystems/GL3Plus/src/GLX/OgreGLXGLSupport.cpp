@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "OgreGLXUtils.h"
 #include "OgreGLXWindow.h"
 
+#ifndef Status
+#define Status int
+#endif
+
+#include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
 static bool ctxErrorOccurred = false;
@@ -819,7 +824,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------------------------------//
 	::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
 	{
-		::GLXContext glxContext;
+		::GLXContext glxContext = NULL;
 		int context_attribs[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 5,

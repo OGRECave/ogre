@@ -32,8 +32,6 @@
 #include "ppapi/utility/completion_callback_factory.h"
 #endif
 
-#include "SampleBrowser.h"
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
@@ -56,10 +54,12 @@ Ogre::Root* OgreAndroidBridge::mRoot = NULL;
 bool OgreAndroidBridge::mInit = false;
 
 #   ifdef OGRE_STATIC_LIB
-Ogre::StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
+StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
 #   endif
 
 #endif
+
+#include "SampleBrowser.h"
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 

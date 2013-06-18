@@ -244,8 +244,14 @@ namespace Ogre {
         PF_R16G16B16A16_SNORM = 87,
         /// ETC1 (Ericsson Texture Compression)
         PF_ETC1_RGB8 = 88,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGB8 = 89,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGBA8 = 90,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGB8A1 = 91,
 		// Number of pixel formats currently defined
-        PF_COUNT = 89
+        PF_COUNT = 92
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 

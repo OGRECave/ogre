@@ -33,25 +33,17 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
-#	if !defined( __MINGW32__ )
-#		define __PRETTY_FUNCTION__ __FUNCTION__
-#		ifndef WIN32_LEAN_AND_MEAN
-#			define WIN32_LEAN_AND_MEAN 1
-#		endif
-#		ifndef NOMINMAX
-#			define NOMINMAX // required to stop windows.h messing up std::min
-#		endif
-#	endif
-#endif
-
 #ifndef GL_GLEXT_PROTOTYPES
 #  define  GL_GLEXT_PROTOTYPES
 #endif
 
+#if OGRE_NO_GLES3_SUPPORT == 0
+#   include <GLES3/gles3w.h>
+#else
+#   include <GLES2/gles2w.h>
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-#   include <OpenGLES/ES2/gl.h>
-#   include <OpenGLES/ES2/glext.h>
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
@@ -79,6 +71,17 @@ THE SOFTWARE.
 #       undef GL_OES_vertex_array_object
 #	endif
 #else
+#   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#       if !defined( __MINGW32__ )
+#           define __PRETTY_FUNCTION__ __FUNCTION__
+#           ifndef WIN32_LEAN_AND_MEAN
+#               define WIN32_LEAN_AND_MEAN 1
+#           endif
+#           ifndef NOMINMAX
+#               define NOMINMAX // required to stop windows.h messing up std::min
+#           endif
+#       endif
+#   endif
 #	undef  GL_GLEXT_PROTOTYPES
 #   if OGRE_NO_GLES3_SUPPORT == 0
 #       include <GLES3/gl3platform.h>
@@ -88,128 +91,19 @@ THE SOFTWARE.
 #       include <GLES2/gl2ext.h>
 #   endif
 #   include <EGL/egl.h>
-
-#	ifndef GL_GLEXT_PROTOTYPES
-#       if OGRE_NO_GLES3_SUPPORT == 1
-
-typedef void (GL_APIENTRYP PFNGLGENQUERIESEXTPROC) (GLsizei n, GLuint *ids);
-typedef void (GL_APIENTRYP PFNGLDELETEQUERIESEXTPROC) (GLsizei n, const GLuint *ids);
-typedef GLboolean (GL_APIENTRYP PFNGLISQUERYEXTPROC) (GLuint id);
-typedef void (GL_APIENTRYP PFNGLBEGINQUERYEXTPROC) (GLenum target, GLuint id);
-typedef void (GL_APIENTRYP PFNGLENDQUERYEXTPROC) (GLenum target);
-typedef void (GL_APIENTRYP PFNGLGETQUERYIVEXTPROC) (GLenum target, GLenum pname, GLint *params);
-typedef void (GL_APIENTRYP PFNGLGETQUERYOBJECTUIVEXTPROC) (GLuint id, GLenum pname, GLuint *params);
-extern PFNGLGENQUERIESEXTPROC glGenQueriesEXT;
-extern PFNGLDELETEQUERIESEXTPROC glDeleteQueriesEXT;
-extern PFNGLISQUERYEXTPROC glIsQueryEXT;
-extern PFNGLBEGINQUERYEXTPROC glBeginQueryEXT;
-extern PFNGLENDQUERYEXTPROC glEndQueryEXT;
-extern PFNGLGETQUERYIVEXTPROC glGetQueryivEXT;
-extern PFNGLGETQUERYOBJECTUIVEXTPROC glGetQueryObjectuivEXT;
-
-typedef void (GL_APIENTRYP PFNGLINSERTEVENTMARKEREXTPROC) (GLsizei length, const GLchar *marker);
-typedef void (GL_APIENTRYP PFNGLPUSHGROUPMARKEREXTPROC) (GLsizei length, const GLchar *marker);
-typedef void (GL_APIENTRYP PFNGLPOPGROUPMARKEREXTPROC) (void);
-
-extern PFNGLINSERTEVENTMARKEREXTPROC glInsertEventMarkerEXT;
-extern PFNGLPUSHGROUPMARKEREXTPROC glPushGroupMarkerEXT;
-extern PFNGLPOPGROUPMARKEREXTPROC glPopGroupMarkerEXT;
-
-typedef void (GL_APIENTRYP PFNGLLABELOBJECTEXTPROC) (GLenum type, GLuint object, GLsizei length, const GLchar *label);
-typedef void (GL_APIENTRYP PFNGLGETOBJECTLABELEXTPROC) (GLenum type, GLuint object, GLsizei bufSize, GLsizei *length, GLchar *label);
-
-extern PFNGLLABELOBJECTEXTPROC glLabelObjectEXT;
-extern PFNGLGETOBJECTLABELEXTPROC glGetObjectLabelEXT;
-
-typedef void (GL_APIENTRYP PFNGLUSEPROGRAMSTAGESEXTPROC) (GLuint pipeline, GLbitfield stages, GLuint program);
-typedef void (GL_APIENTRYP PFNGLACTIVESHADERPROGRAMEXTPROC) (GLuint pipeline, GLuint program);
-typedef GLuint (GL_APIENTRYP PFNGLCREATESHADERPROGRAMVEXTPROC) (GLenum type, GLsizei count, const GLchar **strings);
-typedef void (GL_APIENTRYP PFNGLBINDPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
-typedef void (GL_APIENTRYP PFNGLDELETEPROGRAMPIPELINESEXTPROC) (GLsizei n, const GLuint *pipelines);
-typedef void (GL_APIENTRYP PFNGLGENPROGRAMPIPELINESEXTPROC) (GLsizei n, GLuint *pipelines);
-typedef GLboolean (GL_APIENTRYP PFNGLISPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
-typedef void (GL_APIENTRYP PFNGLPROGRAMPARAMETERIEXTPROC) (GLuint program, GLenum pname, GLint value);
-typedef void (GL_APIENTRYP PFNGLGETPROGRAMPIPELINEIVEXTPROC) (GLuint pipeline, GLenum pname, GLint *params);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1IEXTPROC) (GLuint program, GLint location, GLint x);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2IEXTPROC) (GLuint program, GLint location, GLint x, GLint y);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z, GLint w);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1FEXTPROC) (GLuint program, GLint location, GLfloat x);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM1FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM2FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM3FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORM4FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-typedef void (GL_APIENTRYP PFNGLVALIDATEPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
-typedef void (GL_APIENTRYP PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC) (GLuint pipeline, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-
-extern PFNGLUSEPROGRAMSTAGESEXTPROC glUseProgramStagesEXT;
-extern PFNGLACTIVESHADERPROGRAMEXTPROC glActiveShaderProgramEXT;
-extern PFNGLCREATESHADERPROGRAMVEXTPROC glCreateShaderProgramvEXT;
-extern PFNGLBINDPROGRAMPIPELINEEXTPROC glBindProgramPipelineEXT;
-extern PFNGLDELETEPROGRAMPIPELINESEXTPROC glDeleteProgramPipelinesEXT;
-extern PFNGLGENPROGRAMPIPELINESEXTPROC glGenProgramPipelinesEXT;
-extern PFNGLISPROGRAMPIPELINEEXTPROC glIsProgramPipelineEXT;
-extern PFNGLPROGRAMPARAMETERIEXTPROC glProgramParameteriEXT;
-extern PFNGLGETPROGRAMPIPELINEIVEXTPROC glGetProgramPipelineivEXT;
-extern PFNGLPROGRAMUNIFORM1IEXTPROC glProgramUniform1iEXT;
-extern PFNGLPROGRAMUNIFORM2IEXTPROC glProgramUniform2iEXT;
-extern PFNGLPROGRAMUNIFORM3IEXTPROC glProgramUniform3iEXT;
-extern PFNGLPROGRAMUNIFORM4IEXTPROC glProgramUniform4iEXT;
-extern PFNGLPROGRAMUNIFORM1FEXTPROC glProgramUniform1fEXT;
-extern PFNGLPROGRAMUNIFORM2FEXTPROC glProgramUniform2fEXT;
-extern PFNGLPROGRAMUNIFORM3FEXTPROC glProgramUniform3fEXT;
-extern PFNGLPROGRAMUNIFORM4FEXTPROC glProgramUniform4fEXT;
-extern PFNGLPROGRAMUNIFORM1IVEXTPROC glProgramUniform1ivEXT;
-extern PFNGLPROGRAMUNIFORM2IVEXTPROC glProgramUniform2ivEXT;
-extern PFNGLPROGRAMUNIFORM3IVEXTPROC glProgramUniform3ivEXT;
-extern PFNGLPROGRAMUNIFORM4IVEXTPROC glProgramUniform4ivEXT;
-extern PFNGLPROGRAMUNIFORM1FVEXTPROC glProgramUniform1fvEXT;
-extern PFNGLPROGRAMUNIFORM2FVEXTPROC glProgramUniform2fvEXT;
-extern PFNGLPROGRAMUNIFORM3FVEXTPROC glProgramUniform3fvEXT;
-extern PFNGLPROGRAMUNIFORM4FVEXTPROC glProgramUniform4fvEXT;
-extern PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC glProgramUniformMatrix2fvEXT;
-extern PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC glProgramUniformMatrix3fvEXT;
-extern PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC glProgramUniformMatrix4fvEXT;
-extern PFNGLVALIDATEPROGRAMPIPELINEEXTPROC glValidateProgramPipelineEXT;
-extern PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC glGetProgramPipelineInfoLogEXT;
-
-extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
-extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
-
-typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOES) (GLuint vertexarray);
-typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOES) (GLsizei n, const GLuint *vertexarrays);
-typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOES) (GLsizei n, GLuint *vertexarrays);
-typedef GLboolean (GL_APIENTRYP PFNGLISVERTEXARRAYOES) (GLuint vertexarray);
-
-extern PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES;
-extern PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES;
-extern PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES;
-extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
-#		endif
-#	endif
-
-// If we are going to use the PVRTC_CODEC make sure we
-// setup the needed constants
-#if (OGRE_NO_PVRTC_CODEC == 0)
-#	ifndef GL_IMG_texture_compression_pvrtc
-#		define GL_IMG_texture_compression_pvrtc 1
-#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      0x8C00
-#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      0x8C01
-#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     0x8C02
-#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
-#	endif
 #endif
 
+#if (OGRE_NO_ETC_CODEC == 0)
+#   ifndef GL_OES_compressed_ETC1_RGB8_texture
+#       define GL_OES_compressed_ETC1_RGB8_texture 1
+#       define GL_ETC1_RGB8_OES                                         0x8D64
+#   endif
+#   define GL_COMPRESSED_RGB8_ETC2                                      0x9274
+#   define GL_COMPRESSED_SRGB8_ETC2                                     0x9275
+#   define GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2                  0x9276
+#   define GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2                 0x9277
+#   define GL_COMPRESSED_RGBA8_ETC2_EAC                                 0x9278
+#   define GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC                          0x9279
 #endif
 
 #if defined(__APPLE__)
@@ -224,11 +118,23 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 #   define GL_FILL    0x1B02
 #endif
 
-// Define GL_NONE for convenience
-#define GL_NONE 0
-
 #if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_NO_GLES3_SUPPORT == 1
 #   define GL_BGRA  0x80E1
+#endif
+
+// Apple doesn't define this in their extension.  We'll do it just for convenience.
+// Using the value from desktop GL
+#ifndef GL_SAMPLER_2D_SHADOW_EXT
+#   define GL_SAMPLER_2D_SHADOW_EXT             0x8B62
+#endif
+
+#ifndef GL_EXT_texture_filter_anisotropic
+#   define GL_TEXTURE_MAX_ANISOTROPY_EXT        0x84FE
+#   define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT    0x84FF
+#endif
+
+#ifndef GL_PACK_IMAGE_HEIGHT
+#   define GL_PACK_IMAGE_HEIGHT                 0x806C
 #endif
 
 // Defines for extensions that were made core in OpenGL ES 3
@@ -250,6 +156,20 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 #define GL_DEPTH_COMPONENT24_OES GL_DEPTH_COMPONENT24
 #define GL_DEPTH_COMPONENT32_OES GL_DEPTH_COMPONENT32F
 #define GL_DEPTH24_STENCIL8_OES GL_DEPTH24_STENCIL8
+#define GL_TEXTURE_MAX_LEVEL_APPLE GL_TEXTURE_MAX_LEVEL
+#define GL_MAX_SAMPLES_APPLE GL_MAX_SAMPLES
+#define glGenQueriesEXT glGenQueries
+#define glDeleteQueriesEXT glDeleteQueries
+#define glBeginQueryEXT glBeginQuery
+#define glEndQueryEXT glEndQuery
+#define glGetQueryObjectuivEXT glGetQueryObjectuiv
+#define glRenderbufferStorageMultisampleAPPLE glRenderbufferStorageMultisample
+#define GL_ANY_SAMPLES_PASSED_EXT GL_ANY_SAMPLES_PASSED
+#define GL_QUERY_RESULT_EXT GL_QUERY_RESULT
+#define GL_QUERY_RESULT_AVAILABLE_EXT GL_QUERY_RESULT_AVAILABLE
+#define glDrawElementsInstancedAPPLE glDrawElementsInstanced
+#define glDrawArraysInstancedAPPLE glDrawArraysInstanced
+#define glVertexAttribDivisorAPPLE glVertexAttribDivisor
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
@@ -278,7 +198,7 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 
 #if ENABLE_GL_CHECK
 #define OGRE_CHECK_GL_ERROR(glFunc) \

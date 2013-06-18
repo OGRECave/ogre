@@ -447,9 +447,6 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
-
-            // Enable microcache
-            mGpuProgramManager->setSaveMicrocodesToCache(true);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
@@ -517,6 +514,12 @@ namespace Ogre {
 
         // Create the texture manager        
         mTextureManager = new GL3PlusTextureManager(*mGLSupport);
+
+        if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
+		{
+            // Enable microcache
+            mGpuProgramManager->setSaveMicrocodesToCache(true);
+		}
 
         mGLInitialised = true;
     }
@@ -2534,7 +2537,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::registerThread()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// This is only valid once we've created the main context
 		if (!mMainContext)
 		{
@@ -2567,7 +2570,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::preExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// free context, we'll need this to share lists
         if(mCurrentContext)
 		mCurrentContext->endCurrent();
@@ -2575,7 +2578,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::postExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// reacquire context
         if(mCurrentContext)
 		mCurrentContext->setCurrent();

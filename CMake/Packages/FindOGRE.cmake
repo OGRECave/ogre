@@ -299,7 +299,18 @@ if (OGRE_STATIC)
           set(Boost_USE_MULTITHREADED OFF)
         endif()
       endif()
-      find_package(Boost COMPONENTS thread QUIET)
+      
+      set(OGRE_BOOST_COMPONENTS thread date_time)
+
+      if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+        if(Boost_VERSION GREATER 105300)
+            set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
+        else()
+            set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
+        endif()
+      endif()
+
+      find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
       if (NOT Boost_THREAD_FOUND)
         set(OGRE_DEPS_FOUND FALSE)
       else ()
@@ -559,6 +570,7 @@ set(OGRE_MEDIA_SEARCH_SUFFIX
   Media
   media
   share/OGRE/media
+  share/OGRE/Media
 )
 
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)

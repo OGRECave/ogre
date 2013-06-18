@@ -42,6 +42,8 @@
 #import "OgreOSXCocoaWindow.h"
 #import <QuartzCore/CVDisplayLink.h>
 
+#include "SampleBrowser.h"
+
 using namespace Ogre;
 
 // All this does is suppress some messages in the run log.  NSApplication does not

@@ -445,12 +445,13 @@ namespace Ogre {
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
 	struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
 	{
-		OGRE_MUTEX(mutex)
-			/// Map from logical index to physical buffer location
-			GpuLogicalIndexUseMap map;
-		/// Shortcut to know the buffer size needs
-		size_t bufferSize;
-		GpuLogicalBufferStruct() : bufferSize(0) {}
+            OGRE_MUTEX(mutex);
+            
+            /// Map from logical index to physical buffer location
+            GpuLogicalIndexUseMap map;
+            /// Shortcut to know the buffer size needs
+            size_t bufferSize;
+            GpuLogicalBufferStruct() : bufferSize(0) {}
 	};
 	typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
 
@@ -946,6 +947,8 @@ namespace Ogre {
 			ACT_LIGHT_NUMBER,
 			/// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
 			ACT_LIGHT_CASTS_SHADOWS,
+			/// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
+			ACT_LIGHT_CASTS_SHADOWS_ARRAY,
 
 
 			/** The distance a shadow volume should be extruded when using
@@ -974,6 +977,10 @@ namespace Ogre {
 			combined with the current world matrix
 			*/
 			ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,
+			/** An array of the view/projection matrix of a given spotlight projection frustum,
+             combined with the current world matrix
+             */
+			ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,
 			/// A custom parameter which will come from the renderable, using 'data' as the identifier
 			ACT_CUSTOM,
 			/** provides current elapsed time
@@ -1111,6 +1118,13 @@ namespace Ogre {
 			Passed as float4(minDepth, maxDepth, depthRange, 1 / depthRange)
 			*/
 			ACT_SHADOW_SCENE_DEPTH_RANGE,
+
+            /** Provides an array of information about the depth range of the scene as viewed
+             from a given shadow camera. Requires an index parameter which maps
+             to a light index relative to the current light list.
+             Passed as float4(minDepth, maxDepth, depthRange, 1 / depthRange)
+             */
+			ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY,
 
 			/** Provides the fixed shadow colour as configured via SceneManager::setShadowColour;
 			useful for integrated modulative shadows.
@@ -1442,6 +1456,14 @@ namespace Ogre {
 		@param val The value to set
 		*/
 		void _writeRawConstant(size_t physicalIndex, Real val);
+		/** Write a variable number of floating-point parameters to the program.
+         @note You can use these methods if you have already derived the physical
+         constant buffer location, for a slight speed improvement over using
+         the named / logical index versions.
+         @param physicalIndex The physical buffer index at which to place the parameter
+         @param val The value to set
+         */
+		void _writeRawConstant(size_t physicalIndex, Real val, size_t count);
 		/** Write a single integer parameter to the program.
 		@note You can use these methods if you have already derived the physical
 		constant buffer location, for a slight speed improvement over using

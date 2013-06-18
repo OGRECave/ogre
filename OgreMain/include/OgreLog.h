@@ -115,7 +115,7 @@ namespace Ogre {
 
 		class Stream;
 
-		OGRE_AUTO_MUTEX // public to allow external locking
+		OGRE_AUTO_MUTEX; // public to allow external locking
         /**
         @remarks
             Usual constructor - called by LogManager.

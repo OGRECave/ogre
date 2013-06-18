@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreTextureUnitState.h"
 #include "OgreRenderSystem.h"
+#include "OgreRoot.h"
+#include "OgreD3D11RenderSystem.h"
 
 namespace Ogre 
 {

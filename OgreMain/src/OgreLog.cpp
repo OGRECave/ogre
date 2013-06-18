@@ -54,7 +54,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Log::~Log()
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
 		if (!mSuppressFile)
 		{
 	        mLog.close();
@@ -63,7 +63,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Log::logMessage( const String& message, LogMessageLevel lml, bool maskDebug )
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         if ((mLogLevel + lml) >= OGRE_LOG_THRESHOLD)
         {
 			bool skipThisMessage = false;
@@ -115,35 +115,35 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Log::setTimeStampEnabled(bool timeStamp)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         mTimeStamp = timeStamp;
     }
 
     //-----------------------------------------------------------------------
     void Log::setDebugOutputEnabled(bool debugOutput)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         mDebugOut = debugOutput;
     }
 
 	//-----------------------------------------------------------------------
     void Log::setLogDetail(LoggingLevel ll)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         mLogLevel = ll;
     }
 
     //-----------------------------------------------------------------------
     void Log::addListener(LogListener* listener)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         mListeners.push_back(listener);
     }
 
     //-----------------------------------------------------------------------
     void Log::removeListener(LogListener* listener)
     {
-		OGRE_LOCK_AUTO_MUTEX
+        OGRE_LOCK_AUTO_MUTEX;
         mListeners.erase(std::find(mListeners.begin(), mListeners.end(), listener));
     }
 	//---------------------------------------------------------------------

@@ -69,14 +69,14 @@ namespace Ogre {
 
 	public:
 		/*
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		*/
 		typedef enum {
 			FAR_LEFT_BOTTOM = 0,
@@ -288,14 +288,14 @@ namespace Ogre {
 		anticlockwise around this face (looking onto the face from
 		outside the box). Like this:
 		<pre>
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		</pre>
 		*/
 		inline const Vector3* getAllCorners(void) const

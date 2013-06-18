@@ -276,6 +276,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY,	"derived_light_specular_colour_array",  	GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_NUMBER,   						"light_number",								GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CASTS_SHADOWS, 					"light_casts_shadows",						GCT_FLOAT1),
+		AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CASTS_SHADOWS_ARRAY, 				"light_casts_shadows_array",				GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE,     			"shadow_extrusion_distance",				GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_CAMERA_POSITION,               			"camera_position",							GCT_FLOAT3),
 		AutoShaderParameter(GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE,  			"camera_position_object_space",				GCT_FLOAT3),
@@ -286,6 +287,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX,				"spotlight_viewproj_matrix",				GCT_MATRIX_4X4),
         AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY,          "spotlight_viewproj_matrix_array",          GCT_MATRIX_4X4),      
 		AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,			"spotlight_worldviewproj_matrix",					GCT_MATRIX_4X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,		"spotlight_worldviewproj_matrix_array",     GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_CUSTOM,									"custom",											GCT_FLOAT4),  // *** needs to be tested
 		AutoShaderParameter(GpuProgramParameters::ACT_TIME,										"time",											GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_TIME_0_X,                      			"time_0_x",                     GCT_FLOAT1),
@@ -322,6 +324,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_TEXEL_OFFSETS,               			"texel_offsets",					GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SCENE_DEPTH_RANGE,           			"scene_depth_range",				GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE,    			"shadow_scene_depth_range",			GCT_FLOAT4),
+		AutoShaderParameter(GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY,    	"shadow_scene_depth_range_array",	GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SHADOW_COLOUR,							"shadow_colour",					GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_SIZE,               			 "texture_size",					GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,       			 "inverse_texture_size",			GCT_FLOAT4),

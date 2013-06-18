@@ -5145,7 +5145,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
         if( !floatLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(floatLogical->mutex)
+                    OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 				i != floatLogical->map.end(); ++i)
@@ -5173,7 +5173,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(floatLogical->mutex)
+                    OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
 				i != doubleLogical->map.end(); ++i)
@@ -5201,7 +5201,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
         if( !intLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(intLogical->mutex)
+                    OGRE_LOCK_MUTEX(intLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 				i != intLogical->map.end(); ++i)

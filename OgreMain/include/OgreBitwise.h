@@ -197,21 +197,21 @@ namespace Ogre {
         static inline unsigned int intRead(const void *src, int n) {
             switch(n) {
                 case 1:
-                    return ((uint8*)src)[0];
+                    return ((const uint8*)src)[0];
                 case 2:
-                    return ((uint16*)src)[0];
+                    return ((const uint16*)src)[0];
                 case 3:
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG      
-                    return ((uint32)((uint8*)src)[0]<<16)|
-                            ((uint32)((uint8*)src)[1]<<8)|
-                            ((uint32)((uint8*)src)[2]);
+                    return ((uint32)((const uint8*)src)[0]<<16)|
+                            ((uint32)((const uint8*)src)[1]<<8)|
+                            ((uint32)((const uint8*)src)[2]);
 #else
-                    return ((uint32)((uint8*)src)[0])|
-                            ((uint32)((uint8*)src)[1]<<8)|
-                            ((uint32)((uint8*)src)[2]<<16);
+                    return ((uint32)((const uint8*)src)[0])|
+                            ((uint32)((const uint8*)src)[1]<<8)|
+                            ((uint32)((const uint8*)src)[2]<<16);
 #endif
                 case 4:
-                    return ((uint32*)src)[0];
+                    return ((const uint32*)src)[0];
             } 
             return 0; // ?
         }

@@ -56,8 +56,11 @@ namespace Volume {
     
     ChunkHandler::~ChunkHandler(void)
     {
-        wq->removeRequestHandler(workQueueChannel, this);
-        wq->removeResponseHandler(workQueueChannel, this);
+        if (wq)
+        {
+            wq->removeRequestHandler(workQueueChannel, this);
+            wq->removeResponseHandler(workQueueChannel, this);
+        }
     }
 
     //-----------------------------------------------------------------------

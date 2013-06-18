@@ -35,12 +35,6 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLSLESProgram.h"
 
-// Apple doesn't define this in their extension.  We'll do it just for convenience.
-// Using the value from desktop GL
-#if GL_EXT_shadow_samplers
-#define GL_SAMPLER_2D_SHADOW_EXT 0x8B62
-#endif
-
 namespace Ogre {
 
 	//-----------------------------------------------------------------------
@@ -54,9 +48,7 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("vec4", GL_FLOAT_VEC4));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2D", GL_SAMPLER_2D));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCube", GL_SAMPLER_CUBE));
-#if GL_EXT_shadow_samplers
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW_EXT));
-#endif
 		mTypeEnumMap.insert(StringToEnumMap::value_type("int", GL_INT));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec2", GL_INT_VEC2));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec3", GL_INT_VEC3));
@@ -153,14 +145,9 @@ namespace Ogre {
 		case GL_SAMPLER_CUBE:
 			defToUpdate.constType = GCT_SAMPLERCUBE;
 			break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-        case GL_SAMPLER_2D_SHADOW:
-#endif
-#if GL_EXT_shadow_samplers
         case GL_SAMPLER_2D_SHADOW_EXT:
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
             break;
-#endif
         case GL_INT:
 			defToUpdate.constType = GCT_INT1;
 			break;
