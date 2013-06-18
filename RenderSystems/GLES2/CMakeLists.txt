@@ -14,13 +14,15 @@ file(GLOB SOURCE_FILES "src/*.cpp")
 
 file(GLOB GLSLES_FILES "src/GLSLES/include/*.h" "src/GLSLES/src/*.cpp")
 
+
 if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
-  list(APPEND SOURCE_FILES src/gles3w.cpp)
+  list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gles2w.cpp")
+
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_source_files_properties(src/gles3w.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
   endif()
 else()
-  list(APPEND SOURCE_FILES src/gles2w.cpp)
+  list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gles3w.cpp")
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_source_files_properties(src/gles2w.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
   endif()
