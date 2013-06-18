@@ -237,26 +237,6 @@ macro_log_feature(TINYXML_FOUND "TinyXML" "TinyXML needed for building OgreXMLCo
 find_package(CppUnit)
 macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "http://cppunit.sourceforge.net" FALSE "" "")
 
-#######################################################################
-# Apple-specific
-#######################################################################
-if (APPLE)  
-  if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    find_package(Carbon)
-    macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://developer.apple.com/mac" TRUE "" "")
-
-    find_package(Cocoa)
-    macro_log_feature(Cocoa_FOUND "Cocoa" "Cocoa" "http://developer.apple.com/mac" TRUE "" "")
-
-    find_package(IOKit)
-    macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
-
-    find_package(CoreVideo)
-    macro_log_feature(CoreVideo_FOUND "CoreVideo" "CoreVideo" "http://developer.apple.com/mac" TRUE "" "")
-  endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-endif(APPLE)
-
-
 # now see if we have a buildable Dependencies package in
 # the source tree. If so, include that, and it will take care of
 # setting everything up, including overriding any of the above
@@ -287,9 +267,6 @@ include_directories(
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
   ${CppUnit_INCLUDE_DIRS}
-  ${Carbon_INCLUDE_DIRS}
-  ${Cocoa_INCLUDE_DIRS}
-  ${CoreVideo_INCLUDE_DIRS}
   ${GLSL_Optimizer_INCLUDE_DIRS}
   ${HLSL2GLSL_INCLUDE_DIRS}
 )

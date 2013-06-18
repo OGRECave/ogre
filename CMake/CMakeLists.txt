@@ -61,10 +61,6 @@ endif ()
 if (APPLE)
   set(INST_FILES ${INST_FILES}
     Packages/FindCg.cmake
-    Packages/FindIOKit.cmake
-    Packages/FindCarbon.cmake
-    Packages/FindCocoa.cmake
-    Packages/FindCoreVideo.cmake
   )
   set(STATIC_INST_FILES ${STATIC_INST_FILES}
     Packages/FindGLSLOptimizer.cmake
