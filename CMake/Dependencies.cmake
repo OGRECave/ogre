@@ -170,7 +170,9 @@ if(Boost_FOUND AND Boost_VERSION GREATER 104900)
     find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
-list(REMOVE_DUPLICATES Boost_LIBRARIES)
+if(Boost_FOUND)
+  list(REMOVE_DUPLICATES Boost_LIBRARIES)
+endif()
 
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
