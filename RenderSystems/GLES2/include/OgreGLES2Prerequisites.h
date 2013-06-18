@@ -93,18 +93,6 @@ THE SOFTWARE.
 #   include <EGL/egl.h>
 #endif
 
-// If we are going to use the PVRTC_CODEC make sure we
-// setup the needed constants
-#if (OGRE_NO_PVRTC_CODEC == 0)
-#	ifndef GL_IMG_texture_compression_pvrtc
-#		define GL_IMG_texture_compression_pvrtc 1
-#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      0x8C00
-#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      0x8C01
-#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     0x8C02
-#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
-#	endif
-#endif
-
 #if defined(__APPLE__)
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
     if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
@@ -116,9 +104,6 @@ THE SOFTWARE.
 #ifndef GL_FILL
 #   define GL_FILL    0x1B02
 #endif
-
-// Define GL_NONE for convenience
-#define GL_NONE 0
 
 #if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_NO_GLES3_SUPPORT == 1
 #   define GL_BGRA  0x80E1
