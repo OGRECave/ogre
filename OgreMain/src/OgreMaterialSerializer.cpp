@@ -4324,6 +4324,21 @@ namespace Ogre
                 writeFragmentProgramRef(pPass);
             }
 
+			if(pPass->hasTesselationHullProgram())
+			{
+				writeTesselationHullProgramRef(pPass);
+			}
+
+			if(pPass->hasTesselationDomainProgram())
+			{
+				writeTesselationDomainProgramRef(pPass);
+			}
+			
+            if (pPass->hasGeometryProgram())
+            {
+                writeGeometryProgramRef(pPass);
+            }
+
             if (pPass->hasShadowCasterVertexProgram())
             {
                 writeShadowCasterVertexProgramRef(pPass);
