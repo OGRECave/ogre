@@ -36,7 +36,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic4.hlsl
     entry_point ambientOneTexture_vp
     target vs_4_0
 
@@ -104,7 +104,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV unified
 {
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES
-    delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+    //delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
@@ -113,7 +113,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
-    delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+    //delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
@@ -222,7 +222,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic4.hlsl
     entry_point hardwareSkinningTwoWeightsCaster_vp
     target vs_4_0
     includes_skeletal_animation true
@@ -245,7 +245,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 {
     delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES
-    delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
+    //delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
     delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
     delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
 }
@@ -253,7 +253,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 // Basic hardware skinning using two indexed weights per vertex
 vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic4.hlsl
     entry_point hardwareSkinningTwoWeights_vp
     target vs_4_0
     includes_skeletal_animation true
@@ -285,7 +285,7 @@ vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
     delegate Ogre/HardwareSkinningTwoWeightsGLSL
     delegate Ogre/HardwareSkinningTwoWeightsGLSLES
-    delegate Ogre/HardwareSkinningTwoWeightsHLSL
+    //delegate Ogre/HardwareSkinningTwoWeightsHLSL
     delegate Ogre/HardwareSkinningTwoWeightsCg
     
     default_params

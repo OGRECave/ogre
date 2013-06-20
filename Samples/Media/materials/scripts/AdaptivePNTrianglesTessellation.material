@@ -121,7 +121,7 @@ vertex_program Ogre/PNTrianglesTessellation/simple_tessellation_vs hlsl
 	
 	default_params
 	{
-		param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
+		//param_named_auto g_WorldViewprojMatrix worldviewproj_matrix
 	}	
 }
 

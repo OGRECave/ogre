@@ -54,11 +54,11 @@ vertex_program CrowdShadowCasterCg cg
 	}
 }
 
-vertex_program Instancinghlsl hlsl
+/*vertex_program Instancinghlsl hlsl
 {
 	source Instancing.hlsl
 	target vs_4_0
-	entry_point instancing_vp
+//	entry_point instancing_vp
 	preprocessor_defines SHADOW_CASTER=0
 	default_params
 	{
@@ -111,7 +111,7 @@ vertex_program CrowdShadowCasterhlsl hlsl
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 		param_named_auto ambient ambient_light_colour
 	}
-}
+}*/
 
 vertex_program InstancingGLSL glsl
 {

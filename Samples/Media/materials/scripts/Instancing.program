@@ -56,7 +56,7 @@ fragment_program Ogre/Instancing/shadow_caster_cg_ps cg
 	}
 }
 
-fragment_program Ogre/Instancing_hlsl_ps hlsl
+/*fragment_program Ogre/Instancing_hlsl_ps hlsl
 {
 	source Instancing_ps.hlsl
 	entry_point main_ps
@@ -79,7 +79,7 @@ fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
 	default_params
 	{
 	}
-}
+}*/
 
 
 //--------------------------------------------------------------
