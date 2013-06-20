@@ -185,8 +185,7 @@ namespace Volume {
     void Chunk::prepareGeometry(size_t level, OctreeNode *root, DualGridGenerator *dualGridGenerator, MeshBuilder *meshBuilder, const Vector3 &totalFrom, const Vector3 &totalTo)
     {
         OctreeNodeSplitPolicy policy(mShared->parameters->src,
-            mShared->parameters->errorMultiplicator * mShared->parameters->baseError,
-            mShared->parameters->octreeNodeDistanceCheckDiagonalFactor);
+            mShared->parameters->errorMultiplicator * mShared->parameters->baseError);
         mError = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError;
         root->split(&policy, mShared->parameters->src, mError);
         Real maxMSDistance = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError * mShared->parameters->skirtFactor;

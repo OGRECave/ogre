@@ -258,5 +258,12 @@ namespace Volume {
 
         mTrilinearValue = oldTrilinearValue;
     }
+ 
+    //-----------------------------------------------------------------------
+
+    Real GridSource::getVolumeSpaceToWorldSpaceFactor(void) const
+    {
+        return mVolumeSpaceToWorldSpaceFactor;
+    }
 }
 }

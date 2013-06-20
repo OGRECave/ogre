@@ -100,7 +100,9 @@ namespace Volume {
         mPosXScale = (Real)1.0 / (Real)worldWidth * (Real)mWidth;
         mPosYScale = (Real)1.0 / (Real)worldHeight * (Real)mHeight;
         mPosZScale = (Real)1.0 / (Real)worldDepth * (Real)mDepth;
-    
+
+        mVolumeSpaceToWorldSpaceFactor = (Real)worldWidth * (Real)mWidth;
+
         HardwarePixelBufferSharedPtr buffer = tex->getBuffer(0, 0);
         buffer->lock(HardwareBuffer::HBL_READ_ONLY);
         const PixelBox &pb = buffer->getCurrentLock();
