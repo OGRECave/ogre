@@ -754,6 +754,12 @@ namespace Ogre {
                 if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
 #endif
                 {
+                    if(buf.isNull())
+                    {
+                        buf.bind(new MemoryDataStream(
+                            PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(),
+                            mFormat)));
+                    }
                     _genSoftwareMipmaps(src, buf);
                 }
                 else
