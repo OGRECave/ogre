@@ -922,7 +922,13 @@ namespace Ogre {
             int mipWidth = src.getWidth();
             int mipHeight = src.getHeight();
             int elementJump = 1;
-            for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
+            unsigned int numOfMips = mParentTexture->getNumMipmaps() ;
+            //if(numOfMips == 0)
+            //{
+            //    numOfMips = std::max(log((float)mipWidth), log((float)mipHeight)) - 1;
+            //}
+
+            for(unsigned int i = 1 ; i <= numOfMips ; i++)
             {
 				if(mipHeight > 1)
 				{
