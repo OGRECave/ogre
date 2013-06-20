@@ -704,6 +704,13 @@ namespace Ogre
 			It reads data from a native terrain data chunk. 
 		@return true if the preparation was successful
 		*/
+		bool prepare(DataStreamPtr& stream);
+		/** Prepare terrain data from saved data.
+		@remarks
+			This is safe to do in a background thread as it creates no GPU resources.
+			It reads data from a native terrain data chunk. 
+		@return true if the preparation was successful
+		*/
 		bool prepare(StreamSerialiser& stream);
 
 		/** Prepare the terrain from some import data rather than loading from 

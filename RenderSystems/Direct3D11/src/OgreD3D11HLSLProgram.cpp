@@ -885,7 +885,7 @@ namespace Ogre {
     if(curItem.member != NULL)                       \
         length = strlen(curItem.member);             \
     newMicrocode->write(&length, sizeof(uint16));    \
-    if(length == 0) continue;                        \
+    if(length != 0)                                  \
     newMicrocode->write(curItem.member, length);     \
                 }
 

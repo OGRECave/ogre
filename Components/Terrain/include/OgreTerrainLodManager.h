@@ -83,8 +83,8 @@ namespace Ogre
 			uint size;
 		};
 	public:
-        TerrainLodManager(Terrain* t);
-        TerrainLodManager(Terrain* t, const String& filename);
+        TerrainLodManager(Terrain* t, DataStreamPtr& stream);
+        TerrainLodManager(Terrain* t, const String& filename = "");
         virtual ~TerrainLodManager();
 
 		static const uint16 WORKQUEUE_LOAD_LOD_DATA_REQUEST;
@@ -96,6 +96,7 @@ namespace Ogre
 		void updateToLodLevel(int lodLevel, bool synchronous = false);
 		/// save each LOD level separately compressed so seek is possible
 		static void saveLodData(StreamSerialiser& stream, Terrain* terrain);
+
 		/** Copy geometry data from buffer to mHeightData/mDeltaData
 		  @param lodLevel A LOD level to work with
 		  @param data Buffer which holds geometry data if separated form
@@ -123,7 +124,7 @@ namespace Ogre
 			return mLodInfoTable[lodLevel];
 		}
 	private:
-		void init(Terrain* t);
+		void init();
 		void buildLodInfoTable();
 
 		/** Separate geometry data by LOD level
@@ -144,7 +145,8 @@ namespace Ogre
 		static void separateData(float* data, uint16 size, uint16 numLodLevels, LodsData& lods );
 	private:
 		Terrain* mTerrain;
-		String mDatafile;
+		DataStreamPtr mDataStream;
+		size_t mStreamOffset;
 		uint16 mWorkQueueChannel;
 
 		LodInfo* mLodInfoTable;

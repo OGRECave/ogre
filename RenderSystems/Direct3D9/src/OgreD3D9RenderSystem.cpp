@@ -4174,7 +4174,7 @@ namespace Ogre
 		IDirect3DSurface9* mSurface = activeDevice->getPrimaryWindow()->getRenderSurface();
 		D3DSURFACE_DESC srfDesc;
 
-		if(!FAILED(mSurface->GetDesc(&srfDesc)))
+		if(mSurface && SUCCEEDED(mSurface->GetDesc(&srfDesc)))
 		{
 			/// Probe all depth stencil formats
 			/// Break on first one that matches
