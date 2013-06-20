@@ -2916,7 +2916,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                 !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL) ||
-                                op.vertexData->vertexBufferBinding->getHasInstanceData();
+                                op.vertexData->vertexBufferBinding->hasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 
@@ -3805,7 +3805,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         {
             isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
 
-            if (hwGlBuffer->getIsInstanceData())
+            if (hwGlBuffer->isInstanceData())
             {
                 GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
                 glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );

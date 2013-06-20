@@ -2275,7 +2275,7 @@ bail:
 
         bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+                || op.vertexData->vertexBufferBinding->hasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 
