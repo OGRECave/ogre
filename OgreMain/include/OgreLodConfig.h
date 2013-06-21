@@ -104,8 +104,17 @@ struct LodLevel {
 struct LodConfig {
 	MeshPtr mesh;
 	LodStrategy* strategy;
+
 	typedef vector<LodLevel>::type LodLevelList;
 	LodLevelList levels;
+
+	struct Advanced{
+		bool disableCompression;
+		Advanced() :
+			disableCompression(false)
+		{ }
+	} advanced;
+
 };
 }
 #endif

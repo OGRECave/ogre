@@ -105,6 +105,7 @@ protected:
 	struct PMEdge;
 	struct PMVertex;
 	struct PMTriangle;
+	struct PMTriangleCache;
 	struct PMVertexHash;
 	struct PMVertexEqual;
 	struct PMCollapseCostLess;
@@ -113,6 +114,7 @@ protected:
 
 	typedef vector<PMVertex>::type VertexList;
 	typedef vector<PMTriangle>::type TriangleList;
+	typedef vector<PMTriangleCache>::type TriangleCacheList;
 	typedef HashSet<PMVertex*, PMVertexHash, PMVertexEqual> UniqueVertexSet;
 	typedef multimap<Real, PMVertex*>::type CollapseCostHeap;
 	typedef vector<PMVertex*>::type VertexLookupList;
@@ -160,12 +162,18 @@ protected:
 		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
 	};
 
+	struct _OgrePrivate PMTriangleCache {
+			unsigned int vertexID[3];
+	};
+	
 	struct _OgrePrivate PMTriangle {
 		PMVertex* vertex[3];
 		Vector3 normal;
 		bool isRemoved;
 		unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
 		unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
+		PMTriangleCache* prevLod;
+		bool vertexChanged;
 
 		void computeNormal();
 		bool hasVertex(const PMVertex* v) const;
@@ -173,14 +181,17 @@ protected:
 		bool isMalformed();
 	};
 
-	struct _OgrePrivate PMIndexBufferInfo {
-		size_t indexSize;
-		size_t indexCount;
-	};
-
 	union _OgrePrivate IndexBufferPointer {
 		unsigned short* pshort;
 		unsigned int* pint;
+	};
+
+	struct _OgrePrivate PMIndexBufferInfo {
+		size_t indexSize;
+		size_t indexCount;
+		size_t prevIndexCount;
+		size_t prevOnlyIndexCount;
+		IndexBufferPointer buf;
 	};
 
 	struct _OgrePrivate PMCollapsedEdge {
@@ -193,6 +204,7 @@ protected:
 	VertexLookupList mVertexLookup;
 	VertexList mVertexList;
 	TriangleList mTriangleList;
+	TriangleCacheList mTriangleCacheList;
 	UniqueVertexSet mUniqueVertexSet;
 	CollapseCostHeap mCollapseCostHeap;
 	CollapsedEdges tmpCollapsedEdges; // Tmp container used in collapse().
@@ -224,6 +236,7 @@ protected:
 	void computeVertexCollapseCost(PMVertex* vertex);
 	Real computeEdgeCollapseCost(PMVertex* src, PMEdge* dstEdge);
 	virtual void bakeLods();
+	virtual void bakeMergedLods(int curLod);
 	void collapse(PMVertex* vertex);
 	void initialize();
 	void computeLods(LodConfig& lodConfigs);

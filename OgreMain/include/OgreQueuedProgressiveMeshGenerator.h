@@ -50,6 +50,8 @@ struct PMGenRequest {
 	struct IndexBuffer {
 		size_t indexSize;
 		size_t indexCount;
+		size_t indexStart;
+		size_t indexBufferSize;
 		unsigned char* indexBuffer; // size in bytes = indexSize * indexCount
 		IndexBuffer() :
 			indexBuffer(0) { }
@@ -126,6 +128,8 @@ private:
 	void addVertexBuffer(const PMGenRequest::VertexBuffer& vertexBuffer, bool useSharedVertexLookup);
 	void addIndexBuffer(PMGenRequest::IndexBuffer& indexBuffer, bool useSharedVertexLookup, unsigned short submeshID);
 	void bakeLods();
+	void bakeMergedLods(int curLod);
+
 };
 
 class _OgreExport PMInjectorListener

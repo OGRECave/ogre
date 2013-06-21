@@ -62,15 +62,16 @@ PMInjector& PMInjector::getSingleton(void)
 
 PMGenRequest::~PMGenRequest()
 {
-	vector<SubmeshInfo>::iterator it = submesh.begin();
-	vector<SubmeshInfo>::iterator itEnd = submesh.end();
-	for (; it != itEnd; it++) {
-		delete [] it->indexBuffer.indexBuffer;
-		delete [] it->vertexBuffer.vertexBuffer;
-		vector<IndexBuffer>::iterator it2 = it->genIndexBuffers.begin();
-		vector<IndexBuffer>::iterator it2End = it->genIndexBuffers.end();
+	int submeshCount = submesh.size(); 
+	for(int i=0;i<submeshCount;i++){
+		delete [] submesh[i].indexBuffer.indexBuffer;
+		delete [] submesh[i].vertexBuffer.vertexBuffer;
+		vector<IndexBuffer>::iterator it2 = submesh[i].genIndexBuffers.begin();
+		vector<IndexBuffer>::iterator it2End = submesh[i].genIndexBuffers.end();
 		for (; it2 != it2End; it2++) {
-			delete [] it2->indexBuffer;
+			if(submesh[i].indexBuffer.indexBufferSize != 0 || i % 2 == 0){
+				delete [] it2->indexBuffer;
+			}
 		}
 	}
 }
@@ -241,8 +242,7 @@ void PMWorker::bakeLods()
 {
 
 	unsigned short submeshCount = mRequest->submesh.size();
-	std::auto_ptr<IndexBufferPointer> indexBuffer(new IndexBufferPointer[submeshCount]);
-
+	
 	// Create buffers.
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
@@ -265,27 +265,18 @@ void PMWorker::bakeLods()
 		} else {
 			lods.back().indexCount = indexCount;
 		}
-
+		lods.back().indexStart = 0;
 		lods.back().indexSize = mRequest->submesh[i].indexBuffer.indexSize;
+		lods.back().indexBufferSize = 0; // It means same as index count
 		lods.back().indexBuffer = new unsigned char[lods.back().indexCount * lods.back().indexSize];
 		if (mIndexBufferInfoList[i].indexSize == 2) {
-			indexBuffer.get()[i].pshort = (unsigned short*) lods.back().indexBuffer;
+			mIndexBufferInfoList[i].buf.pshort = (unsigned short*) lods.back().indexBuffer;
 		} else {
-			indexBuffer.get()[i].pint = (unsigned int*) lods.back().indexBuffer;
+			mIndexBufferInfoList[i].buf.pint = (unsigned int*) lods.back().indexBuffer;
 		}
 
 		if (indexCount == 0) {
-			if (mIndexBufferInfoList[i].indexSize == 2) {
-				for (int m = 0; m < 3; m++) {
-					*(indexBuffer.get()[i].pshort++) =
-					    static_cast<unsigned short>(0);
-				}
-			} else {
-				for (int m = 0; m < 3; m++) {
-					*(indexBuffer.get()[i].pint++) =
-					    static_cast<unsigned int>(0);
-				}
-			}
+			memset(mIndexBufferInfoList[i].buf.pshort, 0, 3 * mIndexBufferInfoList[i].indexSize);
 		}
 	}
 
@@ -295,13 +286,150 @@ void PMWorker::bakeLods()
 		if (!mTriangleList[i].isRemoved) {
 			if (mIndexBufferInfoList[mTriangleList[i].submeshID].indexSize == 2) {
 				for (int m = 0; m < 3; m++) {
-					*(indexBuffer.get()[mTriangleList[i].submeshID].pshort++) =
+					*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pshort++) =
 					    static_cast<unsigned short>(mTriangleList[i].vertexID[m]);
 				}
 			} else {
 				for (int m = 0; m < 3; m++) {
-					*(indexBuffer.get()[mTriangleList[i].submeshID].pint++) =
+					*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pint++) =
 					    static_cast<unsigned int>(mTriangleList[i].vertexID[m]);
+				}
+			}
+		}
+	}
+}
+
+void PMWorker::bakeMergedLods( int curLod )
+{
+	unsigned short submeshCount = mRequest->submesh.size();
+
+	if(!(curLod%2)){
+		int indexCount = 0;
+		for (unsigned short i = 0; i < submeshCount; i++) {
+			mIndexBufferInfoList[i].prevIndexCount = mIndexBufferInfoList[i].indexCount;
+			indexCount += mIndexBufferInfoList[i].indexCount;
+			mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
+		}
+		mTriangleCacheList.resize(0);
+		mTriangleCacheList.reserve(indexCount);
+		// TODO reset cache pointer
+		size_t triangleCount = mTriangleList.size();
+		for (size_t i = 0; i < triangleCount; i++) {
+			mTriangleList[i].vertexChanged = false;
+			if (!mTriangleList[i].isRemoved) {
+				PMTriangleCache tri;
+				tri.vertexID[0] = mTriangleList[i].vertexID[0];
+				tri.vertexID[1] = mTriangleList[i].vertexID[1];
+				tri.vertexID[2] = mTriangleList[i].vertexID[2];
+				assert(mTriangleList.capacity() > mTriangleList.size()); // It should not reallocate!
+				mTriangleCacheList.push_back(tri);
+				mTriangleList[i].prevLod = &mTriangleCacheList.back();
+			} else {
+				mTriangleList[i].prevLod = NULL;
+			}
+		}
+	} else {
+
+		// Create buffers.
+		for (unsigned short i = 0; i < submeshCount; i++) {
+			vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
+			int indexCount = mIndexBufferInfoList[i].indexCount + mIndexBufferInfoList[i].prevOnlyIndexCount;
+			assert(indexCount >= 0);
+
+			lods.push_back(PMGenRequest::IndexBuffer());
+			PMGenRequest::IndexBuffer& prevLod = lods.back();
+			prevLod.indexStart = 0;
+			prevLod.indexSize = mRequest->submesh[i].indexBuffer.indexSize;
+
+			//If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
+			//The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
+			//This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
+			//ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
+			indexCount = std::max(indexCount, 3);
+			prevLod.indexCount = std::max(mIndexBufferInfoList[i].prevIndexCount, 3u);
+			prevLod.indexBufferSize = indexCount;
+			prevLod.indexBuffer = new unsigned char[indexCount * mIndexBufferInfoList[i].indexSize];
+			mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer;
+
+			//Check if we should fill it with a "dummy" triangle.
+			if (indexCount == 3) {
+				memset(mIndexBufferInfoList[i].buf.pshort, 0, 3 * mIndexBufferInfoList[i].indexSize);
+			}
+
+			lods.push_back(PMGenRequest::IndexBuffer());
+			PMGenRequest::IndexBuffer& curLod = lods.back();
+			curLod.indexSize = prevLod.indexSize;
+			curLod.indexStart = indexCount - mIndexBufferInfoList[i].indexCount;
+			curLod.indexCount = mIndexBufferInfoList[i].indexCount;
+			curLod.indexBufferSize = prevLod.indexBufferSize;
+			curLod.indexBuffer = prevLod.indexBuffer;
+			if(curLod.indexCount == 0){
+				curLod.indexStart-=3;
+				curLod.indexCount=3;
+			}
+
+		}
+
+
+		// Fill buffers.
+		// Filling will be done in 3 parts.
+		// 1. prevLod only indices.
+		size_t triangleCount = mTriangleList.size();
+		for (size_t i = 0; i < triangleCount; i++) {
+			if (mTriangleList[i].vertexChanged) {
+				assert(mIndexBufferInfoList[mTriangleList[i].submeshID].prevIndexCount != 0);
+				if (mIndexBufferInfoList[mTriangleList[i].submeshID].indexSize == 2) {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pshort++) =
+							static_cast<unsigned short>(mTriangleList[i].prevLod->vertexID[m]);
+					}
+				} else {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pint++) =
+							static_cast<unsigned int>(mTriangleList[i].prevLod->vertexID[m]);
+					}
+				}
+			}
+		}
+
+
+		// 2. shared indices.
+		for (size_t i = 0; i < triangleCount; i++) {
+			if (!mTriangleList[i].isRemoved && !mTriangleList[i].vertexChanged) {
+				assert(mTriangleList[i].prevLod->vertexID[0] == mTriangleList[i].vertexID[0]);
+				assert(mTriangleList[i].prevLod->vertexID[1] == mTriangleList[i].vertexID[1]);
+				assert(mTriangleList[i].prevLod->vertexID[2] == mTriangleList[i].vertexID[2]);
+
+				assert(mIndexBufferInfoList[mTriangleList[i].submeshID].indexCount != 0);
+				assert(mIndexBufferInfoList[mTriangleList[i].submeshID].prevIndexCount != 0);
+				if (mIndexBufferInfoList[mTriangleList[i].submeshID].indexSize == 2) {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pshort++) =
+							static_cast<unsigned short>(mTriangleList[i].vertexID[m]);
+					}
+				} else {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pint++) =
+							static_cast<unsigned int>(mTriangleList[i].vertexID[m]);
+					}
+				}
+			}
+		}
+
+		// 3. curLod indices only.
+		for (size_t i = 0; i < triangleCount; i++) {
+			if (!mTriangleList[i].isRemoved && mTriangleList[i].vertexChanged) {
+				assert(mIndexBufferInfoList[mTriangleList[i].submeshID].indexCount != 0);
+				if (mIndexBufferInfoList[mTriangleList[i].submeshID].indexSize == 2) {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pshort++) =
+							static_cast<unsigned short>(mTriangleList[i].vertexID[m]);
+					}
+				} else {
+					for (int m = 0; m < 3; m++) {
+						*(mIndexBufferInfoList[mTriangleList[i].submeshID].buf.pint++) =
+							static_cast<unsigned int>(mTriangleList[i].vertexID[m]);
+					}
 				}
 			}
 		}
@@ -351,24 +479,28 @@ void PMInjector::inject(PMGenRequest* request)
 		SubMesh::LODFaceList& lods = mesh->getSubMesh(i)->mLodFaceList;
 		typedef vector<PMGenRequest::IndexBuffer>::type GenBuffers;
 		GenBuffers& buffers = request->submesh[i].genIndexBuffers;
-		GenBuffers::iterator it = buffers.begin();
-		GenBuffers::iterator itEnd = buffers.end();
-		for (; it != itEnd; it++) {
-			PMGenRequest::IndexBuffer& buff = *it;
-			int indexCount = buff.indexCount;
-			OgreAssert(indexCount >= 0, "");
+		
+		int buffCount = buffers.size();
+		for (int i=0; i<buffCount;i++) {
+			PMGenRequest::IndexBuffer& buff = buffers[i];
+			int indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
+			OgreAssert(buff.indexCount >= 0, "");
 			lods.push_back(OGRE_NEW IndexData());
-			lods.back()->indexStart = 0;
-			lods.back()->indexCount = indexCount;
+			lods.back()->indexStart = buff.indexStart;
+			lods.back()->indexCount = buff.indexCount;
 			if(indexCount != 0) {
-				lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-					buff.indexSize == 2 ?
-					HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-					indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-				int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
-				void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
-				memcpy(pOutBuff, buff.indexBuffer, sizeInBytes);
-				lods.back()->indexBuffer->unlock();
+				if(i > 0 && buffers[i-1].indexBuffer == buff.indexBuffer){
+					lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
+				} else {
+					lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+						buff.indexSize == 2 ?
+						HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
+						indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+					int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
+					void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
+					memcpy(pOutBuff, buff.indexBuffer, sizeInBytes);
+					lods.back()->indexBuffer->unlock();
+				}
 			}
 		}
 	}
@@ -443,6 +575,8 @@ void QueuedProgressiveMeshGenerator::copyIndexBuffer(IndexData* data, PMGenReque
 		unsigned char* pBuffer = (unsigned char*) indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
 		size_t offset = data->indexStart * out.indexSize;
 		out.indexBuffer = new unsigned char[out.indexCount * out.indexSize];
+		out.indexStart = 0;
+		out.indexBufferSize = 0;
 		memcpy(out.indexBuffer, pBuffer + offset, out.indexCount * out.indexSize);
 		indexBuffer->unlock();
 	}

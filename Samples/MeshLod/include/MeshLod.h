@@ -73,6 +73,7 @@ protected:
 		*/
 
 		mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "wireframe", "Show wireframe");
+		mCompress = mTrayMgr->createCheckBox(TL_TOPLEFT, "compress", "Compress LOD");
 		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
 		mThreaded = mTrayMgr->createCheckBox(TL_TOPLEFT, "threaded", "Background thread");
 		mThreaded->setChecked(true, false);
@@ -161,6 +162,7 @@ protected:
 		lodConfig.levels.clear();
 		lodConfig.mesh = mesh;
 		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		lodConfig.advanced.disableCompression = !mCompress->isChecked();
 		LodLevel lodLevel;
 		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 		lodLevel.distance = 1;
@@ -182,7 +184,11 @@ protected:
 		if(mThreaded->isChecked()){
 			clearLodQueue();
 			QueuedProgressiveMeshGenerator pm;
-			pm.generateAutoconfiguredLodLevels(mesh);
+			LodConfig config;
+			pm.getAutoconfig(mesh, config);
+			config.advanced.disableCompression = !mCompress->isChecked();
+			pm.generateLodLevels(config);
+			//pm.generateAutoconfiguredLodLevels(mesh);
 		} else {
 			ProgressiveMeshGenerator pm;
 			pm.generateAutoconfiguredLodLevels(mesh);
@@ -199,6 +205,7 @@ protected:
 	SceneNode* mHeadNode;
 	Real mUserReductionValue;
 	OgreBites::CheckBox* mWireframe;
+	OgreBites::CheckBox* mCompress;
 	OgreBites::CheckBox* mAutoconfig;
 	OgreBites::CheckBox* mThreaded;
 };
