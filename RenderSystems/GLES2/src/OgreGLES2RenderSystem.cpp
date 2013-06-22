@@ -1547,7 +1547,7 @@ namespace Ogre {
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
             hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                     !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
-                                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+                                    || op.vertexData->vertexBufferBinding->hasInstanceData();
 
             numberOfInstances = op.numberOfInstances;
 
@@ -2290,7 +2290,7 @@ namespace Ogre {
             {
                 if (mCurrentVertexProgram)
                 {
-                    if (hwGlBuffer->getIsInstanceData())
+                    if (hwGlBuffer->isInstanceData())
                     {
                         OGRE_CHECK_GL_ERROR(glVertexAttribDivisorAPPLE(attrib, hwGlBuffer->getInstanceDataStepRate()));
                         instanceAttribsBound.push_back(attrib);
