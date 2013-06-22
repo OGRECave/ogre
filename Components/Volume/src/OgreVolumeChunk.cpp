@@ -81,7 +81,7 @@ namespace Volume {
     bool Chunk::contributesToVolumeMesh(const Vector3 &from, const Vector3 &to) const
     {
         Real centralValue = mShared->parameters->src->getValue((to - from) / (Real)2.0 + from);
-        return Math::Abs(centralValue) <= (to - from).length() * (Real)1.5;
+        return Math::Abs(centralValue) <= (to - from).length() * mShared->parameters->src->getVolumeSpaceToWorldSpaceFactor();
     }
 
     //-----------------------------------------------------------------------
