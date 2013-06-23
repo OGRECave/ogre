@@ -68,7 +68,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name);
+			prg = getByName(name).staticCast<GpuProgram>();
 			if (prg.isNull())
 			{
 				prg = createProgram(name, groupName, filename, gptype, syntaxCode);
@@ -86,7 +86,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name);
+			prg = getByName(name).staticCast<GpuProgram>();
 			if (prg.isNull())
 			{
 				prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);
@@ -115,7 +115,7 @@ namespace Ogre {
 		const String& groupName, const String& filename, 
 		GpuProgramType gptype, const String& syntaxCode)
     {
-		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode);
+		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode).staticCast<GpuProgram>();
         // Set all prarmeters (create does not set, just determines factory)
 		prg->setType(gptype);
 		prg->setSyntaxCode(syntaxCode);
@@ -127,7 +127,7 @@ namespace Ogre {
 		const String& groupName, const String& code, GpuProgramType gptype, 
 		const String& syntaxCode)
     {
-		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode);
+		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode).staticCast<GpuProgram>();
         // Set all prarmeters (create does not set, just determines factory)
 		prg->setType(gptype);
 		prg->setSyntaxCode(syntaxCode);

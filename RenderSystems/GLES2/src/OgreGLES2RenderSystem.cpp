@@ -737,7 +737,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-		GLES2TexturePtr tex = texPtr;
+		GLES2TexturePtr tex = texPtr.staticCast<GLES2Texture>();
 
 		if (!mStateCacheManager->activateGLTextureUnit(stage))
 			return;
@@ -1547,7 +1547,7 @@ namespace Ogre {
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
             hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                     !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
-                                    || op.vertexData->vertexBufferBinding->hasInstanceData();
+                                || op.vertexData->vertexBufferBinding->hasInstanceData();
 
             numberOfInstances = op.numberOfInstances;
 

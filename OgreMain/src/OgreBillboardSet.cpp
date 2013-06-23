@@ -305,7 +305,7 @@ namespace Ogre {
     {
         mMaterialName = name;
 
-        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
+        mMaterial = MaterialManager::getSingleton().getByName(name, groupName).staticCast<Material>();
 
 		if (mMaterial.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
@@ -654,7 +654,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 			
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
 			
             if (mMaterial.isNull())
             {

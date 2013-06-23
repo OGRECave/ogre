@@ -52,7 +52,7 @@ void SGMaterialSerializerListener::materialEventRaised(MaterialSerializer* ser,
 {
 	if (event == MaterialSerializer::MSE_PRE_WRITE)
 	{
-		MaterialPtr matPtr = MaterialManager::getSingleton().getByName(mat->getName());
+		MaterialPtr matPtr = MaterialManager::getSingleton().getByName(mat->getName()).staticCast<Material>();
 		mSourceMaterial = matPtr.get();
 		createSGPassList(mSourceMaterial, mSGPassList);
 	}

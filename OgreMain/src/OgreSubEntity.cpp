@@ -84,7 +84,7 @@ namespace Ogre {
     {
 
 
-		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
+		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName).staticCast<Material>();
 
 		if( material.isNull() )
 		{
@@ -93,7 +93,7 @@ namespace Ogre {
 				"Material does not exist. Have you forgotten to define it in a "
 				".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite");
+			material = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
 
 			if (material.isNull())
 			{
@@ -118,7 +118,7 @@ namespace Ogre {
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
 			
-            mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
+            mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
 			
             if (mMaterialPtr.isNull())
             {

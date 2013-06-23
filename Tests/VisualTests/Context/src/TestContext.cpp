@@ -625,7 +625,7 @@ void TestContext::createDummyScene()
         //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         // creates shaders for base material BaseWhite using the RTSS
-        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
         baseWhite->setLightingEnabled(false);
         mShaderGenerator->createShaderBasedTechnique(
                                                      "BaseWhite",
@@ -648,7 +648,7 @@ void TestContext::createDummyScene()
                                                      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                                            "BaseWhiteNoLighting");
-        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
         if(baseWhite->getNumTechniques() > 1)
         {
             baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(

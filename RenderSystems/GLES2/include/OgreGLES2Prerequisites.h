@@ -122,6 +122,13 @@ THE SOFTWARE.
 #   define GL_BGRA  0x80E1
 #endif
 
+namespace Ogre {
+    class GLES2GpuProgram;
+    class GLES2Texture;
+    typedef SharedPtr<GLES2GpuProgram> GLES2GpuProgramPtr;
+    typedef SharedPtr<GLES2Texture> GLES2TexturePtr;
+};
+
 // Apple doesn't define this in their extension.  We'll do it just for convenience.
 // Using the value from desktop GL
 #ifndef GL_SAMPLER_2D_SHADOW_EXT

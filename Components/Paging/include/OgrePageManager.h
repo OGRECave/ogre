@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreCamera.h"
 #include "OgreFrameListener.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre
 {

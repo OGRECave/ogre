@@ -64,7 +64,7 @@ namespace Ogre
 		rend = mResources.end();
 		for (r = mResources.begin(); r != rend; ++r)
 		{
-			D3D11TexturePtr t = r->second;
+			D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
 			if (t->releaseIfDefaultPool())
 				count++;
 		}
@@ -81,7 +81,7 @@ namespace Ogre
 		rend = mResources.end();
 		for (r = mResources.begin(); r != rend; ++r)
 		{
-			D3D11TexturePtr t = r->second;
+			D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
 			if(t->recreateIfDefaultPool(mDevice))
 				count++;
 		}

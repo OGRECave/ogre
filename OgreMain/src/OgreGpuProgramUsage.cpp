@@ -62,7 +62,7 @@ namespace Ogre
 			mRecreateParams = true;
 		}
 
-		mProgram = GpuProgramManager::getSingleton().getByName(name);
+        mProgram = GpuProgramManager::getSingleton().getByName(name).staticCast<GpuProgram>();
 
         if (mProgram.isNull())
         {

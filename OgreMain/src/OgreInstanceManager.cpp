@@ -122,7 +122,7 @@ namespace Ogre
 	{
 		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() );
+																	mMeshReference->getGroup() ).staticCast<Material>();
 		InstanceBatch *batch = 0;
 
 		//Base material couldn't be found
@@ -207,7 +207,7 @@ namespace Ogre
 
 		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() );
+																	mMeshReference->getGroup() ).staticCast<Material>();
 
 		//Get the array of batches grouped by this material
 		InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialName];

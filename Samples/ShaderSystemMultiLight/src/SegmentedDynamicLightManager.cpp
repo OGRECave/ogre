@@ -22,7 +22,7 @@ SegmentedDynamicLightManager::SegmentedDynamicLightManager() :
     mIsDebugMode(false),
     mManager(NULL),
     mSegmentedLightGrid(SDL_SEGMENT_GRID_SIZE),
-    mLightTexture(NULL),
+    mLightTexture(),
 	mTextureWidth(0),
 	mTextureHeight(SDL_TEXTURE_ROWS)
 {

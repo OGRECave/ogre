@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __OgreWorkQueue_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreAtomicWrappers.h"
 #include "OgreAny.h"
 #include "OgreSharedPtr.h"
 #include "OgreHeaderPrefix.h"

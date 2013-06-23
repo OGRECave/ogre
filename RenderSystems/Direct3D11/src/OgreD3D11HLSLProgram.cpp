@@ -1469,7 +1469,7 @@ namespace Ogre {
         // this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
         if ( !mAssemblerProgram.isNull() )
         {
-            *( mAssemblerProgram.useCountPointer() ) = 0;
+            mAssemblerProgram.setUseCount(0);
             mAssemblerProgram.setNull();
         }
 

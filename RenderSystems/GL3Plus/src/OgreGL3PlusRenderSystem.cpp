@@ -57,6 +57,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 
+#if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                             GLenum type,
                             GLuint id,
@@ -104,6 +105,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
     Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
 }
+#endif
 
 namespace Ogre {
 
@@ -896,7 +898,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-		GL3PlusTexturePtr tex = texPtr;
+		GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
 
 		if (!activateGLTextureUnit(stage))
 			return;
