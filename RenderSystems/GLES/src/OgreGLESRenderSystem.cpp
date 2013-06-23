@@ -586,7 +586,7 @@ namespace Ogre {
 #ifdef GL_DEPTH24_STENCIL8_OES
                depthFormat != GL_DEPTH24_STENCIL8_OES && 
 #endif
-               stencilBuffer )
+               stencilFormat )
 			{
 				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
