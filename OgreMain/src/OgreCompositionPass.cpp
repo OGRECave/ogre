@@ -91,7 +91,7 @@ void CompositionPass::setMaterial(const MaterialPtr& mat)
 //-----------------------------------------------------------------------
 void CompositionPass::setMaterialName(const String &name)
 {
-    mMaterial = MaterialManager::getSingleton().getByName(name);
+    mMaterial = MaterialManager::getSingleton().getByName(name).staticCast<Material>();
 }
 //-----------------------------------------------------------------------
 const MaterialPtr& CompositionPass::getMaterial() const

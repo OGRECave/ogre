@@ -1751,7 +1751,7 @@ bail:
 	void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
 	{
 		static D3D11TexturePtr dt;
-		dt = tex;
+		dt = tex.staticCast<D3D11Texture>();
 		if (enabled && !dt.isNull() && dt->getSize() > 0)
 		{
 			// note used
@@ -2275,7 +2275,7 @@ bail:
 
         bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+                || op.vertexData->vertexBufferBinding->hasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 

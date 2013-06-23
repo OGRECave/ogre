@@ -121,6 +121,8 @@ namespace Volume {
         mPosYScale = (Real)1.0 / (Real)worldDimension.y * (Real)mHeight;
         mPosZScale = (Real)1.0 / (Real)worldDimension.z * (Real)mDepth;
 
+        mVolumeSpaceToWorldSpaceFactor = (Real)worldDimension.x * (Real)mWidth;
+
         // Read data
         size_t elementCount = mWidth * mHeight * mDepth;
         mData = OGRE_ALLOC_T(uint16, elementCount, MEMCATEGORY_GENERAL);

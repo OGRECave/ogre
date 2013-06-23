@@ -410,14 +410,14 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	}
 
 	// Try to get program by name.
-	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName).staticCast<HighLevelGpuProgram>();
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
 	{
 		// Create new GPU program.
 		pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType()).staticCast<HighLevelGpuProgram>();
 
 		// Case cache directory specified -> create program from file.
 		if (cachePath.empty() == false)

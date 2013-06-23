@@ -116,7 +116,7 @@ namespace Ogre {
 
         // Load using resource manager
         mLevel = BspResourceManager::getSingleton().load(filename, 
-            ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+            ResourceGroupManager::getSingleton().getWorldResourceGroupName()).staticCast<BspLevel>();
 
 		if (mLevel->isSkyEnabled())
 		{
@@ -158,7 +158,7 @@ namespace Ogre {
 
         // Load using resource manager
         mLevel = BspResourceManager::getSingleton().load(stream, 
-			ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+			ResourceGroupManager::getSingleton().getWorldResourceGroupName()).staticCast<BspLevel>();
 
 		if (mLevel->isSkyEnabled())
 		{
@@ -387,7 +387,7 @@ namespace Ogre {
                     continue;
                 StaticFaceGroup* faceGroup = mLevel->mFaceGroups + realIndex;
                 // Get Material pointer by handle
-                pMat = MaterialManager::getSingleton().getByHandle(faceGroup->materialHandle);
+                pMat = MaterialManager::getSingleton().getByHandle(faceGroup->materialHandle).staticCast<Material>();
                 assert (!pMat.isNull());
                 // Check normal (manual culling)
                 ManualCullingMode cullMode = pMat->getTechnique(0)->getPass(0)->getManualCullingMode();

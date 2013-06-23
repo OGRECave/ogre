@@ -58,7 +58,7 @@ void Sample_VolumeTerrain::setupContent(void)
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
 
     // Camera
-    mCamera->setPosition((Real)(2560 - 384), (Real)2000, (Real)(2560 - 384));
+    mCamera->setPosition((Real)3264, (Real)2700, (Real)3264);
     mCamera->lookAt((Real)0, (Real)100, (Real)0);
     mCamera->setNearClipDistance((Real)0.5);
 

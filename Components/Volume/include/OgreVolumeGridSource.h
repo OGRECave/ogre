@@ -69,6 +69,9 @@ namespace Volume {
 
         /// Whether to blur the gradient a bit Sobel like.
         const bool mSobelGradient;
+
+        /// Factor to come from volume coordinate to world coordinate.
+        Real mVolumeSpaceToWorldSpaceFactor;
         
         /** Overridden from VolumeSource.
         */
@@ -182,6 +185,12 @@ namespace Volume {
             because the density outside of the sphere is needed, too.
         */
         virtual void combineWithSource(CSGOperationSource *operation, Source *source, const Vector3 &center, Real radius);
+    
+        
+        /** Overridden from VolumeSource.
+        */
+        Real getVolumeSpaceToWorldSpaceFactor(void) const;
+
     };
 
 }

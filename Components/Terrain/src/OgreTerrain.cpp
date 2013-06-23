@@ -594,9 +594,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const String& filename)
 	{
-		freeLodData();
-		mLodManager = OGRE_NEW TerrainLodManager( this, filename );
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 		DataStreamPtr stream = Root::getSingleton().openFileStream(macBundlePath() + "/../Documents/" + filename,
                                                                    _getDerivedResourceGroup());
@@ -604,10 +601,15 @@ namespace Ogre
 		DataStreamPtr stream = Root::getSingleton().openFileStream(filename,
                                                                    _getDerivedResourceGroup());
 #endif
-		
+		return prepare(stream);
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::prepare(DataStreamPtr& stream)
+	{
+		freeLodData();
+		mLodManager = OGRE_NEW TerrainLodManager( this, stream );
 		StreamSerialiser ser(stream);
 		return prepare(ser);
-
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)
@@ -616,7 +618,11 @@ namespace Ogre
 
 		freeTemporaryResources();
 		freeCPUResources();
-        mLodManager = OGRE_NEW TerrainLodManager( this );
+
+		if(mLodManager == NULL)
+		{
+			mLodManager = OGRE_NEW TerrainLodManager( this );
+		}
 
 		copyGlobalOptions();
 
@@ -1170,7 +1176,8 @@ namespace Ogre
 		y = std::min(y, (long)mSize - 1L);
 		y = std::max(y, 0L);
 
-		long skip = 1 << mLodManager->getHighestLodPrepared();
+		int highestLod = mLodManager->getHighestLodPrepared();
+		long skip = 1 << (highestLod != -1 ? highestLod : 0);
 		if (x % skip == 0 && y % skip == 0)
 		return *getHeightData(x, y);
 

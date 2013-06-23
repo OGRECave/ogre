@@ -102,7 +102,7 @@ namespace Ogre
 						// chop off the 'particle_system ' needed by new compilers
 						line = line.substr(5);
 					}
-				    pFont = create(line, groupName);
+				    pFont = create(line, groupName).staticCast<Font>();
 					pFont->_notifyOrigin(stream->getName());
 				    // Skip to and over next {
                     stream->skipLine("{");

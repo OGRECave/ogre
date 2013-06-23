@@ -258,10 +258,10 @@ namespace Ogre
 			// it's important that the names are deterministic for a given terrain, so
 			// use the terrain pointer as an ID
 			const String& matName = terrain->getMaterialName();
-			mat = matMgr.getByName(matName);
+			mat = matMgr.getByName(matName).staticCast<Material>();
 			if (mat.isNull())
 			{
-				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
 			}
 		}
 		// clear everything
@@ -308,10 +308,10 @@ namespace Ogre
 			// it's important that the names are deterministic for a given terrain, so
 			// use the terrain pointer as an ID
 			const String& matName = terrain->getMaterialName() + "/comp";
-			mat = matMgr.getByName(matName);
+			mat = matMgr.getByName(matName).staticCast<Material>();
 			if (mat.isNull())
 			{
-				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
 			}
 		}
 		// clear everything

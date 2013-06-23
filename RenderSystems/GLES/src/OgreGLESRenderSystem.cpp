@@ -586,7 +586,7 @@ namespace Ogre {
 #ifdef GL_DEPTH24_STENCIL8_OES
                depthFormat != GL_DEPTH24_STENCIL8_OES && 
 #endif
-               stencilBuffer )
+               stencilFormat )
 			{
 				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -952,7 +952,7 @@ namespace Ogre {
 
     void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLESTexturePtr tex = texPtr;
+		GLESTexturePtr tex = texPtr.staticCast<GLESTexture>();
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
 			return;

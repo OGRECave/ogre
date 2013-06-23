@@ -303,7 +303,7 @@ namespace Ogre {
         GLES2HardwareUniformBuffer* buf =
         new GLES2HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
         {
-            OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+            OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf);
         }
         return HardwareUniformBufferSharedPtr(buf);

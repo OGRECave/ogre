@@ -57,6 +57,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 
+#if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                             GLenum type,
                             GLuint id,
@@ -104,6 +105,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
     Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
 }
+#endif
 
 namespace Ogre {
 
@@ -720,7 +722,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
-			if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilBuffer != GL_NONE )
+			if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat != GL_NONE )
 			{
 				stencilBuffer = new GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -896,7 +898,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-		GL3PlusTexturePtr tex = texPtr;
+		GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
 
 		if (!activateGLTextureUnit(stage))
 			return;
@@ -1687,7 +1689,7 @@ namespace Ogre {
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
             !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL)) 
-            || op.vertexData->vertexBufferBinding->getHasInstanceData();
+            || op.vertexData->vertexBufferBinding->hasInstanceData();
         
 		size_t numberOfInstances = op.numberOfInstances;
         
@@ -2697,7 +2699,7 @@ namespace Ogre {
 
             if (mCurrentVertexProgram)
             {
-                if (hwGlBuffer->getIsInstanceData())
+                if (hwGlBuffer->isInstanceData())
                 {
                     OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
                     instanceAttribsBound.push_back(attrib);

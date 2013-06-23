@@ -218,50 +218,7 @@ namespace Ogre {
 
 
     };
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to BspLevelPtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class BspLevelPtr : public SharedPtr<BspLevel> 
-    {
-    public:
-        BspLevelPtr() : SharedPtr<BspLevel>() {}
-        explicit BspLevelPtr(BspLevel* rep) : SharedPtr<BspLevel>(rep) {}
-        BspLevelPtr(const BspLevelPtr& r) : SharedPtr<BspLevel>(r) {} 
-        BspLevelPtr(const ResourcePtr& r) : SharedPtr<BspLevel>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<BspLevel*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a BspLevelPtr
-        BspLevelPtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<BspLevel*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<BspLevel*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-            return *this;
-        }
-    };
-
+    typedef SharedPtr<BspLevel> BspLevelPtr;
 }
 
 #endif

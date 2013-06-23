@@ -273,7 +273,6 @@ namespace Ogre {
     {
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
-        GLenum target = GL_TEXTURE_2D;
 
         for(size_t x=0; x<PF_COUNT; ++x)
         {

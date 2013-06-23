@@ -40,11 +40,11 @@ namespace Ogre
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = getVertexProgramName(prof, terrain, tt);
-		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+		HighLevelGpuProgramPtr ret = mgr.getByName(progName).staticCast<HighLevelGpuProgram>();
 		if (ret.isNull())
 		{
 			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				"cg", GPT_VERTEX_PROGRAM);
+				"cg", GPT_VERTEX_PROGRAM).staticCast<HighLevelGpuProgram>();
 		}
 		else
 		{
@@ -65,11 +65,11 @@ namespace Ogre
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = getFragmentProgramName(prof, terrain, tt);
 
-		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+		HighLevelGpuProgramPtr ret = mgr.getByName(progName).staticCast<HighLevelGpuProgram>();
 		if (ret.isNull())
 		{
 			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				"cg", GPT_FRAGMENT_PROGRAM);
+				"cg", GPT_FRAGMENT_PROGRAM).staticCast<HighLevelGpuProgram>();
 		}
 		else
 		{
