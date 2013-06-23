@@ -594,6 +594,13 @@ typedef void (GL_APIENTRYP GLDEBUGPROCKHR)(GLenum source,GLenum type,GLuint id,G
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                        0x83F1
 #endif
 
+/* GL_AMD_compressed_ATC_texture */
+#ifndef GL_AMD_compressed_ATC_texture
+#define ATC_RGB_AMD						  						0x8C92
+#define ATC_RGBA_EXPLICIT_ALPHA_AMD		  						0x8C93
+#define ATC_RGBA_INTERPOLATED_ALPHA_AMD	  						0x87EE
+#endif
+
 /* GL_EXT_texture_filter_anisotropic */
 #ifndef GL_EXT_texture_filter_anisotropic
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT                           0x84FE
