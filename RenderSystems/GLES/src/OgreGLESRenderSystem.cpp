@@ -271,6 +271,8 @@ namespace Ogre {
             mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
             mGLSupport->checkExtension("GL_OES_compressed_paletted_texture"))
         {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION);
+			
             if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
                mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
