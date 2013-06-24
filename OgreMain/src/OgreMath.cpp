@@ -817,6 +817,20 @@ namespace Ogre
         Vector3 normal = calculateBasicFaceNormalWithoutNormalize(a, b, c);
         return intersects(ray, a, b, c, normal, positiveSide, negativeSide);
     }
+	//-----------------------------------------------------------------------
+    /*bool Math::intersects( const Sphere& sphere, const Aabb& aabb )
+	{
+		//TODO: Enable (dark_sylinc)
+		const Vector3& center = sphere.getCenter();
+        Real radius = sphere.getRadius();
+
+		// Arvo's algorithm
+		Vector3 cathetus = center - aabb.m_center;
+		cathetus.x = max( Abs( cathetus.x ) - aabb.m_halfSize.x, 0.0f );
+		cathetus.y = max( Abs( cathetus.y ) - aabb.m_halfSize.y, 0.0f );
+		cathetus.z = max( Abs( cathetus.z ) - aabb.m_halfSize.z, 0.0f );
+		return cathetus.dotProduct( cathetus ) < radius * radius;
+	}*/
     //-----------------------------------------------------------------------
     bool Math::intersects(const Sphere& sphere, const AxisAlignedBox& box)
     {

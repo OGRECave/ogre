@@ -630,6 +630,10 @@ namespace Ogre
             const Vector3& b, const Vector3& c,
             bool positiveSide = true, bool negativeSide = true);
 
+		/** Sphere / box intersection test. */
+		//TODO: Enable (dark_sylinc)
+        //static bool intersects(const Sphere& sphere, const Aabb& aabb);
+
         /** Sphere / box intersection test. */
         static bool intersects(const Sphere& sphere, const AxisAlignedBox& box);
 
@@ -690,6 +694,18 @@ namespace Ogre
 		{
 			assert (minval <= maxval && "Invalid clamp range");
 			return std::max(std::min(val, maxval), minval);
+		}
+		template <>
+		static float Clamp<float>(float val, float minval, float maxval)
+		{
+			assert (minval <= maxval && "Invalid clamp range");
+			return max( min(val, maxval), minval );
+		}
+		template <>
+		static double Clamp<double>(double val, double minval, double maxval)
+		{
+			assert (minval <= maxval && "Invalid clamp range");
+			return max( min(val, maxval), minval );
 		}
 
 		static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 

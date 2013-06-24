@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreAnimable.h"
 #include "OgreAny.h"
 #include "OgreUserObjectBindings.h"
+#include "Math/Array/OgreObjectData.h"
+#include "OgreId.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -57,7 +59,7 @@ namespace Ogre {
             Instances of this class are discrete, relatively small, movable objects
             which are attached to SceneNode objects to define their position.
     */
-    class _OgreExport MovableObject : public ShadowCaster, public AnimableObject, public MovableAlloc
+	class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
         /** Listener which gets called back on MovableObject events.
@@ -75,92 +77,51 @@ namespace Ogre {
             virtual void objectDetached(MovableObject*) {}
             /** MovableObject has been moved */
             virtual void objectMoved(MovableObject*) {}
-            /** Called when the movable object of the camera to be used for rendering.
-            @return
-                true if allows queue for rendering, false otherwise.
-            */
-            virtual bool objectRendering(const MovableObject*, const Camera*) { return true; }
-            /** Called when the movable object needs to query a light list.
-            @remarks
-                If you want to customize light finding for this object, you should override 
-				this method and hook into MovableObject via MovableObject::setListener.
-				Be aware that the default method caches results within a frame to 
-				prevent unnecessary recalculation, so if you override this you 
-				should provide your own caching to maintain performance.
-			@note
-				If you use texture shadows, there is an additional restriction - 
-				since the lights which should have shadow textures rendered for
-				them are determined based on the entire frustum, and not per-object,
-				it is important that the lights returned at the start of this 
-				list (up to the number of shadow textures available) are the same 
-				lights that were used to generate the shadow textures, 
-				and they are in the same order (particularly for additive effects).
-			@note
-				This method will not be called for additive stencil shadows since the
-				light list cannot be varied per object with this technique.
-            @return
-                A pointer to a light list if you populated the light list yourself, or
-                NULL to fall back on the default finding process.
-            */
-            virtual const LightList* objectQueryLights(const MovableObject*) { return 0; }
         };
 
     protected:
-		/// Name of this object
-		String mName;
-		/// Creator of this object (if created by a factory)
-		MovableObjectFactory* mCreator;
-		/// SceneManager holding this object (if applicable)
-		SceneManager* mManager;
         /// node to which this object is attached
         Node* mParentNode;
-        bool mParentIsTagPoint;
         /// Is this object visible?
         bool mVisible;
-		/// Is debug display enabled?
-		bool mDebugDisplay;
-		/// Upper distance to still render
-		Real mUpperDistance;
-		Real mSquaredUpperDistance;
-		// Minimum pixel size to still render
-		Real mMinPixelSize;
-		/// Hidden because of distance?
-		bool mBeyondFarDistance;	
-		/// User objects binding.
-		UserObjectBindings mUserObjectBindings;
-        /// The render queue to use when rendering this object
+		/// The render queue to use when rendering this object
         uint8 mRenderQueueID;
-		/// Flags whether the RenderQueue's default should be used.
-		bool mRenderQueueIDSet;
 		/// The render queue group to use when rendering this object
 		ushort mRenderQueuePriority;
-		/// Flags whether the RenderQueue's default should be used.
-		bool mRenderQueuePrioritySet;
-        /// Flags determining whether this object is included / excluded from scene queries
-        uint32 mQueryFlags;
-        /// Flags determining whether this object is visible (compared to SceneManager mask)
-        uint32 mVisibilityFlags;
-        /// Cached world AABB of this object
-        mutable AxisAlignedBox mWorldAABB;
-		// Cached world bounding sphere
-		mutable Sphere mWorldBoundingSphere;
-        /// World space AABB of this object's dark cap
-        mutable AxisAlignedBox mWorldDarkCapBounds;
+		/// All the object data needed in SoA form
+		ObjectData mObjectData;
+		/// SceneManager holding this object (if applicable)
+		SceneManager* mManager;
+		/// Upper distance to still render. @See ObjectData::mSquaredUpperDistance
+		Real mUpperDistance;
+		// Minimum pixel size to still render
+		Real mMinPixelSize;
+		/// User objects binding.
+		UserObjectBindings mUserObjectBindings;
+		/// World space AABB of this object's dark cap.
+		/// TODO: Move mWorldDarkCapBounds out of here. It's only used by stencil shadows. (dark_sylinc)
+        AxisAlignedBox mWorldDarkCapBounds;
         /// Does this object cast shadows?
         bool mCastShadows;
 
-        /// Does rendering this object disabled by listener?
-        bool mRenderingDisabled;
-        /// MovableObject listener - only one allowed (no list) for size & performance reasons. */
+        /// MovableObject listener - only one allowed (no list) for size & performance reasons.
         Listener* mListener;
 
         /// List of lights for this object
-        mutable LightList mLightList;
-        /// The last frame that this light list was updated in
-        mutable ulong mLightListUpdated;
+        LightList mLightList;
 
-		/// the light mask defined for this movable. This will be taken into consideration when deciding which light should affect this movable
-		uint32 mLightMask;
+		/// Friendly name of this object, can be empty
+		String mName;
+
+		/// Is debug display enabled?
+		bool mDebugDisplay;
+
+		/// Creator of this object (if created by a factory)
+		MovableObjectFactory* mCreator;
+
+#ifndef NDEBUG
+		mutable bool mCachedAabbOutOfDate;
+#endif
 
 		// Static members
 		/// Default query flags
@@ -168,14 +129,12 @@ namespace Ogre {
 		/// Default visibility flags
 		static uint32 msDefaultVisibilityFlags;
 
-
+	protected:
+		Aabb updateSingleWorldAabb();
 
     public:
         /// Constructor
-        MovableObject();
-
-		/// Named constructor
-		MovableObject(const String& name);
+        MovableObject( IdType id );
         /** Virtual destructor - read Scott Meyers if you don't know why this is needed.
         */
         virtual ~MovableObject();
@@ -189,73 +148,47 @@ namespace Ogre {
 		/** Get the manager of this object, if any (internal use only) */
 		virtual SceneManager* _getManager(void) const { return mManager; }
 
+		/** Sets a custom name for this node. Doesn't have to be unique */
+		void setName( const String &name )									{ mName = name; }
+
         /** Returns the name of this object. */
-		virtual const String& getName(void) const { return mName; }
+		const String& getName(void) const									{ return mName; }
 
         /** Returns the type name of this object. */
         virtual const String& getMovableType(void) const = 0;
 
-        /** Returns the node to which this object is attached.
-        @remarks
-            A MovableObject may be attached to either a SceneNode or to a TagPoint, 
-            the latter case if it's attached to a bone on an animated entity. 
-            Both are Node subclasses so this method will return either.
-        */
-        virtual Node* getParentNode(void) const;
-
-        /** Returns the scene node to which this object is attached.
-        @remarks
-            A MovableObject may be attached to either a SceneNode or to a TagPoint, 
-            the latter case if it's attached to a bone on an animated entity. 
-            This method will return the scene node of the parent entity 
-            if the latter is true.
-        */
-        virtual SceneNode* getParentSceneNode(void) const;
-
-		/// Gets whether the parent node is a TagPoint (or a SceneNode)
-		virtual bool isParentTagPoint() const { return mParentIsTagPoint; }
+        /// Returns the node to which this object is attached.
+		Node* getParentNode(void) const										{ return mParentNode; }
 
         /** Internal method called to notify the object that it has been attached to a node.
         */
-        virtual void _notifyAttached(Node* parent, bool isTagPoint = false);
+        virtual void _notifyAttached( Node* parent );
 
-        /** Returns true if this object is attached to a SceneNode or TagPoint. */
-        virtual bool isAttached(void) const;
+        /** Returns true if this object is attached to a Node. */
+		bool isAttached(void) const											{ return mParentNode != 0; }
 
-		/** Detaches an object from a parent SceneNode or TagPoint, if attached. */
-		virtual void detachFromParent(void);
-
-        /** Returns true if this object is attached to a SceneNode or TagPoint, 
-			and this SceneNode / TagPoint is currently in an active part of the
-			scene graph. */
-        virtual bool isInScene(void) const;
+		/** Detaches an object from a parent SceneNode if attached. */
+		void detachFromParent(void);
 
         /** Internal method called to notify the object that it has been moved.
         */
         virtual void _notifyMoved(void);
 
-		/** Internal method to notify the object of the camera to be used for the next rendering operation.
-            @remarks
-                Certain objects may want to do specific processing based on the camera position. This method notifies
-                them in case they wish to do this.
-        */
-        virtual void _notifyCurrentCamera(Camera* cam);
-
         /** Retrieves the local axis-aligned bounding box for this object.
             @remarks
                 This bounding box is in local coordinates.
         */
-        virtual const AxisAlignedBox& getBoundingBox(void) const = 0;
+		Aabb getBoundingBox(void) const;
 
 		/** Retrieves the radius of the origin-centered bounding sphere 
 		 	 for this object.
 		*/
-		virtual Real getBoundingRadius(void) const = 0;
+		Real getBoundingRadius(void) const;
 
         /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
-        virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
+        //const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
 		/** Retrieves the worldspace bounding sphere for this object. */
-        virtual const Sphere& getWorldBoundingSphere(bool derive = false) const;
+        //virtual const Sphere& getWorldBoundingSphere(bool derive = false) const;
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
             @remarks
                 The engine will call this method when this object is to be rendered. The object must then create one or more
@@ -277,64 +210,47 @@ namespace Ogre {
 			changes are best done using this method; large or more longer term
 			changes are best done by detaching.
 		*/
-        virtual void setVisible(bool visible);
+		void setVisible( bool visible )										{ mVisible = visible; }
 
         /** Gets this object whether to be visible or not, if it has a renderable component. 
         @remarks
             Returns the value set by MovableObject::setVisible only.
         */
-        virtual bool getVisible(void) const;
+		bool getVisible(void) const											{ return mVisible; }
 
         /** Returns whether or not this object is supposed to be visible or not. 
 		@remarks
 			Takes into account both upper rendering distance and visible flag.
 		*/
-        virtual bool isVisible(void) const;
+        //virtual bool isVisible(void) const;
 
 		/** Sets the distance at which the object is no longer rendered.
-		@note Camera::setUseRenderingDistance() needs to be called for this parameter to be used.
-		@param dist Distance beyond which the object will not be rendered 
-			(the default is 0, which means objects are always rendered).
+		@param
+			dist Distance beyond which the object will not be rendered (the default is FLT_MAX,
+			which means objects are always rendered). Values equal or below zero will be ignored,
+			and cause an assertion in debug mode.
 		*/
-		virtual void setRenderingDistance(Real dist) { 
-			mUpperDistance = dist; 
-			mSquaredUpperDistance = mUpperDistance * mUpperDistance;
-		}
+		inline void setRenderingDistance(Real dist);
 
 		/** Gets the distance at which batches are no longer rendered. */
-		virtual Real getRenderingDistance(void) const { return mUpperDistance; }		
+		Real getRenderingDistance(void) const								{ return mUpperDistance; }
 
 		/** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
 		@note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.
 		@param pixelSize Number of minimum pixels
 			(the default is 0, which means objects are always rendered).
 		*/
-		virtual void setRenderingMinPixelSize(Real pixelSize) { 
+		void setRenderingMinPixelSize(Real pixelSize) { 
 			mMinPixelSize = pixelSize; 
 		}
 
-		/** Returns the minimum pixel size an object needs to be in both screen axes in order to be rendered
+		/** Returns the minimum pixel size an object needs to be in both screen axes in order to be
+			rendered
 		*/
-		virtual Real getRenderingMinPixelSize() const { 
-			return mMinPixelSize; 
-		}
-
-		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
-			Sets any kind of user value on this object.
-		@remarks
-			This method allows you to associate any user value you like with 
-			this MovableObject. This can be a pointer back to one of your own
-			classes for instance.		
-		*/
-		virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
-
-		/** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
-			Retrieves the custom user value associated with this object.
-		*/
-		virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+		Real getRenderingMinPixelSize() const								{ return mMinPixelSize; }
 
 		/** Return an instance of user objects binding associated with this class.
-		You can use it to associate one or more custom objects with this class instance.
+			You can use it to associate one or more custom objects with this class instance.
 		@see UserObjectBindings::setUserAny.		
 		*/
 		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
@@ -377,10 +293,27 @@ namespace Ogre {
 		virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual uint8 getRenderQueueGroup(void) const;
+        uint8 getRenderQueueGroup(void) const;
 
 		/// return the full transformation of the parent sceneNode or the attachingPoint node
-		virtual const Matrix4& _getParentNodeFullTransform(void) const;
+		Matrix4 _getParentNodeFullTransform(void) const;
+
+		/** Gets the axis aligned box in world space.
+		@remarks
+			Assumes the caches are already updated. Will trigger an assert
+			otherwise. @See getWorldAabbUpdated if you need the update process
+			to be guaranteed
+        */
+		const Aabb getWorldAabb() const;
+
+		/** Gets the axis aligned box in world space.
+		@remarks
+			Unlike getWorldAabb, this function guarantees the cache stays up to date.
+			It is STRONGLY advised against calling this function for a large
+			number of MovableObject. Refactor your queries so that they happen
+			after SceneManager::UpdateAllTransforms() has been called
+		*/
+		const Aabb getWorldAabbUpdated();
 
         /** Sets the query flags for this object.
         @remarks
@@ -389,18 +322,18 @@ namespace Ogre {
             a bit on these flags is set, will it be included in a query asking for that flag. The
             meaning of the bits is application-specific.
         */
-        virtual void setQueryFlags(uint32 flags) { mQueryFlags = flags; }
+        inline void setQueryFlags(uint32 flags);
 
         /** As setQueryFlags, except the flags passed as parameters are appended to the
-        existing flags on this object. */
-        virtual void addQueryFlags(uint32 flags) { mQueryFlags |= flags; }
-            
+			existing flags on this object. */
+        inline void addQueryFlags(uint32 flags);
+
         /** As setQueryFlags, except the flags passed as parameters are removed from the
-        existing flags on this object. */
-        virtual void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
-        
+			existing flags on this object. */
+        inline void removeQueryFlags(uint32 flags);
+
         /// Returns the query flags relevant for this object
-        virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
+        inline uint32 getQueryFlags(void) const;
 
 		/** Set the default query flags for all future MovableObject instances.
 		*/
@@ -410,25 +343,25 @@ namespace Ogre {
 		*/
 		static uint32 getDefaultQueryFlags() { return msDefaultQueryFlags; }
 
-		
+
         /** Sets the visibility flags for this object.
         @remarks
 			As well as a simple true/false value for visibility (as seen in setVisible), 
 			you can also set visibility flags which when 'and'ed with the SceneManager's
 			visibility mask can also make an object invisible.
         */
-        virtual void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
+		inline void setVisibilityFlags(uint32 flags);
 
         /** As setVisibilityFlags, except the flags passed as parameters are appended to the
         existing flags on this object. */
-        virtual void addVisibilityFlags(uint32 flags) { mVisibilityFlags |= flags; }
+        inline void addVisibilityFlags(uint32 flags);
             
         /** As setVisibilityFlags, except the flags passed as parameters are removed from the
         existing flags on this object. */
-        virtual void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
+        inline void removeVisibilityFlags(uint32 flags);
         
         /// Returns the visibility flags relevant for this object
-        virtual uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+        inline uint32 getVisibilityFlags(void) const;
 
 		/** Set the default visibility flags for all future MovableObject instances.
 		*/
@@ -443,11 +376,11 @@ namespace Ogre {
             Note for size and performance reasons only one listener per object
             is allowed.
         */
-        virtual void setListener(Listener* listener) { mListener = listener; }
+        void setListener(Listener* listener) { mListener = listener; }
 
         /** Gets the current listener for this object.
         */
-        virtual Listener* getListener(void) const { return mListener; }
+        Listener* getListener(void) const { return mListener; }
 
         /** Gets a list of lights, ordered relative to how close they are to this movable object.
         @remarks
@@ -467,20 +400,20 @@ namespace Ogre {
             the renderable is a part of the movable.
         @return The list of lights use to lighting this object.
         */
-        virtual const LightList& queryLights(void) const;
+        virtual const LightList& queryLights(void);
 
 		/** Get a bitwise mask which will filter the lights affecting this object
 		@remarks
-		By default, this mask is fully set meaning all lights will affect this object
+			By default, this mask is fully set meaning all lights will affect this object
 		*/
-		virtual uint32 getLightMask()const { return mLightMask; }
+		inline uint32 getLightMask()const;
 		/** Set a bitwise mask which will filter the lights affecting this object
 		@remarks
 		This mask will be compared against the mask held against Light to determine
-		if a light should affect a given object. 
-		By default, this mask is fully set meaning all lights will affect this object
+			if a light should affect a given object. 
+			By default, this mask is fully set meaning all lights will affect this object
 		*/
-		virtual void setLightMask(uint32 lightMask);
+		inline void setLightMask(uint32 lightMask);
 
 		/** Returns a pointer to the current list of lights for this object.
 		@remarks
@@ -489,6 +422,9 @@ namespace Ogre {
 			as a return value) and for reading it's only accurate as at the last frame.
 		*/
 		virtual LightList* _getLightList() { return &mLightList; }
+
+		typedef vector<MovableObject*>::type ShadowRenderableList;
+        typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
 
 		/// Define a default implementation of method from ShadowCaster which implements no shadows
         EdgeData* getEdgeList(void) { return NULL; }
@@ -501,7 +437,8 @@ namespace Ogre {
             bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
 		
         /** Overridden member from ShadowCaster. */
-        const AxisAlignedBox& getLightCapBounds(void) const;
+		const Aabb getLightCapBounds() const;
+		const Aabb getLightCapBoundsUpdated();
         /** Overridden member from ShadowCaster. */
         const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const;
         /** Sets whether or not this object will cast shadows.
@@ -641,5 +578,7 @@ namespace Ogre {
 }
 
 #include "OgreHeaderSuffix.h"
+
+#include "OgreMovableObject.inl"
 
 #endif

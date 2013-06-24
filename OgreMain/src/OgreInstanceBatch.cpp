@@ -87,7 +87,7 @@ namespace Ogre
 		if( sceneNode )
 		{
 			sceneNode->detachAllObjects();
-			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
 		}
 
 		if( mRemoveOwnVertexData )
@@ -143,7 +143,7 @@ namespace Ogre
 			//Only increase the bounding box for those objects we know are in the scene
 			if( ent->isInScene() )
 			{
-				maxScale = std::max(maxScale, ent->getMaxScaleCoef());
+				maxScale = max(maxScale, ent->getMaxScaleCoef());
 				mFullBoundingBox.merge( ent->_getDerivedPosition() );
 			}
 
@@ -156,9 +156,6 @@ namespace Ogre
 
 
 		mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
-
-		//Tell the SceneManager our bounds have changed
-		getParentSceneNode()->needUpdate(true);
 
 		mBoundsDirty	= false;
 		mBoundsUpdated	= true;
@@ -490,7 +487,7 @@ namespace Ogre
 		//the shader
 		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
 					 mMeshReference->getBoundingSphereRadius();
-        depth = std::max( depth, Real(0) );
+        depth = max( depth, Real(0) );
         Real lodValue = depth * cam->_getLodBiasInverse();
 
 		//Now calculate Material LOD

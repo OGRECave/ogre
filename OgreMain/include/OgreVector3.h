@@ -533,9 +533,9 @@ namespace Ogre
         */
         inline void makeFloor( const Vector3& cmp )
         {
-            if( cmp.x < x ) x = cmp.x;
-            if( cmp.y < y ) y = cmp.y;
-            if( cmp.z < z ) z = cmp.z;
+			x = min( x, cmp.x );
+			y = min( y, cmp.y );
+			z = min( z, cmp.z );
         }
 
         /** Sets this vector's components to the maximum of its own and the
@@ -547,9 +547,9 @@ namespace Ogre
         */
         inline void makeCeil( const Vector3& cmp )
         {
-            if( cmp.x > x ) x = cmp.x;
-            if( cmp.y > y ) y = cmp.y;
-            if( cmp.z > z ) z = cmp.z;
+            x = max( x, cmp.x );
+			y = max( y, cmp.y );
+			z = max( z, cmp.z );
         }
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).

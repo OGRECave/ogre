@@ -87,6 +87,14 @@ uint32 SceneManager::FRUSTUM_TYPE_MASK			= 0x04000000;
 uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+	#pragma warning( push )
+	#pragma warning( disable: 4355 )
+#endif
+mNodeMemoryManager( this ),					//'this' hasn't been fully initialized yet
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+	#pragma warning( pop ) 
+#endif
 mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
@@ -791,12 +799,10 @@ void SceneManager::clearScene(void)
 	for (SceneNodeList::iterator i = mSceneNodes.begin();
 		i != mSceneNodes.end(); ++i)
 	{
-		OGRE_DELETE i->second;
+		OGRE_DELETE *i;
 	}
 	mSceneNodes.clear();
 	mAutoTrackingSceneNodes.clear();
-
-
 	
 	// Clear animations
     destroyAllAnimations();
@@ -811,46 +817,33 @@ void SceneManager::clearScene(void)
 
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl(void)
+SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent )
 {
-    return OGRE_NEW SceneNode(this);
+	return OGRE_NEW SceneNode( Id::generateNewId<Node>(), this, &mNodeMemoryManager, parent );
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl(const String& name)
+SceneNode* SceneManager::_createSceneNode( SceneNode *parent )
 {
-    return OGRE_NEW SceneNode(this, name);
-}//-----------------------------------------------------------------------
+	SceneNode* sn = createSceneNodeImpl( parent );
+	mSceneNodes.insert( std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn ), sn );
+    return sn;
+}
+//-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNode(void)
 {
-    SceneNode* sn = createSceneNodeImpl();
-    assert(mSceneNodes.find(sn->getName()) == mSceneNodes.end());
-    mSceneNodes[sn->getName()] = sn;
+    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0 );
+	mSceneNodes.insert( std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn ), sn );
     return sn;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNode(const String& name)
+void SceneManager::destroySceneNode( SceneNode* sn )
 {
-    // Check name not used
-    if (mSceneNodes.find(name) != mSceneNodes.end())
-    {
-        OGRE_EXCEPT(
-            Exception::ERR_DUPLICATE_ITEM,
-            "A scene node with the name " + name + " already exists",
-            "SceneManager::createSceneNode" );
-    }
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn );
 
-    SceneNode* sn = createSceneNodeImpl(name);
-    mSceneNodes[sn->getName()] = sn;
-    return sn;
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroySceneNode(const String& name)
-{
-    SceneNodeList::iterator i = mSceneNodes.find(name);
-
-    if (i == mSceneNodes.end())
+    if( itor == mSceneNodes.end() || sn != *itor )
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode ID: " +
+			StringConverter::toString( sn->getId() ) + ", named '" + sn->getName() + "' not found.",
             "SceneManager::destroySceneNode");
     }
 
@@ -863,13 +856,13 @@ void SceneManager::destroySceneNode(const String& name)
 		AutoTrackingSceneNodes::iterator curri = ai++;
         SceneNode* n = *curri;
         // Tracking this node
-        if (n->getAutoTrackTarget() == i->second)
+        if (n->getAutoTrackTarget() == sn)
         {
             // turn off, this will notify SceneManager to remove
             n->setAutoTracking(false);
         }
         // node is itself a tracker
-        else if (n == i->second)
+        else if (n == sn)
         {
             mAutoTrackingSceneNodes.erase(curri);
         }
@@ -877,52 +870,66 @@ void SceneManager::destroySceneNode(const String& name)
 
 	// detach from parent (don't do this in destructor since bulk destruction
 	// behaves differently)
-	Node* parentNode = i->second->getParent();
-	if (parentNode)
+	Node *parentNode = sn->getParent();
+	if( parentNode )
 	{
-		parentNode->removeChild(i->second);
+		parentNode->removeChild( sn );
 	}
-    OGRE_DELETE i->second;
-    mSceneNodes.erase(i);
-}
-//---------------------------------------------------------------------
-void SceneManager::destroySceneNode(SceneNode* sn)
-{
-	destroySceneNode(sn->getName());
-
+    OGRE_DELETE sn;
+    mSceneNodes.erase( itor );
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
 {
-	if (!mSceneRoot)
+	if( !mSceneRoot )
 	{
 		// Create root scene node
-		mSceneRoot = createSceneNodeImpl("Ogre/SceneRoot");
-		mSceneRoot->_notifyRootNode();
+		mSceneRoot = createSceneNodeImpl( (SceneNode*)0 );
+		mSceneRoot->setName( "Ogre/SceneRoot" );
 	}
 
     return mSceneRoot;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getSceneNode(const String& name) const
+SceneNode* SceneManager::getSceneNode( IdType id )
 {
-    SceneNodeList::const_iterator i = mSceneNodes.find(name);
+	SceneNode *retVal = 0;
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodes.begin(),
+													 mSceneNodes.end(), id, IdCmp() );
 
-    if (i == mSceneNodes.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
-            "SceneManager::getSceneNode");
-    }
+	if( itor != mSceneNodes.end() && (*itor)->getId() == id )
+        retVal = *itor;
 
-    return i->second;
-
+    return retVal;
 }
 //-----------------------------------------------------------------------
-bool SceneManager::hasSceneNode(const String& name) const
+const SceneNode* SceneManager::getSceneNode( IdType id ) const
 {
-	return (mSceneNodes.find(name) != mSceneNodes.end());
-}
+	SceneNode const *retVal = 0;
+	SceneNodeList::const_iterator itor = std::lower_bound( mSceneNodes.begin(),
+															mSceneNodes.end(), id, IdCmp() );
 
+	if( itor != mSceneNodes.end() && (*itor)->getId() == id )
+        retVal = *itor;
+
+    return retVal;
+}
+//-----------------------------------------------------------------------
+void SceneManager::registerSceneNodeListener( SceneNode *sceneNode )
+{
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodesWithListeners.begin(),
+													 mSceneNodesWithListeners.end(), sceneNode );
+	mSceneNodesWithListeners.insert( itor, sceneNode );
+}
+//-----------------------------------------------------------------------
+void SceneManager::unregisterSceneNodeListener( SceneNode *sceneNode )
+{
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodesWithListeners.begin(),
+													 mSceneNodesWithListeners.end(), sceneNode );
+	assert( itor != mSceneNodesWithListeners.end() && *itor == sceneNode );
+	if( itor != mSceneNodesWithListeners.end() && *itor == sceneNode )
+		mSceneNodesWithListeners.erase( itor );
+}
 //-----------------------------------------------------------------------
 const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 
 								   bool shadowDerivation)
@@ -1398,22 +1405,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		// Lock scene graph mutex, no more changes until we're ready to render
 		OGRE_LOCK_MUTEX(sceneGraphMutex)
 
-		// Update scene graph for this camera (can happen multiple times per frame)
-		{
-			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
-			_updateSceneGraph(camera);
-
-			// Auto-track nodes
-			AutoTrackingSceneNodes::iterator atsni, atsniend;
-			atsniend = mAutoTrackingSceneNodes.end();
-			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
-			{
-				(*atsni)->_autoTrack();
-			}
-			// Auto-track camera if required
-			camera->_autoTrack();
-		}
-
 		if (mIlluminationStage != IRS_RENDER_TO_TEXTURE && mFindVisibleObjects)
 		{
 			// Locate any lights which could be affecting the frustum
@@ -1717,7 +1708,7 @@ void SceneManager::_setSkyPlane(
         // Create node and attach
         if (!mSkyPlaneNode)
         {
-            mSkyPlaneNode = createSceneNode(meshName + "Node");
+            mSkyPlaneNode = createSceneNode();
         }
         else
         {
@@ -1787,7 +1778,8 @@ void SceneManager::_setSkyBox(
         // Create node 
         if (!mSkyBoxNode)
         {
-            mSkyBoxNode = createSceneNode("SkyBoxNode");
+            mSkyBoxNode = createSceneNode();
+			mSkyBoxNode->setName( "SkyBoxNode" );
         }
 
 		// Create object
@@ -2004,7 +1996,8 @@ void SceneManager::_setSkyDome(
         // Create node 
         if (!mSkyDomeNode)
         {
-            mSkyDomeNode = createSceneNode("SkyDomeNode");
+            mSkyDomeNode = createSceneNode();
+			mSkyDomeNode->setName( "SkyDomeNode" );
         }
         else
         {
@@ -2214,23 +2207,68 @@ MeshPtr SceneManager::createSkydomePlane(
     return planeMesh;
 
 }
-
-
 //-----------------------------------------------------------------------
-void SceneManager::_updateSceneGraph(Camera* cam)
+void SceneManager::updateAllTransforms()
 {
-	firePreUpdateSceneGraph(cam);
+	NodeMemoryManagerVec::const_iterator it = mNodeMemoryManagerCulledList.begin();
+	NodeMemoryManagerVec::const_iterator en = mNodeMemoryManagerCulledList.end();
 
-	// Process queued needUpdate calls 
-	Node::processQueuedUpdates();
+	while( it != en )
+	{
+		NodeMemoryManager *nodeMemoryManager = *it;
+		const size_t numDepths = nodeMemoryManager->getNumDepths();
 
-    // Cascade down the graph updating transforms & world bounds
-    // In this implementation, just update from the root
-    // Smarter SceneManager subclasses may choose to update only
-    //   certain scene graph branches
-    getRootSceneNode()->_update(true, false);
+		//TODO: Send this to worker threads (dark_sylinc)
 
-	firePostUpdateSceneGraph(cam);
+		//Start from the first level (not root)
+		for( size_t i=1; i<numDepths; ++i )
+		{
+			Transform t;
+			const size_t numNodes = nodeMemoryManager->getFirstNode( t, i );
+
+			Node::updateAllTransforms( numNodes, t );
+		}
+
+		//Call all listeners
+		SceneNodeList::const_iterator itor = mSceneNodesWithListeners.begin();
+		SceneNodeList::const_iterator end  = mSceneNodesWithListeners.end();
+
+		while( itor != end )
+		{
+			(*itor)->getListener()->nodeUpdated( *itor );
+			++itor;
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::highLevelCull()
+{
+	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager );
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateSceneGraph()
+{
+	//TODO: Enable auto tracking again, first manually update the tracked scene nodes for correct math. (dark_sylinc)
+	// Update scene graph for this camera (can happen multiple times per frame)
+	/*{
+		// Auto-track nodes
+		AutoTrackingSceneNodes::iterator atsni, atsniend;
+		atsniend = mAutoTrackingSceneNodes.end();
+		for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+		{
+			(*atsni)->_autoTrack();
+		}
+		// Auto-track camera if required
+		camera->_autoTrack();
+	}*/
+
+	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
+	highLevelCull();
+	updateAllTransforms();
+
+	mNodeMemoryManagerCulledList.clear();
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(
@@ -4149,31 +4187,6 @@ void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
         (*i)->shadowTextureReceiverPreViewProj(light, f);
     }
 }
-//---------------------------------------------------------------------
-void SceneManager::firePreUpdateSceneGraph(Camera* camera)
-{
-    ListenerList listenersCopy = mListeners;
-	ListenerList::iterator i, iend;
-
-	iend = listenersCopy.end();
-	for (i = listenersCopy.begin(); i != iend; ++i)
-	{
-		(*i)->preUpdateSceneGraph(this, camera);
-	}
-}
-//---------------------------------------------------------------------
-void SceneManager::firePostUpdateSceneGraph(Camera* camera)
-{
-    ListenerList listenersCopy = mListeners;
-	ListenerList::iterator i, iend;
-
-	iend = listenersCopy.end();
-	for (i = listenersCopy.begin(); i != iend; ++i)
-	{
-		(*i)->postUpdateSceneGraph(this, camera);
-	}
-}
-
 //---------------------------------------------------------------------
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
@@ -7102,6 +7115,71 @@ void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRender
 SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderableVisitor(void) const
 {
 	return mActiveQueuedRenderableVisitor;
+}
+//-----------------------------------------------------------------------------------
+void SceneManager::buildDiffList( uint16 level,
+						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
+						ArrayMemoryManager::PtrdiffVec &outDiffsList )
+{
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			outDiffsList.push_back( (transform.mParents + transform.mIndex) -
+									(Ogre::Node**)basePtrs[ArrayMemoryManager::Parent] );
+		}
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::applyRebase( uint16 level,
+						char *newBasePtrs[ArrayMemoryManager::NumMemoryTypes],
+						const ArrayMemoryManager::PtrdiffVec &diffsList )
+{
+	ArrayMemoryManager::PtrdiffVec::const_iterator it = diffsList.begin();
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			transform.rebasePtrs( newBasePtrs, *it++ );
+		}
+
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::performCleanup( uint16 level,
+						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
+						size_t startInstance, size_t diffInstances )
+{
+	//If mSceneNodes were ordered by m_chunkBase & m_index, there would be a huge optimization to be made
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	const Ogre::Node **minBasePtr = (const Ogre::Node**)( basePtrs[ArrayMemoryManager::Parent] +
+									startInstance *
+									ArrayMemoryManager::ElementsMemSize[ArrayMemoryManager::Parent] );
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			if( transform.mParents + transform.mIndex > minBasePtr )
+			{
+				transform.rebasePtrs( diffInstances );
+				++itor;
+			}
+		}
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::addLodListener(LodListener *listener)

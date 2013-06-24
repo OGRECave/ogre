@@ -990,6 +990,13 @@ namespace Ogre {
         if(!_fireFrameStarted())
             return false;
 
+		SceneManagerEnumerator::SceneManagerIterator itor = mSceneManagerEnum->getSceneManagerIterator();
+		while( itor.hasMoreElements() )
+		{
+			SceneManager *sceneManager = itor.getNext();
+			sceneManager->updateSceneGraph();
+		}
+
 		if (!_updateAllRenderTargets())
 			return false;
 

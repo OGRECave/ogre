@@ -43,56 +43,19 @@ namespace Ogre {
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
 	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
     //-----------------------------------------------------------------------
-    MovableObject::MovableObject()
-        : mCreator(0)
+    MovableObject::MovableObject( IdType id )
+        : IdObject( id )
+		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
-        , mParentIsTagPoint(false)
         , mVisible(true)
 		, mDebugDisplay(false)
-        , mUpperDistance(0)
-        , mSquaredUpperDistance(0)
+		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
-        , mRenderQueueIDSet(false)
 		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
-        , mVisibilityFlags(msDefaultVisibilityFlags)
         , mCastShadows(true)
-        , mRenderingDisabled(false)
         , mListener(0)
-        , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
-    {
-		if (Root::getSingletonPtr())
-			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
-    }
-    //-----------------------------------------------------------------------
-    MovableObject::MovableObject(const String& name)
-        : mName(name)
-        , mCreator(0)
-        , mManager(0)
-        , mParentNode(0)
-        , mParentIsTagPoint(false)
-        , mVisible(true)
-		, mDebugDisplay(false)
-        , mUpperDistance(0)
-        , mSquaredUpperDistance(0)
-		, mMinPixelSize(0)
-        , mBeyondFarDistance(false)
-        , mRenderQueueID(RENDER_QUEUE_MAIN)
-        , mRenderQueueIDSet(false)
-		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
-        , mVisibilityFlags(msDefaultVisibilityFlags)
-        , mCastShadows(true)
-        , mRenderingDisabled(false)
-        , mListener(0)
-        , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
     {
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
@@ -108,34 +71,20 @@ namespace Ogre {
 
         if (mParentNode)
         {
-            // detach from parent
-            if (mParentIsTagPoint)
-            {
-                // May be we are a lod entity which not in the parent entity child object list,
-                // call this method could safely ignore this case.
-                static_cast<TagPoint*>(mParentNode)->getParentEntity()->detachObjectFromBone(this);
-            }
-            else
-            {
-                // May be we are a lod entity which not in the parent node child object list,
-                // call this method could safely ignore this case.
-                static_cast<SceneNode*>(mParentNode)->detachObject(this);
-            }
+			// May be we are a lod entity which not in the parent node child object list,
+			// call this method could safely ignore this case.
+			static_cast<SceneNode*>(mParentNode)->detachObject( this );
         }
     }
     //-----------------------------------------------------------------------
-    void MovableObject::_notifyAttached(Node* parent, bool isTagPoint)
+    void MovableObject::_notifyAttached( Node* parent )
     {
         assert(!mParentNode || !parent);
 
         bool different = (parent != mParentNode);
 
         mParentNode = parent;
-        mParentIsTagPoint = isTagPoint;
-
-        // Mark light list being dirty, simply decrease
-        // counter by one for minimise overhead
-        --mLightListUpdated;
+		mObjectData.mParents[mObjectData.mIndex] = parent;
 
         // Call listener (note, only called if there's something to do)
         if (mListener && different)
@@ -146,74 +95,21 @@ namespace Ogre {
                 mListener->objectDetached(this);
         }
     }
-    //-----------------------------------------------------------------------
-    Node* MovableObject::getParentNode(void) const
-    {
-        return mParentNode;
-    }
-    //-----------------------------------------------------------------------
-    SceneNode* MovableObject::getParentSceneNode(void) const
-    {
-        if (mParentIsTagPoint)
-        {
-            TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-            return tp->getParentEntity()->getParentSceneNode();
-        }
-        else
-        {
-            return static_cast<SceneNode*>(mParentNode);
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::isAttached(void) const
-    {
-        return (mParentNode != 0);
-
-    }
 	//---------------------------------------------------------------------
 	void MovableObject::detachFromParent(void)
 	{
 		if (isAttached())
 		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				tp->getParentEntity()->detachObjectFromBone(this);
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				sn->detachObject(this);
-			}
-		}
-	}
-    //-----------------------------------------------------------------------
-	bool MovableObject::isInScene(void) const
-	{
-		if (mParentNode != 0)
-		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				return tp->getParentEntity()->isInScene();
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				return sn->isInSceneGraph();
-			}
-		}
-		else
-		{
-			return false;
+			SceneNode* sn = static_cast<SceneNode*>(mParentNode);
+			sn->detachObject(this);
 		}
 	}
     //-----------------------------------------------------------------------
     void MovableObject::_notifyMoved(void)
     {
-        // Mark light list being dirty, simply decrease
-        // counter by one for minimise overhead
-        --mLightListUpdated;
+#ifndef NDEBUG
+		mCachedAabbOutOfDate = true;
+#endif
 
         // Notify listener if exists
         if (mListener)
@@ -222,17 +118,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void MovableObject::setVisible(bool visible)
-    {
-        mVisible = visible;
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::getVisible(void) const
-    {
-        return mVisible;
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::isVisible(void) const
+    /*bool MovableObject::isVisible(void) const
     {
         if (!mVisible || mBeyondFarDistance || mRenderingDisabled)
             return false;
@@ -256,7 +142,7 @@ namespace Ogre {
 				Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
 				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+				Real factor = max(max(scl.x, scl.y), scl.z);
 
 				// Max distance to still render
 				Real maxDist = mUpperDistance + rad * factor;
@@ -285,10 +171,10 @@ namespace Ogre {
 				objBound.x = Math::Sqr(objBound.x);
 				objBound.y = Math::Sqr(objBound.y);
 				objBound.z = Math::Sqr(objBound.z);
-				float sqrObjMedianSize = std::max(std::max(
-									std::min(objBound.x,objBound.y),
-									std::min(objBound.x,objBound.z)),
-									std::min(objBound.y,objBound.z));
+				float sqrObjMedianSize = max(max(
+									min(objBound.x,objBound.y),
+									min(objBound.x,objBound.z)),
+									min(objBound.y,objBound.z));
 
 				//If we have a perspective camera calculations are done relative to distance
 				Real sqrDistance = 1;
@@ -313,55 +199,59 @@ namespace Ogre {
 		}
 
         mRenderingDisabled = mListener && !mListener->objectRendering(this, cam);
-	}
+	}*/
     //-----------------------------------------------------------------------
     void MovableObject::setRenderQueueGroup(uint8 queueID)
     {
 		assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
         mRenderQueueID = queueID;
-        mRenderQueueIDSet = true;
     }
-
 	//-----------------------------------------------------------------------
 	void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
 	{
 		setRenderQueueGroup(queueID);
 		mRenderQueuePriority = priority;
-		mRenderQueuePrioritySet = true;
-
 	}
-
     //-----------------------------------------------------------------------
     uint8 MovableObject::getRenderQueueGroup(void) const
     {
         return mRenderQueueID;
     }
     //-----------------------------------------------------------------------
-	const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
+	Matrix4 MovableObject::_getParentNodeFullTransform(void) const
 	{
-		
-		if(mParentNode)
-		{
-			// object attached to a sceneNode
-			return mParentNode->_getFullTransform();
-		}
-        // fallback
-        return Matrix4::IDENTITY;
+		return mParentNode->_getFullTransform();
+	}
+	//-----------------------------------------------------------------------
+	const Aabb MovableObject::getWorldAabb() const
+	{
+		assert( !mCachedAabbOutOfDate );
+		return mObjectData.mWorldAabb->getAsAabb( mObjectData.mIndex );
+	}
+	//-----------------------------------------------------------------------
+	const Aabb MovableObject::getWorldAabbUpdated()
+	{
+		return updateSingleWorldAabb();
 	}
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
-    {
-        if (derive)
-        {
-            mWorldAABB = this->getBoundingBox();
-            mWorldAABB.transformAffine(_getParentNodeFullTransform());
-        }
+	Aabb MovableObject::updateSingleWorldAabb()
+	{
+		Matrix4 derivedTransform = mParentNode->_getFullTransformUpdated();
 
-        return mWorldAABB;
+		Aabb retVal;
+		mObjectData.mLocalAabb->getAsAabb( retVal, mObjectData.mIndex );
+		retVal.transformAffine( derivedTransform );
 
-    }
+		mObjectData.mWorldAabb->setFromAabb( retVal, mObjectData.mIndex );
+
+#ifndef NDEBUG
+		mCachedAabbOutOfDate = false;
+#endif
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
-	const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
+	/*const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
 	{
 		if (derive)
 		{
@@ -371,43 +261,18 @@ namespace Ogre {
 			mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
 		}
 		return mWorldBoundingSphere;
-	}
+	}*/
     //-----------------------------------------------------------------------
-    const LightList& MovableObject::queryLights(void) const
+    const LightList& MovableObject::queryLights(void)
     {
-        // Try listener first
-        if (mListener)
-        {
-            const LightList* lightList =
-                mListener->objectQueryLights(this);
-            if (lightList)
-            {
-                return *lightList;
-            }
-        }
-
-        // Query from parent entity if exists
-        if (mParentIsTagPoint)
-        {
-            TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-            return tp->getParentEntity()->queryLights();
-        }
-
         if (mParentNode)
         {
             SceneNode* sn = static_cast<SceneNode*>(mParentNode);
 
-            // Make sure we only update this only if need.
-            ulong frame = sn->getCreator()->_getLightsDirtyCounter();
-            if (mLightListUpdated != frame)
-            {
-                mLightListUpdated = frame;
+			const Vector3& scl = mParentNode->_getDerivedScale();
+			Real factor = std::max(std::max(scl.x, scl.y), scl.z);
 
-				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-
-                sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
-            }
+            sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
         }
         else
         {
@@ -417,7 +282,7 @@ namespace Ogre {
         return mLightList;
     }
     //-----------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
+    MovableObject::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light, 
         HardwareIndexBufferSharedPtr* indexBuffer, 
         bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
@@ -426,20 +291,27 @@ namespace Ogre {
         return ShadowRenderableListIterator(dummyList.begin(), dummyList.end());
     }
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getLightCapBounds(void) const
+    const Aabb MovableObject::getLightCapBounds(void) const
     {
+		//TODO: (dark_sylinc) Avoid using this function completely (use SIMD)
         // Same as original bounds
-        return getWorldBoundingBox();
+		return getWorldAabb();
+    }
+	//-----------------------------------------------------------------------
+	const Aabb MovableObject::getLightCapBoundsUpdated(void)
+    {
+		//TODO: (dark_sylinc) Avoid using this function completely (use SIMD)
+        // Same as original bounds
+		return getWorldAabbUpdated();
     }
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getDarkCapBounds(const Light& light, Real extrusionDist) const
+    /*const AxisAlignedBox& MovableObject::getDarkCapBounds(const Light& light, Real extrusionDist) const
     {
         // Extrude own light cap bounds
         mWorldDarkCapBounds = getLightCapBounds();
         this->extrudeBounds(mWorldDarkCapBounds, light.getAs4DVector(), 
             extrusionDist);
         return mWorldDarkCapBounds;
-
     }
     //-----------------------------------------------------------------------
     Real MovableObject::getPointExtrusionDistance(const Light* l) const
@@ -452,7 +324,7 @@ namespace Ogre {
         {
             return 0;
         }
-    }
+    }*/
 	//-----------------------------------------------------------------------
 	uint32 MovableObject::getTypeFlags(void) const
 	{
@@ -464,13 +336,6 @@ namespace Ogre {
 		{
 			return 0xFFFFFFFF;
 		}
-	}
-	//---------------------------------------------------------------------
-	void MovableObject::setLightMask(uint32 lightMask)
-	{
-		this->mLightMask = lightMask;
-		//make sure to request a new light list from the scene manager if mask changed
-		mLightListUpdated = 0;
 	}
 	//---------------------------------------------------------------------
 	class MORecvShadVisitor : public Renderable::Visitor

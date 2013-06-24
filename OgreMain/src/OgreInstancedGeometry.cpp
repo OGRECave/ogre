@@ -1199,7 +1199,7 @@ namespace Ogre {
 		{
 			const MeshLodUsage& meshLod =
 				qmesh->submesh->parent->getLodLevel(lod);
-			mLodValues[lod] = std::max(mLodValues[lod],
+			mLodValues[lod] = max(mLodValues[lod],
 				meshLod.value);
 		}
 
@@ -1278,13 +1278,13 @@ namespace Ogre {
 				const Vector3 &position = objIt->second->getPosition();
 				const Vector3 &scale	= objIt->second->getScale();
 
-				vMin.x = std::min( vMin.x, position.x + aabb.getMinimum().x * scale.x );
-				vMin.y = std::min( vMin.y, position.y + aabb.getMinimum().y * scale.y );
-				vMin.z = std::min( vMin.z, position.z + aabb.getMinimum().z * scale.z );
+				vMin.x = min( vMin.x, position.x + aabb.getMinimum().x * scale.x );
+				vMin.y = min( vMin.y, position.y + aabb.getMinimum().y * scale.y );
+				vMin.z = min( vMin.z, position.z + aabb.getMinimum().z * scale.z );
 
-				vMax.x = std::max( vMax.x, position.x + aabb.getMaximum().x * scale.x );
-				vMax.y = std::max( vMax.y, position.y + aabb.getMaximum().y * scale.y );
-				vMax.z = std::max( vMax.z, position.z + aabb.getMaximum().z * scale.z );
+				vMax.x = max( vMax.x, position.x + aabb.getMaximum().x * scale.x );
+				vMax.y = max( vMax.y, position.y + aabb.getMaximum().y * scale.y );
+				vMax.z = max( vMax.z, position.z + aabb.getMaximum().z * scale.z );
 			}
 
 			aabb.setExtents( vMin, vMax );

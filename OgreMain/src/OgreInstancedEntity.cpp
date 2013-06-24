@@ -470,7 +470,7 @@ namespace Ogre
 	void InstancedEntity::setScale(const Vector3& scale, bool doUpdate) 
 	{ 
 		mScale = scale; 
-		mMaxScaleLocal = std::max<Real>(std::max<Real>(
+		mMaxScaleLocal = max( max(
 			Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
 		mUseLocalTransform = true;
 		markTransformDirty();
@@ -483,7 +483,7 @@ namespace Ogre
 		if (mParentNode)
 		{
 			const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
-			return mMaxScaleLocal * std::max<Real>(std::max<Real>(
+			return mMaxScaleLocal * max(max(
 				Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
 		}
 		return mMaxScaleLocal; 

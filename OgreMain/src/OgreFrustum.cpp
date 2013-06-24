@@ -1131,11 +1131,11 @@ namespace Ogre {
 					Real Px0 = -(Pz0 * Nz0) / Nx0;
 					if (Px0 > eyeSpacePos.x)
 					{
-						*right = std::min(*right, relx0.x);
+						*right = min(*right, relx0.x);
 					}
 					else
 					{
-						*left = std::max(*left, relx0.x);
+						*left = max(*left, relx0.x);
 					}
 				}
 				Real Pz1 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz1 / Nx1) * eyeSpacePos.x));
@@ -1151,11 +1151,11 @@ namespace Ogre {
 					Real Px1 = -(Pz1 * Nz1) / Nx1;
 					if (Px1 > eyeSpacePos.x)
 					{
-						*right = std::min(*right, relx1.x);
+						*right = min(*right, relx1.x);
 					}
 					else
 					{
-						*left = std::max(*left, relx1.x);
+						*left = max(*left, relx1.x);
 					}
 				}
 			}
@@ -1199,11 +1199,11 @@ namespace Ogre {
 					Real Py0 = -(Pz0 * Nz0) / Ny0;
 					if (Py0 > eyeSpacePos.y)
 					{
-						*top = std::min(*top, rely0.y);
+						*top = min(*top, rely0.y);
 					}
 					else
 					{
-						*bottom = std::max(*bottom, rely0.y);
+						*bottom = max(*bottom, rely0.y);
 					}
 				}
 				Real Pz1 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz1 / Ny1) * eyeSpacePos.y));
@@ -1219,11 +1219,11 @@ namespace Ogre {
 					Real Py1 = -(Pz1 * Nz1) / Ny1;
 					if (Py1 > eyeSpacePos.y)
 					{
-						*top = std::min(*top, rely1.y);
+						*top = min(*top, rely1.y);
 					}
 					else
 					{
-						*bottom = std::max(*bottom, rely1.y);
+						*bottom = max(*bottom, rely1.y);
 					}
 				}
 			}

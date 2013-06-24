@@ -279,10 +279,6 @@ namespace Ogre {
         mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
-		// tell parent node to update bounds
-		if (mParentNode)
-			mParentNode->needUpdate();
-
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::removeChainElement(size_t chainIndex)
@@ -316,10 +312,6 @@ namespace Ogre {
         mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
-		// tell parent node to update bounds
-		if (mParentNode)
-			mParentNode->needUpdate();
-
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::clearChain(size_t chainIndex)
@@ -339,10 +331,6 @@ namespace Ogre {
         mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
-		// tell parent node to update bounds
-		if (mParentNode)
-			mParentNode->needUpdate();
-
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::clearAllChains(void)
@@ -386,11 +374,6 @@ namespace Ogre {
 
         mVertexContentDirty = true;
 		mBoundsDirty = true;
-		// tell parent node to update bounds
-		if (mParentNode)
-			mParentNode->needUpdate();
-
-
 	}
 	//-----------------------------------------------------------------------
 	const BillboardChain::Element&
@@ -474,8 +457,8 @@ namespace Ogre {
 			else
 			{
 				mRadius = Math::Sqrt(
-					std::max(mAABB.getMinimum().squaredLength(),
-					mAABB.getMaximum().squaredLength()));
+					max( mAABB.getMinimum().squaredLength(),
+						mAABB.getMaximum().squaredLength() ) );
 			}
 
 			mBoundsDirty = false;

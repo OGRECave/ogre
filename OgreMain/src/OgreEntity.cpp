@@ -204,17 +204,9 @@ namespace Ogre {
 		}
 
 		reevaluateVertexProcessing();
-		
-		// Update of bounds of the parent SceneNode, if Entity already attached
-		// this can happen if Mesh is loaded in background or after reinitialisation
-		if( mParentNode )
-		{
-			getParentSceneNode()->needUpdate();
-		}
 
 		mInitialised = true;
 		mMeshStateCount = mMesh->getStateCount();
-
 	}
 	//-----------------------------------------------------------------------
 	void Entity::_deinitialise(void)
@@ -893,10 +885,6 @@ namespace Ogre {
 				}
 			}
 
-            // Trigger update of bounding box if necessary
-            if (!mChildObjectList.empty())
-                mParentNode->needUpdate();
-
 			mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
         }
 
@@ -908,14 +896,6 @@ namespace Ogre {
         {
             // Cache last parent transform for next frame use too.
             mLastParentXform = _getParentNodeFullTransform();
-
-            //--- Update the child object's transforms
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; child_itr++)
-            {
-                (*child_itr).second->getParentNode()->_update(true, true);
-            }
 
             // Also calculate bone world matrices, since are used as replacement world matrices,
             // but only if it's used (when using hardware animation and skeleton animated).
@@ -1465,10 +1445,6 @@ namespace Ogre {
 
         attachObjectImpl(pMovable, tp);
 
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
-
 		return tp;
     }
 
@@ -1494,11 +1470,7 @@ namespace Ogre {
         detachObjectImpl(obj);
         mChildObjectList.erase(i);
 
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
-
-        return obj;
+		return obj;
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
@@ -1511,10 +1483,6 @@ namespace Ogre {
             {
                 detachObjectImpl(obj);
                 mChildObjectList.erase(i);
-
-                // Trigger update of bounding box if necessary
-                if (mParentNode)
-                    mParentNode->needUpdate();
                 break;
             }
         }
@@ -1523,10 +1491,6 @@ namespace Ogre {
     void Entity::detachAllObjectsFromBone(void)
     {
         detachAllObjectsImpl();
-
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectImpl(MovableObject* pObject)
@@ -2082,7 +2046,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Entity::_notifyAttached(Node* parent, bool isTagPoint)
+    void Entity::_notifyAttached( Node* parent )
     {
         MovableObject::_notifyAttached(parent, isTagPoint);
         // Also notify LOD entities
@@ -2092,7 +2056,6 @@ namespace Ogre {
         {
             (*i)->_notifyAttached(parent, isTagPoint);
         }
-
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------

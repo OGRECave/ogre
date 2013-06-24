@@ -276,7 +276,7 @@ namespace Ogre {
 
 		// update bounds
 		mAABB.merge(mTempVertex.position);
-		mRadius = std::max(mRadius, mTempVertex.position.length());
+		mRadius = max(mRadius, mTempVertex.position.length());
 
 		// reset current texture coord
 		mTexCoordIndex = 0;
@@ -777,12 +777,6 @@ namespace Ogre {
 
 		mCurrentSection = 0;
 		resetTempAreas();
-
-		// Tell parent if present
-		if (mParentNode)
-		{
-			mParentNode->needUpdate();
-		}
 
 		// will return the finished section or NULL if
 		// the section was empty (i.e. zero vertices/indices)

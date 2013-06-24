@@ -151,6 +151,7 @@ set (HEADER_FILES
   include/OgreMeshSerializer.h
   include/OgreMeshSerializerImpl.h
   include/OgreMovableObject.h
+  include/OgreMovableObject.inl
   include/OgreMovablePlane.h
   include/OgreNode.h
   include/OgreNumerics.h

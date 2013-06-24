@@ -55,6 +55,7 @@ Torus Knot Software Ltd.
 #include "OgreLodListener.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
+#include "Math/Array/OgreNodeMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -139,7 +140,7 @@ namespace Ogre {
 		dependent on the Camera, which will always call back the SceneManager
 		which created it to render the scene. 
      */
-	class _OgreExport SceneManager : public SceneMgtAlloc
+	class _OgreExport SceneManager : public SceneMgtAlloc, public ArrayMemoryManager::RebaseListener
     {
     public:
         /// Query type mask which will be used for world geometry @see SceneQuery
@@ -223,24 +224,6 @@ namespace Ogre {
 		public:
 			Listener() {}
 			virtual ~Listener() {}
-
-			/** Called prior to updating the scene graph in this SceneManager.
-			@remarks
-				This is called before updating the scene graph for a camera.
-			@param source The SceneManager instance raising this event.
-			@param camera The camera being updated.
-			*/
-			virtual void preUpdateSceneGraph(SceneManager* source, Camera* camera)
-                        { (void)source; (void)camera; }
-
-			/** Called after updating the scene graph in this SceneManager.
-			@remarks
-				This is called after updating the scene graph for a camera.
-			@param source The SceneManager instance raising this event.
-			@param camera The camera being updated.
-			*/
-			virtual void postUpdateSceneGraph(SceneManager* source, Camera* camera)
-                        { (void)source; (void)camera; }
 
 			/** Called prior to searching for visible objects in this SceneManager.
 			@remarks
@@ -384,9 +367,12 @@ namespace Ogre {
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl(void);
-        /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl(const String& name);
+        virtual SceneNode* createSceneNodeImpl( SceneNode *parent );
+
+		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
+		NodeMemoryManager		mNodeMemoryManager;
+		/// Filled and cleared every frame in HighLevelCull()
+		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
 
 		/// Instance name
 		String mName;
@@ -415,7 +401,7 @@ namespace Ogre {
 		typedef map<String, InstanceManager*>::type InstanceManagerMap;
 		InstanceManagerMap	mInstanceManagerMap;
 
-        typedef map<String, SceneNode*>::type SceneNodeList;
+        typedef vector<SceneNode*>::type SceneNodeList;
 
         /** Central list of SceneNodes - for easy memory management.
             @note
@@ -424,6 +410,7 @@ namespace Ogre {
                 can look up nodes this way.
         */
         SceneNodeList mSceneNodes;
+		SceneNodeList mSceneNodesWithListeners;
 
         /// Camera in progress
         Camera* mCameraInProgress;
@@ -532,7 +519,6 @@ namespace Ogre {
         LightList mLightsAffectingFrustum;
         LightInfoList mCachedLightInfos;
 		LightInfoList mTestLightInfos; // potentially new list
-        ulong mLightsDirtyCounter;
 		LightList mShadowTextureCurrentCasterLightList;
 
 		typedef map<String, MovableObject*>::type MovableObjectMap;
@@ -673,10 +659,6 @@ namespace Ogre {
         virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
 		/// Internal method for firing the pre receiver texture shadows event
         virtual void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
-		/// Internal method for firing pre update scene graph event
-		virtual void firePreUpdateSceneGraph(Camera* camera);
-		/// Internal method for firing post update scene graph event
-		virtual void firePostUpdateSceneGraph(Camera* camera);
 		/// Internal method for firing find visible objects event
 		virtual void firePreFindVisibleObjects(Viewport* v);
 		/// Internal method for firing find visible objects event
@@ -800,6 +782,19 @@ namespace Ogre {
 
 		/** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
 		void updateDirtyInstanceManagers(void);
+
+		/** Culls the scene in a high level fashion (i.e. Octree, Portal, etc.) by taking into account all
+			registered cameras. Produces a list of culled Entities & SceneNodes that must follow a very
+			strict set of rules:
+				* Entities are separated by RenderQueue
+				* Entities sharing the same skeleton need to be adjacent (TODO: Required? dark_sylinc)
+				* SceneNodes must be separated by hierarchy depth and must be contiguous within the same
+				  depth level. (@see mNodeMemoryManagerCulledList)
+		  @remarks
+			The default implementation just returns all nodes in the scene. @See updateAllTransforms
+			@see updateSceneGraph
+		*/
+		virtual void highLevelCull();
         
 	public:
 		/// Method for preparing shadow textures ready for use in a regular render
@@ -1174,20 +1169,6 @@ namespace Ogre {
         */
         virtual void _notifyLightsDirty(void);
 
-        /** Advance method to gets the lights dirty counter.
-        @remarks
-            Scene manager tracking lights that affecting the frustum, if changes
-            detected (the changes includes light list itself and the light's position
-            and attenuation range), then increase the lights dirty counter.
-        @par
-            When implementing customise lights finding algorithm relied on either
-            SceneManager::_getLightsAffectingFrustum or SceneManager::_populateLightList,
-            might check this value for sure that the light list are really need to
-            re-populate, otherwise, returns cached light list (if exists) for better
-            performance.
-        */
-        ulong _getLightsDirtyCounter(void) const { return mLightsDirtyCounter; }
-
         /** Get the list of lights which could be affecting the frustum.
         @remarks
             Note that default implementation of this method returns a cached light list,
@@ -1250,6 +1231,13 @@ namespace Ogre {
         */
         virtual void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
+		/** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
+			Don't call this function directly
+            @par
+                Parent to the scene node we're creating.
+        */
+		virtual SceneNode* _createSceneNode( SceneNode *parent );
+
         /** Creates an instance of a SceneNode.
             @remarks
                 Note that this does not add the SceneNode to the scene hierarchy.
@@ -1268,30 +1256,6 @@ namespace Ogre {
         */
         virtual SceneNode* createSceneNode(void);
 
-        /** Creates an instance of a SceneNode with a given name.
-            @remarks
-                Note that this does not add the SceneNode to the scene hierarchy.
-                This method is for convenience, since it allows an instance to
-                be created for which the SceneManager is responsible for
-                allocating and releasing memory, which is convenient in complex
-                scenes.
-            @par
-                To include the returned SceneNode in the scene, use the addChild
-                method of the SceneNode which is to be it's parent.
-            @par
-                Note that this method takes a name parameter, which makes the node easier to
-                retrieve directly again later.
-        */
-        virtual SceneNode* createSceneNode(const String& name);
-
-        /** Destroys a SceneNode with a given name.
-        @remarks
-            This allows you to physically delete an individual SceneNode if you want to.
-            Note that this is not normally recommended, it's better to allow SceneManager
-            to delete the nodes when the scene is cleared.
-        */
-        virtual void destroySceneNode(const String& name);
-
         /** Destroys a SceneNode.
         @remarks
             This allows you to physically delete an individual SceneNode if you want to.
@@ -1299,6 +1263,7 @@ namespace Ogre {
             to delete the nodes when the scene is cleared.
         */
         virtual void destroySceneNode(SceneNode* sn);
+
         /** Gets the SceneNode at the root of the scene hierarchy.
             @remarks
                 The entire scene is held as a hierarchy of nodes, which
@@ -1314,21 +1279,25 @@ namespace Ogre {
                 However, in all cases there is only ever one root node of
                 the hierarchy, and this method returns a pointer to it.
         */
-        virtual SceneNode* getRootSceneNode(void);
+        SceneNode* getRootSceneNode(void);
 
-        /** Retrieves a named SceneNode from the scene graph.
+        /** Retrieves a SceneNode based on it's ID from the scene graph.
         @remarks
-            If you chose to name a SceneNode as you created it, or if you
-            happened to make a note of the generated name, you can look it
-            up wherever it is in the scene graph using this method.
-			@note Throws an exception if the named instance does not exist
+			@note Returns null if the ID does not exist
+			@note It is a linear search O(N), retrieves the first node found
+			with that name (it's not unique)
         */
-        virtual SceneNode* getSceneNode(const String& name) const;
+        virtual_l1 SceneNode* getSceneNode( IdType id );
+		virtual_l1 const SceneNode* getSceneNode( IdType id ) const;
 
-		/** Returns whether a scene node with the given name exists.
+		/** Node listeners need to be registered with us so that they can be successfully called
+			when calling updateAllTransforms. @See updateAllTransforms
 		*/
-		virtual bool hasSceneNode(const String& name) const;
+		virtual void registerSceneNodeListener( SceneNode *sceneNode );
 
+		/** Unregisters a registered node for listening. @See registerSceneNodeListener
+		*/
+		virtual void unregisterSceneNodeListener( SceneNode *sceneNode );
 
         /** Create an Entity (instance of a discrete mesh).
             @param
@@ -1798,15 +1767,14 @@ namespace Ogre {
         virtual bool getOptionKeys( StringVector& refKeys )
         { (void)refKeys; return false; }
 
-        /** Internal method for updating the scene graph ie the tree of SceneNode instances managed by this class.
-            @remarks
-                This must be done before issuing objects to the rendering pipeline, since derived transformations from
-                parent nodes are not updated until required. This SceneManager is a basic implementation which simply
-                updates all nodes from the root. This ensures the scene is up to date but requires all the nodes
-                to be updated even if they are not visible. Subclasses could trim this such that only potentially visible
-                nodes are updated.
-        */
-        virtual void _updateSceneGraph(Camera* cam);
+		/** Updates the derived transforms of all nodes in the scene. This is typically called once per frame during
+			render, but the user may want to manually call this function.
+		*/
+		void updateAllTransforms();
+
+		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
+		*/
+		void updateSceneGraph();
 
         /** Internal method which parses the scene to find visible objects to render.
             @remarks
@@ -3521,6 +3489,17 @@ namespace Ogre {
 			to always place the camera at the origin and move the world around it.
 		*/
 		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
+
+		//Derived from ArrayMemoryManager::RebaseListener
+		virtual void buildDiffList( uint16 level,
+						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
+						ArrayMemoryManager::PtrdiffVec &outDiffsList );
+		virtual void applyRebase( uint16 level,
+						char *newBasePtrs[ArrayMemoryManager::NumMemoryTypes],
+						const ArrayMemoryManager::PtrdiffVec &diffsList );
+		virtual void performCleanup( uint16 level,
+						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
+						size_t startInstance, size_t diffInstances );
 
 
         /** Add a level of detail listener. */

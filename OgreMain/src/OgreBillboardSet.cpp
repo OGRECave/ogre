@@ -154,7 +154,7 @@ namespace Ogre {
         newBill->_notifyOwner(this);
 
 		// Merge into bounds
-		Real adjust = std::max(mDefaultWidth, mDefaultHeight);
+		Real adjust = max(mDefaultWidth, mDefaultHeight);
         Vector3 vecAdjust(adjust, adjust, adjust);
 		Vector3 newMin = position - vecAdjust;
 		Vector3 newMax = position + vecAdjust;
@@ -576,10 +576,10 @@ namespace Ogre {
                 min.makeFloor(pos);
                 max.makeCeil(pos);
 
-				maxSqLen = std::max(maxSqLen, pos.squaredLength());
+				maxSqLen = max(maxSqLen, pos.squaredLength());
             }
             // Adjust for billboard size
-            Real adjust = std::max(mDefaultWidth, mDefaultHeight);
+            Real adjust = max(mDefaultWidth, mDefaultHeight);
             Vector3 vecAdjust(adjust, adjust, adjust);
             min -= vecAdjust;
             max += vecAdjust;
@@ -588,10 +588,6 @@ namespace Ogre {
 			mBoundingRadius = Math::Sqrt(maxSqLen);
 
         }
-
-        if (mParentNode)
-            mParentNode->needUpdate();
-
     }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& BillboardSet::getBoundingBox(void) const
@@ -1001,11 +997,11 @@ namespace Ogre {
 
         if (bill.mOwnDimensions)
         {
-            sph.setRadius(std::max(bill.mWidth, bill.mHeight));
+            sph.setRadius(max(bill.mWidth, bill.mHeight));
         }
         else
         {
-            sph.setRadius(std::max(mDefaultWidth, mDefaultHeight));
+            sph.setRadius(max(mDefaultWidth, mDefaultHeight));
         }
 
         return cam->isVisible(sph);

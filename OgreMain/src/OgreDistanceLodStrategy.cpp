@@ -83,7 +83,7 @@ namespace Ogre {
         }
 
         // Squared depth should never be below 0, so clamp
-        squaredDepth = std::max(squaredDepth, Real(0));
+        squaredDepth = max(squaredDepth, Real(0));
 
         // Now adjust it by the camera bias and return the computed value
         return squaredDepth * camera->_getLodBiasInverse();

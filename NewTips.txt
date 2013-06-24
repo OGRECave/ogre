@@ -1,0 +1,3 @@
+Create static objects first.
+Sort your creation order of Entities by frequency of creation & destruction: Entities that will be created & destroyed often should be done last. Entities that will never be destroyed should be created first, followed by Entities that will rarely be removed/destroyed.
+Names are no longer unique (ie. two SceneNodes can have the same name). To identify uniqueness, use getId()

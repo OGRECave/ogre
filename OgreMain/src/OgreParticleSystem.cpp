@@ -847,13 +847,13 @@ namespace Ogre {
                 ActiveParticleList::iterator p;
                 Vector3 halfScale = Vector3::UNIT_SCALE * 0.5;
                 Vector3 defaultPadding = 
-                    halfScale * std::max(mDefaultHeight, mDefaultWidth);
+                    halfScale * max(mDefaultHeight, mDefaultWidth);
                 for (p = mActiveParticles.begin(); p != mActiveParticles.end(); ++p)
                 {
                     if ((*p)->mOwnDimensions)
                     {
                         Vector3 padding = 
-                            halfScale * std::max((*p)->mWidth, (*p)->mHeight);
+                            halfScale * max((*p)->mWidth, (*p)->mHeight);
                         min.makeFloor((*p)->position - padding);
                         max.makeCeil((*p)->position + padding);
                     }
@@ -883,8 +883,6 @@ namespace Ogre {
                 // Merge calculated box with current AABB to preserve any user-set AABB
                 mAABB.merge(newAABB);
             }
-
-            mParentNode->needUpdate();
         }
     }
     //-----------------------------------------------------------------------

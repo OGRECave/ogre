@@ -280,7 +280,7 @@ namespace Ogre
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
 		sceneNode->attachObject( batch );
-		sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
+		//sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -459,7 +459,7 @@ namespace Ogre
 				(*itor)->setCastShadows( value );
 				break;
 			case SHOW_BOUNDINGBOX:
-				(*itor)->getParentSceneNode()->showBoundingBox( value );
+				//(*itor)->getParentSceneNode()->showBoundingBox( value );
 				break;
 			default:
 				break;
