@@ -311,6 +311,15 @@ namespace Ogre {
 
 		switch(header.glInternalFormat)
 		{
+		case 37492: // GL_COMPRESSED_RGB8_ETC2
+            imgData->format = PF_ETC2_RGB8;
+			break;
+        case 37496:// GL_COMPRESSED_RGBA8_ETC2_EAC
+			imgData->format = PF_ETC2_RGBA8;
+            break;
+		case 37494: // GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2
+            imgData->format = PF_ETC2_RGB8A1;
+			break;
 		case 35986: // ATC_RGB
 			imgData->format = PF_ATC_RGB;
 			break;
