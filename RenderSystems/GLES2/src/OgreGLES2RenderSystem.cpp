@@ -263,7 +263,10 @@ namespace Ogre {
 
             if(mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC1);
-				
+
+            if(gleswIsSupported(3, 0))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
+
 			if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
