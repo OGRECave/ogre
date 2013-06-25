@@ -1150,7 +1150,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLRenderBuffer *stencilBuffer = depthBuffer;
-			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilBuffer )
+			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilFormat )
 			{
 				stencilBuffer = new GLRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -1578,7 +1578,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
 	{
-		GLTexturePtr tex = texPtr;
+		GLTexturePtr tex = texPtr.staticCast<GLTexture>();
 
 		GLenum lastTextureType = mTextureTypes[stage];
 

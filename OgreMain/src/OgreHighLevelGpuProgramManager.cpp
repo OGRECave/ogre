@@ -194,7 +194,7 @@ namespace Ogre {
             getFactory(language)->create(this, name, getNextHandle(), 
             groupName, false, 0));
 
-        HighLevelGpuProgramPtr prg = ret;
+        HighLevelGpuProgramPtr prg = ret.staticCast<HighLevelGpuProgram>();
         prg->setType(gptype);
         prg->setSyntaxCode(language);
 

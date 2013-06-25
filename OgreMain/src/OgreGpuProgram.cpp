@@ -479,33 +479,5 @@ namespace Ogre
 		GpuProgram* t = static_cast<GpuProgram*>(target);
 		t->setAdjacencyInfoRequired(StringConverter::parseBool(val));
 	}
-    //-----------------------------------------------------------------------
-    GpuProgramPtr& GpuProgramPtr::operator=(const HighLevelGpuProgramPtr& r)
-    {
-        // Can assign direct
-        if (pRep == r.getPointer())
-            return *this;
-        release();
-		// lock & copy other mutex pointer
-        OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-        {
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = r.getPointer();
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-		else
-		{
-			// RHS must be a null pointer
-			assert(r.isNull() && "RHS must be null if it has no mutex!");
-			setNull();
-		}
-        return *this;
-    }
-
 }
 

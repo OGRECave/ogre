@@ -1751,7 +1751,7 @@ bail:
 	void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
 	{
 		static D3D11TexturePtr dt;
-		dt = tex;
+		dt = tex.staticCast<D3D11Texture>();
 		if (enabled && !dt.isNull() && dt->getSize() > 0)
 		{
 			// note used

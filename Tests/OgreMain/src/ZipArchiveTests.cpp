@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "ZipArchiveTests.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreZip.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE

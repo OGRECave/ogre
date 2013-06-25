@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include "OgreDataStream.h"
 #include "OgreCommon.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre
 {

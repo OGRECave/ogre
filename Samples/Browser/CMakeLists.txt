@@ -319,9 +319,28 @@ if (APPLE)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
-    add_custom_command(TARGET SampleBrowser POST_BUILD
-        COMMAND ARGS for fwk in ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/*.framework\; do fwk=$(basename $fwk)\; ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/$fwk ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/$fwk\; done
-        )
+
+    set(FRAMEWORKS OgreOverlay
+        OgrePaging
+        OgreProperty
+        OgreRTShaderSystem
+        OgreTerrain
+        OgreVolume
+        Plugin_BSPSceneManager
+        Plugin_CgProgramManager
+        Plugin_OctreeSceneManager
+        Plugin_OctreeZone
+        Plugin_ParticleFX
+        Plugin_PCZSceneManager
+        RenderSystem_GL
+        RenderSystem_GL3Plus
+    )
+
+    foreach(FWK ${FRAMEWORKS})
+	add_custom_command(TARGET SampleBrowser POST_BUILD
+        COMMAND ARGS if [ -d ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${FWK}.framework ]\; then ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${FWK}.framework ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
+		)
+    endforeach(FWK)
 
 	# Add links for the sample plugins
     foreach(SAMPLE_PLUGIN ${OGRE_SAMPLES_LIST})

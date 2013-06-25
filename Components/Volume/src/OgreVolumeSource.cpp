@@ -184,6 +184,12 @@ namespace Volume {
         }
         return false;
     }
+    
+    //-----------------------------------------------------------------------
 
+    Real Source::getVolumeSpaceToWorldSpaceFactor(void) const
+    {
+        return (Real)1.0;
+    }
 }
 }
