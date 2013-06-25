@@ -928,7 +928,7 @@ namespace Ogre {
             //    numOfMips = std::max(log((float)mipWidth), log((float)mipHeight)) - 1;
             //}
 
-            for(unsigned int i = 1 ; i <= numOfMips ; i++)
+            for(unsigned int i = 1 ; i <= numOfMips  ; i++)
             {
 				if(mipHeight > 1)
 				{

@@ -90,6 +90,75 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_glsl_vs glsl
 	}
 }
 
+//--------------------------------------------------------------
+// hlsl Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HW_VTF_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWRECEIVER
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/HW/shadow_caster_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWCASTER
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/HW_VTF_dq_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/HW_VTF_dq_two_weights_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_hlsl_vs hlsl
+{
+	source HW_VTFInstancing.hlsl
+	entry_point main_vs
+	target vs_4_0
+	
+	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
+
+	uses_vertex_texture_fetch true
+}
+
 
 //--------------------------------------------------------------
 // CG Programs
@@ -98,7 +167,7 @@ vertex_program Ogre/Instancing/HW_VTF_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 
@@ -109,7 +178,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER
 
@@ -120,7 +189,7 @@ vertex_program Ogre/Instancing/HW_VTF_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION
 
@@ -131,7 +200,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION
 
@@ -142,7 +211,7 @@ vertex_program Ogre/Instancing/HW_VTF_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -153,7 +222,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles  vs_3_0 vp40
+	profiles vs_4_0 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -166,6 +235,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_cg_vs cg
 vertex_program Ogre/Instancing/HW_VTF_vs unified
 {
 	delegate Ogre/Instancing/HW_VTF_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_cg_vs
 
 	default_params
@@ -180,6 +250,7 @@ vertex_program Ogre/Instancing/HW_VTF_vs unified
 vertex_program Ogre/Instancing/VTF/HW/shadow_caster_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/shadow_caster_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_cg_vs
 
 	default_params
@@ -192,6 +263,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_vs unified
 vertex_program Ogre/Instancing/HW_VTF_dq_vs unified
 {
 	delegate Ogre/Instancing/HW_VTF_dq_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_dq_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_dq_cg_vs
 
 	default_params
@@ -206,6 +278,7 @@ vertex_program Ogre/Instancing/HW_VTF_dq_vs unified
 vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_cg_vs
 
 	default_params
@@ -218,6 +291,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_vs unified
 vertex_program Ogre/Instancing/HW_VTF_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/HW_VTF_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_dq_two_weights_cg_vs
 
 	default_params
@@ -232,6 +306,7 @@ vertex_program Ogre/Instancing/HW_VTF_dq_two_weights_vs unified
 vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_cg_vs
 
 	default_params

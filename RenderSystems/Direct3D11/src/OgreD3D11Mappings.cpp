@@ -956,11 +956,11 @@ namespace Ogre
         D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 
 		if(bindflags & D3D11_BIND_RENDER_TARGET)
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
-#else
-            if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
-#endif
+//#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+//            if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+//#else
+//            if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
+//#endif
     			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 		if(textype == TEX_TYPE_CUBE_MAP)
