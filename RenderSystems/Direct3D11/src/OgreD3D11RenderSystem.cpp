@@ -1187,6 +1187,7 @@ bail:
 			rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE_3D);
 			rsc->setCapability(RSC_TEXTURE_1D);
+			rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
 		}
 
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -2443,6 +2444,7 @@ bail:
 		if (opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
 		{
 			/// TODO: This is a temporary texture binding, we must bind only if param binding_type is set to <vertex|fragment|hull|domain|(¿geometry?)>
+			
 			/// Pixel Shader binding
 			{
 				// Assaf: seem I have better performance without this check... TODO - remove?
@@ -2458,9 +2460,8 @@ bail:
 							"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
 							"D3D11RenderSystem::_render");
 					}
-
-
 				}
+
 				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
 				if (mDevice.isError())
 				{
@@ -2470,6 +2471,7 @@ bail:
 						"D3D11RenderSystem::_render");
 				}
 			}
+			
 			/// Vertex Shader binding
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
@@ -2500,6 +2502,7 @@ bail:
 					}
 				}
 			}
+			
 			/// Hull Shader binding
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
@@ -2530,6 +2533,7 @@ bail:
 					}
 				}
 			}
+			
 			/// Domain Shader binding
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)

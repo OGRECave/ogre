@@ -317,10 +317,12 @@ namespace Ogre {
         // The method _disableTextureUnit is called to turn a unit off
 
         const TexturePtr& tex = tl._getTexturePtr();
+		bool isValidBinding = false;
 		// Vertex texture binding?
 		if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
 			!mCurrentCapabilities->getVertexTextureUnitsShared())
 		{
+			isValidBinding = true;
 			if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
 			{
 				// Bind vertex texture
@@ -336,7 +338,8 @@ namespace Ogre {
 				_setTexture(texUnit, true, tex);
 			}
 		}
-		else
+
+		if (!isValidBinding)
 		{
 			// Shared vertex / fragment textures or no vertex texture support
 			// Bind texture (may be blank)

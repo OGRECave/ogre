@@ -685,6 +685,12 @@ namespace Ogre
 		case DXGI_FORMAT_B5G5R5A1_UNORM:			return PF_A1R5G5B5;
 		case DXGI_FORMAT_B8G8R8A8_UNORM:			return PF_A8R8G8B8;
 		case DXGI_FORMAT_B8G8R8X8_UNORM:			return PF_X8R8G8B8;
+		case DXGI_FORMAT_BC6H_TYPELESS:             return PF_BC6H_SF16;
+		case DXGI_FORMAT_BC6H_UF16:                 return PF_BC6H_UF16;
+		case DXGI_FORMAT_BC6H_SF16:                 return PF_BC6H_SF16;
+		case DXGI_FORMAT_BC7_TYPELESS:              return PF_BC7_UNORM;
+		case DXGI_FORMAT_BC7_UNORM:                 return PF_BC7_UNORM;
+		case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_BC7_UNORM_SRGB;
 
 #if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
 		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:return PF_UNKNOWN;
@@ -692,12 +698,6 @@ namespace Ogre
 		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:       return PF_A8R8G8B8;
 		case DXGI_FORMAT_B8G8R8X8_TYPELESS:         return PF_UNKNOWN;
 		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:       return PF_X8R8G8B8;
-		case DXGI_FORMAT_BC6H_TYPELESS:             return PF_UNKNOWN;
-		case DXGI_FORMAT_BC6H_UF16:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC6H_SF16:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_TYPELESS:              return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_UNORM:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_UNKNOWN;
 		case DXGI_FORMAT_AYUV:                      return PF_UNKNOWN;
 		case DXGI_FORMAT_Y410:                      return PF_UNKNOWN;
 		case DXGI_FORMAT_Y416:                      return PF_UNKNOWN;
@@ -750,7 +750,10 @@ namespace Ogre
 		case PF_DXT3:			return DXGI_FORMAT_BC3_UNORM;
 		case PF_DXT4:			return DXGI_FORMAT_BC4_UNORM;
 		case PF_DXT5:			return DXGI_FORMAT_BC5_UNORM;
-
+		case PF_BC6H_UF16:		return DXGI_FORMAT_BC6H_UF16;
+		case PF_BC6H_SF16:		return DXGI_FORMAT_BC6H_SF16;
+		case PF_BC7_UNORM:		return DXGI_FORMAT_BC7_UNORM;
+		case PF_BC7_UNORM_SRGB:	return DXGI_FORMAT_BC7_UNORM_SRGB;
 		case PF_UNKNOWN:
 		default:				return DXGI_FORMAT_UNKNOWN;
 		}
