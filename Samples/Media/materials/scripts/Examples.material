@@ -2030,6 +2030,13 @@ fragment_program Examples/ShowUV_pCg_sm4 cg
 	profiles ps_4_0
 }
 
+fragment_program Examples/ShowUV_pHLSL hlsl
+{
+	source Example_Basic4.hlsl
+	entry_point showuv_p
+	target ps_4_0
+}
+
 fragment_program Examples/ShowUV_pGLSLES glsles
 {
 	source ShowUV.glsles
@@ -2046,6 +2053,7 @@ fragment_program Examples/ShowUV_p unified
 {
 	delegate Examples/ShowUV_pGLSL
 	delegate Examples/ShowUV_pGLSLES
+	delegate Examples/ShowUV_pHLSL
 	delegate Examples/ShowUV_pCg
 	delegate Examples/ShowUV_pCg_sm4
 }
@@ -2063,6 +2071,12 @@ fragment_program Examples/ShowUVdir3D_pCg_sm4 cg
 	profiles ps_4_0
 }
 
+fragment_program Examples/ShowUVdir3D_pHLSL hlsl
+{
+	source Example_Basic4.hlsl
+	entry_point showuvdir3d_p
+	target ps_4_0
+}
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 {
@@ -2080,6 +2094,7 @@ fragment_program Examples/ShowUVdir3D_p unified
 {
 	delegate Examples/ShowUVdir3D_pGLSL
 	delegate Examples/ShowUVdir3D_pGLSLES
+	delegate Examples/ShowUVdir3D_pHLSL
 	delegate Examples/ShowUVdir3D_pCg
 	delegate Examples/ShowUVdir3D_pCg_sm4
 }

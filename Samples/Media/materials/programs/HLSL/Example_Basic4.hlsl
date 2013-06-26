@@ -1,6 +1,6 @@
 struct a2v
 {
-    float4 position : POSITION;
+    float4 position : SV_POSITION;
     float2 uv	: TEXCOORD0;
 };
 
@@ -29,7 +29,7 @@ v2p ambientOneTexture_vp(a2v input,
 
 struct a2vhardwareSkinningOneWeight
 {
-	float4 position : POSITION;
+	float4 position : SV_POSITION;
 	float3 normal   : NORMAL;
 	float2 uv       : TEXCOORD0;
 	float  blendIdx : BLENDINDICES;
@@ -77,7 +77,7 @@ v2p hardwareSkinningOneWeight_vp(
 
 struct a2vhardwareSkinningOneWeightCaster
 {
-	float4 position : POSITION;
+	float4 position : SV_POSITION;
 	float3 normal   : NORMAL;
 	float  blendIdx : BLENDINDICES;
 };
@@ -117,7 +117,7 @@ v2phardwareSkinningCaster hardwareSkinningOneWeightCaster_vp(
 */
 struct a2vhardwareSkinningTwoWeights
 {
-	float4 position : POSITION;
+	float4 position : SV_POSITION;
 	float3 normal   : NORMAL;
 	float2 uv       : TEXCOORD0;
 	float4 blendIdx : BLENDINDICES;
@@ -255,7 +255,7 @@ v2p hardwareSkinningFourWeights_vp(
 
 struct a2vhardwareMorphAnimation
 {
-	float3 pos1   : POSITION;
+	float3 pos1   : SV_POSITION;
 	float4 normal : NORMAL;
 	float2 uv	  : TEXCOORD0;
 	float3 pos2	  : TEXCOORD1;
@@ -279,7 +279,7 @@ v2p hardwareMorphAnimation(
 
 struct a2vhardwarePoseAnimation
 {
-	float3 pos : POSITION;
+	float3 pos : SV_POSITION;
 	float4 normal	  : NORMAL;
 	float2 uv		  : TEXCOORD0;
 	float3 pose1	  : TEXCOORD1;
@@ -300,4 +300,164 @@ v2p hardwarePoseAnimation(
 	output.oUv = input.uv;
 	output.colour = float4(1,0,0,1);
 	return output;
+}
+
+struct hardwareMorphAnimationWithNormals_in
+{
+	float3 pos1 : SV_POSITION;
+	float3 normal1  : NORMAL;
+	float2 uv		  : TEXCOORD0;
+	float3 pos2	  : TEXCOORD1;
+	float3 normal2  : TEXCOORD2;
+};
+
+
+// hardware morph animation (with normals)
+v2p hardwareMorphAnimationWithNormals(
+			  hardwareMorphAnimationWithNormals_in input,
+			  uniform float4x4 worldViewProj, 
+			  uniform float4 objSpaceLightPos,
+			  uniform float4 ambient,
+			  uniform float4 anim_t)
+{
+	v2p output;
+	// interpolate position
+	float4 posinterp = float4(input.pos1 + anim_t.x*(input.pos2 - input.pos1), 1.0f);
+
+	// nlerp normal
+	float3 ninterp = input.normal1 + anim_t.x*(input.normal2 - input.normal1);
+	ninterp = normalize(ninterp);
+	
+	output.oPosition = mul(worldViewProj, posinterp);
+	output.oUv = input.uv;
+	
+	float3 lightDir = normalize(
+		objSpaceLightPos.xyz -  (posinterp.xyz * objSpaceLightPos.w));
+
+	// Colour it red to make it easy to identify
+	float lit = saturate(dot(lightDir, ninterp));
+	output.colour = float4((ambient.rgb + float3(lit,lit,lit)) * float3(1,0,0), 1);
+	return output;
+}
+
+struct hardwarePoseAnimationWithNormals_in
+{
+	float3 pos : SV_POSITION;
+	float3 normal	   : NORMAL;
+	float2 uv		   : TEXCOORD0;
+	float3 pose1pos  : TEXCOORD1;
+	float3 pose1norm : TEXCOORD2;
+	float3 pose2pos  : TEXCOORD3;
+	float3 pose2norm : TEXCOORD4;
+};
+
+// hardware pose animation (with normals)
+v2p hardwarePoseAnimationWithNormals(
+			  hardwarePoseAnimationWithNormals_in input,
+
+			  uniform float4x4 worldViewProj, 
+			  uniform float4 objSpaceLightPos,
+			  uniform float4 ambient,
+			  uniform float4 anim_t)
+{
+	v2p output;
+	// interpolate
+	float4 posinterp = float4(input.pos + anim_t.x*input.pose1pos + anim_t.y*input.pose2pos, 1.0f);
+	
+	// nlerp normal
+	// First apply the pose normals (these are actual normals, not offsets)
+	float3 ninterp = anim_t.x*input.pose1norm + anim_t.y*input.pose2norm;
+
+	// Now add back any influence of the original normal
+	// This depends on what the cumulative weighting left the normal at, if it's lacking or cancelled out
+	//float remainder = 1.0 - min(anim_t.x + anim_t.y, 1.0);
+	float remainder = 1.0 - min(length(ninterp), 1.0);
+	ninterp = ninterp + (input.normal * remainder);
+	ninterp = normalize(ninterp);
+
+	output.oPosition = mul(worldViewProj, posinterp);
+	output.oUv = input.uv;
+	
+	float3 lightDir = normalize(
+		objSpaceLightPos.xyz -  (posinterp.xyz * objSpaceLightPos.w));
+
+	// Colour it red to make it easy to identify
+	float lit = saturate(dot(lightDir, ninterp));
+	output.colour = float4((ambient.rgb + float3(lit,lit,lit)) * float3(1,0,0), 1);
+	return output;
+}
+
+struct basic1
+{
+	float4 position : SV_POSITION;
+	float3 tangent       : TANGENT;
+};
+
+struct basic1out
+{
+    float4 oPosition : SV_POSITION;
+	float3 oTangent  : TEXCOORD0;
+};
+
+basic1out basicPassthroughTangent_v(basic1 input,
+						  uniform float4x4 worldViewProj)
+{
+	basic1out output;
+
+	output.oPosition = mul(worldViewProj, input.position);
+	output.oTangent = input.tangent;
+	
+	return output;
+}
+
+struct basic2
+{
+	float4 position : SV_POSITION;
+	float3 normal       : NORMAL;
+};
+
+struct basic2out
+{
+	float4 oPosition : SV_POSITION;
+	float3 oNormal  : TEXCOORD0;
+};
+
+basic2out basicPassthroughNormal_v(basic2 input,
+						  uniform float4x4 worldViewProj)
+{
+	basic2out output;
+	output.oPosition = mul(worldViewProj, input.position);
+	output.oNormal = input.normal;
+	return output;
+}
+// Basic fragment program to display UV
+float4 showuv_p (float4 position : SV_POSITION, float2 uv : TEXCOORD0) : SV_Target
+{
+	// wrap values using frac
+	return float4(frac(uv.x), frac(uv.y), 0, 1);
+}
+// Basic fragment program to display 3d uv
+float4 showuvdir3d_p (float4 position : SV_POSITION, float3 uv : TEXCOORD0) : SV_Target
+{
+	float3 n = normalize(uv);
+	return float4(n.x, n.y, n.z, 1);
+}
+
+/*
+  Basic fragment program using texture and diffuse colour.
+*/
+struct diffuse_in
+{
+	float4 position          : SV_POSITION;
+	float2 uv                : TEXCOORD0;
+	float4 diffuse           : COLOR;
+};
+
+SamplerState MySampler;
+
+float4 diffuseOneTexture_fp(diffuse_in input,
+						  uniform Texture2D texMap : register(t0)) : SV_Target
+{
+	float4 colour = texMap.Sample(MySampler,input.uv) * input.diffuse;
+	return colour;
 }
