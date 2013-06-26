@@ -220,9 +220,9 @@ namespace Ogre {
 
         /** Returns whether or not this object is supposed to be visible or not. 
 		@remarks
-			Takes into account both upper rendering distance and visible flag.
+			Takes into account visibility flags and the setVisible, but not rendering distance.
 		*/
-        //virtual bool isVisible(void) const;
+        bool isVisible(void) const;
 
 		/** Sets the distance at which the object is no longer rendered.
 		@param

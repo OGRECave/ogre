@@ -1157,18 +1157,6 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
-        /** Advance method to increase the lights dirty counter due lights changed.
-        @remarks
-            Scene manager tracking lights that affecting the frustum, if changes
-            detected (the changes includes light list itself and the light's position
-            and attenuation range), then increase the lights dirty counter.
-        @par
-            For some reason, you can call this method to force whole scene objects
-            re-populate their light list. But near in mind, call to this method
-            will harm performance, so should avoid if possible.
-        */
-        virtual void _notifyLightsDirty(void);
-
         /** Get the list of lights which could be affecting the frustum.
         @remarks
             Note that default implementation of this method returns a cached light list,
@@ -1771,6 +1759,14 @@ namespace Ogre {
 			render, but the user may want to manually call this function.
 		*/
 		void updateAllTransforms();
+
+		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
+			Compositor). Then calls MovableObject::buildLightList with that list so that each
+			MovableObject gets it's own sorted list of the closest lights.
+		@remarks
+			@See MovableObject::buildLightList()
+		*/
+		void buildLightList();
 
 		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
 		*/

@@ -121,7 +121,6 @@ mResetIdentityView(false),
 mResetIdentityProj(false),
 mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
-mLightsDirtyCounter(0),
 mMovableNameGenerator("Ogre/MO"),
 mShadowCasterPlainBlackPass(0),
 mShadowReceiverPass(0),
@@ -2241,6 +2240,11 @@ void SceneManager::updateAllTransforms()
 
 		++it;
 	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::buildLightList()
+{
+	//TODO (dark_sylinc)
 }
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()
@@ -4389,11 +4393,6 @@ void SceneManager::updateRenderQueueGroupSplitOptions(RenderQueueGroup* group,
 
 
 }
-//-----------------------------------------------------------------------
-void SceneManager::_notifyLightsDirty(void)
-{
-    ++mLightsDirtyCounter;
-}
 //---------------------------------------------------------------------
 bool SceneManager::lightsForShadowTextureLess::operator ()(
 	const Ogre::Light *l1, const Ogre::Light *l2) const
@@ -4510,10 +4509,6 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
-
-        // notify light dirty, so all movable objects will re-populate
-        // their light list next time
-        _notifyLightsDirty();
     }
 
 }

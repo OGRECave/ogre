@@ -118,9 +118,9 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    /*bool MovableObject::isVisible(void) const
+    bool MovableObject::isVisible(void) const
     {
-        if (!mVisible || mBeyondFarDistance || mRenderingDisabled)
+        if( !mVisible )
             return false;
 
         SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
@@ -129,7 +129,7 @@ namespace Ogre {
 
         return true;
     }
-	//-----------------------------------------------------------------------
+	/*//-----------------------------------------------------------------------
 	void MovableObject::_notifyCurrentCamera(Camera* cam)
 	{
 		if (mParentNode)
