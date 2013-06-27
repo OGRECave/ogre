@@ -60,4 +60,14 @@ namespace Ogre
 			mObjectData.mSquaredUpperDistance[mObjectData.mIndex] = mUpperDistance * mUpperDistance;
 		}
 	}
+	//-----------------------------------------------------------------------------------
+	inline void MovableObject::setVisible( bool visible )
+	{
+		mObjectData.mVisible[mObjectData.mIndex] = visible;
+	}
+	//-----------------------------------------------------------------------------------
+	inline bool MovableObject::getVisible(void) const
+	{
+		return mObjectData.mVisible[mObjectData.mIndex];
+	}
 }

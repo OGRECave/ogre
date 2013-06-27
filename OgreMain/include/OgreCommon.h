@@ -547,7 +547,7 @@ namespace Ogre {
 	};
 
 	class Light;
-	typedef vector<Light*>::type LightList;
+	typedef HashedVector<Light*> LightList;
 
 
 

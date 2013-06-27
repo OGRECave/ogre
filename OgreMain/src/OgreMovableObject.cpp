@@ -48,7 +48,6 @@ namespace Ogre {
 		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
-        , mVisible(true)
 		, mDebugDisplay(false)
 		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
@@ -120,7 +119,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool MovableObject::isVisible(void) const
     {
-        if( !mVisible )
+        if( !getVisible() )
             return false;
 
         SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();

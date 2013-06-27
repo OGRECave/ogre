@@ -82,8 +82,6 @@ namespace Ogre {
     protected:
         /// node to which this object is attached
         Node* mParentNode;
-        /// Is this object visible?
-        bool mVisible;
 		/// The render queue to use when rendering this object
         uint8 mRenderQueueID;
 		/// The render queue group to use when rendering this object
@@ -210,13 +208,13 @@ namespace Ogre {
 			changes are best done using this method; large or more longer term
 			changes are best done by detaching.
 		*/
-		void setVisible( bool visible )										{ mVisible = visible; }
+		inline void setVisible( bool visible );
 
         /** Gets this object whether to be visible or not, if it has a renderable component. 
         @remarks
             Returns the value set by MovableObject::setVisible only.
         */
-		bool getVisible(void) const											{ return mVisible; }
+		inline bool getVisible(void) const;
 
         /** Returns whether or not this object is supposed to be visible or not. 
 		@remarks

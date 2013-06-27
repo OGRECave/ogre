@@ -183,6 +183,16 @@ namespace Ogre {
         UserObjectBindings mUserObjectBindings;
 
     public:
+		/** Index in the vector holding this node reference (could be our parent node, or a global array
+			tracking all created nodes to avoid memory leaks). Used for O(1) removals.
+		@remarks
+			It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
+			it manually.
+		*/
+		size_t mGlobalIndex;
+		/// @copydoc mGlobalIndex
+		size_t mParentIndex;
+
         /** Constructor, should only be called by parent, not directly.
         @remarks
 			Parent pointer can be null.
@@ -529,20 +539,9 @@ namespace Ogre {
         /** Drops the specified child from this node. 
         @remarks
             Does not delete the node, just detaches it from
-            this parent, potentially to be reattached elsewhere.
-		@param
-			The index, as in mChildren[index]
-		@return
-			The pointer to the node that has been dropped
-        */
-        virtual Node* removeChild( size_t index );
-
-        /** Drops the specified child from this node. 
-        @remarks
-            Does not delete the node, just detaches it from
             this parent, potentially to be reattached elsewhere. 
 		@par
-			Does nothing if child is not one of our children.
+			Asserts if child is not one of our children.
         */
         virtual void removeChild( Node* child );
 

@@ -59,7 +59,9 @@ namespace Ogre {
 		mInitialScale(Vector3::UNIT_SCALE),
 		mListener( 0 ),
 		mNodeMemoryManager( nodeMemoryManager ),
-		mDebug( 0 )
+		mDebug( 0 ),
+		mGlobalIndex( -1 ),
+		mParentIndex( -1 )
     {
 		if( mParent )
 			mDepthLevel = mParent->mDepthLevel + 1;
@@ -257,7 +259,8 @@ namespace Ogre {
 
 		//createChildImpl must have passed us as parent. It's a special
 		//case to improve memory usage (avoid transfering mTransform)
-		mChildren.insert( std::lower_bound( mChildren.begin(), mChildren.end(), newNode ), newNode );
+		mChildren.push_back( newNode );
+		newNode->mParentIndex = -1;
 
         return newNode;
     }
@@ -273,31 +276,32 @@ namespace Ogre {
 				child->mParent->getName() + "'.", "Node::addChild");
         }
 
-		mChildren.insert( std::lower_bound( mChildren.begin(), mChildren.end(), child ), child );
+		mChildren.push_back( child );
+		child->mParentIndex = mChildren.size() - 1;
         child->setParent(this);
-    }
-    //-----------------------------------------------------------------------
-    Node* Node::removeChild( size_t index )
-    {
-		NodeVec::iterator itor = mChildren.begin() + index;
-
-		Node *retVal = *itor;
-		(*itor)->setParent( 0 );
-		mChildren.erase( itor );
-
-        return retVal;
     }
     //-----------------------------------------------------------------------
     void Node::removeChild( Node* child )
     {
-		NodeVec::iterator itor = std::lower_bound( mChildren.begin(), mChildren.end(), child );
+		assert( child->getParent() == this && "Node says it's not our child" );
+		assert( child->mParentIndex < mChildren.size() && "mParentIndex was out of date!!!" );
 
-		if( itor != mChildren.end() && child == *itor )
+		if( child->mParentIndex < mChildren.size() )
 		{
-			assert( child->getParent() == this &&
-					"Parent node says it's our child, child says we're not it's parent" );
-			mChildren.erase( itor );
-			child->setParent( 0 );
+			NodeVec::iterator itor = mChildren.begin() + child->mParentIndex;
+
+			assert( child == *itor && "mParentIndex was out of date!!!" );
+
+			if( child == *itor )
+			{
+				itor = efficientVectorRemove( mChildren, itor );
+				child->setParent( 0 );
+				child->mParentIndex = -1;
+
+				//The node that was at the end got swapped and has now a different index
+				if( itor != mChildren.end() )
+					(*itor)->mParentIndex = itor - mChildren.begin();
+			}
 		}
     }
     //-----------------------------------------------------------------------
@@ -579,6 +583,7 @@ namespace Ogre {
 		while( itor != end )
 		{
 			(*itor)->setParent( 0 );
+			(*itor)->mParentIndex = -1;
 			++itor;
 		}
         mChildren.clear();

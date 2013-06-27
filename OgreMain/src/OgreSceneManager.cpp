@@ -824,26 +824,29 @@ SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent )
 SceneNode* SceneManager::_createSceneNode( SceneNode *parent )
 {
 	SceneNode* sn = createSceneNodeImpl( parent );
-	mSceneNodes.insert( std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn ), sn );
+	mSceneNodes.push_back( sn );
+	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNode(void)
 {
     SceneNode* sn = createSceneNodeImpl( (SceneNode*)0 );
-	mSceneNodes.insert( std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn ), sn );
+	mSceneNodes.push_back( sn );
+	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroySceneNode( SceneNode* sn )
 {
-	SceneNodeList::iterator itor = std::lower_bound( mSceneNodes.begin(), mSceneNodes.end(), sn );
+	SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
 
-    if( itor == mSceneNodes.end() || sn != *itor )
+    if( sn->mGlobalIndex >= mSceneNodes.size() || sn != *itor )
     {
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode ID: " +
-			StringConverter::toString( sn->getId() ) + ", named '" + sn->getName() + "' not found.",
-            "SceneManager::destroySceneNode");
+		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "SceneNode ID: " +
+			StringConverter::toString( sn->getId() ) + ", named '" + sn->getName() +
+			"' had it's mGlobalIndex out of date!!! (or the SceneNode wasn't "
+			"created with this SceneManager)", "SceneManager::destroySceneNode");
     }
 
     // Find any scene nodes which are tracking this node, and turn them off
@@ -874,8 +877,12 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 	{
 		parentNode->removeChild( sn );
 	}
+	itor = efficientVectorRemove( mSceneNodes, itor );
     OGRE_DELETE sn;
-    mSceneNodes.erase( itor );
+
+	//The node that was at the end got swapped and has now a different index
+	if( itor != mSceneNodes.end() )
+		(*itor)->mGlobalIndex = itor - mSceneNodes.begin();
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
@@ -892,24 +899,34 @@ SceneNode* SceneManager::getRootSceneNode(void)
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getSceneNode( IdType id )
 {
+	// Use reverse iterators, as we assume the most used nodes are the last ones created.
 	SceneNode *retVal = 0;
-	SceneNodeList::iterator itor = std::lower_bound( mSceneNodes.begin(),
-													 mSceneNodes.end(), id, IdCmp() );
+	SceneNodeList::reverse_iterator ritor = mSceneNodes.rbegin();
+	SceneNodeList::reverse_iterator rend  = mSceneNodes.rend();
 
-	if( itor != mSceneNodes.end() && (*itor)->getId() == id )
-        retVal = *itor;
+	IdCmp idCmp;
+	while( ritor != rend && !idCmp( *ritor, id ) )
+		++ritor;
+
+	if( ritor != mSceneNodes.rend() )
+        retVal = *ritor;
 
     return retVal;
 }
 //-----------------------------------------------------------------------
 const SceneNode* SceneManager::getSceneNode( IdType id ) const
 {
+	// Use reverse iterators, as we assume the most used nodes are the last ones created.
 	SceneNode const *retVal = 0;
-	SceneNodeList::const_iterator itor = std::lower_bound( mSceneNodes.begin(),
-															mSceneNodes.end(), id, IdCmp() );
+	SceneNodeList::const_reverse_iterator ritor = mSceneNodes.rbegin();
+	SceneNodeList::const_reverse_iterator rend  = mSceneNodes.rend();
 
-	if( itor != mSceneNodes.end() && (*itor)->getId() == id )
-        retVal = *itor;
+	IdCmp idCmp;
+	while( ritor != rend && !idCmp( *ritor, id ) )
+		++ritor;
+
+	if( ritor != mSceneNodes.rend() )
+        retVal = *ritor;
 
     return retVal;
 }
