@@ -9,11 +9,6 @@ vertex_program Ogre/Tesselation/VertexProgramGLSL glsl
 {
     source TesselationVp.glsl
     syntax glsl400
-    
-    default_params
-    {
-        param_named_auto g_mWorldViewProj worldviewproj_matrix
-    }
 }
 
 vertex_program Ogre/Tesselation/VertexProgram unified
