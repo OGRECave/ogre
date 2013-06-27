@@ -301,7 +301,11 @@ namespace Ogre {
 
 //----------------------------------------------------------------------------
 // Set the default locale for strings
-#define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#   define OGRE_DEFAULT_LOCALE "en-GB"
+#else
+#   define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+#endif
 
 //----------------------------------------------------------------------------
 // Library suffixes
