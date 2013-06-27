@@ -47,14 +47,13 @@ protected:
 
     void setupContent()
     {
-
         //JAJ lighting
         //FIXME
-        /* mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5)); */
-        /* Ogre::Light* l = mSceneMgr->createLight("MainLight"); */
-        /* l->setType(Ogre::Light::LT_DIRECTIONAL); */
-        /* //l->setPosition(20,80,50); */
-        /* l->setDirection(Ogre::Vector3(0,-1,-1)); */
+        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+        Ogre::Light* l = mSceneMgr->createLight("MainLight");
+        l->setType(Ogre::Light::LT_DIRECTIONAL);
+        //l->setPosition(20,80,50);
+        l->setDirection(Ogre::Vector3(0,-1,-1));
           
         // set our camera
         mTrayMgr->showCursor();
