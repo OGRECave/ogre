@@ -298,6 +298,10 @@ namespace Ogre
 			Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
 		void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
 		void _setVertexTexture(size_t unit, const TexturePtr& tex);
+		void _setGeometryTexture(size_t unit, const TexturePtr& tex);
+		void _setComputeTexture(size_t unit, const TexturePtr& tex);
+		void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
+		void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
 		void _disableTextureUnit(size_t texUnit);
 		void _setTextureCoordSet( size_t unit, size_t index );
         void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, 
