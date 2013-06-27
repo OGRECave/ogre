@@ -183,96 +183,96 @@ namespace Ogre {
         @return
             0.0 if the value could not be parsed, otherwise the Real version of the String.
         */
-        static Real parseReal(const String& val, Real defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Real parseReal(const String& val, Real defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to a Angle. 
         @return
             0.0 if the value could not be parsed, otherwise the Angle version of the String.
         */
-        static inline Radian parseAngle(const String& val, Radian defaultValue = Radian(0), const std::locale &loc = std::locale(msDefaultStringLocale)) {
+        static inline Radian parseAngle(const String& val, Radian defaultValue = Radian(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str())) {
             return Angle(parseReal(val, defaultValue.valueRadians(), loc));
         }
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static int parseInt(const String& val, int defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static int parseInt(const String& val, int defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned int parseUnsignedInt(const String& val, unsigned int defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static unsigned int parseUnsignedInt(const String& val, unsigned int defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static long parseLong(const String& val, long defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static long parseLong(const String& val, long defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to size_t. 
         @return
             defaultValue if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static size_t parseSizeT(const String& val, size_t defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static size_t parseSizeT(const String& val, size_t defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string
             matches "true", "yes" or "1", false otherwise.
         */
-        static bool parseBool(const String& val, bool defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static bool parseBool(const String& val, bool defaultValue = 0, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Vector2 out of a String.
         @remarks
             Format is "x y" ie. 2 Real components, space delimited. Failure to parse returns
             Vector2::ZERO.
         */
-        static Vector2 parseVector2(const String& val, const Vector2& defaultValue = Vector2::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Vector2 parseVector2(const String& val, const Vector2& defaultValue = Vector2::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Vector3 out of a String.
         @remarks
             Format is "x y z" ie. 3 Real components, space delimited. Failure to parse returns
             Vector3::ZERO.
         */
-        static Vector3 parseVector3(const String& val, const Vector3& defaultValue = Vector3::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Vector3 parseVector3(const String& val, const Vector3& defaultValue = Vector3::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Vector4 out of a String.
         @remarks
             Format is "x y z w" ie. 4 Real components, space delimited. Failure to parse returns
             Vector4::ZERO.
         */
-        static Vector4 parseVector4(const String& val, const Vector4& defaultValue = Vector4::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Vector4 parseVector4(const String& val, const Vector4& defaultValue = Vector4::ZERO, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Matrix3 out of a String.
         @remarks
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
             Failure to parse returns Matrix3::IDENTITY.
         */
-        static Matrix3 parseMatrix3(const String& val, const Matrix3& defaultValue = Matrix3::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Matrix3 parseMatrix3(const String& val, const Matrix3& defaultValue = Matrix3::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Matrix4 out of a String.
         @remarks
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc. Failure to parse returns Matrix4::IDENTITY.
         */
-        static Matrix4 parseMatrix4(const String& val, const Matrix4& defaultValue = Matrix4::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Matrix4 parseMatrix4(const String& val, const Matrix4& defaultValue = Matrix4::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a Quaternion out of a String. 
         @remarks
             Format is "w x y z" (i.e. 4x Real values, space delimited). 
             Failure to parse returns Quaternion::IDENTITY.
         */
-        static Quaternion parseQuaternion(const String& val, const Quaternion& defaultValue = Quaternion::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static Quaternion parseQuaternion(const String& val, const Quaternion& defaultValue = Quaternion::IDENTITY, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Parses a ColourValue out of a String. 
         @remarks
             Format is "r g b a" (i.e. 4x Real values, space delimited), or "r g b" which implies
             an alpha value of 1.0 (opaque). Failure to parse returns ColourValue::Black.
         */
-        static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 
         /** Pareses a StringVector from a string.
         @remarks
             Strings must not contain spaces since space is used as a delimiter in
             the output.
         */
-        static StringVector parseStringVector(const String& val, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static StringVector parseStringVector(const String& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Checks the String is a valid number value. */
-        static bool isNumber(const String& val, const std::locale &loc = std::locale(msDefaultStringLocale));
+        static bool isNumber(const String& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 
         //-----------------------------------------------------------------------
         static void setDefaultStringLocale(String loc) { msDefaultStringLocale = loc; }
