@@ -1825,7 +1825,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
 
             //TODO Find better solution for showing tessellated mesh.
-            OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode == GL_LINE_STRIP ? GL_LINE : mPolygonMode));
+            //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode == GL_LINE_STRIP ? GL_LINE : mPolygonMode));
             
             if(op.useIndexes)
             {
