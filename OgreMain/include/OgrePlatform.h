@@ -300,6 +300,10 @@ namespace Ogre {
 #endif
 
 //----------------------------------------------------------------------------
+// Set the default locale for strings
+#define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+
+//----------------------------------------------------------------------------
 // Library suffixes
 // "_d" for debug builds, nothing otherwise
 #if OGRE_DEBUG_MODE

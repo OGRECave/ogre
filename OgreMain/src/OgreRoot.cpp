@@ -652,6 +652,9 @@ namespace Ogre {
         if (!mControllerManager)
 			mControllerManager = OGRE_NEW ControllerManager();
 
+        // Set default string locale
+        StringConverter::setDefaultStringLocale(OGRE_DEFAULT_LOCALE);
+
         // .rendercaps manager
         RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
         // caller wants to load custom RenderSystemCapabilities form a config file
