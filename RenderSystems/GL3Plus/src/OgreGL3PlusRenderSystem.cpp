@@ -1484,16 +1484,19 @@ namespace Ogre {
         switch(level)
         {
         case PM_POINTS:
-            mPolygonMode = GL_POINTS;
+            //mPolygonMode = GL_POINTS;
+            mPolygonMode = GL_POINT;
             break;
         case PM_WIREFRAME:
-            mPolygonMode = GL_LINE_STRIP;
+            //mPolygonMode = GL_LINE_STRIP;
+            mPolygonMode = GL_LINE;
             break;
         default:
         case PM_SOLID:
             mPolygonMode = GL_FILL;
             break;
         }
+        OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
     }
 
     void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
@@ -1794,41 +1797,44 @@ namespace Ogre {
         // Do tessellation rendering. Note: Only evaluation(domain) shaders are required.
         if(mCurrentDomainProgram)
         {
-            GLuint primCount = 0;
-            // Useful primitives for tessellation
-            switch( op.operationType )
-            {
-            case RenderOperation::OT_LINE_LIST:
-                primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
-                break;
+            // GLuint primCount = 0;
+            // // Useful primitives for tessellation
+            // switch( op.operationType )
+            // {
+            // case RenderOperation::OT_LINE_LIST:
+            //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
+            //     break;
 
-            case RenderOperation::OT_LINE_STRIP:
-                primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
-                break;
+            // case RenderOperation::OT_LINE_STRIP:
+            //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
+            //     break;
 
-            case RenderOperation::OT_TRIANGLE_LIST:
-                primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
-                break;
+            // case RenderOperation::OT_TRIANGLE_LIST:
+            //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount);
+            //     //primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
+            //     break;
 
-            case RenderOperation::OT_TRIANGLE_STRIP:
-                primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
-                break;
-            default:
-                break;
-            }
+            // case RenderOperation::OT_TRIANGLE_STRIP:
+            //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
+            //     break;
+            // default:
+            //     break;
+            // }
 
             // These are set via shader in DX11, SV_InsideTessFactor and SV_OutsideTessFactor
             // Hardcoding for the sample
-            float patchLevel(16.f);
-            OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &patchLevel));
-            OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel));
-            OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
+            // float patchLevel(1.f);
+            // OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &patchLevel));
+            // OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel));
+            // OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
 
             //TODO Find better solution for showing tessellated mesh.
             //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode == GL_LINE_STRIP ? GL_LINE : mPolygonMode));
+            //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
             
             if(op.useIndexes)
             {
+                //printf("YES INDEX\n");
                 OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                                  static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
@@ -1836,11 +1842,14 @@ namespace Ogre {
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
                 OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                //OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
             else
             {
-                OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
+                //printf("NO INDEX - primCount: %.4u \n", primCount);
+                OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, op.vertexData->vertexCount));
+                //OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
         }
@@ -1880,11 +1889,13 @@ namespace Ogre {
                 {
                     if(mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
+                        //OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
+                        OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                     }
                     else
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                        //OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                        OGRE_CHECK_GL_ERROR(glDrawRangeElements(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                     }
                 }
             } while (updatePassIterationRenderState());
@@ -1906,8 +1917,9 @@ namespace Ogre {
                 }
                 else
                 {
-                    GLenum mode = (_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode();
-                    OGRE_CHECK_GL_ERROR(glDrawArrays(mode, 0, op.vertexData->vertexCount));
+                    //GLenum mode = (_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode();
+                    //OGRE_CHECK_GL_ERROR(glDrawArrays(mode, 0, op.vertexData->vertexCount));
+                    OGRE_CHECK_GL_ERROR(glDrawArrays(primType, 0, op.vertexData->vertexCount));
                 }
             } while (updatePassIterationRenderState());
         }
