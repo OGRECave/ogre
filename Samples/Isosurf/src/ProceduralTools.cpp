@@ -54,12 +54,15 @@ MeshPtr ProceduralTools::generateTetrahedra()
 
     SubMesh* tetrahedraSubMesh = tetrahedraMesh->createSubMesh();
     tetrahedraSubMesh->operationType = RenderOperation::OT_LINE_LIST;
-    tetrahedraSubMesh->setMaterialName("Ogre/IsoSurf/TessellateTetrahedra");
-        
+    //tetrahedraSubMesh->setMaterialName("Ogre/IsoSurf/TessellateTetrahedra");
+    tetrahedraSubMesh->setMaterialName("BaseWhiteNoLighting");
+    
     Ogre::uint sizeLog2[3] = { X_SIZE_LOG2, Y_SIZE_LOG2, Z_SIZE_LOG2 };
     Ogre::uint nTotalBits = sizeLog2[0] + sizeLog2[1] + sizeLog2[2];
     Ogre::uint nPointsTotal = 1 << nTotalBits;
 
+    printf("PROCEDURING\N");
+    
     tetrahedraSubMesh->useSharedVertices = false;
     tetrahedraSubMesh->vertexData = new VertexData;
     tetrahedraSubMesh->indexData = new IndexData;
