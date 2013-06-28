@@ -302,7 +302,12 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Set the default locale for strings
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_DEFAULT_LOCALE "en-GB"
+#	if _MSC_VER >= 1700
+#		define OGRE_DEFAULT_LOCALE "en_GB"
+#	else
+// Regarding MS http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
+#		define OGRE_DEFAULT_LOCALE "uk"
+#endif
 #else
 #   define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
 #endif
