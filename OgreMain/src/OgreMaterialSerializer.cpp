@@ -3068,7 +3068,7 @@ namespace Ogre
         
         if (strategy == 0)
             logParseError(
-            "Bad lod_strategy attribute, available lod strategy name expected.",
+            "Bad lod_strategy attribute, available LOD strategy name expected.",
             context);
 
         context.material->setLodStrategy(strategy);
@@ -3079,7 +3079,7 @@ namespace Ogre
     bool parseLodDistances(String& params, MaterialScriptContext& context)
     {
         // Set to distance strategy
-        context.material->setLodStrategy(DistanceLodStrategy::getSingletonPtr());
+        context.material->setLodStrategy(DistanceLodSphereStrategy::getSingletonPtr());
 
         StringVector vecparams = StringUtil::split(params, " \t");
 
@@ -3773,7 +3773,7 @@ namespace Ogre
 			// Fire write begin event.
 			fireTechniqueEvent(MSE_WRITE_BEGIN, skipWriting, pTech);
 
-			// Lod index
+			// LOD index
 			if (mDefaults ||
 				pTech->getLodIndex() != 0)
 			{

@@ -105,7 +105,7 @@ namespace Ogre {
 	class _OgreExport  InstancedGeometry : public BatchedGeometryAlloc
 	{
 	public:
-		/** Struct holding geometry optimised per SubMesh / lod level, ready
+		/** Struct holding geometry optimised per SubMesh / LOD level, ready
 			for copying to instances. 
 		@remarks
 			Since we're going to be duplicating geometry lots of times, it's
@@ -391,7 +391,7 @@ namespace Ogre {
 			BatchInstance* mParent;
 			/// LOD level (0 == full LOD)
 			unsigned short mLod;
-			/// lod value at which this LOD starts to apply (squared)
+			/// LOD value at which this LOD starts to apply (squared)
 			Real mLodValue;
 			/// Lookup of Material Buckets in this BatchInstance
 			MaterialBucketMap mMaterialBucketMap;
@@ -401,9 +401,9 @@ namespace Ogre {
 			LODBucket(BatchInstance* parent, unsigned short lod, Real lodValue);
 			virtual ~LODBucket();
 			BatchInstance* getParent(void) { return mParent; }
-			/// Get the lod index
+			/// Get the LOD index
 			ushort getLod(void) const { return mLod; }
-			/// Get the lod value
+			/// Get the LOD value
 			Real getLodValue(void) const { return mLodValue; }
 			/// Assign a queued submesh to this bucket, using specified mesh LOD
 			void assign(QueuedSubMesh* qsm, ushort atLod);
@@ -456,24 +456,24 @@ namespace Ogre {
 
 			ObjectsMap mInstancesMap;
 		public:
-			/// Lod values as built up - use the max at each level
+			/// LOD values as built up - use the max at each level
 			Mesh::LodValueList mLodValues;
 			/// Local AABB relative to BatchInstance centre
 			AxisAlignedBox mAABB;
 			/// Local bounding radius
 			Real mBoundingRadius;
-			/// The current lod level, as determined from the last camera
+			/// The current LOD level, as determined from the last camera
 			ushort mCurrentLod;
-			/// Current lod value, passed on to do material lod later
+			/// Current LOD value, passed on to do material LOD later
 			Real mLodValue;
-            /// Current camera, passed on to do material lod later
+            /// Current camera, passed on to do material LOD later
             Camera *mCamera;
             /// Cached squared view depth value to avoid recalculation by GeometryBucket
             Real mSquaredViewDepth;
 		protected:
 			/// List of LOD buckets			
 			LODBucketList mLodBucketList;
-            /// Lod strategy reference
+            /// LOD strategy reference
             const LodStrategy *mLodStrategy;
 
 		public:
@@ -530,7 +530,7 @@ namespace Ogre {
 			each axis.
 		*/
 		typedef map<uint32, BatchInstance*>::type BatchInstanceMap;
-		/** Simple vectors where are stored all the renderoperations of the Batch.
+		/** Simple vectors where are stored all the render operations of the Batch.
 			This vector is used when we want to delete the batch, in order to delete only one time each
 			render operation.
 
@@ -674,7 +674,7 @@ namespace Ogre {
 			this InstancedGeometry if you like. The Entity passed in is simply 
 			used as a definition.
 		@note Must be called before 'build'.
-        @note All added entities must use the same lod strategy.
+        @note All added entities must use the same LOD strategy.
 		@param ent The Entity to use as a definition (the Mesh and Materials 
 			referenced will be recorded for the build call).
 		@param position The world position at which to add this Entity
@@ -700,7 +700,7 @@ namespace Ogre {
 			versions! We don't do this for you incase you are preparing this 
 			in advance and so don't want the originals detached yet. 
 		@note Must be called before 'build'.
-        @note All added entities must use the same lod strategy.
+        @note All added entities must use the same LOD strategy.
 		@param node Pointer to the node to use to provide a set of Entity 
 			templates
 		*/
@@ -720,7 +720,7 @@ namespace Ogre {
 			/** Add a new batch instance
 		@remarks
 				This method add a new instance of the whole batch, by creating a new 
-				BatchInstance, containing new lod buckets, material buckets and geometry buckets.
+				BatchInstance, containing new LOD buckets, material buckets and geometry buckets.
 				The new geometry buckets will use the same buffers as the base bucket.
 		@note
 			no note

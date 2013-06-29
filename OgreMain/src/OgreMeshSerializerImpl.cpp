@@ -1387,7 +1387,7 @@ namespace Ogre {
         // bool manual;  (true for manual alternate meshes, false for generated)
 		readBools(stream, &(pMesh->mIsLodManual), 1);
 
-		// Preallocate submesh lod face data if not manual
+		// Preallocate submesh LOD face data if not manual
 		if (!pMesh->mIsLodManual)
 		{
 			unsigned short numsubs = pMesh->getNumSubMeshes();
@@ -2886,7 +2886,7 @@ namespace Ogre {
         unsigned short streamID, i;
 
         // Use the old strategy for this mesh
-        LodStrategy *strategy = DistanceLodStrategy::getSingletonPtr();
+        LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
@@ -2894,7 +2894,7 @@ namespace Ogre {
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mIsLodManual), 1);
 
-        // Preallocate submesh lod face data if not manual
+        // Preallocate submesh LOD face data if not manual
         if (!pMesh->mIsLodManual)
         {
             unsigned short numsubs = pMesh->getNumSubMeshes();

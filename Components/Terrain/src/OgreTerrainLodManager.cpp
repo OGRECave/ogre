@@ -127,7 +127,7 @@ namespace Ogre
 
 		if (res->succeeded())
 		{
-			// no others update Lod status
+			// no others update LOD status
 			if(lreq.currentPreparedLod == mHighestLodPrepared && lreq.currentLoadedLod == mHighestLodLoaded )
 			{
 				if( lreq.requestedLod < mHighestLodPrepared )
