@@ -7129,8 +7129,7 @@ SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderable
 	return mActiveQueuedRenderableVisitor;
 }
 //-----------------------------------------------------------------------------------
-void SceneManager::buildDiffList( uint16 level,
-						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
+void SceneManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
 						ArrayMemoryManager::PtrdiffVec &outDiffsList )
 {
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();
@@ -7142,14 +7141,13 @@ void SceneManager::buildDiffList( uint16 level,
 		{
 			Transform &transform = (*itor)->_getTransform();
 			outDiffsList.push_back( (transform.mParents + transform.mIndex) -
-									(Ogre::Node**)basePtrs[ArrayMemoryManager::Parent] );
+									(Ogre::Node**)basePtrs[NodeArrayMemoryManager::Parent] );
 		}
 		++itor;
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::applyRebase( uint16 level,
-						char *newBasePtrs[ArrayMemoryManager::NumMemoryTypes],
+void SceneManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
 						const ArrayMemoryManager::PtrdiffVec &diffsList )
 {
 	ArrayMemoryManager::PtrdiffVec::const_iterator it = diffsList.begin();
@@ -7168,17 +7166,15 @@ void SceneManager::applyRebase( uint16 level,
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::performCleanup( uint16 level,
-						const char *basePtrs[ArrayMemoryManager::NumMemoryTypes],
-						size_t startInstance, size_t diffInstances )
+void SceneManager::performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
+						size_t const *elementsMemSizes, size_t startInstance, size_t diffInstances )
 {
 	//If mSceneNodes were ordered by m_chunkBase & m_index, there would be a huge optimization to be made
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();
 	SceneNodeList::const_iterator end  = mSceneNodes.end();
 
-	const Ogre::Node **minBasePtr = (const Ogre::Node**)( basePtrs[ArrayMemoryManager::Parent] +
-									startInstance *
-									ArrayMemoryManager::ElementsMemSize[ArrayMemoryManager::Parent] );
+	const Ogre::Node **minBasePtr = (const Ogre::Node**)( basePtrs[NodeArrayMemoryManager::Parent] +
+									startInstance * elementsMemSizes[NodeArrayMemoryManager::Parent] );
 
 	while( itor != end )
 	{

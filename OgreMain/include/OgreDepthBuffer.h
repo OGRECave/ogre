@@ -151,6 +151,9 @@ namespace Ogre
 
 		void detachFromAllRenderTargets();
 	};
+
+	/** @} */
+	/** @} */
 }
 
 #include "OgreHeaderSuffix.h"
