@@ -301,15 +301,23 @@ namespace Ogre {
 
 //----------------------------------------------------------------------------
 // Set the default locale for strings
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#	if _MSC_VER >= 1700
-#		define OGRE_DEFAULT_LOCALE "en_GB"
-#	else
-// Regarding MS http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
-#		define OGRE_DEFAULT_LOCALE "uk"
-#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+//	Locales are not supported by the C lib you have to go through JNI.
+#	define OGRE_DEFAULT_LOCALE ""
 #else
-#   define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+#	if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#		if _MSC_VER >= 1700
+#			define OGRE_DEFAULT_LOCALE "en_GB"
+#		else
+// 			http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
+#			define OGRE_DEFAULT_LOCALE "uk"
+#		endif
+#	elif OGRE_COMPILER == OGRE_COMPILER_GCCE
+//		http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
+#   	define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
+#	else
+#   	define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+#	endif
 #endif
 
 //----------------------------------------------------------------------------

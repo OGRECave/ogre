@@ -84,13 +84,6 @@ THE SOFTWARE.
 #	define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                        		0x83F1
 #endif
 
-/* GL_AMD_compressed_ATC_texture */
-#if OGRE_NO_ETC_CODEC == 0 
-#	define ATC_RGB_AMD						  							0x8C92
-#	define ATC_RGBA_EXPLICIT_ALPHA_AMD		  							0x8C93
-#	define ATC_RGBA_INTERPOLATED_ALPHA_AMD	  							0x87EE
-#endif
-
 // Function pointers for FBO extension methods
 // Declare them here since we don't have GLEW to do it for us
 
