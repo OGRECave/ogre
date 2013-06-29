@@ -45,9 +45,39 @@ use_pkgconfig(Cg_PKGC Cg)
 findpkg_framework(Cg)
 
 find_path(Cg_INCLUDE_DIR NAMES cg.h HINTS ${Cg_FRAMEWORK_INCLUDES} ${Cg_INC_SEARCH_PATH} ${Cg_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Cg)
+
+if (CMAKE_CL_64)
+  set (Cg_LIB_SEARCH_PATH ${Cg_HOME}/lib.x64 ${ENV_Cg_LIB64_PATH}
+    ${ENV_Cg_HOME}/lib.x64 ${Cg_LIB_SEARCH_PATH})
+else()
+  set (Cg_LIB_SEARCH_PATH ${Cg_HOME}/lib ${ENV_Cg_LIB_PATH}
+    ${ENV_Cg_HOME}/lib ${Cg_LIB_SEARCH_PATH})
+endif()
+
 find_library(Cg_LIBRARY_REL NAMES ${Cg_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
 find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Debug)
 make_library_set(Cg_LIBRARY)
+
+if (WIN32)
+	if (CMAKE_CL_64)
+		set(Cg_BIN_SEARCH_PATH ${Cg_HOME}/bin.x64 ${ENV_Cg_BIN64_PATH} ${ENV_Cg_HOME}/bin.x64
+			${OGRE_DEPENDENCIES_DIR}/bin ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+			${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
+			${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
+			${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)
+	else()
+		set(Cg_BIN_SEARCH_PATH ${Cg_HOME}/bin ${ENV_Cg_BIN_PATH} ${ENV_Cg_HOME}/bin
+			${OGRE_DEPENDENCIES_DIR}/bin ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+			${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
+			${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
+			${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)
+	endif()
+	find_file(Cg_BINARY_REL NAMES "cg.dll" HINTS ${Cg_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" release relwithdebinfo minsizerel)
+	find_file(Cg_BINARY_DBG NAMES "cg.dll" HINTS ${Cg_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" debug )
+endif()
+mark_as_advanced(Cg_BINARY_REL Cg_BINARY_DBG)
 
 findpkg_finish(Cg)
 add_parent_dir(Cg_INCLUDE_DIRS Cg_INCLUDE_DIR)
