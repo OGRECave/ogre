@@ -71,7 +71,7 @@ namespace Ogre
 			return poolID;
 		}
 
-		void* internalAlloc(size_t a_reqSize)
+		DECL_MALLOC void* internalAlloc(size_t a_reqSize)
 		{
 			size_t poolID = poolIDFromSize(a_reqSize);
 			nedalloc::nedpool* pool(0); // A pool pointer of 0 means the default pool.
@@ -92,7 +92,7 @@ namespace Ogre
 			return nedalloc::nedpmalloc(pool, a_reqSize);
 		}
 
-		void* internalAllocAligned(size_t a_align, size_t a_reqSize)
+		DECL_MALLOC void* internalAllocAligned(size_t a_align, size_t a_reqSize)
 		{
 			size_t poolID = poolIDFromSize(a_reqSize);
 			nedalloc::nedpool* pool(0); // A pool pointer of 0 means the default pool.
@@ -138,7 +138,7 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
-	void* NedPoolingImpl::allocBytes(size_t count, 
+	DECL_MALLOC void* NedPoolingImpl::allocBytes(size_t count, 
 		const char* file, int line, const char* func)
 	{
 		void* ptr = _NedPoolingIntern::internalAlloc(count);
@@ -163,7 +163,7 @@ namespace Ogre
 		_NedPoolingIntern::internalFree(ptr);
 	}
 	//---------------------------------------------------------------------
-	void* NedPoolingImpl::allocBytesAligned(size_t align, size_t count, 
+	DECL_MALLOC void* NedPoolingImpl::allocBytesAligned(size_t align, size_t count, 
 		const char* file, int line, const char* func)
 	{
 		// default to platform SIMD alignment if none specified

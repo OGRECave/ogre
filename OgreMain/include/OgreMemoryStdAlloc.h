@@ -56,7 +56,7 @@ namespace Ogre
 	class _OgreExport StdAllocPolicy
 	{
 	public:
-		static inline void* allocateBytes(size_t count, 
+		static inline DECL_MALLOC void* allocateBytes(size_t count, 
 #if OGRE_MEMORY_TRACKER
 			const char* file = 0, int line = 0, const char* func = 0
 #else
@@ -111,7 +111,7 @@ namespace Ogre
 		typedef int IsValidAlignment
 			[Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];
 
-		static inline void* allocateBytes(size_t count, 
+		static inline DECL_MALLOC void* allocateBytes(size_t count, 
 #if OGRE_MEMORY_TRACKER
 			const char* file = 0, int line = 0, const char* func = 0
 #else
