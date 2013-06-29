@@ -98,15 +98,15 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
         Real seconds = (Real)(Root::getSingleton().getTimer()->getMilliseconds()) / 1000.0;
         Ogre::Pass* renderPass = tetrahedra->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
         //Ogre::Pass* renderPass = mOgreEnt->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
-        // if (renderPass->hasVertexProgram())
-        // {
-        //     Ogre::Vector4 constParam = Ogre::Vector4(-0.5, 0.0, 0.0, 0.2);
-        //     renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[0]", constParam);
+        if (renderPass->hasVertexProgram())
+        {
+            Ogre::Vector4 constParam = Ogre::Vector4(-0.5, 0.0, 0.0, 0.2);
+            renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[0]", constParam);
 
-        //     Ogre::Vector4 timeParam = Ogre::Vector4(
-        //         0.1 + Ogre::Math::Sin(seconds)*0.5, Ogre::Math::Cos(seconds)*0.5, 0.0, 0.1);
-        //     renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[1]", timeParam);
-        // }
+            Ogre::Vector4 timeParam = Ogre::Vector4(
+                0.1 + Ogre::Math::Sin(seconds)*0.5, Ogre::Math::Cos(seconds)*0.5, 0.0, 0.1);
+            renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[1]", timeParam);
+        }
 
         //JAJ
         //FIXME

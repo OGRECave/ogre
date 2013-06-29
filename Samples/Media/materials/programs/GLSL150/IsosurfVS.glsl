@@ -47,11 +47,11 @@ void main()
     vec3 Pos;
 
     // Generate sampling point position based on its index
-    Pos.x = float((gl_VertexID >> SizeShift.x) & SizeMask.x) / (SizeMask.x + 1);
-    Pos.y = float((gl_VertexID >> SizeShift.y) & SizeMask.y) / (SizeMask.y + 1);
-    Pos.z = float((gl_VertexID >> SizeShift.z) & SizeMask.z) / (SizeMask.z + 1);
-    Pos = Pos*2 - 1;
-    //Pos = vertex.xyz;
+    // Pos.x = float((gl_VertexID >> SizeShift.x) & SizeMask.x) / (SizeMask.x + 1);
+    // Pos.y = float((gl_VertexID >> SizeShift.y) & SizeMask.y) / (SizeMask.y + 1);
+    // Pos.z = float((gl_VertexID >> SizeShift.z) & SizeMask.z) / (SizeMask.z + 1);
+    // Pos = Pos*2 - 1;
+    Pos = vertex.xyz;
     
     // Sum up contributions from all metaballs
     vec4 Field = vec4(0,0,0,0);
@@ -62,7 +62,9 @@ void main()
     
     // Transform position and normals
     gl_Position = WorldViewProj * vec4(Pos, 1);
-    VertexOut.N = mat3(WorldViewIT) * Field.xyz;        // we want normals in world space
+    //VertexOut.N = mat3(WorldViewIT) * Field.xyz;        // we want normals in world space
+    VertexOut.N = WorldViewIT * Field.xyz;        // we want normals in world space
+
     VertexOut.Field.x = Field.w;
 
     // Generate in-out flags

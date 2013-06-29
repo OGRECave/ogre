@@ -1792,6 +1792,12 @@ namespace Ogre {
             break;
         }
 
+        if (mCurrentGeometryProgram) {
+            printf("useAdjacency: %.1u \n", useAdjacency);
+            printf("primType == %.1u \n", primType == GL_LINES_ADJACENCY);
+        }
+        
+
         // TODO: Bind atomic counter buffers here
 
         // Do tessellation rendering. Note: Only evaluation(domain) shaders are required.

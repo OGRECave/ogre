@@ -113,7 +113,7 @@ vertex_program Ogre/IsoSurf/BasicVS_GLSL glsl
 
 	default_params
 	{
-		param_named_auto WorldViewProj worldviewproj_matrix
+	    param_named_auto WorldViewProj worldviewproj_matrix
 	}
 }
 
@@ -121,10 +121,9 @@ geometry_program Ogre/IsoSurf/BasicGS_GLSL glsl
 {
 	source JAJBasicGS.glsl
 	syntax glsl150
-	uses_adjacency_information true
 }
 
-fragment_program Ogre/IsoSurf/BasicPS_GLSL glsl
+fragment_program Ogre/IsoSurf/BasicFS_GLSL glsl
 {
 	source JAJBasicFS.glsl
 	syntax glsl150
@@ -132,8 +131,8 @@ fragment_program Ogre/IsoSurf/BasicPS_GLSL glsl
 
 vertex_program Ogre/IsoSurf/SampleFieldVS unified
 {
-	//delegate Ogre/IsoSurf/SampleFieldVS_GLSL
-        delegate Ogre/IsoSurf/BasicVS_GLSL
+	delegate Ogre/IsoSurf/SampleFieldVS_GLSL
+        //delegate Ogre/IsoSurf/BasicVS_GLSL
 	delegate Ogre/IsoSurf/SampleFieldVS_HLSL
 	delegate Ogre/IsoSurf/SampleFieldVS_CG
 	default_params
@@ -144,8 +143,8 @@ vertex_program Ogre/IsoSurf/SampleFieldVS unified
 
 geometry_program Ogre/IsoSurf/TessellateTetrahedraGS unified
 {
-	//delegate Ogre/IsoSurf/TessellateTetrahedraGS_GLSL
-       	delegate Ogre/IsoSurf/BasicGS_GLSL
+	delegate Ogre/IsoSurf/TessellateTetrahedraGS_GLSL
+       	//delegate Ogre/IsoSurf/BasicGS_GLSL
 	delegate Ogre/IsoSurf/TessellateTetrahedraGS_HLSL
 	delegate Ogre/IsoSurf/TessellateTetrahedraGS_CG
 	default_params
@@ -156,8 +155,8 @@ geometry_program Ogre/IsoSurf/TessellateTetrahedraGS unified
 
 fragment_program Ogre/IsoSurf/MetaballPS unified
 {
-	//delegate Ogre/IsoSurf/MetaballPS_GLSL
-        delegate Ogre/IsoSurf/BasicFS_GLSL
+	delegate Ogre/IsoSurf/MetaballPS_GLSL
+        //delegate Ogre/IsoSurf/BasicFS_GLSL
 	delegate Ogre/IsoSurf/MetaballPS_HLSL
 	delegate Ogre/IsoSurf/MetaballPS_CG
 	default_params
@@ -177,10 +176,10 @@ material Ogre/IsoSurf/TessellateTetrahedra
 			
 			}
 			
-			geometry_program_ref Ogre/IsoSurf/TessellateTetrahedraGS
-			{
+			// geometry_program_ref Ogre/IsoSurf/TessellateTetrahedraGS
+			// {
 			
-			}
+			// }
 			
 			fragment_program_ref Ogre/IsoSurf/MetaballPS
 			{

@@ -2,7 +2,7 @@
 
 out vec4 fragColour;
 
-uniform vec4 ColourMe[2];
+uniform vec4 ColourMe[2] = vec4[](vec4(0,0,0,0),vec4(0,0,1,0));
 
 // Pixel shader
 void main()
