@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGLES2FBOMultiRenderTarget.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
 
@@ -110,10 +111,10 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
-#if GL_OES_stencil1
+#ifdef GL_OES_stencil1
         GL_STENCIL_INDEX1_OES,
 #endif
-#if GL_OES_stencil4
+#ifdef GL_OES_stencil4
         GL_STENCIL_INDEX4_OES,
 #endif
         GL_STENCIL_INDEX8
@@ -121,10 +122,10 @@ namespace Ogre {
     static const size_t stencilBits[] =
     {
         0,
-#if GL_OES_stencil1
+#ifdef GL_OES_stencil1
         1,
 #endif
-#if GL_OES_stencil4
+#ifdef GL_OES_stencil4
         4,
 #endif
         8
@@ -135,15 +136,9 @@ namespace Ogre {
     {
         GL_NONE,
         GL_DEPTH_COMPONENT16
-#if GL_OES_depth24 || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
-#endif
-#if GL_OES_depth32 || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH_COMPONENT32_OES
-#endif
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
-#endif
 #if OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH32F_STENCIL8
 #endif
@@ -151,15 +146,9 @@ namespace Ogre {
     static const size_t depthBits[] =
     {
         0,16
-#if GL_OES_depth24 || OGRE_NO_GLES3_SUPPORT == 0
         ,24
-#endif
-#if GL_OES_depth32 || OGRE_NO_GLES3_SUPPORT == 0
         ,32
-#endif
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
         ,24
-#endif
 #if OGRE_NO_GLES3_SUPPORT == 0
         ,32
 #endif
@@ -204,11 +193,9 @@ namespace Ogre {
             glBindTexture(GL_TEXTURE_2D, tid);
 
             // Set some default parameters
-#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-#elif OGRE_NO_GLES3_SUPPORT == 0
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-#endif
+            if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -369,11 +356,11 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
-#if OGRE_NO_GLES3_SUPPORT == 0
-                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
+#if OGRE_NO_GLES3_SUPPORT == 1
+                    if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") &&
+                        depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
 #else
-                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
+                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
 #endif
                     {
                         // General depth/stencil combination
@@ -411,7 +398,6 @@ namespace Ogre {
                         }
                     }
                     else
-#endif
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))
@@ -483,12 +469,10 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-#if GL_OES_packed_depth_stencil        
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
-				desirability += 5000;
-#elif OGRE_NO_GLES3_SUPPORT == 0
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8) // Prefer 24/8 packed 
-				desirability += 5000;
+            if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") || gleswIsSupported(3, 0))
+                if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
+                    desirability += 5000;
+#if OGRE_NO_GLES3_SUPPORT == 0
 			if(depthFormats[props.modes[mode].depth]==GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
 				desirability += 5000;
 #endif

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2GpuProgram.h"
+#include "OgreGLES2Util.h"
 #include "OgreRoot.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESLinkProgram.h"
@@ -865,11 +866,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tempTex));
 
-#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0));
-#elif OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
-#endif
+            if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+                OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0));
+
             // Allocate temporary texture of the size of the destination area
             OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
                          GLES2PixelUtil::optionalPO2(dstBox.getWidth()), GLES2PixelUtil::optionalPO2(dstBox.getHeight()), 
@@ -1066,11 +1065,8 @@ namespace Ogre {
         // Set texture type
         OGRE_CHECK_GL_ERROR(glBindTexture(target, id));
 
-#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000 ));
-#elif OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 ));
-#endif
+        if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000 ));
 
         // Allocate texture memory
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -1214,13 +1210,11 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
-#if GL_APPLE_framebuffer_multisample && OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 
-                                                                      mNumSamples, mGLInternalFormat, mWidth, mHeight));
-#elif OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-                                                                      mNumSamples, mGLInternalFormat, mWidth, mHeight));
-#endif
+            if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
+            {
+                OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,
+                                                                          mNumSamples, mGLInternalFormat, mWidth, mHeight));
+            }
         }
         else
         {

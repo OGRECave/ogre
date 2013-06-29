@@ -185,7 +185,7 @@ namespace Ogre {
 		}
 
         // Check that a valid material was provided
-        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
+        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
 
 		if( material.isNull() )
 		{
@@ -194,7 +194,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite");
+			material = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
 
 			if (material.isNull())
 			{
@@ -1100,7 +1100,7 @@ namespace Ogre {
 		{
 			// Load from default group. If user wants to use alternate groups,
 			// they can define it and preload
-			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName);
+			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName).staticCast<Material>();
 		}
 		return mMaterial;
 	}

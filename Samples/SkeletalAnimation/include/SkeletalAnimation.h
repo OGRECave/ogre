@@ -158,7 +158,7 @@ protected:
 #ifdef USE_RTSHADER_SYSTEM
             if (mShaderGenerator->getTargetLanguage() == "glsles")
             {
-                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
+                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua").staticCast<Material>();
                 mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
             }
 #endif
@@ -224,7 +224,7 @@ protected:
 	{
 		// get the skeleton, animation, and the node track iterator
 		SkeletonPtr skel = SkeletonManager::getSingleton().load("jaiqua.skeleton",
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
 		Animation* anim = skel->getAnimation("Sneak");
 		Animation::NodeTrackIterator tracks = anim->getNodeTrackIterator();
 

@@ -156,14 +156,14 @@ namespace Ogre
 			return AllocPolicy::getMaxAllocationSize();
 		}
 
-        // FIXME: Really this is a C++11 issue. This function is only supported in C++03 and earlier but since there is no good way to check the all compilers for support we'll just go with a libc++ check for now.
-#if OGRE_NO_LIBCPP_SUPPORT == 1
+#if __cplusplus < 201103L
 		void construct(pointer p)
 		{
 			// call placement new
 			new(static_cast<void*>(p)) T();
 		}
 #endif
+
 		void construct(pointer p, const T& val)
 		{
 			// call placement new

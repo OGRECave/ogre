@@ -942,26 +942,6 @@ namespace Ogre {
 
     };
 
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to MeshPtr 
-    @note Has to be a subclass since we need operator=.
-        We could templatise this instead of repeating per Resource subclass, 
-        except to do so requires a form VC6 does not support i.e.
-        ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport MeshPtr : public SharedPtr<Mesh> 
-    {
-    public:
-        MeshPtr() : SharedPtr<Mesh>() {}
-        explicit MeshPtr(Mesh* rep) : SharedPtr<Mesh>(rep) {}
-        MeshPtr(const MeshPtr& r) : SharedPtr<Mesh>(r) {} 
-        MeshPtr(const ResourcePtr& r);
-        /// Operator used to convert a ResourcePtr to a MeshPtr.
-        MeshPtr& operator=(const ResourcePtr& r);
-    protected:
-        /// Override destroy since we need to delete Mesh after fully defined.
-        void destroy(void);
-    };
-
     /** A way of recording the way each LODs is recorded this Mesh. */
     struct MeshLodUsage
     {

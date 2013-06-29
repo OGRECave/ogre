@@ -38,7 +38,9 @@ THE SOFTWARE.
 
 #include <X11/extensions/Xrandr.h>
 
+#if OGRE_THREAD_SUPPORT != 1
 GLenum glxewContextInit(Ogre::GLSupport *glSupport);
+#endif
 
 static Display *_currentDisplay;
 static Display *_getCurrentDisplay(void) { return _currentDisplay; }
@@ -979,7 +981,11 @@ namespace Ogre
 		
 		glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)_getCurrentDisplay;
 		
+#if OGRE_THREAD_SUPPORT != 1
 		if (glxewContextInit(this) != GLEW_OK)
+#else
+		if (glxewContextInit(glxewGetContext()) != GLEW_OK)
+#endif
 		{
 			XCloseDisplay (mGLDisplay);
 			XCloseDisplay (mXDisplay);
@@ -988,4 +994,23 @@ namespace Ogre
 		
 		glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)getProcAddress("glXGetCurrentDisplay");
 	}
+
+#if OGRE_THREAD_SUPPORT == 1
+	GLXEWContext* glxewGetContext()
+	{
+		using namespace Ogre;
+		static OGRE_THREAD_POINTER_VAR(GLXEWContext, GLXEWContextsPtr);
+
+		GLXEWContext * currentGLXEWContextsPtr = OGRE_THREAD_POINTER_GET(GLXEWContextsPtr);
+		if (currentGLXEWContextsPtr == NULL)
+		{
+			currentGLXEWContextsPtr = new GLXEWContext();
+			OGRE_THREAD_POINTER_SET(GLXEWContextsPtr, currentGLXEWContextsPtr);
+			memset(currentGLXEWContextsPtr, 0, sizeof(GLXEWContext));
+			glxewInit();
+		}
+		return currentGLXEWContextsPtr;
+	}
+#endif
 }
+

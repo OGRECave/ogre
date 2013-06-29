@@ -9,32 +9,8 @@
 
 # Configure BSP SceneManager build
 
-set (HEADER_FILES
-  include/OgreBspLevel.h
-  include/OgreBspNode.h
-  include/OgreBspPrerequisites.h
-  include/OgreBspResourceManager.h
-  include/OgreBspSceneManager.h
-  include/OgreBspSceneManagerPlugin.h
-  include/OgreBspSceneNode.h
-  include/OgreQuake3Level.h
-  include/OgreQuake3Shader.h
-  include/OgreQuake3ShaderManager.h
-  include/OgreQuake3Types.h
-)
-
-set (SOURCE_FILES
-  src/OgreBspLevel.cpp
-  src/OgreBspNode.cpp
-  src/OgreBspResourceManager.cpp
-  src/OgreBspSceneManager.cpp
-  src/OgreBspSceneManagerDll.cpp
-  src/OgreBspSceneManagerPlugin.cpp
-  src/OgreBspSceneNode.cpp
-  src/OgreQuake3Level.cpp
-  src/OgreQuake3Shader.cpp
-  src/OgreQuake3ShaderManager.cpp
-)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)

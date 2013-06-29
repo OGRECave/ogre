@@ -48,56 +48,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    MeshPtr::MeshPtr(const ResourcePtr& r) : SharedPtr<Mesh>()
-    {
-		// lock & copy other mutex pointer
-        OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-        {
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<Mesh*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
-    MeshPtr& MeshPtr::operator=(const ResourcePtr& r)
-    {
-        if (pRep == static_cast<Mesh*>(r.getPointer()))
-            return *this;
-        release();
-		// lock & copy other mutex pointer
-        OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-        {
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<Mesh*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-		else
-		{
-			// RHS must be a null pointer
-			assert(r.isNull() && "RHS must be null if it has no mutex!");
-			setNull();
-		}
-        return *this;
-    }
-    //-----------------------------------------------------------------------
-    void MeshPtr::destroy(void)
-    {
-        // We're only overriding so that we can destroy after full definition of Mesh
-        SharedPtr<Mesh>::destroy();
-    }
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
     Mesh::Mesh(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : Resource(creator, name, handle, group, isManual, loader),
@@ -513,7 +463,7 @@ namespace Ogre {
 			{
 				// Load skeleton
 				try {
-					mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup);
+					mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 				}
 				catch (...)
 				{

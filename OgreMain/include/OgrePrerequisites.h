@@ -119,9 +119,6 @@ namespace Ogre {
     typedef unsigned int uint;
 	typedef unsigned long ulong;
 
-	// Useful threading defines
-#include "Threading/OgreThreadDefines.h"
-
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
@@ -163,7 +160,6 @@ namespace Ogre {
     class FrameListener;
     class Frustum;
     class GpuProgram;
-    class GpuProgramPtr;
     class GpuProgramManager;
 	class GpuProgramUsage;
     class HardwareIndexBuffer;
@@ -172,7 +168,6 @@ namespace Ogre {
 	class HardwarePixelBuffer;
     class HardwarePixelBufferSharedPtr;
 	class HighLevelGpuProgram;
-    class HighLevelGpuProgramPtr;
 	class HighLevelGpuProgramManager;
 	class HighLevelGpuProgramFactory;
     class IndexData;
@@ -194,14 +189,12 @@ namespace Ogre {
 	class ManualResourceLoader;
 	class ManualObject;
     class Material;
-    class MaterialPtr;
     class MaterialManager;
     class Math;
     class Matrix3;
     class Matrix4;
     class MemoryManager;
     class Mesh;
-    class MeshPtr;
     class MeshSerializer;
     class MeshSerializerImpl;
     class MeshManager;
@@ -278,7 +271,6 @@ namespace Ogre {
     class SimpleRenderable;
     class SimpleSpline;
     class Skeleton;
-    class SkeletonPtr;
     class SkeletonInstance;
     class SkeletonManager;
     class Sphere;
@@ -295,7 +287,6 @@ namespace Ogre {
 	class ExternalTextureSource;
     class TextureUnitState;
     class Texture;
-    class TexturePtr;
     class TextureManager;
     class TransformKeyFrame;
 	class Timer;
@@ -320,6 +311,17 @@ namespace Ogre {
     class CompositionPass;
     class CompositionTargetPass;
 	class CustomCompositionPass;
+
+    template<typename T> class SharedPtr;
+    typedef SharedPtr<Compositor> CompositorPtr;
+    typedef SharedPtr<GpuProgram> GpuProgramPtr;
+    typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
+    typedef SharedPtr<Material> MaterialPtr;
+    typedef SharedPtr<Mesh> MeshPtr;
+    typedef SharedPtr<PatchMesh> PatchMeshPtr;
+    typedef SharedPtr<Resource> ResourcePtr;
+    typedef SharedPtr<Skeleton> SkeletonPtr;
+    typedef SharedPtr<Texture> TexturePtr;
 }
 
 /* Include all the standard header *after* all the configuration

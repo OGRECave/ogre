@@ -87,7 +87,7 @@ namespace Ogre {
 			i != mLinkedSkeletonAnimSourceList.end(); ++i)
 		{
 			i->pSkeleton = SkeletonManager::getSingleton().load(
-				i->skeletonName, mGroup);
+				i->skeletonName, mGroup).staticCast<Skeleton>();
 		}
 
 
@@ -706,7 +706,7 @@ namespace Ogre {
 		{
 			// Load immediately
 			SkeletonPtr skelPtr = 
-				SkeletonManager::getSingleton().load(skelName, mGroup);
+				SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 			mLinkedSkeletonAnimSourceList.push_back(
 				LinkedSkeletonAnimationSource(skelName, scale, skelPtr));
 

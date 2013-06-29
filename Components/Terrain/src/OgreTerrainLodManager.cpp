@@ -38,21 +38,25 @@ namespace Ogre
 	const uint32 TerrainLodManager::TERRAINLODDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TLDA");
 	const uint16 TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION = 1;
 
-	TerrainLodManager::TerrainLodManager(Terrain* t)
+	TerrainLodManager::TerrainLodManager(Terrain* t, DataStreamPtr& stream)
+		: mTerrain(t)
 	{
-		init(t);
-		mHighestLodPrepared = 0;
+		init();
+		mDataStream = stream;
+		mStreamOffset = mDataStream.isNull() ? 0 : mDataStream->tell();
 	}
 
 	TerrainLodManager::TerrainLodManager(Terrain* t, const String& filename)
+		: mTerrain(t), mStreamOffset(0)
 	{
-		init(t);
-		mDatafile = filename;
+		init();
+
+		if(!filename.empty() && filename.length() > 0)
+			mDataStream = Root::getSingleton().openFileStream(filename, mTerrain->_getDerivedResourceGroup());
 	}
 
-	void TerrainLodManager::init(Terrain* t)
+	void TerrainLodManager::init()
 	{
-		mTerrain = t;
 		mHighestLodPrepared = -1;
 		mHighestLodLoaded = -1;
 		mTargetLodLevel = -1;
@@ -306,11 +310,12 @@ namespace Ogre
 
 	void TerrainLodManager::readLodData(uint16 lowerLodBound, uint16 higherLodBound)
 	{
-		uint16 numLodLevels = mTerrain->getNumLodLevels();
+		if(mDataStream.isNull()) // No file to read from
+			return;
 
-		DataStreamPtr dStream = Root::getSingleton().openFileStream(mDatafile,
-			mTerrain->_getDerivedResourceGroup());
-		StreamSerialiser stream(dStream);
+		uint16 numLodLevels = mTerrain->getNumLodLevels();
+		mDataStream->seek(mStreamOffset);
+		StreamSerialiser stream(mDataStream);
 
         const StreamSerialiser::Chunk *mainChunk = stream.readChunkBegin(Terrain::TERRAIN_CHUNK_ID, Terrain::TERRAIN_CHUNK_VERSION);
 

@@ -31,12 +31,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreGLSLESProgram.h"
 
-// Apple doesn't define this in their extension.  We'll do it just for convenience.
-// Using the value from desktop GL
-#if GL_EXT_shadow_samplers
-#define GL_SAMPLER_2D_SHADOW_EXT 0x8B62
-#endif
-
 namespace Ogre {
 
 	//-----------------------------------------------------------------------

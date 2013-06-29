@@ -62,7 +62,7 @@ namespace Ogre
 			mRecreateParams = true;
 		}
 
-		mProgram = GpuProgramManager::getSingleton().getByName(name);
+        mProgram = GpuProgramManager::getSingleton().getByName(name).staticCast<GpuProgram>();
 
         if (mProgram.isNull())
         {
@@ -82,6 +82,10 @@ namespace Ogre
 			else if (mType == GPT_HULL_PROGRAM)
 			{
 				progType = "hull";
+			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				progType = "compute";
 			}
 
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -164,6 +168,10 @@ namespace Ogre
 			{
 				myType = "hull";
 			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				myType = "compute";
+			}
 
 			String yourType = "fragment";
 			if (mProgram->getType() == GPT_VERTEX_PROGRAM)
@@ -181,6 +189,10 @@ namespace Ogre
 			else if (mProgram->getType() == GPT_HULL_PROGRAM)
 			{
 				yourType = "hull";
+			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				yourType = "compute";
 			}
 
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 

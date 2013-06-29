@@ -56,6 +56,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre {
 	/** \addtogroup Core

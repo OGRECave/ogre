@@ -204,19 +204,17 @@ namespace Ogre {
 
 				// Get buffer size
 				GLint binaryLength = 0;
-#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
-				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-#endif
+                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                    OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 
                 // Create microcode
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
 
-#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
 				// Get binary
-				OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
+                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                    OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
                                                           newMicrocode->getPtr() + sizeof(GLenum)));
-#endif
 
         		// Add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);

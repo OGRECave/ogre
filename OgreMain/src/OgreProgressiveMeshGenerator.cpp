@@ -95,7 +95,7 @@ void ProgressiveMeshGeneratorBase::generateAutoconfiguredLodLevels( MeshPtr& mes
 
 ProgressiveMeshGenerator::ProgressiveMeshGenerator() :
     mUniqueVertexSet((UniqueVertexSet::size_type) 0, (const UniqueVertexSet::hasher&) PMVertexHash(this)),
-    mMesh(NULL), mMeshBoundingSphereRadius(0.0f),
+    mMesh(), mMeshBoundingSphereRadius(0.0f),
     mCollapseCostLimit(NEVER_COLLAPSE_COST)
 {
 	OgreAssert(NEVER_COLLAPSE_COST < UNINITIALIZED_COLLAPSE_COST && NEVER_COLLAPSE_COST != UNINITIALIZED_COLLAPSE_COST, "");

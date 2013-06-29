@@ -4334,7 +4334,7 @@ namespace Ogre{
 			//Register the unsupported program so that materials that use it know that
 			//it exists but is unsupported
 			GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name, 
-					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax);
+					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax).staticCast<GpuProgram>();
 			return;
 		}
 

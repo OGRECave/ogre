@@ -117,13 +117,6 @@ extern "C" {
 }
 #endif
 
-#if OGRE_THREAD_SUPPORT
-#	if !defined(NOMINMAX) && defined(_MSC_VER)
-#		define NOMINMAX // required to stop windows.h messing up std::min
-#	endif
-#   include "Threading/OgreThreadHeaders.h"
-#endif
-
 #if defined ( OGRE_GCC_VISIBILITY ) && ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !__LP64__) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)
 #   pragma GCC visibility pop
 #endif

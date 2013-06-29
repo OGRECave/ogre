@@ -50,15 +50,9 @@ namespace Ogre
 			case GL_DEPTH_COMPONENT16:
 				mBitDepth = 16;
 				break;
-#if GL_OES_depth24
 			case GL_DEPTH_COMPONENT24_OES:
-#endif
-#if GL_OES_depth32
             case GL_DEPTH_COMPONENT32_OES:
-#endif
-#if GL_OES_packed_depth_stencil
             case GL_DEPTH24_STENCIL8_OES:  // Packed depth / stencil
-#endif
 				mBitDepth = 32;
 				break;
 			}

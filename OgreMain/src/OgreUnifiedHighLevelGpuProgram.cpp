@@ -71,7 +71,7 @@ namespace Ogre
 			i != mDelegateNames.end(); ++i)
 		{
 			HighLevelGpuProgramPtr deleg = 
-				HighLevelGpuProgramManager::getSingleton().getByName(*i);
+				HighLevelGpuProgramManager::getSingleton().getByName(*i).staticCast<HighLevelGpuProgram>();
 
 			// Silently ignore missing links
 			if(!deleg.isNull()

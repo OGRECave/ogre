@@ -885,7 +885,7 @@ namespace Ogre {
     if(curItem.member != NULL)                       \
         length = strlen(curItem.member);             \
     newMicrocode->write(&length, sizeof(uint16));    \
-    if(length == 0) continue;                        \
+    if(length != 0)                                  \
     newMicrocode->write(curItem.member, length);     \
                 }
 
@@ -1469,7 +1469,7 @@ namespace Ogre {
         // this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
         if ( !mAssemblerProgram.isNull() )
         {
-            *( mAssemblerProgram.useCountPointer() ) = 0;
+            mAssemblerProgram.setUseCount(0);
             mAssemblerProgram.setNull();
         }
 

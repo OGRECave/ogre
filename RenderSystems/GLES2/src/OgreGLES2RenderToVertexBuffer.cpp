@@ -31,7 +31,7 @@ THE SOFTWARE.
 #if OGRE_NO_GLES3_SUPPORT == 0
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
-#include "OgreGLES2Vertexdeclaration.h"
+#include "OgreGLES2VertexDeclaration.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"

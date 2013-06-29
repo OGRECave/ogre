@@ -173,62 +173,6 @@ namespace Ogre {
 		typedef map<String,MultiRenderTarget*>::type GlobalMRTMap;
 		GlobalMRTMap mGlobalMRTs;
     };
-
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to CompositorPtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport CompositorPtr : public SharedPtr<Compositor> 
-    {
-    public:
-        CompositorPtr() : SharedPtr<Compositor>() {}
-        explicit CompositorPtr(Compositor* rep) : SharedPtr<Compositor>(rep) {}
-        CompositorPtr(const CompositorPtr& r) : SharedPtr<Compositor>(r) {} 
-        CompositorPtr(const ResourcePtr& r) : SharedPtr<Compositor>()
-        {
-            // lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<Compositor*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a CompositorPtr
-        CompositorPtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<Compositor*>(r.getPointer()))
-                return *this;
-            release();
-            // lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<Compositor*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
-    };
 	/** @} */
 	/** @} */
 }

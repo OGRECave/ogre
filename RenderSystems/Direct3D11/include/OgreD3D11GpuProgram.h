@@ -142,52 +142,6 @@ namespace Ogre {
 		void unloadImpl(void);
 		void loadFromMicrocode(ID3D10Blob *  microcode);
 	};
-
-	/** Specialisation of SharedPtr to allow SharedPtr to be assigned to D3D11GpuProgramPtr 
-	@note Has to be a subclass since we need operator=.
-	We could templatise this instead of repeating per Resource subclass, 
-	except to do so requires a form VC6 does not support i.e.
-	ResourceSubclassPtr<T> : public SharedPtr<T>
-	*/
-	class _OgreExport D3D11GpuProgramPtr : public SharedPtr<D3D11GpuProgram> 
-	{
-	public:
-		D3D11GpuProgramPtr() : SharedPtr<D3D11GpuProgram>() {}
-		explicit D3D11GpuProgramPtr(D3D11GpuProgram* rep) : SharedPtr<D3D11GpuProgram>(rep) {}
-		D3D11GpuProgramPtr(const D3D11GpuProgramPtr& r) : SharedPtr<D3D11GpuProgram>(r) {} 
-		D3D11GpuProgramPtr(const ResourcePtr& r) : SharedPtr<D3D11GpuProgram>()
-		{
-			// lock & copy other mutex pointer
-                    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                    
-				pRep = static_cast<D3D11GpuProgram*>(r.getPointer());
-			pUseCount = r.useCountPointer();
-			if (pUseCount)
-			{
-				++(*pUseCount);
-			}
-		}
-
-		/// Operator used to convert a ResourcePtr to a D3D11GpuProgramPtr
-		D3D11GpuProgramPtr& operator=(const ResourcePtr& r)
-		{
-			if (pRep == static_cast<D3D11GpuProgram*>(r.getPointer()))
-				return *this;
-			release();
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                        OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-				pRep = static_cast<D3D11GpuProgram*>(r.getPointer());
-			pUseCount = r.useCountPointer();
-			if (pUseCount)
-			{
-				++(*pUseCount);
-			}
-			return *this;
-		}
-	};
-
 }
 
 
