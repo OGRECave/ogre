@@ -221,7 +221,7 @@ namespace Ogre {
         rsc->setDriverVersion(mDriverVersion);
 
         const char* deviceName = (const char*)glGetString(GL_RENDERER);
-        const char* vendorName = (const char*)glGetString(GL_VENDOR);        
+        const char* vendorName = (const char*)glGetString(GL_VENDOR);
         if (deviceName)
         {
             rsc->setDeviceName(deviceName);
@@ -250,7 +250,7 @@ namespace Ogre {
             disableAutoMip = true;
 #endif
         // The Intel 915G frequently corrupts textures when using hardware mip generation
-        // I'm not currently sure how many generations of hardware this affects, 
+        // I'm not currently sure how many generations of hardware this affects,
         // so for now, be safe.
         if (rsc->getVendor() == GPU_INTEL)
             disableAutoMip = true;
@@ -420,7 +420,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
         rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
-        
+
         GLint maxOutputVertices;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
         rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
@@ -433,7 +433,7 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_TESSELATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELATION_DOMAIN_PROGRAM);
-        
+
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
 
             // 16 boolean params allowed
@@ -467,7 +467,7 @@ namespace Ogre {
 
         // OpenGL 3.0 requires a minimum of 16 texture image units
         units = std::max<GLint>(16, units);
-        
+
         rsc->setNumVertexTextureUnits(static_cast<ushort>(units));
         if (units > 0)
         {
@@ -480,7 +480,7 @@ namespace Ogre {
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
-                
+
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 
@@ -520,7 +520,7 @@ namespace Ogre {
             caps->log(defaultLog);
         }
 
-        // Create the texture manager        
+        // Create the texture manager
         mTextureManager = new GL3PlusTextureManager(*mGLSupport);
 
         if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
@@ -564,13 +564,13 @@ namespace Ogre {
         mTextureManager = 0;
 
         // Delete extra threads contexts
-        for (GL3PlusContextList::iterator i = mBackgroundContextList.begin(); 
+        for (GL3PlusContextList::iterator i = mBackgroundContextList.begin();
              i != mBackgroundContextList.end(); ++i)
         {
             GL3PlusContext* pCurContext = *i;
-            
+
             pCurContext->releaseContext();
-            
+
             delete pCurContext;
         }
         mBackgroundContextList.clear();
@@ -579,32 +579,32 @@ namespace Ogre {
         mStopRendering = true;
 
         mGLInitialised = 0;
-                
+
         RenderSystem::shutdown();
     }
 
-    bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+    bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
                                                    RenderWindowList& createdWindows)
-    {               
+    {
         // Call base render system method.
         if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
             return false;
-        
+
         // Simply call _createRenderWindow in a loop.
         for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
         {
-            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];                        
+            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];
             RenderWindow* curWindow = NULL;
-            
-            curWindow = _createRenderWindow(curRenderWindowDescription.name, 
-                                            curRenderWindowDescription.width, 
-                                            curRenderWindowDescription.height, 
-                                            curRenderWindowDescription.useFullScreen, 
+
+            curWindow = _createRenderWindow(curRenderWindowDescription.name,
+                                            curRenderWindowDescription.width,
+                                            curRenderWindowDescription.height,
+                                            curRenderWindowDescription.useFullScreen,
                                             &curRenderWindowDescription.miscParams);
-            
-            createdWindows.push_back(curWindow);                                                                                    
+
+            createdWindows.push_back(curWindow);
         }
-        
+
         return true;
     }
 
@@ -646,7 +646,7 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
-                        
+
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
             {
@@ -656,7 +656,7 @@ namespace Ogre {
                 if (tokens.size() > 2)
                     mDriverVersion.release = StringConverter::parseInt(tokens[2]);
             }
-            
+
             if(mDriverVersion.major < 3)
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                             "Driver does not support at least OpenGL 3.0.",
@@ -842,13 +842,13 @@ namespace Ogre {
             mClipPlanesDirty = true;
     }
 
-    void GL3PlusRenderSystem::_setPointParameters(Real size, 
+    void GL3PlusRenderSystem::_setPointParameters(Real size,
                                                   bool attenuationEnabled, Real constant, Real linear, Real quadratic,
                                                   Real minSize, Real maxSize)
     {
         float val[4] = {1, 0, 0, 1};
-                
-        if(attenuationEnabled) 
+
+        if(attenuationEnabled)
         {
             // Point size is still calculated in pixels even when attenuation is
             // enabled, which is pretty awkward, since you typically want a viewport
@@ -865,7 +865,7 @@ namespace Ogre {
             val[1] = linear * correction;
             val[2] = quadratic * correction;
             val[3] = 1;
-                        
+
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
                 if(gl3wIsSupported(3, 2))
@@ -892,7 +892,7 @@ namespace Ogre {
                 }
             }
         }
-                
+
         // no scaling required
         // GL has no disabled flag for this so just set to constant
         OGRE_CHECK_GL_ERROR(glPointSize(size));
@@ -1039,7 +1039,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glEnable(GL_BLEND));
             OGRE_CHECK_GL_ERROR(glBlendFunc(sourceBlend, destBlend));
         }
-        
+
         GLint func = GL_FUNC_ADD;
         switch(op)
         {
@@ -1072,8 +1072,8 @@ namespace Ogre {
         GLenum destBlend = getBlendMode(destFactor);
         GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
         GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
-        
-        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+
+        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
         {
             OGRE_CHECK_GL_ERROR(glDisable(GL_BLEND));
@@ -1083,9 +1083,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glEnable(GL_BLEND));
             OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha));
         }
-        
+
         GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
-        
+
         switch(op)
         {
         case SBO_ADD:
@@ -1104,7 +1104,7 @@ namespace Ogre {
             func = GL_MAX;
             break;
         }
-        
+
         switch(alphaOp)
         {
         case SBO_ADD:
@@ -1123,7 +1123,7 @@ namespace Ogre {
             alphaFunc = GL_MAX;
             break;
         }
-        
+
         OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
     }
 
@@ -1163,25 +1163,25 @@ namespace Ogre {
         else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
-            
+
             target = vp->getTarget();
             _setRenderTarget(target);
             mActiveViewport = vp;
-            
+
             GLsizei x, y, w, h;
-            
+
             // Calculate the "lower-left" corner of the viewport
             w = vp->getActualWidth();
             h = vp->getActualHeight();
             x = vp->getActualLeft();
             y = vp->getActualTop();
-            
+
             if (target && !target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
                 y = target->getHeight() - h - y;
             }
-            
+
             OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
 
             // Configure the viewport clipping
@@ -1214,7 +1214,7 @@ namespace Ogre {
         unbindGpuProgram(GPT_VERTEX_PROGRAM);
         unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
         unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
-        
+
         if(mDriverVersion.major >= 4)
         {
             unbindGpuProgram(GPT_HULL_PROGRAM);
@@ -1255,7 +1255,7 @@ namespace Ogre {
             }
             break;
         case CULL_ANTICLOCKWISE:
-            if (mActiveRenderTarget && 
+            if (mActiveRenderTarget &&
                 ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
                  (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)))
             {
@@ -1449,7 +1449,7 @@ namespace Ogre {
                                                            bool forGpuProgram)
     {
         // Thanks to Eric Lenyel for posting this calculation at www.terathon.com
-        
+
         // Calculate the clip-space corner point opposite the clipping plane
         // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
         // transform it into camera space by multiplying it
@@ -1469,12 +1469,12 @@ namespace Ogre {
         matrix[2][0] = c.x;
         matrix[2][1] = c.y;
         matrix[2][2] = c.z + 1.0F;
-        matrix[2][3] = c.w; 
+        matrix[2][3] = c.w;
     }
 
     HardwareOcclusionQuery* GL3PlusRenderSystem::createHardwareOcclusionQuery(void)
     {
-        GL3PlusHardwareOcclusionQuery* ret = new GL3PlusHardwareOcclusionQuery(); 
+        GL3PlusHardwareOcclusionQuery* ret = new GL3PlusHardwareOcclusionQuery();
         mHwOcclusionQueries.push_back(ret);
         return ret;
     }
@@ -1676,12 +1676,12 @@ namespace Ogre {
 
         if (!activateGLTextureUnit(unit))
             return;
-        
+
         GLfloat largest_supported_anisotropy = 0;
         OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy));
 
         if (maxAnisotropy > largest_supported_anisotropy)
-            maxAnisotropy = largest_supported_anisotropy ? 
+            maxAnisotropy = largest_supported_anisotropy ?
                 static_cast<uint>(largest_supported_anisotropy) : 1;
         if (_getCurrentAnisotropy(unit) != maxAnisotropy)
             OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
@@ -1697,11 +1697,11 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL)) 
+                                !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
             || op.vertexData->vertexBufferBinding->hasInstanceData();
-        
+
         size_t numberOfInstances = op.numberOfInstances;
-        
+
         if (op.useGlobalInstancingVertexBufferIsAvailable)
         {
             numberOfInstances *= getGlobalNumberOfInstances();
@@ -1745,20 +1745,20 @@ namespace Ogre {
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
                 continue; // skip unbound elements
 
-            HardwareVertexBufferSharedPtr vertexBuffer = 
+            HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
-            
-            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, 
+
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
                                    mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
         }
-        
+
         if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
         {
             elemEnd = globalVertexDeclaration->getElements().end();
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
                 const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, 
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
                                        mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
             }
         }
@@ -1794,9 +1794,10 @@ namespace Ogre {
 
         if (mCurrentGeometryProgram) {
             printf("useAdjacency: %.1u \n", useAdjacency);
-            printf("primType == %.1u \n", primType == GL_LINES_ADJACENCY);
+            printf("primType == GL_LINES_ADJACENCY: %.1u \n", primType == GL_LINES_ADJACENCY);
+            printf("primType == GL_TRIANGLES: %.1u \n", primType == GL_TRIANGLES);
         }
-        
+
 
         // TODO: Bind atomic counter buffers here
 
@@ -1837,7 +1838,7 @@ namespace Ogre {
             //TODO Find better solution for showing tessellated mesh.
             //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode == GL_LINE_STRIP ? GL_LINE : mPolygonMode));
             //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
-            
+
             if(op.useIndexes)
             {
                 //printf("YES INDEX\n");
@@ -2110,7 +2111,7 @@ namespace Ogre {
             mCurrentGeometryProgram->unbindProgram();
         if (mCurrentFragmentProgram)
             mCurrentFragmentProgram->unbindProgram();
-        
+
         // Disable textures
         _disableTextureUnitsFrom(0);
 
@@ -2134,7 +2135,7 @@ namespace Ogre {
             mCurrentGeometryProgram->bindProgram();
         if (mCurrentFragmentProgram)
             mCurrentFragmentProgram->bindProgram();
-        
+
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
@@ -2177,7 +2178,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glEnable(GL_MULTISAMPLE));
             LogManager::getSingleton().logMessage("Using FSAA.");
         }
-        
+
         if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || gl3wIsSupported(3, 2))
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
@@ -2272,7 +2273,7 @@ namespace Ogre {
             if (target->isHardwareGammaEnabled())
             {
                 OGRE_CHECK_GL_ERROR(glEnable(GL_FRAMEBUFFER_SRGB));
-                
+
                 // Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE here before
                 // enabling, but GL spec says incapable surfaces ignore the setting
                 // anyway. We test the capability to enable isHardwareGammaEnabled.
@@ -2338,23 +2339,23 @@ namespace Ogre {
     void GL3PlusRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         GL3PlusGpuProgram* glprg = static_cast<GL3PlusGpuProgram*>(prg);
-        
-        // Unbind previous gpu program first.
+
+        // Unbind previous GPU program first.
         //
         // Note:
         //  1. Even if both previous and current are the same object, we can't
         //     bypass re-bind completely since the object itself may be modified.
-        //     But we can bypass unbind based on the assumption that object
-        //     internally GL program type shouldn't be changed after it has
-        //     been created. The behavior of bind to a GL program type twice
-        //     should be same as unbind and rebind that GL program type, even
-        //     for different objects.
+        //     But we can bypass unbind based on the assumption that the object's
+        //     internal GL program type shouldn't change after object creation.
+        //     The behavior of binding to a GL program type twice
+        //     should be the same as unbinding and rebinding that GL program type,
+        //     even for different objects.
         //  2. We also assumed that the program's type (vertex or fragment) should
-        //     not be changed during it's in using. If not, the following switch
+        //     not change during its use. If not, the following switch
         //     statement will confuse GL state completely, and we can't fix it
-        //     here. To fix this case, we must coding the program implementation
-        //     itself, if type is changing (during load/unload, etc), and it's in use,
-        //     unbind and notify render system to correct for its state.
+        //     here. To fix this case we must code the program implementation
+        //     itself: if type is changing (during load/unload, etc), and it's in 
+        //     use, unbind and notify render system to correct for its state.
         //
         switch (glprg->getType())
         {
@@ -2366,7 +2367,7 @@ namespace Ogre {
                 mCurrentVertexProgram = glprg;
             }
             break;
-                
+
         case GPT_FRAGMENT_PROGRAM:
             if (mCurrentFragmentProgram != glprg)
             {
@@ -2410,7 +2411,7 @@ namespace Ogre {
         default:
             break;
         }
-        
+
         // Bind the program
         glprg->bindProgram();
 
@@ -2570,22 +2571,22 @@ namespace Ogre {
         // This is only valid once we've created the main context
         if (!mMainContext)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Cannot register a background thread before the main context "
-                        "has been created.", 
+                        "has been created.",
                         "GL3PlusRenderSystem::registerThread");
         }
-        
+
         // Create a new context for this thread. Cloning from the main context
         // will ensure that resources are shared with the main context
         // We want a separate context so that we can safely create GL
         // objects in parallel with the main thread
         GL3PlusContext* newContext = mMainContext->clone();
         mBackgroundContextList.push_back(newContext);
-        
-        // Bind this new context to this thread. 
+
+        // Bind this new context to this thread.
         newContext->setCurrent();
-        
+
         _oneTimeContextInitialization();
         newContext->setInitialized();
     }
@@ -2677,12 +2678,12 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
                                                       HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                      vector<GLuint>::type &attribsBound, 
+                                                      vector<GLuint>::type &attribsBound,
                                                       vector<GLuint>::type &instanceAttribsBound,
                                                       bool updateVAO)
     {
         void* pBufferData = 0;
-        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get()); 
+        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         //        if (updateVAO)
