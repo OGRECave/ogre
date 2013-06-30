@@ -79,9 +79,6 @@ namespace Ogre {
 		void _unmap(ID3D11Resource *res);
 		void _unmapstagingbuffer(bool copyback = true);
 		void _unmapstaticbuffer();
-
-        void _genSoftwareMipmaps( const PixelBox &src, const MemoryDataStreamPtr & buf );
-
 	public:
 		D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
 			size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage);
