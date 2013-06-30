@@ -1,11 +1,9 @@
 #version 400 core
 
-// Tessellation Evaluation Shader (Domain Shader in HLSL)
-
 uniform mat4 g_mWorldViewProjection;
 
+// GLSL tessellation evaluation shader (domain shader in HLSL).
 layout(triangles, equal_spacing, cw) in;
-
 void main()
 {
     // Baricentric interpolation

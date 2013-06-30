@@ -1,9 +1,8 @@
 #version 400 core
 
-// GLSL Control shader
-
 uniform float g_fTessellationFactor;
 
+// GLSL tessellation control shader.
 layout (vertices = 3) out;
 void main()
 {
