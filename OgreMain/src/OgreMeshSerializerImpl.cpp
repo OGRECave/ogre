@@ -1380,6 +1380,11 @@ namespace Ogre {
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
         LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
+
+        // Check that valid strategy name was given, otherwise use default
+        if (strategy == 0)
+            strategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
