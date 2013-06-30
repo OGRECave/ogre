@@ -304,6 +304,8 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 //	Locales are not supported by the C lib you have to go through JNI.
 #	define OGRE_DEFAULT_LOCALE ""
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#	define OGRE_DEFAULT_LOCALE "C"
 #else
 #	if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #		if _MSC_VER >= 1700
