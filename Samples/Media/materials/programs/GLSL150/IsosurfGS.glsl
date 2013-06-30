@@ -21,6 +21,8 @@ out vec3 oNormal;
 
 uniform float IsoValue;
 
+uniform sampler2D edge_table;
+
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 4) out;
 
@@ -52,25 +54,70 @@ void CalcIntersection(vec4 Pos0,
 // outputs: zero, one or two triangles depending if isosurface intersects tetrahedron
 void main()
 {
+
     // construct index for this tetrahedron
-    uint index = uint((int(VertexIn[0].Field.y) << 3) |
+    int index = int((int(VertexIn[0].Field.y) << 3) |
                       (int(VertexIn[1].Field.y) << 2) |
                       (int(VertexIn[2].Field.y) << 1) |
                       int(VertexIn[3].Field.y));
-        
+
     // don't bother if all vertices out or all vertices inside isosurface
     if (index > uint(0) && index < uint(15))
     {
         // Uber-compressed version of the edge table.
-        uint edgeListHex[8] = 
-            uint[8](uint(0x0001cde0), uint(0x98b08c9d), uint(0x674046ce), uint(0x487bc480), 
-                    uint(0x21301d2e), uint(0x139bd910), uint(0x26376e20), uint(0x3b700000));
+        // uint edgeListHex[8] = 
+        //     uint[8](uint(0x0001cde0), uint(0x98b08c9d), uint(0x674046ce), uint(0x487bc480), 
+        //             uint(0x21301d2e), uint(0x139bd910), uint(0x26376e20), uint(0x3b700000));
 
-        uint edgeValFull = edgeListHex[index/uint(2)];
-        uint three = uint(0x3);
-        uint edgeVal = (index % uint(2) == uint(1)) ? (edgeValFull & uint(0xFFFF)) : ((edgeValFull >> 16) & uint(0xFFFF));
-        ivec4 e0 = ivec4((edgeVal >> 14) & three, (edgeVal >> 12) & three, (edgeVal >> 10) & three, (edgeVal >> 8) & three);
-        ivec4 e1 = ivec4((edgeVal >> 6) & three, (edgeVal >> 4) & three, (edgeVal >> 2) & three, (edgeVal >> 0) & three);
+        // uint edgeValFull = edgeListHex[index/uint(2)];
+        // uint three = uint(0x3);
+        // uint edgeVal = (index % uint(2) == uint(1)) ? (edgeValFull & uint(0xFFFF)) : ((edgeValFull >> 16) & uint(0xFFFF));
+        // ivec4 e0 = ivec4((edgeVal >> 14) & three, (edgeVal >> 12) & three, (edgeVal >> 10) & three, (edgeVal >> 8) & three);
+        // ivec4 e1 = ivec4((edgeVal >> 6) & three, (edgeVal >> 4) & three, (edgeVal >> 2) & three, (edgeVal >> 0) & three);
+
+
+        // const uint edge_table[120] = uint[](
+        //   0, 0, 0, 0,
+        //   3, 0, 3, 1,
+        //   2, 1, 2, 0,
+        //   2, 0, 3, 0,
+        //   1, 2, 1, 3,
+        //   1, 0, 1, 2,
+        //   1, 0, 2, 0,
+        //   3, 0, 1, 0,
+        //   0, 2, 0, 1,
+        //   0, 1, 3, 1,
+        //   0, 1, 0, 3,
+        //   3, 1, 2, 1,
+        //   0, 2, 1, 2,
+        //   1, 2, 3, 2,
+        //   0, 3, 2, 3,
+
+        //   0, 0, 0, 1,
+        //   3, 2, 0, 0,
+        //   2, 3, 0, 0,
+        //   2, 1, 3, 1,
+        //   1, 0, 0, 0,
+        //   3, 0, 3, 2,
+        //   1, 3, 2, 3,
+        //   2, 0, 0, 0,
+        //   0, 3, 0, 0,
+        //   0, 2, 3, 2,
+        //   2, 1, 2, 3,
+        //   0, 1, 0, 0,
+        //   0, 3, 1, 3,
+        //   0, 2, 0, 0,
+        //   1, 3, 0, 0
+        // );
+
+        // ivec4 e0 = ivec4(edge_table[index], edge_table[index+1],
+        //                  edge_table[index+2], edge_table[index+3]) * 255;
+        // ivec4 e1 = ivec4(edge_table[index+60], edge_table[index+61], 
+        //                  edge_table[index+62], edge_table[index+63]) * 255;
+
+
+        ivec4 e0 = ivec4(texture2D(edge_table, vec2(index, 0)) * 255);
+        ivec4 e1 = ivec4(texture2D(edge_table, vec2(index, 1)) * 255);
 
         CalcIntersection(gl_in[e0.x].gl_Position, VertexIn[e0.x].N, VertexIn[e0.x].Field,
                          gl_in[e0.y].gl_Position, VertexIn[e0.y].N, VertexIn[e0.y].Field);
@@ -81,9 +128,17 @@ void main()
 
         // Emit additional triangle, if necessary
         if (e1.z != -1) {
+        // if (e1.z != 0) {
             CalcIntersection(gl_in[e1.z].gl_Position, VertexIn[e1.z].N, VertexIn[e1.z].Field,
                              gl_in[e1.w].gl_Position, VertexIn[e1.w].N, VertexIn[e1.w].Field);
         }
+
         EndPrimitive();
     }
+
+  // for (int i = 0; i < gl_in.length(); ++i) {
+  //   gl_Position = gl_in[i].gl_Position;
+  //   EmitVertex();
+  // }
+  // EndPrimitive();
 }

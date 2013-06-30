@@ -126,7 +126,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
                 Vector4 timeParam = Ogre::Vector4(
                     Ogre::Math::Sin(seconds)*0.5, 0.0, Ogre::Math::Cos(seconds)*0.5, 0.0);
                 renderPass2->getFragmentProgramParameters()->setNamedConstant("ColourMe[1]", timeParam);
-            }           
+            }
         }
         
         return SdkSample::frameRenderingQueued(evt); 

@@ -12,18 +12,20 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 in vec3 oNormal;
+
 out vec4 fragColour;
 
 // Pixel shader
 void main()
 {
     // Sanitize input
-    vec3 N = normalize(oNormal);
-    vec3 L = vec3(0, 0, 1);
-    float nDotL = dot(N, L);
+    // vec3 N = normalize(oNormal);
+    // vec3 L = vec3(0, 0, 1);
+    // float nDotL = dot(N, L);
 
-    vec3 materials[2] = vec3[](vec3(1, 1, 1), vec3(0, 0, 0.5));
+    // vec3 materials[2] = vec3[](vec3(1, 1, 1), vec3(0, 0, 0.5));
 
-    fragColour = vec4(abs(nDotL) * materials[int(nDotL < 0.0)], 0.1);
-    fragColour = vec4(1, 1, 1, 1);
+    // fragColour = vec4(abs(nDotL) * materials[int(nDotL < 0.0)], 0.1);
+
+    fragColour = vec4(1,1,1,1);
 }
