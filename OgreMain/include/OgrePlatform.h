@@ -307,7 +307,7 @@ namespace Ogre {
 #else
 #	if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #		if _MSC_VER >= 1700
-#			define OGRE_DEFAULT_LOCALE "en_GB"
+#			define OGRE_DEFAULT_LOCALE "en-GB"
 #		else
 // 			http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
 #			define OGRE_DEFAULT_LOCALE "uk"
