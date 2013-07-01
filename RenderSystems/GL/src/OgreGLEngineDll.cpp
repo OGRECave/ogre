@@ -31,14 +31,14 @@ THE SOFTWARE.
 
 #ifndef OGRE_STATIC_LIB
 
-namespace Ogre {
+namespace Ogre 
+{
     static GLPlugin* plugin;
 
     extern "C" void _OgreGLExport dllStartPlugin(void) throw()
     {
         plugin = OGRE_NEW GLPlugin();
         Root::getSingleton().installPlugin(plugin);
-
     }
 
     extern "C" void _OgreGLExport dllStopPlugin(void)

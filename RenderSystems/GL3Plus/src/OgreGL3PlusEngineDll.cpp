@@ -31,7 +31,8 @@ THE SOFTWARE.
 
 #ifndef OGRE_STATIC_LIB
 
-namespace Ogre {
+namespace Ogre 
+{
     static GL3PlusPlugin* plugin;
 
     extern "C" void _OgreGL3PlusExport dllStartPlugin(void) throw()
