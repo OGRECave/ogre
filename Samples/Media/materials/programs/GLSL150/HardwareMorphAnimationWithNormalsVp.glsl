@@ -1,7 +1,7 @@
 #version 150
 
 in vec4 vertex;
-in vec4 normal;
+in vec3 normal;
 in vec4 uv0;
 in vec4 uv1; // pos2
 in vec4 uv2; // normal2
@@ -21,7 +21,7 @@ void main()
 	vec4 posinterp = vec4(vertex.xyz + anim_t.x*(uv1.xyz - vertex.xyz), 1.0);
 
     // nlerp normal
-	vec3 ninterp = normal1 + anim_t.x*(normal2 - normal1);
+	vec3 ninterp = normal + anim_t.x*(uv2.xyz - normal);
 	ninterp = normalize(ninterp);
 
 	gl_Position = worldViewProj * posinterp;
