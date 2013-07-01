@@ -2261,7 +2261,46 @@ void SceneManager::updateAllTransforms()
 //-----------------------------------------------------------------------
 void SceneManager::buildLightList()
 {
-	//TODO (dark_sylinc)
+	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		//TODO: Cull the lights against all cameras to build the list of visible lights.
+		/*for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			Light::buildLightList( numObjs, objData );
+		}*/
+
+		++it;
+	}
+
+	//Global light list built. Now build a per-movable object light list
+	it = mEntitiesMemoryManagerCulledList.begin();
+	en = mEntitiesMemoryManagerCulledList.end();
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::buildLightList( numObjs, objData );
+		}
+
+		++it;
+	}
 }
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()

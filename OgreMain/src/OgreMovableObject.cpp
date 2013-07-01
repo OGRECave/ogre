@@ -36,6 +36,9 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreLodListener.h"
+#include "OgreLight.h"
+#include "Math/Array/OgreArraySphere.h"
+#include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
@@ -261,6 +264,98 @@ namespace Ogre {
 		}
 		return mWorldBoundingSphere;
 	}*/
+	//-----------------------------------------------------------------------
+	struct LightListInfo
+	{
+		LightVec						lights;
+		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
+		uint32	* RESTRICT_ALIAS		visibilityMask;
+		Sphere	* RESTRICT_ALIAS 		boundingSphere;
+	};
+	void MovableObject::buildLightList( const size_t numNodes, ObjectData objData )
+	{
+		size_t numGlobalLights=0;
+		LightListInfo globalLightList;
+		//mLightList
+		ArraySphere lightSphere;
+		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], 16 );
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+			/*ArrayVector3 parentPos, parentScale;
+			ArrayQuaternion parentRot;
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				Vector3 pos, scale;
+				Quaternion qRot;
+				const Transform &parentTransform = objData.mParents[j]->_getTransform();
+				parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
+				parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
+				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
+
+				parentPos.setFromVector3( pos, j );
+				parentRot.setFromQuaternion( qRot, j );
+				parentScale.setFromVector3( scale, j );
+			}*/
+
+			ArrayReal * RESTRICT_ALIAS arrayRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->m_center );
+
+			const ArrayInt * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																				(objData.mLightMask);
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+				objData.mOwner[j]->mLightList.clear();
+
+			//Now iterate through all lights to find the influence on these 4 Objects at once
+			LightVec::const_iterator lightsIt				= globalLightList.lights.begin();
+			const uint32 * RESTRICT_ALIAS	visibilityMask	= globalLightList.visibilityMask;
+			const Sphere * RESTRICT_ALIAS 	boundingSphere	= globalLightList.boundingSphere;
+			for( size_t j=0; j<numGlobalLights; ++j )
+			{
+				//We check 1 light against 4 MovableObjects at a time.
+				lightSphere.setAll( *boundingSphere );
+
+				//Check if it intersects
+				ArrayInt rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
+				ArrayReal distSimd = objSphere.m_center.squaredDistance( lightSphere.m_center );
+				CastArrayToReal( distance, distSimd );
+
+				//rMask = ( intersects() && lightMask & visibilityMask )
+				rMask = MathlibSSE2::TestFlags32( rMask, MathlibSSE2::And( *objLightMask,
+																			*visibilityMask ) );
+
+				//Convert rMask into something smaller we can work with.
+				uint32 r = BooleanMask4::getScalarMask( rMask );
+
+				for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+				{
+					//Decompose the result for analyzing each MovableObject's
+					//There's no need to check objData.mOwner[k] is null because
+					//we set lightMask to 0 on slot removals
+					if( IS_BIT_SET( k, r ) && objData.mOwner[k] )
+					{
+						objData.mOwner[k]->mLightList.push_back(
+													LightClosest( *lightsIt, distance[k] ) );
+					}
+				}
+
+				++lightsIt;
+				++visibilityMask;
+				++boundingSphere;
+			}
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				std::stable_sort( objData.mOwner[j]->mLightList.begin(),
+									objData.mOwner[j]->mLightList.end() );
+			}
+
+			objData.advanceLightPack();
+		}
+	}
     //-----------------------------------------------------------------------
     const LightList& MovableObject::queryLights(void)
     {
@@ -375,5 +470,20 @@ namespace Ogre {
 	}
 
 
+	inline bool MovableObject::LightClosest::operator < (const MovableObject::LightClosest &right) const
+	{
+		if( light->getType() == Light::LT_DIRECTIONAL &&
+			right.light->getType() != Light::LT_DIRECTIONAL )
+		{
+			return true;
+		}
+		else if( light->getType() != Light::LT_DIRECTIONAL &&
+				 right.light->getType() == Light::LT_DIRECTIONAL )
+		{
+			return false;
+		}
+
+		return sqDistance < right.sqDistance;
+	}
 }
 

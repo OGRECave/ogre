@@ -35,8 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Light::Light()
-		: mLightType(LT_POINT),
+    Light::Light( IdType id )
+		: MovableObject( id ),
+		  mLightType(LT_POINT),
           mPosition(Vector3::ZERO),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),
@@ -63,38 +64,6 @@ namespace Ogre {
 		  mCameraToBeRelativeTo(0),
           mDerivedTransformDirty(false),
 		  mCustomShadowCameraSetup()
-    {
-		//mMinPixelSize should always be zero for lights otherwise lights will disapear
-    	mMinPixelSize = 0;
-    }
-    //-----------------------------------------------------------------------
-	Light::Light(const String& name) : MovableObject(name),
-        mLightType(LT_POINT),
-        mPosition(Vector3::ZERO),
-        mDiffuse(ColourValue::White),
-        mSpecular(ColourValue::Black),
-        mDirection(Vector3::UNIT_Z),
-		mSpotOuter(Degree(40.0f)),
-        mSpotInner(Degree(30.0f)),
-        mSpotFalloff(1.0f),
-        mSpotNearClip(0.0f),
-		mRange(100000),
-		mAttenuationConst(1.0f),
-		mAttenuationLinear(0.0f),
-        mAttenuationQuad(0.0f),
-		mPowerScale(1.0f),
-		mIndexInFrame(0),
-		mOwnShadowFarDist(false),
-		mShadowFarDist(0),
-		mShadowFarDistSquared(0),
-		mShadowNearClipDist(-1),
-		mShadowFarClipDist(-1),
-        mDerivedPosition(Vector3::ZERO),
-        mDerivedDirection(Vector3::UNIT_Z),
-		mDerivedCamRelativeDirty(false),
-		mCameraToBeRelativeTo(0),
-        mDerivedTransformDirty(false),
-		mCustomShadowCameraSetup()
     {
 		//mMinPixelSize should always be zero for lights otherwise lights will disapear
     	mMinPixelSize = 0;
@@ -295,7 +264,7 @@ namespace Ogre {
     {
         mDerivedTransformDirty = true;
 
-        MovableObject::_notifyAttached(parent, isTagPoint);
+        MovableObject::_notifyAttached( parent );
     }
     //-----------------------------------------------------------------------
     void Light::_notifyMoved(void)
@@ -942,11 +911,10 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* LightFactory::createInstanceImpl( const String& name, 
-		const NameValuePairList* params)
+	MovableObject* LightFactory::createInstanceImpl( IdType id, const NameValuePairList* params)
 	{
 
-		Light* light = OGRE_NEW Light(name);
+		Light* light = OGRE_NEW Light(id);
  
 		if(params)
 		{

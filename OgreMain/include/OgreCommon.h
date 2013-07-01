@@ -548,7 +548,7 @@ namespace Ogre {
 
 	class Light;
 	typedef HashedVector<Light*> LightList;
-
+	typedef vector<Light*>::type LightVec;
 
 
     typedef map<String, bool>::type UnaryOptionList;

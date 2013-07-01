@@ -652,7 +652,10 @@ namespace Ogre {
         */
         Listener* getListener(void) const								{ return mListener; }
 
-		/// @See SceneManager::updateAllTransforms()
+		/** @See SceneManager::updateAllTransforms()
+		@remarks
+			We don't pass by reference on purpose (avoid implicit aliasing)
+		*/
 		static void updateAllTransforms( const size_t numNodes, Transform t );
 
         /** Sets the current transform of this node to be the 'initial state' ie that

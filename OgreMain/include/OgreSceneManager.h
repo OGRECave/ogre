@@ -370,9 +370,12 @@ namespace Ogre {
         virtual SceneNode* createSceneNodeImpl( SceneNode *parent );
 
 		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
+		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
 		NodeMemoryManager		mNodeMemoryManager;
 		/// Filled and cleared every frame in HighLevelCull()
 		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
+		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
+		ObjectMemoryManagerVec	mLightsMemoryManagerCulledList;
 
 		/// Instance name
 		String mName;
@@ -409,8 +412,8 @@ namespace Ogre {
                 is held using the hierarchy of SceneNodes starting with the root node. However you
                 can look up nodes this way.
         */
-        SceneNodeList mSceneNodes;
-		SceneNodeList mSceneNodesWithListeners;
+        SceneNodeList	mSceneNodes;
+		SceneNodeList	mSceneNodesWithListeners;
 
         /// Camera in progress
         Camera* mCameraInProgress;

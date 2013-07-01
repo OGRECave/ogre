@@ -89,13 +89,9 @@ namespace Ogre {
             LT_SPOTLIGHT = 2
         };
 
-        /** Default constructor (for Python mainly).
-        */
-        Light();
-
         /** Normal constructor. Should not be called directly, but rather the SceneManager::createLight method should be used.
         */
-        Light(const String& name);
+        Light( IdType id );
 
         /** Standard destructor.
         */
@@ -612,7 +608,7 @@ namespace Ogre {
     class _OgreExport LightFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( IdType id, const NameValuePairList* params);
     public:
         LightFactory() {}
         ~LightFactory() {}

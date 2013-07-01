@@ -79,6 +79,19 @@ namespace Ogre {
             virtual void objectMoved(MovableObject*) {}
         };
 
+		struct LightClosest
+		{
+			Light *light;
+			Real sqDistance;
+
+			LightClosest( Light *_light,  Real _sqDistance ) :
+				light( _light ), sqDistance( _sqDistance ) {}
+
+			inline bool operator < ( const LightClosest &right ) const;
+		};
+
+		typedef vector<LightClosest>::type LightClosestVec;
+
     protected:
         /// node to which this object is attached
         Node* mParentNode;
@@ -106,7 +119,7 @@ namespace Ogre {
         Listener* mListener;
 
         /// List of lights for this object
-        LightList mLightList;
+        LightClosestVec mLightList;
 
 		/// Friendly name of this object, can be empty
 		String mName;
@@ -193,6 +206,12 @@ namespace Ogre {
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
         virtual void _updateRenderQueue(RenderQueue* queue) = 0;
+
+		/** @See SceneManager::buildLightList
+		@remarks
+			We don't pass by reference on purpose (avoid implicit aliasing)
+		*/
+		static void buildLightList( const size_t numNodes, ObjectData t );
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it
@@ -419,7 +438,7 @@ namespace Ogre {
 			(say if you want to use it to implement this method, and use the pointer
 			as a return value) and for reading it's only accurate as at the last frame.
 		*/
-		virtual LightList* _getLightList() { return &mLightList; }
+		LightClosestVec* _getLightList() { return &mLightList; }
 
 		typedef vector<MovableObject*>::type ShadowRenderableList;
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
