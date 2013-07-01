@@ -158,7 +158,7 @@ namespace Ogre {
 
             mInitialized = true;
         }
-        else
+        else if (mInitialized)
         {
 			for( TProfileSessionListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
                 (*i)->finializeSession();
