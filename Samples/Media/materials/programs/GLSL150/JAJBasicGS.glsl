@@ -1,6 +1,6 @@
 #version 150
 
-// Sample trivial GLSL geometry shader.
+// Trivial GLSL geometry shader that doubles a mesh.
 
 uniform mat4 WorldViewProj;
 
@@ -15,8 +15,8 @@ void main(void) {
     EndPrimitive();
 
     for (int i = 0; i < gl_in.length(); ++i) {
-        const vec4 offset = vec4(50,50,50,0);
-        gl_Position = WorldViewProj * (gl_in[i].gl_Position + offset);
+        const vec4 world_offset = vec4(50,50,50,0);
+        gl_Position = WorldViewProj * (gl_in[i].gl_Position + world_offset);
         EmitVertex();
     }
     EndPrimitive();
