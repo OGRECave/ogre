@@ -466,7 +466,7 @@ namespace Ogre {
                            parseReal(vec[12], defaultValue[3][0], loc),
                            parseReal(vec[13], defaultValue[3][1], loc),
                            parseReal(vec[14], defaultValue[3][2], loc),
-                           parseReal(vec[14], defaultValue[3][3], loc));
+                           parseReal(vec[15], defaultValue[3][3], loc));
         }
     }
     //-----------------------------------------------------------------------
