@@ -290,10 +290,33 @@ namespace Ogre {
             logObjectInfo("GLSL compiled: " + mName, mGLShaderHandle);
 
         if(!mCompiled)
+        {
+			String progType = "Fragment";
+			if (mType == GPT_VERTEX_PROGRAM)
+			{
+				progType = "Vertex";
+			}
+			else if (mType == GPT_GEOMETRY_PROGRAM)
+			{
+				progType = "Geometry";
+			}
+			else if (mType == GPT_DOMAIN_PROGRAM)
+			{
+				progType = "Tesselation Evaluation";
+			}
+			else if (mType == GPT_HULL_PROGRAM)
+			{
+				progType = "Tesselation Control";
+			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				progType = "Compute";
+			}
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        ((mType == GPT_VERTEX_PROGRAM) ? "Vertex Program " : "Fragment Program ") + mName +
+                        progType + " Program " + mName +
                         " failed to compile. See compile log above for details.",
                         "GLSLProgram::compile");
+        }
 
         return (mCompiled == 1);
     }

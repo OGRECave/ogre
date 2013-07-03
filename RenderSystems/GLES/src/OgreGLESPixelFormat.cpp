@@ -33,6 +33,13 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 
+/* GL_AMD_compressed_ATC_texture */
+#if OGRE_NO_ETC_CODEC == 0 
+#	define ATC_RGB_AMD						  							0x8C92
+#	define ATC_RGBA_EXPLICIT_ALPHA_AMD		  							0x8C93
+#	define ATC_RGBA_INTERPOLATED_ALPHA_AMD	  							0x87EE
+#endif
+
 
 namespace Ogre  {
     GLenum GLESPixelUtil::getGLOriginFormat(PixelFormat mFormat)

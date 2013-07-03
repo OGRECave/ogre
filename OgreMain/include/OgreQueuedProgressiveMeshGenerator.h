@@ -188,7 +188,7 @@ public:
 	void removeInjectorListener() {mInjectorListener = 0;}
 protected:
 
-	// Copies every generated Lod level to the mesh.
+	// Copies every generated LOD level to the mesh.
 	void inject(PMGenRequest* request);
 
 	PMInjectorListener* mInjectorListener;

@@ -172,7 +172,17 @@ namespace Ogre {
         */
         virtual void worldGeometryStageEnded(void) = 0;
         /** This event is fired when a resource group finished loading. */
-        virtual void resourceGroupLoadEnded(const String& groupName) = 0;
+		virtual void resourceGroupLoadEnded(const String& groupName) = 0;
+		/** This event is fired when a resource was just created.
+		@param resource Weak reference to the resource created.
+		*/
+		virtual void resourceCreated(const ResourcePtr& resource)
+		{ (void)resource; }
+		/** This event is fired when a resource is about to be removed.
+		@param resource Weak reference to the resource removed.
+		*/
+		virtual void resourceRemove(const ResourcePtr& resource)
+		{ (void)resource; }
     };
 
 	/**
@@ -397,6 +407,10 @@ namespace Ogre {
 		void fireResourcePrepareEnded(void);
 		/// Internal event firing method
 		void fireResourceGroupPrepareEnded(const String& groupName);
+		/// Internal event firing method
+		void fireResourceCreated(const ResourcePtr& resource);
+		/// Internal event firing method
+		void fireResourceRemove(const ResourcePtr& resource);
 		/** Internal modification time retrieval */
 		time_t resourceModifiedTime(ResourceGroup* group, const String& filename);
 

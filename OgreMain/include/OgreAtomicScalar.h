@@ -136,6 +136,10 @@ namespace Ogre {
 #include <windows.h>
 #include <intrin.h>
 
+// Save warnings state
+#   pragma warning (push)
+#   pragma warning (disable : 4244)
+
 namespace Ogre {
 
 	/** \addtogroup Core
@@ -281,6 +285,8 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#   pragma warning (pop)
 
 #else
 

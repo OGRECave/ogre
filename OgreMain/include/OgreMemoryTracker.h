@@ -60,6 +60,10 @@ namespace __gnu_cxx
 #   endif
 #endif
 
+#if OGRE_MEMORY_TRACKER
+#   include "Threading/OgreThreadHeaders.h"
+#endif
+
 namespace Ogre
 {
 	/** \addtogroup Core
