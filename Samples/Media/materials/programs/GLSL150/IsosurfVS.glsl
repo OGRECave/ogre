@@ -63,7 +63,6 @@ void main()
     
     // Transform position and normals
     gl_Position = WorldViewProj * vec4(Pos.xyz, 1);
-    //gl_Position = vec4(Pos.xyz, 1);
     VertexOut.N = WorldViewIT * Field.xyz;        // we want normals in world space
     VertexOut.Field.x = Field.w;
 

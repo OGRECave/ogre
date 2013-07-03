@@ -37,7 +37,7 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     MeshPtr mTetrahedraMesh;
 
     //JAJ
-    Entity* mOgreEnt;
+    //Entity* mOgreEnt;
  public:
         
     Sample_Isosurf() 
@@ -66,17 +66,17 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     {
         mCamera->setPosition(0, 0, -40);
         mCamera->lookAt(0,0,0);
-        //mCamera->setNearClipDistance(0.1);
-        //mCamera->setFarClipDistance(100);
+        // mCamera->setNearClipDistance(0.1);
+        // mCamera->setFarClipDistance(100);
 
         //JAJ debug Ogre head
         //FIXME
-        mOgreEnt = mSceneMgr->createEntity("PlainHead", "ogrehead.mesh");
-        mOgreEnt->setMaterialName("JAJ/Basic");
-        //mOgreEnt->setMaterialName("Ogre/IsoSurf/TessellateTetrahedra");
-        SceneNode* ogre = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        ogre->setPosition(0, 100, 30);
-        ogre->attachObject(mOgreEnt);
+        // mOgreEnt = mSceneMgr->createEntity("PlainHead", "ogrehead.mesh");
+        // mOgreEnt->setMaterialName("JAJ/Basic");
+        // //mOgreEnt->setMaterialName("Ogre/IsoSurf/TessellateTetrahedra");
+        // SceneNode* ogre = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        // ogre->setPosition(0, 100, 30);
+        // ogre->attachObject(mOgreEnt);
         //end JAJ
         
         mTetrahedraMesh = ProceduralTools::generateTetrahedra();
@@ -96,38 +96,38 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         Real seconds = (Real)(Root::getSingleton().getTimer()->getMilliseconds()) / 1000.0;
-        // Ogre::Pass* renderPass = tetrahedra->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
-        // //Ogre::Pass* renderPass = mOgreEnt->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
-        // if (renderPass->hasVertexProgram())
-        // {
-        //     Ogre::Vector4 constParam = Ogre::Vector4(-0.5, 0.0, 0.0, 0.2);
-        //     renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[0]", constParam);
+        Ogre::Pass* renderPass = tetrahedra->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
+        //Ogre::Pass* renderPass = mOgreEnt->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
+        if (renderPass->hasVertexProgram())
+        {
+            Ogre::Vector4 constParam = Ogre::Vector4(-0.5, 0.0, 0.0, 0.2);
+            renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[0]", constParam);
 
-        //     Ogre::Vector4 timeParam = Ogre::Vector4(
-        //         0.1 + Ogre::Math::Sin(seconds)*0.5, Ogre::Math::Cos(seconds)*0.5, 0.0, 0.1);
-        //     renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[1]", timeParam);
-        // }
+            Ogre::Vector4 timeParam = Ogre::Vector4(
+                0.1 + Ogre::Math::Sin(seconds)*0.5, Ogre::Math::Cos(seconds)*0.5, 0.0, 0.1);
+            renderPass->getVertexProgramParameters()->setNamedConstant("Metaballs[1]", timeParam);
+        }
 
         //JAJ
         //FIXME
-        Pass* renderPass2 = mOgreEnt->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
-        if (renderPass2->hasFragmentProgram())
-        {
-            Ogre::GpuProgramParametersSharedPtr pParams = renderPass2->getFragmentProgramParameters();
-            if ( pParams.isNull() )
-            {
-                printf("SAD PANDA!");
-            }
-            else if ( pParams->_findNamedConstantDefinition( "ColourMe[0]" ) )
-            {
-                Vector4 constParam = Ogre::Vector4(0.5, 0.1, 0.0, 1.0);
-                renderPass2->getFragmentProgramParameters()->setNamedConstant("ColourMe[0]", constParam);
+        // Pass* renderPass2 = mOgreEnt->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0);
+        // if (renderPass2->hasFragmentProgram())
+        // {
+        //     Ogre::GpuProgramParametersSharedPtr pParams = renderPass2->getFragmentProgramParameters();
+        //     if ( pParams.isNull() )
+        //     {
+        //         printf("SAD PANDA!");
+        //     }
+        //     else if ( pParams->_findNamedConstantDefinition( "ColourMe[0]" ) )
+        //     {
+        //         Vector4 constParam = Ogre::Vector4(0.5, 0.1, 0.0, 1.0);
+        //         renderPass2->getFragmentProgramParameters()->setNamedConstant("ColourMe[0]", constParam);
                 
-                Vector4 timeParam = Ogre::Vector4(
-                    Ogre::Math::Sin(seconds)*0.5, 0.0, Ogre::Math::Cos(seconds)*0.5, 0.0);
-                renderPass2->getFragmentProgramParameters()->setNamedConstant("ColourMe[1]", timeParam);
-            }
-        }
+        //         Vector4 timeParam = Ogre::Vector4(
+        //             Ogre::Math::Sin(seconds)*0.5, 0.0, Ogre::Math::Cos(seconds)*0.5, 0.0);
+        //         renderPass2->getFragmentProgramParameters()->setNamedConstant("ColourMe[1]", timeParam);
+        //     }
+        // }
         
         return SdkSample::frameRenderingQueued(evt); 
     }
