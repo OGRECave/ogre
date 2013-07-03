@@ -207,6 +207,19 @@ namespace Ogre {
         */
         virtual void _updateRenderQueue(RenderQueue* queue) = 0;
 
+		/** @See SceneManager::updateAllBounds
+		@remarks
+			We don't pass by reference on purpose (avoid implicit aliasing)
+		*/
+		static void updateAllBounds( const size_t numNodes, ObjectData t );
+
+		/** @See SceneManager::cullFrustum
+		@remarks
+			We don't pass by reference on purpose (avoid implicit aliasing)
+			We perform frustum culling AND test visibility mask at the same time
+		*/
+		static void cullFrustum( const size_t numNodes, ObjectData t );
+
 		/** @See SceneManager::buildLightList
 		@remarks
 			We don't pass by reference on purpose (avoid implicit aliasing)

@@ -264,6 +264,110 @@ namespace Ogre {
 		}
 		return mWorldBoundingSphere;
 	}*/
+    //-----------------------------------------------------------------------
+	void MovableObject::updateAllBounds( const size_t numNodes, ObjectData objData )
+	{
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+			ArrayMatrix4 parentMat;
+			ArrayVector3 parentScale;
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				Vector3 scale;
+				Matrix4 mat;
+				const Transform &parentTransform = objData.mParents[j]->_getTransform();
+				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
+				parentTransform.mDerivedTransform->getAsMatrix4( mat, parentTransform.mIndex );
+				parentScale.setFromVector3( scale, j );
+				parentMat.setFromMatrix4( mat, j );
+			}
+
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS localRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mLocalRadius);
+
+			*objData.mWorldAabb = *objData.mLocalAabb;
+			objData.mWorldAabb->transformAffine( parentMat );
+			*worldRadius = (*localRadius) * parentScale.getMaxComponent();
+
+			objData.advanceBounsPack();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData )
+	{
+		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
+		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
+		// (we use method Method 5: "If you really don’t care whether a box is
+		// partially or fully inside"):
+		// vector4 signFlip = componentwise_and(plane, 0x80000000);
+		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
+
+		ArrayVector3 planeNormal[6];
+		ArrayReal planeNegD[6];
+
+		ArrayInt sceneFlags;
+		vector<MovableObject*>::type outCulledObjects;
+
+		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
+		//In theory xor is faster, but some archs have a penalty for switching between integer
+		//& floating point, even if it's simd sse
+		ArrayReal signFlip;
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			const ArrayVector3 centerPlusFlippedHS( objData.mWorldAabb->m_center +
+													objData.mWorldAabb->m_halfSize * signFlip );
+
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+
+			//Test all 6 planes and OR the dot product. If all are false, then we're not visible
+			ArrayReal dotResult, mask;
+			dotResult = planeNormal[0].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::CompareLess( dotResult, planeNegD[0] );
+
+			dotResult = planeNormal[1].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[1] ) );
+
+			dotResult = planeNormal[2].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[2] ) );
+
+			dotResult = planeNormal[3].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[3] ) );
+
+			dotResult = planeNormal[4].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[4] ) );
+
+			dotResult = planeNormal[5].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[5] ) );
+
+			dotResult = planeNormal[6].dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[6] ) );
+
+			//Fuse result with visibility flag
+			ArrayInt finalMask = Mathlib::TestFlags32( CastRealToInt( mask ),
+														Mathlib::And( sceneFlags, *visibilityFlags ) );
+
+			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				//Decompose the result for analyzing each MovableObject's
+				//There's no need to check objData.mOwner[j] is null because
+				//we set mVisibilityFlags to 0 on slot removals
+				if( IS_BIT_SET( j, scalarMask ) )
+				{
+					outCulledObjects.push_back( objData.mOwner[j] );
+				}
+			}
+
+			objData.advanceFrustumPack();
+		}
+	}
 	//-----------------------------------------------------------------------
 	struct LightListInfo
 	{
@@ -274,31 +378,13 @@ namespace Ogre {
 	};
 	void MovableObject::buildLightList( const size_t numNodes, ObjectData objData )
 	{
-		size_t numGlobalLights=0;
+		size_t numGlobalLights=10;
 		LightListInfo globalLightList;
 		//mLightList
 		ArraySphere lightSphere;
 		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], 16 );
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
-			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
-			/*ArrayVector3 parentPos, parentScale;
-			ArrayQuaternion parentRot;
-
-			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-			{
-				Vector3 pos, scale;
-				Quaternion qRot;
-				const Transform &parentTransform = objData.mParents[j]->_getTransform();
-				parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
-				parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
-				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
-
-				parentPos.setFromVector3( pos, j );
-				parentRot.setFromQuaternion( qRot, j );
-				parentScale.setFromVector3( scale, j );
-			}*/
-
 			ArrayReal * RESTRICT_ALIAS arrayRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
 																		(objData.mWorldRadius);
 			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->m_center );
@@ -323,6 +409,7 @@ namespace Ogre {
 				ArrayReal distSimd = objSphere.m_center.squaredDistance( lightSphere.m_center );
 				CastArrayToReal( distance, distSimd );
 
+				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
 				//rMask = ( intersects() && lightMask & visibilityMask )
 				rMask = MathlibSSE2::TestFlags32( rMask, MathlibSSE2::And( *objLightMask,
 																			*visibilityMask ) );
@@ -335,7 +422,7 @@ namespace Ogre {
 					//Decompose the result for analyzing each MovableObject's
 					//There's no need to check objData.mOwner[k] is null because
 					//we set lightMask to 0 on slot removals
-					if( IS_BIT_SET( k, r ) && objData.mOwner[k] )
+					if( IS_BIT_SET( k, r ) )
 					{
 						objData.mOwner[k]->mLightList.push_back(
 													LightClosest( *lightsIt, distance[k] ) );
