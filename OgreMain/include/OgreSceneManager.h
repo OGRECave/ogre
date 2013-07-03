@@ -1007,19 +1007,19 @@ namespace Ogre {
 
 
 
-        /// Set of registered lod listeners
+        /// Set of registered LOD listeners
         typedef set<LodListener*>::type LodListenerSet;
         LodListenerSet mLodListeners;
 
-        /// List of movable object lod changed events
+        /// List of movable object LOD changed events
 		typedef vector<MovableObjectLodChangedEvent>::type MovableObjectLodChangedEventList;
         MovableObjectLodChangedEventList mMovableObjectLodChangedEvents;
 
-        /// List of entity mesh lod changed events
+        /// List of entity mesh LOD changed events
         typedef vector<EntityMeshLodChangedEvent>::type EntityMeshLodChangedEventList;
         EntityMeshLodChangedEventList mEntityMeshLodChangedEvents;
 
-        /// List of entity material lod changed events
+        /// List of entity material LOD changed events
         typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
@@ -3534,16 +3534,16 @@ namespace Ogre {
         */
         void removeLodListener(LodListener *listener);
 
-        /** Notify that a movable object lod change event has occurred. */
+        /** Notify that a movable object LOD change event has occurred. */
         void _notifyMovableObjectLodChanged(MovableObjectLodChangedEvent& evt);
 
-        /** Notify that an entity mesh lod change event has occurred. */
+        /** Notify that an entity mesh LOD change event has occurred. */
         void _notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt);
 
-        /** Notify that an entity material lod change event has occurred. */
+        /** Notify that an entity material LOD change event has occurred. */
         void _notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt);
 
-        /** Handle lod events. */
+        /** Handle LOD events. */
         void _handleLodEvents();
 
 		IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}

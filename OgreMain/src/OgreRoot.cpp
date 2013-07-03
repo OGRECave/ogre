@@ -203,7 +203,7 @@ namespace Ogre {
 
         mTimer = OGRE_NEW Timer();
 
-        // Lod strategy manager
+        // LOD strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
 
         // Queued Progressive Mesh Generator Worker

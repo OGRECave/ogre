@@ -1148,10 +1148,14 @@ namespace Ogre {
 				addCreatedResource(res, *grp);
 			}
 		}
+
+		fireResourceCreated(res);
 	}
 	//-----------------------------------------------------------------------
 	void ResourceGroupManager::_notifyResourceRemoved(ResourcePtr& res)
 	{
+		fireResourceRemove(res);
+
 		if (mCurrentGroup)
 		{
 			// Do nothing - we're batch unloading so list will be cleared
@@ -1500,6 +1504,26 @@ namespace Ogre {
 			l != mResourceGroupListenerList.end(); ++l)
 		{
 			(*l)->resourceGroupPrepareEnded(groupName);
+		}
+	}
+	//-----------------------------------------------------------------------
+	void ResourceGroupManager::fireResourceCreated(const ResourcePtr& resource)
+	{
+		OGRE_LOCK_AUTO_MUTEX;
+		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+			l != mResourceGroupListenerList.end(); ++l)
+		{
+			(*l)->resourceCreated(resource);
+		}
+	}
+	//-----------------------------------------------------------------------
+	void ResourceGroupManager::fireResourceRemove(const ResourcePtr& resource)
+	{
+		OGRE_LOCK_AUTO_MUTEX;
+		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+			l != mResourceGroupListenerList.end(); ++l)
+		{
+			(*l)->resourceRemove(resource);
 		}
 	}
 	//-----------------------------------------------------------------------

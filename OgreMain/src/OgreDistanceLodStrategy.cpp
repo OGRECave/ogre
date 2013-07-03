@@ -34,31 +34,15 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 
 namespace Ogre {
-    //-----------------------------------------------------------------------
-    template<> DistanceLodStrategy* Singleton<DistanceLodStrategy>::msSingleton = 0;
-    DistanceLodStrategy* DistanceLodStrategy::getSingletonPtr(void)
-    {
-        return msSingleton;
-    }
-    DistanceLodStrategy& DistanceLodStrategy::getSingleton(void)
-    {
-        assert( msSingleton );  return ( *msSingleton );
-    }
-    //-----------------------------------------------------------------------
-    DistanceLodStrategy::DistanceLodStrategy()
-        : LodStrategy("Distance")
+    DistanceLodStrategy::DistanceLodStrategy(const String& name)
+        : LodStrategy(name)
         , mReferenceViewEnabled(false)
         , mReferenceViewValue(-1)
     { }
     //-----------------------------------------------------------------------
     Real DistanceLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
-        // Get squared depth taking into account bounding radius
-        // (d - r) ^ 2 = d^2 - 2dr + r^2, but this requires a lot 
-        // more computation (including a sqrt) so we approximate 
-        // it with d^2 - r^2, which is good enough for determining 
-        // lod.
-        Real squaredDepth = movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+        Real squaredDepth = getSquaredDepth(movableObject, camera);
 
         // Check if reference view needs to be taken into account
         if (mReferenceViewEnabled)
@@ -72,7 +56,7 @@ namespace Ogre {
             // Get viewport area
             Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
 
-            // Get projection matrix (this is done to avoid computation of tan(fov / 2))
+            // Get projection matrix (this is done to avoid computation of tan(FOV / 2))
             const Matrix4& projectionMatrix = camera->getProjectionMatrix();
 
             // Compute bias value (note that this is similar to the method used for PixelCountLodStrategy)
@@ -158,5 +142,60 @@ namespace Ogre {
     {
         return mReferenceViewEnabled;
     }
+
+    /************************************************************************/
+    /*                                                                      */
+    /************************************************************************/
+
+    //-----------------------------------------------------------------------
+    template<> DistanceLodSphereStrategy* Singleton<DistanceLodSphereStrategy>::msSingleton = 0;
+    DistanceLodSphereStrategy* DistanceLodSphereStrategy::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    DistanceLodSphereStrategy& DistanceLodSphereStrategy::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //-----------------------------------------------------------------------
+    DistanceLodSphereStrategy::DistanceLodSphereStrategy()
+        : DistanceLodStrategy("distance_sphere")
+    { }
+    //-----------------------------------------------------------------------
+    Real DistanceLodSphereStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    {
+        // Get squared depth taking into account bounding radius
+        // (d - r) ^ 2 = d^2 - 2dr + r^2, but this requires a lot 
+        // more computation (including a sqrt) so we approximate 
+        // it with d^2 - r^2, which is good enough for determining 
+        // LOD.
+        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+    }
+    //-----------------------------------------------------------------------
+
+    /************************************************************************/
+    /*                                                                      */
+    /************************************************************************/
+
+    //-----------------------------------------------------------------------
+    template<> DistanceLodBoxStrategy* Singleton<DistanceLodBoxStrategy>::msSingleton = 0;
+    DistanceLodBoxStrategy* DistanceLodBoxStrategy::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    DistanceLodBoxStrategy& DistanceLodBoxStrategy::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //-----------------------------------------------------------------------
+    DistanceLodBoxStrategy::DistanceLodBoxStrategy()
+        : DistanceLodStrategy("distance_box")
+    { }
+    //-----------------------------------------------------------------------
+    Real DistanceLodBoxStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    {
+        return Math::Sqr(movableObject->getBoundingBox().distance(camera->getPosition()));
+    }
+    //-----------------------------------------------------------------------
 
 } // namespace

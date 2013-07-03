@@ -461,7 +461,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
 	LodConfig lodConfig;
     lodConfig.levels.clear();
     lodConfig.mesh = MeshPtr(mesh);
-    lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+    lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
     LodLevel lodLevel;
     lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
     lodLevel.distance = 600.0;
