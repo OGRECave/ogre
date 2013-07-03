@@ -318,6 +318,9 @@ namespace Ogre {
 
         const TexturePtr& tex = tl._getTexturePtr();
 		bool isValidBinding = false;
+
+		_setBindingType(tl.getBindingType());
+
 		// Vertex texture binding?
 		if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
 			!mCurrentCapabilities->getVertexTextureUnitsShared())
@@ -518,6 +521,13 @@ namespace Ogre {
 	{
 		TexturePtr t = TextureManager::getSingleton().getByName(texname).staticCast<Texture>();
 		_setTexture(unit, enabled, t);
+	}
+	//-----------------------------------------------------------------------
+	void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support binding texture to other shaders then fragment", 
+			"RenderSystem::_setBindingType");
 	}
 	//-----------------------------------------------------------------------
 	void RenderSystem::_setVertexTexture(size_t unit, const TexturePtr& tex)

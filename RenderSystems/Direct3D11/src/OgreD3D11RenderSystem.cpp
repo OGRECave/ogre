@@ -1454,6 +1454,11 @@ bail:
 		descDepth.SampleDesc.Quality	= BBDesc.SampleDesc.Quality;
 		descDepth.Usage					= D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
+		// If we tell we want to use it as a Shader Resource when in MSAA, we will fail
+		// This is a recomandation from NVidia.
+		if(BBDesc.SampleDesc.Count == 1)
+			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
 		descDepth.CPUAccessFlags		= 0;
 		descDepth.MiscFlags				= 0;
 
@@ -1766,6 +1771,11 @@ bail:
 		{
 			mTexStageDesc[stage].used = false;
 		}
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
+	{
+		mBindingType = bindingType;
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
@@ -2418,8 +2428,7 @@ bail:
 					"D3D11 device cannot set blend state\nError Description:" + errorDescription,
 					"D3D11RenderSystem::_render");
 			}
-            // PPP: TO DO. Must bind only if the Geometry shader expects this
-			if (mBoundGeometryProgram)
+			if (mBoundGeometryProgram && mBindingType == TextureUnitState::BindingType::BT_GEOMETRY)
 			{
 				{
 					mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
@@ -2473,8 +2482,6 @@ bail:
 
 		if (opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
 		{
-			/// TODO: This is a temporary texture binding, we must bind only if param binding_type is set to <vertex|fragment|hull|domain|(¿geometry?)>
-			
 			/// Pixel Shader binding
 			{
 				// Assaf: seem I have better performance without this check... TODO - remove?
@@ -2503,6 +2510,7 @@ bail:
 			}
 			
 			/// Vertex Shader binding
+			if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
@@ -2532,7 +2540,7 @@ bail:
 			}
 
 			/// Compute Shader binding
-			if (mBoundComputeProgram)
+			if (mBoundComputeProgram && mBindingType == TextureUnitState::BindingType::BT_COMPUTE)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
@@ -2562,7 +2570,7 @@ bail:
 			}
 
 			/// Hull Shader binding
-			if (mBoundTesselationHullProgram)
+			if (mBoundTesselationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_HULL)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
@@ -2592,7 +2600,7 @@ bail:
 			}
 			
 			/// Domain Shader binding
-			if (mBoundTesselationDomainProgram)
+			if (mBoundTesselationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_DOMAIN)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
@@ -3779,6 +3787,8 @@ bail:
 		mBoundTesselationHullProgram = NULL;
 		mBoundTesselationDomainProgram = NULL;
 		mBoundComputeProgram = NULL;
+
+		mBindingType = TextureUnitState::BT_FRAGMENT;
 
 		ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
 
