@@ -1,29 +1,29 @@
 /*
-  -----------------------------------------------------------------------------
-  This source file is part of OGRE
-  (Object-oriented Graphics Rendering Engine)
-  For the latest info, see http://www.ogre3d.org
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  THE SOFTWARE.
-  -----------------------------------------------------------------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
 */
 
 
@@ -167,12 +167,12 @@ namespace Ogre {
         RenderTargetMap::iterator i;
         for (i = mRenderTargets.begin(); i != mRenderTargets.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
-
         mRenderTargets.clear();
+
         if(mGLSupport)
-            delete mGLSupport;
+            OGRE_DELETE mGLSupport;
     }
 
     const String& GL3PlusRenderSystem::getName(void) const
@@ -540,27 +540,36 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::shutdown(void)
     {
+       
+        printf("SHUTDOWN GL3+ RenderSystem\n");
+        RenderSystem::shutdown();
+        printf("SHUTDOWN GL3+ RenderSystem COMPLETE\n");
+
         // Deleting the GLSL program factory
         if (mGLSLProgramFactory)
         {
             // Remove from manager safely
             if (HighLevelGpuProgramManager::getSingletonPtr())
                 HighLevelGpuProgramManager::getSingleton().removeFactory(mGLSLProgramFactory);
-            delete mGLSLProgramFactory;
+            OGRE_DELETE mGLSLProgramFactory;
             mGLSLProgramFactory = 0;
         }
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        delete mGpuProgramManager;
+        printf("DELETE GL3+GpuProgramManager\n");
+        OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;
 
-        delete mHardwareBufferManager;
+        printf("DELETE GL3+HardwareBufferManager\n");
+        OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        delete mRTTManager;
+        printf("DELETE GL3+RTTManager\n");
+        OGRE_DELETE mRTTManager;
         mRTTManager = 0;
 
-        delete mTextureManager;
+        printf("DELETE GL3+TextureManager\n");
+        OGRE_DELETE mTextureManager;
         mTextureManager = 0;
 
         // Delete extra threads contexts
@@ -571,16 +580,22 @@ namespace Ogre {
 
             pCurContext->releaseContext();
 
-            delete pCurContext;
+            printf("DELETE GL3+CurContext\n");
+            OGRE_DELETE pCurContext;
         }
         mBackgroundContextList.clear();
 
         mGLSupport->stop();
         mStopRendering = true;
 
+        // delete mTextureManager;
+        // mTextureManager = 0;
+
         mGLInitialised = 0;
 
-        RenderSystem::shutdown();
+        // printf("SHUTDOWN GL3+ RenderSystem\n");
+        // RenderSystem::shutdown();
+        // printf("SHUTDOWN GL3+ RenderSystem COMPLETE\n");
     }
 
     bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
@@ -1792,11 +1807,11 @@ namespace Ogre {
             break;
         }
 
-        if (mCurrentGeometryProgram) {
-            printf("useAdjacency: %.1u \n", useAdjacency);
-            printf("primType == GL_LINES_ADJACENCY: %.1u \n", primType == GL_LINES_ADJACENCY);
-            printf("primType == GL_TRIANGLES: %.1u \n", primType == GL_TRIANGLES);
-        }
+        // if (mCurrentGeometryProgram) {
+        //     printf("useAdjacency: %.1u \n", useAdjacency);
+        //     printf("primType == GL_LINES_ADJACENCY: %.1u \n", primType == GL_LINES_ADJACENCY);
+        //     printf("primType == GL_TRIANGLES: %.1u \n", primType == GL_TRIANGLES);
+        // }
 
 
         // TODO: Bind atomic counter buffers here
@@ -1868,7 +1883,8 @@ namespace Ogre {
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
-            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+            //FIXME : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Former technically slower, latter breaks samples.
+            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT; 
 
             do
             {
