@@ -83,6 +83,11 @@ public:
 			mSRSSegLightFactory = NULL;
 		}
 
+        while (mLights.size())
+        {
+            removeSpotLight();
+        }
+
 		SdkSample::_shutdown();
 	}
 
