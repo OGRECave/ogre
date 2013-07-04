@@ -56,10 +56,10 @@ void main()
 {
 
     // construct index for this tetrahedron
-    int index = int((int(VertexIn[0].Field.y) << 3) |
-                      (int(VertexIn[1].Field.y) << 2) |
-                      (int(VertexIn[2].Field.y) << 1) |
-                      int(VertexIn[3].Field.y));
+    uint index = uint((uint(VertexIn[0].Field.y) << 3) |
+                      (uint(VertexIn[1].Field.y) << 2) |
+                      (uint(VertexIn[2].Field.y) << 1) |
+                      uint(VertexIn[3].Field.y));
 
     // don't bother if all vertices out or all vertices inside isosurface
     if (index > uint(0) && index < uint(15))
