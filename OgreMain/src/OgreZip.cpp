@@ -271,7 +271,14 @@ namespace Ogre {
 	bool ZipArchive::exists(const String& filename)
 	{		
 		OGRE_LOCK_AUTO_MUTEX;
-		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), filename)) != mFileList.end();
+		String cleanName = filename;
+		if(filename.rfind("/") != String::npos)
+		{
+			StringVector tokens = StringUtil::split(filename, "/");
+			cleanName = tokens[tokens.size() - 1];
+		}
+
+		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
 	}
 	//---------------------------------------------------------------------
 	time_t ZipArchive::getModifiedTime(const String& filename)
