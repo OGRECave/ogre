@@ -1456,8 +1456,8 @@ bail:
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
 		// If we tell we want to use it as a Shader Resource when in MSAA, we will fail
 		// This is a recomandation from NVidia.
-		if(BBDesc.SampleDesc.Count == 1)
-			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+		//		if(BBDesc.SampleDesc.Count == 1)
+		//			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 		descDepth.CPUAccessFlags		= 0;
 		descDepth.MiscFlags				= 0;

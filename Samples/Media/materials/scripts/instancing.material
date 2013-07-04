@@ -1,7 +1,7 @@
 vertex_program InstancingCg cg
 {
 	source instancing.cg
-	profiles vs_4_0 vs_2_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
 	entry_point instancing_vp
 
 	default_params
@@ -16,7 +16,7 @@ vertex_program InstancingCg cg
 vertex_program InstancingShadowCasterCg cg
 {
    	source instancing.cg
-	profiles vs_4_0 vs_2_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
 	entry_point instancingCaster_vp
 	default_params
 	{
@@ -28,7 +28,7 @@ vertex_program InstancingShadowCasterCg cg
 vertex_program CrowdCg cg
 {
 	source instancing.cg
-	profiles vs_4_0 vs_2_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
 	entry_point crowd_vp
 	default_params
 	{
@@ -43,7 +43,7 @@ vertex_program CrowdCg cg
 vertex_program CrowdShadowCasterCg cg
 {
 	source instancing.cg
-	profiles vs_4_0 vs_2_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
 	entry_point crowdCaster_vp
 	default_params
 	{
@@ -57,7 +57,7 @@ vertex_program CrowdShadowCasterCg cg
 vertex_program Instancinghlsl hlsl
 {
 	source Instancing.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point instancing_vp
 	preprocessor_defines SHADOW_CASTER=0
 	default_params
@@ -72,7 +72,7 @@ vertex_program Instancinghlsl hlsl
 vertex_program InstancingShadowCasterhlsl hlsl
 {
    	source Instancing.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point instancingCaster_vp
 	preprocessor_defines SHADOW_CASTER=1
 	default_params
@@ -85,7 +85,7 @@ vertex_program InstancingShadowCasterhlsl hlsl
 vertex_program Crowdhlsl hlsl
 {
 	source Instancing.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point crowd_vp
 	preprocessor_defines SHADOW_CASTER=0
 	default_params
@@ -101,7 +101,7 @@ vertex_program Crowdhlsl hlsl
 vertex_program CrowdShadowCasterhlsl hlsl
 {
 	source Instancing.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point crowdCaster_vp
 	preprocessor_defines SHADOW_CASTER=1
 	default_params

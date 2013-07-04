@@ -10,7 +10,7 @@ fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp4 hlsl
 {
 	source hdrfp4.hlsl
 	entry_point downscale2x2Luminencefp4
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp glsl
@@ -80,7 +80,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3HLSL_fp4 hlsl
 {
 	source hdrfp4.hlsl
 	entry_point downscale3x3fp4
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 fragment_program Ogre/Compositor/HDR/downscale3x3GLSLES_fp glsles
 {
@@ -150,7 +150,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp4 hlsl
 {
 	source hdrfp4.hlsl
 	entry_point downscale3x3brightpassfp4
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Ogre/Compositor/HDR/utils_fp glsl
@@ -236,7 +236,7 @@ fragment_program Ogre/Compositor/HDR/bloomHLSL_fp4 hlsl
 {
 	source hdrfp4.hlsl
 	entry_point bloomfp4
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 fragment_program Ogre/Compositor/HDR/bloomGLSL_fp glsl
 {
@@ -304,7 +304,7 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingHLSL_fp4 hlsl
 {
 	source hdrfp4.hlsl
 	entry_point finalToneMappingfp4
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Ogre/Compositor/HDR/finaltonemappingGLSL_fp glsl

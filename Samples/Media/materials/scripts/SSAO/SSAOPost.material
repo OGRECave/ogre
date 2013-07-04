@@ -2,35 +2,35 @@ fragment_program SSAO/Post/NoFilter_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
     entry_point noFilter_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/Post/BoxFilter_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
     entry_point boxFilter_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/Post/SmartBoxFilter_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
     entry_point smartBoxFilter_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/X_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
     entry_point crossBilateralFilterX_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
     entry_point crossBilateralFilterY_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/Post/NoFilter_fp_cg cg

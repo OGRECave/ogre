@@ -97,7 +97,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT
 
@@ -108,7 +108,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT
 
@@ -119,7 +119,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION
 
@@ -130,7 +130,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION
 
@@ -141,7 +141,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -152,7 +152,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs cg
 {
 	source HW_VTFInstancing.cg
 	entry_point main_vs
-	profiles vs_4_0 vs_3_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -166,7 +166,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_hlsl_vs hlsl
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWRECEIVER,BONE_MATRIX_LUT
 
@@ -177,7 +177,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_hlsl_vs hlsl
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWCASTER,BONE_MATRIX_LUT
 
@@ -188,7 +188,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_hlsl_vs hlsl
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWRECEIVER,BONE_MATRIX_LUT,ST_DUAL_QUATERNION
 
@@ -199,7 +199,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_hlsl_vs hlsl
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWCASTER,BONE_MATRIX_LUT,ST_DUAL_QUATERNION
 
@@ -210,7 +210,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_hlsl_vs hlsl
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWRECEIVER,BONE_MATRIX_LUT,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
 
@@ -221,7 +221,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_hlsl_vs h
 {
 	source HW_VTFInstancing.hlsl
 	entry_point main_vs
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	
 	preprocessor_defines DEPTH_SHADOWCASTER,BONE_MATRIX_LUT,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
 

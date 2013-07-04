@@ -38,7 +38,7 @@ vertex_program Ogre/ParticleGS/GenerateVShlsl4 hlsl
 	source ParticleGS.hlsl
 	entry_point GenerateParticles_VS
 	enable_backwards_compatibility no
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
 geometry_program Ogre/ParticleGS/GenerateGShlsl4 hlsl
@@ -54,7 +54,7 @@ vertex_program Ogre/ParticleGS/DisplayVShlsl4 hlsl
 	source ParticleGS.hlsl
 	entry_point DisplayParticles_VS
 	enable_backwards_compatibility no
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
 geometry_program Ogre/ParticleGS/DisplayGShlsl4 hlsl
@@ -70,7 +70,7 @@ fragment_program Ogre/ParticleGS/DisplayPShlsl4 hlsl
 	source ParticleGS.hlsl
 	entry_point DisplayParticles_PS
 	enable_backwards_compatibility no
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program Ogre/ParticleGS/GenerateVSglsl glsl

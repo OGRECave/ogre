@@ -2,7 +2,7 @@ fragment_program SSAO/HemisphereMC_fp_hlsl hlsl
 {
     source HemisphereMC.hlsl
     entry_point HemisphereMC_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program SSAO/HemisphereMC_fp_cg cg

@@ -837,7 +837,7 @@ vertex_program Examples/GrassWaverVpCg cg
 {
 	source Grass.cg
 	entry_point grass_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 
     default_params
     {
@@ -857,7 +857,7 @@ vertex_program Examples/GrassWaverTexVpCg cg
   {
 	source Grass.cg
 	entry_point grassTex_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 
     default_params
       {
@@ -869,7 +869,7 @@ vertex_program Examples/GrassWaverAmbientVpCg cg
 {
 	source Grass.cg
 	entry_point grassAmbient_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 
     default_params
   	{
@@ -882,7 +882,7 @@ fragment_program Examples/GrassWaverAmbientFpCg cg
 {
 	source Grass.cg
 	entry_point grassAmbient_fp
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
     default_params
     {
     }
@@ -891,7 +891,7 @@ fragment_program Examples/GrassWaverFpCg cg
 {
 	source Grass.cg
 	entry_point grass_fp
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
     default_params
     {
     }
@@ -901,7 +901,7 @@ vertex_program Examples/GrassWaverCasterVpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 
     default_params
     {
@@ -914,7 +914,7 @@ fragment_program Examples/GrassWaverCasterFpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_fp
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
     default_params
     {
     }
@@ -924,7 +924,7 @@ vertex_program Examples/GrassWaverReceiverVpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 
     default_params
     {
@@ -946,7 +946,7 @@ fragment_program Examples/GrassWaverReceiverFpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_fp
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 
 	default_params
     {
@@ -2027,14 +2027,14 @@ fragment_program Examples/ShowUV_pCg_sm4 cg
 {
 	source Example_Basic_sm4.cg
 	entry_point showuv_p
-	profiles ps_4_0
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Examples/ShowUV_pHLSL hlsl
 {
 	source Example_Basic4.hlsl
 	entry_point showuv_p
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Examples/ShowUV_pGLSLES glsles
@@ -2068,14 +2068,14 @@ fragment_program Examples/ShowUVdir3D_pCg_sm4 cg
 {
 	source Example_Basic_sm4.cg
 	entry_point showuvdir3d_p
-	profiles ps_4_0
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 {
 	source Example_Basic4.hlsl
 	entry_point showuvdir3d_p
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
@@ -2114,7 +2114,7 @@ vertex_program Examples/ShowTangents_vCg_sm4 cg
 {
 	source Example_Basic_sm4.cg
 	entry_point basicPassthroughTangent_v
-	profiles vs_4_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2164,7 +2164,7 @@ vertex_program Examples/ShowNormals_vCg_sm4 cg
 {
 	source Example_Basic_sm4.cg
 	entry_point basicPassthroughNormal_v
-	profiles vs_4_0
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix

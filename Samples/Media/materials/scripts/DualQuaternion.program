@@ -6,7 +6,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
-    profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 	
 	default_params
@@ -20,7 +20,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp
-    profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 
 	default_params
@@ -36,7 +36,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsCaster_vp
-    profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 }
 
@@ -44,7 +44,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp
-	profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
+	profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 }
 
@@ -56,7 +56,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsHLSL hlsl
 {
 	source DualQuaternion.hlsl
 	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
-    target vs_4_0
+    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	includes_skeletal_animation true
 	
 	default_params
@@ -70,7 +70,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseHLSL hlsl
 {
 	source DualQuaternion.hlsl
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp
-    target vs_4_0
+    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	includes_skeletal_animation true
 
 	default_params
@@ -86,7 +86,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterHLSL hls
 {
 	source DualQuaternion.hlsl
 	entry_point dualQuaternionHardwareSkinningTwoWeightsCaster_vp
-    target vs_4_0
+    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	includes_skeletal_animation true
 }
 
@@ -94,7 +94,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 {
 	source DualQuaternion.hlsl
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	includes_skeletal_animation true
 }
 

@@ -2,14 +2,14 @@ vertex_program SSAO/GBuffer_vp_hlsl hlsl
 {
     source GBuffer.hlsl
     entry_point GBuffer_vp
-    target vs_4_0
+    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
 fragment_program SSAO/GBuffer_fp_hlsl hlsl
 {
     source GBuffer.hlsl
     entry_point GBuffer_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program SSAO/GBuffer_vp_cg cg

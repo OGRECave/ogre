@@ -5,7 +5,7 @@ vertex_program Ogre/IsoSurf/SampleFieldVS_HLSL hlsl
 {
 	source isosurf.hlsl
 	entry_point mainVS
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -32,7 +32,7 @@ fragment_program Ogre/IsoSurf/MetaballPS_HLSL hlsl
 {
 	source isosurf.hlsl
 	entry_point mainPS
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 //////////

@@ -19,7 +19,7 @@ vertex_program Examples/OffsetMappingVPShaderModel4 cg
 { 
    source OffsetMapping.cg 
    entry_point main_vp 
-   profiles vs_4_0 
+   profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 
 } 
 
 // Bump map with parallax fragment program 
@@ -27,7 +27,7 @@ fragment_program Examples/OffsetMappingFPShaderModel4 cg
 { 
    source OffsetMapping.cg
    entry_point main_fp
-   profiles ps_4_0
+   profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 } 
 
 

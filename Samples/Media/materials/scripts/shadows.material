@@ -70,7 +70,7 @@ fragment_program Ogre/shadow/receiver/depth/pssm3/fpCg cg
 vertex_program Ogre/shadow/caster/depth/vphlsl hlsl
 {
 	source depthshadowobject.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main_vp
 	preprocessor_defines SHADOWCASTER=1;DEPTH_SHADOWCASTER=1;DEPTH_SHADOWRECEIVER=0
 
@@ -84,7 +84,7 @@ vertex_program Ogre/shadow/caster/depth/vphlsl hlsl
 fragment_program Ogre/shadow/caster/depth/fphlsl hlsl
 {
 	source depthshadowobject.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point caster_fp
 	preprocessor_defines SHADOWCASTER=1;DEPTH_SHADOWCASTER=1;DEPTH_SHADOWRECEIVER=0
 
@@ -96,7 +96,7 @@ fragment_program Ogre/shadow/caster/depth/fphlsl hlsl
 vertex_program Ogre/shadow/receiver/depth/pssm3/vphlsl hlsl
 {
 	source depthshadowobject.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main_vp
 	preprocessor_defines SHADOWCASTER=0;DEPTH_SHADOWCASTER=0;DEPTH_SHADOWRECEIVER=1 
 
@@ -118,7 +118,7 @@ vertex_program Ogre/shadow/receiver/depth/pssm3/vphlsl hlsl
 fragment_program Ogre/shadow/receiver/depth/pssm3/fphlsl hlsl
 {
 	source depthshadowobject.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point caster_fp
 	preprocessor_defines SHADOWCASTER=0;DEPTH_SHADOWCASTER=0;DEPTH_SHADOWRECEIVER=1 
 

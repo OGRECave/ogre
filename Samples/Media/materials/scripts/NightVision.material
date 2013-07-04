@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/NightVisionFPCg cg
 {
 	source NightVisionFP.cg
 	entry_point NightVision_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	
 	default_params
 	{
