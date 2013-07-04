@@ -75,50 +75,6 @@ void main()
         ivec4 e0 = ivec4((edgeVal >> 14) & three, (edgeVal >> 12) & three, (edgeVal >> 10) & three, (edgeVal >> 8) & three);
         ivec4 e1 = ivec4((edgeVal >> 6) & three, (edgeVal >> 4) & three, (edgeVal >> 2) & three, (edgeVal >> 0) & three);
 
-
-        // const uint edge_table[120] = uint[](
-        //   0, 0, 0, 0,
-        //   3, 0, 3, 1,
-        //   2, 1, 2, 0,
-        //   2, 0, 3, 0,
-        //   1, 2, 1, 3,
-        //   1, 0, 1, 2,
-        //   1, 0, 2, 0,
-        //   3, 0, 1, 0,
-        //   0, 2, 0, 1,
-        //   0, 1, 3, 1,
-        //   0, 1, 0, 3,
-        //   3, 1, 2, 1,
-        //   0, 2, 1, 2,
-        //   1, 2, 3, 2,
-        //   0, 3, 2, 3,
-
-        //   0, 0, 0, 1,
-        //   3, 2, 0, 0,
-        //   2, 3, 0, 0,
-        //   2, 1, 3, 1,
-        //   1, 0, 0, 0,
-        //   3, 0, 3, 2,
-        //   1, 3, 2, 3,
-        //   2, 0, 0, 0,
-        //   0, 3, 0, 0,
-        //   0, 2, 3, 2,
-        //   2, 1, 2, 3,
-        //   0, 1, 0, 0,
-        //   0, 3, 1, 3,
-        //   0, 2, 0, 0,
-        //   1, 3, 0, 0
-        // );
-
-        // ivec4 e0 = ivec4(edge_table[index], edge_table[index+1],
-        //                  edge_table[index+2], edge_table[index+3]) * 255;
-        // ivec4 e1 = ivec4(edge_table[index+60], edge_table[index+61], 
-        //                  edge_table[index+62], edge_table[index+63]) * 255;
-
-
-        // ivec4 e0 = ivec4(texture2D(edge_table, vec2(index, 0)) * 255);
-        // ivec4 e1 = ivec4(texture2D(edge_table, vec2(index, 1)) * 255);
-
         CalcIntersection(gl_in[e0.x].gl_Position, VertexIn[e0.x].N, VertexIn[e0.x].Field,
                          gl_in[e0.y].gl_Position, VertexIn[e0.y].N, VertexIn[e0.y].Field);
         CalcIntersection(gl_in[e0.z].gl_Position, VertexIn[e0.z].N, VertexIn[e0.z].Field,
@@ -128,7 +84,6 @@ void main()
 
         // Emit additional triangle, if necessary
         if (e1.z != -1) {
-        // if (e1.z != 0) {
              CalcIntersection(gl_in[e1.z].gl_Position, VertexIn[e1.z].N, VertexIn[e1.z].Field,
                               gl_in[e1.w].gl_Position, VertexIn[e1.w].N, VertexIn[e1.w].Field);
          }

@@ -17,42 +17,6 @@ using namespace Ogre;
 
 #define MAKE_INDEX(x, y, z, sizeLog2)   (int)((x) | ((y) << sizeLog2[0]) | ((z) << (sizeLog2[0] + sizeLog2[1])))
 
-//JAJ
-//FIXME
-// unsigned char edge_table[] = {
-//     0, 0, 0, 0,
-//     3, 0, 3, 1,
-//     2, 1, 2, 0,
-//     2, 0, 3, 0,
-//     1, 2, 1, 3,
-//     1, 0, 1, 2,
-//     1, 0, 2, 0,
-//     3, 0, 1, 0,
-//     0, 2, 0, 1,
-//     0, 1, 3, 1,
-//     0, 1, 0, 3,
-//     3, 1, 2, 1,
-//     0, 2, 1, 2,
-//     1, 2, 3, 2,
-//     0, 3, 2, 3,
-
-//     0, 0, 0, 1,
-//     3, 2, 0, 0,
-//     2, 3, 0, 0,
-//     2, 1, 3, 1,
-//     1, 0, 0, 0,
-//     3, 0, 3, 2,
-//     1, 3, 2, 3,
-//     2, 0, 0, 0,
-//     0, 3, 0, 0,
-//     0, 2, 3, 2,
-//     2, 1, 2, 3,
-//     0, 1, 0, 0,
-//     0, 3, 1, 3,
-//     0, 2, 0, 0,
-//     1, 3, 0, 0,
-// };
-
 //--------------------------------------------------------------------------------------
 // Fills pPos with x, y, z de-swizzled from index with bitsizes in sizeLog2
 //
@@ -85,32 +49,6 @@ void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPos)
 
 MeshPtr ProceduralTools::generateTetrahedra()
 {
-    //JAJ
-    //FIXME
-    // DataStreamPtr imgstream(new MemoryDataStream(&edge_table, 120));
-    // // TexturePtr ptex = TextureManager::getSingleton().createManual(
-    // //     "lookup_table", // Name of texture
-    // //     // "General", // Name of resource group in which the texture should be created
-    // //     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-    // //     // TEX_TYPE_2D_ARRAY, // Texture type
-    // //     TEX_TYPE_2D, // Texture type
-    // //     15, // Width
-    // //     2, // Height
-    // //     1, // Depth (Must be 1 for two dimensional textures)
-    // //     0, // Number of mipmaps
-    // //     PF_BYTE_A8R8G8B8, // Pixel format
-    // //     TU_STATIC // usage
-    // // );
-    // TexturePtr ptex = TextureManager::getSingleton().loadRawData(
-    //     "edge_table", // Name of texture
-    //     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-    //     imgstream,
-    //     15, // Width
-    //     2, // Height
-    //     PF_A8R8G8B8, // Pixel format
-    //     TEX_TYPE_2D // Texture type
-    // );
-
     MeshPtr tetrahedraMesh = Ogre::MeshManager::getSingleton().createManual
         ("TetrahedraMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
