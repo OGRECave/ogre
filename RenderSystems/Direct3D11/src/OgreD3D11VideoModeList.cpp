@@ -71,19 +71,15 @@ namespace Ogre
 				DXGI_OUTPUT_DESC OutputDesc;
 				pOutput->GetDesc(&OutputDesc);
 
-				const DXGI_FORMAT allowedAdapterFormatArray[] = 
-				{
-					DXGI_FORMAT_R8G8B8A8_UNORM,			//This is DXUT's preferred mode
+				UINT NumModes = 0;
+                hr = pOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
+                    0,
+                    &NumModes,
+                    NULL );
 
-					//DXGI_FORMAT_R16G16B16A16_FLOAT,
-					//DXGI_FORMAT_R10G10B10A2_UNORM,
-					//DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-				};
-				int allowedAdapterFormatArrayCount  = sizeof(allowedAdapterFormatArray) / sizeof(allowedAdapterFormatArray[0]);
-
-				UINT NumModes = 512;
-				DXGI_MODE_DESC *pDesc = new DXGI_MODE_DESC[ NumModes ];
-				hr = pOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,//allowedAdapterFormatArray[f],
+                DXGI_MODE_DESC *pDesc = new DXGI_MODE_DESC[ NumModes ];
+                ZeroMemory(pDesc, sizeof(DXGI_MODE_DESC) * NumModes);
+				hr = pOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
 					0,
 					&NumModes,
 					pDesc );
@@ -141,7 +137,7 @@ namespace Ogre
 						mModeList.push_back( D3D11VideoMode( OutputDesc,displayMode ) );
 
 				}
-
+                delete [] pDesc;
 			}
 		}
 		/*	

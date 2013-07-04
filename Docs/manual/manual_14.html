@@ -287,7 +287,7 @@ material walls/funkywall1
 
 </p><a name="SEC26"></a>
 <h3 class="subheading"> Top-level material attributes </h3>
-<p>The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:<br><br>
+<p>The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections). However, it does have some, and here they are:<br><br>
 <a name="ANC1"></a>
 </p><a name="SEC27"></a>
 <h3 class="subheading"> lod_distances (deprecated) </h3>
@@ -296,19 +296,19 @@ material walls/funkywall1
 <a name="ANC2"></a>
 </p><a name="SEC28"></a>
 <h3 class="subheading"> lod_strategy </h3>
-<p>Sets the name of the LOD strategy to use. Defaults to 'Distance' which means LOD changes based on distance from the camera. Also supported is 'PixelCount' which changes LOD based on an estimate of the screen-space pixels affected. <br><br>
+<p>Sets the name of the LOD strategy to be used. Defaults to 'distance_sphere' which means LOD changes based on distance from the camera (calculated via the bounding sphere radius). The strategy 'distance_box' behaves the same as 'distance_sphere' except that it uses the object&#039;s bounding <u>box</u> to approximate the distance. Additionally, there are two pixel count strategies which - instead of using the distance from the camera to an object as switching criteria between the different LOD levels - uses the screen space an object occupies to decide when to change the level. The strategy 'pixel_count' changes LOD levels based on an absolute estimate of the screen-space pixels occupied (internally approximated via the bounding radius), whereas 'screen_ratio_pixel_count' sets that absolute screen space value in relation to the screen size (1.0 = object covering complete screen, 0.5 = half screen covered by object, etc.).<br><br>
 Format: lod_strategy &lt;name&gt;<br>
-Default: lod_strategy Distance<br><br>
+Default: lod_strategy distance_sphere<br><br>
 </p><a name="NOD16"></a>
 <a name="SEC29"></a>
 <h3 class="subheading"> lod_values </h3>
-<p>This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for <a href="#ANC2">lod_strategy</a> - it is a list of distances for the 'Distance' strategy, and a list of pixel counts for the 'PixelCount' strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify '0' at the start of the list. You must ensure that there is at least one Technique with a <a href="manual_15.html#ANC7">lod_index</a> value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod_index 0.<br><br>
-<br><br>
+<p>This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for <a href="#ANC2">lod_strategy</a> - it is a list of distances for the distance strategies, and a list of pixel counts for the pixel count strategies, for example. You must give it a list of values, in order from highest (= most detailed) LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next worse LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify '0' at the start of the list. You must ensure that there is at least one Technique with a <a href="manual_15.html#ANC7">lod_index</a> value for each value in the list (so if you specify 3 lod_values, you must have Techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod_index 0.<br><br>
+<br>
 Format: lod_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<br>
-Default: none<br><br>
+Default: none<br>
 
 </p><p>Example: <br>
-lod_strategy Distance
+lod_strategy distance_sphere<br>
 lod_values 300.0 600.5 1200<br><br>
 
 </p><p>The above example would cause the material to use the best Technique at lod_index 0 up to a distance of 300 world units, the best from lod_index 1 from 300 up to 600, lod_index 2 from 600 to 1200, and lod_index 3 from 1200 upwards.<br><br>

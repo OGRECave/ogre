@@ -84,9 +84,19 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
-#if OGRE_NO_ETC_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+#if OGRE_NO_ETC_CODEC == 0 
+#	ifdef GL_OES_compressed_ETC1_RGB8_texture
             case PF_ETC1_RGB8:
                 return GL_ETC1_RGB8_OES;
+#	endif
+#	ifdef GL_AMD_compressed_ATC_texture
+			case PF_ATC_RGB:
+				return ATC_RGB_AMD;
+			case PF_ATC_RGBA_EXPLICIT_ALPHA:
+				return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+			case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+				return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+#	endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -335,9 +345,19 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG;
 #endif
 
-#if OGRE_NO_ETC_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+#if OGRE_NO_ETC_CODEC == 0 
+#	ifdef GL_OES_compressed_ETC1_RGB8_texture
             case PF_ETC1_RGB8:
                 return GL_ETC1_RGB8_OES;
+#	endif
+#	ifdef GL_AMD_compressed_ATC_texture
+			case PF_ATC_RGB:
+				return ATC_RGB_AMD;
+			case PF_ATC_RGBA_EXPLICIT_ALPHA:
+				return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+			case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+				return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+#	endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -568,9 +588,19 @@ namespace Ogre  {
                 return PF_PVRTC2_4BPP;
 #endif
 
-#if OGRE_NO_ETC_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+#if OGRE_NO_ETC_CODEC == 0 
+#	ifdef GL_OES_compressed_ETC1_RGB8_texture
             case GL_ETC1_RGB8_OES:
                 return PF_ETC1_RGB8;
+#	endif
+#	ifdef GL_AMD_compressed_ATC_texture
+			case ATC_RGB_AMD:
+				return PF_ATC_RGB;
+			case ATC_RGBA_EXPLICIT_ALPHA_AMD:
+				return PF_ATC_RGBA_EXPLICIT_ALPHA;
+			case ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+				return PF_ATC_RGBA_INTERPOLATED_ALPHA;
+#	endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0

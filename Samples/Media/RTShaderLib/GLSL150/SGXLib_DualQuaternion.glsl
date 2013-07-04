@@ -108,17 +108,17 @@ void SGX_NormalizeDualQuaternion(inout mat2x4 dq)
 void SGX_AdjointTransposeMatrix(in mat3x3 M, out mat3x3 vOut)
 {
 	mat3x3 atM;
-	atM._m00 = M._m22 * M._m11 - M._m12 * M._m21;
-	atM._m01 = M._m12 * M._m20 - M._m10 * M._m22;
-	atM._m02 = M._m10 * M._m21 - M._m20 * M._m11;
+	atM[0][0] = M[2][2] * M[1][1] - M[1][2] * M[2][1];
+	atM[0][1] = M[1][2] * M[2][0] - M[1][0] * M[2][2];
+	atM[0][2] = M[1][0] * M[2][1] - M[2][0] * M[1][1];
 
-	atM._m10 = M._m02 * M._m21 - M._m22 * M._m01;
-	atM._m11 = M._m22 * M._m00 - M._m02 * M._m20;
-	atM._m12 = M._m20 * M._m01 - M._m00 * M._m21;
+	atM[1][0] = M[0][2] * M[2][1] - M[2][2] * M[0][1];
+	atM[1][1] = M[2][2] * M[0][0] - M[0][2] * M[2][0];
+	atM[1][2] = M[2][0] * M[0][1] - M[0][0] * M[2][1];
 
-	atM._m20 = M._m12 * M._m01 - M._m02 * M._m11;
-	atM._m21 = M._m10 * M._m02 - M._m12 * M._m00;
-	atM._m22 = M._m00 * M._m11 - M._m10 * M._m01;
+	atM[2][0] = M[1][2] * M[0][1] - M[0][2] * M[1][1];
+	atM[2][1] = M[1][0] * M[0][2] - M[1][2] * M[0][0];
+	atM[2][2] = M[0][0] * M[1][1] - M[1][0] * M[0][1];
 
 	vOut = atM;
 }

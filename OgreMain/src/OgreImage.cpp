@@ -544,7 +544,7 @@ namespace Ogre {
 		uchar gammaramp[256];
 		const Real exponent = 1.0f / gamma;
 		for(int i = 0; i < 256; i++) {
-			gammaramp[i] = Math::Pow(i/255.0f, exponent)*255+0.5f;
+			gammaramp[i] = static_cast<uchar>(Math::Pow(i/255.0f, exponent)*255+0.5f);
 		}
 
 		for( size_t i = 0, j = size / stride; i < j; i++, buffer += stride )

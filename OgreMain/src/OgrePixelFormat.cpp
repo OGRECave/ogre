@@ -1296,7 +1296,7 @@ namespace Ogre {
         /* Bytes per element */
         0,
         /* Flags */
-        PFF_COMPRESSED,
+        PFF_COMPRESSED | PFF_HASALPHA,
         /* Component type and count */
         PCT_BYTE, 4,
         /* rbits, gbits, bbits, abits */
@@ -1309,7 +1309,46 @@ namespace Ogre {
         /* Bytes per element */
         0,
         /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ATC_RGB",
+        /* Bytes per element */
+        0,
+        /* Flags */
         PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ATC_RGBA_EXPLICIT_ALPHA",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_ATC_RGBA_INTERPOLATED_ALPHA",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
         /* Component type and count */
         PCT_BYTE, 4,
         /* rbits, gbits, bbits, abits */
@@ -1415,6 +1454,11 @@ namespace Ogre {
                 case PF_ETC2_RGBA8:
                 case PF_ETC2_RGB8A1:
                     return ((width * height) >> 1);
+                case PF_ATC_RGB:
+                    return ((width + 3) / 4) * ((height + 3) / 4) * 8;
+                case PF_ATC_RGBA_EXPLICIT_ALPHA:
+                case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+                    return ((width + 3) / 4) * ((height + 3) / 4) * 16;
 
 				default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",

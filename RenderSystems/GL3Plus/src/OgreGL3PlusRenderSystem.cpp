@@ -299,7 +299,13 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         }
-        
+
+        // Check for etc compression
+        if(mGLSupport->checkExtension("GL_ARB_ES3_compatibility") || gl3wIsSupported(4, 3))
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
+        }
+
         // Check for vtc compression
         if(mGLSupport->checkExtension("GL_NV_texture_compression_vtc"))
         {
@@ -389,8 +395,8 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-//        if(mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || gl3wIsSupported(4, 1))
-//            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+        if(mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || gl3wIsSupported(4, 1))
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);

@@ -40,7 +40,7 @@ namespace Ogre {
 	/** \addtogroup LOD
 	*  @{
 	*/
-	/// Struct containing information about a lod change event for movable objects.
+	/// Struct containing information about a LOD change event for movable objects.
     struct MovableObjectLodChangedEvent
     {
         /// The movable object whose level of detail has changed.
@@ -50,7 +50,7 @@ namespace Ogre {
         Camera *camera;
     };
 
-    /// Struct containing information about a mesh lod change event for entities.
+    /// Struct containing information about a mesh LOD change event for entities.
     struct EntityMeshLodChangedEvent
     {
         /// The entity whose level of detail has changed.
@@ -59,7 +59,7 @@ namespace Ogre {
         /// The camera with respect to which the level of detail has changed.
         Camera *camera;
 
-        /// Lod value as determined by lod strategy.
+        /// LOD value as determined by LOD strategy.
         Real lodValue;
 
         /// Previous level of detail index.
@@ -69,7 +69,7 @@ namespace Ogre {
         ushort newLodIndex;
     };
 
-    /// Struct containing information about a material lod change event for entities.
+    /// Struct containing information about a material LOD change event for entities.
     struct EntityMaterialLodChangedEvent
     {
         /// The sub-entity whose material's level of detail has changed.
@@ -78,7 +78,7 @@ namespace Ogre {
         /// The camera with respect to which the level of detail has changed.
         Camera *camera;
 
-        /// Lod value as determined by lod strategy.
+        /// LOD value as determined by LOD strategy.
         Real lodValue;
 
         /// Previous level of detail index.
@@ -90,16 +90,16 @@ namespace Ogre {
 
 
     /** A interface class defining a listener which can be used to receive
-        notifications of lod events.
+        notifications of LOD events.
         @remarks
             A 'listener' is an interface designed to be called back when
             particular events are called. This class defines the
-            interface relating to lod events. In order to receive
-            notifications of lod events, you should create a subclass of
+            interface relating to LOD events. In order to receive
+            notifications of LOD events, you should create a subclass of
             LodListener and override the methods for which you would like
             to customise the resulting processing. You should then call
             SceneManager::addLodListener passing an instance of this class.
-            There is no limit to the number of lod listeners you can register,
+            There is no limit to the number of LOD listeners you can register,
             allowing you to register multiple listeners for different purposes.
 
             For some uses, it may be advantageous to also subclass
@@ -121,7 +121,7 @@ namespace Ogre {
         virtual ~LodListener() {}
 
         /**
-        Called before a movable object's lod has changed.
+        Called before a movable object's LOD has changed.
         @remarks
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
@@ -135,7 +135,7 @@ namespace Ogre {
         { (void)evt; return false; }
 
         /**
-        Called after a movable object's lod has changed.
+        Called after a movable object's LOD has changed.
         @remarks
             May be called even if not requested from prequeueMovableObjectLodChanged
             as only one event queue is maintained per SceneManger instance.
@@ -144,7 +144,7 @@ namespace Ogre {
         { (void)evt; }
 
         /**
-        Called before an entity's mesh lod has changed.
+        Called before an entity's mesh LOD has changed.
         @remarks
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
@@ -152,7 +152,7 @@ namespace Ogre {
 
             It is possible to change the event notification 
             and even alter the newLodIndex field (possibly to 
-            prevent the lod from changing, or to skip an 
+            prevent the LOD from changing, or to skip an 
             index).
         @return
             True to indicate the event should be queued and
@@ -163,7 +163,7 @@ namespace Ogre {
         { (void)evt; return false; }
 
         /**
-        Called after an entity's mesh lod has changed.
+        Called after an entity's mesh LOD has changed.
         @remarks
             May be called even if not requested from prequeueEntityMeshLodChanged
             as only one event queue is maintained per SceneManger instance.
@@ -172,7 +172,7 @@ namespace Ogre {
         { (void)evt; }
 
         /**
-        Called before an entity's material lod has changed.
+        Called before an entity's material LOD has changed.
         @remarks
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
@@ -180,7 +180,7 @@ namespace Ogre {
 
             It is possible to change the event notification 
             and even alter the newLodIndex field (possibly to 
-            prevent the lod from changing, or to skip an 
+            prevent the LOD from changing, or to skip an 
             index).
         @return
             True to indicate the event should be queued and
@@ -191,7 +191,7 @@ namespace Ogre {
         { (void)evt; return false; }
 
         /**
-        Called after an entity's material lod has changed.
+        Called after an entity's material LOD has changed.
         @remarks
             May be called even if not requested from prequeueEntityMaterialLodChanged
             as only one event queue is maintained per SceneManger instance.

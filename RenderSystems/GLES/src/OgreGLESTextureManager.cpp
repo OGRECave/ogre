@@ -97,7 +97,10 @@ namespace Ogre {
         // Check compressed texture support
         // if a compressed format not supported, revert to PF_A8R8G8B8
         if (PixelUtil::isCompressed(format) &&
-            !caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) && !caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC))
+            !caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) && 
+			!caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC) && 
+			!caps->hasCapability(RSC_TEXTURE_COMPRESSION_ATC) && 
+			!caps->hasCapability(RSC_TEXTURE_COMPRESSION_ETC1))
         {
             return PF_A8R8G8B8;
         }
