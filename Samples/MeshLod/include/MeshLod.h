@@ -77,9 +77,10 @@ protected:
 		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
 		mThreaded = mTrayMgr->createCheckBox(TL_TOPLEFT, "threaded", "Background thread");
 		mThreaded->setChecked(true, false);
-		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Percentage", 200, 50, 0, 100, 101);
-		slider->setValue(50, false); // 50%
-		mUserReductionValue = 0.5; // 50%
+		mReductionSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Reduced vertices", 200, 50, 0, 100, 101);
+		
+		mTrayMgr->createButton(TL_TOPLEFT, "ReduceMore","Reduce More");
+		mTrayMgr->createButton(TL_TOPLEFT, "ReduceLess","Reduce Less");
 
 		mTrayMgr->showCursor();
 	}
@@ -98,8 +99,30 @@ protected:
 		mCamera->setNearClipDistance(mHeadMesh->getBoundingSphereRadius() / 16);
 		mCamera->setFarClipDistance(mHeadMesh->getBoundingSphereRadius() * 256);
 
+		size_t vertexCount = getUniqueVertexCount(mHeadMesh);
+		mReductionSlider->setRange(0,vertexCount,vertexCount+1,false);
+
 		updateLod();
 	}
+
+	size_t getUniqueVertexCount(Ogre::MeshPtr mesh)
+	{
+		// The vertex buffer contains the same vertex position multiple times.
+		// To get the count of the vertices, which has unique positions, we can use progressive mesh.
+		// It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
+		Ogre::LodConfig lodConfig;
+		lodConfig.mesh = mesh;
+		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		LodLevel lodLevel;
+		lodLevel.distance = std::numeric_limits<Real>::max();
+		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
+		lodLevel.reductionValue = 0.0;
+		lodConfig.levels.push_back(lodLevel);
+		ProgressiveMeshGenerator pm;
+		pm.generateLodLevels(lodConfig);
+		return lodConfig.levels[0].outUniqueVertexCount;
+	}
+
 	void cleanupContent()
 	{
 		if(mHeadEntity){
@@ -107,11 +130,19 @@ protected:
 			mHeadEntity = 0;
 		}
 	}
-	
+
+	void buttonHit(Button* button) {
+		if(button->getName() == "ReduceMore") {
+			mReductionSlider->setValue(mReductionSlider->getValue()+1);
+		} else if(button->getName() == "ReduceLess") {
+			mReductionSlider->setValue(mReductionSlider->getValue()-1);
+		}
+	}
+
 	void sliderMoved(Slider* slider)
 	{
 		if (slider->getName() == "ReductionSlider") {
-			mUserReductionValue = slider->getValue() / 100.0f;
+			mUserReductionValue = slider->getValue();
 			mAutoconfig->setChecked(false, false);
 			updateLod();
 		}
@@ -159,12 +190,11 @@ protected:
 	void loadUserLod(Ogre::MeshPtr& mesh, Real reductionValue)
 	{
 		Ogre::LodConfig lodConfig;
-		lodConfig.levels.clear();
 		lodConfig.mesh = mesh;
 		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
 		lodConfig.advanced.disableCompression = !mCompress->isChecked();
 		LodLevel lodLevel;
-		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
+		lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 		lodLevel.distance = 1;
 		lodLevel.reductionValue = reductionValue;
 		lodConfig.levels.push_back(lodLevel);
@@ -188,7 +218,7 @@ protected:
 			pm.getAutoconfig(mesh, config);
 			config.advanced.disableCompression = !mCompress->isChecked();
 			pm.generateLodLevels(config);
-			//pm.generateAutoconfiguredLodLevels(mesh);
+			pm.generateAutoconfiguredLodLevels(mesh);
 		} else {
 			ProgressiveMeshGenerator pm;
 			pm.generateAutoconfiguredLodLevels(mesh);
@@ -208,6 +238,7 @@ protected:
 	OgreBites::CheckBox* mCompress;
 	OgreBites::CheckBox* mAutoconfig;
 	OgreBites::CheckBox* mThreaded;
+	OgreBites::Slider* mReductionSlider;
 };
 
 #endif
