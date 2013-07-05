@@ -199,20 +199,6 @@ namespace Ogre {
         */
         SceneManager* getCreator(void) const { return mCreator; }
 
-        /** This method removes and destroys the child and all of its children.
-        @remarks
-            Unlike removeChild, which removes a single child from this
-            node but does not destroy it, this method destroys the child
-            and all of it's children. 
-        @par
-            Use this if you wish to recursively destroy a node as well as 
-            detaching it from it's parent. Note that any objects attached to
-            the nodes will be detached but will not themselves be destroyed.
-		@param
-			Index to the node, as in mChildren[index], not it's ID
-        */
-        virtual void removeAndDestroyChild( size_t index );
-
 		/** This method removes and destroys the child and all of its children.
         @remarks
             Unlike removeChild, which removes a single child from this

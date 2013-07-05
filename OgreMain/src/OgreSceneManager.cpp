@@ -92,6 +92,7 @@ SceneManager::SceneManager(const String& name) :
 	#pragma warning( disable: 4355 )
 #endif
 mNodeMemoryManager( this ),					//'this' hasn't been fully initialized yet
+mEntityMemoryManager( this ),
 #if  OGRE_COMPILER == OGRE_COMPILER_MSVC
 	#pragma warning( pop ) 
 #endif
@@ -453,7 +454,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
     LightList::const_iterator it;
     for (it = candidateLights.begin(); it != candidateLights.end(); ++it)
     {
-        Light* lt = *it;
+		Light* lt = it->light;
 		// check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
 		if(!(lt->getLightMask() & lightMask))
 			continue; //skip this light
@@ -464,14 +465,14 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         if (lt->getType() == Light::LT_DIRECTIONAL)
         {
             // Always included
-            destList.push_back(lt);
+            destList.push_back(*it);
         }
         else
         {
             // only add in-range lights
 			if (lt->isInLightRange(Sphere(position,radius)))
             {
-                destList.push_back(lt);
+                destList.push_back(*it);
             }
         }
     }
@@ -499,7 +500,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
 	size_t lightIndex = 0;
 	for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
 	{
-		(*li)->_notifyIndexInFrame(lightIndex);
+		li->light->_notifyIndexInFrame(lightIndex);
 	}
 
 
@@ -2259,6 +2260,50 @@ void SceneManager::updateAllTransforms()
 	}
 }
 //-----------------------------------------------------------------------
+void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManager )
+{
+	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
+	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::updateAllBounds( numObjs, objData );
+		}
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::cullLights()
+{
+	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::updateAllBounds( numObjs, objData );
+		}
+	}
+}
+//-----------------------------------------------------------------------
 void SceneManager::buildLightList()
 {
 	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
@@ -2283,6 +2328,8 @@ void SceneManager::buildLightList()
 		++it;
 	}
 
+	LightListInfo globalLightList;
+
 	//Global light list built. Now build a per-movable object light list
 	it = mEntitiesMemoryManagerCulledList.begin();
 	en = mEntitiesMemoryManagerCulledList.end();
@@ -2296,7 +2343,7 @@ void SceneManager::buildLightList()
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			MovableObject::buildLightList( numObjs, objData );
+			MovableObject::buildLightList( numObjs, objData, globalLightList );
 		}
 
 		++it;
@@ -2306,6 +2353,7 @@ void SceneManager::buildLightList()
 void SceneManager::highLevelCull()
 {
 	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager );
+	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager );
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateSceneGraph()
@@ -2327,8 +2375,12 @@ void SceneManager::updateSceneGraph()
 	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
 	highLevelCull();
 	updateAllTransforms();
+	updateAllBounds( mEntitiesMemoryManagerCulledList );
+	updateAllBounds( mLightsMemoryManagerCulledList );
 
 	mNodeMemoryManagerCulledList.clear();
+	mEntitiesMemoryManagerCulledList.clear();
+	mLightsMemoryManagerCulledList.clear();
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(
@@ -2490,12 +2542,12 @@ void SceneManager::renderAdditiveStencilShadowedQueueGroupObjects(
 
         for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
         {
-            Light* l = *li;
+			Light* l = li->light;
             // Set light state
 			if (lightList.empty())
-				lightList.push_back(l);
+				lightList.push_back(*li);
 			else
-				lightList[0] = l;
+				lightList[0] = *li;
 
 			// set up scissor, will cover shadow vol and regular light rendering
 			ClipResult scissored = buildAndSetScissor(lightList, mCameraInProgress);
@@ -2590,7 +2642,7 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
 
     for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
     {
-        Light* l = *li;
+		Light* l = li->light;
         if (l->getCastShadows())
         {
             // Clear stencil
@@ -2733,7 +2785,7 @@ void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
         for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
             i != iend && si != siend; ++i)
         {
-            Light* l = *i;
+			Light* l = i->light;
 
             if (!l->getCastShadows())
                 continue;
@@ -2867,7 +2919,7 @@ void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
 
 			for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
 			{
-				Light* l = *li;
+				Light* l = li->light;
 
 				if (l->getCastShadows() && si != siend)
 				{
@@ -2916,9 +2968,9 @@ void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
 
                 // render lighting passes for this light
                 if (lightList.empty())
-                    lightList.push_back(l);
+                    lightList.push_back(*li);
                 else
-                    lightList[0] = l;
+                    lightList[0] = *li;
 
 				// set up light scissoring, always useful in additive modes
 				ClipResult scissored = buildAndSetScissor(lightList, mCameraInProgress);
@@ -3391,7 +3443,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							&& lightIndex < rendLightList.size(); 
 						++lightIndex, --lightsLeft)
 					{
-						Light* currLight = rendLightList[lightIndex];
+						Light* currLight = rendLightList[lightIndex].light;
 
 						// Check whether we need to filter this one out
 						if ((pass->getRunOnlyForOneLightType() && 
@@ -3407,7 +3459,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							continue;
 						}
 
-						*destit++ = currLight;
+						destit->light = currLight;
+						++destit;
 
 						// potentially need to update content_type shadow texunit
 						// corresponding to this light
@@ -3485,7 +3538,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							// Copy lights over
 							for(LightList::const_iterator iter = copyStart; iter != rendLightList.end() && lightsCopied < lightsToCopy; ++iter)
 							{
-								if((pass->getLightMask() & (*iter)->getLightMask()) != 0)
+								if((pass->getLightMask() & iter->light->getLightMask()) != 0)
 								{
 									localLightList.push_back(*iter);
 									lightsCopied++;
@@ -3589,7 +3642,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 			{
 				if (!manualLightList ||
 					(manualLightList->size() == 1 && 
-					manualLightList->at(0)->getType() != pass->getOnlyLightType())) 
+					manualLightList->at(0).light->getType() != pass->getOnlyLightType())) 
 				{
 					skipBecauseOfLightType = true;
 				}
@@ -4530,11 +4583,11 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
         LightList::iterator j = mLightsAffectingFrustum.begin();
         for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
         {
-            *j = i->light;
+			j->light = i->light;
 			// add cam distance for sorting if texture shadows
 			if (isShadowTechniqueTextureBased())
 			{
-				(*j)->_calcTempSquareDist(camera->getDerivedPosition());
+				j->light->_calcTempSquareDist(camera->getDerivedPosition());
 			}
         }
 
@@ -5308,7 +5361,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
 
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
-		Light* l = *i;
+		Light* l = i->light;
 		// a directional light is being used, no scissoring can be done, period.
 		if (l->getType() == Light::LT_DIRECTIONAL)
 			return CLIPPED_NONE;
@@ -5409,7 +5462,7 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
 		// a directional light is being used, no clipping can be done, period.
-		if ((*i)->getType() == Light::LT_DIRECTIONAL)
+		if (i->light->getType() == Light::LT_DIRECTIONAL)
 			return CLIPPED_NONE;
 
 		if (clipBase)
@@ -5418,7 +5471,7 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
 			// in this list we could clip by, so clip none
 			return CLIPPED_NONE;
 		}
-		clipBase = *i;
+		clipBase = i->light;
 	}
 
 	if (clipBase)
@@ -5532,7 +5585,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 	// Add light to internal list for use in render call
 	LightList lightList;
 	// const_cast is forgiveable here since we pass this const
-	lightList.push_back(const_cast<Light*>(light));
+	lightList.push_back(LightClosest( const_cast<Light*>(light), 0 ));
 
     // Set up scissor test (point & spot lights only)
     ClipResult scissored = CLIPPED_NONE;
@@ -6363,16 +6416,16 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 		for (i = lightList->begin(), si = mShadowTextures.begin();
 			i != iend && si != siend; ++i)
 		{
-			Light* light = *i;
+			Light* light = i->light;
 
 			// skip light if shadows are disabled
 			if (!light->getCastShadows())
 				continue;
 
 			if (mShadowTextureCurrentCasterLightList.empty())
-				mShadowTextureCurrentCasterLightList.push_back(light);
+				mShadowTextureCurrentCasterLightList.push_back(*i);
 			else
-				mShadowTextureCurrentCasterLightList[0] = light;
+				mShadowTextureCurrentCasterLightList[0] = *i;
 
 
 			// texture iteration per light.

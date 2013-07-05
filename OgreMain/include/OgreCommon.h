@@ -547,8 +547,29 @@ namespace Ogre {
 	};
 
 	class Light;
-	typedef HashedVector<Light*> LightList;
 	typedef vector<Light*>::type LightVec;
+
+	/// Used as the light list, sorted
+	struct LightClosest
+	{
+		Light *light;
+		Real sqDistance;
+
+		LightClosest() : light( 0 ),sqDistance( 0.0f ) {}
+		LightClosest( Light *_light,  Real _sqDistance ) :
+			light( _light ), sqDistance( _sqDistance ) {}
+
+		inline bool operator < ( const LightClosest &right ) const;
+	};
+	/// Holds all lights in SoA after being culled over all frustums
+	struct LightListInfo
+	{
+		LightVec						lights;
+		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
+		uint32	* RESTRICT_ALIAS		visibilityMask;
+		Sphere	* RESTRICT_ALIAS 		boundingSphere;
+	};
+	typedef HashedVector<LightClosest> LightList;
 
 
     typedef map<String, bool>::type UnaryOptionList;

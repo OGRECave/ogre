@@ -258,15 +258,6 @@ namespace Ogre {
 		return ConstObjectIterator( mAttachments.begin(), mAttachments.end() );
 	}
     //-----------------------------------------------------------------------
-    void SceneNode::removeAndDestroyChild( size_t index )
-    {
-        SceneNode* pChild = static_cast<SceneNode*>( getChild(index) );
-        pChild->removeAndDestroyAllChildren();
-
-        removeChild(index);
-        pChild->getCreator()->destroySceneNode( pChild );
-    }
-    //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild( SceneNode *sceneNode )
     {
 		assert( sceneNode->getParent() == this );

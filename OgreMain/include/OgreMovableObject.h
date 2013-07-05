@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+	typedef vector<Frustum*>::type FrustumVec;
 
 	// Forward declaration
 	class MovableObjectFactory;
@@ -79,17 +80,6 @@ namespace Ogre {
             virtual void objectMoved(MovableObject*) {}
         };
 
-		struct LightClosest
-		{
-			Light *light;
-			Real sqDistance;
-
-			LightClosest( Light *_light,  Real _sqDistance ) :
-				light( _light ), sqDistance( _sqDistance ) {}
-
-			inline bool operator < ( const LightClosest &right ) const;
-		};
-
 		typedef vector<LightClosest>::type LightClosestVec;
 
     protected:
@@ -119,7 +109,7 @@ namespace Ogre {
         Listener* mListener;
 
         /// List of lights for this object
-        LightClosestVec mLightList;
+        LightList mLightList;
 
 		/// Friendly name of this object, can be empty
 		String mName;
@@ -217,14 +207,41 @@ namespace Ogre {
 		@remarks
 			We don't pass by reference on purpose (avoid implicit aliasing)
 			We perform frustum culling AND test visibility mask at the same time
+		@param frustum
+			Frustum to clip against
+		@param sceneVisibilityFlags
+			Combined scene's visibility flags (i.e. viewport | scene)
+		@param outCulledObjects
+			Out. List of objects that are (fully or partially) inside the frustum and
+			should be rendered
 		*/
-		static void cullFrustum( const size_t numNodes, ObjectData t );
+		typedef vector<MovableObject*>::type MovableObjectVec;
+		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
+								 uint32 sceneVisibilityFlags, MovableObjectVec &outCulledObjects );
+
+		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
+			Produces the global list of visible lights that is needed in buildLightList
+		@remarks
+			We don't pass ObjectData by reference on purpose (avoid implicit aliasing)
+			It's declared here because all affected elements are from MovableObject
+			IMPORTANT: It is assumed that all objects in ObjectData are Lights.
+		@param outGlobalLightList
+			Output, a list of lights, contiguously placed
+		@param frustums
+			An array of all frustums we need to check against
+		*/
+		static void cullLights( const size_t numNodes, ObjectData t, LightListInfo &outGlobalLightList,
+								const FrustumVec &frustums );
 
 		/** @See SceneManager::buildLightList
 		@remarks
 			We don't pass by reference on purpose (avoid implicit aliasing)
+		@param globalLightList
+			List of lights already culled against all possible frustums and
+			reorganized contiguously for SoA
 		*/
-		static void buildLightList( const size_t numNodes, ObjectData t );
+		static void buildLightList( const size_t numNodes, ObjectData t,
+									const LightListInfo &globalLightList );
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it
@@ -451,7 +468,7 @@ namespace Ogre {
 			(say if you want to use it to implement this method, and use the pointer
 			as a return value) and for reading it's only accurate as at the last frame.
 		*/
-		LightClosestVec* _getLightList() { return &mLightList; }
+		LightList* _getLightList() { return &mLightList; }
 
 		typedef vector<MovableObject*>::type ShadowRenderableList;
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;

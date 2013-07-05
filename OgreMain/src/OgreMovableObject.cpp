@@ -297,7 +297,8 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData )
+	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
+									 uint32 sceneVisibilityFlags, MovableObjectVec &outCulledObjects )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
@@ -305,48 +306,67 @@ namespace Ogre {
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
 
-		ArrayVector3 planeNormal[6];
-		ArrayReal planeNegD[6];
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+		ArrayPlane planes[6];
+		const Plane *frustumPlanes = frustum->getFrustumPlanes();
 
-		ArrayInt sceneFlags;
-		vector<MovableObject*>::type outCulledObjects;
+		for( size_t i=0; i<6; ++i )
+		{
+			planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setToSign();
+			planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+		}
 
 		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
 		//In theory xor is faster, but some archs have a penalty for switching between integer
 		//& floating point, even if it's simd sse
-		ArrayReal signFlip;
-
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
-			const ArrayVector3 centerPlusFlippedHS( objData.mWorldAabb->m_center +
-													objData.mWorldAabb->m_halfSize * signFlip );
-
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 
+			//!!!!!!!TODO: (dark_sylinc) OR may be AND!!!!!!!!!!!!!!!!!!!
+
 			//Test all 6 planes and OR the dot product. If all are false, then we're not visible
 			ArrayReal dotResult, mask;
-			dotResult = planeNormal[0].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::CompareLess( dotResult, planeNegD[0] );
+			ArrayVector3 centerPlusFlippedHS;
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[0].signFlip;
+			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::CompareLess( dotResult, planes[0].planeNegD );
 
-			dotResult = planeNormal[1].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[1] ) );
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[1].signFlip;
+			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[1].planeNegD ) );
 
-			dotResult = planeNormal[2].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[2] ) );
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[2].signFlip;
+			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[2].planeNegD ) );
 
-			dotResult = planeNormal[3].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[3] ) );
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[3].signFlip;
+			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[3].planeNegD ) );
 
-			dotResult = planeNormal[4].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[4] ) );
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[4].signFlip;
+			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[4].planeNegD ) );
 
-			dotResult = planeNormal[5].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[5] ) );
-
-			dotResult = planeNormal[6].dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planeNegD[6] ) );
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[5].signFlip;
+			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[5].planeNegD ) );
 
 			//Fuse result with visibility flag
 			ArrayInt finalMask = Mathlib::TestFlags32( CastRealToInt( mask ),
@@ -369,18 +389,125 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	struct LightListInfo
+	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
+									LightListInfo &outGlobalLightList, const FrustumVec &frustums )
 	{
-		LightVec						lights;
-		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
-		uint32	* RESTRICT_ALIAS		visibilityMask;
-		Sphere	* RESTRICT_ALIAS 		boundingSphere;
-	};
-	void MovableObject::buildLightList( const size_t numNodes, ObjectData objData )
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
+		struct ArraySixPlanes
+		{
+			ArrayPlane planes[6];
+		};
+		const size_t numFrustums = frustums.size();
+		ArraySixPlanes *planes = OGRE_ALLOC_T_SIMD( ArraySixPlanes, numFrustums,
+													MEMCATEGORY_SCENE_CONTROL );
+
+		FrustumVec::const_iterator itor = frustums.begin();
+		FrustumVec::const_iterator end  = frustums.end();
+		ArraySixPlanes *planesIt = planes;
+
+		while( itor != end )
+		{
+			const Plane *frustumPlanes = (*itor)->getFrustumPlanes();
+
+			for( size_t i=0; i<6; ++i )
+			{
+				planesIt->planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+				planesIt->planes[i].signFlip.setAll( frustumPlanes[i].normal );
+				planesIt->planes[i].signFlip.setToSign();
+				planesIt->planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+			}
+
+			++planesIt;
+			++itor;
+		}
+
+		//TODO: Profile whether we should use XOR to flip signs
+		//instead of multiplication (see cullFrustum)
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			//Initialize mask to 0
+			ArrayReal mask = ARRAY_REAL_ZERO;
+
+			for( size_t j=0; j<numFrustums; ++j )
+			{
+				//Test all 6 planes and OR the dot product. If all are false, then we're not visible
+				ArrayReal dotResult;
+				ArrayVector3 centerPlusFlippedHS;
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	planes[j].planes[0].signFlip;
+				dotResult = planes[j].planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[0].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	 planes[j].planes[1].signFlip;
+				dotResult = planes[j].planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[1].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	 planes[j].planes[2].signFlip;
+				dotResult = planes[j].planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[2].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	 planes[j].planes[3].signFlip;
+				dotResult = planes[j].planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[3].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	 planes[j].planes[4].signFlip;
+				dotResult = planes[j].planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[4].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																	 planes[j].planes[5].signFlip;
+				dotResult = planes[j].planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+																planes[j].planes[5].planeNegD ) );
+			}
+
+			//Use the light mask to discard null mOwner ptrs
+			mask = Mathlib::And( mask, *objData.mLightMask );
+
+			const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				//Decompose the result for analyzing each MovableObject's
+				//There's no need to check objData.mOwner[j] is null because
+				//we set mVisibilityFlags to 0 on slot removals
+				if( IS_BIT_SET( j, scalarMask ) )
+				{
+					const size_t idx = outGlobalLightList.lights.size();
+					outGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
+					outGlobalLightList.boundingSphere[idx] = Sphere(
+														objData.mWorldAabb->m_center.getAsVector3( j ),
+														objData.mWorldRadius[j] );
+					assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
+					outGlobalLightList.lights.push_back( static_cast<Light*>( objData.mOwner[j] ) );
+				}
+			}
+
+			objData.advanceCullLightPack();
+		}
+
+		OGRE_FREE_SIMD( planes, MEMCATEGORY_SCENE_CONTROL );
+		planes = 0;
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::buildLightList( const size_t numNodes, ObjectData objData,
+										const LightListInfo &globalLightList )
 	{
-		size_t numGlobalLights=10;
-		LightListInfo globalLightList;
-		//mLightList
+		const size_t numGlobalLights = globalLightList.lights.size();
 		ArraySphere lightSphere;
 		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], 16 );
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
@@ -411,8 +538,7 @@ namespace Ogre {
 
 				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
 				//rMask = ( intersects() && lightMask & visibilityMask )
-				rMask = MathlibSSE2::TestFlags32( rMask, MathlibSSE2::And( *objLightMask,
-																			*visibilityMask ) );
+				rMask = Mathlib::TestFlags32( rMask, Mathlib::And( *objLightMask, *visibilityMask ) );
 
 				//Convert rMask into something smaller we can work with.
 				uint32 r = BooleanMask4::getScalarMask( rMask );
@@ -446,20 +572,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const LightList& MovableObject::queryLights(void)
     {
-        if (mParentNode)
-        {
-            SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-
-			const Vector3& scl = mParentNode->_getDerivedScale();
-			Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-
-            sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
-        }
-        else
-        {
-            mLightList.clear();
-        }
-
         return mLightList;
     }
     //-----------------------------------------------------------------------
@@ -557,7 +669,7 @@ namespace Ogre {
 	}
 
 
-	inline bool MovableObject::LightClosest::operator < (const MovableObject::LightClosest &right) const
+	inline bool LightClosest::operator < (const LightClosest &right) const
 	{
 		if( light->getType() == Light::LT_DIRECTIONAL &&
 			right.light->getType() != Light::LT_DIRECTIONAL )

@@ -56,6 +56,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -372,6 +373,7 @@ namespace Ogre {
 		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
 		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
 		NodeMemoryManager		mNodeMemoryManager;
+		ObjectMemoryManager		mEntityMemoryManager;
 		/// Filled and cleared every frame in HighLevelCull()
 		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
@@ -1758,10 +1760,27 @@ namespace Ogre {
         virtual bool getOptionKeys( StringVector& refKeys )
         { (void)refKeys; return false; }
 
-		/** Updates the derived transforms of all nodes in the scene. This is typically called once per frame during
-			render, but the user may want to manually call this function.
+		/** Updates the derived transforms of all nodes in the scene. This is typically called once
+			per frame during render, but the user may want to manually call this function.
+		@param objectMemManager
+			Memory manager containing all objects to be updated (i.e. Entities & Lights are both
+			MovableObjects but are kept separate)
 		*/
 		void updateAllTransforms();
+
+		/** Updates the world aabbs from all entities in the scene. Ought to be called right after
+			updateAllTransforms. @See updateAllTransforms
+		@remarks
+			@See MovableObject::updateAllBounds
+		*/
+		void updateAllBounds( const ObjectMemoryManagerVec &objectMemManager );
+
+		/** Culls Lights against all active cameras. This maximizes SIMD usage, eases multithreading,
+			and allows for a consistent light list across all camera views
+		@remarks
+			This phase is optional. Deferred shading systems don't typically want to use it
+		*/
+		void cullLights();
 
 		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
 			Compositor). Then calls MovableObject::buildLightList with that list so that each
