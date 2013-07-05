@@ -156,7 +156,8 @@ protected:
 		Vector3 position;
 		VEdges edges;
 		VTriangles triangles; /// Triangle ID set, which are using this vertex.
-
+		
+		Vector3 normal;
 		PMVertex* collapseTo;
 		bool seam;
 		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
@@ -222,6 +223,7 @@ protected:
 #endif
 	Real mMeshBoundingSphereRadius;
 	Real mCollapseCostLimit;
+	bool mUseVertexNormals;
 
 	size_t calcLodVertexCount(const LodLevel& lodConfig);
 	void tuneContainerSize();

@@ -96,7 +96,7 @@ void ProgressiveMeshGeneratorBase::generateAutoconfiguredLodLevels( MeshPtr& mes
 ProgressiveMeshGenerator::ProgressiveMeshGenerator() :
     mUniqueVertexSet((UniqueVertexSet::size_type) 0, (const UniqueVertexSet::hasher&) PMVertexHash(this)),
     mMesh(NULL), mMeshBoundingSphereRadius(0.0f),
-    mCollapseCostLimit(NEVER_COLLAPSE_COST)
+    mCollapseCostLimit(NEVER_COLLAPSE_COST), mUseVertexNormals(true)
 {
 	OgreAssert(NEVER_COLLAPSE_COST < UNINITIALIZED_COLLAPSE_COST && NEVER_COLLAPSE_COST != UNINITIALIZED_COLLAPSE_COST, "");
 }
@@ -176,12 +176,12 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 	OgreAssert(vertexData->vertexCount != 0, "");
 
 	// Locate position element and the buffer to go with it.
-	const VertexElement* elem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+	const VertexElement* elemPos = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
 
 	// Only float supported.
-	OgreAssert(elem->getSize() == 12, "");
+	OgreAssert(elemPos->getSize() == 12, "");
 
-	HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elem->getSource());
+	HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elemPos->getSource());
 
 	// Lock the buffer for reading.
 	unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -192,10 +192,31 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 	VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 	lookup.clear();
 
+	HardwareVertexBufferSharedPtr vNormalBuf;
+	unsigned char* vNormal;
+	int vNormSize;
+	const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+	
+	mUseVertexNormals &= (elemNormal != NULL);
+	if(mUseVertexNormals){
+		if(elemNormal->getSource() == elemPos->getSource()){
+			// Don't open the same buffer twice. Just copy the pointer.
+			vNormalBuf = vbuf;
+			vNormal = vStart;
+		}  else {
+			vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
+			assert(vNormalBuf->getSizeInBytes() == vbuf->getSizeInBytes());
+			assert(vNormalBuf->getVertexSize() == vbuf->getVertexSize());
+			vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
+		}
+		vNormSize = vNormalBuf->getVertexSize();
+	}
+
+
 	// Loop through all vertices and insert them to the Unordered Map.
 	for (; vertex < vEnd; vertex += vSize) {
 		float* pFloat;
-		elem->baseVertexPointerToElement(vertex, &pFloat);
+		elemPos->baseVertexPointerToElement(vertex, &pFloat);
 		mVertexList.push_back(PMVertex());
 		PMVertex* v = &mVertexList.back();
 		v->position.x = pFloat[0];
@@ -216,8 +237,32 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 			v->seam = false;
 		}
 		lookup.push_back(v);
+
+		if(mUseVertexNormals){
+			elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
+			if (!ret.second) {
+				if(v->normal.x != pFloat[0]){
+					v->normal.x += pFloat[0];
+					v->normal.y += pFloat[1];
+					v->normal.z += pFloat[2];
+					if(v->normal.isZeroLength()){
+						v->normal = Vector3(1.0, 0.0, 0.0);
+					}
+					v->normal.normalise();
+				}
+			} else {
+				v->normal.x = pFloat[0];
+				v->normal.y = pFloat[1];
+				v->normal.z = pFloat[2];
+				v->normal.normalise();
+			}
+			vNormal += vNormSize;
+		}
 	}
 	vbuf->unlock();
+	if(mUseVertexNormals && elemNormal->getSource() != elemPos->getSource()){
+		vNormalBuf->unlock();
+	}
 }
 template<typename IndexType>
 void ProgressiveMeshGenerator::addIndexDataImpl(IndexType* iPos, const IndexType* iEnd,
@@ -640,8 +685,26 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 		}
 	}
 
+	Real dist = src->position.distance(dst->position);
+	cost = cost * dist;
+	if(mUseVertexNormals){
+		//Take into account vertex normals.
+		Real normalCost = 0;
+		VEdges::iterator it = src->edges.begin();
+		VEdges::iterator itEnd = src->edges.end();
+		for (; it != itEnd; it++) {
+			PMVertex* neighbor = it->dst;
+			Real beforeDist = neighbor->position.distance(src->position);
+			Real afterDist = neighbor->position.distance(dst->position);
+			Real beforeDot = neighbor->normal.dotProduct(src->normal);
+			Real afterDot = neighbor->normal.dotProduct(dst->normal);
+			normalCost = std::max(normalCost, std::abs(beforeDot - afterDot) * std::max(dist, std::abs(beforeDist - afterDist)));
+		}
+		cost = std::max(normalCost * 0.25f, cost);
+	}
+
 	OgreAssert(cost >= 0, "");
-	return cost * src->position.distance(dst->position);
+	return cost;
 }
 
 #if OGRE_DEBUG_MODE
