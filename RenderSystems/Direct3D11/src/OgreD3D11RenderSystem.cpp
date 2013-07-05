@@ -1103,7 +1103,8 @@ bail:
 		rsc->setCapability(RSC_BLENDING);
 		rsc->setCapability(RSC_DOT3);
 		// Cube map
-		rsc->setCapability(RSC_CUBEMAPPING);
+		if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+			rsc->setCapability(RSC_CUBEMAPPING);
 
 		// We always support compression, D3DX will decompress if device does not support
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
