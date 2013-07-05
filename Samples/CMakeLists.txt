@@ -123,6 +123,7 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
 #  add_subdirectory(AtomicCounters)
+  add_subdirectory(Basic)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)

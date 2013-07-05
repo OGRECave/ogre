@@ -71,6 +71,17 @@ fragment_program JAJ/Basic/PS_CG cg
 //////////
 // GLSL //
 //////////
+compute_program JAJ/Basic/CS_GLSL glsl
+{
+        source JAJBasicCS.glsl
+        syntax glsl420
+
+        default_params
+        {
+            param_named number float 1
+        }
+}
+
 vertex_program JAJ/Basic/VS_GLSL glsl
 {
         source JAJBasicVS.glsl
@@ -97,6 +108,13 @@ fragment_program JAJ/Basic/PS_GLSL glsl
 {
         source JAJBasicFS.glsl
         syntax glsl150
+}
+
+compute_program JAJ/Basic/CS unified
+{
+        delegate JAJ/Basic/CS_GLSL
+        // delegate JAJ/Basic/CS_HLSL
+        // delegate JAJ/Basic/CS_CG
 }
 
 vertex_program JAJ/Basic/VS unified
@@ -126,11 +144,27 @@ material JAJ/Basic
         {
                 pass
                 {
+                        compute_program_ref JAJ/Basic/CS
+                        {
+
+                        }
+
                         vertex_program_ref JAJ/Basic/VS
                         {
                         
                         }
                         
+
+                        // tesselation_hull_program_ref JAJ/Basic/THS
+                        // {
+
+                        // }
+                        
+                        // tesselation_domain_program_ref JAJ/Basic/TDS
+                        // {
+
+                        // }
+
                         geometry_program_ref JAJ/Basic/GS
                         {
                         
