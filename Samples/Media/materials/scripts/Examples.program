@@ -46,11 +46,12 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
         param_named_auto ambient ambient_light_colour
     }
 }
+
 // A really basic ambient pass program, support for one texture coordinate set
-vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
-{
-    source AmbientOneTexture.glsl
-}
+// vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
+// {
+//     source AmbientOneTexture.glsl
+// }
 
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
@@ -145,7 +146,7 @@ fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSL glsl
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTexture unified
 {
-	delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSL
+    delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSL
     delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES
     delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureCg
 }
