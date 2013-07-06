@@ -70,9 +70,9 @@ namespace Ogre {
         
         virtual String getType() const;        
 
-		/// Static method to startup and register the PVRTC codec
+		/// Static method to startup and register the ETC codec
 		static void startup(void);
-		/// Static method to shutdown and unregister the PVRTC codec
+		/// Static method to shutdown and unregister the ETC codec
 		static void shutdown(void);
     private:
         bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
