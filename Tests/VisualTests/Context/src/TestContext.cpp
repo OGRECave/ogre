@@ -110,7 +110,7 @@ void TestContext::setup()
 
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
 
-    if(UIInterfaceOrientationIsPortrait(orientation))
+    if (UIInterfaceOrientationIsPortrait(orientation))
         std::swap(w, h);
 
     mRoot->initialise(false, "OGRE Sample Browser");
@@ -122,14 +122,14 @@ void TestContext::setup()
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
-    
+
     // grab input, since moving the window seemed to change the results (in Linux anyways)
     setupInput(mNoGrabMouse);
 
     locateResources();
     createDummyScene();
 #ifdef USE_RTSHADER_SYSTEM
-    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
+    if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
     {
         Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
     }
@@ -376,11 +376,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     OgreBites::Sample* sampleToRun = s;
 
     // if a valid test is passed, then run it, if null, grab the next one from the deque
-    if (s)
-    {
-        sampleToRun = s;
-    }
-    else if (!mTests.empty())
+    if (!sampleToRun && !mTests.empty())
     {
         mTests.pop_front();
         if (!mTests.empty())
@@ -400,11 +396,13 @@ void TestContext::runSample(OgreBites::Sample* s)
         Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
     }
 
-    if(mCurrentTest)
+    if (mCurrentTest)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
 
 #ifdef USE_RTSHADER_SYSTEM
-    sampleToRun->setShaderGenerator(mShaderGenerator);
+    if (sampleToRun) {
+        sampleToRun->setShaderGenerator(mShaderGenerator);
+    }
 #endif
 
     SampleContext::runSample(sampleToRun);
