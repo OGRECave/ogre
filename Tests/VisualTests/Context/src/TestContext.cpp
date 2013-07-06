@@ -122,8 +122,10 @@ void TestContext::setup()
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
+    
     // grab input, since moving the window seemed to change the results (in Linux anyways)
     setupInput(mNoGrabMouse);
+
     locateResources();
     createDummyScene();
 #ifdef USE_RTSHADER_SYSTEM
