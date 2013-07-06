@@ -113,9 +113,9 @@ if (MSVC)
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)
   endif ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast /Zm256")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
   # Enable intrinsics on MSVC in debug mode
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi /Zm256")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
   if (CMAKE_CL_64)
     # Visual Studio bails out on debug builds in 64bit mode unless
 	# this flag is set...
