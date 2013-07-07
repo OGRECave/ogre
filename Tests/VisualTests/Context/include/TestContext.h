@@ -236,6 +236,8 @@ protected:
     bool mGenerateHtml;
     // Force the config dialog
     bool mForceConfig;
+    // Do not confine mouse to window
+    bool mNoGrabMouse;
     // Show usage details
     bool mHelp;
     // Render system to use
