@@ -254,6 +254,7 @@ namespace Ogre {
         */		
 		bool isBuildEdgesEnabled(void) const { return mBuildEdgesEnabled; }
 		void setBuildEdgesEnabled(bool b);
+        SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
     protected:
 
