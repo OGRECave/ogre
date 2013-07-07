@@ -315,40 +315,9 @@ namespace Ogre {
 
         // Copy submeshes first
         vector<SubMesh*>::type::iterator subi;
-        SubMesh* newSub;
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
-            newSub = newMesh->createSubMesh();
-            newSub->mMaterialName = (*subi)->mMaterialName;
-            newSub->mMatInitialised = (*subi)->mMatInitialised;
-            newSub->operationType = (*subi)->operationType;
-            newSub->useSharedVertices = (*subi)->useSharedVertices;
-            newSub->extremityPoints = (*subi)->extremityPoints;
-
-            if (!(*subi)->useSharedVertices)
-            {
-                // Copy unique vertex data
-				newSub->vertexData = (*subi)->vertexData->clone();
-                // Copy unique index map
-                newSub->blendIndexToBoneIndexMap = (*subi)->blendIndexToBoneIndexMap;
-            }
-
-            // Copy index data
-            OGRE_DELETE newSub->indexData;
-			newSub->indexData = (*subi)->indexData->clone();
-            // Copy any bone assignments
-            newSub->mBoneAssignments = (*subi)->mBoneAssignments;
-            newSub->mBoneAssignmentsOutOfDate = (*subi)->mBoneAssignmentsOutOfDate;
-            // Copy texture aliases
-            newSub->mTextureAliases = (*subi)->mTextureAliases;
-
-            // Copy LOD face lists
-            newSub->mLodFaceList.reserve((*subi)->mLodFaceList.size());
-            SubMesh::LODFaceList::const_iterator facei;
-            for (facei = (*subi)->mLodFaceList.begin(); facei != (*subi)->mLodFaceList.end(); ++facei) {
-                IndexData* newIndexData = (*facei)->clone();
-                newSub->mLodFaceList.push_back(newIndexData);
-            }
+            (*subi)->clone("", newMesh.get());
         }
 
         // Copy shared geometry and index map, if any
