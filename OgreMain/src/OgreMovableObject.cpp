@@ -235,6 +235,17 @@ namespace Ogre {
 	{
 		return updateSingleWorldAabb();
 	}
+	//-----------------------------------------------------------------------
+	float MovableObject::getWorldRadius() const
+	{
+		assert( !mCachedAabbOutOfDate );
+		return mObjectData.mWorldRadius[mObjectData.mIndex];
+	}
+	//-----------------------------------------------------------------------
+	float MovableObject::getWorldRadiusUpdated()
+	{
+		return updateSingleWorldRadius();
+	}
     //-----------------------------------------------------------------------
 	Aabb MovableObject::updateSingleWorldAabb()
 	{
@@ -249,6 +260,17 @@ namespace Ogre {
 #ifndef NDEBUG
 		mCachedAabbOutOfDate = false;
 #endif
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------
+	float MovableObject::updateSingleWorldRadius()
+	{
+		const Vector3 derivedScale = mParentNode->_getDerivedScaleUpdated();
+
+		float retVal = mObjectData.mLocalRadius[mObjectData.mIndex] *
+						max( max( derivedScale.x, derivedScale.y ), derivedScale.z );
+		mObjectData.mWorldRadius[mObjectData.mIndex] = retVal;
 
 		return retVal;
 	}
@@ -293,6 +315,11 @@ namespace Ogre {
 			objData.mWorldAabb->transformAffine( parentMat );
 			*worldRadius = (*localRadius) * parentScale.getMaxComponent();
 
+#ifndef NDEBUG
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+				objData.mOwner[j]->mCachedAabbOutOfDate = false;
+#endif
+
 			objData.advanceBounsPack();
 		}
 	}
@@ -333,43 +360,41 @@ namespace Ogre {
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 
-			//!!!!!!!TODO: (dark_sylinc) OR may be AND!!!!!!!!!!!!!!!!!!!
-
-			//Test all 6 planes and OR the dot product. If all are false, then we're not visible
+			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 			ArrayReal dotResult, mask;
 			ArrayVector3 centerPlusFlippedHS;
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[0].signFlip;
 			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::CompareLess( dotResult, planes[0].planeNegD );
+			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
 
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[1].signFlip;
 			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[1].planeNegD ) );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
 
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[2].signFlip;
 			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[2].planeNegD ) );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
 
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[3].signFlip;
 			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[3].planeNegD ) );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
 
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[4].signFlip;
 			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[4].planeNegD ) );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
 
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[5].signFlip;
 			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
-			mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult, planes[5].planeNegD ) );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
 
 			//Fuse result with visibility flag
-			ArrayInt finalMask = Mathlib::TestFlags32( CastRealToInt( mask ),
+			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
@@ -426,57 +451,67 @@ namespace Ogre {
 			++itor;
 		}
 
+		//Implementation detail: Ogre 1.9 treated spotlights as a point (Sphere vs Plane collision test)
+		//for simplicity (and presumably performance). We use aabbs for all lights in Ogre 2.0, which
+		//plays better with area lights when we implemented (and spotlights too) degrading performance
+		//for point lights
+
 		//TODO: Profile whether we should use XOR to flip signs
 		//instead of multiplication (see cullFrustum)
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Initialize mask to 0
-			ArrayReal mask = ARRAY_REAL_ZERO;
+			ArrayInt mask = ARRAY_INT_ZERO;
 
 			for( size_t j=0; j<numFrustums; ++j )
 			{
-				//Test all 6 planes and OR the dot product. If all are false, then we're not visible
+				ArrayReal tmpMask;
+
+				//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 				ArrayReal dotResult;
 				ArrayVector3 centerPlusFlippedHS;
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	planes[j].planes[0].signFlip;
 				dotResult = planes[j].planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
-																planes[j].planes[0].planeNegD ) );
+				tmpMask = Mathlib::CompareGreater( dotResult, planes[j].planes[0].planeNegD );
 
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	 planes[j].planes[1].signFlip;
 				dotResult = planes[j].planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[1].planeNegD ) );
 
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	 planes[j].planes[2].signFlip;
 				dotResult = planes[j].planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[2].planeNegD ) );
 
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	 planes[j].planes[3].signFlip;
 				dotResult = planes[j].planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[3].planeNegD ) );
 
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	 planes[j].planes[4].signFlip;
 				dotResult = planes[j].planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[4].planeNegD ) );
 
 				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																	 planes[j].planes[5].signFlip;
 				dotResult = planes[j].planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
-				mask = Mathlib::Or( mask, Mathlib::CompareLess( dotResult,
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[5].planeNegD ) );
+
+				//Accumulate into mask. If one Frustum can see, then we need to include it.
+				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 			}
 
 			//Use the light mask to discard null mOwner ptrs
-			mask = Mathlib::And( mask, *objData.mLightMask );
+			mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+												(objData.mLightMask) );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
 
@@ -538,7 +573,7 @@ namespace Ogre {
 
 				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
 				//rMask = ( intersects() && lightMask & visibilityMask )
-				rMask = Mathlib::TestFlags32( rMask, Mathlib::And( *objLightMask, *visibilityMask ) );
+				rMask = Mathlib::TestFlags4( rMask, Mathlib::And( *objLightMask, *visibilityMask ) );
 
 				//Convert rMask into something smaller we can work with.
 				uint32 r = BooleanMask4::getScalarMask( rMask );

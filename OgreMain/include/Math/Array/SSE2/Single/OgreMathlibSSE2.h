@@ -187,6 +187,10 @@ namespace Ogre
 		@return
 			r[i] = a[i] & b[i];
 		*/
+		static inline __m128 And( __m128 a, __m128 b )
+		{
+			return _mm_and_ps( a, b );
+		}
 		static inline __m128i And( __m128i a, __m128i b )
 		{
 			return _mm_and_si128( a, b );
@@ -212,7 +216,7 @@ namespace Ogre
 		@return
 			r[i] = (a[i] & b[i]) ? 0xffffffff : 0;
 		*/
-		static inline __m128i TestFlags32( __m128i a, __m128i b )
+		static inline __m128i TestFlags4( __m128i a, __m128i b )
 		{
 			// !( (a & b) == 0 ) --> ( (a & b) == 0 ) ^ -1
 			return _mm_xor_si128( _mm_cmpeq_epi32( _mm_and_si128( a, b ), _mm_setzero_si128() ),
@@ -227,6 +231,10 @@ namespace Ogre
 		{
 			return _mm_or_ps( a, b );
 		}
+		static inline __m128i Or( __m128i a, __m128i b )
+		{
+			return _mm_or_si128( a, b );
+		}
 
 		/** Returns the result of "a < b"
 		@return
@@ -235,6 +243,15 @@ namespace Ogre
 		static inline __m128 CompareLess( __m128 a, __m128 b )
 		{
 			return _mm_cmplt_ps( a, b );
+		}
+
+		/** Returns the result of "a > b"
+		@return
+			r[i] = a[i] > b[i] ? 0xffffffff : 0;
+		*/
+		static inline __m128 CompareGreater( __m128 a, __m128 b )
+		{
+			return _mm_cmpgt_ps( a, b );
 		}
 
 		static inline ArrayReal SetAll( Real val )

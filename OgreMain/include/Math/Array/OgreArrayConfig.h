@@ -48,6 +48,7 @@ THE SOFTWARE.
 				typedef __m128 ArrayReal;
 
 				#define ARRAY_REAL_ZERO _mm_setzero_ps()
+				#define ARRAY_INT_ZERO _mm_setzero_si128()
 
 				class ArrayRadian;
 			}

@@ -132,6 +132,7 @@ namespace Ogre {
 
 	protected:
 		Aabb updateSingleWorldAabb();
+		float updateSingleWorldRadius();
 
     public:
         /// Constructor
@@ -358,9 +359,26 @@ namespace Ogre {
 			Unlike getWorldAabb, this function guarantees the cache stays up to date.
 			It is STRONGLY advised against calling this function for a large
 			number of MovableObject. Refactor your queries so that they happen
-			after SceneManager::UpdateAllTransforms() has been called
+			after SceneManager::updateAllBounds() has been called
 		*/
 		const Aabb getWorldAabbUpdated();
+
+		/** Gets the bounding Radius scaled by max( scale.x, scale.y, scale.z ).
+		@remarks
+			Assumes the caches are already updated. Will trigger an assert
+			otherwise. @See getWorldRadiusUpdated if you need the update process
+			to be guaranteed
+        */
+		float getWorldRadius() const;
+
+		/** Gets the bounding Radius scaled by max( scale.x, scale.y, scale.z ).
+		@remarks
+			Unlike getWorldRadius, this function guarantees the cache stays up to date.
+			It is STRONGLY advised against calling this function for a large
+			number of MovableObject. Refactor your queries so that they happen
+			after SceneManager::updateAllBounds() has been called
+		*/
+		float getWorldRadiusUpdated();
 
         /** Sets the query flags for this object.
         @remarks

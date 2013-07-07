@@ -440,6 +440,7 @@ bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
 void SceneManager::_populateLightList(const Vector3& position, Real radius, 
 									  LightList& destList, uint32 lightMask)
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     // Really basic trawl of the lights, then sort
     // Subclasses could do something smarter
 
@@ -502,8 +503,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
 	{
 		li->light->_notifyIndexInFrame(lightIndex);
 	}
-
-
+#endif
 }
 //-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
@@ -4522,6 +4522,7 @@ bool SceneManager::lightsForShadowTextureLess::operator ()(
 //---------------------------------------------------------------------
 void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     // Basic iteration for this SM
 
     MovableObjectCollection* lights =
@@ -4619,12 +4620,13 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
     }
-
+#endif
 }
 //---------------------------------------------------------------------
 bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
     MovableObject* object)
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     if (object->getCastShadows() && object->isVisible() && 
 		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
 		// objects need an edge list to cast shadows (shadow volumes only)
@@ -4638,7 +4640,7 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
             // Check object is within the shadow far distance
             Vector3 toObj = object->getParentNode()->_getDerivedPosition() 
                 - mCamera->getDerivedPosition();
-            Real radius = object->getWorldBoundingSphere().getRadius();
+            Real radius = object->getWorldRadius();
             Real dist =  toObj.squaredLength();               
             if (dist - (radius * radius) > mFarDistSquared)
             {
@@ -4676,6 +4678,7 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
 
         }
     }
+#endif
     return true;
 }
 //---------------------------------------------------------------------
