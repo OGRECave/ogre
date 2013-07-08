@@ -76,6 +76,7 @@ protected:
 		mCompress = mTrayMgr->createCheckBox(TL_TOPLEFT, "compress", "Compress LOD");
 		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
 		mThreaded = mTrayMgr->createCheckBox(TL_TOPLEFT, "threaded", "Background thread");
+		mNormals = mTrayMgr->createCheckBox(TL_TOPLEFT, "normals", "Use vertex normals");
 		mThreaded->setChecked(true, false);
 		mReductionSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Reduced vertices", 200, 50, 0, 100, 101);
 		
@@ -193,6 +194,7 @@ protected:
 		lodConfig.mesh = mesh;
 		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
 		lodConfig.advanced.useCompression = mCompress->isChecked();
+		lodConfig.advanced.useVertexNormals = mNormals->isChecked();
 		LodLevel lodLevel;
 		lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 		lodLevel.distance = 1;
@@ -217,6 +219,7 @@ protected:
 			LodConfig config;
 			pm.getAutoconfig(mesh, config);
 			config.advanced.useCompression = mCompress->isChecked();
+			config.advanced.useVertexNormals = mNormals->isChecked();
 			pm.generateLodLevels(config);
 			pm.generateAutoconfiguredLodLevels(mesh);
 		} else {
@@ -234,6 +237,7 @@ protected:
 	Entity* mHeadEntity;
 	SceneNode* mHeadNode;
 	Real mUserReductionValue;
+	OgreBites::CheckBox* mNormals;
 	OgreBites::CheckBox* mWireframe;
 	OgreBites::CheckBox* mCompress;
 	OgreBites::CheckBox* mAutoconfig;
