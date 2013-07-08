@@ -150,6 +150,7 @@ namespace Ogre
 
 		TextureUnitState::BindingType mBindingType;
 
+		ID3D11ShaderResourceView* mDSTResView;
 		ID3D11BlendState * mBoundBlendState;
 		ID3D11RasterizerState * mBoundRasterizer;
 		ID3D11DepthStencilState * mBoundDepthStencilState;

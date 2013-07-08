@@ -1457,8 +1457,8 @@ bail:
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
 		// If we tell we want to use it as a Shader Resource when in MSAA, we will fail
 		// This is a recomandation from NVidia.
-		//		if(BBDesc.SampleDesc.Count == 1)
-		//			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 		descDepth.CPUAccessFlags		= 0;
 		descDepth.MiscFlags				= 0;
@@ -1476,6 +1476,28 @@ bail:
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Unable to create depth texture\nError Description:" + errorDescription,
 				"D3D11RenderSystem::_createDepthBufferFor");
+		}
+
+		//
+		// Create the View of the texture
+		// If MSAA is used, we cannot do this
+		//
+		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+			viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+			viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+			viewDesc.Texture2D.MostDetailedMip = 0;
+			viewDesc.Texture2D.MipLevels = 1;
+			SAFE_RELEASE(mDSTResView);
+			HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
+			if( FAILED(hr) || mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Unable to create the view of the depth texture \nError Description:" + errorDescription,
+					"D3D11RenderSystem::_createDepthBufferFor");
+			}
 		}
 
 		// Create the depth stencil view

@@ -66,6 +66,7 @@ fragment_program Ogre/CelShadingFPGLSLES glsles
 	profiles glsles
 }
 
+
 vertex_program Ogre/CelShadingVPGLSL glsl
 {
 	source Example_CelShadingVp.glsl
