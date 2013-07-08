@@ -62,10 +62,13 @@ PMInjector& PMInjector::getSingleton(void)
 
 PMGenRequest::~PMGenRequest()
 {
+	delete [] this->sharedVertexBuffer.vertexBuffer;
+	delete [] this->sharedVertexBuffer.vertexNormalBuffer;
 	int submeshCount = submesh.size(); 
 	for(int i=0;i<submeshCount;i++){
 		delete [] submesh[i].indexBuffer.indexBuffer;
 		delete [] submesh[i].vertexBuffer.vertexBuffer;
+		delete [] submesh[i].vertexBuffer.vertexNormalBuffer;
 		vector<IndexBuffer>::iterator it2 = submesh[i].genIndexBuffers.begin();
 		vector<IndexBuffer>::iterator it2End = submesh[i].genIndexBuffers.end();
 		for (; it2 != it2End; it2++) {
@@ -124,10 +127,12 @@ void PMWorker::buildRequest(LodConfig& lodConfigs)
 	mMeshName = mRequest->meshName;
 #endif
 	mMeshBoundingSphereRadius = lodConfigs.mesh->getBoundingSphereRadius();
+	mUseVertexNormals = lodConfigs.advanced.useVertexNormals;
 	cleanupMemory();
 	tuneContainerSize();
 	initialize(); // Load vertices and triangles.
 	computeCosts(); // Calculate all collapse costs.
+
 #if OGRE_DEBUG_MODE
 	assertValidMesh();
 #endif
@@ -195,6 +200,8 @@ void PMWorker::addVertexBuffer(const PMGenRequest::VertexBuffer& vertexBuffer, b
 	VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 	lookup.clear();
 
+	Vector3* pNormalOut = vertexBuffer.vertexNormalBuffer;
+
 	// Loop through all vertices and insert them to the Unordered Map.
 	Vector3* pOut = vertexBuffer.vertexBuffer;
 	Vector3* pEnd = vertexBuffer.vertexBuffer + vertexBuffer.vertexCount;
@@ -209,11 +216,26 @@ void PMWorker::addVertexBuffer(const PMGenRequest::VertexBuffer& vertexBuffer, b
 			mVertexList.pop_back();
 			v = *ret.first; // Point to the existing vertex.
 			v->seam = true;
+			if(mUseVertexNormals){
+				if(v->normal.x != (*pNormalOut).x){
+					v->normal += *pNormalOut;
+					if(v->normal.isZeroLength()){
+						v->normal = Vector3(1.0, 0.0, 0.0);
+					}
+					v->normal.normalise();
+				}
+				pNormalOut++;
+			}
 		} else {
 #if OGRE_DEBUG_MODE
 			v->costHeapPosition = mCollapseCostHeap.end();
 #endif
 			v->seam = false;
+			if(mUseVertexNormals){
+				v->normal = *pNormalOut;
+				v->normal.normalise();
+				pNormalOut++;
+			}
 		}
 		lookup.push_back(v);
 	}
@@ -532,37 +554,75 @@ void QueuedProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	PMWorker::getSingleton().addRequestToQueue(req);
 }
 
-void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out)
+void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out, LodConfig& config)
 {
 	// Locate position element and the buffer to go with it.
-	const VertexElement* elem = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
+	const VertexElement* elemPos = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
 
 	// Only float supported.
-	OgreAssert(elem->getSize() == 12, "");
+	OgreAssert(elemPos->getSize() == 12, "");
 
-	HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elem->getSource());
+	HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elemPos->getSource());
 
 	out.vertexCount = data->vertexCount;
-	out.vertexBuffer = new Vector3[out.vertexCount];
 
 	if (out.vertexCount > 0) {
+		out.vertexBuffer = new Vector3[out.vertexCount];
+
 		// Lock the buffer for reading.
 		unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 		unsigned char* vertex = vStart;
 		int vSize = vbuf->getVertexSize();
+
+		const VertexElement* elemNormal = 0;
+		HardwareVertexBufferSharedPtr vNormalBuf;
+		unsigned char* vNormal;
+		Vector3* pNormalOut;
+		int vNormalSize;
+		bool& useVertexNormals = config.advanced.useVertexNormals;
+
+		if(useVertexNormals) {
+			elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+			useVertexNormals = (elemNormal != 0);
+			if(useVertexNormals){
+				out.vertexNormalBuffer = new Vector3[out.vertexCount];
+				pNormalOut = out.vertexNormalBuffer;
+				if(elemNormal->getSource() == elemPos->getSource()){
+					vNormalBuf = vbuf;
+					vNormal = vStart;
+				}  else {
+					vNormalBuf = data->vertexBufferBinding->getBuffer(elemNormal->getSource());
+					assert(vNormalBuf->getSizeInBytes() == vbuf->getSizeInBytes());
+					assert(vNormalBuf->getVertexSize() == vbuf->getVertexSize());
+					vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
+				}
+				vNormalSize = vNormalBuf->getVertexSize();
+			}
+		}
 
 		// Loop through all vertices and insert them to the Unordered Map.
 		Vector3* pOut = out.vertexBuffer;
 		Vector3* pEnd = out.vertexBuffer + out.vertexCount;
 		for (; pOut < pEnd; pOut++) {
 			float* pFloat;
-			elem->baseVertexPointerToElement(vertex, &pFloat);
+			elemPos->baseVertexPointerToElement(vertex, &pFloat);
 			pOut->x = *pFloat;
 			pOut->y = *(++pFloat);
 			pOut->z = *(++pFloat);
 			vertex += vSize;
+			if(elemNormal){
+				elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
+				pNormalOut->x = *pFloat;
+				pNormalOut->y = *(++pFloat);
+				pNormalOut->z = *(++pFloat);
+				pNormalOut++;
+				vNormal += vNormalSize;
+			}
 		}
 		vbuf->unlock();
+		if(elemNormal && elemNormal->getSource() != elemPos->getSource()){
+			vNormalBuf->unlock();
+		}
 	}
 }
 
@@ -594,11 +654,11 @@ void QueuedProgressiveMeshGenerator::copyBuffers(Mesh* mesh, PMGenRequest* req)
 		copyIndexBuffer(submesh->indexData, outsubmesh.indexBuffer);
 		outsubmesh.useSharedVertexBuffer = submesh->useSharedVertices;
 		if (!outsubmesh.useSharedVertexBuffer) {
-			copyVertexBuffer(submesh->vertexData, outsubmesh.vertexBuffer);
+			copyVertexBuffer(submesh->vertexData, outsubmesh.vertexBuffer, req->config);
 
 		} else if (!sharedVerticesAdded) {
 			sharedVerticesAdded = true;
-			copyVertexBuffer(mesh->sharedVertexData, req->sharedVertexBuffer);
+			copyVertexBuffer(mesh->sharedVertexData, req->sharedVertexBuffer, req->config);
 		}
 	}
 }

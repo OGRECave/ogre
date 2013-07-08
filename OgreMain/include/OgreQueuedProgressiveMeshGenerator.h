@@ -44,8 +44,10 @@ struct PMGenRequest {
 	struct VertexBuffer {
 		size_t vertexCount;
 		Vector3* vertexBuffer;
+		Vector3* vertexNormalBuffer;
 		VertexBuffer() :
-			vertexBuffer(0) { }
+			vertexBuffer(0), vertexNormalBuffer(0)
+		{ }
 	};
 	struct IndexBuffer {
 		size_t indexSize;
@@ -212,7 +214,7 @@ public:
 	virtual ~QueuedProgressiveMeshGenerator();
 
 private:
-	void copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out);
+	void copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out, LodConfig& config);
 	void copyIndexBuffer(IndexData* data, PMGenRequest::IndexBuffer& out);
 	void copyBuffers(Mesh* mesh, PMGenRequest* req);
 };
