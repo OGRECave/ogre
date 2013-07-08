@@ -109,9 +109,11 @@ struct LodConfig {
 	LodLevelList levels;
 
 	struct Advanced{
-		bool disableCompression;
+		bool useCompression;
+		bool useVertexNormals;
 		Advanced() :
-			disableCompression(false)
+			useCompression(true),
+			useVertexNormals(true)
 		{ }
 	} advanced;
 

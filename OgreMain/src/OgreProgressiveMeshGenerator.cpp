@@ -773,6 +773,7 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	lodConfig.strategy->assertSorted(values);
 #endif
 	mMesh = lodConfig.mesh;
+	mUseVertexNormals = lodConfig.advanced.useVertexNormals;
 	mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
 	mMesh->removeLodLevels();
 	tuneContainerSize();
@@ -784,6 +785,7 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 
 	computeLods(lodConfig);
 
+	lodConfig.advanced.useVertexNormals = mUseVertexNormals;
 	mMesh.get()->_configureMeshLodUsage(lodConfig);
 }
 
@@ -809,7 +811,7 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
 #if OGRE_DEBUG_MODE
 			assertValidMesh();
 #endif // ifndef NDEBUG
-			if(!lodConfigs.advanced.disableCompression && (lodCount-1 != curLod || lodCount % 2 == 0)) {
+			if(lodConfigs.advanced.useCompression && (lodCount-1 != curLod || lodCount % 2 == 0)) {
 				bakeMergedLods(curLod);
 			} else {
 				bakeLods(); // Last Lod level

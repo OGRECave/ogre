@@ -192,7 +192,7 @@ protected:
 		Ogre::LodConfig lodConfig;
 		lodConfig.mesh = mesh;
 		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
-		lodConfig.advanced.disableCompression = !mCompress->isChecked();
+		lodConfig.advanced.useCompression = mCompress->isChecked();
 		LodLevel lodLevel;
 		lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 		lodLevel.distance = 1;
@@ -216,7 +216,7 @@ protected:
 			QueuedProgressiveMeshGenerator pm;
 			LodConfig config;
 			pm.getAutoconfig(mesh, config);
-			config.advanced.disableCompression = !mCompress->isChecked();
+			config.advanced.useCompression = mCompress->isChecked();
 			pm.generateLodLevels(config);
 			pm.generateAutoconfiguredLodLevels(mesh);
 		} else {
