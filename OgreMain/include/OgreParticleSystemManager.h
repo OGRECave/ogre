@@ -387,7 +387,8 @@ namespace Ogre {
 	class _OgreExport ParticleSystemFactory : public MovableObjectFactory
 	{
 	protected:
-		MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
 	public:
 		ParticleSystemFactory() {}
 		~ParticleSystemFactory() {}

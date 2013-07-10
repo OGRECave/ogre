@@ -106,7 +106,7 @@ namespace Ogre
 	class _OgreExport ManualObject : public MovableObject
 	{
 	public:
-		ManualObject(const String& name);
+		ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager );
 		virtual ~ManualObject();
 
 		//pre-declare ManualObjectSection
@@ -552,7 +552,8 @@ namespace Ogre
 	class _OgreExport ManualObjectFactory : public MovableObjectFactory
 	{
 	protected:
-		MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
 	public:
 		ManualObjectFactory() {}
 		~ManualObjectFactory() {}

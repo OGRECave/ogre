@@ -392,7 +392,7 @@ namespace Ogre {
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
 
-        typedef map<String, Camera* >::type CameraList;
+        typedef vector<Camera*>::type CameraList;
 
         /** Central list of cameras - for easy memory management and lookup.
         */
@@ -526,11 +526,11 @@ namespace Ogre {
 		LightInfoList mTestLightInfos; // potentially new list
 		LightList mShadowTextureCurrentCasterLightList;
 
-		typedef map<String, MovableObject*>::type MovableObjectMap;
+		typedef vector<MovableObject*>::type MovableObjectVec;
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
 		struct MovableObjectCollection
 		{
-			MovableObjectMap map;
+			MovableObjectVec movableObjects;
 			OGRE_MUTEX(mutex)
 		};
 		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
@@ -780,6 +780,21 @@ namespace Ogre {
         virtual void ensureShadowTexturesCreated();
         /// Internal method for destroying shadow textures (texture-based shadows)
         virtual void destroyShadowTextures(void);
+
+		/** To be used with MovableObjects. Checks that the input pointer's mGlobalIndex
+			is consistent with the container, otherwise there's a bug and mGlobalIndex
+			is out of date (or could be caused by memory corruption, of course)
+		@remarks
+			It is a template since it's legal to pass a vector<Camera> since Camera
+			is derived from MovableObject too; but would fail compilation.
+		@param container
+			The container that allegedly holds the mo.
+		@param mo
+			MovableObject whose integrity is going to be checked
+		*/
+		template<typename T>
+		void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
+											const T *mo ) const;
 
 		typedef vector<InstanceManager*>::type		InstanceManagerVec;
 		InstanceManagerVec mDirtyInstanceManagers;
@@ -1075,18 +1090,9 @@ namespace Ogre {
                 This camera must be added to the scene at a later time using
                 the attachObject method of the SceneNode class.
             @param
-                name Name to give the new camera.
+                name Name to give the new camera. May not be unique.
         */
         virtual Camera* createCamera(const String& name);
-
-        /** Retrieves a pointer to the named camera.
-		@note Throws an exception if the named instance does not exist
-        */
-        virtual Camera* getCamera(const String& name) const;
-
-		/** Returns whether a camera with the given name exists.
-		*/
-		virtual bool hasCamera(const String& name) const;
 
         /** Removes a camera from the scene.
             @remarks
@@ -1097,13 +1103,6 @@ namespace Ogre {
                 cam Pointer to the camera to remove
         */
         virtual void destroyCamera(Camera *cam);
-
-        /** Removes a camera from the scene.
-            @remarks
-                This method removes an camera from the scene based on the
-                camera's name rather than a pointer.
-        */
-        virtual void destroyCamera(const String& name);
 
         /** Removes (and destroys) all cameras from the scene.
             @remarks
@@ -1125,19 +1124,7 @@ namespace Ogre {
             @param
                 name The name of the new light, to identify it later.
         */
-        virtual Light* createLight(const String& name);
-
-		/** Creates a light with a generated name. */
-		virtual Light* createLight();
-
-        /** Returns a pointer to the named Light which has previously been added to the scene.
-		@note Throws an exception if the named instance does not exist
-        */
-        virtual Light* getLight(const String& name) const;
-
-		/** Returns whether a light with the given name exists.
-		*/
-		virtual bool hasLight(const String& name) const;
+        virtual Light* createLight();
 
 		/** Retrieve a set of clipping planes for a given light. 
 		*/
@@ -1146,12 +1133,6 @@ namespace Ogre {
 		/** Retrieve a scissor rectangle for a given light and camera. 
 		*/
 		virtual const RealRect& getLightScissorRect(Light* l, const Camera* cam);
-
-		/** Removes the named light from the scene and destroys it.
-            @remarks
-                Any pointers held to this light after calling this method will be invalid.
-        */
-        virtual void destroyLight(const String& name);
 
         /** Removes the light from the scene and destroys it based on a pointer.
             @remarks
@@ -1294,20 +1275,16 @@ namespace Ogre {
 
         /** Create an Entity (instance of a discrete mesh).
             @param
-                entityName The name to be given to the entity (must be unique).
-            @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
         */
-        virtual Entity* createEntity(const String& entityName, const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+        virtual Entity* createEntity( const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Create an Entity (instance of a discrete mesh).
             @param
-                entityName The name to be given to the entity (must be unique).
-            @param
                 pMesh The pointer to the Mesh it is to be based on.
         */
-        virtual Entity* createEntity(const String& entityName, const MeshPtr& pMesh );
+        virtual Entity* createEntity( const MeshPtr& pMesh );
 
         /** Create an Entity (instance of a discrete mesh) with an autogenerated name.
             @param
@@ -1315,12 +1292,6 @@ namespace Ogre {
                 mesh will be loaded if it is not already.
         */
         virtual Entity* createEntity(const String& meshName);
-
-        /** Create an Entity (instance of a discrete mesh) with an autogenerated name.
-            @param
-                pMesh The pointer to the Mesh it is to be based on.
-        */
-        virtual Entity* createEntity(const MeshPtr& pMesh);
 
         /** Prefab shapes available without loading a model.
             @note
@@ -1346,13 +1317,6 @@ namespace Ogre {
             @param ptype The prefab type.
         */
         virtual Entity* createEntity(PrefabType ptype);
-        /** Retrieves a pointer to the named Entity. 
-		@note Throws an exception if the named instance does not exist
-		*/
-        virtual Entity* getEntity(const String& name) const;
-		/** Returns whether an entity with the given name exists.
-		*/
-		virtual bool hasEntity(const String& name) const;
 
         /** Removes & destroys an Entity from the SceneManager.
             @warning
@@ -1363,16 +1327,6 @@ namespace Ogre {
                 SceneManager::clearScene
         */
         virtual void destroyEntity(Entity* ent);
-
-        /** Removes & destroys an Entity from the SceneManager by name.
-            @warning
-                Must only be done if the Entity is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene if you are unsure use clearScene.
-            @see
-                SceneManager::clearScene
-        */
-        virtual void destroyEntity(const String& name);
 
         /** Removes & destroys all Entities.
             @warning
@@ -1387,82 +1341,34 @@ namespace Ogre {
 
         /** Create a ManualObject, an object which you populate with geometry
 			manually through a GL immediate-mode style interface.
-        @param
-            name The name to be given to the object (must be unique).
         */
-        virtual ManualObject* createManualObject(const String& name);
-		/** Create a ManualObject, an object which you populate with geometry
-		manually through a GL immediate-mode style interface, generating the name.
-		*/
-		virtual ManualObject* createManualObject();
-        /** Retrieves a pointer to the named ManualObject. 
-		@note Throws an exception if the named instance does not exist
-		*/
-        virtual ManualObject* getManualObject(const String& name) const;
-		/** Returns whether a manual object with the given name exists.
-		*/
-		virtual bool hasManualObject(const String& name) const;
-
+        virtual ManualObject* createManualObject();
         /** Removes & destroys a ManualObject from the SceneManager.
         */
         virtual void destroyManualObject(ManualObject* obj);
-		/** Removes & destroys a ManualObject from the SceneManager.
-		*/
-		virtual void destroyManualObject(const String& name);
 		/** Removes & destroys all ManualObjects from the SceneManager.
 		*/
 		virtual void destroyAllManualObjects(void);
         /** Create a BillboardChain, an object which you can use to render
             a linked chain of billboards.
-        @param
-            name The name to be given to the object (must be unique).
         */
-        virtual BillboardChain* createBillboardChain(const String& name);
-		/** Create a BillboardChain, an object which you can use to render
-		a linked chain of billboards, with a generated name.
-		*/
-		virtual BillboardChain* createBillboardChain();
-        /** Retrieves a pointer to the named BillboardChain. 
-		@note Throws an exception if the named instance does not exist
-		*/
-        virtual BillboardChain* getBillboardChain(const String& name) const;
-		/** Returns whether a billboard chain with the given name exists.
-		*/
-		virtual bool hasBillboardChain(const String& name) const;
-
+        virtual BillboardChain* createBillboardChain();
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
         virtual void destroyBillboardChain(BillboardChain* obj);
 		/** Removes & destroys a BillboardChain from the SceneManager.
 		*/
-		virtual void destroyBillboardChain(const String& name);
+		virtual void destroyBillboardChain( IdType id );
 		/** Removes & destroys all BillboardChains from the SceneManager.
 		*/
 		virtual void destroyAllBillboardChains(void);		
         /** Create a RibbonTrail, an object which you can use to render
             a linked chain of billboards which follows one or more nodes.
-        @param
-            name The name to be given to the object (must be unique).
         */
-        virtual RibbonTrail* createRibbonTrail(const String& name);
-		/** Create a RibbonTrail, an object which you can use to render
-		a linked chain of billboards which follows one or more nodes, generating the name.
-		*/
-		virtual RibbonTrail* createRibbonTrail();
-        /** Retrieves a pointer to the named RibbonTrail. 
-		@note Throws an exception if the named instance does not exist
-		*/
-        virtual RibbonTrail* getRibbonTrail(const String& name) const;
-		/** Returns whether a ribbon trail with the given name exists.
-		*/
-		virtual bool hasRibbonTrail(const String& name) const;
-
+        virtual RibbonTrail* createRibbonTrail();
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
         virtual void destroyRibbonTrail(RibbonTrail* obj);
-		/** Removes & destroys a RibbonTrail from the SceneManager.
-		*/
-		virtual void destroyRibbonTrail(const String& name);
 		/** Removes & destroys all RibbonTrails from the SceneManager.
 		*/
 		virtual void destroyAllRibbonTrails(void);		
@@ -1483,12 +1389,9 @@ namespace Ogre {
             This is probably the more useful particle system creation method since it does not require manual
             setup of the system. Note that the initial quota is based on the template but may be changed later.
         @param 
-            name The name to give the new particle system instance.
-        @param 
             templateName The name of the template to base the new instance on.
         */
-        virtual ParticleSystem* createParticleSystem(const String& name,
-			const String& templateName);
+        virtual ParticleSystem* createParticleSystem( const String& templateName );
         /** Create a blank particle system.
         @remarks
             This method creates a new, blank ParticleSystem instance and returns a pointer to it.
@@ -1501,50 +1404,17 @@ namespace Ogre {
         @par
             Creating a particle system does not make it a part of the scene. As with other MovableObject
             subclasses, a ParticleSystem is not rendered until it is attached to a SceneNode. 
-        @param
-            name The name to give the ParticleSystem.
         @param 
             quota The maximum number of particles to allow in this system. 
         @param
             resourceGroup The resource group which will be used to load dependent resources
         */
-        virtual ParticleSystem* createParticleSystem(const String& name,
-			size_t quota = 500, 
-            const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-        /** Create a blank particle system with a generated name.
-        @remarks
-            This method creates a new, blank ParticleSystem instance and returns a pointer to it.
-            The caller should not delete this object, it will be freed at system shutdown, or can
-            be released earlier using the destroyParticleSystem method.
-        @par
-            The instance returned from this method won't actually do anything because on creation a
-            particle system has no emitters. The caller should manipulate the instance through it's 
-            ParticleSystem methods to actually create a real particle effect. 
-        @par
-            Creating a particle system does not make it a part of the scene. As with other MovableObject
-            subclasses, a ParticleSystem is not rendered until it is attached to a SceneNode. 
-        @param 
-            quota The maximum number of particles to allow in this system. 
-        @param
-            resourceGroup The resource group which will be used to load dependent resources
-        */
-		virtual ParticleSystem* createParticleSystem(size_t quota = 500, 
-			const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        /** Retrieves a pointer to the named ParticleSystem. 
-		@note Throws an exception if the named instance does not exist
-		*/
-        virtual ParticleSystem* getParticleSystem(const String& name) const;
-		/** Returns whether a particle system with the given name exists.
-		*/
-		virtual bool hasParticleSystem(const String& name) const;
+        virtual ParticleSystem* createParticleSystem( size_t quota = 500, 
+            const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
         /** Removes & destroys a ParticleSystem from the SceneManager.
         */
         virtual void destroyParticleSystem(ParticleSystem* obj);
-		/** Removes & destroys a ParticleSystem from the SceneManager.
-		*/
-		virtual void destroyParticleSystem(const String& name);
 		/** Removes & destroys all ParticleSystems from the SceneManager.
 		*/
 		virtual void destroyAllParticleSystems(void);		
@@ -2252,28 +2122,11 @@ namespace Ogre {
                 See the BillboardSet documentations for full details of the
                 returned class.
             @param
-                name The name to give to this billboard set. Must be unique.
-            @param
-                poolSize The initial size of the pool of billboards (see BillboardSet for more information)
-            @see
-                BillboardSet
-        */
-        virtual BillboardSet* createBillboardSet(const String& name, unsigned int poolSize = 20);
-
-        /** Creates a new BillboardSet for use with this scene manager, with a generated name.
-            @param
                 poolSize The initial size of the pool of billboards (see BillboardSet for more information)
             @see
                 BillboardSet
         */
         virtual BillboardSet* createBillboardSet(unsigned int poolSize = 20);
-        /** Retrieves a pointer to the named BillboardSet.
-		@note Throws an exception if the named instance does not exist
-        */
-        virtual BillboardSet* getBillboardSet(const String& name) const;
-		/** Returns whether a billboardset with the given name exists.
-		*/
-		virtual bool hasBillboardSet(const String& name) const;
 
         /** Removes & destroys an BillboardSet from the SceneManager.
             @warning
@@ -2282,14 +2135,6 @@ namespace Ogre {
                 scene. If you are unsure, use clearScene.
         */
         virtual void destroyBillboardSet(BillboardSet* set);
-
-        /** Removes & destroys an BillboardSet from the SceneManager by name.
-            @warning
-                Must only be done if the BillboardSet is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene. If you are unsure, use clearScene.
-        */
-        virtual void destroyBillboardSet(const String& name);
 
         /** Removes & destroys all BillboardSets.
         @warning
@@ -2630,7 +2475,7 @@ namespace Ogre {
         /** Destroys a scene query of any type. */
         virtual void destroyQuery(SceneQuery* query);
 
-        typedef MapIterator<CameraList> CameraIterator;
+        typedef VectorIterator<CameraList> CameraIterator;
         typedef MapIterator<AnimationList> AnimationIterator;
 
         /** Returns a specialised MapIterator over all cameras in the scene. 
@@ -3223,18 +3068,6 @@ namespace Ogre {
 		*/
 		void _addDirtyInstanceManager( InstanceManager *dirtyManager );
 
-		/** Create a movable object of the type specified.
-		@remarks
-			This is the generalised form of MovableObject creation where you can
-			create a MovableObject of any specialised type generically, including
-			any new types registered using plugins.
-		@param name The name to give the object. Must be unique within type.
-		@param typeName The type of object to create
-		@param params Optional name/value pair list to give extra parameters to
-			the created object.
-		*/
-		virtual MovableObject* createMovableObject(const String& name, 
-			const String& typeName, const NameValuePairList* params = 0);
 		/** Create a movable object of the type specified without a name.
 		@remarks
 		This is the generalised form of MovableObject creation where you can
@@ -3250,7 +3083,7 @@ namespace Ogre {
 			The MovableObject will automatically detach itself from any nodes
 			on destruction.
 		*/
-		virtual void destroyMovableObject(const String& name, const String& typeName);
+		virtual void destroyMovableObject( MovableObject *m, const String& typeName );
 		/** Destroys a MovableObject.
 		@remarks
 			The MovableObject will automatically detach itself from any nodes
@@ -3261,13 +3094,7 @@ namespace Ogre {
 		virtual void destroyAllMovableObjectsByType(const String& typeName);
 		/** Destroy all MovableObjects. */
 		virtual void destroyAllMovableObjects(void);
-		/** Get a reference to a previously created MovableObject. 
-		@note Throws an exception if the named instance does not exist
-		*/
-		virtual MovableObject* getMovableObject(const String& name, const String& typeName) const;
-		/** Returns whether a movable object instance with the given name exists. */
-		virtual bool hasMovableObject(const String& name, const String& typeName) const;
-		typedef MapIterator<MovableObjectMap> MovableObjectIterator;
+		typedef VectorIterator<MovableObjectVec> MovableObjectIterator;
 		/** Get an iterator over all MovableObect instances of a given type. 
 		@note
 			The iterator returned from this method is not thread safe, do not use this
@@ -3286,13 +3113,6 @@ namespace Ogre {
 			and that its getMovableType() method returns a proper type name.
 		*/
 		virtual void injectMovableObject(MovableObject* m);
-		/** Extract a previously injected MovableObject.
-		@remarks
-			Essentially this does the same as destroyMovableObject, but only
-			removes the instance from the internal lists, it does not attempt
-			to destroy it.
-		*/
-		virtual void extractMovableObject(const String& name, const String& typeName);
 		/** Extract a previously injected MovableObject.
 		@remarks
 			Essentially this does the same as destroyMovableObject, but only

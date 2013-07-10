@@ -62,13 +62,15 @@ namespace Ogre {
         static String msMovableType;
     public:
 
-        MovablePlane(const String& name);
-        MovablePlane (const Plane& rhs);
+        MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager, const Plane& rhs );
         /** Construct a plane through a normal, and a distance to move the plane along the normal.*/
-        MovablePlane (const Vector3& rkNormal, Real fConstant);
-        MovablePlane (const Vector3& rkNormal, const Vector3& rkPoint);
-        MovablePlane (const Vector3& rkPoint0, const Vector3& rkPoint1,
-            const Vector3& rkPoint2);
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkNormal, Real fConstant );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkNormal, const Vector3& rkPoint );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2 );
         ~MovablePlane() {}
         /// Overridden from MovableObject
         void _notifyCurrentCamera(Camera*) { /* don't care */ }

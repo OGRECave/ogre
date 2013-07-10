@@ -287,91 +287,62 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 	return mWorldGeometryRenderQueue;
 }
 //-----------------------------------------------------------------------
-Camera* SceneManager::createCamera(const String& name)
+Camera* SceneManager::createCamera( const String &name )
 {
-    // Check name not used
-    if (mCameras.find(name) != mCameras.end())
-    {
-        OGRE_EXCEPT(
-            Exception::ERR_DUPLICATE_ITEM,
-            "A camera with the name " + name + " already exists",
-            "SceneManager::createCamera" );
-    }
-
-    Camera *c = OGRE_NEW Camera(name, this);
-    mCameras.insert(CameraList::value_type(name, c));
+	Camera *c = OGRE_NEW Camera( Id::generateNewId<MovableObject>(), &mEntityMemoryManager, this );
+    mCameras.push_back( c );
+	c->mGlobalIndex = mCameras.size() - 1;
+	c->setName( name );
 
 	// create visible bounds aab map entry
 	mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
 
     return c;
 }
-
-//-----------------------------------------------------------------------
-Camera* SceneManager::getCamera(const String& name) const
-{
-    CameraList::const_iterator i = mCameras.find(name);
-    if (i == mCameras.end())
-    {
-        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-            "Cannot find Camera with name " + name,
-            "SceneManager::getCamera");
-    }
-    else
-    {
-        return i->second;
-    }
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasCamera(const String& name) const
-{
-	return (mCameras.find(name) != mCameras.end());
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
-	destroyCamera(cam->getName());
+	checkMovableObjectIntegrity( mCameras, cam );
 
-}
+	// Find in list
+	CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
 
-//-----------------------------------------------------------------------
-void SceneManager::destroyCamera(const String& name)
-{
-    // Find in list
-    CameraList::iterator i = mCameras.find(name);
-    if (i != mCameras.end())
-    {
-		// Remove visible boundary AAB entry
-		CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( i->second );
-		if ( camVisObjIt != mCamVisibleObjectsMap.end() )
-			mCamVisibleObjectsMap.erase( camVisObjIt );
+	// Remove visible boundary AAB entry
+	CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( cam );
+	if ( camVisObjIt != mCamVisibleObjectsMap.end() )
+		mCamVisibleObjectsMap.erase( camVisObjIt );
 
-		// Remove light-shadow cam mapping entry
-		ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( i->second );
-		if ( camLightIt != mShadowCamLightMapping.end() )
-			mShadowCamLightMapping.erase( camLightIt );
+	// Remove light-shadow cam mapping entry
+	ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( cam );
+	if ( camLightIt != mShadowCamLightMapping.end() )
+		mShadowCamLightMapping.erase( camLightIt );
 
-		// Notify render system
-        mDestRenderSystem->_notifyCameraRemoved(i->second);
-        OGRE_DELETE i->second;
-        mCameras.erase(i);
-    }
+	// Notify render system
+    mDestRenderSystem->_notifyCameraRemoved( cam );
 
+	itor = efficientVectorRemove( mCameras, itor );
+    OGRE_DELETE cam;
+	cam = 0;
+
+	//The node that was at the end got swapped and has now a different index
+	if( itor != mCameras.end() )
+		(*itor)->mGlobalIndex = itor - mCameras.begin();
 }
 
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllCameras(void)
 {
-	CameraList::iterator camIt = mCameras.begin();
-	while( camIt != mCameras.end() )
+	CameraList::iterator camIt  = mCameras.begin();
+	CameraList::iterator camEnd = mCameras.end();
+
+	while( camIt != camEnd )
 	{
 		bool dontDelete = false;
 		 // dont destroy shadow texture cameras here. destroyAllCameras is public
 		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
 		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
 		{
-			if( (*camShadowTexIt) == camIt->second )
+			if( (*camShadowTexIt) == *camIt )
 			{
 				dontDelete = true;
 				break;
@@ -379,47 +350,27 @@ void SceneManager::destroyAllCameras(void)
 		}
 
 		if( dontDelete )	// skip this camera
-			camIt++;
+			++camIt;
 		else 
 		{
-			destroyCamera(camIt->second);
-			camIt = mCameras.begin(); // recreate iterator
+			const size_t oldIdx = camIt - mCameras.begin();
+			destroyCamera( *camIt );
+			camIt  = mCameras.begin() + oldIdx;
+			camEnd = mCameras.end();
 		}
 	}
 
 }
 //-----------------------------------------------------------------------
-Light* SceneManager::createLight(const String& name)
-{
-	return static_cast<Light*>(
-		createMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 Light* SceneManager::createLight()
 {
-	String name = mMovableNameGenerator.generate();
-	return createLight(name);
-}
-//-----------------------------------------------------------------------
-Light* SceneManager::getLight(const String& name) const
-{
 	return static_cast<Light*>(
-		getMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasLight(const String& name) const
-{
-	return hasMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
+		createMovableObject(LightFactory::FACTORY_TYPE_NAME));
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyLight(Light *l)
 {
 	destroyMovableObject(l);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyLight(const String& name)
-{
-	destroyMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllLights(void)
@@ -537,9 +488,7 @@ Entity* SceneManager::createEntity(PrefabType ptype)
 }
 
 //-----------------------------------------------------------------------
-Entity* SceneManager::createEntity(
-                                   const String& entityName,
-                                   const String& meshName,
+Entity* SceneManager::createEntity(const String& meshName,
 								   const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
 {
 	// delegate to factory implementation
@@ -547,53 +496,25 @@ Entity* SceneManager::createEntity(
 	params["mesh"] = meshName;
 	params["resourceGroup"] = groupName;
 	return static_cast<Entity*>(
-		createMovableObject(entityName, EntityFactory::FACTORY_TYPE_NAME, 
-			&params));
+		createMovableObject( EntityFactory::FACTORY_TYPE_NAME, &params) );
 
-}
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& entityName, const MeshPtr& pMesh)
-{
-    return createEntity(entityName, pMesh->getName(), pMesh->getGroup());
-}
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& meshName)
-{
-	String name = mMovableNameGenerator.generate();
-	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
-	return createEntity(name, meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 }
 //---------------------------------------------------------------------
 Entity* SceneManager::createEntity(const MeshPtr& pMesh)
 {
-    String name = mMovableNameGenerator.generate();
-    return createEntity(name, pMesh);
+    return createEntity(pMesh->getName(), pMesh->getGroup());
 }
-//-----------------------------------------------------------------------
-Entity* SceneManager::getEntity(const String& name) const
+//---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const String& meshName)
 {
-	return static_cast<Entity*>(
-		getMovableObject(name, EntityFactory::FACTORY_TYPE_NAME));
+	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
+	return createEntity(meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 }
-//-----------------------------------------------------------------------
-bool SceneManager::hasEntity(const String& name) const
-{
-	return hasMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyEntity(Entity *e)
 {
 	destroyMovableObject(e);
 }
-
-//-----------------------------------------------------------------------
-void SceneManager::destroyEntity(const String& name)
-{
-	destroyMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllEntities(void)
 {
@@ -607,29 +528,10 @@ void SceneManager::destroyAllBillboardSets(void)
 	destroyAllMovableObjectsByType(BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-ManualObject* SceneManager::createManualObject(const String& name)
-{
-	return static_cast<ManualObject*>(
-		createMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 ManualObject* SceneManager::createManualObject()
 {
-	String name = mMovableNameGenerator.generate();
-	return createManualObject(name);
-}
-//-----------------------------------------------------------------------
-ManualObject* SceneManager::getManualObject(const String& name) const
-{
 	return static_cast<ManualObject*>(
-		getMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasManualObject(const String& name) const
-{
-	return hasMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-
+		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyManualObject(ManualObject* obj)
@@ -637,49 +539,20 @@ void SceneManager::destroyManualObject(ManualObject* obj)
 	destroyMovableObject(obj);
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyManualObject(const String& name)
-{
-	destroyMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
 void SceneManager::destroyAllManualObjects(void)
 {
 	destroyAllMovableObjectsByType(ManualObjectFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-BillboardChain* SceneManager::createBillboardChain(const String& name)
-{
-	return static_cast<BillboardChain*>(
-		createMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain()
 {
-	String name = mMovableNameGenerator.generate();
-	return createBillboardChain(name);
-}
-//-----------------------------------------------------------------------
-BillboardChain* SceneManager::getBillboardChain(const String& name) const
-{
 	return static_cast<BillboardChain*>(
-		getMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
-
+		createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME));
 }
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardChain(const String& name) const
-{
-	return hasMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardChain(BillboardChain* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardChain(const String& name)
-{
-	destroyMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllBillboardChains(void)
@@ -687,39 +560,15 @@ void SceneManager::destroyAllBillboardChains(void)
 	destroyAllMovableObjectsByType(BillboardChainFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-RibbonTrail* SceneManager::createRibbonTrail(const String& name)
-{
-	return static_cast<RibbonTrail*>(
-		createMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 RibbonTrail* SceneManager::createRibbonTrail()
 {
-	String name = mMovableNameGenerator.generate();
-	return createRibbonTrail(name);
-}
-//-----------------------------------------------------------------------
-RibbonTrail* SceneManager::getRibbonTrail(const String& name) const
-{
 	return static_cast<RibbonTrail*>(
-		getMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
-
+		createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME));
 }
-//-----------------------------------------------------------------------
-bool SceneManager::hasRibbonTrail(const String& name) const
-{
-	return hasMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyRibbonTrail(RibbonTrail* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyRibbonTrail(const String& name)
-{
-	destroyMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllRibbonTrails(void)
@@ -727,57 +576,28 @@ void SceneManager::destroyAllRibbonTrails(void)
 	destroyAllMovableObjectsByType(RibbonTrailFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-	const String& templateName)
+ParticleSystem* SceneManager::createParticleSystem(const String& templateName)
 {
 	NameValuePairList params;
 	params["templateName"] = templateName;
 	
 	return static_cast<ParticleSystem*>(
-		createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-			&params));
+		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &params) );
 }
 //-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-	size_t quota, const String& group)
+ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& group )
 {
 	NameValuePairList params;
 	params["quota"] = StringConverter::toString(quota);
 	params["resourceGroup"] = group;
 	
 	return static_cast<ParticleSystem*>(
-		createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-			&params));
+		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &params) );
 }
-//-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(size_t quota, const String& group)
-{
-	String name = mMovableNameGenerator.generate();
-	return createParticleSystem(name, quota, group);
-}
-
-//-----------------------------------------------------------------------
-ParticleSystem* SceneManager::getParticleSystem(const String& name) const
-{
-	return static_cast<ParticleSystem*>(
-		getMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasParticleSystem(const String& name) const
-{
-	return hasMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyParticleSystem(ParticleSystem* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyParticleSystem(const String& name)
-{
-	destroyMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllParticleSystems(void)
@@ -840,15 +660,15 @@ SceneNode* SceneManager::createSceneNode(void)
 //-----------------------------------------------------------------------
 void SceneManager::destroySceneNode( SceneNode* sn )
 {
-	SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
-
-    if( sn->mGlobalIndex >= mSceneNodes.size() || sn != *itor )
+	if( sn->mGlobalIndex >= mSceneNodes.size() || sn != *(mSceneNodes.begin() + sn->mGlobalIndex) )
     {
 		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "SceneNode ID: " +
 			StringConverter::toString( sn->getId() ) + ", named '" + sn->getName() +
 			"' had it's mGlobalIndex out of date!!! (or the SceneNode wasn't "
 			"created with this SceneManager)", "SceneManager::destroySceneNode");
     }
+
+	SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
 
     // Find any scene nodes which are tracking this node, and turn them off
     AutoTrackingSceneNodes::iterator ai, aiend;
@@ -880,6 +700,7 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 	}
 	itor = efficientVectorRemove( mSceneNodes, itor );
     OGRE_DELETE sn;
+	sn = 0;
 
 	//The node that was at the end got swapped and has now a different index
 	if( itor != mSceneNodes.end() )
@@ -1705,8 +1526,8 @@ void SceneManager::_setSkyPlane(
         // Create entity 
         if (mSkyPlaneEntity)
         {
-            // destroy old one, do it by name for speed
-            destroyEntity(meshName);
+            // destroy old one
+            destroyEntity( mSkyPlaneEntity );
             mSkyPlaneEntity = 0;
         }
         // Create, use the same name for mesh and entity
@@ -1715,12 +1536,16 @@ void SceneManager::_setSkyPlane(
 			Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
 		NameValuePairList params;
 		params["mesh"] = meshName;
-        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, this, &params));
+		mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(
+											Id::generateNewId<MovableObject>(),
+											&mEntityMemoryManager, this, &params ));
+		mSkyPlaneEntity->setName( meshName );
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
 
         MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
-        objectMap->map[meshName] = mSkyPlaneEntity;
+		objectMap->movableObjects.push_back( mSkyPlaneEntity );
+		mSkyPlaneEntity->mGlobalIndex = objectMap->movableObjects.size() - 1;
 
         // Create node and attach
         if (!mSkyPlaneNode)
@@ -1802,7 +1627,8 @@ void SceneManager::_setSkyBox(
 		// Create object
 		if (!mSkyBoxObj)
 		{
-			mSkyBoxObj = OGRE_NEW ManualObject("SkyBox");
+			mSkyBoxObj = OGRE_NEW ManualObject( Id::generateNewId<MovableObject>(),
+												&mEntityMemoryManager );
 			mSkyBoxObj->setCastShadows(false);
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}
@@ -2034,7 +1860,7 @@ void SceneManager::_setSkyDome(
             if (mSkyDomeEntity[i])
             {
                 // destroy old one, do it by name for speed
-                destroyEntity(entName);
+                destroyEntity(mSkyDomeEntity[i]);
                 mSkyDomeEntity[i] = 0;
             }
 			// construct manually so we don't have problems if destroyAllMovableObjects called
@@ -2043,12 +1869,16 @@ void SceneManager::_setSkyDome(
 
 			NameValuePairList params;
 			params["mesh"] = planeMesh->getName();
-			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, this, &params));
+			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(
+												Id::generateNewId<MovableObject>(),
+												&mEntityMemoryManager, this, &params ));
+			mSkyDomeEntity[i]->setName( entName );
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
 
             MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
-            objectMap->map[entName] = mSkyDomeEntity[i];
+			objectMap->movableObjects.push_back( mSkyDomeEntity[i] );
+			mSkyDomeEntity[i]->mGlobalIndex = objectMap->movableObjects.size() - 1;
 
             // Attach to node
             mSkyDomeNode->attachObject(mSkyDomeEntity[i]);
@@ -3787,40 +3617,17 @@ Real SceneManager::getFogDensity(void) const
     return mFogDensity;
 }
 //-----------------------------------------------------------------------
-BillboardSet* SceneManager::createBillboardSet(const String& name, unsigned int poolSize)
+BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
 {
 	NameValuePairList params;
 	params["poolSize"] = StringConverter::toString(poolSize);
 	return static_cast<BillboardSet*>(
-		createMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME, &params));
+		createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME, &params));
 }
-//-----------------------------------------------------------------------
-BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
-{
-	String name = mMovableNameGenerator.generate();
-	return createBillboardSet(name, poolSize);
-}
-//-----------------------------------------------------------------------
-BillboardSet* SceneManager::getBillboardSet(const String& name) const
-{
-	return static_cast<BillboardSet*>(
-		getMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardSet(const String& name) const
-{
-	return hasMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardSet(BillboardSet* set)
 {
 	destroyMovableObject(set);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardSet(const String& name)
-{
-	destroyMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::setDisplaySceneNodes(bool display)
@@ -4002,7 +3809,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
-		Camera dummyCam(StringUtil::BLANK, 0);
+		Camera dummyCam( 0, mEntityMemoryManager, 0 );
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
@@ -4030,7 +3837,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 	mDestRenderSystem->_setProjectionMatrix(projMatrix);
 
 	_setPass(pass);
-	Camera dummyCam(StringUtil::BLANK, 0);
+	Camera dummyCam( 0, &mEntityMemoryManager, 0 );
 	dummyCam.setCustomViewMatrix(true, viewMatrix);
 	dummyCam.setCustomProjectionMatrix(true, projMatrix);
 	// Do we need to update GPU program parameters?
@@ -4902,7 +4709,8 @@ void SceneManager::initShadowVolumeMaterials(void)
     // Also init full screen quad while we're at it
     if (!mFullScreenQuad)
     {
-        mFullScreenQuad = OGRE_NEW Rectangle2D();
+		mFullScreenQuad = OGRE_NEW Rectangle2D( Id::generateNewId<MovableObject>(),
+												&mEntityMemoryManager );
         mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 
@@ -6363,6 +6171,20 @@ void SceneManager::destroyShadowTextures(void)
         
 }
 //---------------------------------------------------------------------
+template<typename T>
+void SceneManager::checkMovableObjectIntegrity( typename const vector<T*>::type &container,
+												const T *mo ) const
+{
+	if( mo->mGlobalIndex >= container.size() || mo != *(container.begin() + mo->mGlobalIndex) )
+	{
+		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "MovableObject ID: " +
+			StringConverter::toString( mo->getId() ) + ", named '" + mo->getName() +
+			"' of type '" + mo->getMovableType() + "'\nHad it's mGlobalIndex out of "
+			"date!!! (or the MovableObject wasn't created with this SceneManager)",
+			"SceneManager::checkMovableObjectIntegrity" );
+	}
+}
+//---------------------------------------------------------------------
 void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
 	// create shadow textures if needed
@@ -6921,13 +6743,13 @@ SceneManager::getMovableObjectCollection(const String& typeName) const
 	}
 }
 //---------------------------------------------------------------------
-MovableObject* SceneManager::createMovableObject(const String& name, 
-	const String& typeName, const NameValuePairList* params)
+MovableObject* SceneManager::createMovableObject( const String& typeName,
+													const NameValuePairList* params)
 {
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
 	{
-		return createCamera(name);
+		return createCamera( "" );
 	}
 	MovableObjectFactory* factory = 
 		Root::getSingleton().getMovableObjectFactory(typeName);
@@ -6937,33 +6759,22 @@ MovableObject* SceneManager::createMovableObject(const String& name,
 	{
 		OGRE_LOCK_MUTEX(objectMap->mutex)
 
-		if (objectMap->map.find(name) != objectMap->map.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"An object of type '" + typeName + "' with name '" + name
-				+ "' already exists.", 
-				"SceneManager::createMovableObject");
-		}
-
-		MovableObject* newObj = factory->createInstance(name, this, params);
-		objectMap->map[name] = newObj;
+		MovableObject* newObj = factory->createInstance( Id::generateNewId<MovableObject>(),
+														&mEntityMemoryManager, this, params );
+		objectMap->movableObjects.push_back( newObj );
+		newObj->mGlobalIndex = objectMap->movableObjects.size() - 1;
 		return newObj;
 	}
 
 }
 //---------------------------------------------------------------------
-MovableObject* SceneManager::createMovableObject(const String& typeName, const NameValuePairList* params /* = 0 */)
-{
-	String name = mMovableNameGenerator.generate();
-	return createMovableObject(name, typeName, params);
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyMovableObject(const String& name, const String& typeName)
+void SceneManager::destroyMovableObject( MovableObject *m, const String& typeName )
 {
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
 	{
-		destroyCamera(name);
+		assert( dynamic_cast<Camera*>(m) );
+		destroyCamera( static_cast<Camera*>(m) );
 		return;
 	}
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
@@ -6973,12 +6784,18 @@ void SceneManager::destroyMovableObject(const String& name, const String& typeNa
 	{
 		OGRE_LOCK_MUTEX(objectMap->mutex)
 
-		MovableObjectMap::iterator mi = objectMap->map.find(name);
-		if (mi != objectMap->map.end())
-		{
-			factory->destroyInstance(mi->second);
-			objectMap->map.erase(mi);
-		}
+		checkMovableObjectIntegrity( objectMap->movableObjects, m );
+
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin() + m->mGlobalIndex;
+
+		//If itor is invalid then something is terribly wrong (deleting a ptr twice may be?)
+		itor = efficientVectorRemove( objectMap->movableObjects, itor );
+		factory->destroyInstance( m );
+		m = 0;
+
+		//The MovableObject that was at the end got swapped and has now a different index
+		if( itor != objectMap->movableObjects.end() )
+			(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
 	}
 }
 //---------------------------------------------------------------------
@@ -6996,16 +6813,27 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 	
 	{
 		OGRE_LOCK_MUTEX(objectMap->mutex)
-		MovableObjectMap::iterator i = objectMap->map.begin();
-		for (; i != objectMap->map.end(); ++i)
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin();
+		MovableObjectVec::iterator end  = objectMap->movableObjects.end();
+		while( itor != end )
 		{
-			// Only destroy our own
-			if (i->second->_getManager() == this)
+			if( (*itor)->_getManager() == this )
 			{
-				factory->destroyInstance(i->second);
+				// Only destroy our own
+				MovableObject *mo = *itor;
+				itor = efficientVectorRemove( objectMap->movableObjects, itor );
+				end  = objectMap->movableObjects.end();
+				factory->destroyInstance( mo );
+
+				//The node that was at the end got swapped and has now a different index
+				if( itor != end )
+					(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
+			}
+			else
+			{
+				++itor;
 			}
 		}
-		objectMap->map.clear();
 	}
 }
 //---------------------------------------------------------------------
@@ -7028,62 +6856,31 @@ void SceneManager::destroyAllMovableObjects(void)
 			// Only destroy if we have a factory instance; otherwise must be injected
 			MovableObjectFactory* factory = 
 				Root::getSingleton().getMovableObjectFactory(ci->first);
-			MovableObjectMap::iterator i = coll->map.begin();
-			for (; i != coll->map.end(); ++i)
+
+			MovableObjectVec::iterator itor = coll->movableObjects.begin();
+			MovableObjectVec::iterator end  = coll->movableObjects.end();
+			while( itor != end )
 			{
-				if (i->second->_getManager() == this)
+				if( (*itor)->_getManager() == this )
 				{
-					factory->destroyInstance(i->second);
+					// Only destroy our own
+					MovableObject *mo = *itor;
+					itor = efficientVectorRemove( coll->movableObjects, itor );
+					end  = coll->movableObjects.end();
+					factory->destroyInstance( mo );
+
+					//The node that was at the end got swapped and has now a different index
+					if( itor != end )
+						(*itor)->mGlobalIndex = itor - coll->movableObjects.begin();
+				}
+				else
+				{
+					++itor;
 				}
 			}
 		}
-		coll->map.clear();
 	}
 
-}
-//---------------------------------------------------------------------
-MovableObject* SceneManager::getMovableObject(const String& name, const String& typeName) const
-{
-	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
-	if (typeName == "Camera")
-	{
-		return getCamera(name);
-	}
-
-	const MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
-	
-	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
-		MovableObjectMap::const_iterator mi = objectMap->map.find(name);
-		if (mi == objectMap->map.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Object named '" + name + "' does not exist.", 
-				"SceneManager::getMovableObject");
-		}
-		return mi->second;
-	}
-	
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasMovableObject(const String& name, const String& typeName) const
-{
-	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
-	if (typeName == "Camera")
-	{
-		return hasCamera(name);
-	}
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
-
-	MovableObjectCollectionMap::const_iterator i = 
-		mMovableObjectCollectionMap.find(typeName);
-	if (i == mMovableObjectCollectionMap.end())
-		return false;
-	
-	{
-		OGRE_LOCK_MUTEX(i->second->mutex)
-		return (i->second->map.find(name) != i->second->map.end());
-	}
 }
 
 //---------------------------------------------------------------------
@@ -7092,12 +6889,12 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	// Iterator not thread safe! Warned in header.
-	return MovableObjectIterator(objectMap->map.begin(), objectMap->map.end());
+	return MovableObjectIterator(objectMap->movableObjects.begin(), objectMap->movableObjects.end());
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
-	destroyMovableObject(m->getName(), m->getMovableType());
+	destroyMovableObject(m, m->getMovableType());
 }
 //---------------------------------------------------------------------
 void SceneManager::injectMovableObject(MovableObject* m)
@@ -7106,28 +6903,26 @@ void SceneManager::injectMovableObject(MovableObject* m)
 	{
 		OGRE_LOCK_MUTEX(objectMap->mutex)
 
-		objectMap->map[m->getName()] = m;
+		objectMap->movableObjects.push_back( m );
+		m->mGlobalIndex = objectMap->movableObjects.size() - 1;
 	}
-}
-//---------------------------------------------------------------------
-void SceneManager::extractMovableObject(const String& name, const String& typeName)
-{
-	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
-	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
-		MovableObjectMap::iterator mi = objectMap->map.find(name);
-		if (mi != objectMap->map.end())
-		{
-			// no delete
-			objectMap->map.erase(mi);
-		}
-	}
-
 }
 //---------------------------------------------------------------------
 void SceneManager::extractMovableObject(MovableObject* m)
 {
-	extractMovableObject(m->getName(), m->getMovableType());
+	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
+	{
+		OGRE_LOCK_MUTEX(objectMap->mutex)
+
+		checkMovableObjectIntegrity( objectMap->movableObjects, m );
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin() + m->mGlobalIndex;
+
+		// no delete
+		itor = efficientVectorRemove( objectMap->movableObjects, itor );
+		//The node that was at the end got swapped and has now a different index
+		if( itor != objectMap->movableObjects.end() )
+			(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::extractAllMovableObjectsByType(const String& typeName)
@@ -7136,7 +6931,7 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 	{
 		OGRE_LOCK_MUTEX(objectMap->mutex)
 		// no deletion
-		objectMap->map.clear();
+		objectMap->movableObjects.clear();
 	}
 }
 //---------------------------------------------------------------------
@@ -7500,7 +7295,4 @@ void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox
 	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
 
 }
-
-
-
 }

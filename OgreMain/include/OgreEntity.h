@@ -79,7 +79,7 @@ namespace Ogre {
     @note
         No functions were declared virtual to improve performance.
     */
-    class _OgreExport Entity: public MovableObject, public Resource::Listener
+    class _OgreExport Entity : public MovableObject, public Resource::Listener
     {
         // Allow EntityFactory full access
         friend class EntityFactory;
@@ -93,10 +93,10 @@ namespace Ogre {
 
         /** Private constructor (instances cannot be created directly).
         */
-        Entity();
-        /** Private constructor - specify name (the usual constructor used).
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager );
+        /** Private constructor.
         */
-        Entity( const String& name, const MeshPtr& mesh);
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh );
 
         /** The Mesh that this Entity is based on.
         */
@@ -276,9 +276,6 @@ namespace Ogre {
         /// Internal implementation of detaching a 'child' object of this entity and clear the parent node of the child entity.
         void detachObjectImpl(MovableObject* pObject);
 
-        /// Internal implementation of detaching all 'child' objects of this entity.
-        void detachAllObjectsImpl(void);
-
         /// Ensures reevaluation of the vertex processing usage.
         void reevaluateVertexProcessing(void);
 
@@ -303,13 +300,9 @@ namespace Ogre {
         /// Contains the child objects (attached to bones) indexed by name.
         typedef map<String, MovableObject*>::type ChildObjectList;
     protected:
-        ChildObjectList mChildObjectList;
-
-
-        /// Bounding box that 'contains' all the mesh of each child entity.
-        mutable AxisAlignedBox mFullBoundingBox;
-
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         ShadowRenderableList mShadowRenderables;
+#endif
 
         /** Nested class to allow entity shadows. */
         class _OgreExport EntityShadowRenderable : public ShadowRenderable
@@ -411,13 +404,6 @@ namespace Ogre {
 
         /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
-
-        /** @copydoc MovableObject::getBoundingBox.
-        */
-        const AxisAlignedBox& getBoundingBox(void) const;
-
-        /// Merge all the child object Bounds a return it.
-        AxisAlignedBox getChildObjectsBoundingBox(void) const;
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
@@ -581,26 +567,23 @@ namespace Ogre {
         /// Detach all MovableObjects previously attached using attachObjectToBone
         void detachAllObjectsFromBone(void);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         typedef MapIterator<ChildObjectList> ChildObjectListIterator;
         /** Gets an iterator to the list of objects attached to bones on this entity. */
         ChildObjectListIterator getAttachedObjectIterator(void);
-        /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const;
-
-        /** @copydoc MovableObject::getWorldBoundingBox */
-        const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
-        /** @copydoc MovableObject::getWorldBoundingSphere */
-        const Sphere& getWorldBoundingSphere(bool derive = false) const;
-
+#endif
         /** @copydoc ShadowCaster::getEdgeList. */
         EdgeData* getEdgeList(void);
         /** @copydoc ShadowCaster::hasEdgeList. */
         bool hasEdgeList(void);
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer,
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
+#endif
 
         /** Internal method for retrieving bone matrix information. */
         const Matrix4* _getBoneMatrices(void) const { return mBoneMatrices;}
@@ -628,7 +611,7 @@ namespace Ogre {
         bool isHardwareAnimationEnabled(void);
 
         /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached( Node* parent );
         /** Returns the number of requests that have been made for software animation
         @remarks
             If non-zero then software animation will be performed in updateAnimation
@@ -861,7 +844,8 @@ namespace Ogre {
     class _OgreExport EntityFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
     public:
         EntityFactory() {}
         ~EntityFactory() {}

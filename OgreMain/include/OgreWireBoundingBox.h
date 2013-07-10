@@ -62,8 +62,7 @@ namespace Ogre {
 
 	public:
 			
-		WireBoundingBox();
-		WireBoundingBox(const String& name);
+		WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager );
 		~WireBoundingBox();
 
         /** Builds the wireframe line list.

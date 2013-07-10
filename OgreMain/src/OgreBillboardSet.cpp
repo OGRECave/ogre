@@ -48,41 +48,9 @@ namespace Ogre {
     RadixSort<BillboardSet::ActiveBillboardList, Billboard*, float> BillboardSet::mRadixSorter;
 
     //-----------------------------------------------------------------------
-    BillboardSet::BillboardSet() :
-		mBoundingRadius(0.0f), 
-        mOriginType( BBO_CENTER ),
-        mRotationType( BBR_TEXCOORD ),
-        mAllDefaultSize( true ),
-        mAutoExtendPool( true ),
-        mSortingEnabled(false),
-        mAccurateFacing(false),
-        mAllDefaultRotation(true),
-        mWorldSpace(false),
-        mVertexData(0),
-        mIndexData(0),
-        mCullIndividual( false ),
-        mBillboardType(BBT_POINT),
-        mCommonDirection(Ogre::Vector3::UNIT_Z),
-        mCommonUpVector(Vector3::UNIT_Y),
-        mPointRendering(false),
-        mBuffersCreated(false),
-        mPoolSize(0),
-		mExternalData(false),
-		mAutoUpdate(true),
-		mBillboardDataChanged(true)
-    {
-        setDefaultDimensions( 100, 100 );
-        setMaterialName( "BaseWhite" );
-        mCastShadows = false;
-        setTextureStacksAndSlices( 1, 1 );
-    }
-
-    //-----------------------------------------------------------------------
-    BillboardSet::BillboardSet(
-        const String& name,
-        unsigned int poolSize,
-        bool externalData) :
-        MovableObject(name),
+    BillboardSet::BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
+								unsigned int poolSize, bool externalData) :
+        MovableObject( id, objectMemoryManager ),
 		mBoundingRadius(0.0f), 
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
@@ -564,22 +532,22 @@ namespace Ogre {
 
             iend = mActiveBillboards.end();
 			Matrix4 invWorld;
-			if (mWorldSpace && getParentSceneNode())
-				invWorld = getParentSceneNode()->_getFullTransform().inverse();
+			if (mWorldSpace && getParentNode())
+				invWorld = getParentNode()->_getFullTransform().inverse();
 
             for (i = mActiveBillboards.begin(); i != iend; ++i)
             {
                 Vector3 pos = (*i)->getPosition();
 				// transform from world space to local space
-				if (mWorldSpace && getParentSceneNode())
+				if (mWorldSpace && getParentNode())
 					pos = invWorld * pos;
                 min.makeFloor(pos);
                 max.makeCeil(pos);
 
-				maxSqLen = max(maxSqLen, pos.squaredLength());
+				maxSqLen = Ogre::max(maxSqLen, pos.squaredLength());
             }
             // Adjust for billboard size
-            Real adjust = max(mDefaultWidth, mDefaultHeight);
+			Real adjust = Ogre::max(mDefaultWidth, mDefaultHeight);
             Vector3 vecAdjust(adjust, adjust, adjust);
             min -= vecAdjust;
             max += vecAdjust;
@@ -618,19 +586,7 @@ namespace Ogre {
 			mBillboardDataChanged = false;
         }
 
-        //only set the render queue group if it has been explicitly set.
-		if (mRenderQueuePrioritySet)
-		{
-			assert(mRenderQueueIDSet == true);
-			queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
-		}
-        else if( mRenderQueueIDSet )
-        {
-           queue->addRenderable(this, mRenderQueueID);
-        } else {
-           queue->addRenderable(this);
-        }
-
+		queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
     }
 
     //-----------------------------------------------------------------------
@@ -1505,8 +1461,9 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* BillboardSetFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* BillboardSetFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		// may have parameters
 		bool externalData = false;
@@ -1529,11 +1486,11 @@ namespace Ogre {
 
 		if (poolSize > 0)
 		{
-			return OGRE_NEW BillboardSet(name, poolSize, externalData);
+			return OGRE_NEW BillboardSet(id, objectMemoryManager, poolSize, externalData);
 		}
 		else
 		{
-			return OGRE_NEW BillboardSet(name);
+			return OGRE_NEW BillboardSet(id, objectMemoryManager);
 		}
 
 	}

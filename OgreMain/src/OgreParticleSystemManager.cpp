@@ -518,8 +518,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
     //-----------------------------------------------------------------------
-	MovableObject* ParticleSystemFactory::createInstanceImpl( const String& name, 
-			const NameValuePairList* params)
+	MovableObject* ParticleSystemFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		if (params != 0)
 		{
@@ -550,7 +551,7 @@ namespace Ogre {
 		}
 		// create using manager
 		return ParticleSystemManager::getSingleton().createSystemImpl(
-				name, quota, resourceGroup);
+								id, objectMemoryManager, quota, resourceGroup);
 				
 
 	}

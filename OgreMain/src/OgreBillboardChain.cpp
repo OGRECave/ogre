@@ -63,9 +63,10 @@ namespace Ogre {
 	{
 	}
 	//-----------------------------------------------------------------------
-	BillboardChain::BillboardChain(const String& name, size_t maxElements,
-		size_t numberOfChains, bool useTextureCoords, bool useColours, bool dynamic)
-		:MovableObject(name),
+	BillboardChain::BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager,
+			size_t maxElements, size_t numberOfChains, bool useTextureCoords,
+			bool useColours, bool dynamic )
+		:MovableObject( id, objectMemoryManager ),
 		mMaxElementsPerChain(maxElements),
 		mChainCount(numberOfChains),
 		mUseTexCoords(useTextureCoords),
@@ -743,15 +744,7 @@ namespace Ogre {
 		updateIndexBuffer();
 
 		if (mIndexData->indexCount > 0)
-		{
-			if (mRenderQueuePrioritySet)
-				queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
-			else if (mRenderQueueIDSet)
-                queue->addRenderable(this, mRenderQueueID);
-            else
-                queue->addRenderable(this);
-		}
-
+			queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::getRenderOperation(RenderOperation& op)
@@ -800,8 +793,9 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* BillboardChainFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* BillboardChainFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		size_t maxElements = 20;
 		size_t numberOfChains = 1;
@@ -839,7 +833,8 @@ namespace Ogre {
 
 		}
 
-		return OGRE_NEW BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
+		return OGRE_NEW BillboardChain( id, objectMemoryManager, maxElements,
+										numberOfChains, useTex, useCol, dynamic);
 
 	}
 	//-----------------------------------------------------------------------

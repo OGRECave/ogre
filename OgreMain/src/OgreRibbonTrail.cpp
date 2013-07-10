@@ -51,9 +51,9 @@ namespace Ogre
     }
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	RibbonTrail::RibbonTrail(const String& name, size_t maxElements, 
+	RibbonTrail::RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements, 
 		size_t numberOfChains, bool useTextureCoords, bool useColours)
-		:BillboardChain(name, maxElements, 0, useTextureCoords, useColours, true),
+		:BillboardChain( id, objectMemoryManager, maxElements, 0, useTextureCoords, useColours, true),
 		mFadeController(0)
 	{
 		setTrailLength(100);
@@ -505,8 +505,9 @@ namespace Ogre
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* RibbonTrailFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* RibbonTrailFactory::createInstanceImpl(  IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		size_t maxElements = 20;
 		size_t numberOfChains = 1;
@@ -538,7 +539,8 @@ namespace Ogre
 
 		}
 
-		return OGRE_NEW RibbonTrail(name, maxElements, numberOfChains, useTex, useCol);
+		return OGRE_NEW RibbonTrail( id, objectMemoryManager, maxElements,
+									 numberOfChains, useTex, useCol);
 
 	}
 	//-----------------------------------------------------------------------

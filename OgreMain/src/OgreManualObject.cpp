@@ -45,8 +45,8 @@ namespace Ogre {
 #define TEMP_INITIAL_VERTEX_SIZE TEMP_VERTEXSIZE_GUESS * TEMP_INITIAL_SIZE
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
 	//-----------------------------------------------------------------------------
-	ManualObject::ManualObject(const String& name)
-		: MovableObject(name),
+	ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
+		: MovableObject( id, objectMemoryManager ),
 		  mDynamic(false), mCurrentSection(0), mFirstVertex(true),
 		  mTempVertexPending(false),
 		  mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
@@ -910,15 +910,7 @@ namespace Ogre {
 				(rop->useIndexes && rop->indexData->indexCount == 0))
 				continue;
 			
-			if (mRenderQueuePrioritySet)
-			{
-				assert(mRenderQueueIDSet == true);
-				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
-			}
-			else if (mRenderQueueIDSet)
-				queue->addRenderable(*i, mRenderQueueID, mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
-			else
-				queue->addRenderable(*i, queue->getDefaultQueueGroup(), mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
+			queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
 		}
 	}
 	//-----------------------------------------------------------------------------
@@ -967,6 +959,7 @@ namespace Ogre {
 		return getEdgeList() != 0;
 	}
 	//-----------------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 	ShadowCaster::ShadowRenderableListIterator
 	ManualObject::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
@@ -1061,6 +1054,7 @@ namespace Ogre {
 
 
 	}
+#endif
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
@@ -1210,10 +1204,11 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	MovableObject* ManualObjectFactory::createInstanceImpl(
-		const String& name, const NameValuePairList* params)
+	MovableObject* ManualObjectFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
-		return OGRE_NEW ManualObject(name);
+		return OGRE_NEW ManualObject( id, objectMemoryManager );
 	}
 	//-----------------------------------------------------------------------------
 	void ManualObjectFactory::destroyInstance( MovableObject* obj)

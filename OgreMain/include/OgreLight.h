@@ -91,7 +91,7 @@ namespace Ogre {
 
         /** Normal constructor. Should not be called directly, but rather the SceneManager::createLight method should be used.
         */
-        Light( IdType id );
+        Light( IdType id, ObjectMemoryManager *objectMemoryManager );
 
         /** Standard destructor.
         */
@@ -608,7 +608,8 @@ namespace Ogre {
     class _OgreExport LightFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( IdType id, const NameValuePairList* params);
+        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
     public:
         LightFactory() {}
         ~LightFactory() {}

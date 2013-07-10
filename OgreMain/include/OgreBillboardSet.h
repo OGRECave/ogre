@@ -110,10 +110,6 @@ namespace Ogre {
     class _OgreExport BillboardSet : public MovableObject, public Renderable
     {
     protected:
-        /** Private constructor (instances cannot be created directly).
-        */
-        BillboardSet();
-
         /// Bounds of all billboards in this set
         AxisAlignedBox mAABB;
         /// Bounding radius
@@ -329,8 +325,8 @@ namespace Ogre {
         @see
             BillboardSet::setAutoextend
         */
-        BillboardSet( const String& name, unsigned int poolSize = 20, 
-            bool externalDataSource = false);
+        BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
+						unsigned int poolSize = 20, bool externalDataSource = false );
 
         virtual ~BillboardSet();
 
@@ -859,7 +855,8 @@ namespace Ogre {
     class _OgreExport BillboardSetFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
     public:
         BillboardSetFactory() {}
         ~BillboardSetFactory() {}

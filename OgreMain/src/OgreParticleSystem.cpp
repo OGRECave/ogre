@@ -1096,14 +1096,13 @@ namespace Ogre {
         if (mRenderer && !mIsRendererConfigured)
         {
             mRenderer->_notifyParticleQuota(mParticlePool.size());
-            mRenderer->_notifyAttached(mParentNode, mParentIsTagPoint);
+            mRenderer->_notifyAttached(mParentNode);
             mRenderer->_notifyDefaultDimensions(mDefaultWidth, mDefaultHeight);
             createVisualParticles(0, mParticlePool.size());
             MaterialPtr mat = MaterialManager::getSingleton().load(
                 mMaterialName, mResourceGroupName);
             mRenderer->_setMaterial(mat);
-			if (mRenderQueueIDSet)
-				mRenderer->setRenderQueueGroup(mRenderQueueID);
+			mRenderer->setRenderQueueGroup(mRenderQueueID);
 			mRenderer->setKeepParticlesInLocalSpace(mLocalSpace);
             mIsRendererConfigured = true;
         }

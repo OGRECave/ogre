@@ -36,30 +36,15 @@ namespace Ogre {
 
     uint SimpleRenderable::msGenNameCount = 0;
 
-    SimpleRenderable::SimpleRenderable()
- 	: MovableObject()
+    SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
+ 	: MovableObject( id, objectMemoryManager )
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
  	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
  	, mCamera(NULL)
-
     {
-        // Generate name
-		StringUtil::StrStreamType name;
-		name << "SimpleRenderable" << msGenNameCount++;
-		mName = name.str();
     }
-
- 	SimpleRenderable::SimpleRenderable(const String& name)
- 	: MovableObject(name)
- 	, mWorldTransform(Matrix4::IDENTITY)
- 	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
- 	, mParentSceneManager(NULL)
- 	, mCamera(NULL)
- 	{
- 	}
 
     void SimpleRenderable::setMaterial( const String& matName )
     {

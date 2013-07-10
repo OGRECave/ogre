@@ -37,14 +37,9 @@ namespace Ogre {
 #define NORMAL_BINDING 1
 #define TEXCOORD_BINDING 2
 
-	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable()
-	{
-		_initRectangle2D(includeTextureCoords, vBufUsage);
-	}
-
-	Rectangle2D::Rectangle2D(const String& name, bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable(name)
+	Rectangle2D::Rectangle2D( IdType id, ObjectMemoryManager *objectMemoryManager,
+								bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage )
+	: SimpleRenderable( id, objectMemoryManager )
 	{
 		_initRectangle2D(includeTextureCoords, vBufUsage);
 	}

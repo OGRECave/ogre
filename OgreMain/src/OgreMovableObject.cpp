@@ -46,21 +46,27 @@ namespace Ogre {
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
 	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
     //-----------------------------------------------------------------------
-    MovableObject::MovableObject( IdType id )
+    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager )
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
-		, mDebugDisplay(false)
 		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
 		, mRenderQueuePriority(100)
         , mCastShadows(true)
         , mListener(0)
+		, mDebugDisplay(false)
+		, mObjectMemoryManager( objectMemoryManager )
+		, mGlobalIndex( -1 )
+		, mParentIndex( -1 )
     {
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
+
+		//Will initialize mObjectData
+		mObjectMemoryManager->objectCreated( mObjectData, mRenderQueueID );
     }
     //-----------------------------------------------------------------------
     MovableObject::~MovableObject()
@@ -77,6 +83,8 @@ namespace Ogre {
 			// call this method could safely ignore this case.
 			static_cast<SceneNode*>(mParentNode)->detachObject( this );
         }
+
+		mObjectMemoryManager->objectDestroyed( mObjectData, mRenderQueueID );
     }
     //-----------------------------------------------------------------------
     void MovableObject::_notifyAttached( Node* parent )
@@ -205,7 +213,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MovableObject::setRenderQueueGroup(uint8 queueID)
     {
-		assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
+		if( mRenderQueueID != queueID )
+			mObjectMemoryManager->objectMoved( mObjectData, mRenderQueueID, queueID );
+
         mRenderQueueID = queueID;
     }
 	//-----------------------------------------------------------------------
@@ -693,11 +703,11 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	MovableObject* MovableObjectFactory::createInstance(
-		const String& name, SceneManager* manager, 
-		const NameValuePairList* params)
+	MovableObject* MovableObjectFactory::createInstance( IdType id,
+								ObjectMemoryManager *objectMemoryManager, SceneManager* manager,
+								const NameValuePairList* params )
 	{
-		MovableObject* m = createInstanceImpl(name, params);
+		MovableObject* m = createInstanceImpl( id, objectMemoryManager, params );
 		m->_notifyCreator(this);
 		m->_notifyManager(manager);
 		return m;

@@ -56,8 +56,9 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Entity::Entity ()
-		: mAnimationState(NULL),
+    Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
+		: MovableObject( id, objectMemoryManager ),
+		  mAnimationState(NULL),
           mSkelAnimVertexData(0),
 		  mSoftwareVertexAnimVertexData(0),
 		  mHardwareVertexAnimVertexData(0),
@@ -87,13 +88,12 @@ namespace Ogre {
           mSkeletonInstance(0),
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
-		  mMeshStateCount(0),
-          mFullBoundingBox()
+		  mMeshStateCount(0)
     {
     }
     //-----------------------------------------------------------------------
-    Entity::Entity( const String& name, const MeshPtr& mesh) :
-		MovableObject(name),
+    Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
+		MovableObject(id, objectMemoryManager),
         mMesh(mesh),
         mAnimationState(NULL),
 		mSkelAnimVertexData(0),
@@ -124,8 +124,7 @@ namespace Ogre {
 		mSkeletonInstance(0),
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
-		mMeshStateCount(0),
-        mFullBoundingBox()
+		mMeshStateCount(0)
 	{
 		_initialise();
     }
@@ -182,8 +181,9 @@ namespace Ogre {
 			{
 				const MeshLodUsage& usage = mMesh->getLodLevel(i);
 				// Manually create entity
-				Entity* lodEnt = OGRE_NEW Entity(mName + "Lod" + StringConverter::toString(i),
-					usage.manualMesh);
+				Entity* lodEnt = OGRE_NEW Entity( Id::generateNewId<MovableObject>(),
+													mObjectMemoryManager, usage.manualMesh );
+				lodEnt->setName( mName + "Lod" + StringConverter::toString(i) );
 				mLodEntityList.push_back(lodEnt);
 			}
 		}
@@ -236,6 +236,7 @@ namespace Ogre {
 		}
         mLodEntityList.clear();
         
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		// Delete shadow renderables
 		ShadowRenderableList::iterator si, siend;
 		siend = mShadowRenderables.end();
@@ -245,10 +246,13 @@ namespace Ogre {
             *si = 0;
 		}
         mShadowRenderables.clear();
+#endif
         
 		// Detach all child objects, do this manually to avoid needUpdate() call
 		// which can fail because of deleted items
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		detachAllObjectsImpl();
+#endif
 
 		if (mSkeletonInstance) {
 			OGRE_FREE_SIMD(mBoneWorldMatrices, MEMCATEGORY_ANIMATION);
@@ -382,7 +386,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
-		MovableObject::_notifyCurrentCamera(cam);
+		//TODO (dark_sylinc): This whole state tracking thing feels wrong.
 
         // Calculate the LOD
         if (mParentNode)
@@ -465,6 +469,8 @@ namespace Ogre {
 
 
         }
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Notify any child objects
         ChildObjectList::iterator child_itr = mChildObjectList.begin();
         ChildObjectList::iterator child_itr_end = mChildObjectList.end();
@@ -472,75 +478,8 @@ namespace Ogre {
         {
             (*child_itr).second->_notifyCurrentCamera(cam);
         }
+#endif
     }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& Entity::getBoundingBox(void) const
-    {
-		// Get from Mesh
-		if (mMesh->isLoaded())
-		{
-			mFullBoundingBox = mMesh->getBounds();
-			mFullBoundingBox.merge(getChildObjectsBoundingBox());
-
-			// Don't scale here, this is taken into account when world BBox calculation is done
-		}
-		else
-			mFullBoundingBox.setNull();
-
-        return mFullBoundingBox;
-    }
-    //-----------------------------------------------------------------------
-    AxisAlignedBox Entity::getChildObjectsBoundingBox(void) const
-    {
-        AxisAlignedBox aa_box;
-        AxisAlignedBox full_aa_box;
-        full_aa_box.setNull();
-
-        ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-        ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-        for( ; child_itr != child_itr_end; child_itr++)
-        {
-            aa_box = child_itr->second->getBoundingBox();
-            TagPoint* tp = (TagPoint*)child_itr->second->getParentNode();
-            // Use transform local to skeleton since world xform comes later
-            aa_box.transformAffine(tp->_getFullLocalTransform());
-
-            full_aa_box.merge(aa_box);
-        }
-
-        return full_aa_box;
-    }
-	//-----------------------------------------------------------------------
-	const AxisAlignedBox& Entity::getWorldBoundingBox(bool derive) const
-	{
-		if (derive)
-		{
-			// derive child bounding boxes
-			ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-			ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-			for( ; child_itr != child_itr_end; child_itr++)
-			{
-				child_itr->second->getWorldBoundingBox(true);
-			}
-		}
-		return MovableObject::getWorldBoundingBox(derive);
-	}
-	//-----------------------------------------------------------------------
-	const Sphere& Entity::getWorldBoundingSphere(bool derive) const
-	{
-		if (derive)
-		{
-			// derive child bounding boxes
-			ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-			ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-			for( ; child_itr != child_itr_end; child_itr++)
-			{
-				child_itr->second->getWorldBoundingSphere(true);
-			}
-		}
-		return MovableObject::getWorldBoundingSphere(derive);
-
-	}
     //-----------------------------------------------------------------------
     void Entity::_updateRenderQueue(RenderQueue* queue)
     {
@@ -584,31 +523,7 @@ namespace Ogre {
         {
             if((*i)->isVisible())
             {
-                // Order: first use subentity queue settings, if available
-                //        if not then use entity queue settings, if available
-                //        finally fall back on default queue settings
-                if((*i)->isRenderQueuePrioritySet())
-                {
-					assert((*i)->isRenderQueueGroupSet() == true);
-                    queue->addRenderable(*i, (*i)->getRenderQueueGroup(), (*i)->getRenderQueuePriority());
-                }
-                else if((*i)->isRenderQueueGroupSet())
-                {
-                    queue->addRenderable(*i, (*i)->getRenderQueueGroup());
-                }
-				else if (mRenderQueuePrioritySet)
-				{
-					assert(mRenderQueueIDSet == true);
-					queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
-				}
-                else if(mRenderQueueIDSet)
-                {
-                    queue->addRenderable(*i, mRenderQueueID);
-				}
-                else
-                {
-                    queue->addRenderable(*i);
-                }
+				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
             }
         }
 
@@ -630,32 +545,6 @@ namespace Ogre {
         if (displayEntity->hasSkeleton() || displayEntity->hasVertexAnimation())
         {
             displayEntity->updateAnimation();
-
-            //--- pass this point,  we are sure that the transformation matrix of each bone and tagPoint have been updated
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; child_itr++)
-            {
-                MovableObject* child = child_itr->second;
-                bool visible = child->isVisible();
-                if (visible && (displayEntity != this))
-                {
-                    //Check if the bone exists in the current LOD
-
-                    //The child is connected to a tagpoint which is connected to a bone
-                    Bone* bone = static_cast<Bone*>(child->getParentNode()->getParent());
-                    if (!displayEntity->getSkeleton()->hasBone(bone->getName()))
-                    {
-                        //Current LOD entity does not have the bone that the
-                        //child is connected to. Do not display.
-                        visible = false;
-                    }
-                }
-                if (visible)
-                {
-                    child->_updateRenderQueue(queue);
-                }   
-            }
         }
 
         // HACK to display bones
@@ -667,19 +556,7 @@ namespace Ogre {
             for (unsigned short b = 0; b < numBones; ++b)
             {
                 Bone* bone = mSkeletonInstance->getBone(b);
-				if (mRenderQueuePrioritySet)
-				{
-					assert(mRenderQueueIDSet == true);
-					queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
-				}
-				else if(mRenderQueueIDSet)
-                {
-                     queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
-                } 
-				else 
-				{
-                     queue->addRenderable(bone->getDebugRenderable(1));
-                }
+				queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
             }
         }
 
@@ -1415,6 +1292,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TagPoint* Entity::attachObjectToBone(const String &boneName, MovableObject *pMovable, const Quaternion &offsetOrientation, const Vector3 &offsetPosition)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         if (mChildObjectList.find(pMovable->getName()) != mChildObjectList.end())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
@@ -1446,19 +1324,24 @@ namespace Ogre {
         attachObjectImpl(pMovable, tp);
 
 		return tp;
+#endif
+		return 0;
     }
 
     //-----------------------------------------------------------------------
     void Entity::attachObjectImpl(MovableObject *pObject, TagPoint *pAttachingPoint)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         assert(mChildObjectList.find(pObject->getName()) == mChildObjectList.end());
         mChildObjectList[pObject->getName()] = pObject;
         pObject->_notifyAttached(pAttachingPoint, true);
+#endif
     }
 
     //-----------------------------------------------------------------------
     MovableObject* Entity::detachObjectFromBone(const String &name)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         ChildObjectList::iterator i = mChildObjectList.find(name);
 
         if (i == mChildObjectList.end())
@@ -1471,10 +1354,13 @@ namespace Ogre {
         mChildObjectList.erase(i);
 
 		return obj;
+#endif
+		return 0;
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         ChildObjectList::iterator i, iend;
         iend = mChildObjectList.end();
         for (i = mChildObjectList.begin(); i != iend; ++i)
@@ -1486,44 +1372,49 @@ namespace Ogre {
                 break;
             }
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsFromBone(void)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         detachAllObjectsImpl();
+#endif
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectImpl(MovableObject* pObject)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         TagPoint* tp = static_cast<TagPoint*>(pObject->getParentNode());
 
         // free the TagPoint so we can reuse it later
         mSkeletonInstance->freeTagPoint(tp);
 
         pObject->_notifyAttached((TagPoint*)0);
+#endif
     }
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsImpl(void)
     {
+
         ChildObjectList::const_iterator i, iend;
         iend = mChildObjectList.end();
         for (i = mChildObjectList.begin(); i != iend; ++i)
         {
             detachObjectImpl(i->second);
         }
-        mChildObjectList.clear();
+        mChildObjectList.clear()
     }
+#endif
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     //-----------------------------------------------------------------------
     Entity::ChildObjectListIterator Entity::getAttachedObjectIterator()
     {
         return ChildObjectListIterator(mChildObjectList.begin(), mChildObjectList.end());
     }
-    //-----------------------------------------------------------------------
-    Real Entity::getBoundingRadius(void) const
-    {
-        return mMesh->getBoundingSphereRadius();
-    }
+#endif
     //-----------------------------------------------------------------------
     void Entity::prepareTempBlendBuffers(void)
     {
@@ -1711,6 +1602,7 @@ namespace Ogre {
 					// Causes some special processing like forcing a separate light cap
 					mVertexProgramInUse = true;
 					
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 					// If shadow renderables already created create their light caps
 					ShadowRenderableList::iterator si = mShadowRenderables.begin();
 					ShadowRenderableList::iterator siend = mShadowRenderables.end();
@@ -1718,6 +1610,7 @@ namespace Ogre {
 					{
 						static_cast<EntityShadowRenderable*>(*si)->_createSeparateLightCap();
 					}
+#endif
 				}
 
 				if (hasSkeleton())
@@ -1806,6 +1699,7 @@ namespace Ogre {
         return mMeshLodFactorTransformed;
     }
     //-----------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     ShadowCaster::ShadowRenderableListIterator
         Entity::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light,
@@ -1975,7 +1869,9 @@ namespace Ogre {
 
 
         return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
+
     }
+#endif
     //-----------------------------------------------------------------------
     const VertexData* Entity::findBlendedVertexData(const VertexData* orig)
     {
@@ -2048,13 +1944,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::_notifyAttached( Node* parent )
     {
-        MovableObject::_notifyAttached(parent, isTagPoint);
+        MovableObject::_notifyAttached(parent);
         // Also notify LOD entities
         LODEntityList::iterator i, iend;
         iend = mLodEntityList.end();
         for (i = mLodEntityList.begin(); i != iend; ++i)
         {
-            (*i)->_notifyAttached(parent, isTagPoint);
+            (*i)->_notifyAttached(parent);
         }
     }
     //-----------------------------------------------------------------------
@@ -2381,8 +2277,9 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* EntityFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* EntityFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		// must have mesh parameter
 		MeshPtr pMesh;
@@ -2416,8 +2313,7 @@ namespace Ogre {
 				"EntityFactory::createInstance");
 		}
 
-		return OGRE_NEW Entity(name, pMesh);
-
+		return OGRE_NEW Entity( id, objectMemoryManager, pMesh );
 	}
 	//-----------------------------------------------------------------------
 	void EntityFactory::destroyInstance( MovableObject* obj)

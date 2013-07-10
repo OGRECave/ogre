@@ -111,11 +111,11 @@ namespace Ogre {
         /// List of lights for this object
         LightList mLightList;
 
-		/// Friendly name of this object, can be empty
-		String mName;
-
 		/// Is debug display enabled?
 		bool mDebugDisplay;
+
+		/// The memory manager used to allocate the ObjectData.
+		ObjectMemoryManager *mObjectMemoryManager;
 
 		/// Creator of this object (if created by a factory)
 		MovableObjectFactory* mCreator;
@@ -123,6 +123,9 @@ namespace Ogre {
 #ifndef NDEBUG
 		mutable bool mCachedAabbOutOfDate;
 #endif
+
+		/// Friendly name of this object, can be empty
+		String mName;
 
 		// Static members
 		/// Default query flags
@@ -135,8 +138,18 @@ namespace Ogre {
 		float updateSingleWorldRadius();
 
     public:
+		/** Index in the vector holding this MO reference (could be our parent node, or a global
+			array tracking all movable objecst to avoid memory leaks). Used for O(1) removals.
+		@remarks
+			It is the parent (or our creator) the one that sets this value, not ourselves.
+			Do NOT modify it manually.
+		*/
+		size_t mGlobalIndex;
+		/// @copydoc mGlobalIndex
+		size_t mParentIndex;
+
         /// Constructor
-        MovableObject( IdType id );
+        MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager );
         /** Virtual destructor - read Scott Meyers if you don't know why this is needed.
         */
         virtual ~MovableObject();
@@ -187,10 +200,6 @@ namespace Ogre {
 		*/
 		Real getBoundingRadius(void) const;
 
-        /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
-        //const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
-		/** Retrieves the worldspace bounding sphere for this object. */
-        //virtual const Sphere& getWorldBoundingSphere(bool derive = false) const;
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
             @remarks
                 The engine will call this method when this object is to be rendered. The object must then create one or more
@@ -584,8 +593,8 @@ namespace Ogre {
 		unsigned long mTypeFlag;
 
 		/// Internal implementation of create method - must be overridden
-		virtual MovableObject* createInstanceImpl(
-			const String& name, const NameValuePairList* params = 0) = 0;
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0) = 0;
 	public:
 		MovableObjectFactory() : mTypeFlag(0xFFFFFFFF) {}
 		virtual ~MovableObjectFactory() {}
@@ -593,15 +602,13 @@ namespace Ogre {
 		virtual const String& getType(void) const = 0;
 
 		/** Create a new instance of the object.
-		@param name The name of the new object
 		@param manager The SceneManager instance that will be holding the
 			instance once created.
 		@param params Name/value pair list of additional parameters required to 
 			construct the object (defined per subtype). Optional.
 		*/
-		virtual MovableObject* createInstance(
-			const String& name, SceneManager* manager, 
-			const NameValuePairList* params = 0);
+		virtual MovableObject* createInstance( IdType id, ObjectMemoryManager *objectMemoryManager,
+										SceneManager* manager, const NameValuePairList* params = 0);
 		/** Destroy an instance of the object */
 		virtual void destroyInstance(MovableObject* obj) = 0;
 

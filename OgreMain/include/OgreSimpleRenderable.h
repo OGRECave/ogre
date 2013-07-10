@@ -69,10 +69,7 @@ namespace Ogre {
 
     public:
         /// Constructor
-        SimpleRenderable();
-
-        /// Named constructor
-        SimpleRenderable(const String& name);
+        SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager );
 
         virtual void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;

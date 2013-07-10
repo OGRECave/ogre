@@ -44,8 +44,8 @@ namespace Ogre {
 
     String Camera::msMovableType = "Camera";
     //-----------------------------------------------------------------------
-    Camera::Camera( const String& name, SceneManager* sm)
-        : Frustum(name),
+    Camera::Camera( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* sm )
+        : Frustum( id, objectMemoryManager ),
 		mSceneMgr(sm),
 		mOrientation(Quaternion::IDENTITY),
 		mPosition(Vector3::ZERO),
@@ -84,8 +84,7 @@ namespace Ogre {
         // no reflection
         mReflect = false;
 
-        mVisible = false;
-
+		setVisible( false );
     }
 
     //-----------------------------------------------------------------------

@@ -35,14 +35,8 @@ THE SOFTWARE.
 namespace Ogre {
     #define POSITION_BINDING 0
 
-	WireBoundingBox::WireBoundingBox()
-	: SimpleRenderable()
-	{
-		_initWireBoundingBox();
-	}
-
-	WireBoundingBox::WireBoundingBox(const String& name) 
-	: SimpleRenderable(name)
+	WireBoundingBox::WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager )
+	: SimpleRenderable( id, objectMemoryManager )
 	{
 		_initWireBoundingBox();
 	}

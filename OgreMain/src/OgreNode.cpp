@@ -736,7 +736,7 @@ namespace Ogre {
 		mMeshPtr = MeshManager::getSingleton().getByName(meshName);
 		if (mMeshPtr.isNull())
 		{
-			ManualObject mo("tmp");
+			ManualObject mo( 0, 0 );
 			mo.begin(mMat->getName());
 			/* 3 axes, each made up of 2 of these (base plane = XY)
              *   .------------|\
