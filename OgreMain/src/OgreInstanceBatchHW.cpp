@@ -37,11 +37,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatchHW::InstanceBatchHW( InstanceManager *creator, MeshPtr &meshReference,
+	InstanceBatchHW::InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
-				InstanceBatch( creator, meshReference, material, instancesPerBatch,
-								indexToBoneMap, batchName ),
+				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
+								instancesPerBatch, indexToBoneMap, batchName ),
 				mKeepStatic( false )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance

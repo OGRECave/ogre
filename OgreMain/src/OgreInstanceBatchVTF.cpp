@@ -45,11 +45,12 @@ namespace Ogre
 	static const uint16 c_maxTexWidth	= 4096;
 	static const uint16 c_maxTexHeight	= 4096;
 
-	BaseInstanceBatchVTF::BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference,
+	BaseInstanceBatchVTF::BaseInstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
-				InstanceBatch( creator, meshReference, material, instancesPerBatch,
-								indexToBoneMap, batchName ),
+				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
+								instancesPerBatch, indexToBoneMap, batchName ),
 				mNumWorldMatrices( instancesPerBatch ),
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
@@ -446,7 +447,8 @@ namespace Ogre
 			}
 		}
 
-		return OGRE_NEW InstancedEntity( this, num, sharedTransformEntity);
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), 0, this,
+										 num, sharedTransformEntity );
 	}
 
 
@@ -474,10 +476,11 @@ namespace Ogre
 	// InstanceBatchVTF
 	//-----------------------------------------------------------------------
 	InstanceBatchVTF::InstanceBatchVTF( 
+		IdType id, ObjectMemoryManager *objectMemoryManager,
 		InstanceManager *creator, MeshPtr &meshReference, 
 		const MaterialPtr &material, size_t instancesPerBatch, 
 		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
-			: BaseInstanceBatchVTF (creator, meshReference, material, 
+			: BaseInstanceBatchVTF (id, objectMemoryManager, creator, meshReference, material,
 									instancesPerBatch, indexToBoneMap, batchName)
 	{
 

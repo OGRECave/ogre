@@ -175,6 +175,8 @@ namespace Ogre {
         /// Returns the node to which this object is attached.
 		Node* getParentNode(void) const										{ return mParentNode; }
 
+		SceneNode* getParentSceneNode(void) const;
+
         /** Internal method called to notify the object that it has been attached to a node.
         */
         virtual void _notifyAttached( Node* parent );

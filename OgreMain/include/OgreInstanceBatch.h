@@ -170,7 +170,8 @@ namespace Ogre
         void defragmentBatchDoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );
 
     public:
-        InstanceBatch( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+        InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
+					   InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
                        size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
                        const String &batchName );
         virtual ~InstanceBatch();

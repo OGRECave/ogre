@@ -1,4 +1,9 @@
 
+#ifndef NDEBUG
+	//Needed by the dynamic_cast assert
+	#include "OgreSceneNode.h"
+#endif
+
 namespace Ogre
 {
 	inline void MovableObject::setVisibilityFlags( uint32 flags )
@@ -69,5 +74,11 @@ namespace Ogre
 	inline bool MovableObject::getVisible(void) const
 	{
 		return mObjectData.mVisible[mObjectData.mIndex];
+	}
+	//-----------------------------------------------------------------------------------
+	SceneNode* MovableObject::getParentSceneNode(void) const
+	{
+		assert( dynamic_cast<SceneNode*>( mParentNode ) );
+		return static_cast<SceneNode*>( mParentNode );
 	}
 }

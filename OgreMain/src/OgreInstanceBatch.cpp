@@ -38,11 +38,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
+	InstanceBatch::InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
+									InstanceManager *creator, MeshPtr &meshReference,
 									const MaterialPtr &material, size_t instancesPerBatch,
 									const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				Renderable(),
-                MovableObject(),
+                MovableObject( id, objectMemoryManager ),
 				mInstancesPerBatch( instancesPerBatch ),
 				mCreator( creator ),
 				mMaterial( material ),
@@ -64,7 +65,7 @@ namespace Ogre
 		//Force batch visibility to be always visible. The instanced entities
 		//have individual visibility flags. If none matches the scene's current,
 		//then this batch won't rendered.
-		mVisibilityFlags = std::numeric_limits<Ogre::uint32>::max();
+		setVisibilityFlags( std::numeric_limits<Ogre::uint32>::max() );
 
 		if( indexToBoneMap )
 		{
@@ -163,6 +164,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::updateVisibility(void)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		mVisible = false;
 
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
@@ -177,6 +179,7 @@ namespace Ogre
 			mVisible |= (*itor)->findVisible( mCurrentCamera );
 			++itor;
 		}
+#endif
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::createAllInstancedEntities()
@@ -194,7 +197,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
-		return OGRE_NEW InstancedEntity( this, num);
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), 0, this, num );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
@@ -513,8 +516,6 @@ namespace Ogre
 
         //Change lod index
         mMaterialLodIndex = idx;
-
-		MovableObject::_notifyCurrentCamera( cam );
 	}
 	//-----------------------------------------------------------------------
 	const AxisAlignedBox& InstanceBatch::getBoundingBox(void) const
@@ -569,7 +570,7 @@ namespace Ogre
 		//Is at least one object in the scene?
 		updateVisibility();
 
-		if( mVisible )
+		if( getVisible() )
 		{
 			if( mMeshReference->hasSkeleton() )
 			{
@@ -588,7 +589,7 @@ namespace Ogre
 
 		//Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
 		//reason stops updating our render queue afterwards, preventing us to recalculate visibility
-		mVisible = true;
+		setVisible( true );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )

@@ -40,8 +40,10 @@ namespace Ogre
 {
 	NameGenerator InstancedEntity::msNameGenerator("");
 
-	InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity ) :
-				MovableObject(),
+	InstancedEntity::InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceBatch *batchOwner, uint32 instanceID,
+										InstancedEntity* sharedTransformEntity ) :
+				MovableObject( id, objectMemoryManager ),
 				mInstanceId( instanceID ),
                 mInUse( false ),
 				mBatchOwner( batchOwner ),
@@ -60,13 +62,10 @@ namespace Ogre
 				mNeedTransformUpdate(true),
 				mNeedAnimTransformUpdate(true),
 				mUseLocalTransform(false)
-
-	
 	{
 		//Use a static name generator to ensure this name stays unique (which may not happen
 		//otherwise due to reparenting when defragmenting)
-		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(mInstanceId) + "/"+
-				msNameGenerator.generate();
+		mName = batchOwner->getName() + "/IE_" + StringConverter::toString(mInstanceId);
 
 		if (sharedTransformEntity)
 		{
@@ -379,10 +378,10 @@ namespace Ogre
 	}
 
 	//-----------------------------------------------------------------------
-	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
+	void InstancedEntity::_notifyAttached( Node* parent )
 	{
 		markTransformDirty();
-		MovableObject::_notifyAttached( parent, isTagPoint );
+		MovableObject::_notifyAttached( parent );
 		updateTransforms();
 	}
 	//-----------------------------------------------------------------------

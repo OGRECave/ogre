@@ -3809,7 +3809,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
-		Camera dummyCam( 0, mEntityMemoryManager, 0 );
+		Camera dummyCam( 0, &mEntityMemoryManager, 0 );
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
@@ -7019,8 +7019,9 @@ SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderable
 	return mActiveQueuedRenderableVisitor;
 }
 //-----------------------------------------------------------------------------------
-void SceneManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
-						ArrayMemoryManager::PtrdiffVec &outDiffsList )
+void SceneManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs,
+									ArrayMemoryManager::PtrdiffVec &outDiffsList )
 {
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();
 	SceneNodeList::const_iterator end  = mSceneNodes.end();
@@ -7037,8 +7038,9 @@ void SceneManager::buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
-						const ArrayMemoryManager::PtrdiffVec &diffsList )
+void SceneManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+								const MemoryPoolVec &newBasePtrs,
+								const ArrayMemoryManager::PtrdiffVec &diffsList )
 {
 	ArrayMemoryManager::PtrdiffVec::const_iterator it = diffsList.begin();
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();
@@ -7056,8 +7058,9 @@ void SceneManager::applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
-						size_t const *elementsMemSizes, size_t startInstance, size_t diffInstances )
+void SceneManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+									size_t startInstance, size_t diffInstances )
 {
 	//If mSceneNodes were ordered by m_chunkBase & m_index, there would be a huge optimization to be made
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();

@@ -155,7 +155,8 @@ namespace Ogre
         static NameGenerator msNameGenerator;
 
 	public:
-		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL);
+		InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceBatch *batchOwner,
+						 uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL );
 		virtual ~InstancedEntity();
 
 		/** Shares the entire transformation with another InstancedEntity. This is useful when a mesh
@@ -200,7 +201,7 @@ namespace Ogre
 
 		/// Overridden so we can tell the InstanceBatch it needs to update it's bounds
 		void _notifyMoved(void);
-		void _notifyAttached( Node* parent, bool isTagPoint = false );
+		void _notifyAttached( Node* parent );
 
 		/// Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue )	{}

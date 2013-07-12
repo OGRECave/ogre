@@ -42,7 +42,6 @@ namespace Ogre {
  	, mMatName("BaseWhite")
  	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
- 	, mCamera(NULL)
     {
     }
 
@@ -81,13 +80,6 @@ namespace Ogre {
     void SimpleRenderable::getWorldTransforms( Matrix4* xform ) const
     {
         *xform = mWorldTransform * mParentNode->_getFullTransform();
-    }
-
-    void SimpleRenderable::_notifyCurrentCamera(Camera* cam)
-    {
-		MovableObject::_notifyCurrentCamera(cam);
-
-        mCamera = cam;
     }
 
     void SimpleRenderable::setBoundingBox( const AxisAlignedBox& box )

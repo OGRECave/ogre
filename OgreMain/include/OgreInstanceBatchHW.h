@@ -71,7 +71,8 @@ namespace Ogre
 		size_t updateVertexBuffer( Camera *currentCamera );
 
 	public:
-		InstanceBatchHW( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+		InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
+							MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName );
 		virtual ~InstanceBatchHW();

@@ -143,7 +143,8 @@ namespace Ogre
 		virtual InstancedEntity* generateInstancedEntity(size_t num);
 
 	public:
-		BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+		BaseInstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager,
+							InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName);
 		virtual ~BaseInstanceBatchVTF();
@@ -213,7 +214,8 @@ namespace Ogre
 
 		virtual bool matricesTogetherPerRow() const { return false; }
 	public:
-		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+		InstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
+							MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName);
 		virtual ~InstanceBatchVTF();

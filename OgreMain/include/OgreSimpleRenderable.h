@@ -61,9 +61,6 @@ namespace Ogre {
         /// The scene manager for the current frame.
         SceneManager *mParentSceneManager;
 
-        /// The camera for the current frame.
-        Camera *mCamera;
-
         /// Static member used to automatically generate names for SimpleRendaerable objects.
         static uint msGenNameCount;
 

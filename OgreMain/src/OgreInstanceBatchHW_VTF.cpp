@@ -45,10 +45,11 @@ namespace Ogre
 	static const uint16 c_maxTexHeightHW	= 4096;
 
 	InstanceBatchHW_VTF::InstanceBatchHW_VTF( 
+		IdType id, ObjectMemoryManager *objectMemoryManager,
 		InstanceManager *creator, MeshPtr &meshReference, 
 		const MaterialPtr &material, size_t instancesPerBatch, 
 		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
-			: BaseInstanceBatchVTF( creator, meshReference, material, 
+			: BaseInstanceBatchVTF( id, objectMemoryManager, creator, meshReference, material,
 									instancesPerBatch, indexToBoneMap, batchName),
 			  mKeepStatic( false )
 	{
