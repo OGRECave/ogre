@@ -217,7 +217,7 @@ protected:
 	//Segmented texture 
 	bool mUseSegmentedLightTexture;
 	bool mIsDebugMode;
-	unsigned short m_LightSamplerIndex;
+	unsigned short mLightSamplerIndex;
 	Ogre::RTShader::UniformParameterPtr mPSLightTextureIndexLimit;
 	Ogre::RTShader::UniformParameterPtr mPSLightTextureLightBounds;
 	Ogre::RTShader::UniformParameterPtr mPSSegmentedLightTexture;

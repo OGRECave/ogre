@@ -116,9 +116,7 @@ namespace Ogre {
         GLenum texTarget = getGL3PlusTextureTarget();
 
         // Calculate size for all mip levels of the texture
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        size_t width, height, depth;
 
         if((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
             // Standard alignment of 4 is not right for some formats
@@ -176,7 +174,7 @@ namespace Ogre {
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
-            size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+            size_t size;
 
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
