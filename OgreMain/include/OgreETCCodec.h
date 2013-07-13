@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,9 +70,9 @@ namespace Ogre {
         
         virtual String getType() const;        
 
-		/// Static method to startup and register the PVRTC codec
+		/// Static method to startup and register the ETC codec
 		static void startup(void);
-		/// Static method to shutdown and unregister the PVRTC codec
+		/// Static method to shutdown and unregister the ETC codec
 		static void shutdown(void);
     private:
         bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
