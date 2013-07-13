@@ -454,7 +454,11 @@ namespace Ogre {
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
-			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+            GLint formats;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
+
+            if(formats > 0)
+                rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
