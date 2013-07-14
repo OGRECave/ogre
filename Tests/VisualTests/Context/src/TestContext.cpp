@@ -434,7 +434,7 @@ void TestContext::createRoot()
 void TestContext::go(OgreBites::Sample* initialSample)
 {
     // Either start up as usual or print usage details.
-    if (not mHelp)
+    if (!mHelp)
     {
         SampleContext::go(initialSample);
     }
