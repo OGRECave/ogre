@@ -433,8 +433,12 @@ void TestContext::createRoot()
 
 void TestContext::go(OgreBites::Sample* initialSample)
 {
-    // either print usage details, or start up as usual
-    if(mHelp)
+    // Either start up as usual or print usage details.
+    if (not mHelp)
+    {
+        SampleContext::go(initialSample);
+    }
+    else
     {
         std::cout<<"\nOgre Visual Testing Context:\n";
         std::cout<<"Runs sets of visual test scenes, taking screenshots, and running comparisons.\n\n";
@@ -445,15 +449,12 @@ void TestContext::go(OgreBites::Sample* initialSample)
         std::cout<<"\t-d           Force config dialog.\n";
         std::cout<<"\t-h, --help   Show usage details.\n";
         std::cout<<"\t-m [comment] Optional comment.\n";
-        std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg)\n";
+        std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg).\n";
         std::cout<<"\t-c [name]    Name of the test result batch to compare against.\n";
         std::cout<<"\t-n [name]    Name for this result image set.\n";
         std::cout<<"\t-rs [name]   Render system to use.\n";
-        std::cout<<"\t-o [path]    Path to output a simple summary file to\n\n";
-    }
-    else
-    {
-        SampleContext::go(initialSample);
+        std::cout<<"\t-o [path]    Path to output a simple summary file to.\n";
+        std::cout<<"\t--nograb     Do not restrict mouse to window (warning: may affect results).\n\n";
     }
 }
 //-----------------------------------------------------------------------
