@@ -485,7 +485,7 @@ namespace Volume {
             return true;
         }
 
-        if (!mCamera)
+        if (!mCamera || !mCamera->getViewport())
         {
             setChunkVisible(true, false);
             return true;
