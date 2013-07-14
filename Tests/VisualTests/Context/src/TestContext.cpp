@@ -50,6 +50,7 @@ THE SOFTWARE.
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
 #include <AppKit/AppKit.h>
+static id mAppDelegate;
 #endif
 
 #ifdef OGRE_STATIC_LIB

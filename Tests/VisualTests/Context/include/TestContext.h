@@ -285,9 +285,6 @@ protected:
 
 @end
 
-
-static id mAppDelegate;
-
 @implementation AppDelegate
 
 @synthesize mTimer;
