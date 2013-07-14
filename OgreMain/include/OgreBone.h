@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define __Bone_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreNode.h"
+#include "OgreOldNode.h"
 
 
 namespace Ogre 
@@ -48,7 +48,7 @@ namespace Ogre
         This class is a node in the joint hierarchy. Mesh vertices also have assignments
         to bones to define how they move in relation to the skeleton.
     */
-    class _OgreExport Bone : public Node
+    class _OgreExport Bone : public OldNode
     {
     public:
         /** Constructor, not to be used directly (use Bone::createChild or Skeleton::createBone) */
@@ -119,7 +119,7 @@ namespace Ogre
 		/** Gets the inverted binding pose orientation. */
 		const Quaternion& _getBindingPoseInverseOrientation(void) const { return mBindDerivedInverseOrientation; }
 
-		/// @see Node::needUpdate
+		/// @see OldNode::needUpdate
 		void needUpdate(bool forceParentUpdate = false);
 
 
@@ -131,9 +131,9 @@ namespace Ogre
         bool mManuallyControlled;
 
         /** See Node. */
-        Node* createChildImpl(void);
+        OldNode* createChildImpl(void);
         /** See Node. */
-        Node* createChildImpl(const String& name);
+        OldNode* createChildImpl(const String& name);
 
         /// Pointer back to creator, for child creation (not smart ptr so child does not preserve parent)
         Skeleton* mCreator;

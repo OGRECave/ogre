@@ -220,6 +220,7 @@ namespace Ogre {
 	class NumericKeyFrame;
 	struct ObjectData;
 	class ObjectMemoryManager;
+	class OldNode;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;

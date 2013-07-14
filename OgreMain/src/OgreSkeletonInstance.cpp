@@ -132,7 +132,7 @@ namespace Ogre {
         newBone->setScale(source->getScale());
 
         // Process children
-		Node::NodeVecIterator it = source->getChildIterator();
+		OldNode::ChildOldNodeIterator it = source->getChildIterator();
         while (it.hasMoreElements())
         {
             cloneBoneAndChildren(static_cast<Bone*>(it.getNext()), newBone);

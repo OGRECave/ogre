@@ -34,12 +34,12 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     Bone::Bone(unsigned short handle, Skeleton* creator) 
-        : Node(), mHandle(handle), mManuallyControlled(false), mCreator(creator)
+        : OldNode(), mHandle(handle), mManuallyControlled(false), mCreator(creator)
     {
     }
     //---------------------------------------------------------------------
     Bone::Bone(const String& name, unsigned short handle, Skeleton* creator) 
-        : Node(name), mHandle(handle), mManuallyControlled(false), mCreator(creator)
+        : OldNode(name), mHandle(handle), mManuallyControlled(false), mCreator(creator)
     {
     }
     //---------------------------------------------------------------------
@@ -57,12 +57,12 @@ namespace Ogre {
         return retBone;
     }
     //---------------------------------------------------------------------
-    Node* Bone::createChildImpl(void)
+    OldNode* Bone::createChildImpl(void)
     {
         return mCreator->createBone();
     }
     //---------------------------------------------------------------------
-    Node* Bone::createChildImpl(const String& name)
+    OldNode* Bone::createChildImpl(const String& name)
     {
         return mCreator->createBone(name);
     }
@@ -118,7 +118,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void Bone::needUpdate(bool forceParentUpdate)
 	{
-		Node::needUpdate(forceParentUpdate);
+		OldNode::needUpdate(forceParentUpdate);
 
 		if (isManuallyControlled())
 		{

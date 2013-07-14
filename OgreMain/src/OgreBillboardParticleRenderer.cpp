@@ -43,7 +43,8 @@ namespace Ogre {
     BillboardParticleRenderer::CmdPointRendering BillboardParticleRenderer::msPointRenderingCmd;
 	BillboardParticleRenderer::CmdAccurateFacing BillboardParticleRenderer::msAccurateFacingCmd;
     //-----------------------------------------------------------------------
-    BillboardParticleRenderer::BillboardParticleRenderer()
+    BillboardParticleRenderer::BillboardParticleRenderer( IdType id,
+															ObjectMemoryManager *objectMemoryManager )
     {
         if (createParamDictionary("BillboardParticleRenderer"))
         {
@@ -104,7 +105,7 @@ namespace Ogre {
         }
 
         // Create billboard set
-        mBillboardSet = OGRE_NEW BillboardSet("", 0, true);
+        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, 0, true );
         // World-relative axes
         mBillboardSet->setBillboardsInWorldSpace(true);
     }
@@ -247,9 +248,9 @@ namespace Ogre {
         mBillboardSet->setPoolSize(quota);
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyAttached(Node* parent, bool isTagPoint)
+    void BillboardParticleRenderer::_notifyAttached(Node* parent)
     {
-        mBillboardSet->_notifyAttached(parent, isTagPoint);
+        mBillboardSet->_notifyAttached(parent);
     }
 	//-----------------------------------------------------------------------
 	void BillboardParticleRenderer::setRenderQueueGroup(uint8 queueID)
@@ -292,9 +293,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
-        const String& name )
+        IdType id, ObjectMemoryManager *objectMemoryManager )
     {
-        return OGRE_NEW BillboardParticleRenderer();
+        return OGRE_NEW BillboardParticleRenderer( id, objectMemoryManager );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRendererFactory::destroyInstance( 

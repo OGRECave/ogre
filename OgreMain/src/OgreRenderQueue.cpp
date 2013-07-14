@@ -298,7 +298,12 @@ namespace Ogre {
 		bool onlyShadowCasters, 
 		VisibleObjectsBoundsInfo* visibleBounds)
 	{
+		//--- !!!TODO: (dark_sylinc) VERY IMPORTANT!!! ---
+		if (mo->getVisible())
+			mo -> _updateRenderQueue( this );
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		mo->_notifyCurrentCamera(cam);
+
 		if (mo->isVisible())
 		{
 			bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
@@ -322,7 +327,7 @@ namespace Ogre {
 					mo->getWorldBoundingSphere(true), cam);
 			}
 		}
-
+#endif
 	}
 
 }

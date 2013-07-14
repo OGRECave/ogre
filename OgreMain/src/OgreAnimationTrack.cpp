@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreAnimation.h"
 #include "OgreKeyFrame.h"
-#include "OgreNode.h"
+#include "OgreOldNode.h"
 #include "OgreLogManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreMesh.h"
@@ -351,7 +351,7 @@ namespace Ogre {
 	}
     //---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	// Node specialisations
+	// OldNode specialisations
 	//---------------------------------------------------------------------
 	NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
 		: AnimationTrack(parent, handle), mTargetNode(0)
@@ -361,7 +361,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle,
-		Node* targetNode)
+		OldNode* targetNode)
 		: AnimationTrack(parent, handle), mTargetNode(targetNode)
         , mSplines(0), mSplineBuildNeeded(false)
         , mUseShortestRotationPath(true)
@@ -463,17 +463,17 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    Node* NodeAnimationTrack::getAssociatedNode(void) const
+    OldNode* NodeAnimationTrack::getAssociatedNode(void) const
     {
         return mTargetNode;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::setAssociatedNode(Node* node)
+    void NodeAnimationTrack::setAssociatedNode(OldNode* node)
     {
         mTargetNode = node;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::applyToNode(Node* node, const TimeIndex& timeIndex, Real weight,
+    void NodeAnimationTrack::applyToNode(OldNode* node, const TimeIndex& timeIndex, Real weight,
 		Real scl)
     {
 		// Nothing to do if no keyframes or zero weight or no node

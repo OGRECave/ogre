@@ -45,6 +45,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		// Iterate over all movable types
 		Root::MovableObjectFactoryIterator factIt = 
 			Root::getSingleton().getMovableObjectFactoryIterator();
@@ -118,6 +119,7 @@ namespace Ogre {
 
 
 		}
+#endif
 
 	}
 	//---------------------------------------------------------------------
@@ -135,6 +137,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		// Iterate over all movable types
 		Root::MovableObjectFactoryIterator factIt = 
 			Root::getSingleton().getMovableObjectFactoryIterator();
@@ -158,6 +161,7 @@ namespace Ogre {
 				}
 			}
 		}
+#endif
 	}
 	//---------------------------------------------------------------------
 	DefaultRaySceneQuery::
@@ -173,6 +177,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultRaySceneQuery::execute(RaySceneQueryListener* listener)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		// Note that because we have no scene partitioning, we actually
 		// perform a complete scene search even if restricted results are
 		// requested; smarter scene manager queries can utilise the paritioning 
@@ -208,7 +213,7 @@ namespace Ogre {
 				}
 			}
 		}
-
+#endif
 	}
 	//---------------------------------------------------------------------
 	DefaultSphereSceneQuery::
@@ -224,6 +229,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultSphereSceneQuery::execute(SceneQueryListener* listener)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		Sphere testSphere;
 
 		// Iterate over all movable types
@@ -254,6 +260,7 @@ namespace Ogre {
 				}
 			}
 		}
+#endif
 	}
 	//---------------------------------------------------------------------
 	DefaultPlaneBoundedVolumeListSceneQuery::
@@ -270,6 +277,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
 	{
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		// Iterate over all movable types
 		Root::MovableObjectFactoryIterator factIt = 
 			Root::getSingleton().getMovableObjectFactoryIterator();
@@ -301,5 +309,6 @@ namespace Ogre {
 				}
 			}
 		}
+#endif
 	}
 }

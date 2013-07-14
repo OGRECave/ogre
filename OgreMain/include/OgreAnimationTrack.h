@@ -111,8 +111,8 @@ namespace Ogre
         maximum number of keyframes for all animable objects just to cope with the most
         animated one.
     @remarks
-        Since the most common animable object is a Node, there are options in this class for associating
-        the track with a Node which will receive keyframe updates automatically when the 'apply' method
+        Since the most common animable object is a OldNode, there are options in this class for associating
+        the track with a OldNode which will receive keyframe updates automatically when the 'apply' method
         is called.
 	@remarks
 		By default rotation is done using shortest-path algorithm.
@@ -328,9 +328,9 @@ namespace Ogre
 	public:
 		/// Constructor
 		NodeAnimationTrack(Animation* parent, unsigned short handle);
-		/// Constructor, associates with a Node
+		/// Constructor, associates with a OldNode
 		NodeAnimationTrack(Animation* parent, unsigned short handle, 
-			Node* targetNode);
+			OldNode* targetNode);
         /// Destructor
         virtual ~NodeAnimationTrack();
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
@@ -341,14 +341,14 @@ namespace Ogre
         @param timePos The time from which this KeyFrame will apply.
         */
         virtual TransformKeyFrame* createNodeKeyFrame(Real timePos);
-		/** Returns a pointer to the associated Node object (if any). */
-		virtual Node* getAssociatedNode(void) const;
+		/** Returns a pointer to the associated OldNode object (if any). */
+		virtual OldNode* getAssociatedNode(void) const;
 
-		/** Sets the associated Node object which will be automatically affected by calls to 'apply'. */
-		virtual void setAssociatedNode(Node* node);
+		/** Sets the associated OldNode object which will be automatically affected by calls to 'apply'. */
+		virtual void setAssociatedNode(OldNode* node);
 
-		/** As the 'apply' method but applies to a specified Node instead of associated node. */
-		virtual void applyToNode(Node* node, const TimeIndex& timeIndex, Real weight = 1.0, 
+		/** As the 'apply' method but applies to a specified OldNode instead of associated node. */
+		virtual void applyToNode(OldNode* node, const TimeIndex& timeIndex, Real weight = 1.0, 
 			Real scale = 1.0f);
 
 		/** Sets the method of rotation calculation */
@@ -398,7 +398,7 @@ namespace Ogre
 		    RotationalSpline rotationSpline;
         };
 
-		Node* mTargetNode;
+		OldNode* mTargetNode;
 		// Prebuilt splines, must be mutable since lazy-update in const method
 		mutable Splines* mSplines;
 		mutable bool mSplineBuildNeeded;

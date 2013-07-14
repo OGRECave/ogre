@@ -986,10 +986,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::_notifyCurrentCamera(Camera* cam)
     {
+		//TODO: (dark_sylinc)
         // Make sure bounding box up-to-date
         updateFrustum();
-
-        MovableObject::_notifyCurrentCamera(cam);
     }
 
     // -------------------------------------------------------------------

@@ -155,6 +155,7 @@ set (HEADER_FILES
   include/OgreMovablePlane.h
   include/OgreNode.h
   include/OgreNumerics.h
+  include/OgreOldNode.h
   include/OgreOptimisedUtil.h
   include/OgreParticle.h
   include/OgreParticleAffector.h
@@ -380,6 +381,7 @@ set (SOURCE_FILES
   src/OgreMovablePlane.cpp
   src/OgreNode.cpp
   src/OgreNumerics.cpp
+  src/OgreOldNode.cpp
   src/OgreOptimisedUtil.cpp
   src/OgreOptimisedUtilGeneral.cpp
 #  src/OgreOptimisedUtilNEON.cpp

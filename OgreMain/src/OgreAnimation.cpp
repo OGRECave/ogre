@@ -76,7 +76,7 @@ namespace Ogre {
         if (hasNodeTrack(handle))
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-                "Node track with the specified handle " +
+                "OldNode track with the specified handle " +
                 StringConverter::toString(handle) + " already exists",
                 "Animation::createNodeTrack");
         }
@@ -87,7 +87,7 @@ namespace Ogre {
         return ret;
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack* Animation::createNodeTrack(unsigned short handle, Node* node)
+    NodeAnimationTrack* Animation::createNodeTrack(unsigned short handle, OldNode* node)
     {
         NodeAnimationTrack* ret = createNodeTrack(handle);
 
@@ -334,7 +334,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-	void Animation::applyToNode(Node* node, Real timePos, Real weight, Real scale)
+	void Animation::applyToNode(OldNode* node, Real timePos, Real weight, Real scale)
     {
 		_applyBaseKeyFrame();
 

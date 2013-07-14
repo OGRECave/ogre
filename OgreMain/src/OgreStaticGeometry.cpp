@@ -163,11 +163,9 @@ namespace Ogre {
 		if (!ret && autoCreate)
 		{
 			// Make a name
-			StringUtil::StrStreamType str;
-			str << mName << ":" << index;
 			// Calculate the region centre
 			Vector3 centre = getRegionCentre(x, y, z);
-			ret = OGRE_NEW Region(this, str.str(), mOwner, index, centre);
+			ret = OGRE_NEW Region( Id::generateNewId<MovableObject>(), 0, this, mOwner, index, centre );
 			mOwner->injectMovableObject(ret);
 			ret->setVisible(mVisible);
 			ret->setCastShadows(mCastShadows);
@@ -535,7 +533,7 @@ namespace Ogre {
 			}
 		}
 		// Iterate through all the child-nodes
-		SceneNode::ConstChildNodeIterator nodei = node->getChildIterator();
+		SceneNode::ConstNodeVecIterator nodei = node->getChildIterator();
 
 		while (nodei.hasMoreElements())
 		{
@@ -711,9 +709,11 @@ namespace Ogre {
 	}
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
-	StaticGeometry::Region::Region(StaticGeometry* parent, const String& name,
-		SceneManager* mgr, uint32 regionID, const Vector3& centre)
-		: MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
+	StaticGeometry::Region::Region( IdType id, ObjectMemoryManager *objectMemoryManager,
+									StaticGeometry* parent, SceneManager* mgr, uint32 regionID,
+									const Vector3& centre ) :
+		MovableObject( id, objectMemoryManager ),
+		mParent(parent), mSceneMgr(mgr), mNode(0),
 		mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
 		mCurrentLod(0), mLodStrategy(0)
 	{
@@ -723,8 +723,7 @@ namespace Ogre {
 	{
 		if (mNode)
 		{
-			mNode->getParentSceneNode()->removeChild(mNode);
-			mSceneMgr->destroySceneNode(mNode->getName());
+			mNode->getParentSceneNode()->removeAndDestroyChild(mNode);
 			mNode = 0;
 		}
 		// delete
@@ -794,8 +793,7 @@ namespace Ogre {
 	void StaticGeometry::Region::build(bool stencilShadows)
 	{
 		// Create a node
-		mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName,
-			mCentre);
+		mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mCentre);
 		mNode->attachObject(this);
 		// We need to create enough LOD buckets to deal with the highest LOD
 		// we encountered in all the meshes queued
@@ -877,24 +875,13 @@ namespace Ogre {
 
 	}
 	//--------------------------------------------------------------------------
-	bool StaticGeometry::Region::isVisible(void) const
-	{
-		if(!mVisible || mBeyondFarDistance)
-			return false;
-
-		SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
-        if (sm && !(mVisibilityFlags & sm->_getCombinedVisibilityMask()))
-            return false;
-
-        return true;
-	}
-	//--------------------------------------------------------------------------
 	StaticGeometry::Region::LODIterator
 	StaticGeometry::Region::getLODIterator(void)
 	{
 		return LODIterator(mLodBucketList.begin(), mLodBucketList.end());
 	}
 	//---------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 	ShadowCaster::ShadowRenderableListIterator
 	StaticGeometry::Region::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
@@ -927,6 +914,7 @@ namespace Ogre {
 		return ShadowCaster::ShadowRenderableListIterator(shadowRendList.begin(), shadowRendList.end());
 
 	}
+#endif
 	//--------------------------------------------------------------------------
 	EdgeData* StaticGeometry::Region::getEdgeList(void)
 	{
@@ -1194,6 +1182,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 	void StaticGeometry::LODBucket::updateShadowRenderables(
 		ShadowTechnique shadowTechnique, const Vector4& lightPos, 
 		HardwareIndexBufferSharedPtr* indexBuffer, bool extrude, 
@@ -1250,6 +1239,7 @@ namespace Ogre {
 		}
 
 	}
+#endif
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
 	StaticGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,

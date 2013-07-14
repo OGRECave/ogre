@@ -69,7 +69,8 @@ namespace Ogre {
          mCurrentViewport(0), 
 		 mCurrentSceneManager(0),
 		 mMainCamBoundsInfo(0),
-         mCurrentPass(0)
+         mCurrentPass(0),
+		 mBlankLight( -1, 0 ) //TODO (dark_sylinc): Check if it needs a dummy Obj manager
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);
@@ -95,7 +96,7 @@ namespace Ogre {
         // If outside light range, return a blank light to ensure zeroised for program
 		if (mCurrentLightList && index < mCurrentLightList->size())
 		{
-			return *((*mCurrentLightList)[index]);
+			return *(*mCurrentLightList)[index].light;
 		}
 		else
         {
@@ -702,8 +703,8 @@ namespace Ogre {
 				l.getType() == Light::LT_SPOTLIGHT &&
 				mSpotlightViewProjMatrixDirty[index])
 			{
-				Frustum frust;
-				SceneNode dummyNode(0);
+				Frustum frust( 0, 0 );
+				SceneNode dummyNode( 0, 0, 0, 0 );
 				dummyNode.attachObject(&frust);
 
 				frust.setProjectionType(PT_PERSPECTIVE);

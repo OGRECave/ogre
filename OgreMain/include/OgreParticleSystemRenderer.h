@@ -70,7 +70,7 @@ namespace Ogre {
         /** Delegated to by ParticleSystem::_notifyCurrentCamera */
         virtual void _notifyCurrentCamera(Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */
-        virtual void _notifyAttached(Node* parent, bool isTagPoint = false) = 0;
+        virtual void _notifyAttached(Node* parent) = 0;
         /** Optional callback notified when particles are rotated */
         virtual void _notifyParticleRotated(void) {}
         /** Optional callback notified when particles are resized individually */

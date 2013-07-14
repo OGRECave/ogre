@@ -3758,7 +3758,7 @@ void SceneManager::_applySceneAnimations(void)
         Animation::NodeTrackIterator nodeTrackIt = anim->getNodeTrackIterator();
         while(nodeTrackIt.hasMoreElements())
         {
-            Node* nd = nodeTrackIt.getNext()->getAssociatedNode();
+            OldNode* nd = nodeTrackIt.getNext()->getAssociatedNode();
 			if (nd)
 				nd->resetToInitialState();
         }

@@ -433,8 +433,8 @@ namespace Ogre {
             Real mSquaredViewDepth;
 
 		public:
-			Region(StaticGeometry* parent, const String& name, SceneManager* mgr, 
-				uint32 regionID, const Vector3& centre);
+			Region( IdType id, ObjectMemoryManager *objectMemoryManager, StaticGeometry* parent,
+					SceneManager* mgr, uint32 regionID, const Vector3& centre );
 			virtual ~Region();
 			// more fields can be added in subclasses
 			StaticGeometry* getParent(void) const { return mParent;}
@@ -454,7 +454,6 @@ namespace Ogre {
 			/// @copydoc MovableObject::visitRenderables
 			void visitRenderables(Renderable::Visitor* visitor, 
 				bool debugRenderables = false);
-			bool isVisible(void) const;
 			uint32 getTypeFlags(void) const;
 
 			typedef VectorIterator<LODBucketList> LODIterator;

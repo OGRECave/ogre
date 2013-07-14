@@ -55,7 +55,7 @@ namespace Ogre {
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
     public:
-        BillboardParticleRenderer();
+		BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
         ~BillboardParticleRenderer();
 
         /** Command object for billboard type (see ParamCommand).*/
@@ -217,7 +217,7 @@ namespace Ogre {
         /// @copydoc ParticleSystemRenderer::_notifyParticleQuota
         void _notifyParticleQuota(size_t quota);
         /// @copydoc ParticleSystemRenderer::_notifyAttached
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached(Node* parent);
         /// @copydoc ParticleSystemRenderer::_notifyDefaultDimensions
         void _notifyDefaultDimensions(Real width, Real height);
 		/// @copydoc ParticleSystemRenderer::setRenderQueueGroup
@@ -251,7 +251,7 @@ namespace Ogre {
         /// @copydoc FactoryObj::getType
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
-        ParticleSystemRenderer* createInstance( const String& name );
+        ParticleSystemRenderer* createInstance( IdType id, ObjectMemoryManager *objectMemoryManager );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };
