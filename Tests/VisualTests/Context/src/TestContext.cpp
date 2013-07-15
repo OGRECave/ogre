@@ -376,7 +376,8 @@ void TestContext::runSample(OgreBites::Sample* s)
 
     OgreBites::Sample* sampleToRun = s;
 
-    // if a valid test is passed, then run it, if null, grab the next one from the deque
+    // If a valid test is passed, then run it
+    // If null, grab the next one from the deque
     if (!sampleToRun && !mTests.empty())
     {
         mTests.pop_front();
@@ -384,10 +385,10 @@ void TestContext::runSample(OgreBites::Sample* s)
             sampleToRun = mTests.front();
     }
 
-    // check if this is a VisualTest
+    // Check if this is a VisualTest
     mCurrentTest = static_cast<VisualTest*>(sampleToRun);
 
-    // set things up to be deterministic
+    // Set things up to be deterministic
     if (mCurrentTest)
     {
         // Seed rand with a predictable value
@@ -395,10 +396,8 @@ void TestContext::runSample(OgreBites::Sample* s)
 
         // Give a fixed timestep for particles and other time-dependent things in OGRE
         Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
-    }
-
-    if (mCurrentTest)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
+    }
 
 #ifdef USE_RTSHADER_SYSTEM
     if (sampleToRun) {

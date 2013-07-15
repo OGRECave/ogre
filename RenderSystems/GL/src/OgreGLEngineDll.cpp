@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -31,21 +31,20 @@ THE SOFTWARE.
 
 #ifndef OGRE_STATIC_LIB
 
-namespace Ogre {
-
-	static GLPlugin* plugin;
+namespace Ogre 
+{
+    static GLPlugin* plugin;
 
     extern "C" void _OgreGLExport dllStartPlugin(void) throw()
     {
-		plugin = new GLPlugin();
-		Root::getSingleton().installPlugin(plugin);
-
+        plugin = OGRE_NEW GLPlugin();
+        Root::getSingleton().installPlugin(plugin);
     }
 
     extern "C" void _OgreGLExport dllStopPlugin(void)
     {
-		Root::getSingleton().uninstallPlugin(plugin);
-		delete plugin;
+        Root::getSingleton().uninstallPlugin(plugin);
+        OGRE_DELETE plugin;
     }
 }
 

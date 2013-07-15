@@ -17,7 +17,7 @@ out vec4 fragColour;
 // Expand a range-compressed vector
 vec3 expand(vec3 v)
 {
-	return (v - 0.5) * 2.0;
+    return (v - 0.5) * 2.0;
 }
 
 void main()
@@ -27,12 +27,12 @@ void main()
 
     // Calculate displacement
     float displacement = (height * scaleBias.x) + scaleBias.y;
-	
+
     vec3 uv2 = vec3(oUv0.xy, 1.0);
-	
+
     // calculate the new tex coord to use for normal and diffuse
     vec2 newTexCoord = ((oEyeDir * displacement) + uv2).xy;
-	
+
     // get the new normal and diffuse values
     vec3 normal = expand(texture(normalHeightMap, newTexCoord).xyz);
     vec3 diffuse = texture(diffuseMap, newTexCoord).xyz;

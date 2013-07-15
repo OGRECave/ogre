@@ -2,8 +2,8 @@
 
 out vec4 fragColour;
 
-// Pixel shader section
+// Fragment shader section.
 void main()
 {
-    fragColour = vec4(1, 0, 0, 1);
+    fragColour = vec4(1, 1, 1, 1);
 }

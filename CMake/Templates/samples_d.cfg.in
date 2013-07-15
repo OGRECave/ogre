@@ -1,4 +1,6 @@
 SampleFolder=@OGRE_SAMPLES_DIR_DBG@
+SamplePlugin=Sample_AtomicCounters_d
+SamplePlugin=Sample_Basic_d
 SamplePlugin=Sample_BezierPatch_d
 SamplePlugin=Sample_BSP_d
 SamplePlugin=Sample_CameraTrack_d

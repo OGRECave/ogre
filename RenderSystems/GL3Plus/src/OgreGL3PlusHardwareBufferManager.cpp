@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -44,11 +44,11 @@ namespace Ogre {
         /// Free? (pack with size)
         uint32 free: 1;
     };
-    #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
-    #define SCRATCH_ALIGNMENT 32
+#define SCRATCH_POOL_SIZE 1 * 1024 * 1024
+#define SCRATCH_ALIGNMENT 32
 
     GL3PlusHardwareBufferManagerBase::GL3PlusHardwareBufferManagerBase()
-		: mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
+        : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
         // Init scratch pool
         // TODO make it a configurable size?
@@ -60,14 +60,14 @@ namespace Ogre {
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GL3PlusScratchBufferAlloc);
         ptrAlloc->free = 1;
 
-		// Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
-		// disable for now until we figure out where the problem lies			
-#	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD) 
-		{
-			mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
-		}
-#	endif
+        // Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
+        // disable for now until we figure out where the problem lies
+#       if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD)
+        {
+            mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
+        }
+#       endif
 
     }
     //-----------------------------------------------------------------------
@@ -80,10 +80,10 @@ namespace Ogre {
     }
 
     HardwareVertexBufferSharedPtr
-        GL3PlusHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
-                                                      size_t numVerts,
-                                                      HardwareBuffer::Usage usage,
-                                                      bool useShadowBuffer)
+    GL3PlusHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
+                                                         size_t numVerts,
+                                                         HardwareBuffer::Usage usage,
+                                                         bool useShadowBuffer)
     {
         GL3PlusHardwareVertexBuffer* buf =
             OGRE_NEW GL3PlusHardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
@@ -95,9 +95,9 @@ namespace Ogre {
     }
 
     HardwareIndexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
-                                                                              size_t numIndexes,
-                                                                              HardwareBuffer::Usage usage,
-                                                                              bool useShadowBuffer)
+                                                                                     size_t numIndexes,
+                                                                                     HardwareBuffer::Usage usage,
+                                                                                     bool useShadowBuffer)
     {
         GL3PlusHardwareIndexBuffer* buf =
             new GL3PlusHardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
@@ -111,7 +111,7 @@ namespace Ogre {
     HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
         GL3PlusHardwareUniformBuffer* buf =
-        new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
+            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf);
@@ -122,7 +122,7 @@ namespace Ogre {
     HardwareCounterBufferSharedPtr GL3PlusHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
         GL3PlusHardwareCounterBuffer* buf =
-        new GL3PlusHardwareCounterBuffer(this, name);
+            new GL3PlusHardwareCounterBuffer(this, name);
         {
             OGRE_LOCK_MUTEX(mCounterBuffersMutex);
             mCounterBuffers.insert(buf);
@@ -130,25 +130,25 @@ namespace Ogre {
         return HardwareCounterBufferSharedPtr(buf);
     }
 
-	RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createRenderToVertexBuffer()
-	{
-		return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);
-	}
+    RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
+        return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);
+    }
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
         switch(usage)
         {
-            case HardwareBuffer::HBU_STATIC:
-            case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
-                return GL_STATIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC:
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
-                return GL_DYNAMIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
-                return GL_STREAM_DRAW;
-            default:
-                return GL_DYNAMIC_DRAW;
+        case HardwareBuffer::HBU_STATIC:
+        case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
+            return GL_STATIC_DRAW;
+        case HardwareBuffer::HBU_DYNAMIC:
+        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
+            return GL_DYNAMIC_DRAW;
+        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
+            return GL_STREAM_DRAW;
+        default:
+            return GL_DYNAMIC_DRAW;
         };
     }
 
@@ -156,43 +156,43 @@ namespace Ogre {
     {
         switch(type)
         {
-            case VET_FLOAT1:
-            case VET_FLOAT2:
-            case VET_FLOAT3:
-            case VET_FLOAT4:
-                return GL_FLOAT;
-            case VET_DOUBLE1:
-            case VET_DOUBLE2:
-            case VET_DOUBLE3:
-            case VET_DOUBLE4:
-                return GL_DOUBLE;
-            case VET_INT1:
-            case VET_INT2:
-            case VET_INT3:
-            case VET_INT4:
-                return GL_INT;
-            case VET_UINT1:
-            case VET_UINT2:
-            case VET_UINT3:
-            case VET_UINT4:
-                return GL_UNSIGNED_INT;
-            case VET_SHORT1:
-            case VET_SHORT2:
-            case VET_SHORT3:
-            case VET_SHORT4:
-                return GL_SHORT;
-            case VET_USHORT1:
-            case VET_USHORT2:
-            case VET_USHORT3:
-            case VET_USHORT4:
-                return GL_UNSIGNED_SHORT;
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
-            case VET_UBYTE4:
-                return GL_UNSIGNED_BYTE;
-            default:
-                return 0;
+        case VET_FLOAT1:
+        case VET_FLOAT2:
+        case VET_FLOAT3:
+        case VET_FLOAT4:
+            return GL_FLOAT;
+        case VET_DOUBLE1:
+        case VET_DOUBLE2:
+        case VET_DOUBLE3:
+        case VET_DOUBLE4:
+            return GL_DOUBLE;
+        case VET_INT1:
+        case VET_INT2:
+        case VET_INT3:
+        case VET_INT4:
+            return GL_INT;
+        case VET_UINT1:
+        case VET_UINT2:
+        case VET_UINT3:
+        case VET_UINT4:
+            return GL_UNSIGNED_INT;
+        case VET_SHORT1:
+        case VET_SHORT2:
+        case VET_SHORT3:
+        case VET_SHORT4:
+            return GL_SHORT;
+        case VET_USHORT1:
+        case VET_USHORT2:
+        case VET_USHORT3:
+        case VET_USHORT4:
+            return GL_UNSIGNED_SHORT;
+        case VET_COLOUR:
+        case VET_COLOUR_ABGR:
+        case VET_COLOUR_ARGB:
+        case VET_UBYTE4:
+            return GL_UNSIGNED_BYTE;
+        default:
+            return 0;
         };
     }
 
@@ -295,14 +295,14 @@ namespace Ogre {
         // Should never get here unless there's a corruption
         assert(false && "Memory deallocation error");
     }
-	//---------------------------------------------------------------------
-	size_t GL3PlusHardwareBufferManagerBase::getGLMapBufferThreshold() const
-	{
-		return mMapBufferThreshold;
-	}
-	//---------------------------------------------------------------------
-	void GL3PlusHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
-	{
-		mMapBufferThreshold = value;
-	}
+    //---------------------------------------------------------------------
+    size_t GL3PlusHardwareBufferManagerBase::getGLMapBufferThreshold() const
+    {
+        return mMapBufferThreshold;
+    }
+    //---------------------------------------------------------------------
+    void GL3PlusHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
+    {
+        mMapBufferThreshold = value;
+    }
 }

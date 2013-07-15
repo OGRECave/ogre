@@ -14,7 +14,7 @@ struct SampleData
 	float4 Pos   : POSITION;
 	float3 N     : TEXCOORD0;
 	float2 Field : TEXCOORD1;
-	float4 Color : COLOR0;
+	//float4 Color : COLOR0;
 };
 
 struct SurfaceVertex
@@ -53,29 +53,29 @@ float4 Metaball(float3 Pos, float3 Center, float RadiusSq)
 
 // Vertex shader
 SampleData mainVS(float4 pos : POSITION,
-						uniform float4x4 WorldViewProj,
-						uniform float4x4 origWorldViewIT)
+		  uniform float4x4 WorldViewProj,
+		  uniform float4x4 origWorldViewIT)
 {
 	SampleData o;
-	
+
 	// Sum up contributions from all metaballs
 	float4 Field = 0;
-	for (int i = 0; i<2; i++) 
+	for (int i = 0; i < 2; i++)
 	{
 		Field += Metaball(pos.xyz, Metaballs[i].xyz, Metaballs[i].w);
 	}
-	
+
 	float3x3 WorldViewIT = { origWorldViewIT[0].xyz, origWorldViewIT[1].xyz, origWorldViewIT[2].xyz };
-	
+
 	// Transform position and normals
 	o.Pos = mul(WorldViewProj, pos);
 	o.N = mul(WorldViewIT, Field.xyz);	// we want normals in world space
 	o.Field.x = Field.w;
-	
+
 	// Generate in-out flags
 	o.Field.y = (Field.w < IsoValue) ? 1 : 0;
 
-	o.Color = (Field*0.5+0.5) * (Field.w / 10.0);
+	//o.Color = (Field*0.5+0.5) * (Field.w / 10.0);
 	return o;
 }
 
@@ -100,7 +100,7 @@ void CalcIntersection(float4 Pos0,
 		}
 	}
 }
-	
+
 // Geometry shader
 // input: line with adjacency (tetrahedron)
 // outputs: zero, one or two triangles depending if isosurface intersects tetrahedron
@@ -117,20 +117,20 @@ void mainGS(
 				(int(Field[1].y) << 2) |
 				(int(Field[2].y) << 1) |
 				 int(Field[3].y);
-	
+
 	// don't bother if all vertices out or all vertices inside isosurface
 	if (index > 0 && index < 15)
 	{
 		//Uber-compressed version of the edge table.
-		unsigned int edgeListHex[] = 
-			{0x0001cde0, 0x98b08c9d, 0x674046ce, 0x487bc480, 
+		unsigned int edgeListHex[] =
+			{0x0001cde0, 0x98b08c9d, 0x674046ce, 0x487bc480,
 			0x21301d2e, 0x139bd910, 0x26376e20, 0x3b700000};
-		
+
 		unsigned int edgeValFull = edgeListHex[index/2];
 		unsigned int edgeVal = (index % 2 == 1) ? (edgeValFull & 0xFFFF) : ((edgeValFull >> 16) & 0xFFFF);
 		int4 e0 = int4((edgeVal >> 14) & 0x3, (edgeVal >> 12) & 0x3, (edgeVal >> 10) & 0x3, (edgeVal >> 8) & 0x3);
 		int4 e1 = int4((edgeVal >> 6) & 0x3, (edgeVal >> 4) & 0x3, (edgeVal >> 2) & 0x3, (edgeVal >> 0) & 0x3);
-		
+
 		CalcIntersection(Pos[e0.x], N[e0.x], Field[e0.x], Pos[e0.y], N[e0.y], Field[e0.y]);
 		CalcIntersection(Pos[e0.z], N[e0.z], Field[e0.z], Pos[e0.w], N[e0.w], Field[e0.w]);
 		CalcIntersection(Pos[e1.x], N[e1.x], Field[e1.x], Pos[e1.y], N[e1.y], Field[e1.y]);
@@ -150,6 +150,6 @@ float4 mainPS(float3 N : TEXCOORD0) : COLOR
 	float3 L = float3(0, 0, 1);
 	//return float4(N*0.5+0.5, 1);
 	float3 materials[2] = { float3(1, 1, 1), float3(0, 0, 0.5)};
-    float nDotL = dot( N, L);
+        float nDotL = dot( N, L);
 	return float4(abs(nDotL) * materials[nDotL < 0.0], 0.1);
 }

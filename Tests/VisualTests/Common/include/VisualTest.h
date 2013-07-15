@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -37,7 +37,7 @@ THE SOFTWARE.
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::Sample
 {
-public:
+ public:
 
     VisualTest()
     {
@@ -122,7 +122,7 @@ public:
         return false;
     }
 
-	/** Default frame started callback, advances animations */
+    /** Default frame started callback, advances animations */
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
     {
         for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
@@ -130,7 +130,7 @@ public:
         return true;
     }
 
-protected:
+ protected:
 
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
