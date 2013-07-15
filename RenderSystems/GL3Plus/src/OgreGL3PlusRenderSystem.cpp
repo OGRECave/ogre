@@ -1814,10 +1814,20 @@ namespace Ogre {
         // }
 
 
-        // TODO: Bind atomic counter buffers here
+        // Bind atomic counter buffers.
+        // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_ATOMIC_COUNTERS))
+        // {
+        //     // GLuint atomicsBuffer;
+        //     // glGenBuffers(1, &atomicsBuffer);
+        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 
+        //                  static_cast<GL3PlusHardwareCounterBuffer*>(HardwareBufferManager::getSingleton().getCounterBuffer().getGLBufferId()));
+        //     glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * 3, NULL, GL_DYNAMIC_DRAW);
+        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+        // }
+        //TODO: Reset atomic counters somewhere
 
-        // Do tessellation rendering. Note: Only evaluation(domain) shaders are required.
-        if(mCurrentDomainProgram)
+        // Do tessellation rendering. Note: Only evaluation (domain) shaders are required.
+        if (mCurrentDomainProgram)
         {
             // GLuint primCount = 0;
             // // Useful primitives for tessellation
@@ -1850,10 +1860,6 @@ namespace Ogre {
             // OGRE_CHECK_GL_ERROR(glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &patchLevel));
             // OGRE_CHECK_GL_ERROR(glPatchParameteri(GL_PATCH_VERTICES, op.vertexData->vertexCount));
 
-            //TODO Find better solution for showing tessellated mesh.
-            //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode == GL_LINE_STRIP ? GL_LINE : mPolygonMode));
-            //OGRE_CHECK_GL_ERROR(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode));
-
             if(op.useIndexes)
             {
                 //printf("YES INDEX\n");
@@ -1862,7 +1868,7 @@ namespace Ogre {
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+                GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
                 OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                 //OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));

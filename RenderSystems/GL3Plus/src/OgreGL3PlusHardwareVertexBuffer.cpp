@@ -121,6 +121,9 @@ namespace Ogre {
             if(result == GL_WAIT_FAILED)
             {
                 // Some error
+                //FIXME
+                printf("FAILED TO WAIT WHILE FENCED\n");
+                printf("OgreGL3PlusHardwareVertexBuffer\n");
             }
             OGRE_CHECK_GL_ERROR(glDeleteSync(mFence));
             mFence = 0;
