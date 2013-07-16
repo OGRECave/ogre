@@ -6024,6 +6024,8 @@ namespace Ogre{
 			mPass->setType(CompositionPass::PT_CLEAR);
 		else if(type == "stencil")
 			mPass->setType(CompositionPass::PT_STENCIL);
+		else if(type == "depth")
+			mPass->setType(CompositionPass::PT_DEPTH);
 		else if(type == "render_quad")
 			mPass->setType(CompositionPass::PT_RENDERQUAD);
 		else if(type == "render_scene")
@@ -6165,6 +6167,20 @@ namespace Ogre{
 						bool val;
 						if(getBoolean(prop->values.front(), &val))
 							mPass->setStencilTwoSidedOperation(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_READ_BACK_AS_TEXTURE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						bool val;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setStencilReadBackAsTextureOperation(val);
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 					}

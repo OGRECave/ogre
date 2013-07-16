@@ -1513,7 +1513,8 @@ namespace Ogre {
                                                      StencilOperation stencilFailOp,
                                                      StencilOperation depthFailOp,
                                                      StencilOperation passOp,
-                                                     bool twoSidedOperation)
+                                                     bool twoSidedOperation,
+													 bool readBackAsTexture)
     {
 		bool flip;
 		mStencilWriteMask = writeMask;

@@ -81,17 +81,12 @@ namespace Ogre {
             OGRE_DELETE i->second;
         }
         mGroups.clear();
-
-
-
-
     }
     //-----------------------------------------------------------------------
     void RenderQueue::addRenderable(Renderable* pRend, uint8 groupID, ushort priority)
     {
         // Find group
         RenderQueueGroup* pGroup = getQueueGroup(groupID);
-
 
 		Technique* pTech;
 

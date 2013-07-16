@@ -139,7 +139,7 @@ namespace Ogre
 		bool		  CompareEnabled;
 
 		D3D11_RECT mScissorRect;
-
+		bool mReadBackAsTexture;
 
 		D3D11HLSLProgram* mBoundVertexProgram;
 		D3D11HLSLProgram* mBoundFragmentProgram;
@@ -279,7 +279,8 @@ namespace Ogre
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false);
+            bool twoSidedOperation = false,
+			bool readBackAsTexture = false);
         void setNormaliseNormals(bool normalise);
 
 		virtual String getErrorDescription(long errorNumber) const;

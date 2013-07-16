@@ -1116,6 +1116,19 @@ namespace Ogre
 		/** Sets how to rasterise triangles, as points, wireframe or solid polys. */
 		virtual void _setPolygonMode(PolygonMode level) = 0;
 
+		/** Turns depth-stencil buffer checking on or off. 
+		@remarks
+		An inactive depth-stencil buffer can be read by a shader as a texture. An 
+		application that reads a depth-stencil buffer as a texture renders in two
+		passes, the first pass writes to the depth-stencil buffer and the second
+		pass reads from the buffer. This allows a shader to compare depth or
+		stencil values previously written to the buffer against the value for
+		the pixel currrently being rendered. The result of the comparison can
+		be used to create effects such as shadow mapping or soft particles
+		in a particle system.
+		*/
+		virtual void setDepthCheckEnabled(bool enabled) = 0;
+
 		/** Turns stencil buffer checking on or off. 
 		@remarks
 		Stencilling (masking off areas of the rendering target based on the stencil 
@@ -1183,7 +1196,8 @@ namespace Ogre
 			StencilOperation stencilFailOp = SOP_KEEP, 
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
-			bool twoSidedOperation = false) = 0;
+			bool twoSidedOperation = false,
+			bool readBackAsTexture = false) = 0;
 
 
 

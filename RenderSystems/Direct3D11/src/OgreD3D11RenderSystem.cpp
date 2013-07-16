@@ -1455,9 +1455,10 @@ bail:
 		descDepth.SampleDesc.Quality	= BBDesc.SampleDesc.Quality;
 		descDepth.Usage					= D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
+
 		// If we tell we want to use it as a Shader Resource when in MSAA, we will fail
 		// This is a recomandation from NVidia.
-		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+		if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
 			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 		descDepth.CPUAccessFlags		= 0;
@@ -1482,7 +1483,7 @@ bail:
 		// Create the View of the texture
 		// If MSAA is used, we cannot do this
 		//
-		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+		if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
 			viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
@@ -2034,7 +2035,7 @@ bail:
     void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
         uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
         StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation)
+        bool twoSidedOperation, bool readBackAsTexture)
     {
 		bool flip = false; // TODO: determine from mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
 
@@ -2059,6 +2060,7 @@ bail:
 			mDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
 		}
 
+		mReadBackAsTexture = readBackAsTexture;
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
@@ -3882,6 +3884,7 @@ bail:
 		}
 
 		mLastVertexSourceCount = 0;
+		mReadBackAsTexture = false;
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::getCustomAttribute(const String& name, void* pData)
