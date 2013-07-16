@@ -144,7 +144,7 @@ namespace Volume {
     public:
         /** To be called with the callback function of a MeshBuilder.
         @param renderOperation
-            Contains the complete renderoperation being built.
+            Contains the complete RenderOperation being built.
         @param vertices
             Contains the vertices of the triangles.
         @param indices
@@ -350,7 +350,7 @@ namespace Volume {
         @param callback
             The callback to execute.
         @param renderOperation
-            The renderoperation being built.
+            The RenderOperation being built.
         @param level
             The LOD level of this mesh.
         @param inProcess
