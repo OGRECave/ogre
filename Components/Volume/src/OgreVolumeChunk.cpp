@@ -204,7 +204,7 @@ namespace Volume {
 
         if (mShared->parameters->lodCallback)
         {
-            meshBuilder->executeCallback(mShared->parameters->lodCallback, level, mShared->chunksBeingProcessed);
+            meshBuilder->executeCallback(mShared->parameters->lodCallback, mRenderOp, level, mShared->chunksBeingProcessed);
         }
 
         mBox = meshBuilder->getBoundingBox();

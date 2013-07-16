@@ -143,6 +143,8 @@ namespace Volume {
     {
     public:
         /** To be called with the callback function of a MeshBuilder.
+        @param renderOperation
+            Contains the complete renderoperation being built.
         @param vertices
             Contains the vertices of the triangles.
         @param indices
@@ -152,7 +154,7 @@ namespace Volume {
         @param inProcess
             The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        virtual void ready(const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
+        virtual void ready(const RenderOperation &renderOperation, const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
     };
 
     /** Class to build up a mesh with vertices and indices.
@@ -345,14 +347,16 @@ namespace Volume {
         AxisAlignedBox getBoundingBox(void);
 
         /** Executes a MeshBuilderCallback on this instance.
-         @param callback
+        @param callback
             The callback to execute.
+        @param renderOperation
+            The renderoperation being built.
         @param level
             The LOD level of this mesh.
         @param inProcess
             The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        void executeCallback(MeshBuilderCallback *callback, size_t level, int inProcess) const;
+        void executeCallback(MeshBuilderCallback *callback, const RenderOperation &renderOperation, size_t level, int inProcess) const;
 
     };
 }
