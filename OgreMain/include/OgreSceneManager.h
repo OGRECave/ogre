@@ -847,6 +847,11 @@ namespace Ogre {
         void renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
             Pass* pass, const LightList *manualLightList, unsigned long flags,
             bool secondpass, bool zfail, bool twosided);
+
+		/** render using the feature of reading back the inactive depth-stencil buffers as texture
+			only on DirectX 11 Render System*/
+		virtual void renderUsingReadBackAsTexture(bool secondpass);
+
         typedef vector<ShadowCaster*>::type ShadowCasterList;
         ShadowCasterList mShadowCasterList;
         SphereSceneQuery* mShadowCasterSphereQuery;

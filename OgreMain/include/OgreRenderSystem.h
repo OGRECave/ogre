@@ -1232,6 +1232,8 @@ namespace Ogre
 		*/
 		virtual void _render(const RenderOperation& op);
 
+		virtual void _renderUsingReadBackAsTexture(bool secondPass);
+
 		/** Gets the capabilities of the render system. */
 		const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }
 

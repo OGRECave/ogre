@@ -1104,7 +1104,10 @@ bail:
 		rsc->setCapability(RSC_DOT3);
 		// Cube map
 		if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+		{
 			rsc->setCapability(RSC_CUBEMAPPING);
+			rsc->setCapability(RSC_READ_BACK_AS_TEXTURE);
+		}
 
 		// We always support compression, D3DX will decompress if device does not support
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
@@ -2993,6 +2996,100 @@ bail:
 			memset(mNumClassInstances, 0, sizeof(mNumClassInstances));		
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr)
+	{
+		if (passNr == 1)
+		{
+			RenderTarget *target = mActiveRenderTarget;
+
+			if (target)
+			{
+				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+				memset(pRTView, 0, sizeof(pRTView));
+
+				target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				//Retrieve depth buffer
+				D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+				// now switch to the new render target
+				mDevice.GetImmediateContext()->OMSetRenderTargets(
+					numberOfViews,
+					pRTView,
+					depthBuffer->getDepthStencilView());
+
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot set render target\nError Description:" + errorDescription,
+						"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+				}
+				
+				mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D10_CLEAR_DEPTH, 1.0f, 0);
+
+				float ClearColor[4];
+				//D3D11Mappings::get(colour, ClearColor);
+				// Clear all views
+				uint numberOfViews;
+				mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
+				if( numberOfViews == 1 )
+					mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
+				else
+				{
+					for( uint i = 0; i < numberOfViews; ++i )
+						mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
+				}
+
+			}
+		}
+		else if (passNr == 2)
+		{
+			RenderTarget *target = mActiveRenderTarget;
+
+			if (target)
+			{
+				//
+				// We need to remove the the DST from the Render Targets if we want to use it as a texture :
+				//
+				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+				memset(pRTView, 0, sizeof(pRTView));
+
+				target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				//Retrieve depth buffer
+				D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+				// now switch to the new render target
+				mDevice.GetImmediateContext()->OMSetRenderTargets(
+					numberOfViews,
+					pRTView,
+					NULL);
+				// TO DO: get effect, current technique and pass from device, set resources to it.
+				 g_pEffect->GetVariableByName("texture_depthBuffer")->AsShaderResource()->SetResource(mDSTResView);	
+			}
+		}
+		else
+		{
+			//
+			// We need to unbind mDSTResView from texture_ZBuffer because this buffer
+			// will be used later as the typical depth buffer, again
+			// must call an annoying Apply(0) here : to flush SetResource(NULL)
+			//
+
+			// TO DO: get effect, current technique and pass from device, set resources to it.
+			// decide on name
+			hr = g_pEffect->GetVariableByName("texture_depthBuffer")->AsShaderResource()->SetResource(NULL);
+			pass->Apply(0);		
+		}
 	}
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setNormaliseNormals(bool normalise)

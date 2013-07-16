@@ -836,6 +836,13 @@ namespace Ogre {
 			mClipPlanesDirty = false;
 		}
     }
+	void RenderSystem::_renderUsingReadBackAsTexture(bool secondPass)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support reading back the inactive depth/stencil",
+			"buffer as a texture. Only DirectX 11 Render System supports it.", 
+			"RenderSystem::_renderUsingReadBackAsTexture");	
+	}
     //-----------------------------------------------------------------------
     void RenderSystem::setInvertVertexWinding(bool invert)
     {

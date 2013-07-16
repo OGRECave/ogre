@@ -5820,6 +5820,13 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
 
 }
 //---------------------------------------------------------------------
+void SceneManager::renderUsingReadBackAsTexture(bool secondpass)
+{
+	if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_READ_BACK_AS_TEXTURE)) return;
+
+	mDestRenderSystem->_renderUsingReadBackAsTexture(secondpass);
+}
+//---------------------------------------------------------------------
 void SceneManager::setShadowColour(const ColourValue& colour)
 {
     mShadowColour = colour;
