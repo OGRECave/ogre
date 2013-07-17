@@ -212,7 +212,7 @@ namespace Ogre {
 
     GLES2Context * EAGLES2Context::clone() const
     {
-        return const_cast<EAGLES2Context *>(this);
+		return new EAGLES2Context(mDrawable, [mContext sharegroup]);
     }
 
 	CAEAGLLayer * EAGLES2Context::getDrawable() const

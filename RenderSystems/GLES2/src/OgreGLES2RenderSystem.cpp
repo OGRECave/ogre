@@ -2191,7 +2191,7 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Cannot register a background thread before the main context "
                         "has been created.",
-                        "GL3PlusRenderSystem::registerThread");
+                        "GLES2RenderSystem::registerThread");
 		}
 
 		// Create a new context for this thread. Cloning from the main context
