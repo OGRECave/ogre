@@ -145,7 +145,7 @@ namespace Volume {
     public:
         /** To be called with the callback function of a MeshBuilder.
         @param simpleRenderable
-            Contains the simpleRenderable for which the triangles were built.
+            Contains the SimpleRenderable for which the triangles were built.
         @param vertices
             Contains the vertices of the triangles.
         @param indices
@@ -351,7 +351,7 @@ namespace Volume {
         @param callback
             The callback to execute.
         @param simpleRenderable
-            Contains the simpleRenderable for which the triangles were built.
+            Contains the SimpleRenderable for which the triangles were built.
         @param level
             The LOD level of this mesh.
         @param inProcess
