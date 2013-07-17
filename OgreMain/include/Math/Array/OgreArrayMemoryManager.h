@@ -261,6 +261,13 @@ namespace Ogre
 				The index, typically mIndex (range [0; ARRAY_PACKED_REALS) )
 		*/
 		void destroySlot( const char *ptrToFirstElement, uint8 index );
+
+		/** Called when m_memoryPools changes, to give a chance derived class to initialize memory
+			to default values
+		@param prevNumSlots
+			The previous value of m_maxMemory before changing m_memoryPools
+		*/
+		virtual void slotsRecreated( size_t prevNumSlots ) {}
 	};
 
 
@@ -274,6 +281,13 @@ namespace Ogre
 	*/
 	class _OgreExport NodeArrayMemoryManager : public ArrayMemoryManager
 	{
+		/// Dummy node where to point Transform::mParents[i] when they're unused slots.
+		Node	*m_dummyNode;
+
+	protected:
+		/// We overload to set all mParents to point to m_dummyNode
+		virtual void slotsRecreated( size_t prevNumSlots );
+
 	public:
 		enum MemoryTypes
 		{
@@ -293,8 +307,9 @@ namespace Ogre
 		static const size_t ElementsMemSize[NumMemoryTypes];
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
-		NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, size_t cleanupThreshold=100,
-								size_t maxHardLimit=-1, RebaseListener *rebaseListener=0 );
+		NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
+								size_t cleanupThreshold=100, size_t maxHardLimit=-1,
+								RebaseListener *rebaseListener=0 );
 
 		/** Requests memory for a new SceneNode (for the Array vectors & matrices)
 			May be also be used for a new Entity, etc.
@@ -336,6 +351,13 @@ namespace Ogre
 	*/
 	class _OgreExport ObjectDataArrayMemoryManager : public ArrayMemoryManager
 	{
+		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
+		Node	*m_dummyNode;
+
+	protected:
+		/// We overload to set all mParents to point to m_dummyNode
+		virtual void slotsRecreated( size_t prevNumSlots );
+
 	public:
 		enum MemoryTypes
 		{
@@ -356,8 +378,9 @@ namespace Ogre
 		static const size_t ElementsMemSize[NumMemoryTypes];
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
-		ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, size_t cleanupThreshold=100,
-										size_t maxHardLimit=-1, RebaseListener *rebaseListener=0 );
+		ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
+										size_t cleanupThreshold=100, size_t maxHardLimit=-1,
+										RebaseListener *rebaseListener=0 );
 
 		/// @copydoc NodeArrayMemoryManager::createNewNode
 		void createNewNode( ObjectData &outData );

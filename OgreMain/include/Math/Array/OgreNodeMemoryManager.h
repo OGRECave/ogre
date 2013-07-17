@@ -56,6 +56,10 @@ namespace Ogre
 		ArrayMemoryManagerVec					m_memoryManagers;
 		ArrayMemoryManager::RebaseListener		*m_rebaseListener;
 
+		/// Dummy node where to point Transform::mParents[i] when they're unused slots.
+		SceneNode								*m_dummyNode;
+		Transform								m_dummyTransformPtrs;
+
 		/** Makes m_memoryManagers big enough to be able to fulfill m_memoryManagers[newDepth]
 		@param newDepth
 			Hierarchy level depth we wish to grow to.
@@ -63,14 +67,7 @@ namespace Ogre
 		void growToDepth( size_t newDepth );
 
 	public:
-		NodeMemoryManager( NodeArrayMemoryManager::RebaseListener *rebaseListener ) :
-			m_rebaseListener( rebaseListener )
-		{
-			//Warning: Don't use m_rebaseListener yet as we may have
-			//been passed a pointer that isn't fully constructed!
-			//(see SceneManager's constructor)
-		}
-
+		NodeMemoryManager( NodeArrayMemoryManager::RebaseListener *rebaseListener );
 		~NodeMemoryManager();
 
 		/** Requests memory for the given transform for the first, initializing values.

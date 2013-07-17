@@ -122,6 +122,28 @@ namespace Ogre
 			}
 		}
 
+		static ArrayMatrix4 createAllFromMatrix4( const Matrix4 &m )
+		{
+			ArrayMatrix4 retVal;
+			retVal.m_chunkBase[0]  = _mm_set_ps1( m._m[0] );
+			retVal.m_chunkBase[1]  = _mm_set_ps1( m._m[1] );
+			retVal.m_chunkBase[2]  = _mm_set_ps1( m._m[2] );
+			retVal.m_chunkBase[3]  = _mm_set_ps1( m._m[3] );
+			retVal.m_chunkBase[4]  = _mm_set_ps1( m._m[4] );
+			retVal.m_chunkBase[5]  = _mm_set_ps1( m._m[5] );
+			retVal.m_chunkBase[6]  = _mm_set_ps1( m._m[6] );
+			retVal.m_chunkBase[7]  = _mm_set_ps1( m._m[7] );
+			retVal.m_chunkBase[8]  = _mm_set_ps1( m._m[8] );
+			retVal.m_chunkBase[9]  = _mm_set_ps1( m._m[9] );
+			retVal.m_chunkBase[10] = _mm_set_ps1( m._m[10] );
+			retVal.m_chunkBase[11] = _mm_set_ps1( m._m[11] );
+			retVal.m_chunkBase[12] = _mm_set_ps1( m._m[12] );
+			retVal.m_chunkBase[13] = _mm_set_ps1( m._m[13] );
+			retVal.m_chunkBase[14] = _mm_set_ps1( m._m[14] );
+			retVal.m_chunkBase[15] = _mm_set_ps1( m._m[15] );
+			return retVal;
+		}
+
 		/** Assigns the value of the other matrix. Does not reference the
 			ptr address, but rather perform a memory copy
             @param
@@ -167,6 +189,8 @@ namespace Ogre
 
 		/// @copydoc Matrix4::isAffine()
 		inline bool isAffine() const;
+
+		static const ArrayMatrix4 IDENTITY;
     };
 	/** @} */
 	/** @} */

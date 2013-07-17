@@ -96,6 +96,12 @@ namespace Ogre {
         /** Constructor, only to be called by the creator SceneManager. */
 		SceneNode( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
 					SceneNode *parent );
+
+		/** Don't use this constructor unless you know what you're doing.
+			@See NodeMemoryManager::m_dummyNode
+		*/
+		SceneNode( const Transform &transformPtrs );
+
         ~SceneNode();
 
         /** Adds an instance of a scene object to this node.

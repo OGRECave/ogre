@@ -53,12 +53,23 @@ namespace Ogre
 	};
 	//-----------------------------------------------------------------------------------
 	ObjectDataArrayMemoryManager::ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
-													size_t cleanupThreshold, size_t maxHardLimit,
+													Node *dummyNode, size_t cleanupThreshold,
+													size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
 			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
-								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
+								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
+			m_dummyNode( dummyNode )
 	{
+	}
+	//-----------------------------------------------------------------------------------
+	void ObjectDataArrayMemoryManager::slotsRecreated( size_t prevNumSlots )
+	{
+		ArrayMemoryManager::slotsRecreated( prevNumSlots );
+
+		Node **nodesPtr = reinterpret_cast<Node**>( m_memoryPools[Parent] ) + prevNumSlots;
+		for( size_t i=prevNumSlots; i<m_maxMemory; ++i )
+			*nodesPtr++ = m_dummyNode;
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectDataArrayMemoryManager::createNewNode( ObjectData &outData )
@@ -93,7 +104,7 @@ namespace Ogre
 												nextSlotBase * m_elementsMemSizes[LightMask] );
 
 		//Set default values
-		outData.mParents[nextSlotIdx] = 0;
+		outData.mParents[nextSlotIdx] = m_dummyNode;
 		outData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldRadius[nextSlotIdx]			= 0;
@@ -108,7 +119,7 @@ namespace Ogre
 	{
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
-		*inOutData.mParents		= 0;
+		*inOutData.mParents		= m_dummyNode;
 		*inOutData.mOwner		= 0;
 		*inOutData.mVisibilityFlags = 0;
 		*inOutData.mQueryFlags	= 0;

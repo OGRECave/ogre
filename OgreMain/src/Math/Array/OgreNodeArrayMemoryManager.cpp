@@ -49,12 +49,23 @@ namespace Ogre
 	};
 	//-----------------------------------------------------------------------------------
 	NodeArrayMemoryManager::NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
-													size_t cleanupThreshold, size_t maxHardLimit,
+													Node *dummyNode, size_t cleanupThreshold,
+													size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
 			ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
-								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
+								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
+			m_dummyNode( dummyNode )
 	{
+	}
+	//-----------------------------------------------------------------------------------
+	void NodeArrayMemoryManager::slotsRecreated( size_t prevNumSlots )
+	{
+		ArrayMemoryManager::slotsRecreated( prevNumSlots );
+
+		Node **nodesPtr = reinterpret_cast<Node**>( m_memoryPools[Parent] ) + prevNumSlots;
+		for( size_t i=prevNumSlots; i<m_maxMemory; ++i )
+			*nodesPtr++ = m_dummyNode;
 	}
 	//-----------------------------------------------------------------------------------
 	void NodeArrayMemoryManager::createNewNode( Transform &outTransform )
@@ -90,7 +101,7 @@ namespace Ogre
 												nextSlotBase * m_elementsMemSizes[InheritScale] );
 
 		//Set default values
-		outTransform.mParents[nextSlotIdx] = 0;
+		outTransform.mParents[nextSlotIdx] = m_dummyNode;
 		outTransform.mPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
 		outTransform.mScale->setFromVector3( Vector3::UNIT_SCALE, nextSlotIdx );
@@ -108,7 +119,7 @@ namespace Ogre
 		//there's one object in scene, 4 objects are still parsed simultaneously)
 
 		//TODO: mParents & mOwner should point to a dummy object (dark_sylinc)
-		*inOutTransform.mParents = 0;
+		*inOutTransform.mParents = m_dummyNode;
 		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
 		//Zero out all pointers
 		inOutTransform = Transform();

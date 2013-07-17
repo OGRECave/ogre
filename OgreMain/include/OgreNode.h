@@ -199,6 +199,11 @@ namespace Ogre {
         */
         Node( IdType id, NodeMemoryManager *nodeMemoryManager, Node *parent );
 
+		/** Don't use this constructor unless you know what you're doing.
+			@See NodeMemoryManager::m_dummyNode
+		*/
+		Node( const Transform &transformPtrs );
+
         virtual ~Node();
 
 		/** Sets a custom name for this node. Doesn't have to be unique */

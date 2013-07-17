@@ -85,6 +85,8 @@ namespace Ogre
 			++i;
 			++itor;
 		}
+
+		slotsRecreated( 0 );
 	}
 	//-----------------------------------------------------------------------------------
 	void ArrayMemoryManager::destroy()
@@ -169,10 +171,13 @@ namespace Ogre
 				++itor;
 			}
 
+			const size_t prevNumSlots = m_maxMemory;
 			m_maxMemory = newMemory;
 
 			//Rebase all ptrs
 			m_rebaseListener->applyRebase( m_managerType, m_level, m_memoryPools, diffsList );
+
+			slotsRecreated( prevNumSlots );
 		}
 
 		return nextSlot;

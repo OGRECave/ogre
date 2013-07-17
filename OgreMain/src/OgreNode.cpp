@@ -69,6 +69,26 @@ namespace Ogre {
 		//Will initialize mTransform
 		mNodeMemoryManager->nodeCreated( mTransform, mDepthLevel );
     }
+	//-----------------------------------------------------------------------
+	Node::Node( const Transform &transformPtrs ) :
+		IdObject( 0 ),
+		mDepthLevel( 0 ),
+		mParent( 0 ),
+		mName( "Dummy Node" ),
+#ifndef NDEBUG
+		mCachedTransformOutOfDate( true ),
+#endif
+		mInitialPosition(Vector3::ZERO),
+		mInitialOrientation(Quaternion::IDENTITY),
+		mInitialScale(Vector3::UNIT_SCALE),
+		mListener( 0 ),
+		mNodeMemoryManager( 0 ),
+		mDebug( 0 ),
+		mGlobalIndex( -1 ),
+		mParentIndex( -1 )
+    {
+		mTransform = transformPtrs;
+    }
     //-----------------------------------------------------------------------
     Node::~Node()
     {
@@ -85,7 +105,8 @@ namespace Ogre {
 		if( mParent )
 			mParent->removeChild( this );
 
-		mNodeMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
+		if( mNodeMemoryManager )
+			mNodeMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
 		mDepthLevel = 0;
 	}
     //-----------------------------------------------------------------------

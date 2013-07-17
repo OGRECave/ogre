@@ -32,6 +32,44 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	NodeMemoryManager::NodeMemoryManager( NodeArrayMemoryManager::RebaseListener *rebaseListener ) :
+			m_rebaseListener( rebaseListener ),
+			m_dummyNode( 0 )
+	{
+		//Warning: Don't use m_rebaseListener yet as we may have
+		//been passed a pointer that isn't fully constructed!
+		//(see SceneManager's constructor)
+
+		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
+		//or yet another object) We only allocate what's needed to prevent access violations.
+		/*m_dummyTransformPtrs.mPosition = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
+		m_dummyTransformPtrs.mOrientation = reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayQuaternion ), MEMCATEGORY_SCENE_OBJECTS ) );
+		m_dummyTransformPtrs.mScale = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );*/
+
+		m_dummyTransformPtrs.mDerivedPosition	= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
+		m_dummyTransformPtrs.mDerivedOrientation= reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayQuaternion ), MEMCATEGORY_SCENE_OBJECTS ) );
+		m_dummyTransformPtrs.mDerivedScale		= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
+
+		/*m_dummyTransformPtrs.mDerivedTransform	= reinterpret_cast<ArrayMatrix4*>( OGRE_MALLOC_SIMD(
+												sizeof( ArrayMatrix4 ), MEMCATEGORY_SCENE_OBJECTS ) );
+		m_dummyTransformPtrs.mInheritOrientation= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
+																	MEMCATEGORY_SCENE_OBJECTS );
+		m_dummyTransformPtrs.mInheritScale		= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
+																	MEMCATEGORY_SCENE_OBJECTS );*/
+
+		*m_dummyTransformPtrs.mDerivedPosition		= ArrayVector3::ZERO;
+		*m_dummyTransformPtrs.mDerivedOrientation	= ArrayQuaternion::IDENTITY;
+		*m_dummyTransformPtrs.mDerivedScale			= ArrayVector3::UNIT_SCALE;
+
+		m_dummyNode = new SceneNode( m_dummyTransformPtrs );
+	}
+	//-----------------------------------------------------------------------------------
 	NodeMemoryManager::~NodeMemoryManager()
 	{
 		ArrayMemoryManagerVec::iterator itor = m_memoryManagers.begin();
@@ -44,6 +82,22 @@ namespace Ogre
 		}
 
 		m_memoryManagers.clear();
+
+		delete m_dummyNode;
+		m_dummyNode = 0;
+
+		/*OGRE_FREE_SIMD( m_dummyTransformPtrs.mPosition, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mScale, MEMCATEGORY_SCENE_OBJECTS );*/
+
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedPosition, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedScale, MEMCATEGORY_SCENE_OBJECTS );
+
+		/*OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedTransform, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mInheritOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( m_dummyTransformPtrs.mInheritScale, MEMCATEGORY_SCENE_OBJECTS );*/
+		m_dummyTransformPtrs = Transform();
 	}
 	//-----------------------------------------------------------------------------------
 	void NodeMemoryManager::growToDepth( size_t newDepth )
@@ -51,7 +105,8 @@ namespace Ogre
 		//TODO: (dark_sylinc) give a specialized hint for each depth
 		while( newDepth >= m_memoryManagers.size() )
 		{
-			m_memoryManagers.push_back( NodeArrayMemoryManager( m_memoryManagers.size(), 100 ) );
+			m_memoryManagers.push_back( NodeArrayMemoryManager( m_memoryManagers.size(), 100,
+																m_dummyNode ) );
 			m_memoryManagers.back().initialize();
 		}
 	}
@@ -109,9 +164,10 @@ namespace Ogre
 		{
 			if( itor->getUsedMemory() )
 				retVal = itor - begin;
+			++itor;
 		}
 
-		return retVal;
+		return retVal + 1;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t NodeMemoryManager::getFirstNode( Transform &outTransform, size_t depth )

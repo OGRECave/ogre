@@ -47,6 +47,14 @@ namespace Ogre {
         , mAutoTrackTarget(0)
     {
     }
+	//-----------------------------------------------------------------------
+    SceneNode::SceneNode( const Transform &transformPtrs )
+		: Node( transformPtrs )
+        , mCreator(0)
+        , mYawFixed(false)
+        , mAutoTrackTarget(0)
+    {
+    }
     //-----------------------------------------------------------------------
     SceneNode::~SceneNode()
     {
