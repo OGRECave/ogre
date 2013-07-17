@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreColourValue.h"
 
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 namespace Ogre {
 
 	// forward decls
@@ -124,6 +126,7 @@ namespace Ogre {
 		const VisibleObjectsBoundsInfo* mMainCamBoundsInfo;
         const Pass* mCurrentPass;
 
+		ObjectMemoryManager mObjectMemoryManager;
         Light mBlankLight;
     public:
         AutoParamDataSource();

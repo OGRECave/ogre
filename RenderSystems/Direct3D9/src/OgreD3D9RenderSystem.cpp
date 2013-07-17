@@ -1725,7 +1725,7 @@ namespace Ogre
 		unsigned short num = 0;
 		for (i = lights.begin(); i != iend && num < limit; ++i, ++num)
 		{
-			setD3D9Light(num, *i);
+			setD3D9Light(num, i->light);
 		}
 		// Disable extra lights
 		for (; num < mCurrentLights[activeDevice]; ++num)
@@ -1752,7 +1752,7 @@ namespace Ogre
 			"Failed to set render state D3DRS_LIGHTING", "D3D9RenderSystem::setLightingEnabled" );
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::setD3D9Light( size_t index, Light* lt )
+	void D3D9RenderSystem::setD3D9Light( size_t index, const Light* lt )
 	{
 		HRESULT hr;
 

@@ -38,6 +38,7 @@ namespace Ogre
 											size_t hintMaxNodes, size_t cleanupThreshold,
 											size_t maxHardLimit, RebaseListener *rebaseListener ) :
 							m_elementsMemSizes( elementsMemSize ),
+							m_totalMemoryMultiplier( 0 ),
 							m_usedMemory( 0 ),
 							m_maxMemory( hintMaxNodes ),
 							m_maxHardLimit( maxHardLimit ),
@@ -63,6 +64,13 @@ namespace Ogre
 			m_maxHardLimit		= m_maxMemory;
 			m_cleanupThreshold	= -1;
 		}
+	}
+	//-----------------------------------------------------------------------------------
+	void ArrayMemoryManager::initialize()
+	{
+		assert( m_usedMemory == 0 && "Calling initialize twice"
+				" with used slots will cause dangling ptrs" );
+		destroy();
 
 		size_t i=0;
 		MemoryPoolVec::iterator itor = m_memoryPools.begin();
@@ -70,7 +78,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-//			*itor = reinterpret_cast<char*>( _aligned_malloc( m_maxMemory * ElementsMemSize[i], 16 ) );
+//			*itor = reinterpret_cast<char*>(_aligned_malloc(m_maxMemory * ElementsMemSize[i], 16));
 			*itor = (char*)OGRE_MALLOC_SIMD( m_maxMemory * m_elementsMemSizes[i],
 											 MEMCATEGORY_SCENE_OBJECTS );
 			memset( *itor, 0, m_maxMemory * m_elementsMemSizes[i] );
@@ -79,7 +87,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	ArrayMemoryManager::~ArrayMemoryManager()
+	void ArrayMemoryManager::destroy()
 	{
 		MemoryPoolVec::iterator itor = m_memoryPools.begin();
 		MemoryPoolVec::iterator end  = m_memoryPools.end();

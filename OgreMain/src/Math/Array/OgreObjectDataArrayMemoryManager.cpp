@@ -55,7 +55,7 @@ namespace Ogre
 	ObjectDataArrayMemoryManager::ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
 													size_t cleanupThreshold, size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
-			ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize,
+			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener )
 	{

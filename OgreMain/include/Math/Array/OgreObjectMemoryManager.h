@@ -70,6 +70,8 @@ namespace Ogre
 			//(see SceneManager's constructor)
 		}
 
+		~ObjectMemoryManager();
+
 		/** Requests memory for the given ObjectData, initializing values.
 		@param outObjectData
 			ObjectData with filled pointers

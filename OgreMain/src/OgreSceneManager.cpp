@@ -505,12 +505,6 @@ Entity* SceneManager::createEntity(const MeshPtr& pMesh)
 {
     return createEntity(pMesh->getName(), pMesh->getGroup());
 }
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& meshName)
-{
-	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
-	return createEntity(meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-}
 //-----------------------------------------------------------------------
 void SceneManager::destroyEntity(Entity *e)
 {

@@ -39,7 +39,7 @@ namespace Ogre
 		Usage:
 		OGRE_NEW SceneNode( Id::generateNewId< Node >() )
 	*/
-	class Id
+	class _OgreExport Id
 	{
 	public:
 		//This function assumes creation of new objects can't be made from multiple threads!!!
@@ -50,7 +50,7 @@ namespace Ogre
 		}
 	};
 
-	class IdObject
+	class _OgreExport IdObject
 	{
 	private:
 		friend struct IdCmp; //Avoid calling getId()
@@ -77,7 +77,7 @@ namespace Ogre
 		}
 	};
 
-	struct IdCmp
+	struct _OgreExport IdCmp
 	{
 		bool operator()( const IdObject *left, const IdType rightId )
 		{

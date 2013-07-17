@@ -48,6 +48,9 @@ namespace Ogre
 		This implementation is most efficient when using LIFO patterns. Since Entities & SceneNodes
 		use this manager, this means that you should create the most static ones first, and the most
 		dynamic ones last (i.e. the ones that are going to be frequently inserted & removed from scene)
+		@par
+		WARNING: This class requires its owner to manually call initialize() and destroy() after all
+		instances have been destroyed. Otherwise memory leaks will happen!
 	@author
 		Matias N. Goldberg
 	@version
@@ -181,7 +184,7 @@ namespace Ogre
 		ManagerType			m_managerType;
 
 	public:
-		/** Constructor
+		/** Constructor. @See intialize. @See destroy.
 			@param elementsMemSize
 				Array containing the size in bytes of each element type (i.e. NodeElementsMemSize)
 			@param numElementsSize
@@ -210,7 +213,24 @@ namespace Ogre
 							size_t numElementsSize, uint16 depthLevel, size_t hintMaxNodes,
 							size_t cleanupThreshold=100, size_t maxHardLimit=-1,
 							RebaseListener *rebaseListener=0 );
-		~ArrayMemoryManager();
+
+		/** Initializes m_memoryPools. Once it has been called, destroy() __must__ be called.
+			@See destroy
+		@remarks
+			The destructor won't free the data, if you don't call destroy, memory will leak.
+			Calling initialize twice is possible and won't leak, but will free the previous
+			memory ptrs without calling the registered RebaseListener. So if there were slots
+			in use, their pointers will become dangling. An assert will trigger if this happens.
+		*/
+		void initialize();
+
+		/** Destroys the memory ptrs. @See initialize
+		@remarks
+			If there were slots in use, make sure they're no longer used, as their ptrs will
+			become dangling ptrs. We don't assert because this may be valid behavior (i.e.
+			on shutdown)
+		*/
+		void destroy();
 
 		/// Gets available memory in bytes
 		size_t getFreeMemory() const;

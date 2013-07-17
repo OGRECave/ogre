@@ -71,6 +71,8 @@ namespace Ogre
 			//(see SceneManager's constructor)
 		}
 
+		~NodeMemoryManager();
+
 		/** Requests memory for the given transform for the first, initializing values.
 		@param outTransform
 			Transform with filled pointers

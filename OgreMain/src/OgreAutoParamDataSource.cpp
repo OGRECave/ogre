@@ -70,7 +70,8 @@ namespace Ogre {
 		 mCurrentSceneManager(0),
 		 mMainCamBoundsInfo(0),
          mCurrentPass(0),
-		 mBlankLight( -1, 0 ) //TODO (dark_sylinc): Check if it needs a dummy Obj manager
+		 mObjectMemoryManager( 0 ),
+		 mBlankLight( 0, &mObjectMemoryManager )
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);

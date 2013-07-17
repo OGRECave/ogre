@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
+#include "OgreCommon.h"
+
 namespace Ogre
 {
 	/** \addtogroup Core
@@ -699,13 +701,13 @@ namespace Ogre
 		static float Clamp<float>(float val, float minval, float maxval)
 		{
 			assert (minval <= maxval && "Invalid clamp range");
-			return max( min(val, maxval), minval );
+			return Ogre::max( Ogre::min(val, maxval), minval );
 		}
 		template <>
 		static double Clamp<double>(double val, double minval, double maxval)
 		{
 			assert (minval <= maxval && "Invalid clamp range");
-			return max( min(val, maxval), minval );
+			return Ogre::max( Ogre::min(val, maxval), minval );
 		}
 
 		static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 

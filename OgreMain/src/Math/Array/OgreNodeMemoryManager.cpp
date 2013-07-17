@@ -32,11 +32,28 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	NodeMemoryManager::~NodeMemoryManager()
+	{
+		ArrayMemoryManagerVec::iterator itor = m_memoryManagers.begin();
+		ArrayMemoryManagerVec::iterator end  = m_memoryManagers.end();
+
+		while( itor != end )
+		{
+			itor->destroy();
+			++itor;
+		}
+
+		m_memoryManagers.clear();
+	}
+	//-----------------------------------------------------------------------------------
 	void NodeMemoryManager::growToDepth( size_t newDepth )
 	{
 		//TODO: (dark_sylinc) give a specialized hint for each depth
-		if( newDepth >= m_memoryManagers.size() )
-			m_memoryManagers.push_back( NodeArrayMemoryManager( newDepth, 100 ) );
+		while( newDepth >= m_memoryManagers.size() )
+		{
+			m_memoryManagers.push_back( NodeArrayMemoryManager( m_memoryManagers.size(), 100 ) );
+			m_memoryManagers.back().initialize();
+		}
 	}
 	//-----------------------------------------------------------------------------------
 	void NodeMemoryManager::nodeCreated( Transform &outTransform, size_t depth )
