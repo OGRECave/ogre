@@ -334,9 +334,6 @@ namespace Ogre {
         */
         void setVisible(bool visible);
 
-        /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const { return 0; /* not visible */ }
-
         /** Gets the details of this light as a 4D vector.
         @remarks
             Getting details of a light as a 4D vector can be useful for

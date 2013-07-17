@@ -449,7 +449,6 @@ namespace Ogre {
 			const String& getMovableType(void) const;
 			void _notifyCurrentCamera(Camera* cam);
 			const AxisAlignedBox& getBoundingBox(void) const;
-			Real getBoundingRadius(void) const;
 			void _updateRenderQueue(RenderQueue* queue);
 			/// @copydoc MovableObject::visitRenderables
 			void visitRenderables(Renderable::Visitor* visitor, 

@@ -193,7 +193,6 @@ namespace Ogre
 		const String& getMovableType(void) const;
 
 		const AxisAlignedBox& getBoundingBox(void) const;
-		Real getBoundingRadius(void) const;
 
 		/** This is used by our batch owner to get the closest entity's depth, returns infinity
             when not attached to a scene node */

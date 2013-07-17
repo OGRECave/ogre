@@ -51,7 +51,6 @@ Torus Knot Software Ltd.
 #include "OgreShadowCameraSetup.h"
 #include "OgreShadowTextureManager.h"
 #include "OgreCamera.h"
-#include "OgreInstancedGeometry.h"
 #include "OgreLodListener.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
@@ -283,7 +282,7 @@ namespace Ogre {
 			@param camera Pointer to the camera being used to render
 			@param iteration For lights that use multiple shadow textures, the iteration number
 			*/
-			virtual void shadowTextureCasterPreViewProj(Light* light, 
+			virtual void shadowTextureCasterPreViewProj( const Light* light, 
 				Camera* camera, size_t iteration)
                         { (void)light; (void)camera; (void)iteration; }
 
@@ -300,7 +299,7 @@ namespace Ogre {
 			@param frustum Pointer to the projection frustum being used to project
 				the shadow texture
 			*/
-			virtual void shadowTextureReceiverPreViewProj(Light* light, 
+			virtual void shadowTextureReceiverPreViewProj( const Light* light, 
 				Frustum* frustum)
                         { (void)light; (void)frustum; }
 
@@ -400,8 +399,6 @@ namespace Ogre {
 
 		typedef map<String, StaticGeometry* >::type StaticGeometryList;
 		StaticGeometryList mStaticGeometryList;
-		typedef map<String, InstancedGeometry* >::type InstancedGeometryList;
-		InstancedGeometryList mInstancedGeometryList;
 
 		typedef map<String, InstanceManager*>::type InstanceManagerMap;
 		InstanceManagerMap	mInstanceManagerMap;
@@ -661,9 +658,9 @@ namespace Ogre {
 		/// Internal method for firing the texture shadows updated event
         virtual void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
 		/// Internal method for firing the pre caster texture shadows event
-        virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
+        virtual void fireShadowTexturesPreCaster(const Light* light, Camera* camera, size_t iteration);
 		/// Internal method for firing the pre receiver texture shadows event
-        virtual void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
+        virtual void fireShadowTexturesPreReceiver(const Light* light, Frustum* f);
 		/// Internal method for firing find visible objects event
 		virtual void firePreFindVisibleObjects(Viewport* v);
 		/// Internal method for firing find visible objects event
@@ -746,7 +743,7 @@ namespace Ogre {
 			LightClippingInfo() : scissorValid(false), clipPlanesValid(false) {}
 
 		};
-		typedef map<Light*, LightClippingInfo>::type LightClippingInfoMap;
+		typedef map<Light const *, LightClippingInfo>::type LightClippingInfoMap;
 		LightClippingInfoMap mLightClippingInfoMap;
 		unsigned long mLightClippingInfoMapFrameNumber;
 
@@ -1128,11 +1125,11 @@ namespace Ogre {
 
 		/** Retrieve a set of clipping planes for a given light. 
 		*/
-		virtual const PlaneList& getLightClippingPlanes(Light* l);
+		virtual const PlaneList& getLightClippingPlanes(const Light* l);
 
 		/** Retrieve a scissor rectangle for a given light and camera. 
 		*/
-		virtual const RealRect& getLightScissorRect(Light* l, const Camera* cam);
+		virtual const RealRect& getLightScissorRect(const Light* l, const Camera* cam);
 
         /** Removes the light from the scene and destroys it based on a pointer.
             @remarks
@@ -1356,9 +1353,6 @@ namespace Ogre {
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
         virtual void destroyBillboardChain(BillboardChain* obj);
-		/** Removes & destroys a BillboardChain from the SceneManager.
-		*/
-		virtual void destroyBillboardChain( IdType id );
 		/** Removes & destroys all BillboardChains from the SceneManager.
 		*/
 		virtual void destroyAllBillboardChains(void);		
@@ -2961,25 +2955,6 @@ namespace Ogre {
 		virtual void destroyStaticGeometry(const String& name);
 		/** Remove & destroy all StaticGeometry instances. */
 		virtual void destroyAllStaticGeometry(void);
-
-		/** Creates a InstancedGeometry instance suitable for use with this
-			SceneManager.
-		@remarks
-			InstancedGeometry is a way of batching up geometry into a more 
-			efficient form, and still be able to move it. Please 
-			read the InstancedGeometry class documentation for full information.
-		@param name The name to give the new object
-		@return The new InstancedGeometry instance
-		*/
-		virtual InstancedGeometry* createInstancedGeometry(const String& name);
-		/** Retrieve a previously created InstancedGeometry instance. */
-		virtual InstancedGeometry* getInstancedGeometry(const String& name) const;
-		/** Remove & destroy a InstancedGeometry instance. */
-		virtual void destroyInstancedGeometry(InstancedGeometry* geom);
-		/** Remove & destroy a InstancedGeometry instance. */
-		virtual void destroyInstancedGeometry(const String& name);
-		/** Remove & destroy all InstancedGeometry instances. */
-		virtual void destroyAllInstancedGeometry(void);
 
 		/** Creates an InstanceManager interface to create & manipulate instanced entities
 			You need to call this function at least once before start calling createInstancedEntity

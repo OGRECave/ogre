@@ -58,11 +58,16 @@ namespace Ogre
 
 		//ArraySphere	* RESTRICT_ALIAS	mWorldSphere;
 
-		/// @See mLocalAabb
+		/** @See mLocalAabb
+		@remarks
+			Its center is at mLocalAabb's center, not at the position or origin
+		*/
 		Real		* RESTRICT_ALIAS	mLocalRadius;
 
 		/** Ours is mWorldRadius[mIndex]. It is the local radius transformed by scale
 			An ArraySphere out of mWorldAabb & WorldRadius for computations
+		@remarks
+			Its center is at mWorldAabb's, not at the derived position
 		*/
 		Real		* RESTRICT_ALIAS	mWorldRadius;
 

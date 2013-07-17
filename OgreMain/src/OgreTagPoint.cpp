@@ -109,6 +109,7 @@ namespace Ogre {
     {
 		Bone::needUpdate(forceParentUpdate);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // We need to tell parent entities node
         if (mParentEntity)
         {
@@ -119,6 +120,7 @@ namespace Ogre {
             }
 
         }
+#endif
 
     }
     //-----------------------------------------------------------------------------

@@ -545,12 +545,6 @@ namespace Ogre {
         */
         virtual void removeChild( Node* child );
 
-        /** Drops the named child from this node. 
-        @remarks
-            Does not delete the node, just detaches it from
-            this parent, potentially to be reattached elsewhere.
-        */
-        virtual Node* removeChild(const String& name);
         /** Removes all child Nodes attached to this node. Does not delete the nodes, just detaches them from
             this parent, potentially to be reattached elsewhere.
         */

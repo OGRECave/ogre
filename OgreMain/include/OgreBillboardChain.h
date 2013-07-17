@@ -262,7 +262,6 @@ namespace Ogre {
 
 		// Overridden members follow
 		Real getSquaredViewDepth(const Camera* cam) const;
-		Real getBoundingRadius(void) const;
 		const AxisAlignedBox& getBoundingBox(void) const;
 		const MaterialPtr& getMaterial(void) const;
 		const String& getMovableType(void) const;

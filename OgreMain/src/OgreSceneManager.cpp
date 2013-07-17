@@ -71,6 +71,7 @@ THE SOFTWARE.
 #include "OgreCompositorChain.h"
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
+#include "OgreOldNode.h"
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -2372,7 +2373,7 @@ void SceneManager::renderAdditiveStencilShadowedQueueGroupObjects(
 
         for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
         {
-			Light* l = li->light;
+			Light const * l = li->light;
             // Set light state
 			if (lightList.empty())
 				lightList.push_back(*li);
@@ -2472,7 +2473,7 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
 
     for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
     {
-		Light* l = li->light;
+		Light const * l = li->light;
         if (l->getCastShadows())
         {
             // Clear stencil
@@ -2615,7 +2616,7 @@ void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
         for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
             i != iend && si != siend; ++i)
         {
-			Light* l = i->light;
+			Light const * l = i->light;
 
             if (!l->getCastShadows())
                 continue;
@@ -2749,7 +2750,7 @@ void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
 
 			for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
 			{
-				Light* l = li->light;
+				Light const * l = li->light;
 
 				if (l->getCastShadows() && si != siend)
 				{
@@ -3273,7 +3274,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							&& lightIndex < rendLightList.size(); 
 						++lightIndex, --lightsLeft)
 					{
-						Light* currLight = rendLightList[lightIndex].light;
+						Light const * currLight = rendLightList[lightIndex].light;
 
 						// Check whether we need to filter this one out
 						if ((pass->getRunOnlyForOneLightType() && 
@@ -4084,7 +4085,7 @@ void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+void SceneManager::fireShadowTexturesPreCaster(const Light* light, Camera* camera, size_t iteration)
 {
     ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
@@ -4096,7 +4097,7 @@ void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, siz
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
+void SceneManager::fireShadowTexturesPreReceiver( const Light* light, Frustum* f)
 {
     ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
@@ -5138,7 +5139,7 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 
 }
 //---------------------------------------------------------------------
-const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
+const RealRect& SceneManager::getLightScissorRect( const Light* l, const Camera* cam )
 {
 	checkCachedLightClippingInfo();
 
@@ -5172,7 +5173,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
 
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
-		Light* l = i->light;
+		Light const * l = i->light;
 		// a directional light is being used, no scissoring can be done, period.
 		if (l->getType() == Light::LT_DIRECTIONAL)
 			return CLIPPED_NONE;
@@ -5244,7 +5245,7 @@ void SceneManager::checkCachedLightClippingInfo()
 	}
 }
 //---------------------------------------------------------------------
-const PlaneList& SceneManager::getLightClippingPlanes(Light* l)
+const PlaneList& SceneManager::getLightClippingPlanes( const Light* l )
 {
 	checkCachedLightClippingInfo();
 
@@ -5269,7 +5270,7 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
 	if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
 		return CLIPPED_NONE;
 
-	Light* clipBase = 0;
+	Light const * clipBase = 0;
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
 		// a directional light is being used, no clipping can be done, period.
@@ -6241,7 +6242,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 		for (i = lightList->begin(), si = mShadowTextures.begin();
 			i != iend && si != siend; ++i)
 		{
-			Light* light = i->light;
+			Light const * light = i->light;
 
 			// skip light if shadows are disabled
 			if (!light->getCastShadows())
@@ -6452,59 +6453,6 @@ void SceneManager::destroyAllStaticGeometry(void)
 		OGRE_DELETE i->second;
 	}
 	mStaticGeometryList.clear();
-}
-//---------------------------------------------------------------------
-InstancedGeometry* SceneManager::createInstancedGeometry(const String& name)
-{
-	// Check not existing
-	if (mInstancedGeometryList.find(name) != mInstancedGeometryList.end())
-	{
-		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-			"InstancedGeometry with name '" + name + "' already exists!", 
-			"SceneManager::createInstancedGeometry");
-	}
-	InstancedGeometry* ret = OGRE_NEW InstancedGeometry(this, name);
-	mInstancedGeometryList[name] = ret;
-	return ret;
-}
-//---------------------------------------------------------------------
-InstancedGeometry* SceneManager::getInstancedGeometry(const String& name) const
-{
-	InstancedGeometryList::const_iterator i = mInstancedGeometryList.find(name);
-	if (i == mInstancedGeometryList.end())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"InstancedGeometry with name '" + name + "' not found", 
-			"SceneManager::createInstancedGeometry");
-	}
-	return i->second;
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(InstancedGeometry* geom)
-{
-	destroyInstancedGeometry(geom->getName());
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(const String& name)
-{
-	InstancedGeometryList::iterator i = mInstancedGeometryList.find(name);
-	if (i != mInstancedGeometryList.end())
-	{
-		OGRE_DELETE i->second;
-		mInstancedGeometryList.erase(i);
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyAllInstancedGeometry(void)
-{
-	InstancedGeometryList::iterator i, iend;
-	iend = mInstancedGeometryList.end();
-	for (i = mInstancedGeometryList.begin(); i != iend; ++i)
-	{
-		OGRE_DELETE i->second;
-	}
-	mInstancedGeometryList.clear();
 }
 //---------------------------------------------------------------------
 InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,

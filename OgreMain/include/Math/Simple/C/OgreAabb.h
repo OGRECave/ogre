@@ -99,6 +99,9 @@ namespace Ogre
 		/// Sets both minimum and maximum extents at once.
 		inline void setExtents( const Vector3& min, const Vector3& max );
 
+		/// Sets both minimum and maximum extents at once (static version).
+		inline static Aabb newFromExtents( const Vector3& min, const Vector3& max );
+
 		/// Gets the minimum corner of the box.
 		inline Vector3 getMinimum() const;
 
@@ -147,7 +150,14 @@ namespace Ogre
 		/// Returns the minimum distance between a given point and any part of the box.
 		inline Real distance( const Vector3 &v ) const;
 
+		/// Returns the radius of a sphere enclosing the aabb from the outside at center m_center
+		inline Real getRadius() const;
+
+		/// Returns the radius of a sphere enclosing the aabb from origin as center
+		inline Real getRadiusOrigin() const;
+
 		static const Aabb BOX_INFINITE;
+		static const Aabb BOX_NULL;
     };
 	/** @} */
 	/** @} */

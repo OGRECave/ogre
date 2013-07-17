@@ -142,10 +142,6 @@ namespace Ogre {
         /** Detaches all objects attached to this node.
         */
         virtual void detachAllObjects(void);
-			
-		/** Tells the SceneNode to update the world bound info it stores.
-		*/
-		virtual void _updateBounds(void);
 
         /** Internal method which locates any visible objects attached to this node and adds them to the passed in queue.
             @remarks

@@ -110,11 +110,6 @@ namespace Ogre {
     class _OgreExport BillboardSet : public MovableObject, public Renderable
     {
     protected:
-        /// Bounds of all billboards in this set
-        AxisAlignedBox mAABB;
-        /// Bounding radius
-        Real mBoundingRadius;
-
         /// Origin of each billboard
         BillboardOrigin mOriginType;
         /// Rotation type of each billboard
@@ -553,20 +548,8 @@ namespace Ogre {
             You may need to call this if you're injecting billboards manually, 
             and you're relying on the BillboardSet to determine culling.
         */
-        void setBounds(const AxisAlignedBox& box, Real radius);
+        void setBounds(const Aabb& aabb, Real radius);
 
-
-        /** Overridden from MovableObject
-        @see
-            MovableObject
-        */
-        virtual const AxisAlignedBox& getBoundingBox(void) const;
-
-        /** Overridden from MovableObject
-        @see
-            MovableObject
-        */
-        virtual Real getBoundingRadius(void) const;
         /** Overridden from MovableObject
         @see
             MovableObject

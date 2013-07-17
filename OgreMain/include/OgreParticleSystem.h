@@ -146,14 +146,13 @@ namespace Ogre {
 			void doSet(void* target, const String& val);
 		};
 
-        /// Default constructor required for STL creation in manager
-        ParticleSystem();
         /** Creates a particle system with no emitters or affectors.
         @remarks
             You should use the ParticleSystemManager to create particle systems rather than creating
             them directly.
         */
-        ParticleSystem(const String& name, const String& resourceGroupName);
+        ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const String& resourceGroupName );
 
         virtual ~ParticleSystem();
 
@@ -371,19 +370,13 @@ namespace Ogre {
         @see
         MovableObject
         */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached(Node* parent);
 
         /** Overridden from MovableObject
             @see
                 MovableObject
         */
         virtual const AxisAlignedBox& getBoundingBox(void) const { return mAABB; }
-
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual Real getBoundingRadius(void) const { return mBoundingRadius; }
 
         /** Overridden from MovableObject
             @see

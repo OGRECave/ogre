@@ -53,11 +53,12 @@ namespace Ogre
 		0,  0,  0,  1);	// w
 
 	FocusedShadowCameraSetup::FocusedShadowCameraSetup(void)
-		: mTempFrustum(OGRE_NEW Frustum())
-		, mLightFrustumCamera(OGRE_NEW Camera("TEMP LIGHT INTERSECT CAM", NULL))
+		: mTempFrustum(OGRE_NEW Frustum( 0, 0 ))
+		, mLightFrustumCamera(OGRE_NEW Camera( 0, NULL, NULL ))
 		, mLightFrustumCameraCalculated(false)
 		, mUseAggressiveRegion(true)
 	{
+		mLightFrustumCamera->setName( "TEMP LIGHT INTERSECT CAM" );
 		mTempFrustum->setProjectionType(PT_PERSPECTIVE);
 	}
 	//-----------------------------------------------------------------------

@@ -170,10 +170,11 @@ namespace Ogre {
         mAttachments.clear();
     }
     //-----------------------------------------------------------------------
-    /*void SceneNode::_findVisibleObjects(Camera* cam, RenderQueue* queue, 
+    void SceneNode::_findVisibleObjects(Camera* cam, RenderQueue* queue, 
 		VisibleObjectsBoundsInfo* visibleBounds, bool includeChildren, 
 		bool displayNodes, bool onlyShadowCasters)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Check self visible
         if (!cam->isVisible(mWorldAABB))
             return;
@@ -214,8 +215,8 @@ namespace Ogre {
 			_addBoundingBoxToQueue(queue);
 		}
 
-
-    }*/
+#endif
+    }
 
 	/*TODO
 	Node::DebugRenderable* SceneNode::getDebugRenderable()

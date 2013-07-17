@@ -52,7 +52,7 @@ namespace Ogre {
 		  mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
 		  mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),
 		  mDeclSize(0), mEstVertexCount(0), mEstIndexCount(0), mTexCoordIndex(0), 
-		  mRadius(0), mAnyIndexed(false), mEdgeList(0), 
+		  mAnyIndexed(false), mEdgeList(0), 
 		  mUseIdentityProjection(false), mUseIdentityView(false), mKeepDeclarationOrder(false)
 	{
 	}
@@ -70,8 +70,10 @@ namespace Ogre {
 			OGRE_DELETE *i;
 		}
 		mSectionList.clear();
-		mRadius = 0;
-		mAABB.setNull();
+		mObjectData.mLocalRadius[mObjectData.mIndex] = 0.0f;
+
+		mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
+
 		OGRE_DELETE mEdgeList;
 		mEdgeList = 0;
 		mAnyIndexed = false;
@@ -275,8 +277,13 @@ namespace Ogre {
 		mTempVertex.position.z = z;
 
 		// update bounds
-		mAABB.merge(mTempVertex.position);
-		mRadius = max(mRadius, mTempVertex.position.length());
+		Aabb aabb;
+		mObjectData.mLocalAabb->getAsAabb( aabb, mObjectData.mIndex );
+		aabb.merge( mTempVertex.position );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = Ogre::max(
+															mObjectData.mLocalRadius[mObjectData.mIndex],
+															mTempVertex.position.length());
 
 		// reset current texture coord
 		mTexCoordIndex = 0;
@@ -834,8 +841,9 @@ namespace Ogre {
 			}
 		}
         // update bounds
-		m->_setBounds(mAABB);
-		m->_setBoundingSphereRadius(mRadius);
+		Aabb aabb = mObjectData.mLocalAabb->getAsAabb(mObjectData.mIndex);
+		m->_setBounds( AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() ) );
+		m->_setBoundingSphereRadius( mObjectData.mLocalRadius[mObjectData.mIndex] );
 
 		m->load();
 
@@ -885,16 +893,6 @@ namespace Ogre {
 	const String& ManualObject::getMovableType(void) const
 	{
 		return ManualObjectFactory::FACTORY_TYPE_NAME;
-	}
-	//-----------------------------------------------------------------------------
-	const AxisAlignedBox& ManualObject::getBoundingBox(void) const
-	{
-		return mAABB;
-	}
-	//-----------------------------------------------------------------------------
-	Real ManualObject::getBoundingRadius(void) const
-	{
-		return mRadius;
 	}
 	//-----------------------------------------------------------------------------
 	void ManualObject::_updateRenderQueue(RenderQueue* queue)

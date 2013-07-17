@@ -36,6 +36,16 @@ namespace Ogre
 		m_halfSize	= (max - min) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
+	inline Aabb Aabb::newFromExtents( const Vector3& min, const Vector3& max )
+	{
+		assert( (min.x <= max.x && min.y <= max.y && min.z <= max.z) &&
+                "The minimum corner of the box must be less than or equal to maximum corner" );
+		Aabb retVal;
+		retVal.m_center		= (max + min) * 0.5f;
+		retVal.m_halfSize	= (max - min) * 0.5f;
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 	inline Vector3 Aabb::getMinimum() const
 	{
 		return m_center - m_halfSize;
@@ -143,5 +153,18 @@ namespace Ogre
 				Math::Abs(m[0][0]) * m_halfSize.x + Math::Abs(m[0][1]) * m_halfSize.y + Math::Abs(m[0][2]) * m_halfSize.z, 
 				Math::Abs(m[1][0]) * m_halfSize.x + Math::Abs(m[1][1]) * m_halfSize.y + Math::Abs(m[1][2]) * m_halfSize.z,
 				Math::Abs(m[2][0]) * m_halfSize.x + Math::Abs(m[2][1]) * m_halfSize.y + Math::Abs(m[2][2]) * m_halfSize.z );
+	}
+	//-----------------------------------------------------------------------------------
+	inline Real Aabb::getRadius() const
+	{
+		return sqrtf( m_halfSize.dotProduct( m_halfSize ) );
+	}
+	//-----------------------------------------------------------------------------------
+	inline Real Aabb::getRadiusOrigin() const
+	{
+		Vector3 v( m_center );
+		v.makeAbs();
+		v += m_halfSize;			
+		return v.length();
 	}
 }

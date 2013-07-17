@@ -615,11 +615,6 @@ namespace Ogre {
 		}
 	}
     //-----------------------------------------------------------------------
-    const LightList& MovableObject::queryLights(void)
-    {
-        return mLightList;
-    }
-    //-----------------------------------------------------------------------
     MovableObject::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light, 
         HardwareIndexBufferSharedPtr* indexBuffer, 

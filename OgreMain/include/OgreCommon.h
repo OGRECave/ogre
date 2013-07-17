@@ -552,7 +552,7 @@ namespace Ogre {
 	/// Used as the light list, sorted
 	struct LightClosest
 	{
-		Light *light;
+		Light const *light;
 		Real sqDistance;
 
 		LightClosest() : light( 0 ),sqDistance( 0.0f ) {}

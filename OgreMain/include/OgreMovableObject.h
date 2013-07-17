@@ -175,7 +175,7 @@ namespace Ogre {
         /// Returns the node to which this object is attached.
 		Node* getParentNode(void) const										{ return mParentNode; }
 
-		SceneNode* getParentSceneNode(void) const;
+		inline SceneNode* getParentSceneNode(void) const;
 
         /** Internal method called to notify the object that it has been attached to a node.
         */
@@ -196,11 +196,6 @@ namespace Ogre {
                 This bounding box is in local coordinates.
         */
 		Aabb getBoundingBox(void) const;
-
-		/** Retrieves the radius of the origin-centered bounding sphere 
-		 	 for this object.
-		*/
-		Real getBoundingRadius(void) const;
 
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
             @remarks
@@ -460,23 +455,10 @@ namespace Ogre {
 
         /** Gets a list of lights, ordered relative to how close they are to this movable object.
         @remarks
-            By default, this method gives the listener a chance to populate light list first,
-            if there is no listener or Listener::objectQueryLights returns NULL, it'll
-            query the light list from parent entity if it is present, or returns
-            SceneNode::findLights if it has parent scene node, otherwise it just returns
-            an empty list.
-        @par
-            The object internally caches the light list, so it will recalculate
-			it only when object is moved, or lights that affect the frustum have
-			been changed (@see SceneManager::_getLightsDirtyCounter),
-            but if listener exists, it will be called each time, so the listener 
-			should implement their own cache mechanism to optimise performance.
-        @par
-            This method can be useful when implementing Renderable::getLights in case
-            the renderable is a part of the movable.
+            The lights are filled in @see buildLightList
         @return The list of lights use to lighting this object.
         */
-        virtual const LightList& queryLights(void);
+		const LightList& queryLights(void) const								{ return mLightList; }
 
 		/** Get a bitwise mask which will filter the lights affecting this object
 		@remarks

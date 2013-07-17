@@ -77,7 +77,7 @@ namespace Ogre {
 		mBoundsDirty(true),
 		mIndexContentDirty(true),
         mVertexContentDirty(true),
-		mRadius(0.0f),
+		mRadius(0.0f), //TODO: (dark_sylinc)
 		mTexCoordDir(TCD_U),
         mVertexCameraUsed(0),
 		mFaceCamera(true),
@@ -692,11 +692,6 @@ namespace Ogre {
 		dist = cam->getDerivedPosition() - mid;
 
 		return dist.squaredLength();
-	}
-	//-----------------------------------------------------------------------
-	Real BillboardChain::getBoundingRadius(void) const
-	{
-		return mRadius;
 	}
 	//-----------------------------------------------------------------------
 	const AxisAlignedBox& BillboardChain::getBoundingBox(void) const

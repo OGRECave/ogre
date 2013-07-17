@@ -255,9 +255,11 @@ namespace Ogre
 			//check object is explicitly visible
 			retVal = isVisible();
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0 
 			//Object's bounding box is viewed by the camera
 			if( retVal && camera )
 				retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
+#endif
 		}
 
 		return retVal;
@@ -358,12 +360,6 @@ namespace Ogre
 		//TODO: Add attached objects (TagPoints) to the bbox
 		return mBatchOwner->_getMeshReference()->getBounds();
     }
-
-	//-----------------------------------------------------------------------
-    Real InstancedEntity::getBoundingRadius(void) const
-	{
-		return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * getMaxScaleCoef();
-	}
 	//-----------------------------------------------------------------------
 	Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
 	{

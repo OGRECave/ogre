@@ -345,15 +345,6 @@ namespace Ogre
 		*/
 		bool getUseIdentityView(void) const { return mUseIdentityView; }
 
-		/** Sets the bounding box.
-			@remarks Call this after having finished creating sections to modify the
-				bounding box. E.g. if you're using ManualObject to create 2D overlays
-				you can call things function to set an infinite bounding box so that
-				the object always stays visible when attached.
-			@see ManualObject::setUseIdentityProjection, ManualObject::setUseIdentityView,
-				AxisAlignedBox::setInfinite */
-		void setBoundingBox(const AxisAlignedBox& box) { mAABB = box; }
-
 		/** Gets a pointer to a ManualObjectSection, i.e. a part of a ManualObject.
 		*/
 		ManualObjectSection* getSection(unsigned int index) const;
@@ -381,10 +372,6 @@ namespace Ogre
 
 		/** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
-		/** @copydoc MovableObject::getBoundingBox. */
-		const AxisAlignedBox& getBoundingBox(void) const;
-		/** @copydoc MovableObject::getBoundingRadius. */
-		Real getBoundingRadius(void) const;
 		/** @copydoc MovableObject::_updateRenderQueue. */
 		void _updateRenderQueue(RenderQueue* queue);
 		/** Implement this method to enable stencil shadows. */
@@ -517,10 +504,6 @@ namespace Ogre
 		size_t mEstIndexCount;
 		/// Current texture coordinate
 		ushort mTexCoordIndex;
-		/// Bounding box
-		AxisAlignedBox mAABB;
-		/// Bounding sphere
-		Real mRadius;
 		/// Any indexed geometry on any sections?
 		bool mAnyIndexed;
 		/// Edge list, used if stencil shadow casting is enabled 

@@ -252,6 +252,8 @@ namespace Ogre {
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
         ParticleSystemRenderer* createInstance( IdType id, ObjectMemoryManager *objectMemoryManager );
+		//TODO: (dark_sylinc)
+		ParticleSystemRenderer* createInstance( const String &name ) { return 0; }
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };

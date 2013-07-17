@@ -49,7 +49,6 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mBoundingRadius( 0 ),
 				mBoundsDirty( false ),
 				mBoundsUpdated( false ),
 				mCurrentCamera( 0 ),
@@ -72,7 +71,8 @@ namespace Ogre
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 		}
 
-		mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
+		//TODO: (dark_sylinc)
+		//mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
 		mName = batchName;
 
@@ -132,7 +132,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateBounds(void)
 	{
-		mFullBoundingBox.setNull();
+		//mFullBoundingBox.setNull();
 
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
@@ -145,18 +145,21 @@ namespace Ogre
 			if( ent->isInScene() )
 			{
 				maxScale = max(maxScale, ent->getMaxScaleCoef());
-				mFullBoundingBox.merge( ent->_getDerivedPosition() );
+				//mFullBoundingBox.merge( ent->_getDerivedPosition() );
 			}
 
 			++itor;
 		}
 
 		Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
-		mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
-		mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);
+		//--- TODO: (dark_sylinc) check this calculation!!! ---
+		/*mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
+		mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);*/
 
 
-		mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
+		//--- TODO: (dark_sylinc) check this calculation!!! ---
+		//mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = 10.0f;
 
 		mBoundsDirty	= false;
 		mBoundsUpdated	= true;
@@ -516,16 +519,6 @@ namespace Ogre
 
         //Change lod index
         mMaterialLodIndex = idx;
-	}
-	//-----------------------------------------------------------------------
-	const AxisAlignedBox& InstanceBatch::getBoundingBox(void) const
-	{
-		return mFullBoundingBox;
-	}
-	//-----------------------------------------------------------------------
-	Real InstanceBatch::getBoundingRadius(void) const
-	{
-		return mBoundingRadius;
 	}
 	//-----------------------------------------------------------------------
 	Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const

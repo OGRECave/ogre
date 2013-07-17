@@ -51,7 +51,6 @@ namespace Ogre {
     BillboardSet::BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
 								unsigned int poolSize, bool externalData) :
         MovableObject( id, objectMemoryManager ),
-		mBoundingRadius(0.0f), 
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
         mAllDefaultSize( true ),
@@ -122,15 +121,17 @@ namespace Ogre {
         newBill->_notifyOwner(this);
 
 		// Merge into bounds
-		Real adjust = max(mDefaultWidth, mDefaultHeight);
+		Real adjust = Ogre::max(mDefaultWidth, mDefaultHeight);
         Vector3 vecAdjust(adjust, adjust, adjust);
 		Vector3 newMin = position - vecAdjust;
 		Vector3 newMax = position + vecAdjust;
 
-        mAABB.merge(newMin);
-        mAABB.merge(newMax);
-
-		mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
+		Aabb aabb;
+		mObjectData.mLocalAabb->getAsAabb( aabb, mObjectData.mIndex );
+		aabb.merge(newMin);
+		aabb.merge(newMax);
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
         return newBill;
     }
@@ -339,8 +340,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_notifyCurrentCamera( Camera* cam )
     {
-		MovableObject::_notifyCurrentCamera(cam);
-
         mCurrentCamera = cam;
 
         // Calculate camera orientation and position
@@ -508,10 +507,10 @@ namespace Ogre {
         mMainBuf->unlock();
     }
 	//-----------------------------------------------------------------------
-	void BillboardSet::setBounds(const AxisAlignedBox& box, Real radius)
+	void BillboardSet::setBounds(const Aabb& aabb, Real radius)
 	{
-		mAABB = box;
-		mBoundingRadius = radius;
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = radius;
 	}
     //-----------------------------------------------------------------------
     void BillboardSet::_updateBounds(void)
@@ -519,8 +518,8 @@ namespace Ogre {
         if (mActiveBillboards.empty())
         {
             // No billboards, null bbox
-            mAABB.setNull();
-			mBoundingRadius = 0.0f;
+			mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = 0.0f;
         }
         else
         {
@@ -552,17 +551,11 @@ namespace Ogre {
             min -= vecAdjust;
             max += vecAdjust;
 
-            mAABB.setExtents(min, max);
-			mBoundingRadius = Math::Sqrt(maxSqLen);
+			mObjectData.mLocalAabb->setFromAabb( Aabb::newFromExtents( min, max ), mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = Math::Sqrt(maxSqLen);
 
         }
     }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& BillboardSet::getBoundingBox(void) const
-    {
-        return mAABB;
-    }
-
     //-----------------------------------------------------------------------
     void BillboardSet::_updateRenderQueue(RenderQueue* queue)
     {
@@ -1355,11 +1348,6 @@ namespace Ogre {
         assert(mParentNode);
         return mParentNode->getSquaredViewDepth(cam);
     }
-    //-----------------------------------------------------------------------
-	Real BillboardSet::getBoundingRadius(void) const
-	{
-		return mBoundingRadius;
-	}
     //-----------------------------------------------------------------------
     const LightList& BillboardSet::getLights(void) const
     {

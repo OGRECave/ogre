@@ -89,8 +89,6 @@ namespace Ogre {
         Real getSquaredViewDepth(const Camera* cam) const
         { (void)cam; return 0; }
 
-        Real getBoundingRadius(void) const { return 0; }
-
     };
 	/** @} */
 	/** @} */

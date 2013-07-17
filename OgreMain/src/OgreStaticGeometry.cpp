@@ -854,11 +854,6 @@ namespace Ogre {
 		return mAABB;
 	}
 	//--------------------------------------------------------------------------
-	Real StaticGeometry::Region::getBoundingRadius(void) const
-	{
-		return mBoundingRadius;
-	}
-	//--------------------------------------------------------------------------
 	void StaticGeometry::Region::_updateRenderQueue(RenderQueue* queue)
 	{
 		mLodBucketList[mCurrentLod]->addRenderables(queue, mRenderQueueID,

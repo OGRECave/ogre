@@ -523,6 +523,8 @@ namespace Ogre {
         {
             if((*i)->isVisible())
             {
+				//TODO: (dark_sylinc) send our mLightList in this function,
+				//instead of overloading getLights
 				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
             }
         }

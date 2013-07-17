@@ -117,7 +117,6 @@ set (HEADER_FILES
   include/OgreInstanceBatchHW_VTF.h
   include/OgreInstanceBatchShader.h
   include/OgreInstanceBatchVTF.h
-  include/OgreInstancedGeometry.h
   include/OgreInstancedEntity.h
   include/OgreInstanceManager.h
   include/OgreIteratorRange.h
@@ -352,7 +351,6 @@ set (SOURCE_FILES
   src/OgreInstanceBatchHW_VTF.cpp
   src/OgreInstanceBatchShader.cpp
   src/OgreInstanceBatchVTF.cpp
-  src/OgreInstancedGeometry.cpp
   src/OgreInstancedEntity.cpp
   src/OgreInstanceManager.cpp
   src/OgreKeyFrame.cpp

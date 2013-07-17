@@ -80,41 +80,9 @@ namespace Ogre {
 
 	};
     //-----------------------------------------------------------------------
-    ParticleSystem::ParticleSystem() 
-      : mAABB(),
-        mBoundingRadius(1.0f),
-        mBoundsAutoUpdate(true),
-        mBoundsUpdateTime(10.0f),
-        mUpdateRemainTime(0),
-        mWorldAABB(),
-        mResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
-        mIsRendererConfigured(false),
-        mSpeedFactor(1.0f),
-        mIterationInterval(0),
-		mIterationIntervalSet(false),
-        mSorted(false),
-        mLocalSpace(false),
-		mNonvisibleTimeout(0),
-		mNonvisibleTimeoutSet(false),
-		mTimeSinceLastVisible(0),
-		mLastVisibleFrame(0),
-        mTimeController(0),
-		mEmittedEmitterPoolInitialised(false),
-		mIsEmitting(true),
-        mRenderer(0),
-        mCullIndividual(false),
-        mPoolSize(0),
-        mEmittedEmitterPoolSize(0)
-	{
-        initParameters();
-
-        // Default to billboard renderer
-        setRenderer("billboard");
-
-    }
-    //-----------------------------------------------------------------------
-    ParticleSystem::ParticleSystem(const String& name, const String& resourceGroup)
-      : MovableObject(name),
+    ParticleSystem::ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
+									const String& resourceGroup )
+      : MovableObject( id, objectMemoryManager ),
         mAABB(),
         mBoundingRadius(1.0f),
         mBoundsAutoUpdate(true),
@@ -847,13 +815,13 @@ namespace Ogre {
                 ActiveParticleList::iterator p;
                 Vector3 halfScale = Vector3::UNIT_SCALE * 0.5;
                 Vector3 defaultPadding = 
-                    halfScale * max(mDefaultHeight, mDefaultWidth);
+					halfScale * Ogre::max(mDefaultHeight, mDefaultWidth);
                 for (p = mActiveParticles.begin(); p != mActiveParticles.end(); ++p)
                 {
                     if ((*p)->mOwnDimensions)
                     {
                         Vector3 padding = 
-                            halfScale * max((*p)->mWidth, (*p)->mHeight);
+							halfScale * Ogre::max((*p)->mWidth, (*p)->mHeight);
                         min.makeFloor((*p)->position - padding);
                         max.makeCeil((*p)->position + padding);
                     }
@@ -967,8 +935,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_notifyCurrentCamera(Camera* cam)
     {
-		MovableObject::_notifyCurrentCamera(cam);
-
 		// Record visible
 		if (isVisible())
 		{			
@@ -990,12 +956,12 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::_notifyAttached(Node* parent, bool isTagPoint)
+    void ParticleSystem::_notifyAttached(Node* parent)
     {
-        MovableObject::_notifyAttached(parent, isTagPoint);
+        MovableObject::_notifyAttached(parent);
         if (mRenderer && mIsRendererConfigured)
         {
-            mRenderer->_notifyAttached(parent, isTagPoint);
+            mRenderer->_notifyAttached(parent);
         }
 
         if (parent && !mTimeController)

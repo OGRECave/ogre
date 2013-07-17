@@ -77,9 +77,6 @@ namespace Ogre {
         void setWorldTransform( const Matrix4& xform );
         virtual void getWorldTransforms( Matrix4* xform ) const;
 
-
-        virtual void _notifyCurrentCamera(Camera* cam);
-
         void setBoundingBox( const AxisAlignedBox& box );
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 

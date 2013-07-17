@@ -114,8 +114,6 @@ namespace Ogre
         CustomParamsVec		mCustomParams;
 
         /// This bbox contains all (visible) instanced entities
-        AxisAlignedBox      mFullBoundingBox;
-        Real                mBoundingRadius;
         bool                mBoundsDirty;
         bool                mBoundsUpdated; //Set to false by derived classes that need it
         Camera              *mCurrentCamera;
@@ -346,10 +344,6 @@ namespace Ogre
 		const String& getMovableType(void) const;
         /** @copydoc MovableObject::_notifyCurrentCamera. */
 		void _notifyCurrentCamera( Camera* cam );
-        /** @copydoc MovableObject::getBoundingBox. */
-		const AxisAlignedBox& getBoundingBox(void) const;
-        /** @copydoc MovableObject::getBoundingRadius. */
-		Real getBoundingRadius(void) const;
 
 		virtual void _updateRenderQueue(RenderQueue* queue);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );

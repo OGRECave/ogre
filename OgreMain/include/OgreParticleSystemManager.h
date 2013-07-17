@@ -119,10 +119,11 @@ namespace Ogre {
         void skipToNextOpenBrace(DataStreamPtr& chunk);
 
 		/// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl(const String& name, size_t quota, 
-			const String& resourceGroup);
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+											size_t quota, const String& resourceGroup);
 		/// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl(const String& name, const String& templateName);
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+											const String& templateName);
 		/// Internal implementation of destroySystem
         void destroySystemImpl(ParticleSystem* sys);
 		

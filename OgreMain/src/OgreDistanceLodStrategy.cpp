@@ -58,7 +58,7 @@ namespace Ogre {
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // lod.
-        Real squaredDepth = movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+        Real squaredDepth = movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getWorldRadius());
 
         // Check if reference view needs to be taken into account
         if (mReferenceViewEnabled)

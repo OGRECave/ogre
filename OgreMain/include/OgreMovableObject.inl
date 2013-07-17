@@ -76,7 +76,7 @@ namespace Ogre
 		return mObjectData.mVisible[mObjectData.mIndex];
 	}
 	//-----------------------------------------------------------------------------------
-	SceneNode* MovableObject::getParentSceneNode(void) const
+	inline SceneNode* MovableObject::getParentSceneNode(void) const
 	{
 		assert( dynamic_cast<SceneNode*>( mParentNode ) );
 		return static_cast<SceneNode*>( mParentNode );
