@@ -3000,10 +3000,10 @@ bail:
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName)
 	{
+		RenderTarget *target = mActiveRenderTarget;
 		switch (passNr)
 		{
 		case 1:
-			RenderTarget *target = mActiveRenderTarget;
 			if (target)
 			{
 				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
@@ -3036,7 +3036,6 @@ bail:
 				float ClearColor[4];
 				//D3D11Mappings::get(colour, ClearColor);
 				// Clear all views
-				uint numberOfViews;
 				mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
 				if( numberOfViews == 1 )
 					mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
@@ -3049,7 +3048,6 @@ bail:
 			}
 			break;
 		case 2:
-			RenderTarget *target = mActiveRenderTarget;
 			if (target)
 			{
 				//
