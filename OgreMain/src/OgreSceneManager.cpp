@@ -88,15 +88,6 @@ uint32 SceneManager::FRUSTUM_TYPE_MASK			= 0x04000000;
 uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
-#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#pragma warning( push )
-	#pragma warning( disable: 4355 )
-#endif
-mNodeMemoryManager( this ),					//'this' hasn't been fully initialized yet
-mEntityMemoryManager( this ),
-#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#pragma warning( pop ) 
-#endif
 mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
@@ -6965,7 +6956,7 @@ SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderable
 	return mActiveQueuedRenderableVisitor;
 }
 //-----------------------------------------------------------------------------------
-void SceneManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+/*void SceneManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
 									const MemoryPoolVec &basePtrs,
 									ArrayMemoryManager::PtrdiffVec &outDiffsList )
 {
@@ -7027,7 +7018,7 @@ void SceneManager::performCleanup( ArrayMemoryManager::ManagerType managerType, 
 			}
 		}
 	}
-}
+}*/
 //---------------------------------------------------------------------
 void SceneManager::addLodListener(LodListener *listener)
 {

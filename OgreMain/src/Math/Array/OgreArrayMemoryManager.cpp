@@ -243,10 +243,12 @@ namespace Ogre
 						++itPools;
 					}
 
-					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
-														m_elementsMemSizes, *itor, lastRange );
-
 					m_usedMemory -= lastRange;
+
+					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
+														m_elementsMemSizes, (*itor - lastRange + 1),
+														lastRange );
+					
 					itor += lastRange;
 				}
 

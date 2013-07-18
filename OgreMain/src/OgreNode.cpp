@@ -68,6 +68,7 @@ namespace Ogre {
 
 		//Will initialize mTransform
 		mNodeMemoryManager->nodeCreated( mTransform, mDepthLevel );
+		mTransform.mOwner[mTransform.mIndex] = this;
     }
 	//-----------------------------------------------------------------------
 	Node::Node( const Transform &transformPtrs ) :
@@ -216,7 +217,10 @@ namespace Ogre {
 													 *mTransform.mDerivedOrientation );
 #ifndef NDEBUG
 		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-			mTransform.mParents[j]->mCachedTransformOutOfDate = false;
+		{
+			if( mTransform.mOwner[j] )
+				mTransform.mOwner[j]->mCachedTransformOutOfDate = false;
+		}
 #endif
     }
 	//-----------------------------------------------------------------------
@@ -265,7 +269,10 @@ namespace Ogre {
 												*t.mDerivedOrientation );
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-				t.mParents[j]->mCachedTransformOutOfDate = false;
+			{
+				if( t.mOwner[j] )
+					t.mOwner[j]->mCachedTransformOutOfDate = false;
+			}
 #endif
 
 			t.advancePack();

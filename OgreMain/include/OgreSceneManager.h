@@ -140,7 +140,7 @@ namespace Ogre {
 		dependent on the Camera, which will always call back the SceneManager
 		which created it to render the scene. 
      */
-	class _OgreExport SceneManager : public SceneMgtAlloc, public ArrayMemoryManager::RebaseListener
+	class _OgreExport SceneManager : public SceneMgtAlloc
     {
     public:
         /// Query type mask which will be used for world geometry @see SceneQuery
@@ -3297,7 +3297,7 @@ namespace Ogre {
 		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
 
 		//Derived from ArrayMemoryManager::RebaseListener
-		virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+		/*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
 									const MemoryPoolVec &basePtrs,
 									ArrayMemoryManager::PtrdiffVec &outDiffsList );
 		virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
@@ -3305,7 +3305,7 @@ namespace Ogre {
 									const ArrayMemoryManager::PtrdiffVec &diffsList );
 		virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
 									 const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
-									 size_t startInstance, size_t diffInstances );
+									 size_t startInstance, size_t diffInstances );*/
 
 
         /** Add a level of detail listener. */

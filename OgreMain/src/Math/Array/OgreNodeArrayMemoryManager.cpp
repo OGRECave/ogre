@@ -37,6 +37,7 @@ namespace Ogre
 	const size_t NodeArrayMemoryManager::ElementsMemSize[NodeArrayMemoryManager::NumMemoryTypes] =
 	{
 		sizeof( Node** ),				//ArrayMemoryManager::Parent
+		sizeof( Node** ),				//ArrayMemoryManager::Owner
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Position
 		4 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Orientation
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Scale
@@ -78,6 +79,8 @@ namespace Ogre
 		outTransform.mIndex = nextSlotIdx;
 		outTransform.mParents			= reinterpret_cast<Node**>( m_memoryPools[Parent] +
 												nextSlotBase * m_elementsMemSizes[Parent] );
+		outTransform.mOwner				= reinterpret_cast<Node**>( m_memoryPools[Owner] +
+												nextSlotBase * m_elementsMemSizes[Owner] );
 		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( m_memoryPools[Position] +
 												nextSlotBase * m_elementsMemSizes[Position] );
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(
@@ -102,6 +105,7 @@ namespace Ogre
 
 		//Set default values
 		outTransform.mParents[nextSlotIdx] = m_dummyNode;
+		outTransform.mOwner[nextSlotIdx] = 0;
 		outTransform.mPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
 		outTransform.mScale->setFromVector3( Vector3::UNIT_SCALE, nextSlotIdx );
@@ -118,8 +122,8 @@ namespace Ogre
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
 
-		//TODO: mParents & mOwner should point to a dummy object (dark_sylinc)
-		*inOutTransform.mParents = m_dummyNode;
+		*inOutTransform.mParents	= m_dummyNode;
+		*inOutTransform.mOwner		= 0;
 		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
 		//Zero out all pointers
 		inOutTransform = Transform();
@@ -128,6 +132,7 @@ namespace Ogre
 	size_t NodeArrayMemoryManager::getFirstNode( Transform &outTransform )
 	{
 		outTransform.mParents			= reinterpret_cast<Node**>( m_memoryPools[Parent] );
+		outTransform.mOwner				= reinterpret_cast<Node**>( m_memoryPools[Owner] );
 		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( m_memoryPools[Position] );
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(
 														m_memoryPools[Orientation] );

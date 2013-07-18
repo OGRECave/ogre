@@ -53,7 +53,6 @@ namespace Ogre
 		typedef vector<ObjectDataArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
 		ArrayMemoryManagerVec					m_memoryManagers;
-		ArrayMemoryManager::RebaseListener		*m_rebaseListener;
 
 		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
 		SceneNode								*m_dummyNode;
@@ -66,7 +65,7 @@ namespace Ogre
 		void growToDepth( size_t newDepth );
 
 	public:
-		ObjectMemoryManager( ArrayMemoryManager::RebaseListener *rebaseListener );
+		ObjectMemoryManager();
 		~ObjectMemoryManager();
 
 		/** Requests memory for the given ObjectData, initializing values.

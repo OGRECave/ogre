@@ -32,14 +32,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	ObjectMemoryManager::ObjectMemoryManager( ArrayMemoryManager::RebaseListener *rebaseListener ) :
-			m_rebaseListener( rebaseListener ),
+	ObjectMemoryManager::ObjectMemoryManager() :
 			m_dummyNode( 0 )
 	{
-		//Warning: Don't use m_rebaseListener yet as we may have
-		//been passed a pointer that isn't fully constructed!
-		//(see SceneManager's constructor)
-
 		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
 		//or yet another object) We only allocate what's needed to prevent access violations.
 		/*m_dummyTransformPtrs.mPosition = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(

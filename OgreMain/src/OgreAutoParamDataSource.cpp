@@ -70,7 +70,6 @@ namespace Ogre {
 		 mCurrentSceneManager(0),
 		 mMainCamBoundsInfo(0),
          mCurrentPass(0),
-		 mObjectMemoryManager( 0 ),
 		 mBlankLight( 0, &mObjectMemoryManager )
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);

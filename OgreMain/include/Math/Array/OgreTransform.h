@@ -42,6 +42,9 @@ namespace Ogre
 		/// Holds the pointers to each parent. Ours is mParents[mIndex]
 		Node			**mParents;
 
+		/// The Node that owns this Transform. Ours is mOwner[mIndex]
+		Node			**mOwner;
+
 		/// Stores the position/translation of a node relative to its parent.
 		ArrayVector3	* RESTRICT_ALIAS	mPosition;
 
@@ -73,6 +76,7 @@ namespace Ogre
 
 		Transform() :
 			mIndex( 0 ),
+			mOwner( 0 ),
 			mParents( 0 ),
 			mPosition( 0 ),
 			mOrientation( 0 ),
@@ -100,7 +104,8 @@ namespace Ogre
 		*/
 		void copy( const Transform &copy )
 		{
-			mParents[mIndex] = copy.mParents[copy.mIndex];
+			mParents[mIndex]	= copy.mParents[copy.mIndex];
+			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
 
 			Vector3 tmp;
 			Quaternion qTmp;
@@ -147,7 +152,8 @@ namespace Ogre
 		*/
 		void rebasePtrs( const MemoryPoolVec &newBasePtrs, const ptrdiff_t diff )
 		{
-			mParents = reinterpret_cast<Node**>( newBasePtrs[NodeArrayMemoryManager::Parent] + diff );
+			mParents	= reinterpret_cast<Node**>( newBasePtrs[NodeArrayMemoryManager::Parent] + diff );
+			mOwner		= reinterpret_cast<Node**>( newBasePtrs[NodeArrayMemoryManager::Owner] + diff );
 
 			mPosition			= reinterpret_cast<ArrayVector3*>(
 									newBasePtrs[NodeArrayMemoryManager::Position] + diff );
@@ -186,6 +192,7 @@ namespace Ogre
 			diffInstances = mParents - newPtr;
 
 			mParents			-= diffInstances;
+			mOwner				-= diffInstances;
 			mPosition			-= diffInstances;
 			mOrientation		-= diffInstances;
 			mScale				-= diffInstances;
@@ -203,6 +210,7 @@ namespace Ogre
 		void advancePack()
 		{
 			mParents			+= ARRAY_PACKED_REALS;
+			mOwner				+= ARRAY_PACKED_REALS;
 			++mPosition;
 			++mOrientation;
 			++mScale;
@@ -217,6 +225,7 @@ namespace Ogre
 		void advancePack( size_t numAdvance )
 		{
 			mParents			+= ARRAY_PACKED_REALS * numAdvance;
+			mOwner				+= ARRAY_PACKED_REALS * numAdvance;
 			mPosition			+= numAdvance;
 			mOrientation		+= numAdvance;
 			mScale				+= numAdvance;

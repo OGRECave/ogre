@@ -294,7 +294,8 @@ namespace Ogre
 		enum MemoryTypes
 		{
 			Parent = 0,
-			Position = 1,
+			Owner,
+			Position,
 			Orientation,
 			Scale,
 			DerivedPosition,

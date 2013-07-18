@@ -49,12 +49,11 @@ namespace Ogre
 		Note that some SceneManager implementations (i.e. Octree like) may want to have more
 		than one NodeMemoryManager, for example one per octant.
 	*/
-	class NodeMemoryManager
+	class NodeMemoryManager : ArrayMemoryManager::RebaseListener
 	{
 		typedef vector<NodeArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
 		ArrayMemoryManagerVec					m_memoryManagers;
-		ArrayMemoryManager::RebaseListener		*m_rebaseListener;
 
 		/// Dummy node where to point Transform::mParents[i] when they're unused slots.
 		SceneNode								*m_dummyNode;
@@ -67,7 +66,7 @@ namespace Ogre
 		void growToDepth( size_t newDepth );
 
 	public:
-		NodeMemoryManager( NodeArrayMemoryManager::RebaseListener *rebaseListener );
+		NodeMemoryManager();
 		~NodeMemoryManager();
 
 		/** Requests memory for the given transform for the first, initializing values.
@@ -125,6 +124,17 @@ namespace Ogre
 			Number of Nodes in this depth level
 		*/
 		size_t getFirstNode( Transform &outTransform, size_t depth );
+
+		//Derived from ArrayMemoryManager::RebaseListener
+		virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs,
+									ArrayMemoryManager::PtrdiffVec &outDiffsList );
+		virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &newBasePtrs,
+									const ArrayMemoryManager::PtrdiffVec &diffsList );
+		virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									 const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+									 size_t startInstance, size_t diffInstances );
 	};
 
 	/** @} */

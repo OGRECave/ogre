@@ -32,14 +32,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	NodeMemoryManager::NodeMemoryManager( NodeArrayMemoryManager::RebaseListener *rebaseListener ) :
-			m_rebaseListener( rebaseListener ),
+	NodeMemoryManager::NodeMemoryManager() :
 			m_dummyNode( 0 )
 	{
-		//Warning: Don't use m_rebaseListener yet as we may have
-		//been passed a pointer that isn't fully constructed!
-		//(see SceneManager's constructor)
-
 		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
 		//or yet another object) We only allocate what's needed to prevent access violations.
 		/*m_dummyTransformPtrs.mPosition = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
@@ -106,7 +101,9 @@ namespace Ogre
 		while( newDepth >= m_memoryManagers.size() )
 		{
 			m_memoryManagers.push_back( NodeArrayMemoryManager( m_memoryManagers.size(), 100,
-																m_dummyNode ) );
+																m_dummyNode, 100,
+																ArrayMemoryManager::MAX_MEMORY_SLOTS,
+																this ) );
 			m_memoryManagers.back().initialize();
 		}
 	}
@@ -173,5 +170,76 @@ namespace Ogre
 	size_t NodeMemoryManager::getFirstNode( Transform &outTransform, size_t depth )
 	{
 		return m_memoryManagers[depth].getFirstNode( outTransform );
+	}
+	//-----------------------------------------------------------------------------------
+	void NodeMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+											const MemoryPoolVec &basePtrs,
+											ArrayMemoryManager::PtrdiffVec &outDiffsList )
+	{
+		//We don't need to build the diff list as we've access to the Node through mOwner
+		//and access to the actual Node with the right pointers.
+		/*Transform transform;
+		const size_t numNodes = this->getFirstNode( transform, level );
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( transform.mOwner[j] )
+				{
+					outDiffsList.push_back( (transform.mParents + transform.mIndex) -
+										(Ogre::Node**)basePtrs[NodeArrayMemoryManager::Parent] );
+				}
+			}
+			transform.advancePack();
+		}*/
+	}
+	//---------------------------------------------------------------------
+	void NodeMemoryManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+											const MemoryPoolVec &newBasePtrs,
+											const ArrayMemoryManager::PtrdiffVec &diffsList )
+	{
+		Transform transform;
+		const size_t numNodes = this->getFirstNode( transform, level );
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( transform.mOwner[j] )
+				{
+					transform.mIndex = j;
+					transform.mOwner[j]->_getTransform() = transform;
+				}
+			}
+
+			transform.advancePack();
+		}
+	}
+	//---------------------------------------------------------------------
+	void NodeMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+										const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+										size_t startInstance, size_t diffInstances )
+	{
+		Transform transform;
+		const size_t numNodes = this->getFirstNode( transform, level );
+
+		size_t roundedStart = startInstance / ARRAY_PACKED_REALS;
+
+		transform.advancePack( roundedStart );
+
+		for( size_t i=roundedStart * ARRAY_PACKED_REALS; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( transform.mOwner[j] )
+				{
+					transform.mIndex = j;
+					transform.mOwner[j]->_getTransform() = transform;
+				}
+			}
+
+			transform.advancePack();
+		}
 	}
 }
