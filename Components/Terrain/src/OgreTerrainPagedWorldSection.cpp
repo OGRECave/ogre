@@ -265,42 +265,56 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	WorkQueue::Response* TerrainPagedWorldSection::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 	{
-		return OGRE_NEW WorkQueue::Response(req, true, Any());
-	}
-	//---------------------------------------------------------------------
-	void TerrainPagedWorldSection::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
-	{
 		if(mPagesInLoading.empty())
 		{
 			mHasRunningTasks = false;
-			return;
+			req->abortRequest();
+			return OGRE_NEW WorkQueue::Response(req, true, Any());
 		}
 
 		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
-		if(currentTime>mNextLoadingTime)
+		if(currentTime < mNextLoadingTime) 
 		{
-			PageID pageID = mPagesInLoading.front();
-
-			// trigger terrain load
-			long x, y;
-			// pageID is the same as a packed index
-			mTerrainGroup->unpackIndex(pageID, &x, &y);
-
-			if(!mTerrainDefiner)
-				mTerrainDefiner = OGRE_NEW TerrainDefiner();
-			mTerrainDefiner->define(mTerrainGroup,x,y);
-
-			mTerrainGroup->loadTerrain(x, y, false);
-
-			mPagesInLoading.pop_front();
-			mNextLoadingTime = currentTime + LOADING_TERRAIN_PAGE_INTERVAL_MS;
+			// Wait until the next page is to be loaded -> we are in background thread here
+			OGRE_THREAD_SLEEP(mNextLoadingTime - currentTime);
 		}
+
+		PageID pageID = mPagesInLoading.front();
+
+		// call the TerrainDefiner from the background thread
+		long x, y;
+		// pageID is the same as a packed index
+		mTerrainGroup->unpackIndex(pageID, &x, &y);
+
+		if(!mTerrainDefiner)
+			mTerrainDefiner = OGRE_NEW TerrainDefiner();
+		mTerrainDefiner->define(mTerrainGroup, x, y);
+
+		// continue loading in main thread
+		return OGRE_NEW WorkQueue::Response(req, true, Any());
+	}
+
+	//---------------------------------------------------------------------
+	void TerrainPagedWorldSection::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		PageID pageID = mPagesInLoading.front();
+
+		// trigger terrain load
+		long x, y;
+		// pageID is the same as a packed index
+		mTerrainGroup->unpackIndex(pageID, &x, &y);
+		mTerrainGroup->loadTerrain(x, y, false);
+		mPagesInLoading.pop_front();
+
+		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
+		mNextLoadingTime = currentTime + LOADING_TERRAIN_PAGE_INTERVAL_MS;
 
 		if(!mPagesInLoading.empty())
 		{
+			// Continue loading other pages
 			Root::getSingleton().getWorkQueue()->addRequest(
-				mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
-				Any(), 0, false);
+					mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
+					Any(), 0, false);
 		}
 		else
 			mHasRunningTasks = false;
