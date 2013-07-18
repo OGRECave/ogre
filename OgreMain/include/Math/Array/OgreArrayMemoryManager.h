@@ -184,6 +184,8 @@ namespace Ogre
 		ManagerType			m_managerType;
 
 	public:
+		static const size_t MAX_MEMORY_SLOTS;
+
 		/** Constructor. @See intialize. @See destroy.
 			@param elementsMemSize
 				Array containing the size in bytes of each element type (i.e. NodeElementsMemSize)
@@ -199,8 +201,8 @@ namespace Ogre
 				destroyed in a non-LIFO order or without being created again. -1 to disable cleanups.
 			@param maxHardLimit
 				Maximum amount of SceneNodes. The manager is not allowed to grow and consume more
-				memory past that limit. -1 for no limit. This is useful when target architecture
-				has much less memory than the dev machine.
+				memory past that limit. MAX_MEMORY_SLOTS for no limit. This is useful when target
+				architecture has much less memory than the dev machine.
 				@par
 				Note that if hintMaxNodes < maxHardLimit, the manager may be forced to do temporary
 				allocations (to do the reallocs) thus during a brief perdiod of time it may consume
@@ -211,7 +213,7 @@ namespace Ogre
 		*/
 		ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
 							size_t numElementsSize, uint16 depthLevel, size_t hintMaxNodes,
-							size_t cleanupThreshold=100, size_t maxHardLimit=-1,
+							size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
 							RebaseListener *rebaseListener=0 );
 
 		/** Initializes m_memoryPools. Once it has been called, destroy() __must__ be called.
@@ -308,7 +310,7 @@ namespace Ogre
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
 		NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
-								size_t cleanupThreshold=100, size_t maxHardLimit=-1,
+								size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
 								RebaseListener *rebaseListener=0 );
 
 		/** Requests memory for a new SceneNode (for the Array vectors & matrices)
@@ -379,7 +381,8 @@ namespace Ogre
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
 		ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
-										size_t cleanupThreshold=100, size_t maxHardLimit=-1,
+										size_t cleanupThreshold=100,
+										size_t maxHardLimit=MAX_MEMORY_SLOTS,
 										RebaseListener *rebaseListener=0 );
 
 		/// @copydoc NodeArrayMemoryManager::createNewNode

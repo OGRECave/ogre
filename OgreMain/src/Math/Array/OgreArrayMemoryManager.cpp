@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	const size_t ArrayMemoryManager::MAX_MEMORY_SLOTS = (size_t)(-ARRAY_PACKED_REALS) - 1;
+
 	ArrayMemoryManager::ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
 											size_t numElementsSize, uint16 depthLevel,
 											size_t hintMaxNodes, size_t cleanupThreshold,
@@ -47,6 +49,11 @@ namespace Ogre
 							m_level( depthLevel ),
 							m_managerType( managerType )
 	{
+		//If the assert triggers, their values will overflow to 0 when
+		//trying to round to nearest multiple of ARRAY_PACKED_REALS
+		assert( m_maxHardLimit < (size_t)(-ARRAY_PACKED_REALS) &&
+				m_maxMemory < (size_t)(-ARRAY_PACKED_REALS) );
+
 		m_memoryPools.resize( numElementsSize, 0 );
 		for( size_t i=0; i<numElementsSize; ++i )
 			m_totalMemoryMultiplier += m_elementsMemSizes[i];

@@ -67,6 +67,7 @@ namespace Ogre {
 
 		//Will initialize mObjectData
 		mObjectMemoryManager->objectCreated( mObjectData, mRenderQueueID );
+		mObjectData.mOwner[mObjectData.mIndex] = this;
     }
     //-----------------------------------------------------------------------
     MovableObject::~MovableObject()
@@ -327,10 +328,13 @@ namespace Ogre {
 
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-				objData.mOwner[j]->mCachedAabbOutOfDate = false;
+			{
+				if( objData.mOwner[j] )
+					objData.mOwner[j]->mCachedAabbOutOfDate = false;
+			}
 #endif
 
-			objData.advanceBounsPack();
+			objData.advanceBoundsPack();
 		}
 	}
 	//-----------------------------------------------------------------------

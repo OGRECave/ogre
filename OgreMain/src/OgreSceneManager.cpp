@@ -2104,6 +2104,8 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 
 			MovableObject::updateAllBounds( numObjs, objData );
 		}
+
+		++it;
 	}
 }
 //-----------------------------------------------------------------------
@@ -2126,6 +2128,8 @@ void SceneManager::cullLights()
 
 			MovableObject::updateAllBounds( numObjs, objData );
 		}
+
+		++it;
 	}
 }
 //-----------------------------------------------------------------------

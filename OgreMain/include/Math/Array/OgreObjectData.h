@@ -126,14 +126,49 @@ namespace Ogre
 			mLightMask[mIndex]				= copy.mLightMask[copy.mIndex];
 		}
 
+		/** Advances all pointers to the next pack, i.e. if we're processing 4
+			elements at a time, move to the next 4 elements.
+		*/
+		void advancePack()
+		{
+			mParents			+= ARRAY_PACKED_REALS;
+			mOwner				+= ARRAY_PACKED_REALS;
+			++mLocalAabb;
+			++mWorldAabb;
+			mLocalRadius		+= ARRAY_PACKED_REALS;
+			mWorldRadius		+= ARRAY_PACKED_REALS;
+			mSquaredUpperDistance+=ARRAY_PACKED_REALS;
+			mVisible			+= ARRAY_PACKED_REALS;
+			mVisibilityFlags	+= ARRAY_PACKED_REALS;
+			mQueryFlags			+= ARRAY_PACKED_REALS;
+			mLightMask			+= ARRAY_PACKED_REALS;
+		}
+
+		void advancePack( size_t numAdvance )
+		{
+			mParents			+= ARRAY_PACKED_REALS * numAdvance;
+			mOwner				+= ARRAY_PACKED_REALS * numAdvance;
+			mLocalAabb			+= numAdvance;
+			mWorldAabb			+= numAdvance;
+			mLocalRadius		+= ARRAY_PACKED_REALS * numAdvance;
+			mWorldRadius		+= ARRAY_PACKED_REALS * numAdvance;
+			mSquaredUpperDistance+=ARRAY_PACKED_REALS * numAdvance;
+			mVisible			+= ARRAY_PACKED_REALS * numAdvance;
+			mVisibilityFlags	+= ARRAY_PACKED_REALS * numAdvance;
+			mQueryFlags			+= ARRAY_PACKED_REALS * numAdvance;
+			mLightMask			+= ARRAY_PACKED_REALS * numAdvance;
+		}
+
 		/** Advances all pointers needed by MovableObject::updateAllBounds to the next pack,
 			i.e. if we're processing 4 elements at a time, move to the next 4 elements.
 		*/
-		void advanceBounsPack()
+		void advanceBoundsPack()
 		{
 			mParents			+= ARRAY_PACKED_REALS;
 			++mLocalAabb;
 			++mWorldAabb;
+			mLocalRadius		+= ARRAY_PACKED_REALS;
+			mWorldRadius		+= ARRAY_PACKED_REALS;
 		}
 
 		/** Advances all pointers needed by MovableObject::cullFrustum to the next pack,
@@ -153,6 +188,7 @@ namespace Ogre
 		{
 			mOwner				+= ARRAY_PACKED_REALS;
 			++mWorldAabb;
+			mWorldRadius		+= ARRAY_PACKED_REALS;
 			mLightMask			+= ARRAY_PACKED_REALS;
 		}
 

@@ -48,7 +48,7 @@ namespace Ogre
 		Note that some SceneManager implementations (i.e. Octree like) may want to have more
 		than one ObjectMemoryManager, for example one per octant.
 	*/
-	class ObjectMemoryManager
+	class ObjectMemoryManager : ArrayMemoryManager::RebaseListener
 	{
 		typedef vector<ObjectDataArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
@@ -112,6 +112,17 @@ namespace Ogre
 			Number of MovableObject in this depth level
 		*/
 		size_t getFirstObjectData( ObjectData &outObjectData, size_t renderQueue );
+
+		//Derived from ArrayMemoryManager::RebaseListener
+		virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs,
+									ArrayMemoryManager::PtrdiffVec &outDiffsList );
+		virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &newBasePtrs,
+									const ArrayMemoryManager::PtrdiffVec &diffsList );
+		virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									 const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+									 size_t startInstance, size_t diffInstances );
 	};
 
 	/** @} */

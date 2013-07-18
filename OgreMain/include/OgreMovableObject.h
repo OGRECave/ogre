@@ -349,6 +349,9 @@ namespace Ogre {
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         uint8 getRenderQueueGroup(void) const;
 
+		/// Returns a direct access to the ObjectData state
+		ObjectData& _getObjectData()										{ return mObjectData; }
+
 		/// return the full transformation of the parent sceneNode or the attachingPoint node
 		Matrix4 _getParentNodeFullTransform(void) const;
 

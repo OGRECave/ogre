@@ -107,7 +107,8 @@ namespace Ogre
 		while( newDepth >= m_memoryManagers.size() )
 		{
 			m_memoryManagers.push_back( ObjectDataArrayMemoryManager( m_memoryManagers.size(), 100,
-																		m_dummyNode ) );
+											m_dummyNode, 100, ArrayMemoryManager::MAX_MEMORY_SLOTS,
+											this ) );
 			m_memoryManagers.back().initialize();
 		}
 	}
@@ -162,5 +163,76 @@ namespace Ogre
 	size_t ObjectMemoryManager::getFirstObjectData( ObjectData &outObjectData, size_t renderQueue )
 	{
 		return m_memoryManagers[renderQueue].getFirstNode( outObjectData );
+	}
+	//-----------------------------------------------------------------------------------
+	void ObjectMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+												const MemoryPoolVec &basePtrs,
+												ArrayMemoryManager::PtrdiffVec &outDiffsList )
+	{
+		//We don't need to build the diff list as we've access to the MovableObject through mOwner
+		//and access to the actual ObjectData with the right pointers.
+		/*ObjectData objectData;
+		const size_t numObjs = this->getFirstObjectData( objectData, level );
+
+		for( size_t i=0; i<numObjs; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( objectData.mOwner[j] )
+				{
+					outDiffsList.push_back( (objectData.mParents + objectData.mIndex) -
+										(Ogre::Node**)basePtrs[ObjectDataArrayMemoryManager::Parent] );
+				}
+			}
+			objectData.advancePack();
+		}*/
+	}
+	//---------------------------------------------------------------------
+	void ObjectMemoryManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+											const MemoryPoolVec &newBasePtrs,
+											const ArrayMemoryManager::PtrdiffVec &diffsList )
+	{
+		ObjectData objectData;
+		const size_t numObjs = this->getFirstObjectData( objectData, level );
+
+		for( size_t i=0; i<numObjs; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( objectData.mOwner[j] )
+				{
+					objectData.mIndex = j;
+					objectData.mOwner[j]->_getObjectData() = objectData;
+				}
+			}
+
+			objectData.advancePack();
+		}
+	}
+	//---------------------------------------------------------------------
+	void ObjectMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+										const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+										size_t startInstance, size_t diffInstances )
+	{
+		ObjectData objectData;
+		const size_t numObjs = this->getFirstObjectData( objectData, level );
+
+		size_t roundedStart = startInstance / ARRAY_PACKED_REALS;
+
+		objectData.advancePack( roundedStart );
+
+		for( size_t i=roundedStart * ARRAY_PACKED_REALS; i<numObjs; i += ARRAY_PACKED_REALS )
+		{
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( objectData.mOwner[j] )
+				{
+					objectData.mIndex = j;
+					objectData.mOwner[j]->_getObjectData() = objectData;
+				}
+			}
+
+			objectData.advancePack();
+		}
 	}
 }
