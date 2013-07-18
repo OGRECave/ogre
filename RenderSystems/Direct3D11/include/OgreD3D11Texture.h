@@ -79,6 +79,8 @@ namespace Ogre {
 
 #ifdef USE_D3DX11_LIBRARY		
 		void _loadDDS(DataStreamPtr &dstream);
+		ID3DX11Effect mEffect;
+		unsinged int mEffectIndex;
 #endif
         void _create1DResourceView();
 		void _create2DResourceView();

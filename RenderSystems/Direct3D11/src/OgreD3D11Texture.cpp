@@ -57,6 +57,10 @@ namespace Ogre
 		mp3DTex(NULL),
 		mDynamicTextures(false),
 		mAutoMipMapGeneration(false)
+#ifdef USE_D3DX11_LIBRARY		
+		, mEffect(NULL)
+		, mEffectIndex(0)
+#endif
 	{
 	}
 	//---------------------------------------------------------------------
@@ -151,6 +155,9 @@ namespace Ogre
 		SAFE_RELEASE(mp1DTex);
 		SAFE_RELEASE(mp2DTex);
 		SAFE_RELEASE(mp3DTex);
+#ifdef USE_D3DX11_LIBRARY		
+		SAFE_RELEASE(mEffect(NULL));
+#endif
 	}
 	//---------------------------------------------------------------------
 	void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -409,6 +416,12 @@ namespace Ogre
 				"D3D11Texture::_create1DTex");
 		}
 
+#ifdef USE_D3DX11_LIBRARY
+		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+		v->AsShaderResource()->SetResource(mpShaderResourceView);
+#endif
+
+
 		this->_setFinalAttributes(desc.Width, 1, 1, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 
 	}
@@ -582,6 +595,11 @@ namespace Ogre
 				"D3D11Texture::_create2DTex");
 		}
 
+#ifdef USE_D3DX11_LIBRARY
+		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+		v->AsShaderResource()->SetResource(mpShaderResourceView);
+#endif
+
 		this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 	}
 	//---------------------------------------------------------------------
@@ -660,6 +678,11 @@ namespace Ogre
 				"D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
 				"D3D11Texture::_create3DTex");
 		}
+
+#ifdef USE_D3DX11_LIBRARY
+		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+		v->AsShaderResource()->SetResource(mpShaderResourceView);
+#endif
 
 		this->_setFinalAttributes(desc.Width, desc.Height, desc.Depth, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 	}

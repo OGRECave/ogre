@@ -850,7 +850,7 @@ namespace Ogre {
 
 		/** render using the feature of reading back the inactive depth-stencil buffers as texture
 			only on DirectX 11 Render System*/
-		virtual void renderUsingReadBackAsTexture(bool secondpass);
+		void renderUsingReadBackAsTexture(unsigned int secondpass, Ogre::String variableName);
 
         typedef vector<ShadowCaster*>::type ShadowCasterList;
         ShadowCasterList mShadowCasterList;

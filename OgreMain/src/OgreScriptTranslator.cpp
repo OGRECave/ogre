@@ -6024,8 +6024,6 @@ namespace Ogre{
 			mPass->setType(CompositionPass::PT_CLEAR);
 		else if(type == "stencil")
 			mPass->setType(CompositionPass::PT_STENCIL);
-		else if(type == "depth")
-			mPass->setType(CompositionPass::PT_DEPTH);
 		else if(type == "render_quad")
 			mPass->setType(CompositionPass::PT_RENDERQUAD);
 		else if(type == "render_scene")

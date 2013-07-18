@@ -1050,7 +1050,7 @@ bail:
 		{
 			mPrimaryWindow = win;
 			win->getCustomAttribute( "D3DDEVICE", &mDevice );
-
+			
 			// Create the texture manager for use by others
 			mTextureManager = new D3D11TextureManager( mDevice );
             // Also create hardware buffer manager
@@ -2998,12 +2998,12 @@ bail:
 
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr)
+	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName)
 	{
-		if (passNr == 1)
+		switch (passNr)
 		{
+		case 1:
 			RenderTarget *target = mActiveRenderTarget;
-
 			if (target)
 			{
 				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
@@ -3047,11 +3047,9 @@ bail:
 				}
 
 			}
-		}
-		else if (passNr == 2)
-		{
+			break;
+		case 2:
 			RenderTarget *target = mActiveRenderTarget;
-
 			if (target)
 			{
 				//
@@ -3073,22 +3071,24 @@ bail:
 					numberOfViews,
 					pRTView,
 					NULL);
-				// TO DO: get effect, current technique and pass from device, set resources to it.
-				 g_pEffect->GetVariableByName("texture_depthBuffer")->AsShaderResource()->SetResource(mDSTResView);	
+				// TO DO get mEffect from D3D11Texture.
+#ifdef USE_D3DX11_LIBRARY
+				mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(mDSTResView);	
+#endif
 			}
-		}
-		else
-		{
+			break;
+		case 3:
 			//
-			// We need to unbind mDSTResView from texture_ZBuffer because this buffer
+			// We need to unbind mDSTResView from the given variable because this buffer
 			// will be used later as the typical depth buffer, again
-			// must call an annoying Apply(0) here : to flush SetResource(NULL)
+			// must call Apply(0) here : to flush SetResource(NULL)
 			//
-
-			// TO DO: get effect, current technique and pass from device, set resources to it.
-			// decide on name
-			hr = g_pEffect->GetVariableByName("texture_depthBuffer")->AsShaderResource()->SetResource(NULL);
-			pass->Apply(0);		
+			// TO DO get mEffect from D3D11Texture. get current technique.
+#ifdef USE_D3DX11_LIBRARY
+			mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(NULL);
+			pass->Apply(0);
+#endif
+			break;
 		}
 	}
     //---------------------------------------------------------------------

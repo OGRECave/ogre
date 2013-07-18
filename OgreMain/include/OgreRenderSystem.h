@@ -1127,7 +1127,7 @@ namespace Ogre
 		be used to create effects such as shadow mapping or soft particles
 		in a particle system.
 		*/
-		virtual void setDepthCheckEnabled(bool enabled) = 0;
+		// virtual void setDepthCheckEnabled(bool enabled) = 0;
 
 		/** Turns stencil buffer checking on or off. 
 		@remarks
@@ -1232,7 +1232,7 @@ namespace Ogre
 		*/
 		virtual void _render(const RenderOperation& op);
 
-		virtual void _renderUsingReadBackAsTexture(bool secondPass);
+		virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName);
 
 		/** Gets the capabilities of the render system. */
 		const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }

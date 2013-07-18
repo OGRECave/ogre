@@ -5820,11 +5820,11 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
 
 }
 //---------------------------------------------------------------------
-void SceneManager::renderUsingReadBackAsTexture(bool secondpass)
+void SceneManager::renderUsingReadBackAsTexture(unsigned int secondPass, Ogre::String variableName)
 {
 	if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_READ_BACK_AS_TEXTURE)) return;
 
-	mDestRenderSystem->_renderUsingReadBackAsTexture(secondpass);
+	mDestRenderSystem->_renderUsingReadBackAsTexture(secondPass,variableName);
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowColour(const ColourValue& colour)

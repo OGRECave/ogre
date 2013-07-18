@@ -139,6 +139,7 @@ namespace Ogre
 		bool		  CompareEnabled;
 
 		D3D11_RECT mScissorRect;
+		
 		bool mReadBackAsTexture;
 
 		D3D11HLSLProgram* mBoundVertexProgram;
@@ -350,7 +351,7 @@ namespace Ogre
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
 		void setVertexBufferBinding(VertexBufferBinding* binding);
-		void _renderUsingReadBackAsTexture(bool secondPass);
+		void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName);
         void _render(const RenderOperation& op);
         /** See
           RenderSystem
