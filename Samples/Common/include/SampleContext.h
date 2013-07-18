@@ -45,7 +45,7 @@
 #    undef USE_RTSHADER_SYSTEM
 #  endif
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
-#undef OGRE_STATIC_GLES
+#    undef OGRE_STATIC_GLES
 #    define USE_RTSHADER_SYSTEM
 #    define OGRE_STATIC_GLES2
 #  endif

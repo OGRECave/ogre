@@ -46,6 +46,10 @@ CPPUNIT_TEST_SUITE_REGISTRATION( RenderSystemCapabilitiesTests );
 void RenderSystemCapabilitiesTests::setUp()
 {
     using namespace Ogre;
+
+    if(LogManager::getSingletonPtr() == 0)
+        mLogManager = OGRE_NEW LogManager();
+
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
     // we need to be able to create FileSystem archives to load .rendercaps
@@ -68,7 +72,7 @@ void RenderSystemCapabilitiesTests::tearDown()
     OGRE_DELETE mRenderSystemCapabilitiesManager;
     OGRE_DELETE mArchiveManager;
     OGRE_DELETE mFileSystemArchiveFactory;
-
+    OGRE_DELETE mLogManager;
 }
 
 void RenderSystemCapabilitiesTests::testIsShaderProfileSupported(void)

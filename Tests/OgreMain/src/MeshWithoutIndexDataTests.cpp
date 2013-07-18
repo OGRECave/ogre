@@ -40,8 +40,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
+    if(LogManager::getSingletonPtr() == 0)
+        mLogManager = OGRE_NEW LogManager();
+
+	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
     LogManager::getSingleton().setLogDetail(LL_LOW);
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
@@ -60,6 +63,7 @@ void MeshWithoutIndexDataTests::tearDown()
 	OGRE_DELETE MaterialManager::getSingletonPtr();
 	OGRE_DELETE LodStrategyManager::getSingletonPtr();
 	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+    OGRE_DELETE mLogManager;
 }
 
 void MeshWithoutIndexDataTests::testCreateSimpleLine()

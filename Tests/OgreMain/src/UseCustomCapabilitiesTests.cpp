@@ -46,10 +46,6 @@ void UseCustomCapabilitiesTests::setUp()
 {
     using namespace Ogre;
 
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-	
 	// write cleanup to log
 	if(LogManager::getSingletonPtr() == 0)
 	{
@@ -69,10 +65,6 @@ void UseCustomCapabilitiesTests::setUp()
 		OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
 	if(Ogre::ResourceGroupManager::getSingletonPtr())
 		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
-
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
 #if OGRE_STATIC
         mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
