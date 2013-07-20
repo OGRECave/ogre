@@ -50,10 +50,10 @@ namespace Ogre
 		return static_cast<uint32>( _mm_movemask_ps( _mm_castsi128_ps( mask ) ) );
 	}
 
-	#define IS_SET_MASK_X( intMask ) ((intMask & MASK_W) == 1)
-	#define IS_SET_MASK_Y( intMask ) ((intMask & MASK_Z) == 1)
-	#define IS_SET_MASK_Z( intMask ) ((intMask & MASK_Y) == 1)
-	#define IS_SET_MASK_W( intMask ) ((intMask & MASK_X) == 1)
+	#define IS_SET_MASK_X( intMask ) ((intMask & MASK_W) != 0)
+	#define IS_SET_MASK_Y( intMask ) ((intMask & MASK_Z) != 0)
+	#define IS_SET_MASK_Z( intMask ) ((intMask & MASK_Y) != 0)
+	#define IS_SET_MASK_W( intMask ) ((intMask & MASK_X) != 0)
 
-	#define IS_BIT_SET( bit, intMask ) ( (intMask & (1 << (ARRAY_PACKED_REALS-bit)) ) == 1)
+	#define IS_BIT_SET( bit, intMask ) ( (intMask & (1 << bit) ) != 0)
 }

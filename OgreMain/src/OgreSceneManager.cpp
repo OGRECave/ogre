@@ -187,6 +187,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	// create the auto param data source instance
 	mAutoParamDataSource = createAutoParamDataSource();
 
+	mVisibleObjects.resize( 1 );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -1383,6 +1384,193 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 }
 
+//-----------------------------------------------------------------------
+void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverlays)
+{
+	OgreProfileGroup("_renderScene2", OGREPROF_GENERAL);
+
+    Root::getSingleton()._pushCurrentSceneManager(this);
+	mActiveQueuedRenderableVisitor->targetSceneMgr = this;
+	mAutoParamDataSource->setCurrentSceneManager(this);
+
+	// Also set the internal viewport pointer at this point, for calls that need it
+	// However don't call setViewport just yet (see below)
+	mCurrentViewport = vp;
+
+	// reset light hash so even if light list is the same, we refresh the content every frame
+	LightList emptyLightList;
+	useLights(emptyLightList, 0);
+
+    mCameraInProgress = camera;
+
+    // Update controllers 
+    ControllerManager::getSingleton().updateAllControllers();
+
+    // Update the scene, only do this once per frame
+    unsigned long thisFrameNumber = Root::getSingleton().getNextFrameNumber();
+    if (thisFrameNumber != mLastFrameNumber)
+    {
+		//TODO: (dark_sylinc) update this once per frame, not per camera
+        // Update animations
+        _applySceneAnimations();
+		updateDirtyInstanceManagers();
+        mLastFrameNumber = thisFrameNumber;
+    }
+
+	{
+		// Lock scene graph mutex, no more changes until we're ready to render
+		OGRE_LOCK_MUTEX(sceneGraphMutex)
+
+		// Invert vertex winding?
+		if (camera->isReflected())
+		{
+			mDestRenderSystem->setInvertVertexWinding(true);
+		}
+		else
+		{
+			mDestRenderSystem->setInvertVertexWinding(false);
+		}
+
+		// Tell params about viewport
+		mAutoParamDataSource->setCurrentViewport(vp);
+		// Set the viewport - this is deliberately after the shadow texture update
+		setViewport(vp);
+
+		// Tell params about camera
+		mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+		// Set autoparams for finite dir light extrusion
+		mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
+
+		// Tell params about current ambient light
+		mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
+		// Tell rendersystem
+		mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+
+		// Tell params about render target
+		mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
+
+
+		// Set camera window clipping planes (if any)
+		if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
+		{
+			mDestRenderSystem->resetClipPlanes();
+			if (camera->isWindowSet())  
+			{
+				mDestRenderSystem->setClipPlanes(camera->getWindowPlanes());
+			}
+		}
+
+		// Prepare render queue for receiving new objects
+		{
+			OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
+			prepareRenderQueue();
+		}
+
+		size_t visibleObjsIdxStart = 0;
+
+		if (mFindVisibleObjects)
+		{
+			OgreProfileGroup("_findVisibleObjects", OGREPROF_CULLING);
+
+			size_t visibleObjsIdxStart = 0;
+			size_t visibleObjsListsPerThread = 1;
+			cullFrustum( mEntitiesMemoryManagerCulledList, camera, visibleObjsIdxStart );
+
+			VisibleObjectsPerThreadVec::const_iterator it = mVisibleObjects.begin();
+			VisibleObjectsPerThreadVec::const_iterator en = mVisibleObjects.begin() +
+																visibleObjsListsPerThread;
+
+			firePreFindVisibleObjects(vp);
+			while( it != en )
+			{
+				MovableObject::MovableObjectVec::const_iterator itor = it->begin();
+				MovableObject::MovableObjectVec::const_iterator end  = it->end();
+
+				while( itor != end )
+				{
+					(*itor)->_updateRenderQueue( getRenderQueue() );
+					++itor;
+				}
+				++it;
+			}
+			firePostFindVisibleObjects(vp);
+			/*// Assemble an AAB on the fly which contains the scene elements visible
+			// by the camera.
+			CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
+
+			assert (camVisObjIt != mCamVisibleObjectsMap.end() &&
+				"Should never fail to find a visible object bound for a camera, "
+				"did you override SceneManager::createCamera or something?");
+
+			// reset the bounds
+			camVisObjIt->second.reset();
+
+			// Parse the scene and tag visibles
+			firePreFindVisibleObjects(vp);
+			_findVisibleObjects(camera, &(camVisObjIt->second),
+				mIlluminationStage == IRS_RENDER_TO_TEXTURE? true : false);
+			firePostFindVisibleObjects(vp);*/
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
+#endif
+		}
+		// Queue skies, if viewport seems it
+		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
+		{
+			_queueSkiesForRendering(camera);
+		}
+	} // end lock on scene graph mutex
+
+    mDestRenderSystem->_beginGeometryCount();
+	// Clear the viewport if required
+	if (mCurrentViewport->getClearEveryFrame())
+	{
+		mDestRenderSystem->clearFrameBuffer(
+			mCurrentViewport->getClearBuffers(), 
+			mCurrentViewport->getBackgroundColour(),
+			mCurrentViewport->getDepthClear() );
+	}        
+    // Begin the frame
+    mDestRenderSystem->_beginFrame();
+
+    // Set rasterisation mode
+    mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
+
+	// Set initial camera state
+	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
+	
+	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
+
+	if (mCameraRelativeRendering)
+	{
+		mCachedViewMatrix.setTrans(Vector3::ZERO);
+		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
+	}
+	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
+
+	
+	setViewMatrix(mCachedViewMatrix);
+
+    // Render scene content
+	{
+		OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
+		_renderVisibleObjects();
+	}
+
+    // End frame
+    mDestRenderSystem->_endFrame();
+
+    // Notify camera of vis faces
+    camera->_notifyRenderedFaces(mDestRenderSystem->_getFaceCount());
+
+    // Notify camera of vis batches
+    camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
+
+	Root::getSingleton()._popCurrentSceneManager(this);
+
+}
+
 
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
@@ -2100,6 +2288,35 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	}
 }
 //-----------------------------------------------------------------------
+void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
+								size_t visObjsIdxStart )
+{
+	MovableObject::MovableObjectVec &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
+	outVisibleObjects.clear();
+
+	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
+	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::cullFrustum( numObjs, objData, camera,
+				camera->getViewport()->getVisibilityMask()|getVisibilityMask(), outVisibleObjects );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
 void SceneManager::cullLights()
 {
 	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
@@ -2172,6 +2389,10 @@ void SceneManager::buildLightList()
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()
 {
+	mNodeMemoryManagerCulledList.clear();
+	mEntitiesMemoryManagerCulledList.clear();
+	mLightsMemoryManagerCulledList.clear();
+
 	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager );
 	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager );
 }
@@ -2197,10 +2418,6 @@ void SceneManager::updateSceneGraph()
 	updateAllTransforms();
 	updateAllBounds( mEntitiesMemoryManagerCulledList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
-
-	mNodeMemoryManagerCulledList.clear();
-	mEntitiesMemoryManagerCulledList.clear();
-	mLightsMemoryManagerCulledList.clear();
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(

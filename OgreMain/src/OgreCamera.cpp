@@ -423,7 +423,7 @@ namespace Ogre {
 		}
 
 		//render scene
-		mSceneMgr->_renderScene(this, vp, includeOverlays);
+		mSceneMgr->_renderScene2(this, vp, includeOverlays);
 
 		// Listener list may have change
 		listenersCopy = mListeners;

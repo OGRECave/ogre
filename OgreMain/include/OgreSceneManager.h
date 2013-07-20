@@ -883,6 +883,15 @@ namespace Ogre {
 		uint32 mVisibilityMask;
 		bool mFindVisibleObjects;
 
+		/** Contains MovableObjects to be visited and rendered.
+		@rermarks
+			Declared here to avoid allocating and deallocating every frame. Declared as array of
+			arrays (vector of vectors) for multithreading purposes (put results in one array while
+			another thread stores in the other array). @See cullFrustum
+		*/
+		typedef vector<MovableObject::MovableObjectVec>::type VisibleObjectsPerThreadVec;
+		VisibleObjectsPerThreadVec mVisibleObjects;
+
 		/// Suppress render state changes?
 		bool mSuppressRenderStateChanges;
 		/// Suppress shadows?
@@ -1632,6 +1641,20 @@ namespace Ogre {
 		*/
 		void updateAllBounds( const ObjectMemoryManagerVec &objectMemManager );
 
+		/** Low level culling, culls all objects against the given frustum active cameras. This
+			includes checking visibility flags (both scene and viewport's)
+			@See MovableObject::cullFrustum
+		@param objectMemManager
+			Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
+			Could be more than one depending on the high level cull system (i.e. tree-based sys)
+		@param Camera
+			Camera whose frustum we're to cull against
+		@param visObjsIdxStart
+			Index to mVisibleObjects so we know which array we should start at.
+		*/
+		void cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
+							size_t visObjsIdxStart );
+
 		/** Culls Lights against all active cameras. This maximizes SIMD usage, eases multithreading,
 			and allows for a consistent light list across all camera views
 		@remarks
@@ -1688,6 +1711,8 @@ namespace Ogre {
             @param includeOverlays Whether or not overlay objects should be rendered
         */
         virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
+
+		virtual void _renderScene2(Camera* camera, Viewport* vp, bool includeOverlays);
 
         /** Internal method for queueing the sky objects with the params as 
             previously set through setSkyBox, setSkyPlane and setSkyDome.
@@ -3102,12 +3127,12 @@ namespace Ogre {
 			Note that this is combined with any per-viewport visibility mask
 			through an 'and' operation. @see Viewport::setVisibilityMask
 		*/
-		virtual void setVisibilityMask(uint32 vmask) { mVisibilityMask = vmask; }
+		virtual_l2 void setVisibilityMask(uint32 vmask) { mVisibilityMask = vmask; }
 
 		/** Gets a mask which is bitwise 'and'ed with objects own visibility masks
 			to determine if the object is visible.
 		*/
-		virtual uint32 getVisibilityMask(void) { return mVisibilityMask; }
+		virtual_l2 uint32 getVisibilityMask(void) { return mVisibilityMask; }
 
 		/** Internal method for getting the combination between the global visibility
 			mask and the per-viewport visibility mask.

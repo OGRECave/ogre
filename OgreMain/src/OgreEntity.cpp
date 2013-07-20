@@ -205,6 +205,12 @@ namespace Ogre {
 
 		reevaluateVertexProcessing();
 
+		Aabb aabb( mMesh->getBounds().getMinimum(), mMesh->getBounds().getMaximum() );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+		mObjectData.mWorldRadius[mObjectData.mIndex] = aabb.getRadius();
+
 		mInitialised = true;
 		mMeshStateCount = mMesh->getStateCount();
 	}
