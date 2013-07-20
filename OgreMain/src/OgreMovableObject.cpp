@@ -45,6 +45,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
 	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
+	const String NullEntity::msMovableType = "NullEntity";
     //-----------------------------------------------------------------------
     MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager )
         : IdObject( id )
@@ -69,6 +70,26 @@ namespace Ogre {
 		mObjectMemoryManager->objectCreated( mObjectData, mRenderQueueID );
 		mObjectData.mOwner[mObjectData.mIndex] = this;
     }
+	//-----------------------------------------------------------------------
+    MovableObject::MovableObject( ObjectData *objectDataPtrs )
+        : IdObject( 0 )
+		, mCreator(0)
+        , mManager(0)
+        , mParentNode(0)
+		, mUpperDistance( std::numeric_limits<float>::max() )
+		, mMinPixelSize(0)
+        , mRenderQueueID(RENDER_QUEUE_MAIN)
+		, mRenderQueuePriority(100)
+        , mCastShadows(true)
+        , mListener(0)
+		, mDebugDisplay(false)
+		, mObjectMemoryManager( 0 )
+		, mGlobalIndex( -1 )
+		, mParentIndex( -1 )
+    {
+		if (Root::getSingletonPtr())
+			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
+    }
     //-----------------------------------------------------------------------
     MovableObject::~MovableObject()
     {
@@ -85,7 +106,8 @@ namespace Ogre {
 			static_cast<SceneNode*>(mParentNode)->detachObject( this );
         }
 
-		mObjectMemoryManager->objectDestroyed( mObjectData, mRenderQueueID );
+		if( mObjectMemoryManager )
+			mObjectMemoryManager->objectDestroyed( mObjectData, mRenderQueueID );
     }
     //-----------------------------------------------------------------------
     void MovableObject::_notifyAttached( Node* parent )
@@ -407,8 +429,16 @@ namespace Ogre {
 			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
 
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayReal tmpMask = Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
+								mask );
+
 			//Fuse result with visibility flag
-			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
+			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
@@ -522,6 +552,14 @@ namespace Ogre {
 				//Accumulate into mask. If one Frustum can see, then we need to include it.
 				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 			}
+
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayReal tmpMask = Mathlib::Or( Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
+			mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 
 			//Use the light mask to discard null mOwner ptrs
 			mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayInt*RESTRICT_ALIAS>

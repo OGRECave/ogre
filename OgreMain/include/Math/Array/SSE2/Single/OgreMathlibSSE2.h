@@ -94,6 +94,7 @@ namespace Ogre
 		static const ArrayReal fRad2Deg;	//Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg
 		static const ArrayReal FLOAT_MIN;	//FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN
 		static const ArrayReal SIGN_MASK;	//0x80000000, 0x80000000, 0x80000000, 0x80000000
+		static const ArrayReal INFINITY;	//Inf, Inf, Inf, Inf
 
 		/** Returns the absolute values of each 4 floats
 			@param
@@ -262,6 +263,15 @@ namespace Ogre
 		static inline ArrayInt SetAll( uint32 val )
 		{
 			return _mm_set1_epi32( val );
+		}
+
+		/** Returns the result of "a == std::numeric_limits<float>::infinity()"
+		@return
+			r[i] = a[i] == Inf ? 0xffffffff : 0;
+		*/
+		static inline ArrayReal isInfinity( ArrayReal a )
+		{
+			return _mm_cmpeq_ps( a, MathlibSSE2::INFINITY );
 		}
 
 		/**	Returns the reciprocal of x

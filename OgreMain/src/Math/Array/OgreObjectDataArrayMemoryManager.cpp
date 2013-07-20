@@ -53,13 +53,14 @@ namespace Ogre
 	};
 	//-----------------------------------------------------------------------------------
 	ObjectDataArrayMemoryManager::ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
-													Node *dummyNode, size_t cleanupThreshold,
-													size_t maxHardLimit,
+													Node *dummyNode, MovableObject *dummyObject,
+													size_t cleanupThreshold, size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
 			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
-			m_dummyNode( dummyNode )
+			m_dummyNode( dummyNode ),
+			m_dummyObject( dummyObject )
 	{
 	}
 	//-----------------------------------------------------------------------------------
@@ -68,8 +69,12 @@ namespace Ogre
 		ArrayMemoryManager::slotsRecreated( prevNumSlots );
 
 		Node **nodesPtr = reinterpret_cast<Node**>( m_memoryPools[Parent] ) + prevNumSlots;
+		MovableObject **ownersPtr = reinterpret_cast<MovableObject**>(m_memoryPools[Owner])+prevNumSlots;
 		for( size_t i=prevNumSlots; i<m_maxMemory; ++i )
+		{
 			*nodesPtr++ = m_dummyNode;
+			*ownersPtr++ = m_dummyObject;
+		}
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectDataArrayMemoryManager::createNewNode( ObjectData &outData )
@@ -104,7 +109,8 @@ namespace Ogre
 												nextSlotBase * m_elementsMemSizes[LightMask] );
 
 		//Set default values
-		outData.mParents[nextSlotIdx] = m_dummyNode;
+		outData.mParents[nextSlotIdx]	= m_dummyNode;
+		outData.mOwner[nextSlotIdx]		= 0; //Caller has to fill it. Otherwise a crash is a good warning
 		outData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldRadius[nextSlotIdx]			= 0;
@@ -119,11 +125,11 @@ namespace Ogre
 	{
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
-		*inOutData.mParents		= m_dummyNode;
-		*inOutData.mOwner		= 0;
-		*inOutData.mVisibilityFlags = 0;
-		*inOutData.mQueryFlags	= 0;
-		*inOutData.mLightMask	= 0;
+		inOutData.mParents[inOutData.mIndex]			= m_dummyNode;
+		inOutData.mOwner[inOutData.mIndex]				= m_dummyObject;
+		inOutData.mVisibilityFlags[inOutData.mIndex]	= 0;
+		inOutData.mQueryFlags[inOutData.mIndex]			= 0;
+		inOutData.mLightMask[inOutData.mIndex]			= 0;
 		destroySlot( reinterpret_cast<char*>(inOutData.mParents), inOutData.mIndex );
 		//Zero out all pointers
 		inOutData = ObjectData();

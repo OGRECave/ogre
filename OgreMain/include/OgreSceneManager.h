@@ -373,6 +373,7 @@ namespace Ogre {
 		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
 		NodeMemoryManager		mNodeMemoryManager;
 		ObjectMemoryManager		mEntityMemoryManager;
+		ObjectMemoryManager		mLightMemoryManager;
 		/// Filled and cleared every frame in HighLevelCull()
 		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
@@ -1654,13 +1655,6 @@ namespace Ogre {
 		*/
 		void cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
 							size_t visObjsIdxStart );
-
-		/** Culls Lights against all active cameras. This maximizes SIMD usage, eases multithreading,
-			and allows for a consistent light list across all camera views
-		@remarks
-			This phase is optional. Deferred shading systems don't typically want to use it
-		*/
-		void cullLights();
 
 		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
 			Compositor). Then calls MovableObject::buildLightList with that list so that each
@@ -3067,10 +3061,13 @@ namespace Ogre {
 		create a MovableObject of any specialised type generically, including
 		any new types registered using plugins. The name is generated automatically.
 		@param typeName The type of object to create
+		@param objectMemMgr Memory Manager that will hold ObjectData data.
 		@param params Optional name/value pair list to give extra parameters to
 		the created object.
 		*/
-		virtual MovableObject* createMovableObject(const String& typeName, const NameValuePairList* params = 0);
+		virtual MovableObject* createMovableObject(const String& typeName,
+													ObjectMemoryManager *objectMemMgr,
+													const NameValuePairList* params = 0);
 		/** Destroys a MovableObject with the name specified, of the type specified.
 		@remarks
 			The MovableObject will automatically detach itself from any nodes

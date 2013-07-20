@@ -54,9 +54,13 @@ namespace Ogre
 		/// ArrayMemoryManagers grouped by hierarchy depth
 		ArrayMemoryManagerVec					m_memoryManagers;
 
+		/// Tracks total number of objects in all render queues.
+		size_t									m_totalObjects;
+
 		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
 		SceneNode								*m_dummyNode;
 		Transform								m_dummyTransformPtrs;
+		NullEntity								*m_dummyObject;
 
 		/** Makes m_memoryManagers big enough to be able to fulfill m_memoryManagers[newDepth]
 		@param newDepth
@@ -101,6 +105,12 @@ namespace Ogre
 			the result instead of calling this function too often.
 		*/
 		size_t getNumRenderQueues() const;
+
+		/** Retrieves the sum of the number of objects in all render queues.
+		@remarks
+			The value is cached to avoid iterating through all RQ levels.
+		*/
+		size_t getTotalNumObjects() const					{ return m_totalObjects; }
 
 		/** Retrieves a ObjectData pointing to the first MovableObject in the given render queue
 		@param outObjectData

@@ -156,15 +156,24 @@ namespace Ogre
 
 		ArrayReal x = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[2] ), m_halfSize.m_chunkBase[2] );	// abs( m02 ) * z +
 		x = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[1] ), m_halfSize.m_chunkBase[1], x );			// abs( m01 ) * y +
-		x = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[0], x );			// abs( m00 ) * x 
+		x = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[0], x );			// abs( m00 ) * x
 
-		ArrayReal y = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[2] ), m_halfSize.m_chunkBase[6] );	// abs( m12 ) * z +
-		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[1] ), m_halfSize.m_chunkBase[5], y );			// abs( m11 ) * y +
-		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[4], y );			// abs( m10 ) * x 
+		ArrayReal y = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[6] ), m_halfSize.m_chunkBase[2] );	// abs( m12 ) * z +
+		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[5] ), m_halfSize.m_chunkBase[1], y );			// abs( m11 ) * y +
+		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[4] ), m_halfSize.m_chunkBase[0], y );			// abs( m10 ) * x
 
-		ArrayReal z = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[2] ), m_halfSize.m_chunkBase[10] );	// abs( m22 ) * z +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[1] ), m_halfSize.m_chunkBase[9], y );			// abs( m21 ) * y +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[8], y );			// abs( m20 ) * x 
+		ArrayReal z = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[10] ), m_halfSize.m_chunkBase[2] );	// abs( m22 ) * z +
+		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[9] ), m_halfSize.m_chunkBase[1], y );			// abs( m21 ) * y +
+		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[8] ), m_halfSize.m_chunkBase[0], y );			// abs( m20 ) * x
+
+		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
+		//(which is ok since we need them to say 'false' to intersection tests)
+		x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, x,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[0], MathlibSSE2::INFINITY ) );
+		y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, y,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[1], MathlibSSE2::INFINITY ) );
+		z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, z,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[2], MathlibSSE2::INFINITY ) );
 
 		m_halfSize = ArrayVector3( x, y, z );
 	}

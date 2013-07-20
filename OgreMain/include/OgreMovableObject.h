@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreAnimable.h"
 #include "OgreAny.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreSceneNode.h"
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"
 #include "OgreHeaderPrefix.h"
@@ -150,6 +151,12 @@ namespace Ogre {
 
         /// Constructor
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager );
+
+		/** Don't use this constructor unless you know what you're doing.
+			@See ObjectMemoryManager::m_dummyNode
+		*/
+		MovableObject( ObjectData *objectDataPtrs );
+
         /** Virtual destructor - read Scott Meyers if you don't know why this is needed.
         */
         virtual ~MovableObject();
@@ -631,6 +638,24 @@ namespace Ogre {
 		unsigned long getTypeFlags(void) const { return mTypeFlag; }
 
 	};
+
+	class _OgreExport NullEntity : public MovableObject
+	{
+		static const String msMovableType;
+	public:
+		NullEntity() : MovableObject( 0 )
+		{
+		}
+
+		virtual const String& getMovableType(void) const
+		{
+			return msMovableType;
+		}
+		virtual void _updateRenderQueue(RenderQueue* queue) {}
+		virtual void visitRenderables(Renderable::Visitor* visitor, 
+			bool debugRenderables = false) {}
+	};
+
 	/** @} */
 	/** @} */
 

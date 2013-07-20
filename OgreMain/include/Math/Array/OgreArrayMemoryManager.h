@@ -355,7 +355,8 @@ namespace Ogre
 	class _OgreExport ObjectDataArrayMemoryManager : public ArrayMemoryManager
 	{
 		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
-		Node	*m_dummyNode;
+		Node			*m_dummyNode;
+		MovableObject	*m_dummyObject;
 
 	protected:
 		/// We overload to set all mParents to point to m_dummyNode
@@ -382,7 +383,7 @@ namespace Ogre
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
 		ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
-										size_t cleanupThreshold=100,
+										MovableObject *dummyObject, size_t cleanupThreshold=100,
 										size_t maxHardLimit=MAX_MEMORY_SLOTS,
 										RebaseListener *rebaseListener=0 );
 

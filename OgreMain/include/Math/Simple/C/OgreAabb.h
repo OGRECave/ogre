@@ -164,7 +164,6 @@ namespace Ogre
 
 }
 
-/*#include "OgreArrayAabb.inl"*/
 #include "OgreAabb.inl"
 
 #endif

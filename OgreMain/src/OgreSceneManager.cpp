@@ -358,7 +358,7 @@ void SceneManager::destroyAllCameras(void)
 Light* SceneManager::createLight()
 {
 	return static_cast<Light*>(
-		createMovableObject(LightFactory::FACTORY_TYPE_NAME));
+		createMovableObject(LightFactory::FACTORY_TYPE_NAME, &mLightMemoryManager));
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyLight(Light *l)
@@ -489,7 +489,7 @@ Entity* SceneManager::createEntity(const String& meshName,
 	params["mesh"] = meshName;
 	params["resourceGroup"] = groupName;
 	return static_cast<Entity*>(
-		createMovableObject( EntityFactory::FACTORY_TYPE_NAME, &params) );
+		createMovableObject( EntityFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
 
 }
 //---------------------------------------------------------------------
@@ -518,7 +518,7 @@ void SceneManager::destroyAllBillboardSets(void)
 ManualObject* SceneManager::createManualObject()
 {
 	return static_cast<ManualObject*>(
-		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME) );
+		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyManualObject(ManualObject* obj)
@@ -534,7 +534,7 @@ void SceneManager::destroyAllManualObjects(void)
 BillboardChain* SceneManager::createBillboardChain()
 {
 	return static_cast<BillboardChain*>(
-		createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME));
+		createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager));
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardChain(BillboardChain* obj)
@@ -550,7 +550,7 @@ void SceneManager::destroyAllBillboardChains(void)
 RibbonTrail* SceneManager::createRibbonTrail()
 {
 	return static_cast<RibbonTrail*>(
-		createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME));
+		createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager));
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyRibbonTrail(RibbonTrail* obj)
@@ -569,7 +569,7 @@ ParticleSystem* SceneManager::createParticleSystem(const String& templateName)
 	params["templateName"] = templateName;
 	
 	return static_cast<ParticleSystem*>(
-		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &params) );
+		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
 }
 //-----------------------------------------------------------------------
 ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& group )
@@ -579,7 +579,7 @@ ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& 
 	params["resourceGroup"] = group;
 	
 	return static_cast<ParticleSystem*>(
-		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &params) );
+		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyParticleSystem(ParticleSystem* obj)
@@ -2317,34 +2317,34 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 	}
 }
 //-----------------------------------------------------------------------
-void SceneManager::cullLights()
+void SceneManager::buildLightList()
 {
+	//TODO: Avoid reallocating this every frame.
+	LightListInfo globalLightList;
+
+	size_t totalNumObjects = 0;
+
 	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
 	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
 	while( it != en )
 	{
-		ObjectMemoryManager *memoryManager = *it;
-		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
-
-		//TODO: Send this to worker threads (dark_sylinc)
-
-		for( size_t i=0; i<numRenderQueues; ++i )
-		{
-			ObjectData objData;
-			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
-
-			MovableObject::updateAllBounds( numObjs, objData );
-		}
-
+		totalNumObjects += (*it)->getTotalNumObjects();
 		++it;
 	}
-}
-//-----------------------------------------------------------------------
-void SceneManager::buildLightList()
-{
-	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
-	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+	globalLightList.lights.reserve( totalNumObjects );
+	globalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, totalNumObjects,
+														MEMCATEGORY_SCENE_CONTROL );
+	globalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, totalNumObjects,
+														MEMCATEGORY_SCENE_CONTROL );
+
+	//TODO: (dark_sylinc) Some cameras in mCamera may not be in use.
+	//Compo Mgr. will know which cameras will be active
+	FrustumVec frustums( mCameras.begin(), mCameras.end() );
+
+	it = mLightsMemoryManagerCulledList.begin();
+	en = mLightsMemoryManagerCulledList.end();
 
 	while( it != en )
 	{
@@ -2354,18 +2354,16 @@ void SceneManager::buildLightList()
 		//TODO: Send this to worker threads (dark_sylinc)
 
 		//TODO: Cull the lights against all cameras to build the list of visible lights.
-		/*for( size_t i=0; i<numRenderQueues; ++i )
+		for( size_t i=0; i<numRenderQueues; ++i )
 		{
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			Light::buildLightList( numObjs, objData );
-		}*/
+			Light::cullLights( numObjs, objData, globalLightList, frustums );
+		}
 
 		++it;
 	}
-
-	LightListInfo globalLightList;
 
 	//Global light list built. Now build a per-movable object light list
 	it = mEntitiesMemoryManagerCulledList.begin();
@@ -2385,6 +2383,9 @@ void SceneManager::buildLightList()
 
 		++it;
 	}
+
+	OGRE_FREE_SIMD( globalLightList.visibilityMask, MEMCATEGORY_SCENE_CONTROL );
+	OGRE_FREE_SIMD( globalLightList.boundingSphere, MEMCATEGORY_SCENE_CONTROL );
 }
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()
@@ -2395,6 +2396,7 @@ void SceneManager::highLevelCull()
 
 	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager );
 	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager );
+	mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateSceneGraph()
@@ -2418,6 +2420,7 @@ void SceneManager::updateSceneGraph()
 	updateAllTransforms();
 	updateAllBounds( mEntitiesMemoryManagerCulledList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
+	buildLightList();
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(
@@ -3829,7 +3832,7 @@ BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
 	NameValuePairList params;
 	params["poolSize"] = StringConverter::toString(poolSize);
 	return static_cast<BillboardSet*>(
-		createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME, &params));
+		createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params));
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardSet(BillboardSet* set)
@@ -6898,7 +6901,8 @@ SceneManager::getMovableObjectCollection(const String& typeName) const
 }
 //---------------------------------------------------------------------
 MovableObject* SceneManager::createMovableObject( const String& typeName,
-													const NameValuePairList* params)
+													ObjectMemoryManager *objectMemMgr,
+													const NameValuePairList* params )
 {
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
@@ -6914,7 +6918,7 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 		OGRE_LOCK_MUTEX(objectMap->mutex)
 
 		MovableObject* newObj = factory->createInstance( Id::generateNewId<MovableObject>(),
-														&mEntityMemoryManager, this, params );
+														 objectMemMgr, this, params );
 		objectMap->movableObjects.push_back( newObj );
 		newObj->mGlobalIndex = objectMap->movableObjects.size() - 1;
 		return newObj;

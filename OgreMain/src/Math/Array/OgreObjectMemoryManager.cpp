@@ -33,7 +33,9 @@ THE SOFTWARE.
 namespace Ogre
 {
 	ObjectMemoryManager::ObjectMemoryManager() :
-			m_dummyNode( 0 )
+			m_totalObjects( 0 ),
+			m_dummyNode( 0 ),
+			m_dummyObject( 0 )
 	{
 		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
 		//or yet another object) We only allocate what's needed to prevent access violations.
@@ -64,6 +66,7 @@ namespace Ogre
 		*m_dummyTransformPtrs.mDerivedTransform		= ArrayMatrix4::IDENTITY;
 
 		m_dummyNode = new SceneNode( m_dummyTransformPtrs );
+		m_dummyObject = new NullEntity();
 	}
 	//-----------------------------------------------------------------------------------
 	ObjectMemoryManager::~ObjectMemoryManager()
@@ -81,6 +84,9 @@ namespace Ogre
 
 		delete m_dummyNode;
 		m_dummyNode = 0;
+
+		delete m_dummyObject;
+		m_dummyObject = 0;
 
 		/*OGRE_FREE_SIMD( m_dummyTransformPtrs.mPosition, MEMCATEGORY_SCENE_OBJECTS );
 		OGRE_FREE_SIMD( m_dummyTransformPtrs.mOrientation, MEMCATEGORY_SCENE_OBJECTS );
@@ -102,8 +108,8 @@ namespace Ogre
 		while( newDepth >= m_memoryManagers.size() )
 		{
 			m_memoryManagers.push_back( ObjectDataArrayMemoryManager( m_memoryManagers.size(), 100,
-											m_dummyNode, 100, ArrayMemoryManager::MAX_MEMORY_SLOTS,
-											this ) );
+											m_dummyNode, m_dummyObject, 100,
+											ArrayMemoryManager::MAX_MEMORY_SLOTS, this ) );
 			m_memoryManagers.back().initialize();
 		}
 	}
@@ -114,6 +120,8 @@ namespace Ogre
 
 		ObjectDataArrayMemoryManager& mgr = m_memoryManagers[renderQueue];
 		mgr.createNewNode( outObjectData );
+
+		++m_totalObjects;
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::objectMoved( ObjectData &inOutObjectData, size_t oldRenderQueue,
@@ -136,6 +144,8 @@ namespace Ogre
 	{
 		ObjectDataArrayMemoryManager &mgr = m_memoryManagers[renderQueue];
 		mgr.destroyNode( outObjectData );
+
+		--m_totalObjects;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ObjectMemoryManager::getNumRenderQueues() const

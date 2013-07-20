@@ -67,6 +67,9 @@ namespace Ogre {
     {
 		//mMinPixelSize should always be zero for lights otherwise lights will disapear
     	mMinPixelSize = 0;
+
+		mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
+		mObjectData.mWorldRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
     }
     //-----------------------------------------------------------------------
     Light::~Light()
