@@ -118,10 +118,6 @@ THE SOFTWARE.
 #   define GL_FILL    0x1B02
 #endif
 
-#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_NO_GLES3_SUPPORT == 1
-#   define GL_BGRA  0x80E1
-#endif
-
 namespace Ogre {
     class GLES2GpuProgram;
     class GLES2Texture;
