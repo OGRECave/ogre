@@ -234,12 +234,13 @@ namespace Volume {
         mTrilinearValue = false;
         float value;
         int x, y;
-        int xStart = Math::Clamp((int)(center.x - radius), 0, mWidth);
-        int xEnd = Math::Clamp((int)(center.x + radius), 0, mWidth);
-        int yStart = Math::Clamp((int)(center.y - radius), 0, mHeight);
-        int yEnd = Math::Clamp((int)(center.y + radius), 0, mHeight);
-        int zStart = Math::Clamp((int)(center.z - radius), 0, mDepth);
-        int zEnd = Math::Clamp((int)(center.z + radius), 0, mDepth);
+        Vector3 scaledCenter(center.x * mPosXScale, center.y * mPosYScale, center.z * mPosZScale);
+        int xStart = Math::Clamp((int)(scaledCenter.x - radius * mPosXScale), 0, mWidth);
+        int xEnd = Math::Clamp((int)(scaledCenter.x + radius * mPosXScale), 0, mWidth);
+        int yStart = Math::Clamp((int)(scaledCenter.y - radius * mPosYScale), 0, mHeight);
+        int yEnd = Math::Clamp((int)(scaledCenter.y + radius * mPosYScale), 0, mHeight);
+        int zStart = Math::Clamp((int)(scaledCenter.z - radius * mPosZScale), 0, mDepth);
+        int zEnd = Math::Clamp((int)(scaledCenter.z + radius * mPosZScale), 0, mDepth);
         Vector3 pos;
         for (int z = zStart; z < zEnd; ++z)
         {
