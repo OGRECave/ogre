@@ -230,20 +230,27 @@ namespace Ogre
 					}
 
 					size_t i=0;
+					const size_t newEnd = *itor + 1;
 					MemoryPoolVec::iterator itPools = m_memoryPools.begin();
 					MemoryPoolVec::iterator enPools = m_memoryPools.end();
 
 					//Shift everything N slots (N = lastRange)
 					while( itPools != enPools )
 					{
-						memcpy( *itPools + ( (*itor - lastRange + 1) * m_elementsMemSizes[i] ),
-								*itPools + ( (*itor + 1) * m_elementsMemSizes[i] ),
-								( m_usedMemory - *itor - 1 ) * m_elementsMemSizes[i] );
+						memcpy( *itPools + ( newEnd - lastRange ) * m_elementsMemSizes[i],
+								*itPools + newEnd * m_elementsMemSizes[i],
+								( m_usedMemory - newEnd ) * m_elementsMemSizes[i] );
+
+						//We need to default-initialize the garbage left after.
+						memset( *itPools + newEnd * m_elementsMemSizes[i], 0,
+								( m_maxMemory - newEnd ) * m_elementsMemSizes[i] );
+
 						++i;
 						++itPools;
 					}
 
 					m_usedMemory -= lastRange;
+					slotsRecreated( m_maxMemory - newEnd );
 
 					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
 														m_elementsMemSizes, (*itor - lastRange + 1),
