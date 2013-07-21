@@ -55,7 +55,9 @@ void Sample_VolumeTerrain::setupContent(void)
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
     mVolumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
+    Timer t;
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
+    LogManager::getSingleton().stream() << "Loaded volume terrain in " << t.getMillisecondsCPU() << " ms";
 
     // Camera
     mCamera->setPosition((Real)3264, (Real)2700, (Real)3264);
@@ -157,7 +159,7 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
         
         mVolumeRoot->getChunkParameters()->updateFrom = intersection - radius * (Real)2.0;
         mVolumeRoot->getChunkParameters()->updateTo = intersection + radius * (Real)2.0;
-        mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(256), 5, mVolumeRoot->getChunkParameters());
+        mVolumeRoot->load(mVolumeRootNode, Vector3::ZERO, Vector3(384), 5, mVolumeRoot->getChunkParameters());
         delete operation;
     }
 }
