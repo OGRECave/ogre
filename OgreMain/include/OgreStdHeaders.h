@@ -60,7 +60,7 @@
 #    	include <unordered_map>
 #    	include <unordered_set>
 #   elif OGRE_THREAD_PROVIDER == 1
-#       include <boost/unordered_set.hpp>
+#       include <boost/unordered_map.hpp>
 #       include <boost/unordered_set.hpp>
 #   else
 #   	error "Your compiler doesn't support unordered_set and unordered_map. Try to compile Ogre with Boost or STLPort."
