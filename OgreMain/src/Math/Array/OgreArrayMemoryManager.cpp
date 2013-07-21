@@ -242,8 +242,8 @@ namespace Ogre
 								( m_usedMemory - newEnd ) * m_elementsMemSizes[i] );
 
 						//We need to default-initialize the garbage left after.
-						memset( *itPools + newEnd * m_elementsMemSizes[i], 0,
-								( m_maxMemory - newEnd ) * m_elementsMemSizes[i] );
+						memset( *itPools + (m_usedMemory - lastRange) * m_elementsMemSizes[i], 0,
+								lastRange * m_elementsMemSizes[i] );
 
 						++i;
 						++itPools;
@@ -253,7 +253,7 @@ namespace Ogre
 					slotsRecreated( m_maxMemory - newEnd );
 
 					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
-														m_elementsMemSizes, (*itor - lastRange + 1),
+														m_elementsMemSizes, (newEnd - lastRange),
 														lastRange );
 					
 					itor += lastRange;
