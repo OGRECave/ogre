@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreCamera.h"
 #include "OgreGL3PlusTextureManager.h"
+#include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
@@ -1817,16 +1818,17 @@ namespace Ogre {
         //     printf("primType == GL_TRIANGLES: %.1u \n", primType == GL_TRIANGLES);
         // }
 
-
         // Bind atomic counter buffers.
         // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_ATOMIC_COUNTERS))
         // {
-        //     // GLuint atomicsBuffer;
-        //     // glGenBuffers(1, &atomicsBuffer);
+        //     GLuint atomicsBuffer = 0;
+            
+        //     glGenBuffers(1, &atomicsBuffer);
         //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 
         //                  static_cast<GL3PlusHardwareCounterBuffer*>(HardwareBufferManager::getSingleton().getCounterBuffer().getGLBufferId()));
-        //     glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * 3, NULL, GL_DYNAMIC_DRAW);
-        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+        //                  //static_cast<GL3PlusHardwareCounterBuffer*>(op..getCounterBuffer().getGLBufferId()));
+        //     // glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * 3, NULL, GL_DYNAMIC_DRAW);
+        //     // glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
         // }
         //TODO: Reset atomic counters somewhere
 
