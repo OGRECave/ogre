@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Ogre_Volume_MeshBuilder_H__
 
 #include <vector>
+#include "OgreSimpleRenderable.h"
 #include "OgreManualObject.h"
 #include "OgreRenderOperation.h"
 #include "OgreVector3.h"
@@ -143,8 +144,8 @@ namespace Volume {
     {
     public:
         /** To be called with the callback function of a MeshBuilder.
-        @param renderOperation
-            Contains the complete RenderOperation being built.
+        @param simpleRenderable
+            Contains the SimpleRenderable for which the triangles were built.
         @param vertices
             Contains the vertices of the triangles.
         @param indices
@@ -154,7 +155,7 @@ namespace Volume {
         @param inProcess
             The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        virtual void ready(const RenderOperation &renderOperation, const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
+        virtual void ready(const SimpleRenderable *simpleRenderable, const VecVertex &vertices, const VecIndices &indices, size_t level, int inProcess) = 0;
     };
 
     /** Class to build up a mesh with vertices and indices.
@@ -349,14 +350,14 @@ namespace Volume {
         /** Executes a MeshBuilderCallback on this instance.
         @param callback
             The callback to execute.
-        @param renderOperation
-            The RenderOperation being built.
+        @param simpleRenderable
+            Contains the SimpleRenderable for which the triangles were built.
         @param level
             The LOD level of this mesh.
         @param inProcess
             The amount of other meshes/LOD-Chunks still to be loaded.
         */
-        void executeCallback(MeshBuilderCallback *callback, const RenderOperation &renderOperation, size_t level, int inProcess) const;
+        void executeCallback(MeshBuilderCallback *callback, const SimpleRenderable *simpleRenderable, size_t level, int inProcess) const;
 
     };
 }
