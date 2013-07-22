@@ -130,8 +130,8 @@ namespace Ogre  {
             case PF_B8G8R8A8:
 			case PF_R8G8B8A8:
             case PF_A2R10G10B10:
-#if defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                return GL_BGRA;
+#if defined(GL_BGRA_EXT) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+                return GL_BGRA_EXT;
 #endif
             case PF_A8B8G8R8:
             case PF_A4R4G4B4:
@@ -645,8 +645,8 @@ namespace Ogre  {
                     default:
                         return PF_A8B8G8R8;
                 }
-#if defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            case GL_BGRA:
+#if defined(GL_BGRA_EXT) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            case GL_BGRA_EXT:
                 return PF_A8B8G8R8;
 #endif
             case GL_RGB8_OES:

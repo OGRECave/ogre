@@ -173,6 +173,20 @@ namespace Ogre {
 #define glDrawElementsInstancedAPPLE glDrawElementsInstanced
 #define glDrawArraysInstancedAPPLE glDrawArraysInstanced
 #define glVertexAttribDivisorAPPLE glVertexAttribDivisor
+#define glMapBufferRangeEXT glMapBufferRange
+#define GL_MAP_WRITE_BIT_EXT GL_MAP_WRITE_BIT
+#define GL_MAP_FLUSH_EXPLICIT_BIT_EXT GL_MAP_FLUSH_EXPLICIT_BIT
+#define GL_MAP_INVALIDATE_RANGE_BIT_EXT GL_MAP_INVALIDATE_RANGE_BIT
+#define GL_MAP_UNSYNCHRONIZED_BIT_EXT GL_MAP_UNSYNCHRONIZED_BIT
+#define GL_MAP_READ_BIT_EXT GL_MAP_READ_BIT
+#define GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE GL_SYNC_GPU_COMMANDS_COMPLETE
+#define glFenceSyncAPPLE glFenceSync
+#define glClientWaitSyncAPPLE glClientWaitSync
+#define GL_SYNC_FLUSH_COMMANDS_BIT_APPLE GL_SYNC_FLUSH_COMMANDS_BIT
+#define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
+#define GL_WAIT_FAILED_APPLE GL_WAIT_FAILED
+#define glDeleteSyncAPPLE glDeleteSync
+#define GL_BGRA_EXT GL_BGRA
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
