@@ -78,7 +78,7 @@ compute_program JAJ/Basic/CS_GLSL glsl
 
         default_params
         {
-            param_named number float 1
+            // param_named name float 10
         }
 }
 
@@ -108,6 +108,12 @@ fragment_program JAJ/Basic/PS_GLSL glsl
 {
         source JAJBasicFS.glsl
         syntax glsl150
+
+        default_params
+        {
+            // param_named atom_counter atomic_counter 10 5
+            param_named atom_counter atomic_counter 10
+        }
 }
 
 compute_program JAJ/Basic/CS unified

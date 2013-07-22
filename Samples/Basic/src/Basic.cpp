@@ -24,6 +24,8 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 {
     Entity* mOgreEnt;
 
+    //HardwareCounterBufferSharedPtr mBuffer;
+
  public:
         
     Sample_Basic() 
@@ -60,6 +62,8 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
         ogre->setPosition(50, -50, 140);
         ogre->setDirection(0,0,1);
         ogre->attachObject(mOgreEnt);
+
+        //mBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(sizeof(uint32), HardwareBuffer::HBU_WRITE_ONLY, false);
     }
 
     void cleanupContent()
@@ -89,6 +93,13 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
             }
         }
 
+        //renderPass->getFragmentProgramParameters()->getNamedConstant("ColourMe[1]", timeParam);
+        int counter = 0;
+        //mBuffer.readData(0, 0, &counter);
+        
+        std::cout << counter << std::endl;
+        // renderPass->getFragmentProgramParameters()->getConstantDefinition("atom_counter").getValue();
+        //renderPass->getFragmentProgramParameters()->getConstantDefinition("atom_counter").getValue();
         return SdkSample::frameRenderingQueued(evt); 
     }
 };
