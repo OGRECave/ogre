@@ -836,7 +836,7 @@ namespace Ogre {
 			mClipPlanesDirty = false;
 		}
     }
-	void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName)
+	void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot)
 	{
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 			"This rendersystem does not support reading back the inactive depth/stencil",

@@ -76,11 +76,10 @@ namespace Ogre {
 					"D3D11Texture::_queryInterface" );
 			}
 		}
-
+		unsigned int mEffectIndex;
 #ifdef USE_D3DX11_LIBRARY		
 		void _loadDDS(DataStreamPtr &dstream);
-		ID3DX11Effect mEffect;
-		unsinged int mEffectIndex;
+		//ID3DX11Effect mEffect;
 #endif
         void _create1DResourceView();
 		void _create2DResourceView();

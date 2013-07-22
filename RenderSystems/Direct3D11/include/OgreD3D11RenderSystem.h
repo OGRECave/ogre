@@ -351,7 +351,7 @@ namespace Ogre
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
 		void setVertexBufferBinding(VertexBufferBinding* binding);
-		void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName);
+		void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const RenderOperation& op);
         /** See
           RenderSystem
