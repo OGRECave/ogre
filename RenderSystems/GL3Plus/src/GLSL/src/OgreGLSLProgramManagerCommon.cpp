@@ -174,6 +174,9 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("image2DMSArray", GL_IMAGE_2D_MULTISAMPLE_ARRAY));
         mTypeEnumMap.insert(StringToEnumMap::value_type("iimage2DMSArray", GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY));
         mTypeEnumMap.insert(StringToEnumMap::value_type("uimage2DMSArray", GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY));
+
+        // GL 4.2
+        mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
     }
 
     //-----------------------------------------------------------------------
@@ -187,6 +190,7 @@ namespace Ogre {
         // Decode uniform size and type
         // Note GLSL never packs rows into float4's(from an API perspective anyway)
         // therefore all values are tight in the buffer
+        //TODO Should the rest of the above enum types be included here?
         switch (gltype)
         {
         case GL_FLOAT:
@@ -242,6 +246,8 @@ namespace Ogre {
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
             break;
         case GL_INT:
+        case GL_UNSIGNED_INT: //JAJ+
+        case GL_UNSIGNED_INT_ATOMIC_COUNTER:
             defToUpdate.constType = GCT_INT1;
             break;
         case GL_INT_VEC2:
@@ -441,14 +447,21 @@ namespace Ogre {
 
             // Don't add built in uniforms
             OGRE_CHECK_GL_ERROR(newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName));
-            if (newGLUniformReference.mLocation >= 0)
+            //JAJ
+            if (newGLUniformReference.mLocation >= 0)// || glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
             {
                 // User defined uniform found, add it to the reference list
-                String paramName = String( uniformName );
+                String paramName = String(uniformName);
 
-                // Current ATI drivers (Catalyst 7.2 and earlier) and older NVidia drivers will include all array elements as uniforms but we only want the root array name and location
-                // Also note that ATI Catalyst 6.8 to 7.2 there is a bug with glUniform that does not allow you to update a uniform array past the first uniform array element
-                // ie you can't start updating an array starting at element 1, must always be element 0.
+                // Current ATI drivers (Catalyst 7.2 and earlier) and
+                // older NVidia drivers will include all array
+                // elements as uniforms but we only want the root
+                // array name and location. Also note that ATI Catalyst
+                // 6.8 to 7.2 there is a bug with glUniform that does
+                // not allow you to update a uniform array past the
+                // first uniform array element ie you can't start
+                // updating an array starting at element 1, must
+                // always be element 0.
 
                 // If the uniform name has a "[" in it then its an array element uniform.
                 String::size_type arrayStart = paramName.find("[");
@@ -460,10 +473,12 @@ namespace Ogre {
                 }
 
                 // Find out which params object this comes from
-                bool foundSource = completeParamSource(paramName,
-                                                       vertexConstantDefs, geometryConstantDefs,
-                                                       fragmentConstantDefs, hullConstantDefs,
-                                                       domainConstantDefs, computeConstantDefs, newGLUniformReference);
+                bool foundSource = completeParamSource(
+                    paramName,
+                    vertexConstantDefs, geometryConstantDefs,
+                    fragmentConstantDefs, hullConstantDefs,
+                    domainConstantDefs, computeConstantDefs,
+                    newGLUniformReference);
 
                 // Only add this parameter if we found the source
                 if (foundSource)
@@ -478,6 +493,59 @@ namespace Ogre {
                 // anyway, individual indexes are only needed for lookup from
                 // user params
             } // end if
+            // Handle atomic counters.
+            // Currently atomic counters cannot be in uniform blocks
+            // and are always unsigned integers.
+            // else if (glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
+            // {
+            //     String paramName = String(uniformName);
+
+            //     // increment the total number of atomic counters
+            //     // including size of array if applicable
+            //     //atomicCounterCount += arraySize;
+            //     // actually, this should not be necessary since
+            //     // parameters are processed one by one
+
+            //     // If the uniform name has a "[" in it then its an array element uniform.
+            //     String::size_type arrayStart = paramName.find("[");
+            //     if (arrayStart != String::npos)
+            //     {
+            //         // if not the first array element then skip it and continue to the next uniform
+            //         if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
+            //         paramName = paramName.substr(0, arrayStart);
+            //     }
+
+            //     std::cout << "ATOMIC COUNTER FOUND: " << paramName  << " " << arraySize << std::endl;
+
+            //     // Find out which params object this comes from
+            //     bool foundSource = completeParamSource(
+            //         paramName,
+            //         vertexConstantDefs, geometryConstantDefs,
+            //         fragmentConstantDefs, hullConstantDefs,
+            //         domainConstantDefs, computeConstantDefs,
+            //         newGLUniformReference);
+
+            //     // Only add this parameter if we found the source
+            //     if (foundSource)
+            //     {
+            //         // size_t adjustedArraySize = 0;
+            //         // if (arraySize == 2 && newGLUniformReference.mConstantDef->arraySize == 1) {
+            //         //     adjustedArraySize = 1;
+            //         // }
+            //         // else {
+            //         //     adjustedArraySize = (size_t) arraySize;
+            //         // }
+
+            //         //FIXME On Linux AMD Catalyst 13.4, OpenGL reports
+            //         // a single atomic counter as having size 2.  Bug
+            //         // or feature?
+            //         // assert((size_t)arraySize == newGLUniformReference.mConstantDef->arraySize
+            //         //        && "GL doesn't agree with our array size!");
+                    
+            //         list.push_back(newGLUniformReference);
+            //         printf("ATOMIC COUNTER SOURCE FOUND");
+            //     }
+            // }
         } // end for
 
         // Now deal with uniform blocks
@@ -693,10 +761,10 @@ namespace Ogre {
                     String::size_type arrayEnd = i->find("]", arrayStart);
                     String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
                     StringUtil::trim(arrayDimTerm);
+                    //TODO
                     // the array term might be a simple number or it might be
                     // an expression (e.g. 24*3) or refer to a constant expression
                     // we'd have to evaluate the expression which could get nasty
-                    // TODO
                     def.arraySize = StringConverter::parseInt(arrayDimTerm);
                 }
                 else
