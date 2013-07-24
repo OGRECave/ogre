@@ -1639,6 +1639,12 @@ namespace Ogre
 		static void writeLayerInstanceList(const Terrain::LayerInstanceList& lst, StreamSerialiser& ser);
 		/// Utility method to read a layer instance list from a stream
 		static bool readLayerInstanceList(StreamSerialiser& ser, size_t numSamplers, Terrain::LayerInstanceList& targetlst);
+
+		// This mutex is write-locked by neighbours if they are in the process of deleting themselves.
+		// It should be read-locked whenever using neighbours in calculations which are possibly running in a
+		// background thread.
+		OGRE_RW_MUTEX(mNeighbourMutex);
+
 	protected:
 		/** Gets the data size at a given LOD level.
 		*/
@@ -1709,7 +1715,8 @@ namespace Ogre
 		// overflow a point into a neighbour index and point
 		void getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy);
 
-		
+		/// Removes this terrain instance from neighbouring terrain's list of neighbours.
+		void removeFromNeighbours();
 
 		uint16 mWorkQueueChannel;
 		SceneManager* mSceneMgr;
