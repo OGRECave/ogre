@@ -140,6 +140,11 @@ namespace Ogre
 		/// Convenience method - this section always uses a grid strategy
 		virtual Grid2DPageStrategyData* getGridStrategyData() const;
 
+		/// Set the interval between the loading of single pages in milliseconds (ms)
+		virtual void setLoadingIntervalMs(uint32 loadingIntervalMs);
+		/// Get the interval between the loading of single pages in milliseconds (ms)
+		virtual uint32 getLoadingIntervalMs() const;
+
 		/// Overridden from PagedWorldSection
 		void loadPage(PageID pageID, bool forceSynchronous = false);
 		/// Overridden from PagedWorldSection
@@ -151,7 +156,6 @@ namespace Ogre
 		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
 		static const uint16 WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST;
-		static const uint64 LOADING_TERRAIN_PAGE_INTERVAL_MS;
 
 		class TerrainDefiner : public TerrainAlloc
 		{
@@ -177,6 +181,7 @@ namespace Ogre
 		bool mHasRunningTasks;
 		uint16 mWorkQueueChannel;
 		unsigned long mNextLoadingTime;
+		uint32 mLoadingIntervalMs;
 
 		/// Overridden from PagedWorldSection
 		void loadSubtypeData(StreamSerialiser& ser);

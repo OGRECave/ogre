@@ -35,7 +35,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 	const uint16 TerrainPagedWorldSection::WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST = 1;
-	const uint64 TerrainPagedWorldSection::LOADING_TERRAIN_PAGE_INTERVAL_MS = 900;
 
 	//---------------------------------------------------------------------
 	TerrainPagedWorldSection::TerrainPagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm)
@@ -43,6 +42,7 @@ namespace Ogre
 		, mTerrainGroup(0)
 		, mTerrainDefiner(0)
 		, mHasRunningTasks(false)
+		, mLoadingIntervalMs(900)
 	{
 		// we always use a grid strategy
 		setStrategy(parent->getManager()->getStrategy("Grid2D"));
@@ -190,6 +190,17 @@ namespace Ogre
 		return static_cast<Grid2DPageStrategyData*>(mStrategyData);
 	}
 	//---------------------------------------------------------------------
+	void TerrainPagedWorldSection::setLoadingIntervalMs(uint32 loadingIntervalMs)
+	{
+		mLoadingIntervalMs = loadingIntervalMs;
+	}
+	//---------------------------------------------------------------------
+	uint32 TerrainPagedWorldSection::getLoadingIntervalMs() const
+	{
+		return mLoadingIntervalMs;
+	}
+
+	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::loadSubtypeData(StreamSerialiser& ser)
 	{
 		// we load the TerrainGroup information from here
@@ -273,7 +284,7 @@ namespace Ogre
 		}
 
 		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
-		if(currentTime < mNextLoadingTime) 
+		if(currentTime < mNextLoadingTime)
 		{
 			// Wait until the next page is to be loaded -> we are in background thread here
 			OGRE_THREAD_SLEEP(mNextLoadingTime - currentTime);
@@ -307,7 +318,7 @@ namespace Ogre
 		mPagesInLoading.pop_front();
 
 		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
-		mNextLoadingTime = currentTime + LOADING_TERRAIN_PAGE_INTERVAL_MS;
+		mNextLoadingTime = currentTime + mLoadingIntervalMs;
 
 		if(!mPagesInLoading.empty())
 		{
