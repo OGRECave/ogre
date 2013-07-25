@@ -357,6 +357,20 @@ void SceneManager::destroyAllCameras(void)
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
 {
+	const size_t totalNumObjects = mLightMemoryManager.getTotalNumObjects() + 1;
+	if( mGlobalLightList.lights.capacity() < totalNumObjects )
+	{
+		assert( mGlobalLightList.lights.empty() &&
+				"Don't create objects in the middle of a scene update!" );
+		mGlobalLightList.lights.reserve( totalNumObjects );
+		OGRE_FREE_SIMD( mGlobalLightList.visibilityMask, MEMCATEGORY_SCENE_CONTROL );
+		OGRE_FREE_SIMD( mGlobalLightList.boundingSphere, MEMCATEGORY_SCENE_CONTROL );
+		mGlobalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, totalNumObjects,
+															MEMCATEGORY_SCENE_CONTROL );
+		mGlobalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, totalNumObjects,
+															MEMCATEGORY_SCENE_CONTROL );
+	}
+
 	return static_cast<Light*>(
 		createMovableObject(LightFactory::FACTORY_TYPE_NAME, &mLightMemoryManager));
 }
@@ -1406,17 +1420,6 @@ void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverl
     // Update controllers 
     ControllerManager::getSingleton().updateAllControllers();
 
-    // Update the scene, only do this once per frame
-    unsigned long thisFrameNumber = Root::getSingleton().getNextFrameNumber();
-    if (thisFrameNumber != mLastFrameNumber)
-    {
-		//TODO: (dark_sylinc) update this once per frame, not per camera
-        // Update animations
-        _applySceneAnimations();
-		updateDirtyInstanceManagers();
-        mLastFrameNumber = thisFrameNumber;
-    }
-
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
 		OGRE_LOCK_MUTEX(sceneGraphMutex)
@@ -2319,32 +2322,14 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 //-----------------------------------------------------------------------
 void SceneManager::buildLightList()
 {
-	//TODO: Avoid reallocating this every frame.
-	LightListInfo globalLightList;
-
-	size_t totalNumObjects = 0;
-
-	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
-	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
-
-	while( it != en )
-	{
-		totalNumObjects += (*it)->getTotalNumObjects();
-		++it;
-	}
-
-	globalLightList.lights.reserve( totalNumObjects );
-	globalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, totalNumObjects,
-														MEMCATEGORY_SCENE_CONTROL );
-	globalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, totalNumObjects,
-														MEMCATEGORY_SCENE_CONTROL );
+	mGlobalLightList.lights.clear();
 
 	//TODO: (dark_sylinc) Some cameras in mCamera may not be in use.
 	//Compo Mgr. will know which cameras will be active
 	FrustumVec frustums( mCameras.begin(), mCameras.end() );
 
-	it = mLightsMemoryManagerCulledList.begin();
-	en = mLightsMemoryManagerCulledList.end();
+	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
 	while( it != en )
 	{
@@ -2359,7 +2344,7 @@ void SceneManager::buildLightList()
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			Light::cullLights( numObjs, objData, globalLightList, frustums );
+			Light::cullLights( numObjs, objData, mGlobalLightList, frustums );
 		}
 
 		++it;
@@ -2378,14 +2363,11 @@ void SceneManager::buildLightList()
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			MovableObject::buildLightList( numObjs, objData, globalLightList );
+			MovableObject::buildLightList( numObjs, objData, mGlobalLightList );
 		}
 
 		++it;
 	}
-
-	OGRE_FREE_SIMD( globalLightList.visibilityMask, MEMCATEGORY_SCENE_CONTROL );
-	OGRE_FREE_SIMD( globalLightList.boundingSphere, MEMCATEGORY_SCENE_CONTROL );
 }
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()
@@ -2417,6 +2399,8 @@ void SceneManager::updateSceneGraph()
 
 	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
 	highLevelCull();
+	_applySceneAnimations();
+	updateDirtyInstanceManagers();
 	updateAllTransforms();
 	updateAllBounds( mEntitiesMemoryManagerCulledList );
 	updateAllBounds( mLightsMemoryManagerCulledList );

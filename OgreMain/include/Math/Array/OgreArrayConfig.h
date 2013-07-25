@@ -52,6 +52,16 @@ THE SOFTWARE.
 
 				class ArrayRadian;
 			}
+
+			#define OGRE_PREFETCH_T0( x ) _mm_prefetch( x, _MM_HINT_T0 )
+			#define OGRE_PREFETCH_T1( x ) _mm_prefetch( x, _MM_HINT_T1 )
+			#define OGRE_PREFETCH_T2( x ) _mm_prefetch( x, _MM_HINT_T2 )
+			#define OGRE_PREFETCH_NTA( x ) _mm_prefetch( x, _MM_HINT_NTA )
+
+			//Distance (in ArrayMemoryManager's slots) used to keep fetching data. This also
+			//means the memory manager needs to allocate extra memory for them.
+			#define OGRE_PREFETCH_SLOT_DISTANCE		4*ARRAY_PACKED_REALS //Must be multiple of ARRAY_PACKED_REALS
+
 		#endif
 
 		namespace Ogre {

@@ -63,8 +63,8 @@ namespace Ogre
 		/// Caches the combined scale from all parent nodes.
 		ArrayVector3	* RESTRICT_ALIAS	mDerivedScale;
 
-		/// Caches the full transform into a 4x4 matrix
-		ArrayMatrix4	* RESTRICT_ALIAS	mDerivedTransform;
+		/// Caches the full transform into a 4x4 matrix. Note it's not Array form! (It's AoS)
+		Matrix4			* RESTRICT_ALIAS	mDerivedTransform;
 
 		/// Stores whether this node inherits orientation from it's parent.
 		/// Ours is mInheritOrientation[mIndex]
@@ -135,8 +135,7 @@ namespace Ogre
 			copy.mDerivedScale->getAsVector3( tmp, copy.mIndex );
 			mDerivedScale->setFromVector3( tmp, mIndex );
 
-			copy.mDerivedTransform->getAsMatrix4( matTmp, copy.mIndex );
-			mDerivedTransform->setFromMatrix4( matTmp, mIndex );
+			mDerivedTransform[mIndex] = copy.mDerivedTransform[mIndex];
 
 			mInheritOrientation[mIndex]	= copy.mInheritOrientation[copy.mIndex];
 			mInheritScale[mIndex]		= copy.mInheritScale[copy.mIndex];
@@ -169,7 +168,7 @@ namespace Ogre
 			mDerivedScale		= reinterpret_cast<ArrayVector3*>(
 									newBasePtrs[NodeArrayMemoryManager::DerivedScale] + diff );
 
-			mDerivedTransform	= reinterpret_cast<ArrayMatrix4*>(
+			mDerivedTransform	= reinterpret_cast<Matrix4*>(
 									newBasePtrs[NodeArrayMemoryManager::WorldMat] + diff );
 
 			mInheritOrientation = reinterpret_cast<bool*>(
@@ -217,7 +216,7 @@ namespace Ogre
 			++mDerivedPosition;
 			++mDerivedOrientation;
 			++mDerivedScale;
-			++mDerivedTransform;
+			mDerivedTransform	+= ARRAY_PACKED_REALS;
 			mInheritOrientation	+= ARRAY_PACKED_REALS;
 			mInheritScale		+= ARRAY_PACKED_REALS;
 		}
@@ -232,7 +231,7 @@ namespace Ogre
 			mDerivedPosition	+= numAdvance;
 			mDerivedOrientation	+= numAdvance;
 			mDerivedScale		+= numAdvance;
-			mDerivedTransform	+= numAdvance;
+			mDerivedTransform	+= ARRAY_PACKED_REALS * numAdvance;
 			mInheritOrientation	+= ARRAY_PACKED_REALS * numAdvance;
 			mInheritScale		+= ARRAY_PACKED_REALS * numAdvance;
 		}

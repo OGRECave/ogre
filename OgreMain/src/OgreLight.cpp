@@ -79,6 +79,24 @@ namespace Ogre {
     void Light::setType(LightTypes type)
     {
         mLightType = type;
+
+		switch( mLightType )
+		{
+		case LT_POINT:
+			mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+			mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+												 mObjectData.mIndex );
+			break;
+		case LT_DIRECTIONAL:
+			mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
+			break;
+		case LT_SPOTLIGHT:
+			//TODO: (dark_sylinc)
+			//mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+			//mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ) );
+			break;
+		}
     }
     //-----------------------------------------------------------------------
     Light::LightTypes Light::getType(void) const
@@ -129,16 +147,29 @@ namespace Ogre {
         mSpotInner = innerAngle;
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
+
+		if( mLightType == LT_SPOTLIGHT )
+		{
+			//TODO: (dark_sylinc) Change bounds
+		}
     }
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightInnerAngle(const Radian& val)
 	{
 		mSpotInner = val;
+		if( mLightType == LT_SPOTLIGHT )
+		{
+			//TODO: (dark_sylinc) Change bounds
+		}
 	}
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightOuterAngle(const Radian& val)
 	{
 		mSpotOuter = val;
+		if( mLightType == LT_SPOTLIGHT )
+		{
+			//TODO: (dark_sylinc) Change bounds
+		}
 	}
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightFalloff(Real val)
@@ -202,6 +233,17 @@ namespace Ogre {
         mAttenuationConst = constant;
         mAttenuationLinear = linear;
         mAttenuationQuad = quadratic;
+
+		if( mLightType == LT_POINT )
+		{
+			mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+			mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+												 mObjectData.mIndex );
+		}
+		else if( mLightType == LT_SPOTLIGHT )
+		{
+			//TODO: (dark_sylinc)
+		}
     }
     //-----------------------------------------------------------------------
     Real Light::getAttenuationRange(void) const

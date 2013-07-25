@@ -96,7 +96,7 @@ namespace Ogre
 												nextSlotBase * m_elementsMemSizes[DerivedOrientation] );
 		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( m_memoryPools[DerivedScale] +
 												nextSlotBase * m_elementsMemSizes[DerivedScale] );
-		outTransform.mDerivedTransform	= reinterpret_cast<ArrayMatrix4*>( m_memoryPools[WorldMat] +
+		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( m_memoryPools[WorldMat] +
 												nextSlotBase * m_elementsMemSizes[WorldMat] );
 		outTransform.mInheritOrientation= reinterpret_cast<bool*>( m_memoryPools[InheritOrientation] +
 												nextSlotBase * m_elementsMemSizes[InheritOrientation] );
@@ -112,7 +112,7 @@ namespace Ogre
 		outTransform.mDerivedPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mDerivedOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
 		outTransform.mDerivedScale->setFromVector3( Vector3::UNIT_SCALE, nextSlotIdx );
-		outTransform.mDerivedTransform->setFromMatrix4( Matrix4::IDENTITY, nextSlotIdx );
+		outTransform.mDerivedTransform[nextSlotIdx] = Matrix4::IDENTITY;
 		outTransform.mInheritOrientation[nextSlotIdx]	= true;
 		outTransform.mInheritScale[nextSlotIdx]			= true;
 	}
@@ -142,7 +142,7 @@ namespace Ogre
 		outTransform.mDerivedOrientation= reinterpret_cast<ArrayQuaternion*>(
 														m_memoryPools[DerivedOrientation] );
 		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( m_memoryPools[DerivedScale] );
-		outTransform.mDerivedTransform	= reinterpret_cast<ArrayMatrix4*>( m_memoryPools[WorldMat] );
+		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( m_memoryPools[WorldMat] );
 		outTransform.mInheritOrientation= reinterpret_cast<bool*>( m_memoryPools[InheritOrientation] );
 		outTransform.mInheritScale		= reinterpret_cast<bool*>( m_memoryPools[InheritScale] );
 

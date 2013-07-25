@@ -40,6 +40,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	class SimpleMatrix4;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -187,11 +189,44 @@ namespace Ogre
 		inline void makeTransform( const ArrayVector3 &position, const ArrayVector3 &scale,
 									const ArrayQuaternion &orientation );
 
+		/** Converts these matrices contained in this ArrayMatrix to AoS form and stores them in dst
+		@remarks
+			'dst' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS matrices
+		*/
+		inline void storeToAoS( Matrix4 * RESTRICT_ALIAS dst ) const;
+
+		/** Converts ARRAY_PACKED_REALS matrices into this ArrayMatrix
+		@remarks
+			'src' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS matrices
+		*/
+		inline void loadFromAoS( Matrix4 * RESTRICT_ALIAS src );
+		inline void loadFromAoS( SimpleMatrix4 * RESTRICT_ALIAS src );
+
 		/// @copydoc Matrix4::isAffine()
 		inline bool isAffine() const;
 
 		static const ArrayMatrix4 IDENTITY;
     };
+
+	/** Simple wrap up to load an AoS matrix 4x4 using SSE. The main reason of this class
+		is to force MSVC to use 4 movaps to load arrays of Matrix4s (which are waaay more
+		efficient that whatever lea+mov junk it tries to produce)
+	*/
+	class _OgreExport SimpleMatrix4
+    {
+    public:
+		ArrayReal		m_chunkBase[4];
+
+		/// Assumes src is aligned
+		void load( const Matrix4 &src )
+		{
+			m_chunkBase[0] = _mm_load_ps( src._m );
+			m_chunkBase[1] = _mm_load_ps( src._m+4 );
+			m_chunkBase[2] = _mm_load_ps( src._m+8 );
+			m_chunkBase[3] = _mm_load_ps( src._m+12 );
+		}
+	};
+
 	/** @} */
 	/** @} */
 

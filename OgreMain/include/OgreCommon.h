@@ -568,6 +568,13 @@ namespace Ogre {
 		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
 		uint32	* RESTRICT_ALIAS		visibilityMask;
 		Sphere	* RESTRICT_ALIAS 		boundingSphere;
+
+		LightListInfo() : visibilityMask(0), boundingSphere(0) {}
+		~LightListInfo()
+		{
+			OGRE_FREE_SIMD( visibilityMask, MEMCATEGORY_SCENE_CONTROL );
+			OGRE_FREE_SIMD( boundingSphere, MEMCATEGORY_SCENE_CONTROL );
+		}
 	};
 	typedef HashedVector<LightClosest> LightList;
 

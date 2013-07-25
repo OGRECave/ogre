@@ -453,4 +453,108 @@ namespace Ogre
 		return _mm_movemask_ps( mask ) == 0x0f;
 	}
 	//-----------------------------------------------------------------------------------
+	inline void ArrayMatrix4::storeToAoS( Matrix4 * RESTRICT_ALIAS dst ) const
+	{
+		//Do not use the unpack version, use the shuffle. Shuffle is faster in k10 processors
+		//("The conceptual shuffle" http://developer.amd.com/community/blog/the-conceptual-shuffle/)
+		//and the unpack version uses 64-bit moves, which can cause store forwarding issues when
+		//then loading them with 128-bit movaps
+#define _MM_TRANSPOSE4_SRC_DST_PS(row0, row1, row2, row3, dst0, dst1, dst2, dst3) { \
+            __m128 tmp3, tmp2, tmp1, tmp0;                          \
+                                                                    \
+            tmp0   = _mm_shuffle_ps((row0), (row1), 0x44);          \
+            tmp2   = _mm_shuffle_ps((row0), (row1), 0xEE);          \
+            tmp1   = _mm_shuffle_ps((row2), (row3), 0x44);          \
+            tmp3   = _mm_shuffle_ps((row2), (row3), 0xEE);          \
+                                                                    \
+            (dst0) = _mm_shuffle_ps(tmp0, tmp1, 0x88);              \
+            (dst1) = _mm_shuffle_ps(tmp0, tmp1, 0xDD);              \
+            (dst2) = _mm_shuffle_ps(tmp2, tmp3, 0x88);              \
+            (dst3) = _mm_shuffle_ps(tmp2, tmp3, 0xDD);              \
+        }
+		//ArrayMatrix4 * RESTRICT_ALIAS dst = reinterpret_cast<ArrayMatrix4 * RESTRICT_ALIAS>( _dst );
+		register ArrayReal m0, m1, m2, m3;
+
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->m_chunkBase[0], this->m_chunkBase[1],
+							this->m_chunkBase[2], this->m_chunkBase[3],
+							m0, m1, m2, m3 );
+		_mm_stream_ps( dst[0]._m, m0 );
+		_mm_stream_ps( dst[1]._m, m1 );
+		_mm_stream_ps( dst[2]._m, m2 );
+		_mm_stream_ps( dst[3]._m, m3 );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->m_chunkBase[4], this->m_chunkBase[5],
+							this->m_chunkBase[6], this->m_chunkBase[7],
+							m0, m1, m2, m3 );
+		_mm_stream_ps( dst[0]._m+4, m0 );
+		_mm_stream_ps( dst[1]._m+4, m1 );
+		_mm_stream_ps( dst[2]._m+4, m2 );
+		_mm_stream_ps( dst[3]._m+4, m3 );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->m_chunkBase[8], this->m_chunkBase[9],
+							this->m_chunkBase[10], this->m_chunkBase[11],
+							m0, m1, m2, m3 );
+		_mm_stream_ps( dst[0]._m+8, m0 );
+		_mm_stream_ps( dst[1]._m+8, m1 );
+		_mm_stream_ps( dst[2]._m+8, m2 );
+		_mm_stream_ps( dst[3]._m+8, m3 );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->m_chunkBase[12], this->m_chunkBase[13],
+							this->m_chunkBase[14], this->m_chunkBase[15],
+							m0, m1, m2, m3 );
+		_mm_stream_ps( dst[0]._m+12, m0 );
+		_mm_stream_ps( dst[1]._m+12, m1 );
+		_mm_stream_ps( dst[2]._m+12, m2 );
+		_mm_stream_ps( dst[3]._m+12, m3 );
+	}
+	//-----------------------------------------------------------------------------------
+	inline void ArrayMatrix4::loadFromAoS( Matrix4 * RESTRICT_ALIAS src )
+	{
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							_mm_load_ps( src[0]._m ), _mm_load_ps( src[1]._m ), 
+							_mm_load_ps( src[2]._m ), _mm_load_ps( src[3]._m ),
+							this->m_chunkBase[0], this->m_chunkBase[1],
+							this->m_chunkBase[2], this->m_chunkBase[3] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							_mm_load_ps( src[0]._m+4 ), _mm_load_ps( src[1]._m+4 ), 
+							_mm_load_ps( src[2]._m+4 ), _mm_load_ps( src[3]._m+4 ),
+							this->m_chunkBase[4], this->m_chunkBase[5],
+							this->m_chunkBase[6], this->m_chunkBase[7] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							_mm_load_ps( src[0]._m+8 ), _mm_load_ps( src[1]._m+8 ), 
+							_mm_load_ps( src[2]._m+8 ), _mm_load_ps( src[3]._m+8 ),
+							this->m_chunkBase[8], this->m_chunkBase[9],
+							this->m_chunkBase[10], this->m_chunkBase[11] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							_mm_load_ps( src[0]._m+12 ), _mm_load_ps( src[1]._m+12 ), 
+							_mm_load_ps( src[2]._m+12 ), _mm_load_ps( src[3]._m+12 ),
+							this->m_chunkBase[12], this->m_chunkBase[13],
+							this->m_chunkBase[14], this->m_chunkBase[15] );
+	}
+	//-----------------------------------------------------------------------------------
+	inline void ArrayMatrix4::loadFromAoS( SimpleMatrix4 * RESTRICT_ALIAS src )
+	{
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							src[0].m_chunkBase[0], src[1].m_chunkBase[0],
+							src[2].m_chunkBase[0], src[3].m_chunkBase[0],
+							this->m_chunkBase[0], this->m_chunkBase[1],
+							this->m_chunkBase[2], this->m_chunkBase[3] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							src[0].m_chunkBase[1], src[1].m_chunkBase[1],
+							src[2].m_chunkBase[1], src[3].m_chunkBase[1],
+							this->m_chunkBase[4], this->m_chunkBase[5],
+							this->m_chunkBase[6], this->m_chunkBase[7] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							src[0].m_chunkBase[2], src[1].m_chunkBase[2],
+							src[2].m_chunkBase[2], src[3].m_chunkBase[2],
+							this->m_chunkBase[8], this->m_chunkBase[9],
+							this->m_chunkBase[10], this->m_chunkBase[11] );
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							src[0].m_chunkBase[3], src[1].m_chunkBase[3],
+							src[2].m_chunkBase[3], src[3].m_chunkBase[3],
+							this->m_chunkBase[12], this->m_chunkBase[13],
+							this->m_chunkBase[14], this->m_chunkBase[15] );
+	}
+	//-----------------------------------------------------------------------------------
 }

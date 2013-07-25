@@ -79,6 +79,7 @@ namespace Ogre
     {
     protected:
 		friend class ArrayMatrix4;
+		friend class SimpleMatrix4;
         /// The matrix entries, indexed by [row][col].
         union {
             Real m[4][4];

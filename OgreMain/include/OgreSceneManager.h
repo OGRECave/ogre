@@ -386,6 +386,9 @@ namespace Ogre {
         RenderQueue* mRenderQueue;
 		bool mLastRenderQueueInvocationCustom;
 
+		/// Updated every frame, has enough memory to hold all lights.
+		LightListInfo mGlobalLightList;
+
         /// Current ambient light, cached for RenderSystem
         ColourValue mAmbientLight;
 

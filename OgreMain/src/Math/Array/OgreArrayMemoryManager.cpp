@@ -33,7 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const size_t ArrayMemoryManager::MAX_MEMORY_SLOTS = (size_t)(-ARRAY_PACKED_REALS) - 1;
+	const size_t ArrayMemoryManager::MAX_MEMORY_SLOTS = (size_t)(-ARRAY_PACKED_REALS) - 1
+															- OGRE_PREFETCH_SLOT_DISTANCE;
 
 	ArrayMemoryManager::ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
 											size_t numElementsSize, uint16 depthLevel,
@@ -53,13 +54,15 @@ namespace Ogre
 		//trying to round to nearest multiple of ARRAY_PACKED_REALS
 		assert( m_maxHardLimit < (size_t)(-ARRAY_PACKED_REALS) &&
 				m_maxMemory < (size_t)(-ARRAY_PACKED_REALS) );
+		assert( m_maxMemory <= m_maxHardLimit );
 
 		m_memoryPools.resize( numElementsSize, 0 );
 		for( size_t i=0; i<numElementsSize; ++i )
 			m_totalMemoryMultiplier += m_elementsMemSizes[i];
 
 		//If m_maxMemory == 1, it cannot grow because 1/2 truncates to 0
-		m_maxMemory = std::max<size_t>( 2, m_maxMemory );
+		m_maxMemory		= std::max<size_t>( 2, m_maxMemory ) + OGRE_PREFETCH_SLOT_DISTANCE;
+		m_maxHardLimit	+= OGRE_PREFETCH_SLOT_DISTANCE;
 
 		// Round up max memory & hard limit to the next multiple of ARRAY_PACKED_REALS
 		m_maxMemory   += (ARRAY_PACKED_REALS - m_maxMemory % ARRAY_PACKED_REALS) % ARRAY_PACKED_REALS;
@@ -110,7 +113,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getFreeMemory() const
 	{
-		return ( m_maxMemory - m_usedMemory + m_availableSlots.size() ) * m_totalMemoryMultiplier;
+		return ( m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE - m_usedMemory + m_availableSlots.size() )
+				* m_totalMemoryMultiplier;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getUsedMemory() const
@@ -141,7 +145,7 @@ namespace Ogre
 			--m_usedMemory;
 		}
 
-		if( m_usedMemory >= m_maxMemory )
+		if( m_usedMemory >= m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE )
 		{
 			if( m_maxMemory >= m_maxHardLimit )
 			{

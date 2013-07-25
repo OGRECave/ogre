@@ -322,6 +322,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void MovableObject::updateAllBounds( const size_t numNodes, ObjectData objData )
 	{
+		SimpleMatrix4 mats[ARRAY_PACKED_REALS];
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
@@ -330,14 +331,27 @@ namespace Ogre {
 
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 			{
+				//Profiling shows these prefetches do make a difference. Perhaps playing with them could
+				//achieve even greater speed ups. This function is terribly bounded by memory latency
+				//Last tested on:
+				//	* Intel Quad Core Extreme QX9650 3Ghz
+				OGRE_PREFETCH_NTA( (const char*)(objData.mParents[i+OGRE_PREFETCH_SLOT_DISTANCE]) );
+
 				Vector3 scale;
-				Matrix4 mat;
 				const Transform &parentTransform = objData.mParents[j]->_getTransform();
 				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
-				parentTransform.mDerivedTransform->getAsMatrix4( mat, parentTransform.mIndex );
+				mats[j].load( parentTransform.mDerivedTransform[parentTransform.mIndex] );
 				parentScale.setFromVector3( scale, j );
-				parentMat.setFromMatrix4( mat, j );
+
+				// j + OGRE_PREFETCH_SLOT_DISTANCE won't go out of bounds because
+				// the memory manager allocates enough extra space
+				OGRE_PREFETCH_NTA( (const char*)objData.mParents[j+(OGRE_PREFETCH_SLOT_DISTANCE>>1)]->
+									_getTransform().mDerivedScale );
+				OGRE_PREFETCH_NTA( (const char*)(objData.mParents[j+(OGRE_PREFETCH_SLOT_DISTANCE>>1)]->
+									_getTransform().mDerivedTransform+parentTransform.mIndex) );
 			}
+
+			parentMat.loadFromAoS( mats );
 
 			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
 																		(objData.mWorldRadius);

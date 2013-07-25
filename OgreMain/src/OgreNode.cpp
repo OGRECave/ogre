@@ -141,16 +141,16 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    Matrix4 Node::_getFullTransform(void) const
+    const Matrix4& Node::_getFullTransform(void) const
     {
 		assert( !mCachedTransformOutOfDate );
-		return mTransform.mDerivedTransform->getAsMatrix4( mTransform.mIndex );
+		return mTransform.mDerivedTransform[mTransform.mIndex];
     }
 	//-----------------------------------------------------------------------
-    Matrix4 Node::_getFullTransformUpdated(void)
+    const Matrix4& Node::_getFullTransformUpdated(void)
     {
 		_updateFromParent();
-        return mTransform.mDerivedTransform->getAsMatrix4( mTransform.mIndex );
+        return mTransform.mDerivedTransform[mTransform.mIndex];
     }
 	//-----------------------------------------------------------------------
 	void Node::_updateFromParent(void)
@@ -212,9 +212,11 @@ namespace Ogre {
 			*mTransform.mDerivedScale		= ArrayVector3::UNIT_SCALE;
 		}
 
-		mTransform.mDerivedTransform->makeTransform( *mTransform.mDerivedPosition,
-													 *mTransform.mDerivedScale,
-													 *mTransform.mDerivedOrientation );
+		ArrayMatrix4 derivedTransform;
+		derivedTransform.makeTransform( *mTransform.mDerivedPosition,
+										 *mTransform.mDerivedScale,
+										 *mTransform.mDerivedOrientation );
+		derivedTransform.storeToAoS( mTransform.mDerivedTransform );
 #ifndef NDEBUG
 		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 		{
@@ -226,6 +228,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Node::updateAllTransforms( const size_t numNodes, Transform t )
 	{
+		ArrayMatrix4 derivedTransform;
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
@@ -264,9 +267,10 @@ namespace Ogre {
 			// Add altered position vector to parents
 			*t.mDerivedPosition += parentPos;
 
-			t.mDerivedTransform->makeTransform( *t.mDerivedPosition,
-												*t.mDerivedScale,
-												*t.mDerivedOrientation );
+			derivedTransform.makeTransform( *t.mDerivedPosition,
+											*t.mDerivedScale,
+											*t.mDerivedOrientation );
+			derivedTransform.storeToAoS( t.mDerivedTransform );
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 			{
