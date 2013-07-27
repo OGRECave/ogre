@@ -38,7 +38,7 @@ namespace Volume {
     
     Vector3 GridSource::getIntersectionStart(const Ray &ray, Real maxDistance) const
     {
-        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth / mPosXScale, (Real)mHeight / mPosYScale, (Real)mDepth / mPosZScale);
         
         // Inside the grid
         if (box.intersects(ray.getOrigin()))
@@ -62,7 +62,7 @@ namespace Volume {
 
     Vector3 GridSource::getIntersectionEnd(const Ray &ray, Real maxDistance) const
     {
-        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth / mPosXScale, (Real)mHeight / mPosYScale, (Real)mDepth / mPosZScale);
         Vector3 direction = ray.getDirection().normalisedCopy();
         Vector3 invertedDirection = (Real)-1.0 * direction;
         Vector3 origin = ray.getOrigin() + direction * box.getSize().length();
