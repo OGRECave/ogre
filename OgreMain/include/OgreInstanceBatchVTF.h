@@ -76,7 +76,6 @@ namespace Ogre
 	protected:
 		typedef vector<uint8>::type HWBoneIdxVec;
 		typedef vector<float>::type HWBoneWgtVec;
-		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					mMatricesPerInstance; //number of bone matrices per instance
 		size_t					mNumWorldMatrices;	//Num bones * num instances

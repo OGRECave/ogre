@@ -544,6 +544,56 @@ namespace Ogre
 		return xVec;
 	}
 	//-----------------------------------------------------------------------------------
+	inline Vector3 ArrayVector3::collapseMin( void ) const
+	{
+		OGRE_ALIGNED_DECL( Real, vals[4], OGRE_SIMD_ALIGNMENT );
+		ArrayReal aosVec0, aosVec1, aosVec2, aosVec3;
+
+		//Transpose XXXX YYYY ZZZZ to XYZZ XYZZ XYZZ XYZZ
+		ArrayReal tmp2, tmp0;
+		tmp0   = _mm_shuffle_ps( m_chunkBase[0], m_chunkBase[1], 0x44 );
+        tmp2   = _mm_shuffle_ps( m_chunkBase[0], m_chunkBase[1], 0xEE );
+
+        aosVec0 = _mm_shuffle_ps( tmp0, m_chunkBase[2], 0x08 );
+		aosVec1 = _mm_shuffle_ps( tmp0, m_chunkBase[2], 0x5D );
+		aosVec2 = _mm_shuffle_ps( tmp2, m_chunkBase[2], 0xA8 );
+		aosVec3 = _mm_shuffle_ps( tmp2, m_chunkBase[2], 0xFD );
+
+		//Do the actual operation
+		aosVec0 = _mm_min_ps( aosVec0, aosVec1 );
+		aosVec2 = _mm_min_ps( aosVec2, aosVec3 );
+		aosVec0 = _mm_min_ps( aosVec0, aosVec2 );
+
+		_mm_store_ps( vals, aosVec0 );
+
+		return Vector3( vals[0], vals[1], vals[2] );
+	}
+	//-----------------------------------------------------------------------------------
+	inline Vector3 ArrayVector3::collapseMax( void ) const
+	{
+		OGRE_ALIGNED_DECL( Real, vals[4], OGRE_SIMD_ALIGNMENT );
+		ArrayReal aosVec0, aosVec1, aosVec2, aosVec3;
+
+		//Transpose XXXX YYYY ZZZZ to XYZZ XYZZ XYZZ XYZZ
+		ArrayReal tmp2, tmp0;
+		tmp0   = _mm_shuffle_ps( m_chunkBase[0], m_chunkBase[1], 0x44 );
+        tmp2   = _mm_shuffle_ps( m_chunkBase[0], m_chunkBase[1], 0xEE );
+
+        aosVec0 = _mm_shuffle_ps( tmp0, m_chunkBase[2], 0x08 );
+		aosVec1 = _mm_shuffle_ps( tmp0, m_chunkBase[2], 0x5D );
+		aosVec2 = _mm_shuffle_ps( tmp2, m_chunkBase[2], 0xA8 );
+		aosVec3 = _mm_shuffle_ps( tmp2, m_chunkBase[2], 0xFD );
+
+		//Do the actual operation
+		aosVec0 = _mm_max_ps( aosVec0, aosVec1 );
+		aosVec2 = _mm_max_ps( aosVec2, aosVec3 );
+		aosVec0 = _mm_max_ps( aosVec0, aosVec2 );
+
+		_mm_store_ps( vals, aosVec0 );
+
+		return Vector3( vals[0], vals[1], vals[2] );
+	}
+	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::Cmov4( ArrayReal mask, const ArrayVector3 &replacement )
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = m_chunkBase;
@@ -551,6 +601,15 @@ namespace Ogre
 		aChunkBase[0] = MathlibSSE2::Cmov4( aChunkBase[0], bChunkBase[0], mask );
 		aChunkBase[1] = MathlibSSE2::Cmov4( aChunkBase[1], bChunkBase[1], mask );
 		aChunkBase[2] = MathlibSSE2::Cmov4( aChunkBase[2], bChunkBase[2], mask );
+	}
+	//-----------------------------------------------------------------------------------
+	inline void ArrayVector3::CmovRobust( ArrayReal mask, const ArrayVector3 &replacement )
+	{
+		ArrayReal * RESTRICT_ALIAS aChunkBase = m_chunkBase;
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.m_chunkBase;
+		aChunkBase[0] = MathlibSSE2::CmovRobust( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibSSE2::CmovRobust( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibSSE2::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
 	}
 	//-----------------------------------------------------------------------------------
 

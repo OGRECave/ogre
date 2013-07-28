@@ -43,9 +43,14 @@ THE SOFTWARE.
 namespace Ogre {
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
-	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
 	const String NullEntity::msMovableType = "NullEntity";
+	const uint32 MovableObject::LAYER_SHADOW_RECEIVER	= 1 << 31;
+	const uint32 MovableObject::LAYER_SHADOW_CASTER		= 1 << 30;
+	const uint32 MovableObject::LAYER_VISIBILITY		= 1 << 29;
+	const uint32 MovableObject::RESERVED_VISIBILITY_FLAGS= ~(LAYER_SHADOW_RECEIVER|LAYER_SHADOW_CASTER|
+															LAYER_VISIBILITY);
+	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
+	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
     MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager )
         : IdObject( id )
@@ -56,7 +61,6 @@ namespace Ogre {
 		, mMinPixelSize(0)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
 		, mRenderQueuePriority(100)
-        , mCastShadows(true)
         , mListener(0)
 		, mDebugDisplay(false)
 		, mObjectMemoryManager( objectMemoryManager )
@@ -80,7 +84,6 @@ namespace Ogre {
 		, mMinPixelSize(0)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
 		, mRenderQueuePriority(100)
-        , mCastShadows(true)
         , mListener(0)
 		, mDebugDisplay(false)
 		, mObjectMemoryManager( 0 )
@@ -116,17 +119,25 @@ namespace Ogre {
 
         bool different = (parent != mParentNode);
 
-        mParentNode = parent;
-		mObjectData.mParents[mObjectData.mIndex] = parent;
+		if( different )
+		{
+			mParentNode = parent;
+			if( parent )
+				mObjectData.mParents[mObjectData.mIndex] = parent;
+			else
+				mObjectData.mParents[mObjectData.mIndex] = mObjectMemoryManager->_getDummyNode();
 
-        // Call listener (note, only called if there's something to do)
-        if (mListener && different)
-        {
-            if (mParentNode)
-                mListener->objectAttached(this);
-            else
-                mListener->objectDetached(this);
-        }
+			setVisible( parent != 0 );
+
+			// Call listener (note, only called if there's something to do)
+			if (mListener)
+			{
+				if (mParentNode)
+					mListener->objectAttached(this);
+				else
+					mListener->objectDetached(this);
+			}
+		}
     }
 	//---------------------------------------------------------------------
 	void MovableObject::detachFromParent(void)
@@ -253,7 +264,7 @@ namespace Ogre {
         return mRenderQueueID;
     }
     //-----------------------------------------------------------------------
-	Matrix4 MovableObject::_getParentNodeFullTransform(void) const
+	const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
 	{
 		return mParentNode->_getFullTransform();
 	}
@@ -402,6 +413,9 @@ namespace Ogre {
 			planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
 		}
 
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
+
 		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
 		//In theory xor is faster, but some archs have a penalty for switching between integer
 		//& floating point, even if it's simd sse
@@ -451,9 +465,26 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
+			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+
 			//Fuse result with visibility flag
+			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
 			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
+			finalMask = Mathlib::And( finalMask, isVisible );
+
+			ArrayReal finalMaskAsReal = CastIntToReal( finalMask );
+
+			//Merge with bounds only if they're visible. We first merge,
+			//then CMov its older value if the object isn't visible
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			vMinBounds.CmovRobust( finalMaskAsReal, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			vMaxBounds.CmovRobust( finalMaskAsReal, newVal );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
 
@@ -470,6 +501,9 @@ namespace Ogre {
 
 			objData.advanceFrustumPack();
 		}
+
+		//TODO: (dark_sylinc) Merge the individual values and return the result. Difference between receiver aabb and normal aabb
+		//vMinBounds
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
@@ -610,7 +644,7 @@ namespace Ogre {
 	{
 		const size_t numGlobalLights = globalLightList.lights.size();
 		ArraySphere lightSphere;
-		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], 16 );
+		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			ArrayReal * RESTRICT_ALIAS arrayRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>

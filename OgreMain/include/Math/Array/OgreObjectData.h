@@ -74,9 +74,6 @@ namespace Ogre
 		/// Upper distance to still render. Ours is mSquaredUpperDistance[mIndex]
 		Real		* RESTRICT_ALIAS	mSquaredUpperDistance;
 
-		/// Whether this MovableObject should be visible or not.
-		bool		* RESTRICT_ALIAS	mVisible;
-
 		/// Flags determining whether this object is visible (compared to SceneManager mask)
         uint32		* RESTRICT_ALIAS	mVisibilityFlags;
 
@@ -99,7 +96,6 @@ namespace Ogre
 			mWorldAabb( 0 ),
 			mWorldRadius( 0 ),
 			mSquaredUpperDistance( 0 ),
-			mVisible( 0 ),
 			mVisibilityFlags( 0 ),
 			mQueryFlags( 0 ),
 			mLightMask( 0 )
@@ -120,7 +116,6 @@ namespace Ogre
 
 			mWorldRadius[mIndex]			= copy.mWorldRadius[copy.mIndex];
 			mSquaredUpperDistance[mIndex]	= copy.mSquaredUpperDistance[copy.mIndex];
-			mVisible[mIndex]				= copy.mVisible[copy.mIndex];
 			mVisibilityFlags[mIndex]		= copy.mVisibilityFlags[copy.mIndex];
 			mQueryFlags[mIndex]				= copy.mQueryFlags[copy.mIndex];
 			mLightMask[mIndex]				= copy.mLightMask[copy.mIndex];
@@ -138,7 +133,6 @@ namespace Ogre
 			mLocalRadius		+= ARRAY_PACKED_REALS;
 			mWorldRadius		+= ARRAY_PACKED_REALS;
 			mSquaredUpperDistance+=ARRAY_PACKED_REALS;
-			mVisible			+= ARRAY_PACKED_REALS;
 			mVisibilityFlags	+= ARRAY_PACKED_REALS;
 			mQueryFlags			+= ARRAY_PACKED_REALS;
 			mLightMask			+= ARRAY_PACKED_REALS;
@@ -153,7 +147,6 @@ namespace Ogre
 			mLocalRadius		+= ARRAY_PACKED_REALS * numAdvance;
 			mWorldRadius		+= ARRAY_PACKED_REALS * numAdvance;
 			mSquaredUpperDistance+=ARRAY_PACKED_REALS * numAdvance;
-			mVisible			+= ARRAY_PACKED_REALS * numAdvance;
 			mVisibilityFlags	+= ARRAY_PACKED_REALS * numAdvance;
 			mQueryFlags			+= ARRAY_PACKED_REALS * numAdvance;
 			mLightMask			+= ARRAY_PACKED_REALS * numAdvance;

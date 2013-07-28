@@ -127,23 +127,11 @@ namespace Ogre {
         */
         MovableObject* getAttachedObject( const String& name );
 
-        /** Detaches the indexed object from this scene node.
-        @remarks
-            Detaches by index, see the alternate version to detach by name. Object indexes
-            may change as other objects are added / removed, but this is the fastest version
-        */
-        virtual_l2 MovableObject* detachObject( size_t index );
         /** Detaches an object by pointer.
 		@remarks
-			It's slower O(N) than detaching by index O(1), but it's faster than detaching by name
+			It's fast, takes only O(1)
 		*/
         virtual_l2 void detachObject(MovableObject* obj);
-
-        /** Detaches the named object from this node and returns a pointer to it.
-		@remarks
-			It's the slowest version. Consider detaching by index or pointer.
-		*/
-        virtual_l2 MovableObject* detachObject(const String& name);
 
         /** Detaches all objects attached to this node.
         */

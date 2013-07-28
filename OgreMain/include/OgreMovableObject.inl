@@ -8,22 +8,22 @@ namespace Ogre
 {
 	inline void MovableObject::setVisibilityFlags( uint32 flags )
 	{
-		mObjectData.mVisibilityFlags[mObjectData.mIndex] = flags;
+		mObjectData.mVisibilityFlags[mObjectData.mIndex] = flags & RESERVED_VISIBILITY_FLAGS;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::addVisibilityFlags( uint32 flags )
 	{
-		mObjectData.mVisibilityFlags[mObjectData.mIndex] |= flags;
+		mObjectData.mVisibilityFlags[mObjectData.mIndex] |= flags & RESERVED_VISIBILITY_FLAGS;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::removeVisibilityFlags( uint32 flags )
 	{
-		mObjectData.mVisibilityFlags[mObjectData.mIndex] &= ~flags;
+		mObjectData.mVisibilityFlags[mObjectData.mIndex] &= ~(flags & RESERVED_VISIBILITY_FLAGS);
 	}
 	//-----------------------------------------------------------------------------------
 	inline uint32 MovableObject::getVisibilityFlags(void) const
 	{
-		return mObjectData.mVisibilityFlags[mObjectData.mIndex];
+		return mObjectData.mVisibilityFlags[mObjectData.mIndex] & RESERVED_VISIBILITY_FLAGS;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::setQueryFlags( uint32 flags )
@@ -68,12 +68,31 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::setVisible( bool visible )
 	{
-		mObjectData.mVisible[mObjectData.mIndex] = visible;
+		assert( (!visible || mParentNode) && "Setting to visible an object without "
+				"attachment is not supported!" );
+
+		if( visible )
+			mObjectData.mVisibilityFlags[mObjectData.mIndex] |= LAYER_VISIBILITY;
+		else
+			mObjectData.mVisibilityFlags[mObjectData.mIndex] &= ~LAYER_VISIBILITY;
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool MovableObject::getVisible(void) const
 	{
-		return mObjectData.mVisible[mObjectData.mIndex];
+		return (mObjectData.mVisibilityFlags[mObjectData.mIndex] & LAYER_VISIBILITY) != 0;
+	}
+	//-----------------------------------------------------------------------------------
+	inline void MovableObject::setCastShadows( bool enabled )
+	{
+		if( enabled )
+			mObjectData.mVisibilityFlags[mObjectData.mIndex] |= LAYER_SHADOW_CASTER;
+		else
+			mObjectData.mVisibilityFlags[mObjectData.mIndex] &= ~LAYER_SHADOW_CASTER;
+	}
+	//-----------------------------------------------------------------------------------
+	inline bool MovableObject::getCastShadows(void) const
+	{
+		return (mObjectData.mVisibilityFlags[mObjectData.mIndex] & LAYER_SHADOW_CASTER) != 0;
 	}
 	//-----------------------------------------------------------------------------------
 	inline SceneNode* MovableObject::getParentSceneNode(void) const

@@ -95,6 +95,8 @@ namespace Ogre
 		static const ArrayReal FLOAT_MIN;	//FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN
 		static const ArrayReal SIGN_MASK;	//0x80000000, 0x80000000, 0x80000000, 0x80000000
 		static const ArrayReal INFINITY;	//Inf, Inf, Inf, Inf
+		static const ArrayReal MAX_NEG;		//Max negative number (x4)
+		static const ArrayReal MAX_POS;		//Max negative number (x4)
 
 		/** Returns the absolute values of each 4 floats
 			@param
@@ -272,6 +274,42 @@ namespace Ogre
 		static inline ArrayReal isInfinity( ArrayReal a )
 		{
 			return _mm_cmpeq_ps( a, MathlibSSE2::INFINITY );
+		}
+
+		/// Returns the maximum value between a and b
+		static inline ArrayReal Max( ArrayReal a, ArrayReal b )
+		{
+			return _mm_max_ps( a, b );
+		}
+
+		/** Returns the minimum value of all elements in a
+		@return
+			r[0] = min( a[0], a[1], a[2], a[3] )
+		*/
+		static inline Real ColapseMin( ArrayReal a )
+		{
+			float r;
+			ArrayReal t0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 2, 3, 2, 3 ) );
+			t0 = _mm_min_ps( a, t0 );
+			a = _mm_shuffle_ps( t0, t0, _MM_SHUFFLE( 1, 1, 0, 0 ) );
+			t0 = _mm_min_ps( a, t0 );
+			_mm_store_ss( &r, t0 );
+			return r;
+		}
+
+		/** Returns the maximum value of all elements in a
+		@return
+			r[0] = max( a[0], a[1], a[2], a[3] )
+		*/
+		static inline Real ColapseMax( ArrayReal a )
+		{
+			float r;
+			ArrayReal t0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 2, 3, 2, 3 ) );
+			t0 = _mm_max_ps( a, t0 );
+			a = _mm_shuffle_ps( t0, t0, _MM_SHUFFLE( 1, 1, 0, 0 ) );
+			t0 = _mm_max_ps( a, t0 );
+			_mm_store_ss( &r, t0 );
+			return r;
 		}
 
 		/**	Returns the reciprocal of x

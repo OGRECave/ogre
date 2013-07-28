@@ -269,6 +269,35 @@ namespace Ogre
 	{
 		if( !mKeepStatic )
 		{
+			Camera *camera=0;
+			ObjectData objData;
+			const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+			MovableObject::MovableObjectVec visibleObjects;
+
+			//TODO: (dark_sylinc) Thread this
+			MovableObject::cullFrustum( numObjs, objData, camera,
+						camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+						visibleObjects );
+
+			/*VisibleObjectsPerThreadVec::const_iterator it = visibleObjects.begin();
+			VisibleObjectsPerThreadVec::const_iterator en = visibleObjects.begin() +
+																visibleObjsListsPerThread;
+			while( it != en )
+			{
+				MovableObject::MovableObjectVec::const_iterator itor = it->begin();
+				MovableObject::MovableObjectVec::const_iterator end  = it->end();
+
+				while( itor != end )
+				{
+					assert( dynamic_cast<InstancedEntity*>(*itor) );
+					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
+					instancedEntity->getTransforms3x4();
+					++itor;
+				}
+				++it;
+			}*/
+
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
 			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )

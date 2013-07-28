@@ -132,34 +132,44 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateBounds(void)
 	{
-		//mFullBoundingBox.setNull();
+		//TODO: First update all bounds from our objects
+		ArrayReal maxWorldRadius = ARRAY_REAL_ZERO;
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
 
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-		Real maxScale = 0;
-		while( itor != end )
+		ObjectData objData;
+		const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
+		for( size_t i=0; i<numObjs; i += ARRAY_PACKED_REALS )
 		{
-			InstancedEntity* ent = (*itor);
-			//Only increase the bounding box for those objects we know are in the scene
-			if( ent->isInScene() )
-			{
-				maxScale = max(maxScale, ent->getMaxScaleCoef());
-				//mFullBoundingBox.merge( ent->_getDerivedPosition() );
-			}
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+			ArrayReal inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
+																Mathlib::SetAll( LAYER_VISIBILITY ) ));
 
-			++itor;
+			//Merge with bounds only if they're in use (and not explicitly hidden,
+			//but may be invisible for some cameras or out of frustum)
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			vMinBounds.CmovRobust( inUse, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			vMaxBounds.CmovRobust( inUse, newVal );
+
+			maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
 		}
 
-		Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
-		//--- TODO: (dark_sylinc) check this calculation!!! ---
-		/*mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
-		mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);*/
+		//We've been merging and processing in bulks, but we now need to join all simd results
+		Vector3 vMin = vMinBounds.collapseMin();
+		Vector3 vMax = vMaxBounds.collapseMax();
 
+		Real maxRadius = Mathlib::ColapseMax( maxWorldRadius );
 
-		//--- TODO: (dark_sylinc) check this calculation!!! ---
-		//mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
-		mObjectData.mLocalRadius[mObjectData.mIndex] = 10.0f;
+		Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
 		mBoundsDirty	= false;
 		mBoundsUpdated	= true;
@@ -357,17 +367,17 @@ namespace Ogre
 		if( !usedEntities.empty() )
 		{
 			first      = *usedEntities.begin();
-			firstPos   = first->_getDerivedPosition();
-			vMinPos      = first->_getDerivedPosition();
+			firstPos   = first->getParentNode()->_getDerivedPosition();
+			vMinPos    = first->getParentNode()->_getDerivedPosition();
 		}
 
 		while( itor != end )
 		{
-			const Vector3 &vPos      = (*itor)->_getDerivedPosition();
+			const Vector3 &vPos      = (*itor)->getParentNode()->_getDerivedPosition();
 
-			vMinPos.x = std::min( vMinPos.x, vPos.x );
-			vMinPos.y = std::min( vMinPos.y, vPos.y );
-			vMinPos.z = std::min( vMinPos.z, vPos.z );
+			vMinPos.x = Ogre::min( vMinPos.x, vPos.x );
+			vMinPos.y = Ogre::min( vMinPos.y, vPos.y );
+			vMinPos.z = Ogre::min( vMinPos.z, vPos.z );
 
 			if( vMinPos.squaredDistance( vPos ) < vMinPos.squaredDistance( firstPos ) )
 			{
@@ -381,15 +391,15 @@ namespace Ogre
 		while( !usedEntities.empty() && mInstancedEntities.size() < mInstancesPerBatch )
 		{
 			InstancedEntityVec::iterator closest   = usedEntities.begin();
-			InstancedEntityVec::iterator it         = usedEntities.begin();
-			InstancedEntityVec::iterator e          = usedEntities.end();
+			InstancedEntityVec::iterator it        = usedEntities.begin();
+			InstancedEntityVec::iterator e         = usedEntities.end();
 
 			Vector3 closestPos;
-			closestPos = (*closest)->_getDerivedPosition();
+			closestPos = (*closest)->getParentNode()->_getDerivedPosition();
 
 			while( it != e )
 			{
-				const Vector3 &vPos   = (*it)->_getDerivedPosition();
+				const Vector3 &vPos   = (*it)->getParentNode()->_getDerivedPosition();
 
 				if( firstPos.squaredDistance( vPos ) < firstPos.squaredDistance( closestPos ) )
 				{

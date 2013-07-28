@@ -372,7 +372,6 @@ namespace Ogre
 			LocalRadius,
 			WorldRadius,
 			SquaredUpperDistance,
-			Visible,
 			VisibilityFlags,
 			QueryFlags,
 			LightMask,

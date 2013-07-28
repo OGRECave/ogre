@@ -64,6 +64,11 @@ namespace Ogre {
 	class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
+		static const uint32 LAYER_SHADOW_RECEIVER;	///When this is bit is set, object receives shadows
+		static const uint32 LAYER_SHADOW_CASTER;	///Object casts shadows (is rendered to shadow camera)
+		static const uint32 LAYER_VISIBILITY;		///When this is bit is clear, the obj is not rendered at all.
+		static const uint32 RESERVED_VISIBILITY_FLAGS;
+
         /** Listener which gets called back on MovableObject events.
         */
         class _OgreExport Listener
@@ -103,8 +108,6 @@ namespace Ogre {
 		/// World space AABB of this object's dark cap.
 		/// TODO: Move mWorldDarkCapBounds out of here. It's only used by stencil shadows. (dark_sylinc)
         AxisAlignedBox mWorldDarkCapBounds;
-        /// Does this object cast shadows?
-        bool mCastShadows;
 
         /// MovableObject listener - only one allowed (no list) for size & performance reasons.
         Listener* mListener;
@@ -360,7 +363,7 @@ namespace Ogre {
 		ObjectData& _getObjectData()										{ return mObjectData; }
 
 		/// return the full transformation of the parent sceneNode or the attachingPoint node
-		Matrix4 _getParentNodeFullTransform(void) const;
+		const Matrix4& _getParentNodeFullTransform(void) const;
 
 		/** Gets the axis aligned box in world space.
 		@remarks
@@ -430,6 +433,7 @@ namespace Ogre {
 			As well as a simple true/false value for visibility (as seen in setVisible), 
 			you can also set visibility flags which when 'and'ed with the SceneManager's
 			visibility mask can also make an object invisible.
+			Changes to reserved visibility flags are ignored (won't take effect).
         */
 		inline void setVisibilityFlags(uint32 flags);
 
@@ -441,7 +445,9 @@ namespace Ogre {
         existing flags on this object. */
         inline void removeVisibilityFlags(uint32 flags);
         
-        /// Returns the visibility flags relevant for this object
+        /** Returns the visibility flags relevant for this object. Reserved visibility flags are
+			not returned.
+		*/
         inline uint32 getVisibilityFlags(void) const;
 
 		/** Set the default visibility flags for all future MovableObject instances.
@@ -521,9 +527,9 @@ namespace Ogre {
         since Light is also a subclass of MovableObject, in that context it means
         whether the light causes shadows itself.
         */
-        void setCastShadows(bool enabled) { mCastShadows = enabled; }
+        inline void setCastShadows( bool enabled );
         /** Returns whether shadow casting is enabled for this object. */
-        bool getCastShadows(void) const { return mCastShadows; }
+        inline bool getCastShadows(void) const;
 		/** Returns whether the Material of any Renderable that this MovableObject will add to 
 			the render queue will receive shadows. 
 		*/

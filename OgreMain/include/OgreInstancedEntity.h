@@ -102,30 +102,6 @@ namespace Ogre
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 		InstancedEntityVec mSharingPartners;
 
-		//////////////////////////////////////////////////////////////////////////
-		// Parameters used for local transformation offset information
-		// The 
-		//////////////////////////////////////////////////////////////////////////
-
-		/// Object position
-		Vector3 mPosition;
-		Vector3 mDerivedLocalPosition;
-		/// Object orientation
-		Quaternion mOrientation;
-		/// Object scale
-		Vector3 mScale;
-		/// The maximum absolute scale for all dimension
-		Real mMaxScaleLocal;
-		/// Full world transform
-		Matrix4 mFullLocalTransform;
-		/// Tells if mFullTransform needs an updated
-		bool mNeedTransformUpdate;
-		/// Tells if the animation world transform needs an update
-		bool mNeedAnimTransformUpdate;
-		/// Tells whether to use the local transform parameters
-		bool mUseLocalTransform;
-
-
 		/// Returns number of matrices written to transform, assumes transform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
 		/// Returns number of 32-bit values written
@@ -147,9 +123,6 @@ namespace Ogre
 
 		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
-
-		/// Mark the transformation matrixes as dirty
-		inline void markTransformDirty();
 
 		/// Incremented count for next name extension
         static NameGenerator msNameGenerator;
@@ -226,45 +199,10 @@ namespace Ogre
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
 
-		/** Retrieve the position */
-		const Vector3& getPosition() const { return mPosition; }
-		/** Set the position or the offset from the parent node if a parent node exists */ 
-		void setPosition(const Vector3& position, bool doUpdate = true);
-
-		/** Retrieve the orientation */
-		const Quaternion& getOrientation() const { return mOrientation; }
-		/** Set the orientation or the offset from the parent node if a parent node exists */
-		void setOrientation(const Quaternion& orientation, bool doUpdate = true);
-
-		/** Retrieve the local scale */ 
-		const Vector3& getScale() const { return mScale; }
-		/** Set the  scale or the offset from the parent node if a parent node exists  */ 
-		void setScale(const Vector3& scale, bool doUpdate = true);
-
-		/** Returns the maximum derived scale coefficient among the xyz values */
-		Real getMaxScaleCoef() const;
-
-		/** Update the world transform and derived values */
-		void updateTransforms();
-
 		/** Tells if the entity is in use. */
 		bool isInUse() const { return mInUse; }
 		/** Sets whether the entity is in use. */
 		void setInUse(bool used);
-
-		/** Returns the world transform of the instanced entity including local transform */
-		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
-			return mUseLocalTransform ? mFullLocalTransform :
-				mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
-		}
-
-		/** Returns the derived position of the instanced entity including local transform */
-		const Vector3& _getDerivedPosition() const {
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
-			return mUseLocalTransform ? mDerivedLocalPosition :
-				mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
-		}
 
 		/** @copydoc MovableObject::isInScene. */
 		virtual bool isInScene(void) const

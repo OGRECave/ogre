@@ -78,6 +78,7 @@ namespace Ogre {
 
         // Also add to name index
 		mAttachments.push_back( obj );
+		obj->mParentIndex = mAttachments.size() - 1;
     }
     //-----------------------------------------------------------------------
 	SceneNode::ObjectVec::iterator SceneNode::getAttachedObjectIt( const String& name )
@@ -123,50 +124,32 @@ namespace Ogre {
         return *itor;
     }
     //-----------------------------------------------------------------------
-    MovableObject* SceneNode::detachObject( size_t index )
-    {
-		ObjectVec::iterator itor = mAttachments.begin() + index;
-		(*itor)->_notifyAttached( (SceneNode*)0 );
-		MovableObject *retVal = *itor;
-
-		efficientVectorRemove( mAttachments, itor );
-
-		return retVal;
-    }
-    //-----------------------------------------------------------------------
-    MovableObject* SceneNode::detachObject( const String& name )
-    {
-		MovableObject *retVal = 0;
-		ObjectVec::iterator itor = getAttachedObjectIt( name );
-
-		if( itor != mAttachments.end() )
-		{
-			retVal = *itor;
-			(*itor)->_notifyAttached( (SceneNode*)0 );
-			efficientVectorRemove( mAttachments, itor );
-		}
-		else
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Object pointer was not attached to "
-				"this scene node", "SceneNode::detachObject");
-		}
-
-		return retVal;
-    }
-    //-----------------------------------------------------------------------
     void SceneNode::detachObject( MovableObject* obj )
     {
-		ObjectVec::iterator itor = std::find( mAttachments.begin(), mAttachments.end(), obj );
+		if( obj->getParentNode() != this )
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "MovableObject ID: " +
+				StringConverter::toString( obj->getId() ) + ", named '" + obj->getName() +
+				"' is not attached to this SceneNode!", "SceneNode::detachObject");
+		}
+		else if( obj->mParentIndex >= mAttachments.size() ||
+				 obj != *(mAttachments.begin() + obj->mParentIndex) )
+		{
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "MovableObject ID: " +
+				StringConverter::toString( obj->getId() ) + ", named '" + obj->getName() +
+				"' had it's mParentIndex out of date!!! (or the MovableObject wasn't "
+				"attached to this SceneNode)", "SceneNode::detachObject");
+		}
+
+		ObjectVec::iterator itor = mAttachments.begin() + obj->mParentIndex;
+
+		(*itor)->_notifyAttached( (SceneNode*)0 );
+		itor = efficientVectorRemove( mAttachments, itor );
 
 		if( itor != mAttachments.end() )
 		{
-			(*itor)->_notifyAttached( (SceneNode*)0 );
-			efficientVectorRemove( mAttachments, itor );
-		}
-		else
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Object pointer was not attached to "
-				"this scene node", "SceneNode::detachObject");
+			//The object that was at the end got swapped and has now a different index
+			(*itor)->mParentIndex = itor - mAttachments.begin();
 		}
     }
     //-----------------------------------------------------------------------

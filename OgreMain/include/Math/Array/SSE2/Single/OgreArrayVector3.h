@@ -248,6 +248,28 @@ namespace Ogre
 		/// @copydoc Vector3::primaryAxis()
 		inline ArrayVector3 primaryAxis( void ) const;
 
+		/** Takes each Vector and returns one returns a single vector
+		@remarks
+			This is useful when calculating bounding boxes, since it can be done independently
+			in SIMD form, and once it is done, merge the results from the simd vectors into one
+		@return
+			Vector.x = min( vector[0].x, vector[1].x, vector[2].x, vector[3].x )
+			Vector.y = min( vector[0].y, vector[1].y, vector[2].y, vector[3].y )
+			Vector.z = min( vector[0].z, vector[1].z, vector[2].z, vector[3].z )
+		*/
+		inline Vector3 collapseMin( void ) const;
+
+		/** Takes each Vector and returns one returns a single vector
+		@remarks
+			This is useful when calculating bounding boxes, since it can be done independently
+			in SIMD form, and once it is done, merge the results from the simd vectors into one
+		@return
+			Vector.x = max( vector[0].x, vector[1].x, vector[2].x, vector[3].x )
+			Vector.y = max( vector[0].y, vector[1].y, vector[2].y, vector[3].y )
+			Vector.z = max( vector[0].z, vector[1].z, vector[2].z, vector[3].z )
+		*/
+		inline Vector3 collapseMax( void ) const;
+
 		/** Conditional move update. @See MathlibSSE2::Cmov4
 			Changes each of the four vectors contained in 'this' with
 			the replacement provided
@@ -269,6 +291,28 @@ namespace Ogre
 				this[i] = mask[i] != 0 ? this[i] : replacement[i]
 		*/
 		inline void Cmov4( ArrayReal mask, const ArrayVector3 &replacement );
+
+		/** Conditional move update. @See MathlibSSE2::CmovRobust
+			Changes each of the four vectors contained in 'this' with
+			the replacement provided
+			@remarks
+				If mask param contains anything other than 0's or 0xffffffff's
+				the result is undefined.
+				Use this version if you want to decide whether to keep current
+				result or overwrite with a replacement (performance optimization).
+				i.e. a = CmovRobust( a, b )
+				If this vector hasn't been assigned yet any value and want to
+				decide between two ArrayVector3s, i.e. a = Cmov4( b, c ) then
+				@see Cmov4( const ArrayVector3 &arg1, const ArrayVector3 &arg2, ArrayReal mask );
+				instead.
+			@param
+				Vectors to be used as replacement if the mask is zero.
+			@param
+				mask filled with either 0's or 0xFFFFFFFF
+			@return
+				this[i] = mask[i] != 0 ? this[i] : replacement[i]
+		*/
+		inline void CmovRobust( ArrayReal mask, const ArrayVector3 &replacement );
 
 		/** Conditional move. @See MathlibSSE2::Cmov4
 			Selects between arg1 & arg2 according to mask

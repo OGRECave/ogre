@@ -46,7 +46,6 @@ namespace Ogre
 		1 * sizeof( Ogre::Real ),		//ArrayMemoryManager::LocalRadius
 		1 * sizeof( Ogre::Real ),		//ArrayMemoryManager::WorldRadius
 		1 * sizeof( Ogre::Real ),		//ArrayMemoryManager::SquaredUpperDistance
-		1 * sizeof( bool ),				//ArrayMemoryManager::Visible
 		1 * sizeof( Ogre::uint32 ),		//ArrayMemoryManager::VisibilityFlags
 		1 * sizeof( Ogre::uint32 ),		//ArrayMemoryManager::QueryFlags
 		1 * sizeof( Ogre::uint32 ),		//ArrayMemoryManager::LightMask
@@ -99,8 +98,6 @@ namespace Ogre
 												nextSlotBase * m_elementsMemSizes[WorldRadius] );
 		outData.mSquaredUpperDistance	= reinterpret_cast<Real*>( m_memoryPools[SquaredUpperDistance] +
 												nextSlotBase * m_elementsMemSizes[SquaredUpperDistance] );
-		outData.mVisible				=reinterpret_cast<bool*>( m_memoryPools[Visible] +
-												nextSlotBase * m_elementsMemSizes[Visible] );
 		outData.mVisibilityFlags		= reinterpret_cast<uint32*>( m_memoryPools[VisibilityFlags] +
 												nextSlotBase * m_elementsMemSizes[VisibilityFlags] );
 		outData.mQueryFlags				= reinterpret_cast<uint32*>( m_memoryPools[QueryFlags] +
@@ -115,7 +112,6 @@ namespace Ogre
 		outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldRadius[nextSlotIdx]			= 0;
 		outData.mSquaredUpperDistance[nextSlotIdx]	= std::numeric_limits<Real>::max();
-		outData.mVisible[nextSlotIdx]				= true;
 		outData.mVisibilityFlags[nextSlotIdx]		= MovableObject::getDefaultVisibilityFlags();
 		outData.mQueryFlags[nextSlotIdx]			= MovableObject::getDefaultQueryFlags();
 		outData.mLightMask[nextSlotIdx]				= 0xFFFFFFFF;

@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 #include "OgreException.h"
 
+#include "Math/Array/OgreBooleanMask.h"
+
 namespace Ogre
 {
 	NameGenerator InstancedEntity::msNameGenerator("");
@@ -53,18 +55,10 @@ namespace Ogre
 				mBoneWorldMatrices(0),
 				mFrameAnimationLastUpdated(std::numeric_limits<unsigned long>::max() - 1),
 				mSharedTransformEntity( 0 ),
-				mTransformLookupNumber(instanceID),
-				mPosition(Vector3::ZERO),
-				mDerivedLocalPosition(Vector3::ZERO),
-				mOrientation(Quaternion::IDENTITY),
-				mScale(Vector3::UNIT_SCALE),
-				mMaxScaleLocal(1),
-				mNeedTransformUpdate(true),
-				mNeedAnimTransformUpdate(true),
-				mUseLocalTransform(false)
+				mTransformLookupNumber(instanceID)
 	{
-		//Use a static name generator to ensure this name stays unique (which may not happen
-		//otherwise due to reparenting when defragmenting)
+		setInUse( false );
+
 		mName = batchOwner->getName() + "/IE_" + StringConverter::toString(mInstanceId);
 
 		if (sharedTransformEntity)
@@ -75,7 +69,6 @@ namespace Ogre
 		{
 			createSkeletonInstance();
 		}
-		updateTransforms();
 	}
 
 	InstancedEntity::~InstancedEntity()
@@ -218,7 +211,7 @@ namespace Ogre
 				const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
 				Mesh::IndexMap::const_iterator itor = indexMap->begin();
 				Mesh::IndexMap::const_iterator end  = indexMap->end();
-				
+
 				while( itor != end )
 				{
 					const Matrix4 &mat = matrices[*itor++];
@@ -363,22 +356,17 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
 	{
-		return _getDerivedPosition().squaredDistance(cam->getDerivedPosition());
+		return mParentNode->_getDerivedPosition().squaredDistance(cam->getDerivedPosition());
 	}
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyMoved(void)
 	{
-		markTransformDirty();
 		MovableObject::_notifyMoved();
-		updateTransforms();
 	}
-
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyAttached( Node* parent )
 	{
-		markTransformDirty();
 		MovableObject::_notifyAttached( parent );
-		updateTransforms();
 	}
 	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const
@@ -409,7 +397,7 @@ namespace Ogre
 				(mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
 				(mSkeletonInstance->getManualBonesDirty());
 
-			if( animationDirty || (mNeedAnimTransformUpdate &&  mBatchOwner->useBoneWorldMatrices()))
+			if( animationDirty || mBatchOwner->useBoneWorldMatrices())
 			{
 				mSkeletonInstance->setAnimationState( *mAnimationState );
 				mSkeletonInstance->_getBoneMatrices( mBoneMatrices );
@@ -422,7 +410,6 @@ namespace Ogre
 													mBoneMatrices,
 													mBoneWorldMatrices,
 													mSkeletonInstance->getNumBones() );
-					mNeedAnimTransformUpdate = false;
 				}
 				
 				mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
@@ -433,88 +420,11 @@ namespace Ogre
 
 		return false;
 	}
-
-	//-----------------------------------------------------------------------
-	void InstancedEntity::markTransformDirty()
-	{
-		mNeedTransformUpdate = true;
-		mNeedAnimTransformUpdate = true; 
-		mBatchOwner->_boundsDirty();
-	}
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setPosition(const Vector3& position, bool doUpdate) 
-	{ 
-		mPosition = position; 
-		mDerivedLocalPosition = position;
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setOrientation(const Quaternion& orientation, bool doUpdate) 
-	{ 
-		mOrientation = orientation;  
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setScale(const Vector3& scale, bool doUpdate) 
-	{ 
-		mScale = scale; 
-		mMaxScaleLocal = max( max(
-			Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	Real InstancedEntity::getMaxScaleCoef() const 
-	{ 
-		if (mParentNode)
-		{
-			const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
-			return mMaxScaleLocal * max(max(
-				Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
-		}
-		return mMaxScaleLocal; 
-	}
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::updateTransforms()
-	{
-		if (mUseLocalTransform && mNeedTransformUpdate)
-		{
-			if (mParentNode)
-			{
-				const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-				const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-				const Vector3& parentScale = mParentNode->_getDerivedScale();
-				
-				Quaternion derivedOrientation = parentOrientation * mOrientation;
-				Vector3 derivedScale = parentScale * mScale;
-				mDerivedLocalPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
-			
-				mFullLocalTransform.makeTransform(mDerivedLocalPosition, derivedScale, derivedOrientation);
-			}
-			else
-			{
-				mFullLocalTransform.makeTransform(mPosition,mScale,mOrientation);
-			}
-			mNeedTransformUpdate = false;
-		}
-	}
-
 	//---------------------------------------------------------------------------
 	void InstancedEntity::setInUse( bool used )
 	{
 		mInUse = used;
-		//Remove the use of local transform if the object is deleted
-		mUseLocalTransform &= used;
+		setVisible( mInUse );
 	}
 	//---------------------------------------------------------------------------
 	void InstancedEntity::setCustomParam( unsigned char idx, const Vector4 &newParam )

@@ -75,7 +75,7 @@ namespace Ogre {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );
         setPoolSize( poolSize );
-        mCastShadows = false;
+		setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
     }
     //-----------------------------------------------------------------------

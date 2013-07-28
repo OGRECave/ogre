@@ -112,6 +112,9 @@ namespace Ogre
 		*/
 		size_t getTotalNumObjects() const					{ return m_totalObjects; }
 
+		/// Returns the pointer to the dummy node (useful when detaching)
+		SceneNode* _getDummyNode() const					{ return m_dummyNode; }
+
 		/** Retrieves a ObjectData pointing to the first MovableObject in the given render queue
 		@param outObjectData
 			[out] ObjectData with filled pointers to the first MovableObject in this depth

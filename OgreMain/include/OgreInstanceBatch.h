@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreMesh.h"
 #include "OgreHeaderPrefix.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
 
 namespace Ogre
 {
@@ -95,6 +96,7 @@ namespace Ogre
         size_t              mInstancesPerBatch;
 
         InstanceManager     *mCreator;
+		ObjectMemoryManager mObjectMemoryManager; ///Only one render queue is used
 
         MaterialPtr         mMaterial;
 

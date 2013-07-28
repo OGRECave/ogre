@@ -61,7 +61,6 @@ THE SOFTWARE.
 			//Distance (in ArrayMemoryManager's slots) used to keep fetching data. This also
 			//means the memory manager needs to allocate extra memory for them.
 			#define OGRE_PREFETCH_SLOT_DISTANCE		4*ARRAY_PACKED_REALS //Must be multiple of ARRAY_PACKED_REALS
-
 		#endif
 
 		namespace Ogre {
@@ -75,6 +74,7 @@ THE SOFTWARE.
 
 		/// Does not convert, just cast ArrayReal to ArrayInt
 		#define CastRealToInt( x )			_mm_castps_si128( x )
+		#define CastIntToReal( x )			_mm_castsi128_ps( x )
 		/// Input must be 16-byte aligned
 		#define CastArrayToReal( outFloatPtr, arraySimd )		_mm_store_ps( outFloatPtr, arraySimd )
 
