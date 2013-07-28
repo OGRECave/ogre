@@ -39,7 +39,7 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 
         // Create a dragon entity and attach it to a node
         Entity *ent = mSceneMgr->createEntity("Dragon", "dragon.mesh");
-        ent->setMaterialName("Example/RasterizationOrder");
+        //ent->setMaterialName("Example/RasterizationOrder");
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->rotate(Vector3(0,1,0), Ogre::Angle(180));
         node->attachObject(ent);

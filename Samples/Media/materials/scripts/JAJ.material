@@ -111,8 +111,9 @@ fragment_program JAJ/Basic/PS_GLSL glsl
 
         default_params
         {
-            // param_named atom_counter atomic_counter 10 5
-            param_named atom_counter atomic_counter 10
+            param_named atom_counter uint 10
+            param_named pretty_colours bool false
+            param_named colour_factor uint[3] 50 50 100
         }
 }
 

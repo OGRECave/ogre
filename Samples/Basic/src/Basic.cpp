@@ -82,24 +82,28 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
             {
                 //printf("SAD PANDA!");
             }
-            else if ( pParams->_findNamedConstantDefinition( "ColourMe[0]" ) )
-            {
-                Vector4 constParam = Ogre::Vector4(0.5, 0.1, 0.0, 1.0);
-                renderPass->getFragmentProgramParameters()->setNamedConstant("ColourMe[0]", constParam);
+            else
+            { 
+                if ( pParams->_findNamedConstantDefinition( "ColourMe[0]" ) )
+                {
+                    Vector4 constParam = Ogre::Vector4(0.5, 0.1, 0.0, 1.0);
+                    renderPass->getFragmentProgramParameters()->setNamedConstant("ColourMe[0]", constParam);
                 
-                Vector4 timeParam = Ogre::Vector4(
-                    Ogre::Math::Sin(seconds)*0.5, 0.0, Ogre::Math::Cos(seconds)*0.5, 0.0);
-                renderPass->getFragmentProgramParameters()->setNamedConstant("ColourMe[1]", timeParam);
+                    Vector4 timeParam = Ogre::Vector4(
+                        Ogre::Math::Sin(seconds)*0.5, 0.0, Ogre::Math::Cos(seconds)*0.5, 0.0);
+                    renderPass->getFragmentProgramParameters()->setNamedConstant("ColourMe[1]", timeParam);
+                }
+                const Ogre::GpuConstantDefinition* atom_counter_def;
+                if ( (atom_counter_def = &pParams->getConstantDefinition("atom_counter")) )
+                {
+                    const uint* counter = pParams->getUnsignedIntPointer(atom_counter_def->physicalIndex);
+                    //const uint* counter2 = ;
+                    std::cout << "FOUND THE ATOMS: " << *counter << " " << std::endl; //<< *counter2 << std::endl;
+                }
             }
         }
 
-        //renderPass->getFragmentProgramParameters()->getNamedConstant("ColourMe[1]", timeParam);
-        int counter = 0;
-        //mBuffer.readData(0, 0, &counter);
-        
-        std::cout << counter << std::endl;
         // renderPass->getFragmentProgramParameters()->getConstantDefinition("atom_counter").getValue();
-        //renderPass->getFragmentProgramParameters()->getConstantDefinition("atom_counter").getValue();
         return SdkSample::frameRenderingQueued(evt); 
     }
 };
