@@ -252,34 +252,35 @@ namespace Ogre {
         void writeGpuProgramRef(const String& attrib, const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params);
         void writeGpuPrograms(void);
         void writeGPUProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-            const unsigned short level = 4, const bool useMainBuffer = true);
-		void writeNamedGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-			const unsigned short level = 4, const bool useMainBuffer = true);
-		void writeLowLevelGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-			const unsigned short level = 4, const bool useMainBuffer = true);
-		void writeGpuProgramParameter(
-			const String& commandName, const String& identifier, 
-			const GpuProgramParameters::AutoConstantEntry* autoEntry, 
-			const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-			bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
-			const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-			const unsigned short level, const bool useMainBuffer);
-		void writeTextureUnit(const TextureUnitState *pTex);
-		void writeSceneBlendFactor(const SceneBlendFactor c_src, const SceneBlendFactor c_dest, 
-			const SceneBlendFactor a_src, const SceneBlendFactor a_dest);
-		void writeSceneBlendFactor(const SceneBlendFactor sbf_src, const SceneBlendFactor sbf_dest);
-		void writeSceneBlendFactor(const SceneBlendFactor sbf);
-		void writeCompareFunction(const CompareFunction cf);
-		void writeColourValue(const ColourValue &colour, bool writeAlpha = false);
-		void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
-		void writeLayerBlendSource(const LayerBlendSource lbs);
+                                       const unsigned short level = 4, const bool useMainBuffer = true);
+        void writeNamedGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
+                                            const unsigned short level = 4, const bool useMainBuffer = true);
+        void writeLowLevelGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
+                                               const unsigned short level = 4, const bool useMainBuffer = true);
+        void writeGpuProgramParameter(
+            const String& commandName, const String& identifier, 
+            const GpuProgramParameters::AutoConstantEntry* autoEntry, 
+            const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
+            bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt, 
+            size_t physicalIndex, size_t physicalSize,
+            const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
+            const unsigned short level, const bool useMainBuffer);
+        void writeTextureUnit(const TextureUnitState *pTex);
+        void writeSceneBlendFactor(const SceneBlendFactor c_src, const SceneBlendFactor c_dest, 
+                                   const SceneBlendFactor a_src, const SceneBlendFactor a_dest);
+        void writeSceneBlendFactor(const SceneBlendFactor sbf_src, const SceneBlendFactor sbf_dest);
+        void writeSceneBlendFactor(const SceneBlendFactor sbf);
+        void writeCompareFunction(const CompareFunction cf);
+        void writeColourValue(const ColourValue &colour, bool writeAlpha = false);
+        void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
+        void writeLayerBlendSource(const LayerBlendSource lbs);
 		
-		typedef multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect>::type EffectMap;
+        typedef multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect>::type EffectMap;
 
-		void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
-		void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
-		void writeScrollEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
-		void writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeScrollEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
 
         String convertFiltering(FilterOptions fo);
 

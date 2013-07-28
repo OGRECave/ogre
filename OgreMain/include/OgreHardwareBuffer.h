@@ -66,7 +66,7 @@ namespace Ogre {
 		and to back it with a system memory 'shadow' copy which can be read and updated arbitrarily.
 		Ogre handles synchronising this buffer with the real hardware buffer (which should still be
 		created with the HBU_DYNAMIC flag if you intend to update it very frequently). Whilst this
-		approach does have it's own costs, such as increased memory overhead, these costs can 
+		approach does have its own costs, such as increased memory overhead, these costs can 
 		often be outweighed by the performance benefits of using a more hardware efficient buffer.
 		You should look for the 'useShadowBuffer' parameter on the creation methods used to create
 		the buffer of the type you require (see HardwareBufferManager) to enable this feature.

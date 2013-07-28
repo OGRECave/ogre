@@ -943,7 +943,7 @@ namespace Ogre {
             elemsSupported = 
                 vdata->allocateHardwareAnimationElements(numberOfElements, animateNormals);
         }
-        // Initialise parametrics incase we don't use all of them
+        // Initialise parametrics in case we don't use all of them
         for (size_t i = 0; i < vdata->hwAnimationDataList.size(); ++i)
         {
             vdata->hwAnimationDataList[i].parametric = 0.0f;

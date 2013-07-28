@@ -130,7 +130,7 @@ namespace Ogre {
     {
         /// Data type
         GpuConstantType constType;
-        /// Physical start index in buffer (either float, double or int buffer)
+        /// Physical start index in buffer (either float, double, int, or uint buffer)
         size_t physicalIndex;
         /// Logical index - used to communicate this constant to the rendersystem
         size_t logicalIndex;
@@ -142,6 +142,12 @@ namespace Ogre {
         /// How this parameter varies (bitwise combination of GpuProgramVariability)
         mutable uint16 variability;
 
+        //TODO Should offset be added to list?
+        // For instance, for GLSL atomic counters:
+        // layout(binding = 1, offset = 10) atomic_uint atom_counter;
+        // Binding goes in logicalIndex, but where does offset go?
+        //size_t offset;
+
         bool isFloat() const
         {
             return isFloat(constType);
@@ -149,23 +155,6 @@ namespace Ogre {
 
         static bool isFloat(GpuConstantType c)
         {
-            // switch(c)
-            // {
-            // case GCT_INT1:
-            // case GCT_INT2:
-            // case GCT_INT3:
-            // case GCT_INT4:
-            // case GCT_SAMPLER1D:
-            // case GCT_SAMPLER2D:
-            // case GCT_SAMPLER2DARRAY:
-            // case GCT_SAMPLER3D:
-            // case GCT_SAMPLERCUBE:
-            // case GCT_SAMPLER1DSHADOW:
-            // case GCT_SAMPLER2DSHADOW:
-            //     return false;
-            // default:
-            //     return true;
-            // };
             switch(c)
             {
             case GCT_FLOAT1:
@@ -194,27 +183,6 @@ namespace Ogre {
 
         static bool isDouble(GpuConstantType c)
         {
-            // switch(c)
-            // {
-            // case GCT_INT1:
-            // case GCT_INT2:
-            // case GCT_INT3:
-            // case GCT_INT4:
-            // case GCT_FLOAT1:
-            // case GCT_FLOAT2:
-            // case GCT_FLOAT3:
-            // case GCT_FLOAT4:
-            // case GCT_SAMPLER1D:
-            // case GCT_SAMPLER2D:
-            // case GCT_SAMPLER2DARRAY:
-            // case GCT_SAMPLER3D:
-            // case GCT_SAMPLERCUBE:
-            // case GCT_SAMPLER1DSHADOW:
-            // case GCT_SAMPLER2DSHADOW:
-            //     return false;
-            // default:
-            //     return true;
-            // };
             switch(c)
             {
             case GCT_DOUBLE1: 
@@ -255,12 +223,12 @@ namespace Ogre {
             };
         }
 
-        bool isUInt() const
+        bool isUnsignedInt() const
         {
-            return isUInt(constType);
+            return isUnsignedInt(constType);
         }
 
-        static bool isUInt(GpuConstantType c)
+        static bool isUnsignedInt(GpuConstantType c)
         {
             switch(c)
             {
@@ -479,12 +447,12 @@ namespace Ogre {
         /// Total size of the uint buffer required
         size_t uintBufferSize;
         /// Total size of the bool buffer required
-        size_t boolBufferSize;
+        // size_t boolBufferSize;
         /// Map of parameter names to GpuConstantDefinition
         GpuConstantDefinitionMap map;
 
     GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), 
-            intBufferSize(0), uintBufferSize(0), boolBufferSize(0) {}
+        intBufferSize(0), uintBufferSize(0) {  } //boolBufferSize(0) {}
 
         /** Generate additional constant entries for arrays based on a base definition.
             @remarks
@@ -596,7 +564,7 @@ namespace Ogre {
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
     */
-    typedef vector<uint>::type UIntConstantList;
+    typedef vector<uint>::type UnsignedIntConstantList;
     /** Definition of container that holds the current bool constants.
         @note Not necessarily in direct index order to constant indexes, logical
         to physical index map is derived from GpuProgram
@@ -604,7 +572,7 @@ namespace Ogre {
     //FIXME What is best container for bool in C++?  Apparently not vector,
     // since it stores bool as bitfield which is slow and awkward.
     // typedef vector<bool>::type BoolConstantList;
-    typedef deque<bool>::type BoolConstantList;
+    // typedef deque<bool>::type BoolConstantList;
 
     /** A group of manually updated parameters that are shared between many parameter sets.
         @remarks
@@ -628,8 +596,8 @@ namespace Ogre {
         FloatConstantList mFloatConstants;
         DoubleConstantList mDoubleConstants;
         IntConstantList mIntConstants;
-        UIntConstantList mUIntConstants;
-        BoolConstantList mBoolConstants;
+        UnsignedIntConstantList mUnsignedIntConstants;
+        // BoolConstantList mBoolConstants;
         String mName;
 
         // Optional data the rendersystem might want to store
@@ -700,8 +668,8 @@ namespace Ogre {
         void setNamedConstant(const String& name, int val);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, uint val) */
         void setNamedConstant(const String& name, uint val);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, bool val) */
-        void setNamedConstant(const String& name, bool val);
+        // /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, bool val) */
+        // void setNamedConstant(const String& name, bool val);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector4& vec) */
         void setNamedConstant(const String& name, const Vector4& vec);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector3& vec) */
@@ -722,8 +690,8 @@ namespace Ogre {
         void setNamedConstant(const String& name, const int *val, size_t count);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const uint *val, size_t count) */
         void setNamedConstant(const String& name, const uint *val, size_t count);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const bool *val, size_t count) */
-        void setNamedConstant(const String& name, const bool *val, size_t count);
+        // /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const bool *val, size_t count) */
+        // void setNamedConstant(const String& name, const bool *val, size_t count);
 
         /// Get a pointer to the 'nth' item in the float buffer
         float* getFloatPointer(size_t pos) { _markDirty(); return &mFloatConstants[pos]; }
@@ -738,13 +706,13 @@ namespace Ogre {
         /// Get a pointer to the 'nth' item in the int buffer
         const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        uint* getUIntPointer(size_t pos) { _markDirty(); return &mUIntConstants[pos]; }
+        uint* getUnsignedIntPointer(size_t pos) { _markDirty(); return &mUnsignedIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        const uint* getUIntPointer(size_t pos) const { return &mUIntConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the bool buffer
-        bool* getBoolPointer(size_t pos) { _markDirty(); return &mBoolConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the bool buffer
-        const bool* getBoolPointer(size_t pos) const { return &mBoolConstants[pos]; }
+        const uint* getUnsignedIntPointer(size_t pos) const { return &mUnsignedIntConstants[pos]; }
+        // /// Get a pointer to the 'nth' item in the bool buffer
+        // bool* getBoolPointer(size_t pos) { _markDirty(); return &mBoolConstants[pos]; }
+        // /// Get a pointer to the 'nth' item in the bool buffer
+        // const bool* getBoolPointer(size_t pos) const { return &mBoolConstants[pos]; }
 
         /// Get a reference to the list of float constants
         const FloatConstantList& getFloatConstantList() const { return mFloatConstants; }
@@ -753,9 +721,9 @@ namespace Ogre {
         /// Get a reference to the list of int constants
         const IntConstantList& getIntConstantList() const { return mIntConstants; }
         /// Get a reference to the list of uint constants
-        const UIntConstantList& getUIntConstantList() const { return mUIntConstants; }
-        /// Get a reference to the list of bool constants
-        const BoolConstantList& getBoolConstantList() const { return mBoolConstants; }
+        const UnsignedIntConstantList& getUnsignedIntConstantList() const { return mUnsignedIntConstants; }
+        // /// Get a reference to the list of bool constants
+        // const BoolConstantList& getBoolConstantList() const { return mBoolConstants; }
 
         /** Internal method that the RenderSystem might use to store optional data. */
         void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
@@ -1331,15 +1299,22 @@ namespace Ogre {
             ACDT_NONE,
             /// the auto constant requires data of type int
             ACDT_INT,
-            /// the auto constant requires data of type real
+            /// the auto constant requires data of type real (float or double)
             ACDT_REAL
+            // /// the auto constant requires data of type unsigned int
+            // ACDT_UINT,
+            // /// the auto constant requires data of type bool
+            // ACDT_BOOL
         };
 
         /** Defines the base element type of the auto constant
          */
         enum ElementType {
             ET_INT,
+            // float or double, depending on 64-bit compiler flag
             ET_REAL
+            // ET_UINT,
+            // ET_BOOL
         };
 
         /** Structure defining an auto constant that's available for use in
@@ -1417,9 +1392,9 @@ namespace Ogre {
         /// Packed list of integer constants (physical indexing)
         IntConstantList mIntConstants;
         /// Packed list of unsigned integer constants (physical indexing)
-        UIntConstantList mUIntConstants;
-        /// Packed list of boolean constants (physical indexing)
-        BoolConstantList mBoolConstants;
+        UnsignedIntConstantList mUnsignedIntConstants;
+        // /// Packed list of boolean constants (physical indexing)
+        // BoolConstantList mBoolConstants;
         /** Logical index to physical index map - for low-level programs
             or high-level programs which pass params this way. */
         GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
@@ -1431,7 +1406,7 @@ namespace Ogre {
         GpuLogicalBufferStructPtr mIntLogicalToPhysical;
         /** Logical index to physical index map - for low-level programs
             or high-level programs which pass params this way. */
-        GpuLogicalBufferStructPtr mUIntLogicalToPhysical;
+        GpuLogicalBufferStructPtr mUnsignedIntLogicalToPhysical;
         /** Logical index to physical index map - for low-level programs
             or high-level programs which pass params this way. */
         GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
@@ -1446,10 +1421,10 @@ namespace Ogre {
         GpuLogicalIndexUse* _getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical uint constant index.
          */
-        GpuLogicalIndexUse* _getUIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        GpuLogicalIndexUse* _getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical bool constant index.
          */
-        GpuLogicalIndexUse* _getBoolConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        // GpuLogicalIndexUse* _getBoolConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
 
         /// Mapping from parameter names to def - high-level programs are expected to populate this
         GpuNamedConstantsPtr mNamedConstants;
@@ -1641,13 +1616,13 @@ namespace Ogre {
             @param count The number of ints to write
         */
         void _writeRawConstants(size_t physicalIndex, const uint* val, size_t count);
-        /** Write a series of boolean values into the underlying integer
-            constant buffer at the given physical index.
-            @param physicalIndex The buffer position to start writing
-            @param val Pointer to a list of values to write
-            @param count The number of ints to write
-        */
-        void _writeRawConstants(size_t physicalIndex, const bool* val, size_t count);
+        // /** Write a series of boolean values into the underlying integer
+        //     constant buffer at the given physical index.
+        //     @param physicalIndex The buffer position to start writing
+        //     @param val Pointer to a list of values to write
+        //     @param count The number of ints to write
+        // */
+        // void _writeRawConstants(size_t physicalIndex, const bool* val, size_t count);
         /** Read a series of floating point values from the underlying float
             constant buffer at the given physical index.
             @param physicalIndex The buffer position to start reading
@@ -1803,7 +1778,7 @@ namespace Ogre {
             @note
             Only applicable to low-level programs.
         */
-        const GpuLogicalBufferStructPtr& getUIntLogicalBufferStruct() const { return mUIntLogicalToPhysical; }
+        const GpuLogicalBufferStructPtr& getUnsignedIntLogicalBufferStruct() const { return mUnsignedIntLogicalToPhysical; }
         /** Get the current list of mappings from low-level logical param indexes
             to physical buffer locations in the integer buffer.
             @note
@@ -1834,7 +1809,7 @@ namespace Ogre {
             high-level programs which use logical parameter indexes).
             @return std::numeric_limits<size_t>::max() if not found
         */
-        size_t getUIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
+        size_t getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
         /** Retrieves the logical index relating to a physical index in the bool
             buffer, for programs which support that (low-level programs and
             high-level programs which use logical parameter indexes).
@@ -1862,17 +1837,17 @@ namespace Ogre {
         /// Get a pointer to the 'nth' item in the int buffer
         const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
         /// Get a reference to the list of uint constants
-        const UIntConstantList& getUIntConstantList() const { return mUIntConstants; }
+        const UnsignedIntConstantList& getUnsignedIntConstantList() const { return mUnsignedIntConstants; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        uint* getUIntPointer(size_t pos) { return &mUIntConstants[pos]; }
+        uint* getUnsignedIntPointer(size_t pos) { return &mUnsignedIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        const uint* getUIntPointer(size_t pos) const { return &mUIntConstants[pos]; }
-        /// Get a reference to the list of bool constants
-        const BoolConstantList& getBoolConstantList() const { return mBoolConstants; }
-        /// Get a pointer to the 'nth' item in the bool buffer
-        bool* getBoolPointer(size_t pos) { return &mBoolConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the bool buffer
-        const bool* getBoolPointer(size_t pos) const { return &mBoolConstants[pos]; }
+        const uint* getUnsignedIntPointer(size_t pos) const { return &mUnsignedIntConstants[pos]; }
+        // /// Get a reference to the list of bool constants
+        // const BoolConstantList& getBoolConstantList() const { return mBoolConstants; }
+        // /// Get a pointer to the 'nth' item in the bool buffer
+        // bool* getBoolPointer(size_t pos) { return &mBoolConstants[pos]; }
+        // /// Get a pointer to the 'nth' item in the bool buffer
+        // const bool* getBoolPointer(size_t pos) const { return &mBoolConstants[pos]; }
 
         /// Get a reference to the list of auto constant bindings
         const AutoConstantList& getAutoConstantList() const { return mAutoConstants; }
@@ -1963,12 +1938,12 @@ namespace Ogre {
             index for unsigned integer values.
             @note Only applicable for low-level programs.
         */
-        const AutoConstantEntry* findUIntAutoConstantEntry(size_t logicalIndex);
-        /** Finds an auto constant that's affecting a given logical parameter
-            index for boolean values.
-            @note Only applicable for low-level programs.
-        */
-        const AutoConstantEntry* findBoolAutoConstantEntry(size_t logicalIndex);
+        const AutoConstantEntry* findUnsignedIntAutoConstantEntry(size_t logicalIndex);
+        // /** Finds an auto constant that's affecting a given logical parameter
+        //     index for boolean values.
+        //     @note Only applicable for low-level programs.
+        // */
+        // const AutoConstantEntry* findBoolAutoConstantEntry(size_t logicalIndex);
         /** Finds an auto constant that's affecting a given named parameter index.
             @note Only applicable to high-level programs.
         */
@@ -1988,7 +1963,7 @@ namespace Ogre {
         /** Finds an auto constant that's affecting a given physical position in
             the unsigned integer buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryUInt(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryUnsignedInt(size_t physicalIndex);
         /** Finds an auto constant that's affecting a given physical position in
             the boolean buffer
         */
@@ -2064,26 +2039,26 @@ namespace Ogre {
             @param val The value to set
         */
         void setNamedConstant(const String& name, uint val);
-        /** Sets a single value constant boolean parameter to the program.
-            @remarks
-            Different types of GPU programs support different types of constant parameters.
-            For example, it's relatively common to find that vertex programs only support
-            floating point constants, and that fragment programs only support integer (fixed point)
-            parameters. This can vary depending on the program version supported by the
-            graphics card being used. You should consult the documentation for the type of
-            low level program you are using, or alternatively use the methods
-            provided on RenderSystemCapabilities to determine the options.
-            @par
-            Another possible limitation is that some systems only allow constants to be set
-            on certain boundaries, e.g. in sets of 4 values for example. Again, see
-            RenderSystemCapabilities for full details.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val The value to set
-        */
-        void setNamedConstant(const String& name, bool val);
+        // /** Sets a single value constant boolean parameter to the program.
+        //     @remarks
+        //     Different types of GPU programs support different types of constant parameters.
+        //     For example, it's relatively common to find that vertex programs only support
+        //     floating point constants, and that fragment programs only support integer (fixed point)
+        //     parameters. This can vary depending on the program version supported by the
+        //     graphics card being used. You should consult the documentation for the type of
+        //     low level program you are using, or alternatively use the methods
+        //     provided on RenderSystemCapabilities to determine the options.
+        //     @par
+        //     Another possible limitation is that some systems only allow constants to be set
+        //     on certain boundaries, e.g. in sets of 4 values for example. Again, see
+        //     RenderSystemCapabilities for full details.
+        //     @note
+        //     This named option will only work if you are using a parameters object created
+        //     from a high-level program (HighLevelGpuProgram).
+        //     @param name The name of the parameter
+        //     @param val The value to set
+        // */
+        // void setNamedConstant(const String& name, bool val);
         /** Sets a Vector4 parameter to the program.
             @param name The name of the parameter
             @param vec The value to set
@@ -2197,24 +2172,24 @@ namespace Ogre {
         */
         void setNamedConstant(const String& name, const uint *val, size_t count,
                               size_t multiple = 4);
-        /** Sets a multiple value constant boolean parameter to the program.
-            @par
-            Some systems only allow constants to be set on certain boundaries,
-            e.g. in sets of 4 values for example. The 'multiple' parameter allows
-            you to control that although you should only change it if you know
-            your chosen language supports that (at the time of writing, only
-            GLSL allows constants which are not a multiple of 4).
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val Pointer to the values to write
-            @param count The number of 'multiples' of floats to write
-            @param multiple The number of raw entries in each element to write,
-            the default is 4 so count = 1 would write 4 floats.
-        */
-        void setNamedConstant(const String& name, const bool *val, size_t count,
-                              size_t multiple = 4);
+        // /** Sets a multiple value constant boolean parameter to the program.
+        //     @par
+        //     Some systems only allow constants to be set on certain boundaries,
+        //     e.g. in sets of 4 values for example. The 'multiple' parameter allows
+        //     you to control that although you should only change it if you know
+        //     your chosen language supports that (at the time of writing, only
+        //     GLSL allows constants which are not a multiple of 4).
+        //     @note
+        //     This named option will only work if you are using a parameters object created
+        //     from a high-level program (HighLevelGpuProgram).
+        //     @param name The name of the parameter
+        //     @param val Pointer to the values to write
+        //     @param count The number of 'multiples' of floats to write
+        //     @param multiple The number of raw entries in each element to write,
+        //     the default is 4 so count = 1 would write 4 floats.
+        // */
+        // void setNamedConstant(const String& name, const bool *val, size_t count,
+        //                       size_t multiple = 4);
         /** Sets up a constant which will automatically be updated by the system.
             @remarks
             Vertex and fragment programs often need parameters which are to do with the
@@ -2299,14 +2274,14 @@ namespace Ogre {
             @param requestedSize The requested size - pass 0 to ignore missing entries
             and return std::numeric_limits<size_t>::max()
         */
-        size_t _getUIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical bool constant index.
             @note Only applicable to low-level programs.
             @param logicalIndex The logical parameter index
             @param requestedSize The requested size - pass 0 to ignore missing entries
             and return std::numeric_limits<size_t>::max()
         */
-        size_t _getBoolConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        //size_t _getBoolConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
 
         /** Sets whether or not we need to transpose the matrices passed in from the rest of OGRE.
             @remarks

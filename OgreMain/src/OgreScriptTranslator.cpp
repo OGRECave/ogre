@@ -107,13 +107,36 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getBoolean(const AbstractNodePtr &node, bool *result)
     {
-        if(node->type != ANT_ATOM)
+        if (node->type != ANT_ATOM)
             return false;
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        if(atom->id != 1 && atom->id != 2)
-            return false;
+        // if (atom->id != 1 && atom->id != 2)
+        //     return false;
 
-        *result = atom->id == 1 ? true : false;
+        // *result = atom->id == 1 ? true : false;
+
+        // if
+
+        // AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
+        // int n = sscanf(atom->value.c_str(), "%d", result);
+
+        // if (n == 0 || n == EOF)
+        //     return false; // Conversion failed
+        //TODO Make more efficient parser
+        //TODO Figure out how to lowercase via Ogre
+        
+        //const char * c_str = atom->value.c_str();
+
+        if (atom->id == 1 || atom->id == 2)
+        {
+            *result = atom->id == 1 ? true : false;
+        }
+        else 
+        {
+            String string(atom->value.c_str());
+            *result = StringConverter::parseBool(string);
+        }
+                
         return true;
     }
     //-------------------------------------------------------------------------
@@ -128,7 +151,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getReal(const Ogre::AbstractNodePtr &node, Ogre::Real *result)
     {
-        if(node->type != ANT_ATOM)
+        if (node->type != ANT_ATOM)
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
@@ -139,7 +162,7 @@ namespace Ogre{
         int n = sscanf(atom->value.c_str(), "%lf", result);
 #endif
 
-        if(n == 0 || n == EOF)
+        if (n == 0 || n == EOF)
             return false; // Conversion failed
 
         return true;
@@ -152,7 +175,20 @@ namespace Ogre{
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         int n = sscanf(atom->value.c_str(), "%f", result);
-        if(n == 0 || n == EOF)
+        if (n == 0 || n == EOF)
+            return false; // Conversion failed
+
+        return true;
+    }
+    //-------------------------------------------------------------------------
+    bool ScriptTranslator::getDouble(const Ogre::AbstractNodePtr &node, double *result)
+    {
+        if(node->type != ANT_ATOM)
+            return false;
+
+        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
+        int n = sscanf(atom->value.c_str(), "%lf", result);
+        if (n == 0 || n == EOF)
             return false; // Conversion failed
 
         return true;
@@ -160,25 +196,25 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInt(const Ogre::AbstractNodePtr &node, int *result)
     {
-        if(node->type != ANT_ATOM)
+        if (node->type != ANT_ATOM)
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
         int n = sscanf(atom->value.c_str(), "%d", result);
-        if(n == 0 || n == EOF)
+        if (n == 0 || n == EOF)
             return false; // Conversion failed
 
         return true;
     }
     //-------------------------------------------------------------------------
-    bool ScriptTranslator::getUInt(const Ogre::AbstractNodePtr &node, uint32 *result)
+    bool ScriptTranslator::getUInt(const Ogre::AbstractNodePtr &node, uint *result)
     {
-        if(node->type != ANT_ATOM)
+        if (node->type != ANT_ATOM)
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        int n = sscanf(atom->value.c_str(), "%u", result);
-        if(n == 0 || n == EOF)
+        uint n = sscanf(atom->value.c_str(), "%u", result);
+        if (n == 0 || n == EOF)
             return false; // Conversion failed
 
         return true;
@@ -302,12 +338,12 @@ namespace Ogre{
     bool ScriptTranslator::getMatrix4(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, Matrix4 *m)
     {
         int n = 0;
-        while(i != end && n < 16)
+        while (i != end && n < 16)
         {
-            if(i != end)
+            if (i != end)
             {
                 Real r = 0;
-                if(getReal(*i, &r))
+                if (getReal(*i, &r))
                     (*m)[n/4][n%4] = r;
                 else
                     return false;
@@ -326,12 +362,12 @@ namespace Ogre{
     {
         bool success = true;
         int n = 0;
-        while(n < count)
+        while (n < count)
         {
-            if(i != end)
+            if (i != end)
             {
                 int v = 0;
-                if(getInt(*i, &v))
+                if (getInt(*i, &v))
                     vals[n] = v;
                 else
                     break;
@@ -342,7 +378,7 @@ namespace Ogre{
             ++n;
         }
 
-        if(n < count)
+        if (n < count)
             success = false;
 
         return success;
@@ -352,12 +388,12 @@ namespace Ogre{
     {
         bool success = true;
         int n = 0;
-        while(n < count)
+        while (n < count)
         {
-            if(i != end)
+            if (i != end)
             {
                 float v = 0;
-                if(getFloat(*i, &v))
+                if (getFloat(*i, &v))
                     vals[n] = v;
                 else
                     break;
@@ -368,7 +404,85 @@ namespace Ogre{
             ++n;
         }
 
-        if(n < count)
+        if (n < count)
+            success = false;
+
+        return success;
+    }
+    //----------------------------------------------------------------------------
+    bool ScriptTranslator::getDoubles(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, double *vals, int count)
+    {
+        bool success = true;
+        int n = 0;
+        while (n < count)
+        {
+            if (i != end)
+            {
+                double v = 0;
+                if (getDouble(*i, &v))
+                    vals[n] = v;
+                else
+                    break;
+                ++i;
+            }
+            else
+                vals[n] = 0;
+            ++n;
+        }
+
+        if (n < count)
+            success = false;
+
+        return success;
+    }
+    //----------------------------------------------------------------------------
+    bool ScriptTranslator::getUInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count)
+    {
+        bool success = true;
+        int n = 0;
+        while (n < count)
+        {
+            if (i != end)
+            {
+                uint v = 0;
+                if (getUInt(*i, &v))
+                    vals[n] = v;
+                else
+                    break;
+                ++i;
+            }
+            else
+                vals[n] = 0;
+            ++n;
+        }
+
+        if (n < count)
+            success = false;
+
+        return success;
+    }
+    //----------------------------------------------------------------------------
+    bool ScriptTranslator::getBooleans(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count)
+    {
+        bool success = true;
+        int n = 0;
+        while (n < count)
+        {
+            if (i != end)
+            {
+                bool v = false;
+                if (getBoolean(*i, &v))
+                    vals[n] = (v != 0);
+                else
+                    break;
+                ++i;
+            }
+            else
+                vals[n] = false;
+            ++n;
+        }
+
+        if (n < count)
             success = false;
 
         return success;
@@ -416,7 +530,7 @@ namespace Ogre{
 
         String val;
         getString(*i, &val);
-        if(val.find("float") != String::npos)
+        if (val.find("float") != String::npos)
         {
             int count = 1;
             if (val.size() == 6)
@@ -429,12 +543,12 @@ namespace Ogre{
 
             *op = (GpuConstantType)(GCT_FLOAT1 + count - 1);
         }
-        else if(val.find("double") != String::npos)
+        else if (val.find("double") != String::npos)
         {
             int count = 1;
-            if (val.size() == 6)
-                count = StringConverter::parseInt(val.substr(5));
-            else if (val.size() > 6)
+            if (val.size() == 7)
+                count = StringConverter::parseInt(val.substr(6));
+            else if (val.size() > 7)
                 return false;
 
             if (count > 4 || count == 0)
@@ -442,7 +556,7 @@ namespace Ogre{
 
             *op = (GpuConstantType)(GCT_DOUBLE1 + count - 1);
         }
-        else if(val.find("int") != String::npos)
+        else if (val.find("int") != String::npos)
         {
             int count = 1;
             if (val.size() == 4)
@@ -454,6 +568,32 @@ namespace Ogre{
                 return false;
 
             *op = (GpuConstantType)(GCT_INT1 + count - 1);
+        }
+        else if (val.find("uint") != String::npos)
+        {
+            int count = 1;
+            if (val.size() == 5)
+                count = StringConverter::parseInt(val.substr(4));
+            else if (val.size() > 5)
+                return false;
+
+            if (count > 4 || count == 0)
+                return false;
+
+            *op = (GpuConstantType)(GCT_UINT1 + count - 1);
+        }
+        else if (val.find("bool") != String::npos)
+        {
+            int count = 1;
+            if (val.size() == 5)
+                count = StringConverter::parseInt(val.substr(4));
+            else if (val.size() > 5)
+                return false;
+
+            if (count > 4 || count == 0)
+                return false;
+
+            *op = (GpuConstantType)(GCT_BOOL1 + count - 1);
         }
         else if(val.find("matrix") != String::npos)
         {
@@ -4580,6 +4720,38 @@ namespace Ogre{
 
     }
     //-------------------------------------------------------------------------
+    int parseProgramParameterDimensions(String& declarator, String type)
+    {
+        // Assume 1 unless otherwise specified
+        int dimensions = 1;
+
+        size_t start = declarator.find_first_not_of(type);
+
+        if (start != String::npos)
+        {
+            size_t end = declarator.find_first_of("[", start);
+
+            // int1, int2, etc.
+            if (end != start)
+            {
+                dimensions *= StringConverter::parseInt(
+                    declarator.substr(start, end - start));
+                start = end;
+            }
+
+            // C-style array
+            while (start != String::npos)
+            {
+                end = declarator.find_first_of("]", start);
+                dimensions *= StringConverter::parseInt(
+                    declarator.substr(start + 1, end - start - 1));
+                start = declarator.find_first_of("[", end);
+            }
+        }
+        
+        return dimensions; 
+    }
+    //-------------------------------------------------------------------------
     void GpuProgramTranslator::translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj)
     {
         size_t animParametricsCount = 0;
@@ -4620,6 +4792,7 @@ namespace Ogre{
                         }
                     }
                     break;
+                //TODO Refactor this case.
                 case ID_PARAM_INDEXED:
                 case ID_PARAM_NAMED:
                     {
@@ -4701,147 +4874,389 @@ namespace Ogre{
                                                        "incorrect subroutine declaration");
                                 }
                             }
-                            else if (atom1->value == "atomic_counter")
-                            {
-                                //GpuProgramParameters::ElementType type = GpuProgramParameters::ET_INT; //FIXME
-                                int count = 0;
-                                if(atom1->value.size() > 14) {
-                                    count = StringConverter::parseInt(atom1->value.substr(3));
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "currently only a single atomic counter can be set at a time");
-                                    break;
-                                }
-                                else
-                                {
-                                    count = 1;
-                                }
+                            // else if (atom1->value == "atomic_counter")
+                            // {
+                            //     //GpuProgramParameters::ElementType type = GpuProgramParameters::ET_INT; //FIXME
+                            //     int count = 0;
+                            //     if(atom1->value.size() > 14) {
+                            //         count = StringConverter::parseInt(atom1->value.substr(3));
+                            //         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                            //                            "currently only a single atomic counter can be set at a time");
+                            //         break;
+                            //     }
+                            //     else
+                            //     {
+                            //         count = 1;
+                            //     }
 
-                                // First, clear out any offending auto constants
-                                if(named)
-                                    params->clearNamedAutoConstant(name);
-                                else
-                                    params->clearAutoConstant(index);
+                            //     // First, clear out any offending auto constants
+                            //     if(named)
+                            //         params->clearNamedAutoConstant(name);
+                            //     else
+                            //         params->clearAutoConstant(index);
 
-                                // uint8 roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-                                int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+                            //     // uint8 roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+                            //     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                // uint32 *vals = OGRE_ALLOC_T(uint32, roundedCount, MEMCATEGORY_SCRIPTING);
-                                int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
-                                if(getInts(k, prop->values.end(), vals, roundedCount))
-                                {
-                                    try
-                                    {
-                                        if(named)
-                                            params->setNamedConstant(name, vals, count, 1);
-                                        else
-                                            params->setConstant(index, vals, roundedCount/4);
-                                    }
-                                    catch(...)
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "setting of constant failed");
-                                    }
-                                }
-                                else
-                                {
-                                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                       "incorrect integer constant declaration");
-                                }
-                                OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
-                            }
+                            //     // uint32 *vals = OGRE_ALLOC_T(uint32, roundedCount, MEMCATEGORY_SCRIPTING);
+                            //     int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
+                            //     if(getInts(k, prop->values.end(), vals, roundedCount))
+                            //     {
+                            //         try
+                            //         {
+                            //             if(named)
+                            //                 params->setNamedConstant(name, vals, count, 1);
+                            //             else
+                            //                 params->setConstant(index, vals, roundedCount/4);
+                            //         }
+                            //         catch(...)
+                            //         {
+                            //             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                            //                                "setting of constant failed");
+                            //         }
+                            //     }
+                            //     else
+                            //     {
+                            //         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                            //                            "incorrect integer constant declaration");
+                            //     }
+                            //     OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                            // }
                             else
                             {
-                                // Find the number of parameters
-                                bool isValid = true;
-                                GpuProgramParameters::ElementType type = GpuProgramParameters::ET_REAL;
-                                int count = 0;
-                                if(atom1->value.find("float") != String::npos || atom1->value.find("double") != String::npos)
+                                // Find the type and number of parameters
+                                // bool isValid = true;
+                                // GpuProgramParameters::ElementType type = GpuProgramParameters::ET_FLOAT;
+                                int count = 1;
+                                if (atom1->value.find("float") != String::npos)
                                 {
-                                    type = GpuProgramParameters::ET_REAL;
-                                    if(atom1->value.size() >= 6)
-                                        count = StringConverter::parseInt(atom1->value.substr(5));
-                                    else
-                                    {
-                                        count = 1;
-                                    }
-                                }
-                                else if(atom1->value.find("int") != String::npos)
-                                {
-                                    type = GpuProgramParameters::ET_INT;
-                                    if(atom1->value.size() >= 4)
-                                        count = StringConverter::parseInt(atom1->value.substr(3));
-                                    else
-                                    {
-                                        count = 1;
-                                    }
-                                }
-                                else
-                                {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "incorrect type specified; only variants of int, float, and double allowed");
-                                    isValid = false;
-                                }
+                                    // type = GpuProgramParameters::ET_FLOAT;
+                                    if (atom1->value.size() >= 6)
+                                        count = parseProgramParameterDimensions(atom1->value, String("float"));
+                                    //count = StringConverter::parseInt(atom1->value.substr(5));
 
-                                if(isValid)
-                                {
                                     // First, clear out any offending auto constants
-                                    if(named)
+                                    if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
                                         params->clearAutoConstant(index);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-                                    if(type == GpuProgramParameters::ET_INT)
+
+                                    float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
+                                    if (getFloats(k, prop->values.end(), vals, roundedCount))
                                     {
-                                        int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
-                                        if(getInts(k, prop->values.end(), vals, roundedCount))
+                                        try
                                         {
-                                            try
-                                            {
-                                                if(named)
-                                                    params->setNamedConstant(name, vals, count, 1);
-                                                else
-                                                    params->setConstant(index, vals, roundedCount/4);
-                                            }
-                                            catch(...)
-                                            {
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "setting of constant failed");
-                                            }
+                                            if (named)
+                                                params->setNamedConstant(name, vals, count, 1);
+                                            else
+                                                params->setConstant(index, vals, roundedCount/4);
                                         }
-                                        else
+                                        catch (...)
                                         {
-                                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                               "incorrect integer constant declaration");
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               "setting of constant failed");
                                         }
-                                        OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                     }
                                     else
                                     {
-                                        float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
-                                        if(getFloats(k, prop->values.end(), vals, roundedCount))
-                                        {
-                                            try
-                                            {
-                                                if(named)
-                                                    params->setNamedConstant(name, vals, count, 1);
-                                                else
-                                                    params->setConstant(index, vals, roundedCount/4);
-                                            }
-                                            catch(...)
-                                            {
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "setting of constant failed");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                               "incorrect float constant declaration");
-                                        }
-                                        OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                           "incorrect float constant declaration");
                                     }
+                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }
+                                else if (atom1->value.find("uint") != String::npos)
+                                {
+                                    // type = GpuProgramParameters::ET_UINT;
+                                    if (atom1->value.size() >= 5)
+                                        count = parseProgramParameterDimensions(atom1->value, String("uint"));
+
+                                    // First, clear out any offending auto constants
+                                    if (named)
+                                        params->clearNamedAutoConstant(name);
+                                    else
+                                        params->clearAutoConstant(index);
+
+                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+
+                                    uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
+                                    if (getUInts(k, prop->values.end(), vals, roundedCount))
+                                    {
+                                        try
+                                        {
+                                            if (named)
+                                                params->setNamedConstant(name, vals, count, 1);
+                                            else
+                                                params->setConstant(index, vals, roundedCount/4);
+                                        }
+                                        catch (...)
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               "setting of constant failed");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                           "incorrect unsigned integer constant declaration");
+                                    }
+                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                }
+                                else if (atom1->value.find("int") != String::npos)
+                                {
+                                    // type = GpuProgramParameters::ET_INT;
+                                    if (atom1->value.size() >= 4)
+                                        count = parseProgramParameterDimensions(atom1->value, String("int"));
+
+                                    // First, clear out any offending auto constants
+                                    if (named)
+                                        params->clearNamedAutoConstant(name);
+                                    else
+                                        params->clearAutoConstant(index);
+
+                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+
+                                    int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
+                                    if (getInts(k, prop->values.end(), vals, roundedCount))
+                                    {
+                                        try
+                                        {
+                                            if (named)
+                                                params->setNamedConstant(name, vals, count, 1);
+                                            else
+                                                params->setConstant(index, vals, roundedCount/4);
+                                        }
+                                        catch (...)
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               "setting of constant failed");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                           "incorrect integer constant declaration");
+                                    }
+                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                }
+                                else if (atom1->value.find("double") != String::npos)
+                                {
+                                    // type = GpuProgramParameters::ET_DOUBLE;
+                                    if (atom1->value.size() >= 7)
+                                        count = parseProgramParameterDimensions(atom1->value, String("double"));
+
+                                    // First, clear out any offending auto constants
+                                    if (named)
+                                        params->clearNamedAutoConstant(name);
+                                    else
+                                        params->clearAutoConstant(index);
+
+                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+
+                                    double *vals = OGRE_ALLOC_T(double, roundedCount, MEMCATEGORY_SCRIPTING);
+                                    if (getDoubles(k, prop->values.end(), vals, roundedCount))
+                                    {
+                                        try
+                                        {
+                                            if (named)
+                                                params->setNamedConstant(name, vals, count, 1);
+                                            else
+                                                params->setConstant(index, vals, roundedCount/4);
+                                        }
+                                        catch (...)
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               "setting of constant failed");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                           "incorrect double constant declaration");
+                                    }
+                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                }                                
+                                else if (atom1->value.find("bool") != String::npos)
+                                {
+                                    // type = GpuProgramParameters::ET_BOOL;
+                                    if (atom1->value.size() >= 5)
+                                        count = parseProgramParameterDimensions(atom1->value, String("bool"));
+
+                                    // First, clear out any offending auto constants
+                                    if (named)
+                                        params->clearNamedAutoConstant(name);
+                                    else
+                                        params->clearAutoConstant(index);
+
+                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+
+                                    uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
+                                    if (getBooleans(k, prop->values.end(), vals, roundedCount))
+                                    {
+                                        try
+                                        {
+                                            if (named)
+                                                params->setNamedConstant(name, vals, count, 1);
+                                            else
+                                                params->setConstant(index, vals, roundedCount/4);
+                                        }
+                                        catch (...)
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               "setting of constant failed");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                           "incorrect boolean constant declaration");
+                                    }
+                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                }
+                                else
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                       "incorrect type specified; only variants of int, uint, float, double, and bool allowed");
+                                    // isValid = false;
+                                }
+
+                                // if (isValid)
+                                // {
+                                //     // First, clear out any offending auto constants
+                                //     if (named)
+                                //         params->clearNamedAutoConstant(name);
+                                //     else
+                                //         params->clearAutoConstant(index);
+
+                                //     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+
+                                //     if (type == GpuProgramParameters::ET_FLOAT)
+                                //     {
+                                //       float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
+                                //         if (getFloats(k, prop->values.end(), vals, roundedCount))
+                                //         {
+                                //             try
+                                //             {
+                                //                 if (named)
+                                //                     params->setNamedConstant(name, vals, count, 1);
+                                //                 else
+                                //                     params->setConstant(index, vals, roundedCount/4);
+                                //             }
+                                //             catch (...)
+                                //             {
+                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                //                                    "setting of constant failed");
+                                //             }
+                                //         }
+                                //         else
+                                //         {
+                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                //                                "incorrect float constant declaration");
+                                //         }
+                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);  
+                                //     }
+                                //     else if (type == GpuProgramParameters::ET_INT)
+                                //     {
+                                //         int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
+                                //         if (getInts(k, prop->values.end(), vals, roundedCount))
+                                //         {
+                                //             try
+                                //             {
+                                //                 if (named)
+                                //                     params->setNamedConstant(name, vals, count, 1);
+                                //                 else
+                                //                     params->setConstant(index, vals, roundedCount/4);
+                                //             }
+                                //             catch (...)
+                                //             {
+                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                //                                    "setting of constant failed");
+                                //             }
+                                //         }
+                                //         else
+                                //         {
+                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                //                                "incorrect integer constant declaration");
+                                //         }
+                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                //     }
+                                //     else if (type == GpuProgramParameters::ET_DOUBLE)
+                                //     {
+                                //         double *vals = OGRE_ALLOC_T(double, roundedCount, MEMCATEGORY_SCRIPTING);
+                                //         if (getDoubles(k, prop->values.end(), vals, roundedCount))
+                                //         {
+                                //             try
+                                //             {
+                                //                 if (named)
+                                //                     params->setNamedConstant(name, vals, count, 1);
+                                //                 else
+                                //                     params->setConstant(index, vals, roundedCount/4);
+                                //             }
+                                //             catch (...)
+                                //             {
+                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                //                                    "setting of constant failed");
+                                //             }
+                                //         }
+                                //         else
+                                //         {
+                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                //                                "incorrect double constant declaration");
+                                //         }
+                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                //     }
+                                //     else if (type == GpuProgramParameters::ET_UINT)
+                                //     {
+                                //         uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
+                                //         if (getUInts(k, prop->values.end(), vals, roundedCount))
+                                //         {
+                                //             try
+                                //             {
+                                //                 if (named)
+                                //                     params->setNamedConstant(name, vals, count, 1);
+                                //                 else
+                                //                     params->setConstant(index, vals, roundedCount/4);
+                                //             }
+                                //             catch (...)
+                                //             {
+                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                //                                    "setting of constant failed");
+                                //             }
+                                //         }
+                                //         else
+                                //         {
+                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                //                                "incorrect unsigned integer constant declaration");
+                                //         }
+                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                //     }
+                                //     else if (type == GpuProgramParameters::ET_BOOL)
+                                //     {
+                                //         bool *vals = OGRE_ALLOC_T(bool, roundedCount, MEMCATEGORY_SCRIPTING);
+                                //         if (getBooleans(k, prop->values.end(), vals, roundedCount))
+                                //         {
+                                //             try
+                                //             {
+                                //                 if (named)
+                                //                     params->setNamedConstant(name, vals, count, 1);
+                                //                 else
+                                //                     params->setConstant(index, vals, roundedCount/4);
+                                //             }
+                                //             catch (...)
+                                //             {
+                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                //                                    "setting of constant failed");
+                                //             }
+                                //         }
+                                //         else
+                                //         {
+                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                //                                "incorrect boolean constant declaration");
+                                //         }
+                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
+                                //     }
+                                // }
                             }
                         }
                         else
