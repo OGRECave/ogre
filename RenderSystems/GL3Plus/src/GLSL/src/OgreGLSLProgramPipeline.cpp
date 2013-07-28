@@ -214,35 +214,7 @@ namespace Ogre
         _useProgram();
     }
 
-    //-----------------------------------------------------------------------
-    void GLSLProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                                  uint16 mask, GpuProgramType fromProgType)
-    {
-        // Iterate through the list of uniform buffers and update them as needed
-        GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
-        GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
-
-        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-        for (it = sharedParams.begin(); it != end; ++it)
-        {
-            for (;currentBuffer != endBuffer; ++currentBuffer)
-            {
-                GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentBuffer->get());
-                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
-
-                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
-                GLint UniformTransform;
-                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
-                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
-
-                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
-            }
-        }
-    }
-
-    //-----------------------------------------------------------------------
+   //-----------------------------------------------------------------------
     void GLSLProgramPipeline::buildGLUniformReferences(void)
     {
         if (!mUniformRefsBuilt)
@@ -257,43 +229,49 @@ namespace Ogre
             {
                 vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mVertexProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           vertParams, NULL, NULL, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           vertParams, NULL, NULL, NULL, NULL, NULL, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
             if (mGeometryProgram)
             {
                 geomParams = &(mGeometryProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mGeometryProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           NULL, geomParams, NULL, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           NULL, geomParams, NULL, NULL, NULL, NULL, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
             if (mFragmentProgram)
             {
                 fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           NULL, NULL, fragParams, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           NULL, NULL, fragParams, NULL, NULL, NULL, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
             if (mHullProgram)
             {
                 hullParams = &(mHullProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mHullProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, hullParams, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           NULL, NULL, NULL, hullParams, NULL, NULL, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
             if (mDomainProgram)
             {
                 domainParams = &(mDomainProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mDomainProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, NULL, domainParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           NULL, NULL, NULL, NULL, domainParams, NULL, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
             if (mComputeProgram)
             {
                 computeParams = &(mComputeProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mComputeProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, NULL, NULL, computeParams, mGLUniformReferences, mGLUniformBufferReferences);
+                                                                           NULL, NULL, NULL, NULL, NULL, computeParams, 
+                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
             }
 
             mUniformRefsBuilt = true;
         }
     }
-
+    
     //-----------------------------------------------------------------------
     void GLSLProgramPipeline::updateUniforms(GpuProgramParametersSharedPtr params,
                                              uint16 mask, GpuProgramType fromProgType)
@@ -315,27 +293,27 @@ namespace Ogre
         }
 
         GLuint progID = 0;
-        if(fromProgType == GPT_VERTEX_PROGRAM)
+        if (fromProgType == GPT_VERTEX_PROGRAM)
         {
             progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
         }
-        else if(fromProgType == GPT_FRAGMENT_PROGRAM)
+        else if (fromProgType == GPT_FRAGMENT_PROGRAM)
         {
             progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
         }
-        else if(fromProgType == GPT_GEOMETRY_PROGRAM)
+        else if (fromProgType == GPT_GEOMETRY_PROGRAM)
         {
             progID = mGeometryProgram->getGLSLProgram()->getGLProgramHandle();
         }
-        else if(fromProgType == GPT_HULL_PROGRAM)
+        else if (fromProgType == GPT_HULL_PROGRAM)
         {
             progID = mHullProgram->getGLSLProgram()->getGLProgramHandle();
         }
-        else if(fromProgType == GPT_DOMAIN_PROGRAM)
+        else if (fromProgType == GPT_DOMAIN_PROGRAM)
         {
             progID = mDomainProgram->getGLSLProgram()->getGLProgramHandle();
         }
-        else if(fromProgType == GPT_COMPUTE_PROGRAM)
+        else if (fromProgType == GPT_COMPUTE_PROGRAM)
         {
             progID = mComputeProgram->getGLSLProgram()->getGLProgramHandle();
         }
@@ -343,8 +321,7 @@ namespace Ogre
         for (; currentUniform != endUniform; ++currentUniform)
         {
             // Only pull values from buffer it's supposed to be in (vertex or fragment)
-            // This method will be called twice, once for vertex program params,
-            // and once for fragment program params.
+            // This method will be called once per shader stage.
             if (fromProgType == currentUniform->mSourceProgType)
             {
                 const GpuConstantDefinition* def = currentUniform->mConstantDef;
@@ -475,6 +452,27 @@ namespace Ogre
                         OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4x3dv(progID, currentUniform->mLocation, glArraySize,
                                                                         transpose, params->getDoublePointer(def->physicalIndex)));
                         break;
+                    case GCT_UINT1:
+                    case GCT_BOOL1:
+                        OGRE_CHECK_GL_ERROR(glProgramUniform1uiv(progID, currentUniform->mLocation, glArraySize,
+                                                                params->getUnsignedIntPointer(def->physicalIndex)));
+                        break;
+                    case GCT_UINT2:
+                    case GCT_BOOL2:
+                        OGRE_CHECK_GL_ERROR(glProgramUniform2uiv(progID, currentUniform->mLocation, glArraySize,
+                                                                 params->getUnsignedIntPointer(def->physicalIndex)));
+                        break;
+                    case GCT_UINT3:
+                    case GCT_BOOL3:
+                        OGRE_CHECK_GL_ERROR(glProgramUniform3uiv(progID, currentUniform->mLocation, glArraySize,
+                                                                 params->getUnsignedIntPointer(def->physicalIndex)));
+                        break;
+                    case GCT_UINT4:
+                    case GCT_BOOL4:
+                        OGRE_CHECK_GL_ERROR(glProgramUniform4uiv(progID, currentUniform->mLocation, glArraySize,
+                                                                 params->getUnsignedIntPointer(def->physicalIndex)));
+                        break;
+
                     case GCT_SAMPLER1D:
                     case GCT_SAMPLER1DSHADOW:
                     case GCT_SAMPLER2D:
@@ -497,6 +495,100 @@ namespace Ogre
 
         } // End for
     }
+
+
+  //-----------------------------------------------------------------------
+    void GLSLProgramPipeline::updateAtomicCounters(GpuProgramParametersSharedPtr params,
+                                                   uint16 mask, GpuProgramType fromProgType)
+    {
+        // Iterate through the list of atomic counter buffers and update them as needed
+        // GLAtomicBufferIterator currentBuffer = mGLAtomicBufferReferences.begin();
+        // GLAtomicBufferIterator endBuffer = mGLAtomicBufferReferences.end();
+
+        GLAtomicCounterReferenceIterator currentAtomicCounter = mGLAtomicCounterReferences.begin();
+        GLAtomicCounterReferenceIterator endAtomicCounter = mGLAtomicCounterReferences.end();
+
+        for (; currentAtomicCounter != endAtomicCounter; ++currentAtomicCounter)
+        {
+            if (fromProgType == currentAtomicCounter->mSourceProgType)
+            {
+                const GpuConstantDefinition* def = currentAtomicCounter->mConstantDef;
+                if (def->variability & mask)
+                {
+                    GLsizei glArraySize = (GLsizei)def->arraySize;
+
+                    // Get the index in the parameter real list
+                    //switch (def->constType)
+
+                    GLuint glBinding = currentAtomicCounter->mBinding;
+                    GLuint glOffset = currentAtomicCounter->mOffset;
+
+                    // Get the buffer this atomic counter belongs to.
+                    //TODO exception handling
+                    HardwareCounterBufferSharedPtr atomic_buffer = mGLCounterBufferReferences[glBinding];
+
+                    // Update the value.
+                    atomic_buffer->writeData(glOffset, sizeof(GLuint) * glArraySize, params->getUnsignedIntPointer(def->physicalIndex));
+
+                    // OGRE_CHECK_GL_ERROR(glProgramUniform3uiv(progID, currentUniform->mLocation, glArraySize,
+                    //                                          params->getUnsignedIntPointer(def->physicalIndex)));
+                    
+                }
+            }
+        }
+
+        // GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
+        // for (it = sharedParams.begin(); it != end; ++it)
+        // {
+        //     for (;currentBuffer != endBuffer; ++currentBuffer)
+        //     {
+        //         GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentBuffer->get());
+        //         GpuSharedParametersPtr paramsPtr = it->getSharedParams();
+
+        //         // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
+        //         GLint UniformTransform;
+        //         OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
+        //         OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
+
+        //         hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
+        //     }
+        // }
+    }
+
+
+    //-----------------------------------------------------------------------
+    void GLSLProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
+                                                  uint16 mask, GpuProgramType fromProgType)
+    {
+        // Iterate through the list of uniform buffers and update them as needed
+        GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
+        GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
+
+        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
+
+        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
+        for (it = sharedParams.begin(); it != end; ++it)
+        {
+            for (;currentBuffer != endBuffer; ++currentBuffer)
+            {
+                GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentBuffer->get());
+                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
+
+                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
+                GLint UniformTransform;
+                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
+                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
+
+                //FIXME does not check if current progrtype, or if shared param is active
+
+                //FIXME This seems to only support copying float data. 
+                // What about int, uint, double, etc?
+                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
+            }
+        }
+    }
+   
+
     //-----------------------------------------------------------------------
     void GLSLProgramPipeline::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {

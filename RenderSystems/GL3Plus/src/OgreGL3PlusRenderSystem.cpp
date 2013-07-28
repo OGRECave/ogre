@@ -2491,7 +2491,7 @@ namespace Ogre {
     {
         //              if (mask & (uint16)GPV_GLOBAL)
         //              {
-        // We could maybe use GL_EXT_bindable_uniform here to produce Dx10-style
+        //TODO We could maybe use GL_EXT_bindable_uniform here to produce Dx10-style
         // shared constant buffers, but GPU support seems fairly weak?
         // check the match to constant buffers & use rendersystem data hooks to store
         // for now, just copy

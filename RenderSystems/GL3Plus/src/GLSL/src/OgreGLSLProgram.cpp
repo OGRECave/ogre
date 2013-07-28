@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 #include "OgreGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
@@ -53,10 +53,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    GLSLProgram::GLSLProgram(ResourceManager* creator, 
+    GLSLProgram::GLSLProgram(ResourceManager* creator,
                              const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader)
-        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
+        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
         , mCompiled(0)
@@ -67,10 +67,10 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("preprocessor_defines", 
+            dict->addParameter(ParameterDef("preprocessor_defines",
                                             "Preprocessor defines use to compile the program.",
                                             PT_STRING),&msCmdPreprocessorDefines);
-            dict->addParameter(ParameterDef("attach", 
+            dict->addParameter(ParameterDef("attach",
                                             "name of another GLSL program needed by this program",
                                             PT_STRING),&msCmdAttach);
             dict->addParameter(ParameterDef("column_major_matrices",
@@ -89,7 +89,7 @@ namespace Ogre {
                              PT_STRING),
                 &msOutputOperationTypeCmd);
             dict->addParameter(
-                ParameterDef("max_output_vertices", 
+                ParameterDef("max_output_vertices",
                              "The maximum number of vertices a single run of this geometry program can output",
                              PT_INT),&msMaxOutputVerticesCmd);
         }
@@ -180,7 +180,7 @@ namespace Ogre {
         if (out < src || out > src + src_len)
             free (out);
     }
-    
+
     //---------------------------------------------------------------------------
     bool GLSLProgram::compile(const bool checkErrors)
     {
@@ -291,27 +291,27 @@ namespace Ogre {
 
         if(!mCompiled)
         {
-			String progType = "Fragment";
-			if (mType == GPT_VERTEX_PROGRAM)
-			{
-				progType = "Vertex";
-			}
-			else if (mType == GPT_GEOMETRY_PROGRAM)
-			{
-				progType = "Geometry";
-			}
-			else if (mType == GPT_DOMAIN_PROGRAM)
-			{
-				progType = "Tesselation Evaluation";
-			}
-			else if (mType == GPT_HULL_PROGRAM)
-			{
-				progType = "Tesselation Control";
-			}
-			else if (mType == GPT_COMPUTE_PROGRAM)
-			{
-				progType = "Compute";
-			}
+            String progType = "Fragment";
+            if (mType == GPT_VERTEX_PROGRAM)
+            {
+                progType = "Vertex";
+            }
+            else if (mType == GPT_GEOMETRY_PROGRAM)
+            {
+                progType = "Geometry";
+            }
+            else if (mType == GPT_DOMAIN_PROGRAM)
+            {
+                progType = "Tesselation Evaluation";
+            }
+            else if (mType == GPT_HULL_PROGRAM)
+            {
+                progType = "Tesselation Control";
+            }
+            else if (mType == GPT_COMPUTE_PROGRAM)
+            {
+                progType = "Compute";
+            }
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         progType + " Program " + mName +
                         " failed to compile. See compile log above for details.",
@@ -330,7 +330,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------------
     void GLSLProgram::unloadImpl()
-    {   
+    {
         // We didn't create mAssemblerProgram through a manager, so override this
         // implementation so that we don't try to remove it from one. Since getCreator()
         // is used, it might target a different matching handle!
@@ -349,7 +349,7 @@ namespace Ogre {
             {
                 OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
             }
-            
+
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mCompiled = 0;
@@ -523,7 +523,7 @@ namespace Ogre {
         while (childprogramcurrent != childprogramend)
         {
             GLSLProgram* childShader = *childprogramcurrent;
-            // bug in ATI GLSL linker : modules without main function must be recompiled each time 
+            // bug in ATI GLSL linker : modules without main function must be recompiled each time
             // they are linked to a different program object
             // don't check for compile errors since there won't be any
             // *** minor inconvenience until ATI fixes there driver
@@ -598,9 +598,9 @@ namespace Ogre {
                         }
                     }
                 }
-            }       
+            }
             // rebuild source
-            std::stringstream newSource;    
+            std::stringstream newSource;
             for(size_t i = 0; i < linesOfSource.size()  ; i++)
             {
                 newSource << linesOfSource[i] << "\n";
@@ -643,7 +643,7 @@ namespace Ogre {
         {
             return RenderOperation::OT_TRIANGLE_FAN;
         }
-        else 
+        else
         {
             // Triangle list is the default fallback. Keep it this way?
             return RenderOperation::OT_TRIANGLE_LIST;

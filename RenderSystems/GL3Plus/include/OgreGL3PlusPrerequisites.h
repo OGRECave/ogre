@@ -104,7 +104,7 @@ namespace Ogre {
 #   define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
-#define ENABLE_GL_CHECK 0
+#define ENABLE_GL_CHECK 1
 #if ENABLE_GL_CHECK
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \

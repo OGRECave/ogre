@@ -36,7 +36,7 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    GL3PlusHardwareCounterBuffer::GL3PlusHardwareCounterBuffer(HardwareBufferManagerBase* mgr, const String& name)
+    GL3PlusHardwareCounterBuffer::GL3PlusHardwareCounterBuffer(HardwareBufferManagerBase* mgr, const String& name = "")
     : HardwareCounterBuffer(mgr, sizeof(GLuint), HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, false, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -51,7 +51,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ATOMIC_COUNTER_BUFFER, mSizeInBytes, NULL, GL_DYNAMIC_DRAW));
 
-//        std::cerr << "creating Counter buffer = " << mBufferId << std::endl;
+        std::cout << "creating Counter buffer = " << name << " " << mBufferId << std::endl;
     }
     
     GL3PlusHardwareCounterBuffer::~GL3PlusHardwareCounterBuffer()

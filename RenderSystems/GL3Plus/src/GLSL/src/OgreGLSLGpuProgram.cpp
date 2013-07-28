@@ -188,7 +188,7 @@ namespace Ogre {
             {
                 GLSLProgramPipelineManager::getSingleton().setActiveComputeLinkProgram( NULL );
             }
-            else // Its a fragment shader
+            else // It's a fragment shader
             {
                 GLSLProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( NULL );
             }
@@ -216,7 +216,7 @@ namespace Ogre {
             {
                 GLSLLinkProgramManager::getSingleton().setActiveComputeShader( NULL );
             }
-            else // Its a fragment shader
+            else // It's a fragment shader
             {
                 GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( NULL );
             }
@@ -259,6 +259,7 @@ namespace Ogre {
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
                 // Pass on parameters from params to program object uniforms
                 programPipeline->updateUniforms(params, mask, mType);
+                programPipeline->updateAtomicCounters(params, mask, mType);
             }
             else
             {
@@ -266,6 +267,8 @@ namespace Ogre {
                 GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
                 // Pass on parameters from params to program object uniforms
                 linkProgram->updateUniforms(params, mask, mType);
+                //TODO add atomic counter support
+                //linkProgram->updateAtomicCounters(params, mask, mType);
             }
         }
         catch (Exception& e) {}

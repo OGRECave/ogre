@@ -61,6 +61,7 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("ivec2", GL_INT_VEC2));
         mTypeEnumMap.insert(StringToEnumMap::value_type("ivec3", GL_INT_VEC3));
         mTypeEnumMap.insert(StringToEnumMap::value_type("ivec4", GL_INT_VEC4));
+        mTypeEnumMap.insert(StringToEnumMap::value_type("bool", GL_BOOL));
         mTypeEnumMap.insert(StringToEnumMap::value_type("bvec2", GL_BOOL_VEC2));
         mTypeEnumMap.insert(StringToEnumMap::value_type("bvec3", GL_BOOL_VEC3));
         mTypeEnumMap.insert(StringToEnumMap::value_type("bvec4", GL_BOOL_VEC4));
@@ -246,8 +247,6 @@ namespace Ogre {
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
             break;
         case GL_INT:
-        case GL_UNSIGNED_INT: //JAJ+
-        case GL_UNSIGNED_INT_ATOMIC_COUNTER:
             defToUpdate.constType = GCT_INT1;
             break;
         case GL_INT_VEC2:
@@ -324,6 +323,31 @@ namespace Ogre {
             break;
         case GL_DOUBLE_MAT4x3:
             defToUpdate.constType = GCT_MATRIX_DOUBLE_4X3;
+            break;
+        case GL_UNSIGNED_INT:
+        case GL_UNSIGNED_INT_ATOMIC_COUNTER: //TODO should be its own type?
+            defToUpdate.constType = GCT_UINT1;
+            break;
+        case GL_UNSIGNED_INT_VEC2:
+            defToUpdate.constType = GCT_UINT2;
+            break;
+        case GL_UNSIGNED_INT_VEC3:
+            defToUpdate.constType = GCT_UINT3;
+            break;
+        case GL_UNSIGNED_INT_VEC4:
+            defToUpdate.constType = GCT_UINT4;
+            break;
+        case GL_BOOL:
+            defToUpdate.constType = GCT_BOOL1;
+            break;
+        case GL_BOOL_VEC2:
+            defToUpdate.constType = GCT_BOOL2;
+            break;
+        case GL_BOOL_VEC3:
+            defToUpdate.constType = GCT_BOOL3;
+            break;
+        case GL_BOOL_VEC4:
+            defToUpdate.constType = GCT_BOOL4;
             break;
         default:
             defToUpdate.constType = GCT_UNKNOWN;
@@ -415,6 +439,89 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
+    //FIXME This is code bloat...either template or unify UniformReference
+    // and AtomicCounterReference
+    bool GLSLProgramManagerCommon::completeParamSource(
+        const String& paramName,
+        const GpuConstantDefinitionMap* vertexConstantDefs,
+        const GpuConstantDefinitionMap* geometryConstantDefs,
+        const GpuConstantDefinitionMap* fragmentConstantDefs,
+        const GpuConstantDefinitionMap* hullConstantDefs,
+        const GpuConstantDefinitionMap* domainConstantDefs,
+        const GpuConstantDefinitionMap* computeConstantDefs,
+        GLAtomicCounterReference& refToUpdate)
+    {
+        if (vertexConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                vertexConstantDefs->find(paramName);
+            if (parami != vertexConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        if (geometryConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                geometryConstantDefs->find(paramName);
+            if (parami != geometryConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_GEOMETRY_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        if (fragmentConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                fragmentConstantDefs->find(paramName);
+            if (parami != fragmentConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_FRAGMENT_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        if (hullConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                hullConstantDefs->find(paramName);
+            if (parami != hullConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_HULL_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        if (domainConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                domainConstantDefs->find(paramName);
+            if (parami != domainConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_DOMAIN_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        if (computeConstantDefs)
+        {
+            GpuConstantDefinitionMap::const_iterator parami =
+                computeConstantDefs->find(paramName);
+            if (parami != computeConstantDefs->end())
+            {
+                refToUpdate.mSourceProgType = GPT_COMPUTE_PROGRAM;
+                refToUpdate.mConstantDef = &(parami->second);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //---------------------------------------------------------------------
     void GLSLProgramManagerCommon::extractUniforms(GLuint programObject,
                                                    const GpuConstantDefinitionMap* vertexConstantDefs,
                                                    const GpuConstantDefinitionMap* geometryConstantDefs,
@@ -422,9 +529,12 @@ namespace Ogre {
                                                    const GpuConstantDefinitionMap* hullConstantDefs,
                                                    const GpuConstantDefinitionMap* domainConstantDefs,
                                                    const GpuConstantDefinitionMap* computeConstantDefs,
-                                                   GLUniformReferenceList& list, GLUniformBufferList& sharedList)
+                                                   GLUniformReferenceList& list,
+                                                   GLAtomicCounterReferenceList& counterList,
+                                                   GLUniformBufferList& sharedList,
+                                                   GLCounterBufferList& counterBufferList)
     {
-        // Scan through the active uniforms and add them to the reference list
+        // Scan through the active uniforms and add them to the reference list.
         GLint uniformCount = 0;
 #define uniformLength 200
         //              GLint uniformLength = 0;
@@ -432,25 +542,26 @@ namespace Ogre {
 
         char uniformName[uniformLength];
         GLUniformReference newGLUniformReference;
+        GLAtomicCounterReference newGLAtomicCounterReference;
 
-        // Get the number of active uniforms
+        // Get the number of active uniforms, including atomic
+        // counters and uniforms contained in uniform blocks.
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
-        // Loop over each of the active uniforms, and add them to the reference container
-        // only do this for user defined uniforms, ignore built in gl state uniforms
-        for (int index = 0; index < uniformCount; index++)
+        // Loop over each of the active uniforms, and add them to the reference container.
+        // Only do this for user defined uniforms, ignore built in GL state uniforms.
+        for (GLuint index = 0; index < uniformCount; index++)
         {
             GLint arraySize;
             GLenum glType;
             OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, uniformLength, NULL,
                                                    &arraySize, &glType, uniformName));
 
-            // Don't add built in uniforms
+            // Don't add built in uniforms, atomic counters, or uniform block parameters.
             OGRE_CHECK_GL_ERROR(newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName));
-            //JAJ
             if (newGLUniformReference.mLocation >= 0)// || glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
             {
-                // User defined uniform found, add it to the reference list
+                // User defined uniform found, add it to the reference list.
                 String paramName = String(uniformName);
 
                 // Current ATI drivers (Catalyst 7.2 and earlier) and
@@ -493,72 +604,80 @@ namespace Ogre {
                 // anyway, individual indexes are only needed for lookup from
                 // user params
             } // end if
-            // Handle atomic counters.
-            // Currently atomic counters cannot be in uniform blocks
-            // and are always unsigned integers.
-            // else if (glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
-            // {
-            //     String paramName = String(uniformName);
+            // Handle atomic counters. Currently atomic counters
+            // cannot be in uniform blocks and are always unsigned
+            // integers.
+            else if (glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
+            {
+                String paramName = String(uniformName);
 
-            //     // increment the total number of atomic counters
-            //     // including size of array if applicable
-            //     //atomicCounterCount += arraySize;
-            //     // actually, this should not be necessary since
-            //     // parameters are processed one by one
+                GLint binding, offset;
+                //GLuint indices [] = {index};
+                OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX, &binding));
+                OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_OFFSET, &offset));
 
-            //     // If the uniform name has a "[" in it then its an array element uniform.
-            //     String::size_type arrayStart = paramName.find("[");
-            //     if (arrayStart != String::npos)
-            //     {
-            //         // if not the first array element then skip it and continue to the next uniform
-            //         if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
-            //         paramName = paramName.substr(0, arrayStart);
-            //     }
+                newGLAtomicCounterReference.mBinding = binding;
+                newGLAtomicCounterReference.mOffset = offset;               
 
-            //     std::cout << "ATOMIC COUNTER FOUND: " << paramName  << " " << arraySize << std::endl;
+                // increment the total number of atomic counters
+                // including size of array if applicable
+                //atomicCounterCount += arraySize;
+                // actually, this should not be necessary since
+                // parameters are processed one by one
 
-            //     // Find out which params object this comes from
-            //     bool foundSource = completeParamSource(
-            //         paramName,
-            //         vertexConstantDefs, geometryConstantDefs,
-            //         fragmentConstantDefs, hullConstantDefs,
-            //         domainConstantDefs, computeConstantDefs,
-            //         newGLUniformReference);
+                // If the uniform name has a "[" in it then its an array element uniform.
+                String::size_type arrayStart = paramName.find("[");
+                if (arrayStart != String::npos)
+                {
+                    // if not the first array element then skip it and continue to the next uniform
+                    if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
+                    paramName = paramName.substr(0, arrayStart);
+                }
 
-            //     // Only add this parameter if we found the source
-            //     if (foundSource)
-            //     {
-            //         // size_t adjustedArraySize = 0;
-            //         // if (arraySize == 2 && newGLUniformReference.mConstantDef->arraySize == 1) {
-            //         //     adjustedArraySize = 1;
-            //         // }
-            //         // else {
-            //         //     adjustedArraySize = (size_t) arraySize;
-            //         // }
+                std::cout << "ATOMIC COUNTER FOUND: " << paramName  << " " << arraySize << std::endl;
 
-            //         //FIXME On Linux AMD Catalyst 13.4, OpenGL reports
-            //         // a single atomic counter as having size 2.  Bug
-            //         // or feature?
-            //         // assert((size_t)arraySize == newGLUniformReference.mConstantDef->arraySize
-            //         //        && "GL doesn't agree with our array size!");
+                // Find out which params object this comes from
+                bool foundSource = completeParamSource(
+                    paramName,
+                    vertexConstantDefs, geometryConstantDefs,
+                    fragmentConstantDefs, hullConstantDefs,
+                    domainConstantDefs, computeConstantDefs,
+                    newGLAtomicCounterReference);
+
+                // Only add this parameter if we found the source
+                if (foundSource)
+                {
+                    // size_t adjustedArraySize = 0;
+                    // if (arraySize == 2 && newGLAtomicCounterReference.mConstantDef->arraySize == 1) {
+                    //     adjustedArraySize = 1;
+                    // }
+                    // else {
+                    //     adjustedArraySize = (size_t) arraySize;
+                    // }
+
+                    //FIXME On Linux AMD Catalyst 13.4, OpenGL reports
+                    // a single atomic counter as having size 2.  Bug
+                    // or feature?
+                    // assert((size_t)arraySize == newGLAtomicCounterReference.mConstantDef->arraySize
+                    //        && "GL doesn't agree with our array size!");
                     
-            //         list.push_back(newGLUniformReference);
-            //         printf("ATOMIC COUNTER SOURCE FOUND");
-            //     }
-            // }
+                    counterList.push_back(newGLAtomicCounterReference);
+                    printf("ATOMIC COUNTER SOURCE FOUND\n");
+                }
+            }
         } // end for
-
-        // Now deal with uniform blocks
 
         GLint blockCount = 0;
 
+        // Now deal with uniform blocks
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
 
         for (int index = 0; index < blockCount; index++)
         {
             OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
-
-            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            
+            //TODO Is this necessary?
+            // GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
 
             GLint blockSize, blockBinding;
             OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
@@ -568,6 +687,30 @@ namespace Ogre {
             GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
             hwGlBuffer->setGLBufferBinding(blockBinding);
             sharedList.push_back(newUniformBuffer);
+        }
+
+        // Now deal with atomic counters buffers
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
+
+        for (int index = 0; index < blockCount; index++)
+        {
+            //TODO Is this necessary?
+            //GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+
+            //TODO We could build list of atomic counters here or above, 
+            // whichever is most efficient.
+            // GLint * active_indices;
+            // OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES, active_indices));
+            
+            GLint bufferSize, bufferBinding;
+            OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
+            OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
+            //TODO check parameters of this GL call
+            HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+
+            GL3PlusHardwareCounterBuffer* hwGlBuffer = static_cast<GL3PlusHardwareCounterBuffer*>(newCounterBuffer.get());
+            hwGlBuffer->setGLBufferBinding(bufferBinding);
+            counterBufferList.push_back(newCounterBuffer);
         }
     }
     //---------------------------------------------------------------------
@@ -605,8 +748,9 @@ namespace Ogre {
                 String::size_type endPos;
                 GpuSharedParametersPtr blockSharedParams;
 
-                // Check for a type. If there is one, then the semicolon is missing
-                // otherwise treat as if it is a uniform block
+                // Check for a type. If there is one, then the
+                // semicolon is missing.  Otherwise treat as if it is
+                // a uniform block.
                 String::size_type lineEndPos = src.find_first_of("\n\r", currPos);
                 line = src.substr(currPos, lineEndPos - currPos);
                 StringVector parts = StringUtil::split(line, " \t");
@@ -723,6 +867,8 @@ namespace Ogre {
         // Remove spaces before opening square braces, otherwise
         // the following split() can split the line at inappropriate
         // places (e.g. "vec3 something [3]" won't work).
+        //FIXME What are valid ways of including spaces in GLSL 
+        // variable declarations?  May need regex.
         for (String::size_type sqp = line.find (" ["); sqp != String::npos;
              sqp = line.find (" ["))
             line.erase (sqp, 1);
@@ -758,14 +904,20 @@ namespace Ogre {
                     if (!name.empty())
                         paramName = name;
 
-                    String::size_type arrayEnd = i->find("]", arrayStart);
-                    String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
-                    StringUtil::trim(arrayDimTerm);
-                    //TODO
-                    // the array term might be a simple number or it might be
-                    // an expression (e.g. 24*3) or refer to a constant expression
-                    // we'd have to evaluate the expression which could get nasty
-                    def.arraySize = StringConverter::parseInt(arrayDimTerm);
+                    def.arraySize = 1;
+
+                    // N-dimensional arrays
+                    while (arrayStart != String::npos) {
+                        String::size_type arrayEnd = i->find("]", arrayStart);
+                        String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
+                        StringUtil::trim(arrayDimTerm);
+                        //TODO
+                        // the array term might be a simple number or it might be
+                        // an expression (e.g. 24*3) or refer to a constant expression
+                        // we'd have to evaluate the expression which could get nasty
+                        def.arraySize *= StringConverter::parseInt(arrayDimTerm);
+                        arrayStart = i->find("[", arrayEnd);
+                    }
                 }
                 else
                 {
@@ -795,10 +947,30 @@ namespace Ogre {
                         def.physicalIndex = defs.floatBufferSize;
                         defs.floatBufferSize += def.arraySize * def.elementSize;
                     }
-                    else
+                    else if (def.isDouble())
+                    {
+                        def.physicalIndex = defs.doubleBufferSize;
+                        defs.doubleBufferSize += def.arraySize * def.elementSize;
+                    }
+                    else if (def.isInt() || def.isSampler())
                     {
                         def.physicalIndex = defs.intBufferSize;
                         defs.intBufferSize += def.arraySize * def.elementSize;
+                    }
+                    else if (def.isUnsignedInt() || def.isBool())
+                    {
+                        def.physicalIndex = defs.uintBufferSize;
+                        defs.uintBufferSize += def.arraySize * def.elementSize;
+                    }
+                    // else if (def.isBool())
+                    // {
+                    //     def.physicalIndex = defs.boolBufferSize;
+                    //     defs.boolBufferSize += def.arraySize * def.elementSize;
+                    // }
+                    else 
+                    {
+                        LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
+                                                              + line + "' in file " + filename);
                     }
                     defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 

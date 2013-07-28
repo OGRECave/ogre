@@ -63,11 +63,15 @@ namespace Ogre
         /// GL Program Pipeline Handle
         GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
 
-        /** Updates program pipeline object uniforms using data from GpuProgramParameters.
+        /** Updates program pipeline object uniforms using named and indexed parameter data from GpuProgramParameters.
             normally called by GLSLGpuProgram::bindProgramParameters() just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object uniform blocks using data from GpuProgramParameters.
+        /** Updates program object atomic counter buffers using data from GpuProgramParameters.
+            normally called by GLSLGpuProgram::bindProgramAtomicCounterParameters() just before rendering occurs.
+        */
+        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniform blocks using shared parameter data from GpuProgramParameters.
             normally called by GLSLGpuProgram::bindProgramSharedParameters() just before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
