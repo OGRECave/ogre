@@ -287,7 +287,7 @@ protected:
 
 @end
 
-static id mAppDelegate;
+//static id mAppDelegate;
 
 @implementation AppDelegate
 
