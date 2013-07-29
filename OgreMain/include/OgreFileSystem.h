@@ -136,7 +136,7 @@ namespace Ogre {
             return OGRE_NEW FileSystemArchive(name, "FileSystem", readOnly);
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance(Archive* ptr) { delete ptr; }
+        void destroyInstance(Archive* ptr) { OGRE_DELETE ptr; }
     };
 
     /** @} */
