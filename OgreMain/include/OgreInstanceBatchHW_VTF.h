@@ -106,7 +106,7 @@ namespace Ogre
 		bool isStatic() const { return mKeepStatic; }
 
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
-		virtual void _updateRenderQueue( RenderQueue* queue );
+		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
 	};
 
 }

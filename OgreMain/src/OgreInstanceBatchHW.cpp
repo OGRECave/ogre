@@ -181,33 +181,49 @@ namespace Ogre
 		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
 	}
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchHW::updateVertexBuffer( Camera *currentCamera )
+	size_t InstanceBatchHW::updateVertexBuffer( Camera *camera )
 	{
 		size_t retVal = 0;
+
+		ObjectData objData;
+		const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+		VisibleObjectsPerThreadVec visibleObjects = mManager->_getTmpVisibleObjectsList();
+		
+		//TODO: (dark_sylinc) Thread this
+		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
+		MovableObject::cullFrustum( numObjs, objData, camera,
+					camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+					visibleObjects[0] );
 
 		//Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
 		const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
 		float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
 											getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
 
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
 		unsigned char numCustomParams			= mCreator->getNumCustomParams();
 		size_t customParamIdx					= 0;
 
-		while( itor != end )
+		size_t visibleObjsIdxStart = 0;
+		size_t visibleObjsListsPerThread = 1;
+		VisibleObjectsPerThreadVec::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
+		VisibleObjectsPerThreadVec::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
+															+ visibleObjsListsPerThread;
+		while( it != en )
 		{
-			//Cull on an individual basis, the less entities are visible, the less instances we draw.
-			//No need to use null matrices at all!
-			if( (*itor)->findVisible( currentCamera ) )
+			MovableObject::MovableObjectVec::const_iterator itor = it->begin();
+			MovableObject::MovableObjectVec::const_iterator end  = it->end();
+
+			while( itor != end )
 			{
-				const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+				//TODO: (dark_sylinc) Thread this. Although it could be just bandwidth limited
+				//and no real gain could be seen
+				assert( dynamic_cast<InstancedEntity*>(*itor) );
+				InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
 
-				if( mManager->getCameraRelativeRendering() )
-					makeMatrixCameraRelative3x4( pDest, floatsWritten );
-
-				pDest += floatsWritten;
+				//Write transform matrix
+				instancedEntity->writeSingleTransform3x4( pDest );
+				pDest += 12;
 
 				//Write custom parameters, if any
 				for( unsigned char i=0; i<numCustomParams; ++i )
@@ -218,11 +234,12 @@ namespace Ogre
 					*pDest++ = mCustomParams[customParamIdx+i].w;
 				}
 
-				++retVal;
+				++itor;
+				customParamIdx += numCustomParams;
 			}
-			++itor;
 
-			customParamIdx += numCustomParams;
+			retVal += it->size();
+			++it;
 		}
 
 		mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
@@ -265,42 +282,13 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue )
+	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
 		if( !mKeepStatic )
 		{
-			Camera *camera=0;
-			ObjectData objData;
-			const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
-
-			MovableObject::MovableObjectVec visibleObjects;
-
-			//TODO: (dark_sylinc) Thread this
-			MovableObject::cullFrustum( numObjs, objData, camera,
-						camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
-						visibleObjects );
-
-			/*VisibleObjectsPerThreadVec::const_iterator it = visibleObjects.begin();
-			VisibleObjectsPerThreadVec::const_iterator en = visibleObjects.begin() +
-																visibleObjsListsPerThread;
-			while( it != en )
-			{
-				MovableObject::MovableObjectVec::const_iterator itor = it->begin();
-				MovableObject::MovableObjectVec::const_iterator end  = it->end();
-
-				while( itor != end )
-				{
-					assert( dynamic_cast<InstancedEntity*>(*itor) );
-					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
-					instancedEntity->getTransforms3x4();
-					++itor;
-				}
-				++it;
-			}*/
-
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
-			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )
+			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		else

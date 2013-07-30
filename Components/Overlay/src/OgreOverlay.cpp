@@ -311,7 +311,7 @@ namespace Ogre {
             {
                 (*i)->_update();
 
-                (*i)->_updateRenderQueue(queue);
+                (*i)->_updateRenderQueue(queue, cam);
             }
         }
 

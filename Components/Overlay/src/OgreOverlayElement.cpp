@@ -617,7 +617,7 @@ namespace Ogre {
         mGeomPositionsOutOfDate = true;
     }
     //---------------------------------------------------------------------
-    void OverlayElement::_updateRenderQueue(RenderQueue* queue)
+    void OverlayElement::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         if (mVisible)
         {

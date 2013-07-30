@@ -563,7 +563,7 @@ namespace Ogre
 		return mMaterial->getBestTechnique( mMaterialLodIndex, this );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
+	void InstanceBatch::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
 		/*if( m_boundsDirty )
 			_updateBounds();*/

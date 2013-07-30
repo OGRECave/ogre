@@ -895,7 +895,7 @@ namespace Ogre {
 		return ManualObjectFactory::FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	void ManualObject::_updateRenderQueue(RenderQueue* queue)
+	void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
 		// To be used when order of creation must be kept while rendering
 		unsigned short priority = queue->getDefaultRenderablePriority();

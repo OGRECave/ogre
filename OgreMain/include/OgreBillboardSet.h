@@ -554,7 +554,7 @@ namespace Ogre {
         @see
             MovableObject
         */
-        virtual void _updateRenderQueue(RenderQueue* queue);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
         /** Overridden from MovableObject
         @see

@@ -487,7 +487,7 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    void Entity::_updateRenderQueue(RenderQueue* queue)
+    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
 		// Do nothing if not initialised yet
 		if (!mInitialised)

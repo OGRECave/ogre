@@ -92,7 +92,7 @@ namespace Ogre {
         return mBox;
     }
 
-    void SimpleRenderable::_updateRenderQueue(RenderQueue* queue)
+    void SimpleRenderable::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
     }

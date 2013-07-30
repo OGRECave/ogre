@@ -118,6 +118,7 @@ set (HEADER_FILES
   include/OgreInstanceBatchShader.h
   include/OgreInstanceBatchVTF.h
   include/OgreInstancedEntity.h
+  include/OgreInstancedEntity.inl
   include/OgreInstanceManager.h
   include/OgreIteratorRange.h
   include/OgreIteratorWrapper.h

@@ -106,6 +106,11 @@ namespace Ogre
 		size_t getTransforms( Matrix4 *xform ) const;
 		/// Returns number of 32-bit values written
 		size_t getTransforms3x4( float *xform ) const;
+		/** Fills xform with the 4x3 world matrix (12 bytes)
+		@remarks
+			Assumes this object is attached to a Node
+		*/
+		inline void writeSingleTransform3x4( float *xform ) const;
 
 		/// Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera ) const;
@@ -176,7 +181,7 @@ namespace Ogre
 		void _notifyAttached( Node* parent );
 
 		/// Do nothing, InstanceBatch takes care of this.
-		void _updateRenderQueue( RenderQueue* queue )	{}
+		void _updateRenderQueue( RenderQueue* queue, Camera *camera )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
 		/** @see Entity::hasSkeleton */
@@ -227,6 +232,8 @@ namespace Ogre
 		const Vector4& getCustomParam( unsigned char idx );
 	};
 }
+
+#include "OgreInstancedEntity.inl"
 
 #include "OgreHeaderSuffix.h"
 

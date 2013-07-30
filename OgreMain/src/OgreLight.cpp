@@ -326,7 +326,7 @@ namespace Ogre {
         return box;
     }
     //-----------------------------------------------------------------------
-    void Light::_updateRenderQueue(RenderQueue* queue)
+    void Light::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         // Do nothing
     }

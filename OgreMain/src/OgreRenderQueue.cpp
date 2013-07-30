@@ -300,7 +300,7 @@ namespace Ogre {
 	{
 		//--- !!!TODO: (dark_sylinc) VERY IMPORTANT!!! ---
 		if (mo->getVisible())
-			mo -> _updateRenderQueue( this );
+			mo -> _updateRenderQueue( this, cam );
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		mo->_notifyCurrentCamera(cam);
 

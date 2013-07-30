@@ -531,7 +531,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue )
+	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
 		if( !mKeepStatic )
 		{

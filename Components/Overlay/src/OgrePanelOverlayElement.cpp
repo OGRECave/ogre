@@ -177,14 +177,14 @@ namespace Ogre {
         OverlayContainer::setMaterialName(matName);
     }
     //---------------------------------------------------------------------
-    void PanelOverlayElement::_updateRenderQueue(RenderQueue* queue)
+    void PanelOverlayElement::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         if (mVisible)
         {
 
             if (!mTransparent && !mMaterial.isNull())
             {
-                OverlayElement::_updateRenderQueue(queue);
+                OverlayElement::_updateRenderQueue(queue, camera);
             }
 
             // Also add children
@@ -192,7 +192,7 @@ namespace Ogre {
             while (it.hasMoreElements())
             {
                 // Give children ZOrder 1 higher than this
-                it.getNext()->_updateRenderQueue(queue);
+                it.getNext()->_updateRenderQueue(queue, camera);
             }
         }
     }

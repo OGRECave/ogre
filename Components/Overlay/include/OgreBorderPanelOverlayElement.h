@@ -173,7 +173,7 @@ namespace Ogre {
         const String& getBorderMaterialName(void) const;
 
         /** @copydoc OverlayContainer::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
         /// @copydoc OverlayElement::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);

@@ -188,6 +188,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	mAutoParamDataSource = createAutoParamDataSource();
 
 	mVisibleObjects.resize( 1 );
+	mTmpVisibleObjects.resize( 1 );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -1479,9 +1480,9 @@ void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverl
 			size_t visibleObjsListsPerThread = 1;
 			cullFrustum( mEntitiesMemoryManagerCulledList, camera, visibleObjsIdxStart );
 
-			VisibleObjectsPerThreadVec::const_iterator it = mVisibleObjects.begin();
-			VisibleObjectsPerThreadVec::const_iterator en = mVisibleObjects.begin() +
-																visibleObjsListsPerThread;
+			VisibleObjectsPerThreadVec::const_iterator it = mVisibleObjects.begin() + visibleObjsIdxStart;
+			VisibleObjectsPerThreadVec::const_iterator en = mVisibleObjects.begin() + visibleObjsIdxStart
+																+ visibleObjsListsPerThread;
 
 			firePreFindVisibleObjects(vp);
 			while( it != en )
@@ -1491,7 +1492,7 @@ void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverl
 
 				while( itor != end )
 				{
-					(*itor)->_updateRenderQueue( getRenderQueue() );
+					(*itor)->_updateRenderQueue( getRenderQueue(), camera );
 					++itor;
 				}
 				++it;
@@ -4142,7 +4143,7 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	if (mSkyBoxEnabled
 		&& mSkyBoxObj && mSkyBoxObj->isVisible())
 	{
-		mSkyBoxObj->_updateRenderQueue(getRenderQueue());
+		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam);
 	}
 
 	if (mSkyDomeEnabled)

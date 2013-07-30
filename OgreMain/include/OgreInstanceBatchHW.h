@@ -104,7 +104,7 @@ namespace Ogre
 
 		/** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
 			per unit basis and finally updated the vertex buffer */
-		virtual void _updateRenderQueue( RenderQueue* queue );
+		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
 	};
 }
 

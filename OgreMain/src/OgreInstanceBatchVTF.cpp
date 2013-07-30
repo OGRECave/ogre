@@ -463,9 +463,9 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue)
+	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
-		InstanceBatch::_updateRenderQueue( queue );
+		InstanceBatch::_updateRenderQueue( queue, camera );
 
 		if( mBoundsUpdated || mDirtyAnimation || mManager->getCameraRelativeRendering() )
 			updateVertexTexture();

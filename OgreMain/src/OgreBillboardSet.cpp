@@ -557,7 +557,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::_updateRenderQueue(RenderQueue* queue)
+    void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         // If we're driving this from our own data, update geometry if need to.
         if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))

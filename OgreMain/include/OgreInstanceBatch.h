@@ -347,7 +347,7 @@ namespace Ogre
         /** @copydoc MovableObject::_notifyCurrentCamera. */
 		void _notifyCurrentCamera( Camera* cam );
 
-		virtual void _updateRenderQueue(RenderQueue* queue);
+		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject

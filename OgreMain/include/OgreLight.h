@@ -314,7 +314,7 @@ namespace Ogre {
         const AxisAlignedBox& getBoundingBox(void) const;
 
         /** @copydoc MovableObject::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;

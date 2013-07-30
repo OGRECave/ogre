@@ -62,7 +62,7 @@ namespace Ogre {
             The subclass must update the render queue using whichever Renderable
             instance(s) it wishes.
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, 
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera,
             list<Particle*>::type& currentParticles, bool cullIndividually) = 0;
 
         /** Sets the material this renderer must use; called by ParticleSystem. */

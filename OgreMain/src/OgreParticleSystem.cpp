@@ -700,11 +700,11 @@ namespace Ogre {
         return p;
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::_updateRenderQueue(RenderQueue* queue)
+    void ParticleSystem::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         if (mRenderer)
         {
-            mRenderer->_updateRenderQueue(queue, mActiveParticles, mCullIndividual);
+            mRenderer->_updateRenderQueue(queue, camera, mActiveParticles, mCullIndividual);
         }
     }
 	//---------------------------------------------------------------------

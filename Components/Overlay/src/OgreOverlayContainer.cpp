@@ -286,19 +286,19 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void OverlayContainer::_updateRenderQueue(RenderQueue* queue)
+    void OverlayContainer::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
         if (mVisible)
         {
 
-            OverlayElement::_updateRenderQueue(queue);
+            OverlayElement::_updateRenderQueue(queue, camera);
 
             // Also add children
             ChildIterator it = getChildIterator();
             while (it.hasMoreElements())
             {
                 // Give children ZOrder 1 higher than this
-                it.getNext()->_updateRenderQueue(queue);
+                it.getNext()->_updateRenderQueue(queue, camera);
             }
         }
 

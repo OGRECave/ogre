@@ -925,7 +925,7 @@ namespace Ogre {
         return mBoundingBox;
     }
     //-----------------------------------------------------------------------
-    void Frustum::_updateRenderQueue(RenderQueue* queue)
+    void Frustum::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
 		if (mDebugDisplay)
 		{
