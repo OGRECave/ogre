@@ -1423,7 +1423,7 @@ namespace Ogre
 		/** Widen a rectangular area of terrain to take into account an extrusion vector.
 		@param vec A vector in world space
 		@param inRect Input rectangle
-		@param inRect Output rectangle
+		@param outRect Output rectangle
 		*/
 		void widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect);
 
@@ -1432,7 +1432,7 @@ namespace Ogre
 		@param vec A vector in world space
 		@param inRect Input rectangle
 		@param minHeight, maxHeight The extents of the height to extrude
-		@param inRect Output rectangle
+		@param outRect Output rectangle
 		*/
 		void widenRectByVector(const Vector3& vec, const Rect& inRect, 
 			Real minHeight, Real maxHeight, Rect& outRect);
@@ -1650,7 +1650,7 @@ namespace Ogre
 		*/
 		uint getGeoDataSizeAtLod(uint16 lodLevel);
         /** Get the real lod level
-         @para lodLevel LOD level which can be negative.
+         @param lodLevel LOD level which can be negative.
          @note After mapping, [-mNumLodLevels, -1] equals to [0,mNumLodLevels-1]
          So you can reference the lowest LOD with -1
          */

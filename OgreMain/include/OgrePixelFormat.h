@@ -559,7 +559,9 @@ namespace Ogre {
         */
         static void packColour(const ColourValue &colour, const PixelFormat pf,  void* dest);
         /** Pack a colour value to memory
-            @param colour	The colour is returned here
+            @param r,g,b,a	The four colour components, range 0.0f to 1.0f
+                            (an exception to this case exists for floating point pixel
+                            formats, which don't clamp to 0.0f..1.0f)
         	@param pf		Pixelformat in which to write the colour
         	@param dest		Destination memory location
         */

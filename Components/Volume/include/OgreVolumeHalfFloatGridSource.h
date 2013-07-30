@@ -62,7 +62,7 @@ namespace Volume {
     public:
 
         /** Constructur.
-        @param volumeSerializationName
+        @param serializedVolumeFile
             Which volume serialization to get the data from.
         @param trilinearValue
             Whether to use trilinear filtering (true) or nearest neighbour (false) for the value.

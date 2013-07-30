@@ -1771,12 +1771,7 @@ namespace Ogre {
 		@note
 		This named option will only work if you are using a parameters object created
 		from a high-level program (HighLevelGpuProgram).
-		@param index The index at which to place the parameter
-		NB this index refers to the number of floats, so a Vector3 is 3. Note that many 
-		rendersystems & programs assume that every floating point parameter is passed in
-		as a vector of 4 items, so you are strongly advised to check with 
-		RenderSystemCapabilities before using this version - if in doubt use Vector4
-		or ColourValue instead (both are 4D).
+        @param name The name of the parameter
 		@param vec The value to set
 		*/
 		void setNamedConstant(const String& name, const Vector3& vec);

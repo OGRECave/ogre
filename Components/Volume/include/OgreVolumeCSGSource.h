@@ -208,7 +208,7 @@ namespace Volume {
         virtual const Source* getSourceB(void) const;
         
         /** Sets the second operator source.
-        @param a
+        @param b
             The second operator source.
         */
         virtual void setSourceB(Source *b);
@@ -320,12 +320,12 @@ namespace Volume {
 
         /** Gets the source.
         @return
-            The  source.
+            The source.
         */
         virtual const Source* getSource(void) const;
         
         /** Sets the source.
-        @param src
+        @param a
             The source.
         */
         virtual void setSource(Source *a);

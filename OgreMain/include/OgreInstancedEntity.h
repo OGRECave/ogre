@@ -282,8 +282,8 @@ namespace Ogre
 			If this function is never called, all instances default to Vector4::ZERO. Watch out!
 			If you destroy an instanced entity and then create it again (remember! Instanced entities
 			are pre-allocated) it's custom param will contain the old value when it was destroyed.
-		@param Index of the param. In the range [0; InstanceManager::getNumCustomParams())
-		@param New parameter
+		@param idx of the param. In the range [0; InstanceManager::getNumCustomParams())
+		@param newParam New parameter
 		*/
 		void setCustomParam( unsigned char idx, const Vector4 &newParam );
 		const Vector4& getCustomParam( unsigned char idx );

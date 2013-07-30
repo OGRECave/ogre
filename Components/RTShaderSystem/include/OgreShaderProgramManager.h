@@ -192,8 +192,7 @@ protected:
 	void removeProgramProcessor(ProgramProcessor* processor);
 
 	/** Destroy a GPU program by name.
-	@param name The name of the program to destroy.
-	@param type The type of the program to destroy.
+	@param gpuProgram The program to destroy.
 	*/
 	void destroyGpuProgram(GpuProgramPtr& gpuProgram);
 

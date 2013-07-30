@@ -68,11 +68,11 @@ protected:
 };
 
 /**
-    \file
+    @file
         Compositor.cpp
-    \brief
+    @brief
         Shows OGRE's Compositor feature
-	\author
+	@author
 		W.J. :wumpus: van der Laan
 			Ogre compositor framework
 		Manuel Bua

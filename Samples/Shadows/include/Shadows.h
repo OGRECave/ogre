@@ -13,9 +13,9 @@ same license as the rest of the engine.
 */
 
 /**
-    \file 
+    @file 
         Shadows.cpp
-    \brief
+    @brief
         Shows a few ways to use Ogre's shadowing techniques
 */
 

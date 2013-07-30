@@ -197,7 +197,7 @@ namespace Ogre
 				* Not implemented. (see HWInstancingVTF's recommendation)
 			ShaderBased:
 				* Not supported.
-		@param Number of custom parameters each instance will have. Default: 0
+		@param numCustomParams Number of custom parameters each instance will have. Default: 0
 		*/
 		void setNumCustomParams( unsigned char numCustomParams );
 

@@ -94,7 +94,7 @@ namespace Ogre
         virtual void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
 		void updateToLodLevel(int lodLevel, bool synchronous = false);
-		/// save each LOD level separately compressed so seek is possible
+		/// Save each LOD level separately compressed so seek is possible
 		static void saveLodData(StreamSerialiser& stream, Terrain* terrain);
 
 		/** Copy geometry data from buffer to mHeightData/mDeltaData
@@ -105,8 +105,8 @@ namespace Ogre
 		  */
 		void fillBufferAtLod(uint lodLevel, const float* data, uint dataSize );
 		/** Read separated geometry data from file into allocated memory
-		  @param lodLevel Which LOD level to load
-		  @returns Allocated array containing geometry data of given LOD level
+		  @param lowerLodBound Lower bound of LOD levels to load
+          @param higherLodBound Upper bound of LOD levels to load
 		  @remarks Geometry data are uncompressed using inflate() and stored into
 			    allocated buffer
 		  */
@@ -129,8 +129,10 @@ namespace Ogre
 
 		/** Separate geometry data by LOD level
 		@param data A geometry data to separate i.e. mHeightData/mDeltaData
-		@returns Allocated array filled with separated geometry data
-		@remarks Allocates new array and fills it with geometry data coupled by LOD level from lowest LOD level to highest. Example:
+        @param size Dimension of the input data
+        @param numLodLevels Number of LOD levels in the input data
+        @param lods The separated LOD data
+        @remarks Allocates new array and fills it with geometry data coupled by LOD level from lowest LOD level to highest. Example:
 			    before separation:
 			    00 01 02 03 04
 			    05 06 07 08 09
