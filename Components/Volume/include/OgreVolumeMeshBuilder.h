@@ -143,6 +143,8 @@ namespace Volume {
     class _OgreVolumeExport MeshBuilderCallback
     {
     public:
+        virtual ~MeshBuilderCallback() {}
+
         /** To be called with the callback function of a MeshBuilder.
         @param simpleRenderable
             Contains the SimpleRenderable for which the triangles were built.

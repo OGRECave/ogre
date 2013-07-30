@@ -58,6 +58,8 @@ namespace Ogre {
     class _OgreExport AnimationContainer
     {
     public:
+        virtual ~AnimationContainer() {}
+
         /** Gets the number of animations in this container. */
         virtual unsigned short getNumAnimations(void) const = 0;
         
