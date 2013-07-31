@@ -210,7 +210,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
-		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), 0, this, num );
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), &mObjectMemoryManager,
+										 this, num );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()

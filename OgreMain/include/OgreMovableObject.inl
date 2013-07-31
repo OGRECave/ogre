@@ -97,7 +97,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline SceneNode* MovableObject::getParentSceneNode(void) const
 	{
-		assert( dynamic_cast<SceneNode*>( mParentNode ) );
+		assert( !mParentNode || dynamic_cast<SceneNode*>( mParentNode ) );
 		return static_cast<SceneNode*>( mParentNode );
 	}
 }

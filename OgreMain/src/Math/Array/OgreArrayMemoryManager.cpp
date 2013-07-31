@@ -226,7 +226,7 @@ namespace Ogre
 				{
 					//First see if we have a continuous range of unused slots
 					size_t lastRange = 1;
-					SlotsVec::const_iterator it = m_availableSlots.begin() + 1;
+					SlotsVec::const_iterator it = itor + 1;
 					while( it != end && (*itor - lastRange) == *it )
 					{
 						++lastRange;
@@ -254,7 +254,7 @@ namespace Ogre
 					}
 
 					m_usedMemory -= lastRange;
-					slotsRecreated( m_maxMemory - newEnd );
+					slotsRecreated( m_usedMemory );
 
 					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
 														m_elementsMemSizes, (newEnd - lastRange),

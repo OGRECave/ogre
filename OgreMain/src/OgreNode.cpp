@@ -292,7 +292,7 @@ namespace Ogre {
 		//createChildImpl must have passed us as parent. It's a special
 		//case to improve memory usage (avoid transfering mTransform)
 		mChildren.push_back( newNode );
-		newNode->mParentIndex = -1;
+		newNode->mParentIndex = mChildren.size() - 1;
 
         return newNode;
     }

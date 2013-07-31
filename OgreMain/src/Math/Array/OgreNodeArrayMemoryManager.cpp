@@ -122,8 +122,8 @@ namespace Ogre
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
 
-		*inOutTransform.mParents	= m_dummyNode;
-		*inOutTransform.mOwner		= 0;
+		inOutTransform.mParents[inOutTransform.mIndex]	= m_dummyNode;
+		inOutTransform.mOwner[inOutTransform.mIndex]	= 0;
 		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
 		//Zero out all pointers
 		inOutTransform = Transform();

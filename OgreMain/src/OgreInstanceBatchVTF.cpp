@@ -447,8 +447,8 @@ namespace Ogre
 			}
 		}
 
-		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), 0, this,
-										 num, sharedTransformEntity );
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), &mObjectMemoryManager,
+										 this, num, sharedTransformEntity );
 	}
 
 

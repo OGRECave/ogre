@@ -373,6 +373,15 @@ namespace Ogre {
 
 		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
 		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
+
+		/** These are the main memory managers. Note that some Scene Managers may have more than one
+			memory manager (eg. one per Octant in an Octree implementation, one per Portal, etc)
+			Those managers can, at the start of scene graph update, transfer/move the objects created
+			in the main mem. managers into their localized versions.
+
+			During @see highLevelCull, those scene managers will update mNodeMemoryManagerCulledList
+			and co. to indicate which memory managers should be traversed for rendering.
+		*/
 		NodeMemoryManager		mNodeMemoryManager;
 		ObjectMemoryManager		mEntityMemoryManager;
 		ObjectMemoryManager		mLightMemoryManager;
@@ -1291,6 +1300,14 @@ namespace Ogre {
 		/** Unregisters a registered node for listening. @See registerSceneNodeListener
 		*/
 		virtual void unregisterSceneNodeListener( SceneNode *sceneNode );
+
+		/** Retrieves the main entity memory manager.
+        @remarks
+			Some Scene Managers may have more than one memory manager (e.g. one per octant in an
+			Octree implementation). At end of scene graph update the scene manager may move
+			the object created with the main memory manager into another another one.
+        */
+		ObjectMemoryManager& _getEntityMemoryManager(void)			{ return mEntityMemoryManager; }
 
         /** Create an Entity (instance of a discrete mesh).
             @param

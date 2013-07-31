@@ -424,7 +424,8 @@ namespace Ogre
 	void InstancedEntity::setInUse( bool used )
 	{
 		mInUse = used;
-		setVisible( mInUse );
+		if( !used )
+			setVisible( false );
 	}
 	//---------------------------------------------------------------------------
 	void InstancedEntity::setCustomParam( unsigned char idx, const Vector4 &newParam )
