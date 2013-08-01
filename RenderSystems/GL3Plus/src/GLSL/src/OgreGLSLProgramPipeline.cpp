@@ -529,10 +529,6 @@ namespace Ogre
 
                     // Update the value.
                     atomic_buffer->writeData(glOffset, sizeof(GLuint) * glArraySize, params->getUnsignedIntPointer(def->physicalIndex));
-
-                    // OGRE_CHECK_GL_ERROR(glProgramUniform3uiv(progID, currentUniform->mLocation, glArraySize,
-                    //                                          params->getUnsignedIntPointer(def->physicalIndex)));
-                    
                 }
             }
         }

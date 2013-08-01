@@ -90,6 +90,18 @@ namespace Ogre {
         {
             gpt = GPT_GEOMETRY_PROGRAM;
         }
+        else if (paramType->second == "tesselation_hull_program")
+        {
+            gpt = GPT_HULL_PROGRAM;
+        }
+        else if (paramType->second == "tesselation_domain_program")
+        {
+            gpt = GPT_DOMAIN_PROGRAM;
+        }
+        else if (paramType->second == "compute_program")
+        {
+            gpt = GPT_COMPUTE_PROGRAM;
+        }
         else
         {
             gpt = GPT_FRAGMENT_PROGRAM;

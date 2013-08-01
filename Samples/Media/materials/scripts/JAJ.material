@@ -57,7 +57,7 @@ geometry_program JAJ/Basic/GS_CG cg
         
         default_params
         {
-                param_named IsoValue float 1
+            param_named IsoValue float 1
         }
 }
 
@@ -89,7 +89,7 @@ vertex_program JAJ/Basic/VS_GLSL glsl
 
         default_params
         {
-                param_named_auto WorldViewProj worldviewproj_matrix
+            param_named_auto WorldViewProj worldviewproj_matrix
         }
 }
 
@@ -100,19 +100,20 @@ geometry_program JAJ/Basic/GS_GLSL glsl
 
         default_params
         {
-                param_named_auto WorldViewProj worldviewproj_matrix
+            param_named_auto WorldViewProj worldviewproj_matrix
         }
 }
 
 fragment_program JAJ/Basic/PS_GLSL glsl
 {
         source JAJBasicFS.glsl
-        syntax glsl150
+        syntax glsl420
 
         default_params
         {
             param_named atom_counter uint 10
             param_named pretty_colours bool false
+            param_named image_load_store bool true
             param_named colour_factor uint[3] 50 50 100
         }
 }
@@ -151,10 +152,10 @@ material JAJ/Basic
         {
                 pass
                 {
-                        compute_program_ref JAJ/Basic/CS
-                        {
+                        // compute_program_ref JAJ/Basic/CS
+                        // {
 
-                        }
+                        // }
 
                         vertex_program_ref JAJ/Basic/VS
                         {

@@ -24,6 +24,9 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 {
     Entity* mOgreEnt;
 
+    TexturePtr mImage;
+    HardwarePixelBufferSharedPtr mPixelBuffer;
+
     //HardwareCounterBufferSharedPtr mBuffer;
 
  public:
@@ -63,7 +66,51 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
         ogre->setDirection(0,0,1);
         ogre->attachObject(mOgreEnt);
 
-        //mBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(sizeof(uint32), HardwareBuffer::HBU_WRITE_ONLY, false);
+        ////////////////////////////////
+        // Image Load/Store
+        ////////////////////////////////
+
+        mImage = TextureManager::getSingleton().createManual(
+            "ImageData", // Name of texture
+            "General", // Name of resource group in which the texture should be created
+            TEX_TYPE_2D, // Texture type
+            256, // Width
+            256, // Height
+            1, // Depth (Must be 1 for two dimensional textures)
+            0, // Number of mipmaps
+            PF_X8R8G8B8, // Pixel format  //TODO support formats from GL3+
+            TU_DYNAMIC_SHADER // usage
+        );
+
+        mPixelBuffer = mImage->getBuffer(0,0);
+
+        // Lock the buffer so we can write to it
+        mPixelBuffer->lock(HardwareBuffer::HBL_DISCARD);
+        const PixelBox &pb = mPixelBuffer->getCurrentLock();
+
+        // Update the contents of pb here
+        // Image data starts at pb.data and has format pb.format
+        // Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
+        uint *data = static_cast<uint*>(pb.data);
+        size_t height = pb.getHeight();
+        size_t width = pb.getWidth();
+        size_t pitch = pb.rowPitch; // Skip between rows of image
+        for (size_t y = 0; y < height; ++y)
+        {
+            for(size_t x = 0; x < width; ++x)
+            {
+                // 0xRRGGBB -> fill the buffer with yellow pixels
+                data[pitch * y + x] = 0x00FFFF00;
+            }
+        }
+
+        // Unlock the buffer again (frees it for use by the GPU)
+        mPixelBuffer->unlock();
+
+        // uint GLid;
+        // mImage->getCustomAttribute("GLID", &GLid);
+
+        // glBindImageTexture(0, GLid, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGB8);
     }
 
     void cleanupContent()

@@ -1895,7 +1895,7 @@ namespace Ogre {
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
-            //FIXME : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Former technically slower, latter breaks samples.
+            //FIXME : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Latter breaks samples.
             GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT; 
 
             do
@@ -2139,6 +2139,12 @@ namespace Ogre {
             mCurrentGeometryProgram->unbindProgram();
         if (mCurrentFragmentProgram)
             mCurrentFragmentProgram->unbindProgram();
+        if (mCurrentHullProgram)
+            mCurrentHullProgram->unbindProgram();
+        if (mCurrentDomainProgram)
+            mCurrentDomainProgram->unbindProgram();
+        if (mCurrentComputeProgram)
+            mCurrentComputeProgram->unbindProgram();
 
         // Disable textures
         _disableTextureUnitsFrom(0);
@@ -2163,6 +2169,12 @@ namespace Ogre {
             mCurrentGeometryProgram->bindProgram();
         if (mCurrentFragmentProgram)
             mCurrentFragmentProgram->bindProgram();
+        if (mCurrentHullProgram)
+            mCurrentHullProgram->bindProgram();
+        if (mCurrentDomainProgram)
+            mCurrentDomainProgram->bindProgram();
+        if (mCurrentComputeProgram)
+            mCurrentComputeProgram->bindProgram();
 
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
@@ -2444,6 +2456,26 @@ namespace Ogre {
         glprg->bindProgram();
 
         RenderSystem::bindGpuProgram(prg);
+
+        //FIXME This needs to be moved somewhere texture specific.
+        // Update images bindings for image load/store
+        static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
+
+        // TextureManager::ResourceMapIterator resource = TextureManager::getSingletonPtr()->getResourceIterator();
+        
+        // while(resource.hasMoreElements())
+        // {
+        //     TextureManager::ResourceMapPtr resource_map = resource.getNext();
+        //     resource_map.getResourceType();
+        // }
+
+        // //FIXME Either a new TextureShaderUsage enum needs to be introduced,
+        // // or additional TextureUsages must be created.  See OgreTexture.h
+        // if (tex->getUsage() == TU_DYNAMIC_SHADER)
+        // {
+        //     // OGRE_CHECK_GL_ERROR(glBindImageTexture(0, mTextureID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8));
+        //     OGRE_CHECK_GL_ERROR(glBindImageTexture(0, tex->getGLID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8));
+        // }
     }
 
     void GL3PlusRenderSystem::unbindGpuProgram(GpuProgramType gptype)
