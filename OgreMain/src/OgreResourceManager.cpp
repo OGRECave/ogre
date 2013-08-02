@@ -511,7 +511,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
 		if (i == mResourcePoolMap.end())
@@ -525,7 +525,10 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyResourcePool(ResourcePool* pool)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        if(!pool)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ResourcePool.", "ResourceManager::destroyResourcePool");
+
+        OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(pool->getName());
 		if (i != mResourcePoolMap.end())
@@ -537,7 +540,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyResourcePool(const String& name)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
 		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
 		if (i != mResourcePoolMap.end())
@@ -550,7 +553,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceManager::destroyAllResourcePools()
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
 		for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
 			i != mResourcePoolMap.end(); ++i)

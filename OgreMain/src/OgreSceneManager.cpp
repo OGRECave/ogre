@@ -323,8 +323,10 @@ bool SceneManager::hasCamera(const String& name) const
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
-	destroyCamera(cam->getName());
+    if(!cam)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null Camera.", "SceneManager::destroyCamera");
 
+	destroyCamera(cam->getName());
 }
 
 //-----------------------------------------------------------------------
@@ -888,8 +890,10 @@ void SceneManager::destroySceneNode(const String& name)
 //---------------------------------------------------------------------
 void SceneManager::destroySceneNode(SceneNode* sn)
 {
-	destroySceneNode(sn->getName());
+    if(!sn)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
 
+	destroySceneNode(sn->getName());
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
@@ -6977,6 +6981,9 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
+    if(!m)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null MovableObject.", "SceneManager::destroyMovableObject");
+
 	destroyMovableObject(m->getName(), m->getMovableType());
 }
 //---------------------------------------------------------------------
