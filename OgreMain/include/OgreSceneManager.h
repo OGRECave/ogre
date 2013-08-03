@@ -415,8 +415,8 @@ namespace Ogre {
 		typedef map<String, StaticGeometry* >::type StaticGeometryList;
 		StaticGeometryList mStaticGeometryList;
 
-		typedef map<String, InstanceManager*>::type InstanceManagerMap;
-		InstanceManagerMap	mInstanceManagerMap;
+		typedef vector<InstanceManager*>::type		InstanceManagerVec;
+		InstanceManagerVec	mInstanceManagers;
 
         typedef vector<SceneNode*>::type SceneNodeList;
 
@@ -808,12 +808,8 @@ namespace Ogre {
 		void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
 											const T *mo ) const;
 
-		typedef vector<InstanceManager*>::type		InstanceManagerVec;
-		InstanceManagerVec mDirtyInstanceManagers;
-		InstanceManagerVec mDirtyInstanceMgrsTmp;
-
 		/** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
-		void updateDirtyInstanceManagers(void);
+		void updateInstanceManagers(void);
 
 		/** Culls the scene in a high level fashion (i.e. Octree, Portal, etc.) by taking into account all
 			registered cameras. Produces a list of culled Entities & SceneNodes that must follow a very
@@ -3080,12 +3076,6 @@ namespace Ogre {
 		@param instancedEntity Instance to remove
 		*/
 		virtual void destroyInstancedEntity( InstancedEntity *instancedEntity );
-
-		/** Called by an InstanceManager when it has at least one InstanceBatch that needs their bounds
-			to be updated for proper culling
-			@param dirtyManager The manager with dirty batches to update
-		*/
-		void _addDirtyInstanceManager( InstanceManager *dirtyManager );
 
 		/** Create a movable object of the type specified without a name.
 		@remarks

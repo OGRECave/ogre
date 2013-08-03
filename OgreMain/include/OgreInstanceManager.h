@@ -106,7 +106,8 @@ namespace Ogre
         InstanceBatchMap        mInstanceBatches;
         size_t                  mIdCount;
 
-        InstanceBatchVec        mDirtyBatches;
+        InstanceBatchVec        mDynamicBatches;
+		InstanceBatchVec        mDirtyStaticBatches;
 
         RenderOperation         mSharedRenderOperation;
 
@@ -283,13 +284,27 @@ namespace Ogre
         bool hasSettings( const String &materialName ) const
         { return mBatchSettings.find( materialName ) != mBatchSettings.end(); }
 
-        /** @copydoc InstanceBatch::setStaticAndUpdate */
-        void setBatchesAsStaticAndUpdate( bool bStatic );
+        /** @copydoc InstanceBatch::setStatic */
+        void setBatchesAsStatic( bool bStatic );
+
+		/** Kees the batch in the dynamic batch list so that it gets updated every frame.
+			@See _removeFromDynamicBatchList
+        @param dynamicBatch
+			The batch which is now static or unused, usually same as caller.
+        */
+		void _addToDynamicBatchList( InstanceBatch *dynamicBatch );
+
+		/** Called when a previously dynamic InstanceBatch went static (@see InstanceBatch::setStatic)
+			or a dynamic batch has no InstancedEntity in use
+        @param batch
+			The batch which is now static or unused, usually same as caller.
+        */
+		void _removeFromDynamicBatchList( InstanceBatch *batch );
 
         /** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
         @param dirtyBatch The batch which is dirty, usually same as caller.
         */
-        void _addDirtyBatch( InstanceBatch *dirtyBatch );
+        void _addDirtyStaticBatch( InstanceBatch *dirtyBatch );
 
         /** Called by SceneManager when we told it we have at least one dirty batch */
         void _updateDirtyBatches(void);
@@ -313,6 +328,23 @@ namespace Ogre
             return InstanceBatchIterator( it->second.begin(), it->second.end() );
         }
     };
+
+	struct InstanceManagerCmp
+	{
+		bool operator () ( const InstanceManager *a, const InstanceManager *b ) const
+		{
+			return a->getName() < b->getName();
+		}
+		bool operator () ( const InstanceManager *a, const String &name ) const
+		{
+			return a->getName() < name;
+		}
+		bool operator () ( const String &name, const InstanceManager *a ) const
+		{
+			return name < a->getName();
+		}
+	};
+
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

@@ -153,7 +153,8 @@ namespace Ogre {
 		size_t mParentIndex;
 
         /// Constructor
-        MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager );
+        MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
+						uint8 renderQueueId=RENDER_QUEUE_MAIN );
 
 		/** Don't use this constructor unless you know what you're doing.
 			@See ObjectMemoryManager::m_dummyNode

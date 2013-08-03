@@ -45,7 +45,7 @@ namespace Ogre
 	InstancedEntity::InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager,
 										InstanceBatch *batchOwner, uint32 instanceID,
 										InstancedEntity* sharedTransformEntity ) :
-				MovableObject( id, objectMemoryManager ),
+				MovableObject( id, objectMemoryManager, 0 ),
 				mInstanceId( instanceID ),
                 mInUse( false ),
 				mBatchOwner( batchOwner ),
@@ -60,6 +60,11 @@ namespace Ogre
 		setInUse( false );
 
 		mName = batchOwner->getName() + "/IE_" + StringConverter::toString(mInstanceId);
+
+		const AxisAlignedBox &bounds = batchOwner->_getMeshReference()->getBounds();
+		Aabb aabb( bounds.getCenter(), bounds.getHalfSize() );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
 		if (sharedTransformEntity)
 		{

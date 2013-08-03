@@ -52,14 +52,14 @@ namespace Ogre {
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
 	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
-    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager )
+    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager, uint8 renderQueueId )
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
 		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mRenderQueueID(RENDER_QUEUE_MAIN)
+        , mRenderQueueID(renderQueueId)
 		, mRenderQueuePriority(100)
         , mListener(0)
 		, mDebugDisplay(false)

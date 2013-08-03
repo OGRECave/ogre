@@ -60,8 +60,6 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW : public InstanceBatch
 	{
-		bool	mKeepStatic;
-
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
@@ -82,21 +80,6 @@ namespace Ogre
 
 		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
-
-		/** Overloaded so that we don't perform needless updates when in static mode. Also doing that
-			could cause glitches with shadow mapping (since Ogre thinks we're small/bigger than we
-			really are when displaying, or that we're somewhere else)
-        */
-		void _boundsDirty(void);
-
-		/** @see InstanceBatch::setStaticAndUpdate. While this flag is true, no individual per-entity
-			cull check is made. This means if the camera is looking at only one instance, all instances
-			are sent to the vertex shader (unlike when this flag is false). This saves a lot of CPU
-			power and a bit of bus bandwidth.
-		*/
-		void setStaticAndUpdate( bool bStatic );
-
-		bool isStatic() const						{ return mKeepStatic; }
 
 		//Renderable overloads
 		void getWorldTransforms( Matrix4* xform ) const;

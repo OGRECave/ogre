@@ -96,7 +96,7 @@ namespace Ogre
         size_t              mInstancesPerBatch;
 
         InstanceManager     *mCreator;
-		ObjectMemoryManager mObjectMemoryManager; ///Only one render queue is used
+		ObjectMemoryManager mLocalObjectMemoryManager; ///Only one render queue is used
 
         MaterialPtr         mMaterial;
 
@@ -116,9 +116,9 @@ namespace Ogre
         CustomParamsVec		mCustomParams;
 
         /// This bbox contains all (visible) instanced entities
-        bool                mBoundsDirty;
-        bool                mBoundsUpdated; //Set to false by derived classes that need it
         Camera              *mCurrentCamera;
+
+		bool				mIsStatic;
 
         unsigned short      mMaterialLodIndex;
 
@@ -275,29 +275,30 @@ namespace Ogre
 		*/
 		void _defragmentBatchDiscard(void);
 
-		/** Called by InstancedEntity(s) to tell us we need to update the bounds
-			(we touch the SceneNode so the SceneManager aknowledges such change)
-        */
-		virtual void _boundsDirty(void);
-
 		/** Tells this batch to stop updating animations, positions, rotations, and display
-			all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
-			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
-			memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
-			billboards of trees, repeating vegetation, etc.
+			all it's active instances. Some implementations allow to keep culling individual
+			instances while others may not.
+			This option makes the batch behave pretty much like Static Geometry, plust the GPU RAM
+			memory advantages (less VRAM, less bandwidth) but no LOD support. Very useful for
+			billboards of trees, repeating vegetation, modular buildings, etc.
 			@remarks
-				This function moves a lot of processing time from the CPU to the GPU. If the GPU
-				is already a bottleneck, you may see a decrease in performance instead!
-				Call this function again (with bStatic=true) if you've made a change to an
-				InstancedEntity and wish this change to take effect.
-				Be sure to call this after you've set all your instances
-				@see InstanceBatchHW::setStaticAndUpdate
+				When individual culling is disabled (or not supported) This function moves a lot of
+				processing time from the CPU to the GPU. If the GPU is already a bottleneck,
+				you may see a decrease in performance instead!
+				@See updateStaticDirty if you've made a change to an InstancedEntity and wish
+				that change to take effect. Be sure to call this after you've set all your instances
+				and not once per change.
 		*/
-		virtual void setStaticAndUpdate( bool bStatic )		{}
+		virtual void setStatic( bool bStatic );
+
+		/** Called by InstancedEntity(s) or directly to tell us we need to update the bounds
+			Should only useful if this batch is static.
+        */
+		void updateStaticDirty(void);
 
 		/** Returns true if this batch was set as static. @see setStaticAndUpdate
 		*/
-		virtual bool isStatic() const						{ return false; }
+		bool isStatic() const								{ return mIsStatic; }
 
 		/** Returns a pointer to a new InstancedEntity ready to use
 			Note it's actually preallocated, so no memory allocation happens at

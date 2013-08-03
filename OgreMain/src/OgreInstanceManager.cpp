@@ -476,7 +476,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::setBatchesAsStaticAndUpdate( bool bStatic )
+	void InstanceManager::setBatchesAsStatic( bool bStatic )
 	{
 		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
 		InstanceBatchMap::iterator end  = mInstanceBatches.end();
@@ -488,7 +488,7 @@ namespace Ogre
 
 			while( it != en )
 			{
-				(*it)->setStaticAndUpdate( bStatic );
+				(*it)->setStatic( bStatic );
 				++it;
 			}
 
@@ -496,18 +496,37 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::_addDirtyBatch( InstanceBatch *dirtyBatch )
+	void InstanceManager::_addToDynamicBatchList( InstanceBatch *dynamicBatch )
 	{
-		if( mDirtyBatches.empty() )
-			mSceneManager->_addDirtyInstanceManager( this );
+		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+													 dynamicBatch );
+		if( itor == mDynamicBatches.end() )
+			mDynamicBatches.push_back( dynamicBatch );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_removeFromDynamicBatchList( InstanceBatch *batch )
+	{
+		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+													 batch );
+		if( itor != mDynamicBatches.end() )
+			efficientVectorRemove( mDynamicBatches, itor );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_addDirtyStaticBatch( InstanceBatch *dirtyBatch )
+	{
+		//If he needs to this very often, they're probably not static...
+		//Note: Calling this more often will only affect performance for the next frame.
+		//It won't crash and can be ignored
+		assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
+				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
 
-		mDirtyBatches.push_back( dirtyBatch );
+		mDirtyStaticBatches.push_back( dirtyBatch );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceManager::_updateDirtyBatches(void)
 	{
-		InstanceBatchVec::const_iterator itor = mDirtyBatches.begin();
-		InstanceBatchVec::const_iterator end  = mDirtyBatches.end();
+		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
 
 		while( itor != end )
 		{
@@ -515,7 +534,16 @@ namespace Ogre
 			++itor;
 		}
 
-		mDirtyBatches.clear();
+		itor = mDirtyStaticBatches.begin();
+		end  = mDirtyStaticBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateBounds();
+			++itor;
+		}
+
+		mDirtyStaticBatches.clear();
 	}
 	//-----------------------------------------------------------------------
 	// Helper functions to unshare the vertices

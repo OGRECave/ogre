@@ -447,7 +447,8 @@ namespace Ogre
 			}
 		}
 
-		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), &mObjectMemoryManager,
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
+										 &mLocalObjectMemoryManager,
 										 this, num, sharedTransformEntity );
 	}
 
@@ -467,10 +468,8 @@ namespace Ogre
 	{
 		InstanceBatch::_updateRenderQueue( queue, camera );
 
-		if( mBoundsUpdated || mDirtyAnimation || mManager->getCameraRelativeRendering() )
+		if( mDirtyAnimation || mManager->getCameraRelativeRendering() )
 			updateVertexTexture();
-
-		mBoundsUpdated = false;
 	}
 	//-----------------------------------------------------------------------
 	// InstanceBatchVTF

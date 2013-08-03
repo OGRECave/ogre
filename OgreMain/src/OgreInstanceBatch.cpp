@@ -49,9 +49,8 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mBoundsDirty( false ),
-				mBoundsUpdated( false ),
 				mCurrentCamera( 0 ),
+				mIsStatic( false ),
 				mMaterialLodIndex( 0 ),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
@@ -70,9 +69,6 @@ namespace Ogre
 		{
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 		}
-
-		//TODO: (dark_sylinc)
-		//mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
 		mName = batchName;
 
@@ -132,13 +128,20 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateBounds(void)
 	{
-		//TODO: First update all bounds from our objects
+		//If this assert triggers, then we did not properly remove ourselves from
+		//the Manager's update list (it's a performance optimization warning)
+		assert( mUnusedEntities.size() != mInstancedEntities.size() );
+
+		//First update all bounds from our objects
+		ObjectData objData;
+		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+		MovableObject::updateAllBounds( numObjs, objData );
+
+		//Now merge the bounds to ours
 		ArrayReal maxWorldRadius = ARRAY_REAL_ZERO;
 		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
 		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
 
-		ObjectData objData;
-		const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
 		for( size_t i=0; i<numObjs; i += ARRAY_PACKED_REALS )
 		{
 			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
@@ -146,7 +149,7 @@ namespace Ogre
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 			ArrayReal inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
-																Mathlib::SetAll( LAYER_VISIBILITY ) ));
+																 Mathlib::SetAll( LAYER_VISIBILITY ) ));
 
 			//Merge with bounds only if they're in use (and not explicitly hidden,
 			//but may be invisible for some cameras or out of frustum)
@@ -159,6 +162,8 @@ namespace Ogre
 			vMaxBounds.CmovRobust( inUse, newVal );
 
 			maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
+
+			objData.advanceDirtyInstanceMgr();
 		}
 
 		//We've been merging and processing in bulks, but we now need to join all simd results
@@ -170,9 +175,6 @@ namespace Ogre
 		Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
 		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
 		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
-
-		mBoundsDirty	= false;
-		mBoundsUpdated	= true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::updateVisibility(void)
@@ -210,8 +212,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
-		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(), &mObjectMemoryManager,
-										 this, num );
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
+										 &mLocalObjectMemoryManager, this, num );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
@@ -284,6 +286,9 @@ namespace Ogre
 
 		if( !mUnusedEntities.empty() )
 		{
+			if( mUnusedEntities.size() == mInstancedEntities.size() && !mIsStatic && mCreator )
+				mCreator->_addToDynamicBatchList( this );
+
 			retVal = mUnusedEntities.back();
 			mUnusedEntities.pop_back();
 
@@ -317,6 +322,9 @@ namespace Ogre
 
 		//Put it back into the queue
 		mUnusedEntities.push_back( instancedEntity );
+
+		if( mUnusedEntities.size() == mInstancedEntities.size() && !mIsStatic && mCreator )
+			mCreator->_removeFromDynamicBatchList( this );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
@@ -471,7 +479,7 @@ namespace Ogre
 
 		//We've potentially changed our bounds
 		if( !isBatchUnused() )
-			_boundsDirty();
+			updateStaticDirty();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_defragmentBatchDiscard(void)
@@ -481,11 +489,31 @@ namespace Ogre
 		deleteUnusedInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_boundsDirty(void)
+	void InstanceBatch::setStatic( bool bStatic )
 	{
-		if( mCreator && !mBoundsDirty ) 
-			mCreator->_addDirtyBatch( this );
-		mBoundsDirty = true;
+		if( mIsStatic != bStatic )
+		{
+			mIsStatic = bStatic;
+			if( bStatic )
+			{
+				if( mCreator )
+				{
+					mCreator->_removeFromDynamicBatchList( this );
+					mCreator->_addDirtyStaticBatch( this );
+				}
+			}
+			else
+			{
+				if( mCreator && mUnusedEntities.size() != mInstancedEntities.size() )
+					mCreator->_addToDynamicBatchList( this );
+			}
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::updateStaticDirty(void)
+	{
+		if( mCreator && mIsStatic )
+			mCreator->_addDirtyStaticBatch( this );
 	}
 	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const

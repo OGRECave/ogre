@@ -1237,7 +1237,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     {
         // Update animations
         _applySceneAnimations();
-		updateDirtyInstanceManagers();
+		updateInstanceManagers();
         mLastFrameNumber = thisFrameNumber;
     }
 
@@ -2401,8 +2401,8 @@ void SceneManager::updateSceneGraph()
 	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
 	highLevelCull();
 	_applySceneAnimations();
-	updateDirtyInstanceManagers();
 	updateAllTransforms();
+	updateInstanceManagers();
 	updateAllBounds( mEntitiesMemoryManagerCulledList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
 	buildLightList();
@@ -6655,7 +6655,10 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 													  size_t numInstancesPerBatch, uint16 flags,
 													  unsigned short subMeshIdx )
 {
-	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																customName, InstanceManagerCmp() );
+	if (itor != mInstanceManagers.end() && (*itor)->getName() == customName )
 	{
 		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
 			"InstancedManager with name '" + customName + "' already exists!", 
@@ -6665,41 +6668,42 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
 													flags, numInstancesPerBatch, subMeshIdx );
 
-	mInstanceManagerMap[customName] = retVal;
+	mInstanceManagers.insert( itor, retVal );
 	return retVal;
 }
 //---------------------------------------------------------------------
 InstanceManager* SceneManager::getInstanceManager( const String &managerName ) const
 {
-	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
-
-	if (itor == mInstanceManagerMap.end())
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
+	if (itor == mInstanceManagers.end() || (*itor)->getName() != managerName )
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 				"InstancedManager with name '" + managerName + "' not found", 
 				"SceneManager::getInstanceManager");
 	}
 
-	return itor->second;
+	return *itor;
 }
 //---------------------------------------------------------------------
 bool SceneManager::hasInstanceManager( const String &managerName ) const
 {
-    InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
-    return itor != mInstanceManagerMap.end();
+    InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
+    return itor != mInstanceManagers.end() && (*itor)->getName() == managerName;
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
-	//The manager we're trying to destroy might have been scheduled for updating
-	//while we haven't yet rendered a frame. Update now to avoid a dangling ptr
-	updateDirtyInstanceManagers();
-
-	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
-	if (i != mInstanceManagerMap.end())
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																name, InstanceManagerCmp() );
+	if (itor != mInstanceManagers.end() && (*itor)->getName() == name )
 	{
-		OGRE_DELETE i->second;
-		mInstanceManagerMap.erase(i);
+		OGRE_DELETE *itor;
+		mInstanceManagers.erase(itor);
 	}
 }
 //---------------------------------------------------------------------
@@ -6710,17 +6714,13 @@ void SceneManager::destroyInstanceManager( InstanceManager *instanceManager )
 //---------------------------------------------------------------------
 void SceneManager::destroyAllInstanceManagers(void)
 {
-	InstanceManagerMap::iterator itor = mInstanceManagerMap.begin();
-	InstanceManagerMap::iterator end  = mInstanceManagerMap.end();
+	InstanceManagerVec::iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::iterator end  = mInstanceManagers.end();
 
 	while( itor != end )
-	{
-		OGRE_DELETE itor->second;
-		++itor;
-	}
+		OGRE_DELETE *itor++;
 
-	mInstanceManagerMap.clear();
-	mDirtyInstanceManagers.clear();
+	mInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,
@@ -6737,16 +6737,18 @@ size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const Stri
 //---------------------------------------------------------------------
 InstancedEntity* SceneManager::createInstancedEntity( const String &materialName, const String &managerName )
 {
-	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
 
-	if (itor == mInstanceManagerMap.end())
+	if (itor == mInstanceManagers.end() || (*itor)->getName() != managerName )
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 				"InstancedManager with name '" + managerName + "' not found", 
 				"SceneManager::createInstanceEntity");
 	}
 
-	return itor->second->createInstancedEntity( materialName );
+	return (*itor)->createInstancedEntity( materialName );
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
@@ -6754,41 +6756,15 @@ void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }
 //---------------------------------------------------------------------
-void SceneManager::_addDirtyInstanceManager( InstanceManager *dirtyManager )
+void SceneManager::updateInstanceManagers(void)
 {
-	mDirtyInstanceManagers.push_back( dirtyManager );
-}
-//---------------------------------------------------------------------
-void SceneManager::updateDirtyInstanceManagers(void)
-{
-	//Copy all dirty mgrs to a temporary buffer to iterate through them. We need this because
-	//if two InstancedEntities from different managers belong to the same SceneNode, one of the
-	//managers may have been tagged as dirty while the other wasn't, and _addDirtyInstanceManager
-	//will get called while iterating through them. The "while" loop will update all mgrs until
-	//no one is dirty anymore (i.e. A makes B aware it's dirty, B makes C aware it's dirty)
-	//mDirtyInstanceMgrsTmp isn't a local variable to prevent allocs & deallocs every frame.
-	mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
-									mDirtyInstanceManagers.end() );
-	mDirtyInstanceManagers.clear();
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
 
-	while( !mDirtyInstanceMgrsTmp.empty() )
+	while( itor != end )
 	{
-		InstanceManagerVec::const_iterator itor = mDirtyInstanceMgrsTmp.begin();
-		InstanceManagerVec::const_iterator end  = mDirtyInstanceMgrsTmp.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateDirtyBatches();
-			++itor;
-		}
-
-		//Clear temp buffer
-		mDirtyInstanceMgrsTmp.clear();
-
-		//Do it again?
-		mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
-									mDirtyInstanceManagers.end() );
-		mDirtyInstanceManagers.clear();
+		(*itor)->_updateDirtyBatches();
+		++itor;
 	}
 }
 //---------------------------------------------------------------------

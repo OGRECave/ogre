@@ -42,8 +42,7 @@ namespace Ogre
 										const MaterialPtr &material, size_t instancesPerBatch,
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
-								instancesPerBatch, indexToBoneMap, batchName ),
-				mKeepStatic( false )
+								instancesPerBatch, indexToBoneMap, batchName )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance
 		mTechnSupportsSkeletal = false;
@@ -186,7 +185,7 @@ namespace Ogre
 		size_t retVal = 0;
 
 		ObjectData objData;
-		const size_t numObjs = mObjectMemoryManager.getFirstObjectData( objData, 0 );
+		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
 		VisibleObjectsPerThreadVec visibleObjects = mManager->_getTmpVisibleObjectsList();
 		
@@ -247,31 +246,6 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW::_boundsDirty(void)
-	{
-		//Don't update if we're static, but still mark we're dirty
-		if( !mBoundsDirty && !mKeepStatic )
-			mCreator->_addDirtyBatch( this );
-		mBoundsDirty = true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatchHW::setStaticAndUpdate( bool bStatic )
-	{
-		//We were dirty but didn't update bounds. Do it now.
-		if( mKeepStatic && mBoundsDirty )
-			mCreator->_addDirtyBatch( this );
-
-		mKeepStatic = bStatic;
-		if( mKeepStatic )
-		{
-			//One final update, since there will be none from now on
-			//(except further calls to this function). Pass NULL because
-			//we want to include only those who were added to the scene
-			//but we don't want to perform culling
-			mRenderOperation.numberOfInstances = updateVertexBuffer( 0 );
-		}
-	}
-	//-----------------------------------------------------------------------
 	void InstanceBatchHW::getWorldTransforms( Matrix4* xform ) const
 	{
 		*xform = Matrix4::IDENTITY;
@@ -284,14 +258,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
-		if( !mKeepStatic )
+		//if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
 			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
-		else
+		/*else
 		{
 			if( mManager->getCameraRelativeRendering() )
 			{
@@ -303,6 +277,6 @@ namespace Ogre
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-		}
+		}*/
 	}
 }

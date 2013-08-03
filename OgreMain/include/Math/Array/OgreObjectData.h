@@ -157,6 +157,9 @@ namespace Ogre
 		*/
 		void advanceBoundsPack()
 		{
+#ifndef NDEBUG
+			mOwner				+= ARRAY_PACKED_REALS;
+#endif
 			mParents			+= ARRAY_PACKED_REALS;
 			++mLocalAabb;
 			++mWorldAabb;
@@ -171,6 +174,16 @@ namespace Ogre
 		{
 			mOwner				+= ARRAY_PACKED_REALS;
 			++mWorldAabb;
+			mVisibilityFlags	+= ARRAY_PACKED_REALS;
+		}
+
+		/** Advances all pointers needed by InstanceBatch::_updateBounds to the next pack,
+			i.e. if we're processing 4 elements at a time, move to the next 4 elements.
+		*/
+		void advanceDirtyInstanceMgr()
+		{
+			++mWorldAabb;
+			mWorldRadius		+= ARRAY_PACKED_REALS;
 			mVisibilityFlags	+= ARRAY_PACKED_REALS;
 		}
 

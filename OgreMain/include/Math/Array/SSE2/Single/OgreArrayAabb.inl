@@ -163,8 +163,8 @@ namespace Ogre
 		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[4] ), m_halfSize.m_chunkBase[0], y );			// abs( m10 ) * x
 
 		ArrayReal z = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[10] ), m_halfSize.m_chunkBase[2] );	// abs( m22 ) * z +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[9] ), m_halfSize.m_chunkBase[1], y );			// abs( m21 ) * y +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[8] ), m_halfSize.m_chunkBase[0], y );			// abs( m20 ) * x
+		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[9] ), m_halfSize.m_chunkBase[1], z );			// abs( m21 ) * y +
+		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[8] ), m_halfSize.m_chunkBase[0], z );			// abs( m20 ) * x
 
 		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
 		//(which is ok since we need them to say 'false' to intersection tests)

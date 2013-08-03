@@ -50,8 +50,7 @@ namespace Ogre
 		const MaterialPtr &material, size_t instancesPerBatch, 
 		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
 			: BaseInstanceBatchVTF( id, objectMemoryManager, creator, meshReference, material,
-									instancesPerBatch, indexToBoneMap, batchName),
-			  mKeepStatic( false )
+									instancesPerBatch, indexToBoneMap, batchName)
 	{
 	}
 	//-----------------------------------------------------------------------
@@ -506,40 +505,15 @@ namespace Ogre
 		return renderedInstances;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW_VTF::_boundsDirty(void)
-	{
-		//Don't update if we're static, but still mark we're dirty
-		if( !mBoundsDirty && !mKeepStatic && mCreator)
-			mCreator->_addDirtyBatch( this );
-		mBoundsDirty = true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatchHW_VTF::setStaticAndUpdate( bool bStatic )
-	{
-		//We were dirty but didn't update bounds. Do it now.
-		if( mKeepStatic && mBoundsDirty )
-			mCreator->_addDirtyBatch( this );
-
-		mKeepStatic = bStatic;
-		if( mKeepStatic )
-		{
-			//One final update, since there will be none from now on
-			//(except further calls to this function). Pass NULL because
-			//we want to include only those who were added to the scene
-			//but we don't want to perform culling
-			mRenderOperation.numberOfInstances = updateVertexTexture( 0 );
-		}
-	}
-	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
-		if( !mKeepStatic )
+		//if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			if( (mRenderOperation.numberOfInstances = updateVertexTexture( mCurrentCamera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
-		else
+		/*else
 		{
 			if( mManager->getCameraRelativeRendering() )
 			{
@@ -551,6 +525,6 @@ namespace Ogre
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-		}
+		}*/
 	}
 }

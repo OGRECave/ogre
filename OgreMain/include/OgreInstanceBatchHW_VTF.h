@@ -60,8 +60,6 @@ namespace Ogre
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
 	protected:
-		bool	mKeepStatic;
-
 		//Pointer to the buffer containing the per instance vertex data
 		HardwareVertexBufferSharedPtr mInstanceVertexBuffer;
 
@@ -99,11 +97,6 @@ namespace Ogre
 
 		/** @copydoc InstanceBatchHW::_boundsDirty */
 		void _boundsDirty(void);
-
-		/** @copydoc InstanceBatchHW::setStaticAndUpdate */
-		void setStaticAndUpdate( bool bStatic );
-
-		bool isStatic() const { return mKeepStatic; }
 
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
 		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
