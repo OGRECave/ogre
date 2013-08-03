@@ -186,7 +186,11 @@ namespace Ogre {
 #define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
 #define GL_WAIT_FAILED_APPLE GL_WAIT_FAILED
 #define glDeleteSyncAPPLE glDeleteSync
-#define GL_BGRA_EXT GL_BGRA
+
+#ifdef GL_BGRA
+#   define GL_BGRA_EXT GL_BGRA
+#endif
+
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
