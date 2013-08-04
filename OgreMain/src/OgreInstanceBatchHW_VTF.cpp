@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "OgreStableHeaders.h"
 #include "OgreInstanceBatchHW_VTF.h"
 #include "OgreSubMesh.h"
@@ -248,99 +249,128 @@ namespace Ogre
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			//Add two floats of padding here? or earlier?
 			//If not using bone matrix lookup, is it ok that it is 8 bytes since divides evenly into 16
-
 		}
 
 		//Create our own vertex buffer
 		mInstanceVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(newSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+										useBoneMatrixLookup() ?
+											HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE :
+											HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, mInstanceVertexBuffer );
 
 		//Mark this buffer as instanced
 		mInstanceVertexBuffer->setIsInstanceData( true );
 		mInstanceVertexBuffer->setInstanceDataStepRate( 1 );
 
-		updateInstanceDataBuffer(true, NULL);
+		if( !useBoneMatrixLookup() )
+			fillVertexBufferOffsets();
 	}
+	//-----------------------------------------------------------------------
+	void InstanceBatchHW_VTF::fillVertexBufferOffsets(void)
+	{
+		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
+		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
 
-	//updates the vertex buffer containing the per instance data
-	size_t InstanceBatchHW_VTF::updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera)
+		//Calculate the texel offsets to correct them offline
+		//Awkwardly enough, the offset is needed in OpenGL too
+		Vector2 texelOffsets;
+		//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
+		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
+		texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
+
+		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+
+		Vector2 *thisVec = static_cast<Vector2*>(
+								mInstanceVertexBuffer->lock( HardwareBuffer::HBL_DISCARD ) );
+
+		//Calculate UV offsets, which change per instance
+		for( size_t i=0; i<mInstancesPerBatch; ++i )
+		{
+			size_t instanceIdx = i * mMatricesPerInstance * mRowLength;
+			thisVec->x = (instanceIdx % maxPixelsPerLine) / texWidth;
+			thisVec->y = (instanceIdx / maxPixelsPerLine) / texHeight;
+			*thisVec = *thisVec - texelOffsets;
+			++thisVec;
+		}
+
+		mInstanceVertexBuffer->unlock();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatchHW_VTF::fillVertexBufferLUT( const VisibleObjectsPerThreadArray &visibleObjects,
+													size_t visibleObjsIdxStart,
+													size_t visibleObjsListsPerThread )
 	{
 		size_t visibleEntityCount = 0;
-		bool useMatrixLookup = useBoneMatrixLookup();
-		if (isFirstTime ^ useMatrixLookup)
+
+		//update the mTransformLookupNumber value in the entities if needed 
+		updateSharedLookupIndexes();
+
+		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
+		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
+
+		//Calculate the texel offsets to correct them offline
+		//Awkwardly enough, the offset is needed in OpenGL too
+		Vector2 texelOffsets;
+		//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
+		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
+		texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
+
+		float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+
+		//TODO: This can be threaded (unless bandwidth bound?)
+		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+
+		VisibleObjectsPerThreadArray::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
+		VisibleObjectsPerThreadArray::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
+															+ visibleObjsListsPerThread;
+		while( it != en )
 		{
-			//update the mTransformLookupNumber value in the entities if needed 
-			updateSharedLookupIndexes();
+			MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+			MovableObject::MovableObjectArray::const_iterator end  = it->end();
 
-			const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
-			const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
-
-			//Calculate the texel offsets to correct them offline
-			//Awkwardly enough, the offset is needed in OpenGL too
-			Vector2 texelOffsets;
-			//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-			texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
-			texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
-
-			float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
-			const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
-
-			//Calculate UV offsets, which change per instance
-			for( size_t i=0; i<mInstancesPerBatch; ++i )
+			while( itor != end )
 			{
-				InstancedEntity* entity = useMatrixLookup ? mInstancedEntities[i] : NULL;
-				if  //Update if we are not using a lookup bone matrix method. In this case the function will 
-					//be called only once
-					(!useMatrixLookup || 
-					//Update if we are in the visible range of the camera (for look up bone matrix method
-					//and static mode).
-					(entity->findVisible(currentCamera)))
-				{
-					size_t matrixIndex = useMatrixLookup ? entity->mTransformLookupNumber : i;
-					size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
-					*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - (float)(texelOffsets.x);
-					*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - (float)(texelOffsets.y);
-					thisVec += 2;
+				assert( dynamic_cast<InstancedEntity*>(*itor) );
+				const InstancedEntity *entity = static_cast<InstancedEntity*>(*itor);
+				size_t matrixIndex = entity->mTransformLookupNumber;
+				size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
+				*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - (float)(texelOffsets.x);
+				*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - (float)(texelOffsets.y);
+				thisVec += 2;
 
-					if (useMatrixLookup)
-					{
-						const Matrix4& mat =  entity->_getParentNodeFullTransform();
-						*(thisVec)     = static_cast<float>( mat[0][0] );
-						*(thisVec + 1) = static_cast<float>( mat[0][1] );
-						*(thisVec + 2) = static_cast<float>( mat[0][2] );
-						*(thisVec + 3) = static_cast<float>( mat[0][3] );
-						*(thisVec + 4) = static_cast<float>( mat[1][0] );
-						*(thisVec + 5) = static_cast<float>( mat[1][1] );
-						*(thisVec + 6) = static_cast<float>( mat[1][2] );
-						*(thisVec + 7) = static_cast<float>( mat[1][3] );
-						*(thisVec + 8) = static_cast<float>( mat[2][0] );
-						*(thisVec + 9) = static_cast<float>( mat[2][1] );
-						*(thisVec + 10)= static_cast<float>( mat[2][2] );
-						*(thisVec + 11)= static_cast<float>( mat[2][3] );
-						if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
-						{
-							const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
-							*(thisVec + 3) -= static_cast<float>( cameraRelativePosition.x );
-							*(thisVec + 7) -= static_cast<float>( cameraRelativePosition.y );
-							*(thisVec + 11) -=  static_cast<float>( cameraRelativePosition.z );
-						}
-						thisVec += 12;
-					}
-					++visibleEntityCount;
-				}
+				const Matrix4& mat =  entity->_getParentNodeFullTransform();
+				*(thisVec)     = static_cast<float>( mat[0][0] );
+				*(thisVec + 1) = static_cast<float>( mat[0][1] );
+				*(thisVec + 2) = static_cast<float>( mat[0][2] );
+				*(thisVec + 3) = static_cast<float>( mat[0][3] );
+				*(thisVec + 4) = static_cast<float>( mat[1][0] );
+				*(thisVec + 5) = static_cast<float>( mat[1][1] );
+				*(thisVec + 6) = static_cast<float>( mat[1][2] );
+				*(thisVec + 7) = static_cast<float>( mat[1][3] );
+				*(thisVec + 8) = static_cast<float>( mat[2][0] );
+				*(thisVec + 9) = static_cast<float>( mat[2][1] );
+				*(thisVec + 10)= static_cast<float>( mat[2][2] );
+				*(thisVec + 11)= static_cast<float>( mat[2][3] );
+
+				//TODO: This hurts my eyes (reading back from write-combining memory)
+				/*if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
+				{
+					const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
+					*(thisVec + 3) -= static_cast<float>( cameraRelativePosition.x );
+					*(thisVec + 7) -= static_cast<float>( cameraRelativePosition.y );
+					*(thisVec + 11) -=  static_cast<float>( cameraRelativePosition.z );
+				}*/
+				thisVec += 12;
+
+				++itor;
 			}
 
-			mInstanceVertexBuffer->unlock();
+			++it;
 		}
-		else
-		{
-			visibleEntityCount = mInstancedEntities.size();
-		}
-		return visibleEntityCount;
+
+		mInstanceVertexBuffer->unlock();
 	}
 	
 	//-----------------------------------------------------------------------
@@ -406,37 +436,113 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchHW_VTF::updateVertexTexture( Camera *currentCamera )
+	size_t InstanceBatchHW_VTF::updateVertexTexture( Camera *camera )
 	{
-		size_t renderedInstances = 0;
+		size_t numRenderedInstances = 0;
+
+		ObjectData objData;
+		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+		VisibleObjectsPerThreadArray &visibleObjects = mManager->_getTmpVisibleObjectsList();
+
+		visibleObjects[0].clear();
+		
+		//TODO: (dark_sylinc) Thread this
+		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
+		MovableObject::cullFrustum( numObjs, objData, camera,
+					camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+					visibleObjects[0] );
+
+		size_t visibleObjsIdxStart = 0;
+		size_t visibleObjsListsPerThread = 1;
+
 		bool useMatrixLookup = useBoneMatrixLookup();
 		if (useMatrixLookup)
 		{
 			//if we are using bone matrix look up we have to update the instance buffer for the 
 			//vertex texture to be relevant
-
-			//also note that in this case the number of instances to render comes directly from the 
-			//updateInstanceDataBuffer() function, not from this function.
-			renderedInstances = updateInstanceDataBuffer(false, currentCamera);
+			fillVertexBufferLUT( visibleObjects, visibleObjsIdxStart, visibleObjsListsPerThread );
 		}
 
-		
-		mDirtyAnimation = false;
-
 		//Now lock the texture and copy the 4x3 matrices!
+		size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
+		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
+
 		mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
 		const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
 
-		float *pSource = static_cast<float*>(pixelBox.data);
-		
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		
-		vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
+		float *pDest = static_cast<float*>(pixelBox.data);
 
-		size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
-		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
+		VisibleObjectsPerThreadArray::const_iterator threadDataStart = visibleObjects.begin() +
+																		visibleObjsIdxStart;
+		VisibleObjectsPerThreadArray::const_iterator threadDataEnd   = visibleObjects.begin() +
+																		visibleObjsIdxStart +
+																		visibleObjsListsPerThread;
+
+		//TODO: (dark_sylinc) Thread this. Although it could be just bandwidth limited
+		//and no real gain could be seen
+		if( mMeshReference->getSkeleton().isNull() )
+		{
+			std::for_each( threadDataStart, threadDataEnd,
+							VisibleObjsPerThreadOperator<SendAllSingleTransformsToTexture>
+														( SendAllSingleTransformsToTexture(pDest) ) );
+		}
+		/*{
+			//bool hasSkeleton = mMeshReference->getSkeleton().isNull();
+
+			//Not skeletally animated
+			while( it != en )
+			{
+				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+				MovableObject::MovableObjectArray::const_iterator end  = it->end();
+
+				while( itor != end )
+				{
+					assert( dynamic_cast<InstancedEntity*>(*itor) );
+					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
+
+					//Write transform matrix
+					instancedEntity->writeSingleTransform3x4( pDest );
+					pDest += 12;
+
+					++itor;
+				}
+
+				numRenderedInstances += it->size();
+				++it;
+			}
+		}
+		else
+		{
+			while( it != en )
+			{
+				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+				MovableObject::MovableObjectArray::const_iterator end  = it->end();
+
+				while( itor != end )
+				{
+					assert( dynamic_cast<InstancedEntity*>(*itor) );
+					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
+
+					//Write transform matrix
+					pDest += instancedEntity->getTransforms3x4( pDest );
+
+					++itor;
+				}
+
+				numRenderedInstances += it->size();
+				++it;
+			}
+		}*/
+
+		mDirtyAnimation = false;
+
 		
-		size_t instanceCount = mInstancedEntities.size();
+		//vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
+
+		
+		
+		/*size_t instanceCount = mInstancedEntities.size();
 		size_t updatedInstances = 0;
 
 		float* transforms = NULL;
@@ -498,11 +604,11 @@ namespace Ogre
 		if (!useMatrixLookup)
 		{
 			renderedInstances = updatedInstances;
-		}
+		}*/
 
 		mMatrixTexture->getBuffer()->unlock();
 
-		return renderedInstances;
+		return numRenderedInstances;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue, Camera *camera )
@@ -526,5 +632,15 @@ namespace Ogre
 			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}*/
+	}
+	//-----------------------------------------------------------------------
+	inline void InstanceBatchHW_VTF::SendAllSingleTransformsToTexture::operator ()
+										( const MovableObject *movableObject )
+	{
+		assert( dynamic_cast<InstancedEntity*>(movableObject) );
+		const InstancedEntity *instancedEntity = static_cast<const InstancedEntity*>(movableObject);
+		//Write transform matrix
+		instancedEntity->writeSingleTransform3x4( pDest );
+		pDest += 12;
 	}
 }

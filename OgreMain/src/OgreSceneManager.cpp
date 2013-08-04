@@ -1480,15 +1480,17 @@ void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverl
 			size_t visibleObjsListsPerThread = 1;
 			cullFrustum( mEntitiesMemoryManagerCulledList, camera, visibleObjsIdxStart );
 
-			VisibleObjectsPerThreadVec::const_iterator it = mVisibleObjects.begin() + visibleObjsIdxStart;
-			VisibleObjectsPerThreadVec::const_iterator en = mVisibleObjects.begin() + visibleObjsIdxStart
-																+ visibleObjsListsPerThread;
+			VisibleObjectsPerThreadArray::const_iterator it =
+														mVisibleObjects.begin() + visibleObjsIdxStart;
+			VisibleObjectsPerThreadArray::const_iterator en =
+														mVisibleObjects.begin() + visibleObjsIdxStart
+														+ visibleObjsListsPerThread;
 
 			firePreFindVisibleObjects(vp);
 			while( it != en )
 			{
-				MovableObject::MovableObjectVec::const_iterator itor = it->begin();
-				MovableObject::MovableObjectVec::const_iterator end  = it->end();
+				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+				MovableObject::MovableObjectArray::const_iterator end  = it->end();
 
 				while( itor != end )
 				{
@@ -2295,7 +2297,7 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
 								size_t visObjsIdxStart )
 {
-	MovableObject::MovableObjectVec &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
+	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
 	outVisibleObjects.clear();
 
 	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();

@@ -110,7 +110,7 @@ namespace Ogre
 		@remarks
 			Assumes this object is attached to a Node
 		*/
-		inline void writeSingleTransform3x4( float *xform ) const;
+		inline void writeSingleTransform3x4( float * RESTRICT_ALIAS xform ) const;
 
 		/// Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera ) const;

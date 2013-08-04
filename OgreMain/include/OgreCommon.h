@@ -547,7 +547,7 @@ namespace Ogre {
 	};
 
 	class Light;
-	typedef vector<Light*>::type LightVec;
+	typedef FastArray<Light*> LightArray;
 
 	/// Used as the light list, sorted
 	struct LightClosest
@@ -564,7 +564,7 @@ namespace Ogre {
 	/// Holds all lights in SoA after being culled over all frustums
 	struct LightListInfo
 	{
-		LightVec						lights;
+		LightArray						lights;
 		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
 		uint32	* RESTRICT_ALIAS		visibilityMask;
 		Sphere	* RESTRICT_ALIAS 		boundingSphere;

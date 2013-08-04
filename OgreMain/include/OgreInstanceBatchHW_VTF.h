@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerThreadArray;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -60,6 +62,25 @@ namespace Ogre
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
 	protected:
+		template <typename T> struct VisibleObjsPerThreadOperator
+		{
+			T &mSecondOperator;
+
+			VisibleObjsPerThreadOperator( T &secondOperator ) : mSecondOperator(secondOperator) {}
+			void operator () ( const MovableObject::MovableObjectArray &visibleObjects )
+			{
+				std::for_each( visibleObjects.begin(), visibleObjects.end(), mSecondOperator );
+			}
+		};
+		struct SendAllSingleTransformsToTexture
+		{
+			float *pDest;
+			SendAllSingleTransformsToTexture( float *_dstTexPtr ) : pDest( _dstTexPtr ) {}
+			inline void operator () ( const MovableObject *mo );
+		};
+		/*struct SendAllAnimatedTransformsToTexture	{ inline void operator () () const; };
+		struct SendAllDualQuatTransformsToTexture	{ inline void operator () () const; };*/
+
 		//Pointer to the buffer containing the per instance vertex data
 		HardwareVertexBufferSharedPtr mInstanceVertexBuffer;
 
@@ -71,12 +92,11 @@ namespace Ogre
 			const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec& hwBoneWgt );
 
 		/** updates the vertex buffer containing the per instance data 
-		@param[in] isFirstTime Tells if this is the first time the buffer is being updated
-		@param[in] currentCamera The camera being used for render (valid when using bone matrix lookup)
-		@return The number of instances to be rendered
 		*/
-		virtual size_t updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera);
+		void fillVertexBufferOffsets(void);
 
+		void fillVertexBufferLUT( const VisibleObjectsPerThreadArray &visibleObjects,
+									size_t visibleObjsIdxStart, size_t visibleObjsListsPerThread );
 
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 

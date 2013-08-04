@@ -73,7 +73,7 @@ namespace Ogre {
         Quaternion orientation;
     };
 
-	typedef vector<MovableObject::MovableObjectVec>::type VisibleObjectsPerThreadVec;
+	typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerThreadArray;
 
 	// Forward declarations
 	class DefaultIntersectionSceneQuery;
@@ -900,7 +900,7 @@ namespace Ogre {
 			arrays (vector of vectors) for multithreading purposes (put results in one array while
 			another thread stores in the other array). @See cullFrustum
 		*/
-		VisibleObjectsPerThreadVec mVisibleObjects;
+		VisibleObjectsPerThreadArray mVisibleObjects;
 
 		/** @See mVisibleObjects. This one is a variable used for temporary storage by (eg.) Instance
 			Managers to cull their internal instanced entities from multiple threads. We do not
@@ -908,7 +908,7 @@ namespace Ogre {
 			be needed to ensure that no two separate systems request this variable at the same time
 			Retrieve this buffer using @see _getTmpVisibleObjectsList
 		*/
-		VisibleObjectsPerThreadVec mTmpVisibleObjects;
+		VisibleObjectsPerThreadArray mTmpVisibleObjects;
 
 		/// Suppress render state changes?
 		bool mSuppressRenderStateChanges;
@@ -1653,7 +1653,7 @@ namespace Ogre {
         { (void)refKeys; return false; }
 
 		/// @See mTmpVisibleObjects
-		VisibleObjectsPerThreadVec& _getTmpVisibleObjectsList()				{ return mTmpVisibleObjects; }
+		VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()			{ return mTmpVisibleObjects; }
 
 		/** Updates the derived transforms of all nodes in the scene. This is typically called once
 			per frame during render, but the user may want to manually call this function.

@@ -82,7 +82,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(lastSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 		thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -114,7 +114,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(newSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -187,7 +187,9 @@ namespace Ogre
 		ObjectData objData;
 		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
-		VisibleObjectsPerThreadVec visibleObjects = mManager->_getTmpVisibleObjectsList();
+		VisibleObjectsPerThreadArray &visibleObjects = mManager->_getTmpVisibleObjectsList();
+
+		visibleObjects[0].clear();
 		
 		//TODO: (dark_sylinc) Thread this
 		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
@@ -205,13 +207,13 @@ namespace Ogre
 
 		size_t visibleObjsIdxStart = 0;
 		size_t visibleObjsListsPerThread = 1;
-		VisibleObjectsPerThreadVec::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
-		VisibleObjectsPerThreadVec::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
+		VisibleObjectsPerThreadArray::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
+		VisibleObjectsPerThreadArray::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
 															+ visibleObjsListsPerThread;
 		while( it != en )
 		{
-			MovableObject::MovableObjectVec::const_iterator itor = it->begin();
-			MovableObject::MovableObjectVec::const_iterator end  = it->end();
+			MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+			MovableObject::MovableObjectArray::const_iterator end  = it->end();
 
 			while( itor != end )
 			{

@@ -233,9 +233,9 @@ namespace Ogre {
 			Out. List of objects that are (fully or partially) inside the frustum and
 			should be rendered
 		*/
-		typedef vector<MovableObject*>::type MovableObjectVec;
+		typedef FastArray<MovableObject*> MovableObjectArray;
 		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
-								 uint32 sceneVisibilityFlags, MovableObjectVec &outCulledObjects );
+								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects );
 
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList

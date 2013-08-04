@@ -386,7 +386,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
-									 uint32 sceneVisibilityFlags, MovableObjectVec &outCulledObjects )
+									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
@@ -658,7 +658,7 @@ namespace Ogre {
 				objData.mOwner[j]->mLightList.clear();
 
 			//Now iterate through all lights to find the influence on these 4 Objects at once
-			LightVec::const_iterator lightsIt				= globalLightList.lights.begin();
+			LightArray::const_iterator lightsIt				= globalLightList.lights.begin();
 			const uint32 * RESTRICT_ALIAS	visibilityMask	= globalLightList.visibilityMask;
 			const Sphere * RESTRICT_ALIAS 	boundingSphere	= globalLightList.boundingSphere;
 			for( size_t j=0; j<numGlobalLights; ++j )

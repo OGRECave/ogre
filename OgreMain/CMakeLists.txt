@@ -88,6 +88,7 @@ set (HEADER_FILES
   include/OgreExternalTextureSource.h
   include/OgreExternalTextureSourceManager.h
   include/OgreFactoryObj.h
+  include/OgreFastArray.h
   include/OgreFileSystem.h
   include/OgreFileSystemLayer.h
   include/OgreFrameListener.h
