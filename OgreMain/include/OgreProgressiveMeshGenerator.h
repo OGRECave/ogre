@@ -238,7 +238,7 @@ protected:
 	void computeVertexCollapseCost(PMVertex* vertex);
 	Real computeEdgeCollapseCost(PMVertex* src, PMEdge* dstEdge);
 	virtual void bakeLods();
-	virtual void bakeMergedLods(int curLod);
+	virtual void bakeMergedLods(bool firstBufferPass);
 	void collapse(PMVertex* vertex);
 	void initialize();
 	void computeLods(LodConfig& lodConfigs);

@@ -321,11 +321,11 @@ void PMWorker::bakeLods()
 	}
 }
 
-void PMWorker::bakeMergedLods( int curLod )
+void PMWorker::bakeMergedLods(bool firstBufferPass)
 {
 	unsigned short submeshCount = mRequest->submesh.size();
 
-	if(!(curLod%2)){
+	if(firstBufferPass){
 		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			mIndexBufferInfoList[i].prevIndexCount = mIndexBufferInfoList[i].indexCount;

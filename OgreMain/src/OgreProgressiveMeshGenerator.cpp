@@ -794,6 +794,7 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
 	size_t vertexCount = mVertexList.size();
 	size_t lastBakeVertexCount = vertexCount;
 	size_t lodCount = lodConfigs.levels.size();
+	bool firstBuffPass = true;
 	for (unsigned short curLod = 0; curLod < lodCount; curLod++) {
 		size_t neededVertexCount = calcLodVertexCount(lodConfigs.levels[curLod]);
 		for (; neededVertexCount < vertexCount; vertexCount--) {
@@ -811,12 +812,19 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
 #if OGRE_DEBUG_MODE
 			assertValidMesh();
 #endif // ifndef NDEBUG
-			if(lodConfigs.advanced.useCompression && (lodCount-1 != curLod || lodCount % 2 == 0)) {
-				bakeMergedLods(curLod);
+			if(lodConfigs.advanced.useCompression && (lodCount-1 != curLod || !firstBuffPass)) {
+				bakeMergedLods(firstBuffPass);
+				firstBuffPass = !firstBuffPass;
 			} else {
 				bakeLods(); // Last Lod level
 			}
 		}
+	}
+
+	// If the compressed buffer is half complete on the end
+	if(!firstBuffPass){
+		// This is only happening if the last Lod level was skipped.
+		bakeLods();
 	}
 }
 
@@ -1129,11 +1137,12 @@ void ProgressiveMeshGenerator::bakeLods()
 	}
 }
 
-void ProgressiveMeshGenerator::bakeMergedLods( int curLod )
+void ProgressiveMeshGenerator::bakeMergedLods(bool firstBufferPass)
 {
 	unsigned short submeshCount = mMesh->getNumSubMeshes();
 
-	if(!(curLod%2)){
+	if(firstBufferPass){
+		// first buffer pass
 		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			mIndexBufferInfoList[i].prevIndexCount = mIndexBufferInfoList[i].indexCount;
@@ -1159,7 +1168,7 @@ void ProgressiveMeshGenerator::bakeMergedLods( int curLod )
 			}
 		}
 	} else {
-
+		// second buffer pass
 
 		// Create buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
