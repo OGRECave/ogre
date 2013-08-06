@@ -779,6 +779,12 @@ namespace OgreBites
 			setItems(mItems);
 		}
 
+		void insertItem(int index, const Ogre::DisplayString& item)
+		{
+			mItems.insert(mItems.begin() + index, item);
+			setItems(mItems);
+		}
+
 		void removeItem(const Ogre::DisplayString& item)
 		{
 			for (size_t i=0; i < mItems.size(); i++)
