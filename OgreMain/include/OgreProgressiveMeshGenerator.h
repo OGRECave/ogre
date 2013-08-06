@@ -80,6 +80,25 @@ public:
 	/// @copydoc ProgressiveMeshGeneratorBase::generateLodLevels
 	void generateLodLevels(LodConfig& lodConfig);
 
+	/**
+	 * @brief Returns the last reduced vertex.
+	 *
+	 * You should call this function after generateLodLevels!
+	 *
+	 * @param outVec The vector receiving the position of the vertex.
+	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
+	 */
+	bool _getLastVertexPos(Vector3& outVec);
+
+	/**
+	 * @brief Returns the destination of the edge, which was last reduced.
+	 *
+	 * You should call this function after generateLodLevels!
+	 *
+	 * @param outVec The vector receiving the CollapseTo position.
+	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
+	 */
+	bool _getLastVertexCollapseTo(Vector3& outVec);
 protected:
 
 	// VectorSet is basically a helper to use a vector as a small set container.
@@ -108,7 +127,7 @@ protected:
 	struct PMTriangleCache;
 	struct PMVertexHash;
 	struct PMVertexEqual;
-	struct PMCollapseCostLess;
+	struct PMProfiledEdge;
 	struct PMCollapsedEdge;
 	struct PMIndexBufferInfo;
 
@@ -118,6 +137,7 @@ protected:
 	typedef HashSet<PMVertex*, PMVertexHash, PMVertexEqual> UniqueVertexSet;
 	typedef multimap<Real, PMVertex*>::type CollapseCostHeap;
 	typedef vector<PMVertex*>::type VertexLookupList;
+	typedef HashMultiMap<PMVertex*, PMProfiledEdge> ProfileLookup;
 
 	typedef VectorSet<PMEdge, 8> VEdges;
 	typedef VectorSet<PMTriangle*, 7> VTriangles;
@@ -158,6 +178,7 @@ protected:
 		VTriangles triangles; /// Triangle ID set, which are using this vertex.
 		
 		Vector3 normal;
+		bool hasProfile;
 		PMVertex* collapseTo;
 		bool seam;
 		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
@@ -201,6 +222,11 @@ protected:
 		unsigned short submeshID;
 	};
 
+	struct _OgrePrivate PMProfiledEdge {
+		PMVertex* dst;
+		Real cost;
+	};
+
 	VertexLookupList mSharedVertexLookup;
 	VertexLookupList mVertexLookup;
 	VertexList mVertexList;
@@ -210,6 +236,7 @@ protected:
 	CollapseCostHeap mCollapseCostHeap;
 	CollapsedEdges tmpCollapsedEdges; // Tmp container used in collapse().
 	IndexBufferInfoList mIndexBufferInfoList;
+	ProfileLookup mProfileLookup;
 
 	MeshPtr mMesh;
 
@@ -224,6 +251,7 @@ protected:
 	Real mMeshBoundingSphereRadius;
 	Real mCollapseCostLimit;
 	bool mUseVertexNormals;
+	PMVertex* mLastReducedVertex;
 
 	size_t calcLodVertexCount(const LodLevel& lodConfig);
 	void tuneContainerSize();
@@ -235,12 +263,14 @@ protected:
 	void computeCosts();
 	bool isBorderVertex(const PMVertex* vertex) const;
 	PMEdge* getPointer(VEdges::iterator it);
-	void computeVertexCollapseCost(PMVertex* vertex);
+	void initVertexCollapseCost(PMVertex* vertex);
+	void computeVertexCollapseCost(PMVertex* vertex, Real& collapseCost, PMVertex*& collapseTo);
 	Real computeEdgeCollapseCost(PMVertex* src, PMEdge* dstEdge);
 	virtual void bakeLods();
 	virtual void bakeMergedLods(bool firstBufferPass);
 	void collapse(PMVertex* vertex);
-	void initialize();
+	void initialize(LodConfig& lodConfig);
+	void injectProfile(LodProfile& profile);
 	void computeLods(LodConfig& lodConfigs);
 	void updateVertexCollapseCost(PMVertex* src);
 

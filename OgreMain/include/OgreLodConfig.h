@@ -35,6 +35,15 @@
 
 namespace Ogre
 {
+
+struct ProfiledEdge {
+	Vector3 src; // Vertex identifier
+	Vector3 dst; // Direction of collapse
+	Real cost; // Requested collapse cost
+};
+
+typedef vector<ProfiledEdge>::type LodProfile;
+
 /**
  * @brief Structure for automatic Lod configuration.
  */
@@ -108,9 +117,10 @@ struct LodConfig {
 	typedef vector<LodLevel>::type LodLevelList;
 	LodLevelList levels;
 
-	struct Advanced{
+	struct Advanced {
 		bool useCompression;
 		bool useVertexNormals;
+		LodProfile profile;
 		Advanced() :
 			useCompression(true),
 			useVertexNormals(true)

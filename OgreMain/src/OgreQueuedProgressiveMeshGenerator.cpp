@@ -130,7 +130,7 @@ void PMWorker::buildRequest(LodConfig& lodConfigs)
 	mUseVertexNormals = lodConfigs.advanced.useVertexNormals;
 	cleanupMemory();
 	tuneContainerSize();
-	initialize(); // Load vertices and triangles.
+	initialize(lodConfigs); // Load vertices and triangles.
 	computeCosts(); // Calculate all collapse costs.
 
 #if OGRE_DEBUG_MODE
@@ -174,7 +174,7 @@ void PMWorker::tuneContainerSize()
 	mIndexBufferInfoList.resize(submeshCount);
 }
 
-void PMWorker::initialize()
+void PMWorker::initialize(LodConfig& lodConfig)
 {
 	unsigned short submeshCount = mRequest->submesh.size();
 	for (unsigned short i = 0; i < submeshCount; ++i) {
@@ -184,6 +184,8 @@ void PMWorker::initialize()
 		addVertexBuffer(vertexBuffer, submesh.useSharedVertexBuffer);
 		addIndexBuffer(submesh.indexBuffer, submesh.useSharedVertexBuffer, i);
 	}
+
+	injectProfile(lodConfig.advanced.profile);
 
 	// These were only needed for addIndexData() and addVertexData().
 	mSharedVertexLookup.clear();
@@ -231,6 +233,7 @@ void PMWorker::addVertexBuffer(const PMGenRequest::VertexBuffer& vertexBuffer, b
 			v->costHeapPosition = mCollapseCostHeap.end();
 #endif
 			v->seam = false;
+			v->hasProfile = false;
 			if(mUseVertexNormals){
 				v->normal = *pNormalOut;
 				v->normal.normalise();
