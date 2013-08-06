@@ -285,6 +285,9 @@ namespace Ogre
 
 			mAnimationState = OGRE_NEW AnimationStateSet();
 			mBatchOwner->_getMeshRef()->_initAnimationState( mAnimationState );
+
+			if( mParentNode )
+				mBatchOwner->_addAnimatedInstance( this );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -371,6 +374,22 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyAttached( Node* parent )
 	{
+		bool different = (parent != mParentNode);
+
+		if( different )
+		{
+			if( parent )
+			{
+				//Check we're skeletally animated and actual owners of our transform
+				if( !mSharedTransformEntity && mSkeletonInstance )
+					mBatchOwner->_addAnimatedInstance( this );
+			}
+			else
+			{
+				mBatchOwner->_removeAnimatedInstance( this );
+			}
+		}
+
 		MovableObject::_notifyAttached( parent );
 	}
 	//-----------------------------------------------------------------------
@@ -392,12 +411,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	bool InstancedEntity::_updateAnimation(void)
 	{
-		if (mSharedTransformEntity)
+		//Probably this is triggered by a missing call to mBatchOwner->_removeAnimatedInstance
+		assert( !mSharedTransformEntity && "Updating the animation of an entity with shared animation" );
+		/*if (mSharedTransformEntity)
 		{
 			return mSharedTransformEntity->_updateAnimation();
 		}
 		else
-		{
+		{*/
 			const bool animationDirty =
 				(mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
 				(mSkeletonInstance->getManualBonesDirty());
@@ -411,7 +432,7 @@ namespace Ogre
 				if (mBatchOwner->useBoneWorldMatrices())
 				{
 					OptimisedUtil::getImplementation()->concatenateAffineMatrices(
-													_getParentNodeFullTransform(),
+													mParentNode->_getFullTransform(),
 													mBoneMatrices,
 													mBoneWorldMatrices,
 													mSkeletonInstance->getNumBones() );
@@ -421,7 +442,7 @@ namespace Ogre
 
 				return true;
 			}
-		}
+		//}
 
 		return false;
 	}

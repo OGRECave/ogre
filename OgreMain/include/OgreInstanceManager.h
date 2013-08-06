@@ -306,7 +306,10 @@ namespace Ogre
         */
         void _addDirtyStaticBatch( InstanceBatch *dirtyBatch );
 
-        /** Called by SceneManager when we told it we have at least one dirty batch */
+		/// Called by SceneManager every frame
+		void _updateAnimations(void);
+
+        /** Called by SceneManager every frame */
         void _updateDirtyBatches(void);
 
         typedef ConstMapIterator<InstanceBatchMap> InstanceBatchMapIterator;

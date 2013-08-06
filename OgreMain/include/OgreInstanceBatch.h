@@ -91,6 +91,7 @@ namespace Ogre
     public:
         typedef vector<InstancedEntity*>::type  InstancedEntityVec;
         typedef vector<Vector4>::type           CustomParamsVec;
+		typedef FastArray<InstancedEntity*>		InstancedEntityArray;
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
@@ -110,6 +111,12 @@ namespace Ogre
         InstancedEntityVec  mInstancedEntities;
         InstancedEntityVec  mUnusedEntities;
 
+		/** This variable may change after we refactor animations. In the meantime: some
+			techniques animate all entities, some techniques don't animate anything
+			(eg. HW Basic) and other techniques animate a few (eg. HW VTF LUT)
+		*/
+		InstancedEntityArray mAnimatedEntities;
+
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
@@ -121,8 +128,6 @@ namespace Ogre
 		bool				mIsStatic;
 
         unsigned short      mMaterialLodIndex;
-
-        bool                mDirtyAnimation; //Set to false at start of each _updateRenderQueue
 
         /// False if a technique doesn't support skeletal animation
         bool                mTechnSupportsSkeletal;
@@ -192,6 +197,9 @@ namespace Ogre
         */
         bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
+		/// Updates animations from all our entities.
+		void _updateAnimations(void);
+
         /** @see InstanceManager::updateDirtyBatches */
         void _updateBounds(void);
 
@@ -251,6 +259,15 @@ namespace Ogre
             Used for defragmentation, @see InstanceManager::defragmentBatches
         */
 		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
+
+		/// Schedules the given Instanced Entity to be updated every frame in @see _updateAnimations
+		void _addAnimatedInstance( InstancedEntity *instancedEntity );
+
+		/** Removes an instanced already scheduled for animation update. @See _updateAnimations
+		@remarks
+			Does nothing if the animation wasn't already added.
+		*/
+		void _removeAnimatedInstance( const InstancedEntity *instancedEntity );
 
         /** @see InstanceManager::defragmentBatches
             This function takes InstancedEntities and pushes back all entities it can fit here

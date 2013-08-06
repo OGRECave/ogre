@@ -808,7 +808,10 @@ namespace Ogre {
 		void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
 											const T *mo ) const;
 
-		/** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
+		/// Updates all instance managers' animations
+		void updateInstanceManagerAnimations(void);
+
+		/** Updates all instance managers with dirty instance batches. @see _addDirtyInstanceManager */
 		void updateInstanceManagers(void);
 
 		/** Culls the scene in a high level fashion (i.e. Octree, Portal, etc.) by taking into account all

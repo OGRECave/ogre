@@ -83,11 +83,14 @@ namespace Ogre
 
 		void operator = ( const FastArray<T> &copy )
 		{
-			m_size		= copy.m_size;
-			m_capacity	= copy.m_size;
-			m_data = (T*)::operator new( m_size * sizeof(T) );
-			for( size_t i=0; i<m_size; ++i )
-				m_data[i] = copy.m_data[i];
+			if( &copy != this )
+			{
+				m_size		= copy.m_size;
+				m_capacity	= copy.m_size;
+				m_data = (T*)::operator new( m_size * sizeof(T) );
+				for( size_t i=0; i<m_size; ++i )
+					m_data[i] = copy.m_data[i];
+			}
 		}
 
 		/// Creates an array reserving the amount of bytes (memory is not initialized)
@@ -125,8 +128,9 @@ namespace Ogre
 			++m_size;
 		}
 
-		void pop()
+		void pop_back()
 		{
+			assert( m_size > 0 && "Can't pop a zero-sized array" );
 			--m_size;
 		}
 
@@ -174,6 +178,30 @@ namespace Ogre
 			assert( idx < m_size && "Index out of bounds" );
             return m_data[idx];
         }
+
+		T& back()
+		{
+			assert( m_size > 0 && "Can't call back with no elements" );
+			return m_data[m_size-1];
+		}
+
+		const T& back() const
+		{
+			assert( m_size > 0 && "Can't call back with no elements" );
+			return m_data[m_size-1];
+		}
+
+		T& front()
+		{
+			assert( m_size > 0 && "Can't call back with no elements" );
+			return m_data[0];
+		}
+
+		const T& front() const
+		{
+			assert( m_size > 0 && "Can't call back with no elements" );
+			return m_data[0];
+		}
 
 		typedef T* iterator;
 		typedef const T* const_iterator;

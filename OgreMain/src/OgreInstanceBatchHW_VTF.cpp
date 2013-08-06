@@ -289,9 +289,8 @@ namespace Ogre
 		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
 			size_t instanceIdx = i * mMatricesPerInstance * mRowLength;
-			thisVec->x = (instanceIdx % maxPixelsPerLine) / texWidth;
-			thisVec->y = (instanceIdx / maxPixelsPerLine) / texHeight;
-			*thisVec = *thisVec - texelOffsets;
+			thisVec->x = (instanceIdx % maxPixelsPerLine) / texWidth - (float)(texelOffsets.x);
+			thisVec->y = (instanceIdx / maxPixelsPerLine) / texHeight - (float)(texelOffsets.x);
 			++thisVec;
 		}
 
@@ -465,8 +464,8 @@ namespace Ogre
 		}
 
 		//Now lock the texture and copy the 4x3 matrices!
-		size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
-		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
+		size_t floatsPerEntity = mMatricesPerInstance * mRowLength * 4;
+		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatsPerEntity);
 
 		mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
 		const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
@@ -483,9 +482,25 @@ namespace Ogre
 		//and no real gain could be seen
 		if( mMeshReference->getSkeleton().isNull() )
 		{
-			std::for_each( threadDataStart, threadDataEnd,
+			numRenderedInstances +=
+				std::for_each( threadDataStart, threadDataEnd,
 							VisibleObjsPerThreadOperator<SendAllSingleTransformsToTexture>
-														( SendAllSingleTransformsToTexture(pDest) ) );
+								( SendAllSingleTransformsToTexture( pDest,
+																	floatsPerEntity,
+																	entitiesPerPadding,
+																	mWidthFloatsPadding ) ) ).
+								mNumRenderedObjects;
+		}
+		else
+		{
+			numRenderedInstances +=
+				std::for_each( threadDataStart, threadDataEnd,
+							VisibleObjsPerThreadOperator<SendAllAnimatedTransformsToTexture>
+								( SendAllAnimatedTransformsToTexture( pDest, floatsPerEntity,
+																		entitiesPerPadding,
+																		mWidthFloatsPadding,
+																		mIndexToBoneMap ) ) ).
+								mNumRenderedObjects;
 		}
 		/*{
 			//bool hasSkeleton = mMeshReference->getSkeleton().isNull();
@@ -534,9 +549,6 @@ namespace Ogre
 				++it;
 			}
 		}*/
-
-		mDirtyAnimation = false;
-
 		
 		//vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
 
@@ -576,7 +588,7 @@ namespace Ogre
 				}
 				
 				if( mMeshReference->hasSkeleton() )
-					mDirtyAnimation |= entity->_updateAnimation();
+					entity->_updateAnimation();
 
 				size_t floatsWritten = entity->getTransforms3x4( transforms );
 
@@ -616,7 +628,7 @@ namespace Ogre
 		//if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
-			if( (mRenderOperation.numberOfInstances = updateVertexTexture( mCurrentCamera )) )
+			if( (mRenderOperation.numberOfInstances = updateVertexTexture( camera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		/*else
@@ -634,13 +646,31 @@ namespace Ogre
 		}*/
 	}
 	//-----------------------------------------------------------------------
-	inline void InstanceBatchHW_VTF::SendAllSingleTransformsToTexture::operator ()
+	FORCEINLINE void InstanceBatchHW_VTF::SendAllSingleTransformsToTexture::operator ()
 										( const MovableObject *movableObject )
 	{
-		assert( dynamic_cast<InstancedEntity*>(movableObject) );
+		assert( dynamic_cast<const InstancedEntity*>(movableObject) );
 		const InstancedEntity *instancedEntity = static_cast<const InstancedEntity*>(movableObject);
+
+		float * RESTRICT_ALIAS pDest = mDest + mFloatsPerEntity * mInstancesWritten + 
+								(size_t)(mInstancesWritten / mEntitiesPerPadding) * mWidthFloatsPadding;
+
 		//Write transform matrix
 		instancedEntity->writeSingleTransform3x4( pDest );
-		pDest += 12;
+		++mInstancesWritten;
+	}
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstanceBatchHW_VTF::SendAllAnimatedTransformsToTexture::operator ()
+										( const MovableObject *movableObject )
+	{
+		assert( dynamic_cast<const InstancedEntity*>(movableObject) );
+		const InstancedEntity *instancedEntity = static_cast<const InstancedEntity*>(movableObject);
+
+		float * RESTRICT_ALIAS pDest = mDest + mFloatsPerEntity * mInstancesWritten + 
+								(size_t)(mInstancesWritten / mEntitiesPerPadding) * mWidthFloatsPadding;
+
+		//Write transform matrices from each bone
+		instancedEntity->writeAnimatedTransform3x4( pDest, boneIdxStart, boneIdxEnd );
+		++mInstancesWritten;
 	}
 }

@@ -106,11 +106,26 @@ namespace Ogre
 		size_t getTransforms( Matrix4 *xform ) const;
 		/// Returns number of 32-bit values written
 		size_t getTransforms3x4( float *xform ) const;
+
 		/** Fills xform with the 4x3 world matrix (12 bytes)
 		@remarks
 			Assumes this object is attached to a Node
 		*/
-		inline void writeSingleTransform3x4( float * RESTRICT_ALIAS xform ) const;
+		FORCEINLINE void writeSingleTransform3x4( float * RESTRICT_ALIAS xform ) const;
+
+		/** Fills xform with 4x3 world matrices from skeletal animation (12 bytes each)
+		@remarks
+			Number of bytes written to xform is 12 * number of matrices
+		@param xform
+			The pointer to store the matrices
+		@param boneIdxStart
+			Iterator to the first bone index map (@See mIndexToBoneMap)
+		@param boneIdxEnd
+			Iterator to the last bone index map (@See mIndexToBoneMap)
+		*/
+		FORCEINLINE void writeAnimatedTransform3x4( float * RESTRICT_ALIAS xform,
+													Mesh::IndexMap::const_iterator boneIdxStart,
+													Mesh::IndexMap::const_iterator boneIdxEnd ) const;
 
 		/// Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera ) const;
@@ -128,6 +143,9 @@ namespace Ogre
 
 		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
+
+		/** Sets whether the entity is in use. */
+		void setInUse(bool used);
 
 		/// Incremented count for next name extension
         static NameGenerator msNameGenerator;
@@ -178,7 +196,8 @@ namespace Ogre
 
 		/// Overridden so we can tell the InstanceBatch it needs to update it's bounds
 		void _notifyMoved(void);
-		void _notifyAttached( Node* parent );
+		/// Overloaded so we can register ourselves for updating our animations
+		virtual void _notifyAttached( Node* parent );
 
 		/// Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue, Camera *camera )	{}
@@ -199,15 +218,13 @@ namespace Ogre
 			@remarks Assumes it has a skeleton (mSkeletonInstance != 0)
 			@return true if something was actually updated
 		*/
-		virtual bool _updateAnimation(void);
+		bool _updateAnimation(void);
 
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
 
 		/** Tells if the entity is in use. */
 		bool isInUse() const { return mInUse; }
-		/** Sets whether the entity is in use. */
-		void setInUse(bool used);
 
 		/** @copydoc MovableObject::isInScene. */
 		virtual bool isInScene(void) const

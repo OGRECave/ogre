@@ -107,7 +107,7 @@ namespace Ogre {
                 The use of shared or non-shared index map is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        typedef vector<unsigned short>::type IndexMap;
+        typedef FastArray<unsigned short> IndexMap;
         IndexMap blendIndexToBoneIndexMap;
 
 		typedef vector<IndexData*>::type LODFaceList;

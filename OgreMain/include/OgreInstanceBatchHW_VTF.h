@@ -65,18 +65,59 @@ namespace Ogre
 		template <typename T> struct VisibleObjsPerThreadOperator
 		{
 			T &mSecondOperator;
+			size_t mNumRenderedObjects;
 
-			VisibleObjsPerThreadOperator( T &secondOperator ) : mSecondOperator(secondOperator) {}
+			VisibleObjsPerThreadOperator( T &secondOperator ) :
+				mSecondOperator(secondOperator), mNumRenderedObjects(0) {}
 			void operator () ( const MovableObject::MovableObjectArray &visibleObjects )
 			{
+				mNumRenderedObjects += visibleObjects.size();
 				std::for_each( visibleObjects.begin(), visibleObjects.end(), mSecondOperator );
 			}
 		};
-		struct SendAllSingleTransformsToTexture
+		struct TransformsToTexture
 		{
-			float *pDest;
-			SendAllSingleTransformsToTexture( float *_dstTexPtr ) : pDest( _dstTexPtr ) {}
-			inline void operator () ( const MovableObject *mo );
+			float * RESTRICT_ALIAS mDest; //Pointer to VTF texture
+			size_t	mFloatsPerEntity;
+			size_t	mEntitiesPerPadding;
+			size_t	mWidthFloatsPadding;
+			TransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+								 size_t floatsPerEntity,
+								 size_t entitiesPerPadding,
+								 size_t widthFloatsPadding ) :
+					mDest( dstPtr ),
+					mFloatsPerEntity( floatsPerEntity ),
+					mEntitiesPerPadding( entitiesPerPadding ),
+					mWidthFloatsPadding( widthFloatsPadding ) {}
+		};
+		struct SendAllSingleTransformsToTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			SendAllSingleTransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+												size_t floatsPerEntity,
+												size_t entitiesPerPadding,
+												size_t widthFloatsPadding ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
+		struct SendAllAnimatedTransformsToTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllAnimatedTransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+												size_t floatsPerEntity,
+												size_t entitiesPerPadding,
+												size_t widthFloatsPadding,
+												const Mesh::IndexMap *indexMap ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
 		};
 		/*struct SendAllAnimatedTransformsToTexture	{ inline void operator () () const; };
 		struct SendAllDualQuatTransformsToTexture	{ inline void operator () () const; };*/

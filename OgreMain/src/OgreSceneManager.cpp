@@ -2404,6 +2404,7 @@ void SceneManager::updateSceneGraph()
 	highLevelCull();
 	_applySceneAnimations();
 	updateAllTransforms();
+	updateInstanceManagerAnimations();
 	updateInstanceManagers();
 	updateAllBounds( mEntitiesMemoryManagerCulledList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
@@ -6756,6 +6757,18 @@ InstancedEntity* SceneManager::createInstancedEntity( const String &materialName
 void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 {
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
+}
+//---------------------------------------------------------------------
+void SceneManager::updateInstanceManagerAnimations(void)
+{
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
+
+	while( itor != end )
+	{
+		(*itor)->_updateAnimations();
+		++itor;
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::updateInstanceManagers(void)

@@ -468,7 +468,7 @@ namespace Ogre
 	{
 		InstanceBatch::_updateRenderQueue( queue, camera );
 
-		if( mDirtyAnimation || mManager->getCameraRelativeRendering() )
+		if( mManager->getCameraRelativeRendering() )
 			updateVertexTexture();
 	}
 	//-----------------------------------------------------------------------

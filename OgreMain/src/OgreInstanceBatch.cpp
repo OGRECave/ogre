@@ -126,6 +126,18 @@ namespace Ogre
 		return true;
 	}
 	//-----------------------------------------------------------------------
+	void InstanceBatch::_updateAnimations(void)
+	{
+		InstancedEntityArray::const_iterator itor = mAnimatedEntities.begin();
+		InstancedEntityArray::const_iterator end  = mAnimatedEntities.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateAnimation();
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateBounds(void)
 	{
 		//If this assert triggers, then we did not properly remove ourselves from
@@ -201,6 +213,7 @@ namespace Ogre
 	{
 		mInstancedEntities.reserve( mInstancesPerBatch );
 		mUnusedEntities.reserve( mInstancesPerBatch );
+		mAnimatedEntities.reserve( mInstancesPerBatch );
 
 		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
@@ -325,6 +338,24 @@ namespace Ogre
 
 		if( mUnusedEntities.size() == mInstancedEntities.size() && !mIsStatic && mCreator )
 			mCreator->_removeFromDynamicBatchList( this );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_addAnimatedInstance( InstancedEntity *instancedEntity )
+	{
+		assert( std::find( mAnimatedEntities.begin(), mAnimatedEntities.end(), instancedEntity ) ==
+				mAnimatedEntities.end() && "Calling _addAnimatedInstance twice" );
+		assert( instancedEntity->mBatchOwner == this && "Instanced Entity should belong to us" );
+
+		mAnimatedEntities.push_back( instancedEntity );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_removeAnimatedInstance( const InstancedEntity *instancedEntity )
+	{
+		InstanceBatch::InstancedEntityArray::iterator itor = std::find( mAnimatedEntities.begin(),
+																		mAnimatedEntities.end(),
+																		instancedEntity );
+		if( itor != mAnimatedEntities.end() )
+			efficientVectorRemove( mAnimatedEntities, itor );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
@@ -468,6 +499,7 @@ namespace Ogre
 		assert( (signed)(mInstancesPerBatch) - (signed)(mInstancedEntities.size()) >= 0 );
 		mInstancedEntities.reserve( mInstancesPerBatch );
 		mUnusedEntities.reserve( mInstancesPerBatch );
+		mAnimatedEntities.reserve( mInstancesPerBatch );
 		mCustomParams.reserve( mCreator->getNumCustomParams() * mInstancesPerBatch );
 		for( size_t i=mInstancedEntities.size(); i<mInstancesPerBatch; ++i )
 		{
@@ -594,34 +626,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
-		/*if( m_boundsDirty )
-			_updateBounds();*/
-
-		mDirtyAnimation = false;
-
-		//Is at least one object in the scene?
-		updateVisibility();
-
-		if( getVisible() )
-		{
-			if( mMeshReference->hasSkeleton() )
-			{
-				InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-				InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-				while( itor != end )	
-				{
-					mDirtyAnimation |= (*itor)->_updateAnimation();
-					++itor;
-				}
-			}
-
-			queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-		}
-
-		//Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
-		//reason stops updating our render queue afterwards, preventing us to recalculate visibility
-		setVisible( true );
+		queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )
