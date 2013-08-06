@@ -1401,6 +1401,8 @@ namespace Ogre {
 		// Loop from 1 rather than 0 (full detail index is not in file)
 		for (i = 1; i < pMesh->mNumLods; ++i)
 		{
+			pMesh->mMeshLodUsageList[0].userValue = strategy->getBaseValue();
+			pMesh->mMeshLodUsageList[0].value = pMesh->mMeshLodUsageList[0].userValue;
 			streamID = readChunk(stream);
 			if (streamID != M_MESH_LOD_USAGE)
 			{
