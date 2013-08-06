@@ -75,7 +75,9 @@ namespace Ogre {
         // Internal methods
         virtual void writeFileHeader(void);
         virtual void writeChunkHeader(uint16 id, size_t size);
-        
+        virtual size_t calcChunkHeaderSize();
+        size_t calcStringSize(const String& string);
+
         void writeFloats(const float* const pfloat, size_t count);
         void writeFloats(const double* const pfloat, size_t count);
         void writeShorts(const uint16* const pShort, size_t count);

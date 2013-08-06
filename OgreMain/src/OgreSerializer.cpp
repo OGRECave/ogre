@@ -37,8 +37,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    /// stream overhead = ID + size
-    const size_t STREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     const uint16 HEADER_STREAM_ID = 0x1000;
     const uint16 OTHER_ENDIAN_HEADER_STREAM_ID = 0x0010;
     //---------------------------------------------------------------------
@@ -402,6 +400,19 @@ namespace Ogre {
             *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
         }
     }
-    
+
+	size_t Serializer::calcChunkHeaderSize()
+	{
+		return sizeof(uint16) + sizeof(uint32);
+	}
+
+	size_t Serializer::calcStringSize( const String& string )
+	{
+		// string + terminating \n character
+		return string.length() + 1;
+	}
+
+
+
 }
 
