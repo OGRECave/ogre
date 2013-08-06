@@ -180,10 +180,25 @@ namespace Ogre {
 
     };
 
+
+	/** Class for providing backwards-compatibility for loading version 1.8 of the .mesh format. 
+	 This mesh format was used from Ogre v1.8.
+	 */
+    class _OgrePrivate MeshSerializerImpl_v1_8 : public MeshSerializerImpl
+    {
+    public:
+        MeshSerializerImpl_v1_8();
+        ~MeshSerializerImpl_v1_8();
+    protected:
+		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
+			unsigned short lodNum, MeshLodUsage& usage);
+    };
+
     /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 
 	 This mesh format was used from Ogre v1.7.
 	 */
-    class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl
+    class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl_v1_8
     {
     public:
         MeshSerializerImpl_v1_41();

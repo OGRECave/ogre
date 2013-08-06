@@ -94,6 +94,7 @@ namespace Ogre {
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
+        friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
         friend class MeshSerializerImpl_v1_2;
         friend class MeshSerializerImpl_v1_1;

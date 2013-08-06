@@ -61,7 +61,7 @@ namespace Ogre {
     {
 
         // Version number
-        mVersion = "[MeshSerializer_v1.8]";
+        mVersion = "[MeshSerializer_v1.9]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
@@ -169,14 +169,16 @@ namespace Ogre {
             }
         }
 
-        // Write LOD data if any
-        if (pMesh->getNumLodLevels() > 1)
-        {
-            LogManager::getSingleton().logMessage("Exporting LOD information....");
-            writeLodInfo(pMesh);
-            LogManager::getSingleton().logMessage("LOD information exported.");
+		// Write LOD data if any
+		if (pMesh->getNumLodLevels() > 1)
+		{
+			LogManager::getSingleton().logMessage("Exporting LOD information....");
+			writeLodInfo(pMesh);
+			LogManager::getSingleton().logMessage("LOD information exported.");
 
-        }
+		}
+
+        
         // Write bounds information
         LogManager::getSingleton().logMessage("Exporting bounds information....");
         writeBoundsInfo(pMesh);
@@ -1279,48 +1281,87 @@ namespace Ogre {
 		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
 		{
 			size = MSTREAM_OVERHEAD_SIZE;
-			// unsigned int numFaces;
+			// unsigned int indexData->indexCount;
 			size += sizeof(unsigned int);
+
+			// unsigned int indexData->indexStart;
+			size += sizeof(unsigned int);
+
+			// unsigned int bufferIndex;
+			size += sizeof(unsigned int);
+
 			SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
-            // bool indexes32Bit
-			size += sizeof(bool);
-			// Lock index buffer to write
-			HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
-			// bool indexes32bit
-			bool idx32 = (!ibuf.isNull() && ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
-			// unsigned short*/int* faceIndexes;
-            if (idx32)
-            {
-			    size += static_cast<unsigned long>(
-                    sizeof(unsigned int) * indexData->indexCount);
-            }
-            else
-            {
-			    size += static_cast<unsigned long>(
-                    sizeof(unsigned short) * indexData->indexCount);
-            }
+			const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
 
-			writeChunkHeader(M_MESH_LOD_GENERATED, size);
-			unsigned int idxCount = static_cast<unsigned int>(indexData->indexCount);
-			writeInts(&idxCount, 1);
-			writeBools(&idx32, 1);
+			unsigned int bufferIndex = -1;
+			for(int i=0;i< lodNum - 1;i++){
+				// it will check any previous Lod levels for the same buffer.
+				// This will allow to use merged/shared buffers.
+				const IndexData* prevIndexData = sm->mLodFaceList[i];
+				if(prevIndexData->indexBuffer == indexData->indexBuffer){
+					bufferIndex = i;
+				}
+			}
 
-			if (idxCount > 0)
-			{
+			HardwareIndexBufferSharedPtr ibuf;
+			bool idx32;
+			if(bufferIndex == -1){
+				// bool indexes32Bit
+				size += sizeof(bool);
+
+				// unsigned int buffIdxCount
+				size += sizeof(unsigned int);
+
+				// Lock index buffer to write
+				ibuf = indexData->indexBuffer;
+
+				// bool indexes32bit
+				idx32 = (!ibuf.isNull() && ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
+
+				// unsigned short*/int* faceIndexes;
 				if (idx32)
 				{
-					unsigned int* pIdx = static_cast<unsigned int*>(
-						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-					writeInts(pIdx, indexData->indexCount);
-					ibuf->unlock();
+					size += static_cast<unsigned long>(
+						sizeof(unsigned int) * indexData->indexCount);
 				}
 				else
 				{
-					unsigned short* pIdx = static_cast<unsigned short*>(
-						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-					writeShorts(pIdx, indexData->indexCount);
-					ibuf->unlock();
+					size += static_cast<unsigned long>(
+						sizeof(unsigned short) * indexData->indexCount);
+				}
+			}
+			writeChunkHeader(M_MESH_LOD_GENERATED, size);
+
+			unsigned int idxCount = static_cast<unsigned int>(indexData->indexCount);
+			writeInts(&idxCount, 1);
+
+			unsigned int idxStart = static_cast<unsigned int>(indexData->indexStart);
+			writeInts(&idxStart, 1);
+
+			writeInts(&bufferIndex, 1);
+
+			if(bufferIndex == -1) {
+				writeBools(&idx32, 1);
+
+				unsigned int buffIdxCount = static_cast<unsigned int>(ibuf->getNumIndexes());
+				writeInts(&buffIdxCount, 1);
+
+				if (buffIdxCount > 0)
+				{
+					if (idx32)
+					{
+						unsigned int* pIdx = static_cast<unsigned int*>(
+							ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+						writeInts(pIdx, buffIdxCount);
+						ibuf->unlock();
+					}
+					else
+					{
+						unsigned short* pIdx = static_cast<unsigned short*>(
+							ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+						writeShorts(pIdx, buffIdxCount);
+						ibuf->unlock();
+					}
 				}
 			}
 		}
@@ -1470,45 +1511,66 @@ namespace Ogre {
 
 			SubMesh* sm = pMesh->getSubMesh(i);
 			// lodNum - 1 because SubMesh doesn't store full detail LOD
-            sm->mLodFaceList[lodNum - 1] = OGRE_NEW IndexData();
+			sm->mLodFaceList[lodNum - 1] = OGRE_NEW IndexData();
 			IndexData* indexData = sm->mLodFaceList[lodNum - 1];
-            // unsigned int numIndexes
-            unsigned int numIndexes;
+			// unsigned int numIndexes
+			unsigned int numIndexes;
 			readInts(stream, &numIndexes, 1);
-            indexData->indexCount = static_cast<size_t>(numIndexes);
-            // bool indexes32Bit
-            bool idx32Bit;
-            readBools(stream, &idx32Bit, 1);
-            // unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
-            if (idx32Bit)
-            {
-                indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(HardwareIndexBuffer::IT_32BIT, indexData->indexCount,
-                    pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
-                unsigned int* pIdx = static_cast<unsigned int*>(
-                    indexData->indexBuffer->lock(
-                        0,
-                        indexData->indexBuffer->getSizeInBytes(),
-                        HardwareBuffer::HBL_DISCARD) );
+			indexData->indexCount = static_cast<size_t>(numIndexes);
 
-			    readInts(stream, pIdx, indexData->indexCount);
-                indexData->indexBuffer->unlock();
+			unsigned int offset;
+			readInts(stream, &offset, 1);
+			indexData->indexStart = static_cast<size_t>(offset);
 
-            }
-            else
-            {
-                indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount,
-                    pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
-                unsigned short* pIdx = static_cast<unsigned short*>(
-                    indexData->indexBuffer->lock(
-                        0,
-                        indexData->indexBuffer->getSizeInBytes(),
-                        HardwareBuffer::HBL_DISCARD) );
-			    readShorts(stream, pIdx, indexData->indexCount);
-                indexData->indexBuffer->unlock();
+			// For merged buffers, you can pass the index of previous Lod.
+			// To create buffer it should be -1.
+			unsigned int bufferIndex;
+			readInts(stream, &bufferIndex, 1);
+			if(bufferIndex != -1) {
+				// copy buffer pointer
+				assert(bufferIndex < lodNum);
+				indexData->indexBuffer = sm->mLodFaceList[bufferIndex]->indexBuffer;
+			} else {
+				// generate buffers
 
-            }
+				// bool indexes32Bit
+				bool idx32Bit;
+				readBools(stream, &idx32Bit, 1);
+				
+				unsigned int buffIndexCount;
+				readInts(stream, &buffIndexCount, 1);
+
+				// unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
+				if (idx32Bit)
+				{
+					indexData->indexBuffer = HardwareBufferManager::getSingleton().
+						createIndexBuffer(HardwareIndexBuffer::IT_32BIT, buffIndexCount,
+						pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
+					unsigned int* pIdx = static_cast<unsigned int*>(
+						indexData->indexBuffer->lock(
+							0,
+							indexData->indexBuffer->getSizeInBytes(),
+							HardwareBuffer::HBL_DISCARD) );
+
+					readInts(stream, pIdx, buffIndexCount);
+					indexData->indexBuffer->unlock();
+
+				}
+				else
+				{
+					indexData->indexBuffer = HardwareBufferManager::getSingleton().
+						createIndexBuffer(HardwareIndexBuffer::IT_16BIT, buffIndexCount,
+						pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
+					unsigned short* pIdx = static_cast<unsigned short*>(
+						indexData->indexBuffer->lock(
+							0,
+							indexData->indexBuffer->getSizeInBytes(),
+							HardwareBuffer::HBL_DISCARD) );
+					readShorts(stream, pIdx, buffIndexCount);
+					indexData->indexBuffer->unlock();
+
+				}
+			}
 
 		}
 	}
@@ -2572,7 +2634,173 @@ namespace Ogre {
 		
         OGRE_FREE(vert, MEMCATEGORY_GEOMETRY);
 	}
-    //---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	MeshSerializerImpl_v1_8::MeshSerializerImpl_v1_8()
+	{
+		// Version number
+		mVersion = "[MeshSerializer_v1.8]";
+	}
+	//---------------------------------------------------------------------
+	MeshSerializerImpl_v1_8::~MeshSerializerImpl_v1_8()
+	{
+	}
+	//---------------------------------------------------------------------
+	void MeshSerializerImpl_v1_8::writeLodUsageGenerated( const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum )
+	{
+		// Usage Header
+		size_t size = MSTREAM_OVERHEAD_SIZE;
+		unsigned short subidx;
+
+		// float fromDepthSquared;
+		size += sizeof(float);
+
+		// Calc generated SubMesh sections size
+		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
+		{
+			// header
+			size += MSTREAM_OVERHEAD_SIZE;
+			// unsigned int numFaces;
+			size += sizeof(unsigned int);
+			SubMesh* sm = pMesh->getSubMesh(subidx);
+			const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
+
+			// bool indexes32Bit
+			size += sizeof(bool);
+			// unsigned short*/int* faceIndexes;
+			if (!indexData->indexBuffer.isNull() &&
+				indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+			{
+				size += static_cast<unsigned long>(
+					sizeof(unsigned int) * indexData->indexCount);
+			}
+			else
+			{
+				size += static_cast<unsigned long>(
+					sizeof(unsigned short) * indexData->indexCount);
+			}
+
+		}
+
+		writeChunkHeader(M_MESH_LOD_USAGE, size);
+		writeFloats(&(usage.userValue), 1);
+
+		// Now write sections
+		// Calc generated SubMesh sections size
+		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
+		{
+			size = MSTREAM_OVERHEAD_SIZE;
+			// unsigned int numFaces;
+			size += sizeof(unsigned int);
+			SubMesh* sm = pMesh->getSubMesh(subidx);
+			const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
+			// bool indexes32Bit
+			size += sizeof(bool);
+			// Lock index buffer to write
+			HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
+			// bool indexes32bit
+			bool idx32 = (!ibuf.isNull() && ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
+			// unsigned short*/int* faceIndexes;
+			if (idx32)
+			{
+				size += static_cast<unsigned long>(
+					sizeof(unsigned int) * indexData->indexCount);
+			}
+			else
+			{
+				size += static_cast<unsigned long>(
+					sizeof(unsigned short) * indexData->indexCount);
+			}
+
+			writeChunkHeader(M_MESH_LOD_GENERATED, size);
+			unsigned int idxCount = static_cast<unsigned int>(indexData->indexCount);
+			writeInts(&idxCount, 1);
+			writeBools(&idx32, 1);
+
+			if (idxCount > 0)
+			{
+				if (idx32)
+				{
+					unsigned int* pIdx = static_cast<unsigned int*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeInts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+				else
+				{
+					unsigned short* pIdx = static_cast<unsigned short*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeShorts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void MeshSerializerImpl_v1_8::readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage )
+	{
+		usage.manualName = "";
+		usage.manualMesh.setNull();
+
+		// Get one set of detail per SubMesh
+		unsigned short numSubs, i;
+		unsigned long streamID;
+		numSubs = pMesh->getNumSubMeshes();
+		for (i = 0; i < numSubs; ++i)
+		{
+			streamID = readChunk(stream);
+			if (streamID != M_MESH_LOD_GENERATED)
+			{
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+					"Missing M_MESH_LOD_GENERATED stream in " + pMesh->getName(),
+					"MeshSerializerImpl::readMeshLodUsageGenerated");
+			}
+
+			SubMesh* sm = pMesh->getSubMesh(i);
+			// lodNum - 1 because SubMesh doesn't store full detail LOD
+			sm->mLodFaceList[lodNum - 1] = OGRE_NEW IndexData();
+			IndexData* indexData = sm->mLodFaceList[lodNum - 1];
+			// unsigned int numIndexes
+			unsigned int numIndexes;
+			readInts(stream, &numIndexes, 1);
+			indexData->indexCount = static_cast<size_t>(numIndexes);
+
+			// bool indexes32Bit
+			bool idx32Bit;
+			readBools(stream, &idx32Bit, 1);
+			// unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
+			if (idx32Bit)
+			{
+				indexData->indexBuffer = HardwareBufferManager::getSingleton().
+					createIndexBuffer(HardwareIndexBuffer::IT_32BIT, indexData->indexCount,
+					pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
+				unsigned int* pIdx = static_cast<unsigned int*>(
+					indexData->indexBuffer->lock(
+					0,
+					indexData->indexBuffer->getSizeInBytes(),
+					HardwareBuffer::HBL_DISCARD) );
+
+				readInts(stream, pIdx, indexData->indexCount);
+				indexData->indexBuffer->unlock();
+
+			}
+			else
+			{
+				indexData->indexBuffer = HardwareBufferManager::getSingleton().
+					createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount,
+					pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
+				unsigned short* pIdx = static_cast<unsigned short*>(
+					indexData->indexBuffer->lock(
+					0,
+					indexData->indexBuffer->getSizeInBytes(),
+					HardwareBuffer::HBL_DISCARD) );
+				readShorts(stream, pIdx, indexData->indexCount);
+				indexData->indexBuffer->unlock();
+			}
+		}
+	}
+	//---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 	MeshSerializerImpl_v1_41::MeshSerializerImpl_v1_41()
