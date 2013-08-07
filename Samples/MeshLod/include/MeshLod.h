@@ -229,7 +229,7 @@ protected:
 			mHeadNode->attachObject(mHeadEntity);
 			forceLodLevel(-1); // disable Lod level forcing
 		} else if(button->getName() == "btnSaveMesh") {
-			if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible()){
+			if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible() && !mLodConfig.levels.empty()){
 				ProgressiveMeshGenerator pm; // Non-threaded
 				pm.generateLodLevels(mLodConfig);
 				forceLodLevel(-1); // disable
@@ -242,7 +242,7 @@ protected:
 			if(!locPtr->empty()){
 				Ogre::FileInfo& info = locPtr->at(0);
 				if(info.archive->getType() != "FileSystem") {
-					// Only FileSystem archive type is supported.
+					mTrayMgr->showOkDialog("Error", "Only FileSystem archive type is supported.");
 					return;
 				}
 				Ogre::String filename = info.archive->getName();
