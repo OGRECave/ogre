@@ -1,7 +1,7 @@
 # Configure Mesh Lod demo build
 
 set(HEADER_FILES include/MeshLod.h)
-set(SOURCE_FILES src/MeshLod.cpp)
+set(SOURCE_FILES src/MeshLodPlugin.cpp src/MeshLod.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
