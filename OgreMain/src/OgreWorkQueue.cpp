@@ -231,7 +231,7 @@ namespace Ogre {
 			}
 #endif
 		}
-		if(idleThread){
+		if(OGRE_THREAD_SUPPORT && idleThread){
 			OGRE_LOCK_MUTEX(mIdleMutex);
 			mIdleRequestQueue.push_back(req);
 			if(!mIdleThreadRunning)
