@@ -479,7 +479,7 @@ void Sample_MeshLod::buttonHit( Button* button )
 			forceLodLevel(-1); // disable Lod level forcing
 		}
 		String filename("");
-		if(!getResourceFullPath(mLodConfig.mesh, filename) || filename != "") {
+		if(!getResourceFullPath(mLodConfig.mesh, filename) || filename == "") {
 			mTrayMgr->showOkDialog("Error", "'" + filename + "' is not a writable path!");
 		} else {
 			MeshSerializer ms;
