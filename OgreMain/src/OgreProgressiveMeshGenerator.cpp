@@ -751,6 +751,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 		}
 	}
 
+	Real diff = src->normal.dotProduct(dst->normal) / 8.0;
 	Real dist = src->position.distance(dst->position);
 	cost = cost * dist;
 	if(mUseVertexNormals){
@@ -764,7 +765,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 			Real afterDist = neighbor->position.distance(dst->position);
 			Real beforeDot = neighbor->normal.dotProduct(src->normal);
 			Real afterDot = neighbor->normal.dotProduct(dst->normal);
-			normalCost = std::max(normalCost, std::abs(beforeDot - afterDot) * std::max(dist, std::abs(beforeDist - afterDist)));
+			normalCost = std::max(normalCost, std::max(diff, std::abs(beforeDot - afterDot)) * std::max((Real)(afterDist/8.0), std::max(dist, std::abs(beforeDist - afterDist))));
 		}
 		cost = std::max(normalCost * 0.25f, cost);
 	}
