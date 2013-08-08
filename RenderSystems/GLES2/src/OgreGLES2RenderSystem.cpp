@@ -404,7 +404,7 @@ namespace Ogre {
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
-        if (mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+        if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
@@ -1570,7 +1570,7 @@ namespace Ogre {
         VertexDeclaration* globalVertexDeclaration;
         bool hasInstanceData;
         size_t numberOfInstances;
-        if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
         {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
@@ -1623,7 +1623,7 @@ namespace Ogre {
 //            boundAttrCount++;
         }
 
-        if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
         {
             if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
             {
@@ -1696,11 +1696,11 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+                if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
                 {
                     if(hasInstanceData)
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedAPPLE((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
+                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
                     }
 #if OGRE_NO_GLES3_SUPPORT == 0
                     else
@@ -1727,9 +1727,9 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if((mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
+                if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
 				{
-					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedAPPLE((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
+					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
 				}
 				else
 				{
@@ -2364,13 +2364,13 @@ namespace Ogre {
                 attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
             }
 
-            if(mGLSupport->checkExtension("GL_APPLE_instanced_arrays") || gleswIsSupported(3, 0))
+            if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
             {
                 if (mCurrentVertexProgram)
                 {
                     if (hwGlBuffer->isInstanceData())
                     {
-                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorAPPLE(attrib, hwGlBuffer->getInstanceDataStepRate()));
+                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, hwGlBuffer->getInstanceDataStepRate()));
                         instanceAttribsBound.push_back(attrib);
                     }
                 }

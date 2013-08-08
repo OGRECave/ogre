@@ -170,9 +170,9 @@ namespace Ogre {
 #define GL_ANY_SAMPLES_PASSED_EXT GL_ANY_SAMPLES_PASSED
 #define GL_QUERY_RESULT_EXT GL_QUERY_RESULT
 #define GL_QUERY_RESULT_AVAILABLE_EXT GL_QUERY_RESULT_AVAILABLE
-#define glDrawElementsInstancedAPPLE glDrawElementsInstanced
-#define glDrawArraysInstancedAPPLE glDrawArraysInstanced
-#define glVertexAttribDivisorAPPLE glVertexAttribDivisor
+#define glDrawElementsInstancedEXT glDrawElementsInstanced
+#define glDrawArraysInstancedEXT glDrawArraysInstanced
+#define glVertexAttribDivisorEXT glVertexAttribDivisor
 #define glMapBufferRangeEXT glMapBufferRange
 #define GL_MAP_WRITE_BIT_EXT GL_MAP_WRITE_BIT
 #define GL_MAP_FLUSH_EXPLICIT_BIT_EXT GL_MAP_FLUSH_EXPLICIT_BIT
