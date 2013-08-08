@@ -482,6 +482,7 @@ namespace Ogre
 		//and no real gain could be seen
 		if( mMeshReference->getSkeleton().isNull() )
 		{
+			//No animations, no anything (perhaps HW Basic is a better technique for this case)
 			numRenderedInstances +=
 				std::for_each( threadDataStart, threadDataEnd,
 							VisibleObjsPerThreadOperator<SendAllSingleTransformsToTexture>
@@ -493,130 +494,46 @@ namespace Ogre
 		}
 		else
 		{
-			numRenderedInstances +=
-				std::for_each( threadDataStart, threadDataEnd,
+			if( !useMatrixLookup && !mUseBoneDualQuaternions )
+			{
+				// Animations, normal
+				numRenderedInstances +=
+					std::for_each( threadDataStart, threadDataEnd,
 							VisibleObjsPerThreadOperator<SendAllAnimatedTransformsToTexture>
 								( SendAllAnimatedTransformsToTexture( pDest, floatsPerEntity,
 																		entitiesPerPadding,
 																		mWidthFloatsPadding,
 																		mIndexToBoneMap ) ) ).
 								mNumRenderedObjects;
-		}
-		/*{
-			//bool hasSkeleton = mMeshReference->getSkeleton().isNull();
-
-			//Not skeletally animated
-			while( it != en )
-			{
-				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-				MovableObject::MovableObjectArray::const_iterator end  = it->end();
-
-				while( itor != end )
-				{
-					assert( dynamic_cast<InstancedEntity*>(*itor) );
-					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
-
-					//Write transform matrix
-					instancedEntity->writeSingleTransform3x4( pDest );
-					pDest += 12;
-
-					++itor;
-				}
-
-				numRenderedInstances += it->size();
-				++it;
-			}
-		}
-		else
-		{
-			while( it != en )
-			{
-				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-				MovableObject::MovableObjectArray::const_iterator end  = it->end();
-
-				while( itor != end )
-				{
-					assert( dynamic_cast<InstancedEntity*>(*itor) );
-					InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
-
-					//Write transform matrix
-					pDest += instancedEntity->getTransforms3x4( pDest );
-
-					++itor;
-				}
-
-				numRenderedInstances += it->size();
-				++it;
-			}
-		}*/
-		
-		//vector<bool>::type writtenPositions(getMaxLookupTableInstances(), false);
-
-		
-		
-		/*size_t instanceCount = mInstancedEntities.size();
-		size_t updatedInstances = 0;
-
-		float* transforms = NULL;
-		//If using dual quaternions, write 3x4 matrices to a temporary buffer, then convert to dual quaternions
-		if(mUseBoneDualQuaternions)
-		{
-			transforms = mTempTransformsArray3x4;
-		}
-		
-		for(size_t i = 0 ; i < instanceCount ; ++i)
-		{
-			InstancedEntity* entity = mInstancedEntities[i];
-			size_t textureLookupPosition = updatedInstances;
-			if (useMatrixLookup)
-			{
-				textureLookupPosition = entity->mTransformLookupNumber;
-			}
-			//Check that we are not using a lookup matrix or that we have not already written
-			//The bone data
-			if (((!useMatrixLookup) || !writtenPositions[entity->mTransformLookupNumber]) &&
-				//Cull on an individual basis, the less entities are visible, the less instances we draw.
-				//No need to use null matrices at all!
-				(entity->findVisible( currentCamera )))
-			{
-				float* pDest = pSource + floatPerEntity * textureLookupPosition + 
-					(size_t)(textureLookupPosition / entitiesPerPadding) * mWidthFloatsPadding;
-
-				if(!mUseBoneDualQuaternions)
-				{
-					transforms = pDest;
-				}
 				
-				if( mMeshReference->hasSkeleton() )
-					entity->_updateAnimation();
-
-				size_t floatsWritten = entity->getTransforms3x4( transforms );
-
-				if( !useMatrixLookup && mManager->getCameraRelativeRendering() )
-					makeMatrixCameraRelative3x4( transforms, floatsWritten );
-
-				if(mUseBoneDualQuaternions)
-				{
-					convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
-				}
-
-				if (useMatrixLookup)
-				{
-					writtenPositions[entity->mTransformLookupNumber] = true;
-				}
-				else
-				{
-					++updatedInstances;
-				}
+				
 			}
-
-			++itor;
+			else if( mUseBoneDualQuaternions )
+			{
+				// Animations, Dual Quaternion Skinning
+				numRenderedInstances +=
+					std::for_each( threadDataStart, threadDataEnd,
+							VisibleObjsPerThreadOperator<SendAllDualQuatTexture>
+								( SendAllDualQuatTexture( pDest, floatsPerEntity,
+															entitiesPerPadding,
+															mWidthFloatsPadding,
+															mIndexToBoneMap ) ) ).
+								mNumRenderedObjects;
+				
+			}
+			else
+			{
+				// Animations, LUT (lookup table)
+				numRenderedInstances +=
+					std::for_each( threadDataStart, threadDataEnd,
+							VisibleObjsPerThreadOperator<SendAllLUTToTexture>
+								( SendAllLUTToTexture( pDest, floatsPerEntity,
+														entitiesPerPadding, mWidthFloatsPadding,
+														mIndexToBoneMap,
+														getMaxLookupTableInstances() ) ) ).
+								mNumRenderedObjects;
+			}
 		}
-
-		if (!useMatrixLookup)
-		{
-			renderedInstances = updatedInstances;
-		}*/
 
 		mMatrixTexture->getBuffer()->unlock();
 
@@ -671,6 +588,39 @@ namespace Ogre
 
 		//Write transform matrices from each bone
 		instancedEntity->writeAnimatedTransform3x4( pDest, boneIdxStart, boneIdxEnd );
+		++mInstancesWritten;
+	}
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstanceBatchHW_VTF::SendAllLUTToTexture::operator ()
+										( const MovableObject *movableObject )
+	{
+		assert( dynamic_cast<const InstancedEntity*>(movableObject) );
+		const InstancedEntity *instancedEntity = static_cast<const InstancedEntity*>(movableObject);
+
+		size_t lutIdx = instancedEntity->mTransformLookupNumber;
+		if( !mWrittenPositions[lutIdx] )
+		{
+			float * RESTRICT_ALIAS pDest = mDest + mFloatsPerEntity * lutIdx +
+									(size_t)(lutIdx / mEntitiesPerPadding) *
+									mWidthFloatsPadding;
+
+			//Write transform matrices from each bone
+			instancedEntity->writeLutTransform3x4( pDest, boneIdxStart, boneIdxEnd );
+			mWrittenPositions[lutIdx] = true;
+		}
+	}
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstanceBatchHW_VTF::SendAllDualQuatTexture::operator ()
+										( const MovableObject *movableObject )
+	{
+		assert( dynamic_cast<const InstancedEntity*>(movableObject) );
+		const InstancedEntity *instancedEntity = static_cast<const InstancedEntity*>(movableObject);
+
+		float * RESTRICT_ALIAS pDest = mDest + mFloatsPerEntity * mInstancesWritten + 
+								(size_t)(mInstancesWritten / mEntitiesPerPadding) * mWidthFloatsPadding;
+
+		//Write transform matrices from each bone
+		instancedEntity->writeDualQuatTransform( pDest, boneIdxStart, boneIdxEnd );
 		++mInstancesWritten;
 	}
 }

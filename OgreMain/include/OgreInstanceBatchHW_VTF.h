@@ -119,8 +119,41 @@ namespace Ogre
 					boneIdxEnd( indexMap->end() ) {}
 			FORCEINLINE void operator () ( const MovableObject *mo );
 		};
-		/*struct SendAllAnimatedTransformsToTexture	{ inline void operator () () const; };
-		struct SendAllDualQuatTransformsToTexture	{ inline void operator () () const; };*/
+		struct SendAllLUTToTexture : public TransformsToTexture
+		{
+			vector<bool>::type mWrittenPositions;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllLUTToTexture( float * RESTRICT_ALIAS dstPtr,
+									size_t floatsPerEntity,
+									size_t entitiesPerPadding,
+									size_t widthFloatsPadding,
+									const Mesh::IndexMap *indexMap,
+									size_t numLutEntries ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ),
+					mWrittenPositions( numLutEntries, false ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
+		struct SendAllDualQuatTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllDualQuatTexture( float * RESTRICT_ALIAS dstPtr,
+									size_t floatsPerEntity,
+									size_t entitiesPerPadding,
+									size_t widthFloatsPadding,
+									const Mesh::IndexMap *indexMap ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
 
 		//Pointer to the buffer containing the per instance vertex data
 		HardwareVertexBufferSharedPtr mInstanceVertexBuffer;

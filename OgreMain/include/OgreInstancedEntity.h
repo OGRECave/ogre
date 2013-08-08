@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreMovableObject.h"
 #include "OgreNode.h"
+#include "OgreDualQuaternion.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -124,6 +125,34 @@ namespace Ogre
 			Iterator to the last bone index map (@See mIndexToBoneMap)
 		*/
 		FORCEINLINE void writeAnimatedTransform3x4( float * RESTRICT_ALIAS xform,
+													Mesh::IndexMap::const_iterator boneIdxStart,
+													Mesh::IndexMap::const_iterator boneIdxEnd ) const;
+
+		/** Fills xform with 4x3 world matrices from skeletal animation (12 bytes each, LUT)
+		@remarks
+			Number of bytes written to xform is 12 * number of matrices
+		@param xform
+			The pointer to store the matrices
+		@param boneIdxStart
+			Iterator to the first bone index map (@See mIndexToBoneMap)
+		@param boneIdxEnd
+			Iterator to the last bone index map (@See mIndexToBoneMap)
+		*/
+		FORCEINLINE void writeLutTransform3x4( float * RESTRICT_ALIAS xform,
+													Mesh::IndexMap::const_iterator boneIdxStart,
+													Mesh::IndexMap::const_iterator boneIdxEnd ) const;
+
+		/** Fills xform with Dual Quaternion matrices from skeletal animation (32 bytes each)
+		@remarks
+			Number of bytes written to xform is 32 * number of matrices
+		@param xform
+			The pointer to store the matrices
+		@param boneIdxStart
+			Iterator to the first bone index map (@See mIndexToBoneMap)
+		@param boneIdxEnd
+			Iterator to the last bone index map (@See mIndexToBoneMap)
+		*/
+		FORCEINLINE void writeDualQuatTransform( float * RESTRICT_ALIAS xform,
 													Mesh::IndexMap::const_iterator boneIdxStart,
 													Mesh::IndexMap::const_iterator boneIdxEnd ) const;
 
