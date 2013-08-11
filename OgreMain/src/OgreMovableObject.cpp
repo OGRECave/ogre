@@ -161,6 +161,30 @@ namespace Ogre {
             mListener->objectMoved(this);
         }
     }
+	//-----------------------------------------------------------------------
+	bool MovableObject::isStatic() const
+	{
+		return mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC;
+	}
+	//-----------------------------------------------------------------------
+	bool MovableObject::setStatic( bool bStatic )
+	{
+		bool retVal = false;
+		if( mObjectMemoryManager->getTwin() &&
+			mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
+			mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+		{
+			mObjectMemoryManager->migrateTo( mObjectData, mRenderQueueID,
+											 mObjectMemoryManager->getTwin() );
+
+			if( mParentNode && mParentNode->isStatic() != bStatic )
+				mParentNode->setStatic( bStatic );
+
+			retVal = true;
+		}
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
     bool MovableObject::isVisible(void) const
     {

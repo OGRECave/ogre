@@ -48,9 +48,9 @@ namespace Ogre
 	BaseInstanceBatchVTF::BaseInstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager,
 										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
+										const Mesh::IndexMap *indexToBoneMap ) :
 				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
-								instancesPerBatch, indexToBoneMap, batchName ),
+								instancesPerBatch, indexToBoneMap ),
 				mNumWorldMatrices( instancesPerBatch ),
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
@@ -478,9 +478,9 @@ namespace Ogre
 		IdType id, ObjectMemoryManager *objectMemoryManager,
 		InstanceManager *creator, MeshPtr &meshReference, 
 		const MaterialPtr &material, size_t instancesPerBatch, 
-		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
+		const Mesh::IndexMap *indexToBoneMap )
 			: BaseInstanceBatchVTF (id, objectMemoryManager, creator, meshReference, material,
-									instancesPerBatch, indexToBoneMap, batchName)
+									instancesPerBatch, indexToBoneMap)
 	{
 
 	}

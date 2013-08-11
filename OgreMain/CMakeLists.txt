@@ -18,6 +18,7 @@ include(PrecompiledHeader)
 # define header and source files for the library
 set (HEADER_FILES
   include/asm_math.h
+  include/Hash/MurmurHash3.h
   include/Ogre.h
   include/OgreAlignedAllocator.h
   include/OgreAnimable.h
@@ -110,6 +111,7 @@ set (HEADER_FILES
   include/OgreHighLevelGpuProgram.h
   include/OgreHighLevelGpuProgramManager.h
   include/OgreId.h
+  include/OgreIdString.h
   include/OgreImage.h
   include/OgreImageCodec.h
   src/OgreImageResampler.h
@@ -280,6 +282,7 @@ set (HEADER_FILES
 )
 
 set (SOURCE_FILES
+  src/Hash/MurmurHash3.cpp
   src/OgreAlignedAllocator.cpp
   src/OgreAnimable.cpp
   src/OgreAnimation.cpp

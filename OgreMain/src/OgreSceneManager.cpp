@@ -157,6 +157,10 @@ mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
+	mNodeMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mNodeMemoryManager[SCENE_DYNAMIC] );
+	mNodeMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mNodeMemoryManager[SCENE_STATIC] );
+	mEntityMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mEntityMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mEntityMemoryManager[SCENE_STATIC] );
 
     // init sky
     for (size_t i = 0; i < 5; ++i)
@@ -283,7 +287,8 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 //-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name )
 {
-	Camera *c = OGRE_NEW Camera( Id::generateNewId<MovableObject>(), &mEntityMemoryManager, this );
+	Camera *c = OGRE_NEW Camera( Id::generateNewId<MovableObject>(),
+								 &mEntityMemoryManager[SCENE_DYNAMIC], this );
     mCameras.push_back( c );
 	c->mGlobalIndex = mCameras.size() - 1;
 	c->setName( name );
@@ -497,20 +502,21 @@ Entity* SceneManager::createEntity(PrefabType ptype)
 
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& meshName,
-								   const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+								   const String& groupName, /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */
+								   SceneMemoryMgrTypes sceneType /*= SCENE_DYNAMIC */ )
 {
 	// delegate to factory implementation
 	NameValuePairList params;
 	params["mesh"] = meshName;
 	params["resourceGroup"] = groupName;
-	return static_cast<Entity*>(
-		createMovableObject( EntityFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
+	return static_cast<Entity*>( createMovableObject( EntityFactory::FACTORY_TYPE_NAME,
+														&mEntityMemoryManager[sceneType], &params) );
 
 }
 //---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const MeshPtr& pMesh)
+Entity* SceneManager::createEntity(const MeshPtr& pMesh, SceneMemoryMgrTypes sceneType)
 {
-    return createEntity(pMesh->getName(), pMesh->getGroup());
+    return createEntity(pMesh->getName(), pMesh->getGroup(), sceneType);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyEntity(Entity *e)
@@ -530,10 +536,10 @@ void SceneManager::destroyAllBillboardSets(void)
 	destroyAllMovableObjectsByType(BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-ManualObject* SceneManager::createManualObject()
+ManualObject* SceneManager::createManualObject( SceneMemoryMgrTypes sceneType )
 {
 	return static_cast<ManualObject*>(
-		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager) );
+		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager[sceneType]) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyManualObject(ManualObject* obj)
@@ -548,8 +554,8 @@ void SceneManager::destroyAllManualObjects(void)
 //-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain()
 {
-	return static_cast<BillboardChain*>(
-		createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager));
+	return static_cast<BillboardChain*>( createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC]) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardChain(BillboardChain* obj)
@@ -564,8 +570,8 @@ void SceneManager::destroyAllBillboardChains(void)
 //-----------------------------------------------------------------------
 RibbonTrail* SceneManager::createRibbonTrail()
 {
-	return static_cast<RibbonTrail*>(
-		createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager));
+	return static_cast<RibbonTrail*>( createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME,
+															&mEntityMemoryManager[SCENE_DYNAMIC]) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyRibbonTrail(RibbonTrail* obj)
@@ -583,8 +589,9 @@ ParticleSystem* SceneManager::createParticleSystem(const String& templateName)
 	NameValuePairList params;
 	params["templateName"] = templateName;
 	
-	return static_cast<ParticleSystem*>(
-		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
+	return static_cast<ParticleSystem*>( createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC],
+															 &params) );
 }
 //-----------------------------------------------------------------------
 ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& group )
@@ -593,8 +600,9 @@ ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& 
 	params["quota"] = StringConverter::toString(quota);
 	params["resourceGroup"] = group;
 	
-	return static_cast<ParticleSystem*>(
-		createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params) );
+	return static_cast<ParticleSystem*>( createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC],
+															 &params) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyParticleSystem(ParticleSystem* obj)
@@ -639,22 +647,22 @@ void SceneManager::clearScene(void)
 
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent )
+SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType )
 {
-	return OGRE_NEW SceneNode( Id::generateNewId<Node>(), this, &mNodeMemoryManager, parent );
+	return OGRE_NEW SceneNode( Id::generateNewId<Node>(), this, &mNodeMemoryManager[sceneType], parent );
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::_createSceneNode( SceneNode *parent )
+SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType )
 {
-	SceneNode* sn = createSceneNodeImpl( parent );
+	SceneNode* sn = createSceneNodeImpl( parent, sceneType );
 	mSceneNodes.push_back( sn );
 	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNode(void)
+SceneNode* SceneManager::createSceneNode( SceneMemoryMgrTypes sceneType )
 {
-    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0 );
+    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0, sceneType );
 	mSceneNodes.push_back( sn );
 	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
@@ -714,7 +722,7 @@ SceneNode* SceneManager::getRootSceneNode(void)
 	if( !mSceneRoot )
 	{
 		// Create root scene node
-		mSceneRoot = createSceneNodeImpl( (SceneNode*)0 );
+		mSceneRoot = createSceneNodeImpl( (SceneNode*)0, SCENE_DYNAMIC );
 		mSceneRoot->setName( "Ogre/SceneRoot" );
 	}
 
@@ -1718,7 +1726,7 @@ void SceneManager::_setSkyPlane(
 		params["mesh"] = meshName;
 		mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(
 											Id::generateNewId<MovableObject>(),
-											&mEntityMemoryManager, this, &params ));
+											&mEntityMemoryManager[SCENE_STATIC], this, &params ));
 		mSkyPlaneEntity->setName( meshName );
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
@@ -1808,7 +1816,7 @@ void SceneManager::_setSkyBox(
 		if (!mSkyBoxObj)
 		{
 			mSkyBoxObj = OGRE_NEW ManualObject( Id::generateNewId<MovableObject>(),
-												&mEntityMemoryManager );
+												&mEntityMemoryManager[SCENE_STATIC] );
 			mSkyBoxObj->setCastShadows(false);
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}
@@ -2051,7 +2059,7 @@ void SceneManager::_setSkyDome(
 			params["mesh"] = planeMesh->getName();
 			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(
 												Id::generateNewId<MovableObject>(),
-												&mEntityMemoryManager, this, &params ));
+												&mEntityMemoryManager[SCENE_STATIC], this, &params ));
 			mSkyDomeEntity[i]->setName( entName );
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
@@ -2379,8 +2387,9 @@ void SceneManager::highLevelCull()
 	mEntitiesMemoryManagerCulledList.clear();
 	mLightsMemoryManagerCulledList.clear();
 
-	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager );
-	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager );
+	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
+	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
 	mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
 }
 //-----------------------------------------------------------------------
@@ -2406,7 +2415,7 @@ void SceneManager::updateSceneGraph()
 	updateAllTransforms();
 	updateInstanceManagerAnimations();
 	updateInstanceManagers();
-	updateAllBounds( mEntitiesMemoryManagerCulledList );
+	updateAllBounds( mEntitiesMemoryManagerUpdateList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
 	buildLightList();
 }
@@ -3819,8 +3828,9 @@ BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
 {
 	NameValuePairList params;
 	params["poolSize"] = StringConverter::toString(poolSize);
-	return static_cast<BillboardSet*>(
-		createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager, &params));
+	return static_cast<BillboardSet*>( createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME,
+															&mEntityMemoryManager[SCENE_DYNAMIC],
+															&params) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardSet(BillboardSet* set)
@@ -4007,7 +4017,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
-		Camera dummyCam( 0, &mEntityMemoryManager, 0 );
+		Camera dummyCam( 0, &mEntityMemoryManager[SCENE_DYNAMIC], 0 );
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
@@ -4035,7 +4045,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 	mDestRenderSystem->_setProjectionMatrix(projMatrix);
 
 	_setPass(pass);
-	Camera dummyCam( 0, &mEntityMemoryManager, 0 );
+	Camera dummyCam( 0, &mEntityMemoryManager[SCENE_DYNAMIC], 0 );
 	dummyCam.setCustomViewMatrix(true, viewMatrix);
 	dummyCam.setCustomProjectionMatrix(true, projMatrix);
 	// Do we need to update GPU program parameters?
@@ -4908,7 +4918,7 @@ void SceneManager::initShadowVolumeMaterials(void)
     if (!mFullScreenQuad)
     {
 		mFullScreenQuad = OGRE_NEW Rectangle2D( Id::generateNewId<MovableObject>(),
-												&mEntityMemoryManager );
+												&mEntityMemoryManager[SCENE_DYNAMIC] );
         mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 
@@ -6675,7 +6685,7 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 	return retVal;
 }
 //---------------------------------------------------------------------
-InstanceManager* SceneManager::getInstanceManager( const String &managerName ) const
+InstanceManager* SceneManager::getInstanceManager( IdString managerName ) const
 {
 	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
 																mInstanceManagers.end(),
@@ -6683,14 +6693,14 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 	if (itor == mInstanceManagers.end() || (*itor)->getName() != managerName )
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"InstancedManager with name '" + managerName + "' not found", 
+				"InstancedManager with name '" + managerName.getFriendlyText() + "' not found",
 				"SceneManager::getInstanceManager");
 	}
 
 	return *itor;
 }
 //---------------------------------------------------------------------
-bool SceneManager::hasInstanceManager( const String &managerName ) const
+bool SceneManager::hasInstanceManager( IdString managerName ) const
 {
     InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
 																mInstanceManagers.end(),
@@ -6698,7 +6708,7 @@ bool SceneManager::hasInstanceManager( const String &managerName ) const
     return itor != mInstanceManagers.end() && (*itor)->getName() == managerName;
 }
 //---------------------------------------------------------------------
-void SceneManager::destroyInstanceManager( const String &name )
+void SceneManager::destroyInstanceManager( IdString name )
 {
 	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
 																mInstanceManagers.end(),

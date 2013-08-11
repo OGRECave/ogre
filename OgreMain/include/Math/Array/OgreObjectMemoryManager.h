@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	enum SceneMemoryMgrTypes;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -62,6 +64,13 @@ namespace Ogre
 		Transform								m_dummyTransformPtrs;
 		NullEntity								*m_dummyObject;
 
+		/** Memory managers can have a 'twin' (optional). A twin is used when there
+			static and dynamic scene managers, thus caching their pointers here is
+			very convenient.
+		*/
+		SceneMemoryMgrTypes						m_memoryManagerType;
+		ObjectMemoryManager						*m_twinMemoryManager;
+
 		/** Makes m_memoryManagers big enough to be able to fulfill m_memoryManagers[newDepth]
 		@param newDepth
 			Hierarchy level depth we wish to grow to.
@@ -71,6 +80,12 @@ namespace Ogre
 	public:
 		ObjectMemoryManager();
 		~ObjectMemoryManager();
+
+		/// @See m_memoryManagerType
+		void _setTwin( SceneMemoryMgrTypes memoryManagerType, ObjectMemoryManager *twinMemoryManager );
+
+		ObjectMemoryManager* getTwin() const						{ return m_twinMemoryManager; }
+		SceneMemoryMgrTypes getMemoryManagerType() const			{ return m_memoryManagerType; }
 
 		/** Requests memory for the given ObjectData, initializing values.
 		@param outObjectData
@@ -98,6 +113,20 @@ namespace Ogre
 			Current render queue it belongs to.
 		*/
 		void objectDestroyed( ObjectData &outObjectData, size_t renderQueue );
+
+		/** Releases memory belonging to us, not before copying it into another manager.
+		@remarks
+			This function is useful when implementing multiple Memory Managers in Scene Managers
+			or when switching nodes from Static to/from Dynamic.
+		@param inOutTransform
+			Valid Transform that belongs to us. Output will belong to the other memory mgr.
+		@param depth
+			Current hierarchy level depth it belongs to.
+		@param dstObjectMemoryManager
+			ObjectMemoryManager  that will now own the transform.
+		*/
+		void migrateTo( ObjectData &inOutTransform, size_t renderQueue,
+						ObjectMemoryManager *dstObjectMemoryManager );
 
 		/** Retrieves the number of render queues that have been created.
 		@remarks

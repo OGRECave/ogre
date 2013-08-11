@@ -35,7 +35,9 @@ namespace Ogre
 	ObjectMemoryManager::ObjectMemoryManager() :
 			m_totalObjects( 0 ),
 			m_dummyNode( 0 ),
-			m_dummyObject( 0 )
+			m_dummyObject( 0 ),
+			m_memoryManagerType( SCENE_DYNAMIC ),
+			m_twinMemoryManager( 0 )
 	{
 		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
 		//or yet another object) We only allocate what's needed to prevent access violations.
@@ -104,6 +106,13 @@ namespace Ogre
 		m_dummyTransformPtrs = Transform();
 	}
 	//-----------------------------------------------------------------------------------
+	void ObjectMemoryManager::_setTwin( SceneMemoryMgrTypes memoryManagerType,
+										ObjectMemoryManager *twinMemoryManager )
+	{
+		m_memoryManagerType = memoryManagerType;
+		m_twinMemoryManager = twinMemoryManager;
+	}
+	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::growToDepth( size_t newDepth )
 	{
 		//TODO: (dark_sylinc) give a specialized hint for each depth
@@ -148,6 +157,16 @@ namespace Ogre
 		mgr.destroyNode( outObjectData );
 
 		--m_totalObjects;
+	}
+	//-----------------------------------------------------------------------------------
+	void ObjectMemoryManager::migrateTo( ObjectData &inOutObjectData, size_t renderQueue,
+										 ObjectMemoryManager *dstObjectMemoryManager )
+	{
+		ObjectData tmp;
+		dstObjectMemoryManager->objectCreated( tmp, renderQueue );
+		tmp.copy( inOutObjectData );
+		this->objectDestroyed( inOutObjectData, renderQueue );
+		inOutObjectData = tmp;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ObjectMemoryManager::getNumRenderQueues() const

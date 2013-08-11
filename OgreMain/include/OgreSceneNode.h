@@ -71,7 +71,7 @@ namespace Ogre {
         void updateFromParentImpl(void);
 
         /** See Node. */
-        Node* createChildImpl(void);
+        Node* createChildImpl( SceneMemoryMgrTypes sceneType );
 
         /// Whether to yaw around a fixed axis.
         bool mYawFixed;
@@ -103,6 +103,9 @@ namespace Ogre {
 		SceneNode( const Transform &transformPtrs );
 
         ~SceneNode();
+
+		/// @copydoc Node::setStatic
+		virtual bool setStatic( bool bStatic );
 
         /** Adds an instance of a scene object to this node.
         @remarks
@@ -218,6 +221,7 @@ namespace Ogre {
             rotate Initial rotation relative to parent
         */
         virtual SceneNode* createChildSceneNode(
+				SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
 				const Vector3& translate = Vector3::ZERO, 
 				const Quaternion& rotate = Quaternion::IDENTITY );
 

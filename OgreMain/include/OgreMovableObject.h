@@ -202,6 +202,27 @@ namespace Ogre {
         */
         virtual void _notifyMoved(void);
 
+		/// Checks whether this MovableObject is static. @See setStatic
+		bool isStatic() const;
+
+		/** Turns this Node into static or dynamic
+		@remarks
+			Switching between dynamic and static has some overhead and forces to update all
+			static scene when converted to static. So don't do it frequently.
+			Static objects are not updated every frame, only when requested explicitly. Use
+			this feature if you plan to have this object unaltered for a very long times
+		@par
+			Note all MovableObjects support switching between static & dynamic after they
+			have been created (eg. InstancedEntity)
+		@par
+			Changing this attribute will cause to switch the attribute to our parent node,
+			and as a result, all of its other attached entities. @See Node::setStatic
+		@return
+			True if setStatic made an actual change. False otherwise. Can fail because the
+			object was already static/dynamic, or because switching is not supported
+		*/
+		bool setStatic( bool bStatic );
+
         /** Retrieves the local axis-aligned bounding box for this object.
             @remarks
                 This bounding box is in local coordinates.

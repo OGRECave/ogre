@@ -369,7 +369,7 @@ namespace Ogre {
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl( SceneNode *parent );
+        virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
 		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
 		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
@@ -382,12 +382,13 @@ namespace Ogre {
 			During @see highLevelCull, those scene managers will update mNodeMemoryManagerCulledList
 			and co. to indicate which memory managers should be traversed for rendering.
 		*/
-		NodeMemoryManager		mNodeMemoryManager;
-		ObjectMemoryManager		mEntityMemoryManager;
+		NodeMemoryManager		mNodeMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
+		ObjectMemoryManager		mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
 		ObjectMemoryManager		mLightMemoryManager;
 		/// Filled and cleared every frame in HighLevelCull()
 		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
+		ObjectMemoryManagerVec	mEntitiesMemoryManagerUpdateList;
 		ObjectMemoryManagerVec	mLightsMemoryManagerCulledList;
 
 		/// Instance name
@@ -1237,7 +1238,7 @@ namespace Ogre {
             @par
                 Parent to the scene node we're creating.
         */
-		virtual SceneNode* _createSceneNode( SceneNode *parent );
+		virtual SceneNode* _createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
         /** Creates an instance of a SceneNode.
             @remarks
@@ -1254,8 +1255,11 @@ namespace Ogre {
                 actually given a generated name, which you can retrieve if you want).
                 If you wish to create a node with a specific name, call the alternative method
                 which takes a name parameter.
+			@params sceneType
+				Dynamic if this node is to be updated frequently. Static if you don't plan to be
+				updating this node in a long time (performance optimization).
         */
-        virtual SceneNode* createSceneNode(void);
+        virtual SceneNode* createSceneNode( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Destroys a SceneNode.
         @remarks
@@ -1306,20 +1310,22 @@ namespace Ogre {
 			Octree implementation). At end of scene graph update the scene manager may move
 			the object created with the main memory manager into another another one.
         */
-		ObjectMemoryManager& _getEntityMemoryManager(void)			{ return mEntityMemoryManager; }
+		ObjectMemoryManager& _getEntityMemoryManager(SceneMemoryMgrTypes sceneType)
+															{ return mEntityMemoryManager[sceneType]; }
 
         /** Create an Entity (instance of a discrete mesh).
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
         */
-        virtual Entity* createEntity( const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+        virtual Entity* createEntity( const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+										SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Create an Entity (instance of a discrete mesh).
             @param
                 pMesh The pointer to the Mesh it is to be based on.
         */
-        virtual Entity* createEntity( const MeshPtr& pMesh );
+        virtual Entity* createEntity( const MeshPtr& pMesh, SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Prefab shapes available without loading a model.
             @note
@@ -1370,7 +1376,7 @@ namespace Ogre {
         /** Create a ManualObject, an object which you populate with geometry
 			manually through a GL immediate-mode style interface.
         */
-        virtual ManualObject* createManualObject();
+        virtual ManualObject* createManualObject( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
         /** Removes & destroys a ManualObject from the SceneManager.
         */
         virtual void destroyManualObject(ManualObject* obj);
@@ -3026,10 +3032,10 @@ namespace Ogre {
 		/** Retrieves an existing InstanceManager by it's name.
 		@note Throws an exception if the named InstanceManager does not exist
 		*/
-		virtual InstanceManager* getInstanceManager( const String &managerName ) const;
+		virtual InstanceManager* getInstanceManager( IdString name ) const;
 
     /** Returns whether an InstanceManager with the given name exists. */
-    virtual bool hasInstanceManager( const String &managerName ) const;
+    virtual bool hasInstanceManager( IdString managerName ) const;
 
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks
@@ -3037,7 +3043,7 @@ namespace Ogre {
 			this manager, since it will become a dangling pointer.
 		@param name Name of the manager to remove
 		*/
-		virtual void destroyInstanceManager( const String &name );
+		virtual void destroyInstanceManager( IdString name );
 		virtual void destroyInstanceManager( InstanceManager *instanceManager );
 
 		virtual void destroyAllInstanceManagers(void);

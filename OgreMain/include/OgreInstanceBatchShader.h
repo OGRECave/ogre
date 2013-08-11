@@ -82,7 +82,7 @@ namespace Ogre
 		InstanceBatchShader( IdType id, ObjectMemoryManager *objectMemoryManager,
 							InstanceManager *creator, MeshPtr &meshReference,
 							const MaterialPtr &material, size_t instancesPerBatch,
-							const Mesh::IndexMap *indexToBoneMap, const String &batchName );
+							const Mesh::IndexMap *indexToBoneMap );
 		virtual ~InstanceBatchShader();
 
 		/** @see InstanceBatch::calculateMaxNumInstances */

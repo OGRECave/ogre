@@ -157,7 +157,7 @@ namespace Ogre {
 
 
         /** Internal method for creating a new child node - must be overridden per subclass. */
-        virtual Node* createChildImpl(void) = 0;
+        virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
 		// TODO: Remove Initial position out of here (dark_sylinc)
         /// The position to use as a base for keyframe animation
@@ -214,6 +214,26 @@ namespace Ogre {
 
         /** Gets this node's parent (NULL if this is the root). */
         Node* getParent(void) const;
+
+		/// Checks whether this node is static. @See setStatic
+		bool isStatic() const;
+
+		/** Turns this Node into static or dynamic
+		@remarks
+			Switching between dynamic and static has some overhead and forces to update all
+			static scene when converted to static. So don't do it frequently.
+			Static objects are not updated every frame, only when requested explicitly. Use
+			this feature if you plan to have this object unaltered for a very long times
+		@par
+			Changing this attribute to a node will cause to switch the attribute to all
+			attached entities (but not children or parent nodes; it's perfectly valid
+			and useful to have dynamic children of a static parent; although the opposite
+			(static children, dynamic parent) is probably a bug.
+		@return
+			True if setStatic made an actual change. False otherwise. Can fail because the
+			object was already static/dynamic, or because switching is not supported
+		*/
+		virtual bool setStatic( bool bStatic );
 
 		/// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
 		uint16 getDepthLevel() const									{ return mDepthLevel; }
@@ -500,6 +520,7 @@ namespace Ogre {
             Initial rotation relative to parent
         */
         virtual Node* createChild(
+			SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
             const Vector3& translate = Vector3::ZERO, 
             const Quaternion& rotate = Quaternion::IDENTITY );
 

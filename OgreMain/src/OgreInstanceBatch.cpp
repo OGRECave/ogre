@@ -41,7 +41,7 @@ namespace Ogre
 	InstanceBatch::InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
 									InstanceManager *creator, MeshPtr &meshReference,
 									const MaterialPtr &material, size_t instancesPerBatch,
-									const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+									const Mesh::IndexMap *indexToBoneMap ) :
 				Renderable(),
                 MovableObject( id, objectMemoryManager ),
 				mInstancesPerBatch( instancesPerBatch ),
@@ -69,8 +69,6 @@ namespace Ogre
 		{
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 		}
-
-		mName = batchName;
 
 		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 	}

@@ -49,9 +49,9 @@ namespace Ogre
 		IdType id, ObjectMemoryManager *objectMemoryManager,
 		InstanceManager *creator, MeshPtr &meshReference, 
 		const MaterialPtr &material, size_t instancesPerBatch, 
-		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
+		const Mesh::IndexMap *indexToBoneMap )
 			: BaseInstanceBatchVTF( id, objectMemoryManager, creator, meshReference, material,
-									instancesPerBatch, indexToBoneMap, batchName)
+									instancesPerBatch, indexToBoneMap )
 	{
 	}
 	//-----------------------------------------------------------------------

@@ -115,6 +115,25 @@ namespace Ogre {
     {
         return mParent;
     }
+	//-----------------------------------------------------------------------
+	bool Node::isStatic() const
+	{
+		return mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC;
+	}
+	//-----------------------------------------------------------------------
+	bool Node::setStatic( bool bStatic )
+	{
+		bool retVal = false;
+		if( mNodeMemoryManager->getTwin() &&
+			mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
+			mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+		{
+			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
+			retVal = true;
+		}
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
     void Node::setParent( Node* parent )
     {
@@ -283,9 +302,10 @@ namespace Ogre {
 		}
 	}
     //-----------------------------------------------------------------------
-    Node* Node::createChild(const Vector3& inTranslate, const Quaternion& inRotate)
+    Node* Node::createChild( SceneMemoryMgrTypes sceneType,
+							 const Vector3& inTranslate, const Quaternion& inRotate )
     {
-        Node* newNode = createChildImpl();
+        Node* newNode = createChildImpl( sceneType );
         newNode->setPosition( inTranslate );
         newNode->setOrientation( inRotate );
 

@@ -39,9 +39,9 @@ namespace Ogre
 	InstanceBatchShader::InstanceBatchShader( IdType id, ObjectMemoryManager *objectMemoryManager,
 										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+										const Mesh::IndexMap *indexToBoneMap ) :
 				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
-								instancesPerBatch, indexToBoneMap, batchName ),
+								instancesPerBatch, indexToBoneMap ),
 				mNumWorldMatrices( instancesPerBatch )
 	{
 	}

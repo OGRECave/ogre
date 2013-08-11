@@ -332,7 +332,14 @@ namespace Ogre {
 
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
 	};
-    
+
+	/// The types of NodeMemoryManager & ObjectMemoryManagers
+	enum SceneMemoryMgrTypes
+	{
+		SCENE_DYNAMIC = 0,
+		SCENE_STATIC,
+		NUM_SCENE_MEMORY_MANAGER_TYPES
+	};
 	
 	/** A hashed vector.
 	*/

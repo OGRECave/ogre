@@ -184,7 +184,7 @@ namespace Ogre
 		InstanceBatchHW_VTF( IdType id, ObjectMemoryManager *objectMemoryManager,
 							InstanceManager *creator, MeshPtr &meshReference,
 							const MaterialPtr &material, size_t instancesPerBatch,
-							const Mesh::IndexMap *indexToBoneMap, const String &batchName );
+							const Mesh::IndexMap *indexToBoneMap );
 		virtual ~InstanceBatchHW_VTF();
 		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;

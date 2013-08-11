@@ -177,8 +177,7 @@ namespace Ogre
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
 					   InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-                       size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-                       const String &batchName );
+                       size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
         virtual ~InstanceBatch();
 
         MeshPtr& _getMeshRef() { return mMeshReference; }

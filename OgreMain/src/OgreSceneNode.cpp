@@ -64,6 +64,40 @@ namespace Ogre {
         // Detach all objects
 		detachAllObjects();
     }
+	//-----------------------------------------------------------------------
+    bool SceneNode::setStatic( bool bStatic )
+	{
+		bool retVal = Node::setStatic( bStatic );
+
+		bool ourCurrentStatus = isStatic();
+
+		if( retVal )
+		{
+			//Now apply the same state to all our attachments.
+			ObjectVec::const_iterator itor = mAttachments.begin();
+			ObjectVec::const_iterator end  = mAttachments.end();
+
+			while( itor != end )
+			{
+				MovableObject *obj = *itor;
+				if( obj->isStatic() != ourCurrentStatus )
+				{
+					bool result = obj->setStatic( bStatic );
+					if( !result )
+					{
+						OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+							"Calling SceneNode::setStatic but attachment ID: " +
+							StringConverter::toString( obj->getId() ) + ", named '" + obj->getName() +
+							"' can't switch after creation. This entity must be created in the given"
+							" state before making the node switch", "SceneNode::setStatic");
+					}
+				}
+				++itor;
+			}
+		}
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
     void SceneNode::attachObject(MovableObject* obj)
     {
@@ -73,6 +107,12 @@ namespace Ogre {
                 "Object already attached to a SceneNode or a Bone",
                 "SceneNode::attachObject");
         }
+		if( obj->isStatic() != this->isStatic() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Object is static while Node isn't, or viceversa",
+                "SceneNode::attachObject");
+		}
 
         obj->_notifyAttached(this);
 
@@ -234,10 +274,10 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    Node* SceneNode::createChildImpl(void)
+    Node* SceneNode::createChildImpl( SceneMemoryMgrTypes sceneType )
     {
         assert(mCreator);
-        return mCreator->_createSceneNode( this );
+        return mCreator->_createSceneNode( this, sceneType );
     }
     //-----------------------------------------------------------------------
     SceneNode::ObjectIterator SceneNode::getAttachedObjectIterator(void)
@@ -275,10 +315,11 @@ namespace Ogre {
 	    mChildren.clear();
     }
     //-----------------------------------------------------------------------
-	SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
-        const Quaternion& inRotate)
+	SceneNode* SceneNode::createChildSceneNode( SceneMemoryMgrTypes sceneType,
+												const Vector3& inTranslate,
+												const Quaternion& inRotate )
 	{
-		return static_cast<SceneNode*>(this->createChild(inTranslate, inRotate));
+		return static_cast<SceneNode*>(this->createChild(sceneType, inTranslate, inRotate));
 	}
 	//-----------------------------------------------------------------------
 	void SceneNode::setListener( Listener* listener )
