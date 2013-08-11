@@ -188,6 +188,9 @@ namespace Ogre {
         glBindFramebuffer(GL_FRAMEBUFFER, fb);
         if (internalFormat != GL_NONE)
         {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
             // Create and attach texture
             glGenTextures(1, &tid);
             glBindTexture(GL_TEXTURE_2D, tid);
@@ -315,7 +318,7 @@ namespace Ogre {
     void GLES2FBOManager::detectFBOFormats()
     {
         // Try all formats, and report which ones work as target
-        GLuint fb, tid;
+        GLuint fb = 0, tid = 0;
 
         for(size_t x=0; x<PF_COUNT; ++x)
         {
@@ -431,8 +434,11 @@ namespace Ogre {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
 			
-            if (internalFormat!=GL_NONE)
+            if (internalFormat != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         // Clear any errors

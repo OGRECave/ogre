@@ -145,8 +145,11 @@ static const size_t depthBits[] =
     {
         glGenFramebuffersEXT(1, &fb);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-        if (fmt!=GL_NONE)
+        if (fmt != GL_NONE)
         {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
             // Create and attach texture
             glGenTextures(1, &tid);
             glBindTexture(GL_TEXTURE_2D, tid);
@@ -289,7 +292,7 @@ static const size_t depthBits[] =
 
 			// Fetch GL format token
 			GLenum fmt = GLPixelUtil::getGLInternalFormat((PixelFormat)x);
-            if(fmt == GL_NONE && x!=0)
+            if(fmt == GL_NONE && x != 0)
                 continue;
 
 			// No test for compressed formats
@@ -410,8 +413,11 @@ static const size_t depthBits[] =
 			// see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
 			glFinish();
 			
-            if (fmt!=GL_NONE)
+            if (fmt != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         // It seems a bug in nVidia driver: glBindFramebufferEXT should restore
