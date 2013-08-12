@@ -116,8 +116,13 @@ namespace Ogre
 		{
 			if( &copy != this )
 			{
+				for( size_t i=0; i<m_size; ++i )
+					m_data[i].~T();
+				::operator delete( m_data );
+
 				m_size		= copy.m_size;
 				m_capacity	= copy.m_size;
+
 				m_data = (T*)::operator new( m_size * sizeof(T) );
 				for( size_t i=0; i<m_size; ++i )
 					m_data[i] = copy.m_data[i];
