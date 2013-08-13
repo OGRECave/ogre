@@ -80,6 +80,7 @@ namespace Ogre
 		{
 			if( m_size + newElements > m_capacity )
 			{
+				const size_t oldCapacity = m_capacity;
 				m_capacity = std::max( m_size + newElements, m_capacity + (m_capacity >> 1) + 1 );
 				T *data = (T*)::operator new( m_capacity * sizeof(T) );
 				memcpy( data, m_data, m_size * sizeof(T) );
@@ -96,11 +97,11 @@ namespace Ogre
 		{
 		}
 
-		void swap( FastArray<T> &toSteal )
+		void swap( FastArray<T> &other )
 		{
-			std::swap( this->m_data, copy.m_data );
-			std::swap( this->m_size, copy.m_size );
-			std::swap( this->m_capacity, copy.m_capacity );
+			std::swap( this->m_data, other.m_data );
+			std::swap( this->m_size, other.m_size );
+			std::swap( this->m_capacity, other.m_capacity );
 		}
 
 		FastArray( const FastArray<T> &copy ) :
@@ -109,7 +110,10 @@ namespace Ogre
 		{
 			m_data = (T*)::operator new( m_size * sizeof(T) );
 			for( size_t i=0; i<m_size; ++i )
+			{
+				new (&m_data[i]) T();
 				m_data[i] = copy.m_data[i];
+			}
 		}
 
 		void operator = ( const FastArray<T> &copy )
@@ -125,7 +129,10 @@ namespace Ogre
 
 				m_data = (T*)::operator new( m_size * sizeof(T) );
 				for( size_t i=0; i<m_size; ++i )
+				{
+					new (&m_data[i]) T();
 					m_data[i] = copy.m_data[i];
+				}
 			}
 		}
 
@@ -144,7 +151,10 @@ namespace Ogre
 		{
 			m_data = (T*)::operator new( count * sizeof(T) );
 			for( size_t i=0; i<count; ++i )
+			{
+				new (&m_data[i]) T();
 				m_data[i] = value;
+			}
 		}
 
 		~FastArray()
@@ -160,6 +170,7 @@ namespace Ogre
 		void push_back( const T& val )
 		{
 			growToFit( 1 );
+			new (&m_data[m_size]) T();
 			m_data[m_size] = val;
 			++m_size;
 		}
@@ -197,7 +208,10 @@ namespace Ogre
 			{
 				growToFit( newSize - m_size );
 				for( size_t i=m_size; i<newSize; ++i )
+				{
+					new (&m_data[i]) T();
 					m_data[i] = value;
+				}
 			}
 
 			m_size = newSize;
@@ -229,13 +243,13 @@ namespace Ogre
 
 		T& front()
 		{
-			assert( m_size > 0 && "Can't call back with no elements" );
+			assert( m_size > 0 && "Can't call front with no elements" );
 			return m_data[0];
 		}
 
 		const T& front() const
 		{
-			assert( m_size > 0 && "Can't call back with no elements" );
+			assert( m_size > 0 && "Can't call front with no elements" );
 			return m_data[0];
 		}
 
