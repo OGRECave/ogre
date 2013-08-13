@@ -386,10 +386,23 @@ namespace Ogre {
 		ObjectMemoryManager		mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
 		ObjectMemoryManager		mLightMemoryManager;
 		/// Filled and cleared every frame in HighLevelCull()
-		NodeMemoryManagerVec	mNodeMemoryManagerCulledList;
+		NodeMemoryManagerVec	mNodeMemoryManagerUpdateList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerUpdateList;
 		ObjectMemoryManagerVec	mLightsMemoryManagerCulledList;
+
+		/** Minimum depth level at which mNodeMemoryManager[SCENE_STATIC] is dirty.
+		@remarks
+			We do an optimization: We know for sure that if node at level N became dirty,
+			we only need to update nodes starting from level N, N+1, N+2, ..., N+n
+			No need to update between level 0, 1, 2, ..., N-1
+		*/
+		uint16					mStaticMinDepthLevelDirty;
+
+		/** Whether mEntityMemoryManager[SCENE_STATIC] is dirty (assume all render queues,
+			you shouldn't be doing this often anyway!)
+		*/
+		bool					mStaticEntitiesDirty;
 
 		/// Instance name
 		String mName;
@@ -436,7 +449,7 @@ namespace Ogre {
         Viewport* mCurrentViewport;
 
         /// Root scene node
-        SceneNode* mSceneRoot;
+		SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
 
         /// Autotracking scene nodes
         typedef set<SceneNode*>::type AutoTrackingSceneNodes;
@@ -1283,8 +1296,11 @@ namespace Ogre {
             @par
                 However, in all cases there is only ever one root node of
                 the hierarchy, and this method returns a pointer to it.
+				There is actually an extra Root Node so that static
+				objects can be attached to it. Note however, static nodes
+				can be children of a dynamic root node.
         */
-        SceneNode* getRootSceneNode(void);
+		SceneNode* getRootSceneNode( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Retrieves a SceneNode based on it's ID from the scene graph.
         @remarks
@@ -1663,6 +1679,10 @@ namespace Ogre {
 
 		/// @See mTmpVisibleObjects
 		VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()			{ return mTmpVisibleObjects; }
+
+		void notifyStaticDirty( MovableObject *movableObject );
+
+		void notifyStaticDirty( Node *node );
 
 		/** Updates the derived transforms of all nodes in the scene. This is typically called once
 			per frame during render, but the user may want to manually call this function.

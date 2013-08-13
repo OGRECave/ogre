@@ -269,7 +269,6 @@ namespace Ogre
 
 		batch->_notifyManager( mSceneManager );
 
-
 		if( !firstTime )
 		{
 			//TODO: Check different materials have the same mInstancesPerBatch upper limit
@@ -295,9 +294,11 @@ namespace Ogre
 		batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
 
 		//Batches need to be part of a scene node so that their renderable can be rendered
-		SceneNode *sceneNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
-		sceneNode->attachObject( batch );
+		SceneNode *rootNode = mSceneManager->getRootSceneNode( sceneType );
+		rootNode->attachObject( batch );
 		//sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
+
+		batch->setStatic( sceneType == SCENE_STATIC );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -526,8 +527,8 @@ namespace Ogre
 		//If he needs to this very often, they're probably not static...
 		//Note: Calling this more often will only affect performance for the next frame.
 		//It won't crash and can be ignored
-		assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
-				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
+		/*assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
+				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );*/
 
 		mDirtyStaticBatches.push_back( dirtyBatch );
 	}
@@ -552,7 +553,8 @@ namespace Ogre
 			++itor;
 		}
 
-		mDirtyStaticBatches.clear();
+		//_updateDirtyBatches will be called after us, and will do that job.
+		//mDirtyStaticBatches.clear();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceManager::_updateDirtyBatches(void)

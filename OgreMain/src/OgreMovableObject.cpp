@@ -137,6 +137,9 @@ namespace Ogre {
 				else
 					mListener->objectDetached(this);
 			}
+
+			if( mManager && isStatic() )
+				mManager->notifyStaticDirty( this );
 		}
     }
 	//---------------------------------------------------------------------
@@ -179,6 +182,9 @@ namespace Ogre {
 
 			if( mParentNode && mParentNode->isStatic() != bStatic )
 				mParentNode->setStatic( bStatic );
+
+			if( mManager && bStatic )
+				mManager->notifyStaticDirty( this );
 
 			retVal = true;
 		}

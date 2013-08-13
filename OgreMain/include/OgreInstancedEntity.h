@@ -223,6 +223,9 @@ namespace Ogre
             when not attached to a scene node */
 		Real getSquaredViewDepth( const Camera* cam ) const;
 
+		/// @copydoc MovableObject::_notifyStaticDirty
+		virtual void _notifyStaticDirty(void) const;
+
 		/// Overridden so we can tell the InstanceBatch it needs to update it's bounds
 		void _notifyMoved(void);
 		/// Overloaded so we can register ourselves for updating our animations

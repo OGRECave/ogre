@@ -367,6 +367,12 @@ namespace Ogre
 		return mParentNode->_getDerivedPosition().squaredDistance(cam->getDerivedPosition());
 	}
 	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyStaticDirty(void) const
+	{
+		assert( mBatchOwner->isStatic() );
+		mBatchOwner->_notifyStaticDirty();
+	}
+	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyMoved(void)
 	{
 		MovableObject::_notifyMoved();

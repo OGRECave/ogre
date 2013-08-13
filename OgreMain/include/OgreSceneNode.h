@@ -107,6 +107,9 @@ namespace Ogre {
 		/// @copydoc Node::setStatic
 		virtual bool setStatic( bool bStatic );
 
+		/// @copydoc Node::_notifyStaticDirty
+		virtual void _notifyStaticDirty(void) const;
+
         /** Adds an instance of a scene object to this node.
         @remarks
             Scene objects can include Entity objects, Camera objects, Light objects, 

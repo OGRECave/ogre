@@ -170,9 +170,9 @@ namespace Ogre {
 		/** Get the creator of this object, if any (internal use only) */
 		virtual MovableObjectFactory*  _getCreator(void) const { return mCreator; }
 		/** Notify the object of it's manager (internal use only) */
-		virtual void _notifyManager(SceneManager* man) { mManager = man; }
+		void _notifyManager(SceneManager* man) { mManager = man; }
 		/** Get the manager of this object, if any (internal use only) */
-		virtual SceneManager* _getManager(void) const { return mManager; }
+		SceneManager* _getManager(void) const { return mManager; }
 
 		/** Sets a custom name for this node. Doesn't have to be unique */
 		void setName( const String &name )									{ mName = name; }
@@ -222,6 +222,9 @@ namespace Ogre {
 			object was already static/dynamic, or because switching is not supported
 		*/
 		bool setStatic( bool bStatic );
+
+		/// Called by SceneManager when it is telling we're a static MovableObject being dirty
+		virtual void _notifyStaticDirty(void) const {}
 
         /** Retrieves the local axis-aligned bounding box for this object.
             @remarks

@@ -793,7 +793,7 @@ namespace Ogre {
 	void StaticGeometry::Region::build(bool stencilShadows)
 	{
 		// Create a node
-		mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mCentre);
+		mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_STATIC, mCentre);
 		mNode->attachObject(this);
 		// We need to create enough LOD buckets to deal with the highest LOD
 		// we encountered in all the meshes queued

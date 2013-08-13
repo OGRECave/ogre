@@ -125,8 +125,6 @@ namespace Ogre
         /// This bbox contains all (visible) instanced entities
         Camera              *mCurrentCamera;
 
-		bool				mIsStatic;
-
         unsigned short      mMaterialLodIndex;
 
         /// False if a technique doesn't support skeletal animation
@@ -305,16 +303,12 @@ namespace Ogre
 				that change to take effect. Be sure to call this after you've set all your instances
 				and not once per change.
 		*/
-		virtual void setStatic( bool bStatic );
+		bool setStatic( bool bStatic );
 
 		/** Called by InstancedEntity(s) or directly to tell us we need to update the bounds
 			Should only useful if this batch is static.
         */
-		void updateStaticDirty(void);
-
-		/** Returns true if this batch was set as static. @see setStaticAndUpdate
-		*/
-		bool isStatic() const								{ return mIsStatic; }
+		virtual void _notifyStaticDirty(void);
 
 		/** Returns a pointer to a new InstancedEntity ready to use
 			Note it's actually preallocated, so no memory allocation happens at

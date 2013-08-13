@@ -50,7 +50,6 @@ namespace Ogre
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
 				mCurrentCamera( 0 ),
-				mIsStatic( false ),
 				mMaterialLodIndex( 0 ),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
@@ -59,6 +58,9 @@ namespace Ogre
 				mRemoveOwnIndexData(false)
 	{
 		assert( mInstancesPerBatch );
+
+		//No twin, but we have the same scene type as our creator
+		mLocalObjectMemoryManager._setTwin( mObjectMemoryManager->getMemoryManagerType(), 0 );
 
 		//Force batch visibility to be always visible. The instanced entities
 		//have individual visibility flags. If none matches the scene's current,
@@ -81,8 +83,9 @@ namespace Ogre
 		SceneNode *sceneNode = getParentSceneNode();
 		if( sceneNode )
 		{
-			sceneNode->detachAllObjects();
-			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
+			sceneNode->detachObject( this );
+			if( sceneNode->getParentSceneNode() )
+				sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
 		}
 
 		if( mRemoveOwnVertexData )
@@ -297,7 +300,7 @@ namespace Ogre
 
 		if( !mUnusedEntities.empty() )
 		{
-			if( mUnusedEntities.size() == mInstancedEntities.size() && !mIsStatic && mCreator )
+			if( mUnusedEntities.size() == mInstancedEntities.size() && !isStatic() && mCreator )
 				mCreator->_addToDynamicBatchList( this );
 
 			retVal = mUnusedEntities.back();
@@ -334,7 +337,7 @@ namespace Ogre
 		//Put it back into the queue
 		mUnusedEntities.push_back( instancedEntity );
 
-		if( mUnusedEntities.size() == mInstancedEntities.size() && !mIsStatic && mCreator )
+		if( mUnusedEntities.size() == mInstancedEntities.size() && !isStatic() && mCreator )
 			mCreator->_removeFromDynamicBatchList( this );
 	}
 	//-----------------------------------------------------------------------
@@ -509,7 +512,7 @@ namespace Ogre
 
 		//We've potentially changed our bounds
 		if( !isBatchUnused() )
-			updateStaticDirty();
+			_notifyStaticDirty();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_defragmentBatchDiscard(void)
@@ -519,11 +522,11 @@ namespace Ogre
 		deleteUnusedInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::setStatic( bool bStatic )
+	bool InstanceBatch::setStatic( bool bStatic )
 	{
-		if( mIsStatic != bStatic )
+		bool retVal = MovableObject::setStatic( bStatic );
+		if( retVal )
 		{
-			mIsStatic = bStatic;
 			if( bStatic )
 			{
 				if( mCreator )
@@ -538,11 +541,13 @@ namespace Ogre
 					mCreator->_addToDynamicBatchList( this );
 			}
 		}
+
+		return retVal;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::updateStaticDirty(void)
+	void InstanceBatch::_notifyStaticDirty(void)
 	{
-		if( mCreator && mIsStatic )
+		if( mCreator && isStatic() )
 			mCreator->_addDirtyStaticBatch( this );
 	}
 	//-----------------------------------------------------------------------

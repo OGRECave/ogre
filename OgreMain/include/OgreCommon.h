@@ -333,7 +333,45 @@ namespace Ogre {
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
 	};
 
-	/// The types of NodeMemoryManager & ObjectMemoryManagers
+	/** The types of NodeMemoryManager & ObjectMemoryManagers
+	@remarks
+		By default all objects are dynamic. Static objects can save a lot of performance on CPU side
+		(and sometimes GPU side, for example with some instancing techniques) by telling the engine
+		they won't be changing often.
+	@par
+		What it means for Nodes:
+			Nodes created with SCENE_STATIC won't update their derived position/rotation/scale every frame.
+			This means that modifying (eg) a static node position won't actually take effect until
+			SceneManager::notifyStaticDirty( mySceneNode ) is called or some other similar call.
+
+			If the static scene node is child of a dynamic parent node, modifying the dynamic node
+			will not cause the static one to notice the change until explicitly notifying the
+			SceneManager that the child node should be updated.
+
+			If a static scene node is child of another static scene node, explicitly notifying the
+			SceneManager of the parent's change automatically causes the child to be updated as well
+
+			Having a dynamic node to be child of a static node is perfectly pausible and encouraged,
+			for example a moving pendulum hanging from a static clock
+			Having a static node being child of a dynamic node doesn't make much sense, and is probably
+			a bug (unless the parent is the root node).
+	@par
+		What it means for Entities (and InstancedEntities, etc)
+			Static entities are scheduled for culling and rendering like dynamic ones, but won't update
+			their world AABB bounds (even if their scene node they're attached to changes)
+			
+			Static entities will update their aabb if user calls SceneManager::
+			notifyStaticDirty( myEntity ) or the static node they're attached to was also flagged as
+			dirty. Note that updating the node's position doesn't flag it as dirty (it's not implicit)
+			and hence the entity won't be updated either
+			
+			Static entities can only be attached to static nodes, and dynamic entities can only be
+			attached to dynamic nodes.
+	@par	
+		Note that on most cases, changing a single static entity or node (or creating more) can cause
+		a lot of other static objects to be scheduled to update, so don't do it often, and do it all
+		in the same frame at startup preferably (i.e. during loading time)
+	*/
 	enum SceneMemoryMgrTypes
 	{
 		SCENE_DYNAMIC = 0,

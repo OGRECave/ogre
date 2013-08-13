@@ -73,6 +73,9 @@ namespace Ogre {
 
 		if( retVal )
 		{
+			if( mCreator && bStatic )
+				mCreator->notifyStaticDirty( this );
+
 			//Now apply the same state to all our attachments.
 			ObjectVec::const_iterator itor = mAttachments.begin();
 			ObjectVec::const_iterator end  = mAttachments.end();
@@ -98,6 +101,19 @@ namespace Ogre {
 
 		return retVal;
 	}
+	//-----------------------------------------------------------------------
+	void SceneNode::_notifyStaticDirty(void) const
+	{
+		if( mCreator )
+		{
+			//All our attachments are dirty now.
+			ObjectVec::const_iterator itor = mAttachments.begin();
+			ObjectVec::const_iterator end  = mAttachments.end();
+
+			while( itor != end )
+				mCreator->notifyStaticDirty( *itor++ );
+		}
+	}
     //-----------------------------------------------------------------------
     void SceneNode::attachObject(MovableObject* obj)
     {
@@ -107,18 +123,21 @@ namespace Ogre {
                 "Object already attached to a SceneNode or a Bone",
                 "SceneNode::attachObject");
         }
-		if( obj->isStatic() != this->isStatic() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Object is static while Node isn't, or viceversa",
-                "SceneNode::attachObject");
-		}
 
         obj->_notifyAttached(this);
 
         // Also add to name index
 		mAttachments.push_back( obj );
 		obj->mParentIndex = mAttachments.size() - 1;
+
+		//Do this after attaching to allow proper cleanup in cases
+		//where object assumes it always has a scene node attached
+		if( obj->isStatic() != this->isStatic() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Object is static while Node isn't, or viceversa",
+                "SceneNode::attachObject");
+		}
     }
     //-----------------------------------------------------------------------
 	SceneNode::ObjectVec::iterator SceneNode::getAttachedObjectIt( const String& name )

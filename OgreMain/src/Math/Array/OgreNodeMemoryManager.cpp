@@ -171,7 +171,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t NodeMemoryManager::getNumDepths() const
 	{
-		size_t retVal = 0;
+		size_t retVal = -1;
 		ArrayMemoryManagerVec::const_iterator begin= m_memoryManagers.begin();
 		ArrayMemoryManagerVec::const_iterator itor = m_memoryManagers.begin();
 		ArrayMemoryManagerVec::const_iterator end  = m_memoryManagers.end();

@@ -89,11 +89,12 @@ uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_M
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
+mStaticMinDepthLevelDirty( 0 ),
+mStaticEntitiesDirty( true ),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
-mSceneRoot(0),
 mSkyPlaneEntity(0),
 mSkyBoxObj(0),
 mSkyPlaneNode(0),
@@ -157,6 +158,9 @@ mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		mSceneRoot[i] = 0;
+
 	mNodeMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mNodeMemoryManager[SCENE_DYNAMIC] );
 	mNodeMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mNodeMemoryManager[SCENE_STATIC] );
 	mEntityMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mEntityMemoryManager[SCENE_DYNAMIC] );
@@ -216,7 +220,8 @@ SceneManager::~SceneManager()
 	OGRE_DELETE mSkyBoxObj;
 
 	OGRE_DELETE mShadowCasterQueryListener;
-    OGRE_DELETE mSceneRoot;
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		OGRE_DELETE mSceneRoot[i];
     OGRE_DELETE mFullScreenQuad;
     OGRE_DELETE mShadowCasterSphereQuery;
     OGRE_DELETE mShadowCasterAABBQuery;
@@ -649,7 +654,11 @@ void SceneManager::clearScene(void)
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType )
 {
-	return OGRE_NEW SceneNode( Id::generateNewId<Node>(), this, &mNodeMemoryManager[sceneType], parent );
+	SceneNode *retVal = OGRE_NEW SceneNode( Id::generateNewId<Node>(), this,
+											&mNodeMemoryManager[sceneType], parent );
+	if( sceneType == SCENE_STATIC )
+		notifyStaticDirty( retVal );
+	return retVal;
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType )
@@ -717,16 +726,16 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 		(*itor)->mGlobalIndex = itor - mSceneNodes.begin();
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getRootSceneNode(void)
+SceneNode* SceneManager::getRootSceneNode( SceneMemoryMgrTypes sceneType )
 {
-	if( !mSceneRoot )
+	if( !mSceneRoot[sceneType] )
 	{
 		// Create root scene node
-		mSceneRoot = createSceneNodeImpl( (SceneNode*)0, SCENE_DYNAMIC );
-		mSceneRoot->setName( "Ogre/SceneRoot" );
+		mSceneRoot[sceneType] = createSceneNodeImpl( (SceneNode*)0, sceneType );
+		mSceneRoot[sceneType]->setName( "Ogre/SceneRoot" + StringConverter::toString( sceneType ) );
 	}
 
-    return mSceneRoot;
+    return mSceneRoot[sceneType];
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getSceneNode( IdType id )
@@ -2243,20 +2252,37 @@ MeshPtr SceneManager::createSkydomePlane(
 
 }
 //-----------------------------------------------------------------------
+void SceneManager::notifyStaticDirty( MovableObject *movableObject )
+{
+	mStaticEntitiesDirty = true;
+	movableObject->_notifyStaticDirty();
+}
+//-----------------------------------------------------------------------
+void SceneManager::notifyStaticDirty( Node *node )
+{
+	assert( node->isStatic() );
+
+	mStaticMinDepthLevelDirty = std::min<uint16>( mStaticMinDepthLevelDirty, node->getDepthLevel() );
+	node->_notifyStaticDirty();
+}
+//-----------------------------------------------------------------------
 void SceneManager::updateAllTransforms()
 {
-	NodeMemoryManagerVec::const_iterator it = mNodeMemoryManagerCulledList.begin();
-	NodeMemoryManagerVec::const_iterator en = mNodeMemoryManagerCulledList.end();
+	NodeMemoryManagerVec::const_iterator it = mNodeMemoryManagerUpdateList.begin();
+	NodeMemoryManagerVec::const_iterator en = mNodeMemoryManagerUpdateList.end();
 
 	while( it != en )
 	{
 		NodeMemoryManager *nodeMemoryManager = *it;
 		const size_t numDepths = nodeMemoryManager->getNumDepths();
 
+		size_t start = nodeMemoryManager->getMemoryManagerType() == SCENE_STATIC ?
+													mStaticMinDepthLevelDirty : 1;
+
 		//TODO: Send this to worker threads (dark_sylinc)
 
-		//Start from the first level (not root)
-		for( size_t i=1; i<numDepths; ++i )
+		//Start from the first level (not root) unless static (start from first dirty)
+		for( size_t i=start; i<numDepths; ++i )
 		{
 			Transform t;
 			const size_t numNodes = nodeMemoryManager->getFirstNode( t, i );
@@ -2383,14 +2409,28 @@ void SceneManager::buildLightList()
 //-----------------------------------------------------------------------
 void SceneManager::highLevelCull()
 {
-	mNodeMemoryManagerCulledList.clear();
+	mNodeMemoryManagerUpdateList.clear();
 	mEntitiesMemoryManagerCulledList.clear();
+	mEntitiesMemoryManagerUpdateList.clear();
 	mLightsMemoryManagerCulledList.clear();
 
-	mNodeMemoryManagerCulledList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
+	mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
 	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_STATIC] );
 	mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
 	mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
+
+	if( mStaticEntitiesDirty )
+	{
+		//Entities have changed
+		mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_STATIC] );
+	}
+
+	if( mStaticMinDepthLevelDirty < mNodeMemoryManager[SCENE_STATIC].getNumDepths() )
+	{
+		//Nodes have changed
+		mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_STATIC] );
+	}
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateSceneGraph()
@@ -2418,6 +2458,10 @@ void SceneManager::updateSceneGraph()
 	updateAllBounds( mEntitiesMemoryManagerUpdateList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
 	buildLightList();
+
+	// Reset these
+	mStaticMinDepthLevelDirty = std::numeric_limits<uint16>::max();
+	mStaticEntitiesDirty = false;
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(

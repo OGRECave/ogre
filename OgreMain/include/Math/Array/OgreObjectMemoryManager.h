@@ -84,6 +84,7 @@ namespace Ogre
 		/// @See m_memoryManagerType
 		void _setTwin( SceneMemoryMgrTypes memoryManagerType, ObjectMemoryManager *twinMemoryManager );
 
+		/// Note the return value can be null
 		ObjectMemoryManager* getTwin() const						{ return m_twinMemoryManager; }
 		SceneMemoryMgrTypes getMemoryManagerType() const			{ return m_memoryManagerType; }
 
