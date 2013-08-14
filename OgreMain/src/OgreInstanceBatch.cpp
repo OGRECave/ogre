@@ -54,6 +54,7 @@ namespace Ogre
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),
+				mStaticDirty( false ),
 				mRemoveOwnVertexData(false),
 				mRemoveOwnIndexData(false)
 	{
@@ -188,6 +189,8 @@ namespace Ogre
 		Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
 		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
 		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+
+		mStaticDirty = false;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::updateVisibility(void)
@@ -533,6 +536,7 @@ namespace Ogre
 				{
 					mCreator->_removeFromDynamicBatchList( this );
 					mCreator->_addDirtyStaticBatch( this );
+					mStaticDirty = true;
 				}
 			}
 			else
@@ -547,8 +551,11 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_notifyStaticDirty(void)
 	{
-		if( mCreator && isStatic() )
+		if( mCreator && isStatic() && !mStaticDirty )
+		{
 			mCreator->_addDirtyStaticBatch( this );
+			mStaticDirty = true;
+		}
 	}
 	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const

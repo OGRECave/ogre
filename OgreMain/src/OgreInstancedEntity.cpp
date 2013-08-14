@@ -394,6 +394,9 @@ namespace Ogre
 			{
 				mBatchOwner->_removeAnimatedInstance( this );
 			}
+
+			if( isStatic() )
+				_notifyStaticDirty();
 		}
 
 		MovableObject::_notifyAttached( parent );

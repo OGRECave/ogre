@@ -138,6 +138,8 @@ namespace Ogre
         /// Tells that the list of entity instances with shared transforms has changed
         bool mTransformSharingDirty;
 
+		bool mStaticDirty;
+
         /// When true remove the memory of the VertexData we've created because no one else will
         bool mRemoveOwnVertexData;
         /// When true remove the memory of the IndexData we've created because no one else will

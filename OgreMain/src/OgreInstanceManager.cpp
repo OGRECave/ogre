@@ -527,8 +527,8 @@ namespace Ogre
 		//If he needs to this very often, they're probably not static...
 		//Note: Calling this more often will only affect performance for the next frame.
 		//It won't crash and can be ignored
-		/*assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
-				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );*/
+		assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
+				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
 
 		mDirtyStaticBatches.push_back( dirtyBatch );
 	}
