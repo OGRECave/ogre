@@ -162,8 +162,8 @@ namespace Ogre {
 		}
 
 		box.data = pMappedResource.pData;
-		box.rowPitch = pMappedResource.RowPitch;
-		box.slicePitch = pMappedResource.DepthPitch;
+        box.rowPitch = pMappedResource.RowPitch;
+        box.slicePitch = pMappedResource.DepthPitch;
 	}
 	//-----------------------------------------------------------------------------  
 	void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -197,8 +197,8 @@ namespace Ogre {
 		else if(flags == D3D11_MAP_WRITE_DISCARD)
 			flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-		PixelBox box;
-		_map(mStagingBuffer, flags, box);
+        PixelBox box;
+        _map(mStagingBuffer, flags, box);
 		return box.data;
 	}
 	//-----------------------------------------------------------------------------  
@@ -408,9 +408,8 @@ namespace Ogre {
 			if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
 			{
 				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-
-				PixelBox box;
-				_map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
+                PixelBox box;
+                _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
 				void *data = box.data; 
 
 				memcpy(data, mCurrentLock.data, sizeinbytes);
@@ -746,19 +745,7 @@ namespace Ogre {
  
 			if (!isDds)
 			{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-                // A workaround for a D3D11 bug when running an old feature set without WinRT.
-                // The bug is an internal crash in D3D11 when you call context->GenerateMips.
-                D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-                if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
-                {
-                    _genSoftwareMipmaps(src, buf);
-                }
-                else
-#endif
-                {
-                    _genMipmaps();
-                }
+                _genMipmaps();
  			}
 		}	
 
@@ -907,58 +894,4 @@ namespace Ogre {
 			break;
 		}
 	}
-    //-----------------------------------------------------------------------------    
-    void D3D11HardwarePixelBuffer::_genSoftwareMipmaps( const PixelBox &src, const MemoryDataStreamPtr & buf )
-    {
-        if(mParentTexture->HasAutoMipMapGenerationEnabled())
-        {
-            int mipWidth = src.getWidth();
-            int mipHeight = src.getHeight();
-            int elementJump = 1;
-            for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
-            {
-                mipWidth /= 2;
-                mipHeight /= 2;
-                elementJump *= 2;
-                size_t mipImageSize = PixelUtil::getMemorySize(mipWidth, mipHeight, src.getDepth(),
-                    mFormat);
-
-                MemoryDataStreamPtr bufMip;
-                bufMip.bind(new MemoryDataStream(mipImageSize));
-
-                size_t elemSize = PixelUtil::getNumElemBytes(mFormat);
-                for(int x = 0 ; x < mipWidth; x++)
-                {
-                    for(int y = 0 ; y < mipHeight  ; y++)
-                    {
-                        memcpy(bufMip->getPtr() + (x + y * mipWidth) * elemSize, buf->getPtr()  + (x + y * mipWidth * elementJump) * elemSize * elementJump, elemSize);
-                    }
-                }
-
-                D3D11_BOX dstBoxDx11mip = OgreImageBoxToDx11Box(mLockBox);
-                dstBoxDx11mip.front = 0;
-                dstBoxDx11mip.back = mLockBox.getDepth();
-                dstBoxDx11mip.right = mipWidth;
-                dstBoxDx11mip.bottom = mipHeight;
-                size_t mipRowWidth = elemSize * mipWidth;
-
-                mDevice.GetImmediateContext()->UpdateSubresource( 
-                    mParentTexture->GetTex2D(), 
-                    i,
-                    &dstBoxDx11mip,
-                    bufMip->getPtr(),
-                    mipRowWidth,
-                    0 );
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot update 2d subresource\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::blitFromMemory");
-                }
-
-            }
-        }
-    }
-
 };

@@ -2726,7 +2726,7 @@ namespace Ogre {
     {
 		String streamAsString = stream->getAsString();
 
-		MaterialPtr ogreMaterial = MaterialManager::getSingleton().create(stream->getName(), groupName);
+		MaterialPtr ogreMaterial = MaterialManager::getSingleton().create(stream->getName(), groupName).staticCast<Material>();
 
 		String sourceToUse = CgProgram::resolveCgIncludes(streamAsString, ogreMaterial.getPointer(), stream->getName());
 

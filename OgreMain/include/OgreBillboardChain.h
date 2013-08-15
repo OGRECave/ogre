@@ -61,7 +61,7 @@ namespace Ogre {
 		chain segments in a single render operation, provided they all use the
 		same material. To clarify the terminology: a 'segment' is a separate 
 		sub-part of the chain with its own start and end (called the 'head'
-		and the 'tail'. An 'element' is a single position / colour / texcoord
+		and the 'tail'). An 'element' is a single position / colour / texcoord
 		entry in a segment. You can add items to the head of a chain, and 
 		remove them from the tail, very efficiently. Each segment has a max
 		size, and if adding an element to the segment would exceed this size, 
@@ -100,7 +100,7 @@ namespace Ogre {
 			Real texCoord;
 			ColourValue colour;
 
-			//Only used when mFaceCamera == false
+			/// Only used when mFaceCamera == false
 			Quaternion orientation;
 		};
 		typedef vector<Element>::type ElementList;
@@ -110,12 +110,12 @@ namespace Ogre {
 		@param maxElements The maximum number of elements per chain
 		@param numberOfChains The number of separate chain segments contained in this object
 		@param useTextureCoords If true, use texture coordinates from the chain elements
-		@param useVertexColours If true, use vertex colours from the chain elements
+		@param useColours If true, use vertex colours from the chain elements
 		@param dynamic If true, buffers are created with the intention of being updated
 		*/
 		BillboardChain(const String& name, size_t maxElements = 20, size_t numberOfChains = 1, 
 			bool useTextureCoords = true, bool useColours = true, bool dynamic = true);
-		/// destructor
+		/// Destructor
 		virtual ~BillboardChain();
 
 		/** Set the maximum number of chain elements per chain 
@@ -349,7 +349,7 @@ namespace Ogre {
 		virtual void setupChainContainers(void);
 		/// Setup vertex declaration
 		virtual void setupVertexDeclaration(void);
-		// Setup buffers
+		/// Setup buffers
 		virtual void setupBuffers(void);
 		/// Update the contents of the vertex buffer
 		virtual void updateVertexBuffer(Camera* cam);

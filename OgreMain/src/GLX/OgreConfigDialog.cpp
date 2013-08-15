@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 #include <string>
 
+#define XTSTRINGDEFINES
+
 #include <X11/X.h>
 #include <X11/Xutil.h>
 #include <X11/Xlib.h>
@@ -132,10 +134,10 @@ public:
 	/* Class that binds a callback to a RenderSystem */
 	class RendererCallbackData {
 	public:
-		RendererCallbackData(GLXConfigurator *parent, RenderSystem *renderer, Widget optionmenu):
-			parent(parent),
-			renderer(renderer),
-			optionmenu(optionmenu) {
+		RendererCallbackData(GLXConfigurator *parent_, RenderSystem *renderer_, Widget optionmenu_):
+			parent(parent_),
+			renderer(renderer_),
+			optionmenu(optionmenu_) {
 		}
 		GLXConfigurator *parent;
 		RenderSystem *renderer;
@@ -150,11 +152,11 @@ public:
 	/* Class that binds a callback to a certain configuration option/value */
 	class ConfigCallbackData {
 	public:
-		ConfigCallbackData(GLXConfigurator *parent, const std::string &optionName, const std::string &valueName, Widget optionmenu):
-			parent(parent),
-			optionName(optionName),
-			valueName(valueName),
-			optionmenu(optionmenu) {
+		ConfigCallbackData(GLXConfigurator *parent_, const std::string &optionName_, const std::string &valueName_, Widget optionmenu_):
+			parent(parent_),
+			optionName(optionName_),
+			valueName(valueName_),
+			optionmenu(optionmenu_) {
 		}
 		GLXConfigurator *parent;
 		std::string optionName, valueName;
@@ -180,13 +182,13 @@ private:
 	/* Callbacks that set a setting */
 	static void renderSystemHandler(Widget w, RendererCallbackData *cdata, XtPointer callData) {
 		// Set selected renderer its name
-		XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->renderer->getName().c_str(), 0, NULL);
+            XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->renderer->getName().c_str(), 0, NULL);
 		// Notify Configurator (and Ogre)
 		cdata->parent->SetRenderer(cdata->renderer);
 	}
 	static void configOptionHandler(Widget w, ConfigCallbackData *cdata, XtPointer callData) {
 		// Set selected renderer its name
-		XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->valueName.c_str(), 0, NULL);
+            XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->valueName.c_str(), 0, NULL);
 		// Notify Configurator (and Ogre)
 		cdata->parent->SetConfigOption(cdata->optionName, cdata->valueName);
 	}
@@ -352,7 +354,7 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
         DataStreamPtr imgStreamPtr;
 
         // Load backdrop image using OGRE
-        imgStream = new MemoryDataStream((void*)GLX_backdrop_data, sizeof(GLX_backdrop_data), false);
+        imgStream = new MemoryDataStream(const_cast<unsigned char*>(GLX_backdrop_data), sizeof(GLX_backdrop_data), false);
         imgStreamPtr = DataStreamPtr(imgStream);
 		img.load(imgStreamPtr, imgType);
 

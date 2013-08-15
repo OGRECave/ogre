@@ -73,7 +73,17 @@ public class MainActivity extends Activity implements SensorEventListener {
 		handler.post(renderer);
 	}
 	
-	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		Runnable destroyer = new Runnable() {
+			public void run() {
+				OgreActivityJNI.destroy();
+			}
+		};
+		handler.post(destroyer);
+	}
 
 	private void sysInit() {
 		final Runnable initRunnable = new Runnable() {

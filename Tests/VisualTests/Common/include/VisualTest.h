@@ -31,13 +31,13 @@ THE SOFTWARE.
 
 #include "SdkSample.h"
 
+// resource group that will be automatically unloaded after the close of the sample
+#define TRANSIENT_RESOURCE_GROUP "VisualTestTransient"
+
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::Sample
 {
 public:
-
-    // resource group that will be automatically unloaded after the close of the sample
-    Ogre::String TRANSIENT_RESOURCE_GROUP;
 
     VisualTest()
     {
@@ -46,7 +46,6 @@ public:
         mInfo["Category"] = "Tests";
         mInfo["Thumbnail"] = "thumb_visual_tests.png";
         mInfo["Help"] = "";
-        TRANSIENT_RESOURCE_GROUP = "VisualTestTransient";
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);

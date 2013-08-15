@@ -437,7 +437,7 @@ namespace Ogre {
 	void RenderSystem::_setTexture(size_t unit, bool enabled, 
 		const String &texname)
 	{
-		TexturePtr t = TextureManager::getSingleton().getByName(texname);
+		TexturePtr t = TextureManager::getSingleton().getByName(texname).staticCast<Texture>();
 		_setTexture(unit, enabled, t);
 	}
 	//-----------------------------------------------------------------------
@@ -954,7 +954,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr val )
     {
-        if ( !val.isNull() && !val->getIsInstanceData() )
+        if ( !val.isNull() && !val->isInstanceData() )
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                         "A none instance data vertex buffer was set to be the global instance vertex buffer.",

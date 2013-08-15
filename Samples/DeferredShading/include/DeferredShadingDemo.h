@@ -399,7 +399,7 @@ protected:
 			String matname = light->getName()+"m";
 			// Create coloured material
 			MaterialPtr mat = MaterialManager::getSingleton().create(matname,
-                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
             Pass* pass = mat->getTechnique(0)->getPass(0);
             pass->setDiffuse(0.0f,0.0f,0.0f,1.0f);
 			pass->setAmbient(0.0f,0.0f,0.0f);

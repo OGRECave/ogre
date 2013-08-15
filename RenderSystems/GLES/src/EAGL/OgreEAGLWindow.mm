@@ -66,7 +66,7 @@ namespace Ogre {
     {
         destroy();
 
-        if (mContext == NULL)
+        if (mContext != NULL)
         {
             OGRE_DELETE mContext;
         }

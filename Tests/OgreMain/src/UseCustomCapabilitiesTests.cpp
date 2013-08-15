@@ -46,10 +46,6 @@ void UseCustomCapabilitiesTests::setUp()
 {
     using namespace Ogre;
 
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-	
 	// write cleanup to log
 	if(LogManager::getSingletonPtr() == 0)
 	{
@@ -70,9 +66,9 @@ void UseCustomCapabilitiesTests::setUp()
 	if(Ogre::ResourceGroupManager::getSingletonPtr())
 		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+#if OGRE_STATIC
+        mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
+#endif
 }
 
 void UseCustomCapabilitiesTests::tearDown()
@@ -82,6 +78,9 @@ void UseCustomCapabilitiesTests::tearDown()
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
+#if OGRE_STATIC
+        OGRE_DELETE mStaticPluginLoader;
+#endif
 }
 
 void checkCaps(const Ogre::RenderSystemCapabilities* caps)
@@ -203,7 +202,14 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
+#ifdef OGRE_STATIC_LIB
+	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
+
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -264,7 +270,14 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
-    Root* root = OGRE_NEW Root("plugins.cfg");
+#ifdef OGRE_STATIC_LIB
+	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
+	Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
+
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{

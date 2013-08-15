@@ -8,16 +8,11 @@ uniform float shadowFuzzyWidth;
 
 uniform sampler2D shadowMap;
 out vec4 fragColour;
+in vec4 shadowUV;
+in vec4 oColour;
 
 void main()
 {
-	vec4 shadowUV = gl_TexCoord[0];
-	// point on shadowmap
-#if LINEAR_RANGE
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
-#else
-	shadowUV = shadowUV / shadowUV.w;
-#endif
 	float centerdepth = texture(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -57,10 +52,10 @@ void main()
 	
 	final *= 0.2;
 
-	fragColour = vec4(gl_Color.xyz * final, 1);
+	fragColour = vec4(oColour.xyz * final, 1);
 	
 #else
-	fragColour = (finalCenterDepth > shadowUV.z) ? gl_Color : vec4(0,0,0,1);
+	fragColour = (finalCenterDepth > shadowUV.z) ? oColour : vec4(0.5,0,0,1);
 #endif
 
 #endif

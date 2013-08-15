@@ -64,7 +64,7 @@ class _OgreSampleClassExport SSAOGBufferSchemeHandler : public Ogre::MaterialMan
 public:
 	SSAOGBufferSchemeHandler()
 	{
-		mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+		mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer").staticCast<Material>();
 	}
 
 	virtual ~SSAOGBufferSchemeHandler()
@@ -798,7 +798,7 @@ protected:
         // remove compositor first???
         CompositorManager::getSingleton().removeCompositor(mViewport, compositor);
         
-        (static_cast<MaterialPtr>(MaterialManager::getSingleton().getByName(material)))->getTechnique(0)->
+        MaterialManager::getSingleton().getByName(material).staticCast<Material>()->getTechnique(0)->
         getPass(0)->getFragmentProgramParameters()->setNamedConstant(uniform, value);
         
         // adding again

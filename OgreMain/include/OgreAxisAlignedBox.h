@@ -69,14 +69,14 @@ namespace Ogre {
 
 	public:
 		/*
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		*/
 		typedef enum {
 			FAR_LEFT_BOTTOM = 0,
@@ -288,16 +288,15 @@ namespace Ogre {
 		anticlockwise around this face (looking onto the face from
 		outside the box). Like this:
 		<pre>
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		</pre>
-		@remarks as this implementation uses a static member, make sure to use your own copy !
 		*/
 		inline const Vector3* getAllCorners(void) const
 		{
@@ -325,7 +324,7 @@ namespace Ogre {
 			return mCorners;
 		}
 
-		/** gets the position of one of the corners
+		/** Gets the position of one of the corners
 		*/
 		Vector3 getCorner(CornerEnum cornerToGet) const
 		{

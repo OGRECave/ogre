@@ -379,13 +379,13 @@ void PMInjector::inject(PMGenRequest* request)
 void QueuedProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 {
 #if OGRE_DEBUG_MODE
-	// Do not call this with empty Lod.
+	// Do not call this with empty LOD.
 	OgreAssert(!lodConfig.levels.empty(), "");
 
-	// Too many lod levels.
+	// Too many LOD levels.
 	OgreAssert(lodConfig.levels.size() <= 0xffff, "");
 
-	// Lod distances needs to be sorted.
+	// LOD distances needs to be sorted.
 	Mesh::LodValueList values;
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);

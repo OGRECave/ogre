@@ -47,19 +47,11 @@ namespace Ogre {
     class _OgreParticleFXExport CylinderEmitter : public AreaEmitter
     {
     public:
-        // See AreaEmitter
-
+        /** See AreaEmitter. */
         CylinderEmitter(ParticleSystem* psys);
 
         /** See ParticleEmitter. */
         void _initParticle(Particle* pParticle);
-
-    protected:
-        // See AreaEmitter
-
-
-
-
     };
 
 }

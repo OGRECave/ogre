@@ -703,6 +703,9 @@ void Sample_NewInstancing::testCapabilities( const RenderSystemCapabilities* cap
 	}
 
 	if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
+#if OGRE_NO_GLES3_SUPPORT == 0
+		!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
+#endif
 		!GpuProgramManager::getSingleton().isSyntaxSupported("fp40") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") &&

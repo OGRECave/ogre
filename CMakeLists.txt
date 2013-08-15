@@ -127,7 +127,20 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
   endif ()
   if (MSVC_VERSION GREATER 1600 OR MSVC_VERSION EQUAL 1600)
+    option(OGRE_BUILD_MSVC_MP "Enable build with multiple processes in Visual Studio" TRUE)
+  else()
+    set(OGRE_BUILD_MSVC_MP FALSE CACHE BOOL "Forcing switch off /MP for older Visual Studio versions" FORCE)
+  endif()
+  if(OGRE_BUILD_MSVC_MP)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  endif ()
+  if(CMAKE_GENERATOR STREQUAL "Visual Studio 11 Win64" OR CMAKE_GENERATOR STREQUAL "Visual Studio 11")
+    option(OGRE_BUILD_MSVC_ZM "Add /Zm256 parameter to Visual Studio to fix PCH error" FALSE)
+  else()
+    set(OGRE_BUILD_MSVC_ZM FALSE CACHE BOOL "Forcing switch off /Zm256 for older Visual Studio versions" FORCE)
+  endif()
+  if(OGRE_BUILD_MSVC_ZM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm256")
   endif ()
 endif ()
 if (MINGW)
@@ -332,7 +345,12 @@ endif ()
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
-  set(OGRE_CONFIG_ENABLE_ETC1 TRUE CACHE BOOL "Forcing ETC1 codec for OpenGL ES" FORCE)
+  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL ES" FORCE)
+endif()
+
+# Enable the ETC codec if OpenGL 3+ is being built
+if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
+  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
 
 ######################################################################
@@ -341,14 +359,16 @@ endif()
 
 # Customise what to build
 cmake_dependent_option(OGRE_STATIC "Static build" FALSE "" TRUE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" TRUE "WIN32;DirectX11_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" TRUE "WIN32;DirectX11_FOUND  OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL3PLUS "Build OpenGL 3+ RenderSystem [EXPERIMENTAL]" FALSE "OPENGL_FOUND; NOT OGRE_BUILD_RENDERSYSTEM_GLES; NOT OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_STAGE3D "Build Stage3D RenderSystem" FALSE "FLASHCC" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_NACL "Build Ogre for Google's Native Client (NaCl)" FALSE "OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_WINRT "Build Ogre for Metro style application (WinRT)" FALSE "WIN32" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_WINDOWS_PHONE "Build Ogre for Windows Phone" FALSE "WIN32" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
@@ -359,13 +379,13 @@ cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TR
 cmake_dependent_option(OGRE_BUILD_COMPONENT_VOLUME "Build Volume component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS" FALSE)
-cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY "Build Overlay component" TRUE "FREETYPE_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY "Build Overlay component" TRUE "FREETYPE_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS "Build RTShader System FFP core shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS "Build RTShader System extensions shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 
-cmake_dependent_option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
-cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
+cmake_dependent_option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE "OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_XSIEXPORTER "Build the Softimage exporter" FALSE "Softimage_FOUND" FALSE)
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
@@ -389,23 +409,24 @@ option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" F
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 # determine threading options
 include(PrepareThreadingOptions)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND" FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
-option(OGRE_CONFIG_ENABLE_ETC1 "Build ETC1 codec." FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
+option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT "Enable Cg support to ES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER "Enable GLSL optimiser use in GLES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT "Use VertexArrayObjects if possible." FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES_STATE_CACHE_SUPPORT "Enable GLES state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT "Enable GLES 2 state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES3_SUPPORT "Enable OpenGL ES 3.x Features" FALSE "OPENGLES3_FOUND;OGRE_BUILD_RENDERSYSTEM_GLES2;NOT OGRE_BUILD_PLATFORM_WINRT" FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES3_SUPPORT "Enable OpenGL ES 3.x Features" FALSE "OPENGLES3_FOUND;OGRE_BUILD_RENDERSYSTEM_GLES2;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT "Enable libc++ support for OS X" FALSE "APPLE" FALSE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
+option(OGRE_BUILD_DOCS "Generate documentation target for build if Doxygen is installed." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
@@ -413,6 +434,13 @@ cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
+if (WIN32)
+	option(OGRE_INSTALL_VSPROPS "Install Visual Studio Property Page." FALSE)
+	if (OGRE_INSTALL_VSPROPS)
+		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${OGRE_BINARY_DIR}/OGRE.props)
+		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
+	endif ()
+endif ()
 
 # Unity build options
 # A Unity build includes all sources files in just a few actual compilation units
@@ -434,7 +462,7 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC
-  OGRE_CONFIG_ENABLE_ETC1
+  OGRE_CONFIG_ENABLE_ETC
   OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
   OGRE_CONFIG_ENABLE_ZIP
   OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT
@@ -509,7 +537,9 @@ if (OGRE_BUILD_XSIEXPORTER)
 endif ()
 
 # Install documentation
-add_subdirectory(Docs)
+if (OGRE_BUILD_DOCS)
+  add_subdirectory(Docs)
+endif ()
 
 # Install media files
 if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)

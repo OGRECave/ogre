@@ -55,10 +55,7 @@ protected:
 
     /// Holds the volume root.
     Chunk *mVolumeRoot;
-
-    /// Holds the read volume parameters.
-    ChunkParameters mParameters;
-
+    
     /// The node on which the terrain is attached.
     SceneNode *mVolumeRootNode;
 

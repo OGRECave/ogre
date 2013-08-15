@@ -89,5 +89,6 @@ public:
     // Need these for loading .rendercaps from the file system
     ArchiveManager* mArchiveManager;
     FileSystemArchiveFactory* mFileSystemArchiveFactory;
+    LogManager *mLogManager;
 
 };

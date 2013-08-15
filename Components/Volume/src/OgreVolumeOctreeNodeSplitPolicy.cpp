@@ -30,8 +30,8 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
     
-    OctreeNodeSplitPolicy::OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize, const Real minSplitDistanceDiagonalFactor) :
-        mSrc(src), mMaxCellSize(maxCellSize), mMinSplitDistanceDiagonalFactor(minSplitDistanceDiagonalFactor)
+    OctreeNodeSplitPolicy::OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize) :
+        mSrc(src), mMaxCellSize(maxCellSize)
     {
     }
 
@@ -50,7 +50,7 @@ namespace Volume {
 
         // Don't split if nothing is inside.
         Vector4 centerValue = mSrc->getValueAndGradient(node->getCenter());
-        if (Math::Abs(centerValue.w) > (to - from).length() * mMinSplitDistanceDiagonalFactor)
+        if (Math::Abs(centerValue.w) > (to - from).length() * mSrc->getVolumeSpaceToWorldSpaceFactor())
         {
             node->setCenterValue(centerValue);
             return false;

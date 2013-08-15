@@ -53,13 +53,14 @@ namespace Ogre {
             OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
                          "ConfigDialog::initialise");
 
-        NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", nil];
+        NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", @"Content Scaling Factor", nil];
         NSArray *fullScreenOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
         NSArray *colourDepthOptions = [[NSArray alloc] initWithObjects:@"32", @"16", nil];
         NSArray *rttOptions = [[NSArray alloc] initWithObjects:@"FBO", @"PBuffer", @"Copy", nil];
         NSMutableArray *videoModeOptions = [[NSMutableArray alloc] initWithCapacity:1];
         NSMutableArray *fsaaOptions = [[NSMutableArray alloc] initWithCapacity:1];
         NSArray *sRGBOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
+        NSArray *contentScaleOptions = [[NSArray alloc] initWithObjects:@"2.0", @"1.5", @"1.33", @"1.0", nil];
 #ifdef __LP64__
         NSArray *macAPIOptions = [[NSArray alloc] initWithObjects:@"cocoa", nil];
 #else
@@ -79,6 +80,7 @@ namespace Ogre {
 			rs->setConfigOption("Full Screen", "No");
 			rs->setConfigOption("RTT Preferred Mode", "FBO");
 			rs->setConfigOption("sRGB Gamma Conversion", "No");
+			rs->setConfigOption("Content Scaling Factor", "1.0");
 #ifdef __LP64__
 			rs->setConfigOption("macAPI", "cocoa");
 #else
@@ -124,7 +126,7 @@ namespace Ogre {
         }
 
         NSArray *objects = [[NSArray alloc] initWithObjects:fullScreenOptions, fsaaOptions,
-                            colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, nil];
+                            colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, contentScaleOptions, nil];
         [mWindowDelegate setOptions:[NSDictionary dictionaryWithObjects:objects forKeys:keys]];
 
         // Clean up all those arrays
@@ -135,6 +137,7 @@ namespace Ogre {
         [videoModeOptions release];
         [sRGBOptions release];
         [macAPIOptions release];
+        [contentScaleOptions release];
         [keys release];
         [objects release];
 

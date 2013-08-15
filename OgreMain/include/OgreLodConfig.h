@@ -36,7 +36,7 @@
 namespace Ogre
 {
 /**
- * @brief Structure for automatic Lod configuration.
+ * @brief Structure for automatic LOD configuration.
  */
 struct LodLevel {
 	/**
@@ -64,13 +64,13 @@ struct LodLevel {
 		 * @brief Reduces the vertices, until the cost is bigger then the given value.
 		 *
 		 * Collapse cost is equal to the amount of artifact the reduction causes.
-		 * This generates the best Lod output, but the collapse cost depends on implementation.
+		 * This generates the best LOD output, but the collapse cost depends on implementation.
 		 */
 		VRM_COLLAPSE_COST
 	};
 
 	/**
-	 * @brief Distance to swap the Lod.
+	 * @brief Distance to swap the LOD.
 	 *
 	 * This depends on LodStrategy.
 	 */
@@ -91,12 +91,12 @@ struct LodLevel {
 	/**
 	 * @brief This is set by ProgressiveMeshGenerator::build() function.
 	 *
-	 * Use Mesh::getNumLodLevels() for generated Lod count.
+	 * Use Mesh::getNumLodLevels() for generated LOD count.
 	 */
 	size_t outUniqueVertexCount;
 
 	/**
-	 * @brief Whether the Lod level generation was skipped, because it has same vertex count as the previous Lod level.
+	 * @brief Whether the LOD level generation was skipped, because it has same vertex count as the previous LOD level.
 	 */
 	bool outSkipped;
 };

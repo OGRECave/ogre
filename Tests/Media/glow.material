@@ -3,11 +3,27 @@ vertex_program glow_vs_glsl glsl
 	source vs_glow.glsl
 }
 
+vertex_program glow_vs_glsl150 glsl
+{
+	source vs_glow150.glsl
+	syntax glsl150
+
+	default_params
+	{
+        param_named_auto worldViewProjMatrix worldviewproj_matrix
+	}
+}
+
 fragment_program glow_ps_glsl glsl
 {
 	source ps_glow.glsl
 }
 
+fragment_program glow_ps_glsl150 glsl
+{
+	source ps_glow150.glsl
+	syntax glsl150
+}
 vertex_program glow_vs_glsles glsles
 {
 	source vs_glow.glsles
@@ -42,6 +58,7 @@ fragment_program glow_ps_cg cg
 
 vertex_program glow_vs unified
 {
+	delegate glow_vs_glsl150
 	delegate glow_vs_glsl
 	delegate glow_vs_glsles
 	delegate glow_vs_cg
@@ -49,6 +66,7 @@ vertex_program glow_vs unified
 
 fragment_program glow_ps unified
 {
+	delegate glow_ps_glsl150
 	delegate glow_ps_glsl
 	delegate glow_ps_glsles
 	delegate glow_ps_cg

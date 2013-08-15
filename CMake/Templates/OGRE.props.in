@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <OGRE_HOME>@CMAKE_INSTALL_PREFIX@</OGRE_HOME>
+    <OGRE_INCLUDE>$(OGRE_HOME)/include</OGRE_INCLUDE>
+    <OGRE_LIB>$(OGRE_HOME)/lib</OGRE_LIB>
+    <OGRE_BIN>$(OGRE_HOME)/bin</OGRE_BIN>
+    <OGRE_MEDIA>$(OGRE_HOME)/@OGRE_MEDIA_PATH@</OGRE_MEDIA>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OGRE_INCLUDE);$(OGRE_INCLUDE)/OGRE;$(OGRE_INCLUDE)/OGRE/Overlay;$(OGRE_INCLUDE)/OIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OGRE_LIB);$(OGRE_LIB)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="OGRE_HOME">
+      <Value>$(OGRE_HOME)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OGRE_INCLUDE">
+      <Value>$(OGRE_INCLUDE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OGRE_LIB">
+      <Value>$(OGRE_LIB)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OGRE_BIN">
+      <Value>$(OGRE_BIN)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OGRE_MEDIA">
+      <Value>$(OGRE_MEDIA)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

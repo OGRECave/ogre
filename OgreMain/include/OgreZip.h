@@ -32,6 +32,9 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
+#if OGRE_THREAD_SUPPORT
+#include "Threading/OgreThreadHeaders.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 // Forward declaration for zziplib to avoid header file dependency.
@@ -65,7 +68,7 @@ namespace Ogre {
         /// A pointer to file io alternative implementation 
         zzip_plugin_io_handlers* mPluginIo;
 
-		OGRE_AUTO_MUTEX
+        OGRE_AUTO_MUTEX;
     public:
         ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
         ~ZipArchive();

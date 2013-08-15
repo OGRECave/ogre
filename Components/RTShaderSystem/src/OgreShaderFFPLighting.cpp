@@ -666,7 +666,7 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 		else
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Using iterative lighting method with RT Shader System requires specifieng explicit light type.",
+				"Using iterative lighting method with RT Shader System requires specifying explicit light type.",
 				"FFPLighting::preAddToRenderState");			
 		}
 	}

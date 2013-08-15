@@ -1,7 +1,7 @@
 #version 100
 
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 uniform float inverseShadowmapSize;
 uniform float fixedDepthBias;
@@ -28,7 +28,7 @@ void main()
 
 	// get the new normal and diffuse values
 	vec3 normal = normalize(expand(texture2D(normalMap, vUv1.xy).xyz));
-	vec4 vertexColour = clamp(dot(normal, tangentLightDir), 0.0, 1.0) * lightColour;
+	vec4 vertexColour = clamp(dot(normal, tangentLightDir), 0.0, 1.0) * vec4(0.590839, 0.36056, 0.13028, 1.0);
 	vec4 shadowUV = vUv0;
 	// point on shadowmap
 #if LINEAR_RANGE
@@ -82,5 +82,6 @@ void main()
 #endif
 
 #endif
+	gl_FragColor = vec4(1.0,0.0,1.0, 1.0);
    
 }

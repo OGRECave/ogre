@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreCamera.h"
 #include "OgreException.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre
 {

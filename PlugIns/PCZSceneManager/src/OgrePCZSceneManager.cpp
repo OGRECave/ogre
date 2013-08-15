@@ -622,7 +622,7 @@ namespace Ogre
         MovableObjectCollection* lights =
             getMovableObjectCollection(PCZLightFactory::FACTORY_TYPE_NAME);
 	    {
-		    OGRE_LOCK_MUTEX(lights->mutex)
+                OGRE_LOCK_MUTEX(lights->mutex);
 
 		    MovableObjectIterator it(lights->map.begin(), lights->map.end());
 
@@ -720,10 +720,11 @@ namespace Ogre
 		{
 			// add to the global list of zones
 			mZones[instanceName] = newZone;
-		}
-		if (newZone->requiresZoneSpecificNodeData())
-		{
-			createZoneSpecificNodeData(newZone);
+
+            if (newZone->requiresZoneSpecificNodeData())
+            {
+                createZoneSpecificNodeData(newZone);
+            }
 		}
 		return newZone;
 	}
@@ -742,7 +743,7 @@ namespace Ogre
 		MovableObjectCollection* lights =
 		getMovableObjectCollection(PCZLightFactory::FACTORY_TYPE_NAME);
 		{
-			OGRE_LOCK_MUTEX(lights->mutex) // Is locking necessary in destroyZone? I don't know..
+                    OGRE_LOCK_MUTEX(lights->mutex); // Is locking necessary in destroyZone? I don't know..
 
 			MovableObjectIterator it(lights->map.begin(), lights->map.end());
 
@@ -984,7 +985,7 @@ namespace Ogre
 
 
 		{
-			OGRE_LOCK_MUTEX(lights->mutex)
+                    OGRE_LOCK_MUTEX(lights->mutex);
 
 			// Pre-allocate memory
 			mTestLightInfos.clear();

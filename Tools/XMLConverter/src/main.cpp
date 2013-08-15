@@ -471,7 +471,7 @@ void meshToXML(XmlOptions opts)
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
 
     MeshPtr mesh = MeshManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Mesh>();
     
 
     meshSerializer->importMesh(stream, mesh.getPointer());
@@ -633,7 +633,7 @@ void XMLToBinary(XmlOptions opts)
             LodConfig lodConfig;
             lodConfig.levels.clear();
             lodConfig.mesh = newMesh->clone(newMesh->getName());
-            lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+            lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
 
             LodLevel lodLevel;
             lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
@@ -643,7 +643,7 @@ void XMLToBinary(XmlOptions opts)
                 cout << "\nHow many extra LOD levels would you like to generate? ";
                 cin >> numLod;
 
-                cout << "\nWhat lod strategy should be used? ";
+                cout << "\nWhat LOD strategy should be used? ";
                 cin >> opts.lodStrategy;
 
                 cout << "\nWhat unit of reduction would you like to use:" <<
@@ -842,7 +842,7 @@ void XMLToBinary(XmlOptions opts)
     {
         delete doc;
         SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
 		if (opts.optimiseAnimations)
 		{
@@ -872,7 +872,7 @@ void skeletonToXML(XmlOptions opts)
 	}
 
     SkeletonPtr skel = SkeletonManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
@@ -948,6 +948,8 @@ int main(int numargs, char** args)
 		cerr << "ABORTING!" << std::endl;
 		retCode = 1;
 	}
+
+    Pass::processPendingPassUpdates(); // make sure passes are cleaned up
 
     delete xmlSkeletonSerializer;
     delete skeletonSerializer;

@@ -65,7 +65,7 @@ namespace Ogre {
     {
     protected:
 
-        // World geometry
+        /// World geometry
         BspLevelPtr mLevel;
 
         // State variables for rendering WIP

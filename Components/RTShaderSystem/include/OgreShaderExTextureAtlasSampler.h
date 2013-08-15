@@ -178,28 +178,29 @@ protected:
 
 // Attributes.
 protected:
-	// The index of the information on the texture in the table
+	/// The index of the information on the texture in the table
 	ParameterPtr mVSInpTextureTableIndex;
 	
-	TextureUnitState::UVWAddressingMode mTextureAddressings[TAS_MAX_TEXTURES]; // The addressing mode for each texture
-	// The position and size of the texture in the atlas 
+    /// The addressing mode for each texture
+	TextureUnitState::UVWAddressingMode mTextureAddressings[TAS_MAX_TEXTURES];
+	/// The position and size of the texture in the atlas
 	ParameterPtr mVSOutTextureDatas[TAS_MAX_TEXTURES];
-	// The position and size of the texture in the atlas
+	/// The position and size of the texture in the atlas
 	ParameterPtr mPSInpTextureDatas[TAS_MAX_TEXTURES];
-	//A parameter carrying the sizes of the atlas textures
+	/// A parameter carrying the sizes of the atlas textures
 	UniformParameterPtr mPSTextureSizes[TAS_MAX_TEXTURES];
-	// The table containing information on the textures in the atlas
+	/// The table containing information on the textures in the atlas
 	UniformParameterPtr mVSTextureTable[TAS_MAX_TEXTURES];
 
-	//The position of the texture coordinates containing the index information 
+	/// The position of the texture coordinates containing the index information
 	ushort mAtlasTexcoordPos; 
-	//The texture atlas table data
+	/// The texture atlas table data
 	TextureAtlasTablePtr mAtlasTableDatas[TAS_MAX_TEXTURES];
-	//For each texture unit in the pass tells if it uses atlas texture
+	/// For each texture unit in the pass tells if it uses atlas texture
 	bool mIsAtlasTextureUnits[TAS_MAX_TEXTURES];
-	//Tells if the data in mAtlasTableData has been uploaded to the corresponding mVSTextureTable parameter
+	/// Tells if the data in mAtlasTableData has been uploaded to the corresponding mVSTextureTable parameter
 	bool mIsTableDataUpdated;
-	//Tells whether border issue handling uses auto adjust polling position.
+	/// Tells whether border issue handling uses auto adjust polling position.
 	bool mAutoAdjustPollPosition;
 };
 

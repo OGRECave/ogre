@@ -63,7 +63,7 @@ namespace Ogre {
     {
         destroy();
 
-        if (mContext == NULL)
+        if (mContext != NULL)
         {
             OGRE_DELETE mContext;
         }
@@ -422,21 +422,27 @@ namespace Ogre {
         {
             attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT;
         }
-        
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
             OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+#if OGRE_NO_GLES3_SUPPORT == 0
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
+#else
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
-
+#endif
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
         }
         else
         {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
+#if OGRE_NO_GLES3_SUPPORT == 0
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_FRAMEBUFFER, attachmentCount, attachments));
+#else
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments));
+#endif
         }
         
         OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));

@@ -126,7 +126,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
     protected:
-        // Flag indicating if this panel should be visual or just group things
+        /// Flag indicating if this panel should be visual or just group things
         bool mTransparent;
         // Texture tiling
         Real mTileX[OGRE_MAX_TEXTURE_LAYERS];
@@ -136,7 +136,7 @@ namespace Ogre {
 
         RenderOperation mRenderOp;
 
-        /// internal method for setting up geometry, called by OverlayElement::update
+        /// Internal method for setting up geometry, called by OverlayElement::update
         virtual void updatePositionGeometry(void);
 
         /// Called to update the texture coords when layers change

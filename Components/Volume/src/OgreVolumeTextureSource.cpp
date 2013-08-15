@@ -37,31 +37,12 @@ namespace Volume {
 
     float TextureSource::getVolumeGridValue(int x, int y, int z) const
     {
-        if (x >= mWidth)
-        {
-            x = mWidth - 1;
-        }
-        else if (x < 0)
-        {
-            x = 0;
-        }
-
-        if (y >= mHeight)
-        {
-            y = mHeight - 1;
-        } else if (y < 0)
-        {
-            y = 0;
-        }
-
-        if (z >= mDepth)
-        {
-            z = mDepth - 1;
-        } else if (z < 0)
-        {
-            z = 0;
-        }
-
+        x = x >= mWidth ? mWidth - 1 : x;
+        x = x < 0 ? 0 : x;
+        y = y >= mHeight ? mHeight - 1 : y;
+        y = y < 0 ? 0 : y;
+        z = z >= mDepth ? mDepth - 1 : z;
+        z = z < 0 ? 0 : z;
         return mData[(mDepth - z - 1) * mWidthTimesHeight + y * mWidth + x];
     }
     
@@ -85,7 +66,7 @@ namespace Volume {
             TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
             Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
             false,0,0,Ogre::TEX_TYPE_3D);
-        Ogre::TexturePtr tex = res.first;
+        Ogre::TexturePtr tex = res.first.staticCast<Texture>();
         tex->setUsage(TU_DYNAMIC);
         tex->load();
        
@@ -100,7 +81,9 @@ namespace Volume {
         mPosXScale = (Real)1.0 / (Real)worldWidth * (Real)mWidth;
         mPosYScale = (Real)1.0 / (Real)worldHeight * (Real)mHeight;
         mPosZScale = (Real)1.0 / (Real)worldDepth * (Real)mDepth;
-    
+
+        mVolumeSpaceToWorldSpaceFactor = (Real)worldWidth * (Real)mWidth;
+
         HardwarePixelBufferSharedPtr buffer = tex->getBuffer(0, 0);
         buffer->lock(HardwareBuffer::HBL_READ_ONLY);
         const PixelBox &pb = buffer->getCurrentLock();

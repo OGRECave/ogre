@@ -29,9 +29,9 @@ THE SOFTWARE.
 #define __OgreWorkQueue_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreAtomicWrappers.h"
 #include "OgreAny.h"
 #include "OgreSharedPtr.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -73,7 +73,7 @@ namespace Ogre
 		typedef map<String, uint16>::type ChannelMap;
 		ChannelMap mChannelMap;
 		uint16 mNextChannel;
-		OGRE_MUTEX(mChannelMapMutex)
+		OGRE_MUTEX(mChannelMapMutex);
 	public:
 		/// Numeric identifier for a request
 		typedef unsigned long long int RequestID;
@@ -469,7 +469,7 @@ namespace Ogre
 		ResponseQueue mResponseQueue; // Guarded by mResponseMutex
 
 		/// Thread function
-		struct WorkerFunc OGRE_THREAD_WORKER_INHERIT
+		struct _OgreExport WorkerFunc OGRE_THREAD_WORKER_INHERIT
 		{
 			DefaultWorkQueueBase* mQueue;
 
@@ -477,6 +477,8 @@ namespace Ogre
 				: mQueue(q) {}
 
 			void operator()();
+			
+			void operator()() const;
 
 			void run();
 		};
@@ -489,7 +491,7 @@ namespace Ogre
 		class _OgreExport RequestHandlerHolder : public UtilityAlloc
 		{
 		protected:
-			OGRE_RW_MUTEX(mRWMutex)
+			OGRE_RW_MUTEX(mRWMutex);
 			RequestHandler* mHandler;
 		public:
 			RequestHandlerHolder(RequestHandler* handler)
@@ -547,11 +549,11 @@ namespace Ogre
 		// For example if threadA locks mIdleMutex first then tries to lock mProcessMutex,
 		// and threadB locks mProcessMutex first, then mIdleMutex. In this case you can get livelock and the system is dead!
 		//RULE: Lock mProcessMutex before other mutex, to prevent livelocks
-		OGRE_MUTEX(mIdleMutex)
-		OGRE_MUTEX(mRequestMutex)
-		OGRE_MUTEX(mProcessMutex)
-		OGRE_MUTEX(mResponseMutex)
-		OGRE_RW_MUTEX(mRequestHandlerMutex)
+		OGRE_MUTEX(mIdleMutex);
+		OGRE_MUTEX(mRequestMutex);
+		OGRE_MUTEX(mProcessMutex);
+		OGRE_MUTEX(mResponseMutex);
+		OGRE_RW_MUTEX(mRequestHandlerMutex);
 
 
 		void processRequestResponse(Request* r, bool synchronous);

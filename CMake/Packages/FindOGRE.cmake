@@ -290,10 +290,27 @@ if (OGRE_STATIC)
       set(OGRE_DEPS_FOUND FALSE)
 	endif ()
   endif ()
-
+endif()
   if (OGRE_CONFIG_THREADS)
     if (OGRE_CONFIG_THREAD_PROVIDER EQUAL 1)
-      find_package(Boost COMPONENTS thread QUIET)
+      if (OGRE_STATIC)
+    	set(Boost_USE_STATIC_LIBS TRUE)
+    	if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+          set(Boost_USE_MULTITHREADED OFF)
+        endif()
+      endif()
+      
+      set(OGRE_BOOST_COMPONENTS thread date_time)
+      find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+      if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+        if(Boost_VERSION GREATER 105300)
+            set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
+        else()
+            set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
+        endif()
+      endif()
+
+      find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
       if (NOT Boost_THREAD_FOUND)
         set(OGRE_DEPS_FOUND FALSE)
       else ()
@@ -318,7 +335,7 @@ if (OGRE_STATIC)
       endif ()
     endif ()
   endif ()
-  
+if (OGRE_STATIC)
   if (NOT OGRE_DEPS_FOUND)
     pkg_message(OGRE "Could not find all required dependencies for the Ogre package.")
     set(OGRE_FOUND FALSE)
@@ -553,6 +570,7 @@ set(OGRE_MEDIA_SEARCH_SUFFIX
   Media
   media
   share/OGRE/media
+  share/OGRE/Media
 )
 
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)

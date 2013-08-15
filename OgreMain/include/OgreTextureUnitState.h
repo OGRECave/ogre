@@ -560,6 +560,11 @@ namespace Ogre {
         */
         bool getIsAlpha(void) const;
 
+        /// @copydoc Texture::getGamma
+        Real getGamma() const { return mGamma; }
+        /// @copydoc Texture::setGamma
+        void setGamma(Real gamma) { mGamma = gamma; }
+
         /// @copydoc Texture::setHardwareGammaEnabled
         void setHardwareGammaEnabled(bool enabled);
         /// @copydoc Texture::isHardwareGammaEnabled
@@ -934,9 +939,8 @@ namespace Ogre {
             generated coordinates rather than static model texture coordinates.
         @param enable
             True to enable, false to disable
-        @param planar
-            If set to @c true, instead of being based on normals the environment effect is based on
-            vertex positions. This is good for planar surfaces.
+        @param envMapType
+            The type of environment mapping to perform. Planar, curved, reflection or normal. @see EnvMapType
         @note
             This option has no effect in the programmable pipeline.
         */
@@ -1198,6 +1202,8 @@ namespace Ogre {
         /** Set the texture pointer for a given frame (internal use only!). */
         void _setTexturePtr(const TexturePtr& texptr, size_t frame);
 
+		size_t calculateSize(void) const;
+
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
         */
@@ -1227,6 +1233,7 @@ protected:
         mutable bool mTextureLoadFailed;
         bool mIsAlpha;
         bool mHwGamma;
+        Real mGamma;
 
         mutable bool mRecalcTexMatrix;
         Real mUMod, mVMod;

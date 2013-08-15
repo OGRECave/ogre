@@ -60,6 +60,10 @@ namespace __gnu_cxx
 #   endif
 #endif
 
+#if OGRE_MEMORY_TRACKER
+#   include "Threading/OgreThreadHeaders.h"
+#endif
+
 namespace Ogre
 {
 	/** \addtogroup Core
@@ -79,7 +83,7 @@ namespace Ogre
 	class _OgreExport MemoryTracker
 	{
 	protected:
-		OGRE_AUTO_MUTEX
+            OGRE_AUTO_MUTEX;
 
 		// Allocation record
 		struct Alloc

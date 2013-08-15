@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreOSXCocoaContext_H__
 
 #include "OgreOSXContext.h"
-#import <Cocoa/Cocoa.h>
+#import <AppKit/NSOpenGL.h>
 
 namespace Ogre {
 

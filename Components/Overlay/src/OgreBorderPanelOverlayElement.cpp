@@ -67,7 +67,7 @@ namespace Ogre {
         mPixelRightBorderSize(0),
         mPixelTopBorderSize(0),
         mPixelBottomBorderSize(0),
-        mBorderMaterial(0),
+        mBorderMaterial(),
         mBorderRenderable(0)
     {   
         if (createParamDictionary("BorderPanelOverlayElement"))
@@ -487,7 +487,7 @@ namespace Ogre {
     void BorderPanelOverlayElement::setBorderMaterialName(const String& name)
     {
         mBorderMaterialName = name;
-        mBorderMaterial = MaterialManager::getSingleton().getByName(name);
+        mBorderMaterial = MaterialManager::getSingleton().getByName(name).staticCast<Material>();
         if (mBorderMaterial.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
 				"BorderPanelOverlayElement::setBorderMaterialName" );

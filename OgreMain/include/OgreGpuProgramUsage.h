@@ -138,6 +138,8 @@ namespace Ogre
         /// Unload this usage 
         void _unload(void);
 
+        size_t calculateSize(void) const;
+
 		// Resource Listener
 		void unloadingComplete(Resource* prog);
 		void loadingComplete(Resource* prog);

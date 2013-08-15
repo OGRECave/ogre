@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	OGRE_STATIC_MUTEX_INSTANCE(D3D9Resource::msDeviceAccessMutex)
+    OGRE_STATIC_MUTEX_INSTANCE(D3D9Resource::msDeviceAccessMutex);
 
 	D3D9Resource::D3D9Resource()
 	{				

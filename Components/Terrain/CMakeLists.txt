@@ -14,42 +14,25 @@
 PROJECT(OgreTerrain)
 
 # define header and source files for the library
-set (HEADER_FILES
-    include/OgreTerrain.h
-    include/OgreTerrainGroup.h
-	include/OgreTerrainLayerBlendMap.h
-	include/OgreTerrainMaterialGenerator.h
-	include/OgreTerrainMaterialGeneratorA.h
-	include/OgreTerrainPrerequisites.h
-    include/OgreTerrainQuadTreeNode.h
-	include/OgreTerrainAutoUpdateLod.h
-	include/OgreTerrainLodManager.h
-)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-set (SOURCE_FILES
-	src/OgreTerrain.cpp
-    src/OgreTerrainGroup.cpp
-	src/OgreTerrainLayerBlendMap.cpp
-	src/OgreTerrainMaterialGenerator.cpp
-	src/OgreTerrainMaterialGeneratorA.cpp
-	src/OgreTerrainMaterialShaderHelperCg.cpp
-	src/OgreTerrainMaterialShaderHelperGLSL.cpp
-	src/OgreTerrainMaterialShaderHelperGLSLES.cpp
-	src/OgreTerrainMaterialShaderHelperHLSL.cpp
-	src/OgreTerrainQuadTreeNode.cpp
-	src/OgreTerrainAutoUpdateLod.cpp
-	src/OgreTerrainLodManager.cpp
+list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreTerrainPagedWorldSection.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreTerrainPaging.h"
+)
+list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTerrainPagedWorldSection.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTerrainPaging.cpp"
 )
 
 # Add needed definitions 
 add_definitions(-DOGRE_TERRAIN_EXPORTS -D_MT -D_USRDLL)
 
 if (OGRE_BUILD_COMPONENT_PAGING)
-  set (HEADER_FILES ${HEADER_FILES}
-	include/OgreTerrainPaging.h
+  list(APPEND HEADER_FILES
+    include/OgreTerrainPaging.h
 	include/OgreTerrainPagedWorldSection.h
   )
-  set (SOURCE_FILES ${SOURCE_FILES}
+  list(APPEND SOURCE_FILES
 	src/OgreTerrainPaging.cpp
 	src/OgreTerrainPagedWorldSection.cpp
   )

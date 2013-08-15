@@ -668,7 +668,7 @@ void buildLod(Mesh* mesh)
         LodConfig lodConfig;
 		lodConfig.levels.clear();
 		lodConfig.mesh = mesh->clone(mesh->getName());
-		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
 
 		if (askLodDtls)
 		{

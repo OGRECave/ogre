@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -63,7 +64,7 @@ namespace Ogre {
         void findFiles(const String& pattern, bool recursive, bool dirs,
             StringVector* simpleList, FileInfoList* detailList) const;
 
-        OGRE_AUTO_MUTEX
+        OGRE_AUTO_MUTEX;
     public:
         FileSystemArchive(const String& name, const String& archType, bool readOnly );
         ~FileSystemArchive();
@@ -135,7 +136,7 @@ namespace Ogre {
             return OGRE_NEW FileSystemArchive(name, "FileSystem", readOnly);
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance(Archive* ptr) { delete ptr; }
+        void destroyInstance(Archive* ptr) { OGRE_DELETE ptr; }
     };
 
     /** @} */

@@ -72,7 +72,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
     try
     {
 
-        cf.load(filename, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "\t;=", true);
+        cf.loadFromResourceSystem(filename, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "\t;=", true);
 
         // Go through all sections & controls in the file
         Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -87,7 +87,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
             {
                 materialName = cf.getSetting("material", secName);
 				
-				Ogre::MaterialPtr curMat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+				Ogre::MaterialPtr curMat = Ogre::MaterialManager::getSingleton().getByName(materialName).staticCast<Ogre::Material>();
 				curMat->load();
 				Ogre::Technique * curTec = curMat->getBestTechnique();
 				if (!curTec || !curTec->isSupported())

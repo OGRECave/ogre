@@ -42,24 +42,24 @@ class _OgreExport ProgressiveMeshGeneratorBase
 {
 public:
 	/**
-	 * @brief Generates the Lod levels for a mesh.
+	 * @brief Generates the LOD levels for a mesh.
 	 * 
-	 * @param lodConfig Specification of the requested Lod levels.
+	 * @param lodConfig Specification of the requested LOD levels.
 	 */
 	virtual void generateLodLevels(LodConfig& lodConfig) = 0;
 
 	/**
-	 * @brief Generates the Lod levels for a mesh without configuring it.
+	 * @brief Generates the LOD levels for a mesh without configuring it.
 	 *
-	 * @param mesh Generate the Lod for this mesh.
+	 * @param mesh Generate the LOD for this mesh.
 	 */
 	virtual void generateAutoconfiguredLodLevels(MeshPtr& mesh);
 
 	/**
-	 * @brief Fills Lod Config with a config, which works on any mesh.
+	 * @brief Fills LOD Config with a config, which works on any mesh.
 	 *
 	 * @param inMesh Optimize for this mesh.
-	 * @param outLodConfig Lod configuration storing the output.
+	 * @param outLodConfig LOD configuration storing the output.
 	 */
 	virtual void getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig);
 
@@ -153,19 +153,19 @@ protected:
 	struct _OgrePrivate PMVertex {
 		Vector3 position;
 		VEdges edges;
-		VTriangles triangles; // Triangle ID set, which are using this vertex.
+		VTriangles triangles; /// Triangle ID set, which are using this vertex.
 
 		PMVertex* collapseTo;
 		bool seam;
-		CollapseCostHeap::iterator costHeapPosition; // Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
+		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
 	};
 
 	struct _OgrePrivate PMTriangle {
 		PMVertex* vertex[3];
 		Vector3 normal;
 		bool isRemoved;
-		unsigned short submeshID; // ID of the submesh. Usable with mMesh.getSubMesh() function.
-		unsigned int vertexID[3]; // Vertex ID in the buffer associated with the submeshID.
+		unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+		unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
 		void computeNormal();
 		bool hasVertex(const PMVertex* v) const;

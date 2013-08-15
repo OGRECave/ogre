@@ -51,6 +51,7 @@ namespace Ogre {
 		, mTextureLoadFailed(false)
 		, mIsAlpha(false)
 		, mHwGamma(false)
+		, mGamma(1)
 		, mRecalcTexMatrix(false)
 		, mUMod(0)
 		, mVMod(0)
@@ -108,6 +109,7 @@ namespace Ogre {
 		, mTextureLoadFailed(false)
 		, mIsAlpha(false)
 		, mHwGamma(false)
+		, mGamma(1)
 		, mRecalcTexMatrix(false)
 		, mUMod(0)
 		, mVMod(0)
@@ -158,7 +160,7 @@ namespace Ogre {
         assert(mEffects.empty());
 
         // copy basic members (int's, real's)
-        memcpy( this, &oth, (uchar *)(&oth.mFrames) - (uchar *)(&oth) );
+        memcpy( this, &oth, (const uchar *)(&oth.mFrames) - (const uchar *)(&oth) );
         // copy complex members
         mFrames  = oth.mFrames;
 		mFramePtrs = oth.mFramePtrs;
@@ -1157,7 +1159,7 @@ namespace Ogre {
 					mFramePtrs[frame] = 
 						TextureManager::getSingleton().prepare(mFrames[frame], 
 							mParent->getResourceGroup(), mTextureType, 
-							mTextureSrcMipmaps, 1.0f, mIsAlpha, mDesiredFormat, mHwGamma);
+							mTextureSrcMipmaps, mGamma, mIsAlpha, mDesiredFormat, mHwGamma);
 				}
 				catch (Exception &e) {
 					String msg;
@@ -1189,7 +1191,7 @@ namespace Ogre {
 					mFramePtrs[frame] = 
 						TextureManager::getSingleton().load(mFrames[frame], 
 							mParent->getResourceGroup(), mTextureType, 
-							mTextureSrcMipmaps, 1.0f, mIsAlpha, mDesiredFormat, mHwGamma);
+							mTextureSrcMipmaps, mGamma, mIsAlpha, mDesiredFormat, mHwGamma);
 				}
 				catch (Exception &e) {
 					String msg;
@@ -1199,7 +1201,7 @@ namespace Ogre {
 						+ e.getFullDescription();
 					LogManager::getSingleton().logMessage(msg);
 					mTextureLoadFailed = true;
-				}	
+				}
 			}
 			else
 			{
@@ -1544,4 +1546,35 @@ namespace Ogre {
 		mCompositorRefTexName = textureName; 
 		mCompositorRefMrtIndex = mrtIndex; 
 	}
+    //-----------------------------------------------------------------------
+    size_t TextureUnitState::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(unsigned int) * 3;
+        memSize += sizeof(int);
+        memSize += sizeof(float);
+        memSize += sizeof(Real) * 5;
+        memSize += sizeof(bool) * 8;
+        memSize += sizeof(size_t);
+        memSize += sizeof(TextureType);
+        memSize += sizeof(PixelFormat);
+        memSize += sizeof(UVWAddressingMode);
+        memSize += sizeof(ColourValue);
+        memSize += sizeof(LayerBlendModeEx) * 2;
+        memSize += sizeof(SceneBlendFactor) * 2;
+        memSize += sizeof(Radian);
+        memSize += sizeof(Matrix4);
+        memSize += sizeof(FilterOptions) * 3;
+        memSize += sizeof(CompareFunction);
+        memSize += sizeof(BindingType);
+        memSize += sizeof(ContentType);
+        memSize += sizeof(String) * 4;
+
+        memSize += mFrames.size() * sizeof(String);
+        memSize += mFramePtrs.size() * sizeof(TexturePtr);
+        memSize += mEffects.size() * sizeof(TextureEffect);
+
+        return memSize;
+    }
 }

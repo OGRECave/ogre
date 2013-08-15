@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __SharedPtr_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreAtomicScalar.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -49,6 +50,61 @@ namespace Ogre {
 		SPFM_FREE
 	};
 
+    struct SharedPtrInfo {
+        inline SharedPtrInfo(SharedPtrFreeMethod freeMethod) 
+            : useCount(1)
+            , useFreeMethod(freeMethod) 
+        {}
+
+        AtomicScalar<unsigned> useCount;
+        SharedPtrFreeMethod    useFreeMethod; /// If we should use OGRE_FREE instead of OGRE_DELETE
+    };
+
+	class SharedPtrDeleter
+	{
+	public:
+		virtual void destroy()=0;
+
+		virtual ~SharedPtrDeleter() {}
+	};
+
+	template <class T>
+	class SharedPtrDeleterDelete : public SharedPtrDeleter
+	{
+		T*             pRep;
+		public:
+			SharedPtrDeleterDelete(T* rep) : pRep(rep) {}
+		void destroy()
+		{
+			OGRE_DELETE pRep;
+		}
+	};
+
+	template <class T>
+	class SharedPtrDeleterDeleteT : public SharedPtrDeleter
+	{
+		T*             pRep;
+		public:
+			SharedPtrDeleterDeleteT(T* rep) : pRep(rep) {}
+		void destroy()
+		{
+			OGRE_DELETE_T(pRep, T, MEMCATEGORY_GENERAL);
+		}
+	};
+
+	template <class T>
+	class SharedPtrDeleterFree : public SharedPtrDeleter
+	{
+		T*             pRep;
+		public:
+			SharedPtrDeleterFree(T* rep) : pRep(rep) {}
+		void destroy()
+		{
+			OGRE_FREE(pRep, MEMCATEGORY_GENERAL);
+		}
+	};
+
+
 	/** Reference-counted shared pointer, used for objects where implicit destruction is 
         required. 
     @remarks
@@ -59,20 +115,23 @@ namespace Ogre {
     */
 	template<class T> class SharedPtr
 	{
+        template<typename Y> friend class SharedPtr;
 	protected:
-		T* pRep;
-		unsigned int* pUseCount;
-		SharedPtrFreeMethod useFreeMethod; // if we should use OGRE_FREE instead of OGRE_DELETE
+		T*             pRep;
+        SharedPtrInfo* pInfo;
+		SharedPtrDeleter* pDel;
+
+        SharedPtr(T* rep, SharedPtrInfo* info, SharedPtrDeleter* del) : pRep(rep), pInfo(info), pDel(del)
+		{
+		}
+
 	public:
-		OGRE_AUTO_SHARED_MUTEX // public to allow external locking
 		/** Constructor, does not initialise the SharedPtr.
 			@remarks
 				<b>Dangerous!</b> You have to call bind() before using the SharedPtr.
 		*/
-		SharedPtr() : pRep(0), pUseCount(0), useFreeMethod(SPFM_DELETE)
-        {
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
-        }
+		SharedPtr() : pRep(0), pInfo(0), pDel(0)
+        {}
 
 		/** Constructor.
 		@param rep The pointer to take ownership of
@@ -80,37 +139,72 @@ namespace Ogre {
 		*/
         template< class Y>
 		explicit SharedPtr(Y* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) 
-			: pRep(rep)
-			, pUseCount(rep ? OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1) : 0)
-			, useFreeMethod(inFreeMethod)
+            : pRep(rep)
+            , pInfo(rep ? OGRE_NEW_T(SharedPtrInfo, MEMCATEGORY_GENERAL)(inFreeMethod) : 0)
 		{
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
-			if (rep)
+			switch (inFreeMethod)
 			{
-				OGRE_NEW_AUTO_SHARED_MUTEX
+				case SPFM_DELETE:  pDel = new SharedPtrDeleterDelete<Y>(rep);break;
+				case SPFM_DELETE_T:pDel = new SharedPtrDeleterDeleteT<Y>(rep);break;
+				case SPFM_FREE:    pDel = new SharedPtrDeleterFree<Y>(rep);break;
 			}
 		}
+
 		SharedPtr(const SharedPtr& r)
-            : pRep(0), pUseCount(0), useFreeMethod(SPFM_DELETE)
+            : pRep(r.pRep)
+            , pInfo(r.pInfo)
+			, pDel(r.pDel)
 		{
-			// lock & copy other mutex pointer
-            
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
+            if (pRep) 
             {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-			    pRep = r.pRep;
-			    pUseCount = r.pUseCount; 
-				useFreeMethod = r.useFreeMethod;
-			    // Handle zero pointer gracefully to manage STL containers
-			    if(pUseCount)
-			    {
-				    ++(*pUseCount); 
-			    }
+                ++pInfo->useCount;
             }
 		}
+
 		SharedPtr& operator=(const SharedPtr& r) {
+			if (pRep == r.pRep)
+            {
+                assert(pInfo == r.pInfo);
+				return *this;
+            }
+			// Swap current data into a local copy
+			// this ensures we deal with rhs and this being dependent
+			SharedPtr<T> tmp(r);
+			swap(tmp);
+			return *this;
+		}
+		
+		/* For C++11 compilers, use enable_if to only expose functions when viable
+         *
+         * MSVC 2012 and earlier only claim conformance to C++98. This is fortunate,
+         * because they don't support default template parameters
+         */
+#if __cplusplus >= 201103L
+        template<class Y,
+            class = typename std::enable_if<std::is_convertible<Y*, T*>::value>::type>
+#else
+        template<class Y>
+#endif
+        SharedPtr(const SharedPtr<Y>& r)
+            : pRep(r.getPointer())
+            , pInfo(r.pInfo)
+			, pDel(r.pDel)
+		{
+            if (pRep) 
+            {
+                ++pInfo->useCount;
+            }
+        }
+
+		
+#if __cplusplus >= 201103L
+        template<class Y,
+                 class = typename std::enable_if<std::is_assignable<T*, Y*>::value>::type>
+#else
+        template<class Y>
+#endif
+        SharedPtr& operator=(const SharedPtr<Y>& r)
+        {
 			if (pRep == r.pRep)
 				return *this;
 			// Swap current data into a local copy
@@ -119,42 +213,30 @@ namespace Ogre {
 			swap(tmp);
 			return *this;
 		}
-		
-		template< class Y>
-		SharedPtr(const SharedPtr<Y>& r)
-            : pRep(0), pUseCount(0), useFreeMethod(SPFM_DELETE)
-		{
-			// lock & copy other mutex pointer
 
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-			    pRep = r.getPointer();
-			    pUseCount = r.useCountPointer();
-				useFreeMethod = r.freeMethod();
-			    // Handle zero pointer gracefully to manage STL containers
-			    if(pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-		}
-		template< class Y>
-		SharedPtr& operator=(const SharedPtr<Y>& r) {
-			if (pRep == r.getPointer())
-				return *this;
-			// Swap current data into a local copy
-			// this ensures we deal with rhs and this being dependent
-			SharedPtr<T> tmp(r);
-			swap(tmp);
-			return *this;
-		}
-		virtual ~SharedPtr() {
+		~SharedPtr() {
             release();
 		}
 
+
+        template<typename Y>
+        inline SharedPtr<Y> staticCast() const
+        {
+            if(pRep) {
+                ++pInfo->useCount;
+				return SharedPtr<Y>(static_cast<Y*>(pRep), pInfo, pDel);
+            } else return SharedPtr<Y>();
+        }
+
+        template<typename Y>
+        inline SharedPtr<Y> dynamicCast() const
+        {
+            if(pRep) {
+                Y* rep = dynamic_cast<Y*>(pRep);
+                ++pInfo->useCount;
+				return SharedPtr<Y>(rep, pInfo, pDel);
+            } else return SharedPtr<Y>();
+        }
 
 		inline T& operator*() const { assert(pRep); return *pRep; }
 		inline T* operator->() const { assert(pRep); return pRep; }
@@ -165,30 +247,30 @@ namespace Ogre {
 				Assumes that the SharedPtr is uninitialised!
 		*/
 		void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
-			assert(!pRep && !pUseCount);
-            OGRE_NEW_AUTO_SHARED_MUTEX
-			OGRE_LOCK_AUTO_SHARED_MUTEX
-			pUseCount = OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1);
+			assert(!pRep && !pInfo);
+			pInfo = OGRE_NEW_T(SharedPtrInfo, MEMCATEGORY_GENERAL)(inFreeMethod);
 			pRep = rep;
-			useFreeMethod = inFreeMethod;
+			switch (inFreeMethod)
+			{
+				case SPFM_DELETE:  pDel = new SharedPtrDeleterDelete<T>(rep);break;
+				case SPFM_DELETE_T:pDel = new SharedPtrDeleterDeleteT<T>(rep);break;
+				case SPFM_FREE:    pDel = new SharedPtrDeleterFree<T>(rep);break;
+			}
 		}
 
-		inline bool unique() const { OGRE_LOCK_AUTO_SHARED_MUTEX assert(pUseCount); return *pUseCount == 1; }
-		inline unsigned int useCount() const { OGRE_LOCK_AUTO_SHARED_MUTEX assert(pUseCount); return *pUseCount; }
-		inline unsigned int* useCountPointer() const { return pUseCount; }
+		inline bool unique() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get() == 1; }
+		inline unsigned int useCount() const { assert(pInfo && pInfo->useCount.get()); return pInfo->useCount.get(); }
+        inline void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
 
 		inline T* getPointer() const { return pRep; }
-		inline SharedPtrFreeMethod freeMethod() const { return useFreeMethod; }
+		inline SharedPtrFreeMethod freeMethod() const { return pInfo->useFreeMethod; }
 
 		inline bool isNull(void) const { return pRep == 0; }
 
         inline void setNull(void) { 
 			if (pRep)
 			{
-				// can't scope lock mutex before release in case deleted
 				release();
-				pRep = 0;
-				pUseCount = 0;
 			}
         }
 
@@ -196,37 +278,26 @@ namespace Ogre {
 
         inline void release(void)
         {
-			bool destroyThis = false;
-
-            /* If the mutex is not initialized to a non-zero value, then
-               neither is pUseCount nor pRep.
-             */
-
-            OGRE_MUTEX_CONDITIONAL(OGRE_AUTO_MUTEX_NAME)
-			{
-				// lock own mutex in limited scope (must unlock before destroy)
-				OGRE_LOCK_AUTO_SHARED_MUTEX
-				if (pUseCount)
-				{
-					if (--(*pUseCount) == 0) 
-					{
-						destroyThis = true;
-	                }
-				}
+            if (pRep)
+            {
+                assert(pInfo);
+                if(--pInfo->useCount == 0)
+                    destroy();
             }
-			if (destroyThis)
-				destroy();
 
-            OGRE_SET_AUTO_SHARED_MUTEX_NULL
+            pRep = 0;
+            pInfo = 0;
+			pDel=0;
         }
 
-        virtual void destroy(void)
+        /** IF YOU GET A CRASH HERE, YOU FORGOT TO FREE UP POINTERS
+         BEFORE SHUTTING OGRE DOWN
+         Use setNull() before shutdown or make sure your pointer goes
+         out of scope before OGRE shuts down to avoid this. */
+        inline void destroy(void)
         {
-            // IF YOU GET A CRASH HERE, YOU FORGOT TO FREE UP POINTERS
-            // BEFORE SHUTTING OGRE DOWN
-            // Use setNull() before shutdown or make sure your pointer goes
-            // out of scope before OGRE shuts down to avoid this.
-			switch(useFreeMethod)
+            assert(pRep && pInfo);
+			/*switch(pInfo->useFreeMethod)
 			{
 			case SPFM_DELETE:
 				OGRE_DELETE pRep;
@@ -237,21 +308,18 @@ namespace Ogre {
 			case SPFM_FREE:
 				OGRE_FREE(pRep, MEMCATEGORY_GENERAL);
 				break;
-			};
-			// use OGRE_FREE instead of OGRE_DELETE_T since 'unsigned int' isn't a destructor
-			// we only used OGRE_NEW_T to be able to use constructor
-            OGRE_FREE(pUseCount, MEMCATEGORY_GENERAL);
-			OGRE_DELETE_AUTO_SHARED_MUTEX
+			};*/
+			pDel->destroy();
+
+            OGRE_DELETE_T(pInfo, SharedPtrInfo, MEMCATEGORY_GENERAL);
+			delete pDel;
         }
 
-		virtual void swap(SharedPtr<T> &other) 
+		inline void swap(SharedPtr<T> &other) 
 		{
 			std::swap(pRep, other.pRep);
-			std::swap(pUseCount, other.pUseCount);
-			std::swap(useFreeMethod, other.useFreeMethod);
-#if OGRE_THREAD_SUPPORT
-			std::swap(OGRE_AUTO_MUTEX_NAME, other.OGRE_AUTO_MUTEX_NAME);
-#endif
+			std::swap(pInfo, other.pInfo);
+			std::swap(pDel, other.pDel);
 		}
 	};
 

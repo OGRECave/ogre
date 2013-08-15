@@ -1150,7 +1150,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLRenderBuffer *stencilBuffer = depthBuffer;
-			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilBuffer )
+			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilFormat )
 			{
 				stencilBuffer = new GLRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -1578,7 +1578,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
 	{
-		GLTexturePtr tex = texPtr;
+		GLTexturePtr tex = texPtr.staticCast<GLTexture>();
 
 		GLenum lastTextureType = mTextureTypes[stage];
 
@@ -2916,7 +2916,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                 !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL) ||
-                                op.vertexData->vertexBufferBinding->getHasInstanceData();
+                                op.vertexData->vertexBufferBinding->hasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 
@@ -3669,7 +3669,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::registerThread()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// This is only valid once we've created the main context
 		if (!mMainContext)
 		{
@@ -3705,7 +3705,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::preExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// free context, we'll need this to share lists
         if(mCurrentContext)
             mCurrentContext->endCurrent();
@@ -3713,7 +3713,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::postExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+            OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// reacquire context
         if(mCurrentContext)
             mCurrentContext->setCurrent();
@@ -3805,7 +3805,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         {
             isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
 
-            if (hwGlBuffer->getIsInstanceData())
+            if (hwGlBuffer->isInstanceData())
             {
                 GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
                 glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );

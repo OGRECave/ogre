@@ -13,9 +13,9 @@ same license as the rest of the engine.
 */
 
 /**
-    \file 
+    @file 
         Shadows.cpp
-    \brief
+    @brief
         Shows a few ways to use Ogre's shadowing techniques
 */
 
@@ -750,10 +750,10 @@ protected:
 					(*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
 				}
 
-				themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL);
+				themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL).staticCast<Material>();
 				mCustomRockwallVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
 				mCustomRockwallFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
-				themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL);
+				themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL).staticCast<Material>();
 				mCustomAtheneVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
 				mCustomAtheneFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
 				showSliders = true;
@@ -787,10 +787,10 @@ protected:
 					(*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
 				}
 
-				themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
+				themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL + "/PCF").staticCast<Material>();
 				mCustomRockwallVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
 				mCustomRockwallFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
-				themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL + "/PCF");
+				themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL + "/PCF").staticCast<Material>();
 				mCustomAtheneVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
 				mCustomAtheneFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
 				showSliders = true;

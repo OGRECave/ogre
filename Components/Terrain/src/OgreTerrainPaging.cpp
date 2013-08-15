@@ -47,7 +47,7 @@ namespace Ogre
 	TerrainPagedWorldSection* TerrainPaging::createWorldSection(
 		PagedWorld* world, TerrainGroup* terrainGroup, 
 		Real loadRadius, Real holdRadius, int32 minX, int32 minY, int32 maxX, int32 maxY, 
-		const String& sectionName)
+		const String& sectionName, uint32 loadingIntervalMs)
 	{
 		TerrainPagedWorldSection* ret = static_cast<TerrainPagedWorldSection*>(
 			world->createSection(terrainGroup->getSceneManager(), SectionFactory::FACTORY_NAME, sectionName));
@@ -56,6 +56,7 @@ namespace Ogre
 		ret->setLoadRadius(loadRadius);
 		ret->setHoldRadius(holdRadius);
 		ret->setPageRange(minX, minY, maxX, maxY);
+		ret->setLoadingIntervalMs(loadingIntervalMs);
 
 		return ret;
 

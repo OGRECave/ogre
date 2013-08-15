@@ -416,9 +416,12 @@ namespace Ogre {
 				memset(CPUString, 0, sizeof(CPUString));
 				memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
-				*((int*)CPUString) = result._ebx;
-				*((int*)(CPUString+4)) = result._edx;
-				*((int*)(CPUString+8)) = result._ecx;
+				//*((int*)CPUString) = result._ebx;
+                                memcpy(CPUString, &result._ebx, sizeof(int));
+				//*((int*)(CPUString+4)) = result._edx;
+                                memcpy(CPUString+4, &result._edx, sizeof(int));
+                                //*((int*)(CPUString+8)) = result._ecx;
+                                memcpy(CPUString+8, &result._ecx, sizeof(int));
 
 				detailedIdentStr << CPUString;
 

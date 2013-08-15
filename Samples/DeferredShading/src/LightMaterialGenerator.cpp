@@ -64,7 +64,7 @@ public:
 			programName += "LightMaterial_vs";
 		}
 
-		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName).staticCast<GpuProgram>();
 		assert(!ptr.isNull());
 		return ptr;
 	}
@@ -119,7 +119,7 @@ public:
 		{
 			materialName += "Shadow";
 		}
-		return MaterialManager::getSingleton().getByName(materialName);
+		return MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
 	}
 
 	protected:
@@ -229,7 +229,7 @@ public:
 			programName += "LightMaterial_vs";
 		}
 
-		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName).staticCast<GpuProgram>();
 		assert(!ptr.isNull());
 		return ptr;
 	}
@@ -290,7 +290,7 @@ public:
 		{
 			materialName += "Shadow";
 		}
-		return MaterialManager::getSingleton().getByName(materialName);
+		return MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
 	}
 
 protected:
@@ -302,7 +302,7 @@ protected:
         String strPPD;
 
         //Get the type of light
-        Ogre::uint lightType;
+        Ogre::uint lightType = 0;
         if (permutation & LightMaterialGenerator::MI_POINT)
         {
             lightType = 1;

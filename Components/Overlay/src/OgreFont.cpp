@@ -168,7 +168,7 @@ namespace Ogre
     {
         // Create a new material
         mMaterial =  MaterialManager::getSingleton().create(
-			"Fonts/" + mName,  mGroup);
+			"Fonts/" + mName,  mGroup).staticCast<Material>();
 
 		if (mMaterial.isNull())
         {
@@ -236,7 +236,7 @@ namespace Ogre
 		String texName = mName + "Texture";
 		// Create, setting isManual to true and passing self as loader
 		mTexture = TextureManager::getSingleton().create(
-			texName, mGroup, true, this);
+			texName, mGroup, true, this).staticCast<Texture>();
 		mTexture->setTextureType(TEX_TYPE_2D);
 		mTexture->setNumMipmaps(0);
 		mTexture->load();

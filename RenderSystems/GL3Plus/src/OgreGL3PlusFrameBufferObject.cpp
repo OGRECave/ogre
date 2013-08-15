@@ -155,14 +155,7 @@ namespace Ogre {
             else
             {
                 // Detach
-                if(getFormat() == PF_DEPTH)
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
-                }
+                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
             }
         }
 
@@ -210,7 +203,8 @@ namespace Ogre {
 		}
 
         // Drawbuffer extension supported, use it
-        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        if(getFormat() != PF_DEPTH)
+            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
 		if (mMultisampleFB)
 		{
@@ -259,7 +253,7 @@ namespace Ogre {
 		if (mMultisampleFB)
 		{
             GLint oldfb = 0;
-            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
 			// Blit from multisample buffer to final buffer, triggers resolve
 			size_t width = mColour[0].buffer->getWidth();

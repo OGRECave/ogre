@@ -9,25 +9,8 @@
 
 # Configure Octree SceneManager build
 
-set (HEADER_FILES
-  include/OgreOctree.h
-  include/OgreOctreeCamera.h
-  include/OgreOctreeNode.h
-  include/OgreOctreePlugin.h
-  include/OgreOctreePrerequisites.h
-  include/OgreOctreeSceneManager.h
-  include/OgreOctreeSceneQuery.h
-)
-
-set (SOURCE_FILES
-  src/OgreOctree.cpp
-  src/OgreOctreeCamera.cpp
-  src/OgreOctreeNode.cpp
-  src/OgreOctreePlugin.cpp
-  src/OgreOctreeSceneManager.cpp
-  src/OgreOctreeSceneManagerDll.cpp
-  src/OgreOctreeSceneQuery.cpp
-)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)
@@ -44,4 +27,3 @@ ogre_config_framework(Plugin_OctreeSceneManager)
 
 ogre_config_plugin(Plugin_OctreeSceneManager)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/OctreeSceneManager)
-

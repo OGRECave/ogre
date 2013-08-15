@@ -33,16 +33,19 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs unifi
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs unified
 {
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_glsl
 }
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase_vs unified
 {	
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase_vs_glsl
 }
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs unified
 {	
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs_glsl
 }
 
 fragment_program Ogre/RTShader/shadow_caster_dq_ps unified
@@ -229,6 +232,21 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg cg
 	}
 }
 
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_glsl glsl
+{
+	source DualQuaternionSkinning_ShadowCasterTwoPhaseTwoWeights.glsl
+	//will run on 3 to accommodate the amount of registers
+	attach Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
 ///////////////////////////////////////////////////////////////////////////
 /// Declare materials for casters and casters with hardware skinning
 ///////////////////////////////////////////////////////////////////////////

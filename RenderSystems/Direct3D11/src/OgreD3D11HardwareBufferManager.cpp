@@ -57,7 +57,7 @@ namespace Ogre {
 		D3D11HardwareVertexBuffer* vbuf = new D3D11HardwareVertexBuffer(
 			this, vertexSize, numVerts, usage, mlpD3DDevice, false, useShadowBuffer, false);
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 				mVertexBuffers.insert(vbuf);
 		}
 		return HardwareVertexBufferSharedPtr(vbuf);
@@ -72,7 +72,7 @@ namespace Ogre {
 		D3D11HardwareVertexBuffer* vbuf = new D3D11HardwareVertexBuffer(
 			this, vertexSize, numVerts, usage, mlpD3DDevice, false, useShadowBuffer, true);
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 				mVertexBuffers.insert(vbuf);
 		}
 		return HardwareVertexBufferSharedPtr(vbuf);
@@ -87,7 +87,7 @@ namespace Ogre {
 		D3D11HardwareIndexBuffer* idx = new D3D11HardwareIndexBuffer(
 			this, itype, numIndexes, usage, mlpD3DDevice, false, useShadowBuffer);
 		{
-			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 				mIndexBuffers.insert(idx);
 		}
 		return HardwareIndexBufferSharedPtr(idx);
@@ -129,7 +129,7 @@ namespace Ogre {
 		{*/
 			uni = new D3D11HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, mlpD3DDevice);
 			{
-				OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+				OGRE_LOCK_MUTEX(mUniformBuffersMutex);
 				mUniformBuffers.insert(uni);
 			}
 		//}
@@ -163,7 +163,7 @@ namespace Ogre {
 		size_t uCount = 0;
 
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 				VertexBufferList::iterator v, vend;
 			vend = mVertexBuffers.end();
 			for (v = mVertexBuffers.begin(); v != vend; ++v)
@@ -176,7 +176,7 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 				IndexBufferList::iterator i, iend;
 			iend = mIndexBuffers.end();
 			for (i = mIndexBuffers.begin(); i != iend; ++i)
@@ -190,8 +190,8 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
-				UniformBufferList::iterator i, iend;
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex);
+			UniformBufferList::iterator i, iend;
 			iend = mUniformBuffers.end();
 			for (i = mUniformBuffers.begin(); i != iend; ++i)
 			{
@@ -219,7 +219,7 @@ namespace Ogre {
 		size_t uCount = 0;
 
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 				VertexBufferList::iterator v, vend;
 			vend = mVertexBuffers.end();
 			for (v = mVertexBuffers.begin(); v != vend; ++v)
@@ -232,7 +232,7 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 				IndexBufferList::iterator i, iend;
 			iend = mIndexBuffers.end();
 			for (i = mIndexBuffers.begin(); i != iend; ++i)
@@ -246,8 +246,8 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
-				UniformBufferList::iterator i, iend;
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex);
+			UniformBufferList::iterator i, iend;
 			iend = mUniformBuffers.end();
 			for (i = mUniformBuffers.begin(); i != iend; ++i)
 			{

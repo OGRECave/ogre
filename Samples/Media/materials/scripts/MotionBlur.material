@@ -47,10 +47,10 @@ fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
 
 fragment_program Ogre/Compositor/Combine_fp unified
 {
-	//delegate Ogre/Compositor/Combine_GLSL_fp
-	//delegate Ogre/Compositor/Combine_GLSLES_fp
+	delegate Ogre/Compositor/Combine_GLSL_fp
+	delegate Ogre/Compositor/Combine_GLSLES_fp
 	delegate Ogre/Compositor/Combine_HLSL_fp
-	//delegate Ogre/Compositor/Combine_Cg_fp
+	delegate Ogre/Compositor/Combine_Cg_fp
 }
 
 material Ogre/Compositor/Combine

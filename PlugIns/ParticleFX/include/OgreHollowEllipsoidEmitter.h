@@ -107,7 +107,7 @@ namespace Ogre {
         Real getInnerSizeZ(void) const;
 
     protected:
-        // See ParticleEmitter
+        /// @see ParticleEmitter
 
         /// Size of 'clear' center area (> 0 and < 1.0)
         Vector3 mInnerSize;

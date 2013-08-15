@@ -141,7 +141,7 @@ protected:
 		Entity* head = mSceneMgr->createEntity("Head", "ogrehead.mesh");
 		head->setMaterialName("Examples/OffsetMapping/Specular");
 #if defined(USE_RTSHADER_SYSTEM)
-        MaterialPtr headMat = MaterialManager::getSingleton().getByName("Examples/OffsetMapping/Specular");
+        MaterialPtr headMat = MaterialManager::getSingleton().getByName("Examples/OffsetMapping/Specular").staticCast<Material>();
         headMat->getBestTechnique()->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 30, 0))->attachObject(head);
@@ -166,7 +166,7 @@ protected:
 		sm->indexData->indexCount = 18;
 
 #if defined(USE_RTSHADER_SYSTEM)
-        MaterialPtr grassMat = MaterialManager::getSingleton().getByName("Examples/GrassBlades");
+        MaterialPtr grassMat = MaterialManager::getSingleton().getByName("Examples/GrassBlades").staticCast<Material>();
         grassMat->getTechnique(0)->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
 

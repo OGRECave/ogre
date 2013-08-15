@@ -29,6 +29,10 @@ THE SOFTWARE.
 #ifndef __TestContext_H__
 #define __TestContext_H__
 
+#include "SampleContext.h"
+#include "SamplePlugin.h"
+#include "VisualTest.h"
+
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
 
@@ -38,10 +42,6 @@ THE SOFTWARE.
 extern int *_NSGetArgc(void);
 extern char ***_NSGetArgv(void);
 #endif
-
-#include "SampleContext.h"
-#include "SamplePlugin.h"
-#include "VisualTest.h"
 
 class TestBatch;
 using namespace Ogre;
@@ -162,6 +162,7 @@ public:
     virtual void finishedTests();
 
     void createDummyScene();
+    void destroyDummyScene();
     bool initializeRTShaderSystem(SceneManager* sceneMgr);
     void finalizeRTShaderSystem();
 
@@ -235,6 +236,8 @@ protected:
     bool mGenerateHtml;
     // Force the config dialog
     bool mForceConfig;
+    // Do not confine mouse to window
+    bool mNoGrabMouse;
     // Show usage details
     bool mHelp;
     // Render system to use
@@ -283,9 +286,6 @@ protected:
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
 @end
-
-
-static id mAppDelegate;
 
 @implementation AppDelegate
 

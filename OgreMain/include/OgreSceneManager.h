@@ -56,6 +56,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -509,11 +510,11 @@ namespace Ogre {
         /// Cached light information, used to tracking light's changes
         struct _OgreExport LightInfo
         {
-            Light* light;       // Just a pointer for comparison, the light might destroyed for some reason
-            int type;           // Use int instead of Light::LightTypes to avoid header file dependence
-            Real range;         // Sets to zero if directional light
-            Vector3 position;   // Sets to zero if directional light
-			uint32 lightMask;   // Light mask
+            Light* light;       /// Just a pointer for comparison, the light might destroyed for some reason
+            int type;           /// Use int instead of Light::LightTypes to avoid header file dependence
+            Real range;         /// Sets to zero if directional light
+            Vector3 position;   /// Sets to zero if directional light
+			uint32 lightMask;   /// Light mask
 
             bool operator== (const LightInfo& rhs) const
             {
@@ -539,8 +540,8 @@ namespace Ogre {
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
 		struct MovableObjectCollection
 		{
-			MovableObjectMap map;
-			OGRE_MUTEX(mutex)
+                    MovableObjectMap map;
+                    OGRE_MUTEX(mutex);
 		};
 		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
 		MovableObjectCollectionMap mMovableObjectCollectionMap;
@@ -556,7 +557,7 @@ namespace Ogre {
 		*/
 		const MovableObjectCollection* getMovableObjectCollection(const String& typeName) const;
 		/// Mutex over the collection of MovableObject types
-		OGRE_MUTEX(mMovableObjectCollectionMapMutex)
+		OGRE_MUTEX(mMovableObjectCollectionMapMutex);
 
         /** Internal method for initialising the render queue.
         @remarks
@@ -630,13 +631,13 @@ namespace Ogre {
             int xsegments, int ysegments, int ySegmentsToKeep, 
             const String& groupName);
 
-        // Flag indicating whether SceneNodes will be rendered as a set of 3 axes
+        /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
         bool mDisplayNodes;
 
         /// Storage of animations, lookup by name
         typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
-		OGRE_MUTEX(mAnimationsListMutex)
+        OGRE_MUTEX(mAnimationsListMutex);
         AnimationStateSet mAnimationStates;
 
 
@@ -852,9 +853,9 @@ namespace Ogre {
         AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
         Real mDefaultShadowFarDist;
         Real mDefaultShadowFarDistSquared;
-        Real mShadowTextureOffset; // proportion of texture offset in view direction e.g. 0.4
-        Real mShadowTextureFadeStart; // as a proportion e.g. 0.6
-        Real mShadowTextureFadeEnd; // as a proportion e.g. 0.9
+        Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
+        Real mShadowTextureFadeStart; /// As a proportion e.g. 0.6
+        Real mShadowTextureFadeEnd; /// As a proportion e.g. 0.9
 		bool mShadowTextureSelfShadow;
 		Pass* mShadowTextureCustomCasterPass;
 		Pass* mShadowTextureCustomReceiverPass;
@@ -1006,19 +1007,19 @@ namespace Ogre {
 
 
 
-        /// Set of registered lod listeners
+        /// Set of registered LOD listeners
         typedef set<LodListener*>::type LodListenerSet;
         LodListenerSet mLodListeners;
 
-        /// List of movable object lod changed events
+        /// List of movable object LOD changed events
 		typedef vector<MovableObjectLodChangedEvent>::type MovableObjectLodChangedEventList;
         MovableObjectLodChangedEventList mMovableObjectLodChangedEvents;
 
-        /// List of entity mesh lod changed events
+        /// List of entity mesh LOD changed events
         typedef vector<EntityMeshLodChangedEvent>::type EntityMeshLodChangedEventList;
         EntityMeshLodChangedEventList mEntityMeshLodChangedEvents;
 
-        /// List of entity material lod changed events
+        /// List of entity material LOD changed events
         typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
@@ -1057,7 +1058,7 @@ namespace Ogre {
 			locking required during rendering lower than to make update locks
 			more granular.
 		*/
-		OGRE_MUTEX(sceneGraphMutex)
+        OGRE_MUTEX(sceneGraphMutex);
 
 		/** Return the instance name of this SceneManager. */
 		const String& getName(void) const { return mName; }
@@ -2374,7 +2375,7 @@ namespace Ogre {
             you have to call methods on Node and Animation in a particular order (namely
             Node::resetToInitialState and Animation::apply). To make this easier and to
             help track the current time position of animations, the AnimationState object
-            is provided. </p>
+            is provided.
             So if you don't want to control animation application manually, call this method,
             update the returned object as you like every frame and let SceneManager apply 
             the animation state for you.
@@ -2442,7 +2443,6 @@ namespace Ogre {
             bool doBeginEndFrame = false) ;
 
 		/** Manual rendering method for rendering a single object. 
-		@remarks
 		@param rend The renderable to issue to the pipeline
 		@param pass The pass to use
 		@param vp Pointer to the viewport to render to, or 0 to use the existing viewport
@@ -3533,16 +3533,16 @@ namespace Ogre {
         */
         void removeLodListener(LodListener *listener);
 
-        /** Notify that a movable object lod change event has occurred. */
+        /** Notify that a movable object LOD change event has occurred. */
         void _notifyMovableObjectLodChanged(MovableObjectLodChangedEvent& evt);
 
-        /** Notify that an entity mesh lod change event has occurred. */
+        /** Notify that an entity mesh LOD change event has occurred. */
         void _notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt);
 
-        /** Notify that an entity material lod change event has occurred. */
+        /** Notify that an entity material LOD change event has occurred. */
         void _notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt);
 
-        /** Handle lod events. */
+        /** Handle LOD events. */
         void _handleLodEvents();
 
 		IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}

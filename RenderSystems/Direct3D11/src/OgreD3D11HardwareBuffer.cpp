@@ -106,9 +106,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		SAFE_RELEASE(mlpD3DBuffer);
-#endif
 		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
 		SAFE_DELETE(mShadowBuffer);
 	}
@@ -120,6 +118,7 @@ namespace Ogre {
 		{
 			// need to realloc
 			mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
+			SAFE_RELEASE(mlpD3DBuffer);
 			HRESULT hr = mDevice->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
 			if (FAILED(hr) || mDevice.isError())
 			{

@@ -71,7 +71,7 @@ namespace Ogre {
 		// Was it created?
 		if(res.second)
         {
-            TexturePtr tex = res.first;
+            TexturePtr tex = res.first.staticCast<Texture>();
             tex->setTextureType(texType);
             tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
 				static_cast<size_t>(numMipmaps));
@@ -89,7 +89,7 @@ namespace Ogre {
     {
 		ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
-        TexturePtr tex = res.first;
+        TexturePtr tex = res.first.staticCast<Texture>();
 		tex->prepare();
         return tex;
     }
@@ -100,7 +100,7 @@ namespace Ogre {
     {
 		ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
-        TexturePtr tex = res.first;
+        TexturePtr tex = res.first.staticCast<Texture>();
 		tex->load();
         return tex;
     }
@@ -110,7 +110,7 @@ namespace Ogre {
         const Image &img, TextureType texType, int numMipmaps, Real gamma, bool isAlpha, 
 		PixelFormat desiredFormat, bool hwGamma)
     {
-        TexturePtr tex = create(name, group, true);
+        TexturePtr tex = create(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -129,7 +129,7 @@ namespace Ogre {
         PixelFormat format, TextureType texType, 
         int numMipmaps, Real gamma, bool hwGamma)
 	{
-        TexturePtr tex = create(name, group, true);
+        TexturePtr tex = create(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -160,7 +160,7 @@ namespace Ogre {
         {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
         }
-        ret = create(name, group, true, loader);
+        ret = create(name, group, true, loader).staticCast<Texture>();
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);

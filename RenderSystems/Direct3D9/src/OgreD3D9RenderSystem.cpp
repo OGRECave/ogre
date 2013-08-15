@@ -1946,7 +1946,7 @@ namespace Ogre
 	void D3D9RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
 	{
 		HRESULT hr;
-		D3D9TexturePtr dt = tex;
+		D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
 		if (enabled && !dt.isNull())
 		{
 			// note used
@@ -2025,7 +2025,7 @@ namespace Ogre
 		}
 		else
 		{
-			D3D9TexturePtr dt = tex;
+			D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
 			// note used
 			dt->touch();
 
@@ -3289,7 +3289,7 @@ namespace Ogre
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || binding->getHasInstanceData();
+                || binding->hasInstanceData();
 
 
 		// TODO: attempt to detect duplicates
@@ -3329,7 +3329,7 @@ namespace Ogre
             // SetStreamSourceFreq
             if ( hasInstanceData ) 
             {
-		        if ( d3d9buf->getIsInstanceData() )
+		        if ( d3d9buf->isInstanceData() )
 		        {
 			        hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
 		        }
@@ -3660,7 +3660,7 @@ namespace Ogre
 		case GPT_VERTEX_PROGRAM:
 			mActiveVertexGpuProgramParameters = params;
 			{
-				OGRE_LOCK_MUTEX(floatLogical->mutex)
+                            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 						i != floatLogical->map.end(); ++i)
@@ -3687,7 +3687,7 @@ namespace Ogre
 			}
 			// bind ints
 			{
-				OGRE_LOCK_MUTEX(intLogical->mutex)
+                            OGRE_LOCK_MUTEX(intLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 						i != intLogical->map.end(); ++i)
@@ -3716,7 +3716,7 @@ namespace Ogre
 		case GPT_FRAGMENT_PROGRAM:
 			mActiveFragmentGpuProgramParameters = params;
 			{
-				OGRE_LOCK_MUTEX(floatLogical->mutex)
+                            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 						i != floatLogical->map.end(); ++i)
@@ -3742,7 +3742,7 @@ namespace Ogre
 			}
 			// bind ints
 			{
-				OGRE_LOCK_MUTEX(intLogical->mutex)
+                            OGRE_LOCK_MUTEX(intLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 						i != intLogical->map.end(); ++i)
@@ -4174,7 +4174,7 @@ namespace Ogre
 		IDirect3DSurface9* mSurface = activeDevice->getPrimaryWindow()->getRenderSurface();
 		D3DSURFACE_DESC srfDesc;
 
-		if(!FAILED(mSurface->GetDesc(&srfDesc)))
+		if(mSurface && SUCCEEDED(mSurface->GetDesc(&srfDesc)))
 		{
 			/// Probe all depth stencil formats
 			/// Break on first one that matches

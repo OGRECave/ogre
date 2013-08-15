@@ -345,7 +345,7 @@ namespace Ogre {
 		// Wrap memory, be sure not to delete when stream destroyed
 		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
-		pCodec->codeToFile(wrapper, filename, codeDataPtr);
+		pCodec->encodeToFile(wrapper, filename, codeDataPtr);
 	}
 	//---------------------------------------------------------------------
 	DataStreamPtr Image::encode(const String& formatextension)
@@ -373,7 +373,7 @@ namespace Ogre {
 		// Wrap memory, be sure not to delete when stream destroyed
 		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
-		return pCodec->code(wrapper, codeDataPtr);
+		return pCodec->encode(wrapper, codeDataPtr);
 	}
 	//-----------------------------------------------------------------------------
 	Image & Image::load(DataStreamPtr& stream, const String& type )
@@ -540,33 +540,18 @@ namespace Ogre {
 		if( bpp != 24 && bpp != 32 ) return;
 
 		uint stride = bpp >> 3;
+		
+		uchar gammaramp[256];
+		const Real exponent = 1.0f / gamma;
+		for(int i = 0; i < 256; i++) {
+			gammaramp[i] = static_cast<uchar>(Math::Pow(i/255.0f, exponent)*255+0.5f);
+		}
 
 		for( size_t i = 0, j = size / stride; i < j; i++, buffer += stride )
 		{
-			float r, g, b;
-
-			r = (float)buffer[0];
-			g = (float)buffer[1];
-			b = (float)buffer[2];
-
-			r = r * gamma;
-			g = g * gamma;
-			b = b * gamma;
-
-			float scale = 1.0f, tmp;
-
-			if( r > 255.0f && (tmp=(255.0f/r)) < scale )
-				scale = tmp;
-			if( g > 255.0f && (tmp=(255.0f/g)) < scale )
-				scale = tmp;
-			if( b > 255.0f && (tmp=(255.0f/b)) < scale )
-				scale = tmp;
-
-			r *= scale; g *= scale; b *= scale;
-
-			buffer[0] = (uchar)r;
-			buffer[1] = (uchar)g;
-			buffer[2] = (uchar)b;
+			buffer[0] = gammaramp[buffer[0]];
+			buffer[1] = gammaramp[buffer[1]];
+			buffer[2] = gammaramp[buffer[2]];
 		}
 	}
 	//-----------------------------------------------------------------------------

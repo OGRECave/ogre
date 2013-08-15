@@ -534,7 +534,7 @@ MaterialPtr GBufferMaterialGeneratorImpl::generateTemplateMaterial(MaterialGener
 	String matName = mBaseName + "Mat_" + StringConverter::toString(permutation);
 
 	MaterialPtr matPtr = MaterialManager::getSingleton().create
-		(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
 	Pass* pass = matPtr->getTechnique(0)->getPass(0);
 	pass->setName(mBaseName + "Pass_" + StringConverter::toString(permutation));
 	pass->setLightingEnabled(false);

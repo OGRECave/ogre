@@ -44,7 +44,7 @@ void main()
 	vec3 binormal = cross(normal, tangent); 
 
 	// Form a rotation matrix out of the vectors, column major for glsl es 
-	mat3 rotation = mat3(tangent, localbinormal, normal);
+	mat3 rotation = mat3(tangent, binormal, normal);
     
 	// Transform the light vector according to this matrix 
 	tangentLightDir[0] = normalize(rotation * lightDir); 

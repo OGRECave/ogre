@@ -35,68 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    template<> PixelCountLodStrategy* Singleton<PixelCountLodStrategy>::msSingleton = 0;
-    PixelCountLodStrategy* PixelCountLodStrategy::getSingletonPtr(void)
-    {
-        return msSingleton;
-    }
-    PixelCountLodStrategy& PixelCountLodStrategy::getSingleton(void)
-    {
-        assert( msSingleton );  return ( *msSingleton );
-    }
-    //-----------------------------------------------------------------------
-    PixelCountLodStrategy::PixelCountLodStrategy()
-        : LodStrategy("PixelCount")
+    PixelCountLodStrategy::PixelCountLodStrategy(const String& name)
+        : LodStrategy(name)
     { }
-    //-----------------------------------------------------------------------
-    Real PixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
-    {
-        // Get viewport
-        const Viewport *viewport = camera->getViewport();
-
-        // Get viewport area
-        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
-
-        // Get area of unprojected circle with object bounding radius
-        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadius());
-
-        // Base computation on projection type
-        switch (camera->getProjectionType())
-        {
-        case PT_PERSPECTIVE:
-            {
-                // Get camera distance
-                Real distanceSquared = movableObject->getParentNode()->getSquaredViewDepth(camera);
-
-                // Check for 0 distance
-                if (distanceSquared <= std::numeric_limits<Real>::epsilon())
-                    return getBaseValue();
-
-                // Get projection matrix (this is done to avoid computation of tan(fov / 2))
-                const Matrix4& projectionMatrix = camera->getProjectionMatrix();
-
-                // Estimate pixel count
-                return (boundingArea * viewportArea * projectionMatrix[0][0] * projectionMatrix[1][1]) / distanceSquared;
-            }
-        case PT_ORTHOGRAPHIC:
-            {
-                // Compute orthographic area
-                Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
-
-                // Check for 0 orthographic area
-                if (orthoArea <= std::numeric_limits<Real>::epsilon())
-                    return getBaseValue();
-
-                // Estimate pixel count
-                return (boundingArea * viewportArea) / orthoArea;
-            }
-        default:
-            {
-                // This case is not covered for obvious reasons
-                throw;
-            }
-        }
-    }
     //---------------------------------------------------------------------
     Real PixelCountLodStrategy::getBaseValue() const
     {
@@ -133,5 +74,107 @@ namespace Ogre {
         // Check if values are sorted descending
         return isSortedDescending(values);
     }
+
+    /************************************************************************/
+    /*  AbsolutPixelCountLodStrategy                                        */
+    /************************************************************************/
+
+    //-----------------------------------------------------------------------
+    template<> AbsolutePixelCountLodStrategy* Singleton<AbsolutePixelCountLodStrategy>::msSingleton = 0;
+    AbsolutePixelCountLodStrategy* AbsolutePixelCountLodStrategy::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    AbsolutePixelCountLodStrategy& AbsolutePixelCountLodStrategy::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //-----------------------------------------------------------------------
+    AbsolutePixelCountLodStrategy::AbsolutePixelCountLodStrategy()
+        : PixelCountLodStrategy("pixel_count")
+    { }
+    //-----------------------------------------------------------------------
+    Real AbsolutePixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    {
+        // Get viewport
+        const Viewport *viewport = camera->getViewport();
+
+        // Get viewport area
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+
+        // Get area of unprojected circle with object bounding radius
+        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadius());
+
+        // Base computation on projection type
+        switch (camera->getProjectionType())
+        {
+        case PT_PERSPECTIVE:
+            {
+                // Get camera distance
+                Real distanceSquared = movableObject->getParentNode()->getSquaredViewDepth(camera);
+
+                // Check for 0 distance
+                if (distanceSquared <= std::numeric_limits<Real>::epsilon())
+                    return getBaseValue();
+
+                // Get projection matrix (this is done to avoid computation of tan(FOV / 2))
+                const Matrix4& projectionMatrix = camera->getProjectionMatrix();
+
+                // Estimate pixel count
+                return (boundingArea * viewportArea * projectionMatrix[0][0] * projectionMatrix[1][1]) / distanceSquared;
+            }
+        case PT_ORTHOGRAPHIC:
+            {
+                // Compute orthographic area
+                Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
+
+                // Check for 0 orthographic area
+                if (orthoArea <= std::numeric_limits<Real>::epsilon())
+                    return getBaseValue();
+
+                // Estimate pixel count
+                return (boundingArea * viewportArea) / orthoArea;
+            }
+        default:
+            {
+                // This case is not covered for obvious reasons
+                throw;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+
+    /************************************************************************/
+    /* ScreenRatioPixelCountLodStrategy                                     */
+    /************************************************************************/
+
+    //-----------------------------------------------------------------------
+    template<> ScreenRatioPixelCountLodStrategy* Singleton<ScreenRatioPixelCountLodStrategy>::msSingleton = 0;
+    ScreenRatioPixelCountLodStrategy* ScreenRatioPixelCountLodStrategy::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    ScreenRatioPixelCountLodStrategy& ScreenRatioPixelCountLodStrategy::getSingleton(void)
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //-----------------------------------------------------------------------
+    ScreenRatioPixelCountLodStrategy::ScreenRatioPixelCountLodStrategy()
+        : PixelCountLodStrategy("screen_ratio_pixel_count")
+    { }
+    //-----------------------------------------------------------------------
+    Real ScreenRatioPixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    {
+        // Get absolute pixel count
+        Real absoluteValue = AbsolutePixelCountLodStrategy::getSingletonPtr()->getValueImpl(movableObject, camera);
+
+        // Get viewport area
+        const Viewport *viewport = camera->getViewport();        
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+        
+        // Return ratio of screen size to absolutely covered pixel count
+        return absoluteValue / viewportArea;
+    }
+    //-----------------------------------------------------------------------
 
 } // namespace

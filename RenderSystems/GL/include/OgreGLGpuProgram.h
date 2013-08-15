@@ -53,6 +53,8 @@ namespace Ogre {
 		/// Bind just the pass iteration parameters
 		virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
 
+        /// @copydoc Resource::calculateSize
+        virtual size_t calculateSize(void) const;
 
         /// Get the assigned GL program id
         GLuint getProgramID(void) const

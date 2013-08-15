@@ -134,7 +134,7 @@ namespace Ogre
 		void updateVertexTexture(void);
 
 		/** Affects VTF texture's width dimension */
-		virtual bool matricesToghetherPerRow() const = 0;
+		virtual bool matricesTogetherPerRow() const = 0;
 
 		/** update the lookup numbers for entities with shared transforms */
 		virtual void updateSharedLookupIndexes();
@@ -211,7 +211,7 @@ namespace Ogre
 		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
 			const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt );
 
-		virtual bool matricesToghetherPerRow() const { return false; }
+		virtual bool matricesTogetherPerRow() const { return false; }
 	public:
 		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,

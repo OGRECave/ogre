@@ -198,7 +198,7 @@ SceneManager::~SceneManager()
 
 	// clear down movable object collection map
 	{
-		OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+            OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 		for (MovableObjectCollectionMap::iterator i = mMovableObjectCollectionMap.begin();
 			i != mMovableObjectCollectionMap.end(); ++i)
 		{
@@ -323,8 +323,10 @@ bool SceneManager::hasCamera(const String& name) const
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
-	destroyCamera(cam->getName());
+    if(!cam)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null Camera.", "SceneManager::destroyCamera");
 
+	destroyCamera(cam->getName());
 }
 
 //-----------------------------------------------------------------------
@@ -888,8 +890,10 @@ void SceneManager::destroySceneNode(const String& name)
 //---------------------------------------------------------------------
 void SceneManager::destroySceneNode(SceneNode* sn)
 {
-	destroySceneNode(sn->getName());
+    if(!sn)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
 
+	destroySceneNode(sn->getName());
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
@@ -1396,7 +1400,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
-		OGRE_LOCK_MUTEX(sceneGraphMutex)
+            OGRE_LOCK_MUTEX(sceneGraphMutex);
 
 		// Update scene graph for this camera (can happen multiple times per frame)
 		{
@@ -1652,7 +1656,7 @@ void SceneManager::_setSkyPlane(
         String meshName = mName + "SkyPlane";
         mSkyPlane = plane;
 
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -1667,7 +1671,7 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneRenderQueue = renderQueue;
 
         // Set up the plane
-        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName);
+        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName).staticCast<Mesh>();
         if (!planeMesh.isNull())
         {
             // Destroy the old one
@@ -1760,7 +1764,7 @@ void SceneManager::_setSkyBox(
 {
     if (enable)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -1896,7 +1900,7 @@ void SceneManager::_setSkyBox(
 				// Used to use combined material but now we're using queue we can't split to change frame
 				// This doesn't use much memory because textures aren't duplicated
 				String matName = mName + "SkyBoxPlane" + StringConverter::toString(i);
-				MaterialPtr boxMat = matMgr.getByName(matName, groupName);
+				MaterialPtr boxMat = matMgr.getByName(matName, groupName).staticCast<Material>();
 				if (boxMat.isNull())
 				{
 					// Create new by clone
@@ -1986,7 +1990,7 @@ void SceneManager::_setSkyDome(
 {
     if (enable)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -2123,7 +2127,7 @@ MeshPtr SceneManager::createSkyboxPlane(
 
     // Check to see if existing plane
     MeshManager& mm = MeshManager::getSingleton();
-    MeshPtr planeMesh = mm.getByName(meshName, groupName);
+    MeshPtr planeMesh = mm.getByName(meshName, groupName).staticCast<Mesh>();
     if(!planeMesh.isNull())
     {
         // destroy existing
@@ -2195,7 +2199,7 @@ MeshPtr SceneManager::createSkydomePlane(
 
     // Check to see if existing plane
     MeshManager& mm = MeshManager::getSingleton();
-    MeshPtr planeMesh = mm.getByName(meshName, groupName);
+    MeshPtr planeMesh = mm.getByName(meshName, groupName).staticCast<Mesh>();
     if(!planeMesh.isNull())
     {
         // destroy existing
@@ -3679,7 +3683,7 @@ void SceneManager::setDisplaySceneNodes(bool display)
 //-----------------------------------------------------------------------
 Animation* SceneManager::createAnimation(const String& name, Real length)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
     // Check name not used
     if (mAnimationsList.find(name) != mAnimationsList.end())
@@ -3697,7 +3701,7 @@ Animation* SceneManager::createAnimation(const String& name, Real length)
 //-----------------------------------------------------------------------
 Animation* SceneManager::getAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	AnimationList::const_iterator i = mAnimationsList.find(name);
     if (i == mAnimationsList.end())
@@ -3711,13 +3715,13 @@ Animation* SceneManager::getAnimation(const String& name) const
 //-----------------------------------------------------------------------
 bool SceneManager::hasAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 	return (mAnimationsList.find(name) != mAnimationsList.end());
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAnimation(const String& name)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	// Also destroy any animation states referencing this animation
 	mAnimationStates.removeAnimationState(name);
@@ -3739,7 +3743,7 @@ void SceneManager::destroyAnimation(const String& name)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllAnimations(void)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
     // Destroy all states too, since they cannot reference destroyed animations
     destroyAllAnimationStates();
 
@@ -3786,7 +3790,7 @@ void SceneManager::destroyAllAnimationStates(void)
 void SceneManager::_applySceneAnimations(void)
 {
 	// manual lock over states (extended duration required)
-	OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME)
+    OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME);
 
 	// Iterate twice, once to reset, once to apply, to allow blending
     ConstEnabledAnimationStateIterator stateIt = mAnimationStates.getEnabledAnimationStateIterator();
@@ -4408,7 +4412,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 
 
 	{
-		OGRE_LOCK_MUTEX(lights->mutex)
+            OGRE_LOCK_MUTEX(lights->mutex);
 
 		// Pre-allocate memory
 		mTestLightInfos.clear();
@@ -4654,13 +4658,13 @@ void SceneManager::initShadowVolumeMaterials(void)
     if (!mShadowDebugPass)
     {
         MaterialPtr matDebug = 
-            MaterialManager::getSingleton().getByName("Ogre/Debug/ShadowVolumes");
+            MaterialManager::getSingleton().getByName("Ogre/Debug/ShadowVolumes").staticCast<Material>();
         if (matDebug.isNull())
         {
             // Create
             matDebug = MaterialManager::getSingleton().create(
                 "Ogre/Debug/ShadowVolumes", 
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
             mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
             mShadowDebugPass->setSceneBlending(SBT_ADD); 
             mShadowDebugPass->setLightingEnabled(false);
@@ -4707,13 +4711,13 @@ void SceneManager::initShadowVolumeMaterials(void)
     {
 
         MaterialPtr matStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowVolumes");
+            "Ogre/StencilShadowVolumes").staticCast<Material>();
         if (matStencil.isNull())
         {
             // Init
             matStencil = MaterialManager::getSingleton().create(
                 "Ogre/StencilShadowVolumes",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
             mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
 
             if (mDestRenderSystem->getCapabilities()->hasCapability(
@@ -4756,13 +4760,13 @@ void SceneManager::initShadowVolumeMaterials(void)
     {
 
         MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowModulationPass");
+            "Ogre/StencilShadowModulationPass").staticCast<Material>();
         if (matModStencil.isNull())
         {
             // Init
             matModStencil = MaterialManager::getSingleton().create(
                 "Ogre/StencilShadowModulationPass",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
             mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
             mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO); 
             mShadowModulativePass->setLightingEnabled(false);
@@ -4790,12 +4794,12 @@ void SceneManager::initShadowVolumeMaterials(void)
     if (!mShadowCasterPlainBlackPass)
     {
         MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowCaster");
+            "Ogre/TextureShadowCaster").staticCast<Material>();
         if (matPlainBlack.isNull())
         {
             matPlainBlack = MaterialManager::getSingleton().create(
                 "Ogre/TextureShadowCaster",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
             mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
             // Lighting has to be on, because we need shadow coloured objects
             // Note that because we can't predict vertex programs, we'll have to
@@ -4819,12 +4823,12 @@ void SceneManager::initShadowVolumeMaterials(void)
     if (!mShadowReceiverPass)
     {
         MaterialPtr matShadRec = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowReceiver");
+            "Ogre/TextureShadowReceiver").staticCast<Material>();
         if (matShadRec.isNull())			
         {
             matShadRec = MaterialManager::getSingleton().create(
                 "Ogre/TextureShadowReceiver",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
             mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
 			// Don't set lighting and blending modes here, depends on additive / modulative
             TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
@@ -4838,7 +4842,7 @@ void SceneManager::initShadowVolumeMaterials(void)
 
     // Set up spot shadow fade texture (loaded from code data block)
     TexturePtr spotShadowFadeTex = 
-        TextureManager::getSingleton().getByName("spot_shadow_fade.png");
+        TextureManager::getSingleton().getByName("spot_shadow_fade.png").staticCast<Texture>();
     if (spotShadowFadeTex.isNull())
     {
         // Load the manual buffer into an image (don't destroy memory!
@@ -6009,7 +6013,7 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
 	}
 	else
 	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
+		MaterialPtr mat = MaterialManager::getSingleton().getByName(name).staticCast<Material>();
 		if (mat.isNull())
 		{
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
@@ -6054,7 +6058,7 @@ void SceneManager::setShadowTextureReceiverMaterial(const String& name)
 	}
 	else
 	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
+		MaterialPtr mat = MaterialManager::getSingleton().getByName(name).staticCast<Material>();
 		if (mat.isNull())
 		{
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
@@ -6160,11 +6164,11 @@ void SceneManager::ensureShadowTexturesCreated()
 			shadowRTT->setAutoUpdated(false);
 
 			// Also create corresponding Material used for rendering this shadow
-			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
+			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
 			if (mat.isNull())
 			{
 				mat = MaterialManager::getSingleton().create(
-					matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+					matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
 			}
 			Pass* p = mat->getTechnique(0)->getPass(0);
 			if (p->getNumTextureUnitStates() != 1 ||
@@ -6216,7 +6220,7 @@ void SceneManager::destroyShadowTextures(void)
 
 		// Cleanup material that references this texture
 		String matName = shadowTex->getName() + "Mat" + getName();
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
+		MaterialPtr mat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
 		if (!mat.isNull())
 		{
 			// manually clear TUS to ensure texture ref released
@@ -6764,7 +6768,7 @@ SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName)
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6785,7 +6789,7 @@ const SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName) const
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::const_iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6815,7 +6819,7 @@ MovableObject* SceneManager::createMovableObject(const String& name,
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		if (objectMap->map.find(name) != objectMap->map.end())
 		{
@@ -6851,7 +6855,7 @@ void SceneManager::destroyMovableObject(const String& name, const String& typeNa
 		Root::getSingleton().getMovableObjectFactory(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		MovableObjectMap::iterator mi = objectMap->map.find(name);
 		if (mi != objectMap->map.end())
@@ -6875,7 +6879,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 		Root::getSingleton().getMovableObjectFactory(typeName);
 	
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::iterator i = objectMap->map.begin();
 		for (; i != objectMap->map.end(); ++i)
 		{
@@ -6892,7 +6896,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 void SceneManager::destroyAllMovableObjects(void)
 {
 	// Lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin();
 
@@ -6901,7 +6905,7 @@ void SceneManager::destroyAllMovableObjects(void)
 		MovableObjectCollection* coll = ci->second;
 
 		// lock map mutex
-		OGRE_LOCK_MUTEX(coll->mutex)
+		OGRE_LOCK_MUTEX(coll->mutex);
 
 		if (Root::getSingleton().hasMovableObjectFactory(ci->first))
 		{
@@ -6933,7 +6937,7 @@ MovableObject* SceneManager::getMovableObject(const String& name, const String& 
 	const MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::const_iterator mi = objectMap->map.find(name);
 		if (mi == objectMap->map.end())
 		{
@@ -6953,7 +6957,7 @@ bool SceneManager::hasMovableObject(const String& name, const String& typeName) 
 	{
 		return hasCamera(name);
 	}
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::const_iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -6961,7 +6965,7 @@ bool SceneManager::hasMovableObject(const String& name, const String& typeName) 
 		return false;
 	
 	{
-		OGRE_LOCK_MUTEX(i->second->mutex)
+            OGRE_LOCK_MUTEX(i->second->mutex);
 		return (i->second->map.find(name) != i->second->map.end());
 	}
 }
@@ -6977,6 +6981,9 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
+    if(!m)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null MovableObject.", "SceneManager::destroyMovableObject");
+
 	destroyMovableObject(m->getName(), m->getMovableType());
 }
 //---------------------------------------------------------------------
@@ -6984,7 +6991,7 @@ void SceneManager::injectMovableObject(MovableObject* m)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		objectMap->map[m->getName()] = m;
 	}
@@ -6994,7 +7001,7 @@ void SceneManager::extractMovableObject(const String& name, const String& typeNa
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectMap::iterator mi = objectMap->map.find(name);
 		if (mi != objectMap->map.end())
 		{
@@ -7014,7 +7021,7 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		// no deletion
 		objectMap->map.clear();
 	}

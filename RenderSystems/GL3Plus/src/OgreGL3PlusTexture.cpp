@@ -116,9 +116,7 @@ namespace Ogre {
         GLenum texTarget = getGL3PlusTextureTarget();
 
         // Calculate size for all mip levels of the texture
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        size_t width, height, depth;
 
         if((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
             // Standard alignment of 4 is not right for some formats
@@ -176,7 +174,7 @@ namespace Ogre {
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
-            size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+            size_t size;
 
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -251,9 +249,27 @@ namespace Ogre {
         }
         else
         {
-            if((mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2)) && mTextureType == TEX_TYPE_2D)
+            if(mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
             {
-                OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                switch(mTextureType)
+                {
+                    case TEX_TYPE_1D:
+                        OGRE_CHECK_GL_ERROR(glTexStorage1D(GL_TEXTURE_1D, GLsizei(mNumMipmaps+1), format, GLsizei(width)));
+                        break;
+                    case TEX_TYPE_2D:
+                    case TEX_TYPE_2D_RECT:
+                        OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                        break;
+                    case TEX_TYPE_CUBE_MAP:
+                        OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                        break;
+                    case TEX_TYPE_2D_ARRAY:
+                        OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                        break;
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                        break;
+                }
             }
             else
             {

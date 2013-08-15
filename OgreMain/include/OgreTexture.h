@@ -91,9 +91,6 @@ namespace Ogre {
 		MIP_DEFAULT = -1
 	};
 
-    // Forward declaration
-    class TexturePtr;
-
     /** Abstract class representing a Texture resource.
         @remarks
             The actual concrete subclass which will exist for a texture
@@ -404,7 +401,7 @@ namespace Ogre {
 
         TextureType mTextureType;
 		PixelFormat mFormat;
-        int mUsage; // Bit field, so this can't be TextureUsage
+        int mUsage; /// Bit field, so this can't be TextureUsage
 
         PixelFormat mSrcFormat;
         size_t mSrcWidth, mSrcHeight, mSrcDepth;
@@ -436,62 +433,6 @@ namespace Ogre {
 		*/
 		String getSourceFileType() const;
 
-    };
-
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to TexturePtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport TexturePtr : public SharedPtr<Texture> 
-    {
-    public:
-        TexturePtr() : SharedPtr<Texture>() {}
-        explicit TexturePtr(Texture* rep) : SharedPtr<Texture>(rep) {}
-        TexturePtr(const TexturePtr& r) : SharedPtr<Texture>(r) {} 
-        TexturePtr(const ResourcePtr& r) : SharedPtr<Texture>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<Texture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a TexturePtr
-        TexturePtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<Texture*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<Texture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
     };
 	/** @} */
 	/** @} */

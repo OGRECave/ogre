@@ -43,6 +43,9 @@ namespace Ogre {
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
 	class GL3PlusDepthBuffer;
+
+    typedef SharedPtr<GL3PlusGpuProgram> GL3PlusGpuProgramPtr;
+    typedef SharedPtr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

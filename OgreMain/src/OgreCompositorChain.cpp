@@ -106,10 +106,10 @@ void CompositorChain::createOriginalScene()
     compName += StringConverter::toString((size_t)mViewport);
 
 	mOriginalSceneScheme = mViewport->getMaterialScheme();
-	CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+	CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Compositor>();
 	if (scene.isNull())
 	{
-		scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+		scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Compositor>();
 		CompositionTechnique *t = scene->createTechnique();
 		t->setSchemeName(StringUtil::BLANK);
 		CompositionTargetPass *tp = t->getOutputTargetPass();
@@ -129,7 +129,7 @@ void CompositorChain::createOriginalScene()
 
 		/// Create base "original scene" compositor
 		scene = CompositorManager::getSingleton().load(compName,
-			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Compositor>();
 
 
 

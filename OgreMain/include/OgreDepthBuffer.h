@@ -45,8 +45,8 @@ namespace Ogre
 		DepthBuffer sharing is handled automatically for you. However, there are times where you want
 		to specifically control depth buffers to achieve certain effects or increase performance.
 		You can control this by hinting Ogre with POOL IDs. Created depth buffers can live in different
-		pools, or alltoghether in the same one.
-		Usually, a depth buffer can only be attached to a RenderTarget only if it's dimensions are bigger
+		pools, or all together in the same one.
+		Usually, a depth buffer can only be attached to a RenderTarget if it's dimensions are bigger
 		and have the same bit depth and same multisample settings. Depth Buffers are created automatically
 		for new RTs when needed, and stored in the pool where the RenderTarget should have drawn from.
 		By default, all RTs have the Id POOL_DEFAULT, which means all depth buffers are stored by default
@@ -93,11 +93,11 @@ namespace Ogre
 					 uint32 fsaa, const String &fsaaHint, bool manual );
 		virtual ~DepthBuffer();
 
-		//Sets the pool id in which this DepthBuffer lives
-		//Note this will detach any render target from this depth buffer
+		/** Sets the pool id in which this DepthBuffer lives.
+            Note this will detach any render target from this depth buffer */
 		void _setPoolId( uint16 poolId );
 
-		//Gets the pool id in which this DepthBuffer lives
+		/// Gets the pool id in which this DepthBuffer lives
 		virtual uint16 getPoolId() const;
 		virtual uint16 getBitDepth() const;
 		virtual uint32 getWidth() const;
@@ -105,8 +105,8 @@ namespace Ogre
 		virtual uint32 getFsaa() const;
 		virtual const String& getFsaaHint() const;
 
-		//Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
-		//with it's render target (aka, a backbuffer or similar)
+		/** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
+            with it's render target (aka, a backbuffer or similar) */
 		bool isManual() const;
 
 		/** Returns whether the specified RenderTarget is compatible with this DepthBuffer
@@ -132,7 +132,7 @@ namespace Ogre
 		/** Called when a RenderTarget is detaches from this DepthBuffer
             @remarks
                 Same as DepthBuffer::_notifyRenderTargetAttached()
-			@param renderTarget The RenderTarget that has just been attached
+			@param renderTarget The RenderTarget that has just been detached
         */
 		virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );
 

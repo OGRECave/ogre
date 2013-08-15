@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGLES2FBOMultiRenderTarget.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
 
@@ -110,10 +111,10 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
-#if GL_OES_stencil1
+#ifdef GL_OES_stencil1
         GL_STENCIL_INDEX1_OES,
 #endif
-#if GL_OES_stencil4
+#ifdef GL_OES_stencil4
         GL_STENCIL_INDEX4_OES,
 #endif
         GL_STENCIL_INDEX8
@@ -121,10 +122,10 @@ namespace Ogre {
     static const size_t stencilBits[] =
     {
         0,
-#if GL_OES_stencil1
+#ifdef GL_OES_stencil1
         1,
 #endif
-#if GL_OES_stencil4
+#ifdef GL_OES_stencil4
         4,
 #endif
         8
@@ -135,15 +136,9 @@ namespace Ogre {
     {
         GL_NONE,
         GL_DEPTH_COMPONENT16
-#if GL_OES_depth24 || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
-#endif
-#if GL_OES_depth32 || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH_COMPONENT32_OES
-#endif
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
-#endif
 #if OGRE_NO_GLES3_SUPPORT == 0
         , GL_DEPTH32F_STENCIL8
 #endif
@@ -151,15 +146,9 @@ namespace Ogre {
     static const size_t depthBits[] =
     {
         0,16
-#if GL_OES_depth24 || OGRE_NO_GLES3_SUPPORT == 0
         ,24
-#endif
-#if GL_OES_depth32 || OGRE_NO_GLES3_SUPPORT == 0
         ,32
-#endif
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
         ,24
-#endif
 #if OGRE_NO_GLES3_SUPPORT == 0
         ,32
 #endif
@@ -191,7 +180,44 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
-    
+
+    void GLES2FBOManager::_createTempFramebuffer(GLuint internalFormat, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid)
+    {
+        // Create and attach framebuffer
+        glGenFramebuffers(1, &fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, fb);
+        if (internalFormat != GL_NONE)
+        {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
+            // Create and attach texture
+            glGenTextures(1, &tid);
+            glBindTexture(GL_TEXTURE_2D, tid);
+
+            // Set some default parameters
+            if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, type, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                   GL_TEXTURE_2D, tid, 0);
+        }
+#if 0//OGRE_NO_GLES3_SUPPORT == 0
+        else
+        {
+            // Draw to nowhere -- stencil/depth only
+            glDrawBuffers(1, GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
+#endif
+    }
+
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
                  false   if this combo is not supported
@@ -292,8 +318,7 @@ namespace Ogre {
     void GLES2FBOManager::detectFBOFormats()
     {
         // Try all formats, and report which ones work as target
-        GLuint fb, tid;
-        GLenum target = GL_TEXTURE_2D;
+        GLuint fb = 0, tid = 0;
 
         for(size_t x=0; x<PF_COUNT; ++x)
         {
@@ -302,6 +327,7 @@ namespace Ogre {
 			// Fetch GL format token
 			GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
             GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             if(internalFormat == GL_NONE)
@@ -315,37 +341,8 @@ namespace Ogre {
                 continue;
 
             // Create and attach framebuffer
-            glGenFramebuffers(1, &fb);
-            glBindFramebuffer(GL_FRAMEBUFFER, fb);
-            if (internalFormat != GL_NONE)
-            {
-				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
+            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
 
-                // Set some default parameters
-#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-#elif OGRE_NO_GLES3_SUPPORT == 0
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-#endif
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-				glTexImage2D(target, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, GLES2PixelUtil::getGLOriginDataType((PixelFormat)x), 0);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                target, tid, 0);
-            }
-#if 0//OGRE_NO_GLES3_SUPPORT == 0
-			else
-			{
-				// Draw to nowhere -- stencil/depth only
-				glDrawBuffers(1, GL_NONE);
-				glReadBuffer(GL_NONE);
-            }
-#endif
             // Check status
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -362,11 +359,11 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-#if GL_OES_packed_depth_stencil || OGRE_NO_GLES3_SUPPORT == 0
-#if OGRE_NO_GLES3_SUPPORT == 0
-                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
+#if OGRE_NO_GLES3_SUPPORT == 1
+                    if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") &&
+                        depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
 #else
-                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
+                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
 #endif
                     {
                         // General depth/stencil combination
@@ -388,10 +385,22 @@ namespace Ogre {
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
                             }
+                            else
+                            {
+                                // There is a small edge case that FBO is trashed during the test
+                                // on some drivers resulting in undefined behavior
+                                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                                glDeleteFramebuffers(1, &fb);
+
+                                // Workaround for NVIDIA / Linux 169.21 driver problem
+                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                glFinish();
+
+                                _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
+                            }
                         }
                     }
                     else
-#endif
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))
@@ -403,6 +412,19 @@ namespace Ogre {
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
                         }
+                        else
+                        {
+                            // There is a small edge case that FBO is trashed during the test
+                            // on some drivers resulting in undefined behavior
+                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                            glDeleteFramebuffers(1, &fb);
+
+                            // Workaround for NVIDIA / Linux 169.21 driver problem
+                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                            glFinish();
+
+                            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
+                        }
                     }
                 }
                 LogManager::getSingleton().logMessage(str.str());
@@ -412,8 +434,11 @@ namespace Ogre {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
 			
-            if (internalFormat!=GL_NONE)
+            if (internalFormat != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         // Clear any errors
@@ -450,12 +475,10 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-#if GL_OES_packed_depth_stencil        
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
-				desirability += 5000;
-#elif OGRE_NO_GLES3_SUPPORT == 0
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8) // Prefer 24/8 packed 
-				desirability += 5000;
+            if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") || gleswIsSupported(3, 0))
+                if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
+                    desirability += 5000;
+#if OGRE_NO_GLES3_SUPPORT == 0
 			if(depthFormats[props.modes[mode].depth]==GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
 				desirability += 5000;
 #endif

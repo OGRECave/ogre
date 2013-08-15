@@ -71,15 +71,15 @@ namespace Ogre {
     protected:
         bool mOwnDimensions;
         bool mUseTexcoordRect;
-        uint16 mTexcoordIndex;      // index into the BillboardSet array of texture coordinates
-        FloatRect mTexcoordRect;    // individual texture coordinates
+        uint16 mTexcoordIndex;      /// Index into the BillboardSet array of texture coordinates
+        FloatRect mTexcoordRect;    /// Individual texture coordinates
         Real mWidth;
         Real mHeight;
     public:
         // Note the intentional public access to main internal variables used at runtime
         // Forcing access via get/set would be too costly for 000's of billboards
         Vector3 mPosition;
-        // Normalised direction vector
+        /// Normalised direction vector
         Vector3 mDirection;
         BillboardSet* mParentSet;
         ColourValue mColour;
@@ -163,7 +163,7 @@ namespace Ogre {
         /** Retrieves the billboard's personal width, if hasOwnDimensions is true. */
         Real getOwnWidth(void) const;
 
-        /** Retrieves the billboard's personal width, if hasOwnDimensions is true. */
+        /** Retrieves the billboard's personal height, if hasOwnDimensions is true. */
         Real getOwnHeight(void) const;
 
         /** Internal method for notifying the billboard of it's owner.
@@ -213,7 +213,7 @@ namespace Ogre {
 
         /** getTexcoordRect() returns the previous value set by setTexcoordRect(). 
             @remarks
-                This value is useful only when isUseTexcoordRect return true.
+                This value is useful only when isUseTexcoordRect returns true.
         */
         const FloatRect& getTexcoordRect(void) const { return mTexcoordRect; }
     };

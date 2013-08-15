@@ -35,13 +35,14 @@ namespace Ogre
 {
 	// forward decls
 	class Font;
-    class FontPtr;
     class FontManager;
 	class Overlay;
     class OverlayContainer;
     class OverlayElement;
     class OverlayElementFactory;
     class OverlayManager;
+
+    typedef SharedPtr<Font> FontPtr;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT

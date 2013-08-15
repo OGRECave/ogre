@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreManualObject.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre {
 
@@ -855,10 +856,10 @@ namespace Ogre {
 		: mParent(parent)
 	{
 		String matName = "Ogre/Debug/AxesMat";
-		mMat = MaterialManager::getSingleton().getByName(matName);
+		mMat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
 		if (mMat.isNull())
 		{
-			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
 			Pass* p = mMat->getTechnique(0)->getPass(0);
 			p->setLightingEnabled(false);
 			p->setPolygonModeOverrideable(false);
@@ -869,7 +870,7 @@ namespace Ogre {
 		}
 
 		String meshName = "Ogre/Debug/AxesMesh";
-		mMeshPtr = MeshManager::getSingleton().getByName(meshName);
+		mMeshPtr = MeshManager::getSingleton().getByName(meshName).staticCast<Mesh>();
 		if (mMeshPtr.isNull())
 		{
 			ManualObject mo("tmp");

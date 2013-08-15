@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2DepthBuffer.h"
+#include "OgreGLES2Util.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -43,16 +44,18 @@ namespace Ogre {
         
         mNumSamples = 0;
         mMultisampleFB = 0;
-        
+
         // Check multisampling if supported
-#if GL_APPLE_framebuffer_multisample && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-        // Check samples supported
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
-        GLint maxSamples;
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-        mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
-#endif
+        if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
+        {
+            // Check samples supported
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
+            GLint maxSamples;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+        }
+
 		// Will we need a second FBO to do multisampling?
 		if (mNumSamples)
 		{
@@ -276,11 +279,14 @@ namespace Ogre {
 	{
 		if (mMultisampleFB)
 		{
-#if GL_APPLE_framebuffer_multisample && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-			// Blit from multisample buffer to final buffer, triggers resolve
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB));
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mFB));
-#elif OGRE_NO_GLES3_SUPPORT == 0
+#if OGRE_NO_GLES3_SUPPORT == 1
+            if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample"))
+            {
+                // Blit from multisample buffer to final buffer, triggers resolve
+                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB));
+                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mFB));
+            }
+#else
             GLint oldfb = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 

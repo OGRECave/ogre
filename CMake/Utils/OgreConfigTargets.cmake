@@ -13,7 +13,11 @@ if(APPLE)
     set_property( TARGET ${targ} PROPERTY XCODE_ATTRIBUTE_${xc_prop_name} ${xc_prop_val} )
   endmacro(set_xcode_property)
 
-  set(MIN_IOS_VERSION "4.3")
+  if(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT)
+    set(MIN_IOS_VERSION "5.0")
+  else()
+    set(MIN_IOS_VERSION "4.3")
+  endif()
 
   if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(PLATFORM_NAME "macosx")

@@ -111,18 +111,18 @@ namespace Ogre {
 	void MaterialManager::initialise(void)
 	{
 		// Set up default material - don't use name contructor as we want to avoid applying defaults
-		mDefaultSettings = create("DefaultSettings", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+		mDefaultSettings = create("DefaultSettings", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
         // Add a single technique and pass, non-programmable
         mDefaultSettings->createTechnique()->createPass();
 
-        // Set the default lod strategy
+        // Set the default LOD strategy
         mDefaultSettings->setLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy());
 
 	    // Set up a lit base white material
 	    create("BaseWhite", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 	    // Set up an unlit base white material
         MaterialPtr baseWhiteNoLighting = create("BaseWhiteNoLighting",
-			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
         baseWhiteNoLighting->setLightingEnabled(false);
 
 	}

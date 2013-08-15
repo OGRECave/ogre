@@ -76,16 +76,16 @@ namespace Ogre {
         String mName;
         /// Internal root node, used as parent for 3D objects
         SceneNode* mRootNode;
-        // 2D elements
-        // OverlayContainers, linked list for easy sorting by zorder later
-        // Not a map because sort can be saved since changes infrequent (unlike render queue)
+        /** 2D elements
+            OverlayContainers, linked list for easy sorting by zorder later
+            Not a map because sort can be saved since changes infrequent (unlike render queue) */
         OverlayContainerList m2DElements;
 
-        // Degrees of rotation around center
+        /// Degrees of rotation around center
         Radian mRotate;
-        // Scroll values, offsets
+        /// Scroll values, offsets
         Real mScrollX, mScrollY;
-        // Scale values
+        /// Scale values
         Real mScaleX, mScaleY;
 
         mutable Matrix4 mTransform;

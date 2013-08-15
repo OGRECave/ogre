@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreOSXCocoaView.h"
+#import <AppKit/AppKit.h>
 
 @implementation OgreView
 

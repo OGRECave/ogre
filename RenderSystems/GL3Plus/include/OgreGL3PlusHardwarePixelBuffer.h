@@ -53,10 +53,10 @@ namespace Ogre {
 
             void freeBuffer();
 
-            // Upload a box of pixels to this buffer on the card
+            /// Upload a box of pixels to this buffer on the card
             virtual void upload(const PixelBox &data, const Image::Box &dest);
 
-            // Download a box of pixels from the card
+            /// Download a box of pixels from the card
             virtual void download(const PixelBox &data);
 
         public:
@@ -138,7 +138,7 @@ namespace Ogre {
             GL3PlusRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
             ~GL3PlusRenderBuffer();
 
-        /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
+            /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
             virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
 
         protected:
