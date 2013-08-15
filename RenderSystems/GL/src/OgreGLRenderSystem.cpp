@@ -1275,8 +1275,8 @@ namespace Ogre {
 		unsigned short num = 0;
 		for (i = lights.begin(); i != iend && num < limit; ++i, ++num)
 		{
-			setGLLight(num, *i);
-			mLights[num] = *i;
+			setGLLight(num, i->light);
+			mLights[num] = i->light;
 		}
 		// Disable extra lights
 		for (; num < mCurrentLights; ++num)
@@ -1293,7 +1293,7 @@ namespace Ogre {
 
 	}
 
-	void GLRenderSystem::setGLLight(size_t index, Light* lt)
+	void GLRenderSystem::setGLLight(size_t index, const Light* lt)
 	{
 		GLenum gl_index = GL_LIGHT0 + index;
 
@@ -2086,7 +2086,7 @@ namespace Ogre {
 		{
 			if (mLights[i] != NULL)
 			{
-				Light* lt = mLights[i];
+				const Light* lt = mLights[i];
 				setGLLightPositionDirection(lt, GL_LIGHT0 + i);
 			}
 		}
@@ -2855,7 +2855,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		activateGLTextureUnit(0);
 	}
 	//---------------------------------------------------------------------
-	void GLRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
+	void GLRenderSystem::setGLLightPositionDirection(const Light* lt, GLenum lightindex)
 	{
 		// Set position / direction
 		Vector4 vec;
