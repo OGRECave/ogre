@@ -36,6 +36,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	class RenderTarget;
+	struct CompositorChannel;
 
 	/** \addtogroup Core
 	*  @{
@@ -59,10 +60,12 @@ namespace Ogre
 	protected:
 		RenderTarget	*mTarget;
 	public:
-		CompositorPass( const CompositorPassDef *definition ) : mDefinition( definition ) {}
+		CompositorPass( const CompositorPassDef *definition, RenderTarget *target ) :
+				mTarget( target ), mDefinition( definition ) {}
 
 		virtual void execute() = 0;
 
+		/// @See CompositorNode::notifyDestroyed
 		virtual void notifyDestroyed( const CompositorChannel &channel );
 
 		CompositorPassType getType() const { return mDefinition->mPassType; }

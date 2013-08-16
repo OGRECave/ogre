@@ -26,51 +26,31 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorManager2_H__
-#define __CompositorManager2_H__
+#include "OgreStableHeaders.h"
 
-#include "OgreHeaderPrefix.h"
-#include "OgreCompositorCommon.h"
-
-#include "OgreTexture.h"
+#include "Compositor/OgreCompositorShadowNodeDef.h"
 
 namespace Ogre
 {
-	typedef vector<TexturePtr>::type TextureVec;
-	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
-
-	//class _OgreExport CompositorManager2 : public ResourceManager
-	class _OgreExport CompositorManager2
+	CompositorShadowNodeDef::ShadowTextureDefinition*
+			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx )
 	{
-		TextureVec		mGlobalTextures;
-		RenderWindow	*mRenderWindow;
+		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
+		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
 
-		CompositorShadowNodeVec	mShadowNodes;
-		/// Main sequence in the order they should be executed
-		CompositorNodeVec		mNodeSequence;
+		while( itor != end )
+		{
+			if( itor->light == lightIdx )
+			{
+				OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "There's already a texture for light index #"
+								+ StringConverter::toString( lightIdx ),
+								"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+			}
+			++itor;
+		}
 
-	public:
-		CompositorManager2();
-		~CompositorManager2();
-
-		/** The final rendering is done by passing the RenderWindow to one of the input
-			channels. This functions does exactly that.
-		*/
-		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
-
-		void validateNodes();
-
-		/// Finds the requested ShadowNode. Throws if not found.
-		ShadowNode* findShadowNode( IdString nodeName ) const;
-
-		/** Finds the requested Camera. Throws if not found.
-		@remarks
-			If cameraName is empty, uses the default camera
-		*/
-		Camera* findCamera( IdString cameraName ) const;
-	};
+		mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique ) );
+		return &mShadowMapTexDefinitions.back();
+	}
+	//-----------------------------------------------------------------------------------
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif

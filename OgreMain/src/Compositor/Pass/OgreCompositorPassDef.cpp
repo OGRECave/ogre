@@ -26,51 +26,40 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorManager2_H__
-#define __CompositorManager2_H__
+#include "OgreStableHeaders.h"
 
-#include "OgreHeaderPrefix.h"
-#include "OgreCompositorCommon.h"
-
-#include "OgreTexture.h"
+#include "Compositor/Pass/OgreCompositorPassDef.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 namespace Ogre
 {
-	typedef vector<TexturePtr>::type TextureVec;
-	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
-
-	//class _OgreExport CompositorManager2 : public ResourceManager
-	class _OgreExport CompositorManager2
+	CompositorTargetDef::~CompositorTargetDef()
 	{
-		TextureVec		mGlobalTextures;
-		RenderWindow	*mRenderWindow;
+		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
+		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
 
-		CompositorShadowNodeVec	mShadowNodes;
-		/// Main sequence in the order they should be executed
-		CompositorNodeVec		mNodeSequence;
+		while( itor != end )
+		{
+			delete *itor;
+			++itor;
+		}
 
-	public:
-		CompositorManager2();
-		~CompositorManager2();
+		mCompositorPasses.clear();
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
+	{
+		CompositorPassDef *retVal = 0;
+		switch( passType )
+		{
+		case PASS_SCENE:
+			retVal = new CompositorPassSceneDef();
+			break;
+		}
 
-		/** The final rendering is done by passing the RenderWindow to one of the input
-			channels. This functions does exactly that.
-		*/
-		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
-
-		void validateNodes();
-
-		/// Finds the requested ShadowNode. Throws if not found.
-		ShadowNode* findShadowNode( IdString nodeName ) const;
-
-		/** Finds the requested Camera. Throws if not found.
-		@remarks
-			If cameraName is empty, uses the default camera
-		*/
-		Camera* findCamera( IdString cameraName ) const;
-	};
+		mCompositorPasses.push_back( retVal );
+		
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif

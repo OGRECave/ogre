@@ -63,7 +63,7 @@ namespace Ogre
 		/// Last Render Queue ID to render. Not inclusive
 		uint8			mLastRQ;
 
-		CompositorPassSceneDef() : CompositorPassDef( SCENE_PASS ) {}
+		CompositorPassSceneDef() : CompositorPassDef( PASS_SCENE ) {}
 	};
 
 	/** @} */

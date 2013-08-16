@@ -26,51 +26,16 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorManager2_H__
-#define __CompositorManager2_H__
+#include "OgreStableHeaders.h"
 
-#include "OgreHeaderPrefix.h"
-#include "OgreCompositorCommon.h"
-
-#include "OgreTexture.h"
+#include "Compositor/OgreCompositorNodeDef.h"
 
 namespace Ogre
 {
-	typedef vector<TexturePtr>::type TextureVec;
-	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
-
-	//class _OgreExport CompositorManager2 : public ResourceManager
-	class _OgreExport CompositorManager2
+	CompositorTargetDef* CompositorNodeDef::addTargetPass( IdString renderTargetName )
 	{
-		TextureVec		mGlobalTextures;
-		RenderWindow	*mRenderWindow;
-
-		CompositorShadowNodeVec	mShadowNodes;
-		/// Main sequence in the order they should be executed
-		CompositorNodeVec		mNodeSequence;
-
-	public:
-		CompositorManager2();
-		~CompositorManager2();
-
-		/** The final rendering is done by passing the RenderWindow to one of the input
-			channels. This functions does exactly that.
-		*/
-		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
-
-		void validateNodes();
-
-		/// Finds the requested ShadowNode. Throws if not found.
-		ShadowNode* findShadowNode( IdString nodeName ) const;
-
-		/** Finds the requested Camera. Throws if not found.
-		@remarks
-			If cameraName is empty, uses the default camera
-		*/
-		Camera* findCamera( IdString cameraName ) const;
-	};
+		mTargetPasses.push_back( CompositorTargetDef( renderTargetName ) );
+		return &mTargetPasses.back();
+	}
+	//-----------------------------------------------------------------------------------
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif

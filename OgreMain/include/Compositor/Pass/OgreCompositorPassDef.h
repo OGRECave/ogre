@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 
+#include "OgreIdString.h"
+
 namespace Ogre
 {
 	/** \addtogroup Core
@@ -66,19 +68,34 @@ namespace Ogre
 	class CompositorPassDef : public CompositorInstAlloc
 	{
 		friend class CompositorPass;
-
 		CompositorPassType	mPassType;
+
+	public:
 		CompositorPassDef( CompositorPassType passType ) : mPassType( passType ) {}
+		CompositorPassType getType() const					{ return mPassType; }
 	};
 
 	typedef vector<CompositorPassDef*>::type CompositorPassDefVec;
 
 	class CompositorTargetDef : public CompositorInstAlloc
 	{
-	public:
-		///Name is local to Node! (unless using 'global_' prefix)
+		/// Name is local to Node! (unless using 'global_' prefix)
 		IdString				mRenderTargetName;
 		CompositorPassDefVec	mCompositorPasses;
+
+	public:
+		CompositorTargetDef( IdString renderTargetName ) : mRenderTargetName( renderTargetName ) {}
+		~CompositorTargetDef();
+
+		/** Reserves enough memory for all passes (efficient allocation)
+		@remarks
+			Calling this function is not obligatory, but recommended
+		@param numPasses
+			The number of passes expected to contain.
+		*/
+		void setNumPasses( size_t numPasses )			{ mCompositorPasses.reserve( numPasses ); }
+
+		CompositorPassDef* addPass( CompositorPassType passType );
 	};
 
 	/** @} */

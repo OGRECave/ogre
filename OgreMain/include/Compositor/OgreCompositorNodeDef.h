@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
+#include "Compositor/Pass/OgreCompositorPassDef.h"
 #include "OgreIdString.h"
 
 namespace Ogre
@@ -53,6 +54,7 @@ namespace Ogre
     */
 	class _OgreExport CompositorNodeDef : public CompositorInstAlloc
 	{
+	protected:
 		friend class CompositorNode;
 
 		/// Local texture definition
@@ -80,8 +82,10 @@ namespace Ogre
 				fsaa(true), hwGammaWrite(Undefined), depthBufferId(1) {}
         };
 
-		typedef vector<TextureDefinition>::type		TextureDefinitionVec;
+		
 		typedef vector<uint32>::type				ChannelMappings;
+		typedef vector<TextureDefinition>::type		TextureDefinitionVec;
+		typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
 		/** Tells where to grab the RenderTarget from for the output channel.
 			They can come either from an input channel, or from local textures.
 			The first 31 bits indicate the channel #, the last 31st bit is used to
@@ -91,6 +95,8 @@ namespace Ogre
 		ChannelMappings			mOutChannelMapping;
 
 		TextureDefinitionVec	mLocalTextureDefs;
+
+		CompositorTargetDefVec	mTargetPasses;
 
 	public:
 		/** Retrieves in which container to look for when wanting to know the output texture
@@ -109,6 +115,22 @@ namespace Ogre
 			index		 = value & 0x7FFFFFFF;
 			localTexture = (value & 0x80000000) != 0;
 		}
+
+		/** Reserves enough memory for all passes (efficient allocation, better than using
+			linked lists or other containers with two level of indirections)
+		@remarks
+			Calling this function is not obligatory, but recommended
+		@param numPasses
+			The number of passes expected to contain.
+		*/
+		void setNumTargetPass( size_t numPasses )			{ mTargetPasses.reserve( numPasses ); }
+
+		/** Adds a new Target pass.
+		@remarks
+			WARNING: Calling this function may invalidate all previous returned pointers
+			unless you've properly called setNumTargetPass
+		*/
+		CompositorTargetDef* addTargetPass( IdString renderTargetName );
 	};
 
 	/** @} */

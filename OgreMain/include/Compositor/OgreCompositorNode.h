@@ -120,12 +120,18 @@ namespace Ogre
 		*/
 		void disconnectOutput();
 
+		/** Call this function when caller has destroyed a RenderTarget in which the callee
+			may have a reference to that pointer, so that we can clean it up.
+		@param channel
+			Channel containing the pointer about to be destroyed (must still be valid)
+		*/
 		void notifyDestroyed( const CompositorChannel &channel );
 
 	public:
+		CompositorNode( IdType id, const CompositorNodeDef *definition, RenderSystem *renderSys );
 		CompositorNode( IdType id, const CompositorNodeDef *definition,
 						RenderSystem *renderSys, const RenderTarget *finalTarget );
-		~CompositorNode();
+		virtual ~CompositorNode();
 
 		/** Connects this node (let's call it node 'A') to node 'B', mapping the output
 			channels from A into the input channels from B

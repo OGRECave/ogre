@@ -31,8 +31,16 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 
+#include "Compositor/Pass/OgreCompositorPass.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
+
 namespace Ogre
 {
+	class RenderTarget;
+	class ShadowNode;
+	class Camera;
+	class CompositorManager2;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -55,9 +63,12 @@ namespace Ogre
 		ShadowNode		*mShadowNode;
 		Camera			*mCamera;
 
+		CompositorManager2 const *mCompositorManager;
+
 	public:
-		CompositorScenePass( const CompositorPassSceneDef *definition );
-		~CompositorScenePass();
+		CompositorPassScene( const CompositorPassSceneDef *definition, const CompositorManager2 *manager,
+								RenderTarget *target );
+		~CompositorPassScene();
 
 		virtual void execute();
 
@@ -67,6 +78,7 @@ namespace Ogre
 
 	/** @} */
 	/** @} */
+}
 
 #include "OgreHeaderSuffix.h"
 

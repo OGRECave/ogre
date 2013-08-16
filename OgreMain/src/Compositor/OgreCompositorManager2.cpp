@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 namespace Ogre
 {

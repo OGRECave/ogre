@@ -26,14 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorShadowNode_H__
-#define __CompositorShadowNode_H__
+#ifndef __CompositorShadowNodeDef_H__
+#define __CompositorShadowNodeDef_H__
 
 #include "OgreHeaderPrefix.h"
 
-#include "Compositor/OgreCompositorNode.h"
-#include "Compositor/OgreCompositorShadowNodeDef.h"
-#include "OgreShadowCameraSetup.h"
+#include "Compositor/OgreCompositorNodeDef.h"
 
 namespace Ogre
 {
@@ -44,6 +42,15 @@ namespace Ogre
 	*  @{
 	*/
 
+	enum ShadowMapTechniques
+	{
+		SHADOWMAP_DEFAULT,
+		SHADOWMAP_PLANEOPTIMAL,
+		SHADOWMAP_FOCUSED,
+		SHADOWMAP_LiPSSM,
+		SHADOWMAP_PSSM
+	};
+
 	/** Shadow Nodes are special nodes (not to be confused with @see CompositorNode)
 		that are only used for rendering shadow maps.
 		Normal Compositor Nodes can share or own a ShadowNode. The ShadowNode will
@@ -52,31 +59,61 @@ namespace Ogre
 	@par
 		ShadowNode are very flexible compared to Ogre 1.x; as they allow mixing multiple
 		shadow camera setups for different lights.
-	@par
-		Shadow Nodes derive from nodes so that they can be used as regular nodes
     @author
 		Matias N. Goldberg
     @version
         1.0
     */
-	class _OgreExport CompositorShadowNode : public CompositorNode
+	class _OgreExport CompositorShadowNodeDef : public CompositorNodeDef
 	{
-		struct ShadowMapPass
-		{
-			RenderTarget			*target;
-			ShadowCameraSetupPtr	shadowCameraSetup;
-			size_t					light;	//Render Nth closest light
-			size_t					split;	//Split for that light (only for PSSM/CSM)
-			//CompositorPassScene		*scenePass;
-		};
-
-		typedef vector<ShadowMapPass> ShadowMapPassVec;
-		ShadowMapPassVec		mShadowMaps;
+		friend class CompositorShadowNode;
 
 	public:
-		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
-								RenderSystem *renderSys );
-		~CompositorShadowNode();
+		/// Local texture definition
+        class ShadowTextureDefinition : public CompositorInstAlloc
+        {
+        public:
+            IdString	name;
+			uint		shadowTextCount;
+            uint		width;
+            uint		height;
+            PixelFormatList formatList; // more than one means MRT
+			uint		fsaa;			// FSAA level
+			bool		hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats)
+			uint16		depthBufferId;	// Depth Buffer's pool ID
+
+			size_t		light;	//Render Nth closest light
+			size_t		split;	//Split for that light (only for PSSM/CSM)
+			ShadowMapTechniques	shadowMapTechnique;
+
+			ShadowTextureDefinition( ShadowMapTechniques t ) : shadowTextCount(0), width(0), height(0),
+					fsaa(0), hwGammaWrite(false), depthBufferId(1), light(0), split(0),
+					shadowMapTechnique(t) {}
+        };
+
+	protected:
+		typedef vector<ShadowTextureDefinition>::type	ShadowMapTexDefVec;
+		ShadowMapTexDefVec	mShadowMapTexDefinitions;
+		ShadowMapTechniques	mDefaultTechnique;
+
+	public:
+		CompositorShadowNodeDef() : mDefaultTechnique( SHADOWMAP_DEFAULT ) {}
+
+		/** Reserves enough memory for all texture definitions
+		@remarks
+			Calling this function is not obligatory, but recommended
+		@param numTex
+			The number of shadow textures expected to contain.
+		*/
+		void setNumShadowTextureDefinitions( size_t numTex )
+														{ mShadowMapTexDefinitions.reserve( numTex ); }
+
+		/** Adds a new ShadowTexture definition.
+		@remarks
+			WARNING: Calling this function may invalidate all previous returned pointers
+			unless you've properly called setNumShadowTextureDefinitions
+		*/
+		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx );
 	};
 
 	/** @} */

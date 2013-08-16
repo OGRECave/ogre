@@ -40,6 +40,15 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorNode::CompositorNode( IdType id, const CompositorNodeDef *definition,
+									RenderSystem *renderSys ) :
+			IdObject( id ),
+			mNumConnectedInputs( 0 ),
+			mRenderSystem( renderSys ),
+			mDefinition( definition )
+	{
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorNode::CompositorNode( IdType id, const CompositorNodeDef *definition,
 									RenderSystem *renderSys, const RenderTarget *finalTarget ) :
 			IdObject( id ),
 			mNumConnectedInputs( 0 ),
