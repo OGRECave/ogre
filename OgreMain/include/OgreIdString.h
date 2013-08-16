@@ -80,6 +80,12 @@ namespace Ogre
 			OGRE_COPY_DEBUG_STRING( string );
 		}
 
+		IdString( uint32 value ) : m_hash( 0 )
+		{
+			OGRE_HASH_FUNC( &value, sizeof( value ), Seed, &m_hash );
+			OGRE_COPY_DEBUG_STRING( value );
+		}
+
 #ifndef NDEBUG
 		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 			#pragma warning( push )
@@ -118,10 +124,21 @@ namespace Ogre
 			m_debugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
 		}
 
+		void OGRE_COPY_DEBUG_STRING( uint32 value )
+		{
+			sprintf( m_debugString, "[Value 0x%.8x]", value );
+			m_debugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+		}
+
 		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 			#pragma warning( pop )
 		#endif
 #endif
+
+		IdString operator + ( IdString idString ) const
+		{
+			return IdString( m_hash + idString.m_hash );
+		}
 
 		bool operator < ( IdString idString ) const
 		{
