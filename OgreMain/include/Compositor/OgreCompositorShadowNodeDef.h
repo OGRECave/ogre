@@ -73,8 +73,7 @@ namespace Ogre
         class ShadowTextureDefinition : public CompositorInstAlloc
         {
         public:
-            IdString	name;
-			uint		shadowTextCount;
+            
             uint		width;
             uint		height;
             PixelFormatList formatList; // more than one means MRT
@@ -85,10 +84,12 @@ namespace Ogre
 			size_t		light;	//Render Nth closest light
 			size_t		split;	//Split for that light (only for PSSM/CSM)
 			ShadowMapTechniques	shadowMapTechnique;
+			IdString	name;
 
-			ShadowTextureDefinition( ShadowMapTechniques t ) : shadowTextCount(0), width(0), height(0),
-					fsaa(0), hwGammaWrite(false), depthBufferId(1), light(0), split(0),
-					shadowMapTechnique(t) {}
+			ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
+									size_t _light, size_t _split ) :
+					width(0), height(0), fsaa(0), hwGammaWrite(false), depthBufferId(1),
+					light(_light), split(_split), shadowMapTechnique(t), name( _name ) {}
         };
 
 	protected:
@@ -112,8 +113,17 @@ namespace Ogre
 		@remarks
 			WARNING: Calling this function may invalidate all previous returned pointers
 			unless you've properly called setNumShadowTextureDefinitions
+		@param lightIdx
+			Nth Closest Light to assign this texture to. Must be unique unless split is different.
+		@param split
+			Split for the given light. Only valid for CSM/PSSM shadow maps.
+			Must be unique for the same lightIdx.
+		@param name
+			Name to alias this texture for reference. Can be blank. If not blank, must be
+			unique and not contain the "global_" prefix.
 		*/
-		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx );
+		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
+															 const String &name );
 	};
 
 	/** @} */

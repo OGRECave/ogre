@@ -28,36 +28,32 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "Compositor/OgreCompositorShadowNodeDef.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
-	CompositorShadowNodeDef::ShadowTextureDefinition*
-			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 const String &name )
+	void CompositorWorkspaceDef::connect( uint32 outChannel, IdString outNode,
+											uint32 inChannel, IdString inNode )
 	{
-		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
-		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
+		ChannelRouteList::const_iterator itor = mChannelRoutes.begin();
+		ChannelRouteList::const_iterator end  = mChannelRoutes.end();
 
 		while( itor != end )
 		{
-			if( itor->light == lightIdx && itor->split == split )
+			if( itor->inNode == inNode && itor->inChannel == inChannel )
 			{
-				OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "There's already a texture for light index #"
-								+ StringConverter::toString( lightIdx ),
-								"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+				LogManager::getSingleton().logMessage( "WARNING: Node '" +
+							itor->outNode.getFriendlyText() + "' and Node '" +
+							outNode.getFriendlyText() + "' are both trying to connect "
+							"to the same input channel #" + StringConverter::toString( inChannel ) +
+							" from node '" + inNode.getFriendlyText() + "'. Only the latter will work" );
+				break; //Early out
 			}
 			++itor;
 		}
 
-		if( !name.empty() )
-		{
-			addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
-		}
-
-		mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
-																	 lightIdx, split ) );
-		return &mShadowMapTexDefinitions.back();
+		mChannelRoutes.push_back( ChannelRoute( outChannel, outNode, inChannel, inNode ) );
 	}
 	//-----------------------------------------------------------------------------------
 }

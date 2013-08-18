@@ -32,6 +32,19 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	void CompositorNodeDef::getTextureSource( size_t outputChannel, size_t &index,
+												TextureSource &textureSource ) const
+	{
+		uint32 value		= mOutChannelMapping[outputChannel];
+		uint32 texSource	= (value & 0xC0000000) >> 30;
+
+		assert( texSource < NUM_TEXTURES_SOURCES );
+		assert( texSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
+
+		index		 = value & 0x3FFFFFFF;
+		textureSource = static_cast<TextureSource>( texSource );
+	}
+	//-----------------------------------------------------------------------------------
 	CompositorTargetDef* CompositorNodeDef::addTargetPass( IdString renderTargetName )
 	{
 		mTargetPasses.push_back( CompositorTargetDef( renderTargetName ) );

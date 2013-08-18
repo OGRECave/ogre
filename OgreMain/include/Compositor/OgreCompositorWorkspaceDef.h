@@ -26,38 +26,60 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef __CompositorWorkspaceDef_H__
+#define __CompositorWorkspaceDef_H__
 
-#include "Compositor/OgreCompositorShadowNodeDef.h"
+#include "OgreHeaderPrefix.h"
+#include "Compositor/OgreTextureDefinition.h"
 
 namespace Ogre
 {
-	CompositorShadowNodeDef::ShadowTextureDefinition*
-			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 const String &name )
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	/** TODO: Describe!!!
+	@author
+		Matias N. Goldberg
+    @version
+        1.0
+    */
+	class _OgreExport CompositorWorkspaceDef : public TextureDefinitionBase
 	{
-		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
-		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
-
-		while( itor != end )
+	protected:
+		struct ChannelRoute
 		{
-			if( itor->light == lightIdx && itor->split == split )
-			{
-				OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "There's already a texture for light index #"
-								+ StringConverter::toString( lightIdx ),
-								"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
-			}
-			++itor;
-		}
+			uint32		outChannel;
+			IdString	outNode;
+			uint32		inChannel;
+			IdString	inNode;
+			ChannelRoute( uint32 _outChannel, IdString _outNode, uint32 _inChannel, IdString _inNode ) :
+						outChannel( _outChannel ), outNode( _outNode ),
+						inChannel( _inChannel ), inNode( _inNode ) {}
+		};
 
-		if( !name.empty() )
-		{
-			addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
-		}
+		IdString			mName;
 
-		mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
-																	 lightIdx, split ) );
-		return &mShadowMapTexDefinitions.back();
-	}
-	//-----------------------------------------------------------------------------------
+		typedef map<IdString, IdString>::type	NodeAliasMap;
+		typedef list<ChannelRoute>::type		ChannelRouteList;
+
+		NodeAliasMap		mNodeAlias;
+		ChannelRouteList	mChannelRoutes;
+
+	public:
+		CompositorWorkspaceDef( IdString name ) :
+			TextureDefinitionBase( TEXTURE_GLOBAL ), mName( name ) {}
+
+		void connect( uint32 outChannel, IdString outNode, uint32 inChannel, IdString inNode );
+	};
+
+	/** @} */
+	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
+#endif

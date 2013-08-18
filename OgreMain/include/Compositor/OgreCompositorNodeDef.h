@@ -30,9 +30,8 @@ THE SOFTWARE.
 #define __CompositorNodeDef_H__
 
 #include "OgreHeaderPrefix.h"
-#include "Compositor/OgreCompositorCommon.h"
+#include "Compositor/OgreTextureDefinition.h"
 #include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "OgreIdString.h"
 
 namespace Ogre
 {
@@ -52,69 +51,36 @@ namespace Ogre
     @version
         1.0
     */
-	class _OgreExport CompositorNodeDef : public CompositorInstAlloc
+	class _OgreExport CompositorNodeDef : public TextureDefinitionBase
 	{
 	protected:
 		friend class CompositorNode;
 
-		/// Local texture definition
-        class TextureDefinition : public CompositorInstAlloc
-        {
-        public:
-			enum BoolSetting
-			{
-				Undefined = 0,
-				False,
-				True,
-			};
-
-            IdString name;
-            uint width;       // 0 means adapt to target width
-            uint height;      // 0 means adapt to target height
-			float widthFactor;  // multiple of target width to use (if width = 0)
-			float heightFactor; // multiple of target height to use (if height = 0)
-            PixelFormatList formatList; // more than one means MRT
-			bool fsaa;			// FSAA enabled; True = Use main target's, False = disable
-			BoolSetting hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats) 
-			uint16 depthBufferId;//Depth Buffer's pool ID.
-
-			TextureDefinition() :width(0), height(0), widthFactor(1.0f), heightFactor(1.0f), 
-				fsaa(true), hwGammaWrite(Undefined), depthBufferId(1) {}
-        };
-
-		
 		typedef vector<uint32>::type				ChannelMappings;
-		typedef vector<TextureDefinition>::type		TextureDefinitionVec;
 		typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
 		/** Tells where to grab the RenderTarget from for the output channel.
 			They can come either from an input channel, or from local textures.
-			The first 31 bits indicate the channel #, the last 31st bit is used to
-			determine whether it comes from the input channel, or the local texture
-			If the bit is set, it's a local texture.
+			The first 30 bits indicate the channel #, the last 30th & 31sts bit are used
+			to determine whether it comes from the input channel, the local texture, or
+			it is global.
 		*/
 		ChannelMappings			mOutChannelMapping;
-
-		TextureDefinitionVec	mLocalTextureDefs;
-
 		CompositorTargetDefVec	mTargetPasses;
 
 	public:
+		CompositorNodeDef() : TextureDefinitionBase( TEXTURE_LOCAL ) {}
+
 		/** Retrieves in which container to look for when wanting to know the output texture
 			using the mappings from input/local texture -> output.
-		@param outputChannel
+		@param outputChannel [in]
 			The output channel we want to know about
 		@param index [out]
 			The index at the container in which the texture associated with the output channel
 			is stored
-		@param localTexture [out]
-			True if the source is a local texture, false if it's from another input
+		@param textureSource [out]
+			Where to get this texture from
 		*/
-		void getTextureSource( size_t outputChannel, size_t &index, bool &localTexture ) const
-		{
-			uint32 value = mOutChannelMapping[outputChannel];
-			index		 = value & 0x7FFFFFFF;
-			localTexture = (value & 0x80000000) != 0;
-		}
+		void getTextureSource( size_t outputChannel, size_t &index, TextureSource &textureSource ) const;
 
 		/** Reserves enough memory for all passes (efficient allocation, better than using
 			linked lists or other containers with two level of indirections)
