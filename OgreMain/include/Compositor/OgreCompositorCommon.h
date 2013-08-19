@@ -37,14 +37,14 @@ namespace Ogre
 	class RenderTarget;
 	struct CompositorChannel;
 
+	class CompositorNodeDef;
+	class CompositorWorkspaceDef;
+
 	class CompositorManager2;
 
-	typedef vector<RenderTarget*>::type RenderTargetVec;
 	typedef vector<CompositorPass*>::type CompositorPassVec;
 	typedef vector<CompositorNode*>::type CompositorNodeVec;
 	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
-
-	typedef vector<size_t>::type ChannelVec;
 
 	enum PixelFormat;
 	typedef vector<PixelFormat>::type PixelFormatList;

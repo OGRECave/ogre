@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
+#include "Compositor/OgreCompositorChannel.h"
 #include "OgreIdString.h"
 
 namespace Ogre
@@ -85,10 +86,11 @@ namespace Ogre
     @version
         1.0
     */
-	class _OgreExport CompositorNode : public CompositorInstAlloc, public IdObject
+	class _OgreExport CompositorNode : public CompositorInstAlloc
 	{
 	protected:
-		typedef vector<CompositorChannel>::type CompositorChannelVec;
+		/// Unique name across the same workspace
+		IdString				mName;
 
 		/// Must be <= mInTextures.size(). Tracks how many pointers are not null in mInTextures
 		size_t					mNumConnectedInputs;
@@ -128,20 +130,38 @@ namespace Ogre
 		void notifyDestroyed( const CompositorChannel &channel );
 
 	public:
-		CompositorNode( IdType id, const CompositorNodeDef *definition, RenderSystem *renderSys );
-		CompositorNode( IdType id, const CompositorNodeDef *definition,
+		CompositorNode( IdString name, const CompositorNodeDef *definition, RenderSystem *renderSys );
+		CompositorNode( IdString name, const CompositorNodeDef *definition,
 						RenderSystem *renderSys, const RenderTarget *finalTarget );
 		virtual ~CompositorNode();
 
+		IdString getName(void) const								{ return mName; }
+		const CompositorNodeDef* getDefinition() const				{ return mDefinition; }
+
 		/** Connects this node (let's call it node 'A') to node 'B', mapping the output
-			channels from A into the input channels from B
-		@param outChannelsA
-			Output to use from node A. Container must be same size as inChannelsB
-		@param inChannelsB
-			Input to connect the output from A. Container must be same size as outChannelsA
+			channel from A into the input channel from B
+		@param outChannelA
+			Output to use from node A.
+		@param inChannelB
+			Input to connect the output from A.
 		*/
-		void connectTo( const ChannelVec &outChannelsA, CompositorNode *nodeB,
-						const ChannelVec &inChannelsB );
+		void connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB );
+
+		/** Connects (injects) an external RT into the given channel. Usually used for
+			the "connect_output" directive for the RenderWindow.
+		@param rt
+			The RenderTarget.
+		@param textures
+			The Textures associated with the RT. Can be empty (eg. RenderWindow) but
+			could cause crashes/exceptions if tried to use in PASS_QUAD passes.
+		@param inChannelA
+			In which channel number to inject to.
+		*/
+		void connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
+								size_t inChannelA );
+
+		bool areAllInputsConnected() const	{ return mNumConnectedInputs == mInTextures.size(); }
+		const CompositorChannelVec& getInputChannel() const			{ return mInTextures; }
 
 	private:
 		CompositorNodeDef const *mDefinition;

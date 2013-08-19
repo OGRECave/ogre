@@ -26,13 +26,11 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorChannel_H__
-#define __CompositorChannel_H__
+#ifndef __CompositorWorkspace_H__
+#define __CompositorWorkspace_H__
 
 #include "OgreHeaderPrefix.h"
-#include "Compositor/OgreCompositorCommon.h"
-
-#include "OgreTexture.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
 
 namespace Ogre
 {
@@ -43,31 +41,38 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** A channel in the compositor transports textures between nodes.
-		Unfortunately, Ogre's design of RenderTargets, Textures & MRTs isn't as straightforward
-		and encapsulated as we wanted them to be. Therefore we need this Channel structure
-		to abstract them.
-	@par
-		In short, when we want to render to a texture, we need a RenderTarget. When we want
-		to sample from, we need a Texture. Until here there is an almost 1:1 relationship.
-		However when MRTs come into play, this relationship is destroyed and not handled
-		very well by Ogre. We do.
-	*/
-	struct CompositorChannel
+	/** TODO: Describe!!!
+	@author
+		Matias N. Goldberg
+    @version
+        1.0
+    */
+	class _OgreExport CompositorWorkspace : public CompositorInstAlloc, public IdObject
 	{
-		typedef vector<TexturePtr>::type TextureVec;
-		RenderTarget	*target;
-		TextureVec		textures;
+	protected:
+		CompositorWorkspaceDef const *mDefinition;
 
-		CompositorChannel() : target( 0 ) {}
+		bool					mValid;
 
-		TexturePtr getTexture( size_t idx ) const		{ return textures[idx]; }
-		bool isMrt() const								{ return textures.size() > 1; }
-		bool isValid() const							{ return target != 0; }
-		bool operator == ( const CompositorChannel &right ) const	{ return target == right.target; }
+		/// Main sequence in the order they should be executed
+		CompositorNodeVec		mNodeSequence;
+		CompositorShadowNodeVec	mShadowNodes;
+		RenderSystem			*mRenderSys;
+
+		RenderTarget			*mRenderWindow;
+
+		void createAllNodes(void);
+		void destroyAllNodes(void);
+		void connectAllNodes(void);
+
+		/// Linear search. Returns null if not found.
+		CompositorNode* findNode( IdString aliasName ) const;
+
+	public:
+		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
+								RenderSystem *renderSys );
+		~CompositorWorkspace();
 	};
-
-	typedef vector<CompositorChannel>::type CompositorChannelVec;
 
 	/** @} */
 	/** @} */

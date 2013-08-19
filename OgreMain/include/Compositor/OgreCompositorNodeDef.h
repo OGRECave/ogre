@@ -56,6 +56,8 @@ namespace Ogre
 	protected:
 		friend class CompositorNode;
 
+		IdString	mName;
+
 		typedef vector<uint32>::type				ChannelMappings;
 		typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
 		/** Tells where to grab the RenderTarget from for the output channel.
@@ -68,7 +70,7 @@ namespace Ogre
 		CompositorTargetDefVec	mTargetPasses;
 
 	public:
-		CompositorNodeDef() : TextureDefinitionBase( TEXTURE_LOCAL ) {}
+		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( mName ) {}
 
 		/** Retrieves in which container to look for when wanting to know the output texture
 			using the mappings from input/local texture -> output.

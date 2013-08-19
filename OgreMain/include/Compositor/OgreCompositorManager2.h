@@ -31,13 +31,13 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 #include "OgreCompositorCommon.h"
+#include "OgreIdString.h"
 
 #include "OgreTexture.h"
 
 namespace Ogre
 {
 	typedef vector<TexturePtr>::type TextureVec;
-	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
 
 	//class _OgreExport CompositorManager2 : public ResourceManager
 	class _OgreExport CompositorManager2
@@ -45,9 +45,13 @@ namespace Ogre
 		TextureVec		mGlobalTextures;
 		RenderWindow	*mRenderWindow;
 
-		CompositorShadowNodeVec	mShadowNodes;
-		/// Main sequence in the order they should be executed
-		CompositorNodeVec		mNodeSequence;
+		typedef map<IdString, CompositorNodeDef*>::type CompositorNodeDefMap;
+		CompositorNodeDefMap	mNodeDefinitions;
+
+		typedef map<IdString, CompositorWorkspaceDef*>::type CompositorWorkspaceDefMap;
+		CompositorWorkspaceDefMap mWorkspaceDefs;
+
+		//vector<Workspace>
 
 	public:
 		CompositorManager2();
@@ -70,6 +74,12 @@ namespace Ogre
 		Camera* findCamera( IdString cameraName ) const;
 
 		bool hasNodeDefinition( IdString nodeDefName ) const;
+
+		const CompositorNodeDef* getNodeDefinition( IdString nodeDefName ) const;
+
+		CompositorNodeDef* addNodeDefinition( IdString name );
+
+		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 	};
 }
 

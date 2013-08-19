@@ -39,18 +39,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorNode::CompositorNode( IdType id, const CompositorNodeDef *definition,
+	CompositorNode::CompositorNode( IdString name, const CompositorNodeDef *definition,
 									RenderSystem *renderSys ) :
-			IdObject( id ),
+			mName( name ),
 			mNumConnectedInputs( 0 ),
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorNode::CompositorNode( IdType id, const CompositorNodeDef *definition,
+	CompositorNode::CompositorNode( IdString name, const CompositorNodeDef *definition,
 									RenderSystem *renderSys, const RenderTarget *finalTarget ) :
-			IdObject( id ),
+			mName( name ),
 			mNumConnectedInputs( 0 ),
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
@@ -259,30 +259,27 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorNode::connectTo( const ChannelVec &outChannelsA, CompositorNode *nodeB,
-									const ChannelVec &inChannelsB )
+	void CompositorNode::connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )
 	{
-		assert( outChannelsA.size() == inChannelsB.size() );
+		//Nodes must be connected in the right order (and after routeOutputs was called)
+		//to avoid passing null pointers (which is probably not what we wanted)
+		assert( this->mOutTextures[outChannelA].isValid() &&
+				"Compositor node got connected in the wrong order!" );
 
-		for( size_t i=0; i<outChannelsA.size(); ++i )
-		{
-			size_t outChannelA	= outChannelsA[i];
-			size_t inChannelB	= inChannelsB[i];
+		if( !nodeB->mInTextures[inChannelB].isValid() )
+			++nodeB->mNumConnectedInputs;
+		nodeB->mInTextures[inChannelB] = this->mOutTextures[outChannelA];
 
-			//Nodes must be connected in the right order (and after routeOutputs was called)
-			//to avoid passing null pointers (which is probably not what we wanted)
-			assert( this->mOutTextures[outChannelA].isValid() &&
-					"Compositor node got connected in the wrong order!" );
+		if( nodeB->mNumConnectedInputs >= nodeB->mInTextures.size() )
+			nodeB->routeOutputs();
 
-			if( !nodeB->mInTextures[inChannelB].isValid() )
-				++nodeB->mNumConnectedInputs;
-			nodeB->mInTextures[inChannelB] = this->mOutTextures[outChannelA];
-
-			if( nodeB->mNumConnectedInputs >= nodeB->mInTextures.size() )
-				nodeB->routeOutputs();
-
-			this->mConnectedNodes.push_back( nodeB );
-		}
+		this->mConnectedNodes.push_back( nodeB );
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorNode::connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
+											size_t inChannelA )
+	{
+		mInTextures[inChannelA].target		= rt;
+		mInTextures[inChannelA].textures	= textures;
+	}
 }
