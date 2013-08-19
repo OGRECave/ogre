@@ -61,13 +61,15 @@ namespace Ogre
 		void validateNodes();
 
 		/// Finds the requested ShadowNode. Throws if not found.
-		ShadowNode* findShadowNode( IdString nodeName ) const;
+		CompositorShadowNode* findShadowNode( IdString nodeName ) const;
 
 		/** Finds the requested Camera. Throws if not found.
 		@remarks
 			If cameraName is empty, uses the default camera
 		*/
 		Camera* findCamera( IdString cameraName ) const;
+
+		bool hasNodeDefinition( IdString nodeDefName ) const;
 	};
 }
 

@@ -37,6 +37,8 @@ namespace Ogre
 	class RenderTarget;
 	struct CompositorChannel;
 
+	class CompositorManager2;
+
 	typedef vector<RenderTarget*>::type RenderTargetVec;
 	typedef vector<CompositorPass*>::type CompositorPassVec;
 	typedef vector<CompositorNode*>::type CompositorNodeVec;

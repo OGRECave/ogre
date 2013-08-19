@@ -29,10 +29,38 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorManager2.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
 {
+	CompositorWorkspaceDef::CompositorWorkspaceDef( IdString name,
+													CompositorManager2 *compositorManager ) :
+			TextureDefinitionBase( TEXTURE_GLOBAL ),
+			mName( name ),
+			mFinalInChannel( 0 ),
+			mCompositorManager( compositorManager )
+	{
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::createImplicitAlias( IdString nodeName )
+	{
+		if( mAliasedNodes.find( nodeName ) == mAliasedNodes.end() )
+		{
+			if( !mCompositorManager->hasNodeDefinition( nodeName ) )
+			{
+				OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+							 "Can't find node " + nodeName.getFriendlyText(),
+							 "CompositorWorkspaceDef::createImplicitAlias" );
+			}
+			else
+			{
+				//Create the implicit alias
+				mAliasedNodes[nodeName] = nodeName;
+			}
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorWorkspaceDef::connect( uint32 outChannel, IdString outNode,
 											uint32 inChannel, IdString inNode )
 	{
@@ -53,7 +81,28 @@ namespace Ogre
 			++itor;
 		}
 
+		createImplicitAlias( outNode );
+		createImplicitAlias( inNode );
+
 		mChannelRoutes.push_back( ChannelRoute( outChannel, outNode, inChannel, inNode ) );
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::connectOutput( uint32 inChannel, IdString inNode )
+	{
+		createImplicitAlias( inNode );
+		mFinalInChannel = inChannel;
+		mFinalNode		= inNode;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::addAlias( IdString alias, IdString nodeName )
+	{
+		if( alias != nodeName && mCompositorManager->hasNodeDefinition( alias ) )
+		{
+			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
+						 "Can't use the name of a node definition as alias.",
+						 "CompositorWorkspaceDef::addAlias" );
+		}
+
+		mAliasedNodes[alias] = nodeName;
+	}
 }

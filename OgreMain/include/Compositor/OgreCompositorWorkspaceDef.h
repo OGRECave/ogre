@@ -41,7 +41,9 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** TODO: Describe!!!
+	/** Workspaces assume all other definitions are already parsed as we perform
+		validation checks.
+		TODO: Describe!!!
 	@author
 		Matias N. Goldberg
     @version
@@ -66,14 +68,61 @@ namespace Ogre
 		typedef map<IdString, IdString>::type	NodeAliasMap;
 		typedef list<ChannelRoute>::type		ChannelRouteList;
 
-		NodeAliasMap		mNodeAlias;
+		NodeAliasMap		mAliasedNodes;
 		ChannelRouteList	mChannelRoutes;
 
-	public:
-		CompositorWorkspaceDef( IdString name ) :
-			TextureDefinitionBase( TEXTURE_GLOBAL ), mName( name ) {}
+		
+		uint32				mFinalInChannel;/// Input Channel # to send the RenderWindow to
+		IdString			mFinalNode;		/// Alias of the final node to send the RenderWindow to
 
+		CompositorManager2	*mCompositorManager;
+
+		/** Checks if nodeName is already aliased (whether explicitly or implicitly). If not,
+			checks whether the name of the node corresponds to an actual Node definition.
+			If so, creates the implicit alias; otherwise throws
+		@remarks
+			This means it's only safe to pass names that aren't Nodes if it's already
+			 been explicitly aliased.
+		@param
+			Name of the node definition.
+		*/
+		void createImplicitAlias( IdString nodeName );
+
+	public:
+		CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
+
+		/** Connects outNode's output channel to inNode's input channel.
+		@remarks
+			This mapping will later be used to know how connections should be done.
+			@See CompositorNode::connectTo
+			If outNode & inNode are not in mAliasedNodes and they match the name of an
+			existing node definition, an implicit alias is created automatically.
+			Else it throws.
+		*/
 		void connect( uint32 outChannel, IdString outNode, uint32 inChannel, IdString inNode );
+
+		/** Connects the (probably "final") node by passing the RenderWindow in the given input channel
+		@remarks
+			@See connect
+			Only passing the RenderTarget to one node is supported. If the user wants to use it
+			in more nodes, he can use a dummy node as splitter (gotta love Nodes' flexibility! :)).
+			An implicit alias may be created.
+		*/
+		void connectOutput( uint32 inChannel, IdString inNode );
+
+		/** An alias is explicitly used when the user wants to use multiple, independent
+			instances of the same node. Each alias equals one instance.
+			An implicit alias is when the name of the alias and it's node name match.
+		@remarks
+			This function will throw if trying the alias is already taken by a node
+			definition (unless the node name and the alias match)
+			This function will throw if the alias was already used.
+		@param alias
+			Name of the alias (instance)
+		@param nodeName
+			Name of the node definition
+		*/
+		void addAlias( IdString alias, IdString nodeName );
 	};
 
 	/** @} */
