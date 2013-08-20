@@ -621,6 +621,12 @@ namespace Ogre {
          	dimensions. In case the source and destination format match, a plain copy is done.
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
+
+      	/** Flips pixels inplace in vertical direction.
+            @param	src			PixelBox containing pixels, pitches and format
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        static void bulkPixelVerticalFlip(const PixelBox &box);
     };
 	/** @} */
 	/** @} */
