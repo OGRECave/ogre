@@ -45,8 +45,11 @@ namespace Ogre
 		textureSource = static_cast<TextureSource>( texSource );
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorTargetDef* CompositorNodeDef::addTargetPass( IdString renderTargetName )
+	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName )
 	{
+		if( renderTargetName.find( "global_" ) == 0 )
+			addTextureSourceName( renderTargetName, 0, TEXTURE_GLOBAL );
+
 		mTargetPasses.push_back( CompositorTargetDef( renderTargetName ) );
 		return &mTargetPasses.back();
 	}

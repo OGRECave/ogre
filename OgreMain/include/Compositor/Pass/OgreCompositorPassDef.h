@@ -87,6 +87,8 @@ namespace Ogre
 		CompositorTargetDef( IdString renderTargetName ) : mRenderTargetName( renderTargetName ) {}
 		~CompositorTargetDef();
 
+		IdString getRenderTargetName() const			{ return mRenderTargetName; }
+
 		/** Reserves enough memory for all passes (efficient allocation)
 		@remarks
 			Calling this function is not obligatory, but recommended
@@ -96,6 +98,8 @@ namespace Ogre
 		void setNumPasses( size_t numPasses )			{ mCompositorPasses.reserve( numPasses ); }
 
 		CompositorPassDef* addPass( CompositorPassType passType );
+
+		const CompositorPassDefVec& getCompositorPasses() const	{ return mCompositorPasses; }
 	};
 
 	/** @} */

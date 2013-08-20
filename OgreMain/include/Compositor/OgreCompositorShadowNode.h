@@ -74,8 +74,8 @@ namespace Ogre
 		ShadowMapPassVec		mShadowMaps;
 
 	public:
-		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
-								RenderSystem *renderSys );
+		CompositorShadowNode( IdType id, IdString name, const CompositorShadowNodeDef *definition,
+								const CompositorWorkspace *workspace, RenderSystem *renderSys );
 		~CompositorShadowNode();
 	};
 

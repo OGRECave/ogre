@@ -31,9 +31,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class CompositorPass;
 	class CompositorNode;
+	class CompositorPass;
 	class CompositorShadowNode;
+	class CompositorWorkspace;
 	class RenderTarget;
 	struct CompositorChannel;
 
@@ -42,9 +43,9 @@ namespace Ogre
 
 	class CompositorManager2;
 
-	typedef vector<CompositorPass*>::type CompositorPassVec;
-	typedef vector<CompositorNode*>::type CompositorNodeVec;
-	typedef vector<CompositorShadowNode*>::type CompositorShadowNodeVec;
+	typedef vector<CompositorNode*>::type		CompositorNodeVec;
+	typedef vector<CompositorPass*>::type		CompositorPassVec;
+	typedef vector<CompositorShadowNode*>::type	CompositorShadowNodeVec;
 
 	enum PixelFormat;
 	typedef vector<PixelFormat>::type PixelFormatList;

@@ -55,9 +55,12 @@ namespace Ogre
 						"TextureDefinitionBase::addLocalTextureDefinition" );
 		}
 
+		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
+		uint32 value = (index & 0x3FFFFFFF)|(textureSource<<30);
+
 		IdString hashedName( name );
 		NameToChannelMap::const_iterator itor = mNameToChannelMap.find( hashedName );
-		if( itor != mNameToChannelMap.end() )
+		if( itor != mNameToChannelMap.end() && itor->second != value )
 		{
 			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
 						"Texture with same name '" + name +
@@ -65,15 +68,13 @@ namespace Ogre
 						"TextureDefinitionBase::addLocalTextureDefinition" );
 		}
 
-		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
-
-		mNameToChannelMap[hashedName] = (index & 0x3FFFFFFF)|(textureSource<<30);
+		mNameToChannelMap[hashedName] = value;
 
 		return hashedName;
 	}
 	//-----------------------------------------------------------------------------------
 	void TextureDefinitionBase::getTextureSource( IdString name, size_t &index,
-												TextureSource &textureSource ) const
+													TextureSource &textureSource ) const
 	{
 		NameToChannelMap::const_iterator itor = mNameToChannelMap.find( name );
 		if( itor == mNameToChannelMap.end() )

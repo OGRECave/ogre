@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorChannel.h"
 
 namespace Ogre
 {
@@ -57,6 +58,7 @@ namespace Ogre
 		/// Main sequence in the order they should be executed
 		CompositorNodeVec		mNodeSequence;
 		CompositorShadowNodeVec	mShadowNodes;
+		CompositorChannelVec	mGlobalTextures;
 		RenderSystem			*mRenderSys;
 
 		RenderTarget			*mRenderWindow;
@@ -72,6 +74,8 @@ namespace Ogre
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
 								RenderSystem *renderSys );
 		~CompositorWorkspace();
+
+		const CompositorChannel& getGlobalTexture( IdString name ) const;
 	};
 
 	/** @} */

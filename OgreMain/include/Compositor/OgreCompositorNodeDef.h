@@ -42,6 +42,9 @@ namespace Ogre
 	*  @{
 	*/
 
+	typedef vector<uint32>::type				ChannelMappings;
+	typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
+
 	/** Compositor nodes are the core subject of compositing.
 		TODO: Describe!!!
 	@remarks
@@ -58,8 +61,6 @@ namespace Ogre
 
 		IdString	mName;
 
-		typedef vector<uint32>::type				ChannelMappings;
-		typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
 		/** Tells where to grab the RenderTarget from for the output channel.
 			They can come either from an input channel, or from local textures.
 			The first 30 bits indicate the channel #, the last 30th & 31sts bit are used
@@ -72,6 +73,8 @@ namespace Ogre
 	public:
 		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( mName ) {}
 
+		/// See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
+		using TextureDefinitionBase::getTextureSource;
 		/** Retrieves in which container to look for when wanting to know the output texture
 			using the mappings from input/local texture -> output.
 		@param outputChannel [in]
@@ -97,8 +100,10 @@ namespace Ogre
 		@remarks
 			WARNING: Calling this function may invalidate all previous returned pointers
 			unless you've properly called setNumTargetPass
+		@param renderTargetName
+			We need the full name, not just the hash; so we can check whether it has the global_ prefix
 		*/
-		CompositorTargetDef* addTargetPass( IdString renderTargetName );
+		CompositorTargetDef* addTargetPass( const String &renderTargetName );
 	};
 
 	/** @} */

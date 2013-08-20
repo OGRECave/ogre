@@ -86,7 +86,7 @@ namespace Ogre
     @version
         1.0
     */
-	class _OgreExport CompositorNode : public CompositorInstAlloc
+	class _OgreExport CompositorNode : public CompositorInstAlloc, public IdObject
 	{
 	protected:
 		/// Unique name across the same workspace
@@ -104,6 +104,8 @@ namespace Ogre
 
 		/// Nodes we're connected to. If we destroy our local textures, we need to inform them
 		CompositorNodeVec	mConnectedNodes;
+
+		CompositorWorkspace const *mWorkspace;
 
 		RenderSystem		*mRenderSystem; /// Used to create/destroy MRTs
 
@@ -130,9 +132,14 @@ namespace Ogre
 		void notifyDestroyed( const CompositorChannel &channel );
 
 	public:
-		CompositorNode( IdString name, const CompositorNodeDef *definition, RenderSystem *renderSys );
-		CompositorNode( IdString name, const CompositorNodeDef *definition,
-						RenderSystem *renderSys, const RenderTarget *finalTarget );
+		/** The Id must be unique across all engine so we can create unique named textures.
+			The name is only unique across the workspace
+		*/
+		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
+						const CompositorWorkspace *workspace, RenderSystem *renderSys );
+		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
+						const CompositorWorkspace *workspace, RenderSystem *renderSys,
+						const RenderTarget *finalTarget );
 		virtual ~CompositorNode();
 
 		IdString getName(void) const								{ return mName; }
@@ -162,6 +169,8 @@ namespace Ogre
 
 		bool areAllInputsConnected() const	{ return mNumConnectedInputs == mInTextures.size(); }
 		const CompositorChannelVec& getInputChannel() const			{ return mInTextures; }
+
+		void initializePasses(void);
 
 	private:
 		CompositorNodeDef const *mDefinition;

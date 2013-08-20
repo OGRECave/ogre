@@ -64,7 +64,7 @@ namespace Ogre
 		{
 			const CompositorNodeDef *nodeDef = compoManager->getNodeDefinition( itor->second );
 			CompositorNode *newNode = new CompositorNode( Id::generateNewId<CompositorNode>(),
-															nodeDef, mRenderSys );
+															itor->first, nodeDef, this, mRenderSys );
 			mNodeSequence.push_back( newNode );
 			++itor;
 		}
@@ -174,6 +174,16 @@ namespace Ogre
 			// We need mNodeSequence in the right order of execution!
 			mNodeSequence.clear();
 			mNodeSequence.insert( mNodeSequence.end(), processedList.begin(), processedList.end() );
+
+			CompositorNodeVec::iterator itor = mNodeSequence.begin();
+			CompositorNodeVec::iterator end  = mNodeSequence.end();
+
+			while( itor != end )
+			{
+				(*itor)->initializePasses();
+				++itor;
+			}
+
 			mValid = true;
 		}
 	}
@@ -192,5 +202,13 @@ namespace Ogre
 		}
 
 		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
+	const CompositorChannel& CompositorWorkspace::getGlobalTexture( IdString name ) const
+	{
+		size_t index;
+		TextureDefinitionBase::TextureSource textureSource;
+		mDefinition->getTextureSource( name, index, textureSource );
+		return mGlobalTextures[index];
 	}
 }

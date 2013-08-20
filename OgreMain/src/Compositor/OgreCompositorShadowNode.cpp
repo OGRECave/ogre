@@ -37,9 +37,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
+	CompositorShadowNode::CompositorShadowNode( IdType id, IdString name,
+												const CompositorShadowNodeDef *definition,
+												const CompositorWorkspace *workspace,
 												RenderSystem *renderSys ) :
-			CompositorNode( id, definition, renderSys )
+			CompositorNode( id, name, definition, workspace, renderSys )
 	{
 		//Create the local textures
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =

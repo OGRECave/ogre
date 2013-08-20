@@ -98,7 +98,8 @@ namespace Ogre
 		ShadowMapTechniques	mDefaultTechnique;
 
 	public:
-		CompositorShadowNodeDef() : mDefaultTechnique( SHADOWMAP_DEFAULT ) {}
+		CompositorShadowNodeDef( IdType name ) :
+				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ) {}
 
 		/** Reserves enough memory for all texture definitions
 		@remarks

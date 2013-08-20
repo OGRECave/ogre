@@ -29,17 +29,18 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
-#include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 
 namespace Ogre
 {
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
-												const CompositorManager2 *manager, RenderTarget *target ) :
+												const CompositorWorkspace *workspace,
+												RenderTarget *target ) :
 				CompositorPass( definition, target ),
 				mDefinition( definition ),
 				mShadowNode( 0 ),
 				mCamera( 0 ),
-				mCompositorManager( manager )
+				mWorkspace( workspace )
 	{
 		mShadowNode	= manager->findShadowNode( mDefinition->mShadowNode );
 		mCamera		= manager->findCamera( mDefinition->mCameraName );

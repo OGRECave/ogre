@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/OgreCompositorChannel.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreRenderTexture.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -39,19 +41,24 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorNode::CompositorNode( IdString name, const CompositorNodeDef *definition,
-									RenderSystem *renderSys ) :
+	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
+									const CompositorWorkspace *workspace, RenderSystem *renderSys ) :
+			IdObject( id ),
 			mName( name ),
 			mNumConnectedInputs( 0 ),
+			mWorkspace( workspace ),
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorNode::CompositorNode( IdString name, const CompositorNodeDef *definition,
-									RenderSystem *renderSys, const RenderTarget *finalTarget ) :
+	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
+									const CompositorWorkspace *workspace, RenderSystem *renderSys,
+									const RenderTarget *finalTarget ) :
+			IdObject( id ),
 			mName( name ),
 			mNumConnectedInputs( 0 ),
+			mWorkspace( workspace ),
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
 	{
@@ -174,9 +181,13 @@ namespace Ogre
 		while( itor != end )
 		{
 			size_t index;
-			bool localTexture;
-			mDefinition->getTextureSource( itor - begin, index, localTexture );
-			if( localTexture )
+			TextureDefinitionBase::TextureSource textureSource;
+			mDefinition->getTextureSource( itor - begin, index, textureSource );
+
+			assert( textureSource == TextureDefinitionBase::TEXTURE_LOCAL ||
+					textureSource == TextureDefinitionBase::TEXTURE_INPUT );
+
+			if( textureSource == TextureDefinitionBase::TEXTURE_LOCAL )
 				*itor = mLocalTextures[index];
 			else
 				*itor = mInTextures[index];
@@ -281,5 +292,57 @@ namespace Ogre
 	{
 		mInTextures[inChannelA].target		= rt;
 		mInTextures[inChannelA].textures	= textures;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorNode::initializePasses(void)
+	{
+		CompositorTargetDefVec::const_iterator itor = mDefinition->mTargetPasses.begin();
+		CompositorTargetDefVec::const_iterator end  = mDefinition->mTargetPasses.end();
+
+		while( itor != end )
+		{
+			CompositorChannel const * channel = 0;
+			size_t index;
+			TextureDefinitionBase::TextureSource textureSource;
+			mDefinition->getTextureSource( itor->getRenderTargetName(), index, textureSource );
+			switch( textureSource )
+			{
+			case TextureDefinitionBase::TEXTURE_INPUT:
+				channel = &mInTextures[index];
+				break;
+			case TextureDefinitionBase::TEXTURE_LOCAL:
+				channel = &mLocalTextures[index];
+				break;
+			case TextureDefinitionBase::TEXTURE_GLOBAL:
+				channel = &mWorkspace->getGlobalTexture( itor->getRenderTargetName() );
+				break;
+			}
+
+			const CompositorPassDefVec &passes = itor->getCompositorPasses();
+			CompositorPassDefVec::const_iterator itPass = passes.begin();
+			CompositorPassDefVec::const_iterator enPass = passes.end();
+
+			while( itPass != enPass )
+			{
+				CompositorPass *newPass = 0;
+				switch( (*itPass)->getType() )
+				{
+				case PASS_SCENE:
+					newPass = new CompositorPassScene( static_cast<CompositorPassSceneDef*>(*itPass),
+														mWorkspace, channel->target );
+					break;
+				default:
+					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+								"Pass type not implemented or not recognized",
+								"CompositorNode::initializePasses" );
+					break;
+				}
+
+				mPasses.push_back( newPass );
+				++itPass;
+			}
+
+			++itor;
+		}
 	}
 }

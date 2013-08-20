@@ -39,7 +39,7 @@ namespace Ogre
 	class RenderTarget;
 	class ShadowNode;
 	class Camera;
-	class CompositorManager2;
+	class CompositorWorkspace;
 
 	/** \addtogroup Core
 	*  @{
@@ -63,11 +63,11 @@ namespace Ogre
 		ShadowNode		*mShadowNode;
 		Camera			*mCamera;
 
-		CompositorManager2 const *mCompositorManager;
+		CompositorWorkspace const *mWorkspace;
 
 	public:
-		CompositorPassScene( const CompositorPassSceneDef *definition, const CompositorManager2 *manager,
-								RenderTarget *target );
+		CompositorPassScene( const CompositorPassSceneDef *definition,
+								const CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
 		virtual void execute();
