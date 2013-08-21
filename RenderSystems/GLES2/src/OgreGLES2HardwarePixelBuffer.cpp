@@ -287,12 +287,12 @@ namespace Ogre {
         mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
         // Log a message
-        std::stringstream str;
-        str << "GLES2HardwarePixelBuffer constructed for texture " << baseName
-            << " id " << mTextureID << " face " << mFace << " level " << mLevel << ": "
-            << "width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
-            << " format=" << PixelUtil::getFormatName(mFormat);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+//        std::stringstream str;
+//        str << "GLES2HardwarePixelBuffer constructed for texture " << baseName
+//            << " id " << mTextureID << " face " << mFace << " level " << mLevel << ": "
+//            << "width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
+//            << " format=" << PixelUtil::getFormatName(mFormat);
+//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         // Set up a pixel box
         mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
@@ -363,17 +363,17 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
 
-        std::stringstream str;
-        str << "GLES2TextureBuffer::upload: " << mTextureID
-        << " pixel buffer: " << mBufferId
-        << " bytes: " << mSizeInBytes
-        << " dest depth: " << dest.getDepth()
-        << " dest front: " << dest.front
-        << " datasize: " << dataSize
-        << " face: " << mFace << " level: " << mLevel
-        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-        << " format: " << PixelUtil::getFormatName(mFormat);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+//        std::stringstream str;
+//        str << "GLES2TextureBuffer::upload: " << mTextureID
+//        << " pixel buffer: " << mBufferId
+//        << " bytes: " << mSizeInBytes
+//        << " dest depth: " << dest.getDepth()
+//        << " dest front: " << dest.front
+//        << " datasize: " << dataSize
+//        << " face: " << mFace << " level: " << mLevel
+//        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
+//        << " format: " << PixelUtil::getFormatName(mFormat);
+//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, dataSize, GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
@@ -438,11 +438,11 @@ namespace Ogre {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
-            LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                                  " Target: " + StringConverter::toString(mTarget) +
-                                                  " Format: " + PixelUtil::getFormatName(data.format) +
-                                                  " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                                  " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+//            LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+//                                                  " Target: " + StringConverter::toString(mTarget) +
+//                                                  " Format: " + PixelUtil::getFormatName(data.format) +
+//                                                  " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+//                                                  " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
 
             switch(mTarget) {
                 case GL_TEXTURE_2D:
@@ -497,14 +497,14 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
 
-        std::stringstream str;
-        str << "GLES2TextureBuffer::download: " << mTextureID
-        << " pixel buffer: " << mBufferId
-        << " bytes: " << mSizeInBytes
-        << " face: " << mFace << " level: " << mLevel
-        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-        << " format: " << PixelUtil::getFormatName(mFormat);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+//        std::stringstream str;
+//        str << "GLES2TextureBuffer::download: " << mTextureID
+//        << " pixel buffer: " << mBufferId
+//        << " bytes: " << mSizeInBytes
+//        << " face: " << mFace << " level: " << mLevel
+//        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
+//        << " format: " << PixelUtil::getFormatName(mFormat);
+//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
         if(PixelUtil::isCompressed(data.format))
@@ -577,11 +577,11 @@ namespace Ogre {
 #else
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
-        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                              " Target: " + StringConverter::toString(mTarget) +
-                                              " Format: " + PixelUtil::getFormatName(data.format) +
-                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
-                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+//        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+//                                              " Target: " + StringConverter::toString(mTarget) +
+//                                              " Format: " + PixelUtil::getFormatName(data.format) +
+//                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+//                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
         if (PixelUtil::isCompressed(data.format))
