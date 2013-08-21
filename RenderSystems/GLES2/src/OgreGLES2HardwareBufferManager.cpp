@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderToVertexBuffer.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2Support.h"
+#include "OgreGLES2Util.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -55,14 +56,14 @@ namespace Ogre {
                                                       HardwareBuffer::Usage usage,
                                                       bool useShadowBuffer)
     {
-#if OGRE_NO_GLES3_SUPPORT == 0
-        GLES2HardwareVertexBuffer* buf =
-            OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
-#else
-        // always use shadowBuffer
-        GLES2HardwareVertexBuffer* buf =
-            OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
-#endif
+        GLES2HardwareVertexBuffer* buf = 0;
+
+        if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
+        else
+            // always use shadowBuffer
+            buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
+
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
             mVertexBuffers.insert(buf);
@@ -75,14 +76,13 @@ namespace Ogre {
                                                                               HardwareBuffer::Usage usage,
                                                                               bool useShadowBuffer)
     {
-#if OGRE_NO_GLES3_SUPPORT == 0
-        GLES2HardwareIndexBuffer* buf =
-            OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
-#else
-        // always use shadowBuffer
-        GLES2HardwareIndexBuffer* buf =
-            OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, true);
-#endif
+        GLES2HardwareIndexBuffer* buf = 0;
+        if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
+        else
+            // always use shadowBuffer
+            buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, true);
+
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex);
             mIndexBuffers.insert(buf);

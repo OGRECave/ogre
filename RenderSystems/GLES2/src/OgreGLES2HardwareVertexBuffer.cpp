@@ -41,14 +41,6 @@ namespace Ogre {
                                                        bool useShadowBuffer)
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer)
     {
-#if OGRE_NO_GLES3_SUPPORT == 1
-        if (!useShadowBuffer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only supported with shadowBuffer",
-                        "GLES2HardwareVertexBuffer");
-        }
-#endif
         createBuffer();
     }
 
@@ -113,71 +105,64 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer::lock");
         }
 
-        void* retPtr = 0;
+        GLenum access = 0;
 
-        if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
-        {
-            if (!retPtr)
-            {
-                GLenum access = 0;
-                // Use glMapBuffer
-                static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
+        // Use glMapBuffer
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-                void* pBuffer;
+        void* pBuffer;
 #if OGRE_NO_GLES3_SUPPORT == 0 || defined(GL_EXT_map_buffer_range)
-                if (mUsage & HBU_WRITE_ONLY)
-                {
-                    access = GL_MAP_WRITE_BIT_EXT;
-                    access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
-                    if(options == HBL_DISCARD)
-                    {
-                        // Discard the buffer
-                        access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
-                    }
-                    access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
-                }
-                else if (options == HBL_READ_ONLY)
-                    access = GL_MAP_READ_BIT_EXT;
-                else
-                    access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
+        if (mUsage & HBU_WRITE_ONLY)
+        {
+            access = GL_MAP_WRITE_BIT_EXT;
+            access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
+            if(options == HBL_DISCARD)
+            {
+                // Discard the buffer
+                access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
+            }
+            access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
+        }
+        else if (options == HBL_READ_ONLY)
+            access = GL_MAP_READ_BIT_EXT;
+        else
+            access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
 
-                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, access));
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, access));
 #else
-                if(options == HBL_DISCARD)
-                {
-                    // Discard the buffer
-                    OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
-                                                     GLES2HardwareBufferManager::getGLUsage(mUsage)));
-                }
-                if (mUsage & HBU_WRITE_ONLY)
-                    access = GL_WRITE_ONLY_OES;
+        if(options == HBL_DISCARD)
+        {
+            // Discard the buffer
+            OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
+                                             GLES2HardwareBufferManager::getGLUsage(mUsage)));
+        }
+        if (mUsage & HBU_WRITE_ONLY)
+            access = GL_WRITE_ONLY_OES;
 
-                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ARRAY_BUFFER, access));
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ARRAY_BUFFER, access));
 #endif
 
-                if(pBuffer == 0)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                                "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
-                }
-
-                if(mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
-                {
-                    GLenum result;
-                    OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
-                    if(result == GL_WAIT_FAILED_APPLE)
-                    {
-                        // Some error
-                    }
-                    OGRE_CHECK_GL_ERROR(glDeleteSyncAPPLE(mFence));
-                    mFence = 0;
-                }
-
-                // return offsetted
-                retPtr = static_cast<void*>(
-                                            static_cast<unsigned char*>(pBuffer) + offset);
-            }
+        if(pBuffer == 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
         }
+
+        if(mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
+        {
+            GLenum result;
+            OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
+            if(result == GL_WAIT_FAILED_APPLE)
+            {
+                // Some error
+            }
+            OGRE_CHECK_GL_ERROR(glDeleteSyncAPPLE(mFence));
+            mFence = 0;
+        }
+
+        // return offsetted
+        void* retPtr = static_cast<void*>(
+                                    static_cast<unsigned char*>(pBuffer) + offset);
 
 		mIsLocked = true;
         return retPtr;
@@ -185,30 +170,21 @@ namespace Ogre {
 
     void GLES2HardwareVertexBuffer::unlockImpl(void)
     {
-        if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
-        {
-            static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
 #if OGRE_NO_GLES3_SUPPORT == 0 || defined(GL_EXT_map_buffer_range)
-            if (mUsage & HBU_WRITE_ONLY)
-            {
-                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ARRAY_BUFFER, mLockStart, mLockSize));
-            }
-#endif
-            GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
-            if(!mapped)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Buffer data corrupted, please reload", 
-                            "GLES2HardwareVertexBuffer::unlock");
-            }
+        if (mUsage & HBU_WRITE_ONLY)
+        {
+            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ARRAY_BUFFER, mLockStart, mLockSize));
         }
-        else
+#endif
+        GLboolean mapped;
+        OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
+        if(!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only buffer mapping is supported",
-                        "GLES2HardwareVertexBuffer::unlockImpl");
+                        "Buffer data corrupted, please reload", 
+                        "GLES2HardwareVertexBuffer::unlock");
         }
 
         mIsLocked = false;
@@ -224,26 +200,30 @@ namespace Ogre {
         }
         else
         {
-#if OGRE_NO_GLES3_SUPPORT == 0
-            // Map the buffer range then copy out of it into our destination buffer
-            void* srcData;
-            OGRE_CHECK_GL_ERROR(srcData = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_READ_BIT));
-            memcpy(pDest, srcData, length);
+            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            {
+                // Map the buffer range then copy out of it into our destination buffer
+                void* srcData;
+                OGRE_CHECK_GL_ERROR(srcData = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, GL_MAP_READ_BIT_EXT));
+                memcpy(pDest, srcData, length);
 
-            // Unmap the buffer since we are done.
-            GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ARRAY_BUFFER));
-            if(!mapped)
+                // Unmap the buffer since we are done.
+                GLboolean mapped;
+                OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
+                if(!mapped)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Buffer data corrupted, please reload",
+                                "GLES2HardwareVertexBuffer::readData");
+                }
+            }
+            else
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Buffer data corrupted, please reload",
+                            "Read hardware buffer is not supported",
                             "GLES2HardwareVertexBuffer::readData");
+
             }
-#else
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Read hardware buffer is not supported",
-                        "GLES2HardwareVertexBuffer::readData");
-#endif
         }
     }
 

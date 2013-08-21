@@ -49,13 +49,6 @@ namespace Ogre {
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2HardwareIndexBuffer");
 		}
-
-		if (!useShadowBuffer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only support with shadowBuffer",
-                        "GLES2HardwareIndexBuffer");
-        }
 #endif
         createBuffer();
     }
@@ -104,30 +97,21 @@ namespace Ogre {
     
     void GLES2HardwareIndexBuffer::unlockImpl(void)
     {
-        if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
-        {
-            static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
 #if OGRE_NO_GLES3_SUPPORT == 0 || defined(GL_EXT_map_buffer_range)
-            if (mUsage & HBU_WRITE_ONLY)
-            {
-                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, mLockStart, mLockSize));
-            }
-#endif
-            GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ELEMENT_ARRAY_BUFFER));
-            if(!mapped)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Buffer data corrupted, please reload", 
-                    "GLES2HardwareIndexBuffer::unlock");
-            }
-        }
-        else
+        if (mUsage & HBU_WRITE_ONLY)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only buffer mapping is only supported",
-                        "GLES2HardwareIndexBuffer::unlockImpl");
+            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, mLockStart, mLockSize));
+        }
+#endif
+        GLboolean mapped;
+        OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ELEMENT_ARRAY_BUFFER));
+        if(!mapped)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                "Buffer data corrupted, please reload", 
+                "GLES2HardwareIndexBuffer::unlock");
         }
         mIsLocked = false;
     }
@@ -143,60 +127,52 @@ namespace Ogre {
                         "GLES2HardwareIndexBuffer::lock");
         }
 
-        void* retPtr = 0;
+        GLenum access = 0;
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
-        if(getGLSupport()->checkExtension("GL_OES_mapbuffer") || gleswIsSupported(3, 0))
-        {
-            if (!retPtr)
-            {
-                GLenum access = 0;
-                static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
-
-                void* pBuffer;
+        void* pBuffer;
 #if OGRE_NO_GLES3_SUPPORT == 0 || defined(GL_EXT_map_buffer_range)
-                if (mUsage & HBU_WRITE_ONLY)
-                {
-                    access = GL_MAP_WRITE_BIT_EXT;
-                    access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
-                    if(options == HBL_DISCARD)
-                    {
-                        // Discard the buffer
-                        access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
-                    }
-                    // We explicitly flush when the buffer is unlocked
-                    access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
-                }
-                else if (options == HBL_READ_ONLY)
-                    access = GL_MAP_READ_BIT_EXT;
-                else
-                    access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
-
-                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));
-#else
-                // Use glMapBuffer
-                if(options == HBL_DISCARD)
-                {
-                    // Discard the buffer
-                    OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
-                                                     GLES2HardwareBufferManager::getGLUsage(mUsage)));
-                }
-                if (mUsage & HBU_WRITE_ONLY)
-                    access = GL_WRITE_ONLY_OES;
-
-                OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ELEMENT_ARRAY_BUFFER, access));
-#endif
-                if(pBuffer == 0)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                        "Index Buffer: Out of memory", 
-                        "GLES2HardwareIndexBuffer::lock");
-                }
-
-                // return offsetted
-                retPtr = static_cast<void*>(
-                    static_cast<unsigned char*>(pBuffer) + offset);
+        if (mUsage & HBU_WRITE_ONLY)
+        {
+            access = GL_MAP_WRITE_BIT_EXT;
+            access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
+            if(options == HBL_DISCARD)
+            {
+                // Discard the buffer
+                access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
             }
+            // We explicitly flush when the buffer is unlocked
+            access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
         }
+        else if (options == HBL_READ_ONLY)
+            access = GL_MAP_READ_BIT_EXT;
+        else
+            access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
+
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));
+#else
+        // Use glMapBuffer
+        if(options == HBL_DISCARD)
+        {
+            // Discard the buffer
+            OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
+                                             GLES2HardwareBufferManager::getGLUsage(mUsage)));
+        }
+        if (mUsage & HBU_WRITE_ONLY)
+            access = GL_WRITE_ONLY_OES;
+
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ELEMENT_ARRAY_BUFFER, access));
+#endif
+        if(pBuffer == 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                "Index Buffer: Out of memory", 
+                "GLES2HardwareIndexBuffer::lock");
+        }
+
+        // return offsetted
+        void *retPtr = static_cast<void*>(
+            static_cast<unsigned char*>(pBuffer) + offset);
 		mIsLocked = true;
         return retPtr;
     }
@@ -214,26 +190,29 @@ namespace Ogre {
         }
         else
         {
-#if OGRE_NO_GLES3_SUPPORT == 0
-            // Map the buffer range then copy out of it into our destination buffer
-            void* srcData;
-            OGRE_CHECK_GL_ERROR(srcData = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, length, GL_MAP_READ_BIT));
-            memcpy(pDest, srcData, length);
+            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            {
+                // Map the buffer range then copy out of it into our destination buffer
+                void* srcData;
+                OGRE_CHECK_GL_ERROR(srcData = glMapBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, offset, length, GL_MAP_READ_BIT_EXT));
+                memcpy(pDest, srcData, length);
 
-            // Unmap the buffer since we are done.
-            GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
-            if(!mapped)
+                // Unmap the buffer since we are done.
+                GLboolean mapped;
+                OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ELEMENT_ARRAY_BUFFER));
+                if(!mapped)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Buffer data corrupted, please reload",
+                                "GLES2HardwareIndexBuffer::readData");
+                }
+            }
+            else
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Buffer data corrupted, please reload",
+                            "Reading hardware buffer is not supported",
                             "GLES2HardwareIndexBuffer::readData");
             }
-#else
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Reading hardware buffer is not supported",
-                        "GLES2HardwareIndexBuffer::readData");
-#endif
         }
     }
 
