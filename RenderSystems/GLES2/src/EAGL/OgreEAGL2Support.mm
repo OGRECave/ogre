@@ -297,7 +297,11 @@ namespace Ogre {
                         __FUNCTION__);
             return context;
         }
-        
+
+        // Initialise GL3W
+        if (gleswInit())
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
+
         return context;
     }
 

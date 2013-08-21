@@ -170,10 +170,6 @@ namespace Ogre {
     {
 		mGLSupport->start();
 
-        // Initialise GL3W
-        if (gleswInit())
-            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
-
         // Create the texture manager
 		mTextureManager = OGRE_NEW GLES2TextureManager(*mGLSupport); 
 
@@ -572,6 +568,7 @@ namespace Ogre {
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             tokens = StringUtil::split(shadingLangVersion, ". ");
             size_t i = 0;
+
             // iOS reports the GLSL version with a whole bunch of non-digit characters so we have to find where the version starts.
             for(; i < tokens.size(); i++)
             {
@@ -641,6 +638,9 @@ namespace Ogre {
 
 			GLES2RenderBuffer *stencilBuffer = depthBuffer;
 			if( 
+#if OGRE_NO_GLES3_SUPPORT == 0
+               depthFormat != GL_DEPTH32F_STENCIL8 &&
+#endif
                depthFormat != GL_DEPTH24_STENCIL8_OES &&
                stencilFormat )
 			{
@@ -1567,15 +1567,15 @@ namespace Ogre {
         RenderSystem::_render(op);
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
-        VertexDeclaration* globalVertexDeclaration;
-        bool hasInstanceData;
-        size_t numberOfInstances;
+        VertexDeclaration* globalVertexDeclaration = 0;
+        bool hasInstanceData = false;
+        size_t numberOfInstances = 0;
         if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
         {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
             hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                    !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
+                                !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
                                 || op.vertexData->vertexBufferBinding->hasInstanceData();
 
             numberOfInstances = op.numberOfInstances;
@@ -1754,6 +1754,20 @@ namespace Ogre {
  		{
  			OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
   		}
+
+        // Set fences
+        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
+        {
+            const VertexElement & elem = *elemIter;
+            size_t source = elem.getSource();
+
+            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
+                continue; // skip unbound elements
+
+            HardwareVertexBufferSharedPtr vertexBuffer =
+            op.vertexData->vertexBufferBinding->getBuffer(source);
+            static_cast<GLES2HardwareVertexBuffer*>(vertexBuffer.get())->setFence();
+        }
 
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
@@ -2325,7 +2339,7 @@ namespace Ogre {
         const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
-//        if (updateVAO)
+        if (updateVAO)
         {
 			mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId());
@@ -2398,14 +2412,14 @@ namespace Ogre {
                                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                       pBufferData));
             
-            vector<GLuint>::type::iterator ai = std::find(mRenderAttribsBound.begin(), mRenderAttribsBound.end(), attrib);
-            if(ai == mRenderAttribsBound.end())
-            {
+//            vector<GLuint>::type::iterator ai = std::find(mRenderAttribsBound.begin(), mRenderAttribsBound.end(), attrib);
+//            if(ai == mRenderAttribsBound.end())
+//            {
                 // If this attribute hasn't been enabled, do so and keep a record of it.
                 OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
 
-                mRenderAttribsBound.push_back(attrib);
-            }
+//                mRenderAttribsBound.push_back(attrib);
+//            }
 
             attribsBound.push_back(attrib);
         }

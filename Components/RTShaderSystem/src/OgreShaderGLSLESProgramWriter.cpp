@@ -282,6 +282,14 @@ namespace Ogre {
             os << "precision highp float;" << std::endl;
             os << "precision highp int;" << std::endl;
 
+            // Redefine texture functions to maintain reusability
+            if(mGLSLVersion > 100)
+            {
+                os << "#define texture2D texture" << std::endl;
+                os << "#define texture3D texture" << std::endl;
+                os << "#define textureCube texture" << std::endl;
+            }
+
             // Generate source code header.
             writeProgramTitle(os, program);
             os<< std::endl;
@@ -542,7 +550,16 @@ namespace Ogre {
 				
 				if (gpuType == GPT_FRAGMENT_PROGRAM)
 				{
-					os << "\tgl_FragColor = outputColor;" << std::endl;
+                    // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
+                    // Always add gl_FragColor as an output.  The name is for compatibility.
+                    if(mGLSLVersion > 100)
+                    {
+                        os << "\tfragColour = outputColor;" << std::endl;
+                    }
+                    else
+                    {
+                        os << "\tgl_FragColor = outputColor;" << std::endl;
+                    }
 				}
 				else if (gpuType == GPT_VERTEX_PROGRAM)
 				{
@@ -583,7 +600,11 @@ namespace Ogre {
                     paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
                     mInputToGLStatesMap[pParam->getName()] = paramName;
 
-                    os << "varying\t";
+                    if(mGLSLVersion > 100)
+                        os << "in\t";
+                    else
+                        os << "varying\t";
+
                     os << mGpuConstTypeMap[pParam->getType()];
                     os << "\t";	
                     os << paramName;
@@ -595,7 +616,10 @@ namespace Ogre {
                     // Due the fact that glsl does not have register like cg we have to rename the params
                     // according their content.
                     mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
-                    os << "attribute\t"; 
+                    if(mGLSLVersion > 100)
+                        os << "in\t";
+                    else
+                        os << "attribute\t";
 
                     // All uv texcoords passed by OGRE are vec4
                     if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
@@ -652,7 +676,10 @@ namespace Ogre {
                     }
                     else
                     {
-                        os << "varying\t";
+                        if(mGLSLVersion > 100)
+                            os << "out\t";
+                        else
+                            os << "varying\t";
                         os << mGpuConstTypeMap[pParam->getType()];
                         os << "\t";
                         os << pParam->getName();
@@ -665,7 +692,10 @@ namespace Ogre {
                 }
                 else if(gpuType == GPT_FRAGMENT_PROGRAM &&
                         pParam->getSemantic() == Parameter::SPS_COLOR)
-                {					
+                {
+                    if(mGLSLVersion > 100)
+                        os << "out vec4 fragColour;" << std::endl;
+
                     // GLSL ES fragment program has to always write gl_FragColor
                     mInputToGLStatesMap[pParam->getName()] = "outputColor";
                 }

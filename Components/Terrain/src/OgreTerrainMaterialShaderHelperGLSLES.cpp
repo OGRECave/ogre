@@ -81,25 +81,40 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
-        outStream << "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n"
-        << "precision highp int;\n"
-        << "precision highp float;\n";
+        uint16 glslVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+        String inKeyword = "attribute";
+        String outKeyword = "varying";
+
+        outStream << "#version " << glslVersion;
+
+        // Starting with ES 3.0 the version must contain the string "es" after the version number with a space separating them
+        if(glslVersion > 100)
+        {
+            outStream << " es";
+            inKeyword = "in";
+            outKeyword = "out";
+        }
+
+        outStream << std::endl;
+
+        outStream << "precision highp int;\n";
+        outStream << "precision highp float;\n";
 
         bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
         if (compression)
         {
             outStream <<
-                "attribute vec2 posIndex;\n"
-                "attribute float height;\n";
+                inKeyword << " vec2 posIndex;\n" <<
+                inKeyword << " float height;\n";
         }
         else
         {
             outStream <<
-                "attribute vec4 position;\n"
-                "attribute vec2 uv0;\n";
+                inKeyword << " vec4 position;\n" <<
+                inKeyword << " vec2 uv0;\n";
         }
         if (tt != RENDER_COMPOSITE_MAP)
-            outStream << "attribute vec2 delta;\n"; // lodDelta, lodThreshold
+            outStream << inKeyword << " vec2 delta;\n"; // lodDelta, lodThreshold
 
         outStream <<
             "uniform mat4 worldMatrix;\n"
@@ -122,11 +137,11 @@ namespace Ogre
             outStream << "uniform vec4 uvMul_" << i << ";\n";
 
         outStream <<
-            "varying vec4 oPosObj;\n";
+            outKeyword << " vec4 oPosObj;\n";
 
         uint texCoordSet = 1;
         outStream <<
-            "varying vec4 oUVMisc; // xy = uv, z = camDepth\n";
+            outKeyword << " vec4 oUVMisc; // xy = uv, z = camDepth\n";
 
         // layer UV's premultiplied, packed as xy/zw
         uint numUVSets = numLayers / 2;
@@ -137,21 +152,21 @@ namespace Ogre
             for (uint i = 0; i < numUVSets; ++i)
             {
                 outStream <<
-                    "varying vec4 layerUV" << i << ";\n";
+                    outKeyword << " vec4 layerUV" << i << ";\n";
             }
         }
 
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
-            outStream << "varying vec2 lodInfo;\n";
+            outStream << outKeyword << " vec2 lodInfo;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
             outStream <<
-                "uniform vec4 fogParams;\n"
-                "varying float fogVal;\n";
+                "uniform vec4 fogParams;\n" <<
+                outKeyword << " float fogVal;\n";
         }
 
         if (prof->isShadowingEnabled(tt, terrain))
@@ -234,10 +249,26 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+
+        uint16 glslVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+        String inKeyword = "varying";
+        String outKeyword = "";
+
+        outStream << "#version " << glslVersion;
+
+        // Starting with ES 3.0 the version must contain the string "es" after the version number with a space separating them
+        if(glslVersion > 100)
+        {
+            outStream << " es";
+            inKeyword = "in";
+            outKeyword = "out";
+        }
+
+        outStream << std::endl;
+
         // Main header
         outStream <<
             // helpers
-            "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n"
             "precision highp int;\n"
             "precision highp float;\n"
             "vec4 expand(vec4 v)\n"
@@ -252,11 +283,19 @@ namespace Ogre
             "    return vec4(amb, diffuse, specular, 1.0);\n"
             "}\n\n";
 
+        if(glslVersion > 100)
+        {
+            outStream << "out vec4 fragColour;\n";
+            outStream << "#define texture2D texture\n";
+            outStream << "#define texture3D texture\n";
+            outStream << "#define textureCube texture\n";
+        }
+
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
 
-        outStream << "varying vec4 oPosObj;\n"
-                     "varying vec4 oUVMisc;\n";
+        outStream << inKeyword << " vec4 oPosObj;\n" <<
+                     inKeyword << " vec4 oUVMisc;\n";
 
         uint texCoordSet = 1;
 
@@ -272,20 +311,20 @@ namespace Ogre
             for (uint i = 0; i < numUVSets; ++i)
             {
                 outStream <<
-                    "varying vec4 layerUV" << i << ";\n";
+                    inKeyword << " vec4 layerUV" << i << ";\n";
             }
         }
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
-            outStream << "varying vec2 lodInfo;\n";
+            outStream << inKeyword << " vec2 lodInfo;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
             outStream <<
-                "uniform vec3 fogColour;\n"
-                "varying float fogVal;\n";
+                "uniform vec3 fogColour;\n" <<
+                inKeyword << " float fogVal;\n";
         }
 
         uint currentSamplerIdx = 0;
@@ -349,9 +388,17 @@ namespace Ogre
 
         outStream << "void main(void) {\n"
             "    float shadow = 1.0;\n"
-            "    vec2 uv = oUVMisc.xy;\n"
-            // base colour
-            "    gl_FragColor = vec4(0,0,0,1);\n";
+            "    vec2 uv = oUVMisc.xy;\n";
+
+        // base colour
+        if(glslVersion > 100)
+        {
+            outStream << "    fragColour = vec4(0,0,0,1);\n";
+        }
+        else
+        {
+            outStream << "    gl_FragColor = vec4(0,0,0,1);\n";
+        }
 
         if (tt != LOW_LOD)
         {
@@ -532,18 +579,21 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+        uint16 glslVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+        String outVariable = (glslVersion > 100) ? "fragColour" : "gl_FragColor";
+
         if (tt == LOW_LOD)
         {
             if (prof->isShadowingEnabled(tt, terrain))
             {
                 generateFpDynamicShadows(prof, terrain, tt, outStream);
                 outStream <<
-                    "    gl_FragColor.rgb = diffuse * rtshadow;\n";
+                    "    " << outVariable << ".rgb = diffuse * rtshadow;\n";
             }
             else
             {
                 outStream <<
-                    "    gl_FragColor.rgb = diffuse;\n";
+                    "    " << outVariable << ".rgb = diffuse;\n";
             }
         }
         else
@@ -565,7 +615,7 @@ namespace Ogre
             }
 
             // diffuse lighting
-            outStream << "    gl_FragColor.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            outStream << "    " << outVariable << ".rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
@@ -575,16 +625,16 @@ namespace Ogre
             {
                 // Lighting embedded in alpha
                 outStream <<
-                    "    gl_FragColor.a = shadow;\n";
+                    "    " << outVariable << ".a = shadow;\n";
             }
             else
             {
                 // Apply specular
-                outStream << "    gl_FragColor.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                outStream << "    " << outVariable << ".rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
 
                 if (prof->getParent()->getDebugLevel())
                 {
-                    outStream << "    gl_FragColor.rg += lodInfo.xy;\n";
+                    outStream << "    " << outVariable << ".rg += lodInfo.xy;\n";
                 }
             }
         }
@@ -592,7 +642,7 @@ namespace Ogre
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
-            outStream << "    gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColour, fogVal);\n";
+            outStream << "    " << outVariable << ".rgb = mix(" << outVariable << ".rgb, fogColour, fogVal);\n";
         }
 
         // Final return

@@ -136,10 +136,6 @@ namespace Ogre {
 #   define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT    0x84FF
 #endif
 
-#ifndef GL_PACK_IMAGE_HEIGHT
-#   define GL_PACK_IMAGE_HEIGHT                 0x806C
-#endif
-
 // Defines for extensions that were made core in OpenGL ES 3
 #if OGRE_NO_GLES3_SUPPORT == 0
 #define glProgramBinaryOES glProgramBinary
@@ -153,6 +149,14 @@ namespace Ogre {
 #define GL_RED_EXT GL_RED
 #define GL_RG_EXT GL_RG
 #define GL_R8_EXT GL_R8
+#define GL_R16F_EXT GL_R16F
+#define GL_R32F_EXT GL_R32F
+#define GL_RG16F_EXT GL_RG16F
+#define GL_RG32F_EXT GL_RG32F
+#define GL_RGB16F_EXT GL_RGB16F
+#define GL_RGB32F_EXT GL_RGB32F
+#define GL_RGBA16F_EXT GL_RGBA16F
+#define GL_RGBA32F_EXT GL_RGBA32F
 #define GL_PROGRAM_BINARY_LENGTH_OES GL_PROGRAM_BINARY_LENGTH
 #define GL_MIN_EXT GL_MIN
 #define GL_MAX_EXT GL_MAX
@@ -186,10 +190,10 @@ namespace Ogre {
 #define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
 #define GL_WAIT_FAILED_APPLE GL_WAIT_FAILED
 #define glDeleteSyncAPPLE glDeleteSync
-
-#ifdef GL_BGRA
-#   define GL_BGRA_EXT GL_BGRA
-#endif
+#define glFlushMappedBufferRangeEXT glFlushMappedBufferRange
+#define glBindVertexArrayOES glBindVertexArray
+#define glGenVertexArraysOES glGenVertexArrays
+#define glDeleteVertexArraysOES glDeleteVertexArrays
 
 #endif
 

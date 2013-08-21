@@ -33,18 +33,12 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
-    // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
-    #   define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
-
 	class GLES2StateCacheManager;
 
     /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
-            char* mScratchBufferPool;
-            OGRE_MUTEX(mScratchMutex);
-            size_t mMapBufferThreshold;
 			GLES2StateCacheManager* mStateCacheManager;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
@@ -78,22 +72,6 @@ namespace Ogre {
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(unsigned int type);
 
-            /** Allocator method to allow us to use a pool of memory as a scratch
-                area for hardware buffers. This is because glMapBuffer is incredibly
-                inefficient, seemingly no matter what options we give it. So for the
-                period of lock/unlock, we will instead allocate a section of a local
-                memory pool, and use glBufferSubDataARB / glGetBufferSubDataARB
-                instead.
-            */
-            void* allocateScratch(uint32 size);
-
-            /// @see allocateScratch
-            void deallocateScratch(void* ptr);
-
-    		/** Threshold after which glMapBuffer is used and not glBufferSubData
-            */
-            size_t getGLMapBufferThreshold() const;
-            void setGLMapBufferThreshold( const size_t value );
 			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
     };
 
@@ -118,35 +96,6 @@ namespace Ogre {
 		/// Utility function to get the correct GL type based on VET's
 		static GLenum getGLType(unsigned int type)
             { return GLES2HardwareBufferManagerBase::getGLType(type); }
-
-		/** Allocator method to allow us to use a pool of memory as a scratch
-		area for hardware buffers. This is because glMapBuffer is incredibly
-		inefficient, seemingly no matter what options we give it. So for the
-		period of lock/unlock, we will instead allocate a section of a local
-		memory pool, and use glBufferSubDataARB / glGetBufferSubDataARB
-		instead.
-		*/
-		void* allocateScratch(uint32 size)
-		{
-			return static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->allocateScratch(size);
-		}
-
-		/// @see allocateScratch
-		void deallocateScratch(void* ptr)
-		{
-			static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->deallocateScratch(ptr);
-		}
-
-        /** Threshold after which glMapBuffer is used and not glBufferSubData
-		*/
-		size_t getGLMapBufferThreshold() const
-		{
-			return static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->getGLMapBufferThreshold();
-		}
-		void setGLMapBufferThreshold( const size_t value )
-		{
-			static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->setGLMapBufferThreshold(value);
-		}
 	};
 
 }
