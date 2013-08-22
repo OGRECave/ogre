@@ -53,7 +53,7 @@ namespace Volume {
         
         /** Overridden from GridSource.
         */
-        virtual float getVolumeGridValue(int x, int y, int z) const;
+        virtual float getVolumeGridValue(size_t x, size_t y, size_t z) const;
 
         /** Overridden from GridSource.
         */

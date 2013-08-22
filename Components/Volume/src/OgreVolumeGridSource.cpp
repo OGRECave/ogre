@@ -235,12 +235,12 @@ namespace Volume {
         float value;
         int x, y;
         Vector3 scaledCenter(center.x * mPosXScale, center.y * mPosYScale, center.z * mPosZScale);
-        int xStart = Math::Clamp((int)(scaledCenter.x - radius * mPosXScale), 0, mWidth);
-        int xEnd = Math::Clamp((int)(scaledCenter.x + radius * mPosXScale), 0, mWidth);
-        int yStart = Math::Clamp((int)(scaledCenter.y - radius * mPosYScale), 0, mHeight);
-        int yEnd = Math::Clamp((int)(scaledCenter.y + radius * mPosYScale), 0, mHeight);
-        int zStart = Math::Clamp((int)(scaledCenter.z - radius * mPosZScale), 0, mDepth);
-        int zEnd = Math::Clamp((int)(scaledCenter.z + radius * mPosZScale), 0, mDepth);
+        int xStart = Math::Clamp((size_t)(scaledCenter.x - radius * mPosXScale), (size_t)0, mWidth);
+        int xEnd = Math::Clamp((size_t)(scaledCenter.x + radius * mPosXScale), (size_t)0, mWidth);
+        int yStart = Math::Clamp((size_t)(scaledCenter.y - radius * mPosYScale), (size_t)0, mHeight);
+        int yEnd = Math::Clamp((size_t)(scaledCenter.y + radius * mPosYScale), (size_t)0, mHeight);
+        int zStart = Math::Clamp((size_t)(scaledCenter.z - radius * mPosZScale), (size_t)0, mDepth);
+        int zEnd = Math::Clamp((size_t)(scaledCenter.z + radius * mPosZScale), (size_t)0, mDepth);
         Vector3 pos;
         for (int z = zStart; z < zEnd; ++z)
         {
