@@ -56,7 +56,8 @@ namespace Volume {
     
     ChunkHandler::~ChunkHandler(void)
     {
-        if (wq)
+        // Root might already be shutdown.
+        if (wq && Root::getSingletonPtr())
         {
             wq->removeRequestHandler(workQueueChannel, this);
             wq->removeResponseHandler(workQueueChannel, this);

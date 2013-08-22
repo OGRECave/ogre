@@ -253,7 +253,7 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
-        GLSLESGpuProgram *prog;
+        GLSLESGpuProgram *prog = 0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
             prog = mVertexProgram;

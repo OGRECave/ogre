@@ -136,7 +136,7 @@ namespace Ogre {
 
 		// Set some misc default parameters, these can of course be changed later
 		mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
-                                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                                                            GL_TEXTURE_MIN_FILTER, (mUsage & TU_AUTOMIPMAP) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
         mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
@@ -225,6 +225,11 @@ namespace Ogre {
         else
         {
 #if OGRE_NO_GLES3_SUPPORT == 0
+//            LogManager::getSingleton().logMessage("GLES2Texture::create - Name: " + mName +
+//                                                      " ID: " + StringConverter::toString(mTextureID) +
+//                                                      " Width: " + StringConverter::toString(width) +
+//                                                      " Height: " + StringConverter::toString(height) +
+//                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex));
             switch(mTextureType)
             {
                 case TEX_TYPE_1D:

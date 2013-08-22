@@ -67,7 +67,7 @@ namespace Ogre {
             RenderTarget::addListener passing an instance of this class.
             There is no limit to the number of RenderTarget listeners you can register,
             allowing you to register multiple listeners for different purposes.
-            </p>
+
             RenderTarget events occur before and after the target is updated as a whole,
             and before and after each viewport on that target is updated. Each RenderTarget
             holds it's own set of listeners, but you can register the same listener on

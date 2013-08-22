@@ -443,6 +443,10 @@ namespace Ogre {
                         "CocoaWindow::copyContentsToMemory" );
         }
         
+        if(dst.getWidth() != dst.rowPitch)
+        {
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch));
+        }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
@@ -455,24 +459,9 @@ namespace Ogre {
                      format, type, dst.data));
         
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
         
-        //vertical flip
-        {
-            size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-            size_t height = dst.getHeight();
-            uchar *tmpData = (uchar *)OGRE_MALLOC_ALIGN(rowSpan * height, MEMCATEGORY_GENERAL, false);
-            uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-            
-            while (tmpRow >= tmpData)
-            {
-                memcpy(tmpRow, srcRow, rowSpan);
-                srcRow += rowSpan;
-                tmpRow -= rowSpan;
-            }
-            memcpy(dst.data, tmpData, rowSpan * height);
-            
-            OGRE_FREE_ALIGN(tmpData, MEMCATEGORY_GENERAL, false);
-        }
+        PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
     void CocoaWindow::reposition(int left, int top)

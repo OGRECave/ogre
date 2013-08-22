@@ -38,31 +38,12 @@ namespace Volume {
 
     float HalfFloatGridSource::getVolumeGridValue(int x, int y, int z) const
     {
-        if (x >= mWidth)
-        {
-            x = mWidth - 1;
-        }
-        else if (x < 0)
-        {
-            x = 0;
-        }
-
-        if (y >= mHeight)
-        {
-            y = mHeight - 1;
-        } else if (y < 0)
-        {
-            y = 0;
-        }
-
-        if (z >= mDepth)
-        {
-            z = mDepth - 1;
-        } else if (z < 0)
-        {
-            z = 0;
-        }
-
+        x = x >= mWidth ? mWidth - 1 : x;
+        x = x < 0 ? 0 : x;
+        y = y >= mHeight ? mHeight - 1 : y;
+        y = y < 0 ? 0 : y;
+        z = z >= mDepth ? mDepth - 1 : z;
+        z = z < 0 ? 0 : z;
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
 

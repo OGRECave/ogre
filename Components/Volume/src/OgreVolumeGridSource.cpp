@@ -38,7 +38,7 @@ namespace Volume {
     
     Vector3 GridSource::getIntersectionStart(const Ray &ray, Real maxDistance) const
     {
-        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth / mPosXScale, (Real)mHeight / mPosYScale, (Real)mDepth / mPosZScale);
         
         // Inside the grid
         if (box.intersects(ray.getOrigin()))
@@ -62,7 +62,7 @@ namespace Volume {
 
     Vector3 GridSource::getIntersectionEnd(const Ray &ray, Real maxDistance) const
     {
-        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth / mPosXScale, (Real)mHeight / mPosYScale, (Real)mDepth / mPosZScale);
         Vector3 direction = ray.getDirection().normalisedCopy();
         Vector3 invertedDirection = (Real)-1.0 * direction;
         Vector3 origin = ray.getOrigin() + direction * box.getSize().length();
@@ -234,12 +234,13 @@ namespace Volume {
         mTrilinearValue = false;
         float value;
         int x, y;
-        int xStart = Math::Clamp((int)(center.x - radius), 0, mWidth);
-        int xEnd = Math::Clamp((int)(center.x + radius), 0, mWidth);
-        int yStart = Math::Clamp((int)(center.y - radius), 0, mHeight);
-        int yEnd = Math::Clamp((int)(center.y + radius), 0, mHeight);
-        int zStart = Math::Clamp((int)(center.z - radius), 0, mDepth);
-        int zEnd = Math::Clamp((int)(center.z + radius), 0, mDepth);
+        Vector3 scaledCenter(center.x * mPosXScale, center.y * mPosYScale, center.z * mPosZScale);
+        int xStart = Math::Clamp((int)(scaledCenter.x - radius * mPosXScale), 0, mWidth);
+        int xEnd = Math::Clamp((int)(scaledCenter.x + radius * mPosXScale), 0, mWidth);
+        int yStart = Math::Clamp((int)(scaledCenter.y - radius * mPosYScale), 0, mHeight);
+        int yEnd = Math::Clamp((int)(scaledCenter.y + radius * mPosYScale), 0, mHeight);
+        int zStart = Math::Clamp((int)(scaledCenter.z - radius * mPosZScale), 0, mDepth);
+        int zEnd = Math::Clamp((int)(scaledCenter.z + radius * mPosZScale), 0, mDepth);
         Vector3 pos;
         for (int z = zStart; z < zEnd; ++z)
         {

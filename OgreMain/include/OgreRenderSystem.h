@@ -841,7 +841,7 @@ namespace Ogre
 		virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.
@@ -853,7 +853,7 @@ namespace Ogre
 		virtual void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.

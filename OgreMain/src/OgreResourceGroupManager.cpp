@@ -1126,7 +1126,6 @@ namespace Ogre {
 			{
 				loadList = li->second;
 			}
-			loadList->push_back(res);
 
 		}
 
