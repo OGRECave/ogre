@@ -54,6 +54,7 @@ namespace Ogre
 		CompositorWorkspaceDef const *mDefinition;
 
 		bool					mValid;
+		bool					mEnabled;
 
 		/// Main sequence in the order they should be executed
 		CompositorNodeVec		mNodeSequence;
@@ -72,10 +73,35 @@ namespace Ogre
 
 	public:
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-								RenderSystem *renderSys );
+								RenderTarget *finalRenderTarget, RenderSystem *renderSys,
+								bool bEnabled );
 		~CompositorWorkspace();
 
 		const CompositorChannel& getGlobalTexture( IdString name ) const;
+
+		/// Only valid workspaces can update without crashing
+		bool isValid(void) const							{ return mValid; }
+
+		void setEnabled( bool bEnabled )					{ mEnabled = bEnabled; }
+		bool getEnabled() const								{ return mEnabled; }
+
+		/** Destroys and recreates all nodes. TODO: Only revalidate nodes adjacent to those that
+			were invalidated, to avoid recreating so many D3D/GL resources (local textures)
+			which is important for GUI editors.
+		*/
+		void revalidateAllNodes(void);
+
+		void _update(void);
+
+		//TODO
+		CompositorShadowNode* findShadowNode( IdString nodeName ) const	{ return 0; }
+
+		/** Finds the requested Camera. Throws if not found.
+		@remarks
+			If cameraName is empty, uses the default camera
+		*/
+		//TODO
+		Camera* findCamera( IdString cameraName ) const 	{ return 0; }
 	};
 
 	/** @} */

@@ -172,6 +172,8 @@ namespace Ogre
 
 		void initializePasses(void);
 
+		void _update(void);
+
 	private:
 		CompositorNodeDef const *mDefinition;
 	};

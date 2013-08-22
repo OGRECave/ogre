@@ -100,13 +100,24 @@ namespace Ogre
 		*/
 		NameToChannelMap		mNameToChannelMap;
 
+		static uint32 encodeTexSource( size_t index, TextureSource textureSource );
+		static void decodeTexSource( uint32 encodedVal, size_t &outIdx, TextureSource &outTexSource );
+
 	public:
 		TextureDefinitionBase( TextureSource defaultSource );
+
+		/// This has O(N) complexity! (not cached, we look in mNameToChannelMap)
+		size_t getNumInputChannels(void) const;
 
 		/** Adds a texture name, whether a real one or an alias, and where to grab it from.
 		@remarks
 			Throws if a texture with same name already exists, or if the name makes improper
-			usage of the 'global' prefix
+			usage of the 'global' prefix.
+		@par
+			This is a generic way to add input channels, by calling:
+				addTextureSourceName( "myRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
+			You're assigning an alias named "myRT" to channel Input #0
+			For local or global textures, use addLocalTextureDefinition
 		@param fullName
 			The name of the texture. Names are usually valid only throughout this node.
 			We need the name, not its hash because we need to validate the global_ prefix
@@ -148,12 +159,15 @@ namespace Ogre
 			unless you've properly called setLocalTextureDefinitions
 		@par
 			@See addTextureSourceName remarks for what it can throw
+		@par
+			Textures are local when the derived class is a Node definition, and
+			it's global when the derived class is a Workspace definition
 		@param name
 			The name of the texture. Names are usually valid only throughout this node.
 			We need the name, not its hash because we need to validate the global_ prefix
 			is used correctly.
 		*/
-		TextureDefinition* addLocalTextureDefinition( const String &name );
+		TextureDefinition* addTextureDefinition( const String &name );
 	};
 
 	/** @} */

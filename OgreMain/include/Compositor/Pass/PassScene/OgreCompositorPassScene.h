@@ -37,8 +37,8 @@ THE SOFTWARE.
 namespace Ogre
 {
 	class RenderTarget;
-	class ShadowNode;
 	class Camera;
+	class CompositorShadowNode;
 	class CompositorWorkspace;
 
 	/** \addtogroup Core
@@ -60,8 +60,8 @@ namespace Ogre
 	class _OgreExport CompositorPassScene : public CompositorPass
 	{
 	protected:
-		ShadowNode		*mShadowNode;
-		Camera			*mCamera;
+		CompositorShadowNode	*mShadowNode;
+		Camera					*mCamera;
 
 		CompositorWorkspace const *mWorkspace;
 
@@ -70,7 +70,7 @@ namespace Ogre
 								const CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
-		virtual void execute();
+		virtual void execute() {}
 
 	private:
 		CompositorPassSceneDef const *mDefinition;

@@ -51,7 +51,12 @@ namespace Ogre
 		typedef map<IdString, CompositorWorkspaceDef*>::type CompositorWorkspaceDefMap;
 		CompositorWorkspaceDefMap mWorkspaceDefs;
 
-		//vector<Workspace>
+		typedef vector<CompositorWorkspace*>::type WorkspaceVec;
+		WorkspaceVec			mWorkspaces;
+
+		RenderSystem			*mRenderSystem;
+
+		void validateNodes(void);
 
 	public:
 		CompositorManager2();
@@ -61,8 +66,6 @@ namespace Ogre
 			channels. This functions does exactly that.
 		*/
 		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
-
-		void validateNodes();
 
 		/// Finds the requested ShadowNode. Throws if not found.
 		CompositorShadowNode* findShadowNode( IdString nodeName ) const;
@@ -80,6 +83,10 @@ namespace Ogre
 		CompositorNodeDef* addNodeDefinition( IdString name );
 
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
+
+		void addWorkspace( RenderTarget *finalRenderTarget, IdString definitionName, bool bEnabled );
+
+		void _update(void);
 	};
 }
 

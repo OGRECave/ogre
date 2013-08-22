@@ -123,7 +123,7 @@ namespace Ogre
 		@param nodeName
 			Name of the node definition
 		*/
-		void addAlias( IdString alias, IdString nodeName );
+		void addNodeAlias( IdString alias, IdString nodeName );
 	};
 
 	/** @} */

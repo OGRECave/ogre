@@ -42,7 +42,7 @@ namespace Ogre
 				mCamera( 0 ),
 				mWorkspace( workspace )
 	{
-		mShadowNode	= manager->findShadowNode( mDefinition->mShadowNode );
-		mCamera		= manager->findCamera( mDefinition->mCameraName );
+		mShadowNode	= workspace->findShadowNode( mDefinition->mShadowNode );
+		mCamera		= workspace->findCamera( mDefinition->mCameraName );
 	}
 }

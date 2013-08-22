@@ -42,7 +42,7 @@ namespace Ogre
 	*  @{
 	*/
 
-	class CompositorPassSceneDef : public CompositorPassDef
+	class _OgreExport CompositorPassSceneDef : public CompositorPassDef
 	{
 	public:
 		enum ShadowNodeRecalculation
@@ -63,7 +63,14 @@ namespace Ogre
 		/// Last Render Queue ID to render. Not inclusive
 		uint8			mLastRQ;
 
-		CompositorPassSceneDef() : CompositorPassDef( PASS_SCENE ) {}
+		CompositorPassSceneDef() :
+			CompositorPassDef( PASS_SCENE ),
+			mVisibilityMask( 0xffffffff ),
+			mShadowNodeRecalculation( ShadowNodeFirstOnly ),
+			mFirstRQ( 0 ),
+			mLastRQ( -1 )
+		{
+		}
 	};
 
 	/** @} */

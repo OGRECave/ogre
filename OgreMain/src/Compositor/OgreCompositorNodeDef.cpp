@@ -35,14 +35,8 @@ namespace Ogre
 	void CompositorNodeDef::getTextureSource( size_t outputChannel, size_t &index,
 												TextureSource &textureSource ) const
 	{
-		uint32 value		= mOutChannelMapping[outputChannel];
-		uint32 texSource	= (value & 0xC0000000) >> 30;
-
-		assert( texSource < NUM_TEXTURES_SOURCES );
-		assert( texSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
-
-		index		 = value & 0x3FFFFFFF;
-		textureSource = static_cast<TextureSource>( texSource );
+		decodeTexSource( mOutChannelMapping[outputChannel], index, textureSource );
+		assert( textureSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName )
@@ -54,4 +48,17 @@ namespace Ogre
 		return &mTargetPasses.back();
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorNodeDef::_validateAndFinish(void)
+	{
+		ChannelMappings::const_iterator itor = mOutChannelMapping.begin();
+		ChannelMappings::const_iterator end  = mOutChannelMapping.end();
+
+		while( itor != end )
+		{
+			size_t index;
+			TextureSource texSource;
+			decodeTexSource( *itor, index, texSource );
+			++itor;
+		}
+	}
 }

@@ -104,6 +104,12 @@ namespace Ogre
 			We need the full name, not just the hash; so we can check whether it has the global_ prefix
 		*/
 		CompositorTargetDef* addTargetPass( const String &renderTargetName );
+
+		/** Issues warnings about correct usage except if serious setup errors show up, and
+			finalize whatever we couldn't do because not all definitions were loaded when
+			we were created.
+		*/
+		void _validateAndFinish(void);
 	};
 
 	/** @} */

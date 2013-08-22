@@ -37,13 +37,17 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-												RenderSystem *renderSys ) :
+												RenderTarget *finalRenderTarget, RenderSystem *renderSys,
+												bool bEnabled ) :
 			IdObject( id ),
 			mDefinition( definition ),
+			mRenderWindow( finalRenderTarget ),
 			mValid( false ),
-			mRenderSys( renderSys ),
-			mRenderWindow( 0 )
+			mEnabled( bEnabled ),
+			mRenderSys( renderSys )
 	{
+		createAllNodes();
+		connectAllNodes();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorWorkspace::~CompositorWorkspace()
@@ -210,5 +214,24 @@ namespace Ogre
 		TextureDefinitionBase::TextureSource textureSource;
 		mDefinition->getTextureSource( name, index, textureSource );
 		return mGlobalTextures[index];
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::revalidateAllNodes(void)
+	{
+		createAllNodes();
+		connectAllNodes();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::_update(void)
+	{
+		CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+		CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+
+		while( itor != end )
+		{
+			CompositorNode *node = *itor;
+			node->_update();
+			++itor;
+		}
 	}
 }

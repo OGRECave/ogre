@@ -30,10 +30,48 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
 namespace Ogre
 {
+	template<typename T>
+	typename void deleteAllSecondClear( T& container )
+	{
+		//Delete all workspace definitions
+		T::const_iterator itor = container.begin();
+		T::const_iterator end  = container.end();
+		while( itor != end )
+		{
+			delete itor->second;
+			++itor;
+		}
+		container.clear();
+	}
+	template<typename T>
+	typename void deleteAllClear( T& container )
+	{
+		//Delete all workspace definitions
+		T::const_iterator itor = container.begin();
+		T::const_iterator end  = container.end();
+		while( itor != end )
+			delete *itor++;
+		container.clear();
+	}
+
+	CompositorManager2::CompositorManager2() :
+		mRenderWindow( 0 ),
+		mRenderSystem( 0 )
+	{
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorManager2::~CompositorManager2()
+	{
+		deleteAllSecondClear( mWorkspaceDefs );
+		deleteAllSecondClear( mNodeDefinitions );
+		deleteAllClear( mWorkspaces );
+	}
+	//-----------------------------------------------------------------------------------
 	bool CompositorManager2::hasNodeDefinition( IdString nodeDefName ) const
 	{
 		return mNodeDefinitions.find( nodeDefName ) != mNodeDefinitions.end();
@@ -65,6 +103,7 @@ namespace Ogre
 		if( mNodeDefinitions.find( name ) == mNodeDefinitions.end() )
 		{
 			retVal = new CompositorNodeDef( name );
+			mNodeDefinitions[name] = retVal;
 		}
 		else
 		{
@@ -83,6 +122,7 @@ namespace Ogre
 		if( mWorkspaceDefs.find( name ) == mWorkspaceDefs.end() )
 		{
 			retVal = new CompositorWorkspaceDef( name, this );
+			mWorkspaceDefs[name] = retVal;
 		}
 		else
 		{
@@ -92,5 +132,50 @@ namespace Ogre
 		}
 
 		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::addWorkspace( RenderTarget *finalRenderTarget, IdString definitionName,
+											bool bEnabled )
+	{
+		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
+		if( itor == mWorkspaceDefs.end() )
+		{
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition '" +
+							definitionName.getFriendlyText() + "' not found",
+							"CompositorManager2::addWorkspace" );
+		}
+		else
+		{
+			CompositorWorkspace* workspace = new CompositorWorkspace(
+								Id::generateNewId<CompositorWorkspace>(), itor->second,
+								finalRenderTarget, mRenderSystem, bEnabled );
+			mWorkspaces.push_back( workspace );
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::_update(void)
+	{
+		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
+		WorkspaceVec::const_iterator end  = mWorkspaces.end();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() )
+			{
+				if( workspace->isValid() )
+				{
+					workspace->_update();
+				}
+				else
+				{
+					//TODO: We may end up recreating this every frame for invalid workspaces
+					workspace->revalidateAllNodes();
+					if( workspace->isValid() )
+						workspace->_update();
+				}
+			}
+			++itor;
+		}
 	}
 }

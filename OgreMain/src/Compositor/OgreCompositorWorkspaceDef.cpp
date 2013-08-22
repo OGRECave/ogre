@@ -94,7 +94,7 @@ namespace Ogre
 		mFinalNode		= inNode;
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspaceDef::addAlias( IdString alias, IdString nodeName )
+	void CompositorWorkspaceDef::addNodeAlias( IdString alias, IdString nodeName )
 	{
 		if( alias != nodeName && mCompositorManager->hasNodeDefinition( alias ) )
 		{

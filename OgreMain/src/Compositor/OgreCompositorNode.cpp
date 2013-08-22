@@ -50,6 +50,8 @@ namespace Ogre
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
 	{
+		mInTextures.resize( mDefinition->getNumInputChannels(), CompositorChannel() );
+		mOutTextures.resize( mDefinition->mOutChannelMapping.size() );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
@@ -62,6 +64,8 @@ namespace Ogre
 			mRenderSystem( renderSys ),
 			mDefinition( definition )
 	{
+		mInTextures.resize( mDefinition->getNumInputChannels(), CompositorChannel() );
+
 		bool defaultHwGamma		= false;
 		uint defaultFsaa		= 0;
 		String defaultFsaaHint	= StringUtil::BLANK;
@@ -290,6 +294,8 @@ namespace Ogre
 	void CompositorNode::connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
 											size_t inChannelA )
 	{
+		if( !mInTextures[inChannelA].target )
+			++mNumConnectedInputs;
 		mInTextures[inChannelA].target		= rt;
 		mInTextures[inChannelA].textures	= textures;
 	}
@@ -342,6 +348,19 @@ namespace Ogre
 				++itPass;
 			}
 
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorNode::_update(void)
+	{
+		CompositorPassVec::const_iterator itor = mPasses.begin();
+		CompositorPassVec::const_iterator end  = mPasses.end();
+
+		while( itor != end )
+		{
+			CompositorPass *pass = *itor;
+			pass->execute();
 			++itor;
 		}
 	}

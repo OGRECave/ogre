@@ -38,6 +38,41 @@ namespace Ogre
 				mDefaultLocalTextureSource == TEXTURE_GLOBAL );
 	}
 	//-----------------------------------------------------------------------------------
+	size_t TextureDefinitionBase::getNumInputChannels(void) const
+	{
+		size_t numInputChannels = 0;
+		NameToChannelMap::const_iterator itor = mNameToChannelMap.begin();
+		NameToChannelMap::const_iterator end  = mNameToChannelMap.end();
+
+		while( itor != end )
+		{
+			size_t index;
+			TextureSource texSource;
+			decodeTexSource( itor->second, index, texSource );
+			if( texSource == TEXTURE_INPUT )
+				++numInputChannels;
+			++itor;
+		}
+
+		return numInputChannels;
+	}
+	//-----------------------------------------------------------------------------------
+	inline uint32 TextureDefinitionBase::encodeTexSource( size_t index, TextureSource textureSource )
+	{
+		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
+		return (index & 0x3FFFFFFF)|(textureSource<<30);
+	}
+	//-----------------------------------------------------------------------------------
+	inline void TextureDefinitionBase::decodeTexSource( uint32 encodedVal, size_t &outIdx,
+														TextureSource &outTexSource )
+	{
+		uint32 texSource = (encodedVal & 0xC0000000) >> 30;
+		assert( texSource < NUM_TEXTURES_SOURCES );
+
+		outIdx		 = encodedVal & 0x3FFFFFFF;
+		outTexSource = static_cast<TextureSource>( texSource );
+	}
+	//-----------------------------------------------------------------------------------
 	IdString TextureDefinitionBase::addTextureSourceName( const String &name, size_t index,
 															TextureSource textureSource )
 	{
@@ -55,8 +90,7 @@ namespace Ogre
 						"TextureDefinitionBase::addLocalTextureDefinition" );
 		}
 
-		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
-		uint32 value = (index & 0x3FFFFFFF)|(textureSource<<30);
+		const uint32 value = encodeTexSource( index, textureSource );
 
 		IdString hashedName( name );
 		NameToChannelMap::const_iterator itor = mNameToChannelMap.find( hashedName );
@@ -84,15 +118,10 @@ namespace Ogre
 						"CompositorNodeDef::getTextureSource" );
 		}
 
-		uint32 value		= itor->second;
-		uint32 texSource	= (value & 0xC0000000) >> 30;
-		assert( texSource < NUM_TEXTURES_SOURCES );
-
-		index		 = value & 0x3FFFFFFF;
-		textureSource = static_cast<TextureSource>( texSource );
+		decodeTexSource( itor->second, index, textureSource );
 	}
 	//-----------------------------------------------------------------------------------
-	TextureDefinitionBase::TextureDefinition* TextureDefinitionBase::addLocalTextureDefinition
+	TextureDefinitionBase::TextureDefinition* TextureDefinitionBase::addTextureDefinition
 																		( const String &name )
 	{
 		IdString hashedName = addTextureSourceName( name, mLocalTextureDefs.size(),
