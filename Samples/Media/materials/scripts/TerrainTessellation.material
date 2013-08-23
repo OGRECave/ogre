@@ -1,0 +1,334 @@
+/*
+----------------------------------------------------------
+Terrain Tessellation sample from NVIDIA's DirectX 11 SDK:
+http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
+----------------------------------------------------------
+*/
+
+vertex_program Ogre/TerrainTessellation/InitializationVS hlsl
+{
+	source  TerrainTessellationDeformation.hlsl
+	entry_point InitializationVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/TerrainTessellation/InitializationPS hlsl
+{
+	source TerrainTessellationDeformation.hlsl
+	entry_point InitializationPS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/TerrainTessellation/GradientPS hlsl
+{
+	source TerrainTessellationDeformation.hlsl
+	entry_point GradientPS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}
+}
+
+
+material Ogre/TerrainTessellation/TerrainDeformation
+{
+	technique initialization
+	{
+		pass init
+		{
+			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
+			{
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/InitializationPS
+			{
+			}
+		}
+
+	}
+	
+	technique gradienttech
+	{
+		pass gradient
+		{
+			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
+			{
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/GradientPS
+			{
+			}
+		}
+	}
+
+
+/* ATTENTION HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CREATE MATERIAL FILE USING THIS PART>
+
+BlendState NoBlending
+
+DepthStencilState DisableDepthWrites
+
+RasterizerState NoMultisampling
+
+*/	
+}
+
+vertex_program Ogre/TerrainTessellation/HwTessellationPassThruVS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point HwTessellationPassThruVS
+	target vs_5_0
+
+	default_params
+	{
+
+	}
+}
+
+vertex_program Ogre/TerrainTessellation/VTFDisplacementVS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point VTFDisplacementVS
+	target vs_4_0
+
+	default_params
+	{
+
+	}
+}
+
+tesselation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point TerrainScreenspaceLODHS
+	target hs_5_0
+
+	default_params
+	{
+
+	}
+}
+
+tesselation_domain_program Ogre/TerrainTessellation/TerrainDisplaceDS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point TerrainDisplaceDS
+	target ds_5_0
+
+	default_params
+	{
+
+	}
+}
+/*
+geometry_program Ogre/TerrainTessellation/GSSolidWire
+{
+	source TerrainTessellationWireframe.hlsl
+	entry_point GSSolidWire
+	target gs_4_0
+
+	default_params
+	{
+
+	}
+}
+*/
+fragment_program Ogre/TerrainTessellation/SmoothShadePS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point SmoothShadePS
+	target ps_5_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/TerrainTessellation/PSSolidWire hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point PSSolidWire
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+material Ogre/TerrainTessellation/
+{
+	technique
+	{
+		pass HwTessellated
+		{
+			vertex_program_ref Ogre/TerrainTessellation/HwTessellationPassThruVS
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/SmoothShadePS
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+		/*
+		pass HwTessellatedWireframe
+		{
+			vertex_program_ref Ogre/TerrainTessellation/HwTessellationPassThruVS
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
+			{
+			
+			}
+			
+			geometry_program_ref Ogre/TerrainTessellation/GSSolidWire
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/PSSolidWire
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+		*/
+		pass ShadedTriStrip
+		{
+			vertex_program_ref Ogre/TerrainTessellation/VTFDisplacementVS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/SmoothShadePS
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+		/*
+		pass HwTessellatedWireframe
+		{
+			vertex_program_ref Ogre/TerrainTessellation/VTFDisplacementVS
+			{
+			
+			}
+			
+			geometry_program_ref Ogre/TerrainTessellation/GSSolidWire
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/PSSolidWire
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+		*/
+	}
+}
+
+/* ATTENTION HERE !!!!!! CREATE THE MATERIAL FILE USING THIS PART
+
+
+// Miscellaneous states
+BlendState EnableColorWrites
+{
+    RenderTargetWriteMask[0] = 0xf;
+};
+
+DepthStencilState EnableDepthWrites
+{
+    DepthEnable = true;
+    DepthWriteMask = 1;
+};
+
+RasterizerState MultisamplingCullFront
+{
+    MultisampleEnable = true;
+    CullMode = Front;
+};
+
+RasterizerState MultisamplingCullBack
+{
+    MultisampleEnable = true;
+    CullMode = Back;
+};
+
+RasterizerState NoMultisampling
+{
+    MultisampleEnable = false;
+    CullMode = None;
+};
+*/
