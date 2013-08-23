@@ -390,6 +390,11 @@ namespace Ogre {
       	*/
       	PixelBox getSubVolume(const Box &def) const;
         
+      	/** Return a data pointer pointing to top left front pixel of the pixel box.
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        void* getTopLeftFrontPixelPtr() const;
+        
         /**
          * Get colour value from a certain location in the PixelBox. The z coordinate
          * is only valid for cubemaps and volume textures. This uses the first (largest)

@@ -454,9 +454,9 @@ namespace Ogre {
         }
         
         OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
-        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data));
+                     format, type, dst.getTopLeftFrontPixelPtr()));
         
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));

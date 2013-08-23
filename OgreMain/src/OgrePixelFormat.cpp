@@ -74,6 +74,10 @@ namespace Ogre {
 
 		return rval;
 	}
+    void* PixelBox::getTopLeftFrontPixelPtr() const
+    {
+        return (uint8*)data + (left + top * rowPitch + front * slicePitch) * PixelUtil::getNumElemBytes(format);
+    }
     //-----------------------------------------------------------------------
     /**
     * Directly get the description record for provided pixel format. For debug builds,
