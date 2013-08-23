@@ -386,6 +386,17 @@ namespace Ogre {
 		void removeListener(Listener* l);
 
     protected:
+
+
+		/**		!!!!!! TODO !!!!!!
+			TODO: (dark_sylinc) Refactor this class. There's a lot of dead code after the new compositor.
+			The Viewports are managed automatically and no longer created by the user directly.
+			There are no "auto updated" viewports, and the showSkies & overlays booleans have to
+			go away
+			Z Order doesn't make sense either now.
+			Clears have to be done with a pass_clear, there are no longer "clear every frame viewports" 
+		*/
+
         Camera* mCamera;
         RenderTarget* mTarget;
         /// Relative dimensions, irrespective of target dimensions (0..1)

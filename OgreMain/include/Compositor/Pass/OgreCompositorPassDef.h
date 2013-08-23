@@ -70,9 +70,18 @@ namespace Ogre
 		friend class CompositorPass;
 		CompositorPassType	mPassType;
 
+		/// Viewport's region to draw
+		float				mVpLeft;
+		float				mVpTop;
+		float				mVpWidth;
+		float				mVpHeight;
+
 	public:
-		CompositorPassDef( CompositorPassType passType ) : mPassType( passType ) {}
-		CompositorPassType getType() const					{ return mPassType; }
+		CompositorPassDef( CompositorPassType passType ) :
+			mPassType( passType ),
+			mVpLeft( 0 ), mVpTop( 0 ),
+			mVpWidth( 1 ), mVpHeight( 1 ) {}
+		CompositorPassType getType() const				{ return mPassType; }
 	};
 
 	typedef vector<CompositorPassDef*>::type CompositorPassDefVec;

@@ -70,7 +70,7 @@ namespace Ogre
 								const CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
-		virtual void execute() {}
+		virtual void execute();
 
 	private:
 		CompositorPassSceneDef const *mDefinition;

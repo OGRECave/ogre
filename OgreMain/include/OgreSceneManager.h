@@ -421,10 +421,12 @@ namespace Ogre {
         RenderSystem *mDestRenderSystem;
 
         typedef vector<Camera*>::type CameraList;
+		typedef map<IdString, Camera*>::type CameraMap;
 
         /** Central list of cameras - for easy memory management and lookup.
         */
-        CameraList mCameras;
+        CameraList	mCameras;
+		CameraMap	mCamerasByName;
 
 		typedef map<String, StaticGeometry* >::type StaticGeometryList;
 		StaticGeometryList mStaticGeometryList;
@@ -1130,18 +1132,26 @@ namespace Ogre {
             @remarks
                 This camera must be added to the scene at a later time using
                 the attachObject method of the SceneNode class.
-            @param
-                name Name to give the new camera. May not be unique.
+            @param name
+				Name to give the new camera. Must be unique.
         */
         virtual Camera* createCamera(const String& name);
+
+		/** Finds the camera with the given name. Throws if not found.
+		@param name
+			Hash of the name of the camera to find
+		@return
+			Camera pointer
+		*/
+		virtual Camera* findCamera( IdString name ) const;
 
         /** Removes a camera from the scene.
             @remarks
                 This method removes a previously added camera from the scene.
                 The camera is deleted so the caller must ensure no references
                 to it's previous instance (e.g. in a SceneNode) are used.
-            @param
-                cam Pointer to the camera to remove
+            @param cam
+				Pointer to the camera to remove
         */
         virtual void destroyCamera(Camera *cam);
 
@@ -1707,11 +1717,15 @@ namespace Ogre {
 			Could be more than one depending on the high level cull system (i.e. tree-based sys)
 		@param Camera
 			Camera whose frustum we're to cull against
+		@param firstRq
+			First RenderQueue ID to render (inclusive)
+		@param lastRq
+			Last RenderQueue ID to render (exclusive)
 		@param visObjsIdxStart
 			Index to mVisibleObjects so we know which array we should start at.
 		*/
 		void cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-							size_t visObjsIdxStart );
+							uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart );
 
 		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
 			Compositor). Then calls MovableObject::buildLightList with that list so that each
@@ -1763,7 +1777,8 @@ namespace Ogre {
         */
         virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
 
-		virtual void _renderScene2(Camera* camera, Viewport* vp, bool includeOverlays);
+		virtual void _renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
+									bool includeOverlays );
 
         /** Internal method for queueing the sky objects with the params as 
             previously set through setSkyBox, setSkyPlane and setSkyDome.

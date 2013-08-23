@@ -31,8 +31,48 @@ THE SOFTWARE.
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/OgreCompositorChannel.h"
 
+#include "OgreRenderTarget.h"
+#include "OgreViewport.h"
+
 namespace Ogre
 {
+	CompositorPass::CompositorPass( const CompositorPassDef *definition, RenderTarget *target ) :
+			mTarget( target ),
+			mViewport( 0 ),
+			mDefinition( definition )
+	{
+		const Real EPSILON = 1e-6f;
+
+		const unsigned short numViewports = mTarget->getNumViewports();
+		for( unsigned short i=0; i<numViewports && !mViewport; ++i )
+		{
+			Viewport *vp = mTarget->getViewport(i);
+			if( Math::Abs( vp->getLeft() - mDefinition->mVpLeft )	< EPSILON &&
+				Math::Abs( vp->getTop() - mDefinition->mVpTop )		< EPSILON &&
+				Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
+				Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON )
+			{
+				mViewport = vp;
+			}
+		}
+
+		if( !mViewport )
+		{
+			mViewport = mTarget->addViewport( 0, 0, mDefinition->mVpLeft, mDefinition->mVpTop,
+												mDefinition->mVpWidth, mDefinition->mVpHeight );
+			mViewport->setAutoUpdated( false );
+			mViewport->setClearEveryFrame( false );
+		}
+
+		//These are deprecated and the user should not be fiddling with viewports from now on
+		assert( mViewport->isAutoUpdated() );
+		assert( mViewport->getClearEveryFrame() );
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorPass::~CompositorPass()
+	{
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorPass::notifyDestroyed( const CompositorChannel &channel )
 	{
 		if( channel.target == mTarget )

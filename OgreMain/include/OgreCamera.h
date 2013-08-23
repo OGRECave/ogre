@@ -353,8 +353,12 @@ namespace Ogre {
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
         @param includeOverlays Whether or not any overlay objects should be included
+		@param firstRq
+			First RenderQueue ID to render (inclusive)
+		@param lastRq
+			Last RenderQueue ID to render (exclusive)
         */
-        void _renderScene(Viewport *vp, bool includeOverlays);
+        void _renderScene(Viewport *vp, uint8 firstRq, uint8 lastRq, bool includeOverlays);
 
         /** Function for outputting to a stream.
         */

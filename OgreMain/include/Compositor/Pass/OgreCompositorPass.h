@@ -59,9 +59,10 @@ namespace Ogre
 	{
 	protected:
 		RenderTarget	*mTarget;
+		Viewport		*mViewport;
 	public:
-		CompositorPass( const CompositorPassDef *definition, RenderTarget *target ) :
-				mTarget( target ), mDefinition( definition ) {}
+		CompositorPass( const CompositorPassDef *definition, RenderTarget *target );
+		virtual ~CompositorPass();
 
 		virtual void execute() = 0;
 

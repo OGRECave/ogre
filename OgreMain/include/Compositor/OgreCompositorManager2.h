@@ -84,7 +84,14 @@ namespace Ogre
 
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 
-		void addWorkspace( RenderTarget *finalRenderTarget, IdString definitionName, bool bEnabled );
+		/**
+		@param defaultVp
+			Default viewport to use when a camera name wasn't specified explicitly in a
+			pass definition. This pointer can be null if you promise to use all explicit
+			camera names in your passes (and those cameras already exist)
+		*/
+		void addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
+							Camera *defaultCam, IdString definitionName, bool bEnabled );
 
 		void _update(void);
 	};

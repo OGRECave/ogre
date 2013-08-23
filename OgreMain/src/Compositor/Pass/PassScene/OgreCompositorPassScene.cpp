@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
+#include "OgreViewport.h"
+#include "OgreMovableObject.h"
+
 namespace Ogre
 {
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
@@ -43,6 +46,26 @@ namespace Ogre
 				mWorkspace( workspace )
 	{
 		mShadowNode	= workspace->findShadowNode( mDefinition->mShadowNode );
-		mCamera		= workspace->findCamera( mDefinition->mCameraName );
+
+		if( mDefinition->mCameraName != IdString() )
+		{
+			mCamera = workspace->findCamera( mDefinition->mCameraName );
+		}
+		else
+		{
+			//Get the 'default' camera passed to the workspace
+			mCamera = workspace->getDefaultCamera();
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorPassScene::~CompositorPassScene()
+	{
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorPassScene::execute()
+	{
+		assert( mDefinition->mVisibilityMask & MovableObject::LAYER_VISIBILITY );
+		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
+		mCamera->_renderScene( mViewport, mDefinition->mFirstRQ, mDefinition->mLastRQ,  true );
 	}
 }

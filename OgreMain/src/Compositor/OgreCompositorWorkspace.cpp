@@ -32,18 +32,22 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorNode.h"
 
+#include "OgreSceneManager.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
 {
 	CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-												RenderTarget *finalRenderTarget, RenderSystem *renderSys,
-												bool bEnabled ) :
+												RenderTarget *finalRenderTarget,
+												SceneManager *sceneManager, Camera *defaultCam,
+												RenderSystem *renderSys, bool bEnabled ) :
 			IdObject( id ),
 			mDefinition( definition ),
 			mRenderWindow( finalRenderTarget ),
 			mValid( false ),
 			mEnabled( bEnabled ),
+			mDefaultCamera( defaultCam ),
+			mSceneManager( sceneManager ),
 			mRenderSys( renderSys )
 	{
 		createAllNodes();
@@ -220,6 +224,11 @@ namespace Ogre
 	{
 		createAllNodes();
 		connectAllNodes();
+	}
+	//-----------------------------------------------------------------------------------
+	Camera* CompositorWorkspace::findCamera( IdString cameraName ) const 
+	{
+		return mSceneManager->findCamera( cameraName );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_update(void)

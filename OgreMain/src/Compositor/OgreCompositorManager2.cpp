@@ -134,8 +134,8 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::addWorkspace( RenderTarget *finalRenderTarget, IdString definitionName,
-											bool bEnabled )
+	void CompositorManager2::addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
+											Camera *defaultCam, IdString definitionName, bool bEnabled )
 	{
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
 		if( itor == mWorkspaceDefs.end() )
@@ -148,7 +148,7 @@ namespace Ogre
 		{
 			CompositorWorkspace* workspace = new CompositorWorkspace(
 								Id::generateNewId<CompositorWorkspace>(), itor->second,
-								finalRenderTarget, mRenderSystem, bEnabled );
+								finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
 			mWorkspaces.push_back( workspace );
 		}
 	}

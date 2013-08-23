@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/OgreCompositorChannel.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
+#include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
@@ -333,6 +334,10 @@ namespace Ogre
 				CompositorPass *newPass = 0;
 				switch( (*itPass)->getType() )
 				{
+				case PASS_CLEAR:
+					newPass = new CompositorPassClear( static_cast<CompositorPassClearDef*>(*itPass),
+														channel->target );
+					break;
 				case PASS_SCENE:
 					newPass = new CompositorPassScene( static_cast<CompositorPassSceneDef*>(*itPass),
 														mWorkspace, channel->target );

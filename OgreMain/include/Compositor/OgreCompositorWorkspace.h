@@ -60,6 +60,8 @@ namespace Ogre
 		CompositorNodeVec		mNodeSequence;
 		CompositorShadowNodeVec	mShadowNodes;
 		CompositorChannelVec	mGlobalTextures;
+		Camera					*mDefaultCamera; /// Could be null. @See CompositorManager2::addWorkspace
+		SceneManager			*mSceneManager;
 		RenderSystem			*mRenderSys;
 
 		RenderTarget			*mRenderWindow;
@@ -73,8 +75,8 @@ namespace Ogre
 
 	public:
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-								RenderTarget *finalRenderTarget, RenderSystem *renderSys,
-								bool bEnabled );
+								RenderTarget *finalRenderTarget, SceneManager *sceneManager,
+								Camera *defaultCam, RenderSystem *renderSys, bool bEnabled );
 		~CompositorWorkspace();
 
 		const CompositorChannel& getGlobalTexture( IdString name ) const;
@@ -96,12 +98,11 @@ namespace Ogre
 		//TODO
 		CompositorShadowNode* findShadowNode( IdString nodeName ) const	{ return 0; }
 
-		/** Finds the requested Camera. Throws if not found.
-		@remarks
-			If cameraName is empty, uses the default camera
-		*/
-		//TODO
-		Camera* findCamera( IdString cameraName ) const 	{ return 0; }
+		/// Finds a camera in the scene manager we have.
+		Camera* findCamera( IdString cameraName ) const;
+
+		/// Gets the default camera passed through mDefaultViewport.
+		Camera* getDefaultCamera() const					{ return mDefaultCamera; }
 	};
 
 	/** @} */

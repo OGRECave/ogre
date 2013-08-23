@@ -292,16 +292,36 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 //-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name )
 {
+	if( mCamerasByName.find( name ) != mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
+					 "Camera with name '" + name + "' already exists", "SceneManager::createCamera" );
+	}
+
 	Camera *c = OGRE_NEW Camera( Id::generateNewId<MovableObject>(),
 								 &mEntityMemoryManager[SCENE_DYNAMIC], this );
     mCameras.push_back( c );
 	c->mGlobalIndex = mCameras.size() - 1;
 	c->setName( name );
+	mCamerasByName[name] = c;
 
 	// create visible bounds aab map entry
 	mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
 
     return c;
+}
+//-----------------------------------------------------------------------
+Camera* SceneManager::findCamera( IdString name ) const
+{
+	CameraMap::const_iterator itor = mCamerasByName.find( name );
+	if( itor == mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+					 "Camera with name '" + name.getFriendlyText() + "' not found",
+					 "SceneManager::getCamera" );
+	}
+
+    return itor->second;
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
@@ -324,6 +344,8 @@ void SceneManager::destroyCamera(Camera *cam)
 	// Notify render system
     mDestRenderSystem->_notifyCameraRemoved( cam );
 
+	IdString camName( cam->getName() );
+
 	itor = efficientVectorRemove( mCameras, itor );
     OGRE_DELETE cam;
 	cam = 0;
@@ -331,6 +353,18 @@ void SceneManager::destroyCamera(Camera *cam)
 	//The node that was at the end got swapped and has now a different index
 	if( itor != mCameras.end() )
 		(*itor)->mGlobalIndex = itor - mCameras.begin();
+
+	CameraMap::iterator itorMap = mCamerasByName.find( camName );
+	if( itorMap == mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+					 "Camera with name '" + camName.getFriendlyText() + "' not found!",
+					 "SceneManager::destroyCamera" );
+	}
+	else
+	{
+		mCamerasByName.erase( itorMap );
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -1417,7 +1451,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 }
 
 //-----------------------------------------------------------------------
-void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverlays)
+void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
+									bool includeOverlays )
 {
 	OgreProfileGroup("_renderScene2", OGREPROF_GENERAL);
 
@@ -1495,7 +1530,8 @@ void SceneManager::_renderScene2(Camera* camera, Viewport* vp, bool includeOverl
 
 			size_t visibleObjsIdxStart = 0;
 			size_t visibleObjsListsPerThread = 1;
-			cullFrustum( mEntitiesMemoryManagerCulledList, camera, visibleObjsIdxStart );
+			cullFrustum( mEntitiesMemoryManagerCulledList, camera, firstRq, lastRq,
+						 visibleObjsIdxStart );
 
 			VisibleObjectsPerThreadArray::const_iterator it =
 														mVisibleObjects.begin() + visibleObjsIdxStart;
@@ -2329,7 +2365,7 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 }
 //-----------------------------------------------------------------------
 void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-								size_t visObjsIdxStart )
+								uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart )
 {
 	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
 	outVisibleObjects.clear();
@@ -2342,9 +2378,12 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 		ObjectMemoryManager *memoryManager = *it;
 		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
 
+		firstRq = std::min<size_t>( firstRq, numRenderQueues );
+		lastRq  = std::min<size_t>( lastRq,  numRenderQueues );
+
 		//TODO: Send this to worker threads (dark_sylinc)
 
-		for( size_t i=0; i<numRenderQueues; ++i )
+		for( size_t i=firstRq; i<lastRq; ++i )
 		{
 			ObjectData objData;
 			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );

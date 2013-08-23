@@ -26,44 +26,51 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef __CompositorPassClear_H__
+#define __CompositorPassClear_H__
 
-#include "Compositor/Pass/OgreCompositorPassDef.h"
+#include "OgreHeaderPrefix.h"
+
+#include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
-#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 namespace Ogre
 {
-	CompositorTargetDef::~CompositorTargetDef()
+	class RenderTarget;
+	class Camera;
+	class CompositorShadowNode;
+	class CompositorWorkspace;
+
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	/** Implementation of CompositorPass
+		This implementation will the RenderTarget using the parameters from definition
+		(rectangle area, which buffers, what values, etc)
+    @author
+		Matias N. Goldberg
+    @version
+        1.0
+    */
+	class _OgreExport CompositorPassClear : public CompositorPass
 	{
-		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
-		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
+	public:
+		CompositorPassClear( const CompositorPassClearDef *definition, RenderTarget *target );
 
-		while( itor != end )
-		{
-			delete *itor;
-			++itor;
-		}
+		virtual void execute();
 
-		mCompositorPasses.clear();
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
-	{
-		CompositorPassDef *retVal = 0;
-		switch( passType )
-		{
-		case PASS_CLEAR:
-			retVal = new CompositorPassClearDef();
-			break;
-		case PASS_SCENE:
-			retVal = new CompositorPassSceneDef();
-			break;
-		}
+	private:
+		CompositorPassClearDef const *mDefinition;
+	};
 
-		mCompositorPasses.push_back( retVal );
-		
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
+	/** @} */
+	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
+#endif

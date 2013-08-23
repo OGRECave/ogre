@@ -221,7 +221,7 @@ namespace Ogre {
         if (mCamera)
         {
             // Tell Camera to render into me
-            mCamera->_renderScene(this, mShowOverlays);
+            mCamera->_renderScene(this, 0, 255, mShowOverlays);
         }
     }
     //---------------------------------------------------------------------
