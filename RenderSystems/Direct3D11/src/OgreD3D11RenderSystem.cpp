@@ -2998,7 +2998,7 @@ bail:
 
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName)
+	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName, unsigned int StartSlot)
 	{
 		RenderTarget *target = mActiveRenderTarget;
 		switch (passNr)
@@ -3031,7 +3031,7 @@ bail:
 						"D3D11RenderSystem::_renderUsingReadBackAsTexture");
 				}
 				
-				mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D10_CLEAR_DEPTH, 1.0f, 0);
+				mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 				float ClearColor[4];
 				//D3D11Mappings::get(colour, ClearColor);
@@ -3069,10 +3069,17 @@ bail:
 					numberOfViews,
 					pRTView,
 					NULL);
-				// TO DO get mEffect from D3D11Texture.
-#ifdef USE_D3DX11_LIBRARY
-				mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(mDSTResView);	
-#endif
+				//mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(mDSTResView);	
+
+				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+						"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+				}
+
 			}
 			break;
 		case 3:
@@ -3081,11 +3088,22 @@ bail:
 			// will be used later as the typical depth buffer, again
 			// must call Apply(0) here : to flush SetResource(NULL)
 			//
-			// TO DO get mEffect from D3D11Texture. get current technique.
-#ifdef USE_D3DX11_LIBRARY
-			mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(NULL);
-			pass->Apply(0);
-#endif
+			
+			if (target)
+			{
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), NULL);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+					}			
+			}
+
 			break;
 		}
 	}

@@ -1232,7 +1232,7 @@ namespace Ogre
 		*/
 		virtual void _render(const RenderOperation& op);
 
-		virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName);
+		virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
 		/** Gets the capabilities of the render system. */
 		const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }
