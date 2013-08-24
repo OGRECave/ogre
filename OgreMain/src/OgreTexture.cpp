@@ -439,15 +439,24 @@ namespace Ogre {
 		void* currentPixData = pixData;
 		for (size_t face = 0; face < getNumFaces(); ++face)
 		{
+            size_t width = getWidth();
+            size_t height = getHeight();
+            size_t depth = getDepth();
 			for (size_t mip = 0; mip < numMips; ++mip)
 			{
-				size_t mipDataSize = PixelUtil::getMemorySize(getWidth(), getHeight(), getDepth(), getFormat());
+				size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 
-				Ogre::PixelBox pixBox(getWidth(), getHeight(), getDepth(), getFormat(), currentPixData);
+				Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
 				getBuffer(face, mip)->blitToMemory(pixBox);
 
 				currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
+                if(width != 1)
+                    width /= 2;
+                if(height != 1)
+                    height /= 2;
+                if(depth != 1)
+                    depth /= 2;
 			}
 		}
 
