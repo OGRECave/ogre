@@ -72,15 +72,15 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 
         mImage = TextureManager::getSingleton().createManual(
             "ImageData", // Name of texture
-            "General", // Name of resource group in which the texture should be created
+            "General",   // Name of resource group in which the texture should be created
             TEX_TYPE_2D, // Texture type
-            256, // Width
-            256, // Height
-            1, // Depth (Must be 1 for two dimensional textures)
-            0, // Number of mipmaps
-            PF_X8R8G8B8, // Pixel format  //TODO support formats from GL3+
-            TU_DYNAMIC_SHADER // usage
+            256, 256, 1, // Width, Height, Depth
+            0,           // Number of mipmaps
+            PF_X8R8G8B8  // Pixel format  //TODO support formats from GL3+
+            //TU_DYNAMIC   // usage
         );
+
+        mImage->createShaderAccessPoint(0);
 
         mPixelBuffer = mImage->getBuffer(0,0);
 
@@ -99,22 +99,38 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
         {
             for(size_t x = 0; x < width; ++x)
             {
-                // 0xRRGGBB -> fill the buffer with yellow pixels
-                data[pitch * y + x] = 0x00FFFF00;
+                // 0xXXRRGGBB -> fill the buffer with yellow pixels
+                // data[pitch * y + x] = 0x00FFFF00;
+                data[pitch * y + x] = 0x0087CEEB;
             }
         }
 
         // Unlock the buffer again (frees it for use by the GPU)
         mPixelBuffer->unlock();
-
-        // uint GLid;
-        // mImage->getCustomAttribute("GLID", &GLid);
-
-        // glBindImageTexture(0, GLid, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGB8);
     }
 
     void cleanupContent()
     {
+        // Read image load/store data.
+        mPixelBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        const PixelBox &pb = mPixelBuffer->getCurrentLock();
+        uint *data = static_cast<uint*>(pb.data);
+        size_t height = pb.getHeight();
+        size_t width = pb.getWidth();
+        size_t pitch = pb.rowPitch; // Skip between rows of image
+        printf("Buffer values.\n");
+        // for (size_t y = 0; y < height; ++y)
+        // {
+        //     for(size_t x = 0; x < width; ++x)
+        //     {
+        //         std::cout << " " << std::hex << data[pitch * y + x];
+        //     }
+        //     std::cout << std::endl;
+        // }
+        std::cout << std::hex << data[0];
+        std::cout << " " << data[1] << std::endl;
+        mPixelBuffer->unlock();
+
         //MeshManager::getSingleton().remove(mTetrahedraMesh->getName());
     }
 
@@ -143,9 +159,10 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
                 const Ogre::GpuConstantDefinition* atom_counter_def;
                 if ( (atom_counter_def = &pParams->getConstantDefinition("atom_counter")) )
                 {
-                    const uint* counter = pParams->getUnsignedIntPointer(atom_counter_def->physicalIndex);
+                    //TODO lock buffer, retrieve counter value similar to compute above
+                    //const uint* counter = pParams->getUnsignedIntPointer(atom_counter_def->physicalIndex);
                     //const uint* counter2 = ;
-                    std::cout << "FOUND THE ATOMS: " << *counter << " " << std::endl; //<< *counter2 << std::endl;
+                    //std::cout << "FOUND THE ATOMS: " << *counter << " " << std::endl; //<< *counter2 << std::endl;
                 }
             }
         }

@@ -1,3 +1,22 @@
+shared_params switches
+{
+        shared_param_named awesome bool true
+
+}
+
+shared_params colors
+{
+        shared_param_named R float 1.0
+        // shared_param_named GB float2 0.0 1.0
+}
+
+shared_params more_switches
+{
+        shared_param_named more_awesome bool false
+}
+
+//shared_params counters
+
 //////////
 // HLSL //
 //////////
@@ -19,7 +38,7 @@ geometry_program JAJ/Basic/GS_HLSL hlsl
         entry_point mainGS
         target gs_4_0
         uses_adjacency_information true
-        
+
         default_params
         {
                 param_named IsoValue float 1
@@ -54,7 +73,7 @@ geometry_program JAJ/Basic/GS_CG cg
         entry_point mainGS
         profiles gpu_gp gp4_gp
         uses_adjacency_information true
-        
+
         default_params
         {
             param_named IsoValue float 1
@@ -74,11 +93,19 @@ fragment_program JAJ/Basic/PS_CG cg
 compute_program JAJ/Basic/CS_GLSL glsl
 {
         source JAJBasicCS.glsl
-        syntax glsl420
+        syntax glsl430
+        compute_group_dimensions 32 1 1
+        //TODO is this necessary?
+        // placement postrender
+        //TODO how to handle glMemoryBarrier?
+        // do other programs need to support this?
+        // should be able to handle multiple barriers via bit ops
+        // pre_memory_barrier texture
+        // post_memory_barrier texture
 
         default_params
         {
-            // param_named name float 10
+            param_named multiplier float 10.0
         }
 }
 
@@ -107,13 +134,15 @@ geometry_program JAJ/Basic/GS_GLSL glsl
 fragment_program JAJ/Basic/PS_GLSL glsl
 {
         source JAJBasicFS.glsl
-        syntax glsl420
+        syntax glsl430
 
         default_params
         {
+            shared_params_ref switches
+            shared_params_ref more_switches
             param_named atom_counter uint 10
             param_named pretty_colours bool false
-            param_named image_load_store bool true
+            param_named image_load_store bool false
             param_named colour_factor uint[3] 50 50 100
         }
 }
@@ -152,22 +181,27 @@ material JAJ/Basic
         {
                 pass
                 {
-                        // compute_program_ref JAJ/Basic/CS
-                        // {
+                    texture_unit
+                    {
+                      texture data.csv
+                      image_bind 0 read X8R8B8G8
+                    }
 
-                        // }
+                        compute_program_ref JAJ/Basic/CS
+                        {
+
+                        }
 
                         vertex_program_ref JAJ/Basic/VS
                         {
-                        
+
                         }
-                        
 
                         // tesselation_hull_program_ref JAJ/Basic/THS
                         // {
 
                         // }
-                        
+
                         // tesselation_domain_program_ref JAJ/Basic/TDS
                         // {
 
@@ -175,12 +209,12 @@ material JAJ/Basic
 
                         geometry_program_ref JAJ/Basic/GS
                         {
-                        
+
                         }
-                        
+
                         fragment_program_ref JAJ/Basic/PS
                         {
-                        
+
                         }
                 }
         }

@@ -46,6 +46,19 @@ namespace Ogre {
     /** \addtogroup Materials
      *  @{
      */
+
+    enum BaseConstantType
+    {
+        BCT_FLOAT = 1,
+        BCT_INT = 2,
+        BCT_DOUBLE = 3,
+        BCT_UINT = 4,
+        BCT_BOOL = 5,
+        BCT_SAMPLER = 6,
+        BCT_SUBROUTINE = 7,
+        BCT_UNKNOWN = 99
+    };
+
     /** Enumeration of the types of constant we may encounter in programs.
         @note Low-level programs, by definition, will always use either
         float4 or int4 constant types since that is the fundamental underlying
@@ -294,6 +307,26 @@ namespace Ogre {
             return c == GCT_SUBROUTINE;
         }
 
+        static BaseConstantType getBaseType(GpuConstantType ctype)
+        {
+            if (isFloat(ctype))
+                return BCT_FLOAT;
+            else if (isDouble(ctype))
+                return BCT_DOUBLE;
+            else if (isInt(ctype))
+                return BCT_INT;
+            else if (isUnsignedInt(ctype))
+                return BCT_UINT;
+            else if (isBool(ctype))
+                return BCT_BOOL;
+            else if (isSampler(ctype))
+                return BCT_SAMPLER;
+            else if (isSubroutine(ctype))
+                return BCT_SUBROUTINE;
+            else
+                return BCT_UNKNOWN;
+        }
+
         /** Get the element size of a given type, including whether to pad the
             elements into multiples of 4 (e.g. SM1 and D3D does, GLSL doesn't)
         */
@@ -451,8 +484,8 @@ namespace Ogre {
         /// Map of parameter names to GpuConstantDefinition
         GpuConstantDefinitionMap map;
 
-    GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), 
-        intBufferSize(0), uintBufferSize(0) {  } //boolBufferSize(0) {}
+        GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), 
+            intBufferSize(0), uintBufferSize(0) {  } //boolBufferSize(0) {}
 
         /** Generate additional constant entries for arrays based on a base definition.
             @remarks
@@ -592,28 +625,38 @@ namespace Ogre {
     class _OgreExport GpuSharedParameters : public GpuParamsAlloc
     {
     protected:
-        GpuNamedConstants mNamedConstants;
-        FloatConstantList mFloatConstants;
-        DoubleConstantList mDoubleConstants;
-        IntConstantList mIntConstants;
-        UnsignedIntConstantList mUnsignedIntConstants;
-        // BoolConstantList mBoolConstants;
+        /// Name of the shared parameter set.
         String mName;
 
-        // Optional data the rendersystem might want to store
+        /// Shared parameter definitions and related data.
+        GpuNamedConstants mNamedConstants;
+
+        /// List of float constant values.
+        FloatConstantList mFloatConstants;
+        /// List of double constants values.
+        DoubleConstantList mDoubleConstants;
+        /// List of int constant values.
+        IntConstantList mIntConstants;
+        /// List of unsigned int constant values.
+        UnsignedIntConstantList mUnsignedIntConstants;
+        // BoolConstantList mBoolConstants;
+
+        /// Optional data the rendersystem might want to store.
         mutable Any mRenderSystemData;
 
-        /// Not used when copying data, but might be useful to RS using shared buffers
+        /// Not used when copying data, but might be useful to RS using shared buffers.
         size_t mFrameLastUpdated;
 
-        /// Version number of the definitions in this buffer
+        /// Version number of the definitions in this buffer.
         unsigned long mVersion;
+
+        bool mDirty;
 
     public:
         GpuSharedParameters(const String& name);
         virtual ~GpuSharedParameters();
 
-        /// Get the name of this shared parameter set
+        /// Get the name of this shared parameter set.
         const String& getName() { return mName; }
 
         /** Add a new constant definition to this shared set of parameters.
@@ -638,14 +681,33 @@ namespace Ogre {
         */
         unsigned long getVersion() const { return mVersion; }
 
+        /** Calculate the expected size of the shared parameter buffer based
+            on constant definition data types.
+        */
         size_t calculateSize(void) const;
 
-        /** Mark the shared set as being dirty (values modified).
+        /** True if this parameter set is dirty (values have been modified, 
+            but the render system has not updated them yet).
+        */
+        bool isDirty() const { return mDirty; }
+
+        /** Mark the shared set as being clean (values successfully updated
+            by the render system).
             @remarks
-            You do not need to call this yourself, set is marked as dirty whenever
-            setNamedConstant or (non const) getFloatPointer et al are called.
+            You do not need to call this yourself. The set is marked as clean
+            whenever the render system updates dirty shared parameters.
+         */
+        void _markClean();
+
+        /** Mark the shared set as being dirty (values modified and not yet
+            updated in render system).
+            @remarks
+            You do not need to call this yourself. The set is marked as 
+            dirty whenever setNamedConstant or (non const) getFloatPointer 
+            et al are called.
         */
         void _markDirty();
+
         /// Get the frame in which this shared parameter set was last updated
         size_t getFrameLastUpdated() const { return mFrameLastUpdated; }
 

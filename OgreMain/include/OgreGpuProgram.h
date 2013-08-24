@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreRenderOperation.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreVector3.h"
 
 namespace Ogre {
 
@@ -71,11 +72,11 @@ namespace Ogre {
     protected:
         /// Command object - see ParamCommand
         class _OgreExport CmdType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
     class _OgreExport CmdSyntax : public ParamCommand
     {
     public:
@@ -118,6 +119,12 @@ namespace Ogre {
         String doGet(const void* target) const;
         void doSet(void* target, const String& val);
     };
+    class _OgreExport CmdComputeGroupDims : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
     // Command object for setting / getting parameters
     static CmdType msTypeCmd;
     static CmdSyntax msSyntaxCmd;
@@ -127,6 +134,7 @@ namespace Ogre {
     static CmdVTF msVTFCmd;
     static CmdManualNamedConstsFile msManNamedConstsFileCmd;
     static CmdAdjacency msAdjacencyCmd;
+    static CmdComputeGroupDims msComputeGroupDimsCmd;
     /// The type of the program
     GpuProgramType mType;
     /// The name of the file to load source from (may be blank)
@@ -147,6 +155,8 @@ namespace Ogre {
     bool mVertexTextureFetch;
     /// Does this (geometry) program require adjacency information?
     bool mNeedsAdjacencyInfo;
+    /// The number of process groups dispatched by this (compute) program.
+    Vector3 mComputeGroupDimensions;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
     /// Did we encounter a compilation error?
@@ -334,6 +344,14 @@ namespace Ogre {
         from the input primitives.
     */
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
+    /** Sets the number of process groups dispatched by this compute
+        program.
+     */
+    virtual void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
+    /** Returns the number of process groups dispatched by this compute 
+        program.
+     */
+    virtual Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
 
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.

@@ -4471,8 +4471,8 @@ namespace Ogre{
         if (!GpuProgramManager::getSingleton().isSyntaxSupported(syntax))
         {
             compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line, ", Shader name: " + obj->name);
-            //Register the unsupported program so that materials that use it know that
-            //it exists but is unsupported
+            // Register the unsupported program so that materials that use it know that
+            // it exists but is unsupported.
             GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name,
                                                                                      compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax).staticCast<GpuProgram>();
             return;
@@ -4695,7 +4695,7 @@ namespace Ogre{
         if(prog == 0)
         {
             compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
-                               "gpu program \"" + obj->name + "\" could not be created");
+                               "GPU program \"" + obj->name + "\" could not be created");
             return;
         }
 
@@ -4922,6 +4922,7 @@ namespace Ogre{
                             //     }
                             //     OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                             // }
+                            //TODO This should probably converted into a function of type.
                             else
                             {
                                 // Find the type and number of parameters
@@ -4933,7 +4934,6 @@ namespace Ogre{
                                     // type = GpuProgramParameters::ET_FLOAT;
                                     if (atom1->value.size() >= 6)
                                         count = parseProgramParameterDimensions(atom1->value, String("float"));
-                                    //count = StringConverter::parseInt(atom1->value.substr(5));
 
                                     // First, clear out any offending auto constants
                                     if (named)
@@ -5477,6 +5477,40 @@ namespace Ogre{
                         }
                     }
                     break;
+                // case ID_COMPUTE_WORKGROUP_DIMENSIONS:
+                //     if (obj->id != ID_COMPUTE_PROGRAM)
+                //         break;
+                //     if (prop->values.size() == 3)
+                //     {
+                //         AbstractNodeList::const_iterator first_dimension = getNodeAt(prop->values, 0);
+
+                //         uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
+                //         if(getUInts(k, prop->values.end(), vals, 3))
+                //         {
+                //             try
+                //             {
+                //                 params->setNamedConstant(name, m);
+                //             }
+                //             catch(...)
+                //             {
+                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                //                                    "setting workgroup_dimensions parameter failed");
+                //             }
+                //         }
+                //         else
+                //         {
+                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                //                                "incorrect workgroup_dimensions declaration");
+                //         }
+                //     }
+                //     else
+                //     {
+                //         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                //                            "workgroup_dimensions property requires 3 arguments");
+                //     }
+
+                    
+                //     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
                                        "token \"" + prop->name + "\" is not recognized");
@@ -5496,7 +5530,7 @@ namespace Ogre{
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
         // Must have a name
-        if(obj->name.empty())
+        if (obj->name.empty())
         {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line,
                                "shared_params must be given a name");
@@ -5507,28 +5541,28 @@ namespace Ogre{
         CreateGpuSharedParametersScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup());
         bool processed = compiler->_fireEvent(&evt, (void*)&sharedParams);
 
-        if(!processed)
+        if (!processed)
         {
             sharedParams = GpuProgramManager::getSingleton().createSharedParameters(obj->name).get();
         }
 
-        if(!sharedParams)
+        if (!sharedParams)
         {
             compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
             return;
         }
 
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for (AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if ((*i)->type == ANT_PROPERTY)
             {
                 PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
-                switch(prop->id)
+                switch (prop->id)
                 {
                 case ID_SHARED_PARAM_NAMED:
                     {
-                        if(prop->values.size() < 2)
+                        if (prop->values.size() < 2)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "shared_param_named - expected 2 or more arguments");
@@ -5537,7 +5571,7 @@ namespace Ogre{
 
                         AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
 
-                        if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
+                        if ((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "name and parameter type expected");
@@ -5549,7 +5583,7 @@ namespace Ogre{
 
                         String pName = atom0->value;
                         GpuConstantType constType = GCT_UNKNOWN;
-                        size_t arraySz = 1;
+                        //size_t arraySz = 1;
                         if (!getConstantType(i1, &constType))
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -5557,87 +5591,157 @@ namespace Ogre{
                             continue;
                         }
 
-                        bool isFloat = GpuConstantDefinition::isFloat(constType);
+                        // bool isFloat = GpuConstantDefinition::isFloat(constType);
+                        // bool isInt = GpuConstantDefinition::isInt(constType);
+                        // bool isDouble = GpuConstantDefinition::isDouble(constType);
+                        // bool isUInt = GpuConstantDefinition::isUnsignedInt(constType);
+                        // bool isBool = GpuConstantDefinition::isBool(constType);
 
-                        FloatConstantList mFloats;
-                        IntConstantList mInts;
+                        // FloatConstantList mFloats;
+                        // IntConstantList mInts;
+                        // DoubleConstantList mDoubles;
+                        // UnsignedIntConstantList mUInts;
 
-                        AbstractNodeList::const_iterator otherValsi = prop->values.begin();
-                        std::advance(otherValsi, 2);
+                        BaseConstantType baseType = GpuConstantDefinition::getBaseType(constType);
 
-                        for (; otherValsi != prop->values.end(); ++otherValsi)
+                        switch (baseType)
                         {
-                            if((*otherValsi)->type != ANT_ATOM)
-                                continue;
-
-                            AtomAbstractNode *atom = (AtomAbstractNode*)(*otherValsi).get();
-
-                            if (atom->value.at(0) == '[' && atom->value.at(atom->value.size() - 1) == ']')
-                            {
-                                String arrayStr = atom->value.substr(1, atom->value.size() - 2);
-                                if(!StringConverter::isNumber(arrayStr))
-                                {
-                                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                       "invalid array size");
-                                    continue;
-                                }
-                                arraySz = StringConverter::parseInt(arrayStr);
-                            }
-                            else
-                            {
-                                if(!StringConverter::isNumber(atom->value))
-                                {
-                                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                       atom->value + " invalid - extra parameters to shared_param_named must be numbers");
-                                    continue;
-                                }
-                                if (isFloat)
-                                    mFloats.push_back((float)StringConverter::parseReal(atom->value));
-                                else
-                                    mInts.push_back(StringConverter::parseInt(atom->value));
-                            }
-
-                        } // each extra param
-
-                        // define constant entry
-                        try
-                        {
-                            sharedParams->addConstantDefinition(pName, constType, arraySz);
-                        }
-                        catch(Exception& e)
-                        {
+                        case BCT_FLOAT:
+                            translateSharedParamNamed <float> (compiler, sharedParams, prop, pName, baseType, constType);
+                            break;
+                        case BCT_INT:
+                            translateSharedParamNamed <int> (compiler, sharedParams, prop, pName, baseType, constType);
+                            break;
+                        case BCT_DOUBLE:
+                            translateSharedParamNamed <double> (compiler, sharedParams, prop, pName, baseType, constType);
+                            break;
+                        case BCT_UINT:
+                        case BCT_BOOL:
+                            translateSharedParamNamed <uint> (compiler, sharedParams, prop, pName, baseType, constType);
+                            break;
+                        // case BCT_BOOL:
+                        //     translateSharedParamNamed <bool> (compiler, sharedParams, prop, pName, baseType, constType);
+                        //     break;
+                        default:
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               e.getDescription());
-                            continue;
+                                               "invalid parameter type");
+                            break;
                         }
-
-
-                        // initial values
-                        size_t elemsExpected = GpuConstantDefinition::getElementSize(constType, false) * arraySz;
-                        size_t elemsFound = isFloat ? mFloats.size() : mInts.size();
-                        if (elemsFound)
-                        {
-                            if (elemsExpected != elemsFound)
-                            {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "Wrong number of values supplied for parameter type");
-                                continue;
-                            }
-
-                            if (isFloat)
-                                sharedParams->setNamedConstant(pName, &mFloats[0], elemsFound);
-                            else
-                                sharedParams->setNamedConstant(pName, &mInts[0], elemsFound);
-
-                        }
-
                     }
+
                 }
             }
         }
+    }
+    //-------------------------------------------------------------------------
+    template <class T>
+    void SharedParamsTranslator::translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
+    {
+        std::vector<T> values;
 
+        size_t arraySz = 1;
 
+        AbstractNodeList::const_iterator otherValsi = prop->values.begin();
+        std::advance(otherValsi, 2);
 
+        for (; otherValsi != prop->values.end(); ++otherValsi)
+        {
+            if((*otherValsi)->type != ANT_ATOM)
+                continue;
+
+            AtomAbstractNode *atom = (AtomAbstractNode*)(*otherValsi).get();
+
+            if (atom->value.at(0) == '[' && atom->value.at(atom->value.size() - 1) == ']')
+            {
+                String arrayStr = atom->value.substr(1, atom->value.size() - 2);
+                if(!StringConverter::isNumber(arrayStr))
+                {
+                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                       "invalid array size");
+                    continue;
+                }
+                arraySz = StringConverter::parseInt(arrayStr);
+            }
+            else
+            {
+                //TODO bool no longer makes this check true - perhaps another check will do
+                // if(!StringConverter::isNumber(atom->value))
+                // {
+                //     compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                //                        atom->value + " invalid - extra parameters to shared_param_named must be numbers");
+                //     continue;
+                // }
+
+                // if (isFloat)
+                //     mFloats.push_back((float)StringConverter::parseReal(atom->value));
+                // else if (isInt)
+                //     mInts.push_back(StringConverter::parseInt(atom->value));
+                // else if (isDouble)
+                //     mDoubles.push_back(StringConverter::parseDouble(atom->value));
+                // else if (isUInt)
+                //     mUInts.push_back(StringConverter::parseUInt(atom->value));
+                // else if (isBool)
+                //     mUInts.push_back(StringConverter::parseBoolean(atom->value));
+                
+                switch(baseType)
+                {
+                case BCT_FLOAT:
+                    values.push_back((float)StringConverter::parseReal(atom->value));
+                    break;
+                case BCT_INT:
+                    values.push_back(StringConverter::parseInt(atom->value));
+                    break;
+                case BCT_DOUBLE:
+                    values.push_back((double)StringConverter::parseReal(atom->value));
+                    break;
+                case BCT_UINT:
+                    values.push_back(StringConverter::parseUnsignedInt(atom->value));
+                    break;
+                case BCT_BOOL:
+                    values.push_back((uint)StringConverter::parseBool(atom->value));
+                    break;
+                default:
+                    // This should never be reached.
+                    break;
+                }
+            }
+
+        } // each extra param
+
+        // define constant entry
+        try
+        {
+            sharedParams->addConstantDefinition(pName, constType, arraySz);
+        }
+        catch(Exception& e)
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                               e.getDescription());
+            // continue;
+            return;
+        }
+
+        // initial values
+        size_t elemsExpected = GpuConstantDefinition::getElementSize(constType, false) * arraySz;
+        // size_t elemsFound = isFloat ? mFloats.size() : mInts.size();
+        size_t elemsFound = values.size();
+        if (elemsFound)
+        {
+            if (elemsExpected != elemsFound)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   "Wrong number of values supplied for parameter type");
+                // continue;
+                return;
+            }
+
+            // if (isFloat)
+            //     sharedParams->setNamedConstant(pName, &mFloats[0], elemsFound);
+            // else
+            //     sharedParams->setNamedConstant(pName, &mInts[0], elemsFound);
+
+            sharedParams->setNamedConstant(pName, &values[0], elemsFound);
+        }
     }
 
     /**************************************************************************
@@ -5648,7 +5752,7 @@ namespace Ogre{
     {
     }
 
-    void ParticleSystemTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+    void ParticleSystemTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr &node)
     {
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
         // Find the name
