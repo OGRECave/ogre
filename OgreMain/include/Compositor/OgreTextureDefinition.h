@@ -82,8 +82,28 @@ namespace Ogre
 			BoolSetting hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats) 
 			uint16 depthBufferId;//Depth Buffer's pool ID.
 
+			/** In D3D9, reading from an fsaa texture is not possible, hence it always has
+				to be resolved before using it. When resolves are implicit, trying to read
+				a render target as a texture will make Ogre to automatically resolve the
+				FSAA rt into a normal one.
+			@par
+				For implicit resolves, try to render everything first, then use it as a texture
+				instead of mixing reads & writes, to avoid excessive resolves on the same frame.
+			@par
+				In D3D10+ & GL 3.3+; FSAA surfaces can be read as textures (that is, without
+				resolving) for advanced image manipulation (or even performing custom resolves).
+				For this reason, turning Explicit resolves on will force Ogre not to resolve
+				targets when used as a texture; resolving can still be done using a PASS_RESOLVE
+				or using a PASS_QUAD with a custom resolve pixel shader.
+			@par
+				Explicit resolves are obviously not supported in D3D9, thus this flag is forced
+				always to false, and PASS_RESOLVE passes are skipped.
+			*/
+			bool	fsaaExplicitResolve;
+
 			TextureDefinition( IdString _name ) : name(_name), width(0), height(0), widthFactor(1.0f),
-					heightFactor(1.0f), fsaa(true), hwGammaWrite(Undefined), depthBufferId(1) {}
+					heightFactor(1.0f), fsaa(true), hwGammaWrite(Undefined), depthBufferId(1),
+					fsaaExplicitResolve(false) {}
         };
 
 		typedef vector<TextureDefinition>::type		TextureDefinitionVec;

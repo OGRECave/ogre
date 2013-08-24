@@ -65,8 +65,8 @@ namespace Ogre
 		}
 
 		//These are deprecated and the user should not be fiddling with viewports from now on
-		assert( mViewport->isAutoUpdated() );
-		assert( mViewport->getClearEveryFrame() );
+		assert( !mViewport->isAutoUpdated() );
+		assert( !mViewport->getClearEveryFrame() );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorPass::~CompositorPass()

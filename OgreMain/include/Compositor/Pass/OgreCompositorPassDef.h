@@ -47,7 +47,8 @@ namespace Ogre
 		PASS_SCENE,
 		PASS_QUAD,
 		PASS_CLEAR,
-		PASS_STENCIL
+		PASS_STENCIL,
+		PASS_RESOLVE
 	};
 
 	/** Interface to abstract all types of pass definitions (@see CompositorPassType):
