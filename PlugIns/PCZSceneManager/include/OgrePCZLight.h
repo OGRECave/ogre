@@ -46,7 +46,6 @@ namespace Ogre
     typedef list<PCZone*>::type ZoneList;
 
     /** Specialized version of Ogre::Light which caches which zones the light affects
-    @remarks
     */
 
     class _OgrePCZPluginExport PCZLight : public Light
@@ -75,11 +74,11 @@ namespace Ogre
         */
         void addZoneToAffectedZonesList(PCZone * zone);
 
-        /** check if a zone is in the list of zones affected by the light 
+        /** Check if a zone is in the list of zones affected by the light
         */
         bool affectsZone(PCZone * zone);
 
-        /** returns flag indicating if the light affects a zone which is visible
+        /** @return Flag indicating if the light affects a zone which is visible
         *   in the current frame
         */
         bool affectsVisibleZone(void) {return mAffectsVisibleZone;}

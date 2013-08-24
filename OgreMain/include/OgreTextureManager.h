@@ -211,8 +211,10 @@ namespace Ogre {
                 The name of the resource group to assign the texture to
             @param stream
                 Incoming data stream
-            @param width, height
-                The dimensions of the texture
+            @param width
+                The width of the texture
+            @param height
+                The height of the texture
             @param format
                 The format of the data being passed in; the manager reserves
                 the right to create a different format for the texture if the 
@@ -232,7 +234,6 @@ namespace Ogre {
 				 to linear space when reading from this texture. Only applicable for 
 				 8-bits per channel textures, will be ignored for other types. Has the advantage
 				 over pre-applied gamma that the texture precision is maintained.
-
         */
         virtual TexturePtr loadRawData(const String &name, const String& group,
             DataStreamPtr& stream, ushort width, ushort height, 
@@ -246,8 +247,12 @@ namespace Ogre {
                 group The name of the resource group to assign the texture to
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
-            @param
-                width, height, depth The dimensions of the texture
+            @param width
+                The width of the texture
+            @param height
+                The height of the texture
+            @param depth
+                The depth of the texture
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
@@ -293,8 +298,10 @@ namespace Ogre {
                 group The name of the resource group to assign the texture to
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
-            @param
-                width, height The dimensions of the texture
+            @param width
+                The width of the texture
+            @param height
+                The height of the texture
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps()).

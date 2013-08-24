@@ -367,8 +367,6 @@ namespace Ogre {
         const String &getSourceForTex(const String &name, size_t mrtIndex = 0);
 
         /** Queue a render system operation.
-        @return
-            Destination pass.
         */
         void queueRenderSystemOp(TargetOperation &finalState, RenderSystemOperation *op);
 

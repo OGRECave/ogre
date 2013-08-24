@@ -54,25 +54,23 @@ THE SOFTWARE.
 #   ifdef OGRE_BUILD_PLUGIN_BSP
 #       include "BSP.h"
 #   endif
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#       ifdef USE_RTSHADER_SYSTEM
-#           include "ShaderSystem.h"
-#       endif
-#               include "DualQuaternion.h"
-#       include "DeferredShadingDemo.h"
-#       include "Instancing.h"
-#       include "NewInstancing.h"
-#       include "TextureArray.h"
-#       include "SSAO.h"
-#       include "OceanDemo.h"
-#               ifdef OGRE_BUILD_COMPONENT_VOLUME
-#                       include "VolumeCSG.h"
-#                       include "VolumeTerrain.h"
-#               endif
-#       ifdef OGRE_BUILD_COMPONENT_TERRAIN
-#           include "EndlessWorld.h"
-#           include "Terrain.h"
-#       endif
+#   ifdef USE_RTSHADER_SYSTEM
+#       include "ShaderSystem.h"
+#   endif
+#	include "DualQuaternion.h"
+#   include "DeferredShadingDemo.h"
+#   include "Instancing.h"
+#   include "NewInstancing.h"
+#   include "TextureArray.h"
+#   include "SSAO.h"
+#   include "OceanDemo.h"
+#	ifdef OGRE_BUILD_COMPONENT_VOLUME
+#		include "VolumeCSG.h"
+#		include "VolumeTerrain.h"
+#	endif
+#   ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#       include "EndlessWorld.h"
+#       include "Terrain.h"
 #   endif
 #   include "CelShading.h"
 #   include "Compositor.h"

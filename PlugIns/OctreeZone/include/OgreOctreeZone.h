@@ -47,7 +47,6 @@ Code Style Update	 :
 namespace Ogre
 {
     /** Octree version of PCZone 
-    @remarks
     */
 	class OctreeZoneData;
 
@@ -81,29 +80,29 @@ namespace Ogre
 		 */
 		virtual bool requiresZoneSpecificNodeData(void);
 
-		/** create zone specific data for a node
+		/** Create zone specific data for a node
 		*/
 		virtual void createNodeZoneData(PCZSceneNode *);
 
-		/** (recursive) check the given node against all portals in the zone
+		/** (recursive) Check the given node against all portals in the zone
 		*/
 		virtual void _checkNodeAgainstPortals(PCZSceneNode *, Portal * );
 
-        /** (recursive) check the given light against all portals in the zone
+        /** (recursive) Check the given light against all portals in the zone
         */
         virtual void _checkLightAgainstPortals(PCZLight *, 
                                                unsigned long, 
                                                PCZFrustum *,
                                                Portal*);
 
-		/* Update the zone data for each portal 
+		/** Update the zone data for each portal
 		*/
 		void updatePortalsZoneData(void);
 
 		/** Mark nodes dirty base on moving portals. */
 		void dirtyNodeByMovingPortals(void);
 
-		/* Update a node's home zone */
+		/** Update a node's home zone */
 		virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
 
         /** Find and add visible objects to the render queue.
@@ -119,7 +118,7 @@ namespace Ogre
 									  bool displayNodes,
 									  bool showBoundingBoxes);
 
-		/* Functions for finding Nodes that intersect various shapes */
+		/** Functions for finding Nodes that intersect various shapes */
 		virtual void _findNodes(const AxisAlignedBox &t, 
 						        PCZSceneNodeList &list,
                                 PortalList &visitedPortals,
@@ -146,7 +145,7 @@ namespace Ogre
 						        PCZSceneNode *exclude );
 
 		/** Sets the given option for the Zone
-				@remarks
+         @remarks
 			Options are:
 			"Size", AxisAlignedBox *;
 			"Depth", int *;
@@ -154,24 +153,24 @@ namespace Ogre
 		*/
 		virtual bool setOption( const String &, const void * );
 
-		/** called when the scene manager creates a camera because
+		/** Called when the scene manager creates a camera because
 		    some zone managers (like TerrainZone) need the camera info.
 		*/
 		virtual void notifyCameraCreated( Camera* c );
 
-		/* called by PCZSM during setWorldGeometryRenderQueue() */
+		/** Called by PCZSM during setWorldGeometryRenderQueue() */
 		virtual void notifyWorldGeometryRenderQueue(uint8 qid);
 
-		/* Called when a _renderScene is called in the SceneManager */
+		/** Called when a _renderScene is called in the SceneManager */
 		virtual void notifyBeginRenderScene(void);
 
-		/* called by PCZSM during setZoneGeometry() */
+		/** Called by PCZSM during setZoneGeometry() */
 		virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode);
 
-		/* get the world coordinate aabb of the zone */
+		/** Get the world coordinate aabb of the zone */
 		virtual void getAABB(AxisAlignedBox &);
 
-		// Init function carried over from OctreeSceneManager
+		/// Init function carried over from OctreeSceneManager
 		void init(AxisAlignedBox &box, int depth);
 		/** Resizes the octree to the given size */
 		void resize( const AxisAlignedBox &box );
@@ -239,9 +238,9 @@ namespace Ogre
 		bool _isIn( AxisAlignedBox &box );
 
 	public:
-		///Octree this node is attached to.
+		/// Octree this node is attached to.
 		Octree *		mOctant;
-		// octree-specific world bounding box (only includes attached objects, not children)
+		/// Octree-specific world bounding box (only includes attached objects, not children)
 		AxisAlignedBox	mOctreeWorldAABB;
 	};
 

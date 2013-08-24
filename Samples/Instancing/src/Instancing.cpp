@@ -13,9 +13,9 @@ same license as the rest of the engine.
 */
 
 /**
-\file 
+@file 
 Instancing.cpp
-\brief
+@brief
 Shows OGRE's instancing feature
 */
 

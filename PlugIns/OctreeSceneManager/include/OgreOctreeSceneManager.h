@@ -60,14 +60,10 @@ class OctreeSphereSceneQuery;
 class OctreeAxisAlignedBoxSceneQuery;
 class OctreePlaneBoundedVolumeListSceneQuery;
 
-
 typedef list< WireBoundingBox * >::type BoxList;
 typedef list< unsigned long >::type ColorList;
-//typedef list< SceneNode * >::type SceneNodeList;
-
 
 /** Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial queries.
-@remarks
 */
 
 class _OgreOctreePluginExport OctreeSceneManager : public SceneManager

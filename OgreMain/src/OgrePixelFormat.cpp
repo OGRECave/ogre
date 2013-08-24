@@ -818,6 +818,50 @@ namespace Ogre {
             dstptr += dstSliceSkipBytes;
         }
     }
+    //-----------------------------------------------------------------------
+    void PixelUtil::bulkPixelVerticalFlip(const PixelBox &box)
+    {
+		// Check for compressed formats, we don't support decompression, compression or recoding
+		if(PixelUtil::isCompressed(box.format))
+		{
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                        "This method can not be used for compressed formats",
+                        "PixelUtil::bulkPixelVerticalFlip");
+		}
+        
+        const size_t pixelSize = PixelUtil::getNumElemBytes(box.format);
+        const size_t copySize = (box.right - box.left) * pixelSize;
+
+        // Calculate pitches in bytes
+        const size_t rowPitchBytes = box.rowPitch * pixelSize;
+        const size_t slicePitchBytes = box.slicePitch * pixelSize;
+
+        uint8 *basesrcptr = static_cast<uint8*>(box.data)
+            + (box.left + box.top * box.rowPitch + box.front * box.slicePitch) * pixelSize;
+        uint8 *basedstptr = basesrcptr + (box.bottom - box.top - 1) * rowPitchBytes;
+        uint8* tmpptr = (uint8*)OGRE_MALLOC_ALIGN(copySize, MEMCATEGORY_GENERAL, false);
+        
+        // swap rows
+        const size_t halfRowCount = (box.bottom - box.top) >> 1;
+        for(size_t z = box.front; z < box.back; z++)
+        {
+            uint8* srcptr = basesrcptr;
+            uint8* dstptr = basedstptr;
+            for(size_t y = 0; y < halfRowCount; y++)
+            {
+                // swap rows
+                memcpy(tmpptr, dstptr, copySize);
+                memcpy(dstptr, srcptr, copySize);
+                memcpy(srcptr, tmpptr, copySize);
+                srcptr += rowPitchBytes;
+                dstptr -= rowPitchBytes;
+            }
+            basesrcptr += slicePitchBytes;
+            basedstptr += slicePitchBytes;
+        }
+        
+        OGRE_FREE_ALIGN(tmpptr, MEMCATEGORY_GENERAL, false);
+    }
 
     ColourValue PixelBox::getColourAt(size_t x, size_t y, size_t z)
     {

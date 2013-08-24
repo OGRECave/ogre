@@ -146,8 +146,11 @@ namespace Ogre {
     {
         glGenFramebuffers(1, &fb);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
-        if (fmt!=GL_NONE)
+        if (fmt != GL_NONE)
         {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
             // Create and attach texture
             glGenTextures(1, &tid);
             glBindTexture(GL_TEXTURE_2D, tid);
@@ -379,7 +382,10 @@ namespace Ogre {
             glDeleteFramebuffers(1, &fb);
 
             if (fmt != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         String fmtstring = "";

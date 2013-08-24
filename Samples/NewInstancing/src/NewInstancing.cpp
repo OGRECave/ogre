@@ -129,10 +129,19 @@ void Sample_NewInstancing::setupContent()
 
 	checkHardwareSupport();
 
-	mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED );
-	mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_FLOAT32_R );
+    mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED );
 	mSceneMgr->setShadowTextureSelfShadow( true );
 	mSceneMgr->setShadowCasterRenderBackFaces( true );
+
+    if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") == String::npos)
+    {
+        mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_FLOAT32_R );
+    }
+    else
+    {
+        // Use a smaller texture for GL ES 3.0
+        mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT32_R );
+    }
 
 	//LiSPSMShadowCameraSetup *shadowCameraSetup = new LiSPSMShadowCameraSetup();
 	FocusedShadowCameraSetup *shadowCameraSetup = new FocusedShadowCameraSetup();

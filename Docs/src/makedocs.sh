@@ -13,11 +13,18 @@
 # Generate API docs using doxygen
 doxygen src/html.cfg
 
+# Remove old manual
+rm -rf manual vbo-update 
+
 # Generate manuals from texi
 for f in src/*.texi;
 do
 	texi2html -Verbose --css-include=style.css --output=`basename $f .texi` -split=node -top_file=index.html $f
 done
-# copy stylesheet to core docs folder
+
+# Copy stylesheet to core docs folder
 cp src/style.css .
 	
+# Copy images to the manual folder
+mkdir -p manual/images
+cp src/images/* manual/images/

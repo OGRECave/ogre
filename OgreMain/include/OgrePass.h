@@ -473,24 +473,24 @@ namespace Ogre {
         */
         bool getPointSpritesEnabled(void) const;
 
-        /** Sets how points are attenuated with distance.
-            @remarks
-            When performing point rendering or point sprite rendering,
-            point size can be attenuated with distance. The equation for
-            doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2).
-            @par
-            For example, to disable distance attenuation (constant screensize)
-            you would set constant to 1, and linear and quadratic to 0. A
-            standard perspective attenuation would be 0, 1, 0 respectively.
-            @note
-            The resulting size is clamped to the minimum and maximum point
-            size.
-            @param enabled Whether point attenuation is enabled
-            @param constant, linear, quadratic Parameters to the attenuation
-            function defined above
-        */
-        void setPointAttenuation(bool enabled,
-                                 Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
+		/** Sets how points are attenuated with distance.
+		@remarks
+			When performing point rendering or point sprite rendering,
+			point size can be attenuated with distance. The equation for
+			doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2).
+		@par
+			For example, to disable distance attenuation (constant screensize)
+			you would set constant to 1, and linear and quadratic to 0. A
+			standard perspective attenuation would be 0, 1, 0 respectively.
+		@note
+			The resulting size is clamped to the minimum and maximum point
+			size.
+		@param enabled Whether point attenuation is enabled
+		@param constant, linear, quadratic Parameters to the attenuation
+			function defined above
+		*/
+		void setPointAttenuation(bool enabled,
+			Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
 
         /** Returns whether points are attenuated with distance. */
         bool isPointAttenuationEnabled(void) const;

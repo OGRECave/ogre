@@ -41,7 +41,7 @@
 using namespace Ogre;
 
 #if OGRE_THREAD_SUPPORT != 1
-GLenum wglewContextInit (Ogre::GLSupport *glSupport);
+GLenum GLEWAPIENTRY wglewContextInit (Ogre::GLSupport *glSupport);
 #endif
 
 namespace Ogre {

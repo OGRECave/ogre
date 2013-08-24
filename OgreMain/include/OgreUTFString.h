@@ -556,7 +556,7 @@ namespace Ogre {
 		//! sets the value of the character at \a loc to the Unicode value \a ch (UTF-32)
 		/*! Providing sentinel values (values between U+D800-U+DFFF) are accepted, but you should be aware
 		that you can also unwittingly create a valid surrogate pair if you don't pay attention to what you
-		are doing. \note This operation may also lengthen the string if a surrogate pair is needed to
+		are doing. @note This operation may also lengthen the string if a surrogate pair is needed to
 		represent the value given, but one is not available to replace; or alternatively shorten the string
 		if an existing surrogate pair is replaced with a character that is representable without a surrogate
 		pair. The return value will signify any lengthening or shortening performed, returning 0 if no change
@@ -934,7 +934,7 @@ namespace Ogre {
 		/*! This function, like its counterpart, will happily create invalid UTF-16 surrogate pairs. These
 		invalid entries will be created for any value of \c in_uc that falls in the range U+D800 - U+DFFF.
 		These are generally useful as sentinel values to represent various program specific conditions.
-		\note This function will also pass through any single UTF-16 code point without modification,
+		@note This function will also pass through any single UTF-16 code point without modification,
 		making it a safe method of ensuring a stream that is unknown UTF-32 or UTF-16 is truly UTF-16.*/
 		static size_t _utf32_to_utf16( const unicode_char& in_uc, code_point out_cp[2] );
 		//@}

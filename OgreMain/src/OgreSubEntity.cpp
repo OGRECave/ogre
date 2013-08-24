@@ -163,7 +163,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void SubEntity::setIndexDataStartIndex(size_t start_index)
     {
-		if(start_index >= 0 && start_index < mSubMesh->indexData->indexCount)
+		if(start_index < mSubMesh->indexData->indexCount)
 	        mIndexStart = start_index;
     }
     //-----------------------------------------------------------------------

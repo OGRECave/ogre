@@ -337,7 +337,7 @@ namespace Ogre {
             @param height
                 Specifies the height of the patch in control points. 
                 Note this parameter must greater than or equal to 3.
-            @param uMaxSubdivisionLevel, vMaxSubdivisionLevel 
+            @param uMaxSubdivisionLevel, vMaxSubdivisionLevel
                 If you want to manually set the top level of subdivision, 
                 do it here, otherwise let the system decide.
             @param visibleSide 

@@ -939,9 +939,8 @@ namespace Ogre {
             generated coordinates rather than static model texture coordinates.
         @param enable
             True to enable, false to disable
-        @param planar
-            If set to @c true, instead of being based on normals the environment effect is based on
-            vertex positions. This is good for planar surfaces.
+        @param envMapType
+            The type of environment mapping to perform. Planar, curved, reflection or normal. @see EnvMapType
         @note
             This option has no effect in the programmable pipeline.
         */

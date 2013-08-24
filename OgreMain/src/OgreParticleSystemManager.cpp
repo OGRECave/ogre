@@ -275,6 +275,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyEmitter(ParticleEmitter* emitter)
     {
+        if(!emitter)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleEmitter.", "ParticleSystemManager::_destroyEmitter");
+
         OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleEmitterFactoryMap::iterator pFact = mEmitterFactories.find(emitter->getType());
@@ -307,6 +310,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyAffector(ParticleAffector* affector)
     {
+        if(!affector)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleAffector.", "ParticleSystemManager::_destroyAffector");
+
         OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleAffectorFactoryMap::iterator pFact = mAffectorFactories.find(affector->getType());
@@ -322,7 +328,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystemRenderer* ParticleSystemManager::_createRenderer(const String& rendererType)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
         // Locate affector type
         ParticleSystemRendererFactoryMap::iterator pFact = mRendererFactories.find(rendererType);
 
@@ -337,7 +343,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyRenderer(ParticleSystemRenderer* renderer)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        if(!renderer)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleSystemRenderer.", "ParticleSystemManager::_destroyRenderer");
+
+        OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleSystemRendererFactoryMap::iterator pFact = mRendererFactories.find(renderer->getType());
 

@@ -58,7 +58,7 @@ THE SOFTWARE.
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #if OGRE_THREAD_SUPPORT != 1
-GLenum glewContextInit (Ogre::GLSupport *glSupport);
+GLenum GLEWAPIENTRY glewContextInit (Ogre::GLSupport *glSupport);
 #endif
 
 namespace Ogre {
