@@ -43,7 +43,7 @@ namespace Ogre
 		T::const_iterator end  = container.end();
 		while( itor != end )
 		{
-			delete itor->second;
+			OGRE_DELETE itor->second;
 			++itor;
 		}
 		container.clear();
@@ -55,14 +55,36 @@ namespace Ogre
 		T::const_iterator itor = container.begin();
 		T::const_iterator end  = container.end();
 		while( itor != end )
-			delete *itor++;
+			OGRE_DELETE *itor++;
 		container.clear();
 	}
 
 	CompositorManager2::CompositorManager2() :
-		mRenderWindow( 0 ),
 		mRenderSystem( 0 )
 	{
+		//----------------------------------------------------------------
+		// Create a default Node & Workspace for basic rendering:
+		//		* Clears the screen
+		//		* Renders all objects from RQ 0 to Max.
+		//		* No shadows
+		//----------------------------------------------------------------
+		CompositorNodeDef *nodeDef = this->addNodeDefinition( "Default Node RenderScene" );
+
+		//Input texture
+		nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
+
+		nodeDef->setNumTargetPass( 1 );
+		{
+			CompositorTargetDef *targetDef = nodeDef->addTargetPass( "WindowRT" );
+			targetDef->setNumPasses( 2 );
+			{
+				targetDef->addPass( PASS_CLEAR );
+				targetDef->addPass( PASS_SCENE );
+			}
+		}
+
+		CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( "Default RenderScene" );
+		workDef->connectOutput( 0, "Default Node RenderScene" );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorManager2::~CompositorManager2()
@@ -102,7 +124,7 @@ namespace Ogre
 
 		if( mNodeDefinitions.find( name ) == mNodeDefinitions.end() )
 		{
-			retVal = new CompositorNodeDef( name );
+			retVal = OGRE_NEW CompositorNodeDef( name );
 			mNodeDefinitions[name] = retVal;
 		}
 		else
@@ -121,7 +143,7 @@ namespace Ogre
 
 		if( mWorkspaceDefs.find( name ) == mWorkspaceDefs.end() )
 		{
-			retVal = new CompositorWorkspaceDef( name, this );
+			retVal = OGRE_NEW CompositorWorkspaceDef( name, this );
 			mWorkspaceDefs[name] = retVal;
 		}
 		else
@@ -146,7 +168,7 @@ namespace Ogre
 		}
 		else
 		{
-			CompositorWorkspace* workspace = new CompositorWorkspace(
+			CompositorWorkspace* workspace = OGRE_NEW CompositorWorkspace(
 								Id::generateNewId<CompositorWorkspace>(), itor->second,
 								finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
 			mWorkspaces.push_back( workspace );

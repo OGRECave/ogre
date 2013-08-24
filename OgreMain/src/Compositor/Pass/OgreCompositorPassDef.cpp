@@ -41,7 +41,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			delete *itor;
+			OGRE_DELETE *itor;
 			++itor;
 		}
 
@@ -54,10 +54,10 @@ namespace Ogre
 		switch( passType )
 		{
 		case PASS_CLEAR:
-			retVal = new CompositorPassClearDef();
+			retVal = OGRE_NEW CompositorPassClearDef();
 			break;
 		case PASS_SCENE:
-			retVal = new CompositorPassSceneDef();
+			retVal = OGRE_NEW CompositorPassSceneDef();
 			break;
 		}
 

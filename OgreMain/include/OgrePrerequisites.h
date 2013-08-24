@@ -323,6 +323,7 @@ namespace Ogre {
 	class WorkQueue;
     class Compositor;
     class CompositorManager;
+	class CompositorManager2;
     class CompositorChain;
     class CompositorInstance;
 	class CompositorLogic;

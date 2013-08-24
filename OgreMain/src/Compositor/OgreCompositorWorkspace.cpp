@@ -71,8 +71,8 @@ namespace Ogre
 		while( itor != end )
 		{
 			const CompositorNodeDef *nodeDef = compoManager->getNodeDefinition( itor->second );
-			CompositorNode *newNode = new CompositorNode( Id::generateNewId<CompositorNode>(),
-															itor->first, nodeDef, this, mRenderSys );
+			CompositorNode *newNode = OGRE_NEW CompositorNode( Id::generateNewId<CompositorNode>(),
+																itor->first, nodeDef, this, mRenderSys );
 			mNodeSequence.push_back( newNode );
 			++itor;
 		}
@@ -85,7 +85,7 @@ namespace Ogre
 		CompositorNodeVec::const_iterator end  = mNodeSequence.end();
 
 		while( itor != end )
-			delete *itor++;
+			OGRE_DELETE *itor++;
 		mNodeSequence.clear();
 	}
 	//-----------------------------------------------------------------------------------

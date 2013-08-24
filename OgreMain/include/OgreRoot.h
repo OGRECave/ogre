@@ -118,6 +118,7 @@ namespace Ogre
         HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
 		ExternalTextureSourceManager* mExternalTextureSourceManager;
         CompositorManager* mCompositorManager;      
+		CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
 		Real mFrameSmoothingTime;
 		bool mRemoveQueueStructuresOnClear;
@@ -314,6 +315,8 @@ namespace Ogre
         /** Retrieve a pointer to the currently selected render system.
         */
         RenderSystem* getRenderSystem(void);
+
+		CompositorManager2* getCompositorManager2() const			{ return mCompositorManager2; }
 
         /** Initialises the renderer.
             @remarks

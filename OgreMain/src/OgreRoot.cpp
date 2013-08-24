@@ -66,6 +66,8 @@ THE SOFTWARE.
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
+#include "Compositor/OgreCompositorManager2.h"
+
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
 #endif
@@ -116,6 +118,7 @@ namespace Ogre {
       : mQueuedEnd(false)
       , mLogManager(0)
 	  , mRenderSystemCapabilitiesManager(0)
+	  , mCompositorManager2(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
@@ -248,6 +251,7 @@ namespace Ogre {
 
 		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
         mCompositorManager = OGRE_NEW CompositorManager();
+		mCompositorManager2 = OGRE_NEW CompositorManager2();
 
 		mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
@@ -293,6 +297,7 @@ namespace Ogre {
 
 		destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mCompositorManager;
+		OGRE_DELETE mCompositorManager2;
 		OGRE_DELETE mExternalTextureSourceManager;
 #if OGRE_NO_FREEIMAGE == 0
 		FreeImageCodec::shutdown();
@@ -1415,7 +1420,9 @@ namespace Ogre {
     bool Root::_updateAllRenderTargets(void)
     {
         // update all targets but don't swap buffers
-        mActiveRenderer->_updateAllRenderTargets(false);
+        //mActiveRenderer->_updateAllRenderTargets(false);
+		mCompositorManager2->_update();
+
 		// give client app opportunity to use queued GPU time
 		bool ret = _fireFrameRenderingQueued();
 		// block for final swap

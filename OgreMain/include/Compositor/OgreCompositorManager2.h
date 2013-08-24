@@ -40,11 +40,8 @@ namespace Ogre
 	typedef vector<TexturePtr>::type TextureVec;
 
 	//class _OgreExport CompositorManager2 : public ResourceManager
-	class _OgreExport CompositorManager2
+	class _OgreExport CompositorManager2 : public ResourceAlloc
 	{
-		TextureVec		mGlobalTextures;
-		RenderWindow	*mRenderWindow;
-
 		typedef map<IdString, CompositorNodeDef*>::type CompositorNodeDefMap;
 		CompositorNodeDefMap	mNodeDefinitions;
 

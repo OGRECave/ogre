@@ -147,6 +147,14 @@ namespace Ogre
 		//Don't leave dangling pointers
 		disconnectOutput();
 
+		{
+			//Destroy all passes
+			CompositorPassVec::const_iterator itor = mPasses.begin();
+			CompositorPassVec::const_iterator end  = mPasses.end();
+			while( itor != end )
+				OGRE_DELETE *itor++;
+		}
+
 		//Destroy our local textures
 		CompositorNodeDef::TextureDefinitionVec::const_iterator itor =
 																mDefinition->mLocalTextureDefs.begin();
@@ -335,12 +343,14 @@ namespace Ogre
 				switch( (*itPass)->getType() )
 				{
 				case PASS_CLEAR:
-					newPass = new CompositorPassClear( static_cast<CompositorPassClearDef*>(*itPass),
-														channel->target );
+					newPass = OGRE_NEW CompositorPassClear(
+											static_cast<CompositorPassClearDef*>(*itPass),
+											channel->target );
 					break;
 				case PASS_SCENE:
-					newPass = new CompositorPassScene( static_cast<CompositorPassSceneDef*>(*itPass),
-														mWorkspace, channel->target );
+					newPass = OGRE_NEW CompositorPassScene(
+											static_cast<CompositorPassSceneDef*>(*itPass),
+											mWorkspace, channel->target );
 					break;
 				default:
 					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
