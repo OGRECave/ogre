@@ -294,6 +294,11 @@ namespace Ogre
 
 			fbConfig = mGLSupport->selectFBConfig(minAttribs, maxAttribs);
 
+			// Now check the actual supported fsaa value
+			GLint maxSamples;
+			mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &maxSamples);
+			mFSAA = maxSamples;
+
 			if (gamma != 0)
 			{
 				mGLSupport->getFBConfigAttrib(fbConfig, GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &gamma);
