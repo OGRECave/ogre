@@ -33,7 +33,7 @@
 
 namespace Ogre {
     GL3PlusTextureManager::GL3PlusTextureManager(GL3PlusSupport& support)
-        : TextureManager(), mGLSupport(support), mWarningTextureID(0), mImages()
+        : TextureManager(), mGLSupport(support), mWarningTextureID(0)//, mImages()
     {
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -55,38 +55,28 @@ namespace Ogre {
                                                 ManualResourceLoader* loader,
                                                 const NameValuePairList* createParams)
     {
-        // GL3PlusTexture * texture = new GL3PlusTexture(this, name, handle, group, isManual, loader, mGLSupport);
-        
-        // // Add texture to images if destined for image load/store.
-        // if (texture->getUsage() == TU_DYNAMIC_SHADER)
-        // {
-        //     registerImage(texture);
-        // }
-
-        // return texture;
-
         return new GL3PlusTexture(this, name, handle, group, isManual, loader, mGLSupport);
     }
 
 
-    TexturePtr GL3PlusTextureManager::createManual(const String & name, const String& group,
-                                                   TextureType texType, uint width, uint height, uint depth, int numMipmaps,
-                                                   PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
-                                                   uint fsaa, const String& fsaaHint)
-    {
-        TexturePtr texture = TextureManager::createManual(
-            name, group, texType, 
-            width, height, depth, numMipmaps,
-            format, usage, loader, hwGamma, 
-            fsaa, fsaaHint);
+    // TexturePtr GL3PlusTextureManager::createManual(const String & name, const String& group,
+    //                                                TextureType texType, uint width, uint height, uint depth, int numMipmaps,
+    //                                                PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
+    //                                                uint fsaa, const String& fsaaHint)
+    // {
+    //     TexturePtr texture = TextureManager::createManual(
+    //         name, group, texType, 
+    //         width, height, depth, numMipmaps,
+    //         format, usage, loader, hwGamma, 
+    //         fsaa, fsaaHint);
 
-        if (texture->getUsage() == TU_DYNAMIC_SHADER)
-        {
-            registerImage(texture);
-        }
+    //     if (texture->getUsage() == TU_DYNAMIC_SHADER)
+    //     {
+    //         registerImage(texture);
+    //     }
 
-        return texture;
-    }
+    //     return texture;
+    // }
 
     //-----------------------------------------------------------------------------
     void GL3PlusTextureManager::createWarningTexture()
@@ -172,24 +162,32 @@ namespace Ogre {
         return false;
     }
 
-    void GL3PlusTextureManager::registerImage(TexturePtr texture)
-    {
-        mImages.push_back(texture);
-    }
+    // void GL3PlusTextureManager::registerImage(TexturePtr texture)
+    // {
+    //     mImages.push_back(texture);
+    // }
 
     //FIXME Should this become a standard Texture class feature?
-    void GL3PlusTextureManager::bindImages()
-    {
-        TexturePtrList::iterator texture = mImages.begin();
-        TexturePtrList::iterator end = mImages.end();
+    // void GL3PlusTextureManager::bindImages()
+    // {
+    //     //FIXME currently produces a GL_INVALID_OPERATION, so temporarily run once
+    //     // static bool images_bound = false;
 
-        for (; texture != end; texture++)
-        {
-            std::cout << "IMAGE LOAD/STORE" << std::endl;
-            GL3PlusTexturePtr tex = texture->staticCast<GL3PlusTexture>();
-            OGRE_CHECK_GL_ERROR(glBindImageTexture(0, tex->getGLID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8));
-        }
+    //     TexturePtrList::iterator texture = mImages.begin();
+    //     TexturePtrList::iterator end = mImages.end();
 
-        //FIXME add exception handling
-    }
+    //     // if (!images_bound && !mImages.empty()) {
+    //         for (; texture != end; texture++)
+    //         {
+    //             //std::cout << "IMAGE LOAD/STORE" << std::endl;
+    //             GL3PlusTexturePtr tex = texture->staticCast<GL3PlusTexture>();
+    //             //TODO This needs to be redone so that:
+    //             // * binding point (first parameter) and possibly other parameters come from shader
+    //             // * simple conversion of shader format to GLenum format
+    //             // * material scripts can create images
+    //             //OGRE_CHECK_GL_ERROR(glBindImageTexture(0, tex->getGLID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8));
+    //         }
+    //         // images_bound = true;
+    //     // }
+    // }
 }

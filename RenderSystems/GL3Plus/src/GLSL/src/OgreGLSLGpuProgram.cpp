@@ -108,7 +108,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLSLGpuProgram::bindProgram(void)
     {
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Tell the Program Pipeline Manager what pipeline is to become active
             switch (mType)
@@ -232,12 +232,13 @@ namespace Ogre {
         // Link can throw exceptions, ignore them at this point
         try
         {
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
                 // Pass on parameters from params to program object uniforms
                 programPipeline->updateUniformBlocks(params, mask, mType);
+                // programPipeline->updateShaderStorageBlock(params, mask, mType);
             }
             else
             {
@@ -256,7 +257,7 @@ namespace Ogre {
         // Link can throw exceptions, ignore them at this point
         try
         {
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
@@ -280,7 +281,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
     {
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Activate the program pipeline object
             GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();

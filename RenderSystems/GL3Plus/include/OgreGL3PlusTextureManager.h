@@ -56,12 +56,12 @@ namespace Ogre {
         bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
                                           bool preciseFormatOnly = false);
 
-        void bindImages();
+        // void bindImages();
 
-        TexturePtr createManual(const String & name, const String& group,
-                                TextureType texType, uint width, uint height, uint depth, int numMipmaps,
-                                PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
-                                uint fsaa, const String& fsaaHint);
+        /* TexturePtr createManual(const String & name, const String& group, */
+        /*                         TextureType texType, uint width, uint height, uint depth, int numMipmaps, */
+        /*                         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma,  */
+        /*                         uint fsaa, const String& fsaaHint); */
 
     protected:
         /// @copydoc ResourceManager::createImpl
@@ -77,10 +77,10 @@ namespace Ogre {
 
     private:
         /// Register a texture as an image texture used in image load/store.
-        void registerImage(TexturePtr texture);
+        // void registerImage(TexturePtr texture);
 
         /// Collection of textures associated with image load/store variables.
-        TexturePtrList mImages;
+        // TexturePtrList mImages;
     };
 }
 

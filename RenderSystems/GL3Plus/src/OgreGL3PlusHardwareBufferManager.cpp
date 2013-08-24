@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
+#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreRoot.h"
@@ -73,6 +74,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GL3PlusHardwareBufferManagerBase::~GL3PlusHardwareBufferManagerBase()
     {
+        mShaderStorageBuffers.clear();
+
         destroyAllDeclarations();
         destroyAllBindings();
 
@@ -115,6 +118,17 @@ namespace Ogre {
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf);
+        }
+        return HardwareUniformBufferSharedPtr(buf);
+    }
+
+    HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManagerBase::createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    {
+        GL3PlusHardwareShaderStorageBuffer* buf =
+            new GL3PlusHardwareShaderStorageBuffer(this, sizeBytes, usage, useShadowBuffer, name);
+        {
+            OGRE_LOCK_MUTEX(mUniformBuffersMutex);
+            mShaderStorageBuffers.insert(buf);
         }
         return HardwareUniformBufferSharedPtr(buf);
     }

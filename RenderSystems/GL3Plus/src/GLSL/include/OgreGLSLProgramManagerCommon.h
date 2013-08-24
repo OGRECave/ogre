@@ -48,7 +48,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgramManagerCommon
     {
     protected:
-        /// Active objects defining the active rendering gpu state
+        /// Active objects defining the active rendering GPU state.
         GLSLGpuProgram* mActiveVertexGpuProgram;
         GLSLGpuProgram* mActiveGeometryGpuProgram;
         GLSLGpuProgram* mActiveFragmentGpuProgram;
@@ -58,9 +58,9 @@ namespace Ogre {
 
         typedef map<String, GLenum>::type StringToEnumMap;
         StringToEnumMap mTypeEnumMap;
-        /// Use type to complete other information
+        /// Use type to complete other information.
         void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
-        /// Find where the data for a specific uniform should come from, populate
+        /// Find where the data for a specific uniform should come from, populate.
         bool completeParamSource(const String& paramName,
                                  const GpuConstantDefinitionMap* vertexConstantDefs,
                                  const GpuConstantDefinitionMap* geometryConstantDefs,
@@ -69,7 +69,7 @@ namespace Ogre {
                                  const GpuConstantDefinitionMap* domainConstantDefs,
                                  const GpuConstantDefinitionMap* computeConstantDefs,
                                  GLUniformReference& refToUpdate);
-        /// Find where the data for a specific atomic counter uniform should come from, populate
+        /// Find where the data for a specific atomic counter uniform should come from, populate.
         bool completeParamSource(const String& paramName,
                                  const GpuConstantDefinitionMap* vertexConstantDefs,
                                  const GpuConstantDefinitionMap* geometryConstantDefs,
@@ -106,9 +106,11 @@ namespace Ogre {
                              const GpuConstantDefinitionMap* hullConstantDefs,
                              const GpuConstantDefinitionMap* domainConstantDefs,
                              const GpuConstantDefinitionMap* computeConstantDefs,
-                             GLUniformReferenceList& list, 
-                             GLAtomicCounterReferenceList& counterList, 
-                             GLUniformBufferList& sharedList,
+                             GLUniformReferenceList& uniformList, 
+                             GLAtomicCounterReferenceList& counterList,
+                             GLUniformBufferList& uniformBufferList,
+                             SharedParamsBufferMap& sharedParamsBufferMap,
+                             //GLShaderStorageBufferList& shaderStorageBufferList,
                              GLCounterBufferList& counterBufferList);
         /** Populate a list of uniforms based on GLSL source.
             @param src Reference to the source code

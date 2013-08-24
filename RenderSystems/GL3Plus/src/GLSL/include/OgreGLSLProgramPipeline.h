@@ -56,47 +56,56 @@ namespace Ogre
     class _OgreGL3PlusExport GLSLProgramPipeline : public GLSLProgramCommon
     {
     public:
-        /// Constructor should only be used by GLSLProgramPipelineManager
+        /// Constructor should only be used by GLSLProgramPipelineManager.
         GLSLProgramPipeline(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
         virtual ~GLSLProgramPipeline();
 
         /// GL Program Pipeline Handle
         GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
 
-        /** Updates program pipeline object uniforms using named and indexed parameter data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindProgramParameters() just before rendering occurs.
+        /** Updates program pipeline object uniforms using named and
+            indexed parameter data from GpuProgramParameters.
+            normally called by GLSLGpuProgram::bindProgramParameters()
+            just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object atomic counter buffers using data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindProgramAtomicCounterParameters() just before rendering occurs.
+        /** Updates program object atomic counter buffers using data
+            from GpuProgramParameters.  Normally called by
+            GLSLGpuProgram::bindProgramAtomicCounterParameters() just
+            before rendering occurs.
         */
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object uniform blocks using shared parameter data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindProgramSharedParameters() just before rendering occurs.
+        /** Updates program object uniform blocks using shared
+            parameter data from GpuProgramParameters.  Normally called
+            by GLSLGpuProgram::bindProgramSharedParameters() just
+            before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program pipeline object uniforms using data from pass iteration GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindProgramPassIterationParameters() just before multi pass rendering occurs.
+        /** Updates program pipeline object uniforms using data from
+            pass iteration GpuProgramParameters.  Normally called by
+            GLSLGpuProgram::bindProgramPassIterationParameters() just
+            before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
 
-        /** Makes a program pipeline object active by making sure it is linked and then putting it in use.
+        /** Makes a program pipeline object active by making sure it
+            is linked and then putting it in use.
          */
         void activate(void);
 
-        /// Get the index of a non-standard attribute bound in the linked code
+        /// Get the index of a non-standard attribute bound in the linked code.
         virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
 
     protected:
-        /// GL handle for pipeline object
+        /// GL handle for pipeline object.
         GLuint mGLProgramPipelineHandle;
 
-        /// Compiles and links the separate programs
+        /// Compiles and links the separate programs.
         virtual void compileAndLink(void);
         void compileIndividualProgram(GLSLGpuProgram *program);
-        /// Put a program pipeline in use
+        /// Put a program pipeline in use.
         virtual void _useProgram(void);
-        /// Build uniform references from active named uniforms
+        /// Build uniform references from active named uniforms.
         virtual void buildGLUniformReferences(void);
     };
 }

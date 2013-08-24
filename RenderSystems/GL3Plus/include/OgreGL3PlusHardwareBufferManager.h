@@ -34,6 +34,7 @@
 
 namespace Ogre {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
+    //TODO Double check that this still holds.
 #       define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
 
     /** Implementation of HardwareBufferManager for OpenGL. */
@@ -43,6 +44,8 @@ namespace Ogre {
         char* mScratchBufferPool;
         OGRE_MUTEX(mScratchMutex);
         size_t mMapBufferThreshold;
+
+        UniformBufferList mShaderStorageBuffers;
 
     public:
         GL3PlusHardwareBufferManagerBase();
@@ -60,9 +63,19 @@ namespace Ogre {
         /// Create a uniform buffer
         HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                            bool useShadowBuffer, size_t binding, const String& name = "");
+
+        /// Create a shader storage buffer.
+        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                                 bool useShadowBuffer, const String& name = "");
+        /// Create a shader storage buffer.
+        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                                 bool useShadowBuffer, size_t binding, const String& name = "");
         /// Create a counter buffer
         HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                            bool useShadowBuffer, const String& name = "");
+        /// Create a counter buffer
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                           bool useShadowBuffer, size_t binding, const String& name = "");
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
@@ -93,6 +106,9 @@ namespace Ogre {
     /// GL3PlusHardwareBufferManagerBase as a Singleton
     class _OgreGL3PlusExport GL3PlusHardwareBufferManager : public HardwareBufferManager
     {
+    // protected:
+    //     UniformBufferList mShaderStorageBuffers;
+
     public:
     GL3PlusHardwareBufferManager()
         : HardwareBufferManager(OGRE_NEW GL3PlusHardwareBufferManagerBase())
@@ -101,14 +117,15 @@ namespace Ogre {
         }
         ~GL3PlusHardwareBufferManager()
         {
+            // mShaderStorageBuffers.clear();
             OGRE_DELETE mImpl;
         }
 
-        /// Utility function to get the correct GL usage based on HBU's
+        /// Utility function to get the correct GL usage based on HBU's.
         static GLenum getGLUsage(unsigned int usage)
         { return GL3PlusHardwareBufferManagerBase::getGLUsage(usage); }
 
-        /// Utility function to get the correct GL type based on VET's
+        /// Utility function to get the correct GL type based on VET's.
         static GLenum getGLType(unsigned int type)
         { return GL3PlusHardwareBufferManagerBase::getGLType(type); }
 
@@ -130,7 +147,7 @@ namespace Ogre {
             static_cast<GL3PlusHardwareBufferManagerBase*>(mImpl)->deallocateScratch(ptr);
         }
 
-        /** Threshold after which glMapBuffer is used and not glBufferSubData
+        /** Threshold after which glMapBuffer is used and not glBufferSubData.
          */
         size_t getGLMapBufferThreshold() const
         {
@@ -139,6 +156,13 @@ namespace Ogre {
         void setGLMapBufferThreshold( const size_t value )
         {
             static_cast<GL3PlusHardwareBufferManagerBase*>(mImpl)->setGLMapBufferThreshold(value);
+        }
+
+        /// Create a shader storage buffer.
+        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                                 bool useShadowBuffer, const String& name = "")
+        {
+            return static_cast<GL3PlusHardwareBufferManagerBase*>(mImpl)->createShaderStorageBuffer(sizeBytes, usage, useShadowBuffer, name);
         }
 
     };

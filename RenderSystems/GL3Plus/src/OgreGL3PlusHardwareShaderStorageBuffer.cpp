@@ -27,15 +27,15 @@
 */
 
 #include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGL3PlusHardwareUniformBuffer.h"
+#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
-    GL3PlusHardwareUniformBuffer::GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr,
-                                                               size_t bufferSize,
-                                                               HardwareBuffer::Usage usage,
-                                                               bool useShadowBuffer, const String& name)
+    GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer(HardwareBufferManagerBase* mgr,
+                                                                           size_t bufferSize,
+                                                                           HardwareBuffer::Usage usage,
+                                                                           bool useShadowBuffer, const String& name)
         : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -43,46 +43,46 @@ namespace Ogre {
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Cannot create GL uniform buffer",
-                        "GL3PlusHardwareUniformBuffer::GL3PlusHardwareUniformBuffer");
+                        "Cannot create GL shader storage buffer",
+                        "GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer");
         }
 
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, NULL,
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBufferData(GL_SHADER_STORAGE_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
 
-        //        std::cerr << "creating uniform buffer = " << mBufferId << std::endl;
+        //        std::cerr << "creating shader storage buffer = " << mBufferId << std::endl;
     }
 
-    GL3PlusHardwareUniformBuffer::~GL3PlusHardwareUniformBuffer()
+    GL3PlusHardwareShaderStorageBuffer::~GL3PlusHardwareShaderStorageBuffer()
     {
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
     }
 
-    void GL3PlusHardwareUniformBuffer::setGLBufferBinding(GLint binding)
+    void GL3PlusHardwareShaderStorageBuffer::setGLBufferBinding(GLint binding)
     {
         mBinding = binding;
 
-        // Attach the entire buffer to the UBO binding index.
-        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_UNIFORM_BUFFER, mBinding, mBufferId));
+        // Attach the buffer to the UBO binding
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, mBinding, mBufferId));
     }
 
-    void* GL3PlusHardwareUniformBuffer::lockImpl(size_t offset,
-                                                 size_t length,
-                                                 LockOptions options)
+    void* GL3PlusHardwareShaderStorageBuffer::lockImpl(size_t offset,
+                                                       size_t length,
+                                                       LockOptions options)
     {
         if (mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Invalid attempt to lock a uniform buffer that has already been locked",
-                        "GL3PlusHardwareUniformBuffer::lock");
+                        "Invalid attempt to lock a shader storage buffer that has already been locked",
+                        "GL3PlusHardwareShaderStorageBuffer::lock");
         }
 
         GLenum access = 0;
         void* retPtr = 0;
 
         // Use glMapBuffer
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
 
         if (mUsage & HBU_WRITE_ONLY)
         {
@@ -99,16 +99,17 @@ namespace Ogre {
         else
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
+        //FIXME Is this correct usage for shader storage buffers?
         access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
         void* pBuffer;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_UNIFORM_BUFFER, offset, length, access));
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, length, access));
 
         if(pBuffer == 0)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Uniform Buffer: Out of memory",
-                        "GL3PlusHardwareUniformBuffer::lock");
+                        "Shader Storage Buffer: Out of memory",
+                        "GL3PlusHardwareShaderStorageBuffer::lock");
         }
 
         // return offsetted
@@ -118,64 +119,64 @@ namespace Ogre {
         return retPtr;
     }
 
-    void GL3PlusHardwareUniformBuffer::unlockImpl(void)
+    void GL3PlusHardwareShaderStorageBuffer::unlockImpl(void)
     {
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
 
         if (mUsage & HBU_WRITE_ONLY)
         {
-            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_UNIFORM_BUFFER, mLockStart, mLockSize));
+            OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_SHADER_STORAGE_BUFFER, mLockStart, mLockSize));
         }
 
         GLboolean mapped;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_UNIFORM_BUFFER));
+        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER));
         if(!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Buffer data corrupted, please reload",
-                        "GL3PlusHardwareUniformBuffer::unlock");
+                        "GL3PlusHardwareShaderStorageBuffer::unlock");
         }
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0));
 
         mIsLocked = false;
     }
 
-    void GL3PlusHardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
+    void GL3PlusHardwareShaderStorageBuffer::readData(size_t offset, size_t length, void* pDest)
     {
         // Get data from the real buffer
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
 
-        OGRE_CHECK_GL_ERROR(glGetBufferSubData(GL_UNIFORM_BUFFER, offset, length, pDest));
+        //FIXME May not be implemented for GL_SHADER_STORAGE_BUFFER?
+        OGRE_CHECK_GL_ERROR(glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, length, pDest));
     }
 
-    void GL3PlusHardwareUniformBuffer::writeData(size_t offset,
-                                                 size_t length,
-                                                 const void* pSource,
-                                                 bool discardWholeBuffer)
+    void GL3PlusHardwareShaderStorageBuffer::writeData(size_t offset,
+                                                       size_t length,
+                                                       const void* pSource,
+                                                       bool discardWholeBuffer)
     {
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
 
         if (offset == 0 && length == mSizeInBytes)
         {
-            OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, pSource,
+            OGRE_CHECK_GL_ERROR(glBufferData(GL_SHADER_STORAGE_BUFFER, mSizeInBytes, pSource,
                                              GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
         }
         else
         {
             if(discardWholeBuffer)
             {
-                OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, NULL,
+                OGRE_CHECK_GL_ERROR(glBufferData(GL_SHADER_STORAGE_BUFFER, mSizeInBytes, NULL,
                                                  GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
             }
 
-            OGRE_CHECK_GL_ERROR(glBufferSubData(GL_UNIFORM_BUFFER, offset, length, pSource));
+            OGRE_CHECK_GL_ERROR(glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, length, pSource));
         }
     }
 
-    void GL3PlusHardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
-                                                size_t dstOffset, size_t length, bool discardWholeBuffer)
+    void GL3PlusHardwareShaderStorageBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
+                                                      size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
-        // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
             HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
@@ -183,26 +184,22 @@ namespace Ogre {
         else
         {
             // Unbind the current buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0));
 
             // Zero out this(destination) buffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
-            OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, length, 0, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, mBufferId));
+            OGRE_CHECK_GL_ERROR(glBufferData(GL_SHADER_STORAGE_BUFFER, length, 0, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0));
 
             // Do it the fast way.
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareUniformBuffer &>(srcBuffer).getGLBufferId()));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareShaderStorageBuffer &>(srcBuffer).getGLBufferId()));
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, mBufferId));
 
+            //FIXME Perhaps not implemented for shader storage buffers?
             OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
 
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, 0));
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
         }
     }
-
-    // void GL3PlusHardwareUniformBuffer::getOffsetMap(, void* pDest)
-    // {
-        
-    // }
 }

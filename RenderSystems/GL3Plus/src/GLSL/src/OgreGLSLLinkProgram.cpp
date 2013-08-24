@@ -278,7 +278,7 @@ namespace Ogre {
             // Do we know how many shared params there are yet? Or if there are any blocks defined?
             GLSLLinkProgramManager::getSingleton().extractUniforms(
                 mGLProgramHandle, vertParams, geomParams, fragParams, hullParams, domainParams, computeParams, 
-                mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mGLCounterBufferReferences);
+                mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
 
             mUniformRefsBuilt = true;
         }

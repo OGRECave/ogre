@@ -327,6 +327,7 @@ namespace Ogre {
         mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram( this ));
         // Shader params need to be forwarded to low level implementation
         mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
+        mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
     }
     //---------------------------------------------------------------------------
     void GLSLProgram::unloadImpl()

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
+#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 
@@ -73,6 +74,7 @@ namespace Ogre {
     typedef GLAtomicCounterReferenceList::iterator GLAtomicCounterReferenceIterator;
     typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
     typedef GLUniformBufferList::iterator GLUniformBufferIterator;
+    typedef map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr>::type SharedParamsBufferMap;
     typedef vector<HardwareCounterBufferSharedPtr>::type GLCounterBufferList;
     typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
@@ -88,6 +90,8 @@ namespace Ogre {
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
         /// Container of uniform buffer references that are active in the program object
         GLUniformBufferList mGLUniformBufferReferences;
+        /// Map of shared parameter blocks to uniform buffer references
+        SharedParamsBufferMap mSharedParamsBufferMap;
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
 

@@ -102,9 +102,15 @@ namespace Ogre {
         {
             gpt = GPT_COMPUTE_PROGRAM;
         }
-        else
+        else if (paramType->second == "fragment_program")
         {
             gpt = GPT_FRAGMENT_PROGRAM;
+        }
+        else 
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Unknown or unimplemented program type " + paramType->second,
+                        "GL3PlusGpuProgramManager::createImpl");
         }
 
         return (iter->second)(this, name, handle, group, isManual,

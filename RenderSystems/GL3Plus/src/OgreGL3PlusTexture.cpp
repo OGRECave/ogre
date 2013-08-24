@@ -76,7 +76,7 @@ namespace Ogre {
 
     GLenum GL3PlusTexture::getGL3PlusTextureTarget(void) const
     {
-        switch(mTextureType)
+        switch (mTextureType)
         {
         case TEX_TYPE_1D:
             return GL_TEXTURE_1D;
@@ -104,7 +104,7 @@ namespace Ogre {
         // Check requested number of mipmaps
         size_t maxMips = GL3PlusPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
 
-        if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
+        if (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;
 
         mNumMipmaps = mNumRequestedMipmaps;
@@ -118,7 +118,7 @@ namespace Ogre {
         // Calculate size for all mip levels of the texture
         size_t width, height, depth;
 
-        if((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
+        if ((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
             // Standard alignment of 4 is not right for some formats
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         }
@@ -140,21 +140,21 @@ namespace Ogre {
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
         // Set up texture swizzling
-        if(mGLSupport.checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
+        if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE));
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
 
-            if(mFormat == PF_BYTE_LA)
+            if (mFormat == PF_BYTE_LA)
             {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN));
             }
-            else if(mFormat == PF_L8 || mFormat == PF_L16)
+            else if (mFormat == PF_L8 || mFormat == PF_L16)
             {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
@@ -233,15 +233,15 @@ namespace Ogre {
                     break;
                 };
 
-                if(width > 1)
+                if (width > 1)
                 {
                     width = width / 2;
                 }
-                if(height > 1)
+                if (height > 1)
                 {
                     height = height / 2;
                 }
-                if(depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 {
                     depth = depth / 2;
                 }
@@ -249,7 +249,7 @@ namespace Ogre {
         }
         else
         {
-            if(mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
+            if (mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
             {
                 switch(mTextureType)
                 {
@@ -339,7 +339,7 @@ namespace Ogre {
                     {
                         height = height / 2;
                     }
-                    if(depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                     {
                         depth = depth / 2;
                     }
@@ -386,7 +386,7 @@ namespace Ogre {
 
         LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
 
-        if(mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D ||
+        if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D ||
            mTextureType == TEX_TYPE_2D_RECT || mTextureType == TEX_TYPE_2D_ARRAY || mTextureType == TEX_TYPE_3D)
         {
             doImageIO(mName, mGroup, ext, *loadedImages, this);
@@ -396,12 +396,12 @@ namespace Ogre {
             if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
                 mTextureType = TEX_TYPE_CUBE_MAP;
             // If this is a volumetric texture set the texture type flag accordingly.
-            if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+            if ((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
-            if(getSourceFileType() == "dds")
+            if (getSourceFileType() == "dds")
             {
                 // XX HACK there should be a better way to specify whether
                 // all faces are in the same file or not
@@ -537,6 +537,72 @@ namespace Ogre {
     {
         if (name == "GLID")
             *static_cast<GLuint*>(pData) = mTextureID;
+    }
+    
+    void GL3PlusTexture::createShaderAccessPoint(uint bindPoint, TextureAccess access, 
+                                                 int mipmapLevel, int textureArrayIndex, 
+                                                 PixelFormat* format)
+    {
+        GLenum GlAccess;
+
+        switch (access)
+        {
+        case TA_READ:
+            GlAccess = GL_READ_ONLY;
+            break;
+        case TA_WRITE:
+            GlAccess = GL_WRITE_ONLY;
+            break;
+        case TA_READ_WRITE:
+            GlAccess = GL_READ_WRITE;
+            break;
+        default:
+            //TODO error handling
+            break;
+        }
+
+        if (!format) format = &mFormat;
+        GLenum GlFormat = GL3PlusPixelUtil::getClosestGLImageInternalFormat(*format);
+
+        GLboolean isArrayTexture;
+
+        switch(mTextureType)
+        {
+        case TEX_TYPE_2D_ARRAY:
+            isArrayTexture = GL_TRUE;
+            break;
+        default:
+            isArrayTexture = GL_FALSE;
+            break;
+        }
+
+        // TODO
+        // * add memory barrier
+        // * material script access (can have multiple instances for a single texture_unit)
+        //     shader_access <binding point> [<access>] [<mipmap level>] [<texture array layer>] [<format>]
+        //     shader_access 2 read_write 0 0 PF_UINT32_R
+        //   binding point - location to bind for shader access; for OpenGL this must be unique and is not related to texture binding point
+        //   access - give the shader read, write, or read_write privileges [default read_write]
+        //   mipmap level - texture mipmap level to use [default 0]
+        //   texture array layer - layer of texture array to use: 'all', or layer number (if not layered, just use 0) [default 0]
+        //   format - texture format to be read in shader; for OpenGL this may be different than bound texture format - not sure about DX11 [default same format as texture]
+        //   Note that for OpenGL the shader access (image) binding point 
+        //   must be specified, it is NOT the same as the texture binding point,
+        //   and it must be unique among textures in this pass.
+        // * enforce binding point uniqueness by checking against 
+        //   image binding point allocation list in GL3PlusTextureManager
+        // * generalize for other render systems by introducing vitual method in Texture 
+        // for (image in mImages)
+        // {
+        // OGRE_CHECK_GL_ERROR(
+        //     glBindImageTexture(
+        //         mImageBind, mTextureID, 
+        //         mMipmapLevel, 
+        //         mLayered.find('all') != str::npos ? GL_TRUE : GL_FALSE, mLayer,
+        //         mImageAccess (READ, WRITE, READ_WRITE), 
+        //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE 
+        OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
+        // }
     }
 
 }
