@@ -129,7 +129,9 @@ namespace Ogre {
     {
         detectFBOFormats();
 
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
+        GLsizei numBuffers = 1;
+        
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(numBuffers, &mTempFBO));
     }
 
     GL3PlusFBOManager::~GL3PlusFBOManager()
@@ -139,42 +141,48 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.");
         }
 
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
+        GLsizei numBuffers = 1;
+
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(numBuffers, &mTempFBO));
     }
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
-        glGenFramebuffers(1, &fb);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &fb));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb));
         if (fmt != GL_NONE)
         {
             if (tid)
-                glDeleteTextures(1, &tid);
+                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
 
             // Create and attach texture
-            glGenTextures(1, &tid);
-            glBindTexture(GL_TEXTURE_2D, tid);
+            OGRE_CHECK_GL_ERROR(glGenTextures(1, &tid));
+            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tid));
 
             // Set some default parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0);
+            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0));
 
-            if(ogreFormat == PF_DEPTH)
-                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0);
+            if (ogreFormat == PF_DEPTH)
+            {
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0));
+            }
             else
-                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0);
+            {
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0));
+            }
         }
         else
         {
             // Draw to nowhere -- stencil/depth only
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+            OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_NONE));
+            OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
         }
     }
 
@@ -186,49 +194,49 @@ namespace Ogre {
     {
         GLuint status, depthRB = 0, stencilRB = 0;
 
-        if(depthFormat != GL_NONE)
+        if (depthFormat != GL_NONE)
         {
             // Generate depth renderbuffer
-            glGenRenderbuffers(1, &depthRB);
+            OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &depthRB));
 
             // Bind it to FBO
-            glBindRenderbuffer(GL_RENDERBUFFER, depthRB);
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, depthRB));
 
             // Allocate storage for depth buffer
-            glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
-                                  PROBE_SIZE, PROBE_SIZE);
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
+                                                      PROBE_SIZE, PROBE_SIZE));
 
             // Attach depth
-            glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRB);
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRB));
         }
 
-        if(stencilFormat != GL_NONE)
+        if (stencilFormat != GL_NONE)
         {
             // Generate stencil renderbuffer
-            glGenRenderbuffers(1, &stencilRB);
+            OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &stencilRB));
             // Bind it to FBO
-            glBindRenderbuffer(GL_RENDERBUFFER, stencilRB);
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, stencilRB));
 
             // Allocate storage for stencil buffer
-            glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE);
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE));
 
             // Attach stencil
-            glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                      GL_RENDERBUFFER, stencilRB);
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                          GL_RENDERBUFFER, stencilRB));
         }
 
         status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 
         // If status is negative, clean up
         // Detach and destroy
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
 
         if (depthRB)
-            glDeleteRenderbuffers(1, &depthRB);
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &depthRB));
 
         if (stencilRB)
-            glDeleteRenderbuffers(1, &stencilRB);
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &stencilRB));
 
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
@@ -242,28 +250,28 @@ namespace Ogre {
         GLuint packedRB;
 
         // Generate renderbuffer
-        glGenRenderbuffers(1, &packedRB);
+        OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &packedRB));
 
         // Bind it to FBO
-        glBindRenderbuffer(GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, packedRB));
 
         // Allocate storage for buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, packedFormat, PROBE_SIZE, PROBE_SIZE);
+        OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, packedFormat, PROBE_SIZE, PROBE_SIZE));
 
         // Attach depth
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                  GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                                      GL_RENDERBUFFER, packedRB));
 
         // Attach stencil
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                  GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                      GL_RENDERBUFFER, packedRB));
 
         GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 
         // Detach and destroy
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glDeleteRenderbuffers(1, &packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &packedRB));
 
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
@@ -336,12 +344,12 @@ namespace Ogre {
                             {
                                 // There is a small edge case that FBO is trashed during the test
                                 // on some drivers resulting in undefined behavior
-                                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                                glDeleteFramebuffers(1, &fb);
+                                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+                                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
                                 // Workaround for NVIDIA / Linux 169.21 driver problem
                                 // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                                glFinish();
+                                OGRE_CHECK_GL_ERROR(glFinish());
 
                                 _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                             }
@@ -363,12 +371,12 @@ namespace Ogre {
                         {
                             // There is a small edge case that FBO is trashed during the test
                             // on some drivers resulting in undefined behavior
-                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                            glDeleteFramebuffers(1, &fb);
+                            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+                            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
                             // Workaround for NVIDIA / Linux 169.21 driver problem
                             // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                            glFinish();
+                            OGRE_CHECK_GL_ERROR(glFinish());
 
                             _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                         }
@@ -378,12 +386,12 @@ namespace Ogre {
             }
 
             // Delete texture and framebuffer
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-            glDeleteFramebuffers(1, &fb);
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
             if (fmt != GL_NONE)
             {
-                glDeleteTextures(1, &tid);
+                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
                 tid = 0;
             }
         }
