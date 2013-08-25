@@ -84,6 +84,28 @@ public:
 
 	/// @copydoc ProgressiveMeshGeneratorBase::generateLodLevels
 	void generateLodLevels(LodConfig& lodConfig);
+
+	/**
+	 * @brief Returns the last reduced vertex.
+	 *
+	 * You should call this function after generateLodLevels!
+	 *
+	 * @param outVec The vector receiving the position of the vertex.
+	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
+	 */
+	bool _getLastVertexPos(Vector3& outVec);
+
+	/**
+	 * @brief Returns the destination of the edge, which was last reduced.
+	 *
+	 * You should call this function after generateLodLevels!
+	 *
+	 * @param outVec The vector receiving the CollapseTo position.
+	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
+	 */
+	bool _getLastVertexCollapseTo(Vector3& outVec);
+
+	MeshPtr _generateConvexHull(const String& meshName, int step);
 protected:
 
 	// VectorSet is basically a helper to use a vector as a small set container.
@@ -239,6 +261,7 @@ protected:
 	Real mMeshBoundingSphereRadius;
 	Real mCollapseCostLimit;
 	bool mUseVertexNormals;
+	PMVertex* mLastReducedVertex;
 	Real mOutsideWeight;
 	Real mOutsideWalkAngle;
 

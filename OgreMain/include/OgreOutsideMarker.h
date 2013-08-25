@@ -49,6 +49,8 @@ public:
 	 */
 	OutsideMarker(ProgressiveMeshGenerator::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle, int step);
 	void markOutside(); /// Mark vertices, which are visible from outside.
+	MeshPtr createConvexHullMesh(const String& meshName,
+		const String& resourceGroupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME); /// Returns a mesh containing the Convex Hull shape.
 
 private:
 	typedef ProgressiveMeshGenerator::PMVertex CHVertex;
@@ -64,6 +66,7 @@ private:
 	typedef std::vector<CHTriangle*> CHTrianglePList;
 	typedef std::vector<std::pair<CHVertex*, CHVertex*> > CHEdgeList;
 
+	const Real mEpsilon; /// Amount of allowed floating point error if 4 vertices are on the same plane.
 	CHTriangleList mHull; /// Contains the current triangles of the convex hull.
 	CHTrianglePList mVisibleTriangles; /// Temporary vector for addVisibleEdges function (prevent allocation every call).
 	CHEdgeList mEdges; /// Temporary vector for the horizon edges, when inserting a new vertex into the hull.
@@ -88,6 +91,11 @@ private:
 	void markVertices(); /// if we have the convex hull, this will walk on the faces which have less then 90 degree difference.
 	template<typename T>
 	void addHullTriangleVertices(std::vector<CHVertex*>& stack, T tri); /// Add triangle to stack (called from markVertices only).
+	/// Determines whether ptarget is on the same side of the p0-p1 line as p2. Assuming each point is on the same plane.
+	Real pointToLineDir(const Vector3& ptarget, const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& n);
+	bool isInsideTriangle(const Vector3& ptarget, const CHTriangle& tri); /// Whether the vertex is inside the triangle. We assume that it is on the same plane
+	bool isInsideLine(const Vector3& ptarget, const Vector3& p0, const Vector3& p1); /// Whether ptarget is between p0 and p1. Assuming they are on the same line.
+	bool isSamePosition(const Vector3& p0, const Vector3& p1); /// Whether p0 = p1 with mEpsilon allowed float error.
 };
 }
 

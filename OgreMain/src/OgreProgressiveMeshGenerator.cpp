@@ -862,8 +862,8 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
 		for (; neededVertexCount < vertexCount; vertexCount--) {
 			CollapseCostHeap::iterator nextVertex = mCollapseCostHeap.begin();
 			if (nextVertex != mCollapseCostHeap.end() && nextVertex->first < mCollapseCostLimit) {
-				PMVertex* vertex = nextVertex->second;
-				collapse(vertex);
+				mLastReducedVertex = nextVertex->second;
+				collapse(mLastReducedVertex);
 			} else {
 				break;
 			}
@@ -1416,6 +1416,33 @@ void ProgressiveMeshGenerator::cleanupMemory()
 	this->mUniqueVertexSet.clear();
 	this->mVertexList.clear();
 	this->mTriangleList.clear();
+	mLastReducedVertex = NULL;
+}
+
+bool ProgressiveMeshGenerator::_getLastVertexPos(Vector3& outVec)
+{
+	if(mLastReducedVertex){
+		outVec = mLastReducedVertex->position;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool ProgressiveMeshGenerator::_getLastVertexCollapseTo( Vector3& outVec )
+{
+	if(mLastReducedVertex){
+		outVec = mLastReducedVertex->collapseTo->position;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+Ogre::MeshPtr ProgressiveMeshGenerator::_generateConvexHull(const String& meshName, int step)
+{
+	OutsideMarker outsideMarker(mVertexList, mMeshBoundingSphereRadius, mOutsideWalkAngle, step);
+	return outsideMarker.createConvexHullMesh(meshName);
 }
 
 bool ProgressiveMeshGenerator::PMVertexEqual::operator() (const PMVertex* lhs, const PMVertex* rhs) const

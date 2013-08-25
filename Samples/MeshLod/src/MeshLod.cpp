@@ -10,6 +10,9 @@ using namespace OgreBites;
 #include "OgreMeshSerializer.h"
 
 Sample_MeshLod::Sample_MeshLod() :
+#if SHOW_MESH_HULL
+	mHullEntity(0),
+#endif
 	mMeshEntity(0)
 {
 	mInfo["Title"] = "Mesh Lod";
@@ -31,7 +34,10 @@ void Sample_MeshLod::setupContent()
 
 	// create a node for the model
 	mMeshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-
+#if SHOW_MESH_HULL
+	mHullNode = mMeshNode->createChildSceneNode();
+	mHullNode->scale(1.001,1.001,1.001);
+#endif
 	PMInjector::getSingleton().setInjectorListener(this);
 
 	// setup gui
@@ -79,6 +85,8 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
 	// Basic options:
 	mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "chkShowWireframe", "Show wireframe", 200);
 	mUseVertexNormals = mTrayMgr->createCheckBox(TL_TOPLEFT, "chkUseVertexNormals", "Use vertex normals", 200);
+	mOutsideWeightSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldOutsideWeight", "Weighten outside", 200, 50, 0, 100, 101);
+	mOutsideWalkAngle = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldOutsideWalkAngle", "Outside angle", 200, 50, -1, 1, 201);
 	mReductionSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldReductionValue", "Reduced vertices", 200, 50, 0, 100, 101);
 	mTrayMgr->createButton(TL_TOPLEFT, "btnReduceMore","Reduce More");
 	mTrayMgr->createButton(TL_TOPLEFT, "btnReduceLess","Reduce Less");
@@ -134,6 +142,8 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 
 	size_t vertexCount = getUniqueVertexCount(mLodConfig.mesh);
 	mReductionSlider->setRange(0,vertexCount,vertexCount+1,false);
+	mOutsideWeightSlider->setValue(0, false);
+	mOutsideWalkAngle->setValue(0, false);
 	mLodLevelList->clearItems();
 	mWorkLevel.distance = std::numeric_limits<Real>::max();
 	mWorkLevel.reductionMethod = LodLevel::VRM_CONSTANT;
@@ -143,6 +153,8 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 
 	if(mLodLevelList->getNumItems() > 0){
 		loadLodLevel(mLodLevelList->getSelectionIndex());
+	} else {
+		loadUserLod();
 	}
 }
 
@@ -172,6 +184,8 @@ bool Sample_MeshLod::loadConfig()
 	}
 
 	mUseVertexNormals->setChecked(mLodConfig.advanced.useVertexNormals, false);
+	mOutsideWeightSlider->setValue(std::sqrt(mLodConfig.advanced.outsideWeight), false);
+	mOutsideWalkAngle->setValue(mLodConfig.advanced.outsideWalkAngle, false);
 	return true;
 }
 
@@ -208,8 +222,8 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 	mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
 	// Remove outdated Lod requests to reduce delay.
 	PMWorker::getSingleton().clearPendingLodRequests();
-	QueuedProgressiveMeshGenerator pm; // Threaded
-	//ProgressiveMeshGenerator pm; // Non-threaded
+	//QueuedProgressiveMeshGenerator pm; // Threaded
+	ProgressiveMeshGenerator pm; // Non-threaded
 	if(!useWorkLod){
 		pm.generateLodLevels(mLodConfig);
 		forceLodLevel(-1);
@@ -220,6 +234,7 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 		pm.generateLodLevels(config);
 		forceLodLevel(1);
 	}
+	getUniqueVertexCount(mLodConfig.mesh);
 }
 void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
@@ -235,6 +250,16 @@ void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 }
 size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 {
+#if SHOW_MESH_HULL
+	const String meshName("ConvexHull.mesh");
+	if(mHullEntity){
+		mHullNode->detachObject(mHullEntity);
+		mSceneMgr->destroyEntity(mHullEntity);
+		// Removes from the resources list.
+		MeshManager::getSingleton().remove(meshName);
+		mHullEntity = NULL;
+	}
+#endif
 	// The vertex buffer contains the same vertex position multiple times.
 	// To get the count of the vertices, which has unique positions, we can use progressive mesh.
 	// It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
@@ -248,6 +273,10 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 	lodConfig.levels.push_back(lodLevel);
 	ProgressiveMeshGenerator pm;
 	pm.generateLodLevels(lodConfig);
+#if SHOW_MESH_HULL
+	mHullEntity = mSceneMgr->createEntity(pm._generateConvexHull(meshName, (int)mWorkLevel.reductionValue - 1));
+	mHullNode->attachObject(mHullEntity);
+#endif
 	return lodConfig.levels[0].outUniqueVertexCount;
 }
 
@@ -378,7 +407,7 @@ void Sample_MeshLod::addToProfile( Real cost )
 		int size = mLodConfig.advanced.profile.size();
 		for(int i=0;i<size;i++){
 			ProfiledEdge& v = mLodConfig.advanced.profile[i];
-			if(v.src == pv.src && v.dst == pv.src){
+			if(v.src == pv.src && v.dst == pv.dst){
 				v.cost = cost;
 				mProfileList->selectItem(i, false);
 				loadUserLod();
@@ -421,12 +450,19 @@ void Sample_MeshLod::itemSelected( SelectMenu* menu )
 	}
 }
 
-void Sample_MeshLod::sliderMoved( Slider* slider )
+void Sample_MeshLod::sliderMoved(Slider* slider)
 {
 	if (slider->getName() == "sldReductionValue") {
 		mWorkLevel.reductionValue = slider->getValue();
 		loadUserLod();
+	} else if (slider->getName() == "sldOutsideWeight") {
+		mLodConfig.advanced.outsideWeight = (mOutsideWeightSlider->getValue() * mOutsideWeightSlider->getValue()) / 10000;
+		loadUserLod();
+	} else if (slider->getName() == "sldOutsideWalkAngle") {
+		mLodConfig.advanced.outsideWalkAngle = mOutsideWalkAngle->getValue();
+		loadUserLod();
 	}
+	
 }
 
 void Sample_MeshLod::buttonHit( Button* button )

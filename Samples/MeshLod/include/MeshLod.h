@@ -6,6 +6,8 @@
 #include "OgreLodConfig.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
+#define SHOW_MESH_HULL 0
+
 class _OgreSampleClassExport Sample_MeshLod :
 	public OgreBites::SdkSample,
 	public Ogre::PMInjectorListener
@@ -60,6 +62,10 @@ protected:
 	Ogre::LodConfig mLodConfig; /// Current LodConfig, which we are editing.
 	Ogre::Entity* mMeshEntity; /// Entity of the mesh.
 	Ogre::SceneNode* mMeshNode; /// Node of the mesh.
+#if SHOW_MESH_HULL
+	Ogre::Entity* mHullEntity; /// Entity of the mesh hull.
+	Ogre::SceneNode* mHullNode; /// Node of the mesh hull.
+#endif
 
 // GUI elements:
 	OgreBites::CheckBox* mUseVertexNormals;
@@ -67,6 +73,8 @@ protected:
 	OgreBites::SelectMenu* mProfileList;
 	OgreBites::SelectMenu* mLodLevelList;
 	OgreBites::Slider* mReductionSlider;
+	OgreBites::Slider* mOutsideWeightSlider;
+	OgreBites::Slider* mOutsideWalkAngle;
 	OgreBites::Label* mDistanceLabel;
 };
 

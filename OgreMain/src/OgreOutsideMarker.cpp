@@ -38,6 +38,7 @@ namespace Ogre
 OutsideMarker::OutsideMarker(ProgressiveMeshGenerator::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle, int step) :
 	mVertexListOrig(vertexList),
 	mWalkAngle(walkAngle),
+	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0), // How much floating point math error you have for equal values. This may depend on compiler flags.
 	mStep(step)
 {
 	assert(!vertexList.empty());
@@ -146,7 +147,7 @@ void OutsideMarker::initHull()
 	}
 
 	// Volume should be bigger than 0, so that we can guarantee that the centroid point is inside the hull
-	assert(getTetrahedronVolume(vertex[0], vertex[1], vertex[2], vertex[3]) > 0);
+	assert(getTetrahedronVolume(vertex[0], vertex[1], vertex[2], vertex[3]) > mEpsilon);
 	// Centroid = (a + b + c + d) / 4
 	mCentroid = vertex[0]->position + vertex[1]->position + vertex[2]->position + vertex[3]->position;
 	mCentroid /= 4.0f;
@@ -241,7 +242,18 @@ void OutsideMarker::getVisibleTriangles( const CHVertex* target, CHTrianglePList
 		}
 		Real dot1 = it->normal.dotProduct(it->vertex[0]->position);
 		Real dot2 = it->normal.dotProduct(target->position);
-		if (dot1 < dot2) {
+		if(std::abs(dot2 - dot1) <= mEpsilon) {
+			//Special case: The vertex is on the plane of the triangle
+			//mVisibleTriangles.push_back(&*it);
+			if (isInsideTriangle(target->position, *it)) {
+				// Vertex is inside of a convex hull triangle.
+				mVisibleTriangles.clear();
+				return;
+			} else {
+				// If the vertex is outside, then we should add it to the hull.
+				visibleTriangles.push_back(&*it);
+			}
+		} else if (dot1 < dot2) {
 			visibleTriangles.push_back(&*it);
 		}
 	}
@@ -257,6 +269,85 @@ void OutsideMarker::addEdge(CHEdgeList& edges, CHVertex* a, CHVertex* b)
 	} else {
 		edges.push_back(CHEdgeList::value_type(b, a));
 	}
+}
+
+bool OutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle& tri){
+
+	// The idea is that if all angle is smaller to that point, than it should be inside.
+	// NOTE: We assume that the vertex is on the triangle plane!
+
+	const Vector3& p0 = tri.vertex[0]->position;
+	const Vector3& p1 = tri.vertex[1]->position;
+	const Vector3& p2 = tri.vertex[2]->position;
+	const Vector3& n = tri.normal;
+
+	bool b0, b1, b2;
+	Real d0, d1, d2;
+
+	// It should not contain malformed triangles!
+	assert(!isSamePosition(p0, p1) && !isSamePosition(p1, p2) && !isSamePosition(p2, p0));
+
+	{
+		d0 = pointToLineDir(ptarget, p0, p1, p2, n);
+		if (std::abs(d0) <= mEpsilon){
+			//Vertex is on the edge, so we need to compare length.
+			return isInsideLine(ptarget, p0, p1);
+		}
+		b0 = d0 < 0.0f;
+	}
+
+	{
+		d1 = pointToLineDir(ptarget, p1, p2, p0, n);
+		if (std::abs(d1) <= mEpsilon){
+			//Vertex is on the edge, so we need to compare length.
+			return isInsideLine(ptarget, p1, p2);
+		}
+		b1 = d1 < 0.0f;
+	}
+
+	if (b0 != b1) {
+		return false;
+	}
+
+	{
+		d2 = pointToLineDir(ptarget, p2, p0, p1, n);
+		if (std::abs(d2) <= mEpsilon){
+			//Vertex is on the edge, so we need to compare length.
+			return isInsideLine(ptarget, p2, p0);
+		}
+		b2 = d2 < 0.0f;
+	}
+
+	return (b1 == b2);
+}
+
+bool OutsideMarker::isSamePosition( const Vector3& p0, const Vector3& p1 )
+{
+	return (std::abs(p0.x - p1.x) <= mEpsilon && std::abs(p0.y - p1.y) <= mEpsilon && std::abs(p0.z - p1.z) <= mEpsilon);
+}
+
+Real OutsideMarker::pointToLineDir(const Vector3& ptarget, const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& n)
+{
+	return n.crossProduct(p1 - p0).dotProduct(ptarget - p0);
+}
+
+bool OutsideMarker::isInsideLine( const Vector3& ptarget, const Vector3& p0, const Vector3& p1 )
+{
+	// This function returns whether ptarget is between p0 and p1.
+	// It is outside if:
+	// -the dir vector is in the opposite direction
+	// -the length is smaller.
+	// -ptarget is not p0 or p1
+	// NOTE: We assume that the 3 points are on the same line!
+
+	Vector3 v1 = p1 - p0;
+	Vector3 v2 = ptarget - p0;
+	Real len1 = v1.squaredLength();
+	Real len2 = v2.squaredLength();
+	Real dot = v1.dotProduct(v2);
+	return isSamePosition(ptarget, p1) || (
+		dot > 0.0 // Same direction
+		&& len1 > len2); // Shorter
 }
 
 void OutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horizon)
@@ -341,6 +432,100 @@ void OutsideMarker::cleanHull()
 	}
 	end++;
 	mHull.resize(end);
+}
+
+Ogre::MeshPtr OutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
+{
+	// Based on the wiki sample: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Generating+A+Mesh
+
+	// Resource with given name should not exist!
+	assert(MeshManager::getSingleton().getByName(meshName).isNull());
+
+	generateHull(); // calculate mHull triangles.
+
+	// Convex hull can't be empty!
+	assert(!mHull.empty());
+
+	MeshPtr mesh = MeshManager::getSingleton().createManual(meshName, resourceGroupName, NULL);
+	SubMesh* subMesh = mesh->createSubMesh();
+
+	vector<Real>::type vertexBuffer;
+	vector<unsigned short>::type indexBuffer;
+	// 3 position/triangle * 3 Real/position
+	vertexBuffer.reserve(mHull.size() * 9);
+	// 3 index / triangle
+	indexBuffer.reserve(mHull.size() * 3);
+	int id=0;
+	// min & max position
+	Vector3 minBounds(std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max());
+	Vector3 maxBounds(std::numeric_limits<Real>::min(), std::numeric_limits<Real>::min(), std::numeric_limits<Real>::min());
+
+	for (size_t i = 0; i < mHull.size(); i++) {
+		assert(!mHull[i].removed);
+		for(size_t n = 0; n < 3; n++){
+			indexBuffer.push_back(id++);
+			vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
+			vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
+			vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
+			minBounds.x = std::min(minBounds.x, mHull[i].vertex[n]->position.x);
+			minBounds.y = std::min(minBounds.y, mHull[i].vertex[n]->position.y);
+			minBounds.z = std::min(minBounds.z, mHull[i].vertex[n]->position.z);
+			maxBounds.x = std::max(maxBounds.x, mHull[i].vertex[n]->position.x);
+			maxBounds.y = std::max(maxBounds.y, mHull[i].vertex[n]->position.y);
+			maxBounds.z = std::max(maxBounds.z, mHull[i].vertex[n]->position.z);
+		}
+	}
+
+	/// Create vertex data structure for 8 vertices shared between submeshes
+	mesh->sharedVertexData = new VertexData();
+	mesh->sharedVertexData->vertexCount = mHull.size() * 3;
+
+	/// Create declaration (memory format) of vertex data
+	VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
+	size_t offset = 0;
+	// 1st buffer
+	decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
+	offset += VertexElement::getTypeSize(VET_FLOAT3);
+
+	/// Allocate vertex buffer of the requested number of vertices (vertexCount) 
+	/// and bytes per vertex (offset)
+	HardwareVertexBufferSharedPtr vbuf = 
+		HardwareBufferManager::getSingleton().createVertexBuffer(
+		offset, mesh->sharedVertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	/// Upload the vertex data to the card
+	vbuf->writeData(0, vbuf->getSizeInBytes(), &vertexBuffer[0], true);
+
+	/// Set vertex buffer binding so buffer 0 is bound to our vertex buffer
+	VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding; 
+	bind->setBinding(0, vbuf);
+
+	/// Allocate index buffer of the requested number of vertices (ibufCount) 
+	HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+		createIndexBuffer(
+		HardwareIndexBuffer::IT_16BIT, 
+		indexBuffer.size(), 
+		HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+	/// Upload the index data to the card
+	ibuf->writeData(0, ibuf->getSizeInBytes(), &indexBuffer[0], true);
+
+	/// Set parameters of the submesh
+	subMesh->useSharedVertices = true;
+	subMesh->indexData->indexBuffer = ibuf;
+	subMesh->indexData->indexCount = indexBuffer.size();
+	subMesh->indexData->indexStart = 0;
+
+	/// Set bounding information (for culling)
+	mesh->_setBounds(AxisAlignedBox(minBounds, maxBounds));
+	mesh->_setBoundingSphereRadius(maxBounds.distance(minBounds) / 2.0f);
+
+	/// Set material to transparent blue
+	subMesh->setMaterialName("Examples/TransparentBlue50");
+
+	/// Notify -Mesh object that it has been loaded
+	mesh->load();
+
+	return mesh;
 }
 
 template<typename T>
