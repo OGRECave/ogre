@@ -29,10 +29,12 @@
 #ifndef __QueuedProgressiveMeshGenerator_H_
 #define __QueuedProgressiveMeshGenerator_H_
 
+#include "OgrePrerequisites.h"
 #include "OgreProgressiveMeshGenerator.h"
 #include "OgreSingleton.h"
 #include "OgreWorkQueue.h"
 #include "OgreFrameListener.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {

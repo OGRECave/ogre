@@ -47,6 +47,7 @@
 #include "OgreLodStrategy.h"
 #include "OgreLogManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreOutsideMarker.h"
 
 namespace Ogre
 {
@@ -175,6 +176,18 @@ void ProgressiveMeshGenerator::initialize(LodConfig& lodConfig)
 	mSharedVertexLookup.clear();
 	mVertexLookup.clear();
 	mUniqueVertexSet.clear();
+
+	ProgressiveMeshGenerator::VertexList::iterator v, vEnd;
+	v = mVertexList.begin();
+	vEnd = mVertexList.end();
+	for (;v != vEnd; v++) {
+		v->isOuterWallVertex = false;
+	}
+
+	if(mOutsideWeight != 0.0) {
+		OutsideMarker outsideMarker(mVertexList, lodConfig.advanced.outsideWalkAngle, mMeshBoundingSphereRadius, (int)lodConfig.levels[0].reductionValue);
+		outsideMarker.markOutside();
+	}
 }
 
 void ProgressiveMeshGenerator::PMTriangle::computeNormal()
@@ -223,8 +236,6 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 			vNormal = vStart;
 		}  else {
 			vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
-			assert(vNormalBuf->getSizeInBytes() == vbuf->getSizeInBytes());
-			assert(vNormalBuf->getVertexSize() == vbuf->getVertexSize());
 			vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
 		}
 		vNormSize = vNormalBuf->getVertexSize();
@@ -253,6 +264,7 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 			v->costHeapPosition = mCollapseCostHeap.end();
 #endif
 			v->seam = false;
+			v->isInsideHull = false;
 			v->hasProfile = false;
 		}
 		lookup.push_back(v);
@@ -575,7 +587,7 @@ void ProgressiveMeshGenerator::initVertexCollapseCost(PMVertex* vertex)
 	computeVertexCollapseCost(vertex, collapseCost, collapseTo);
 
 	vertex->collapseTo = collapseTo;
-	vertex->costHeapPosition = mCollapseCostHeap.insert(std::make_pair(collapseCost, vertex));
+	vertex->costHeapPosition = mCollapseCostHeap.insert(CollapseCostHeap::value_type(collapseCost, vertex));
 }
 
 void ProgressiveMeshGenerator::updateVertexCollapseCost(PMVertex* vertex)
@@ -590,7 +602,7 @@ void ProgressiveMeshGenerator::updateVertexCollapseCost(PMVertex* vertex)
 		mCollapseCostHeap.erase(vertex->costHeapPosition);
 		if (collapseCost != UNINITIALIZED_COLLAPSE_COST) {
 			vertex->collapseTo = collapseTo;
-			vertex->costHeapPosition = mCollapseCostHeap.insert(std::make_pair(collapseCost, vertex));
+			vertex->costHeapPosition = mCollapseCostHeap.insert(CollapseCostHeap::value_type(collapseCost, vertex));
 		} else {
 #if OGRE_DEBUG_MODE
 			vertex->collapseTo = NULL;
@@ -751,7 +763,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 		}
 	}
 
-	Real diff = src->normal.dotProduct(dst->normal) / 8.0;
+	Real diff = src->normal.dotProduct(dst->normal) / 8.0f;
 	Real dist = src->position.distance(dst->position);
 	cost = cost * dist;
 	if(mUseVertexNormals){
@@ -768,6 +780,16 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 			normalCost = std::max(normalCost, std::max(diff, std::abs(beforeDot - afterDot)) * std::max((Real)(afterDist/8.0), std::max(dist, std::abs(beforeDist - afterDist))));
 		}
 		cost = std::max(normalCost * 0.25f, cost);
+	}
+
+	if(src->isOuterWallVertex || dst->isOuterWallVertex) {
+		if(mOutsideWeight != 0.0f) {
+			if(mOutsideWeight != 1.0f) {
+				cost *= std::max(0.0078125f, mOutsideWeight * 8.0f);
+			} else {
+				return NEVER_COLLAPSE_COST;
+			}
+		}
 	}
 
 	OgreAssert(cost >= 0, "");
@@ -810,6 +832,8 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	}
 	lodConfig.strategy->assertSorted(values);
 #endif
+	mOutsideWeight = lodConfig.advanced.outsideWeight;
+	mOutsideWalkAngle = lodConfig.advanced.outsideWalkAngle;
 	mMesh = lodConfig.mesh;
 	mUseVertexNormals = lodConfig.advanced.useVertexNormals;
 	mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
@@ -838,8 +862,8 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
 		for (; neededVertexCount < vertexCount; vertexCount--) {
 			CollapseCostHeap::iterator nextVertex = mCollapseCostHeap.begin();
 			if (nextVertex != mCollapseCostHeap.end() && nextVertex->first < mCollapseCostLimit) {
-				mLastReducedVertex = nextVertex->second;
-				collapse(mLastReducedVertex);
+				PMVertex* vertex = nextVertex->second;
+				collapse(vertex);
 			} else {
 				break;
 			}
@@ -1392,30 +1416,7 @@ void ProgressiveMeshGenerator::cleanupMemory()
 	this->mUniqueVertexSet.clear();
 	this->mVertexList.clear();
 	this->mTriangleList.clear();
-	mLastReducedVertex = NULL;
 }
-
-bool ProgressiveMeshGenerator::_getLastVertexPos(Vector3& outVec)
-{
-	if(mLastReducedVertex){
-		outVec = mLastReducedVertex->position;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool ProgressiveMeshGenerator::_getLastVertexCollapseTo( Vector3& outVec )
-{
-	if(mLastReducedVertex){
-		outVec = mLastReducedVertex->collapseTo->position;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-
 
 bool ProgressiveMeshGenerator::PMVertexEqual::operator() (const PMVertex* lhs, const PMVertex* rhs) const
 {

@@ -34,9 +34,12 @@
 #include "OgreSmallVector.h"
 #include "OgreMesh.h"
 #include "OgreLodConfig.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
+
+class OutsideMarker;
 
 class _OgreExport ProgressiveMeshGeneratorBase
 {
@@ -74,31 +77,13 @@ class _OgreExport ProgressiveMeshGenerator :
 {
 public:
 
+	friend class Ogre::OutsideMarker;
+
 	ProgressiveMeshGenerator();
 	virtual ~ProgressiveMeshGenerator();
 
 	/// @copydoc ProgressiveMeshGeneratorBase::generateLodLevels
 	void generateLodLevels(LodConfig& lodConfig);
-
-	/**
-	 * @brief Returns the last reduced vertex.
-	 *
-	 * You should call this function after generateLodLevels!
-	 *
-	 * @param outVec The vector receiving the position of the vertex.
-	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
-	 */
-	bool _getLastVertexPos(Vector3& outVec);
-
-	/**
-	 * @brief Returns the destination of the edge, which was last reduced.
-	 *
-	 * You should call this function after generateLodLevels!
-	 *
-	 * @param outVec The vector receiving the CollapseTo position.
-	 * @return Whether the outVec was changed. If the mesh is reduced at least 1 vertex, then it returns true.
-	 */
-	bool _getLastVertexCollapseTo(Vector3& outVec);
 protected:
 
 	// VectorSet is basically a helper to use a vector as a small set container.
@@ -182,6 +167,9 @@ protected:
 		PMVertex* collapseTo;
 		bool seam;
 		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
+		bool isOuterWallVertex;
+		bool isOuterWallVertexInPass;
+		bool isInsideHull;
 	};
 
 	struct _OgrePrivate PMTriangleCache {
@@ -251,7 +239,8 @@ protected:
 	Real mMeshBoundingSphereRadius;
 	Real mCollapseCostLimit;
 	bool mUseVertexNormals;
-	PMVertex* mLastReducedVertex;
+	Real mOutsideWeight;
+	Real mOutsideWalkAngle;
 
 	size_t calcLodVertexCount(const LodLevel& lodConfig);
 	void tuneContainerSize();
@@ -294,6 +283,10 @@ protected:
 	PMTriangle* isDuplicateTriangle(PMTriangle* triangle);
 	int getTriangleID(PMTriangle* triangle);
 	void cleanupMemory();
+
+	void markOuterWall();
+	void markOuterWallForHullTriangle();
+	void addHullTriangleVertices(std::vector<PMVertex*>& stack, PMTriangle* tri);
 };
 
 }

@@ -120,10 +120,14 @@ struct LodConfig {
 	struct Advanced {
 		bool useCompression;
 		bool useVertexNormals;
+		Ogre::Real outsideWeight;
+		Ogre::Real outsideWalkAngle;
 		LodProfile profile;
 		Advanced() :
 			useCompression(true),
-			useVertexNormals(true)
+			useVertexNormals(true),
+			outsideWeight(0.0),
+			outsideWalkAngle(0.0)
 		{ }
 	} advanced;
 
