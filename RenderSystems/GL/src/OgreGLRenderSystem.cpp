@@ -293,7 +293,7 @@ namespace Ogre {
 				if (arbUnits > units)
 					units = arbUnits;
 			}
-			rsc->setNumTextureUnits(units);
+			rsc->setNumTextureUnits(std::min<ushort>(16, units));
 		}
 		else
 		{

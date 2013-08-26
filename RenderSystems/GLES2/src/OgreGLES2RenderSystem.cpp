@@ -212,7 +212,7 @@ namespace Ogre {
         // Multitexturing support and set number of texture units
         GLint units;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
-        rsc->setNumTextureUnits(units);
+        rsc->setNumTextureUnits(std::min<ushort>(16, units));
 
         // Check for hardware stencil support and set bit depth
         GLint stencil;

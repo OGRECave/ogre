@@ -264,7 +264,7 @@ namespace Ogre {
         // Multitexturing support and set number of texture units
         GLint units;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
-        rsc->setNumTextureUnits(units);
+        rsc->setNumTextureUnits(std::min<ushort>(16, units));
 
         // Check for Anisotropy support
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
