@@ -341,9 +341,6 @@ void SceneManager::destroyCamera(Camera *cam)
 	if ( camLightIt != mShadowCamLightMapping.end() )
 		mShadowCamLightMapping.erase( camLightIt );
 
-	// Notify render system
-    mDestRenderSystem->_notifyCameraRemoved( cam );
-
 	IdString camName( cam->getName() );
 
 	itor = efficientVectorRemove( mCameras, itor );
@@ -1067,12 +1064,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 				if (shadowTexIndex < mShadowTextures.size())
 				{
 					shadowTex = getShadowTexture(shadowTexIndex);
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 					// Hook up projection frustum
 					Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
 					// Enable projective texturing if fixed-function, but also need to
 					// disable it explicitly for program pipeline.
 					pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
 					mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
+#endif
 				}
 				else
 				{
@@ -2853,6 +2852,7 @@ void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
 	RenderQueueGroup* pGroup, 
 	QueuedRenderableCollection::OrganisationMode om)
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     /* For each light, we need to render all the solids from each group, 
     then do the modulative shadows, then render the transparents from
     each group.
@@ -2986,13 +2986,14 @@ void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
 			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
     }// for each priority
-
+#endif
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
 	RenderQueueGroup* pGroup, 
 	QueuedRenderableCollection::OrganisationMode om)
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 	RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 	LightList lightList;
 
@@ -3118,7 +3119,7 @@ void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
 			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
 	}// for each priority
-
+#endif
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
@@ -3587,9 +3588,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 										pass->getTextureUnitState(tuindex));
 								const TexturePtr& shadowTex = mShadowTextures[shadowTexIndex];
 								tu->_setTexturePtr(shadowTex);
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 								Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
 								tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
 								mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
+#endif
 								++numShadowTextureLights;
 								++shadowTexIndex;
 								// Have to set TU on rendersystem right now, although
@@ -4315,10 +4318,12 @@ bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)
     RenderQueueListenerList::iterator i, iend;
     bool skip = false;
 
+	RenderQueue *rq = getRenderQueue();
+
     iend = mRenderQueueListeners.end();
     for (i = mRenderQueueListeners.begin(); i != iend; ++i)
     {
-        (*i)->renderQueueStarted(id, invocation, skip);
+		(*i)->renderQueueStarted( rq, id, invocation, skip );
     }
     return skip;
 }
@@ -6355,7 +6360,7 @@ void SceneManager::ensureShadowTexturesCreated()
 			if (shadowRTT->getNumViewports() == 0)
 			{
 				// Note camera assignment is transient when multiple SMs
-				Viewport *v = shadowRTT->addViewport(cam);
+				Viewport *v = shadowRTT->addViewport();
 				// remove overlays
 				v->setOverlaysEnabled(false);
 			}
@@ -6535,7 +6540,9 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 				Viewport *shadowView = shadowRTT->getViewport(0);
 				Camera *texCam = *ci;
 				// rebind camera, incase another SM in use which has switched to its cam
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 				shadowView->setCamera(texCam);
+#endif
 
 				// Associate main view camera as LOD camera
 				texCam->setLodCamera(cam);
@@ -6563,7 +6570,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 				fireShadowTexturesPreCaster(light, texCam, j);
 
 				// Update target
-				shadowRTT->update();
+				//shadowRTT->update();
 
 				++si; // next shadow texture
 				++ci; // next camera

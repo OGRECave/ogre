@@ -2025,8 +2025,11 @@ namespace Ogre
 		mFSAA = fsaa;		
 	}
 	//---------------------------------------------------------------------
+	//!!!!!! TODO: (dark_sylinc) Do this at workspace level (compositor) !!!!!!!!
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     void D3D9RenderTexture::update(bool swap)
     {
+		
 		D3D9DeviceManager* deviceManager = D3D9RenderSystem::getDeviceManager();       	
 		D3D9Device* currRenderWindowDevice = deviceManager->getActiveRenderTargetDevice();
 
@@ -2050,6 +2053,7 @@ namespace Ogre
 			}
 		}
 	}
+#endif
 	//---------------------------------------------------------------------
 	void D3D9RenderTexture::getCustomAttribute( const String& name, void *pData )
 	{

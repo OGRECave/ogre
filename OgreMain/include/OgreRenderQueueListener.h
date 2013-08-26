@@ -77,9 +77,9 @@ namespace Ogre {
 			rendered. Note that in this case the renderQueueEnded event will not be raised
 			for this queue group.
         */
-        virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation)
-        { (void)queueGroupId; (void)invocation; (void)skipThisInvocation; }
+        virtual void renderQueueStarted( RenderQueue *rq, uint8 queueGroupId, const String& invocation, 
+										 bool& skipThisInvocation)
+        { (void)rq; (void)queueGroupId; (void)invocation; (void)skipThisInvocation; }
 
         /** Event raised after a queue group is rendered. 
         @remarks

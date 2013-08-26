@@ -133,29 +133,6 @@ namespace Ogre {
 		*/
 		virtual void _detachDepthBuffer();
 
-        /** Tells the target to update it's contents.
-            @remarks
-                If OGRE is not running in an automatic rendering loop
-                (started using Root::startRendering),
-                the user of the library is responsible for asking each render
-                target to refresh. This is the method used to do this. It automatically
-                re-renders the contents of the target using whatever cameras have been
-                pointed at it (using Camera::setRenderTarget).
-            @par
-                This allows OGRE to be used in multi-windowed utilities
-                and for contents to be refreshed only when required, rather than
-                constantly as with the automatic rendering loop.
-			@param swapBuffers For targets that support double-buffering, if set 
-				to true, the target will immediately
-				swap it's buffers after update. Otherwise, the buffers are
-				not swapped, and you have to call swapBuffers yourself sometime
-				later. You might want to do this on some rendersystems which 
-				pause for queued rendering commands to complete before accepting
-				swap buffers calls - so you could do other CPU tasks whilst the 
-				queued commands complete. Or, you might do this if you want custom
-				control over your windows, such as for externally created windows.
-        */
-        virtual void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
             @remarks
                 For targets that are double-buffered so that no

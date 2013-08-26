@@ -260,8 +260,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void OverlayManager::_queueOverlaysForRendering(Camera* cam, 
-        RenderQueue* pQueue, Viewport* vp)
+    void OverlayManager::_queueOverlaysForRendering( RenderQueue* pQueue, Viewport* vp )
     {
         bool orientationModeChanged = false;
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
@@ -296,7 +295,7 @@ namespace Ogre {
                 o->scroll(0.f, 0.f);
             }
 #endif
-            o->_findVisibleObjects(cam, pQueue);
+            o->_findVisibleObjects( (Camera*)(0), pQueue );
         }
     }
     //---------------------------------------------------------------------

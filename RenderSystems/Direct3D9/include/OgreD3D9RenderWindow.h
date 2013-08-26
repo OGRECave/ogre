@@ -81,13 +81,14 @@ namespace Ogre
 		
 
 		/// @copydoc RenderTarget::_beginUpdate
-		void _beginUpdate();
+		virtual void _beginUpdate();
 	
-		/// @copydoc RenderTarget::_updateViewport(Viewport* viewport, bool updateStatistics)
-		void _updateViewport(Viewport* viewport, bool updateStatistics = true);
+		/// @copydoc RenderTarget::_updateViewport
+		virtual void _updateViewport( Viewport* viewport, Camera *camera, uint8 firstRq, uint8 lastRq,
+										bool updateStatistics );
 
 		/// @copydoc RenderTarget::_endUpdate
-		void _endUpdate();
+		virtual void _endUpdate();
 
 		/// Accessor for render surface
 		IDirect3DSurface9* getRenderSurface();

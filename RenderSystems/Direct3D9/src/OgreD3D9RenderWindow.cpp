@@ -441,7 +441,7 @@ namespace Ogre
 			// Notify viewports of resize
 			ViewportList::iterator it = mViewportList.begin();
 			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();	
+				(*it++)->_updateDimensions();	
 		}
 	} 
 
@@ -830,11 +830,12 @@ namespace Ogre
 		RenderWindow::_beginUpdate();
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderWindow::_updateViewport(Viewport* viewport, bool updateStatistics)
+	void D3D9RenderWindow::_updateViewport( Viewport* viewport, Camera *camera, uint8 firstRq,
+											uint8 lastRq, bool updateStatistics )
 	{
 		if (mDeviceValid)
 		{
-			RenderWindow::_updateViewport(viewport, updateStatistics);
+			RenderWindow::_updateViewport( viewport, camera, firstRq, lastRq, updateStatistics );
 		}
 	}
 	//---------------------------------------------------------------------
@@ -924,7 +925,7 @@ namespace Ogre
 			// Notify viewports of resize
 			ViewportList::iterator it = mViewportList.begin();
 			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();			
+				(*it++)->_updateDimensions();			
 		}	
 
 	}

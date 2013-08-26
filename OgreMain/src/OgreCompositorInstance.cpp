@@ -230,7 +230,7 @@ public:
 
 		if(mQuadFarCorners)
 		{
-			const Ogre::Vector3 *corners = vp->getCamera()->getWorldSpaceCorners();
+			/*const Ogre::Vector3 *corners = vp->getCamera()->getWorldSpaceCorners();
 			if(mQuadFarCornersViewSpace)
 			{
 				const Ogre::Matrix4 &viewMat = vp->getCamera()->getViewMatrix(true);
@@ -239,7 +239,7 @@ public:
 			else
 			{
 				rect->setNormals(corners[5], corners[6], corners[4], corners[7]);
-			}
+			}*/
 		}
 
 		// Queue passes from mat
@@ -712,7 +712,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
                     }
                     
                     RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-                    rt->setAutoUpdated(false);
+                    //rt->setAutoUpdated(false);
                     mrt->bindSurface(atch, rt);
                     
                     // Also add to local textures so we can look up
@@ -758,12 +758,12 @@ void CompositorInstance::createResources(bool forResizeOnly)
 		rendTarget->setDepthBufferPool( def->depthBufferId );
         
         /// Set up viewport over entire texture
-        rendTarget->setAutoUpdated( false );
+        //rendTarget->setAutoUpdated( false );
         
 		// We may be sharing / reusing this texture, so test before adding viewport
 		if (rendTarget->getNumViewports() == 0)
 		{
-			Viewport* v;
+			/*Viewport* v;
 			Camera* camera = mChain->getViewport()->getCamera();
 			if (!camera)
 			{
@@ -787,7 +787,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
             
 			v->setClearEveryFrame( false );
 			v->setOverlaysEnabled( false );
-			v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );
+			v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );*/
 		}
     }
     
@@ -1259,7 +1259,7 @@ void CompositorInstance::_fireNotifyResourcesCreated(bool forResizeOnly)
 void CompositorInstance::notifyCameraChanged(Camera* camera)
 {
 	// update local texture's viewports.
-	LocalTextureMap::iterator localTexIter = mLocalTextures.begin();
+	/*LocalTextureMap::iterator localTexIter = mLocalTextures.begin();
 	LocalTextureMap::iterator localTexIterEnd = mLocalTextures.end();
 	while (localTexIter != localTexIterEnd)
 	{
@@ -1280,7 +1280,7 @@ void CompositorInstance::notifyCameraChanged(Camera* camera)
 		MultiRenderTarget* target = localMRTIter->second;
 		target->getViewport(0)->setCamera(camera);
 		++localMRTIter;
-	}
+	}*/
 }
 //-----------------------------------------------------------------------
 CompositorInstance::RenderSystemOperation::~RenderSystemOperation()

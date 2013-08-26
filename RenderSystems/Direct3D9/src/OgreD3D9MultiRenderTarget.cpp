@@ -98,6 +98,8 @@ namespace Ogre
 		checkAndUpdate();
 	}
 
+	//!!!!!! TODO: (dark_sylinc) Do this at workspace level (compositor) !!!!!!!!
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     void D3D9MultiRenderTarget::update(bool swapBuffers)
     {     
 		D3D9DeviceManager* deviceManager = D3D9RenderSystem::getDeviceManager();       	
@@ -119,10 +121,11 @@ namespace Ogre
 					deviceManager->setActiveRenderTargetDevice(device);
 					MultiRenderTarget::update(swapBuffers);
 					deviceManager->setActiveRenderTargetDevice(NULL);
-				}								
+				}
 			}
 		}		
     }
+#endif
 
 	void D3D9MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
     {

@@ -272,7 +272,6 @@ void Compositor::createGlobalTextures()
 							def->hwGammaWrite && !PixelUtil::isFloatingPoint(*p), def->fsaa); 
 					
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-					rt->setAutoUpdated(false);
 					mrt->bindSurface(atch, rt);
 
 					// Also add to local textures so we can look up

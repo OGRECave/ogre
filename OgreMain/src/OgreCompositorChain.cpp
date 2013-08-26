@@ -47,8 +47,8 @@ CompositorChain::CompositorChain(Viewport *vp):
 	mAnyCompositorsEnabled(false)
 {
 	assert(vp);
-	mOldClearEveryFrameBuffers = vp->getClearBuffers();
-	vp->addListener(this);
+	//mOldClearEveryFrameBuffers = vp->getClearBuffers();
+	//vp->addListener(this);
 
 	createOriginalScene();
 	vp->getTarget()->addListener(this);
@@ -66,7 +66,7 @@ void CompositorChain::destroyResources(void)
 	if (mViewport)
 	{
 		mViewport->getTarget()->removeListener(this);
-		mViewport->removeListener(this);
+		//mViewport->removeListener(this);
 		removeAllCompositors();
 		destroyOriginalScene();
 
@@ -288,7 +288,7 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
 	/// target Rendertarget will not yet have been set as current. 
 	/// ( RenderSystem::setViewport(...) ) if it would have been, the rendering
 	/// order would be screwed up and problems would arise with copying rendertextures.
-	Camera *cam = mViewport->getCamera();
+	/*Camera *cam = mViewport->getCamera();
 	if (cam)
 	{
 		cam->getSceneManager()->_setActiveCompositorChain(this);
@@ -306,16 +306,16 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
         preTargetOperation(*i, i->target->getViewport(0), cam);
         i->target->update();
         postTargetOperation(*i, i->target->getViewport(0), cam);
-    }
+    }*/
 }
 //-----------------------------------------------------------------------
 void CompositorChain::postRenderTargetUpdate(const RenderTargetEvent& evt)
 {
-	Camera *cam = mViewport->getCamera();
+	/*Camera *cam = mViewport->getCamera();
 	if (cam)
 	{
 		cam->getSceneManager()->_setActiveCompositorChain(0);
-	}
+	}*/
 }
 //-----------------------------------------------------------------------
 void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
@@ -327,7 +327,7 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
 	// set original scene details from viewport
 	CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPass(0);
 	CompositionTargetPass* passParent = pass->getParent();
-	if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
+	/*if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
 		pass->getClearColour() != mViewport->getBackgroundColour() ||
 		pass->getClearDepth() != mViewport->getDepthClear() ||
 		passParent->getVisibilityMask() != mViewport->getVisibilityMask() ||
@@ -344,12 +344,12 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
 		_compile();
 	}
 
-	Camera *cam = mViewport->getCamera();
+	/*Camera *cam = mViewport->getCamera();
 	if (cam)
 	{
 		/// Prepare for output operation
 		preTargetOperation(mOutputOperation, mViewport, cam);
-	}
+	}*/
 }
 //-----------------------------------------------------------------------
 void CompositorChain::preTargetOperation(CompositorInstance::TargetOperation &op, Viewport *vp, Camera *cam)
@@ -408,18 +408,18 @@ void CompositorChain::postViewportUpdate(const RenderTargetViewportEvent& evt)
     if(evt.source != mViewport || !mAnyCompositorsEnabled)
         return;
 
-	Camera *cam = mViewport->getCamera();
-	postTargetOperation(mOutputOperation, mViewport, cam);
+	/*Camera *cam = mViewport->getCamera();
+	postTargetOperation(mOutputOperation, mViewport, cam);*/
 }
 //-----------------------------------------------------------------------
 void CompositorChain::viewportCameraChanged(Viewport* viewport)
 {
-	Camera* camera = viewport->getCamera();
+	/*Camera* camera = viewport->getCamera();
 	size_t count = mInstances.size();
 	for (size_t i = 0; i < count; ++i)
 	{
 		mInstances[i]->notifyCameraChanged(camera);
-	}
+	}*/
 }
 //-----------------------------------------------------------------------
 void CompositorChain::viewportDimensionsChanged(Viewport* viewport)
@@ -474,9 +474,9 @@ void CompositorChain::_compile()
     CompositorInstance *lastComposition = mOriginalScene;
 	mOriginalScene->mPreviousInstance = 0;
 	CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPass(0);
-	pass->setClearBuffers(mViewport->getClearBuffers());
+	/*pass->setClearBuffers(mViewport->getClearBuffers());
 	pass->setClearColour(mViewport->getBackgroundColour());
-	pass->setClearDepth(mViewport->getDepthClear());
+	pass->setClearDepth(mViewport->getDepthClear());*/
     for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
     {
         if((*i)->getEnabled())
@@ -502,15 +502,15 @@ void CompositorChain::_compile()
 		if (mAnyCompositorsEnabled)
 		{
 			// Save old viewport clearing options
-			mOldClearEveryFrameBuffers = mViewport->getClearBuffers();
+			//mOldClearEveryFrameBuffers = mViewport->getClearBuffers();
 			// Don't clear anything every frame since we have our own clear ops
-			mViewport->setClearEveryFrame(false);
+			//mViewport->setClearEveryFrame(false);
 		}
 		else
 		{
 			// Reset clearing options
-			mViewport->setClearEveryFrame(mOldClearEveryFrameBuffers > 0, 
-				mOldClearEveryFrameBuffers);
+			/*mViewport->setClearEveryFrame(mOldClearEveryFrameBuffers > 0, 
+				mOldClearEveryFrameBuffers);*/
 		}
 	}
 
@@ -531,7 +531,7 @@ Viewport *CompositorChain::getViewport()
     return mViewport;
 }
 //-----------------------------------------------------------------------
-void CompositorChain::RQListener::renderQueueStarted(uint8 id, 
+void CompositorChain::RQListener::renderQueueStarted( RenderQueue *rq, uint8 id, 
 	const String& invocation, bool& skipThisQueue)
 {
 	// Skip when not matching viewport

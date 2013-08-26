@@ -204,7 +204,8 @@ namespace Ogre {
         public:
             /** @copydoc RenderQueueListener::renderQueueStarted
             */
-            virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);
+            virtual void renderQueueStarted( RenderQueue *rq, uint8 queueGroupId,
+											 const String& invocation, bool& skipThisInvocation );
             /** @copydoc RenderQueueListener::renderQueueEnded
             */
             virtual void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation);

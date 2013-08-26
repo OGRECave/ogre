@@ -124,7 +124,7 @@ namespace Ogre {
         OverlayMapIterator getOverlayIterator(void);
 
         /** Internal method for queueing the visible overlays for rendering. */
-        void _queueOverlaysForRendering(Camera* cam, RenderQueue* pQueue, Viewport *vp);
+        void _queueOverlaysForRendering( RenderQueue* pQueue, Viewport *vp );
 
         /** Method for determining if the viewport has changed dimensions. 
         @remarks This is used by pixel-based OverlayElements to work out if they need to
