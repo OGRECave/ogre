@@ -1402,14 +1402,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	} // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
-	// Clear the viewport if required
-	if (mCurrentViewport->getClearEveryFrame())
-	{
-		mDestRenderSystem->clearFrameBuffer(
-			mCurrentViewport->getClearBuffers(), 
-			mCurrentViewport->getBackgroundColour(),
-			mCurrentViewport->getDepthClear() );
-	}        
+
     // Begin the frame
     mDestRenderSystem->_beginFrame();
 
@@ -1582,14 +1575,7 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 	} // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
-	// Clear the viewport if required
-	if (mCurrentViewport->getClearEveryFrame())
-	{
-		mDestRenderSystem->clearFrameBuffer(
-			mCurrentViewport->getClearBuffers(), 
-			mCurrentViewport->getBackgroundColour(),
-			mCurrentViewport->getDepthClear() );
-	}        
+
     // Begin the frame
     mDestRenderSystem->_beginFrame();
 
@@ -6370,13 +6356,9 @@ void SceneManager::ensureShadowTexturesCreated()
 			{
 				// Note camera assignment is transient when multiple SMs
 				Viewport *v = shadowRTT->addViewport(cam);
-				v->setClearEveryFrame(true);
 				// remove overlays
 				v->setOverlaysEnabled(false);
 			}
-
-			// Don't update automatically - we'll do it when required
-			shadowRTT->setAutoUpdated(false);
 
 			// Also create corresponding Material used for rendering this shadow
 			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
@@ -6576,9 +6558,6 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 					mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam, j);
 				else
 					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam, j);
-
-				// Setup background colour
-				shadowView->setBackgroundColour(ColourValue::White);
 
 				// Fire shadow caster update, callee can alter camera settings
 				fireShadowTexturesPreCaster(light, texCam, j);

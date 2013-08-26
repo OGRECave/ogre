@@ -755,11 +755,11 @@ namespace Ogre {
     {
         // Retrieve the current viewport from the scene manager.
         // The viewport is only valid during a viewport update.
-        Viewport *currentViewport = sm->getCurrentViewport();
-        if( !currentViewport )
+        Camera *cameraInProgress = sm->getCameraInProgress();
+        if( !cameraInProgress )
             return false;
 
-        updateVertexBuffer(currentViewport->getCamera());
+        updateVertexBuffer( cameraInProgress );
         return true;
     }
 	//-----------------------------------------------------------------------

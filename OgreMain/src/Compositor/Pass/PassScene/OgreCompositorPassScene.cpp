@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreViewport.h"
+#include "OgreRenderTarget.h"
 #include "OgreMovableObject.h"
 
 namespace Ogre
@@ -65,7 +66,14 @@ namespace Ogre
 	void CompositorPassScene::execute()
 	{
 		assert( mDefinition->mVisibilityMask & MovableObject::LAYER_VISIBILITY );
+		if( mDefinition->mBeginRtUpdate )
+			mTarget->_beginUpdate();
+
 		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
-		mCamera->_renderScene( mViewport, mDefinition->mFirstRQ, mDefinition->mLastRQ,  true );
+		mTarget->_updateViewport( mViewport, mCamera, mDefinition->mFirstRQ,
+									mDefinition->mLastRQ, true );
+
+		if( mDefinition->mEndRtUpdate )
+			mTarget->_endUpdate();
 	}
 }

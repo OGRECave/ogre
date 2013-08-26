@@ -175,7 +175,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::_update(void)
+	void CompositorManager2::_update( bool swapFinalTargets, bool waitForVSync )
 	{
 		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
 		WorkspaceVec::const_iterator end  = mWorkspaces.end();
@@ -187,16 +187,31 @@ namespace Ogre
 			{
 				if( workspace->isValid() )
 				{
-					workspace->_update();
+					workspace->_update( swapFinalTargets, waitForVSync );
 				}
 				else
 				{
 					//TODO: We may end up recreating this every frame for invalid workspaces
 					workspace->revalidateAllNodes();
 					if( workspace->isValid() )
-						workspace->_update();
+						workspace->_update( swapFinalTargets, waitForVSync );
 				}
 			}
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::_swapAllFinalTargets( bool waitForVSync )
+	{
+		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
+		WorkspaceVec::const_iterator end  = mWorkspaces.end();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() && workspace->isValid() )
+				workspace->_swapFinalTarget( waitForVSync );
+
 			++itor;
 		}
 	}

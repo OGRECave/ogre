@@ -68,20 +68,25 @@ namespace Ogre
 	*/
 	class _OgreExport CompositorPassDef : public CompositorInstAlloc
 	{
-		friend class CompositorPass;
 		CompositorPassType	mPassType;
-
+	public:
 		/// Viewport's region to draw
 		float				mVpLeft;
 		float				mVpTop;
 		float				mVpWidth;
 		float				mVpHeight;
 
+		/// True if a previous pass doesn't alter the contents of the same render target we do
+		bool				mBeginRtUpdate;
+		/// End if we're the last consecutive pass to alter the contents of the same render target
+		bool				mEndRtUpdate;
+
 	public:
 		CompositorPassDef( CompositorPassType passType ) :
 			mPassType( passType ),
 			mVpLeft( 0 ), mVpTop( 0 ),
-			mVpWidth( 1 ), mVpHeight( 1 ) {}
+			mVpWidth( 1 ), mVpHeight( 1 ),
+			mBeginRtUpdate( true ), mEndRtUpdate( true ) {}
 		CompositorPassType getType() const				{ return mPassType; }
 	};
 

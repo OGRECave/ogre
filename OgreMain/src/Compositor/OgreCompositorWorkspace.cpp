@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNode.h"
 
 #include "OgreSceneManager.h"
+#include "OgreRenderTarget.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
@@ -231,7 +232,7 @@ namespace Ogre
 		return mSceneManager->findCamera( cameraName );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspace::_update(void)
+	void CompositorWorkspace::_update( bool swapFinalTargets, bool waitForVSync )
 	{
 		CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
 		CompositorNodeVec::const_iterator end  = mNodeSequence.end();
@@ -242,5 +243,14 @@ namespace Ogre
 			node->_update();
 			++itor;
 		}
+
+		if( swapFinalTargets && mRenderWindow )
+			mRenderWindow->swapBuffers( waitForVSync );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::_swapFinalTarget( bool waitForVSync )
+	{
+		if( mRenderWindow )
+			mRenderWindow->swapBuffers( waitForVSync );
 	}
 }

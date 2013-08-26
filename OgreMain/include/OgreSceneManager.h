@@ -3357,6 +3357,10 @@ namespace Ogre {
 			valid during viewport update. */
 		Viewport* getCurrentViewport(void) const { return mCurrentViewport; }
 
+		/** Gets the current camera being rendered (advanced use only, only 
+			valid during viewport update. */
+		Camera* getCameraInProgress(void) const		{ return mCameraInProgress; }
+
 		/** Returns a visibility boundary box for a specific camera. */
 		const VisibleObjectsBoundsInfo& getVisibleObjectsBoundsInfo(const Camera* cam) const;
 

@@ -60,7 +60,6 @@ namespace Ogre
 	typedef vector<DepthBuffer*>::type DepthBufferVec;
 	typedef map< uint16, DepthBufferVec >::type DepthBufferMap;
 	typedef map< String, RenderTarget * >::type RenderTargetMap;
-	typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
 
 	class TextureManager;
 	/// Enum describing the ways to generate texture coordinates
@@ -1284,12 +1283,6 @@ namespace Ogre
 		*/
 		virtual void _notifyCameraRemoved(const Camera* cam);
 
-		/** Internal method for updating all render targets attached to this rendering system. */
-		virtual void _updateAllRenderTargets(bool swapBuffers = true);
-		/** Internal method for swapping all the buffers on all render targets,
-		if _updateAllRenderTargets was called with a 'false' parameter. */
-		virtual void _swapAllRenderTargetBuffers(bool waitForVsync = true);
-
 		/** Sets whether or not vertex windings set should be inverted; this can be important
 		for rendering reflections. */
 		virtual void setInvertVertexWinding(bool invert);
@@ -1517,8 +1510,6 @@ namespace Ogre
 
 		/** The render targets. */
 		RenderTargetMap mRenderTargets;
-		/** The render targets, ordered by priority. */
-		RenderTargetPriorityMap mPrioritisedRenderTargets;
 		/** The Active render target. */
 		RenderTarget * mActiveRenderTarget;
 

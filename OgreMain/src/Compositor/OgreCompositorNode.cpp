@@ -106,7 +106,6 @@ namespace Ogre
 												itor->formatList[0], TU_RENDERTARGET, 0, hwGamma,
 												fsaa, fsaaHint );
 				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-				rt->setAutoUpdated(false);
 				newChannel.target = rt;
 				newChannel.textures.push_back( tex );
 			}
@@ -129,7 +128,6 @@ namespace Ogre
 												*pixIt, TU_RENDERTARGET, 0, hwGamma,
 												fsaa, fsaaHint );
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-					rt->setAutoUpdated(false);
 					mrt->bindSurface( rtNum, rt );
 					newChannel.textures.push_back( tex );
 					++pixIt;

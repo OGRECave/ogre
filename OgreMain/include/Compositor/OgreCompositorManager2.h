@@ -90,7 +90,8 @@ namespace Ogre
 		void addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 							Camera *defaultCam, IdString definitionName, bool bEnabled );
 
-		void _update(void);
+		void _update( bool swapFinalTargets, bool waitForVSync );
+		void _swapAllFinalTargets( bool waitForVSync );
 	};
 }
 

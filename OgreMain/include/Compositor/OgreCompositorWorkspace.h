@@ -93,7 +93,8 @@ namespace Ogre
 		*/
 		void revalidateAllNodes(void);
 
-		void _update(void);
+		void _update( bool swapFinalTargets, bool waitForVSync );
+		void _swapFinalTarget( bool waitForVSync );
 
 		//TODO
 		CompositorShadowNode* findShadowNode( IdString nodeName ) const	{ return 0; }

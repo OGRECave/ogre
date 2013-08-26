@@ -57,21 +57,8 @@ namespace Ogre {
 	class _OgreExport Viewport : public ViewportAlloc
     {
     public:
-		/** Listener interface so you can be notified of Viewport changes. */
-		class _OgreExport Listener
-		{
-		public:
-			virtual ~Listener() {}
-
-			/** Notification of when a new camera is set to target listening Viewport. */
-			virtual void viewportCameraChanged(Viewport* viewport) {}
-
-			/** Notification of when target listening Viewport's dimensions changed. */
-			virtual void viewportDimensionsChanged(Viewport* viewport) {}
-
-			/** Notification of when target listening Viewport's is destroyed. */
-			virtual void viewportDestroyed(Viewport* viewport) {}
-		};
+		/// @copydoc MovableObject::mGlobalIndex
+		size_t mGlobalIndex;
 
         /** The usual constructor.
             @param camera
@@ -89,11 +76,9 @@ namespace Ogre {
                 the front.
         */
         Viewport(
-            Camera* camera,
             RenderTarget* target,
             Real left, Real top,
-            Real width, Real height,
-            int ZOrder);
+            Real width, Real height );
 
         /** Default destructor.
         */
@@ -110,7 +95,7 @@ namespace Ogre {
 
         /** Instructs the viewport to updates its contents.
         */
-        void update(void);
+        void update( Camera* camera, uint8 firstRq, uint8 lastRq );
 		
 		/** Instructs the viewport to clear itself, without performing an update.
 		 @remarks
@@ -132,15 +117,6 @@ namespace Ogre {
         */
         RenderTarget* getTarget(void) const;
 
-        /** Retrieves a pointer to the camera for this viewport.
-        */
-        Camera* getCamera(void) const;
-
-        /** Sets the camera to use for rendering to this viewport. */
-        void setCamera(Camera* cam);
-
-        /** Gets the Z-Order of this viewport. */
-		int getZOrder(void) const;
 		/** Gets one of the relative dimensions of the viewport,
             a value between 0.0 and 1.0.
         */
@@ -211,59 +187,6 @@ namespace Ogre {
         */
         static OrientationMode getDefaultOrientationMode();
 
-        /** Sets the initial background colour of the viewport (before
-            rendering).
-        */
-        void setBackgroundColour(const ColourValue& colour);
-
-        /** Gets the background colour.
-        */
-        const ColourValue& getBackgroundColour(void) const;
-
-		/** Sets the initial depth buffer value of the viewport (before
-            rendering). Default is 1
-        */
-        void setDepthClear( Real depth );
-
-        /** Gets the default depth buffer value to which the viewport is cleared.
-        */
-        Real getDepthClear(void) const;
-
-        /** Determines whether to clear the viewport before rendering.
-		@remarks
-			You can use this method to set which buffers are cleared
-			(if any) before rendering every frame.
-        @param clear Whether or not to clear any buffers
-		@param buffers One or more values from FrameBufferType denoting
-			which buffers to clear, if clear is set to true. Note you should
-			not clear the stencil buffer here unless you know what you're doing.
-         */
-        void setClearEveryFrame(bool clear, unsigned int buffers = FBT_COLOUR | FBT_DEPTH);
-
-        /** Determines if the viewport is cleared before every frame.
-        */
-        bool getClearEveryFrame(void) const;
-
-		/** Gets which buffers are to be cleared each frame. */
-        unsigned int getClearBuffers(void) const;
-
-		/** Sets whether this viewport should be automatically updated 
-			if Ogre's rendering loop or RenderTarget::update is being used.
-        @remarks
-            By default, if you use Ogre's own rendering loop (Root::startRendering)
-            or call RenderTarget::update, all viewports are updated automatically.
-            This method allows you to control that behaviour, if for example you 
-			have a viewport which you only want to update periodically.
-        @param autoupdate If true, the viewport is updated during the automatic
-            render loop or when RenderTarget::update() is called. If false, the 
-            viewport is only updated when its update() method is called explicitly.
-        */
-		void setAutoUpdated(bool autoupdate);
-		/** Gets whether this viewport is automatically updated if 
-			Ogre's rendering loop or RenderTarget::update is being used.
-        */
-		bool isAutoUpdated() const;
-
 		/** Set the material scheme which the viewport should use.
 		@remarks
 			This allows you to tell the system to use a particular
@@ -286,14 +209,6 @@ namespace Ogre {
 
         bool _isUpdated(void) const;
         void _clearUpdatedFlag(void);
-
-        /** Gets the number of rendered faces in the last update.
-        */
-        unsigned int _getNumRenderedFaces(void) const;
-
-        /** Gets the number of rendered batches in the last update.
-        */
-        unsigned int _getNumRenderedBatches(void) const;
 
         /** Tells this viewport whether it should display Overlay objects.
         @remarks
@@ -380,11 +295,6 @@ namespace Ogre {
         void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
                                    Real &screenX, Real &screenY);
 
-		/// Add a listener to this camera
-		void addListener(Listener* l);
-		/// Remove a listener to this camera
-		void removeListener(Listener* l);
-
     protected:
 
 
@@ -397,19 +307,12 @@ namespace Ogre {
 			Clears have to be done with a pass_clear, there are no longer "clear every frame viewports" 
 		*/
 
-        Camera* mCamera;
         RenderTarget* mTarget;
         /// Relative dimensions, irrespective of target dimensions (0..1)
         float mRelLeft, mRelTop, mRelWidth, mRelHeight;
         /// Actual dimensions, based on target dimensions
         int mActLeft, mActTop, mActWidth, mActHeight;
-        /// ZOrder
-        int mZOrder;
         /// Background options
-        ColourValue mBackColour;
-		Real mDepthClearValue;
-        bool mClearEveryFrame;
-		unsigned int mClearBuffers;
         bool mUpdated;
         bool mShowOverlays;
         bool mShowSkies;
@@ -423,12 +326,6 @@ namespace Ogre {
         /// Viewport orientation mode
         OrientationMode mOrientationMode;
         static OrientationMode mDefaultOrientationMode;
-
-		/// Automatic rendering on/off
-		bool mIsAutoUpdated;
-
-		typedef vector<Listener*>::type ListenerList;
-		ListenerList mListeners;
     };
 	/** @} */
 	/** @} */

@@ -58,15 +58,9 @@ namespace Ogre
 
 		if( !mViewport )
 		{
-			mViewport = mTarget->addViewport( 0, 0, mDefinition->mVpLeft, mDefinition->mVpTop,
+			mViewport = mTarget->addViewport( mDefinition->mVpLeft, mDefinition->mVpTop,
 												mDefinition->mVpWidth, mDefinition->mVpHeight );
-			mViewport->setAutoUpdated( false );
-			mViewport->setClearEveryFrame( false );
 		}
-
-		//These are deprecated and the user should not be fiddling with viewports from now on
-		assert( !mViewport->isAutoUpdated() );
-		assert( !mViewport->getClearEveryFrame() );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorPass::~CompositorPass()
