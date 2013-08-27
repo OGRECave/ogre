@@ -1094,6 +1094,8 @@ namespace Ogre {
                 case CG_TEXUNIT30: pos = 30; break;
                 case CG_TEXUNIT31: pos = 31; break;
 #endif
+                default:
+                    break;
                 }
                 if (pos != -1)
                 {

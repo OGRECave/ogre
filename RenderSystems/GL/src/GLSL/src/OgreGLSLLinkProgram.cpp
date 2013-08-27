@@ -386,6 +386,7 @@ namespace Ogre {
 							(GLint*)params->getIntPointer(def->physicalIndex));
 						break;
                     case GCT_UNKNOWN:
+                    default:
                         break;
 
 					} // end switch
@@ -518,25 +519,15 @@ namespace Ogre {
 			//Don't set adjacency flag. We handle it internally and expose "false"
 
 			RenderOperation::OperationType inputOperationType = mGeometryProgram->getGLSLProgram()->getInputOperationType();
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_INPUT_TYPE_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
 				getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
 
 			RenderOperation::OperationType outputOperationType = mGeometryProgram->getGLSLProgram()->getOutputOperationType();
-			switch (outputOperationType)
-			{
-			case RenderOperation::OT_POINT_LIST:
-			case RenderOperation::OT_LINE_STRIP:
-			case RenderOperation::OT_TRIANGLE_STRIP:
-			case RenderOperation::OT_LINE_LIST:
-			case RenderOperation::OT_TRIANGLE_LIST:
-			case RenderOperation::OT_TRIANGLE_FAN:
-				break;
 
-			}
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_OUTPUT_TYPE_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
 				getGLGeometryOutputPrimitiveType(outputOperationType));
 
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_VERTICES_OUT_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
 				mGeometryProgram->getGLSLProgram()->getMaxOutputVertices());
 		}
 
