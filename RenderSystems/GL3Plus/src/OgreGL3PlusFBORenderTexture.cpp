@@ -225,7 +225,7 @@ namespace Ogre {
                                                           GL_RENDERBUFFER, stencilRB));
         }
 
-        status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+        OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
         // If status is negative, clean up
         // Detach and destroy
@@ -266,7 +266,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                       GL_RENDERBUFFER, packedRB));
 
-        GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+        GLuint status;
+        OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
         // Detach and destroy
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
@@ -304,7 +305,8 @@ namespace Ogre {
             _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
 
             // Check status
-            GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+            GLuint status;
+            OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment

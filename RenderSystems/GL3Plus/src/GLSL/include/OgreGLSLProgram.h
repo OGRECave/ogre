@@ -133,7 +133,7 @@ namespace Ogre {
     ~GLSLProgram();
 
     GLuint getGLShaderHandle() const { return mGLShaderHandle; }
-    GLuint getGLProgramHandle() const { return mGLProgramHandle; }
+    GLuint getGLProgramHandle();
     void attachToProgramObject( const GLuint programObject );
     void detachFromProgramObject( const GLuint programObject );
     String getAttachedShaderNames() const { return mAttachedShaderNames; }
@@ -200,6 +200,7 @@ namespace Ogre {
     /// GL handle for shader object
     GLuint mGLShaderHandle;
     GLuint mGLProgramHandle;
+    bool mGLProgramHandleIsSet;
     /// Flag indicating if shader object successfully compiled
     GLint mCompiled;
     /// The input operation type for this (geometry) program

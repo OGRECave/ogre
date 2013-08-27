@@ -107,6 +107,9 @@ namespace Ogre
         virtual void _useProgram(void);
         /// Build uniform references from active named uniforms.
         virtual void buildGLUniformReferences(void);
+
+        void getMicrocodeFromCache(void);
+        void getIndividualProgramMicrocodeFromCache(GLSLGpuProgram* program);
     };
 }
 

@@ -59,6 +59,7 @@ namespace Ogre {
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
+        , mGLProgramHandleIsSet(false)
         , mCompiled(0)
         , mColumnMajorMatrices(true)
     {
@@ -221,12 +222,12 @@ namespace Ogre {
             //            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
             //                glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-                //                if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-                //                    glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
-            }
+            // if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            // {
+            //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+            //     //                if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+            //     //                    glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
+            // }
         }
 
         // Add preprocessor extras and main source
@@ -324,7 +325,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLProgram::createLowLevelImpl(void)
     {
-        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram( this ));
+        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram(this));
         // Shader params need to be forwarded to low level implementation
         mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
         mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
@@ -430,7 +431,7 @@ namespace Ogre {
         StringVector vecShaderNames = StringUtil::split(shaderNames, " \t", 0);
 
         size_t programNameCount = vecShaderNames.size();
-        for ( size_t i = 0; i < programNameCount; ++i )
+        for ( size_t i = 0; i < programNameCount; ++i)
         {
             static_cast<GLSLProgram*>(target)->attachChildShader(vecShaderNames[i]);
         }
@@ -490,24 +491,24 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLProgram::attachChildShader(const String& name)
     {
-        // is the name valid and already loaded?
-        // check with the high level program manager to see if it was loaded
+        // Is the name valid and already loaded?
+        // Check with the high level program manager to see if it was loaded.
         HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name).staticCast<HighLevelGpuProgram>();
         if (!hlProgram.isNull())
         {
             if (hlProgram->getSyntaxCode() == "glsl")
             {
-                // make sure attached program source gets loaded and compiled
+                // Make sure attached program source gets loaded and compiled
                 // don't need a low level implementation for attached shader objects
                 // loadHighLevelImpl will only load the source and compile once
-                // so don't worry about calling it several times
+                // so don't worry about calling it several times.
                 GLSLProgram* childShader = static_cast<GLSLProgram*>(hlProgram.getPointer());
-                // load the source and attach the child shader only if supported
+                // Load the source and attach the child shader only if supported.
                 if (isSupported())
                 {
                     childShader->loadHighLevelImpl();
-                    // add to the container
-                    mAttachedGLSLPrograms.push_back( childShader );
+                    // Add to the container.
+                    mAttachedGLSLPrograms.push_back(childShader);
                     mAttachedShaderNames += name + " ";
                 }
             }
@@ -515,34 +516,27 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLProgram::attachToProgramObject( const GLuint programObject )
+    void GLSLProgram::attachToProgramObject(const GLuint programObject)
     {
         // attach child objects
-        GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-        GLSLProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
+        GLSLProgramContainerIterator childProgramCurrent = mAttachedGLSLPrograms.begin();
+        GLSLProgramContainerIterator childProgramEnd = mAttachedGLSLPrograms.end();
 
-        while (childprogramcurrent != childprogramend)
+        for (; childProgramCurrent != childProgramEnd; ++childProgramCurrent)
         {
-            GLSLProgram* childShader = *childprogramcurrent;
-            // bug in ATI GLSL linker : modules without main function must be recompiled each time
-            // they are linked to a different program object
-            // don't check for compile errors since there won't be any
-            // *** minor inconvenience until ATI fixes there driver
+            GLSLProgram* childShader = *childProgramCurrent;
             childShader->compile(true);
-
-            childShader->attachToProgramObject( programObject );
-
-            ++childprogramcurrent;
+            childShader->attachToProgramObject(programObject);
         }
         OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
-        logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject );
+        logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject);
     }
 
     //-----------------------------------------------------------------------
-    void GLSLProgram::detachFromProgramObject( const GLuint programObject )
+    void GLSLProgram::detachFromProgramObject(const GLuint programObject)
     {
         OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
-        logObjectInfo( "Error detaching " + mName + " shader object from GLSL Program Object", programObject );
+        logObjectInfo( "Error detaching " + mName + " shader object from GLSL Program Object", programObject);
         // attach child objects
         GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
         GLSLProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
@@ -550,7 +544,7 @@ namespace Ogre {
         while (childprogramcurrent != childprogramend)
         {
             GLSLProgram* childShader = *childprogramcurrent;
-            childShader->detachFromProgramObject( programObject );
+            childShader->detachFromProgramObject(programObject);
             ++childprogramcurrent;
         }
     }
@@ -563,17 +557,17 @@ namespace Ogre {
         return language;
     }
     //-----------------------------------------------------------------------
-    Ogre::GpuProgramParametersSharedPtr GLSLProgram::createParameters( void )
+    Ogre::GpuProgramParametersSharedPtr GLSLProgram::createParameters(void)
     {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         return params;
     }
     //-----------------------------------------------------------------------
-    void GLSLProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
+    void GLSLProgram::checkAndFixInvalidDefaultPrecisionError(String &message)
     {
         String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
         vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
-        if( message.find(precisionQualifierErrorString) != String::npos )
+        if (message.find(precisionQualifierErrorString) != String::npos)
         {
             LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
 
@@ -675,5 +669,14 @@ namespace Ogre {
             return "triangle_list";
             break;
         }
+    }
+
+    GLuint GLSLProgram::getGLProgramHandle() {
+        if (!mGLProgramHandleIsSet)
+        {
+            OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+            mGLProgramHandleIsSet = true;
+        }
+        return mGLProgramHandle;
     }
 }

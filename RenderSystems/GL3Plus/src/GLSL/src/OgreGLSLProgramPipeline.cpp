@@ -47,8 +47,11 @@ namespace Ogre
 
     void GLSLProgramPipeline::compileAndLink()
     {
+        // Ensure no monolithic programs are in use.
+        OGRE_CHECK_GL_ERROR(glUseProgram(0));
+
         OGRE_CHECK_GL_ERROR(glGenProgramPipelines(1, &mGLProgramPipelineHandle));
-        OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
+        //OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
 
         mVertexArrayObject = new GL3PlusVertexArrayObject();
         mVertexArrayObject->bind();
@@ -62,48 +65,50 @@ namespace Ogre
 
         if(mLinked)
         {
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-            {
-                // Add to the microcode to the cache
-                String name;
-                name = getCombinedName();
+            // if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            // {
+            //     // Add to the microcode to the cache
+            //     String name;
+            //     name = getCombinedName();
 
-                // Get buffer size
-                GLint binaryLength = 0;
+            //     // Get buffer size
+            //     GLint binaryLength = 0;
 
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramPipelineHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+            //     //OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramPipelineHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
-                // Create microcode
-                GpuProgramManager::Microcode newMicrocode =
-                    GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
+            //     OGRE_CHECK_GL_ERROR(glGetProgramiv(, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
-                // Get binary
-                OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramPipelineHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
+            //     // Create microcode
+            //     GpuProgramManager::Microcode newMicrocode =
+            //         GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
 
-                // Add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-            }
-            if(mVertexProgram && mVertexProgram->isLinked())
+            //     // Get binary
+            //     OGRE_CHECK_GL_ERROR(glGetProgramBinary(, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
+
+            //     // Add to the microcode to the cache
+            //     GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+            // }
+            if (mVertexProgram && mVertexProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
             }
-            if(mFragmentProgram && mFragmentProgram->isLinked())
+            if (mFragmentProgram && mFragmentProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT, mFragmentProgram->getGLSLProgram()->getGLProgramHandle()));
             }
-            if(mGeometryProgram && mGeometryProgram->isLinked())
+            if (mGeometryProgram && mGeometryProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_GEOMETRY_SHADER_BIT, mGeometryProgram->getGLSLProgram()->getGLProgramHandle()));
             }
-            if(mDomainProgram && mDomainProgram->isLinked())
+            if (mDomainProgram && mDomainProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_EVALUATION_SHADER_BIT, mDomainProgram->getGLSLProgram()->getGLProgramHandle()));
             }
-            if(mHullProgram && mHullProgram->isLinked())
+            if (mHullProgram && mHullProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_CONTROL_SHADER_BIT, mHullProgram->getGLSLProgram()->getGLProgramHandle()));
             }
-            if(mComputeProgram && mComputeProgram->isLinked())
+            if (mComputeProgram && mComputeProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_COMPUTE_SHADER_BIT, mComputeProgram->getGLSLProgram()->getGLProgramHandle()));
             }
@@ -119,25 +124,61 @@ namespace Ogre
 
     void GLSLProgramPipeline::compileIndividualProgram(GLSLGpuProgram *program)
     {
-        GLint linkStatus = 0;
-        // Compile and attach program
-        if(program && !program->isLinked())
+        if (program && !program->isLinked())
         {
-            try
-            {
-                program->getGLSLProgram()->compile(true);
-            }
-            catch (Exception& e)
-            {
-                LogManager::getSingleton().stream() << e.getDescription();
-                mTriedToLinkAndFailed = true;
-                return;
-            }
+            GLint linkStatus = 0;
+
+            String programName = program->getName();
+
             GLuint programHandle = program->getGLSLProgram()->getGLProgramHandle();
+
             OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
-            program->getGLSLProgram()->attachToProgramObject(programHandle);
-            OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-            OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+            //if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
+                OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
+
+            // Use precompiled program if possible.
+            bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
+            if (microcodeAvailableInCache)
+            {
+                GpuProgramManager::Microcode cacheMicrocode =
+                    GpuProgramManager::getSingleton().getMicrocodeFromCache(programName);
+                cacheMicrocode->seek(0);
+
+                GLenum binaryFormat = 0;
+                cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+
+                GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+
+                OGRE_CHECK_GL_ERROR(glProgramBinary(programHandle,
+                                                    binaryFormat,
+                                                    cacheMicrocode->getPtr() + sizeof(GLenum),
+                                                    binaryLength));
+
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+            }
+
+            // Compilation needed if precompiled program is
+            // unavailable or failed to link.
+            if (!linkStatus)
+            {
+                try
+                {
+                    program->getGLSLProgram()->compile(true);
+                }
+                catch (Exception& e)
+                {
+                    LogManager::getSingleton().stream() << e.getDescription();
+                    mTriedToLinkAndFailed = true;
+                    return;
+                }
+
+                program->getGLSLProgram()->attachToProgramObject(programHandle);
+                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+
+                // Binary cache needs an update.
+                microcodeAvailableInCache = false;
+            }
 
             program->setLinked(linkStatus);
             mLinked = linkStatus;
@@ -148,6 +189,35 @@ namespace Ogre
 
             if(program->getType() == GPT_VERTEX_PROGRAM)
                 setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
+
+            // Add the microcode to the cache.
+            if (!microcodeAvailableInCache && mLinked && 
+                GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            {
+                // Get buffer size.
+                GLint binaryLength = 0;
+
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+
+                // Create microcode.
+                GpuProgramManager::Microcode newMicrocode =
+                    GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
+
+                // Get binary.
+                OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
+
+                // std::vector<uchar> buffer(binaryLength);
+                // GLenum format(0);
+                // OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, &format, &buffer[0]));
+
+
+                // GLenum binaryFormat = 0;
+                // std::vector<uchar> binaryData(binaryLength);
+                // newMicrocode->read(&binaryFormat, sizeof(GLenum));
+                // newMicrocode->read(&binaryData[0], binaryLength);
+
+                GpuProgramManager::getSingleton().addMicrocodeToCache(programName, newMicrocode);
+            }
         }
     }
 
@@ -170,13 +240,13 @@ namespace Ogre
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
 
-            // Sadly position is a special case
+            // Sadly position is a special case.
             if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
             {
                 OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, "position"));
             }
 
-            // For uv and other case the index is a part of the name
+            // For UV and other cases the index is a part of the name.
             if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
             {
                 String attStringWithSemantic = String(attString) + StringConverter::toString(index);
@@ -184,7 +254,7 @@ namespace Ogre
             }
 
             // Update mCustomAttributesIndexes with the index we found (or didn't find)
-            mCustomAttributesIndexes[semantic-1][index] = attrib;
+            mCustomAttributesIndexes[semantic - 1][index] = attrib;
             res = attrib;
         }
 
@@ -196,21 +266,13 @@ namespace Ogre
     {
         if (!mLinked && !mTriedToLinkAndFailed)
         {
-            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-                 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
-            {
-                getMicrocodeFromCache();
-            }
-            else
-            {
-                compileAndLink();
-            }
+            compileAndLink();
 
             extractLayoutQualifiers();
 
             buildGLUniformReferences();
         }
-
+        
         _useProgram();
     }
 

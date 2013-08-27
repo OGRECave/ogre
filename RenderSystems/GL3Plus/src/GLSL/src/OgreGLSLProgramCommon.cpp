@@ -186,21 +186,16 @@ namespace Ogre {
         GpuProgramManager::Microcode cacheMicrocode =
             GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 
-        // add to the microcode to the cache
-        String name;
-        name = getCombinedName();
-
-        // turns out we need this param when loading
-        GLenum binaryFormat = 0;
-
         cacheMicrocode->seek(0);
 
-        // get size of binary
+        // Turns out we need this param when loading.
+        GLenum binaryFormat = 0;
         cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
+        // Get size of binary.
         GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
 
-        // load binary
+        // Load binary.
         OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,
                                             binaryFormat,
                                             cacheMicrocode->getPtr(),
@@ -210,11 +205,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
         if (!success)
         {
-            //
             // Something must have changed since the program binaries
             // were cached away. Fallback to source shader loading path,
             // and then retrieve and cache new program binaries once again.
-            //
             compileAndLink();
         }
     }
