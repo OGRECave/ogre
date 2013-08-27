@@ -56,12 +56,12 @@ namespace Ogre
         mVertexArrayObject = new GL3PlusVertexArrayObject();
         mVertexArrayObject->bind();
 
-        compileIndividualProgram(mVertexProgram);
-        compileIndividualProgram(mFragmentProgram);
-        compileIndividualProgram(mGeometryProgram);
-        compileIndividualProgram(mDomainProgram);
-        compileIndividualProgram(mHullProgram);
-        compileIndividualProgram(mComputeProgram);
+        loadIndividualProgram(mVertexProgram);
+        loadIndividualProgram(mFragmentProgram);
+        loadIndividualProgram(mGeometryProgram);
+        loadIndividualProgram(mDomainProgram);
+        loadIndividualProgram(mHullProgram);
+        loadIndividualProgram(mComputeProgram);
 
         if(mLinked)
         {
@@ -122,7 +122,7 @@ namespace Ogre
         }
     }
 
-    void GLSLProgramPipeline::compileIndividualProgram(GLSLGpuProgram *program)
+    void GLSLProgramPipeline::loadIndividualProgram(GLSLGpuProgram *program)
     {
         if (program && !program->isLinked())
         {
@@ -155,6 +155,8 @@ namespace Ogre
                                                     binaryLength));
 
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+                if (!linkStatus)
+                    logObjectInfo("Could not use cached binary " + programName, programHandle);
             }
 
             // Compilation needed if precompiled program is
@@ -187,7 +189,7 @@ namespace Ogre
 
             logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
 
-            if(program->getType() == GPT_VERTEX_PROGRAM)
+            if (program->getType() == GPT_VERTEX_PROGRAM)
                 setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
 
             // Add the microcode to the cache.
@@ -209,7 +211,6 @@ namespace Ogre
                 // std::vector<uchar> buffer(binaryLength);
                 // GLenum format(0);
                 // OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, &format, &buffer[0]));
-
 
                 // GLenum binaryFormat = 0;
                 // std::vector<uchar> binaryData(binaryLength);

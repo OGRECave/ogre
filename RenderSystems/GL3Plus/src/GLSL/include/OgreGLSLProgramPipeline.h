@@ -102,7 +102,7 @@ namespace Ogre
 
         /// Compiles and links the separate programs.
         virtual void compileAndLink(void);
-        void compileIndividualProgram(GLSLGpuProgram *program);
+        void loadIndividualProgram(GLSLGpuProgram *program);
         /// Put a program pipeline in use.
         virtual void _useProgram(void);
         /// Build uniform references from active named uniforms.
