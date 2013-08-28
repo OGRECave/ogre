@@ -34,9 +34,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     String StringConverter::toString(Real val, unsigned short precision, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -49,9 +50,10 @@ namespace Ogre {
 #if OGRE_DOUBLE_PRECISION == 1
     //-----------------------------------------------------------------------
     String StringConverter::toString(float val, unsigned short precision,
-                                     unsigned short width, char fill, std::ios::fmtflags flags)
+                                     unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -63,9 +65,10 @@ namespace Ogre {
 #else
     //-----------------------------------------------------------------------
     String StringConverter::toString(double val, unsigned short precision,
-                                     unsigned short width, char fill, std::ios::fmtflags flags)
+                                     unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -77,9 +80,10 @@ namespace Ogre {
 #endif
     //-----------------------------------------------------------------------
     String StringConverter::toString(int val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -90,9 +94,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
     String StringConverter::toString(unsigned int val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -102,9 +107,10 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(size_t val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -115,9 +121,10 @@ namespace Ogre {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
     //-----------------------------------------------------------------------
     String StringConverter::toString(unsigned long val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -130,9 +137,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 #else
     String StringConverter::toString(size_t val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -142,9 +150,10 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(unsigned long val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -155,9 +164,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 #endif
     String StringConverter::toString(long val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+        unsigned short width, char fill, std::ios::fmtflags flags, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -166,31 +176,35 @@ namespace Ogre {
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Vector2& val)
+    String StringConverter::toString(const Vector2& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream << val.x << " " << val.y;
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Vector3& val)
+    String StringConverter::toString(const Vector3& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Vector4& val)
+    String StringConverter::toString(const Vector4& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream << val.x << " " << val.y << " " << val.z << " " << val.w;
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Matrix3& val)
+    String StringConverter::toString(const Matrix3& val, const std::locale &loc)
     {
         StringStream stream;
-        stream << val[0][0] << " " 
+        stream.imbue(loc);
+        stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
             << val[1][0] << " "             
@@ -226,10 +240,11 @@ namespace Ogre {
             }
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Matrix4& val)
+    String StringConverter::toString(const Matrix4& val, const std::locale &loc)
     {
         StringStream stream;
-        stream << val[0][0] << " " 
+        stream.imbue(loc);
+        stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
             << val[0][3] << " "             
@@ -248,23 +263,26 @@ namespace Ogre {
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const Quaternion& val)
+    String StringConverter::toString(const Quaternion& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream  << val.w << " " << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const ColourValue& val)
+    String StringConverter::toString(const ColourValue& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         stream << val.r << " " << val.g << " " << val.b << " " << val.a;
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(const StringVector& val)
+    String StringConverter::toString(const StringVector& val, const std::locale &loc)
     {
         StringStream stream;
+        stream.imbue(loc);
         StringVector::const_iterator i, iend, ibegin;
         ibegin = val.begin();
         iend = val.end();

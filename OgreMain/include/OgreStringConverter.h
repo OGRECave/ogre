@@ -72,66 +72,65 @@ namespace Ogre {
         /** Converts a Real to a String. */
         static String toString(Real val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 #if OGRE_DOUBLE_PRECISION == 1
         /** Converts a float to a String. */
         static String toString(float val, unsigned short precision = 6,
                                unsigned short width = 0, char fill = ' ',
-                               std::ios::fmtflags flags = std::ios::fmtflags(0) );
+                               std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 #else
         /** Converts a double to a String. */
         static String toString(double val, unsigned short precision = 6,
                                unsigned short width = 0, char fill = ' ',
-                               std::ios::fmtflags flags = std::ios::fmtflags(0) );
+                               std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 #endif
         /** Converts a Radian to a String. */
         static String toString(Radian val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) )
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()))
         {
-            return toString(val.valueAngleUnits(), precision, width, fill, flags);
+            return toString(val.valueAngleUnits(), precision, width, fill, flags, loc);
         }
         /** Converts a Degree to a String. */
         static String toString(Degree val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) )
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()))
         {
-            return toString(val.valueAngleUnits(), precision, width, fill, flags);
+            return toString(val.valueAngleUnits(), precision, width, fill, flags, loc);
         }
         /** Converts an int to a String. */
         static String toString(int val, unsigned short width = 0, 
             char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
         /** Converts an unsigned int to a String. */
         static String toString(unsigned int val, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a size_t to a String. */
         static String toString(size_t val, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-                /** Converts an unsigned long to a String. */
-                static String toString(unsigned long val, 
-                    unsigned short width = 0, char fill = ' ', 
-                    std::ios::fmtflags flags = std::ios::fmtflags(0) );
-
+        /** Converts an unsigned long to a String. */
+        static String toString(unsigned long val, 
+            unsigned short width = 0, char fill = ' ', 
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         #endif
 #else
         /** Converts a size_t to a String. */
         static String toString(size_t val, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts an unsigned long to a String. */
         static String toString(unsigned long val, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 #endif
         /** Converts a long to a String. */
         static String toString(long val, 
             unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0) );
+            std::ios::fmtflags flags = std::ios::fmtflags(0), const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a boolean to a String. 
         @param yesNo If set to true, result is 'yes' or 'no' instead of 'true' or 'false'
         */
@@ -140,44 +139,44 @@ namespace Ogre {
         @remarks
             Format is "x y" (i.e. 2x Real values, space delimited)
         */
-        static String toString(const Vector2& val);
+        static String toString(const Vector2& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a Vector3 to a String. 
         @remarks
             Format is "x y z" (i.e. 3x Real values, space delimited)
         */
-        static String toString(const Vector3& val);
+        static String toString(const Vector3& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a Vector4 to a String. 
         @remarks
             Format is "x y z w" (i.e. 4x Real values, space delimited)
         */
-        static String toString(const Vector4& val);
+        static String toString(const Vector4& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a Matrix3 to a String. 
         @remarks
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
         */
-        static String toString(const Matrix3& val);
+        static String toString(const Matrix3& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a Matrix4 to a String. 
         @remarks
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc.
         */
-        static String toString(const Matrix4& val);
+        static String toString(const Matrix4& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a Quaternion to a String. 
         @remarks
             Format is "w x y z" (i.e. 4x Real values, space delimited)
         */
-        static String toString(const Quaternion& val);
+        static String toString(const Quaternion& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a ColourValue to a String. 
         @remarks
             Format is "r g b a" (i.e. 4x Real values, space delimited). 
         */
-        static String toString(const ColourValue& val);
+        static String toString(const ColourValue& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
         /** Converts a StringVector to a string.
         @remarks
             Strings must not contain spaces since space is used as a delimiter in
             the output.
         */
-        static String toString(const StringVector& val);
+        static String toString(const StringVector& val, const std::locale &loc = std::locale(msDefaultStringLocale.c_str()));
 
         /** Converts a String to a Real. 
         @return
