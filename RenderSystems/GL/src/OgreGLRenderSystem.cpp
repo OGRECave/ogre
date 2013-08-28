@@ -947,6 +947,8 @@ namespace Ogre {
 	{
 		RenderSystem::shutdown();
 
+		delete mStateCacheManager;
+
 		// Deleting the GLSL program factory
 		if (mGLSLProgramFactory)
 		{
