@@ -80,8 +80,8 @@ namespace Ogre
         GLboolean mDepthMask;
         /// Stores the current polygon rendering mode
         GLenum mPolygonMode;
-        /// Stores the current blend equation
-        GLenum mBlendEquation;
+        GLenum mBlendEquationRGB;
+        GLenum mBlendEquationAlpha;
         /// Stores the current blend source function
         GLenum mBlendFuncSource;
         /// Stores the current blend destination function
@@ -184,15 +184,12 @@ namespace Ogre
          */
         bool activateGLTextureUnit(size_t unit);
         
-        /** Gets the current blend equation setting.
-         @return The blend equation.
-         */
-        GLenum getBlendEquation(void) const { return mBlendEquation; }
         
-        /** Sets the current blend equation setting.
-         @param eq The blend equation to use.
-         */
+        /// Set the blend equation for both RGB and alpha at the same time.
         void setBlendEquation(GLenum eq);
+
+        /// Set the blend equation for RGB and alpha separately.
+        void setBlendEquation(GLenum eqRGB, GLenum eqA);
         
         /** Sets the blending function.
          @param source The blend mode for the source.

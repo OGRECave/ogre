@@ -80,7 +80,8 @@ namespace Ogre {
     {
         mDepthMask = GL_TRUE;
         mPolygonMode = GL_FILL;
-        mBlendEquation = GL_FUNC_ADD;
+        mBlendEquationRGB = GL_FUNC_ADD;
+        mBlendEquationAlpha = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
@@ -305,13 +306,37 @@ namespace Ogre {
     
     void GLStateCacheManager::setBlendEquation(GLenum eq)
     {
-        if(mBlendEquation != eq)
+        if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
         {
-            mBlendEquation = eq;
-            
-            glBlendEquation(eq);
+            mBlendEquationRGB = eq;
+            mBlendEquationAlpha = eq;
+
+            if(GLEW_VERSION_1_4 || GLEW_ARB_imaging)
+            {
+                glBlendEquation(eq);
+            }
+            else if(GLEW_EXT_blend_minmax && (eq == GL_MIN || eq == GL_MAX))
+            {
+                glBlendEquationEXT(eq);
+            }
         }
     }
+
+    void GLStateCacheManager::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
+    {
+        if(mBlendEquationRGB != eqRGB || mBlendEquationAlpha != eqAlpha)
+        {
+            mBlendEquationRGB = eqRGB;
+            mBlendEquationAlpha = eqAlpha;
+
+			if(GLEW_VERSION_2_0) {
+				glBlendEquationSeparate(eqRGB, eqAlpha);
+			}
+			else if(GLEW_EXT_blend_equation_separate) {
+				glBlendEquationSeparateEXT(eqRGB, eqAlpha);
+			}
+		}
+	}
     
     void GLStateCacheManager::setDepthMask(GLboolean mask)
     {

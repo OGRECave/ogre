@@ -1881,14 +1881,7 @@ namespace Ogre {
 			break;
 		}
 
-		if(GLEW_VERSION_1_4 || GLEW_ARB_imaging)
-        {
-			glBlendEquation(func);
-		}
-		else if(GLEW_EXT_blend_minmax && (func == GL_MIN || func == GL_MAX))
-        {
-			glBlendEquationEXT(func);
-		}
+		mStateCacheManager->setBlendEquation(func);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setSeparateSceneBlending(
@@ -1955,12 +1948,7 @@ namespace Ogre {
 			break;
 		}
 
-		if(GLEW_VERSION_2_0) {
-			glBlendEquationSeparate(func, alphaFunc);
-		}
-		else if(GLEW_EXT_blend_equation_separate) {
-			glBlendEquationSeparateEXT(func, alphaFunc);
-		}
+		mStateCacheManager->setBlendEquation(func, alphaFunc);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
