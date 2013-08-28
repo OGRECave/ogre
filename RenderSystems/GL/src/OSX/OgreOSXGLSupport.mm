@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include <dlfcn.h>
 
 #include <OpenGL/OpenGL.h>
+#include <AppKit/NSScreen.h>
 
 namespace Ogre {
 
@@ -64,6 +65,7 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optHiddenWindow;
 	ConfigOption optVsync;
 	ConfigOption optSRGB;
+    ConfigOption optContentScalingFactor;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	ConfigOption optEnableFixedPipeline;
 #endif
@@ -109,19 +111,20 @@ void OSXGLSupport::addConfig( void )
 	optSRGB.currentValue = "No";
 	optSRGB.immutable = false;
 
+    optContentScalingFactor.name = "Content Scaling Factor";
+    optContentScalingFactor.possibleValues.push_back( "1.0" );
+    optContentScalingFactor.possibleValues.push_back( "1.33" );
+    optContentScalingFactor.possibleValues.push_back( "1.5" );
+    optContentScalingFactor.possibleValues.push_back( "2.0" );
+    optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
+    optContentScalingFactor.immutable = false;
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
 		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
 		optEnableFixedPipeline.possibleValues.push_back( "No" );
 		optEnableFixedPipeline.currentValue = "Yes";
 		optEnableFixedPipeline.immutable = false;
-#endif
-
-    mOptions[ optFullScreen.name ] = optFullScreen;
-	mOptions[ optBitDepth.name ] = optBitDepth;
-
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
 #endif
 
 	CGLRendererInfoObj rend;
@@ -286,6 +289,12 @@ void OSXGLSupport::addConfig( void )
 	mOptions[optHiddenWindow.name] = optHiddenWindow;
 	mOptions[optVsync.name] = optVsync;
 	mOptions[optSRGB.name] = optSRGB;
+    mOptions[optBitDepth.name] = optBitDepth;
+    mOptions[optContentScalingFactor.name] = optContentScalingFactor;
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
+#endif
 }
 
 String OSXGLSupport::validateConfig( void )
@@ -331,6 +340,12 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
         if( opt != mOptions.end() )
         {
             winOptions[ "vsync" ] = opt->second.currentValue;
+        }
+
+        opt = mOptions.find( "Content Scaling Factor" );
+        if( opt != mOptions.end() )
+        {
+            winOptions["contentScalingFactor"] = opt->second.currentValue;
         }
 
         opt = mOptions.find( "sRGB Gamma Conversion" );
