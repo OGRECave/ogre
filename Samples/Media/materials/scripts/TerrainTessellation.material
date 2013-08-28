@@ -170,7 +170,7 @@ fragment_program Ogre/TerrainTessellation/PSSolidWire hlsl
 	}	
 }
 
-material Ogre/TerrainTessellation/
+material Ogre/TerrainTessellation/Terrain
 {
 	technique
 	{

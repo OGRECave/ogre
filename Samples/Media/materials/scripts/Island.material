@@ -1,0 +1,330 @@
+vertex_program Ogre/Island/FullScreenQuadVS hlsl
+{
+	source Island.hlsl
+	entry_point FullScreenQuadVS
+	target vs_4_0
+
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/Island/RefractionDepthManualResolvePS1 hlsl
+{
+	source Island.hlsl
+	entry_point RefractionDepthManualResolvePS1
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/Island/RefractionDepthManualResolvePS2 hlsl
+{
+	source Island.hlsl
+	entry_point RefractionDepthManualResolvePS2
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/Island/RefractionDepthManualResolvePS4 hlsl
+{
+	source Island.hlsl
+	entry_point RefractionDepthManualResolvePS2
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+material Ogre/Island/RefractionDepthManualResolve
+{
+	technique RefractionDepthManualResolve
+	{
+		pass MS1
+		{
+			vertex_program_ref Ogre/Island/FullScreenQuadVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Island/RefractionDepthManualResolvePS1
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+		pass MS2
+		{
+			vertex_program_ref Ogre/Island/FullScreenQuadVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Island/RefractionDepthManualResolvePS2
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off	
+		}
+		pass MS4
+		{
+			vertex_program_ref Ogre/Island/FullScreenQuadVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Island/RefractionDepthManualResolvePS4
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+
+}
+
+fragment_program Ogre/Island/MainToBackBufferPS hlsl
+{
+	source Island.hlsl
+	entry_point MainToBackBufferPS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+material Ogre/Island/MainToBackBuffer
+{
+	technique MainToBackBuffer
+	{
+		pass Solid
+		{
+			vertex_program_ref Ogre/Island/FullScreenQuadVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Island/MainToBackBufferPS
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+}
+
+vertex_program Ogre/Island/WaterNormalmapCombineVS hlsl
+{
+	source Island.hlsl
+	entry_point WaterNormalmapCombineVS
+	target vs_4_0
+
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/Island/WaterNormalmapCombinePS hlsl
+{
+	source Island.hlsl
+	entry_point WaterNormalmapCombinePS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+material Ogre/Island/WaterNormalmapCombine
+{
+	technique WaterNormalmapCombine
+	{
+		pass Solid
+		{
+			vertex_program_ref Ogre/Island/WaterNormalmapCombineVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Island/WaterNormalmapCombinePS
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+}
+
+vertex_program Ogre/Island/PassThroughVS hlsl
+{
+	source Island.hlsl
+	entry_point PassThroughVS
+	target vs_5_0
+
+	default_params
+	{
+
+	}
+}
+
+tesselation_hull_program Ogre/Island/PatchHS hlsl
+{
+	source Island.hlsl
+	entry_point PatchHS
+	target hs_5_0
+
+	default_params
+	{
+
+	}
+}
+
+tessellation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
+{
+	source Island.hlsl
+	entry_point HeightFieldPatchDS
+	target ds_5_0
+
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/Island/HeightFieldPatchPS hlsl
+{
+	source Island.hlsl
+	entry_point HeightFieldPatchPS
+	target ps_5_0
+
+	default_params
+	{
+
+	}
+}
+
+fragment_program Ogre/Island/ColorPS hlsl
+{
+	source IslandCommon.hlsl
+	entry_point ColorPS
+	target ps_5_0
+
+	default_params
+	{
+
+	}
+}
+
+material Ogre/Island/RenderHeightfield
+{
+	technique RenderHeightfield
+	{
+		pass Solid
+		{
+			vertex_program_ref Ogre/Island/PassThroughVS
+			{
+			
+			}
+			tesselation_hull_program_ref Ogre/Island/PatchHS
+			{
+			
+			}
+			tesselation_domain_program_ref Ogre/Island/HeightFieldPatchDS
+			{
+			
+			}			
+			fragment_program_ref Ogre/Island/HeightFieldPatchPS
+			{
+			
+			}
+			
+			cull_software back
+			depth_check on
+			depth_write on
+		}
+		
+		pass DepthOnly
+		{
+			vertex_program_ref Ogre/Island/PassThroughVS
+			{
+			
+			}
+			tesselation_hull_program_ref Ogre/Island/PatchHS
+			{
+			
+			}
+			tesselation_domain_program_ref Ogre/Island/HeightFieldPatchDS
+			{
+			
+			}			
+			fragment_program_ref Ogre/Island/ColorPS
+			{
+			
+			}
+			
+			cull_software back
+			depth_check on
+			depth_write on
+		}
+	}
+}
+
+
+material Ogre/Island/RenderWater
+{
+	technique RenderWater
+	{
+		pass Solid
+		{
+			vertex_program_ref Ogre/Island/PassThroughVS
+			{
+			
+			}
+			tesselation_hull_program_ref Ogre/Island/PatchHS
+			{
+			
+			}
+			tesselation_domain_program_ref Ogre/Island/WaterPatchDS
+			{
+			
+			}			
+			fragment_program_ref Ogre/Island/WaterPatchPS
+			{
+			
+			}
+			
+			cull_software back
+			depth_check on
+			depth_write on
+		}
+
+	}
+}
