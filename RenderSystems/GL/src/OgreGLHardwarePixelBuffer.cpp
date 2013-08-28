@@ -610,7 +610,6 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     mGLSupport.getStateCacheManager()->setDisabled(GL_CULL_FACE);
     mGLSupport.getStateCacheManager()->setDisabled(GL_LIGHTING);
     mGLSupport.getStateCacheManager()->setDisabled(GL_FOG);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     
     /// Save and reset matrices
     glMatrixMode(GL_MODELVIEW);

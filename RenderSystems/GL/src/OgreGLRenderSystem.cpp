@@ -3046,12 +3046,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
 
-		glColor4f(1,1,1,1);
-		if (GLEW_EXT_secondary_color)
-		{
-			glSecondaryColor3fEXT(0.0f, 0.0f, 0.0f);
-		}
-
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setNormaliseNormals(bool normalise)
