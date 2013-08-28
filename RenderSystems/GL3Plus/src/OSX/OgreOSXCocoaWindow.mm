@@ -324,7 +324,7 @@ namespace Ogre {
     {
         NSRect winFrame;
         if(mContentScalingFactor > 1.0)
-            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
@@ -334,7 +334,7 @@ namespace Ogre {
     {
         NSRect winFrame;
         if(mContentScalingFactor > 1.0)
-            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
@@ -368,7 +368,6 @@ namespace Ogre {
                     [mGLPixelFormat release];
                     mGLPixelFormat = nil;
                 }
-
             }
 		}
 		
@@ -543,8 +542,7 @@ namespace Ogre {
             CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
             CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
             [mGLContext update];
-            
-            
+
             mLeft = viewFrame.origin.x; 
             mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
@@ -688,7 +686,12 @@ namespace Ogre {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
-                NSRect backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
+                NSRect backingRect = NSZeroRect;
+                if(mContentScalingFactor > 1.0)
+                    backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
+                else
+                    backingRect = mainDisplayRect;
+
                 GLint backingStoreDimensions[2] = { static_cast<GLint>(backingRect.size.width), static_cast<GLint>(backingRect.size.height) };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
