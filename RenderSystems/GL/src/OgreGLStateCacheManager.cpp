@@ -648,4 +648,36 @@ namespace Ogre {
                 glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, &mPointAttenuation[0]);
         }
     }
+
+    void GLStateCacheManager::enableTextureCoordGen (GLenum type)
+    {
+        HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
+        if (it == mTextureCoordGen.end())
+        {
+            glEnable(type);
+            mTextureCoordGen[mActiveTextureUnit].mEnabled.insert(type);
+        }
+        else
+        {
+            if (it->second.mEnabled.find(type) == it->second.mEnabled.end())
+            {
+                glEnable(type);
+                it->second.mEnabled.insert(type);
+            }
+        }
+    }
+
+    void GLStateCacheManager::disableTextureCoordGen (GLenum type)
+    {
+        HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
+        if (it != mTextureCoordGen.end())
+        {
+            std::set<GLenum>::iterator found = it->second.mEnabled.find(type);
+            if (found != it->second.mEnabled.end())
+            {
+                glDisable(type);
+                it->second.mEnabled.erase(found);
+            }
+        }
+    }
 }

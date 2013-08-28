@@ -45,11 +45,6 @@ namespace Ogre
 
         struct TextureUnitParams
         {
-            ~TextureUnitParams()
-            {
-                mTexParameteriMap.clear();
-            }
-
             TexParameteriMap mTexParameteriMap;
         };
 
@@ -63,8 +58,16 @@ namespace Ogre
         /// Stores textures currently bound to each texture stage
         HashMap <GLenum, GLuint> mBoundTextures;
 
-        /// Stores the currently enabled texture type per texture unit (FFP-relevant only)
+        /// Stores the currently enabled texture type per texture unit (FFP only)
         HashMap <GLenum, GLenum> mFFPCurrentTextureTypes;
+
+
+        struct TexGenParams
+        {
+            std::set<GLenum> mEnabled;
+        };
+        /// Stores the currently enabled texcoord generation types per texture unit
+        HashMap <GLenum, TexGenParams> mTextureCoordGen;
 
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
@@ -125,6 +128,11 @@ namespace Ogre
         void setFFPCurrentTextureType(GLenum type);
         /// Removes texturing for the currently activated texture unit
         void removeFFPCurrentTextureType();
+
+        /// Enable the specified texture coordinate generation option for the currently activated texture unit
+        void enableTextureCoordGen (GLenum type);
+        /// Disable the specified texture coordinate generation option for the currently activated texture unit
+        void disableTextureCoordGen (GLenum type);
 
         // Set material lighting parameters
         void setAmbient (GLfloat r, GLfloat g, GLfloat b, GLfloat a);

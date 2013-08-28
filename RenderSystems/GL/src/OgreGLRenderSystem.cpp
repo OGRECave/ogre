@@ -1615,20 +1615,20 @@ namespace Ogre {
 		switch( m )
 		{
 		case TEXCALC_NONE:
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 			break;
 
 		case TEXCALC_ENVIRONMENT_MAP:
 			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 
 			// Need to use a texture matrix to flip the spheremap
 			mUseAutoTextureMatrix = true;
@@ -1645,18 +1645,18 @@ namespace Ogre {
 			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
 			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
 
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 #else
 			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 #endif
 			break;
 		case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
@@ -1665,10 +1665,10 @@ namespace Ogre {
 			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
 			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
 
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 
 			// We need an extra texture matrix here
 			// This sets the texture matrix to be the inverse of the view matrix
@@ -1691,10 +1691,10 @@ namespace Ogre {
 			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP );
 			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP );
 
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_S );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_T );
-			mStateCacheManager->setEnabled( GL_TEXTURE_GEN_R );
-			mStateCacheManager->setDisabled( GL_TEXTURE_GEN_Q );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_S );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_T );
+			mStateCacheManager->enableTextureCoordGen( GL_TEXTURE_GEN_R );
+			mStateCacheManager->disableTextureCoordGen( GL_TEXTURE_GEN_Q );
 			break;
 		case TEXCALC_PROJECTIVE_TEXTURE:
 			glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
@@ -1705,10 +1705,10 @@ namespace Ogre {
 			glTexGenfv(GL_T, GL_EYE_PLANE, eyePlaneT);
 			glTexGenfv(GL_R, GL_EYE_PLANE, eyePlaneR);
 			glTexGenfv(GL_Q, GL_EYE_PLANE, eyePlaneQ);
-			mStateCacheManager->setEnabled(GL_TEXTURE_GEN_S);
-			mStateCacheManager->setEnabled(GL_TEXTURE_GEN_T);
-			mStateCacheManager->setEnabled(GL_TEXTURE_GEN_R);
-			mStateCacheManager->setEnabled(GL_TEXTURE_GEN_Q);
+			mStateCacheManager->enableTextureCoordGen(GL_TEXTURE_GEN_S);
+			mStateCacheManager->enableTextureCoordGen(GL_TEXTURE_GEN_T);
+			mStateCacheManager->enableTextureCoordGen(GL_TEXTURE_GEN_R);
+			mStateCacheManager->enableTextureCoordGen(GL_TEXTURE_GEN_Q);
 
 			mUseAutoTextureMatrix = true;
 
