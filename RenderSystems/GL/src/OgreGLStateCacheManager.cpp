@@ -218,8 +218,6 @@ namespace Ogre {
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLStateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
-        glTexParameteri(target, pname, param);
-        return;
         GLuint texId = mBoundTextures[mActiveTextureUnit];
 
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
