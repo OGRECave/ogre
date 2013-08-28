@@ -80,7 +80,7 @@ namespace Ogre {
 	{
     public:
         /** Texture constructor */
-		GLTextureBuffer(const String &baseName, GLenum target, GLuint id, GLint face, 
+        GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id, GLint face,
 			GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
         ~GLTextureBuffer();
         
@@ -116,9 +116,11 @@ namespace Ogre {
 		GLint mLevel;
 		bool mSoftwareMipmap;		// Use GLU for mip mapping
         bool mHwGamma;
-        
+
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
+
+        GLSupport& mGLSupport;
     };
      /** Renderbuffer surface.  Needs FBO extension.
      */

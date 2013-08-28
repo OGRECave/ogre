@@ -43,6 +43,8 @@ namespace Ogre {
         class GLSLProgramFactory;
     }
 
+    class GLStateCacheManager;
+
 	/**
       Implementation of GL as a rendering system.
      */
@@ -96,6 +98,9 @@ namespace Ogre {
 		/// Store last colour write state
 		bool mColourWrite[4];
 
+		/// Store scissor box
+		int mScissorBox[4];
+
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
@@ -133,6 +138,8 @@ namespace Ogre {
 		typedef list<GLContext*>::type GLContextList;
 		/// List of background thread contexts
 		GLContextList mBackgroundContextList;
+
+		GLStateCacheManager* mStateCacheManager;
 
         /** Manager object for creating render textures.
             Direct render to texture via GL_EXT_framebuffer_object is preferable 
