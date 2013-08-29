@@ -82,6 +82,10 @@ namespace Ogre
 
 		virtual void execute();
 
+		void _setCustomCamera( Camera *camera )					{ mCamera = camera; }
+
+		const CompositorPassSceneDef* getDefinition() const		{ return mDefinition; }
+
 	private:
 		CompositorPassSceneDef const *mDefinition;
 	};

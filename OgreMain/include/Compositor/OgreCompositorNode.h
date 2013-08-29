@@ -131,6 +131,13 @@ namespace Ogre
 		*/
 		void notifyDestroyed( const CompositorChannel &channel );
 
+		/** Called right after we create a PASS_SCENE pass. Derived
+			classes may want to do something with it
+		@param pass
+			Newly created pass to toy with.
+		*/
+		virtual void postInitializePassScene( CompositorPassScene *pass ) {}
+
 	public:
 		/** The Id must be unique across all engine so we can create unique named textures.
 			The name is only unique across the workspace

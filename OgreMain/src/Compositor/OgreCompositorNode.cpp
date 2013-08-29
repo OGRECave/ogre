@@ -66,6 +66,7 @@ namespace Ogre
 			mDefinition( definition )
 	{
 		mInTextures.resize( mDefinition->getNumInputChannels(), CompositorChannel() );
+		mOutTextures.resize( mDefinition->mOutChannelMapping.size() );
 
 		bool defaultHwGamma		= false;
 		uint defaultFsaa		= 0;
@@ -167,7 +168,7 @@ namespace Ogre
 				//Normal RT. We don't hold any reference to, so just deregister from TextureManager
 				TextureManager::getSingleton().remove( textureName );
 			}
-			else
+			else if( !itor->formatList.empty() )
 			{
 				//MRT. We need to destroy both the MultiRenderTarget ptr AND the textures
 				mRenderSystem->destroyRenderTarget( textureName );
@@ -348,7 +349,9 @@ namespace Ogre
 				case PASS_SCENE:
 					newPass = OGRE_NEW CompositorPassScene(
 											static_cast<CompositorPassSceneDef*>(*itPass),
-											mWorkspace, channel->target );
+											mWorkspace->getDefaultCamera(), mWorkspace,
+											channel->target );
+					postInitializePassScene( static_cast<CompositorPassScene*>( newPass ) );
 					break;
 				default:
 					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,

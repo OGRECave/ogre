@@ -126,9 +126,12 @@ namespace Ogre
 		@param name
 			Name to alias this texture for reference. Can be blank. If not blank, must be
 			unique and not contain the "global_" prefix. We need a hard copy
+		@param isAtlas
+			True if this shadow map is rendered in an UV atlas; which means we don't create
+			our own texture, but rather reference another through the local name.
 		*/
 		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
-															 String name );
+															 String name, bool isAtlas );
 	};
 
 	/** @} */

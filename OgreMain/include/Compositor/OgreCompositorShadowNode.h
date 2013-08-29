@@ -63,22 +63,25 @@ namespace Ogre
 	{
 		CompositorShadowNodeDef const *mDefinition;
 
-		struct ShadowMapPass
+		struct ShadowMapCamera
 		{
-			RenderTarget			*target;
 			ShadowCameraSetupPtr	shadowCameraSetup;
-			size_t					light;	//Render Nth closest light
-			size_t					split;	//Split for that light (only for PSSM/CSM)
-			CompositorPassScene		*scenePass;
+			Camera					*camera;
 		};
 
-		typedef vector<ShadowMapPass> ShadowMapPassVec;
-		ShadowMapPassVec		mShadowMaps;
+		typedef vector<ShadowMapCamera>::type ShadowMapCameraVec;
+		/// One per shadow map (whether texture or atlas)
+		ShadowMapCameraVec		mShadowMapCameras;
 
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
 								const CompositorWorkspace *workspace, RenderSystem *renderSys );
 		~CompositorShadowNode();
+
+		void _update(void);
+
+		/// We derive so we can override the camera with ours
+		virtual void postInitializePassScene( CompositorPassScene *pass );
 	};
 
 	/** @} */

@@ -47,8 +47,16 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNodeDef::ShadowTextureDefinition*
 			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 String name )
+																 String name, bool isAtlas )
 	{
+		if( name.empty() && isAtlas )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+							"Shadow maps used as atlas can't have empty names."
+							" Light index #" + StringConverter::toString( lightIdx ),
+							"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+		}
+
 		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
 		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
 
@@ -69,7 +77,8 @@ namespace Ogre
 					StringConverter::toString( split ) + "]";
 		}
 
-		addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
+		if( !isAtlas )
+			addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
 		mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
 																	 lightIdx, split ) );
 		return &mShadowMapTexDefinitions.back();

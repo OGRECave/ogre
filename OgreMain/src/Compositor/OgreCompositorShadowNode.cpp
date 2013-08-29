@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Compositor/OgreCompositorChannel.h"
 
+#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
@@ -53,44 +55,49 @@ namespace Ogre
 		{
 			CompositorChannel newChannel;
 
-			String textureName = (itor->name + IdString( id )).getFriendlyText();
-			if( itor->formatList.size() == 1 )
+			//When format list is empty, then this definition is for a shadow map atlas.
+			if( itor->formatList.empty() )
 			{
-				//Normal RT
-				TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
-												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
-												itor->formatList[0], TU_RENDERTARGET, 0,
-												itor->hwGammaWrite, itor->fsaa );
-				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-				newChannel.target = rt;
-				newChannel.textures.push_back( tex );
-			}
-			else
-			{
-				//MRT
-				MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
-				PixelFormatList::const_iterator pixIt = itor->formatList.begin();
-				PixelFormatList::const_iterator pixEn = itor->formatList.end();
-
-				newChannel.target = mrt;
-
-				while( pixIt != pixEn )
+				String textureName = (itor->name + IdString( id )).getFriendlyText();
+				if( itor->formatList.size() == 1 )
 				{
-					size_t rtNum = pixIt - itor->formatList.begin();
-					TexturePtr tex = TextureManager::getSingleton().createManual(
-												textureName + StringConverter::toString( rtNum ),
-												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
-												*pixIt, TU_RENDERTARGET, 0, itor->hwGammaWrite,
-												itor->fsaa );
+					//Normal RT
+					TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
+													ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+													TEX_TYPE_2D, itor->width, itor->height, 0,
+													itor->formatList[0], TU_RENDERTARGET, 0,
+													itor->hwGammaWrite, itor->fsaa );
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-					mrt->bindSurface( rtNum, rt );
+					newChannel.target = rt;
 					newChannel.textures.push_back( tex );
-					++pixIt;
+				}
+				else
+				{
+					//MRT
+					MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
+					PixelFormatList::const_iterator pixIt = itor->formatList.begin();
+					PixelFormatList::const_iterator pixEn = itor->formatList.end();
+
+					newChannel.target = mrt;
+
+					while( pixIt != pixEn )
+					{
+						size_t rtNum = pixIt - itor->formatList.begin();
+						TexturePtr tex = TextureManager::getSingleton().createManual(
+													textureName + StringConverter::toString( rtNum ),
+													ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+													TEX_TYPE_2D, itor->width, itor->height, 0,
+													*pixIt, TU_RENDERTARGET, 0, itor->hwGammaWrite,
+													itor->fsaa );
+						RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+						mrt->bindSurface( rtNum, rt );
+						newChannel.textures.push_back( tex );
+						++pixIt;
+					}
 				}
 			}
 
+			// Push a null RT & Texture so we preserve the index order from getTextureSource.
 			mLocalTextures.push_back( newChannel );
 
 			++itor;
@@ -107,4 +114,27 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::_update(void)
+	{
+		ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
+		ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
+
+		while( itor != end )
+		{
+			//itor->shadowCameraSetup->getShadowCamera;
+			//itor->camera;
+			++itor;
+		}
+
+		CompositorNode::_update();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::postInitializePassScene( CompositorPassScene *pass )
+	{
+		const CompositorPassSceneDef *passDef = pass->getDefinition();
+		const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
+
+		//smCamera.shadowCameraSetup->getShadowCamera
+		pass->_setCustomCamera( smCamera.camera );
+	}
 }

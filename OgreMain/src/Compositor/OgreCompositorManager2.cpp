@@ -94,7 +94,7 @@ namespace Ogre
 		//-------
 		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
 		shadowNode->setNumShadowTextureDefinitions( 1 );
-		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex" );
+		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
 		texDef->width	= 1024;
 		texDef->height	= 1024;
 		texDef->formatList.push_back( PF_FLOAT32_R );
