@@ -207,7 +207,7 @@ tesselation_hull_program Ogre/Island/PatchHS hlsl
 	}
 }
 
-tessellation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
+tesselation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
 {
 	source Island.hlsl
 	entry_point HeightFieldPatchDS

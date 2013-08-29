@@ -1,12 +1,3 @@
-GeometryShader gsSOAddAngularForces = ConstructGSWithSO( CompileShader( gs_4_0, AddAngularForcesGS() ), "POSITION.xyzw" );  
-GeometryShader gsSOIntegrate = ConstructGSWithSO( CompileShader( vs_4_0, addForcesAndIntegrateVSG() ), "POSITION.xyzw" );  
-GeometryShader gsSOSatisfySpringConstraints = ConstructGSWithSO( CompileShader( gs_4_0, SatisfySpringConstraintsGS() ), "POSITION.xyzw" );  
-GeometryShader gsSOSatisfyAngularSpringConstraints = ConstructGSWithSO( CompileShader( gs_4_0, SatisfyAngularSpringConstraintsGS() ), "POSITION.xyzw" );  
-GeometryShader gsSOSatisfyCollisionConstraints = ConstructGSWithSO( CompileShader( vs_4_0, SatisfyCollisionConstraintsVSG() ), "POSITION.xyzw" );  
-GeometryShader gsSOUpdateCoordinateFrames = ConstructGSWithSO( CompileShader( vs_4_0, UpdateCoordinateFrameVSG() ), "X_AXIS.xyzw;Y_AXIS.xyzw;Z_AXIS.xyzw" );  
-GeometryShader gsSOPropagateCoordinateFrames = ConstructGSWithSO( CompileShader( vs_4_0, PropagateCoordinateFrameVSG() ), "X_AXIS.xyzw;Y_AXIS.xyzw;Z_AXIS.xyzw" );  
-GeometryShader gsSORestoreToDefaultPositions = ConstructGSWithSO( CompileShader( vs_4_0, restoreToDefaultPositionsVSG() ), "POSITION.xyzw" );  
-
 vertex_program Ogre/Hair/AddAngularForcesVS hlsl
 {
 	source Hair.hlsl
@@ -284,9 +275,6 @@ fragment_program Ogre/Hair/RenderCoordinateFramePS hlsl
 	}	
 }
 
-
-
-
 material Ogre/Hair/SimulateHair
 {
 	technique SimulateHair
@@ -454,7 +442,7 @@ material Ogre/Hair/SimulateHair
 	}
 }
 
-vertex_program Ogre/Hair/InterpolateVS_DUMMY11
+vertex_program Ogre/Hair/InterpolateVS_DUMMY11 hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateVS_DUMMY11
@@ -466,7 +454,7 @@ vertex_program Ogre/Hair/InterpolateVS_DUMMY11
 	}
 }
 
-vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD
+vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateVSMultiStrand_LOAD
@@ -478,7 +466,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD
 	}
 }
 
-vertex_program Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD
+vertex_program Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateVSMultiStrandDepthShadows_LOAD
@@ -490,7 +478,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD
 	}
 }
 
-vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions
+vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateVSMultiStrandCollisions
@@ -502,7 +490,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrand
@@ -514,7 +502,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrandDepth
@@ -526,7 +514,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrandCollisions
@@ -538,7 +526,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrand
@@ -550,7 +538,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrandDepth
@@ -562,7 +550,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrandCollisions
@@ -574,7 +562,19 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions
 	}
 }
 
-geometry_program Ogre/Hair/InterpolateGS
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSMultiStrandCollisionsWithGS
+	target ds_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+geometry_program Ogre/Hair/InterpolateGS hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateGS
@@ -586,7 +586,7 @@ geometry_program Ogre/Hair/InterpolateGS
 	}
 }
 
-geometry_program Ogre/Hair/InterpolateGSDepthShadows
+geometry_program Ogre/Hair/InterpolateGSDepthShadows hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateGSDepthShadows
@@ -598,7 +598,7 @@ geometry_program Ogre/Hair/InterpolateGSDepthShadows
 	}
 }
 
-geometry_program Ogre/Hair/InterpolateGSMultiStrandCollisions
+geometry_program Ogre/Hair/InterpolateGSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateGSMultiStrandCollisions
@@ -610,7 +610,7 @@ geometry_program Ogre/Hair/InterpolateGSMultiStrandCollisions
 	}
 }
 
-fragment_program Ogre/Hair/RenderPS
+fragment_program Ogre/Hair/RenderPS hlsl
 {
 	source Hair.hlsl
 	entry_point RenderPS
@@ -622,7 +622,7 @@ fragment_program Ogre/Hair/RenderPS
 	}
 }
 
-fragment_program Ogre/Hair/RenderDepthPSSmall
+fragment_program Ogre/Hair/RenderDepthPSSmall hlsl
 {
 	source Hair.hlsl
 	entry_point RenderDepthPSSmall
@@ -634,7 +634,7 @@ fragment_program Ogre/Hair/RenderDepthPSSmall
 	}
 }
 
-fragment_program Ogre/Hair/InterpolatePSMultiStrandCollisions
+fragment_program Ogre/Hair/InterpolatePSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolatePSMultiStrandCollisions
@@ -646,7 +646,7 @@ fragment_program Ogre/Hair/InterpolatePSMultiStrandCollisions
 	}
 }
 
-fragment_program Ogre/Hair/RenderDepthPSSmall_DOM
+fragment_program Ogre/Hair/RenderDepthPSSmall_DOM hlsl
 {
 	source Hair.hlsl
 	entry_point RenderDepthPSSmall_DOM
@@ -958,6 +958,18 @@ geometry_program Ogre/Hair/InterpolateGS2Grid hlsl
 	}	
 }
 
+geometry_program Ogre/Hair/GS_ARRAY hlsl
+{
+	source Hair.hlsl
+	entry_point GS_ARRAY
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
 tesselation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
 {
 	source Hair.hlsl
@@ -1028,6 +1040,342 @@ fragment_program Ogre/Hair/RenderPSForGridMRT hlsl
 	{
 
 	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSBMultiStrandDepthShadows hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSBMultiStrandDepthShadows
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrandDepthShadows
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrandDepthShadows_LOAD
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/FullScreenTriVS hlsl
+{
+	source Hair.hlsl
+	entry_point FullScreenTriVS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshVS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshVS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshVSShadows hlsl
+{
+	source Hair.hlsl
+	entry_point MeshVSShadows
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VSDrawPlane hlsl
+{
+	source Hair.hlsl
+	entry_point VSDrawPlane
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshDepthVS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthVS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VS_GRID hlsl
+{
+	source Hair.hlsl
+	entry_point VS_GRID
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VS_COLLISIONS hlsl
+{
+	source Hair.hlsl
+	entry_point VS_COLLISIONS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VS_GRID_FLUIDSIM hlsl
+{
+	source Hair.hlsl
+	entry_point VS_GRID_FLUIDSIM
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VSArrow hlsl
+{
+	source Hair.hlsl
+	entry_point VSArrow
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/VisDepthsPS hlsl
+{
+	source Hair.hlsl
+	entry_point VisDepthsPS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/CopyTexturePS hlsl
+{
+	source Hair.hlsl
+	entry_point CopyTexturePS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshPS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshPS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshPSShadows hlsl
+{
+	source Hair.hlsl
+	entry_point MeshPSShadows
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PSDrawPlane hlsl
+{
+	source Hair.hlsl
+	entry_point PSDrawPlane
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshDepthPS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthPS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshDepthPS_DOM hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthPS_DOM
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_TEXTURE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_TEXTURE
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_COLLISIONS_TEXTURE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_COLLISIONS_TEXTURE
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_RESOLVE_SUPERSAMPLE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_RESOLVE_SUPERSAMPLE
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_RECONSTRUCT_DEPTH hlsl
+{
+	source Hair.hlsl
+	entry_point PS_RECONSTRUCT_DEPTH
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_TEXTURE_DEMUX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_TEXTURE_DEMUX
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DEMUX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DEMUX
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_VOXELIZE_OBSTACLES hlsl
+{
+	source Hair.hlsl
+	entry_point PS_VOXELIZE_OBSTACLES
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DEMUX_TO_3D_OBSTACLE_TEX
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PSArrow hlsl
+{
+	source Hair.hlsl
+	entry_point PSArrow
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
 }
 
 material Ogre/Hair/RenderHair
@@ -1637,295 +1985,472 @@ material Ogre/Hair/RenderHair
 			cull_hardware none
 			cull_software none
 		}
-		
-		/*
-		//next passes are for shadows--------------------------------------------------------------
+		//next passes are for shadows
 		pass InterpolateInstancedDepthVS
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSBMultiStrandDepthShadows()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall()));        
-			SetDepthStencilState(DepthTest, 0);
-			SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-			SetRasterizerState(SolidNoCull);
+			vertex_program_ref Ogre/Hair/InterpolateVSBMultiStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		}
 
 		pass InterpolateInstancedDepthVS_DOM
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSBMultiStrandDepthShadows()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall_DOM()));        
-			SetDepthStencilState(NoDepthStencilTest, 0);
-			SetRasterizerState(SolidNoCull);
-			SetBlendState( BlendingAdd_BS, float4( 1.0f, 1.0f, 1.0f, 0.0f ), 0xffffffff );
+			vertex_program_ref Ogre/Hair/InterpolateVSBMultiStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		}
 
 		pass InterpolateInstancedDepthVSSingleStrand
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSSingleStrandDepthShadows()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall()));
-			SetDepthStencilState(DepthTest, 0);
-			SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-			SetRasterizerState(SolidNoCull);
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		}
 
 		pass InterpolateInstancedDepthVSSingleStrand_DOM
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSSingleStrandDepthShadows()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall_DOM()));
-			SetDepthStencilState(NoDepthStencilTest, 0);
-			SetRasterizerState(SolidNoCull);
-			SetBlendState( BlendingAdd_BS, float4( 1.0f, 1.0f, 1.0f, 0.0f ), 0xffffffff );
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		}
 
 		pass InterpolateInstancedDepthVSSingleStrand_LOAD
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSSingleStrandDepthShadows_LOAD()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall()));
-			SetDepthStencilState(DepthTest, 0);
-			SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-			SetRasterizerState(SolidNoCull);
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		} 
 		pass InterpolateInstancedDepthVSSingleStrand_LOAD_DOM
 		{
-			SetVertexShader(CompileShader(vs_4_0, InterpolateVSSingleStrandDepthShadows_LOAD()));
-			SetGeometryShader(CompileShader(gs_4_0, InterpolateGSDepthShadows()));
-			SetPixelShader(CompileShader(ps_4_0, RenderDepthPSSmall_DOM()));
-			SetDepthStencilState(NoDepthStencilTest, 0);
-			SetRasterizerState(SolidNoCull);
-			SetBlendState( BlendingAdd_BS, float4( 1.0f, 1.0f, 1.0f, 0.0f ), 0xffffffff );
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
 		} 
 			
 		pass VisualizeShadowMap
 		{
-			SetVertexShader( CompileShader( vs_4_0, FullScreenTriVS() ) );
-			SetGeometryShader( NULL );
-			SetPixelShader( CompileShader( ps_4_0, VisDepthsPS() ) );
-			SetRasterizerState(SolidNoCull);
-			SetDepthStencilState(NoDepthStencilTest, 0);
-			SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );		
+			vertex_program_ref Ogre/Hair/FullScreenTriVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/VisDepthsPS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none	
 		}
 		
 		pass copyTexture
 		{
-			SetVertexShader( CompileShader( vs_4_0, FullScreenTriVS() ) );
-			SetGeometryShader( NULL );
-			SetPixelShader( CompileShader( ps_4_0, CopyTexturePS() ) );
-			SetRasterizerState(SolidNoCull);
-			SetDepthStencilState(NoDepthStencilTest, 0);
-			SetBlendState( NoBlendingJustAlphaWrite, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );	 //TEMP SARAH! set write mask to just be the alpha channel!	 
+			vertex_program_ref Ogre/Hair/FullScreenTriVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/CopyTexturePS
+			{
+			
+			}
+			scene_blend alpha_blend
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
 		}
 		
 		pass AllNulls
 		{
-			SetVertexShader(NULL);
-			SetHullShader(NULL);
-			SetDomainShader(NULL);
-			SetGeometryShader(NULL);
-			SetPixelShader(NULL);
-		}*/
+		}
 	}
 }
-/*
-technique10 RenderMesh
+
+material Ogre/Hair/RenderMesh
 {
-    pass RenderWithoutShadows
-    {
-        SetVertexShader(CompileShader(vs_4_0, MeshVS()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, MeshPS()));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTestOnly, 0);
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-    }
-    pass RenderWithShadows
-    {
-        SetVertexShader(CompileShader(vs_4_0, MeshVSShadows()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, MeshPSShadows()));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTestOnly, 0);
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-    }
-    pass RenderMeshDepthPass
-    {
-        SetVertexShader(CompileShader(vs_4_0, MeshVS()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, MeshPS()));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTest, 0);
-        SetBlendState( NoColorWrite, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-    }
+	technique RenderMesh
+	{
+		pass RenderWithoutShadows
+		{
+			vertex_program_ref Ogre/Hair/MeshVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPS
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		pass RenderWithShadows
+		{
+			vertex_program_ref Ogre/Hair/MeshVSShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPSShadows
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		pass RenderMeshDepthPass
+		{
+			vertex_program_ref Ogre/Hair/MeshVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+			colour_write off
+		}
+	}
+}
+material Ogre/Hair/RenderPlane
+{
+	technique RenderPlane
+	{
+		pass RenderPlaneWithShadows
+		{
+			vertex_program_ref Ogre/Hair/VSDrawPlane
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSDrawPlane
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+			
+		}  
+		pass RenderPlaneWithoutShadows
+		{
+			vertex_program_ref Ogre/Hair/VSDrawPlane
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSDrawPlane
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none			
+		}  
+	}
 }
 
-
-technique10 RenderPlane
+material Ogre/Hair/RenderMeshDepth
 {
-    pass RenderPlaneWithShadows
-    {
-        SetVertexShader(CompileShader(vs_4_0, VSDrawPlane()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, PSDrawPlane(true)));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTest, 0);
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        
-    }  
-    pass RenderPlaneWithoutShadows
-    {
-        SetVertexShader(CompileShader(vs_4_0, VSDrawPlane()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, PSDrawPlane(false)));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTest, 0);
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        
-    }  
+	technique RenderMeshDepth
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/MeshDepthVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshDepthPS
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}  
+	}
+}
+material Ogre/Hair/RenderMeshDepth_DOM
+{
+	technique RenderMeshDepth_DOM
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/MeshDepthVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshDepthPS_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}  
+	}
 }
 
-
-
-technique10 RenderMeshDepth
+material Ogre/Hair/RenderArrow
 {
-    pass
-    {
-        SetVertexShader(CompileShader(vs_4_0, MeshDepthVS()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, MeshDepthPS()));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTest, 0);
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-    }  
+	technique RenderArrow
+	{
+		pass P0
+		{
+			vertex_program_ref Ogre/Hair/VSArrow
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSArrow
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none       
+		}
+	}
 }
 
-technique10 RenderMeshDepth_DOM
+material Ogre/Hair/DrawTexture
 {
-    pass
-    {
-        SetVertexShader(CompileShader(vs_4_0, MeshDepthVS()));
-        SetGeometryShader(0);
-        SetPixelShader(CompileShader(ps_4_0, MeshDepthPS_DOM()));
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(NoDepthStencilTest, 0);
-        SetBlendState( BlendingAdd_BS, float4( 1.0f, 1.0f, 1.0f, 0.0f ), 0xffffffff );
-    }  
+	technique DrawTexture
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_TEXTURE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass drawCollisionsTexture
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_COLLISIONS_TEXTURE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass ResolveSuperSample
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_RESOLVE_SUPERSAMPLE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass ReconstructDepth
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_RECONSTRUCT_DEPTH
+			{
+			
+			}
+			depth_check off
+			depth_write on
+			colour_write off
+		}       
+	}
 }
 
-
-
-technique10 RenderArrow
+material Ogre/Hair/DrawTextureDemuxed
 {
-    pass P0
-    {
-        SetVertexShader(    CompileShader( vs_4_0,VSArrow()      ) ); 
-        SetGeometryShader(  NULL                                   );
-        SetPixelShader(     CompileShader( ps_4_0,PSArrow()      ) );
-        
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetRasterizerState(SolidNoCull);
-        SetDepthStencilState(DepthTest, 0);        
-    }
+	technique DrawTextureDemuxed
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_TEXTURE_DEMUX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
 }
 
-
-
-technique10 DrawTexture
+material Ogre/Hair/TextureDemux
 {
-    pass
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_GRID()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_DRAW_TEXTURE()  ));
+	technique TextureDemux
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
 
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-    pass drawCollisionsTexture
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_COLLISIONS()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_DRAW_COLLISIONS_TEXTURE()  ));
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-    pass ResolveSuperSample
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_COLLISIONS()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_RESOLVE_SUPERSAMPLE()  ));
-
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-    pass ReconstructDepth
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_COLLISIONS()         ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_RECONSTRUCT_DEPTH()  ));
-        
-        SetBlendState( NoColorWrite, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( DepthWriteOnly, 0 );
-        
-        //SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        //SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-    
-        
+			fragment_program_ref Ogre/Hair/PS_DEMUX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
 }
 
-technique10 DrawTextureDemuxed
+material Ogre/Hair/VoxelizeObstacles
 {
-    pass
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_GRID()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_DRAW_TEXTURE_DEMUX()  ));
+	technique VoxelizeObstacles
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
 
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
+			fragment_program_ref Ogre/Hair/PS_VOXELIZE_OBSTACLES
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
 }
 
-technique10 TextureDemux
+material Ogre/Hair/DemuxTo3DFluidObstacles
 {
-    pass
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_GRID()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_DEMUX()         ));
+	technique DemuxTo3DFluidObstacles
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID_FLUIDSIM
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
 
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
+	}
 }
-
-technique10 VoxelizeObstacles
-{
-    pass
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_GRID()          ));
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0,  PS_VOXELIZE_OBSTACLES()         ));
-
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-}
-
-technique10 DemuxTo3DFluidObstacles
-{
-    pass
-    {
-        SetVertexShader(CompileShader( vs_4_0,  VS_GRID_FLUIDSIM()              ));
-        SetGeometryShader( CompileShader( gs_4_0,  GS_ARRAY()                   ));
-        SetPixelShader( CompileShader( ps_4_0,  PS_DEMUX_TO_3D_OBSTACLE_TEX()   ));
-
-        SetBlendState( NoBlending, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
-        SetDepthStencilState( NoDepthStencilTest, 0 );
-    }
-
-}
-*/
