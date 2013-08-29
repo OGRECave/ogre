@@ -58,6 +58,9 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLTextureManager::createWarningTexture()
 	{
+		// NB we bypass state cache, this method is called once on startup and before
+		// GLStateCacheManager::initializeCache
+
 		// Generate warning texture
 		size_t width = 8;
 		size_t height = 8;
