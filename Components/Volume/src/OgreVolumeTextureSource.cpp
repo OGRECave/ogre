@@ -62,7 +62,7 @@ namespace Volume {
         Ogre::ResourceManager::ResourceCreateOrRetrieveResult res =
             TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
             Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
-            false,0,0,Ogre::TEX_TYPE_3D);
+            false, 0, 0, Ogre::TEX_TYPE_3D, 0);
         Ogre::TexturePtr tex = res.first.staticCast<Texture>();
         tex->setUsage(TU_DYNAMIC);
         tex->load();
