@@ -21,18 +21,6 @@ Texture2D g_CoarseGradientMap;
 Texture2D g_DetailNoiseTexture;
 Texture2D g_DetailNoiseGradTexture;
 
-float2 g_DetailUVScale = 1;				// x is scale; y is 1/scale
-
-
-
-float3 g_EyePos;      // world-space eye position
-float3 g_ViewDir;     // world-space eye direction
-// The proj matrix does not vary between the LOD and view-centre versions.  Only the view matrix varies.
-row_major float4x4 g_WorldViewProj;
-row_major float4x4 g_WorldViewLOD, g_WorldViewProjLOD;
-row_major float4x4 g_Proj;
-
-
 cbuffer TessellationBuffer
 {
     float2 g_screenSize; //Tessellation factors: x=edge, y=inside, z=MinDistance, w=range

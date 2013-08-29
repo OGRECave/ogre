@@ -13,7 +13,7 @@ vertex_program Ogre/TerrainTessellation/InitializationVS hlsl
 	
 	default_params
 	{
-
+		param_named_auto g_WorldViewProj worldviewproj_matrix
 	}
 }
 
@@ -25,7 +25,8 @@ fragment_program Ogre/TerrainTessellation/InitializationPS hlsl
 	
 	default_params
 	{
-
+		param_named g_FractalOctaves int3 0 0 0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
 	}
 }
 
@@ -37,7 +38,8 @@ fragment_program Ogre/TerrainTessellation/GradientPS hlsl
 	
 	default_params
 	{
-
+		param_named g_FractalOctaves int3 0 0 0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
 	}
 }
 
@@ -71,19 +73,7 @@ material Ogre/TerrainTessellation/TerrainDeformation
 			{
 			}
 		}
-	}
-
-
-/* ATTENTION HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	CREATE MATERIAL FILE USING THIS PART>
-
-BlendState NoBlending
-
-DepthStencilState DisableDepthWrites
-
-RasterizerState NoMultisampling
-
-*/	
+	}	
 }
 
 vertex_program Ogre/TerrainTessellation/HwTessellationPassThruVS hlsl
@@ -94,7 +84,12 @@ vertex_program Ogre/TerrainTessellation/HwTessellationPassThruVS hlsl
 
 	default_params
 	{
-
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DebugShowTiles bool false
+		param_named g_DetailNoiseScale float 5
+		param_named g_tileSize float 5
+		param_named g_DetailUVScale float2 0.0 0.0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0		
 	}
 }
 
@@ -106,7 +101,14 @@ vertex_program Ogre/TerrainTessellation/VTFDisplacementVS hlsl
 
 	default_params
 	{
-
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DebugShowTiles bool false
+		param_named g_DebugShowPatches bool false
+		param_named g_DetailNoiseScale float 5
+		param_named g_fDiscplacementHeight float 5
+		param_named g_tileSize float 5
+		param_named g_DetailUVScale float2 0.0 0.0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
 	}
 }
 
@@ -118,7 +120,12 @@ tesselation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
 
 	default_params
 	{
-
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named_auto g_WorldViewProjLOD worldviewproj_matrix
+		param_named_auto g_WorldViewLOD worldview_matrix
+		param_named_auto g_Proj projection_matrix
+		param_named_auto g_EyePos camera_position
+		param_named_auto g_ViewDir view_direction
 	}
 }
 
@@ -130,22 +137,12 @@ tesselation_domain_program Ogre/TerrainTessellation/TerrainDisplaceDS hlsl
 
 	default_params
 	{
-
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DebugShowPatches bool true
+		param_named g_fDisplacementHeight float 5
 	}
 }
-/*
-geometry_program Ogre/TerrainTessellation/GSSolidWire
-{
-	source TerrainTessellationWireframe.hlsl
-	entry_point GSSolidWire
-	target gs_4_0
 
-	default_params
-	{
-
-	}
-}
-*/
 fragment_program Ogre/TerrainTessellation/SmoothShadePS hlsl
 {
 	source TerrainTessellation.hlsl
@@ -154,19 +151,7 @@ fragment_program Ogre/TerrainTessellation/SmoothShadePS hlsl
 	
 	default_params
 	{
-
-	}	
-}
-
-fragment_program Ogre/TerrainTessellation/PSSolidWire hlsl
-{
-	source TerrainTessellation.hlsl
-	entry_point PSSolidWire
-	target ps_4_0
-	
-	default_params
-	{
-
+		param_named g_CoarseSampleSpacing float 1.0
 	}	
 }
 
@@ -206,45 +191,6 @@ material Ogre/TerrainTessellation/Terrain
 
 			}
 		}
-		/*
-		pass HwTessellatedWireframe
-		{
-			vertex_program_ref Ogre/TerrainTessellation/HwTessellationPassThruVS
-			{
-			
-			}
-			
-			tesselation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
-			{
-			
-			}
-			
-			tesselation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
-			{
-			
-			}
-			
-			geometry_program_ref Ogre/TerrainTessellation/GSSolidWire
-			{
-			
-			}
-			
-			fragment_program_ref Ogre/TerrainTessellation/PSSolidWire
-			{
-			
-			}	
-			
-			texture_unit 
-			{
-
-			}
-			
-			texture_unit 
-			{
-
-			}
-		}
-		*/
 		pass ShadedTriStrip
 		{
 			vertex_program_ref Ogre/TerrainTessellation/VTFDisplacementVS
@@ -267,68 +213,5 @@ material Ogre/TerrainTessellation/Terrain
 
 			}
 		}
-		/*
-		pass HwTessellatedWireframe
-		{
-			vertex_program_ref Ogre/TerrainTessellation/VTFDisplacementVS
-			{
-			
-			}
-			
-			geometry_program_ref Ogre/TerrainTessellation/GSSolidWire
-			{
-			
-			}
-			
-			fragment_program_ref Ogre/TerrainTessellation/PSSolidWire
-			{
-			
-			}	
-			
-			texture_unit 
-			{
-
-			}
-			
-			texture_unit 
-			{
-
-			}
-		}
-		*/
 	}
 }
-
-/* ATTENTION HERE !!!!!! CREATE THE MATERIAL FILE USING THIS PART
-
-
-// Miscellaneous states
-BlendState EnableColorWrites
-{
-    RenderTargetWriteMask[0] = 0xf;
-};
-
-DepthStencilState EnableDepthWrites
-{
-    DepthEnable = true;
-    DepthWriteMask = 1;
-};
-
-RasterizerState MultisamplingCullFront
-{
-    MultisampleEnable = true;
-    CullMode = Front;
-};
-
-RasterizerState MultisamplingCullBack
-{
-    MultisampleEnable = true;
-    CullMode = Back;
-};
-
-RasterizerState NoMultisampling
-{
-    MultisampleEnable = false;
-    CullMode = None;
-};
-*/

@@ -42,7 +42,7 @@ struct AppVertexTessellation
 	uniform float g_tileSize;
 	uniform float2 g_DetailUVScale;
 	//uniform int3   g_FractalOctaves;
-	float3 g_TextureWorldOffset;
+	uniform float3 g_TextureWorldOffset;
 };
 
 struct AppVertex
@@ -57,9 +57,9 @@ struct AppVertex
 	uniform float g_DetailNoiseScale;
 	uniform float g_fDisplacementHeight;
 	uniform float g_tileSize;
-	uniform float g_DetailUVScale;
+	uniform float2 g_DetailUVScale;
 	//uniform int3   g_FractalOctaves;
-	float3 g_TextureWorldOffset;
+	uniform float3 g_TextureWorldOffset;
 };
 
 SamplerState SamplerRepeatMaxAniso

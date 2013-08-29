@@ -90,7 +90,6 @@ struct PatchData
 
 shared cbuffer cb0
 {
-
 	// rendering control variables
 	float		g_RenderCaustics;
 	float		g_UseDynamicLOD;
@@ -104,11 +103,11 @@ shared cbuffer cb0
 	int			g_MSSamples;
 
 	// view/time dependent variables
-	float4x4    g_ModelViewMatrix;
-    float4x4    g_ModelViewProjectionMatrix;
-	float4x4	g_ModelViewProjectionMatrixInv;
-    float4x4    g_LightModelViewProjectionMatrix;
-    float4x4    g_LightModelViewProjectionMatrixInv;
+	matrix    g_ModelViewMatrix;
+    matrix    g_ModelViewProjectionMatrix;
+	matrix    g_ModelViewProjectionMatrixInv;
+    matrix    g_LightModelViewProjectionMatrix;
+    matrix    g_LightModelViewProjectionMatrixInv;
     float3      g_CameraPosition;
     float3      g_CameraDirection;
 

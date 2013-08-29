@@ -23,7 +23,7 @@ struct DeformVertex
     float4 pos : SV_Position;
     float2 texCoord : TEXCOORD1;
 	uniform int3 g_FractalOctaves;
-	float3 g_TextureWorldOffset;	// Offset of fractal terrain in texture space.
+	uniform float3 g_TextureWorldOffset;	// Offset of fractal terrain in texture space.
 };
 
 DeformVertex InitializationVS( NullVertex input )
@@ -84,12 +84,12 @@ float3 debugFlat(float2 uv)
 
 float4 InitializationPS( DeformVertex input ) : SV_Target
 {
-	const float2 uv = g_TextureWorldOffset.xz + WORLD_UV_REPEATS * input.texCoord;
+	const float2 uv = input.g_TextureWorldOffset.xz + WORLD_UV_REPEATS * input.texCoord;
 	//return float4(debugXRamps(uv),  1);
 	//return float4(debugFlat(uv),  1);
 	//return float4(debugSineHills(uv),  1);
 	//return float4(debugCubes(uv), 1);
-	return hybridTerrain(uv, g_FractalOctaves);
+	return hybridTerrain(uv, input.g_FractalOctaves);
 }
 
 Texture2D g_InputTexture;
