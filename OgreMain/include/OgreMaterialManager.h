@@ -158,7 +158,7 @@ namespace Ogre {
 							const NameValuePairList* createParams = 0);
 		
 		/// Get a resource by name
-		/// @see ResourceManager::getByName
+		/// @see ResourceManager::getResourceByName
 		MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Default constructor.

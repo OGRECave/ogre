@@ -66,7 +66,7 @@ namespace Ogre {
         void _initialise(void);
 
 		/// Get a resource by name
-		/// @see ResourceManager::getByName
+		/// @see ResourceManager::getResourceByName
 		MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
 

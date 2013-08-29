@@ -158,8 +158,8 @@ namespace Ogre {
 			in one call so there are no race conditions if using multiple
 			threads that could cause getByName() to return null, but create() to
 			fail because another thread created a resource in between.
-		@see ResourceManager::create
-		@see ResourceManager::getByName
+		@see ResourceManager::createResource
+		@see ResourceManager::getResourceByName
 		@return A pair, the first element being the pointer, and the second being 
 			an indicator specifying whether the resource was newly created.
 		*/
