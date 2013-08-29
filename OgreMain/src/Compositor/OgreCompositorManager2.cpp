@@ -30,8 +30,11 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 namespace Ogre
 {
@@ -79,18 +82,40 @@ namespace Ogre
 			targetDef->setNumPasses( 2 );
 			{
 				targetDef->addPass( PASS_CLEAR );
-				targetDef->addPass( PASS_SCENE );
+				CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( targetDef->addPass( PASS_SCENE ) );
+
+				passScene->mShadowNode = "Default Shadow Node";
 			}
 		}
 
 		CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( "Default RenderScene" );
 		workDef->connectOutput( 0, "Default Node RenderScene" );
+
+		//-------
+		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
+		shadowNode->setNumShadowTextureDefinitions( 1 );
+		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex" );
+		texDef->width	= 1024;
+		texDef->height	= 1024;
+		texDef->formatList.push_back( PF_FLOAT32_R );
+
+		shadowNode->setNumTargetPass( 1 );
+		{
+			CompositorTargetDef *targetDef = shadowNode->addTargetPass( "MyFirstTex" );
+			targetDef->setNumPasses( 2 );
+			{
+				targetDef->addPass( PASS_CLEAR );
+				CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+				passDef->mShadowMapIdx = 0;
+			}
+		}
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorManager2::~CompositorManager2()
 	{
 		deleteAllSecondClear( mWorkspaceDefs );
 		deleteAllSecondClear( mNodeDefinitions );
+		deleteAllSecondClear( mShadowNodeDefs );
 		deleteAllClear( mWorkspaces );
 	}
 	//-----------------------------------------------------------------------------------
@@ -132,6 +157,45 @@ namespace Ogre
 			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A node definition with name '" +
 							name.getFriendlyText() + "' already exists",
 							"CompositorManager2::addNodeDefinition" );
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
+	const CompositorShadowNodeDef* CompositorManager2::getShadowNodeDefinition(
+																	IdString nodeDefName ) const
+	{
+		CompositorShadowNodeDef const *retVal = 0;
+		
+		CompositorShadowNodeDefMap::const_iterator itor = mShadowNodeDefs.find( nodeDefName );
+		if( itor == mShadowNodeDefs.end() )
+		{
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
+							nodeDefName.getFriendlyText() + "' not found",
+							"CompositorManager2::getShadowNodeDefinition" );
+		}
+		else
+		{
+			retVal = itor->second;
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorShadowNodeDef* CompositorManager2::addShadowNodeDefinition( IdString name )
+	{
+		CompositorShadowNodeDef *retVal = 0;
+
+		if( mShadowNodeDefs.find( name ) == mShadowNodeDefs.end() )
+		{
+			retVal = OGRE_NEW CompositorShadowNodeDef( name );
+			mShadowNodeDefs[name] = retVal;
+		}
+		else
+		{
+			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A shadow node definition with name '" +
+							name.getFriendlyText() + "' already exists",
+							"CompositorManager2::addShadowNodeDefinition" );
 		}
 
 		return retVal;

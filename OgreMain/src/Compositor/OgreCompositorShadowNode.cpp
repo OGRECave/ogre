@@ -37,11 +37,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorShadowNode::CompositorShadowNode( IdType id, IdString name,
-												const CompositorShadowNodeDef *definition,
+	CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
 												const CompositorWorkspace *workspace,
 												RenderSystem *renderSys ) :
-			CompositorNode( id, name, definition, workspace, renderSys )
+			CompositorNode( id, definition->getName(), definition, workspace, renderSys ),
+			mDefinition( definition )
 	{
 		//Create the local textures
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
@@ -95,6 +95,12 @@ namespace Ogre
 
 			++itor;
 		}
+
+		// Shadow Nodes don't have input and global texture should've been created by
+		// the time we get created. Therefore, we can safely initialize now as our
+		// output may be used in regular nodes and we're created on-demand (as soon
+		// as a Node discovers it needs us for the first time, we get created)
+		initializePasses();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNode::~CompositorShadowNode()

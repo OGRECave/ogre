@@ -62,11 +62,21 @@ namespace Ogre
 	protected:
 		CompositorShadowNode	*mShadowNode;
 		Camera					*mCamera;
+		bool					mUpdateShadowNode;
 
 		CompositorWorkspace const *mWorkspace;
 
 	public:
-		CompositorPassScene( const CompositorPassSceneDef *definition,
+		/** Constructor
+		@param definition
+		@param defaultCamera
+			Used when the definition's camera name is empty
+		@param workspace
+			Workspace that ultimately owns us
+		@param target
+			The RenderTarget we're supposed to draw to. Can be RenderWindow, RenderTexture, MRT, etc
+		*/
+		CompositorPassScene( const CompositorPassSceneDef *definition, Camera *defaultCamera,
 								const CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorManager2.h"
-#include "Compositor/OgreCompositorNode.h"
+#include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
@@ -92,8 +92,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::connectAllNodes(void)
 	{
-		//First connect the RenderWindow, otherwise the node could end up not being processed
 		{
+			//First connect the RenderWindow, otherwise the node could end up not being processed
 			CompositorNode *finalNode = findNode( mDefinition->mFinalNode );
 			finalNode->connectFinalRT( mRenderWindow, CompositorChannel::TextureVec(),
 										mDefinition->mFinalInChannel );
@@ -129,7 +129,7 @@ namespace Ogre
 					{
 						if( itRoute->outNode == node->getName() )
 						{
-							node->connectTo( itRoute->outChannel, findNode( itRoute->inNode ),
+							node->connectTo( itRoute->outChannel, findNode( itRoute->inNode, true ),
 											 itRoute->inChannel );
 						}
 						++itRoute;
@@ -197,7 +197,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorNode* CompositorWorkspace::findNode( IdString aliasName ) const
+	CompositorNode* CompositorWorkspace::findNode( IdString aliasName, bool includeShadowNodes ) const
 	{
 		CompositorNode *retVal = 0;
 		CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
@@ -209,6 +209,9 @@ namespace Ogre
 				retVal = *itor;
 			++itor;
 		}
+
+		if( !retVal && includeShadowNodes )
+			retVal = findShadowNode( aliasName );
 
 		return retVal;
 	}
@@ -252,5 +255,31 @@ namespace Ogre
 	{
 		if( mRenderWindow )
 			mRenderWindow->swapBuffers( waitForVSync );
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const
+	{
+		CompositorShadowNode *retVal = 0;
+
+		CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
+		CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
+
+		while( itor != end && !retVal )
+		{
+			if( (*itor)->getName() == nodeDefName )
+				retVal = *itor;
+			++itor;
+		}
+
+		if( !retVal )
+		{
+			//Not found, create one.
+			const CompositorManager2 *compoManager = mDefinition->mCompositorManager;
+			const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
+			retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
+													def, this, mRenderSys );
+		}
+
+		return retVal;
 	}
 }

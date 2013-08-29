@@ -135,9 +135,12 @@ namespace Ogre
 			usage of the 'global' prefix.
 		@par
 			This is a generic way to add input channels, by calling:
+
 				addTextureSourceName( "myRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
+
 			You're assigning an alias named "myRT" to channel Input #0
 			For local or global textures, use addLocalTextureDefinition
+
 		@param fullName
 			The name of the texture. Names are usually valid only throughout this node.
 			We need the name, not its hash because we need to validate the global_ prefix
@@ -149,7 +152,8 @@ namespace Ogre
 		@return
 			IdString of the fullName paremeter, for convenience
 		*/
-		IdString addTextureSourceName( const String &name, size_t index, TextureSource textureSource );
+		virtual IdString addTextureSourceName( const String &name, size_t index,
+												TextureSource textureSource );
 
 		/** Retrieves in which container to look for when looking to which texture is a given name
 			associated with.

@@ -88,7 +88,7 @@ namespace Ogre
 
 			ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
 									size_t _light, size_t _split ) :
-					width(0), height(0), fsaa(0), hwGammaWrite(false), depthBufferId(1),
+					width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
 					light(_light), split(_split), shadowMapTechnique(t), name( _name ) {}
         };
 
@@ -98,8 +98,12 @@ namespace Ogre
 		ShadowMapTechniques	mDefaultTechnique;
 
 	public:
-		CompositorShadowNodeDef( IdType name ) :
+		CompositorShadowNodeDef( IdString name ) :
 				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ) {}
+
+		/// Overloaded to prevent creating input channels.
+		virtual IdString addTextureSourceName( const String &name, size_t index,
+												TextureSource textureSource );
 
 		/** Reserves enough memory for all texture definitions
 		@remarks
@@ -121,10 +125,10 @@ namespace Ogre
 			Must be unique for the same lightIdx.
 		@param name
 			Name to alias this texture for reference. Can be blank. If not blank, must be
-			unique and not contain the "global_" prefix.
+			unique and not contain the "global_" prefix. We need a hard copy
 		*/
 		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
-															 const String &name );
+															 String name );
 	};
 
 	/** @} */

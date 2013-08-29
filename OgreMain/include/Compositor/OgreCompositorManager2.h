@@ -45,6 +45,9 @@ namespace Ogre
 		typedef map<IdString, CompositorNodeDef*>::type CompositorNodeDefMap;
 		CompositorNodeDefMap	mNodeDefinitions;
 
+		typedef map<IdString, CompositorShadowNodeDef*>::type CompositorShadowNodeDefMap;
+		CompositorShadowNodeDefMap mShadowNodeDefs;
+
 		typedef map<IdString, CompositorWorkspaceDef*>::type CompositorWorkspaceDefMap;
 		CompositorWorkspaceDefMap mWorkspaceDefs;
 
@@ -64,20 +67,15 @@ namespace Ogre
 		*/
 		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
 
-		/// Finds the requested ShadowNode. Throws if not found.
-		CompositorShadowNode* findShadowNode( IdString nodeName ) const;
-
-		/** Finds the requested Camera. Throws if not found.
-		@remarks
-			If cameraName is empty, uses the default camera
-		*/
-		Camera* findCamera( IdString cameraName ) const;
-
 		bool hasNodeDefinition( IdString nodeDefName ) const;
 
 		const CompositorNodeDef* getNodeDefinition( IdString nodeDefName ) const;
 
 		CompositorNodeDef* addNodeDefinition( IdString name );
+
+		const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
+
+		CompositorShadowNodeDef* addShadowNodeDefinition( IdString name );
 
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 

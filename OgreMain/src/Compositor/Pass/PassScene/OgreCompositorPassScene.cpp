@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -38,25 +39,23 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
+												Camera *defaultCamera,
 												const CompositorWorkspace *workspace,
 												RenderTarget *target ) :
 				CompositorPass( definition, target ),
 				mDefinition( definition ),
 				mShadowNode( 0 ),
 				mCamera( 0 ),
+				mUpdateShadowNode( true ),
 				mWorkspace( workspace )
 	{
+		//TODO: Determine whether mUpdateShadowNode should be true or false
 		mShadowNode	= workspace->findShadowNode( mDefinition->mShadowNode );
 
 		if( mDefinition->mCameraName != IdString() )
-		{
 			mCamera = workspace->findCamera( mDefinition->mCameraName );
-		}
 		else
-		{
-			//Get the 'default' camera passed to the workspace
-			mCamera = workspace->getDefaultCamera();
-		}
+			mCamera = defaultCamera;
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorPassScene::~CompositorPassScene()
@@ -66,6 +65,21 @@ namespace Ogre
 	void CompositorPassScene::execute()
 	{
 		assert( mDefinition->mVisibilityMask & MovableObject::LAYER_VISIBILITY );
+
+		if( mShadowNode && mUpdateShadowNode )
+		{
+			//We need to prepare for rendering another RT (we broke the contiguous chain)
+			if( !mDefinition->mEndRtUpdate )
+				mTarget->_endUpdate();
+
+			mShadowNode->_update();
+
+			//We need to restore the previous RT's update
+			if( !mDefinition->mBeginRtUpdate )
+				mTarget->_beginUpdate();
+		}
+
+		//Call beginUpdate if we're the first to use this RT
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
 
@@ -73,6 +87,7 @@ namespace Ogre
 		mTarget->_updateViewport( mViewport, mCamera, mDefinition->mFirstRQ,
 									mDefinition->mLastRQ, true );
 
+		//Call endUpdate if we're the last pass in a row to use this RT
 		if( mDefinition->mEndRtUpdate )
 			mTarget->_endUpdate();
 	}

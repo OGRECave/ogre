@@ -32,9 +32,22 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	IdString CompositorShadowNodeDef::addTextureSourceName( const String &name, size_t index,
+															TextureSource textureSource )
+	{
+		if( textureSource == TEXTURE_INPUT )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
+							" Shadow Node: '" + mName.getFriendlyText() + "'",
+							"OgreCompositorShadowNodeDef::addTextureSourceName" );
+		}
+
+		return CompositorNodeDef::addTextureSourceName( name, index, textureSource );
+	}
+	//-----------------------------------------------------------------------------------
 	CompositorShadowNodeDef::ShadowTextureDefinition*
 			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 const String &name )
+																 String name )
 	{
 		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
 		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
@@ -52,12 +65,13 @@ namespace Ogre
 
 		if( !name.empty() )
 		{
-			addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
+			name = "[Light " + StringConverter::toString( lightIdx ) + "; Split " +
+					StringConverter::toString( split ) + "]";
 		}
 
+		addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
 		mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
 																	 lightIdx, split ) );
 		return &mShadowMapTexDefinitions.back();
 	}
-	//-----------------------------------------------------------------------------------
 }

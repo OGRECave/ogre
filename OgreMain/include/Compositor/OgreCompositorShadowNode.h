@@ -61,20 +61,22 @@ namespace Ogre
     */
 	class _OgreExport CompositorShadowNode : public CompositorNode
 	{
+		CompositorShadowNodeDef const *mDefinition;
+
 		struct ShadowMapPass
 		{
 			RenderTarget			*target;
 			ShadowCameraSetupPtr	shadowCameraSetup;
 			size_t					light;	//Render Nth closest light
 			size_t					split;	//Split for that light (only for PSSM/CSM)
-			//CompositorPassScene		*scenePass;
+			CompositorPassScene		*scenePass;
 		};
 
 		typedef vector<ShadowMapPass> ShadowMapPassVec;
 		ShadowMapPassVec		mShadowMaps;
 
 	public:
-		CompositorShadowNode( IdType id, IdString name, const CompositorShadowNodeDef *definition,
+		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
 								const CompositorWorkspace *workspace, RenderSystem *renderSys );
 		~CompositorShadowNode();
 	};

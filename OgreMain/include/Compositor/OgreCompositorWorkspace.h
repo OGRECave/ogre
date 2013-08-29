@@ -70,8 +70,19 @@ namespace Ogre
 		void destroyAllNodes(void);
 		void connectAllNodes(void);
 
-		/// Linear search. Returns null if not found.
-		CompositorNode* findNode( IdString aliasName ) const;
+		/** Finds a node instance with the given aliased name
+		@remarks
+			Linear search O(N)
+		@param aliasName
+			Name of the node instance (they're unique)
+		@param includeShadowNodes
+			When true, also looks for ShadowNodes with that name, if the instance doesn't exists,
+			it's created (default: false). @See findShadowNode
+			When a Node has the same name of a Shadow Node, the Node takes precedence.
+		@return
+			Null if not found. Valid pointer otherwise.
+		*/
+		CompositorNode* findNode( IdString aliasName, bool includeShadowNodes=false ) const;
 
 	public:
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
@@ -96,8 +107,20 @@ namespace Ogre
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapFinalTarget( bool waitForVSync );
 
-		//TODO
-		CompositorShadowNode* findShadowNode( IdString nodeName ) const	{ return 0; }
+		/** Finds a shadow node given it's definition name. If it doesn't exist, creates one.
+			Note that unlike nodes, there can only be one ShadowNode instance per definition
+			(in the same workspace)
+		@remarks
+			Performs a linear search O(N). There aren't many ShadowNodes active in a workspace
+			to justify a better container (plus we mostly iterate through it).
+		@par
+			Throws if the shadow definition doesn't exist.
+		@param nodeDefName
+			Name of the definition.
+		@return
+			ShadowNode pointer
+		*/
+		CompositorShadowNode* findShadowNode( IdString nodeDefName ) const;
 
 		/// Finds a camera in the scene manager we have.
 		Camera* findCamera( IdString cameraName ) const;

@@ -73,6 +73,8 @@ namespace Ogre
 	public:
 		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( mName ) {}
 
+		IdString getName() const							{ return mName; }
+
 		/// See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
 		using TextureDefinitionBase::getTextureSource;
 		/** Retrieves in which container to look for when wanting to know the output texture
@@ -109,7 +111,7 @@ namespace Ogre
 			finalize whatever we couldn't do because not all definitions were loaded when
 			we were created.
 		*/
-		void _validateAndFinish(void);
+		virtual void _validateAndFinish(void);
 	};
 
 	/** @} */

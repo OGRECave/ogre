@@ -76,6 +76,9 @@ namespace Ogre
 		float				mVpWidth;
 		float				mVpHeight;
 
+		/// Shadow map index it belongs to (only filled in passes owned by Shadow Nodes)
+		uint32				mShadowMapIdx;
+
 		/// True if a previous pass doesn't alter the contents of the same render target we do
 		bool				mBeginRtUpdate;
 		/// End if we're the last consecutive pass to alter the contents of the same render target
@@ -85,7 +88,7 @@ namespace Ogre
 		CompositorPassDef( CompositorPassType passType ) :
 			mPassType( passType ),
 			mVpLeft( 0 ), mVpTop( 0 ),
-			mVpWidth( 1 ), mVpHeight( 1 ),
+			mVpWidth( 1 ), mVpHeight( 1 ), mShadowMapIdx( 0 ),
 			mBeginRtUpdate( true ), mEndRtUpdate( true ) {}
 		CompositorPassType getType() const				{ return mPassType; }
 	};

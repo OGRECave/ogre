@@ -33,12 +33,14 @@ namespace Ogre
 {
 	class CompositorNode;
 	class CompositorPass;
+	class CompositorPassScene;
 	class CompositorShadowNode;
 	class CompositorWorkspace;
 	class RenderTarget;
 	struct CompositorChannel;
 
 	class CompositorNodeDef;
+	class CompositorShadowNodeDef;
 	class CompositorWorkspaceDef;
 
 	class CompositorManager2;
