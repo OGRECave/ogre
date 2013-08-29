@@ -64,6 +64,16 @@ namespace Ogre {
         TextureManager(void);
         virtual ~TextureManager();
 
+
+		/// Create a new texture
+		/// @see ResourceManager::createResource
+		TexturePtr create (const String& name, const String& group,
+							bool isManual = false, ManualResourceLoader* loader = 0,
+							const NameValuePairList* createParams = 0);
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		TexturePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
         /** Create a new texture, or retrieve an existing one with the same
             name if it already exists.
             @param

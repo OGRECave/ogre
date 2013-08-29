@@ -773,7 +773,7 @@ namespace Ogre {
 	}
 	void InstancedGeometry::MaterialBucket:: setMaterial(const String & name)
 	{
-		mMaterial=MaterialManager::getSingleton().getByName(name).staticCast<Material>();
+		mMaterial=MaterialManager::getSingleton().getByName(name);
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::destroy(void)
@@ -1566,7 +1566,7 @@ namespace Ogre {
 		, mTechnique(0)
 		, mLastIndex(0)
 	{
-        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName).staticCast<Material>();
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 	}
 	//--------------------------------------------------------------------------
 	InstancedGeometry::MaterialBucket::~MaterialBucket()
@@ -1618,7 +1618,7 @@ namespace Ogre {
 	void InstancedGeometry::MaterialBucket::build()
 	{
 		mTechnique = 0;
-		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName).staticCast<Material>();
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 		if (mMaterial.isNull())
 		{
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,

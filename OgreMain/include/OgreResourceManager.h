@@ -145,7 +145,7 @@ namespace Ogre {
         @param createParams If any parameters are required to create an instance,
             they should be supplied here as name / value pairs
         */
-        virtual ResourcePtr create(const String& name, const String& group, 
+        virtual ResourcePtr createResource(const String& name, const String& group,
             bool isManual = false, ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
 
@@ -158,8 +158,8 @@ namespace Ogre {
 			in one call so there are no race conditions if using multiple
 			threads that could cause getByName() to return null, but create() to
 			fail because another thread created a resource in between.
-		@see ResourceManager::create
-		@see ResourceManager::getByName
+		@see ResourceManager::createResource
+		@see ResourceManager::getResourceByName
 		@return A pair, the first element being the pointer, and the second being 
 			an indicator specifying whether the resource was newly created.
 		*/
@@ -348,7 +348,7 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        virtual ResourcePtr getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
@@ -356,7 +356,7 @@ namespace Ogre {
 		/// Returns whether the named resource exists in this manager
 		virtual bool resourceExists(const String& name)
 		{
-			return !getByName(name).isNull();
+			return !getResourceByName(name).isNull();
 		}
 		/// Returns whether a resource with the given handle exists in this manager
 		virtual bool resourceExists(ResourceHandle handle)

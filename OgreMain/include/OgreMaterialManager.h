@@ -127,6 +127,7 @@ namespace Ogre {
         OGRE_THREAD_POINTER(MaterialSerializer, mSerializer);
 		/// Default settings
 		MaterialPtr mDefaultSettings;
+
 		/// Overridden from ResourceManager
 		Resource* createImpl(const String& name, ResourceHandle handle, 
 			const String& group, bool isManual, ManualResourceLoader* loader,
@@ -149,7 +150,17 @@ namespace Ogre {
     public:
 		/// Default material scheme
 		static String DEFAULT_SCHEME_NAME;
+
+		/// Create a new material
+		/// @see ResourceManager::createResource
+		MaterialPtr create (const String& name, const String& group,
+							bool isManual = false, ManualResourceLoader* loader = 0,
+							const NameValuePairList* createParams = 0);
 		
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
         /** Default constructor.
         */
         MaterialManager();

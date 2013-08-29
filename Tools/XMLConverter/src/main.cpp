@@ -471,7 +471,7 @@ void meshToXML(XmlOptions opts)
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
 
     MeshPtr mesh = MeshManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Mesh>();
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     
 
     meshSerializer->importMesh(stream, mesh.getPointer());
@@ -842,7 +842,7 @@ void XMLToBinary(XmlOptions opts)
     {
         delete doc;
         SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
+            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
 		if (opts.optimiseAnimations)
 		{
@@ -872,7 +872,7 @@ void skeletonToXML(XmlOptions opts)
 	}
 
     SkeletonPtr skel = SkeletonManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));

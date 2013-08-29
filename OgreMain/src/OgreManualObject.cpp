@@ -185,7 +185,7 @@ namespace Ogre {
 		}
 
         // Check that a valid material was provided
-        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
+        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
 
 		if( material.isNull() )
 		{
@@ -194,7 +194,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
+            material = MaterialManager::getSingleton().getByName("BaseWhite");
 
 			if (material.isNull())
 			{

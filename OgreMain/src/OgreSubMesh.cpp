@@ -161,7 +161,7 @@ namespace Ogre {
         if (hasTextureAliases() && MaterialManager::getSingleton().resourceExists(mMaterialName))
         {
             // get the current submesh material
-            MaterialPtr material = MaterialManager::getSingleton().getByName( mMaterialName ).staticCast<Material>();
+            MaterialPtr material = MaterialManager::getSingleton().getByName( mMaterialName );
             // get test result for if change will occur when the texture aliases are applied
             if (material->applyTextureAliases(mTextureAliases, false))
             {
@@ -195,7 +195,7 @@ namespace Ogre {
 				if(!MaterialManager::getSingleton().resourceExists(newMaterialName))
 				{
 					Ogre::MaterialPtr newMaterial = Ogre::MaterialManager::getSingleton().create(
-						newMaterialName, material->getGroup()).staticCast<Material>();
+						newMaterialName, material->getGroup());
 					// copy parent material details to new material
 					material->copyDetailsTo(newMaterial);
 					// apply texture aliases to new material
