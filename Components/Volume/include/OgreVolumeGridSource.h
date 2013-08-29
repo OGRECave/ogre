@@ -44,12 +44,15 @@ namespace Volume {
     protected:
 
         /// The texture width.
-        int mWidth;
+        size_t mWidth;
 
         /// The texture height.
-        int mHeight;
-
-        /// The scale of the position based on the world width.
+        size_t mHeight;
+		
+        /// The texture depth.
+        size_t mDepth;
+        
+		/// The scale of the position based on the world width.
         Real mPosXScale;
         
         /// The scale of the position based on the world height.
@@ -57,9 +60,6 @@ namespace Volume {
         
         /// The scale of the position based on the world depth.
         Real mPosZScale;
-
-        /// The texture depth.
-        int mDepth;
 
         /// Whether to use trilinear filtering or not for the value.
         bool mTrilinearValue;
@@ -91,7 +91,7 @@ namespace Volume {
         @return
             The density.
         */
-        virtual float getVolumeGridValue(int x, int y, int z) const = 0;
+        virtual float getVolumeGridValue(size_t x, size_t y, size_t z) const = 0;
         
         /** Sets the volume value of a position.
         @param x
