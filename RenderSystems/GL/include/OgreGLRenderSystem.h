@@ -505,6 +505,7 @@ namespace Ogre {
         void unregisterThread();
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
+        GLSupport* getGLSupportRef() { return mGLSupport; }
 
         // ----------------------------------
         // GLRenderSystem specific members

@@ -116,12 +116,11 @@ namespace Ogre {
         mRenderAttribsBound.reserve(100);
         mRenderInstanceAttribsBound.reserve(100);
 
-        mStateCacheManager = new GLStateCacheManager();
+        mStateCacheManager = OGRE_NEW GLStateCacheManager();
 
 		// Get our GLSupport
 		mGLSupport = getGLSupport();
 		mGLSupport->setStateCacheManager(mStateCacheManager);
-
 
 		for( i=0; i<MAX_LIGHTS; i++ )
 			mLights[i] = NULL;
@@ -947,7 +946,7 @@ namespace Ogre {
 	{
 		RenderSystem::shutdown();
 
-		delete mStateCacheManager;
+		OGRE_DELETE mStateCacheManager;
 
 		// Deleting the GLSL program factory
 		if (mGLSLProgramFactory)
@@ -1860,7 +1859,7 @@ namespace Ogre {
 		else
 		{
 			mStateCacheManager->setEnabled(GL_BLEND);
-			glBlendFunc(sourceBlend, destBlend);
+			mStateCacheManager->setBlendFunc(sourceBlend, destBlend);
 		}
 
 		GLint func = GL_FUNC_ADD;
@@ -2366,7 +2365,7 @@ namespace Ogre {
 				mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT);
 				// Back
 				glActiveStencilFaceEXT(GL_BACK);
-				glStencilMask(writeMask);
+				mStateCacheManager->setStencilMask(writeMask);
 				glStencilFunc(convertCompareFunction(func), refValue, compareMask);
 				glStencilOp(
 					convertStencilOp(stencilFailOp, !flip), 
@@ -2374,7 +2373,7 @@ namespace Ogre {
 					convertStencilOp(passOp, !flip));
 				// Front
 				glActiveStencilFaceEXT(GL_FRONT);
-				glStencilMask(writeMask);
+				mStateCacheManager->setStencilMask(writeMask);
 				glStencilFunc(convertCompareFunction(func), refValue, compareMask);
 				glStencilOp(
 					convertStencilOp(stencilFailOp, flip),
@@ -2388,7 +2387,7 @@ namespace Ogre {
                 mStateCacheManager->setDisabled(GL_STENCIL_TEST_TWO_SIDE_EXT);
 
 			flip = false;
-			glStencilMask(writeMask);
+			mStateCacheManager->setStencilMask(writeMask);
 			glStencilFunc(convertCompareFunction(func), refValue, compareMask);
 			glStencilOp(
 				convertStencilOp(stencilFailOp, flip),
@@ -2940,7 +2939,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 			if(mCurrentCapabilities->hasCapability(RSC_VBO))
 			{
-				glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
+				mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB,
 					static_cast<GLHardwareIndexBuffer*>(
 					op.indexData->indexBuffer.get())->getGLBufferId());
 
@@ -3320,7 +3319,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		{
 			flags |= GL_STENCIL_BUFFER_BIT;
 			// Enable buffer for writing if it isn't
-			glStencilMask(0xFFFFFFFF);
+			mStateCacheManager->setStencilMask(0xFFFFFFFF);
 
 			glClearStencil(stencil);
 		}
@@ -3369,7 +3368,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 		if (buffers & FBT_STENCIL)
 		{
-			glStencilMask(mStencilWriteMask);
+			mStateCacheManager->setStencilMask(mStencilWriteMask);
 		}
 	}
 	// ------------------------------------------------------------------
@@ -3527,7 +3526,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// difference with the really state stored in GL context.
 		mStateCacheManager->setDepthMask(mDepthWrite);
 		mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
-		glStencilMask(mStencilWriteMask);
+		mStateCacheManager->setStencilMask(mStencilWriteMask);
 
 	}
 	//---------------------------------------------------------------------
@@ -3706,7 +3705,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
         if(mCurrentCapabilities->hasCapability(RSC_VBO))
         {
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 
+            mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER_ARB, 
                 hwGlBuffer->getGLBufferId());
             pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
         }

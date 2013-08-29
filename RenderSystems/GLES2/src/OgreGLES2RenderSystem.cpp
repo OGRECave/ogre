@@ -93,7 +93,7 @@ namespace Ogre {
         mResourceManager = OGRE_NEW AndroidResourceManager();
 #endif
         
-		mStateCacheManager = new GLES2StateCacheManager();
+		mStateCacheManager = OGRE_NEW GLES2StateCacheManager();
         mGLSupport = getGLSupport();
 		mGLSupport->setStateCacheManager(mStateCacheManager);
         

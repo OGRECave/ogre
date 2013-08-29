@@ -41,8 +41,6 @@ namespace Ogre {
     
     void GLStateCacheManager::initializeCache()
     {
-        // XXX: Initial state is guaranteed by the spec, this function should probably be removed
-
         glBlendEquation(GL_FUNC_ADD);
         
         glBlendFunc(GL_ONE, GL_ZERO);

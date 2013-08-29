@@ -33,14 +33,16 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    class GLStateCacheManager;
+
 // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
 #	define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
-
 
     /** Implementation of HardwareBufferManager for OpenGL. */
     class _OgreGLExport GLHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
 	protected:
+        GLStateCacheManager* mStateCacheManager;
 		char* mScratchBufferPool;
 		OGRE_MUTEX(mScratchMutex);
 		size_t mMapBufferThreshold;
@@ -67,6 +69,8 @@ namespace Ogre {
 
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(unsigned int type);
+
+        GLStateCacheManager * getStateCacheManager() { return mStateCacheManager; }
 
 		/** Allocator method to allow us to use a pool of memory as a scratch
 			area for hardware buffers. This is because glMapBuffer is incredibly
