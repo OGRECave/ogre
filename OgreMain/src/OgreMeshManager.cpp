@@ -140,7 +140,7 @@ namespace Ogre
         ManualResourceLoader* loader)
     {
 		// Don't try to get existing, create should fail if already exists
-		return createResource(name, groupName, true, loader).staticCast<Mesh>();
+		return create(name, groupName, true, loader);
     }
     //-----------------------------------------------------------------------
     MeshPtr MeshManager::createPlane( const String& name, const String& groupName,
@@ -349,11 +349,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::createPrefabPlane(void)
     {
-        MeshPtr msh = createResource(
+        MeshPtr msh = create(
             "Prefab_Plane", 
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
             true, // manually loaded
-            this).staticCast<Mesh>();
+            this);
 		// Planes can never be manifold
 		msh->setAutoBuildEdgeLists(false);
         // to preserve previous behaviour, load immediately
@@ -362,11 +362,11 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void MeshManager::createPrefabCube(void)
 	{
-		MeshPtr msh = createResource(
+		MeshPtr msh = create(
 			"Prefab_Cube", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded
-			this).staticCast<Mesh>();
+			this);
 
 		// to preserve previous behaviour, load immediately
 		msh->load();
@@ -374,11 +374,11 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	void MeshManager::createPrefabSphere(void)
 	{
-		MeshPtr msh = createResource(
+		MeshPtr msh = create(
 			"Prefab_Sphere", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded
-			this).staticCast<Mesh>();
+			this);
 
 		// to preserve previous behaviour, load immediately
 		msh->load();
@@ -939,7 +939,7 @@ namespace Ogre
                 "MeshManager::createBezierPatch");
         }
 
-        MeshPtr pMesh = getByName(name).staticCast<Mesh>();
+        MeshPtr pMesh = getByName(name);
         if (!pMesh.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A mesh called " + name + 

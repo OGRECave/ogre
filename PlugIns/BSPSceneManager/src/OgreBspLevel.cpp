@@ -344,7 +344,7 @@ namespace Ogre {
 			tmp << q3lvl.mShaders[shadIdx].name << "#" << q3lvl.mFaces[face].lm_texture;
 			shaderName = tmp.str();
 
-            MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName).staticCast<Material>();
+            MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName);
             if (shadMat.isNull())
             {
                 // Build new material
@@ -368,7 +368,7 @@ namespace Ogre {
                 else
                 {
                     // No shader script, try default type texture
-                    shadMat = mm.create(shaderName, resourceGroup).staticCast<Material>();
+                    shadMat = mm.create(shaderName, resourceGroup);
                     Pass *shadPass = shadMat->getTechnique(0)->getPass(0);
                     // Try jpg
                     TextureUnitState* tex = 0;

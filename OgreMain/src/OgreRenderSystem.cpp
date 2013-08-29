@@ -437,7 +437,7 @@ namespace Ogre {
 	void RenderSystem::_setTexture(size_t unit, bool enabled, 
 		const String &texname)
 	{
-		TexturePtr t = TextureManager::getSingleton().getByName(texname).staticCast<Texture>();
+		TexturePtr t = TextureManager::getSingleton().getByName(texname);
 		_setTexture(unit, enabled, t);
 	}
 	//-----------------------------------------------------------------------

@@ -119,7 +119,7 @@ public:
 		{
 			materialName += "Shadow";
 		}
-		return MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
+		return MaterialManager::getSingleton().getByName(materialName);
 	}
 
 	protected:
@@ -290,7 +290,7 @@ public:
 		{
 			materialName += "Shadow";
 		}
-		return MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
+		return MaterialManager::getSingleton().getByName(materialName);
 	}
 
 protected:

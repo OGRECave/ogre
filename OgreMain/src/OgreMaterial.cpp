@@ -201,11 +201,11 @@ namespace Ogre {
 		MaterialPtr newMat;
 		if (changeGroup)
 		{
-			newMat = MaterialManager::getSingleton().create(newName, newGroup).staticCast<Material>();
+			newMat = MaterialManager::getSingleton().create(newName, newGroup);
 		}
 		else
 		{
-			newMat = MaterialManager::getSingleton().create(newName, mGroup).staticCast<Material>();
+			newMat = MaterialManager::getSingleton().create(newName, mGroup);
 		}
         
 

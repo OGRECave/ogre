@@ -1308,7 +1308,7 @@ namespace Ogre {
 	void StaticGeometry::MaterialBucket::build(bool stencilShadows)
 	{
 		mTechnique = 0;
-		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName).staticCast<Material>();
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 		if (mMaterial.isNull())
 		{
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,

@@ -73,7 +73,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name).staticCast<GpuProgram>();
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgram(name, groupName, filename, gptype, syntaxCode);
@@ -91,7 +91,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name).staticCast<GpuProgram>();
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);

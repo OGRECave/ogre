@@ -518,7 +518,7 @@ void Sample_Compositor::createEffects(void)
 		/// Motion blur effect
 	Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
 			"Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		).staticCast<Compositor>();
+		);
 	{
 		Ogre::CompositionTechnique *t = comp3->createTechnique();
 		{
@@ -589,7 +589,7 @@ void Sample_Compositor::createEffects(void)
 	/// Heat vision effect
 	Ogre::CompositorPtr comp4 = Ogre::CompositorManager::getSingleton().create(
 			"Heat Vision", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		).staticCast<Compositor>();
+		);
 	{
 		Ogre::CompositionTechnique *t = comp4->createTechnique();
 		t->setCompositorLogicName("HeatVision");

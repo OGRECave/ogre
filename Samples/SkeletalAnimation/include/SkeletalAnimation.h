@@ -158,7 +158,7 @@ protected:
 #ifdef USE_RTSHADER_SYSTEM
             if (mShaderGenerator->getTargetLanguage() == "glsles")
             {
-                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua").staticCast<Material>();
+                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
                 mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
             }
 #endif

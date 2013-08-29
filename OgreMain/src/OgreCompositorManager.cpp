@@ -166,7 +166,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 //-----------------------------------------------------------------------
 CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String &compositor, int addPosition)
 {
-	CompositorPtr comp = getByName(compositor).staticCast<Compositor>();
+	CompositorPtr comp = getByName(compositor);
 	if(comp.isNull())
 		return 0;
 	CompositorChain *chain = getCompositorChain(vp);
