@@ -107,6 +107,18 @@ namespace Ogre {
 	{
 		return OGRE_NEW Material(this, name, handle, group, isManual, loader);
 	}
+	//-----------------------------------------------------------------------
+	MaterialPtr MaterialManager::create (const String& name, const String& group,
+									bool isManual, ManualResourceLoader* loader,
+									const NameValuePairList* createParams)
+	{
+		return createResource(name,group,isManual,loader,createParams).staticCast<Material>();
+	}
+	//-----------------------------------------------------------------------
+	MaterialPtr MaterialManager::getByName(const String& name, const String& groupName)
+	{
+		return getResourceByName(name, groupName).staticCast<Material>();
+	}
     //-----------------------------------------------------------------------
 	void MaterialManager::initialise(void)
 	{

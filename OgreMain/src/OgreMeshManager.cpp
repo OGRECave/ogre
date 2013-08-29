@@ -71,6 +71,11 @@ namespace Ogre
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
+    MeshPtr MeshManager::getByName(const String& name, const String& groupName)
+    {
+        return getResourceByName(name, groupName).staticCast<Mesh>();
+    }
+    //-----------------------------------------------------------------------
     void MeshManager::_initialise(void)
     {
         // Create prefab objects
@@ -124,11 +129,18 @@ namespace Ogre
         return pMesh;
     }
     //-----------------------------------------------------------------------
+    MeshPtr MeshManager::create (const String& name, const String& group,
+                                    bool isManual, ManualResourceLoader* loader,
+                                    const NameValuePairList* createParams)
+    {
+        return createResource(name,group,isManual,loader,createParams).staticCast<Mesh>();
+    }
+    //-----------------------------------------------------------------------
     MeshPtr MeshManager::createManual( const String& name, const String& groupName, 
         ManualResourceLoader* loader)
     {
 		// Don't try to get existing, create should fail if already exists
-        return create(name, groupName, true, loader).staticCast<Mesh>();
+		return createResource(name, groupName, true, loader).staticCast<Mesh>();
     }
     //-----------------------------------------------------------------------
     MeshPtr MeshManager::createPlane( const String& name, const String& groupName,
@@ -337,7 +349,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::createPrefabPlane(void)
     {
-        MeshPtr msh = create(
+        MeshPtr msh = createResource(
             "Prefab_Plane", 
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
             true, // manually loaded
@@ -350,7 +362,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void MeshManager::createPrefabCube(void)
 	{
-		MeshPtr msh = create(
+		MeshPtr msh = createResource(
 			"Prefab_Cube", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded
@@ -362,7 +374,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	void MeshManager::createPrefabSphere(void)
 	{
-		MeshPtr msh = create(
+		MeshPtr msh = createResource(
 			"Prefab_Sphere", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded

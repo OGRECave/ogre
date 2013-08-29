@@ -71,6 +71,10 @@ namespace Ogre {
 		GpuProgramManager();
 		virtual ~GpuProgramManager();
 
+		/// Get a resource by name
+		/// @see GpuProgramManager::getResourceByName
+		GpuProgramPtr getByName(const String& name, bool preferHighLevelPrograms = true);
+
         /** Loads a GPU program from a file of assembly. 
 		@remarks
 			This method creates a new program of the type specified as the second parameter.
@@ -158,12 +162,12 @@ namespace Ogre {
             GpuProgramType gptype, const String& syntaxCode, bool isManual = false, 
             ManualResourceLoader* loader = 0);
 
-        /** Overrides the standard ResourceManager getByName method.
+        /** Overrides the standard ResourceManager getResourceByName method.
         @param name The name of the program to retrieve
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
             returned in preference to low-level programs.
         */
-        ResourcePtr getByName(const String& name, bool preferHighLevelPrograms = true);
+        ResourcePtr getResourceByName(const String& name, bool preferHighLevelPrograms = true);
 
 
 		/** Create a new set of shared parameters, which can be used across many 

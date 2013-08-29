@@ -43,6 +43,11 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
+    //-----------------------------------------------------------------------
+    GpuProgramPtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    {
+        return getResourceByName(name, preferHighLevelPrograms).staticCast<GpuProgram>();
+    }
 	//---------------------------------------------------------------------------
 	GpuProgramManager::GpuProgramManager()
 	{
@@ -154,16 +159,16 @@ namespace Ogre {
         return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    ResourcePtr GpuProgramManager::getResourceByName(const String& name, bool preferHighLevelPrograms)
     {
         ResourcePtr ret;
         if (preferHighLevelPrograms)
         {
-            ret = HighLevelGpuProgramManager::getSingleton().getByName(name);
+            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name);
             if (!ret.isNull())
                 return ret;
         }
-        return ResourceManager::getByName(name);
+        return ResourceManager::getResourceByName(name);
     }
 	//-----------------------------------------------------------------------------
 	GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)

@@ -77,6 +77,18 @@ namespace Ogre
 	{
 		return OGRE_NEW Font(this, name, handle, group, isManual, loader);
 	}
+	//-----------------------------------------------------------------------
+	FontPtr FontManager::getByName(const String& name, const String& groupName)
+	{
+		return getResourceByName(name, groupName).staticCast<Font>();
+	}
+	//---------------------------------------------------------------------
+	FontPtr FontManager::create (const String& name, const String& group,
+									bool isManual, ManualResourceLoader* loader,
+									const NameValuePairList* createParams)
+	{
+		return createResource(name,group,isManual,loader,createParams).staticCast<Font>();
+	}
 	//---------------------------------------------------------------------
     void FontManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
@@ -102,7 +114,7 @@ namespace Ogre
 						// chop off the 'particle_system ' needed by new compilers
 						line = line.substr(5);
 					}
-				    pFont = create(line, groupName).staticCast<Font>();
+					pFont = createResource(line, groupName).staticCast<Font>();
 					pFont->_notifyOrigin(stream->getName());
 				    // Skip to and over next {
                     stream->skipLine("{");
