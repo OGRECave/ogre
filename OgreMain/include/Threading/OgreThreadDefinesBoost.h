@@ -59,7 +59,7 @@ THE SOFTWARE
 #define OGRE_THREAD_NOTIFY_ONE(sync) sync.notify_one()
 #define OGRE_THREAD_NOTIFY_ALL(sync) sync.notify_all()
 // Read-write mutex
-#define OGRE_RW_MUTEX(name) mutable boost::shared_mutex name;
+#define OGRE_RW_MUTEX(name) mutable boost::shared_mutex name
 #define OGRE_LOCK_RW_MUTEX_READ(name) boost::shared_lock<boost::shared_mutex> ogrenameLock(name)
 #define OGRE_LOCK_RW_MUTEX_WRITE(name) boost::unique_lock<boost::shared_mutex> ogrenameLock(name)
 // Thread-local pointer
