@@ -77,7 +77,7 @@ namespace Ogre {
 	{
 		uint32 operator()(const Pass* p) const
 		{
-                    OGRE_LOCK_MUTEX(p->mGpuProgramChangeMutex);
+			OGRE_LOCK_MUTEX(p->mGpuProgramChangeMutex);
 
 			_StringHash H;
 			uint32 hash = p->getIndex() << 28;
@@ -87,6 +87,18 @@ namespace Ogre {
 			if (p->hasFragmentProgram())
 				hash += (static_cast<uint32>(H(p->getFragmentProgramName()))
 					% (1 << 14));
+			if (p->hasGeometryProgram())
+				hash += (static_cast<uint32>(H(p->getGeometryProgramName()))
+						 % (1 << 14));
+			if (p->hasTesselationDomainProgram())
+				hash += (static_cast<uint32>(H(p->getTesselationDomainProgramName()))
+						 % (1 << 14));
+			if (p->hasTesselationHullProgram())
+				hash += (static_cast<uint32>(H(p->getTesselationHullProgramName()))
+						 % (1 << 14));
+			if (p->hasComputeProgram())
+				hash += (static_cast<uint32>(H(p->getComputeProgramName()))
+						 % (1 << 14));
 
 			return hash;
 		}
