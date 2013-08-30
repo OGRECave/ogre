@@ -41,40 +41,44 @@ Texture3D Texture_obstvelocity;
 
 
 // Variables
-int         fluidType = FT_SMOKE;
-bool        advectAsTemperature = false;
-bool        treatAsLiquidVelocity = false;
-int         drawTextureNumber = 1;
-float       textureWidth;
-float       textureHeight;
-float       textureDepth;
-float       liquidHeight = 24;
+shader cbuffer cb0
+{
+	//int         fluidType = FT_SMOKE;
+	bool        g_advectAsTemperature = false;
+	bool        g_treatAsLiquidVelocity = false;
+	int         g_drawTextureNumber = 1;
+	float       g_textureWidth;
+	float       g_textureHeight;
+	float       g_textureDepth;
 
-// NOTE: The spacing between simulation grid cells is \delta x  = 1, so it is omitted everywhere
-float       timestep                = 1.0f;
-float       decay                   = 1.0f; // this is the (1.0 - dissipation_rate). dissipation_rate >= 0 ==> decay <= 1
-float       rho                     = 1.2f; // rho = density of the fluid
-float       viscosity               = 5e-6f;// kinematic viscosity
-float       vortConfinementScale    = 0.0f; // this is typically a small value >= 0
-float3      gravity                 = 0;    // note this is assumed to be given as pre-multiplied by the timestep, so it's really velocity: cells per step
-float       temperatureLoss         = 0.003;// a constant amount subtracted at every step when advecting a quatnity as tempterature
+	// NOTE: The spacing between simulation grid cells is \delta x  = 1, so it is omitted everywhere
+	float       g_timestep                = 1.0f;
+	float       g_decay                   = 1.0f; // this is the (1.0 - dissipation_rate). dissipation_rate >= 0 ==> g_decay <= 1
+	float       g_viscosity               = 5e-6f;// kinematic g_viscosity
+	float       g_vortConfinementScale    = 0.0f; // this is typically a small value >= 0
+	float3      g_gravity                 = 0;    // note this is assumed to be given as pre-multiplied by the g_timestep, so it's really velocity: cells per step
+	float       g_temperatureLoss         = 0.003;// a constant amount subtracted at every step when advecting a quatnity as tempterature
 
-float       radius;
-float3      center; 
-float4      color;
+	float       g_radius;
+	float3      g_center; 
+	float4      g_color;
 
-float4      obstBoxVelocity = float4(0, 0, 0, 0);
-float3      obstBoxLBDcorner;
-float3      obstBoxRTUcorner;
+	float4      g_obstBoxVelocity = float4(0, 0, 0, 0);
+	float3      g_obstBoxLBDcorner;
+	float3      g_obstBoxRTUcorner;
+}
+
 
 //parameters for attenuating velocity based on porous obstacles.
 //these values are not hooked into CPP code yet, and so this option is not used currently
-bool        doVelocityAttenuation = false; 
-float       maxDensityAmount = 0.7;
-float       maxDensityDecay = 0.95;
-//--------------------------------------------------------------------------------------
-// Pipeline State definitions
-//--------------------------------------------------------------------------------------
+shared cbuffer constants
+{
+	bool        doVelocityAttenuation = false; 
+	float       maxDensityAmount = 0.7;
+	float       maxDensityg_decay = 0.95;
+	float       liquidHeight = 24;
+	float       rho                     = 1.2f; // rho = density of the fluid
+}
 
 SamplerState samPointClamp
 {
@@ -134,18 +138,18 @@ VS_OUTPUT_FLUIDSIM VS_GRID( VS_INPUT_FLUIDSIM input)
 
     output.pos = float4(input.position.x, input.position.y, input.position.z, 1.0);
     output.cell0 = float3(input.textureCoords0.x, input.textureCoords0.y, input.textureCoords0.z);
-    output.texcoords = float3( (input.textureCoords0.x)/(textureWidth),
-                              (input.textureCoords0.y)/(textureHeight), 
-                              (input.textureCoords0.z+0.5)/(textureDepth));
+    output.texcoords = float3( (input.textureCoords0.x)/(g_textureWidth),
+                              (input.textureCoords0.y)/(g_textureHeight), 
+                              (input.textureCoords0.z+0.5)/(g_textureDepth));
 
     float x = output.texcoords.x;
     float y = output.texcoords.y;
     float z = output.texcoords.z;
 
     // compute single texel offsets in each dimension
-    float invW = 1.0/textureWidth;
-    float invH = 1.0/textureHeight;
-    float invD = 1.0/textureDepth;
+    float invW = 1.0/g_textureWidth;
+    float invH = 1.0/g_textureHeight;
+    float invD = 1.0/g_textureDepth;
 
     output.LR = float2(x - invW, x + invW);
     output.BT = float2(y - invH, y + invH);
@@ -219,14 +223,14 @@ float3 GetAdvectedPosTexCoords(GS_OUTPUT_FLUIDSIM input)
 {
     float3 pos = input.cell0;
 
-    pos -= timestep * Texture_velocity.SampleLevel( samPointClamp, input.texcoords, 0 ).xyz;
+    pos -= g_timestep * Texture_velocity.SampleLevel( samPointClamp, input.texcoords, 0 ).xyz;
 
-    return float3(pos.x/textureWidth, pos.y/textureHeight, (pos.z+0.5)/textureDepth);
+    return float3(pos.x/g_textureWidth, pos.y/g_textureHeight, (pos.z+0.5)/g_textureDepth);
 }
 
 bool IsOutsideSimulationDomain( float3 cellTexcoords )
 {
-    if( treatAsLiquidVelocity )
+    if( g_treatAsLiquidVelocity )
     {
         if( Texture_levelset.SampleLevel(samPointClamp, cellTexcoords, 0 ).r <= 0 )
             return false;
@@ -318,17 +322,17 @@ float4 PS_ADVECT_MACCORMACK( GS_OUTPUT_FLUIDSIM input ) : SV_Target
         return 0;
 
     // get advected new position
-    float3 npos = input.cell0 - timestep * Texture_velocity.SampleLevel( samPointClamp, input.texcoords, 0 ).xyz;
+    float3 npos = input.cell0 - g_timestep * Texture_velocity.SampleLevel( samPointClamp, input.texcoords, 0 ).xyz;
     
     // convert new position to texture coordinates
-    float3 nposTC = float3(npos.x/textureWidth, npos.y/textureHeight, (npos.z+0.5)/textureDepth);
+    float3 nposTC = float3(npos.x/g_textureWidth, npos.y/g_textureHeight, (npos.z+0.5)/g_textureDepth);
 
     // find the texel corner closest to the semi-Lagrangian "particle"
     float3 nposTexel = floor( npos + float3( 0.5f, 0.5f, 0.5f ) );
-    float3 nposTexelTC = float3( nposTexel.x/textureWidth, nposTexel.y/textureHeight, nposTexel.z/textureDepth);
+    float3 nposTexelTC = float3( nposTexel.x/g_textureWidth, nposTexel.y/g_textureHeight, nposTexel.z/g_textureDepth);
 
     // ht (half-texel)
-    float3 ht = float3(0.5f/textureWidth, 0.5f/textureHeight, 0.5f/textureDepth);
+    float3 ht = float3(0.5f/g_textureWidth, 0.5f/g_textureHeight, 0.5f/g_textureDepth);
 
     // get the values of nodes that contribute to the interpolated value
     // (texel centers are at half-integer locations)
@@ -359,11 +363,11 @@ float4 PS_ADVECT_MACCORMACK( GS_OUTPUT_FLUIDSIM input ) : SV_Target
                  Texture_phi_hat.SampleLevel( samPointClamp, input.texcoords, 0 ) );
 
     // clamp result to the desired range
-    ret = max( min( ret, phiMax ), phiMin ) * decay;
+    ret = max( min( ret, phiMax ), phiMin ) * g_decay;
 
-    if(advectAsTemperature)
+    if(g_advectAsTemperature)
     {
-         ret -= temperatureLoss * timestep;
+         ret -= g_temperatureLoss * g_timestep;
          ret = clamp(ret,float4(0,0,0,0),float4(5,5,5,5));
     }
 
@@ -375,25 +379,25 @@ float4 PS_ADVECT( GS_OUTPUT_FLUIDSIM input ) : SV_Target
     if( IsOutsideSimulationDomain(input.texcoords.xyz ) )
         return 0;
 
-    float decayAmount = decay;
+    float g_decayAmount = g_decay;
 
     if(doVelocityAttenuation)
     {
         float obstacle = Texture_obstacles.SampleLevel(samPointClamp, input.texcoords.xyz, 0).r;
         if( obstacle <= OBSTACLE_BOUNDARY) return 0;
-        decayAmount *= clamp((obstacle-maxDensityAmount)/(1 - maxDensityAmount),0,1)*(1-maxDensityDecay)+maxDensityDecay;
+        g_decayAmount *= clamp((obstacle-maxDensityAmount)/(1 - maxDensityAmount),0,1)*(1-maxDensityg_decay)+maxDensityg_decay;
     }
     else if( IsNonEmptyCell(input.texcoords.xyz) )
         return 0;
 
     float3 npos = GetAdvectedPosTexCoords(input);
-    float4 ret = Texture_phi.SampleLevel( samLinear, npos, 0) * decayAmount;
+    float4 ret = Texture_phi.SampleLevel( samLinear, npos, 0) * g_decayAmount;
     
 
     
-    if(advectAsTemperature)
+    if(g_advectAsTemperature)
     {
-         ret -= temperatureLoss * timestep;
+         ret -= g_temperatureLoss * g_timestep;
          ret = clamp(ret,float4(0,0,0,0),float4(5,5,5,5));
     }
 
@@ -444,7 +448,7 @@ float4 PS_CONFINEMENT( GS_OUTPUT_FLUIDSIM input ) : SV_Target
     eta = normalize( eta + float3(0.001, 0.001, 0.001) );
 
     float4 force;
-    force.xyz = timestep * vortConfinementScale * float3( eta.y * omega.z - eta.z * omega.y,
+    force.xyz = g_timestep * g_vortConfinementScale * float3( eta.y * omega.z - eta.z * omega.y,
                                             eta.z * omega.x - eta.x * omega.z,
                                             eta.x * omega.y - eta.y * omega.x );
     
@@ -464,8 +468,8 @@ float4 PS_DIFFUSE( GS_OUTPUT_FLUIDSIM input ) : SV_Target
     float4 phin0D = Texture_phi_next.SampleLevel( samPointClamp, DOWNCELL, 0 );
     float4 phin0U = Texture_phi_next.SampleLevel( samPointClamp, UPCELL, 0 );
 
-    float dT = timestep;
-    float v = viscosity;
+    float dT = g_timestep;
+    float v = g_viscosity;
     float dX = 1;
 
     float4 phin1C = ( (phi0C * dX*dX) - (dT * v * ( phin0L + phin0R + phin0B + phin0T + phin0D + phin0T )) ) / ((6 * dT * v) + (dX*dX));
@@ -578,7 +582,7 @@ float4 PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT( GS_OUTPUT_FLUIDSIM input) : SV_Target
 
 float4 PS_INJECT_LIQUID( GS_OUTPUT_FLUIDSIM input) : SV_Target
 {
-    // This is a hack to prevent the liquid from "falling through the floor" when using large timesteps.
+    // This is a hack to prevent the liquid from "falling through the floor" when using large g_timesteps.
     // The idea is to blend between the initial and "known" balanced state and the current level set state
 
     float d = input.cell0.z - liquidHeight;
@@ -598,9 +602,9 @@ float4 PS_REDISTANCING(  GS_OUTPUT_FLUIDSIM input ) : SV_Target
     float phiC = Texture_phi_next.SampleLevel( samPointClamp, input.texcoords, 0).r;
   
     // avoid redistancing near boundaries, where gradients are ill-defined
-    if( (input.cell0.x < 3) || (input.cell0.x > (textureWidth-4)) ||
-        (input.cell0.y < 3) || (input.cell0.y > (textureHeight-4)) ||
-        (input.cell0.z < 3) || (input.cell0.z > (textureDepth-4)) )
+    if( (input.cell0.x < 3) || (input.cell0.x > (g_textureWidth-4)) ||
+        (input.cell0.y < 3) || (input.cell0.y > (g_textureHeight-4)) ||
+        (input.cell0.z < 3) || (input.cell0.z > (g_textureDepth-4)) )
         return phiC;
 
     bool isBoundary;
@@ -618,7 +622,7 @@ float4 PS_REDISTANCING(  GS_OUTPUT_FLUIDSIM input ) : SV_Target
     //float signPhi = phiC / sqrt( (phiC*phiC) + (normGradPhi*normGradPhi));
 
     float3 backwardsPos = input.cell0 - (gradPhi/normGradPhi) * signPhi * dt;
-    float3 npos = float3(backwardsPos.x/textureWidth, backwardsPos.y/textureHeight, (backwardsPos.z+0.5f)/textureDepth);
+    float3 npos = float3(backwardsPos.x/g_textureWidth, backwardsPos.y/g_textureHeight, (backwardsPos.z+0.5f)/g_textureDepth);
 
     return Texture_phi_next.SampleLevel( samLinear, npos, 0).r + (signPhi * dt);
 }
@@ -637,7 +641,7 @@ float4 PS_EXTRAPOLATE_VELOCITY( GS_OUTPUT_FLUIDSIM input ) : SV_Target
 
     float3 normalizedGradLS = normalize( Gradient(Texture_levelset, input) );
     float3 backwardsPos = input.cell0 - normalizedGradLS * dt;
-    float3 npos = float3(backwardsPos.x/textureWidth, backwardsPos.y/textureHeight, (backwardsPos.z+0.5f)/textureDepth);
+    float3 npos = float3(backwardsPos.x/g_textureWidth, backwardsPos.y/g_textureHeight, (backwardsPos.z+0.5f)/g_textureDepth);
 
     float4 ret = Texture_velocity.SampleLevel( samLinear, npos, 0);
     
@@ -650,16 +654,16 @@ float4 PS_LIQUID_STREAM( GS_OUTPUT_FLUIDSIM input, uniform bool outputColor ) : 
     if( IsNonEmptyCell(input.texcoords.xyz) )
         return 0;
 
-    float dist = length(input.cell0 - center);
+    float dist = length(input.cell0 - g_center);
     
     float4 result;
 
     if( outputColor )
-        result.rgb = color;
+        result.rgb = g_color;
     else
-        result.rgb = (dist - radius);
+        result.rgb = (dist - g_radius);
     
-    if(dist < radius)
+    if(dist < g_radius)
         result.a = 1;
     else 
         result.a = 0;
@@ -675,7 +679,7 @@ float4 PS_APPLY_GRAVITY( GS_OUTPUT_FLUIDSIM input) : SV_Target
     if( IsNonEmptyCell(input.texcoords.xyz) )
         return 0;
 
-    return float4(gravity, 1.0);     
+    return float4(g_gravity, 1.0);     
 }
 
 float4 PS_GAUSSIAN( GS_OUTPUT_FLUIDSIM input ) : SV_Target 
@@ -683,9 +687,9 @@ float4 PS_GAUSSIAN( GS_OUTPUT_FLUIDSIM input ) : SV_Target
     if( IsNonEmptyCell(input.texcoords.xyz) )
         return 0;
 
-    float dist = length( input.cell0 - center ) * radius;
+    float dist = length( input.cell0 - g_center ) * g_radius;
     float4 result;
-    result.rgb = color;    // + sin(color.rgb*10.0+cell*5.0)*0.2;
+    result.rgb = g_color;    // + sin(g_color.rgb*10.0+cell*5.0)*0.2;
     result.a = exp( -dist*dist );
 
     return result;
@@ -697,7 +701,7 @@ float4 PS_COPY_TEXURE( GS_OUTPUT_FLUIDSIM input ) : SV_Target
         return 0;
      
     float4 texCol = Texture_inDensity.SampleLevel( samLinear, input.texcoords.xy,0);
-    return texCol*color;
+    return texCol*g_color;
 }
 
 float4 PS_ADD_DERIVATIVE_VEL( GS_OUTPUT_FLUIDSIM input ) : SV_Target 
@@ -713,7 +717,7 @@ float4 PS_ADD_DERIVATIVE_VEL( GS_OUTPUT_FLUIDSIM input ) : SV_Target
     
     float4 vel = float4((pL-pR)*pCenter,(pB-pT)*pCenter,pCenter,1);
     
-    return vel*color; 
+    return vel*g_color; 
 }
 
 // obstacle texture initialization
@@ -733,8 +737,8 @@ struct PSDrawBoxOut
 PSDrawBoxOut PS_DYNAMIC_OBSTACLE_BOX( GS_OUTPUT_FLUIDSIM input )
 {
     PSDrawBoxOut voxel;
-    float3 innerobstBoxLBDcorner = obstBoxLBDcorner + 1;
-    float3 innerobstBoxRTUcorner = obstBoxRTUcorner - 1;
+    float3 innerobstBoxLBDcorner = g_obstBoxLBDcorner + 1;
+    float3 innerobstBoxRTUcorner = g_obstBoxRTUcorner - 1;
     // cells completely inside box = 0.5
     if(PointIsInsideBox(input.cell0, innerobstBoxLBDcorner, innerobstBoxRTUcorner))
     {
@@ -744,10 +748,10 @@ PSDrawBoxOut PS_DYNAMIC_OBSTACLE_BOX( GS_OUTPUT_FLUIDSIM input )
     }
 
     // cells in box boundary = 1.0
-    if(PointIsInsideBox(input.cell0, obstBoxLBDcorner, obstBoxRTUcorner))
+    if(PointIsInsideBox(input.cell0, g_obstBoxLBDcorner, g_obstBoxRTUcorner))
     {
         voxel.obstacle = OBSTACLE_BOUNDARY;
-        voxel.velocity = float4(obstBoxVelocity.xyz,1);
+        voxel.velocity = float4(g_obstBoxVelocity.xyz,1);
         return voxel;
     }
 
@@ -767,25 +771,25 @@ PSDrawBoxOut PS_STATIC_OBSTACLE( GS_OUTPUT_FLUIDSIM input ) : SV_Target
 float4 PS_DRAW_TEXTURE( VS_OUTPUT_FLUIDSIM input ) : SV_Target
 {
     //("Phi as density"),
-    if( drawTextureNumber == 1)
+    if( g_drawTextureNumber == 1)
         return float4(abs(Texture_phi.SampleLevel(samLinear,input.texcoords,0).r), 0.0f, 0.0f, 1.0f);
     //("Phi as level set"),
-    else if( drawTextureNumber == 2)
+    else if( g_drawTextureNumber == 2)
     {
-        float levelSet = Texture_phi.SampleLevel(samLinear,input.texcoords,0).r/(textureDepth);
-        float color = lerp(1.0f, 0.0f, abs(levelSet));
+        float levelSet = Texture_phi.SampleLevel(samLinear,input.texcoords,0).r/(g_textureDepth);
+        float g_color = lerp(1.0f, 0.0f, abs(levelSet));
         if( levelSet < 0 )
-            return float4(0.0f,  color, 0.0f, 1.0f);
-        return float4(color, 0.0f, 0.0f, 1.0f);
+            return float4(0.0f,  g_color, 0.0f, 1.0f);
+        return float4(g_color, 0.0f, 0.0f, 1.0f);
     }
     //("Gradient of phi"),
-    else if( drawTextureNumber == 3)
+    else if( g_drawTextureNumber == 3)
         return float4(Gradient(Texture_phi, input), 1.0f);
     //("Velocity Field"),
-    else if( drawTextureNumber == 4)
+    else if( g_drawTextureNumber == 4)
         return float4(abs(Texture_velocity.SampleLevel(samLinear,input.texcoords,0).xyz),1.0f);
     //("Pressure Field"),
-    else if ( drawTextureNumber == 5)
+    else if ( g_drawTextureNumber == 5)
         return float4(abs(Texture_pressure.SampleLevel(samLinear,input.texcoords,0).xyz), 1.0f);
     //("Voxelized Obstacles"),
     else

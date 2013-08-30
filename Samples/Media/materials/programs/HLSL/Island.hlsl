@@ -87,7 +87,6 @@ struct PatchData
 //--------------------------------------------------------------------------------------
 // Constant Buffers
 //--------------------------------------------------------------------------------------
-
 shared cbuffer cb0
 {
 	// rendering control variables
@@ -105,9 +104,9 @@ shared cbuffer cb0
 	// view/time dependent variables
 	matrix    g_ModelViewMatrix;
     matrix    g_ModelViewProjectionMatrix;
-	matrix    g_ModelViewProjectionMatrixInv;
+	//matrix    g_ModelViewProjectionMatrixInv;
     matrix    g_LightModelViewProjectionMatrix;
-    matrix    g_LightModelViewProjectionMatrixInv;
+    //matrix    g_LightModelViewProjectionMatrixInv;
     float3      g_CameraPosition;
     float3      g_CameraDirection;
 

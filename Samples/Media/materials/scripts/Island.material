@@ -110,7 +110,7 @@ fragment_program Ogre/Island/MainToBackBufferPS hlsl
 	
 	default_params
 	{
-
+		param_named g_MainBufferSizeMultiplier float2 0.0 0.0
 	}	
 }
 
@@ -156,7 +156,8 @@ fragment_program Ogre/Island/WaterNormalmapCombinePS hlsl
 	
 	default_params
 	{
-
+		param_named_auto g_CameraPosition camera_position
+		param_named g_WaterBumpTexcoordShift float2 0.0 0.0
 	}	
 }
 
@@ -203,7 +204,11 @@ tesselation_hull_program Ogre/Island/PatchHS hlsl
 
 	default_params
 	{
-
+		param_named g_FrustumCullInHS float 0.0
+		param_named g_TerrainBeingRendered float 0.0
+		param_named_auto g_ModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_CameraPosition camera_position
+		param_named_auto g_CameraDirection view_direction
 	}
 }
 
@@ -215,7 +220,13 @@ tesselation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
 
 	default_params
 	{
-
+		param_named g_RenderCaustics float 0.0
+		param_named g_UseDynamicLOD float 0.0
+		param_named g_DynamicTessFactor float 0.0
+		param_named g_StaticTessFactor float 0.0
+		param_named g_SkipCausticsCalculation float 0.0
+		param_named_auto g_ModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_CameraPosition camera_position
 	}
 }
 
@@ -227,7 +238,11 @@ fragment_program Ogre/Island/HeightFieldPatchPS hlsl
 
 	default_params
 	{
-
+		param_named g_HalfSpaceCullSign float 0.0
+		param_named g_HalfSpaceCullPosition float 0.0
+		param_named_auto g_LightModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_CameraPosition camera_position
+		param_named_auto g_LightPosition light_position
 	}
 }
 
@@ -297,6 +312,43 @@ material Ogre/Island/RenderHeightfield
 	}
 }
 
+tesselation_domain_program Ogre/Island/WaterPatchDS hlsl
+{
+	source Island.hlsl
+	entry_point WaterPatchDS
+	target ds_5_0
+
+	default_params
+	{
+		param_named g_UseDynamicLOD float 0.0
+		param_named g_DynamicTessFactor float 0.0
+		param_named g_StaticTessFactor float 0.0	
+		param_named_auto g_ModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_CameraPosition camera_position
+		param_named_auto g_LightPosition light_position
+		param_named g_WaterBumpTexcoordShift float2 0.0 0.0
+	}
+}
+
+fragment_program Ogre/Island/WaterPatchPS hlsl
+{
+	source IslandCommon.hlsl
+	entry_point WaterPatchPS
+	target ps_5_0
+
+	default_params
+	{
+		param_named_auto g_ModelViewMatrix worldview_matrix
+		param_named_auto g_ModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_LightModelViewProjectionMatrix worldviewproj_matrix
+		param_named_auto g_CameraPosition camera_position
+		param_named_auto g_LightPosition light_position
+		param_named g_WaterBumpTexcoordShift float2 0.0 0.0
+		param_named g_ScreenSizeInv float2 0.0 0.0
+		param_named g_ZNear float 0.0
+		param_named g_ZFar float 0.0
+	}
+}
 
 material Ogre/Island/RenderWater
 {

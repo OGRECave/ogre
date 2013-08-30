@@ -52,11 +52,16 @@ material Ogre/TerrainTessellation/TerrainDeformation
 		{
 			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
 			{
+			
 			}
 			
 			fragment_program_ref Ogre/TerrainTessellation/InitializationPS
 			{
+			
 			}
+			depth_write off
+			cull_hardware off
+			cull_software off
 		}
 
 	}
@@ -67,11 +72,16 @@ material Ogre/TerrainTessellation/TerrainDeformation
 		{
 			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
 			{
+			
 			}
 			
 			fragment_program_ref Ogre/TerrainTessellation/GradientPS
 			{
+			
 			}
+			depth_write off
+			cull_hardware off
+			cull_software off
 		}
 	}	
 }

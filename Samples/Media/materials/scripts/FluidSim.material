@@ -6,7 +6,9 @@ vertex_program Ogre/FluidSim/VS_GRID hlsl
 
 	default_params
 	{
-
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
 	}
 }
 
@@ -31,7 +33,14 @@ fragment_program Ogre/FluidSim/PS_ADVECT_MACCORMACK hlsl
 	
 	default_params
 	{
-
+		param_named g_advectAsTemperature bool false
+		param_named g_treatAsLiquidVelocity bool false
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
+		param_named g_timestep float 0.0
+		param_named g_decay float 0.0
+		param_named g_temperatureLoss float 0.0
 	}	
 }
 
@@ -43,7 +52,14 @@ fragment_program Ogre/FluidSim/PS_ADVECT hlsl
 	
 	default_params
 	{
-
+		param_named g_advectAsTemperature bool false
+		param_named g_treatAsLiquidVelocity bool false
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0	
+		param_named g_timestep float 0.0
+		param_named g_decay float 0.0
+		param_named g_temperatureLoss float 0.0		
 	}	
 }
 
@@ -67,7 +83,9 @@ fragment_program Ogre/FluidSim/PS_CONFINEMENT hlsl
 	
 	default_params
 	{
-
+		param_named g_treatAsLiquidVelocity bool false
+		param_named g_timestep float 0.0
+		param_named g_vortConfinementScale float 0.0
 	}	
 }
 
@@ -79,7 +97,8 @@ fragment_program Ogre/FluidSim/PS_DIFFUSE hlsl
 	
 	default_params
 	{
-
+		param_named g_timestep float 0.0
+		param_named g_viscosity float 0.0
 	}	
 }
 
@@ -115,7 +134,7 @@ fragment_program Ogre/FluidSim/PS_PROJECT hlsl
 	
 	default_params
 	{
-
+		param_named g_treatAsLiquidVelocity bool false
 	}	
 }
 
@@ -151,7 +170,7 @@ fragment_program Ogre/FluidSim/PS_APPLY_AIR_PRESSURE hlsl
 	
 	default_params
 	{
-
+		param_named g_treatAsLiquidVelocity bool false
 	}	
 }
 
@@ -163,7 +182,9 @@ fragment_program Ogre/FluidSim/PS_REDISTANCING hlsl
 	
 	default_params
 	{
-
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
 	}	
 }
 
@@ -175,7 +196,10 @@ fragment_program Ogre/FluidSim/PS_EXTRAPOLATE_VELOCITY hlsl
 	
 	default_params
 	{
-
+		param_named g_treatAsLiquidVelocity bool false
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0		
 	}	
 }
 
@@ -187,7 +211,9 @@ fragment_program Ogre/FluidSim/PS_LIQUID_STREAM hlsl
 	
 	default_params
 	{
-
+		param_named g_radius float 0.0
+		param_named g_center float 0.0
+		param_named g_color float 0.0
 	}	
 }
 
@@ -199,7 +225,8 @@ fragment_program Ogre/FluidSim/PS_APPLY_GRAVITY hlsl
 	
 	default_params
 	{
-
+		param_named g_treatAsLiquidVelocity bool false
+		param_named g_gravity float 9.8
 	}	
 }
 
@@ -211,7 +238,9 @@ fragment_program Ogre/FluidSim/PS_GAUSSIAN hlsl
 	
 	default_params
 	{
-
+		param_named g_radius float 0.0
+		param_named g_center float 0.0
+		param_named g_color float 0.0
 	}	
 }
 
@@ -223,7 +252,7 @@ fragment_program Ogre/FluidSim/PS_COPY_TEXURE hlsl
 	
 	default_params
 	{
-
+		param_named g_color float 0.0
 	}	
 }
 
@@ -235,7 +264,7 @@ fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 	
 	default_params
 	{
-
+		param_named g_color float 0.0
 	}	
 }
 
@@ -295,7 +324,9 @@ fragment_program Ogre/FluidSim/PS_DYNAMIC_OBSTACLE_BOX hlsl
 	
 	default_params
 	{
-
+		param_named g_obstBoxVelocity float4 0.0 0.0 0.0 0.0
+		param_named g_obstBoxRTUcorner float4 0.0 0.0 0.0 0.0
+		param_named g_obstBoxLBDcorner float4 0.0 0.0 0.0 0.0
 	}	
 }
 
@@ -307,7 +338,9 @@ fragment_program Ogre/FluidSim/PS_DRAW_TEXTURE hlsl
 	
 	default_params
 	{
-
+		param_named g_drawTextureNumber int 1
+		param_named g_textureDepth float 0.0
+		param_named g_color float 0.0		
 	}	
 }
 

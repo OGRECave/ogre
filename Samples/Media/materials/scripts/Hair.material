@@ -30,7 +30,16 @@ vertex_program Ogre/Hair/addForcesAndIntegrateVS hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalTransform bool false
+		param_named g_bApplyHorizontalForce bool false
+		param_named g_bAddGravity bool false
+		param_named g_TimeStep float 1.0
+		param_named g_gravityStrength float 1.0
+		param_named g_bSimulate bool false
+		param_named g_windForce float3 1.0 1.0 1.0
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
 	}	
 }
 
@@ -42,7 +51,16 @@ geometry_program Ogre/Hair/addForcesAndIntegrateVSG hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalTransform bool false
+		param_named g_bApplyHorizontalForce bool false
+		param_named g_bAddGravity bool false
+		param_named g_TimeStep float 1.0
+		param_named g_gravityStrength float 1.0
+		param_named g_bSimulate bool false
+		param_named g_windForce float3 1.0 1.0 1.0
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
 	}	
 }
 
@@ -73,7 +91,7 @@ geometry_program Ogre/Hair/SatisfySpringConstraintsGS hlsl
 vertex_program Ogre/Hair/SatisfyAngularSpringConstraintsVS hlsl
 {
 	source Hair.hlsl
-	entry_point SatisfyAngularSpringConstraintsGS
+	entry_point SatisfyAngularSpringConstraintsVS
 	target vs_4_0
 	
 	default_params
@@ -90,7 +108,7 @@ geometry_program Ogre/Hair/SatisfyAngularSpringConstraintsGS hlsl
 	
 	default_params
 	{
-
+		param_named g_angularStiffness float 1.0
 	}	
 }
 
@@ -126,7 +144,7 @@ vertex_program Ogre/Hair/UpdateCoordinateFrameVS hlsl
 	
 	default_params
 	{
-
+		param_named g_blendAxis float 0.0
 	}	
 }
 
@@ -138,7 +156,7 @@ geometry_program Ogre/Hair/UpdateCoordinateFrameVSG hlsl
 	
 	default_params
 	{
-
+		param_named g_blendAxis float 0.0
 	}	
 }
 
@@ -462,7 +480,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD hlsl
 	
 	default_params
 	{
-	
+		param_named g_bApplyAdditionalRenderingTransform bool false
 	}
 }
 
@@ -474,7 +492,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD hlsl
 	
 	default_params
 	{
-	
+		param_named g_bApplyAdditionalRenderingTransform bool false	
 	}
 }
 
@@ -486,7 +504,8 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions hlsl
 	
 	default_params
 	{
-	
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0		
 	}
 }
 
@@ -498,7 +517,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
 	
 	default_params
 	{
-	
+		param_named g_fNumHairsLOD float 1.0
 	}
 }
 
@@ -510,7 +529,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
 	
 	default_params
 	{
-	
+		param_named g_fNumHairsLOD float 1.0
 	}
 }
 
@@ -522,7 +541,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
 	
 	default_params
 	{
-	
+		param_named g_fNumHairsLOD float 1.0
 	}
 }
 
@@ -534,7 +553,12 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
 	
 	default_params
 	{
-	
+		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0	
+		param_named g_thinning float 0.5
 	}
 }
 
@@ -546,7 +570,11 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
 	
 	default_params
 	{
-	
+		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_thinning float 0.5		
 	}
 }
 
@@ -570,7 +598,8 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS hl
 	
 	default_params
 	{
-	
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0	
 	}
 }
 
@@ -582,7 +611,8 @@ geometry_program Ogre/Hair/InterpolateGS hlsl
 	
 	default_params
 	{
-	
+		param_named g_ScreenWidth float 1280.0
+		param_named g_ScreenHeight float 1024.0	
 	}
 }
 
@@ -618,7 +648,16 @@ fragment_program Ogre/Hair/RenderPS hlsl
 	
 	default_params
 	{
-	
+		param_named g_ksP float 0.0
+		param_named g_ksS float 0.0
+		param_named g_kd float 0.0
+		param_named g_specPowerPrimary float 0.0
+		param_named g_specPowerSecondary float 0.0
+		param_named g_ksP_sparkles float 0.0
+		param_named g_specPowerPrimarySparkles float 0.0
+		param_named g_ka float 0.0
+		param_named g_baseColor float4 0.0 0.0 0.0 0.0
+		param_named g_specColor float4 0.0 0.0 0.0 0.0
 	}
 }
 
@@ -714,19 +753,25 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrand_SO hlsl
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_doCurlyHair bool false
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
 vertex_program Ogre/Hair/InterpolateVSSingleStrand_SO hlsl
 {
 	source Hair.hlsl
-	entry_point InterpolateVSMultiStrand_SO
+	entry_point InterpolateVSSingleStrand_SO
 	target vs_4_0
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -738,7 +783,11 @@ vertex_program Ogre/Hair/InterpolateVSDepthPrepass hlsl
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_doCurlyHair bool false
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -750,7 +799,9 @@ vertex_program Ogre/Hair/InterpolateVSDepthPrepass_LOAD hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0		
 	}	
 }
 
@@ -762,7 +813,8 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrand hlsl
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair bool false
 	}	
 }
 
@@ -774,7 +826,8 @@ vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass hlsl
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -786,7 +839,7 @@ vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass_LOAD hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalRenderingTransform bool false
 	}	
 }
 
@@ -798,7 +851,8 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrand hlsl
 	
 	default_params
 	{
-
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -810,7 +864,9 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrand_LOAD hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0		
 	}	
 }
 
@@ -822,7 +878,8 @@ vertex_program Ogre/Hair/InterpolateVSMCollisions hlsl
 	
 	default_params
 	{
-
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
 	}	
 }
 
@@ -877,7 +934,7 @@ geometry_program Ogre/Hair/TessellateVSBSplineCFsG hlsl
 geometry_program Ogre/Hair/TessellateVSBSplineSBCFsG hlsl
 {
 	source Hair.hlsl
-	entry_point TessellateVSBSplineCFs
+	entry_point TessellateVSBSplineSBCFs
 	target vs_4_0
 	
 	default_params
@@ -889,7 +946,7 @@ geometry_program Ogre/Hair/TessellateVSBSplineSBCFsG hlsl
 geometry_program Ogre/Hair/TessellateVSBSplineLengthsG hlsl
 {
 	source Hair.hlsl
-	entry_point TessellateVSBSplineCFs
+	entry_point TessellateVSBSplineLengths
 	target vs_4_0
 	
 	default_params
@@ -901,12 +958,12 @@ geometry_program Ogre/Hair/TessellateVSBSplineLengthsG hlsl
 geometry_program Ogre/Hair/InterpolateVSMultiStrand_SOG hlsl
 {
 	source Hair.hlsl
-	entry_point TessellateVSBSplineCFs
+	entry_point InterpolateVSMultiStrand_SO
 	target vs_4_0
 	
 	default_params
 	{
-
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -930,7 +987,8 @@ geometry_program Ogre/Hair/InterpolateGSDepthPrepass hlsl
 	
 	default_params
 	{
-
+		param_named g_ScreenWidth float 1280.0
+		param_named g_ScreenHeight float 1024.0
 	}	
 }
 
@@ -978,7 +1036,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
 	
 	default_params
 	{
-
+		param_named g_fNumHairsLOD float 1.0
 	}	
 }
 
@@ -990,7 +1048,11 @@ tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair bool false
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -1002,7 +1064,11 @@ tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_NORMAL hlsl
 	
 	default_params
 	{
-
+		param_named g_bApplyAdditionalRenderingTransform bool false	
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair bool false
+		param_named g_thinning float 0.5
 	}	
 }
 
@@ -1050,7 +1116,7 @@ vertex_program Ogre/Hair/InterpolateVSBMultiStrandDepthShadows hlsl
 	
 	default_params
 	{
-	
+		param_named g_doCurlyHair bool false
 	}
 }
 
@@ -1074,7 +1140,7 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD hlsl
 	
 	default_params
 	{
-	
+			param_named g_bApplyAdditionalRenderingTransform bool false
 	}
 }
 
@@ -1170,7 +1236,9 @@ vertex_program Ogre/Hair/VS_GRID_FLUIDSIM hlsl
 	
 	default_params
 	{
-	
+		param_named fluidg_textureWidth int 1
+		param_named fluidg_textureHeight int 1
+		param_named fluidg_textureDepth int 1		
 	}
 }
 
@@ -1179,6 +1247,30 @@ vertex_program Ogre/Hair/VSArrow hlsl
 	source Hair.hlsl
 	entry_point VSArrow
 	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/CollisionVS hlsl
+{
+	source Hair.hlsl
+	entry_point CollisionVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_currentCollisionSphere int 1
+	}
+}
+
+fragment_program Ogre/Hair/CollisionPS hlsl
+{
+	source Hair.hlsl
+	entry_point CollisionPS
+	target ps_4_0
 	
 	default_params
 	{
@@ -1218,7 +1310,7 @@ fragment_program Ogre/Hair/MeshPS hlsl
 	
 	default_params
 	{
-	
+		param_named g_useScalpTexture bool false
 	}
 }
 
@@ -1230,7 +1322,7 @@ fragment_program Ogre/Hair/MeshPSShadows hlsl
 	
 	default_params
 	{
-	
+		param_named g_useScalpTexture bool false
 	}
 }
 
@@ -1302,7 +1394,8 @@ fragment_program Ogre/Hair/PS_RESOLVE_SUPERSAMPLE hlsl
 	
 	default_params
 	{
-	
+		param_named g_SSg_textureWidth float 0.0
+		param_named g_SSg_textureHeight float 0.0
 	}
 }
 
@@ -1350,7 +1443,9 @@ fragment_program Ogre/Hair/PS_VOXELIZE_OBSTACLES hlsl
 	
 	default_params
 	{
-	
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
 	}
 }
 
@@ -1362,7 +1457,9 @@ fragment_program Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX hlsl
 	
 	default_params
 	{
-	
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
 	}
 }
 
@@ -2426,6 +2523,29 @@ material Ogre/Hair/VoxelizeObstacles
 			}
 			depth_check off
 			depth_write off
+		}
+	}
+}
+
+material Ogre/Hair/RenderCollisionObjects
+{
+	technique RenderCollisionObjects
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/CollisionVS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/CollisionPS
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware off
+			cull_software off
 		}
 	}
 }

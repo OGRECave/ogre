@@ -7,6 +7,8 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 
 #define MAX_IMPLICITS 10
 //constants that change frame to frame
+
+//ATTENTION TO THESE. SET THEM CORRECTLY. ADD COMPUTE SHADER TO THE MATERIAL>
 cbuffer cbPerFrame : register( b0 )
 {
     row_major float4x4 additionalTransformation; //use this transform to transform all the vertices. We are using this to transform hair vertices back to the vicinity of the head after simulation is turned off and on again
@@ -21,7 +23,7 @@ cbuffer cbPerFrame : register( b0 )
 
 	float g_angularStiffness;
     float g_gravityStrength;
-    float TimeStep;
+    float g_TimeStep;
     int g_integrate; 
 
 	int g_bApplyAdditionalTransform;
@@ -415,9 +417,9 @@ float4 addForcesAndIntegrate(float4 position, float4 oldPosition, float4 force, 
         posInGrid.y += 0.5;
         posInGrid.z += 0.5;
         float3 texcoords = float3(posInGrid.x, 1.0-posInGrid.y, posInGrid.z);
-        float3 windForce = (g_FluidVelocityTexture.SampleLevel(samLinearClamp,texcoords,0).xyz);
-        windForce *= (1-stiffness)*(5) + 5;
-        force.xyz += windForce;
+        float3 g_windForce = (g_FluidVelocityTexture.SampleLevel(samLinearClamp,texcoords,0).xyz);
+        g_windForce *= (1-stiffness)*(5) + 5;
+        force.xyz += g_windForce;
     }
     
     //Gravity
@@ -448,7 +450,7 @@ float4 addForcesAndIntegrate(float4 position, float4 oldPosition, float4 force, 
     //velocity.xyz = clamp(velocity.xyz, float3(-clampAmount,-clampAmount,-clampAmount), float3(clampAmount,clampAmount,clampAmount) );
     outputPos.xyz = position.xyz
                     + velocity.xyz
-                    + force.xyz*TimeStep*TimeStep; 
+                    + force.xyz*g_TimeStep*g_TimeStep; 
 
     //this makes stiff hair even stiffer, and makes it go towards its base transformed pose. 
 	//However, we only apply this force when the hair and the base transformed hair are "relatively" close (and we apply this more to hair we have already designated as stiff). 

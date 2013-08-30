@@ -5,7 +5,7 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 ----------------------------------------------------------
 */
 
-#include "Hair.h"
+//#include "Hair.h"
 
 #define oneOverSqrt2PI 0.39894228040143267
 #define PI 3.1415926535897932384626433832795
@@ -20,14 +20,6 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 
 #define SHADOWS_VS
 
-float g_widthMulC = 0.5;//      1;//0.5;
-float g_widthMulB = 0.5;//     1;//0.5;
-float g_widthMulGS = 0.95;//    0.8;
-float g_widthMul = 1.0; //this is for the depth prepass
-
-//tessellation hardware
-int g_maxPatchesPerTessellatedStrand; //g_maxPatchesPerTessellatedStrand = maxStrandLength/(strandVerticesInPatch-1). note that maxStrandLength will be differernt depending on whether or not we are using this variable for a tessellated strand vs a non-tessllated strand, and will be different based on the tessellation factor.
-
 // PCF
 #define PCF_RADIUS 5
 #define PCF_INCREMENT 2
@@ -39,72 +31,178 @@ int g_maxPatchesPerTessellatedStrand; //g_maxPatchesPerTessellatedStrand = maxSt
 #define RGBA8_PRECISION_DENSITY (64.0/255.0)
 #define INV_RGBA8_PRECISION_DENSITY (255.0/64.0)
 
-//#define INTERPOLATION_LOD_GS
-float g_ScreenWidth = 1280.0;
-float g_ScreenHeight = 1024.0;
-float g_InterpolationLOD = 1.0;
-
-bool g_bApplyAdditionalTransform;
-bool g_bApplyAdditionalRenderingTransform;
-
-row_major float4x4 ViewProjection;
-row_major float4x4 WorldView;
-row_major float4x4 WorldViewProjection;
-row_major float4x4 WorldToGrid;
-row_major float4x4 GridToWorld;
-row_major float4x4 RootTransformation;
-row_major float4x4 additionalTransformation;
-row_major float4x4 TotalTransformation;
-row_major float4x4 HairToWorldTransform;
-row_major float4x4 currentHairTransformation;
-row_major float4x4 currentHairTransformationInverse;
-
-//for plane:
-float3 vLightPos;
-float fTextureWidth =  1024.0f;
-
-
-float SStextureWidth;
-float SStextureHeight;
-
-float3 LightPosition = float3(1, 1, 1);
-float3 EyePosition;
-float g_StrandWidthMultiplier;
-float4 arrowColor;
-float3 TransformedEyePosition;
-
-float g_kdMesh = 1;
-float g_ksMesh = 0.1;
-float g_specPowerMesh = 10;
-float g_AmbientLightMesh = 0.3;
-
-//parameters for shading
-float g_alpha = 1.0f;
-float g_ksP;
-float g_ksS;
-float g_kd;
-float g_ka;
-float g_specPowerPrimary;
-float g_specPowerSecondary;    
-float g_ksP_sparkles;
-float g_specPowerPrimarySparkles;
-float g_fNumHairsLOD = 1;
-float g_fWidthHairsLOD = 1;
-#define SCALE_WIDTH_WITH_LOD
-
-float4 g_baseColor;
-float4 g_specColor;
-float g_maxLengthToRoot = 12; //this is the maximum length of any strand in the whole hairstyle 
-bool g_useScalpTexture;
-
-//parameters for shadow:
-float g_lightBufferRes;
-
 #define g_NumInterpolatedAttributesMinusOne 1023
 #define g_NumInterpolatedAttributes 1024
 
-int g_NumTotalWisps;
-int g_NumMaxStrandsPerWisp;
+shared cbuffer constants
+{
+	//float g_widthMulC = 0.5;//      1;//0.5;
+	float g_widthMulB = 0.5;//     1;//0.5;
+	float g_widthMulGS = 0.95;//    0.8;
+	float g_widthMul = 1.0; //this is for the depth prepass
+	//tessellation hardware
+	int g_maxPatchesPerTessellatedStrand; //g_maxPatchesPerTessellatedStrand = maxStrandLength/(strandVerticesInPatch-1). note that maxStrandLength will be differernt depending on whether or not we are using this variable for a tessellated strand vs a non-tessllated strand, and will be different based on the tessellation factor.
+	float g_InterpolationLOD = 1.0;
+	float fg_textureWidth =  1024.0f;
+	float g_StrandWidthMultiplier = 25.0f;
+	float4 g_arrowColor;
+	
+	//float g_kdMesh = 1;
+	//float g_ksMesh = 0.1;
+	//float g_specPowerMesh = 10;
+	//float g_AmbientLightMesh = 0.3;
+
+	float g_alpha = 1.0f;
+	
+	float g_lightBufferRes = 1.0f;
+	
+	//clumping
+	float g_clumpWidth = 1.0f;
+	float g_topWidth = 0.7;
+	float g_bottomWidth = 0.05;	
+	float g_lt = 0.7;
+	float g_lv = 0.05;	
+	
+	//float       splatSize;
+	//int         g_blurRadius;
+	//float3      g_blurDirection;
+	//float       g_blurSigma;
+	//bool        g_useGradientBasedForce;
+}
+
+shared cbuffer cb0
+{
+	float g_ScreenWidth = 1280.0;
+	float g_ScreenHeight = 1024.0;
+
+	bool g_bApplyAdditionalTransform;
+	bool g_bApplyAdditionalRenderingTransform;
+
+	float g_SSg_textureWidth;
+	float g_SSg_textureHeight;
+
+	float g_ksP;
+	float g_ksS;
+	float g_kd;
+	float g_ka;
+	float g_specPowerPrimary;
+	float g_specPowerSecondary;    
+	float g_specPowerPrimarySparkles;
+	float g_ksP_sparkles;
+	float4 g_baseColor;
+	float4 g_specColor;
+	
+	float g_fNumHairsLOD = 1;
+	float g_fWidthHairsLOD = 1;	
+	
+	float g_maxLengthToRoot = 12; //this is the maximum length of any strand in the whole hairstyle 
+	bool g_useScalpTexture;
+	
+	int g_NumTotalWisps;
+	int g_NumMaxStrandsPerWisp;
+	
+	float g_blendAxis; //for coordinate frame correction
+	bool g_doCurlyHair;
+	float g_angularStiffness;
+	bool g_bApplyHorizontalForce = false;
+	bool g_bAddGravity = false;
+	float g_TimeStep = 0.1; 
+	float g_gravityStrength = 0.1f;
+	bool g_bSimulate = false;
+	
+	//wind
+	float3 g_windForce = float3(-1,0,0);
+	
+	//wind fluid simulation
+	int fluidg_textureWidth;
+	int fluidg_textureHeight;
+	int fluidg_textureDepth;
+	
+	//body collisions
+	int g_NumSphereImplicits;
+	int g_NumCylinderImplicits;
+	int g_NumSphereNoMoveImplicits;
+	
+	//render the collision spheres
+	int g_currentCollisionSphere;
+	
+	float g_thinning = 0.5;
+	int g_TessellatedMasterStrandLengthMax; // start from here.
+	
+	float       g_densityThreshold;
+	float       g_interHairForces;
+	
+	float       g_textureHeight;
+	float       g_textureWidth;
+	float       g_textureDepth;
+	
+	float       g_gridZStep;
+	float       g_gridZMin;
+	int         g_gridNumRTs;	
+	
+	int         g_rowWidth;
+	int         g_colWidth;
+	int         g_textureIndex;
+	int         g_gridZIndex;
+	
+	bool        g_useBlurTexture;
+	bool        g_bClearForces;
+	bool        g_useShadows;
+	
+	float g_SoftEdges;
+	float g_SigmaA;
+	
+	float g_ZNear, g_ZFar;
+}
+
+#define SCALE_WIDTH_WITH_LOD
+
+shared cbuffer collisionmatrixes
+{
+	row_major float4x4 CollisionSphereTransformations[MAX_IMPLICITS];
+	row_major float4x4 CollisionSphereInverseTransformations[MAX_IMPLICITS];
+	row_major float4x4 CollisionCylinderTransformations[MAX_IMPLICITS];
+	row_major float4x4 CollisionCylinderInverseTransformations[MAX_IMPLICITS];
+
+	row_major float4x4 SphereNoMoveImplicitTransform[MAX_IMPLICITS];
+	row_major float4x4 SphereNoMoveImplicitInverseTransform[MAX_IMPLICITS];
+
+	int g_UseSphereForBarycentricInterpolant[MAX_IMPLICITS];
+	int g_UseCylinderForBarycentricInterpolant[MAX_IMPLICITS];
+	int g_UseSphereNoMoveForBarycentricInterpolant[MAX_IMPLICITS];
+}
+
+shared cbuffer matrixes
+{
+	matrix ViewProjection;
+	matrix WorldView;
+	matrix WorldViewProjection;
+	row_major float4x4 WorldToGrid;
+	row_major float4x4 GridToWorld;
+	row_major float4x4 RootTransformation;
+	row_major float4x4 additionalTransformation;
+	row_major float4x4 TotalTransformation;
+	row_major float4x4 HairToWorldTransform;
+	row_major float4x4 currentHairTransformation;
+	row_major float4x4 currentHairTransformationInverse;
+	
+	float3 vLightPos;
+	float3 LightPosition = float3(1, 1, 1);
+	float3 EyePosition;
+	float3 TransformedEyePosition;
+	float3 vLightDir;   //TO DO SHADOWS: if world matrices (like HairToWorldTransform) are incorporated into shadows
+						//               this vector might change to be in world space rather than hair space.
+						//               in that case calculations using it will have to change, since they are currently 
+						//               happening in hair space
+	float3 vLightDirObjectSpace;
+	
+	matrix mWorldViewProj;
+	matrix mLightView;
+	matrix mLightProj;
+	matrix mLightViewProj;
+	matrix mLightViewProjI;
+	matrix mLightViewProjClip2Tex;
+}
 
 //texture and buffer variables
 Buffer<float2> g_Attributes : register(t0);
@@ -179,93 +277,6 @@ Texture2D meshAOMap : register(t56);
 
 StructuredBuffer<float4> g_MasterStrandSB : register(t57);
 StructuredBuffer<float4> g_coordinateFramesSB : register(t58);
-
-float g_blendAxis; //for coordinate frame correction
-
-bool doCurlyHair;
-
-float g_angularStiffness;
-bool g_bApplyHorizontalForce = false;
-bool g_bAddGravity = false;
-float TimeStep = 0.1; 
-float g_gravityStrength = 0.1f;
-bool g_bSimulate = false;
-
-//wind
-float3 windForce = float3(-1,0,0);
-
-//wind fluid simulation
-int fluidTextureWidth;
-int fluidTextureHeight;
-int fluidTextureDepth;
-
-//body collisions
-int g_NumSphereImplicits;
-int g_NumCylinderImplicits;
-int g_NumSphereNoMoveImplicits;
-
-row_major float4x4 CollisionSphereTransformations[MAX_IMPLICITS];
-row_major float4x4 CollisionSphereInverseTransformations[MAX_IMPLICITS];
-row_major float4x4 CollisionCylinderTransformations[MAX_IMPLICITS];
-row_major float4x4 CollisionCylinderInverseTransformations[MAX_IMPLICITS];
-
-row_major float4x4 SphereNoMoveImplicitTransform[MAX_IMPLICITS];
-row_major float4x4 SphereNoMoveImplicitInverseTransform[MAX_IMPLICITS];
-
-int g_UseSphereForBarycentricInterpolant[MAX_IMPLICITS];
-int g_UseCylinderForBarycentricInterpolant[MAX_IMPLICITS];
-int g_UseSphereNoMoveForBarycentricInterpolant[MAX_IMPLICITS];
-
-//render the collision spheres
-int currentCollisionSphere;
-
-//clumping
-float g_clumpWidth = 1.0f;
-float g_topWidth = 0.7;
-float g_bottomWidth = 0.05;
-float g_thinning = 0.5;
-float g_lt = 0.7;
-float g_lv = 0.05;
-int g_TessellatedMasterStrandLengthMax;
-
-float       g_densityThreshold;
-float       g_interHairForces;
-float       textureHeight;
-float       textureWidth;
-float       textureDepth;
-float       splatSize;
-float       g_gridZStep;
-float       g_gridZMin;
-int         g_gridNumRTs;
-int         rowWidth;
-int         colWidth;
-int         textureIndex;
-int         gridZIndex;
-int         blurRadius;
-float3      blurDirection;
-float       blurSigma;
-bool        useBlurTexture;
-bool        useGradientBasedForce;
-
-bool        g_bClearForces;
-
-bool        useShadows;
-
-float4x4 mWorldViewProj;
-float4x4 mLightView;
-float4x4 mLightProj;
-float4x4 mLightViewProj;
-float4x4 mLightViewProjI;
-float4x4 mLightViewProjClip2Tex;
-
-float3 vLightDir;   //TO DO SHADOWS: if world matrices (like HairToWorldTransform) are incorporated into shadows
-                    //               this vector might change to be in world space rather than hair space.
-                    //               in that case calculations using it will have to change, since they are currently 
-                    //               happening in hair space
-float g_SoftEdges;
-float g_SigmaA;
-float ZNear, ZFar;
-float3 vLightDirObjectSpace;
 
 cbuffer onblend
 {
@@ -638,14 +649,14 @@ void DistanceConstraint(inout HairVertex particle0, inout HairVertex particle1, 
 //this code only works with demuxed textures, not the original density texture
 float Sample2DTexArray(Texture2DArray tex, float3 posInGrid)
 {
-    float3 texcoords = float3(posInGrid.x, posInGrid.y, posInGrid.z * textureDepth);
+    float3 texcoords = float3(posInGrid.x, posInGrid.y, posInGrid.z * g_textureDepth);
     float density = abs(tex.SampleLevel(samLinearClamp,texcoords,0)).r; 
     return density; 
 }
 
 float3 SampleGradientTrilinear(Texture2DArray tex, float3 tc)
 {
-    float3 texelWidth = float3( 1.0/textureWidth, 1.0/textureHeight, 1.0/textureDepth );
+    float3 texelWidth = float3( 1.0/g_textureWidth, 1.0/g_textureHeight, 1.0/g_textureDepth );
 
     #define LEFTCELL    float3 (tc.x-texelWidth.x, tc.y, tc.z)
     #define RIGHTCELL   float3 (tc.x+texelWidth.x, tc.y, tc.z)
@@ -773,9 +784,9 @@ HairVertex addForcesAndIntegrateVS(HairVertexPair particlePair, uint vertexID : 
         posInGrid.y += 0.5;
         posInGrid.z += 0.5;
         float3 texcoords = float3(posInGrid.x, 1.0-posInGrid.y, posInGrid.z);
-        float3 windForce = (g_FluidVelocityTexture.SampleLevel(samLinearClamp,texcoords,0).xyz);
-        windForce *= (1-stiffness)*(5) + 5;
-        force.xyz += windForce;
+        float3 g_windForce = (g_FluidVelocityTexture.SampleLevel(samLinearClamp,texcoords,0).xyz);
+        g_windForce *= (1-stiffness)*(5) + 5;
+        force.xyz += g_windForce;
     }
     
     //Gravity------------------------------------------------------------------------
@@ -815,7 +826,7 @@ HairVertex addForcesAndIntegrateVS(HairVertexPair particlePair, uint vertexID : 
     //velocity.xyz = clamp(velocity.xyz, float3(-clampAmount,-clampAmount,-clampAmount), float3(clampAmount,clampAmount,clampAmount) );
     outputPos.Position.xyz = particlePair.position.xyz
                              + velocity.xyz
-                             + force.xyz*TimeStep*TimeStep; 
+                             + force.xyz*g_TimeStep*g_TimeStep; 
 
     //this makes stiff hair even stiffer, and makes it go towards its base transformed pose.
 	//However, we only apply this force when the hair and the base transformed hair are "relatively" close. Here we have huristically decided this value to be 1.6 units
@@ -1827,7 +1838,7 @@ float ShadowPCF(float2 texcoord, float z)
 
 float NormalizeDepth(float z)
 {
-	return (z - ZNear) / (ZFar - ZNear) * CSM_ZMAX;
+	return (z - g_ZNear) / (g_ZFar - g_ZNear) * CSM_ZMAX;
 }
 
 float WorldToDepth(float3 wPos)
@@ -2275,7 +2286,7 @@ HairVertex2 InterpolateVSMultiStrand_LOAD(uint index : SV_VertexID )
     output.scalpTexcoords = float2(IdAlphaTex.w,tangent.w);
     
     #ifdef SHADOWS_VS
-    if(useShadows)
+    if(g_useShadows)
     {
         float3 Pos = mul(float4(output.Position.xyz, 1), HairToWorldTransform).xyz;
 	    float2 texcoords = WorldToLightCoord(Pos);
@@ -2353,7 +2364,7 @@ Buffer<float4> InterpolatedPositionAndWidth, Buffer<float4> InterpolatedIdAlphaT
     hairPoint.scalpTexcoords = float2(IdAlphaTex.w,vTangent.w);
     
     #ifdef SHADOWS_VS
-    if(useShadows)
+    if(g_useShadows)
     {
         float3 Pos = mul(float4(PositionAndWidth.xyz, 1), HairToWorldTransform).xyz;
 	    float2 texcoords = WorldToLightCoord(Pos);
@@ -2590,7 +2601,7 @@ inout float2 texcoordsOut, inout int MasterStrandNumberOut, inout float lengthTo
     //jitter the position slightly
     float2 jitter = g_strandDeviations.Load((outputID & g_NumInterpolatedAttributesMinusOne) * g_TessellatedMasterStrandLengthMax + vertexID); 
  
-    if(doCurlyHair)
+    if(g_doCurlyHair)
         jitter += g_curlDeviations.Load(MasterStrandNumber*g_TessellatedMasterStrandLengthMax + vertexID); 
 
     clumpCoordinates += jitter;
@@ -3031,7 +3042,7 @@ HairVertex2 InterpolateDSMultiStrand(OutputPatch<DUMMY, 1> inputPatch, BARY_HS_C
 	    hairvert.Position.xyz = mul( float4(hairvert.Position.xyz,1.0),additionalTransformation).xyz;
 
 #ifdef SHADOWS_VS
-	if(useShadows)
+	if(g_useShadows)
 	{
 		float3 Pos = mul(float4(hairvert.Position, 1), HairToWorldTransform).xyz;
 		float2 texcoords = WorldToLightCoord(Pos);
@@ -3263,7 +3274,7 @@ HairVertex2 InterpolateDSSingleStrand_NORMAL(OutputPatch<DUMMY, 1> inputPatch, H
     //jitter the position slightly
     float2 jitter = g_strandDeviations.Load((InstanceID & g_NumInterpolatedAttributesMinusOne) * g_TessellatedMasterStrandLengthMax + vertexID);
 
-    if(doCurlyHair)
+    if(g_doCurlyHair)
         jitter += g_curlDeviations.Load(MasterStrandNumber*g_TessellatedMasterStrandLengthMax + vertexID); 
 
     clumpCoordinates += jitter;
@@ -3319,7 +3330,7 @@ HairVertex2 InterpolateDSSingleStrand_NORMAL(OutputPatch<DUMMY, 1> inputPatch, H
 	    output.Position.xyz = mul( float4(output.Position.xyz,1.0),additionalTransformation).xyz;
 
     #ifdef SHADOWS_VS
-    if(useShadows)
+    if(g_useShadows)
     {
         float3 Pos = mul(float4(output.Position.xyz, 1), HairToWorldTransform).xyz;
 	    float2 texcoords = WorldToLightCoord(Pos);
@@ -3359,7 +3370,7 @@ HairVertexPWI InterpolateDSSingleStrand_DEPTH(OutputPatch<DUMMY, 1> inputPatch, 
     //jitter the position slightly
     float2 jitter = g_strandDeviations.Load((InstanceID & g_NumInterpolatedAttributesMinusOne) * g_TessellatedMasterStrandLengthMax + vertexID);
 
-    if(doCurlyHair)
+    if(g_doCurlyHair)
         jitter += g_curlDeviations.Load(MasterStrandNumber*g_TessellatedMasterStrandLengthMax + vertexID); 
 
     clumpCoordinates += jitter;
@@ -3472,7 +3483,7 @@ HairVertex2 InterpolateVSSingleStrand_LOAD(uint index : SV_VertexID)
     
     
     #ifdef SHADOWS_VS
-    if(useShadows)
+    if(g_useShadows)
     {
         float3 Pos = mul(float4(output.Position.xyz, 1), HairToWorldTransform).xyz;
 	    float2 texcoords = WorldToLightCoord(Pos);
@@ -3766,11 +3777,11 @@ void InterpolateGSDepthPrepass(line HairVertexPWIAT vertex[2], inout TriangleStr
 #endif
     
     float4x3 tex;
-    int textureIndex = vertex[0].ID & 3;
-    tex[0] = float3(0,vertex[0].tex,textureIndex);
-    tex[1] = float3(1,vertex[0].tex,textureIndex);
-    tex[2] = float3(0,vertex[1].tex,textureIndex);
-    tex[3] = float3(1,vertex[1].tex,textureIndex);
+    int g_textureIndex = vertex[0].ID & 3;
+    tex[0] = float3(0,vertex[0].tex,g_textureIndex);
+    tex[1] = float3(1,vertex[0].tex,g_textureIndex);
+    tex[2] = float3(0,vertex[1].tex,g_textureIndex);
+    tex[3] = float3(1,vertex[1].tex,g_textureIndex);
     
     
     hairPoint.Position = mul( float4(pos[0],1.0),ViewProjection);
@@ -4175,7 +4186,7 @@ float4 InterpolatePSMultiStrandCollisions(HairCollisionVertex input) : SV_Target
     posInGrid.x += 0.5;
     posInGrid.y += 0.5;
     posInGrid.z += 0.5;
-    float3 texcoords = float3(posInGrid.x, 1.0-posInGrid.y, posInGrid.z * textureDepth);
+    float3 texcoords = float3(posInGrid.x, 1.0-posInGrid.y, posInGrid.z * g_textureDepth);
     float density = Texture_Voxelized_Obstacles.SampleLevel(samLinearClamp,texcoords,0).r;  
     if( density>g_densityThreshold*1.8 )
            return float4(input.vertexID,input.vertexID,input.vertexID,input.vertexID);
@@ -4200,12 +4211,12 @@ float4 RenderPSDensity(HairPoint input) : SV_Target
     posInGrid.y += 0.5;
     posInGrid.z += 0.5;
       
-    float3 texcoords = float3(posInGrid.x, 1.0 - posInGrid.y, posInGrid.z * textureDepth);
+    float3 texcoords = float3(posInGrid.x, 1.0 - posInGrid.y, posInGrid.z * g_textureDepth);
     float density;
     
     //using wrap mode to show where our texture accesses are wrong
     
-    if(useBlurTexture)
+    if(g_useBlurTexture)
         density = abs(Texture_density_Blur.SampleLevel(samLinearWrap,texcoords,0)).r; 
    	else
    	    density = abs(Texture_density_Demux.SampleLevel(samLinearWrap,texcoords,0)).r; 
@@ -4221,12 +4232,12 @@ float4 RenderPSDensitySmall(HairPointDepthDensity input) : SV_Target
     posInGrid.y += 0.5;
     posInGrid.z += 0.5;
       
-    float3 texcoords = float3(posInGrid.x, 1.0 - posInGrid.y, posInGrid.z * textureDepth);
+    float3 texcoords = float3(posInGrid.x, 1.0 - posInGrid.y, posInGrid.z * g_textureDepth);
     float density;
     
     //using wrap mode to show where our texture accesses are wrong
     
-    if(useBlurTexture)
+    if(g_useBlurTexture)
         density = abs(Texture_density_Blur.SampleLevel(samLinearWrap,texcoords,0)).r; 
    	else
    	    density = abs(Texture_density_Demux.SampleLevel(samLinearWrap,texcoords,0)).r; 
@@ -4362,7 +4373,7 @@ float4 RenderPS(HairPoint input) : SV_Target
 	float shadow = input.shadow;
 #else
 	float shadow = 0.0f;
-	if(useShadows)
+	if(g_useShadows)
     {
 		float3 Pos = mul(float4(input.wPos, 1), HairToWorldTransform).xyz;
 		float2 texcoords = WorldToLightCoord(Pos);
@@ -4503,7 +4514,7 @@ float4 VisDepthsPS ( PostProc_VSOut IN ) : SV_TARGET
     float4 val = tShadowMap.SampleLevel(samPointClamp, IN.tex.xy, 0 );
 	float4 output = float4(0,0,0,0);
 
-	output.x = (val.x - ZNear) / (ZFar - ZNear);
+	output.x = (val.x - g_ZNear) / (g_ZFar - g_ZNear);
 
 	return output;
 }
@@ -4587,7 +4598,7 @@ float DOM_FILTER( float2 tex, float fragDepth, float filterWidth )
     //PreShader - This should all be optimized away by the compiler
     //====================================
     float fStartOffset = BoxFilterStart( filterWidth );
-    float texOffset = 1.0f / fTextureWidth;
+    float texOffset = 1.0f / fg_textureWidth;
     //====================================
     
     fragDepth -= 0.3f;
@@ -4608,7 +4619,7 @@ float PCF_FILTER( float2 tex, float fragDepth, float filterWidth, Texture2D text
     //PreShader - This should all be optimized away by the compiler
     //====================================
     float fStartOffset = BoxFilterStart( filterWidth );
-    float texOffset = 1.0f / fTextureWidth;
+    float texOffset = 1.0f / fg_textureWidth;
     //====================================
     
     fragDepth -= 0.3f;
@@ -4725,7 +4736,7 @@ PsCnDOutput MeshPSShadows(MeshVertexOutShadows vertex)
     float3 ambient = ambientColor*0.15;
 
     float lit = 1.0f;
-	if(useShadows)
+	if(g_useShadows)
 	{
 		float fDepth = mul(float4(vertex.wpos, 1), mLightView).z;
         lit = SHADOW_FILTER( vertex.lightTexCoords, fDepth, 22 );
@@ -4782,13 +4793,13 @@ PSIn VSDrawPlane( VSPlaneIn input )
     return output;
 }
 
-float4 PSDrawPlane( uniform bool useShadows, PSIn input ) : SV_Target
+float4 PSDrawPlane( uniform bool g_useShadows, PSIn input ) : SV_Target
 {
 	float4 output = (float4)0.0f;
 	
     float lit = 1.0f;
     
-    if(useShadows)
+    if(g_useShadows)
         lit = SHADOW_FILTER( input.lightTexCoords, input.fDepth, 16 );
 
 	float3 wLight = normalize( input.wLight );
@@ -4811,9 +4822,9 @@ MeshVertexOut CollisionVS(MeshVertexIn vertexIn)
     bool render = true;
     if(render)
     { 
-        Pos = mul(float4(Pos,1), CollisionSphereTransformations[currentCollisionSphere]).xyz;
-        //Pos = mul(float4(Pos,1), SphereNoMoveImplicitTransform[currentCollisionSphere]).xyz;
-        //Pos = mul(float4(Pos,1), CollisionCylinderTransformations[currentCollisionSphere]).xyz;
+        Pos = mul(float4(Pos,1), CollisionSphereTransformations[g_currentCollisionSphere]).xyz;
+        //Pos = mul(float4(Pos,1), SphereNoMoveImplicitTransform[g_currentCollisionSphere]).xyz;
+        //Pos = mul(float4(Pos,1), CollisionCylinderTransformations[g_currentCollisionSphere]).xyz;
         Pos = mul(float4(Pos,1), HairToWorldTransform).xyz;
     }
     else
@@ -4888,7 +4899,7 @@ VS_OUTPUT_ARROW VSArrow( VS_INPUT_ARROW input )
 PsCnDOutput PSArrow(VS_OUTPUT_ARROW In)
 {  
     PsCnDOutput ret;
-    ret.Color = arrowColor;
+    ret.Color = g_arrowColor;
 //    ret.Depth = In.Depth;
     return ret;
 }
@@ -4934,8 +4945,8 @@ VS_OUTPUT_POSITION_TEX VS_GRID( VS_INPUT_POSITION_TEX input)
     VS_OUTPUT_POSITION_TEX output = (VS_OUTPUT_POSITION_TEX)0;
 
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1.0);
-    output.Texcoords = float3( (input.Texcoords.x)/(textureWidth),
-                               (input.Texcoords.y)/(textureHeight), 
+    output.Texcoords = float3( (input.Texcoords.x)/(g_textureWidth),
+                               (input.Texcoords.y)/(g_textureHeight), 
                                 input.Texcoords.z);                   
     return output;
 }
@@ -4946,9 +4957,9 @@ VS_OUTPUT_FLUIDSIM VS_GRID_FLUIDSIM( VS_INPUT_FLUIDSIM input)
 
     output.pos = float4(input.position.x, input.position.y, input.position.z, 1.0);
     output.rtindex = input.textureCoords0.z;
-    output.texcoords = float3( (input.textureCoords0.x)/(fluidTextureWidth),
-                               (input.textureCoords0.y)/(fluidTextureHeight), 
-                               (input.textureCoords0.z)/(fluidTextureDepth)*textureDepth); 
+    output.texcoords = float3( (input.textureCoords0.x)/(fluidg_textureWidth),
+                               (input.textureCoords0.y)/(fluidg_textureHeight), 
+                               (input.textureCoords0.z)/(fluidg_textureDepth)*g_textureDepth); 
     return output;
 }
 
@@ -4980,7 +4991,7 @@ float4 PS_DEMUX_TO_3D_OBSTACLE_TEX( GS_OUTPUT_FLUIDSIM input ) : SV_Target
         
     float returnVal;
     
-    float4 posInWorld = mul( float4(input.texcoords.x-0.5, 0.5-input.texcoords.y,(input.texcoords.z/textureDepth) - 0.5,1),GridToWorld);
+    float4 posInWorld = mul( float4(input.texcoords.x-0.5, 0.5-input.texcoords.y,(input.texcoords.z/g_textureDepth) - 0.5,1),GridToWorld);
     
     for(int i=0;i<g_NumSphereImplicits;i++)
         if(PartitionInOutBoundarySphere(posInWorld.xyz,0.4,i,returnVal))
@@ -5015,8 +5026,8 @@ float4 PS_RESOLVE_SUPERSAMPLE( VS_OUTPUT_POSITION_TEX input ) : SV_Target
     float4 color = g_SupersampledSceneColor.SampleLevel(samLinear,input.Texcoords.xy,0);
  
     //more taps: these dont cost a lot but improve the look
-    float TexelX = 1.0/(SStextureWidth);
-    float TexelY = 1.0/(SStextureHeight);
+    float TexelX = 1.0/(g_SSg_textureWidth);
+    float TexelY = 1.0/(g_SSg_textureHeight);
     color += g_SupersampledSceneColor.SampleLevel(samLinear,input.Texcoords.xy + float2(-0.9*TexelX, 0.4*TexelY),0);
     color += g_SupersampledSceneColor.SampleLevel(samLinear,input.Texcoords.xy + float2( 0.4*TexelX, 0.9*TexelY),0);
     color += g_SupersampledSceneColor.SampleLevel(samLinear,input.Texcoords.xy + float2( 0.9*TexelX,-0.4*TexelY),0);
@@ -5040,7 +5051,7 @@ PsOutColorDepth PS_RECONSTRUCT_DEPTH( VS_OUTPUT_POSITION_TEX input )
 
 float4 PS_DRAW_TEXTURE( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 {
-    if( uint(input.Position.x) % rowWidth == 0 || uint(input.Position.y) % colWidth == 0)
+    if( uint(input.Position.x) % g_rowWidth == 0 || uint(input.Position.y) % g_colWidth == 0)
         return float4(1,0,0,1);
     
     int zSlice = floor(input.Texcoords.z/4.0);
@@ -5062,15 +5073,15 @@ float4 PS_DRAW_TEXTURE( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 
 float4 PS_DRAW_TEXTURE_DEMUX( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 {
-    if( uint(input.Position.x) % rowWidth == 0 || uint(input.Position.y) % colWidth == 0)
+    if( uint(input.Position.x) % g_rowWidth == 0 || uint(input.Position.y) % g_colWidth == 0)
         return float4(1,0,0,1);
     
     float density = 0.0f;
-    if(textureIndex == 1)
+    if(g_textureIndex == 1)
         density = abs(Texture_density_Demux.SampleLevel(samPointClamp,input.Texcoords.xyz,0)).r;
-    else if(textureIndex == 2)
+    else if(g_textureIndex == 2)
         density = abs(Texture_density_Blur_Temp.SampleLevel(samPointClamp,input.Texcoords.xyz,0)).r;
-    else if(textureIndex == 3)
+    else if(g_textureIndex == 3)
         density = abs(Texture_density_Blur.SampleLevel(samPointClamp,input.Texcoords.xyz,0)).r;    
     else
         return float4(1,1,0,1);   
@@ -5103,7 +5114,7 @@ float4 PS_DRAW_COLLISIONS_TEXTURE( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 
 float4 PS_VOXELIZE_OBSTACLES( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 {
-    float4 posInWorld = mul( float4(input.Texcoords.x-0.5, 0.5-input.Texcoords.y, gridZIndex/textureDepth - 0.5,1),GridToWorld);
+    float4 posInWorld = mul( float4(input.Texcoords.x-0.5, 0.5-input.Texcoords.y, g_gridZIndex/g_textureDepth - 0.5,1),GridToWorld);
     
     if(evaluateVertexInsideImplicits(posInWorld.xyz))
          return g_densityThreshold*2 + 0.0001; 
@@ -5113,14 +5124,14 @@ float4 PS_VOXELIZE_OBSTACLES( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 
 float4 PS_DEMUX( VS_OUTPUT_POSITION_TEX input ) : SV_Target
 {
-    float obstacleDensity = Texture_Voxelized_Obstacles.SampleLevel(samPointClamp,float3(input.Texcoords.xy,gridZIndex),0).r;
+    float obstacleDensity = Texture_Voxelized_Obstacles.SampleLevel(samPointClamp,float3(input.Texcoords.xy,g_gridZIndex),0).r;
     if(obstacleDensity>0)
         return obstacleDensity;
    
     //-----------------------------------
     
-    int zSlice = floor(gridZIndex/4.0);
-    int rgba = 0x3 & gridZIndex;
+    int zSlice = floor(g_gridZIndex/4.0);
+    int rgba = 0x3 & g_gridZIndex;
 
     float3 texcoords = float3(input.Texcoords.xy,zSlice);
     float4 density = abs(Texture_density.SampleLevel(samPointClamp,texcoords,0));
