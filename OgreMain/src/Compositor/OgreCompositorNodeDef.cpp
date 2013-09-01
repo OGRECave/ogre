@@ -47,18 +47,4 @@ namespace Ogre
 		mTargetPasses.push_back( CompositorTargetDef( renderTargetName ) );
 		return &mTargetPasses.back();
 	}
-	//-----------------------------------------------------------------------------------
-	void CompositorNodeDef::_validateAndFinish(void)
-	{
-		ChannelMappings::const_iterator itor = mOutChannelMapping.begin();
-		ChannelMappings::const_iterator end  = mOutChannelMapping.end();
-
-		while( itor != end )
-		{
-			size_t index;
-			TextureSource texSource;
-			decodeTexSource( *itor, index, texSource );
-			++itor;
-		}
-	}
 }

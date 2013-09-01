@@ -223,7 +223,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void LiSPSMShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-		const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
+							const Light *light, Camera *texCam, size_t iteration) const
 	{
 		// check availability - viewport not needed
 		OgreAssert(sm != NULL, "SceneManager is NULL");

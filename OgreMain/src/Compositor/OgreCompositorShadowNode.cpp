@@ -103,11 +103,11 @@ namespace Ogre
 			++itor;
 		}
 
-		// Shadow Nodes don't have input and global texture should've been created by
+		// Shadow Nodes don't have input; and global textures should be ready by
 		// the time we get created. Therefore, we can safely initialize now as our
 		// output may be used in regular nodes and we're created on-demand (as soon
 		// as a Node discovers it needs us for the first time, we get created)
-		initializePasses();
+		createPasses();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNode::~CompositorShadowNode()

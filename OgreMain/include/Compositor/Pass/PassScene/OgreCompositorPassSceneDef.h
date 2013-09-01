@@ -42,16 +42,16 @@ namespace Ogre
 	*  @{
 	*/
 
+	enum ShadowNodeRecalculation
+	{
+		SHADOW_NODE_RECALCULATE,
+		SHADOW_NODE_REUSE,
+		SHADOW_NODE_FIRST_ONLY
+	};
+
 	class _OgreExport CompositorPassSceneDef : public CompositorPassDef
 	{
 	public:
-		enum ShadowNodeRecalculation
-		{
-			ShadowNodeRecalculate,
-			ShadowNodeReuse,
-			ShadowNodeFirstOnly
-		};
-
 		/// Viewport's visibility mask while rendering our pass
 		uint32					mVisibilityMask;
 		IdString				mShadowNode;
@@ -66,7 +66,7 @@ namespace Ogre
 		CompositorPassSceneDef() :
 			CompositorPassDef( PASS_SCENE ),
 			mVisibilityMask( 0xffffffff ),
-			mShadowNodeRecalculation( ShadowNodeFirstOnly ),
+			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),
 			mLastRQ( -1 )
 		{

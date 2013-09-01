@@ -177,8 +177,17 @@ namespace Ogre
 		bool areAllInputsConnected() const	{ return mNumConnectedInputs == mInTextures.size(); }
 		const CompositorChannelVec& getInputChannel() const			{ return mInTextures; }
 
-		void initializePasses(void);
+		/** Creates all passes based on our definition
+		@remarks
+			Call this function after connecting all channels (at least our input)
+			otherwise we may bind null pointer RTs to the passes (and then crash)
+			@See connectTo and @see connectFinalRT
+		*/
+		void createPasses(void);
 
+		const CompositorPassVec& _getPasses() const					{ return mPasses; }
+
+		/// Calling this function every frame will cause us to execute all our passes (ie. render)
 		void _update(void);
 
 	private:

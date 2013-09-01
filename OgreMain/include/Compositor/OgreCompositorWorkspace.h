@@ -66,9 +66,26 @@ namespace Ogre
 
 		RenderTarget			*mRenderWindow;
 
+		/// Creates all the node instances from our definition
 		void createAllNodes(void);
+
+		/// Destroys all node instances
 		void destroyAllNodes(void);
+
+		/** Connects all nodes' input and output channels (including final rt)
+			according to our definition. Then creates the passes from all nodes
+		@remarks
+			Call this function after createAllNodes
+		*/
 		void connectAllNodes(void);
+
+		/** Setup ShadowNodes in every pass from every node so that we recalculate them as
+			little as possible (when passes use SHADOW_NODE_FIRST_ONLY flag)
+		@remarks
+			Call this function after calling createPasses() on every node, since we
+			need the passes to have been already created
+		*/
+		void setupPassesShadowNodes(void);
 
 		/** Finds a node instance with the given aliased name
 		@remarks
@@ -117,10 +134,12 @@ namespace Ogre
 			Throws if the shadow definition doesn't exist.
 		@param nodeDefName
 			Name of the definition.
+		@param bCreated [out]
+			Set to true if we had to create a new shadow node (it didn't exist)
 		@return
 			ShadowNode pointer
 		*/
-		CompositorShadowNode* findShadowNode( IdString nodeDefName ) const;
+		CompositorShadowNode* getShadowNode( IdString nodeDefName, bool &bCreated ) const;
 
 		/// Finds a camera in the scene manager we have.
 		Camera* findCamera( IdString cameraName ) const;

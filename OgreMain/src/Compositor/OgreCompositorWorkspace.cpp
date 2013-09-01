@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
 #include "OgreLogManager.h"
@@ -189,11 +191,74 @@ namespace Ogre
 
 			while( itor != end )
 			{
-				(*itor)->initializePasses();
+				(*itor)->createPasses();
 				++itor;
 			}
 
+			//Now manage automatic shadow nodes present PASS_SCENE passes
+			//(when using SHADOW_NODE_FIRST_ONLY)
+			setupPassesShadowNodes();
+
 			mValid = true;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::setupPassesShadowNodes(void)
+	{
+		CompositorShadowNodeVec::iterator itShadowNode = mShadowNodes.begin();
+		CompositorShadowNodeVec::iterator enShadowNode = mShadowNodes.end();
+
+		while( itShadowNode != enShadowNode )
+		{
+			Camera *lastCamera = 0;
+			CompositorShadowNode *shadowNode = *itShadowNode;
+
+			CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+			CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+			while( itor != end )
+			{
+				const CompositorPassVec &passes = (*itor)->_getPasses();
+				CompositorPassVec::const_iterator itPasses = passes.begin();
+				CompositorPassVec::const_iterator enPasses = passes.end();
+
+				while( itPasses != enPasses )
+				{
+					if( (*itPasses)->getType() == PASS_SCENE )
+					{
+						assert( dynamic_cast<CompositorPassScene*>( *itPasses ) );
+						CompositorPassScene *pass = static_cast<CompositorPassScene*>( *itPasses );
+
+						if( shadowNode == pass->getShadowNode() )
+						{
+							ShadowNodeRecalculation recalc =
+													pass->getDefinition()->mShadowNodeRecalculation;
+
+							if( recalc == SHADOW_NODE_RECALCULATE )
+							{
+								//We're forced to recalculate anyway, save the new camera
+								lastCamera = pass->getCamera();
+							}
+							else if( recalc == SHADOW_NODE_FIRST_ONLY )
+							{
+								if( lastCamera != pass->getCamera() )
+								{
+									//Either this is the first one, or camera changed.
+									//We need to recalculate
+									pass->_setUpdateShadowNode( true );
+									lastCamera = pass->getCamera();
+								}
+								else
+								{
+									pass->_setUpdateShadowNode( false );
+								}
+							}
+						}
+					}
+					++itPasses;
+				}
+				++itor;
+			}
+			++itShadowNode;
 		}
 	}
 	//-----------------------------------------------------------------------------------
@@ -211,7 +276,12 @@ namespace Ogre
 		}
 
 		if( !retVal && includeShadowNodes )
-			retVal = findShadowNode( aliasName );
+		{
+			bool shadowNodeCreated;
+			retVal = getShadowNode( aliasName, shadowNodeCreated );
+			assert( !shadowNodeCreated && "Shadow Node should be created by now, or referencing a shadow"
+					" node that will never be used in a pass!" );
+		}
 
 		return retVal;
 	}
@@ -257,9 +327,10 @@ namespace Ogre
 			mRenderWindow->swapBuffers( waitForVSync );
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const
+	CompositorShadowNode* CompositorWorkspace::getShadowNode( IdString nodeDefName, bool &bCreated ) const
 	{
 		CompositorShadowNode *retVal = 0;
+		bCreated = false;
 
 		CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
 		CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
@@ -278,6 +349,7 @@ namespace Ogre
 			const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
 			retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
 													def, this, mRenderSys );
+			bCreated = true;
 		}
 
 		return retVal;

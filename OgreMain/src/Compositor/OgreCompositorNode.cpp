@@ -308,7 +308,7 @@ namespace Ogre
 		mInTextures[inChannelA].textures	= textures;
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorNode::initializePasses(void)
+	void CompositorNode::createPasses(void)
 	{
 		CompositorTargetDefVec::const_iterator itor = mDefinition->mTargetPasses.begin();
 		CompositorTargetDefVec::const_iterator end  = mDefinition->mTargetPasses.end();

@@ -199,7 +199,7 @@ namespace Ogre
 		http://www.cg.tuwien.ac.at/research/vr/lispsm/
 		*/
 		virtual void getShadowCamera(const SceneManager *sm, const Camera *cam, 
-			const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
+									const Light *light, Camera *texCam, size_t iteration) const;
 
 		/** Adjusts the parameter n to produce optimal shadows.
 		@remarks

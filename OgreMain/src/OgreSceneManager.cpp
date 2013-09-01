@@ -6562,9 +6562,9 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 				camLightIt->second = light;
 
 				if (light->getCustomShadowCameraSetup().isNull())
-					mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam, j);
+					mDefaultShadowCameraSetup->getShadowCamera(this, cam, light, texCam, j);
 				else
-					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam, j);
+					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, light, texCam, j);
 
 				// Fire shadow caster update, callee can alter camera settings
 				fireShadowTexturesPreCaster(light, texCam, j);

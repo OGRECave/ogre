@@ -46,11 +46,18 @@ namespace Ogre
 				mDefinition( definition ),
 				mShadowNode( 0 ),
 				mCamera( 0 ),
-				mUpdateShadowNode( true ),
+				mUpdateShadowNode( false ),
 				mWorkspace( workspace )
 	{
-		//TODO: Determine whether mUpdateShadowNode should be true or false
-		mShadowNode	= workspace->findShadowNode( mDefinition->mShadowNode );
+		if( mDefinition->mShadowNode != IdString() )
+		{
+			bool shadowNodeCreated;
+			mShadowNode	= workspace->getShadowNode( mDefinition->mShadowNode, shadowNodeCreated );
+
+			// Passes with "first_only" option are set in CompositorWorkspace::setupPassesShadowNodes
+			if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_FIRST_ONLY )
+				mUpdateShadowNode = mDefinition->mShadowNodeRecalculation == SHADOW_NODE_RECALCULATE;
+		}
 
 		if( mDefinition->mCameraName != IdString() )
 			mCamera = workspace->findCamera( mDefinition->mCameraName );
