@@ -53,6 +53,10 @@ namespace Ogre
 			mSceneManager( sceneManager ),
 			mRenderSys( renderSys )
 	{
+		//Create global textures
+		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
+												id, true, mRenderWindow, mRenderSys );
+
 		createAllNodes();
 		connectAllNodes();
 	}
@@ -60,6 +64,10 @@ namespace Ogre
 	CompositorWorkspace::~CompositorWorkspace()
 	{
 		destroyAllNodes();
+
+		//Destroy our global textures
+		TextureDefinitionBase::destroyTextures( mDefinition->mLocalTextureDefs, mGlobalTextures,
+												getId(), true, mRenderSys );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::createAllNodes(void)

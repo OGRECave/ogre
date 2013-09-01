@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
+#include "Compositor/OgreCompositorChannel.h"
 #include "OgreIdString.h"
 
 namespace Ogre
@@ -192,6 +193,39 @@ namespace Ogre
 			is used correctly.
 		*/
 		TextureDefinition* addTextureDefinition( const String &name );
+
+		/** Utility function to create the textures based on a given set of
+			texture definitions and put them in a container.
+		@remarks
+			Useful because both Workspace & CompositorNode share the same functionality
+			(create global/local textures respectively) without having to create a whole
+			base class just for one function. It's confusing that Nodes & Workspace would
+			share the same base class, as if they were the same base object or share
+			similar functionality (when in fact, workspace manages nodes)
+		@param textureDefs
+			Array of texture definitions
+		@param inOutTexContainer
+			Where we'll store the newly created RTs & textures
+		@param id
+			Unique id in the case we want textures to have unique names (uniqueNames must be true)
+		@param uniqueNames
+			Set to true if each RT will have a unique name based on given Id, or we don't. The
+			latter is useful for global textures (let them get access through materials)
+		@param finalTarget
+			The final render target (usually the render window) we have to clone parameters from
+			(eg. when using auto width & height, or fsaa settings)
+		@param renderSys
+			The RenderSystem to use
+		*/
+		static void createTextures( const TextureDefinitionVec &textureDefs,
+									CompositorChannelVec &inOutTexContainer,
+									IdType id, bool uniqueNames,
+									const RenderTarget *finalTarget, RenderSystem *renderSys );
+
+		/// @See createTextures. id & uniqueNames should match those used at creation
+		static void destroyTextures( const TextureDefinitionVec &textureDefs,
+									CompositorChannelVec &inOutTexContainer,
+									IdType id, bool uniqueNames, RenderSystem *renderSys );
 	};
 
 	/** @} */

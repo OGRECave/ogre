@@ -29,6 +29,10 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "Compositor/OgreTextureDefinition.h"
 
+#include "OgreRenderTarget.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderSystem.h"
+
 namespace Ogre
 {
 	TextureDefinitionBase::TextureDefinitionBase( TextureSource defaultSource ) :
@@ -128,5 +132,122 @@ namespace Ogre
 													mDefaultLocalTextureSource );
 		mLocalTextureDefs.push_back( TextureDefinition( hashedName ) );
 		return &mLocalTextureDefs.back();
+	}
+
+	//-----------------------------------------------------------------------------------
+	void TextureDefinitionBase::createTextures( const TextureDefinitionVec &textureDefs,
+												CompositorChannelVec &inOutTexContainer,
+												IdType id, bool uniqueNames,
+												const RenderTarget *finalTarget,
+												RenderSystem *renderSys )
+	{
+		bool defaultHwGamma		= false;
+		uint defaultFsaa		= 0;
+		String defaultFsaaHint	= StringUtil::BLANK;
+		if( finalTarget )
+		{
+			// Inherit settings from target
+			defaultHwGamma	= finalTarget->isHardwareGammaEnabled();
+			defaultFsaa		= finalTarget->getFSAA();
+			defaultFsaaHint	= finalTarget->getFSAAHint();
+		}
+
+		//Create the local textures
+		TextureDefinitionVec::const_iterator itor = textureDefs.begin();
+		TextureDefinitionVec::const_iterator end  = textureDefs.end();
+
+		while( itor != end )
+		{
+			CompositorChannel newChannel;
+
+			//If undefined, use main target's hw gamma settings, else use explicit setting
+			bool hwGamma	= itor->hwGammaWrite == TextureDefinition::Undefined ?
+								defaultHwGamma :
+								itor->hwGammaWrite == TextureDefinition::True;
+			//If true, use main target's fsaa settings, else disable
+			uint fsaa		= itor->fsaa ? defaultFsaa : 0;
+			const String &fsaaHint = itor->fsaa ? defaultFsaaHint : StringUtil::BLANK;
+
+			String textureName;
+			if( !uniqueNames )
+				textureName = (itor->name + IdString( id )).getFriendlyText();
+			else
+				textureName = itor->name.getFriendlyText();
+
+			if( itor->formatList.size() == 1 )
+			{
+				//Normal RT
+				TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
+												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+												TEX_TYPE_2D, itor->width, itor->height, 0,
+												itor->formatList[0], TU_RENDERTARGET, 0, hwGamma,
+												fsaa, fsaaHint );
+				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+				newChannel.target = rt;
+				newChannel.textures.push_back( tex );
+			}
+			else
+			{
+				//MRT
+				MultiRenderTarget* mrt = renderSys->createMultiRenderTarget( textureName );
+				PixelFormatList::const_iterator pixIt = itor->formatList.begin();
+				PixelFormatList::const_iterator pixEn = itor->formatList.end();
+
+				newChannel.target = mrt;
+
+				while( pixIt != pixEn )
+				{
+					size_t rtNum = pixIt - itor->formatList.begin();
+					TexturePtr tex = TextureManager::getSingleton().createManual(
+												textureName + StringConverter::toString( rtNum ),
+												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+												TEX_TYPE_2D, itor->width, itor->height, 0,
+												*pixIt, TU_RENDERTARGET, 0, hwGamma,
+												fsaa, fsaaHint );
+					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+					mrt->bindSurface( rtNum, rt );
+					newChannel.textures.push_back( tex );
+					++pixIt;
+				}
+			}
+
+			inOutTexContainer.push_back( newChannel );
+
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void TextureDefinitionBase::destroyTextures( const TextureDefinitionVec &textureDefs,
+												 CompositorChannelVec &inOutTexContainer,
+												 IdType id, bool uniqueNames, RenderSystem *renderSys )
+	{
+		TextureDefinitionVec::const_iterator itor = textureDefs.begin();
+		TextureDefinitionVec::const_iterator end  = textureDefs.end();
+
+		while( itor != end )
+		{
+			String textureName;
+			if( !uniqueNames )
+				textureName = (itor->name + IdString( id )).getFriendlyText();
+			else
+				textureName = itor->name.getFriendlyText();
+
+			if( itor->formatList.size() == 1 )
+			{
+				//Normal RT. We don't hold any reference to, so just deregister from TextureManager
+				TextureManager::getSingleton().remove( textureName );
+			}
+			else if( !itor->formatList.empty() )
+			{
+				//MRT. We need to destroy both the MultiRenderTarget ptr AND the textures
+				renderSys->destroyRenderTarget( textureName );
+				for( size_t i=0; i<itor->formatList.size(); ++i )
+					TextureManager::getSingleton().remove( textureName + StringConverter::toString(i) );
+			}
+
+			++itor;
+		}
+
+		inOutTexContainer.clear();
 	}
 }

@@ -30,15 +30,10 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorNodeDef.h"
-#include "Compositor/OgreCompositorChannel.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
-
-#include "OgreRenderTexture.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
@@ -68,77 +63,9 @@ namespace Ogre
 		mInTextures.resize( mDefinition->getNumInputChannels(), CompositorChannel() );
 		mOutTextures.resize( mDefinition->mOutChannelMapping.size() );
 
-		bool defaultHwGamma		= false;
-		uint defaultFsaa		= 0;
-		String defaultFsaaHint	= StringUtil::BLANK;
-		if( finalTarget )
-		{
-			// Inherit settings from target
-			defaultHwGamma	= finalTarget->isHardwareGammaEnabled();
-			defaultFsaa		= finalTarget->getFSAA();
-			defaultFsaaHint	= finalTarget->getFSAAHint();
-		}
-
-		//Create the local textures
-		CompositorNodeDef::TextureDefinitionVec::const_iterator itor =
-																definition->mLocalTextureDefs.begin();
-		CompositorNodeDef::TextureDefinitionVec::const_iterator end  =
-																definition->mLocalTextureDefs.end();
-
-		while( itor != end )
-		{
-			CompositorChannel newChannel;
-
-			//If undefined, use main target's hw gamma settings, else use explicit setting
-			bool hwGamma	= itor->hwGammaWrite == CompositorNodeDef::TextureDefinition::Undefined ?
-								defaultHwGamma :
-								itor->hwGammaWrite == CompositorNodeDef::TextureDefinition::True;
-			//If true, use main target's fsaa settings, else disable
-			uint fsaa		= itor->fsaa ? defaultFsaa : 0;
-			const String &fsaaHint = itor->fsaa ? defaultFsaaHint : StringUtil::BLANK;
-
-			String textureName = (itor->name + IdString( id )).getFriendlyText();
-			if( itor->formatList.size() == 1 )
-			{
-				//Normal RT
-				TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
-												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
-												itor->formatList[0], TU_RENDERTARGET, 0, hwGamma,
-												fsaa, fsaaHint );
-				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-				newChannel.target = rt;
-				newChannel.textures.push_back( tex );
-			}
-			else
-			{
-				//MRT
-				MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
-				PixelFormatList::const_iterator pixIt = itor->formatList.begin();
-				PixelFormatList::const_iterator pixEn = itor->formatList.end();
-
-				newChannel.target = mrt;
-
-				while( pixIt != pixEn )
-				{
-					size_t rtNum = pixIt - itor->formatList.begin();
-					TexturePtr tex = TextureManager::getSingleton().createManual(
-												textureName + StringConverter::toString( rtNum ),
-												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
-												*pixIt, TU_RENDERTARGET, 0, hwGamma,
-												fsaa, fsaaHint );
-					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-					mrt->bindSurface( rtNum, rt );
-					newChannel.textures.push_back( tex );
-					++pixIt;
-				}
-			}
-
-			mLocalTextures.push_back( newChannel );
-
-			++itor;
-		}
+		//Create local textures
+		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mLocalTextures,
+												id, false, finalTarget, mRenderSystem );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorNode::~CompositorNode()
@@ -155,31 +82,8 @@ namespace Ogre
 		}
 
 		//Destroy our local textures
-		CompositorNodeDef::TextureDefinitionVec::const_iterator itor =
-																mDefinition->mLocalTextureDefs.begin();
-		CompositorNodeDef::TextureDefinitionVec::const_iterator end  =
-																mDefinition->mLocalTextureDefs.end();
-
-		while( itor != end )
-		{
-			String textureName = (itor->name + IdString( getId() )).getFriendlyText();
-			if( itor->formatList.size() == 1 )
-			{
-				//Normal RT. We don't hold any reference to, so just deregister from TextureManager
-				TextureManager::getSingleton().remove( textureName );
-			}
-			else if( !itor->formatList.empty() )
-			{
-				//MRT. We need to destroy both the MultiRenderTarget ptr AND the textures
-				mRenderSystem->destroyRenderTarget( textureName );
-				for( size_t i=0; i<itor->formatList.size(); ++i )
-					TextureManager::getSingleton().remove( textureName + StringConverter::toString(i) );
-			}
-
-			++itor;
-		}
-
-		mLocalTextures.clear();
+		TextureDefinitionBase::destroyTextures( mDefinition->mLocalTextureDefs, mLocalTextures,
+												getId(), false, mRenderSystem );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::routeOutputs()

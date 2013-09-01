@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
-#include "Compositor/OgreCompositorChannel.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 
