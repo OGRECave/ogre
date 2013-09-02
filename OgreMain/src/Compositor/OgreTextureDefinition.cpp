@@ -217,32 +217,28 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void TextureDefinitionBase::destroyTextures( const TextureDefinitionVec &textureDefs,
-												 CompositorChannelVec &inOutTexContainer,
-												 IdType id, bool uniqueNames, RenderSystem *renderSys )
+	void TextureDefinitionBase::destroyTextures( CompositorChannelVec &inOutTexContainer,
+												 RenderSystem *renderSys )
 	{
-		TextureDefinitionVec::const_iterator itor = textureDefs.begin();
-		TextureDefinitionVec::const_iterator end  = textureDefs.end();
+		CompositorChannelVec::const_iterator itor = inOutTexContainer.begin();
+		CompositorChannelVec::const_iterator end  = inOutTexContainer.end();
 
 		while( itor != end )
 		{
-			String textureName;
-			if( !uniqueNames )
-				textureName = (itor->name + IdString( id )).getFriendlyText();
-			else
-				textureName = itor->name.getFriendlyText();
-
-			if( itor->formatList.size() == 1 )
+			if( itor->isValid() )
 			{
-				//Normal RT. We don't hold any reference to, so just deregister from TextureManager
-				TextureManager::getSingleton().remove( textureName );
-			}
-			else if( !itor->formatList.empty() )
-			{
-				//MRT. We need to destroy both the MultiRenderTarget ptr AND the textures
-				renderSys->destroyRenderTarget( textureName );
-				for( size_t i=0; i<itor->formatList.size(); ++i )
-					TextureManager::getSingleton().remove( textureName + StringConverter::toString(i) );
+				if( !itor->isMrt() )
+				{
+					//Normal RT. We don't hold any reference to, so just deregister from TextureManager
+					TextureManager::getSingleton().remove( itor->textures[0]->getName() );
+				}
+				else
+				{
+					//MRT. We need to destroy both the MultiRenderTarget ptr AND the textures
+					renderSys->destroyRenderTarget( itor->target->getName() );
+					for( size_t i=0; i<itor->textures.size(); ++i )
+						TextureManager::getSingleton().remove( itor->textures[i]->getName() );
+				}
 			}
 
 			++itor;

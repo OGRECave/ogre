@@ -66,8 +66,7 @@ namespace Ogre
 		destroyAllNodes();
 
 		//Destroy our global textures
-		TextureDefinitionBase::destroyTextures( mDefinition->mLocalTextureDefs, mGlobalTextures,
-												getId(), true, mRenderSys );
+		TextureDefinitionBase::destroyTextures( mGlobalTextures, mRenderSys );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::createAllNodes(void)

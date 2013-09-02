@@ -222,10 +222,8 @@ namespace Ogre
 									IdType id, bool uniqueNames,
 									const RenderTarget *finalTarget, RenderSystem *renderSys );
 
-		/// @See createTextures. id & uniqueNames should match those used at creation
-		static void destroyTextures( const TextureDefinitionVec &textureDefs,
-									CompositorChannelVec &inOutTexContainer,
-									IdType id, bool uniqueNames, RenderSystem *renderSys );
+		/// @See createTextures
+		static void destroyTextures( CompositorChannelVec &inOutTexContainer, RenderSystem *renderSys );
 	};
 
 	/** @} */

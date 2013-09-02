@@ -82,8 +82,7 @@ namespace Ogre
 		}
 
 		//Destroy our local textures
-		TextureDefinitionBase::destroyTextures( mDefinition->mLocalTextureDefs, mLocalTextures,
-												getId(), false, mRenderSystem );
+		TextureDefinitionBase::destroyTextures( mLocalTextures, mRenderSystem );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::routeOutputs()

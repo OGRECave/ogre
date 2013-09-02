@@ -61,7 +61,6 @@ namespace Ogre
 
 		CompositorChannel() : target( 0 ) {}
 
-		TexturePtr getTexture( size_t idx ) const		{ return textures[idx]; }
 		bool isMrt() const								{ return textures.size() > 1; }
 		bool isValid() const							{ return target != 0; }
 		bool operator == ( const CompositorChannel &right ) const	{ return target == right.target; }
