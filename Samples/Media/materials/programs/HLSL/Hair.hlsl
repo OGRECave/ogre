@@ -127,29 +127,29 @@ shared cbuffer cb0
 	int g_currentCollisionSphere;
 	
 	float g_thinning = 0.5;
-	int g_TessellatedMasterStrandLengthMax; // start from here.
+	int g_TessellatedMasterStrandLengthMax;
 	
 	float       g_densityThreshold;
-	float       g_interHairForces;
+	// float       g_interHairForces; - not used
 	
 	float       g_textureHeight;
 	float       g_textureWidth;
 	float       g_textureDepth;
 	
-	float       g_gridZStep;
-	float       g_gridZMin;
-	int         g_gridNumRTs;	
+	// float       g_gridZStep;
+	//float       g_gridZMin;
+	//int         g_gridNumRTs;	
 	
 	int         g_rowWidth;
 	int         g_colWidth;
 	int         g_textureIndex;
 	int         g_gridZIndex;
 	
-	bool        g_useBlurTexture;
+	bool        g_useBlurTexture; // - not used
 	bool        g_bClearForces;
 	bool        g_useShadows;
 	
-	float g_SoftEdges;
+	// float g_SoftEdges; - not used
 	float g_SigmaA;
 	
 	float g_ZNear, g_ZFar;
@@ -3777,11 +3777,11 @@ void InterpolateGSDepthPrepass(line HairVertexPWIAT vertex[2], inout TriangleStr
 #endif
     
     float4x3 tex;
-    int g_textureIndex = vertex[0].ID & 3;
-    tex[0] = float3(0,vertex[0].tex,g_textureIndex);
-    tex[1] = float3(1,vertex[0].tex,g_textureIndex);
-    tex[2] = float3(0,vertex[1].tex,g_textureIndex);
-    tex[3] = float3(1,vertex[1].tex,g_textureIndex);
+    int textureIndex = vertex[0].ID & 3;
+    tex[0] = float3(0,vertex[0].tex,textureIndex);
+    tex[1] = float3(1,vertex[0].tex,textureIndex);
+    tex[2] = float3(0,vertex[1].tex,textureIndex);
+    tex[3] = float3(1,vertex[1].tex,textureIndex);
     
     
     hairPoint.Position = mul( float4(pos[0],1.0),ViewProjection);

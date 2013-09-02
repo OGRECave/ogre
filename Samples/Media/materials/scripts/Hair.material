@@ -18,7 +18,7 @@ geometry_program Ogre/Hair/AddAngularForcesGS hlsl
 	
 	default_params
 	{
-
+		param_named g_bClearForces bool false
 	}	
 }
 
@@ -481,6 +481,10 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD hlsl
 	default_params
 	{
 		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_useShadows bool true
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}
 }
 
@@ -559,6 +563,10 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
 		param_named g_NumTotalWisps int 0
 		param_named g_NumMaxStrandsPerWisp int 0	
 		param_named g_thinning float 0.5
+		param_named g_useShadows bool true
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}
 }
 
@@ -658,6 +666,10 @@ fragment_program Ogre/Hair/RenderPS hlsl
 		param_named g_ka float 0.0
 		param_named g_baseColor float4 0.0 0.0 0.0 0.0
 		param_named g_specColor float4 0.0 0.0 0.0 0.0
+		param_named g_useShadows bool true
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}
 }
 
@@ -681,7 +693,8 @@ fragment_program Ogre/Hair/InterpolatePSMultiStrandCollisions hlsl
 	
 	default_params
 	{
-	
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
 	}
 }
 
@@ -772,6 +785,7 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrand_SO hlsl
 	{
 		param_named g_maxLengthToRoot float 12.0
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -788,6 +802,7 @@ vertex_program Ogre/Hair/InterpolateVSDepthPrepass hlsl
 		param_named g_NumMaxStrandsPerWisp int 0
 		param_named g_doCurlyHair bool false
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -828,6 +843,7 @@ vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass hlsl
 	{
 		param_named g_maxLengthToRoot float 12.0
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -840,6 +856,7 @@ vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass_LOAD hlsl
 	default_params
 	{
 		param_named g_bApplyAdditionalRenderingTransform bool false
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -853,6 +870,7 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrand hlsl
 	{
 		param_named g_maxLengthToRoot float 12.0
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -866,7 +884,11 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrand_LOAD hlsl
 	{
 		param_named g_bApplyAdditionalRenderingTransform bool false
 		param_named g_NumTotalWisps int 0
-		param_named g_NumMaxStrandsPerWisp int 0		
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_useShadows bool true		
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}	
 }
 
@@ -1053,6 +1075,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
 		param_named g_maxLengthToRoot float 12.0
 		param_named g_doCurlyHair bool false
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}	
 }
 
@@ -1069,6 +1092,11 @@ tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_NORMAL hlsl
 		param_named g_maxLengthToRoot float 12.0
 		param_named g_doCurlyHair bool false
 		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+		param_named g_useShadows bool true
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}	
 }
 
@@ -1128,7 +1156,7 @@ vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows hlsl
 	
 	default_params
 	{
-	
+		param_named g_TessellatedMasterStrandLengthMax int 1
 	}
 }
 
@@ -1200,7 +1228,8 @@ vertex_program Ogre/Hair/MeshDepthVS hlsl
 	
 	default_params
 	{
-	
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}
 }
 
@@ -1212,7 +1241,8 @@ vertex_program Ogre/Hair/VS_GRID hlsl
 	
 	default_params
 	{
-	
+		param_named g_textureHeight float 1.0
+		param_named g_textureWidth float 1.0
 	}
 }
 
@@ -1238,7 +1268,8 @@ vertex_program Ogre/Hair/VS_GRID_FLUIDSIM hlsl
 	{
 		param_named fluidg_textureWidth int 1
 		param_named fluidg_textureHeight int 1
-		param_named fluidg_textureDepth int 1		
+		param_named fluidg_textureDepth int 1
+		param_named g_textureDepth float 1.0		
 	}
 }
 
@@ -1286,7 +1317,8 @@ fragment_program Ogre/Hair/VisDepthsPS hlsl
 	
 	default_params
 	{
-	
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
 	}
 }
 
@@ -1323,6 +1355,7 @@ fragment_program Ogre/Hair/MeshPSShadows hlsl
 	default_params
 	{
 		param_named g_useScalpTexture bool false
+		param_named g_useShadows bool true
 	}
 }
 
@@ -1334,7 +1367,7 @@ fragment_program Ogre/Hair/PSDrawPlane hlsl
 	
 	default_params
 	{
-	
+		param_named g_useShadows bool true
 	}
 }
 
@@ -1370,7 +1403,9 @@ fragment_program Ogre/Hair/PS_DRAW_TEXTURE hlsl
 	
 	default_params
 	{
-	
+		param_named g_densityThreshold float 1.0
+		param_named g_rowWidth int 1
+		param_named g_colWidth int 1
 	}
 }
 
@@ -1419,7 +1454,10 @@ fragment_program Ogre/Hair/PS_DRAW_TEXTURE_DEMUX hlsl
 	
 	default_params
 	{
-	
+		param_named g_densityThreshold float 1.0
+		param_named g_rowWidth int 1
+		param_named g_colWidth int 1
+		param_named g_textureIndex int 1
 	}
 }
 
@@ -1431,7 +1469,7 @@ fragment_program Ogre/Hair/PS_DEMUX hlsl
 	
 	default_params
 	{
-	
+		param_named g_gridZIndex int 1
 	}
 }
 
@@ -1446,6 +1484,9 @@ fragment_program Ogre/Hair/PS_VOXELIZE_OBSTACLES hlsl
 		param_named g_NumSphereImplicits int 1
 		param_named g_NumCylinderImplicits int 1
 		param_named g_NumSphereNoMoveImplicits int 1
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
+		param_named g_gridZIndex int 1
 	}
 }
 
@@ -1460,6 +1501,8 @@ fragment_program Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX hlsl
 		param_named g_NumSphereImplicits int 1
 		param_named g_NumCylinderImplicits int 1
 		param_named g_NumSphereNoMoveImplicits int 1
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
 	}
 }
 
