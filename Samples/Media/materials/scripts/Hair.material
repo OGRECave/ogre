@@ -2587,8 +2587,8 @@ material Ogre/Hair/RenderCollisionObjects
 			}
 			depth_check on
 			depth_write off
-			cull_hardware off
-			cull_software off
+			cull_hardware none
+			cull_software none
 		}
 	}
 }

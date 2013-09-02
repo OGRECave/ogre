@@ -60,8 +60,8 @@ material Ogre/TerrainTessellation/TerrainDeformation
 			
 			}
 			depth_write off
-			cull_hardware off
-			cull_software off
+			cull_hardware none
+			cull_software none
 		}
 
 	}
@@ -80,8 +80,8 @@ material Ogre/TerrainTessellation/TerrainDeformation
 			
 			}
 			depth_write off
-			cull_hardware off
-			cull_software off
+			cull_hardware none
+			cull_software none
 		}
 	}	
 }

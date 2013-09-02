@@ -800,7 +800,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
-
+		
 		configureTerrainDefaults(l);
 #ifdef PAGING
 		// Paging setup

@@ -756,7 +756,7 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
 	{
 		String progName = terrain->getMaterialName() + "/sm2/vp";
-
+		
 		switch(tt)
 		{
 		case HIGH_LOD:
