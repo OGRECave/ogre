@@ -168,6 +168,11 @@ namespace Ogre {
             {
 				OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
             }
+
+            // Currently bound buffer is being deleted, update the cached value to 0,
+            // which it likely the buffer that will be bound by the driver.
+            // An update will be forced next time we try to bind on this target.
+            (*i).second = 0;
         }
     }
     

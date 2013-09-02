@@ -35,122 +35,31 @@ typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
 namespace Ogre
 {
+	class GLStateCacheManagerImp;
+
     /** An in memory cache of the OpenGL state.
+     @remarks
+     State changes can be particularly expensive time wise. This is because
+     a change requires OpenGL to re-evaluate and update the state machine.
+     Because of the general purpose nature of OGRE we often set the state for
+     a specific texture, material, buffer, etc. But this may be the same as the
+     current status of the state machine and is therefore redundant and causes
+     unnecessary work to be performed by OpenGL.
+     @par
+     Instead we are caching the state so that we can check whether it actually
+     does need to be updated. This leads to improved performance all around and 
+     can be somewhat dramatic in some cases.
      */
     class _OgreGLExport GLStateCacheManager : public StateCacheAlloc
     {
     private:
-        typedef HashMap<GLenum, GLuint> BindBufferMap;
-        typedef HashMap<GLenum, GLint> TexParameteriMap;
+		GLStateCacheManagerImp* mImp;
 
-        struct TextureUnitParams
-        {
-            TexParameteriMap mTexParameteriMap;
-        };
-
-        typedef HashMap<GLuint, TextureUnitParams> TexUnitsMap;
-
-        /* These variables are used for caching OpenGL state.
-         They are cached because state changes can be quite expensive,
-         which is especially important on mobile or embedded systems.
-         */
-
-        /// Stores textures currently bound to each texture stage
-        HashMap <GLenum, GLuint> mBoundTextures;
-
-        /// Stores the currently enabled texture type per texture unit (FFP only)
-        HashMap <GLenum, GLenum> mFFPCurrentTextureTypes;
-
-
-        struct TexGenParams
-        {
-            std::set<GLenum> mEnabled;
-        };
-        /// Stores the currently enabled texcoord generation types per texture unit
-        HashMap <GLenum, TexGenParams> mTextureCoordGen;
-
-        /// A map of different buffer types and the currently bound buffer for each type
-        BindBufferMap mActiveBufferMap;
-        /// A map of texture parameters for each texture unit
-        TexUnitsMap mTexUnitsMap;
-        /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
-        std::set<GLenum> mEnabled;
-        /// Stores the current clear colour
-        vector<GLclampf>::type mClearColour;
-        /// Stores the current colour write mask
-        vector<GLboolean>::type mColourMask;
-        /// Stores the current depth write mask
-        GLboolean mDepthMask;
-        /// Stores the current polygon rendering mode
-        GLenum mPolygonMode;
-        GLenum mBlendEquationRGB;
-        GLenum mBlendEquationAlpha;
-        /// Stores the current blend source function
-        GLenum mBlendFuncSource;
-        /// Stores the current blend destination function
-        GLenum mBlendFuncDest;
-        /// Stores the current face culling setting
-        GLenum mCullFace;
-        /// Stores the current depth test function
-        GLenum mDepthFunc;
-        /// Stores the current stencil mask
-        GLuint mStencilMask;
-		/// Stores the last bounded texture id
-        GLuint mLastBoundedTexID;
-        /// Stores the currently active texture unit
-        GLenum mActiveTextureUnit;
-        /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
-        unsigned int mDiscardBuffers;
-        /// Stores the current depth clearing colour
-        GLclampf mClearDepth;
-
-        GLenum mShadeModel;
-
-        int mViewport[4];
-
-        GLfloat mAmbient[4];
-        GLfloat mDiffuse[4];
-        GLfloat mSpecular[4];
-        GLfloat mEmissive[4];
-        GLfloat mLightAmbient[4];
-        GLfloat mShininess;
-
-        GLfloat mPointSize;
-        GLfloat mPointSizeMin;
-        GLfloat mPointSizeMax;
-        GLfloat mPointAttenuation[4];
-        
     public:
         GLStateCacheManager(void);
         ~GLStateCacheManager(void);
 
-        /// Set the texturing type for the currently activated texture unit
-        void setFFPCurrentTextureType(GLenum type);
-        /// Removes texturing for the currently activated texture unit
-        void removeFFPCurrentTextureType();
-
-        /// Enable the specified texture coordinate generation option for the currently activated texture unit
-        void enableTextureCoordGen (GLenum type);
-        /// Disable the specified texture coordinate generation option for the currently activated texture unit
-        void disableTextureCoordGen (GLenum type);
-
-        // Set material lighting parameters
-        void setAmbient (GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-        void setDiffuse (GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-        void setEmissive (GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-        void setSpecular (GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-        void setShininess (GLfloat shininess);
-
-        void setPolygonMode (GLenum mode);
-
-        void setPointSize (GLfloat size);
-
-        void setPointParameters (GLfloat* attenuation, float minSize, float maxSize);
-
-        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
-        void getViewport(int* array);
-        
-        /** Initialize our cache variables and sets the
+		/** Initialize our cache variables and sets the
             GL states on the current context.
         */
         void initializeCache();
@@ -159,82 +68,92 @@ namespace Ogre
         */
         void clearCache();
 		
-        /** Bind an OpenGL buffer of any type.
+		/** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
-        void bindGLBuffer(GLenum target, GLuint buffer, GLenum attach = 0, bool force = false);
-        
-        /** Delete an OpenGL buffer of any type.
+        void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
+
+		/** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
-        void deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach = 0, bool force = false);
-        
-        /** Bind an OpenGL texture of any type.
+        void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
+
+		/** Bind an OpenGL texture of any type.
          @param target The texture target.
          @param texture The texture ID.
          */
         void bindGLTexture(GLenum target, GLuint texture);
-        
+
         /** Sets an integer parameter value per texture target.
          @param target The texture target.
          @param pname The parameter name.
          @param param The parameter value.
          */
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
-        
+
         /** Activate an OpenGL texture unit.
          @param offset The texture unit to activate.
          @return Whether or not the texture unit was successfully activated.
          */
         bool activateGLTextureUnit(size_t unit);
-        
-        
-        /// Set the blend equation for both RGB and alpha at the same time.
+
+        /** Gets the current blend equation setting.
+         @return The blend equation.
+         */
+        GLenum getBlendEquation(void) const;
+
+        /** Sets the current blend equation setting.
+         @param eq The blend equation to use.
+         */
         void setBlendEquation(GLenum eq);
 
         /// Set the blend equation for RGB and alpha separately.
         void setBlendEquation(GLenum eqRGB, GLenum eqA);
-        
+
         /** Sets the blending function.
          @param source The blend mode for the source.
          @param dest The blend mode for the destination
          */
         void setBlendFunc(GLenum source, GLenum dest);
-        
+
+        void setShadeModel(GLenum model);
+
+        void setLightAmbient(GLfloat r, GLfloat g, GLfloat b);
+
         /** Gets the current depth mask setting.
          @return The current depth mask.
          */
-        GLboolean getDepthMask(void) const { return mDepthMask; }
-        
+        GLboolean getDepthMask(void) const;
+
         /** Sets the current depth mask setting.
          @param mask The depth mask to use.
          */
         void setDepthMask(GLboolean mask);
-        
+
         /** Gets the current depth test function.
          @return The current depth test function.
          */
-        GLenum getDepthFunc(void) const { return mDepthFunc; }
-        
+        GLenum getDepthFunc(void) const;
+
         /** Sets the current depth test function.
          @param func The depth test function to use.
          */
         void setDepthFunc(GLenum func);
-        
-        /** Gets the clear depth in the range from [0..1].
+
+		/** Gets the clear depth in the range from [0..1].
          @return The current clearing depth.
          */
-        GLclampf getClearDepth(void) const { return mClearDepth; }
-        
+        GLclampf getClearDepth(void) const;
+
         /** Sets the clear depth in the range from [0..1].
          @param depth The clear depth to use.
          */
         void setClearDepth(GLclampf depth);
-        
+
         /** Sets the color to clear to.
          @param red The red component.
          @param green The green component.
@@ -242,12 +161,12 @@ namespace Ogre
          @param alpha The alpha component.
          */
         void setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
-        
+
         /** Gets the current colour mask setting.
          @return An array containing the mask in RGBA order.
          */
-        vector<GLboolean>::type & getColourMask(void) { return mColourMask; }
-        
+        vector<GLboolean>::type & getColourMask(void) const;
+
         /** Sets the current colour mask.
          @param red The red component.
          @param green The green component.
@@ -255,44 +174,73 @@ namespace Ogre
          @param alpha The alpha component.
          */
         void setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
-        
+
         /** Gets the current stencil mask.
          @return The stencil mask.
          */
-        GLuint getStencilMask(void) const { return mStencilMask; }
-        
+        GLuint getStencilMask(void) const;
+
         /** Sets the stencil mask.
          @param mask The stencil mask to use
          */
         void setStencilMask(GLuint mask);
-        
+
         /** Enables a piece of OpenGL functionality.
          @param flag The function to enable.
          */
         void setEnabled(GLenum flag);
-        
+
         /** Disables a piece of OpenGL functionality.
          @param flag The function to disable.
          */
         void setDisabled(GLenum flag);
 
-        /** Check if a piece of OpenGL functionality is enabled (uses cached value).
-         @param flag The function to check.
-         */
-        bool getEnabled(GLenum flag);
-
-        void setShadeModel (GLenum model);
-
-        void setLightAmbient (GLfloat r, GLfloat g, GLfloat b);
-        
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.
          */
-        unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
-        
-        void setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
-                        
+        unsigned int getDiscardBuffers(void) const;
+
+        /** Sets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
+         @param flags The bit mask of buffers to be discarded. Stored as Ogre::FrameBufferType.
+         */
+        void setDiscardBuffers(unsigned int flags);
+
+        /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
+         @return The current polygon rendering mode.
+         */
+        GLenum getPolygonMode(void) const;
+
+        /** Sets the current polygon rendering mode.
+         @param mode The polygon mode to use.
+         */
+        void setPolygonMode(GLenum mode);
+
+        /** Sets the face culling mode.
+         @return The current face culling mode
+         */
+        GLenum getCullFace(void) const;
+
+        /** Sets the face culling setting.
+         @param face The face culling mode to use.
+         */
         void setCullFace(GLenum face);
+
+        /// Enable the specified texture coordinate generation option for the currently active texture unit
+        void enableTextureCoordGen(GLenum type);
+        /// Disable the specified texture coordinate generation option for the currently active texture unit
+        void disableTextureCoordGen(GLenum type);
+
+        // Set material lighting parameters
+        void setMaterialAmbient(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+        void setMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+        void setMaterialEmissive(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+        void setMaterialSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+        void setMaterialShininess(GLfloat shininess);
+        void setPointSize(GLfloat size);
+        void setPointParameters(GLfloat* attenuation, float minSize, float maxSize);
+
+        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void getViewport(int* array);
     };
 }
 

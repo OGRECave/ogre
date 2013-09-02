@@ -28,6 +28,27 @@ source_group(NVparse FILES ${NVPARSE_SOURCE} ${NVPARSE_HEADERS})
 source_group(ATIFS FILES ${ATIFS_SOURCE} ${ATIFS_HEADERS})
 source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLUniformCacheImp.cpp
+  )
+else()
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLNullUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLNullUniformCacheImp.cpp
+  )
+endif()
+
 # Add system specific settings
 if (WIN32)
   file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")

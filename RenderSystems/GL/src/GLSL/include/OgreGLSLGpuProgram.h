@@ -32,7 +32,7 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLGpuProgram.h"
-
+#include "OgreGLUniformCache.h"
 
 namespace Ogre {
     namespace GLSL {
@@ -50,6 +50,7 @@ namespace Ogre {
     private:
 		/// GL Handle for the shader object
 		GLSLProgram* mGLSLProgram;
+        GLUniformCache *mUniformCache;
 
 		/// Keep track of the number of vertex shaders created
 		static GLuint mVertexShaderCount;
@@ -85,6 +86,7 @@ namespace Ogre {
 		/// @copydoc GLGpuProgram::isAttributeValid
 		bool isAttributeValid(VertexElementSemantic semantic, uint index);
 		
+        GLUniformCache * getUniformCache(void) { return mUniformCache; }
 
     protected:
         /// Overridden from GpuProgram

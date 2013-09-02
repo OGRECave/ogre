@@ -26,34 +26,32 @@
  -----------------------------------------------------------------------------
  */
 
-#include "OgreStableHeaders.h"
-#include "OgreGLES2UniformCache.h"
+#ifndef __GLNullUniformCacheImp_H__
+#define __GLNullUniformCacheImp_H__
 
-#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
-#   include "OgreGLES2UniformCacheImp.h"
-#else
-#   include "OgreGLES2NullUniformCacheImp.h"
-#endif
+#include "OgreGLPrerequisites.h"
 
-namespace Ogre {
-    
-    GLES2UniformCache::GLES2UniformCache()
-    {
-        mImp = new GLES2UniformCacheImp();
-    }
-    
-    GLES2UniformCache::~GLES2UniformCache()
-    {
-        delete mImp;
-    }
+typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
 
-    void GLES2UniformCache::clearCache()
+namespace Ogre
+{
+    /** An in memory cache of the OpenGL ES 2 uniforms.
+     @see GLUniformCache
+     */
+    class _OgreGLExport GLUniformCacheImp : public UniformCacheAlloc
     {
-        mImp->clearCache();
-    }
+    public:
+        GLUniformCacheImp(void);
+        ~GLUniformCacheImp(void);
 
-    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
-    {
-        return mImp->updateUniform(location, value, length);
-    }
+        /// Clear out the cache
+        void clearCache();
+
+        /** Update a uniform
+         @return A boolean value indicating whether this uniform needs to be updated in the GL.
+         */
+        bool updateUniform(GLint location, const void *value, GLsizei length);
+    };
 }
+
+#endif

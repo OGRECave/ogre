@@ -63,6 +63,8 @@ namespace Ogre {
 		// there is nothing to load
 		mLoadFromFile = false;
 
+        // Initialise uniform cache
+		mUniformCache = new GLUniformCache();
     }
     //-----------------------------------------------------------------------
     GLSLGpuProgram::~GLSLGpuProgram()
@@ -70,6 +72,9 @@ namespace Ogre {
         // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         unload(); 
+
+        delete mUniformCache;
+        mUniformCache = 0;
     }
 	//-----------------------------------------------------------------------------
     void GLSLGpuProgram::loadImpl(void)

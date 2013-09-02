@@ -32,7 +32,7 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-#if OGRE_NO_GLES2_STATE_CACHE_SUPPORT == 0
+#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
 #   include "OgreGLES2StateCacheManagerImp.h"
 #else
 #   include "OgreGLES2NullStateCacheManagerImp.h"
