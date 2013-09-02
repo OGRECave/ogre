@@ -118,7 +118,7 @@ namespace Ogre
 		if( itor == mNameToChannelMap.end() )
 		{
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-						"Can't find texture with name: '" + name.getFriendlyText(),
+						"Can't find texture with name: '" + name.getFriendlyText() + "'",
 						"CompositorNodeDef::getTextureSource" );
 		}
 
@@ -141,6 +141,8 @@ namespace Ogre
 												const RenderTarget *finalTarget,
 												RenderSystem *renderSys )
 	{
+		inOutTexContainer.reserve( textureDefs.size() );
+
 		bool defaultHwGamma		= false;
 		uint defaultFsaa		= 0;
 		String defaultFsaaHint	= StringUtil::BLANK;

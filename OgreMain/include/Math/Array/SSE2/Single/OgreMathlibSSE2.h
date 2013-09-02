@@ -39,6 +39,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	//SAB_Conversion stands for Strict aliasing broken rule conversion :P
+	//It should work on x86/x64 platforms, which are SSE
+	union SAB_Conversion { uint32 ui; float fl; };
+
 	class ArrayRadian
 	{
 		ArrayReal mRad;
@@ -209,7 +213,22 @@ namespace Ogre
 		}
 		static inline __m128 And( __m128 a, uint32 b )
 		{
-			return _mm_and_ps( a, _mm_castsi128_ps( _mm_set1_epi32( b ) ) );
+			SAB_Conversion v;
+			v.ui = b;
+			return _mm_and_ps( a, _mm_set_ps1( v.fl ) );
+		}
+
+		/** Test if "a AND b" will result in non-zero, returning 0xffffffff on those cases
+		@remarks
+			Because there is no "not-equal" instruction in integer SSE2, be need to do some
+			bit flipping.
+		@return
+			r[i] = (a[i] & b[i]) ? 0xffffffff : 0;
+		*/
+		static inline __m128 TestFlags4( __m128 a, __m128 b )
+		{
+			// ( (a & b) != 0 )
+			return _mm_cmpneq_ps( _mm_and_ps( a, b ), _mm_setzero_ps() );
 		}
 
 		/** Test if "a AND b" will result in non-zero, returning 0xffffffff on those cases
@@ -260,6 +279,14 @@ namespace Ogre
 		static inline ArrayReal SetAll( Real val )
 		{
 			return _mm_set_ps1( val );
+		}
+
+		static inline ArrayReal SetAllR( uint32 val )
+		{
+			//The name is quite ironic. Works in x86 (we can assume x86 platform, this is SSE!)
+			SAB_Conversion v;
+			v.ui = val;
+			return _mm_set_ps1( v.fl );
 		}
 
 		static inline ArrayInt SetAll( uint32 val )

@@ -95,6 +95,7 @@ mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
+mCurrentShadowNode(0),
 mSkyPlaneEntity(0),
 mSkyBoxObj(0),
 mSkyPlaneNode(0),
@@ -197,6 +198,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 
 	mVisibleObjects.resize( 1 );
 	mTmpVisibleObjects.resize( 1 );
+	mVisibleObjectBoundsPerThread.resize( 1 );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -1521,7 +1523,7 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 			OgreProfileGroup("_findVisibleObjects", OGREPROF_CULLING);
 
 			size_t visibleObjsIdxStart = 0;
-			size_t visibleObjsListsPerThread = 1;
+			size_t numThreads = 1;
 			cullFrustum( mEntitiesMemoryManagerCulledList, camera, firstRq, lastRq,
 						 visibleObjsIdxStart );
 
@@ -1529,8 +1531,9 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 														mVisibleObjects.begin() + visibleObjsIdxStart;
 			VisibleObjectsPerThreadArray::const_iterator en =
 														mVisibleObjects.begin() + visibleObjsIdxStart
-														+ visibleObjsListsPerThread;
+														+ numThreads;
 
+			//TODO: _updateRenderQueue MIGHT be called in parallel
 			firePreFindVisibleObjects(vp);
 			while( it != en )
 			{
@@ -2354,6 +2357,9 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 {
 	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
 	outVisibleObjects.clear();
+
+	VisibleObjectsBoundsInfo &aabbInfo = *(mVisibleObjectBoundsPerThread.begin() + visObjsIdxStart);
+	aabbInfo.reset();
 
 	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
 	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
@@ -7481,11 +7487,11 @@ void VisibleObjectsBoundsInfo::reset()
 {
 	aabb.setNull();
 	receiverAabb.setNull();
-	minDistance = minDistanceInFrustum = std::numeric_limits<Real>::infinity();
-	maxDistance = maxDistanceInFrustum = 0;
+	minDistanceInFrustum = std::numeric_limits<Real>::infinity();
+	maxDistanceInFrustum = 0;
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
+/*void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
 		   const Camera* cam, bool receiver)
 {
 	aabb.merge(boxBounds);
@@ -7494,8 +7500,6 @@ void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphe
 	// use view matrix to determine distance, works with custom view matrices
 	Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
 	Real camDistToCenter = vsSpherePos.length();
-	minDistance = std::min(minDistance, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
-	maxDistance = std::max(maxDistance, camDistToCenter + sphereBounds.getRadius());
 	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
 	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
 }
@@ -7510,5 +7514,5 @@ void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox
 	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
 	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
 
-}
+}*/
 }

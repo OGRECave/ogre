@@ -29,12 +29,14 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {
@@ -44,6 +46,9 @@ namespace Ogre
 			CompositorNode( id, definition->getName(), definition, workspace, renderSys ),
 			mDefinition( definition )
 	{
+		mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
+		mLocalTextures.reserve( definition->mShadowMapTexDefinitions.size() );
+
 		//Create the local textures
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
 															definition->mShadowMapTexDefinitions.begin();
@@ -55,7 +60,7 @@ namespace Ogre
 			CompositorChannel newChannel;
 
 			//When format list is empty, then this definition is for a shadow map atlas.
-			if( itor->formatList.empty() )
+			if( !itor->formatList.empty() )
 			{
 				String textureName = (itor->name + IdString( id )).getFriendlyText();
 				if( itor->formatList.size() == 1 )
@@ -98,6 +103,16 @@ namespace Ogre
 
 			// Push a null RT & Texture so we preserve the index order from getTextureSource.
 			mLocalTextures.push_back( newChannel );
+
+			// One map, one camera
+			const size_t shadowMapIdx = itor - definition->mShadowMapTexDefinitions.begin();
+			SceneManager *sceneManager = workspace->getSceneManager();
+			ShadowMapCamera shadowMapCamera;
+			shadowMapCamera.camera = sceneManager->createCamera( "ShadowNode Camera ID " +
+												StringConverter::toString( id ) + " Map " +
+												StringConverter::toString( shadowMapIdx ) );
+			//shadowMapCamera.shadowCameraSetup = TODO
+			mShadowMapCameras.push_back( shadowMapCamera );
 
 			++itor;
 		}

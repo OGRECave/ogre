@@ -71,7 +71,7 @@ namespace Ogre
 			++itor;
 		}
 
-		if( !name.empty() )
+		if( name.empty() )
 		{
 			name = "[Light " + StringConverter::toString( lightIdx ) + "; Split " +
 					StringConverter::toString( split ) + "]";

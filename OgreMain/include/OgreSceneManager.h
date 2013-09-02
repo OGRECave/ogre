@@ -81,6 +81,7 @@ namespace Ogre {
 	class DefaultSphereSceneQuery;
 	class DefaultAxisAlignedBoxSceneQuery;
 	class CompositorChain;
+	class CompositorShadowNode;
 
 	/** Structure collecting together information about the visible objects
 	that have been discovered in a scene.
@@ -91,10 +92,6 @@ namespace Ogre {
 		AxisAlignedBox aabb;
 		/// The axis-aligned bounds of the visible shadow receiver objects
 		AxisAlignedBox receiverAabb;
-		/// The closest a visible object is to the camera
-		Real minDistance;
-		/// The farthest a visible objects is from the camera
-		Real maxDistance;
 		/// The closest a object in the frustum regardless of visibility / shadow caster flags
 		Real minDistanceInFrustum;
 		/// The farthest object in the frustum regardless of visibility / shadow caster flags
@@ -102,13 +99,13 @@ namespace Ogre {
 
 		VisibleObjectsBoundsInfo();
 		void reset();
-		void merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
+		/*void merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
 			const Camera* cam, bool receiver=true);
 		/** Merge an object that is not being rendered because it's not a shadow caster, 
 			but is a shadow receiver so should be included in the range.
-		*/
+		*//*
 		void mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-			const Sphere& sphereBounds, const Camera* cam);
+			const Sphere& sphereBounds, const Camera* cam);*/
 
 
 	};
@@ -449,6 +446,14 @@ namespace Ogre {
         Camera* mCameraInProgress;
         /// Current Viewport
         Viewport* mCurrentViewport;
+
+		typedef vector<VisibleObjectsBoundsInfo>::type VisibleObjectsBoundsInfoVec;
+		typedef map<Camera*, VisibleObjectsBoundsInfoVec> VisibleObjectsRqMap;
+
+		CompositorShadowNode*	mCurrentShadowNode;
+		VisibleObjectsRqMap		mVisibleObjsPerRenderQueue; //mVisibleObjsPerRenderQueue[camera][rqId]
+		/// Used to calculate the bounds in different threads, then merged into mVisibleObjsPerRenderQueue
+		VisibleObjectsBoundsInfoVec mVisibleObjectBoundsPerThread;
 
         /// Root scene node
 		SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
@@ -2990,6 +2995,8 @@ namespace Ogre {
 		planes should be used to restrict light rendering.
 		*/
 		virtual bool getShadowUseLightClipPlanes() const { return mShadowAdditiveLightClip; }
+
+		void _setCurrentShadowNode( CompositorShadowNode *shadowNode ) { mCurrentShadowNode = shadowNode; }
 
 		/** Sets the active compositor chain of the current scene being rendered.
 			@note CompositorChain does this automatically, no need to call manually.

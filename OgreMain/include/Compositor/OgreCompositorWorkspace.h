@@ -146,6 +146,8 @@ namespace Ogre
 
 		/// Gets the default camera passed through mDefaultViewport.
 		Camera* getDefaultCamera() const					{ return mDefaultCamera; }
+
+		SceneManager* getSceneManager() const				{ return mSceneManager; }
 	};
 
 	/** @} */

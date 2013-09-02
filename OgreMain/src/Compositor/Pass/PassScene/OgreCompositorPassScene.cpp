@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
+#include "OgreSceneManager.h"
 #include "OgreMovableObject.h"
 
 namespace Ogre
@@ -91,6 +92,7 @@ namespace Ogre
 			mTarget->_beginUpdate();
 
 		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
+		mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
 		mTarget->_updateViewport( mViewport, mCamera, mDefinition->mFirstRQ,
 									mDefinition->mLastRQ, true );
 
