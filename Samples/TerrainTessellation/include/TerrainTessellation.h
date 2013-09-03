@@ -1,13 +1,37 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+Also see acknowledgements in Readme.html
+
+You may use this sample code for anything you like, it is not covered by the
+same license as the rest of the engine.
+-----------------------------------------------------------------------------
+*/
+
 #ifndef __TerrainTessellation_H__
 #define __TerrainTessellation_H__
 
+#define TERRAIN_PAGE_MIN_X 0
+#define TERRAIN_PAGE_MIN_Y 0
+#define TERRAIN_PAGE_MAX_X 0
+#define TERRAIN_PAGE_MAX_Y 0
+
 #include "SdkSample.h"
-#include "OgreImage.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
-#include "OgreTerrainMaterialGeneratorCustom.h"
+#include "TerrainTessellationMaterialGenerator.h"
 #include "OgreTerrainPaging.h"
+#include "OgreImage.h"
+
+#define TERRAIN_FILE_PREFIX String("testTerrain")
+#define TERRAIN_FILE_SUFFIX String("dat")
+#define TERRAIN_WORLD_SIZE 12000.0f
+#define TERRAIN_SIZE 513
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -20,13 +44,13 @@ public:
 		: mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
-		, mFly(false)
-		, mFallVelocity(0)
-		, mMode(MODE_NORMAL)
-		, mLayerEdit(1)
-		, mBrushSizeTerrainSpace(0.02)
-		, mHeightUpdateCountDown(0)
-		, mTerrainPos(1000,0,5000)
+		//, mFly(false)
+		//, mFallVelocity(0)
+		//, mMode(MODE_NORMAL)
+		//, mLayerEdit(1)
+		//, mBrushSizeTerrainSpace(0.02)
+		//, mHeightUpdateCountDown(0)
+		//, mTerrainPos(1000,0,5000)
 		, mTerrainsImported(false)	
 	{
 		mInfo["Title"] = "TerrainTessellation";
@@ -81,34 +105,35 @@ public:
 
 	void sliderMoved(Slider* slider)
 	{
-		switch (slider->getName())
+		if (slider->getName() == "tessellationAmount")
 		{
-			case "tessellationAmount":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
-				break;
-			case "ridgeOctaves":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_ridgeOctaves", slider->getValue() );
-				break;
-			case "fBmOctaves":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_fBmOctaves", slider->getValue() );
-				break;
-			case "TwistOctaves":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_TwistOctaves", slider->getValue() );
-				break;
-			case "detailNoiseScale":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_detailNoiseScale", slider->getValue() );
-				break;
-			case "targetTrianglesWidth":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_targetTrianglesWidth", slider->getValue() );
-				break;
-			default:
-				break;
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
+		}
+		if (slider->getName() == "ridgeOctaves")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_ridgeOctaves", slider->getValue() );
+		}
+		if (slider->getName() == "fBmOctaves")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_fBmOctaves", slider->getValue() );
+		}
+		if (slider->getName() == "TwistOctaves")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_TwistOctaves", slider->getValue() );
+		}
+		if (slider->getName() == "detailNoiseScale")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_detailNoiseScale", slider->getValue() );
+		}
+		if (slider->getName() == "targetTrianglesWidth")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "TerrainTessellation" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_targetTrianglesWidth", slider->getValue() );
 		}
 	}
 
@@ -141,7 +166,7 @@ protected:
 		
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
-		mTerrainGroup->setOrigin(mTerrainPos);
+		//mTerrainGroup->setOrigin(mTerrainPos);
 		
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 		
@@ -154,10 +179,10 @@ protected:
 		//mTerrainGlobals->setLightMapSize(256);
 		
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
-		mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
+		//mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
 		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 		//mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
-		mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
+		//mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
 		
 		// Init custom materialgenerator
 		TerrainMaterialGeneratorPtr terrainMaterialGenerator;
@@ -166,7 +191,7 @@ protected:
 		TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial("Ogre/TerrainTessellation/Terrain");         
 		terrainMaterialGenerator.bind( terrainMaterial );  
 					   
-		terrainGlobals->setDefaultMaterialGenerator( terrainMaterialGenerator );
+		mTerrainGlobals->setDefaultMaterialGenerator( terrainMaterialGenerator );
 	}
 
 	void unloadResources()
@@ -224,7 +249,7 @@ protected:
 	void cleanupContent()
 	{
 		// clean up properly to avoid interfering with subsequent samples
-		if (mTerrainPaging)
+		if (mPaging)
 		{
 			OGRE_DELETE mTerrainPaging;
 			OGRE_DELETE mPageManager;
@@ -249,7 +274,6 @@ protected:
 	TerrainPaging* mTerrainPaging;
 	PageManager* mPageManager;
 	
-	bool mTerrainPaging;
 	bool mTerrainsImported;
 	
 };

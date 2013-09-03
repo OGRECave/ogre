@@ -1,3 +1,17 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+Also see acknowledgements in Readme.html
+
+You may use this sample code for anything you like, it is not covered by the
+same license as the rest of the engine.
+-----------------------------------------------------------------------------
+*/
+
 #ifndef __Hair_H__
 #define __Hair_H__
 
@@ -136,36 +150,29 @@ public:
 
 	void sliderMoved(Slider* slider)
 	{
-		switch (slider->getName())
-		{
-			case "tessellationLOD":
-				if (!mDynamicLOD && mHWTessellation)
-				{
-					MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
-					lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_ManualLOD", slider->getValue() );
-				}
-				break;
-			case "HairWidth":
-				if (!mDynamicLOD && mHWTessellation)
-				{
-					MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
-					lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_HairWidth", slider->getValue() );
-				}
-				break;				
-			case "LODRate":
+		if (slider->getName() == "tessellationLOD")
+			if (!mDynamicLOD && mHWTessellation)
+			{
 				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_LODRate", slider->getValue() );
-				break;
-			case "WindStrength":
-				if (mAddWindForce)
-				{
-					MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
-					lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_WindStrength", slider->getValue() );
-				}
-				break;				
-			default:
-				break;
+				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_ManualLOD", slider->getValue() );
+			}
+		if (slider->getName() == "HairWidth")
+			if (!mDynamicLOD && mHWTessellation)
+			{
+				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
+				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_HairWidth", slider->getValue() );
+			}
+		if (slider->getName()=="LODRate")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_LODRate", slider->getValue() );
 		}
+		if (slider->getName()=="WindStrength")
+			if (mAddWindForce)
+			{
+				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
+				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_WindStrength", slider->getValue() );
+			}
 	}
 
 protected:
@@ -238,19 +245,19 @@ protected:
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "HWTessellation", "HW Tessellation")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "DynamicLOD", "Dynamic LOD")->setChecked(true, false);
 		
-		mTessellationLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "tessellationLOD", "Manual tessellation LOD", 200, 40, 1, 50, 50);
-		mTessellationLOD->show();
+		mManualLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "tessellationLOD", "Manual tessellation LOD", 200, 40, 1, 50, 50);
+		mManualLOD->show();
 		
-		mTessellationLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "HairWidth", "Hair Width", 200, 40, 1, 100, 100);
-		mTessellationLOD->show();
+		mHairWidth = mTrayMgr->createThickSlider(TL_TOPLEFT, "HairWidth", "Hair Width", 200, 40, 1, 100, 100);
+		mHairWidth->show();
 		
-		mTessellationLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "LODRate", "LOD Rate", 200, 40, 1, 100, 100);
-		mTessellationLOD->show();
+		mLODRate = mTrayMgr->createThickSlider(TL_TOPLEFT, "LODRate", "LOD Rate", 200, 40, 1, 100, 100);
+		mLODRate->show();
 		
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "WindForce", "Add wind force")->setChecked(true, false);
 		
-		mTessellationLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "WindStrength", "Wind Strength", 200, 40, 0.01, 0.25, 25);
-		mTessellationLOD->show();
+		mWindStrength = mTrayMgr->createThickSlider(TL_TOPLEFT, "WindStrength", "Wind Strength", 200, 40, 0.01, 0.25, 25);
+		mWindStrength->show();
 		
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "ComputeShader", "Compute Shader")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "SimulationLOD", "SimulationLOD")->setChecked(true, false);
@@ -285,6 +292,7 @@ protected:
 		// clean up properly to avoid interfering with subsequent samples
 	}
 
+	SelectMenu* mMeshMenu;
 	SceneNode* mObjectNode;
 	bool mPlayAnimation;
 	bool mLoopAnimation;
@@ -308,7 +316,7 @@ protected:
 	bool mSimulationLOD;
 	bool mSimulate;
 	bool mShowCollision;
-	bool mSchowScene;
+	bool mShowScene;
 };
 
 #endif

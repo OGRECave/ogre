@@ -82,18 +82,15 @@ public:
 
 	void sliderMoved(Slider* slider)
 	{
-		switch (slider->getName())
+		if (slider->getName() == "tessellationLOD")
 		{
-			case "tessellationLOD":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_DynamicTessFactor", slider->getValue() );
-				break;
-			case "tessellationFactor":
-				MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-				lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_StaticTessFactor", slider->getValue() );
-				break;
-			default:
-				break;
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_DynamicTessFactor", slider->getValue() );
+		}
+		if (slider->getName() == "tessellationFactor")
+		{
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_StaticTessFactor", slider->getValue() );		
 		}
 	}
 
