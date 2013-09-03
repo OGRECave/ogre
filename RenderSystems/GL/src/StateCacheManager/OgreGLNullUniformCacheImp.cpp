@@ -27,33 +27,24 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2UniformCache.h"
-
-#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
-#   include "OgreGLES2UniformCacheImp.h"
-#else
-#   include "OgreGLES2NullUniformCacheImp.h"
-#endif
+#include "OgreGLNullUniformCacheImp.h"
 
 namespace Ogre {
     
-    GLES2UniformCache::GLES2UniformCache()
+    GLUniformCacheImp::GLUniformCacheImp(void)
     {
-        mImp = new GLES2UniformCacheImp();
-    }
-    
-    GLES2UniformCache::~GLES2UniformCache()
-    {
-        delete mImp;
     }
 
-    void GLES2UniformCache::clearCache()
+    void GLUniformCacheImp::clearCache()
     {
-        mImp->clearCache();
     }
 
-    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
+    GLUniformCacheImp::~GLUniformCacheImp(void)
     {
-        return mImp->updateUniform(location, value, length);
+    }
+
+    bool GLUniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
+    {
+        return true;
     }
 }

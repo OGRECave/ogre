@@ -158,7 +158,6 @@ namespace Ogre {
 
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
-		bool activateGLTextureUnit(size_t unit);
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
                 const size_t vertexStart, 
                 vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );

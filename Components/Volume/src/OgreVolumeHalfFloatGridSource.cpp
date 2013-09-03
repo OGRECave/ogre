@@ -36,14 +36,11 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    float HalfFloatGridSource::getVolumeGridValue(int x, int y, int z) const
+    float HalfFloatGridSource::getVolumeGridValue(size_t x, size_t y, size_t z) const
     {
         x = x >= mWidth ? mWidth - 1 : x;
-        x = x < 0 ? 0 : x;
         y = y >= mHeight ? mHeight - 1 : y;
-        y = y < 0 ? 0 : y;
         z = z >= mDepth ? mDepth - 1 : z;
-        z = z < 0 ? 0 : z;
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
 

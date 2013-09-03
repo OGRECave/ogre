@@ -27,33 +27,37 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLES2UniformCache.h"
-
-#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
-#   include "OgreGLES2UniformCacheImp.h"
-#else
-#   include "OgreGLES2NullUniformCacheImp.h"
-#endif
+#include "OgreGLUniformCacheImp.h"
 
 namespace Ogre {
     
-    GLES2UniformCache::GLES2UniformCache()
+    GLUniformCacheImp::GLUniformCacheImp(void)
     {
-        mImp = new GLES2UniformCacheImp();
+        clearCache();
     }
     
-    GLES2UniformCache::~GLES2UniformCache()
+    void GLUniformCacheImp::clearCache()
     {
-        delete mImp;
+        mUniformValueMap.clear();
     }
-
-    void GLES2UniformCache::clearCache()
+    
+    GLUniformCacheImp::~GLUniformCacheImp(void)
     {
-        mImp->clearCache();
+        mUniformValueMap.clear();
     }
-
-    bool GLES2UniformCache::updateUniform(GLint location, const void *value, GLsizei length)
+    
+    bool GLUniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
     {
-        return mImp->updateUniform(location, value, length);
+        uint32 current = mUniformValueMap[location];
+        uint32 hash = Ogre::FastHash((const char *)value, length);
+        // First check if the uniform name is in the map. If not, this is new so insert it into the map.
+        if (!current || (current != hash))
+        {
+            // Haven't cached this state yet or the value has changed
+            mUniformValueMap[location] = hash;
+			return true;
+        }
+
+        return false;
     }
 }
