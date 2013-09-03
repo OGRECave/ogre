@@ -358,7 +358,9 @@ namespace Ogre {
 		@param lastRq
 			Last RenderQueue ID to render (exclusive)
         */
-        void _renderScene(Viewport *vp, uint8 firstRq, uint8 lastRq, bool includeOverlays);
+        void _cullScenePhase01( Viewport *vp, uint8 firstRq, uint8 lastRq );
+
+		void _renderScenePhase02(Viewport *vp, uint8 firstRq, uint8 lastRq, bool includeOverlays);
 
         /** Function for outputting to a stream.
         */

@@ -830,12 +830,14 @@ namespace Ogre
 		RenderWindow::_beginUpdate();
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderWindow::_updateViewport( Viewport* viewport, Camera *camera, uint8 firstRq,
-											uint8 lastRq, bool updateStatistics )
+	void D3D9RenderWindow::_updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
+														 uint8 firstRq, uint8 lastRq,
+														 bool updateStatistics )
 	{
 		if (mDeviceValid)
 		{
-			RenderWindow::_updateViewport( viewport, camera, firstRq, lastRq, updateStatistics );
+			RenderWindow::_updateViewportRenderPhase02( viewport, camera, firstRq, lastRq,
+														updateStatistics );
 		}
 	}
 	//---------------------------------------------------------------------

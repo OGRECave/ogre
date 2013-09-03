@@ -8,7 +8,8 @@ namespace Ogre
 {
 	inline void MovableObject::setVisibilityFlags( uint32 flags )
 	{
-		mObjectData.mVisibilityFlags[mObjectData.mIndex] = flags & RESERVED_VISIBILITY_FLAGS;
+		mObjectData.mVisibilityFlags[mObjectData.mIndex] = (flags & RESERVED_VISIBILITY_FLAGS) |
+						(mObjectData.mVisibilityFlags[mObjectData.mIndex] & ~RESERVED_VISIBILITY_FLAGS);
 	}
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::addVisibilityFlags( uint32 flags )

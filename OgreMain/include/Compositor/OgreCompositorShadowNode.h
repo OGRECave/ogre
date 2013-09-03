@@ -78,7 +78,11 @@ namespace Ogre
 								const CompositorWorkspace *workspace, RenderSystem *renderSys );
 		~CompositorShadowNode();
 
-		void _update(void);
+		/** Renders into the shadow map, executes passes
+		@param camera
+			Camera used to calculate our shadow camera (in case of directional lights).
+		*/
+		void _update( Camera* camera );
 
 		/// We derive so we can override the camera with ours
 		virtual void postInitializePassScene( CompositorPassScene *pass );

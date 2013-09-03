@@ -448,12 +448,13 @@ namespace Ogre {
         Viewport* mCurrentViewport;
 
 		typedef vector<VisibleObjectsBoundsInfo>::type VisibleObjectsBoundsInfoVec;
-		typedef map<Camera*, VisibleObjectsBoundsInfoVec> VisibleObjectsRqMap;
+		typedef vector<VisibleObjectsBoundsInfoVec>::type VisibleObjectsBoundsPerThread;
+		typedef map<const Camera*, VisibleObjectsBoundsInfoVec>::type VisibleObjectsRqMap;
 
 		CompositorShadowNode*	mCurrentShadowNode;
 		VisibleObjectsRqMap		mVisibleObjsPerRenderQueue; //mVisibleObjsPerRenderQueue[camera][rqId]
 		/// Used to calculate the bounds in different threads, then merged into mVisibleObjsPerRenderQueue
-		VisibleObjectsBoundsInfoVec mVisibleObjectBoundsPerThread;
+		VisibleObjectsBoundsPerThread mVisibleObjectBoundsPerThread;
 
         /// Root scene node
 		SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
@@ -1038,6 +1039,8 @@ namespace Ogre {
 		virtual void buildLightClip(const Light* l, PlaneList& planes);
 		virtual void resetLightClip();
 		virtual void checkCachedLightClippingInfo();
+
+		void collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq );
 
 		/// The active renderable visitor class - subclasses could override this
 		SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
@@ -1782,7 +1785,9 @@ namespace Ogre {
         */
         virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
 
-		virtual void _renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
+		virtual void _cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq );
+
+		virtual void _renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
 									bool includeOverlays );
 
         /** Internal method for queueing the sky objects with the params as 

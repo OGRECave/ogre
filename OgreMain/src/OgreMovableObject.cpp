@@ -416,7 +416,8 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
-									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects )
+									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
+									 VisibleObjectsBoundsInfo *outBoundsInfo )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
@@ -431,7 +432,7 @@ namespace Ogre {
 			ArrayReal		planeNegD;
 		};
 
-		ArrayReal sceneFlags = Mathlib::SetAllR( sceneVisibilityFlags );
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
 		ArrayPlane planes[6];
 		const Plane *frustumPlanes = frustum->getFrustumPlanes();
 
@@ -454,7 +455,7 @@ namespace Ogre {
 		//& floating point, even if it's simd sse
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
-			ArrayReal * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
@@ -498,28 +499,29 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
-			ArrayReal isVisible = Mathlib::TestFlags4( *visibilityFlags,
-														Mathlib::SetAllR( LAYER_VISIBILITY ) );
-			ArrayReal isReceiver= Mathlib::TestFlags4( *visibilityFlags,
-														Mathlib::SetAllR( LAYER_SHADOW_RECEIVER ) );
+			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayReal finalMask = Mathlib::TestFlags4( Mathlib::Or( mask, tmpMask ),
+			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
 			finalMask				= Mathlib::And( finalMask, isVisible );
-			ArrayReal receiverMask	= Mathlib::And( finalMask, isReceiver );
+			ArrayReal finalMskAsReal= CastIntToReal( finalMask );
+			ArrayReal receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
 			//Merge with bounds only if they're visible. We first merge, then CMov its older
 			//value if the object isn't visible. Also do the same with the receiver-only aabb
 			ArrayVector3 newVal( vMinBounds );
 			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
-			vMinBounds.CmovRobust( finalMask, newVal );
+			vMinBounds.CmovRobust( finalMskAsReal, newVal );
 			vMinRcvBounds.CmovRobust( receiverMask, newVal );
 
 			newVal = vMaxBounds;
 			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
-			vMaxBounds.CmovRobust( finalMask, newVal );
+			vMaxBounds.CmovRobust( finalMskAsReal, newVal );
 			vMaxRcvBounds.CmovRobust( receiverMask, newVal );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
@@ -538,8 +540,29 @@ namespace Ogre {
 			objData.advanceFrustumPack();
 		}
 
-		//TODO: (dark_sylinc) Merge the individual values and return the result. Difference between receiver aabb and normal aabb
-		//vMinBounds
+		//Merge the individual values and return the result.
+		if( outBoundsInfo )
+		{
+			Vector3 vMin = vMinBounds.collapseMin();
+			Vector3 vMax = vMaxBounds.collapseMax();
+			if( vMin > vMax )
+				outBoundsInfo->aabb.setNull();
+			else
+				outBoundsInfo->aabb.setExtents( vMin, vMax );
+
+			vMin = vMinRcvBounds.collapseMin();
+			vMax = vMaxRcvBounds.collapseMax();
+			if( vMin > vMax )
+			{
+				outBoundsInfo->receiverAabb.setNull();
+			}
+			else
+			{
+				outBoundsInfo->receiverAabb.setExtents( vMinRcvBounds.collapseMin(),
+														vMaxRcvBounds.collapseMax() );
+			}
+			
+		}
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
@@ -589,7 +612,7 @@ namespace Ogre {
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Initialize mask to 0
-			ArrayReal mask = ARRAY_REAL_ZERO;
+			ArrayInt mask = ARRAY_INT_ZERO;
 
 			for( size_t j=0; j<numFrustums; ++j )
 			{
@@ -634,7 +657,7 @@ namespace Ogre {
 																planes[j].planes[5].planeNegD ) );
 
 				//Accumulate into mask. If one Frustum can see, then we need to include it.
-				mask = Mathlib::Or( mask, tmpMask );
+				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 			}
 
 			//Always pass the test if any of the components were
@@ -643,10 +666,10 @@ namespace Ogre {
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
-			mask = Mathlib::Or( mask, tmpMask );
+			mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 
 			//Use the light mask to discard null mOwner ptrs
-			mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+			mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 												(objData.mLightMask) );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
@@ -687,7 +710,7 @@ namespace Ogre {
 																		(objData.mWorldRadius);
 			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->m_center );
 
-			const ArrayReal * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+			const ArrayInt * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																				(objData.mLightMask);
 
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
@@ -703,7 +726,7 @@ namespace Ogre {
 				lightSphere.setAll( *boundingSphere );
 
 				//Check if it intersects
-				ArrayReal rMask = lightSphere.intersects( objSphere );
+				ArrayInt rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
 				ArrayReal distSimd = objSphere.m_center.squaredDistance( lightSphere.m_center );
 				CastArrayToReal( distance, distSimd );
 

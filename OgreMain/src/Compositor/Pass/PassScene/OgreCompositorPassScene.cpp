@@ -74,27 +74,37 @@ namespace Ogre
 	{
 		assert( mDefinition->mVisibilityMask & MovableObject::LAYER_VISIBILITY );
 
-		if( mShadowNode && mUpdateShadowNode )
+		/*if( mShadowNode && mUpdateShadowNode )
 		{
 			//We need to prepare for rendering another RT (we broke the contiguous chain)
 			if( !mDefinition->mEndRtUpdate )
 				mTarget->_endUpdate();
 
-			mShadowNode->_update();
+			//mShadowNode->_update();
 
 			//We need to restore the previous RT's update
 			if( !mDefinition->mBeginRtUpdate )
 				mTarget->_beginUpdate();
-		}
+		}*/
 
 		//Call beginUpdate if we're the first to use this RT
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
 
+		//Shadow node is updated from within the SceneManager in the middle of normal scene rendering
+		//The reasoning behind this is that we can reuse calculated visible bounds info; which is
+		//expensive to calculate on our own (we need to frustum cull every object for that).
+		mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
+
+		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mDefinition->mFirstRQ,
+											 mDefinition->mLastRQ );
+
 		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
 		mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
-		mTarget->_updateViewport( mViewport, mCamera, mDefinition->mFirstRQ,
-									mDefinition->mLastRQ, true );
+		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mDefinition->mFirstRQ,
+												mDefinition->mLastRQ );
+		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mDefinition->mFirstRQ,
+												mDefinition->mLastRQ, true );
 
 		//Call endUpdate if we're the last pass in a row to use this RT
 		if( mDefinition->mEndRtUpdate )

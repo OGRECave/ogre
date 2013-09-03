@@ -195,7 +195,7 @@ namespace Ogre
 		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
 		MovableObject::cullFrustum( numObjs, objData, camera,
 					camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
-					visibleObjects[0] );
+					visibleObjects[0], (VisibleObjectsBoundsInfo*)0 );
 
 		//Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
 		const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;

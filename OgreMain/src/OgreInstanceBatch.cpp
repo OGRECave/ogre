@@ -160,10 +160,10 @@ namespace Ogre
 		{
 			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
 																		(objData.mWorldRadius);
-			ArrayReal * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
-			ArrayReal inUse = Mathlib::TestFlags4( *visibilityFlags,
-													Mathlib::SetAllR( LAYER_VISIBILITY ) );
+			ArrayReal inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
+																 Mathlib::SetAll( LAYER_VISIBILITY ) ));
 
 			//Merge with bounds only if they're in use (and not explicitly hidden,
 			//but may be invisible for some cameras or out of frustum)

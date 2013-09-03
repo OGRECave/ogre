@@ -136,6 +136,8 @@ namespace Ogre
 		*/
 		size_t getNumRenderQueues() const;
 
+		size_t _getTotalRenderQueues() const				{ return m_memoryManagers.size(); }
+
 		/** Retrieves the sum of the number of objects in all render queues.
 		@remarks
 			The value is cached to avoid iterating through all RQ levels.

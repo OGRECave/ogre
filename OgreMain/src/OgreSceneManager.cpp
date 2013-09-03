@@ -309,6 +309,7 @@ Camera* SceneManager::createCamera( const String &name )
 
 	// create visible bounds aab map entry
 	mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
+	mVisibleObjsPerRenderQueue[c] = VisibleObjectsBoundsInfoVec();
 
     return c;
 }
@@ -337,6 +338,12 @@ void SceneManager::destroyCamera(Camera *cam)
 	CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( cam );
 	if ( camVisObjIt != mCamVisibleObjectsMap.end() )
 		mCamVisibleObjectsMap.erase( camVisObjIt );
+
+	{
+		VisibleObjectsRqMap::iterator it = mVisibleObjsPerRenderQueue.find( cam );
+		if( it != mVisibleObjsPerRenderQueue.end() )
+			mVisibleObjsPerRenderQueue.erase( it );
+	}
 
 	// Remove light-shadow cam mapping entry
 	ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( cam );
@@ -1443,16 +1450,101 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	Root::getSingleton()._popCurrentSceneManager(this);
 
 }
-
 //-----------------------------------------------------------------------
-void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
-									bool includeOverlays )
+void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq )
 {
-	OgreProfileGroup("_renderScene2", OGREPROF_GENERAL);
+	OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
 
     Root::getSingleton()._pushCurrentSceneManager(this);
 	mActiveQueuedRenderableVisitor->targetSceneMgr = this;
 	mAutoParamDataSource->setCurrentSceneManager(this);
+
+	// Also set the internal viewport pointer at this point, for calls that need it
+	// However don't call setViewport just yet (see below)
+	mCurrentViewport = vp;
+    mCameraInProgress = camera;
+
+	{
+		// Lock scene graph mutex, no more changes until we're ready to render
+		OGRE_LOCK_MUTEX(sceneGraphMutex)
+
+		// Prepare render queue for receiving new objects
+		/*{
+			OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
+			prepareRenderQueue();
+		}*/
+
+		size_t visibleObjsIdxStart = 0;
+
+		if (mFindVisibleObjects)
+		{
+			OgreProfileGroup("cullFrusum", OGREPROF_CULLING);
+
+			// Quick way of reducing overhead/stress on VisibleObjectsBoundsInfo
+			// calculation (lastRq can be up to 255)
+			uint8 realFirstRq= firstRq;
+			uint8 realLastRq = 0;
+			{
+				ObjectMemoryManagerVec::const_iterator itor = mEntitiesMemoryManagerCulledList.begin();
+				ObjectMemoryManagerVec::const_iterator end  = mEntitiesMemoryManagerCulledList.end();
+				while( itor != end )
+				{
+					realFirstRq = std::min<uint8>( realFirstRq, (*itor)->_getTotalRenderQueues() );
+					realLastRq	= std::max<uint8>( realLastRq, (*itor)->_getTotalRenderQueues() );
+					++itor;
+				}
+				realLastRq = std::min( realLastRq, lastRq );
+			}
+
+			size_t visibleObjsIdxStart = 0;
+			size_t numThreads = 1;
+			cullFrustum( mEntitiesMemoryManagerCulledList, camera, realFirstRq, realLastRq,
+						 visibleObjsIdxStart );
+
+			//Now merge the bounds from all threads into one
+			collectVisibleBoundsInfoFromThreads( camera, realFirstRq, realLastRq );
+
+			/* Commented out because ideally we would save the render queue results between
+				phases, not the cull list from all threads. Currently the RenderQueue is a
+				mess to do that.
+			VisibleObjectsPerThreadArray::const_iterator it =
+														mVisibleObjects.begin() + visibleObjsIdxStart;
+			VisibleObjectsPerThreadArray::const_iterator en =
+														mVisibleObjects.begin() + visibleObjsIdxStart
+														+ numThreads;
+
+			//TODO: _updateRenderQueue MIGHT be called in parallel
+			firePreFindVisibleObjects(vp);
+			while( it != en )
+			{
+				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+				MovableObject::MovableObjectArray::const_iterator end  = it->end();
+
+				while( itor != end )
+				{
+					(*itor)->_updateRenderQueue( getRenderQueue(), camera );
+					++itor;
+				}
+				++it;
+			}
+			firePostFindVisibleObjects(vp);
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
+#endif*/
+		}
+		// Queue skies, if viewport seems it
+		/*if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
+		{
+			_queueSkiesForRendering(camera);
+		}*/
+	} // end lock on scene graph mutex
+}
+//-----------------------------------------------------------------------
+void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
+									bool includeOverlays )
+{
+	OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
 
 	// Also set the internal viewport pointer at this point, for calls that need it
 	// However don't call setViewport just yet (see below)
@@ -1463,9 +1555,6 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 	useLights(emptyLightList, 0);
 
     mCameraInProgress = camera;
-
-    // Update controllers 
-    ControllerManager::getSingleton().updateAllControllers();
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
@@ -1520,13 +1609,11 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 
 		if (mFindVisibleObjects)
 		{
-			OgreProfileGroup("_findVisibleObjects", OGREPROF_CULLING);
+			OgreProfileGroup("_updateRenderQueue", OGREPROF_CULLING);
 
+			//mVisibleObjects should be filled in phase 01
 			size_t visibleObjsIdxStart = 0;
 			size_t numThreads = 1;
-			cullFrustum( mEntitiesMemoryManagerCulledList, camera, firstRq, lastRq,
-						 visibleObjsIdxStart );
-
 			VisibleObjectsPerThreadArray::const_iterator it =
 														mVisibleObjects.begin() + visibleObjsIdxStart;
 			VisibleObjectsPerThreadArray::const_iterator en =
@@ -1548,22 +1635,6 @@ void SceneManager::_renderScene2( Camera* camera, Viewport* vp, uint8 firstRq, u
 				++it;
 			}
 			firePostFindVisibleObjects(vp);
-			/*// Assemble an AAB on the fly which contains the scene elements visible
-			// by the camera.
-			CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
-
-			assert (camVisObjIt != mCamVisibleObjectsMap.end() &&
-				"Should never fail to find a visible object bound for a camera, "
-				"did you override SceneManager::createCamera or something?");
-
-			// reset the bounds
-			camVisObjIt->second.reset();
-
-			// Parse the scene and tag visibles
-			firePreFindVisibleObjects(vp);
-			_findVisibleObjects(camera, &(camVisObjIt->second),
-				mIlluminationStage == IRS_RENDER_TO_TEXTURE? true : false);
-			firePostFindVisibleObjects(vp);*/
 
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
@@ -2353,13 +2424,26 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 }
 //-----------------------------------------------------------------------
 void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-								uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart )
+								uint8 _firstRq, uint8 _lastRq, size_t visObjsIdxStart )
 {
 	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
 	outVisibleObjects.clear();
 
-	VisibleObjectsBoundsInfo &aabbInfo = *(mVisibleObjectBoundsPerThread.begin() + visObjsIdxStart);
-	aabbInfo.reset();
+	VisibleObjectsBoundsInfoVec &aabbInfo = *(mVisibleObjectBoundsPerThread.begin() + visObjsIdxStart);
+	{
+		if( aabbInfo.size() < _lastRq )
+			aabbInfo.resize( _lastRq );
+
+		//Reset the aabb infos.
+		VisibleObjectsBoundsInfoVec::iterator itor = aabbInfo.begin() + _firstRq;
+		VisibleObjectsBoundsInfoVec::iterator end  = aabbInfo.begin() + _lastRq;
+
+		while( itor != end )
+		{
+			itor->reset();
+			++itor;
+		}
+	}
 
 	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
 	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
@@ -2369,8 +2453,8 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 		ObjectMemoryManager *memoryManager = *it;
 		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
 
-		firstRq = std::min<size_t>( firstRq, numRenderQueues );
-		lastRq  = std::min<size_t>( lastRq,  numRenderQueues );
+		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
 
 		//TODO: Send this to worker threads (dark_sylinc)
 
@@ -2380,7 +2464,8 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
 
 			MovableObject::cullFrustum( numObjs, objData, camera,
-				camera->getViewport()->getVisibilityMask()|getVisibilityMask(), outVisibleObjects );
+					camera->getViewport()->getVisibilityMask()|getVisibilityMask(),
+					outVisibleObjects, &aabbInfo[i] );
 		}
 
 		++it;
@@ -2480,6 +2565,10 @@ void SceneManager::updateSceneGraph()
 	}*/
 
 	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
+
+	// Update controllers 
+    ControllerManager::getSingleton().updateAllControllers();
+
 	highLevelCull();
 	_applySceneAnimations();
 	updateAllTransforms();
@@ -5519,6 +5608,28 @@ void SceneManager::resetScissor()
 		return;
 
 	mDestRenderSystem->setScissorTest(false);
+}
+//---------------------------------------------------------------------
+void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq )
+{
+	VisibleObjectsRqMap::iterator boundsIt = mVisibleObjsPerRenderQueue.find( camera );
+	if( boundsIt->second.size() < lastRq )
+		boundsIt->second.resize( lastRq );
+	for( size_t i=firstRq; i<lastRq; ++i )
+		boundsIt->second[i].reset();
+
+	VisibleObjectsBoundsPerThread::const_iterator it = mVisibleObjectBoundsPerThread.begin();
+	VisibleObjectsBoundsPerThread::const_iterator en = mVisibleObjectBoundsPerThread.end();
+	while( it != en )
+	{
+		const VisibleObjectsBoundsInfoVec &threadInfo = *it;
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			boundsIt->second[i].aabb.merge( threadInfo[i].aabb );
+			boundsIt->second[i].receiverAabb.merge( threadInfo[i].receiverAabb );
+		}
+		++it;
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::checkCachedLightClippingInfo()

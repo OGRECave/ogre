@@ -128,7 +128,7 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::_update(void)
+	void CompositorShadowNode::_update( Camera* camera )
 	{
 		ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
 		ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();

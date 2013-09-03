@@ -256,10 +256,13 @@ namespace Ogre {
 		@param outCulledObjects
 			Out. List of objects that are (fully or partially) inside the frustum and
 			should be rendered
+		@param outBoundsInfo [out]
+			Bounds information from culled objects. Pointer can be null
 		*/
 		typedef FastArray<MovableObject*> MovableObjectArray;
 		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
-								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects );
+								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
+								 VisibleObjectsBoundsInfo *outBoundsInfo );
 
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList

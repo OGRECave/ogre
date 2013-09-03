@@ -83,9 +83,9 @@ namespace Ogre
 		/// @copydoc RenderTarget::_beginUpdate
 		virtual void _beginUpdate();
 	
-		/// @copydoc RenderTarget::_updateViewport
-		virtual void _updateViewport( Viewport* viewport, Camera *camera, uint8 firstRq, uint8 lastRq,
-										bool updateStatistics );
+		/// @copydoc RenderTarget::_updateViewportRenderPhase02
+		virtual void _updateViewportRenderPhase02( Viewport* viewport, Camera *camera, uint8 firstRq,
+													uint8 lastRq, bool updateStatistics );
 
 		/// @copydoc RenderTarget::_endUpdate
 		virtual void _endUpdate();
