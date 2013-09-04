@@ -23,15 +23,11 @@ same license as the rest of the engine.
 
 using namespace Ogre;
 
-#include "Ogre.h"
-#include "OgreTerrain.h"
-#include "OgreTerrainMaterialGenerator.h"
-
-class TerrainMaterial : public Ogre::TerrainMaterialGenerator
+class TerrainTessellationMaterialGenerator : public TerrainMaterialGenerator
 {
 public:
       
-    TerrainMaterial(Ogre::String materialName, bool addNormalmap=true, bool cloneMaterial=true);
+    TerrainTessellationMaterialGenerator(Ogre::String materialName, bool addNormalmap=true, bool cloneMaterial=true);
       
     void setMaterialByName(const Ogre::String materialName); 
     void addNormalMapOnGenerate(bool set) { mAddNormalMap=set; };
@@ -39,7 +35,7 @@ public:
 
     Ogre::String getMaterialName() { return mMaterialName; };
         
-    class Profile : public Ogre::TerrainMaterialGenerator::Profile
+    class Profile : public TerrainMaterialGenerator::Profile
     {
     public:
         Profile(Ogre::TerrainMaterialGenerator* parent, const Ogre::String& name, const Ogre::String& desc);
@@ -47,17 +43,17 @@ public:
 
         bool isVertexCompressionSupported() const { return false; }
 
-        Ogre::MaterialPtr generate(const Ogre::Terrain* terrain);
+        MaterialPtr generate(const Terrain* terrain);
 
-        Ogre::MaterialPtr generateForCompositeMap(const Ogre::Terrain* terrain);
+        MaterialPtr generateForCompositeMap(const Terrain* terrain);
 
-        Ogre::uint8 getMaxLayers(const Ogre::Terrain* terrain) const;
+        Ogre::uint8 getMaxLayers(const Terrain* terrain) const;
 
-        void updateParams(const Ogre::MaterialPtr& mat, const Ogre::Terrain* terrain);
+        void updateParams(const MaterialPtr& mat, const Terrain* terrain);
 
-        void updateParamsForCompositeMap(const Ogre::MaterialPtr& mat, const Ogre::Terrain* terrain);
+        void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain);
 
-        void requestOptions(Ogre::Terrain* terrain);
+        void requestOptions(Terrain* terrain);
 
 		bool isLightmapEnabled() const  { return mLightmapEnabled; }
 		/** Whether to support a light map over the terrain in the shader,

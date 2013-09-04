@@ -188,7 +188,7 @@ protected:
 		TerrainMaterialGeneratorPtr terrainMaterialGenerator;
 
 		// Set Ogre Material  with the name "TerrainMaterial" in constructor
-		TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial("Ogre/TerrainTessellation/Terrain");         
+		TerrainTessellationMaterialGenerator *terrainMaterial = OGRE_NEW TerrainTessellationMaterialGenerator("Ogre/TerrainTessellation/Terrain");         
 		terrainMaterialGenerator.bind( terrainMaterial );  
 					   
 		mTerrainGlobals->setDefaultMaterialGenerator( terrainMaterialGenerator );
