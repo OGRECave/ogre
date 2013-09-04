@@ -118,6 +118,8 @@ namespace Ogre {
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
 	{
+        // Initialise uniform cache
+		mUniformCache = new GLUniformCache();
 	}
 
 	//-----------------------------------------------------------------------
@@ -125,6 +127,8 @@ namespace Ogre {
 	{
 		glDeleteObjectARB(mGLHandle);
 
+        delete mUniformCache;
+        mUniformCache = 0;
 	}
 
 	//-----------------------------------------------------------------------
@@ -313,14 +317,14 @@ namespace Ogre {
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                                  params->getIntPointer(def->physicalIndex),
-                                                                                  def->elementSize * def->arraySize * sizeof(int));
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getIntPointer(def->physicalIndex),
+                                                                        def->elementSize * def->arraySize * sizeof(int));
                             break;
                         default:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                                  params->getFloatPointer(def->physicalIndex),
-                                                                                  def->elementSize * def->arraySize * sizeof(float));
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getFloatPointer(def->physicalIndex),
+                                                                        def->elementSize * def->arraySize * sizeof(float));
                             break;
 
                     }
@@ -461,36 +465,12 @@ namespace Ogre {
 				// get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-                    if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
-                    {
-                        if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                             params->getFloatPointer(index),
-                                                                             currentUniform->mConstantDef->elementSize *
-                                                                             currentUniform->mConstantDef->arraySize *
-                                                                             sizeof(float)))
-                            return;
-                    }
-                    else if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
-                    {
-                        if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                               params->getFloatPointer(index),
-                                                                               currentUniform->mConstantDef->elementSize *
-                                                                               currentUniform->mConstantDef->arraySize *
-                                                                               sizeof(float)))
-                            return;
-                    }
-                    else if (mGeometryProgram && currentUniform->mSourceProgType == GPT_GEOMETRY_PROGRAM)
-                    {
-                        if(!mGeometryProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                               params->getFloatPointer(index),
-                                                                               currentUniform->mConstantDef->elementSize *
-                                                                               currentUniform->mConstantDef->arraySize *
-                                                                               sizeof(float)))
-                            return;
-                    }
-//					glUniform1fvARB( currentUniform->mLocation, 1, params->getFloatPointer(index));
-					// there will only be one multipass entry
-					return;
+                    if(!mUniformCache->updateUniform(currentUniform->mLocation,
+                                                     params->getFloatPointer(index),
+                                                     currentUniform->mConstantDef->elementSize *
+                                                     currentUniform->mConstantDef->arraySize *
+                                                     sizeof(float)))
+                        return;
 				}
 			}
 		}
