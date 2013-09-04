@@ -57,7 +57,7 @@ namespace Ogre {
         Before you create a concrete instance of the OverlaySystem the OGRE::Root must be created
 		but not initialized. In the ctor all relevant systems are created and registered. The dtor
 		must be called before you delete OGRE::Root.
-		To make the overlay's visible (= render into your viewports) you have to register this
+		To make the overlays visible (= render into your viewports) you have to register this
 		instance as a RenderQueueListener in your scenemanager(s).
     */
 	class _OgreOverlayExport OverlaySystem : public OverlayAlloc , public Ogre::RenderQueueListener
@@ -70,9 +70,6 @@ namespace Ogre {
 		virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
 			bool& skipThisInvocation);
 	private:
-		OverlayElementFactory* mPanelFactory;
-        OverlayElementFactory* mBorderPanelFactory;
-        OverlayElementFactory* mTextAreaFactory;
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;
 
