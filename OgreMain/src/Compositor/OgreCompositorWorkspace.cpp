@@ -283,12 +283,7 @@ namespace Ogre
 		}
 
 		if( !retVal && includeShadowNodes )
-		{
-			bool shadowNodeCreated;
-			retVal = getShadowNode( aliasName, shadowNodeCreated );
-			assert( !shadowNodeCreated && "Shadow Node should be created by now, or referencing a shadow"
-					" node that will never be used in a pass!" );
-		}
+			retVal = findShadowNode( aliasName );
 
 		return retVal;
 	}
@@ -334,10 +329,9 @@ namespace Ogre
 			mRenderWindow->swapBuffers( waitForVSync );
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorShadowNode* CompositorWorkspace::getShadowNode( IdString nodeDefName, bool &bCreated ) const
+	CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const
 	{
 		CompositorShadowNode *retVal = 0;
-		bCreated = false;
 
 		CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
 		CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
@@ -349,6 +343,14 @@ namespace Ogre
 			++itor;
 		}
 
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorShadowNode* CompositorWorkspace::findOrCreateShadowNode( IdString nodeDefName, bool &bCreated )
+	{
+		CompositorShadowNode *retVal = findShadowNode( nodeDefName );
+		bCreated = false;
+
 		if( !retVal )
 		{
 			//Not found, create one.
@@ -356,6 +358,7 @@ namespace Ogre
 			const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
 			retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
 													def, this, mRenderSys );
+			mShadowNodes.push_back( retVal );
 			bCreated = true;
 		}
 

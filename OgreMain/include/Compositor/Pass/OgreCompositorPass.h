@@ -69,7 +69,9 @@ namespace Ogre
 		/// @See CompositorNode::notifyDestroyed
 		virtual void notifyDestroyed( const CompositorChannel &channel );
 
-		CompositorPassType getType() const { return mDefinition->getType(); }
+		CompositorPassType getType() const	{ return mDefinition->getType(); }
+
+		Viewport* getViewport() const		{ return mViewport; }
 	private:
 		CompositorPassDef const *mDefinition;
 	};

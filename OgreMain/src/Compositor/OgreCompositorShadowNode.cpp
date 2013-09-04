@@ -38,10 +38,14 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreSceneManager.h"
 
+#include "OgreShadowCameraSetupFocused.h"
+#include "OgreShadowCameraSetupLiSPSM.h"
+#include "OgreShadowCameraSetupPSSM.h"
+
 namespace Ogre
 {
 	CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
-												const CompositorWorkspace *workspace,
+												CompositorWorkspace *workspace,
 												RenderSystem *renderSys ) :
 			CompositorNode( id, definition->getName(), definition, workspace, renderSys ),
 			mDefinition( definition )
@@ -111,7 +115,33 @@ namespace Ogre
 			shadowMapCamera.camera = sceneManager->createCamera( "ShadowNode Camera ID " +
 												StringConverter::toString( id ) + " Map " +
 												StringConverter::toString( shadowMapIdx ) );
-			//shadowMapCamera.shadowCameraSetup = TODO
+			switch( itor->shadowMapTechnique )
+			{
+			case SHADOWMAP_DEFAULT:
+				shadowMapCamera.shadowCameraSetup =
+								ShadowCameraSetupPtr( OGRE_NEW DefaultShadowCameraSetup() );
+				break;
+			/*case SHADOWMAP_PLANEOPTIMAL:
+				break;*/
+			case SHADOWMAP_FOCUSED:
+				shadowMapCamera.shadowCameraSetup =
+								ShadowCameraSetupPtr( OGRE_NEW FocusedShadowCameraSetup() );
+				break;
+			case SHADOWMAP_LiPSSM:
+				shadowMapCamera.shadowCameraSetup =
+								ShadowCameraSetupPtr( OGRE_NEW LiSPSMShadowCameraSetup() );
+				break;
+			case SHADOWMAP_PSSM:
+				shadowMapCamera.shadowCameraSetup =
+								ShadowCameraSetupPtr( OGRE_NEW PSSMShadowCameraSetup() );
+				break;
+			default:
+				OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+							"Shadow Map technique not implemented or not recognized.",
+							"CompositorShadowNode::CompositorShadowNode");
+				break;
+			}
+
 			mShadowMapCameras.push_back( shadowMapCamera );
 
 			++itor;
@@ -130,16 +160,55 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::_update( Camera* camera )
 	{
-		ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
-		ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
+		//Setup all the cameras
+		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+															mDefinition->mShadowMapTexDefinitions.begin();
+		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
+															mDefinition->mShadowMapTexDefinitions.end();
+
+		ShadowMapCameraVec::const_iterator itShadowCamera = mShadowMapCameras.begin();
+		const SceneManager *sceneManager = camera->getSceneManager();
+
+		size_t nextLightIdx = 0;
+		Light const *nextLight = 0;
+		size_t lastLightMap	= -1;
+		size_t iterations	= 1;
+
+		uint32 combinedVisibilityFlags = camera->getViewport()->getVisibilityMask() &
+											sceneManager->getVisibilityMask();
 
 		while( itor != end )
 		{
-			//itor->shadowCameraSetup->getShadowCamera;
-			//itor->camera;
+			//iterations will be zero when the light idx difference is zero (eg. same light,
+			//different split count, same light and bigger than one if there are gaps
+			//(eg. render light map 0 & 2, not 1)
+			//The iterators are assumed to be sorted by light index.
+			iterations = itor->light - lastLightMap;
+			for( size_t i=0; i<iterations; ++i )
+			{
+				nextLight = sceneManager->nextClosestShadowLight( nextLightIdx,
+																	combinedVisibilityFlags );
+			}
+
+			if( nextLight )
+			{
+				itShadowCamera->shadowCameraSetup->getShadowCamera(
+														sceneManager, camera, nextLight,
+														itShadowCamera->camera, itor->split );
+				lastLightMap = itor->light;
+			}
+			else
+			{
+				//No more shadow mapping lights. We should avoid render
+				//those maps and have to set them to blank textures
+				break;
+			}
+
+			++itShadowCamera;
 			++itor;
 		}
 
+		//Now render all passes
 		CompositorNode::_update();
 	}
 	//-----------------------------------------------------------------------------------
@@ -148,7 +217,11 @@ namespace Ogre
 		const CompositorPassSceneDef *passDef = pass->getDefinition();
 		const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
 
-		//smCamera.shadowCameraSetup->getShadowCamera
+		assert( (!smCamera.camera->getViewport() ||
+				smCamera.camera->getViewport() == pass->getViewport()) &&
+				"Two scene passes to the same shadow map have different viewport!" );
+
+		smCamera.camera->_notifyViewport( pass->getViewport() );
 		pass->_setCustomCamera( smCamera.camera );
 	}
 }

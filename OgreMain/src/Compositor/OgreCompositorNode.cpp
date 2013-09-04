@@ -38,7 +38,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-									const CompositorWorkspace *workspace, RenderSystem *renderSys ) :
+									CompositorWorkspace *workspace, RenderSystem *renderSys ) :
 			IdObject( id ),
 			mName( name ),
 			mNumConnectedInputs( 0 ),
@@ -51,7 +51,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-									const CompositorWorkspace *workspace, RenderSystem *renderSys,
+									CompositorWorkspace *workspace, RenderSystem *renderSys,
 									const RenderTarget *finalTarget ) :
 			IdObject( id ),
 			mName( name ),

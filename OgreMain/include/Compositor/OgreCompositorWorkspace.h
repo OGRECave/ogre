@@ -94,7 +94,7 @@ namespace Ogre
 			Name of the node instance (they're unique)
 		@param includeShadowNodes
 			When true, also looks for ShadowNodes with that name, if the instance doesn't exists,
-			it's created (default: false). @See findShadowNode
+			it will not be created (default: false). @See findShadowNode
 			When a Node has the same name of a Shadow Node, the Node takes precedence.
 		@return
 			Null if not found. Valid pointer otherwise.
@@ -124,6 +124,19 @@ namespace Ogre
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapFinalTarget( bool waitForVSync );
 
+		/** Finds a shadow node instance with a given name.
+			Note that unlike nodes, there can only be one ShadowNode instance per definition
+			(in the same workspace)
+		@remarks
+			Performs a linear search O(N). There aren't many ShadowNodes active in a workspace
+			to justify a better container (plus we mostly iterate through it).
+		@param nodeDefName
+			Name of the definition.
+		@return
+			ShadowNode pointer. Null if not found.
+		*/
+		CompositorShadowNode* findShadowNode( IdString nodeDefName ) const;
+
 		/** Finds a shadow node given it's definition name. If it doesn't exist, creates one.
 			Note that unlike nodes, there can only be one ShadowNode instance per definition
 			(in the same workspace)
@@ -139,7 +152,7 @@ namespace Ogre
 		@return
 			ShadowNode pointer
 		*/
-		CompositorShadowNode* getShadowNode( IdString nodeDefName, bool &bCreated ) const;
+		CompositorShadowNode* findOrCreateShadowNode( IdString nodeDefName, bool &bCreated );
 
 		/// Finds a camera in the scene manager we have.
 		Camera* findCamera( IdString cameraName ) const;

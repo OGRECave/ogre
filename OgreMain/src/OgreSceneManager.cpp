@@ -197,6 +197,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	mAutoParamDataSource = createAutoParamDataSource();
 
 	mVisibleObjects.resize( 1 );
+	mVisibleObjectsBackup.resize( 1 );
 	mTmpVisibleObjects.resize( 1 );
 	mVisibleObjectBoundsPerThread.resize( 1 );
 }
@@ -434,6 +435,28 @@ void SceneManager::destroyLight(Light *l)
 void SceneManager::destroyAllLights(void)
 {
 	destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
+const Light* SceneManager::nextClosestShadowLight( size_t &startLightIdx, uint32 visibilityFlags ) const
+{
+	Light const *retVal = 0;
+	if( startLightIdx < mGlobalLightList.lights.size() )
+	{
+		LightArray::const_iterator itor = mGlobalLightList.lights.begin() + startLightIdx;
+		LightArray::const_iterator end  = mGlobalLightList.lights.end();
+
+		while( itor != end && !retVal )
+		{
+			if( (*itor)->getVisibilityFlags() & visibilityFlags && (*itor)->getCastShadows() )
+			{
+				retVal = *itor;
+				startLightIdx = (itor - mGlobalLightList.lights.begin()) + 1;
+			}
+			++itor;
+		}
+	}
+
+	return retVal;
 }
 //-----------------------------------------------------------------------
 const LightList& SceneManager::_getLightsAffectingFrustum(void) const
@@ -1451,6 +1474,11 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 }
 //-----------------------------------------------------------------------
+void SceneManager::_swapVisibleObjectsForShadowMapping()
+{
+	mVisibleObjects.swap( mVisibleObjectsBackup );
+}
+//-----------------------------------------------------------------------
 void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq )
 {
 	OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
@@ -1503,41 +1531,7 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 
 			//Now merge the bounds from all threads into one
 			collectVisibleBoundsInfoFromThreads( camera, realFirstRq, realLastRq );
-
-			/* Commented out because ideally we would save the render queue results between
-				phases, not the cull list from all threads. Currently the RenderQueue is a
-				mess to do that.
-			VisibleObjectsPerThreadArray::const_iterator it =
-														mVisibleObjects.begin() + visibleObjsIdxStart;
-			VisibleObjectsPerThreadArray::const_iterator en =
-														mVisibleObjects.begin() + visibleObjsIdxStart
-														+ numThreads;
-
-			//TODO: _updateRenderQueue MIGHT be called in parallel
-			firePreFindVisibleObjects(vp);
-			while( it != en )
-			{
-				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-				MovableObject::MovableObjectArray::const_iterator end  = it->end();
-
-				while( itor != end )
-				{
-					(*itor)->_updateRenderQueue( getRenderQueue(), camera );
-					++itor;
-				}
-				++it;
-			}
-			firePostFindVisibleObjects(vp);
-
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-#endif*/
 		}
-		// Queue skies, if viewport seems it
-		/*if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
-		{
-			_queueSkiesForRendering(camera);
-		}*/
 	} // end lock on scene graph mutex
 }
 //-----------------------------------------------------------------------
@@ -6678,10 +6672,10 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 				assert(camLightIt != mShadowCamLightMapping.end());
 				camLightIt->second = light;
 
-				if (light->getCustomShadowCameraSetup().isNull())
+				/*if (light->getCustomShadowCameraSetup().isNull())
 					mDefaultShadowCameraSetup->getShadowCamera(this, cam, light, texCam, j);
 				else
-					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, light, texCam, j);
+					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, light, texCam, j);*/
 
 				// Fire shadow caster update, callee can alter camera settings
 				fireShadowTexturesPreCaster(light, texCam, j);

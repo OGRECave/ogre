@@ -105,7 +105,7 @@ namespace Ogre
 		/// Nodes we're connected to. If we destroy our local textures, we need to inform them
 		CompositorNodeVec	mConnectedNodes;
 
-		CompositorWorkspace const *mWorkspace;
+		CompositorWorkspace	*mWorkspace;
 
 		RenderSystem		*mRenderSystem; /// Used to create/destroy MRTs
 
@@ -143,9 +143,9 @@ namespace Ogre
 			The name is only unique across the workspace
 		*/
 		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-						const CompositorWorkspace *workspace, RenderSystem *renderSys );
+						CompositorWorkspace *workspace, RenderSystem *renderSys );
 		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-						const CompositorWorkspace *workspace, RenderSystem *renderSys,
+						CompositorWorkspace *workspace, RenderSystem *renderSys,
 						const RenderTarget *finalTarget );
 		virtual ~CompositorNode();
 

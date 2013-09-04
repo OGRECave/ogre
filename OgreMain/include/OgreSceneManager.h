@@ -927,6 +927,9 @@ namespace Ogre {
 		*/
 		VisibleObjectsPerThreadArray mVisibleObjects;
 
+		/// @See CompositorShadowNode remarks
+		VisibleObjectsPerThreadArray mVisibleObjectsBackup;
+
 		/** @See mVisibleObjects. This one is a variable used for temporary storage by (eg.) Instance
 			Managers to cull their internal instanced entities from multiple threads. We do not
 			guarantee that those who acquired our data retain sole ownership; thus extra care may
@@ -1184,6 +1187,26 @@ namespace Ogre {
                 name The name of the new light, to identify it later.
         */
         virtual Light* createLight();
+
+		/** Gets the next closest light to all cameras that can cast a shadow starting from the
+			Nth position. Should be called after buildLightList
+		@remarks
+			Performs a linear search with worst case O( N-nthLight ) and an average of O(1)
+			complexity.
+			Normally returning mGlobalLightList[nthLight] should be enough. However such light
+			may not cast shadows or may be filtered by visibility flags, hence we linear search
+			for the next light in the array.
+		@param inOutStartLightIdx [in/out]
+			In: The index in mGlobalLightList at which we should starting the search.
+			Out: Actual index from the return value plus one. You should continue from this index
+			in the next call to get the next light.
+		@param visibilityFlags
+			Combined visibility flags (camera's + scene manager's) to filter unwanted lights
+		@return
+			The light pointer. Null if startLightIdx goes out of bounds (which is valid) or
+			there wasn't any other light left that would cast shadows.
+		*/
+		const Light* nextClosestShadowLight( size_t &inOutStartLightIdx, uint32 visibilityFlags ) const;
 
 		/** Retrieve a set of clipping planes for a given light. 
 		*/
@@ -1785,8 +1808,36 @@ namespace Ogre {
         */
         virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
 
+		/// @See CompositorShadowNode remarks
+		void _swapVisibleObjectsForShadowMapping();
+
+		/** Performs the frustum culling that will later be needed by _renderPhase02
+            @remarks
+                @See CompositorShadowNode to understand why rendering is split in two phases
+            @param camera Pointer to a camera from whose viewpoint the scene is to
+                be rendered.
+            @param vp The target viewport
+			@param firstRq first render queue ID to render (gets clamped if too big)
+			@param lastRq last render queue ID to render (gets clamped if too big)
+        */
 		virtual void _cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq );
 
+		/** Prompts the class to send its contents to the renderer.
+            @remarks
+                This method prompts the scene manager to send the
+                contents of the scene it manages to the rendering
+                pipeline. You must have called _cullPhase01 before calling
+				this function.
+				Note that this method is not normally called directly by the
+				user application; it is called automatically by the Ogre
+				rendering loop.
+            @param camera Pointer to a camera from whose viewpoint the scene is to
+                be rendered.
+            @param vp The target viewport
+			@param firstRq first render queue ID to render (gets clamped if too big)
+			@param lastRq last render queue ID to render (gets clamped if too big)
+            @param includeOverlays Whether or not overlay objects should be rendered
+        */
 		virtual void _renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
 									bool includeOverlays );
 
@@ -3207,7 +3258,7 @@ namespace Ogre {
 		/** Gets a mask which is bitwise 'and'ed with objects own visibility masks
 			to determine if the object is visible.
 		*/
-		virtual_l2 uint32 getVisibilityMask(void) { return mVisibilityMask; }
+		virtual_l2 uint32 getVisibilityMask(void) const { return mVisibilityMask; }
 
 		/** Internal method for getting the combination between the global visibility
 			mask and the per-viewport visibility mask.

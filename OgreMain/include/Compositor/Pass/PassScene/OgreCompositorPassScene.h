@@ -64,8 +64,6 @@ namespace Ogre
 		Camera					*mCamera;
 		bool					mUpdateShadowNode;
 
-		CompositorWorkspace const *mWorkspace;
-
 	public:
 		/** Constructor
 		@param definition
@@ -77,7 +75,7 @@ namespace Ogre
 			The RenderTarget we're supposed to draw to. Can be RenderWindow, RenderTexture, MRT, etc
 		*/
 		CompositorPassScene( const CompositorPassSceneDef *definition, Camera *defaultCamera,
-								const CompositorWorkspace *workspace, RenderTarget *target );
+								CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
 		virtual void execute();
