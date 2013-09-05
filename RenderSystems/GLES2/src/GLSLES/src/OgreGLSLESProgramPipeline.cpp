@@ -293,12 +293,12 @@ namespace Ogre
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
                                                                         def->elementSize * def->arraySize * sizeof(int));
                             break;
                         default:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getFloatPointer(def->physicalIndex),
                                                                         def->elementSize * def->arraySize * sizeof(float));
                             break;
@@ -447,7 +447,7 @@ namespace Ogre
                     GLuint progID = 0;
                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
-                        if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                        if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                                              params->getFloatPointer(index),
                                                                              currentUniform->mConstantDef->elementSize *
                                                                              currentUniform->mConstantDef->arraySize *
@@ -460,7 +460,7 @@ namespace Ogre
                     
                     if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
                     {
-                        if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                        if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                params->getFloatPointer(index),
                                                                                currentUniform->mConstantDef->elementSize *
                                                                                currentUniform->mConstantDef->arraySize *

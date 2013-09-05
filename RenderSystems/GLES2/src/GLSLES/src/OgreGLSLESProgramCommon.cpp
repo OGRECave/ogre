@@ -67,12 +67,18 @@ namespace Ogre {
                         "Attempted to create a shader program without both a vertex and fragment program.",
                         "GLSLESProgramCommon::GLSLESProgramCommon");
         }
+
+        // Initialise uniform cache
+		mUniformCache = new GLES2UniformCache();
 	}
     
 	//-----------------------------------------------------------------------
 	GLSLESProgramCommon::~GLSLESProgramCommon(void)
 	{
 		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+
+        delete mUniformCache;
+        mUniformCache = 0;
 	}
     
 	//-----------------------------------------------------------------------

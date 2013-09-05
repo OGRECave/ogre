@@ -32,6 +32,7 @@
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
+#include "OgreGLES2UniformCache.h"
 
 namespace Ogre {
 
@@ -70,6 +71,7 @@ namespace Ogre {
 		GLSLESGpuProgram* mVertexProgram;
 		/// Linked fragment program
 		GLSLESGpuProgram* mFragmentProgram;
+        GLES2UniformCache *mUniformCache;
 		/// Flag to indicate that uniform references have already been built
 		bool mUniformRefsBuilt;
 		/// GL handle for the program object
@@ -152,6 +154,7 @@ namespace Ogre {
 
 		GLSLESGpuProgram* getVertexProgram(void) const { return mVertexProgram; }
 		GLSLESGpuProgram* getFragmentProgram(void) const { return mFragmentProgram; }
+        GLES2UniformCache * getUniformCache(void) { return mUniformCache; }
 	};
 }
 

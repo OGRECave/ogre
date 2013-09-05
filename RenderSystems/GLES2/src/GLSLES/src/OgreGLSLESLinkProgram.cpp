@@ -288,12 +288,12 @@ namespace Ogre {
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getIntPointer(def->physicalIndex),
                                                                                   def->elementSize * def->arraySize * sizeof(int));
                             break;
                         default:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getFloatPointer(def->physicalIndex),
                                                                                   def->elementSize * def->arraySize * sizeof(float));
                             break;
@@ -465,24 +465,11 @@ namespace Ogre {
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
-                     {
-                         if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                              params->getFloatPointer(index),
-                                                                              currentUniform->mConstantDef->elementSize *
-                                                                              currentUniform->mConstantDef->arraySize *
-                                                                              sizeof(float)))
-                             return;
-                     }
-                     else
-                     {
-                         if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                              params->getFloatPointer(index),
-                                                                              currentUniform->mConstantDef->elementSize *
-                                                                              currentUniform->mConstantDef->arraySize *
-                                                                              sizeof(float)))
-                             return;
-                     }
+                     mUniformCache->updateUniform(currentUniform->mLocation,
+                                                  params->getFloatPointer(index),
+                                                  currentUniform->mConstantDef->elementSize *
+                                                  currentUniform->mConstantDef->arraySize *
+                                                  sizeof(float));
 					// There will only be one multipass entry
 					return;
 				}
