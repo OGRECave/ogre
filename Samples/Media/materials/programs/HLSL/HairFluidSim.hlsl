@@ -41,11 +41,11 @@ Texture3D Texture_obstvelocity;
 
 
 // Variables
-shader cbuffer cb0
+shared cbuffer cb0
 {
 	//int         fluidType = FT_SMOKE;
-	bool        g_advectAsTemperature = false;
-	bool        g_treatAsLiquidVelocity = false;
+	int        g_advectAsTemperature = 0;
+	int        g_treatAsLiquidVelocity = 0;
 	int         g_drawTextureNumber = 1;
 	float       g_textureWidth;
 	float       g_textureHeight;
@@ -230,7 +230,7 @@ float3 GetAdvectedPosTexCoords(GS_OUTPUT_FLUIDSIM input)
 
 bool IsOutsideSimulationDomain( float3 cellTexcoords )
 {
-    if( g_treatAsLiquidVelocity )
+    if( g_treatAsLiquidVelocity == 1)
     {
         if( Texture_levelset.SampleLevel(samPointClamp, cellTexcoords, 0 ).r <= 0 )
             return false;

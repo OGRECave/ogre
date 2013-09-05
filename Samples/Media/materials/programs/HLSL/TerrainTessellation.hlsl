@@ -21,6 +21,18 @@ Texture2D g_CoarseGradientMap;
 Texture2D g_DetailNoiseTexture;
 Texture2D g_DetailNoiseGradTexture;
 
+shared cbuffer UniformVariables
+{
+	int g_DebugShowTiles;
+	int g_DebugShowPatches;
+	float g_DetailNoiseScale;
+	float g_fDisplacementHeight;
+	float g_tileSize;
+	float2 g_DetailUVScale;
+	int3   g_FractalOctaves;
+	float3 g_TextureWorldOffset;
+};
+
 cbuffer TessellationBuffer
 {
     float2 g_screenSize; //Tessellation factors: x=edge, y=inside, z=MinDistance, w=range
@@ -43,10 +55,6 @@ struct VS_CONTROL_POINT_OUTPUT
 	float3 vPosition        : POSITION;
     float2 vWorldXZ         : TEXCOORD1;
 	Adjacency adjacency     : ADJACENCY_SIZES;
-	float g_DetailNoiseScale;
-	float g_DetailUVScale;
-	/*int3 g_FractalOctaves; */
-	float3 g_TextureWorldOffset;
 };
 
 struct MeshVertex
@@ -55,29 +63,10 @@ struct MeshVertex
     float2 vWorldXZ         : TEXCOORD1;
     float3 vNormal          : NORMAL;
 	float3 debugColour      : COLOR;
-	
-	bool  g_debugShowPatches;
-	float g_DetailNoiseScale;
-	float g_fDisplacementHeight;
-	float g_DetailUVScale;
-	float3 g_TextureWorldOffset;
 };
 
-//bool   g_DebugShowPatches = false;
-
-//bool   g_DebugShowTiles   = false;
-
-//float  g_DetailNoiseScale = 0.2;
-
-//float  g_fDisplacementHeight = 1;
-
-
-//float2 g_screenSize;				// Render target size for screen-space calculations.
-//int    g_tessellatedTriWidth = 10;
-//float  g_tileSize = 1;
-
 // There's no vertex data.  Position and UV coords are created purely from vertex and instance IDs.
-void ReconstructPosition(AppVertex input, out float3 pos, out int2 intUV)
+void ReconstructPosition1(AppVertex input, out float3 pos, out int2 intUV)
 {
     float iv = floor(input.VertexId * RECIP_CONTROL_VTX_PER_TILE_EDGE);
     float iu = input.VertexId - iv * CONTROL_VTX_PER_TILE_EDGE;
@@ -85,22 +74,22 @@ void ReconstructPosition(AppVertex input, out float3 pos, out int2 intUV)
     float v = iv / (CONTROL_VTX_PER_TILE_EDGE - 1.0);
 
 	// Shrink tiles slightly to show gaps between them.
-	float size = input.g_tileSize;
-	if (input.g_DebugShowTiles)
+	float size = g_tileSize;
+	if (g_DebugShowTiles)
 		size *= 0.98;
 
 	pos = float3(u * size + input.position.x, 0, v * size + input.position.y);
 	intUV = int2(iu,iv);
 }
 
-void ReconstructPosition(AppVertex input, out float3 pos)
+/*void ReconstructPosition(AppVertex input, out float3 pos)
 {
 	int2 dummy;
 	ReconstructPosition(input, pos, dummy);
-}
+}*/
 
 // There's no vertex data.  Position and UV coords are created purely from vertex and instance IDs.
-void ReconstructPosition(AppVertexTessellation input, out float3 pos, out int2 intUV)
+void ReconstructPosition2(AppVertexTessellation input, out float3 pos, out int2 intUV)
 {
     float iv = floor(input.VertexId * RECIP_CONTROL_VTX_PER_TILE_EDGE);
     float iu = input.VertexId - iv * CONTROL_VTX_PER_TILE_EDGE;
@@ -108,19 +97,19 @@ void ReconstructPosition(AppVertexTessellation input, out float3 pos, out int2 i
     float v = iv / (CONTROL_VTX_PER_TILE_EDGE - 1.0);
 
 	// Shrink tiles slightly to show gaps between them.
-	float size = input.g_tileSize;
-	if (input.g_DebugShowTiles)
+	float size = g_tileSize;
+	if (g_DebugShowTiles)
 		size *= 0.98;
 
 	pos = float3(u * size + input.position.x, 0, v * size + input.position.y);
 	intUV = int2(iu,iv);
 }
 
-void ReconstructPosition(AppVertexTessellation input, out float3 pos)
+/*void ReconstructPosition(AppVertexTessellation input, out float3 pos)
 {
 	int2 dummy;
 	ReconstructPosition(input, pos, dummy);
-}
+}*/
 
 // A very simple, regular procedural terrain for debugging cracks etc.
 float debugSineHills(float2 uv)
@@ -136,7 +125,7 @@ float DetailUVScale()
 	return DETAIL_UV_SCALE;
 }
 
-float2 DetailNoiseSampleCoords(float2 uv, float g_DetailUVScale, float3 g_TextureWorldOffset)
+float2 DetailNoiseSampleCoords(float2 uv, float2 g_DetailUVScale, float3 g_TextureWorldOffset)
 {
 	// Texture coords have to be offset by the eye's 2D world position.
 	const float2 texOffset = float2(g_TextureWorldOffset.x, -g_TextureWorldOffset.z);
@@ -166,12 +155,12 @@ float SampleLevelDetailNoise(float2 uv, float coarse, float g_DetailNoiseScale, 
 	return ScaleDetailNoise(coarse, detail, g_DetailNoiseScale);
 }
 
-float2 SampleDetailGradOctaves(float2 uv, float g_DetailNoiseScale, float2 g_DetailUVScale)
+float2 SampleDetailGradOctaves(float2 uv, float g_DetailNoiseScale, float2 g_DetailUVScale, float3 g_TextureWorldOffset)
 {
 	// There is a 50x scale built into the texture in order to make better use of the range.  This scale
 	// is hardcoded by the GUI in the normal map generator.  Compensate here with a 1/50.
 	const float TEX_SCALE = 0.02;
-	float2 grad = TEX_SCALE * ScaleDetailGrad(g_DetailNoiseGradTexture.Sample(SamplerRepeatMaxAniso, DetailNoiseSampleCoords(uv,g_DetailUVScale)).ra,g_DetailNoiseScale);
+	float2 grad = TEX_SCALE * ScaleDetailGrad(g_DetailNoiseGradTexture.Sample(SamplerRepeatMaxAniso, DetailNoiseSampleCoords(uv,g_DetailUVScale,g_TextureWorldOffset)).ra,g_DetailNoiseScale);
 	return grad;
 }
 
@@ -211,7 +200,7 @@ float SampleHeightForVS(Texture2D coarseTex, SamplerState coarseSampler, float2 
 float SampleHeightForVS(Texture2D tex, SamplerState sam, float2 worldXZ, float g_DetailNoiseScale,float2 g_DetailUVScale/*, int3 g_FractalOctaves*/, float3 g_TextureWorldOffset)
 {
 	int2 offset = 0;
-	return SampleHeightForVS(tex, sam, worldXZ, offset, g_DetailNoiseScale, g_DetailUVScale,/* g_FractalOctaves*/, g_TextureWorldOffset);
+	return SampleHeightForVS(tex, sam, worldXZ, offset, g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
 }
 
 MeshVertex VTFDisplacementVS(AppVertex input)
@@ -219,11 +208,11 @@ MeshVertex VTFDisplacementVS(AppVertex input)
     MeshVertex output = (MeshVertex) 0;
     float3 displacedPos;
 	int2 intUV;
-	ReconstructPosition(input, displacedPos, intUV);
+	ReconstructPosition1(input, displacedPos, intUV);
     
-    float z  = input.g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(1,1), input.g_DetailNoiseScale, input.g_DetailUVScale/*, input.g_FractalOctaves*/, input.g_TextureWorldOffset);
-    float z2 = input.g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(2,1), input.g_DetailNoiseScale, input.g_DetailUVScale/*, input.g_FractalOctaves*/, input.g_TextureWorldOffset);
-    float z3 = input.g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(1,2), input.g_DetailNoiseScale, input.g_DetailUVScale/*, input.g_FractalOctaves*/, input.g_TextureWorldOffset);
+    float z  = g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(1,1), g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
+    float z2 = g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(2,1), g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
+    float z3 = g_fDisplacementHeight * SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, displacedPos.xz, int2(1,2), g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
     
     float3 normal = float3(z2 - z, 1.0 / CONTROL_VTX_PER_TILE_EDGE, z3 - z);
     
@@ -234,14 +223,14 @@ MeshVertex VTFDisplacementVS(AppVertex input)
     output.vNormal = normalize(normal);
 	output.debugColour = float3(1, 0.1, 0);
 	output.vNormal = float3(1,1,1);
-	output.g_DebugShowPatches = input.g_DebugShowPatches;
-	output.g_DetailNoiseScale = input.g_DetailNoiseScale;
-	output.g_fDisplacementHeight = input.g_fDisplacementHeight;
-	output.g_DetailUVScale = input.g_DetailUVScale;
-	/*output.g_FractalOctaves = input.g_FractalOctaves; */
-	output.g_TextureWorldOffset = input.g_TextureWorldOffset;
+	//output.g_DebugShowPatches = g_DebugShowPatches;
+	//output.g_DetailNoiseScale = g_DetailNoiseScale;
+	//output.g_fDisplacementHeight = g_fDisplacementHeight;
+	//output.g_DetailUVScale = g_DetailUVScale;
+	/*output.g_FractalOctaves = g_FractalOctaves; */
+	//output.g_TextureWorldOffset = g_TextureWorldOffset;
     // For debugging, darken a chequer board pattern of tiles to highlight tile boundaries.
-	if (input.g_DebugShowPatches)
+	if (g_DebugShowPatches)
 	    output.vNormal *= (0.5 * (((uint) intUV.x + (uint) intUV.y) % 2) + 0.5);
 
     return output;
@@ -251,16 +240,16 @@ VS_CONTROL_POINT_OUTPUT HwTessellationPassThruVS( AppVertexTessellation input )
 {
     VS_CONTROL_POINT_OUTPUT output;
 	int2 intUV;
-	ReconstructPosition(input, output.vPosition, intUV);
+	ReconstructPosition2(input, output.vPosition, intUV);
 
-	float z = SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, output.vPosition.xz, input.g_DetailNoiseScale, input.g_DetailUVScale/*, input.g_FractalOctaves*/, input.g_TextureWorldOffset);
+	float z = SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, output.vPosition.xz, g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
 	output.vPosition.y += z;
 	output.vWorldXZ = output.vPosition.xz;
 	output.adjacency = input.adjacency;
-	output.g_DetailNoiseScale = input.g_DetailNoiseScale;
-	output.g_DetailUVScale = input.g_DetailUVScale;
-	/*output.g_FractalOctaves = input.g_FractalOctaves; */
-	output.g_TextureWorldOffset = input.g_TextureWorldOffset;
+	//output.g_DetailNoiseScale = g_DetailNoiseScale;
+	//output.g_DetailUVScale = g_DetailUVScale;
+	/*output.g_FractalOctaves = g_FractalOctaves; */
+	//output.g_TextureWorldOffset = g_TextureWorldOffset;
 	
 	return output;
 }
@@ -274,9 +263,6 @@ struct HS_CONSTANT_DATA_OUTPUT
 	float Inside[2]       : SV_InsideTessFactor;
     float2 vWorldXZ[4]    : TEXCOORD4;
 	float3 debugColour[5] : COLOR;			// 5th is centre
-	float g_DetailNoiseScale;
-	/*int3 g_FractalOctaves; */
-	float3 g_TextureWorldOffset;
 };
 
 struct HS_OUTPUT
@@ -375,7 +361,7 @@ float LargerNeighbourAdjacencyClamp(float tess)
 	return clamp(t, 2,32);
 }
 
-void MakeVertexHeightsAgree(inout float3 p0, inout float3 p1, /*float g_DetailNoiseScale, float g_DetailUVScale*/)
+void MakeVertexHeightsAgree(inout float3 p0, inout float3 p1/*, float g_DetailNoiseScale, float g_DetailUVScale*/)
 {
 	// This ought to work: if the adjacency has repositioned a vertex in XZ, we need to re-acquire its height.
 	// However, causes an internal fxc error.  Again! :-(
@@ -434,10 +420,10 @@ HS_CONSTANT_DATA_OUTPUT TerrainScreenspaceLODConstantsHS(InputPatch<VS_CONTROL_P
 	const float  sideLen = max(abs(ip[1].vPosition.x - ip[0].vPosition.x), abs(ip[1].vPosition.x - ip[2].vPosition.x));		// assume square & uniform
 	const float  diagLen = sqrt(2*sideLen*sideLen);
 
-	Output.g_DetailNoiseScale = ip[0].g_DetailNoiseScale;
-	Output.g_DetailUVScale = ip[0].g_DetailUVScale;
+	//Output.g_DetailNoiseScale = ip[0].g_DetailNoiseScale;
+	//Output.g_DetailUVScale = ip[0].g_DetailUVScale;
 	/*Output.g_FractalOctaves = ip[0].g_FractalOctaves; */
-	Output.g_TextureWorldOffset = ip[0].g_TextureWorldOffset;
+	//Output.g_TextureWorldOffset = ip[0].g_TextureWorldOffset;
 	
 	if (!inFrustum(centre, g_EyePos / WORLD_SCALE, g_ViewDir, diagLen))
 	{
@@ -580,7 +566,8 @@ float3 TessellatedWorldPos(HS_CONSTANT_DATA_OUTPUT input,
 					float g_DetailNoiseScale,
 					float2 g_DetailUVScale,
 					float g_fDisplacementHeight
-					/*, int3 input.g_FractalOctaves*/
+					/*, int3 g_FractalOctaves*/
+					, float3 g_TextureWorldOffset
 					)
 {
     // bilerp the position
@@ -588,8 +575,8 @@ float3 TessellatedWorldPos(HS_CONSTANT_DATA_OUTPUT input,
     
 	const int mipLevel   = 0;
 
-	float height = SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, worldPos.xz, g_DetailNoiseScale, g_DetailUVScale/*, input.g_FractalOctaves*/);
-    worldPos.y += input.g_fDisplacementHeight * height;
+	float height = SampleHeightForVS(g_CoarseHeightMap, SamplerClampLinear, worldPos.xz, g_DetailNoiseScale, g_DetailUVScale/*, g_FractalOctaves*/, g_TextureWorldOffset);
+    worldPos.y += g_fDisplacementHeight * height;
 
 	return worldPos;
 }
@@ -611,21 +598,21 @@ MeshVertex TerrainDisplaceDS( HS_CONSTANT_DATA_OUTPUT input,
                     float2 UV : SV_DomainLocation,
                     const OutputPatch<HS_OUTPUT, 4> terrainQuad,
 					uint PatchID : SV_PrimitiveID,
-					uniform bool g_DebugShowPatches,
+					uniform int g_DebugShowPatches,
 					uniform float g_fDisplacementHeight)
 {
     MeshVertex Output = (MeshVertex) 0;
 
-	const float3 worldPos = TessellatedWorldPos(input, UV, terrainQuad, input.g_DetailNoiseScale, g_fDisplacementHeight, input.g_DetailUVScale/*, input.g_FractalOctaves*/);
+	const float3 worldPos = TessellatedWorldPos(input, UV, terrainQuad, g_DetailNoiseScale, g_DetailUVScale, g_fDisplacementHeight/*, g_FractalOctaves*/, g_TextureWorldOffset);
     Output.vPosition = mul(float4(worldPos.xyz,1), g_WorldViewProj);
 	Output.debugColour = lerpDebugColours(input.debugColour, UV);
 	Output.vWorldXZ = worldPos.xz;
 	Output.vNormal = float3(1,1,1);
-	Output.g_DebugShowPatches = g_DebugShowPatches;
-	Output.g_DetailNoiseScale = input.g_DetailNoiseScale;
-	Output.g_fDisplacementHeight = g_fDisplacementHeight;
-	Output.g_DetailUVScale = input.g_DetailUVScale;
-	Output.g_TextureWorldOffset = input.g_TextureWorldOffset;
+	//Output.g_DebugShowPatches = g_DebugShowPatches;
+	//Output.g_DetailNoiseScale = input.g_DetailNoiseScale;
+	//Output.g_fDisplacementHeight = g_fDisplacementHeight;
+	//Output.g_DetailUVScale = input.g_DetailUVScale;
+	//Output.g_TextureWorldOffset = input.g_TextureWorldOffset;
 	
 	// For debugging, darken a chequer board pattern of tiles to highlight tile boundaries.
 	if (g_DebugShowPatches)
@@ -664,14 +651,14 @@ float3 SampleDetailNormal(float2 worldXZ, float g_DetailNoiseScale, float2 g_Det
 
 	// The MIP-mapping doesn't seem to work very well.  Maybe I need to think more carefully about
 	// anti-aliasing the normal function?
-	float2 grad = SampleDetailGradOctaves(uv, g_DetailNoiseScale, g_DetailUVScale);
+	float2 grad = SampleDetailGradOctaves(uv, g_DetailNoiseScale, g_DetailUVScale,g_TextureWorldOffset);
 	return normalize(float3(-vScale * grad.x, g_CoarseSampleSpacing * WORLD_UV_REPEATS_RECIP * g_DetailUVScale.y, vScale * grad.y));
 }
 
 float DebugCracksPattern(MeshVertex input)
 {
 	// Dark grey and black - to better show any cracks.
-	if (input.g_DebugShowPatches)
+	if (g_DebugShowPatches)
 		return 0.1 * (input.vNormal.x - 0.5);
 	else 
 		return 0;
@@ -686,13 +673,13 @@ float4 SmoothShadePS(MeshVertex input,
 	// the texture sizes that I overlooked?!?
 	const float ARBITRARY_FUDGE = 2;
 	const float2 grad = g_CoarseGradientMap.Sample(SamplerRepeatLinear, worldXZtoHeightUV(input.vWorldXZ)).rg;
-	const float vScale = ARBITRARY_FUDGE * input.g_fDisplacementHeight * WORLD_SCALE * VERTICAL_SCALE;
+	const float vScale = ARBITRARY_FUDGE * g_fDisplacementHeight * WORLD_SCALE * VERTICAL_SCALE;
 	const float3 coarseNormal = normalize(float3(vScale * grad.x, g_CoarseSampleSpacing, -vScale * grad.y));
-	const float3 detailNormal = SampleDetailNormal(input.vWorldXZ, input.g_DetailNoiseScale,input.g_DetailUVScale,g_CoarseSampleSpacing);
+	const float3 detailNormal = SampleDetailNormal(input.vWorldXZ, g_DetailNoiseScale,g_DetailUVScale,g_CoarseSampleSpacing);
 	const float3 normal = normalize(coarseNormal + detailNormal);
 
 	// Texture coords have to be offset by the eye's 2D world position.  Why the 2x???
-	const float2 texUV = input.vWorldXZ + 2 * float2(input.g_TextureWorldOffset.x, -input.g_TextureWorldOffset.z);;
+	const float2 texUV = input.vWorldXZ + 2 * float2(g_TextureWorldOffset.x, -g_TextureWorldOffset.z);;
 
 	// We apply two textures at vastly different scales: macro and micro detail.
 	float3 macroDetail = g_TerrainColourTexture1.Sample(SamplerRepeatMaxAniso, texUV).xyz;				// we know that this is grey only
@@ -720,7 +707,7 @@ float4 SmoothShadePS(MeshVertex input,
 	float lit = saturate(HighContrast(dot(lightDir, normal)));
 
 	// Chequer pattern still comes down from the DS.
-	if (input.g_DebugShowPatches)
+	if (g_DebugShowPatches)
 		lit *= input.vNormal.x;
 
 	//return lit;

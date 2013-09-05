@@ -1,6 +1,6 @@
-vertex_program Ogre/FluidSim/VS_GRID hlsl
+/*vertex_program Ogre/FluidSim/VS_GRID hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point VS_GRID
 	target vs_4_0
 
@@ -14,7 +14,7 @@ vertex_program Ogre/FluidSim/VS_GRID hlsl
 
 geometry_program Ogre/FluidSim/GS_ARRAY hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point GS_ARRAY
 	target gs_4_0
 
@@ -27,14 +27,14 @@ geometry_program Ogre/FluidSim/GS_ARRAY hlsl
 
 fragment_program Ogre/FluidSim/PS_ADVECT_MACCORMACK hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADVECT_MACCORMACK
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_advectAsTemperature bool false
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_advectAsTemperature int 0
+		param_named g_treatAsLiquidVelocity int 0
 		param_named g_textureWidth float 0.0
 		param_named g_textureHeight float 0.0
 		param_named g_textureDepth float 0.0
@@ -46,14 +46,14 @@ fragment_program Ogre/FluidSim/PS_ADVECT_MACCORMACK hlsl
 
 fragment_program Ogre/FluidSim/PS_ADVECT hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADVECT
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_advectAsTemperature bool false
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_advectAsTemperature int 0
+		param_named g_treatAsLiquidVelocity int 0
 		param_named g_textureWidth float 0.0
 		param_named g_textureHeight float 0.0
 		param_named g_textureDepth float 0.0	
@@ -65,7 +65,7 @@ fragment_program Ogre/FluidSim/PS_ADVECT hlsl
 
 fragment_program Ogre/FluidSim/PS_VORTICITY hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_VORTICITY
 	target ps_4_0
 	
@@ -77,13 +77,13 @@ fragment_program Ogre/FluidSim/PS_VORTICITY hlsl
 
 fragment_program Ogre/FluidSim/PS_CONFINEMENT hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_CONFINEMENT
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_treatAsLiquidVelocity int 0
 		param_named g_timestep float 0.0
 		param_named g_vortConfinementScale float 0.0
 	}	
@@ -91,7 +91,7 @@ fragment_program Ogre/FluidSim/PS_CONFINEMENT hlsl
 
 fragment_program Ogre/FluidSim/PS_DIFFUSE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_DIFFUSE
 	target ps_4_0
 	
@@ -104,7 +104,7 @@ fragment_program Ogre/FluidSim/PS_DIFFUSE hlsl
 
 fragment_program Ogre/FluidSim/PS_DIVERGENCE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_DIVERGENCE
 	target ps_4_0
 	
@@ -116,7 +116,7 @@ fragment_program Ogre/FluidSim/PS_DIVERGENCE hlsl
 
 fragment_program Ogre/FluidSim/PS_SCALAR_JACOBI hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_SCALAR_JACOBI
 	target ps_4_0
 	
@@ -128,19 +128,19 @@ fragment_program Ogre/FluidSim/PS_SCALAR_JACOBI hlsl
 
 fragment_program Ogre/FluidSim/PS_PROJECT hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_PROJECT
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_treatAsLiquidVelocity int 0
 	}	
 }
 
 fragment_program Ogre/FluidSim/PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT
 	target ps_4_0
 	
@@ -152,7 +152,7 @@ fragment_program Ogre/FluidSim/PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT hlsl
 
 fragment_program Ogre/FluidSim/PS_INJECT_LIQUID hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_INJECT_LIQUID
 	target ps_4_0
 	
@@ -164,19 +164,19 @@ fragment_program Ogre/FluidSim/PS_INJECT_LIQUID hlsl
 
 fragment_program Ogre/FluidSim/PS_APPLY_AIR_PRESSURE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_APPLY_AIR_PRESSURE
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_treatAsLiquidVelocity int 0
 	}	
 }
 
 fragment_program Ogre/FluidSim/PS_REDISTANCING hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_REDISTANCING
 	target ps_4_0
 	
@@ -190,13 +190,13 @@ fragment_program Ogre/FluidSim/PS_REDISTANCING hlsl
 
 fragment_program Ogre/FluidSim/PS_EXTRAPOLATE_VELOCITY hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_EXTRAPOLATE_VELOCITY
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_treatAsLiquidVelocity int 0
 		param_named g_textureWidth float 0.0
 		param_named g_textureHeight float 0.0
 		param_named g_textureDepth float 0.0		
@@ -205,7 +205,7 @@ fragment_program Ogre/FluidSim/PS_EXTRAPOLATE_VELOCITY hlsl
 
 fragment_program Ogre/FluidSim/PS_LIQUID_STREAM hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_LIQUID_STREAM
 	target ps_4_0
 	
@@ -219,20 +219,20 @@ fragment_program Ogre/FluidSim/PS_LIQUID_STREAM hlsl
 
 fragment_program Ogre/FluidSim/PS_APPLY_GRAVITY hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_APPLY_GRAVITY
 	target ps_4_0
 	
 	default_params
 	{
-		param_named g_treatAsLiquidVelocity bool false
+		param_named g_treatAsLiquidVelocity int 0
 		param_named g_gravity float 9.8
 	}	
 }
 
 fragment_program Ogre/FluidSim/PS_GAUSSIAN hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_GAUSSIAN
 	target ps_4_0
 	
@@ -246,7 +246,7 @@ fragment_program Ogre/FluidSim/PS_GAUSSIAN hlsl
 
 fragment_program Ogre/FluidSim/PS_COPY_TEXURE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_COPY_TEXURE
 	target ps_4_0
 	
@@ -258,7 +258,7 @@ fragment_program Ogre/FluidSim/PS_COPY_TEXURE hlsl
 
 fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADD_DERIVATIVE_VEL
 	target ps_4_0
 	
@@ -270,7 +270,7 @@ fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 
 fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADD_DERIVATIVE_VEL
 	target ps_4_0
 	
@@ -282,7 +282,7 @@ fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 
 fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADD_DERIVATIVE_VEL
 	target ps_4_0
 	
@@ -294,7 +294,7 @@ fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 
 fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_ADD_DERIVATIVE_VEL
 	target ps_4_0
 	
@@ -306,7 +306,7 @@ fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
 
 fragment_program Ogre/FluidSim/PS_STATIC_OBSTACLE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_STATIC_OBSTACLE
 	target ps_4_0
 	
@@ -318,7 +318,7 @@ fragment_program Ogre/FluidSim/PS_STATIC_OBSTACLE hlsl
 
 fragment_program Ogre/FluidSim/PS_DYNAMIC_OBSTACLE_BOX hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_DYNAMIC_OBSTACLE_BOX
 	target ps_4_0
 	
@@ -332,7 +332,7 @@ fragment_program Ogre/FluidSim/PS_DYNAMIC_OBSTACLE_BOX hlsl
 
 fragment_program Ogre/FluidSim/PS_DRAW_TEXTURE hlsl
 {
-	source FluidSim.hlsl
+	source HairFluidSim.hlsl
 	entry_point PS_DRAW_TEXTURE
 	target ps_4_0
 	
@@ -858,4 +858,4 @@ material Ogre/FluidSim
 			depth_write off
 		}
 	}	
-}
+}*/

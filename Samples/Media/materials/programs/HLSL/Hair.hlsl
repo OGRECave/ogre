@@ -6,7 +6,14 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 */
 
 //#include "Hair.h"
+#define NUM_MRTS 8
+#define NUM_PASSES 1
+#define ARRAY_SIZE (NUM_PASSES * NUM_MRTS)
 
+#define CSM_ZMAX 1.0
+#define	CSM_HALF_NUM_TEX 4
+
+#define MAX_IMPLICITS 10
 #define oneOverSqrt2PI 0.39894228040143267
 #define PI 3.1415926535897932384626433832795
 
@@ -75,8 +82,8 @@ shared cbuffer cb0
 	float g_ScreenWidth = 1280.0;
 	float g_ScreenHeight = 1024.0;
 
-	bool g_bApplyAdditionalTransform;
-	bool g_bApplyAdditionalRenderingTransform;
+	int g_bApplyAdditionalTransform;
+	int g_bApplyAdditionalRenderingTransform;
 
 	float g_SSg_textureWidth;
 	float g_SSg_textureHeight;
@@ -96,19 +103,19 @@ shared cbuffer cb0
 	float g_fWidthHairsLOD = 1;	
 	
 	float g_maxLengthToRoot = 12; //this is the maximum length of any strand in the whole hairstyle 
-	bool g_useScalpTexture;
+	int g_useScalpTexture;
 	
 	int g_NumTotalWisps;
 	int g_NumMaxStrandsPerWisp;
 	
 	float g_blendAxis; //for coordinate frame correction
-	bool g_doCurlyHair;
+	int g_doCurlyHair;
 	float g_angularStiffness;
-	bool g_bApplyHorizontalForce = false;
-	bool g_bAddGravity = false;
+	int g_bApplyHorizontalForce = false;
+	int g_bAddGravity = false;
 	float g_TimeStep = 0.1; 
 	float g_gravityStrength = 0.1f;
-	bool g_bSimulate = false;
+	int g_bSimulate = false;
 	
 	//wind
 	float3 g_windForce = float3(-1,0,0);
@@ -145,11 +152,11 @@ shared cbuffer cb0
 	int         g_textureIndex;
 	int         g_gridZIndex;
 	
-	bool        g_useBlurTexture; // - not used
-	bool        g_bClearForces;
-	bool        g_useShadows;
+	int        g_useBlurTexture; // - not used
+	int        g_bClearForces;
+	int        g_useShadows;
 	
-	// float g_SoftEdges; - not used
+	float g_SoftEdges; // - not used
 	float g_SigmaA;
 	
 	float g_ZNear, g_ZFar;
@@ -334,6 +341,32 @@ SamplerState samAniso
 
 //    Hair simulation
 //structs
+
+struct HairVertex 
+{
+    float4 Position;
+};
+
+struct coordinateFrame
+{
+    float3 x;
+	float3 y;
+	float3 z;
+};
+
+struct CFVertex 
+{
+    float4 Position;
+	float3 Color;
+};
+
+struct collisionImplicit
+{
+    float3 center;
+	float3 rotation;
+	float3 scale;
+};
+
 struct HairVertexPair
 {
     float4 position : POSITION0;
@@ -2252,11 +2285,11 @@ struct BARYCOLLISIONS_HS_CONSTANT_DATA_OUTPUT
 	float3 masterStrandRoots : BBB;
 };
 
-const int NHAIRS_PER_PATCH = 64;
+static const int NHAIRS_PER_PATCH = 64;
 int g_iFirstPatchHair;
 // if length of hair is more than 64 verts, we are rendering it using several patches (subhairs)
 int g_iSubHairFirstVert; // this is index of first subshair vertex inside hair
-const int NSEGMENTS_PER_PATCH = 64; // this is number of subhair segments
+static const int NSEGMENTS_PER_PATCH = 64; // this is number of subhair segments
 
 struct DUMMY
 {
@@ -4793,7 +4826,7 @@ PSIn VSDrawPlane( VSPlaneIn input )
     return output;
 }
 
-float4 PSDrawPlane( uniform bool g_useShadows, PSIn input ) : SV_Target
+float4 PSDrawPlane( uniform int g_useShadows, PSIn input ) : SV_Target
 {
 	float4 output = (float4)0.0f;
 	

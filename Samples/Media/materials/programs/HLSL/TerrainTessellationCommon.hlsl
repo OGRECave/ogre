@@ -36,13 +36,6 @@ struct AppVertexTessellation
 	Adjacency adjacency;
     uint VertexId    : SV_VertexID;
     uint InstanceId  : SV_InstanceID;
-	
-	uniform bool g_DebugShowTiles;
-	uniform float g_DetailNoiseScale;
-	uniform float g_tileSize;
-	uniform float2 g_DetailUVScale;
-	//uniform int3   g_FractalOctaves;
-	uniform float3 g_TextureWorldOffset;
 };
 
 struct AppVertex
@@ -51,15 +44,6 @@ struct AppVertex
 	Adjacency adjacency;
     uint VertexId    : SV_VertexID;
     uint InstanceId  : SV_InstanceID;
-	
-	uniform bool g_DebugShowTiles;
-	uniform bool g_DebugShowPatches;
-	uniform float g_DetailNoiseScale;
-	uniform float g_fDisplacementHeight;
-	uniform float g_tileSize;
-	uniform float2 g_DetailUVScale;
-	//uniform int3   g_FractalOctaves;
-	uniform float3 g_TextureWorldOffset;
 };
 
 SamplerState SamplerRepeatMaxAniso
