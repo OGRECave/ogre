@@ -30,8 +30,8 @@ TerrainTessellationMaterialGenerator::TerrainTessellationMaterialGenerator(Ogre:
 	, mAddNormalMap(addNormalmap)
 	, mCloneMaterial(cloneMaterial)
 {
-	mProfiles.push_back(OGRE_NEW Profile(this, "Ogre/TerrainTessellation", "Profile for rendering Ogre standard material"));
-	setActiveProfile("OgreMaterial");
+	mProfiles.push_back(OGRE_NEW Profile(this, materialName, "Profile for rendering Ogre standard material"));
+	setActiveProfile(materialName);
 }
 // -----------------------------------------------------------------------------------------------------------------------
 void TerrainTessellationMaterialGenerator::setMaterialByName(const Ogre::String materialName) 

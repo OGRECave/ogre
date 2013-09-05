@@ -44,13 +44,13 @@ public:
 		: mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
-		//, mFly(false)
+		, mFly(false)
 		//, mFallVelocity(0)
 		//, mMode(MODE_NORMAL)
 		//, mLayerEdit(1)
 		//, mBrushSizeTerrainSpace(0.02)
 		//, mHeightUpdateCountDown(0)
-		//, mTerrainPos(1000,0,5000)
+		, mTerrainPos(1,1,1)
 		, mTerrainsImported(false)	
 	{
 		mInfo["Title"] = "TerrainTessellation";
@@ -85,6 +85,20 @@ public:
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
+		if (!mFly)
+		{
+			// clamp to terrain
+			Vector3 camPos = mCamera->getPosition();
+			Ray ray;
+			ray.setOrigin(Vector3(camPos.x, mTerrainPos.y + 10000, camPos.z));
+			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
+
+			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
+			const Real distanceAboveTerrain = 50;
+			if (rayResult.hit)
+				mCamera->setPosition(camPos.x, rayResult.position.y + distanceAboveTerrain, camPos.z);
+		}
+
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
 	}
 
@@ -100,6 +114,10 @@ public:
 		if (box->getName() == "Tessellation")
 		{
 			// disable tessellation
+		}
+		if (box == mFlyBox)
+		{
+			mFly = mFlyBox->isChecked();
 		}
 	}
 
@@ -139,51 +157,38 @@ public:
 
 protected:
 
-	void setupContent()
+	void configureTerrainDefaults(Light* l)
 	{
-		// create our main node to attach our entities to
-		mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-
-		mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox", 5000);  // set our skybox
-
-		setupModels();
-		setupLights();
-		setupControls();
-		
-		// set our camera
-		mCamera->setFOVy(Ogre::Degree(50.0));
-		mCamera->setFOVy(Ogre::Degree(50.0));
-		mCamera->setNearClipDistance(0.01f);
-		mCamera->lookAt(Ogre::Vector3::ZERO);
-		mCamera->setPosition(0, 0, 500);
-		
-
-		// Set our camera to orbit around the origin at a suitable distance
-		mCameraMan->setStyle(CS_ORBIT);
-		mCameraMan->setYawPitchDist(Radian(0), Radian(0), 400);
-
-		mTrayMgr->showCursor();
-		
-		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
-		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
-		//mTerrainGroup->setOrigin(mTerrainPos);
-		
-		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
-		
 		// Configure global
 		mTerrainGlobals->setMaxPixelError(8);
 		// testing composite map
 		mTerrainGlobals->setCompositeMapDistance(3000);
 		//mTerrainGlobals->setUseRayBoxDistanceCalculation(true);
-		//mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
-		//mTerrainGlobals->setLightMapSize(256);
-		
-		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
-		//mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
+		mTerrainGlobals->getDefaultMaterialGenerator()->setLightmapEnabled(false);
+
 		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 		//mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
-		//mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
-		
+		mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
+
+		// Configure default import settings for if we use imported image
+		Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
+		defaultimp.terrainSize = TERRAIN_SIZE;
+		defaultimp.worldSize = TERRAIN_WORLD_SIZE;
+		defaultimp.inputScale = 600;
+		defaultimp.minBatchSize = 33;
+		defaultimp.maxBatchSize = 65;
+		// textures
+		defaultimp.layerList.resize(3);
+		defaultimp.layerList[0].worldSize = 100;
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		defaultimp.layerList[1].worldSize = 30;
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		defaultimp.layerList[2].worldSize = 200;
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+
 		// Init custom materialgenerator
 		TerrainMaterialGeneratorPtr terrainMaterialGenerator;
 
@@ -194,14 +199,76 @@ protected:
 		mTerrainGlobals->setDefaultMaterialGenerator( terrainMaterialGenerator );
 	}
 
+	void setupContent()
+	{
+		// create our main node to attach our entities to
+		mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox", 5000);  // set our skybox
+
+		setupLights();
+		setupControls();
+		
+		// set our camera
+		mCamera->setFOVy(Ogre::Degree(50.0));
+		mCamera->setFOVy(Ogre::Degree(50.0));
+		mCamera->setNearClipDistance(0.01f);
+		mCamera->lookAt(Ogre::Vector3::ZERO);
+		mCamera->setPosition(0, 0, 500);
+		mCameraMan->setTopSpeed(100);
+
+		setDragLook(true);
+
+		// Set our camera to orbit around the origin at a suitable distance
+		mCameraMan->setStyle(CS_ORBIT);
+		mCameraMan->setYawPitchDist(Radian(0), Radian(0), 400);
+
+		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
+		MaterialManager::getSingleton().setDefaultAnisotropy(7);
+
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 4000, 10000);
+
+		mTrayMgr->showCursor();
+		
+		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
+
+		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
+		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
+		mTerrainGroup->setOrigin(mTerrainPos);
+		mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) ); // probably will do it in tessellation stages.
+		
+		Vector3 lightdir(0.55, -0.3, 0.75);
+		lightdir.normalise();
+
+		Light* l = mSceneMgr->createLight("tstLight");
+		l->setType(Light::LT_DIRECTIONAL);
+		l->setDirection(lightdir);
+		l->setDiffuseColour(ColourValue::White);
+		l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
+
+		configureTerrainDefaults(l);
+
+		mTerrainGroup->freeTemporaryResources();
+	}
+
 	void unloadResources()
 	{
 
 	}
 
-	void setupModels()
+	void setupView()
 	{
+		SdkSample::setupView();
+		// put camera at world center, so that it's difficult to reach the edge
+		Vector3 worldCenter(0,0,0);
+		mCamera->setPosition(mTerrainPos+worldCenter);
+		mCamera->lookAt(mTerrainPos);
+		mCamera->setNearClipDistance(0.1);
+		mCamera->setFarClipDistance(50000);
 
+		if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
+        {
+            mCamera->setFarClipDistance(0);   // enable infinite far clip distance if we can
+        }
 	}
 
 	void setupLights()
@@ -240,6 +307,9 @@ protected:
 		mTargetTrianglesWidth = mTrayMgr->createThickSlider(TL_TOPLEFT, "targetTrianglesWidth", "Target triangles width", 200, 40, 1, 50, 50);
 		mTargetTrianglesWidth->show();
 
+		mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
+		mFlyBox->setChecked(false, true);
+
 		// a friendly reminder
 		StringVector names;
 		names.push_back("Help");
@@ -267,6 +337,7 @@ protected:
 	Slider*		mTwistOctaves;
 	Slider*		mDetailNoiseScale;
 	Slider*		mTargetTrianglesWidth;
+	CheckBox* mFlyBox;
 
 	TerrainGlobalOptions* mTerrainGlobals;
 	TerrainGroup* mTerrainGroup;
@@ -275,6 +346,9 @@ protected:
 	PageManager* mPageManager;
 	
 	bool mTerrainsImported;
+
+	bool mFly;
+	Vector3 mTerrainPos;
 	
 };
 
