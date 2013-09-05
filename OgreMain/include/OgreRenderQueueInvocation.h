@@ -72,8 +72,6 @@ namespace Ogre {
 		String mInvocationName;
 		/// Solids ordering mode
 		QueuedRenderableCollection::OrganisationMode mSolidsOrganisation;
-		/// Suppress shadows processing in this invocation?
-		bool mSuppressShadows;
 		/// Suppress OGRE's render state management?
 		bool mSuppressRenderStateChanges;
 	public:
@@ -104,18 +102,6 @@ namespace Ogre {
 		*/
 		virtual QueuedRenderableCollection::OrganisationMode
 			getSolidsOrganisation(void) const { return mSolidsOrganisation; }
-
-		/** Sets whether shadows are suppressed when invoking this queue. 
-		@remarks
-			When doing effects you often will want to suppress shadow processing
-			if shadows will already have been done by a previous render.
-		*/
-		virtual void setSuppressShadows(bool suppress) 
-		{ mSuppressShadows =  suppress; }
-
-		/** Gets whether shadows are suppressed when invoking this queue. 
-		*/
-		virtual bool getSuppressShadows(void) const { return mSuppressShadows; }
 
 		/** Sets whether render state changes are suppressed when invoking this queue. 
 		@remarks

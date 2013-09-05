@@ -618,15 +618,7 @@ namespace Ogre {
             allow the SceneManager to omit it if required. A return value of false
             skips this pass. 
         */
-        virtual bool validatePassForRendering(const Pass* pass);
-
-        /** Internal method to validate whether a Renderable should be allowed to render.
-        @remarks
-        Called just before a pass is about to be used for rendering a Renderable to
-        allow the SceneManager to omit it if required. A return value of false
-        skips it. 
-        */
-        virtual bool validateRenderableForRendering(const Pass* pass, const Renderable* rend);
+        virtual_l2 bool validatePassForRendering(const Pass* pass);
 
         enum BoxPlane
         {
@@ -903,7 +895,6 @@ namespace Ogre {
         Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
         Real mShadowTextureFadeStart; /// As a proportion e.g. 0.6
         Real mShadowTextureFadeEnd; /// As a proportion e.g. 0.9
-		bool mShadowTextureSelfShadow;
 		Pass* mShadowTextureCustomCasterPass;
 		Pass* mShadowTextureCustomReceiverPass;
 		String mShadowTextureCustomCasterVertexProgram;
@@ -940,9 +931,6 @@ namespace Ogre {
 
 		/// Suppress render state changes?
 		bool mSuppressRenderStateChanges;
-		/// Suppress shadows?
-		bool mSuppressShadows;
-
 
         GpuProgramParametersSharedPtr mInfiniteExtrusionParams;
         GpuProgramParametersSharedPtr mFiniteExtrusionParams;
@@ -987,32 +975,20 @@ namespace Ogre {
             Custom scene managers are encouraged to override this method to add optimisations, 
             and to add their own custom shadow casters (perhaps for world geometry)
         */
-        virtual const ShadowCasterList& findShadowCastersForLight(const Light* light, 
+        virtual_l1 const ShadowCasterList& findShadowCastersForLight(const Light* light, 
             const Camera* camera);
         /** Render a group in the ordinary way */
-		virtual void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
-			QueuedRenderableCollection::OrganisationMode om);
-		/** Render a group with the added complexity of additive stencil shadows. */
-		virtual void renderAdditiveStencilShadowedQueueGroupObjects(RenderQueueGroup* group, 
-			QueuedRenderableCollection::OrganisationMode om);
-		/** Render a group with the added complexity of modulative stencil shadows. */
-		virtual void renderModulativeStencilShadowedQueueGroupObjects(RenderQueueGroup* group, 
+		virtual_l1 void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
 			QueuedRenderableCollection::OrganisationMode om);
         /** Render a group rendering only shadow casters. */
-		virtual void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group, 
-			QueuedRenderableCollection::OrganisationMode om);
-        /** Render a group rendering only shadow receivers. */
-		virtual void renderTextureShadowReceiverQueueGroupObjects(RenderQueueGroup* group, 
-			QueuedRenderableCollection::OrganisationMode om);
-        /** Render a group with the added complexity of modulative texture shadows. */
-		virtual void renderModulativeTextureShadowedQueueGroupObjects(RenderQueueGroup* group, 
+		virtual_l1 void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group, 
 			QueuedRenderableCollection::OrganisationMode om);
 
 		/** Render a group with additive texture shadows. */
-		virtual void renderAdditiveTextureShadowedQueueGroupObjects(RenderQueueGroup* group, 
+		virtual_l1 void renderAdditiveTextureShadowedQueueGroupObjects(RenderQueueGroup* group, 
 			QueuedRenderableCollection::OrganisationMode om);
 		/** Render a set of objects, see renderSingleObject for param definitions */
-		virtual void renderObjects(const QueuedRenderableCollection& objs, 
+		virtual_l1 void renderObjects(const QueuedRenderableCollection& objs, 
 			QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
             bool doLightIteration, const LightList* manualLightList = 0);
 		/** Render those objects in the transparent pass list which have shadow casting forced on
@@ -1020,17 +996,9 @@ namespace Ogre {
 			This function is intended to be used to render the shadows of transparent objects which have
 			transparency_casts_shadows set to 'on' in their material
 		*/
-		virtual void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs, 
+		virtual_l1 void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs, 
 			QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
 			bool doLightIteration, const LightList* manualLightList = 0);
-
-		/** Update the state of the global render queue splitting based on a shadow
-		option change. */
-		virtual void updateRenderQueueSplitOptions(void);
-		/** Update the state of the render queue group splitting based on a shadow
-		option change. */
-		virtual void updateRenderQueueGroupSplitOptions(RenderQueueGroup* group, 
-			bool suppressShadows, bool suppressRenderState);
 
 		/// Set up a scissor rectangle from a group of lights
 		virtual ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
@@ -2896,23 +2864,6 @@ namespace Ogre {
         virtual void setShadowTextureFadeEnd(Real fadeEnd) 
         { mShadowTextureFadeEnd = fadeEnd; }
 
-		/** Sets whether or not texture shadows should attempt to self-shadow.
-		@remarks
-			The default implementation of texture shadows uses a fixed-function 
-			colour texture projection approach for maximum compatibility, and 
-			as such cannot support self-shadowing. However, if you decide to 
-			implement a more complex shadowing technique using the 
-			setShadowTextureCasterMaterial and setShadowTextureReceiverMaterial 
-			there is a possibility you may be able to support 
-			self-shadowing (e.g by implementing a shader-based shadow map). In 
-			this case you might want to enable this option.
-		@param selfShadow Whether to attempt self-shadowing with texture shadows
-		*/
-		virtual void setShadowTextureSelfShadow(bool selfShadow); 
-
-		/// Gets whether or not texture shadows attempt to self-shadow.
-		virtual bool getShadowTextureSelfShadow(void) const 
-		{ return mShadowTextureSelfShadow; }
 		/** Sets the default material to use for rendering shadow casters.
 		@remarks
 			By default shadow casters are rendered into the shadow texture using
@@ -3366,24 +3317,6 @@ namespace Ogre {
 		*/
 		virtual void _markGpuParamsDirty(uint16 mask);
 
-
-		/** Indicates to the SceneManager whether it should suppress the 
-			active shadow rendering technique until told otherwise.
-		@remarks
-			This is a temporary alternative to setShadowTechnique to suppress
-			the rendering of shadows and forcing all processing down the 
-			standard rendering path. This is intended for internal use only.
-		@param suppress If true, no shadow rendering will occur until this
-			method is called again with a parameter of false.
-		*/
-		virtual void _suppressShadows(bool suppress); 
-
-		/** Are shadows suppressed? 
-		@see _suppressShadows
-		*/
-		virtual bool _areShadowsSuppressed(void) const
-		{ return mSuppressShadows; }
-
 		/** Render the objects in a given queue group 
 		@remarks You should only call this from a RenderQueueInvocation implementation
 		*/
@@ -3485,7 +3418,8 @@ namespace Ogre {
         /** Handle lod events. */
         void _handleLodEvents();
 
-		IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
+		void _setCurrentRenderStage( IlluminationRenderStage stage ) { mIlluminationStage = stage; }
+		IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
     };
 
     /** Default implementation of IntersectionSceneQuery. */

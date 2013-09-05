@@ -39,7 +39,7 @@ namespace Ogre
 		const String& invocationName)
 		: mRenderQueueGroupID(renderQueueGroupID), mInvocationName(invocationName), 
 		mSolidsOrganisation(QueuedRenderableCollection::OM_PASS_GROUP), 
-		mSuppressShadows(false), mSuppressRenderStateChanges(false)
+		mSuppressRenderStateChanges(false)
 	{
 
 	}
@@ -51,15 +51,12 @@ namespace Ogre
 	//-----------------------------------------------------------------------------
 	void RenderQueueInvocation::invoke(RenderQueueGroup* group, SceneManager* targetSceneManager)
 	{
-		bool oldShadows = targetSceneManager->_areShadowsSuppressed();
 		bool oldRSChanges = targetSceneManager->_areRenderStateChangesSuppressed();
 
-		targetSceneManager->_suppressShadows(mSuppressShadows);
 		targetSceneManager->_suppressRenderStateChanges(mSuppressRenderStateChanges);
 
 		targetSceneManager->_renderQueueGroupObjects(group, mSolidsOrganisation);
 
-		targetSceneManager->_suppressShadows(oldShadows);
 		targetSceneManager->_suppressRenderStateChanges(oldRSChanges);
 
 	}

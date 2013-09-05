@@ -84,7 +84,7 @@ namespace Ogre
 				targetDef->addPass( PASS_CLEAR );
 				CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( targetDef->addPass( PASS_SCENE ) );
 
-				passScene->mShadowNode = "Default Shadow Node";
+				//passScene->mShadowNode = "Default Shadow Node";
 			}
 		}
 
@@ -92,7 +92,7 @@ namespace Ogre
 		workDef->connectOutput( 0, "Default Node RenderScene" );
 
 		//-------
-		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
+		/*CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
 		shadowNode->setNumShadowTextureDefinitions( 1 );
 		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
 		texDef->width	= 1024;
@@ -109,7 +109,7 @@ namespace Ogre
 				passDef->mShadowMapIdx = 0;
 				passDef->mIncludeOverlays = false;
 			}
-		}
+		}*/
 
 		validateAllNodes();
 	}

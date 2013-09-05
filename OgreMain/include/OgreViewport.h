@@ -243,21 +243,6 @@ namespace Ogre {
             viewport. */
         bool getSkiesEnabled(void) const;
 
-        /** Tells this viewport whether it should display shadows.
-        @remarks
-            This setting enables you to disable shadow rendering for a given viewport. The global
-			shadow technique set on SceneManager still controls the type and nature of shadows,
-			but this flag can override the setting so that no shadows are rendered for a given
-			viewport to save processing time where they are not required.
-        @param enabled If true, any shadows are displayed, if false they are not.
-        */
-        void setShadowsEnabled(bool enabled);
-
-        /** Returns whether or not shadows (defined in the SceneManager) are displayed in this
-            viewport. */
-        bool getShadowsEnabled(void) const;
-
-
 		/** Sets a per-viewport visibility mask.
 		@remarks
 			The visibility mask is a way to exclude objects from rendering for
@@ -317,7 +302,6 @@ namespace Ogre {
         bool mUpdated;
         bool mShowOverlays;
         bool mShowSkies;
-		bool mShowShadows;
 		uint32 mVisibilityMask;
 		// Render queue invocation sequence name
 		String mRQSequenceName;

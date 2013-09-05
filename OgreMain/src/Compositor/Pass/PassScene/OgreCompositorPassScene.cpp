@@ -100,15 +100,13 @@ namespace Ogre
 		if( mShadowNode && mUpdateShadowNode )
 		{
 			//We need to prepare for rendering another RT (we broke the contiguous chain)
-			if( !mDefinition->mEndRtUpdate )
-				mTarget->_endUpdate();
+			mTarget->_endUpdate();
 
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
 			mShadowNode->_update( mCamera );
 
 			//We need to restore the previous RT's update
-			if( !mDefinition->mBeginRtUpdate )
-				mTarget->_beginUpdate();
+			mTarget->_beginUpdate();
 		}
 
 		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mDefinition->mFirstRQ,

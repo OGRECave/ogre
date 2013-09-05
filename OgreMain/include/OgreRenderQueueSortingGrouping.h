@@ -326,17 +326,8 @@ namespace Ogre {
 
 		/// Parent queue group
         RenderQueueGroup* mParent;
-        bool mSplitPassesByLightingType;
-        bool mSplitNoShadowPasses;
-		bool mShadowCastersNotReceivers;
         /// Solid pass list, used when no shadows, modulative shadows, or ambient passes for additive
 		QueuedRenderableCollection mSolidsBasic;
-        /// Solid per-light pass list, used with additive shadows
-        QueuedRenderableCollection mSolidsDiffuseSpecular;
-        /// Solid decal (texture) pass list, used with additive shadows
-        QueuedRenderableCollection mSolidsDecal;
-        /// Solid pass list, used when shadows are enabled but shadow receive is turned off for these passes
-        QueuedRenderableCollection mSolidsNoShadowReceive;
 		/// Unsorted transparent list
 		QueuedRenderableCollection mTransparentsUnsorted;
 		/// Transparent list
@@ -346,19 +337,14 @@ namespace Ogre {
         void removePassEntry(Pass* p);
 
         /// Internal method for adding a solid renderable
-        void addSolidRenderable(Technique* pTech, Renderable* rend, bool toNoShadowMap);
-        /// Internal method for adding a solid renderable
-        void addSolidRenderableSplitByLightType(Technique* pTech, Renderable* rend);
+        void addSolidRenderable(Technique* pTech, Renderable* rend);
         /// Internal method for adding an unsorted transparent renderable
         void addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend);
         /// Internal method for adding a transparent renderable
         void addTransparentRenderable(Technique* pTech, Renderable* rend);
 
     public:
-        RenderPriorityGroup(RenderQueueGroup* parent, 
-            bool splitPassesByLightingType,
-            bool splitNoShadowPasses, 
-			bool shadowCastersNotReceivers); 
+        RenderPriorityGroup( RenderQueueGroup* parent ); 
            
         ~RenderPriorityGroup() { }
 
@@ -368,18 +354,6 @@ namespace Ogre {
 			of solids which have shadow receive enabled for additive shadows. */
         const QueuedRenderableCollection& getSolidsBasic(void) const
         { return mSolidsBasic; }
-        /** Get the collection of solids currently queued per light (only applicable in 
-		 	additive shadow modes). */
-        const QueuedRenderableCollection& getSolidsDiffuseSpecular(void) const
-        { return mSolidsDiffuseSpecular; }
-        /** Get the collection of solids currently queued for decal passes (only 
-			applicable in additive shadow modes). */
-        const QueuedRenderableCollection& getSolidsDecal(void) const
-        { return mSolidsDecal; }
-        /** Get the collection of solids for which shadow receipt is disabled (only
-			applicable when shadows are enabled). */
-        const QueuedRenderableCollection& getSolidsNoShadowReceive(void) const
-        { return mSolidsNoShadowReceive; }
         /** Get the collection of transparent objects currently queued */
         const QueuedRenderableCollection& getTransparentsUnsorted(void) const
         { return mTransparentsUnsorted; }
@@ -423,30 +397,6 @@ namespace Ogre {
         */
         void clear(void);
 
-        /** Sets whether or not the queue will split passes by their lighting type,
-        ie ambient, per-light and decal. 
-        */
-        void setSplitPassesByLightingType(bool split)
-        {
-            mSplitPassesByLightingType = split;
-        }
-
-        /** Sets whether or not passes which have shadow receive disabled should
-            be separated. 
-        */
-        void setSplitNoShadowPasses(bool split)
-        {
-            mSplitNoShadowPasses = split;
-        }
-
-		/** Sets whether or not objects which cast shadows should be treated as
-			never receiving shadows. 
-		*/
-		void setShadowCastersCannotBeReceivers(bool ind)
-		{
-			mShadowCastersNotReceivers = ind;
-		}
-
 		/** Merge group of renderables. 
 		*/
 		void merge( const RenderPriorityGroup* rhs );
@@ -470,27 +420,15 @@ namespace Ogre {
         typedef ConstMapIterator<PriorityMap> ConstPriorityMapIterator;
     protected:
         RenderQueue* mParent;
-        bool mSplitPassesByLightingType;
-        bool mSplitNoShadowPasses;
-		bool mShadowCastersNotReceivers;
         /// Map of RenderPriorityGroup objects
         PriorityMap mPriorityGroups;
-		/// Whether shadows are enabled for this queue
-		bool mShadowsEnabled;
 		/// Bitmask of the organisation modes requested (for new priority groups)
 		uint8 mOrganisationMode;
 
 
     public:
-		RenderQueueGroup(RenderQueue* parent,
-            bool splitPassesByLightingType,
-            bool splitNoShadowPasses,
-            bool shadowCastersNotReceivers) 
+		RenderQueueGroup(RenderQueue* parent) 
             : mParent(parent)
-            , mSplitPassesByLightingType(splitPassesByLightingType)
-            , mSplitNoShadowPasses(splitNoShadowPasses)
-            , mShadowCastersNotReceivers(shadowCastersNotReceivers)
-            , mShadowsEnabled(true)
 			, mOrganisationMode(0)
         {
         }
@@ -525,10 +463,7 @@ namespace Ogre {
             if (i == mPriorityGroups.end())
             {
                 // Missing, create
-                pPriorityGrp = OGRE_NEW RenderPriorityGroup(this, 
-                    mSplitPassesByLightingType,
-                    mSplitNoShadowPasses, 
-					mShadowCastersNotReceivers);
+                pPriorityGrp = OGRE_NEW RenderPriorityGroup(this);
 				if (mOrganisationMode)
 				{
 					pPriorityGrp->resetOrganisationModes();
@@ -571,63 +506,6 @@ namespace Ogre {
 
         }
 
-		/** Indicate whether a given queue group will be doing any
-		shadow setup.
-		@remarks
-		This method allows you to inform the queue about a queue group, and to 
-		indicate whether this group will require shadow processing of any sort.
-		In order to preserve rendering order, OGRE has to treat queue groups
-		as very separate elements of the scene, and this can result in it
-		having to duplicate shadow setup for each group. Therefore, if you
-		know that a group which you are using will never need shadows, you
-		should preregister the group using this method in order to improve
-		the performance.
-		*/
-		void setShadowsEnabled(bool enabled) { mShadowsEnabled = enabled; }
-
-		/** Are shadows enabled for this queue? */
-		bool getShadowsEnabled(void) const { return mShadowsEnabled; }
-
-        /** Sets whether or not the queue will split passes by their lighting type,
-        ie ambient, per-light and decal. 
-        */
-        void setSplitPassesByLightingType(bool split)
-        {
-            mSplitPassesByLightingType = split;
-            PriorityMap::iterator i, iend;
-            iend = mPriorityGroups.end();
-            for (i = mPriorityGroups.begin(); i != iend; ++i)
-            {
-                i->second->setSplitPassesByLightingType(split);
-            }
-        }
-        /** Sets whether or not the queue will split passes which have shadow receive
-        turned off (in their parent material), which is needed when certain shadow
-        techniques are used.
-        */
-        void setSplitNoShadowPasses(bool split)
-        {
-            mSplitNoShadowPasses = split;
-            PriorityMap::iterator i, iend;
-            iend = mPriorityGroups.end();
-            for (i = mPriorityGroups.begin(); i != iend; ++i)
-            {
-                i->second->setSplitNoShadowPasses(split);
-            }
-        }
-		/** Sets whether or not objects which cast shadows should be treated as
-		never receiving shadows. 
-		*/
-		void setShadowCastersCannotBeReceivers(bool ind)
-		{
-			mShadowCastersNotReceivers = ind;
-			PriorityMap::iterator i, iend;
-			iend = mPriorityGroups.end();
-			for (i = mPriorityGroups.begin(); i != iend; ++i)
-			{
-				i->second->setShadowCastersCannotBeReceivers(ind);
-			}
-		}
 		/** Reset the organisation modes required for the solids in this group. 
 		@remarks
 			You can only do this when the group is empty, ie after clearing the 
@@ -699,10 +577,7 @@ namespace Ogre {
 				if (i == mPriorityGroups.end())
 				{
 					// Missing, create
-					pDstPriorityGrp = OGRE_NEW RenderPriorityGroup(this, 
-						mSplitPassesByLightingType,
-						mSplitNoShadowPasses, 
-						mShadowCastersNotReceivers);
+					pDstPriorityGrp = OGRE_NEW RenderPriorityGroup( this );
 					if (mOrganisationMode)
 					{
 						pDstPriorityGrp->resetOrganisationModes();

@@ -376,9 +376,6 @@ void CompositorChain::preTargetOperation(CompositorInstance::TargetOperation &op
 	/// Set material scheme 
 	mOldMaterialScheme = vp->getMaterialScheme();
 	vp->setMaterialScheme(op.materialScheme);
-	/// Set shadows enabled
-	mOldShadowsEnabled = vp->getShadowsEnabled();
-	vp->setShadowsEnabled(op.shadowsEnabled);
     /// XXX TODO
     //vp->setClearEveryFrame( true );
     //vp->setOverlaysEnabled( false );
@@ -399,7 +396,6 @@ void CompositorChain::postTargetOperation(CompositorInstance::TargetOperation &o
 
     vp->setVisibilityMask(mOldVisibilityMask);
 	vp->setMaterialScheme(mOldMaterialScheme);
-	vp->setShadowsEnabled(mOldShadowsEnabled);
 }
 //-----------------------------------------------------------------------
 void CompositorChain::postViewportUpdate(const RenderTargetViewportEvent& evt)

@@ -167,7 +167,7 @@ namespace Ogre
 															mDefinition->mShadowMapTexDefinitions.end();
 
 		ShadowMapCameraVec::const_iterator itShadowCamera = mShadowMapCameras.begin();
-		const SceneManager *sceneManager = camera->getSceneManager();
+		SceneManager *sceneManager = camera->getSceneManager();
 
 		size_t nextLightIdx = 0;
 		Light const *nextLight = 0;
@@ -208,8 +208,15 @@ namespace Ogre
 			++itor;
 		}
 
+		SceneManager::IlluminationRenderStage previous = sceneManager->_getCurrentRenderStage();
+		sceneManager->_setCurrentRenderStage( SceneManager::IRS_RENDER_TO_TEXTURE );
+
+		//TODO: Set SceneManager::mShadowTextureCurrentCasterLightList (or refactor)
+
 		//Now render all passes
 		CompositorNode::_update();
+
+		sceneManager->_setCurrentRenderStage( previous );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::postInitializePassScene( CompositorPassScene *pass )
