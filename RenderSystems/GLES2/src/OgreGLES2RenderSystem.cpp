@@ -132,8 +132,11 @@ namespace Ogre {
 
         mRenderTargets.clear();
         OGRE_DELETE mGLSupport;
+        mGLSupport = 0;
+
         OGRE_DELETE mStateCacheManager;
-		
+        mStateCacheManager = 0;
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         if (mResourceManager != NULL)
 		{

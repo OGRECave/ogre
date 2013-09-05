@@ -48,6 +48,7 @@ namespace Ogre {
     GLES2StateCacheManager::~GLES2StateCacheManager()
     {
         delete mImp;
+        mImp = 0;
     }
 
     void GLES2StateCacheManager::initializeCache()

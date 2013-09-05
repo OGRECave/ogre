@@ -48,6 +48,7 @@ namespace Ogre {
     GLStateCacheManager::~GLStateCacheManager()
     {
         OGRE_DELETE mImp;
+        mImp = 0;
     }
 
     void GLStateCacheManager::initializeCache()
