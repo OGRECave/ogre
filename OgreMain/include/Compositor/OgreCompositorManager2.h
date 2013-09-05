@@ -46,7 +46,9 @@ namespace Ogre
 		CompositorNodeDefMap	mNodeDefinitions;
 
 		typedef map<IdString, CompositorShadowNodeDef*>::type CompositorShadowNodeDefMap;
+		typedef vector<CompositorShadowNodeDef*>::type CompositorShadowNodeDefVec;
 		CompositorShadowNodeDefMap mShadowNodeDefs;
+		CompositorShadowNodeDefVec mUnfinishedShadowNodes;
 
 		typedef map<IdString, CompositorWorkspaceDef*>::type CompositorWorkspaceDefMap;
 		CompositorWorkspaceDefMap mWorkspaceDefs;
@@ -85,8 +87,11 @@ namespace Ogre
 			pass definition. This pointer can be null if you promise to use all explicit
 			camera names in your passes (and those cameras already exist)
 		*/
-		void addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
-							Camera *defaultCam, IdString definitionName, bool bEnabled );
+		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
+											Camera *defaultCam, IdString definitionName, bool bEnabled );
+
+		/// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
+		void validateAllNodes();
 
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapAllFinalTargets( bool waitForVSync );

@@ -132,6 +132,16 @@ namespace Ogre
 		*/
 		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
 															 String name, bool isAtlas );
+
+		/** Checks that paremeters are correctly set, and finalizes whatever needs to be
+			done, probably because not enough data was available at the time of creation.
+		@remarks
+			If possible, try to validate parameters at creation time to avoid delaying
+			when the error shows up.
+			We should validate here if it's not possible to validate at any other time
+			or if it's substantially easier to do so here.
+		*/
+		virtual void _validateAndFinish();
 	};
 
 	/** @} */

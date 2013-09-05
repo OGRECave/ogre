@@ -107,12 +107,16 @@ namespace Ogre
 				targetDef->addPass( PASS_CLEAR );
 				CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
 				passDef->mShadowMapIdx = 0;
+				passDef->mIncludeOverlays = false;
 			}
 		}
+
+		validateAllNodes();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorManager2::~CompositorManager2()
 	{
+		deleteAllClear( mUnfinishedShadowNodes );
 		deleteAllSecondClear( mWorkspaceDefs );
 		deleteAllSecondClear( mNodeDefinitions );
 		deleteAllSecondClear( mShadowNodeDefs );
@@ -177,6 +181,14 @@ namespace Ogre
 		else
 		{
 			retVal = itor->second;
+
+			if( !retVal )
+			{
+				OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "ShadowNode definition with name '" +
+							nodeDefName.getFriendlyText() + "' was found but not validated.\n"
+							"Did you call validateAllObjects?",
+							"CompositorManager2::getShadowNodeDefinition" );
+			}
 		}
 
 		return retVal;
@@ -189,7 +201,8 @@ namespace Ogre
 		if( mShadowNodeDefs.find( name ) == mShadowNodeDefs.end() )
 		{
 			retVal = OGRE_NEW CompositorShadowNodeDef( name );
-			mShadowNodeDefs[name] = retVal;
+			mShadowNodeDefs[name] = 0; //Fill with a null ptr, it will later be validated
+			mUnfinishedShadowNodes.push_back( retVal );
 		}
 		else
 		{
@@ -220,8 +233,9 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
-											Camera *defaultCam, IdString definitionName, bool bEnabled )
+	CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
+											 RenderTarget *finalRenderTarget, Camera *defaultCam,
+											 IdString definitionName, bool bEnabled )
 	{
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
 		if( itor == mWorkspaceDefs.end() )
@@ -237,6 +251,25 @@ namespace Ogre
 								finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
 			mWorkspaces.push_back( workspace );
 		}
+
+		return mWorkspaces.back();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::validateAllNodes()
+	{
+		CompositorShadowNodeDefVec::iterator itor = mUnfinishedShadowNodes.begin();
+		CompositorShadowNodeDefVec::iterator end  = mUnfinishedShadowNodes.end();
+
+		while( itor != end )
+		{
+			(*itor)->_validateAndFinish();
+			mShadowNodeDefs[(*itor)->getName()] = *itor;
+			//Nullify in case next iterator's call throws: we would free previous pointers twice
+			*itor = 0;
+			++itor;
+		}
+
+		mUnfinishedShadowNodes.clear();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorManager2::_update( bool swapFinalTargets, bool waitForVSync )

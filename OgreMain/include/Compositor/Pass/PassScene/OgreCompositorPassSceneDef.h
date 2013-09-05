@@ -70,6 +70,8 @@ namespace Ogre
 			mFirstRQ( 0 ),
 			mLastRQ( -1 )
 		{
+			//Change base defaults
+			mIncludeOverlays = true;
 		}
 	};
 

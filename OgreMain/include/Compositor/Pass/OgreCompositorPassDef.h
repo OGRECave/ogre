@@ -84,12 +84,18 @@ namespace Ogre
 		/// End if we're the last consecutive pass to alter the contents of the same render target
 		bool				mEndRtUpdate;
 
+		/** TODO: Refactor OgreOverlay to remove this design atrocity.
+			A custom overlay pass is a better alternative (or just use their own RQ)
+		*/
+		bool				mIncludeOverlays;
+
 	public:
 		CompositorPassDef( CompositorPassType passType ) :
 			mPassType( passType ),
 			mVpLeft( 0 ), mVpTop( 0 ),
 			mVpWidth( 1 ), mVpHeight( 1 ), mShadowMapIdx( 0 ),
-			mBeginRtUpdate( true ), mEndRtUpdate( true ) {}
+			mBeginRtUpdate( true ), mEndRtUpdate( true ),
+			mIncludeOverlays( false ) {}
 		CompositorPassType getType() const				{ return mPassType; }
 	};
 

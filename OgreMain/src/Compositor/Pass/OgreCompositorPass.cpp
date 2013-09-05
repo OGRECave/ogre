@@ -50,7 +50,8 @@ namespace Ogre
 			if( Math::Abs( vp->getLeft() - mDefinition->mVpLeft )	< EPSILON &&
 				Math::Abs( vp->getTop() - mDefinition->mVpTop )		< EPSILON &&
 				Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
-				Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON )
+				Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON &&
+				vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
 			{
 				mViewport = vp;
 			}
@@ -60,6 +61,7 @@ namespace Ogre
 		{
 			mViewport = mTarget->addViewport( mDefinition->mVpLeft, mDefinition->mVpTop,
 												mDefinition->mVpWidth, mDefinition->mVpHeight );
+			mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
 		}
 	}
 	//-----------------------------------------------------------------------------------

@@ -176,6 +176,7 @@ namespace Ogre
 
 		bool areAllInputsConnected() const	{ return mNumConnectedInputs == mInTextures.size(); }
 		const CompositorChannelVec& getInputChannel() const			{ return mInTextures; }
+		const CompositorChannelVec& getLocalTextures() const		{ return mLocalTextures; }
 
 		/** Creates all passes based on our definition
 		@remarks

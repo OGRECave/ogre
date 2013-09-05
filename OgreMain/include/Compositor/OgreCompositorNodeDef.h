@@ -71,7 +71,7 @@ namespace Ogre
 		CompositorTargetDefVec	mTargetPasses;
 
 	public:
-		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( mName ) {}
+		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( name ) {}
 
 		IdString getName() const							{ return mName; }
 
