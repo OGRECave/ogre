@@ -49,7 +49,8 @@ namespace Ogre
 												RenderSystem *renderSys ) :
 			CompositorNode( id, definition->getName(), definition, workspace, renderSys ),
 			mDefinition( definition ),
-			mLastCamera( 0 )
+			mLastCamera( 0 ),
+			mLastFrame( -1 )
 	{
 		mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
 		mLocalTextures.reserve( definition->mShadowMapTexDefinitions.size() );
@@ -163,8 +164,13 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::buildClosestLightList( const Camera *newCamera )
 	{
-		if( mLastCamera == newCamera )
+		const size_t currentFrameCount = mWorkspace->getFrameCount();
+		if( mLastCamera == newCamera && mLastFrame != currentFrameCount )
+		{
 			return;
+		}
+
+		mLastFrame = currentFrameCount;
 
 		const Real EPSILON = 1e-6f;
 

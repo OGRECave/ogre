@@ -56,6 +56,8 @@ namespace Ogre
 		typedef vector<CompositorWorkspace*>::type WorkspaceVec;
 		WorkspaceVec			mWorkspaces;
 
+		size_t					mFrameCount;
+
 		RenderSystem			*mRenderSystem;
 
 		void validateNodes(void);
@@ -80,6 +82,9 @@ namespace Ogre
 		CompositorShadowNodeDef* addShadowNodeDefinition( IdString name );
 
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
+
+		size_t getFrameCount(void) const					{ return mFrameCount; }
+		
 
 		/**
 		@param defaultVp

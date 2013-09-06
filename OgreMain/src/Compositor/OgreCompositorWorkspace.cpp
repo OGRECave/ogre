@@ -217,6 +217,9 @@ namespace Ogre
 
 		while( itShadowNode != enShadowNode )
 		{
+#ifndef NDEBUG
+			set<Camera*>::type usedCameras;
+#endif
 			Camera *lastCamera = 0;
 			CompositorShadowNode *shadowNode = *itShadowNode;
 
@@ -244,6 +247,9 @@ namespace Ogre
 							{
 								//We're forced to recalculate anyway, save the new camera
 								lastCamera = pass->getCamera();
+#ifndef NDEBUG
+								usedCameras.insert( lastCamera );
+#endif
 							}
 							else if( recalc == SHADOW_NODE_FIRST_ONLY )
 							{
@@ -253,6 +259,30 @@ namespace Ogre
 									//We need to recalculate
 									pass->_setUpdateShadowNode( true );
 									lastCamera = pass->getCamera();
+
+									//Performance warning check. Only on non-release builds.
+									//We don't raise the log on SHADOW_NODE_RECALCULATE because
+									//that's explicit. We assume the user knows what he's doing.
+									//(may be he changed the objects without us knowing
+									//through a listener)
+#ifndef NDEBUG
+									if( usedCameras.find( lastCamera ) != usedCameras.end() )
+									{
+										LogManager::getSingleton().logMessage(
+				"\tPerformance Warning: Shadow Node '" + (*itor)->getName().getFriendlyText() +
+				"' is forced to recalculate twice (or more) its contents for the same camera.\n"
+				"\tThis happens when assigning a shadow node to a pass using a different camera "
+				"and then using it back again in another pass with the older camera.\n"
+				"\tYou can fix this by cloning the shadow node and using the clone for the pass with "
+				"a different camera. But beware you'll be trading performance for more VRAM usage.\n"
+				"\tOr you can ignore this warning." );
+									}
+									else
+									{
+										usedCameras.insert( lastCamera );
+									}
+#endif
+
 								}
 								else
 								{
@@ -305,6 +335,11 @@ namespace Ogre
 	Camera* CompositorWorkspace::findCamera( IdString cameraName ) const 
 	{
 		return mSceneManager->findCamera( cameraName );
+	}
+	//-----------------------------------------------------------------------------------
+	size_t CompositorWorkspace::getFrameCount(void) const
+	{
+		return mDefinition->mCompositorManager->getFrameCount();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_update( bool swapFinalTargets, bool waitForVSync )

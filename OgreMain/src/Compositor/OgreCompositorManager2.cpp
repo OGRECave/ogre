@@ -63,6 +63,7 @@ namespace Ogre
 	}
 
 	CompositorManager2::CompositorManager2() :
+		mFrameCount( 0 ),
 		mRenderSystem( 0 )
 	{
 		//----------------------------------------------------------------
@@ -296,6 +297,8 @@ namespace Ogre
 			}
 			++itor;
 		}
+
+		++mFrameCount;
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorManager2::_swapAllFinalTargets( bool waitForVSync )

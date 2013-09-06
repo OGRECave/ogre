@@ -161,6 +161,8 @@ namespace Ogre
 		Camera* getDefaultCamera() const					{ return mDefaultCamera; }
 
 		SceneManager* getSceneManager() const				{ return mSceneManager; }
+
+		size_t getFrameCount(void) const;
 	};
 
 	/** @} */

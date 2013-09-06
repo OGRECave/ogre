@@ -115,6 +115,7 @@ namespace Ogre
 		typedef vector<size_t>::type LightIndexVec;
 
 		Camera const *			mLastCamera;
+		size_t					mLastFrame;
 		LightIndexVec			mShadowMapLightIndex;
 
 		void buildClosestLightList( const Camera *newCamera );
