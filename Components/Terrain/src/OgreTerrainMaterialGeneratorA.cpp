@@ -85,11 +85,7 @@ namespace Ogre
 		, mLowLodShadows(false)
 	{
 		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
-        if (hmgr.isLanguageSupported("cg"))
-        {
-            mShaderLanguage = "cg";
-        }
-        else if (hmgr.isLanguageSupported("hlsl"))
+		if (hmgr.isLanguageSupported("hlsl"))
         {
             mShaderLanguage = "hlsl";
         }
@@ -100,6 +96,10 @@ namespace Ogre
         else if (hmgr.isLanguageSupported("glsles"))
         {
             mShaderLanguage = "glsles";
+        }
+		if (hmgr.isLanguageSupported("cg"))
+        {
+            mShaderLanguage = "cg";
         }
         else
         {
@@ -338,14 +338,8 @@ namespace Ogre
 		if (!mShaderGen)
 		{
 			bool check2x = mLayerNormalMappingEnabled || mLayerParallaxMappingEnabled;
-			if (hmgr.isLanguageSupported("cg"))
-            {
-				mShaderGen = OGRE_NEW ShaderHelperCg();
-            }
-			else if (hmgr.isLanguageSupported("hlsl") &&
-				((check2x && gmgr.isSyntaxSupported("ps_4_0")) ||
-				(check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
-				(!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
+			if (hmgr.isLanguageSupported("hlsl") &&
+				((check2x && gmgr.isSyntaxSupported("ps_4_0")) ))
             {
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
             }
@@ -356,6 +350,10 @@ namespace Ogre
 			else if (hmgr.isLanguageSupported("glsles"))
             {
 				mShaderGen = OGRE_NEW ShaderHelperGLSLES();
+            }
+			else if (hmgr.isLanguageSupported("cg"))
+            {
+				mShaderGen = OGRE_NEW ShaderHelperCg();
             }
 			else
 			{

@@ -40,6 +40,7 @@ namespace Ogre
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = getVertexProgramName(prof, terrain, tt);
+
 		HighLevelGpuProgramPtr ret = mgr.getByName(progName).staticCast<HighLevelGpuProgram>();
 		if (ret.isNull())
 		{
