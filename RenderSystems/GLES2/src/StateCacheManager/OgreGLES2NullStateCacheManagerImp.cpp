@@ -137,7 +137,8 @@ namespace Ogre {
         // Update GL
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
     }
-    
+
+    void GLES2StateCacheManagerImp::invalidateStateForTexture(GLuint texture) { }
 
     void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {

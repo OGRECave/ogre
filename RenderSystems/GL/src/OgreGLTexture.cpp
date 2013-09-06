@@ -384,8 +384,8 @@ namespace Ogre {
     {
 		mSurfaceList.clear();
         glDeleteTextures( 1, &mTextureID );
+		mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
     }
-
 	
 	//---------------------------------------------------------------------------------------------
 	void GLTexture::_createSurfaceList()

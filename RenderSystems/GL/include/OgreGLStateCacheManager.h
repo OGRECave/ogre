@@ -88,6 +88,11 @@ namespace Ogre
          */
         void bindGLTexture(GLenum target, GLuint texture);
 
+        /** Invalidates the state associated with a particular texture ID.
+         @param texture The texture ID.
+         */
+        void invalidateStateForTexture(GLuint texture);
+
         /** Sets an integer parameter value per texture target.
          @param target The texture target.
          @param pname The parameter name.

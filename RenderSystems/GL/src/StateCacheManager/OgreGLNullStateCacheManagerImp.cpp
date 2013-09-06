@@ -184,6 +184,7 @@ namespace Ogre {
         glTexParameteri(target, pname, param);
     }
     
+    void GLStateCacheManagerImp::invalidateStateForTexture(GLuint texture) { }
 
     void GLStateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {

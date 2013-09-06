@@ -229,7 +229,13 @@ namespace Ogre {
             (*i).second = 0;
         }
     }
-    
+
+    void GLStateCacheManagerImp::invalidateStateForTexture(GLuint texture)
+    {
+        TexUnitsMap::iterator it = mTexUnitsMap.find(texture);
+        mTexUnitsMap.erase(it);
+    }
+
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLStateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {

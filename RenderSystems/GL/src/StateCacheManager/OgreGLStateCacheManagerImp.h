@@ -145,7 +145,10 @@ namespace Ogre
         
         /// See GLStateCacheManager.setTexParameteri.
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
-        
+
+        /// See GLStateCacheManager.invalidateStateForTexture.
+        void invalidateStateForTexture(GLuint texture);
+
         /// See GLStateCacheManager.activateGLTextureUnit.
         bool activateGLTextureUnit(size_t unit);
         
