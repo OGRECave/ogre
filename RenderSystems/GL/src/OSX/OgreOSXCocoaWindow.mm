@@ -60,7 +60,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mWindowOrigin(NSZeroPoint),
-        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
+        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mUseNSView(false), mContentScalingFactor(1.0)
     {
     }
 
@@ -167,6 +168,9 @@ namespace Ogre {
             if(opt != miscParams->end())
                 fullScreen = StringConverter::parseBool(opt->second);
 
+            opt = miscParams->find("contentScalingFactor");
+            if(opt != miscParams->end())
+                mContentScalingFactor = StringConverter::parseReal(opt->second);
         }
 
         NSOpenGLPixelFormatAttribute attribs[30];
