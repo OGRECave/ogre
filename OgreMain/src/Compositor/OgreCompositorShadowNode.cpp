@@ -48,7 +48,8 @@ namespace Ogre
 												CompositorWorkspace *workspace,
 												RenderSystem *renderSys ) :
 			CompositorNode( id, definition->getName(), definition, workspace, renderSys ),
-			mDefinition( definition )
+			mDefinition( definition ),
+			mLastCamera( 0 )
 	{
 		mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
 		mLocalTextures.reserve( definition->mShadowMapTexDefinitions.size() );
@@ -76,6 +77,7 @@ namespace Ogre
 													itor->formatList[0], TU_RENDERTARGET, 0,
 													itor->hwGammaWrite, itor->fsaa );
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+					rt->setDepthBufferPool( itor->depthBufferId );
 					newChannel.target = rt;
 					newChannel.textures.push_back( tex );
 				}
@@ -86,6 +88,7 @@ namespace Ogre
 					PixelFormatList::const_iterator pixIt = itor->formatList.begin();
 					PixelFormatList::const_iterator pixEn = itor->formatList.end();
 
+					mrt->setDepthBufferPool( itor->depthBufferId );
 					newChannel.target = mrt;
 
 					while( pixIt != pixEn )
@@ -158,51 +161,121 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::buildClosestLightList( const Camera *newCamera )
+	{
+		if( mLastCamera == newCamera )
+			return;
+
+		const Real EPSILON = 1e-6f;
+
+		mLastCamera = newCamera;
+		mShadowMapLightIndex.clear();
+
+		const Viewport *viewport = newCamera->getViewport();
+		const SceneManager *sceneManager = newCamera->getSceneManager();
+		const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+
+		uint32 combinedVisibilityFlags = viewport->getVisibilityMask() &
+											sceneManager->getVisibilityMask();
+
+		const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
+		mShadowMapLightIndex.reserve( numLights );
+
+		const Vector3 &camPos( newCamera->getDerivedPosition() );
+
+		size_t minIdx = -1;
+		Real minMaxDistance = -std::numeric_limits<Real>::max();
+
+		//O(N*M) Complexity. Not my brightest moment. Feel free to improve this snippet,
+		//but profile it! (M tends to be very small, usually way below 8)
+		for( size_t i=0; i<numLights; ++i )
+		{
+			Real minDistance = std::numeric_limits<Real>::max();
+			uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
+			Sphere const * RESTRICT_ALIAS boundingSphere = globalLightList.boundingSphere;
+			for( size_t j=0; j<globalLightList.lights.size(); ++j )
+			{
+				if( *visibilityMask & combinedVisibilityFlags &&
+					*visibilityMask & MovableObject::LAYER_SHADOW_CASTER )
+				{
+					const Real fDist = camPos.distance( boundingSphere->getCenter() ) -
+										boundingSphere->getRadius();
+					if( fDist < minDistance && fDist > minMaxDistance )
+					{
+						bool bNewIdx = true;
+						if( Math::Abs( fDist - minMaxDistance ) < EPSILON && minIdx != j )
+						{
+							//Rare case where two or more lights are equally distant
+							//from the camera. Check whether we've already added it
+							LightIndexVec::const_iterator it = std::find( mShadowMapLightIndex.begin(),
+																		mShadowMapLightIndex.end(), j );
+							if( it != mShadowMapLightIndex.end() )
+								bNewIdx = false;
+						}
+
+						if( bNewIdx )
+						{
+							minIdx = j;
+							minDistance		= fDist;
+							minMaxDistance	= fDist;
+						}
+					}
+				}
+
+				if( minIdx != -1 &&
+					(mShadowMapLightIndex.empty() || minIdx != mShadowMapLightIndex.back()) )
+				{
+					mShadowMapLightIndex.push_back( minIdx );
+				}
+
+				++visibilityMask;
+				++boundingSphere;
+			}
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::_update( Camera* camera )
 	{
+		ShadowMapCameraVec::const_iterator itShadowCamera = mShadowMapCameras.begin();
+		SceneManager *sceneManager	= camera->getSceneManager();
+		const Viewport *viewport	= camera->getViewport();
+
+		buildClosestLightList( camera );
+
+		const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+
 		//Setup all the cameras
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
 															mDefinition->mShadowMapTexDefinitions.begin();
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
 															mDefinition->mShadowMapTexDefinitions.end();
 
-		ShadowMapCameraVec::const_iterator itShadowCamera = mShadowMapCameras.begin();
-		SceneManager *sceneManager = camera->getSceneManager();
-
-		size_t nextLightIdx = 0;
-		Light const *nextLight = 0;
-		size_t lastLightMap	= -1;
-		size_t iterations	= 1;
-
-		uint32 combinedVisibilityFlags = camera->getViewport()->getVisibilityMask() &
-											sceneManager->getVisibilityMask();
-
 		while( itor != end )
 		{
-			//iterations will be zero when the light idx difference is zero (eg. same light,
-			//different split count, same light and bigger than one if there are gaps
-			//(eg. render light map 0 & 2, not 1)
-			//The iterators are assumed to be sorted by light index.
-			iterations = itor->light - lastLightMap;
-			for( size_t i=0; i<iterations; ++i )
+			if( itor->light < mShadowMapLightIndex.size() )
 			{
-				nextLight = sceneManager->nextClosestShadowLight( nextLightIdx,
-																	combinedVisibilityFlags );
-			}
+				Light const *light = globalLightList.lights[mShadowMapLightIndex[itor->light]];
 
-			if( nextLight )
-			{
-				itShadowCamera->shadowCameraSetup->getShadowCamera(
-														sceneManager, camera, nextLight,
-														itShadowCamera->camera, itor->split );
-				lastLightMap = itor->light;
+				Camera *texCamera = itShadowCamera->camera;
+
+				//Use the material scheme of the main viewport 
+				//This is required to pick up the correct shadow_caster_material and similar properties.
+				texCamera->getViewport()->setMaterialScheme( viewport->getMaterialScheme() );
+
+				// Associate main view camera as LOD camera
+				texCamera->setLodCamera( camera );
+
+				// set base
+				if( light->getType() != Light::LT_POINT )
+					texCamera->setDirection( light->getDerivedDirection() );
+				if( light->getType() != Light::LT_DIRECTIONAL )
+					texCamera->setPosition( light->getDerivedPosition() );
+
+				itShadowCamera->shadowCameraSetup->getShadowCamera( sceneManager, camera, light,
+																	texCamera, itor->split );
 			}
-			else
-			{
-				//No more shadow mapping lights. We should avoid render
-				//those maps and have to set them to blank textures
-				break;
-			}
+			//Else... this shadow map shouldn't be rendered(TODO) and when used, return a blank one.
+			//The Nth closest lights don't cast shadows
 
 			++itShadowCamera;
 			++itor;
@@ -211,7 +284,7 @@ namespace Ogre
 		SceneManager::IlluminationRenderStage previous = sceneManager->_getCurrentRenderStage();
 		sceneManager->_setCurrentRenderStage( SceneManager::IRS_RENDER_TO_TEXTURE );
 
-		//TODO: Set SceneManager::mShadowTextureCurrentCasterLightList (or refactor)
+		//TODO: Set SceneManager::mShadowTextureCurrentCasterLightList & mShadowTextureIndexLightList (or refactor)
 
 		//Now render all passes
 		CompositorNode::_update();

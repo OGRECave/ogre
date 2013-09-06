@@ -148,8 +148,6 @@ namespace Ogre{
 		void translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-		void translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-		void translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 	};
 
 	class _OgreExport TextureUnitTranslator : public ScriptTranslator

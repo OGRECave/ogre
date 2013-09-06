@@ -174,9 +174,7 @@ namespace Ogre {
             /// No special illumination stage
             IRS_NONE,
             /// Render to texture stage, used for texture based shadows
-            IRS_RENDER_TO_TEXTURE,
-            /// Render from shadow texture to receivers stage
-            IRS_RENDER_RECEIVER_PASS
+            IRS_RENDER_TO_TEXTURE
         };
 
 		/** Enumeration of the possible modes allowed for processing the special case
@@ -253,8 +251,7 @@ namespace Ogre {
 
 			/** Event raised after all shadow textures have been rendered into for 
 				all queues / targets but before any other geometry has been rendered
-				(including main scene geometry and any additional shadow receiver 
-				passes). 
+				(including main scene geometry). 
 			@remarks
 				This callback is useful for those that wish to perform some 
 				additional processing on shadow textures before they are used to 
@@ -284,23 +281,6 @@ namespace Ogre {
 			virtual void shadowTextureCasterPreViewProj( const Light* light, 
 				Camera* camera, size_t iteration)
                         { (void)light; (void)camera; (void)iteration; }
-
-			/** This event occurs just before the view & projection matrices are
-		 		set for re-rendering a shadow receiver.
-			@remarks
-				You can use this event hook to perform some custom processing,
-				such as altering the projection frustum being used for rendering 
-				the shadow onto the receiver to perform an advanced shadow 
-				technique.
-			@note
-				This event will only be fired when texture shadows are in use.
-			@param light Pointer to the light for which shadows are being rendered
-			@param frustum Pointer to the projection frustum being used to project
-				the shadow texture
-			*/
-			virtual void shadowTextureReceiverPreViewProj( const Light* light, 
-				Frustum* frustum)
-                        { (void)light; (void)frustum; }
 
 			/** Hook to allow the listener to override the ordering of lights for
 				the entire frustum.
@@ -522,10 +502,6 @@ namespace Ogre {
 		typedef map< const Camera*, VisibleObjectsBoundsInfo>::type CamVisibleObjectsMap;
 		CamVisibleObjectsMap mCamVisibleObjectsMap; 
 
-		/** ShadowCamera to light mapping */
-		typedef map< const Camera*, const Light* >::type ShadowCamLightMapping;
-		ShadowCamLightMapping mShadowCamLightMapping;
-
 		/// Array defining shadow count per light type.
 		size_t mShadowTextureCountPerType[3];
 
@@ -590,8 +566,6 @@ namespace Ogre {
         virtual void initRenderQueue(void);
         /// A pass designed to let us render shadow colour on white for texture shadows
         Pass* mShadowCasterPlainBlackPass;
-        /// A pass designed to let us render shadow receivers for texture shadows
-        Pass* mShadowReceiverPass;
         /** Internal method for turning a regular pass into a shadow caster pass.
         @remarks
             This is only used for texture shadows, basically we're trying to
@@ -601,16 +575,7 @@ namespace Ogre {
             and fudge the AutoParamDataSource to set black lighting for
             passes with vertex programs. 
         */
-        virtual const Pass* deriveShadowCasterPass(const Pass* pass);
-        /** Internal method for turning a regular pass into a shadow receiver pass.
-        @remarks
-        This is only used for texture shadows, basically we're trying to
-        ensure that objects are rendered with a projective texture.
-        This method will usually return a standard single-texture pass for
-        all fixed function passes, but will merge in a vertex program
-        for passes with vertex programs. 
-        */
-        virtual const Pass* deriveShadowReceiverPass(const Pass* pass);
+        virtual_l2 const Pass* deriveShadowCasterPass(const Pass* pass);
     
         /** Internal method to validate whether a Pass should be allowed to render.
         @remarks
@@ -688,8 +653,6 @@ namespace Ogre {
         virtual void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
 		/// Internal method for firing the pre caster texture shadows event
         virtual void fireShadowTexturesPreCaster(const Light* light, Camera* camera, size_t iteration);
-		/// Internal method for firing the pre receiver texture shadows event
-        virtual void fireShadowTexturesPreReceiver(const Light* light, Frustum* f);
 		/// Internal method for firing find visible objects event
 		virtual void firePreFindVisibleObjects(Viewport* v);
 		/// Internal method for firing find visible objects event
@@ -896,15 +859,10 @@ namespace Ogre {
         Real mShadowTextureFadeStart; /// As a proportion e.g. 0.6
         Real mShadowTextureFadeEnd; /// As a proportion e.g. 0.9
 		Pass* mShadowTextureCustomCasterPass;
-		Pass* mShadowTextureCustomReceiverPass;
 		String mShadowTextureCustomCasterVertexProgram;
 		String mShadowTextureCustomCasterFragmentProgram;
-		String mShadowTextureCustomReceiverVertexProgram;
-		String mShadowTextureCustomReceiverFragmentProgram;
 		GpuProgramParametersSharedPtr mShadowTextureCustomCasterVPParams;
 		GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
-		GpuProgramParametersSharedPtr mShadowTextureCustomReceiverVPParams;
-		GpuProgramParametersSharedPtr mShadowTextureCustomReceiverFPParams;
 
 		/// Visibility mask used to show / hide objects
 		uint32 mVisibilityMask;
@@ -1156,25 +1114,7 @@ namespace Ogre {
         */
         virtual Light* createLight();
 
-		/** Gets the next closest light to all cameras that can cast a shadow starting from the
-			Nth position. Should be called after buildLightList
-		@remarks
-			Performs a linear search with worst case O( N-nthLight ) and an average of O(1)
-			complexity.
-			Normally returning mGlobalLightList[nthLight] should be enough. However such light
-			may not cast shadows or may be filtered by visibility flags, hence we linear search
-			for the next light in the array.
-		@param inOutStartLightIdx [in/out]
-			In: The index in mGlobalLightList at which we should starting the search.
-			Out: Actual index from the return value plus one. You should continue from this index
-			in the next call to get the next light.
-		@param visibilityFlags
-			Combined visibility flags (camera's + scene manager's) to filter unwanted lights
-		@return
-			The light pointer. Null if startLightIdx goes out of bounds (which is valid) or
-			there wasn't any other light left that would cast shadows.
-		*/
-		const Light* nextClosestShadowLight( size_t &inOutStartLightIdx, uint32 visibilityFlags ) const;
+		const LightListInfo& getGlobalLightList(void) const	{ return mGlobalLightList; }
 
 		/** Retrieve a set of clipping planes for a given light. 
 		*/
@@ -2766,7 +2706,7 @@ namespace Ogre {
 			By default, a colour texture is used (PF_X8R8G8B8) for texture shadows,
 			but if you want to use more advanced texture shadow types you can 
 			alter this. If you do, you will have to also call
-			setShadowTextureCasterMaterial and setShadowTextureReceiverMaterial
+			setShadowTextureCasterMaterial
 			to provide shader-based materials to use these customised shadow
 			texture formats.
 		@note This is the simple form, see setShadowTextureConfig for the more 
@@ -2869,7 +2809,7 @@ namespace Ogre {
 			By default shadow casters are rendered into the shadow texture using
 			an automatically generated fixed-function pass. This allows basic
 			projective texture shadows, but it's possible to use more advanced
-			shadow techniques by overriding the caster and receiver materials, for
+			shadow techniques by overriding the caster materials, for
 			example providing vertex and fragment programs to implement shadow
 			maps.
 		@par
@@ -2878,35 +2818,13 @@ namespace Ogre {
 		@note
 			Individual objects may also override the vertex program in
 			your default material if their materials include 
-			shadow_caster_vertex_program_ref, shadow_receiver_vertex_program_ref
-			shadow_caster_material entries, so if you use both make sure they are compatible.			
+			shadow_caster_vertex_program_ref, shadow_caster_material entries,
+			so if you use both make sure they are compatible.			
 		@note
 			Only a single pass is allowed in your material, although multiple
 			techniques may be used for hardware fallback.
 		*/
 		virtual void setShadowTextureCasterMaterial(const String& name);
-		/** Sets the default material to use for rendering shadow receivers.
-		@remarks
-			By default shadow receivers are rendered as a post-pass using basic
-			modulation. This allows basic projective texture shadows, but it's 
-			possible to use more advanced shadow techniques by overriding the 
-			caster and receiver materials, for example providing vertex and 
-			fragment programs to implement shadow maps.
-		@par
-			You can rely on texture unit 0 containing the shadow texture, and 
-			for the unit to be set to use projective texturing from the light 
-			(only useful if you're using fixed-function, which is unlikely; 
-			otherwise you should rely on the texture_viewproj_matrix auto binding)
-		@note
-			Individual objects may also override the vertex program in
-			your default material if their materials include 
-			shadow_caster_vertex_program_ref shadow_receiver_vertex_program_ref
-			shadow_receiver_material entries, so if you use both make sure they are compatible.
-		@note
-			Only a single pass is allowed in your material, although multiple
-			techniques may be used for hardware fallback.
-		*/
-		virtual void setShadowTextureReceiverMaterial(const String& name);
 
 		/** Sets whether or not shadow casters should be rendered into shadow
 			textures using their back faces rather than their front faces. 
@@ -3262,7 +3180,7 @@ namespace Ogre {
 		/** Render something as if it came from the current queue.
 			@param pass		Material pass to use for setting up this quad.
 			@param rend		Renderable to render
-			@param shadowDerivation Whether passes should be replaced with shadow caster / receiver passes
+			@param shadowDerivation Whether passes should be replaced with shadow caster passes
 		 */
 		virtual void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true,
 			bool doLightIteration = false, const LightList* manualLightList = 0);
@@ -3359,9 +3277,6 @@ namespace Ogre {
 
 		/** Returns a visibility boundary box for a specific camera. */
 		const VisibleObjectsBoundsInfo& getVisibleObjectsBoundsInfo(const Camera* cam) const;
-
-		/**  Returns the shadow caster AAB for a specific light-camera combination */
-		const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration = 0) const;
 
 		/** Set whether to use camera-relative co-ordinates when rendering, ie
 			to always place the camera at the origin and move the world around it.

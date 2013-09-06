@@ -118,7 +118,6 @@ mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
 mMovableNameGenerator("Ogre/MO"),
 mShadowCasterPlainBlackPass(0),
-mShadowReceiverPass(0),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
@@ -147,7 +146,6 @@ mShadowTextureOffset(0.6),
 mShadowTextureFadeStart(0.7), 
 mShadowTextureFadeEnd(0.9),
 mShadowTextureCustomCasterPass(0),
-mShadowTextureCustomReceiverPass(0),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
 mSuppressRenderStateChanges(false),
@@ -340,11 +338,6 @@ void SceneManager::destroyCamera(Camera *cam)
 			mVisibleObjsPerRenderQueue.erase( it );
 	}
 
-	// Remove light-shadow cam mapping entry
-	ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( cam );
-	if ( camLightIt != mShadowCamLightMapping.end() )
-		mShadowCamLightMapping.erase( camLightIt );
-
 	IdString camName( cam->getName() );
 
 	itor = efficientVectorRemove( mCameras, itor );
@@ -429,28 +422,6 @@ void SceneManager::destroyLight(Light *l)
 void SceneManager::destroyAllLights(void)
 {
 	destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-const Light* SceneManager::nextClosestShadowLight( size_t &startLightIdx, uint32 visibilityFlags ) const
-{
-	Light const *retVal = 0;
-	if( startLightIdx < mGlobalLightList.lights.size() )
-	{
-		LightArray::const_iterator itor = mGlobalLightList.lights.begin() + startLightIdx;
-		LightArray::const_iterator end  = mGlobalLightList.lights.end();
-
-		while( itor != end && !retVal )
-		{
-			if( (*itor)->getVisibilityFlags() & visibilityFlags && (*itor)->getCastShadows() )
-			{
-				retVal = *itor;
-				startLightIdx = (itor - mGlobalLightList.lights.begin()) + 1;
-			}
-			++itor;
-		}
-	}
-
-	return retVal;
 }
 //-----------------------------------------------------------------------
 const LightList& SceneManager::_getLightsAffectingFrustum(void) const
@@ -869,10 +840,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			// Derive a special shadow caster pass from this one
 			pass = deriveShadowCasterPass(pass);
-		}
-		else if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && shadowDerivation)
-		{
-			pass = deriveShadowReceiverPass(pass);
 		}
 
         // Tell params about current pass
@@ -3902,18 +3869,6 @@ void SceneManager::fireShadowTexturesPreCaster(const Light* light, Camera* camer
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreReceiver( const Light* light, Frustum* f)
-{
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
-    {
-        (*i)->shadowTextureReceiverPreViewProj(light, f);
-    }
-}
-//---------------------------------------------------------------------
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
     ListenerList listenersCopy = mListeners;
@@ -4470,26 +4425,6 @@ void SceneManager::initShadowVolumeMaterials(void)
         }
     }
 
-    if (!mShadowReceiverPass)
-    {
-        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowReceiver");
-        if (matShadRec.isNull())			
-        {
-            matShadRec = MaterialManager::getSingleton().create(
-                "Ogre/TextureShadowReceiver",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-			// Don't set lighting and blending modes here, depends on additive / modulative
-            TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
-            t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-        }
-        else
-        {
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-        }
-    }
-
     // Set up spot shadow fade texture (loaded from code data block)
     TexturePtr spotShadowFadeTex = 
         TextureManager::getSingleton().getByName("spot_shadow_fade.png");
@@ -4660,193 +4595,6 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 			}
 		}
         
-		// handle the case where there is no fixed pipeline support
-		retPass->getParent()->getParent()->compile();
-        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
-        if( btech )
-        {
-		    retPass = btech->getPass(0);
-        }
-
-		return retPass;
-	}
-	else
-	{
-        return pass;
-    }
-
-}
-//---------------------------------------------------------------------
-const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
-{
-
-    if (isShadowTechniqueTextureBased())
-    {
-		Pass* retPass = NULL;
-		if (!pass->getParent()->getShadowReceiverMaterial().isNull())
-		{
-			return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0); 
-		}
-		else
-		{
-			retPass = mShadowTextureCustomReceiverPass ? 
-				mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-		}
-
-		// Does incoming pass have a custom shadow receiver program?
-		if (!pass->getShadowReceiverVertexProgramName().empty())
-		{
-			// Have to merge the shadow receiver vertex program in
-			retPass->setVertexProgram(
-				pass->getShadowReceiverVertexProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getVertexProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setVertexProgramParameters(
-				pass->getShadowReceiverVertexProgramParameters());
-			// Also have to hack the light autoparams, that is done later
-		}
-		else 
-		{
-			if (retPass == mShadowTextureCustomReceiverPass)
-			{
-				// reset vp?
-				if (mShadowTextureCustomReceiverPass->getVertexProgramName() !=
-					mShadowTextureCustomReceiverVertexProgram)
-				{
-					mShadowTextureCustomReceiverPass->setVertexProgram(
-						mShadowTextureCustomReceiverVertexProgram, false);
-					if(mShadowTextureCustomReceiverPass->hasVertexProgram())
-					{
-						mShadowTextureCustomReceiverPass->setVertexProgramParameters(
-							mShadowTextureCustomReceiverVPParams);
-
-					}
-
-				}
-
-			}
-			else
-			{
-				// Standard shadow receiver pass, reset to no vp
-				retPass->setVertexProgram(StringUtil::BLANK);
-			}
-		}
-
-        unsigned short keepTUCount;
-		// If additive, need lighting parameters & standard programs
-		if (isShadowTechniqueAdditive())
-		{
-			retPass->setLightingEnabled(true);
-			retPass->setAmbient(pass->getAmbient());
-			retPass->setSelfIllumination(pass->getSelfIllumination());
-			retPass->setDiffuse(pass->getDiffuse());
-			retPass->setSpecular(pass->getSpecular());
-			retPass->setShininess(pass->getShininess());
-			retPass->setIteratePerLight(pass->getIteratePerLight(), 
-				pass->getRunOnlyForOneLightType(), pass->getOnlyLightType());
-			retPass->setLightMask(pass->getLightMask());
-
-            // We need to keep alpha rejection settings
-            retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
-                pass->getAlphaRejectValue());
-            // Copy texture state, shift up one since 0 is shadow texture
-            unsigned short origPassTUCount = pass->getNumTextureUnitStates();
-            for (unsigned short t = 0; t < origPassTUCount; ++t)
-            {
-                unsigned short targetIndex = t+1;
-                TextureUnitState* tex;
-                if (retPass->getNumTextureUnitStates() <= targetIndex)
-                {
-                    tex = retPass->createTextureUnitState();
-                }
-                else
-                {
-                    tex = retPass->getTextureUnitState(targetIndex);
-                }
-                (*tex) = *(pass->getTextureUnitState(t));
-				// If programmable, have to adjust the texcoord sets too
-				// D3D insists that texcoordsets match tex unit in programmable mode
-				if (retPass->hasVertexProgram())
-					tex->setTextureCoordSet(targetIndex);
-            }
-            keepTUCount = origPassTUCount + 1;
-		}// additive lighting
-		else
-		{
-			// need to keep spotlight fade etc
-			keepTUCount = retPass->getNumTextureUnitStates();
-		}
-
-
-		// Will also need fragment programs since this is a complex light setup
-		if (!pass->getShadowReceiverFragmentProgramName().empty())
-		{
-			// Have to merge the shadow receiver vertex program in
-			retPass->setFragmentProgram(
-				pass->getShadowReceiverFragmentProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getFragmentProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setFragmentProgramParameters(
-				pass->getShadowReceiverFragmentProgramParameters());
-
-			// Did we bind a shadow vertex program?
-			if (pass->hasVertexProgram() && !retPass->hasVertexProgram())
-			{
-				// We didn't bind a receiver-specific program, so bind the original
-				retPass->setVertexProgram(pass->getVertexProgramName(), false);
-				const GpuProgramPtr& prog = retPass->getVertexProgram();
-				// Load this program if required
-				if (!prog->isLoaded())
-					prog->load();
-				// Copy params
-				retPass->setVertexProgramParameters(
-					pass->getVertexProgramParameters());
-
-			}
-		}
-		else 
-		{
-			// Reset any merged fragment programs from last time
-			if (retPass == mShadowTextureCustomReceiverPass)
-			{
-				// reset fp?
-				if (mShadowTextureCustomReceiverPass->getFragmentProgramName() !=
-					mShadowTextureCustomReceiverFragmentProgram)
-				{
-					mShadowTextureCustomReceiverPass->setFragmentProgram(
-						mShadowTextureCustomReceiverFragmentProgram, false);
-					if(mShadowTextureCustomReceiverPass->hasFragmentProgram())
-					{
-						mShadowTextureCustomReceiverPass->setFragmentProgramParameters(
-							mShadowTextureCustomReceiverFPParams);
-
-					}
-
-				}
-
-			}
-			else
-			{
-				// Standard shadow receiver pass, reset to no fp
-				retPass->setFragmentProgram(StringUtil::BLANK);
-			}
-
-		}
-
-        // Remove any extra texture units
-        while (retPass->getNumTextureUnitStates() > keepTUCount)
-        {
-            retPass->removeTextureUnitState(keepTUCount);
-        }
-
-		retPass->_load();
-
 		// handle the case where there is no fixed pipeline support
 		retPass->getParent()->getParent()->compile();
         Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
@@ -5715,59 +5463,6 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTextureReceiverMaterial(const String& name)
-{
-	if (name.empty())
-	{
-		mShadowTextureCustomReceiverPass = 0;
-	}
-	else
-	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
-		if (mat.isNull())
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-				"Cannot locate material called '" + name + "'", 
-				"SceneManager::setShadowTextureReceiverMaterial");
-		}
-		mat->load();
-		if (!mat->getBestTechnique())
-		{
-			// unsupported
-			mShadowTextureCustomReceiverPass = 0;
-		}
-		else
-		{
-
-			mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
-			if (mShadowTextureCustomReceiverPass->hasVertexProgram())
-			{
-				// Save vertex program and params in case we have to swap them out
-				mShadowTextureCustomReceiverVertexProgram = 
-					mShadowTextureCustomReceiverPass->getVertexProgramName();
-				mShadowTextureCustomReceiverVPParams = 
-					mShadowTextureCustomReceiverPass->getVertexProgramParameters();
-			}
-			else
-			{
-				mShadowTextureCustomReceiverVertexProgram = StringUtil::BLANK;
-			}
-			if (mShadowTextureCustomReceiverPass->hasFragmentProgram())
-			{
-				// Save fragment program and params in case we have to swap them out
-				mShadowTextureCustomReceiverFragmentProgram = 
-					mShadowTextureCustomReceiverPass->getFragmentProgramName();
-				mShadowTextureCustomReceiverFPParams = 
-					mShadowTextureCustomReceiverPass->getFragmentProgramParameters();
-			}
-			else
-			{
-				mShadowTextureCustomReceiverFragmentProgram = StringUtil::BLANK;
-			}
-		}
-	}
-}
-//---------------------------------------------------------------------
 void SceneManager::setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup)
 {
 	mDefaultShadowCameraSetup = shadowSetup;
@@ -5786,9 +5481,6 @@ void SceneManager::ensureShadowTexturesCreated()
 		destroyShadowTextures();
 		ShadowTextureManager::getSingleton().getShadowTextures(
 			mShadowTextureConfigList, mShadowTextures);
-
-		// clear shadow cam - light mapping
-		mShadowCamLightMapping.clear();
 
 		//Used to get the depth buffer ID setting for each RTT
 		size_t __i = 0;
@@ -5847,9 +5539,6 @@ void SceneManager::ensureShadowTexturesCreated()
 				mat->touch();
 
 			}
-
-			// insert dummy camera-light combination
-			mShadowCamLightMapping[cam] = 0;
 
 			// Get null shadow texture
 			if (mShadowTextureConfigList.empty())
@@ -5936,7 +5625,6 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 
 	try
 	{
-		
 		// Determine far shadow distance
 		Real shadowDist = mDefaultShadowFarDist;
 		if (!shadowDist)
@@ -5949,18 +5637,6 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 		Real shadowEnd = shadowDist + shadowOffset;
 		Real fadeStart = shadowEnd * mShadowTextureFadeStart;
 		Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
-		// Additive lighting should not use fogging, since it will overbrighten; use border clamp
-		if (!isShadowTechniqueAdditive())
-		{
-			// set fogging to hide the shadow edge 
-			mShadowReceiverPass->setFog(true, FOG_LINEAR, ColourValue::White, 
-				0, fadeStart, fadeEnd);
-		}
-		else
-		{
-			// disable fogging explicitly
-			mShadowReceiverPass->setFog(true, FOG_NONE);
-		}
 
 		// Iterate over the lights we've found, max out at the limit of light textures
 		// Note that the light sorting must now place shadow casting lights at the
@@ -6014,11 +5690,6 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 				// Use the material scheme of the main viewport 
 				// This is required to pick up the correct shadow_caster_material and similar properties.
 				shadowView->setMaterialScheme(vp->getMaterialScheme());
-
-				// update shadow cam - light mapping
-				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
-				assert(camLightIt != mShadowCamLightMapping.end());
-				camLightIt->second = light;
 
 				/*if (light->getCustomShadowCameraSetup().isNull())
 					mDefaultShadowCameraSetup->getShadowCamera(this, cam, light, texCam, j);
@@ -6638,44 +6309,6 @@ SceneManager::getVisibleObjectsBoundsInfo(const Camera* cam) const
 		return nullBox;
 	else
 		return camVisObjIt->second;
-}
-//---------------------------------------------------------------------
-const VisibleObjectsBoundsInfo& 
-SceneManager::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
-{
-	static VisibleObjectsBoundsInfo nullBox;
-
-	// find light
-	unsigned int foundCount = 0;
-	ShadowCamLightMapping::const_iterator it; 
-	for ( it = mShadowCamLightMapping.begin() ; it != mShadowCamLightMapping.end(); ++it )
-	{
-		if ( it->second == light )
-		{
-			if (foundCount == iteration)
-			{
-				// search the camera-aab list for the texture cam
-				CamVisibleObjectsMap::const_iterator camIt = mCamVisibleObjectsMap.find( it->first );
-
-				if ( camIt == mCamVisibleObjectsMap.end() )
-				{
-					return nullBox;
-				}
-				else
-				{
-					return camIt->second;
-				}
-			}
-			else
-			{
-				// multiple shadow textures per light, keep searching
-				++foundCount;
-			}
-		}
-	}
-
-	// AAB not available
-	return nullBox;
 }
 //---------------------------------------------------------------------
 void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRenderableVisitor* visitor)

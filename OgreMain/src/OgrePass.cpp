@@ -184,9 +184,7 @@ namespace Ogre {
 		, mVertexProgramUsage(0)
 		, mShadowCasterVertexProgramUsage(0)
         , mShadowCasterFragmentProgramUsage(0)
-		, mShadowReceiverVertexProgramUsage(0)
 		, mFragmentProgramUsage(0)
-		, mShadowReceiverFragmentProgramUsage(0)
         , mGeometryProgramUsage(0)
 		, mTesselationHullProgramUsage(0)
 		, mTesselationDomainProgramUsage(0)
@@ -216,8 +214,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
 	Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
         :mParent(parent), mIndex(index), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), 
-		mShadowCasterFragmentProgramUsage(0), mShadowReceiverVertexProgramUsage(0), mFragmentProgramUsage(0), 
-		mShadowReceiverFragmentProgramUsage(0), mGeometryProgramUsage(0), mTesselationHullProgramUsage(0)
+		mShadowCasterFragmentProgramUsage(0), mFragmentProgramUsage(0), 
+		mGeometryProgramUsage(0), mTesselationHullProgramUsage(0)
 		, mTesselationDomainProgramUsage(0), mComputeProgramUsage(0), mQueuedForDeletion(false), mPassIterationCount(1)
     {
         *this = oth;
@@ -239,8 +237,6 @@ namespace Ogre {
 		OGRE_DELETE mComputeProgramUsage;
 		OGRE_DELETE mShadowCasterVertexProgramUsage;
         OGRE_DELETE mShadowCasterFragmentProgramUsage;
-		OGRE_DELETE mShadowReceiverVertexProgramUsage;
-		OGRE_DELETE mShadowReceiverFragmentProgramUsage;		
     }
     //-----------------------------------------------------------------------------
     Pass& Pass::operator=(const Pass& oth)
@@ -342,16 +338,6 @@ namespace Ogre {
             mShadowCasterFragmentProgramUsage = NULL;
         }
 
-		OGRE_DELETE mShadowReceiverVertexProgramUsage;
-        if (oth.mShadowReceiverVertexProgramUsage)
-        {
-            mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage), this);
-        }
-        else
-        {
-            mShadowReceiverVertexProgramUsage = NULL;
-        }
-
 		OGRE_DELETE mFragmentProgramUsage;
 		if (oth.mFragmentProgramUsage)
 		{
@@ -402,16 +388,6 @@ namespace Ogre {
 		    mComputeProgramUsage = NULL;
         }
 
-		OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-		if (oth.mShadowReceiverFragmentProgramUsage)
-		{
-			mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage), this);
-		}
-		else
-		{
-			mShadowReceiverFragmentProgramUsage = NULL;
-		}
-
 		TextureUnitStates::const_iterator i, iend;
 
         // Clear texture units but doesn't notify need recompilation in the case
@@ -454,12 +430,8 @@ namespace Ogre {
             memSize += mShadowCasterVertexProgramUsage->calculateSize();
         if(mShadowCasterFragmentProgramUsage)
             memSize += mShadowCasterFragmentProgramUsage->calculateSize();
-        if(mShadowReceiverVertexProgramUsage)
-            memSize += mShadowReceiverVertexProgramUsage->calculateSize();
         if(mFragmentProgramUsage)
             memSize += mFragmentProgramUsage->calculateSize();
-        if(mShadowReceiverFragmentProgramUsage)
-            memSize += mShadowReceiverFragmentProgramUsage->calculateSize();
         if(mGeometryProgramUsage)
             memSize += mGeometryProgramUsage->calculateSize();
         if(mTesselationHullProgramUsage)
@@ -1332,11 +1304,6 @@ namespace Ogre {
             // Load fragment program
             mShadowCasterFragmentProgramUsage->_load();
         }
-        if (mShadowReceiverVertexProgramUsage)
-        {
-            // Load vertex program
-            mShadowReceiverVertexProgramUsage->_load();
-        }
 
 		if (mTesselationHullProgramUsage)
 		{
@@ -1360,11 +1327,6 @@ namespace Ogre {
         {
 			// Load fragment program
             mFragmentProgramUsage->_load();
-		}
-		if (mShadowReceiverFragmentProgramUsage)
-		{
-			// Load Fragment program
-			mShadowReceiverFragmentProgramUsage->_load();
 		}
 
 		if (mComputeProgramUsage)
@@ -1963,11 +1925,6 @@ namespace Ogre {
             OGRE_DELETE mShadowCasterFragmentProgramUsage;
             mShadowCasterFragmentProgramUsage = 0;
         }
-        if (mShadowReceiverVertexProgramUsage)
-        {
-            OGRE_DELETE mShadowReceiverVertexProgramUsage;
-            mShadowReceiverVertexProgramUsage = 0;
-        }
         if (mGeometryProgramUsage)
         {
             delete mGeometryProgramUsage;
@@ -1993,11 +1950,6 @@ namespace Ogre {
             OGRE_DELETE mComputeProgramUsage;
             mComputeProgramUsage = 0;
         }
-		if (mShadowReceiverFragmentProgramUsage)
-		{
-			OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-			mShadowReceiverFragmentProgramUsage = 0;
-		}
         // remove from dirty list, if there
 		{
 			OGRE_LOCK_MUTEX(msDirtyHashListMutex)
@@ -2137,116 +2089,6 @@ namespace Ogre {
     {
         return mShadowCasterFragmentProgramUsage->getProgram();
     }
-    //-----------------------------------------------------------------------
-    void Pass::setShadowReceiverVertexProgram(const String& name)
-    {
-        // Turn off vertex program if name blank
-        if (name.empty())
-        {
-            if (mShadowReceiverVertexProgramUsage) OGRE_DELETE mShadowReceiverVertexProgramUsage;
-            mShadowReceiverVertexProgramUsage = NULL;
-        }
-        else
-        {
-            if (!mShadowReceiverVertexProgramUsage)
-            {
-                mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
-            }
-            mShadowReceiverVertexProgramUsage->setProgramName(name);
-        }
-        // Needs recompilation
-        mParent->_notifyNeedsRecompile();
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setShadowReceiverVertexProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        if (!mShadowReceiverVertexProgramUsage)
-        {
-            OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                "This pass does not have a shadow receiver vertex program assigned!",
-                "Pass::setShadowReceiverVertexProgramParameters");
-        }
-        mShadowReceiverVertexProgramUsage->setParameters(params);
-    }
-    //-----------------------------------------------------------------------
-    const String& Pass::getShadowReceiverVertexProgramName(void) const
-    {
-        if (!mShadowReceiverVertexProgramUsage)
-            return StringUtil::BLANK;
-        else
-            return mShadowReceiverVertexProgramUsage->getProgramName();
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getShadowReceiverVertexProgramParameters(void) const
-    {
-        if (!mShadowReceiverVertexProgramUsage)
-        {
-            OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                "This pass does not have a shadow receiver vertex program assigned!",
-                "Pass::getShadowReceiverVertexProgramParameters");
-        }
-        return mShadowReceiverVertexProgramUsage->getParameters();
-    }
-    //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getShadowReceiverVertexProgram(void) const
-    {
-        return mShadowReceiverVertexProgramUsage->getProgram();
-    }
-	//-----------------------------------------------------------------------
-	void Pass::setShadowReceiverFragmentProgram(const String& name)
-	{
-		// Turn off Fragment program if name blank
-		if (name.empty())
-		{
-			if (mShadowReceiverFragmentProgramUsage) OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-			mShadowReceiverFragmentProgramUsage = NULL;
-		}
-		else
-		{
-			if (!mShadowReceiverFragmentProgramUsage)
-			{
-				mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
-			}
-			mShadowReceiverFragmentProgramUsage->setProgramName(name);
-		}
-		// Needs recompilation
-		mParent->_notifyNeedsRecompile();
-	}
-	//-----------------------------------------------------------------------
-	void Pass::setShadowReceiverFragmentProgramParameters(GpuProgramParametersSharedPtr params)
-	{
-		if (!mShadowReceiverFragmentProgramUsage)
-		{
-			OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-				"This pass does not have a shadow receiver fragment program assigned!",
-				"Pass::setShadowReceiverFragmentProgramParameters");
-		}
-		mShadowReceiverFragmentProgramUsage->setParameters(params);
-	}
-	//-----------------------------------------------------------------------
-	const String& Pass::getShadowReceiverFragmentProgramName(void) const
-	{
-		if (!mShadowReceiverFragmentProgramUsage)
-			return StringUtil::BLANK;
-		else
-			return mShadowReceiverFragmentProgramUsage->getProgramName();
-	}
-	//-----------------------------------------------------------------------
-	GpuProgramParametersSharedPtr Pass::getShadowReceiverFragmentProgramParameters(void) const
-	{
-		if (!mShadowReceiverFragmentProgramUsage)
-		{
-			OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-				"This pass does not have a shadow receiver fragment program assigned!",
-				"Pass::getShadowReceiverFragmentProgramParameters");
-		}
-		return mShadowReceiverFragmentProgramUsage->getParameters();
-	}
-	//-----------------------------------------------------------------------
-	const GpuProgramPtr& Pass::getShadowReceiverFragmentProgram(void) const
-	{
-		return mShadowReceiverFragmentProgramUsage->getProgram();
-	}
     //-----------------------------------------------------------------------
 	const String& Pass::getResourceGroup(void) const
 	{

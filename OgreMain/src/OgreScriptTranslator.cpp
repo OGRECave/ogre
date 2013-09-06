@@ -772,31 +772,6 @@ namespace Ogre{
 								"shadow_caster_material cannot accept argument \"" + (*i0)->getValue() + "\"");
 					}
 					break;
-				case ID_SHADOW_RECEIVER_MATERIAL:
-					if(prop->values.empty())
-					{
-						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-					}
-					else if(prop->values.size() > 1)
-					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"shadow_receiver_material only accepts 1 argument");
-					}
-					else
-					{
-						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-						String matName;
-						if(getString(*i0, &matName))
-						{
-							ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, matName);
-							compiler->_fireEvent(&evt, 0);
-							mTechnique->setShadowReceiverMaterial(evt.mName);
-						}
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-								"shadow_receiver_material_name cannot accept argument \"" + (*i0)->getValue() + "\"");
-					}
-					break;
 				case ID_GPU_VENDOR_RULE:
 					if(prop->values.size() < 2)
 					{
@@ -2379,12 +2354,6 @@ namespace Ogre{
 				case ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF:
 					translateShadowCasterFragmentProgramRef(compiler, child);
 					break;
-				case ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF:
-					translateShadowReceiverVertexProgramRef(compiler, child);
-					break;
-				case ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF:
-					translateShadowReceiverFragmentProgramRef(compiler, child);
-					break;
 				default:
 					processNode(compiler, *i);
 				}
@@ -2596,58 +2565,6 @@ namespace Ogre{
 		if(pass->getShadowCasterFragmentProgram()->isSupported())
 		{
 			GpuProgramParametersSharedPtr params = pass->getShadowCasterFragmentProgramParameters();
-			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-		}
-	}
-	//-------------------------------------------------------------------------
-	void PassTranslator::translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-	{
-		if(node->name.empty())
-		{
-			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-			return;
-		}
-
-		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-		compiler->_fireEvent(&evt, 0);
-
-		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
-		{
-			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-			return;
-		}
-
-		Pass *pass = any_cast<Pass*>(node->parent->context);
-		pass->setShadowReceiverVertexProgram(evt.mName);
-		if(pass->getShadowReceiverVertexProgram()->isSupported())
-		{
-			GpuProgramParametersSharedPtr params = pass->getShadowReceiverVertexProgramParameters();
-			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-		}
-	}
-	//-------------------------------------------------------------------------
-	void PassTranslator::translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-	{
-		if(node->name.empty())
-		{
-			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-			return;
-		}
-
-		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-		compiler->_fireEvent(&evt, 0);
-
-		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
-		{
-			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-			return;
-		}
-
-		Pass *pass = any_cast<Pass*>(node->parent->context);
-		pass->setShadowReceiverFragmentProgram(evt.mName);
-		if(pass->getShadowReceiverFragmentProgram()->isSupported())
-		{
-			GpuProgramParametersSharedPtr params = pass->getShadowReceiverFragmentProgramParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
 		}
 	}

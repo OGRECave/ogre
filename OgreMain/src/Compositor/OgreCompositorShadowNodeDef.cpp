@@ -62,8 +62,13 @@ namespace Ogre
 		ShadowMapTexDefVec::const_iterator itor = mShadowMapTexDefinitions.begin();
 		ShadowMapTexDefVec::const_iterator end  = mShadowMapTexDefinitions.end();
 
+		size_t newLight = 1;
+
 		while( itor != end )
 		{
+			if( itor->light == lightIdx )
+				newLight = 0;
+
 			if( itor->light == lightIdx && itor->split == split )
 			{
 				OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "There's already a texture for light index #"
@@ -72,6 +77,8 @@ namespace Ogre
 			}
 			++itor;
 		}
+
+		mNumLights += newLight;
 
 		if( name.empty() )
 		{

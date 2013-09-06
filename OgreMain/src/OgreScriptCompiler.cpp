@@ -1007,8 +1007,6 @@ namespace Ogre
 		mIds["compute_program_ref"] = ID_COMPUTE_PROGRAM_REF;
 		mIds["shadow_caster_vertex_program_ref"] = ID_SHADOW_CASTER_VERTEX_PROGRAM_REF;
 		mIds["shadow_caster_fragment_program_ref"] = ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF;
-		mIds["shadow_receiver_vertex_program_ref"] = ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF;
-		mIds["shadow_receiver_fragment_program_ref"] = ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF;
 
         mIds["lod_values"] = ID_LOD_VALUES;
         mIds["lod_strategy"] = ID_LOD_STRATEGY;
@@ -1028,7 +1026,6 @@ namespace Ogre
 		mIds["scheme"] = ID_SCHEME;
 		mIds["lod_index"] = ID_LOD_INDEX;
 		mIds["shadow_caster_material"] = ID_SHADOW_CASTER_MATERIAL;
-		mIds["shadow_receiver_material"] = ID_SHADOW_RECEIVER_MATERIAL;
 		mIds["gpu_vendor_rule"] = ID_GPU_VENDOR_RULE;
 		mIds["gpu_device_rule"] = ID_GPU_DEVICE_RULE;
 		mIds["include"] = ID_INCLUDE;

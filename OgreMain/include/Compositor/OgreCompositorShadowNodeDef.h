@@ -97,9 +97,12 @@ namespace Ogre
 		ShadowMapTexDefVec	mShadowMapTexDefinitions;
 		ShadowMapTechniques	mDefaultTechnique;
 
+		/// Not the same as mShadowMapTexDefinitions.size(), because splits aren't included
+		size_t				mNumLights;
+
 	public:
 		CompositorShadowNodeDef( IdString name ) :
-				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ) {}
+				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ), mNumLights( 0 ) {}
 
 		/// Overloaded to prevent creating input channels.
 		virtual IdString addTextureSourceName( const String &name, size_t index,

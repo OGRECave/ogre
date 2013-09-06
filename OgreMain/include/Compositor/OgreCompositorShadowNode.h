@@ -112,6 +112,13 @@ namespace Ogre
 		/// One per shadow map (whether texture or atlas)
 		ShadowMapCameraVec		mShadowMapCameras;
 
+		typedef vector<size_t>::type LightIndexVec;
+
+		Camera const *			mLastCamera;
+		LightIndexVec			mShadowMapLightIndex;
+
+		void buildClosestLightList( const Camera *newCamera );
+
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
 								CompositorWorkspace *workspace, RenderSystem *renderSys );
