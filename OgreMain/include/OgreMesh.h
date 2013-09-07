@@ -96,6 +96,7 @@ namespace Ogre {
         friend class MeshSerializerImpl;
         friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
+		friend class MeshSerializerImpl_v1_3;
         friend class MeshSerializerImpl_v1_2;
         friend class MeshSerializerImpl_v1_1;
 
@@ -160,7 +161,7 @@ namespace Ogre {
             VertexData* targetVertexData);
 
         const LodStrategy *mLodStrategy;
-        bool mIsLodManual;
+		bool mHasManualLodLevel;
         ushort mNumLods;
         MeshLodUsageList mMeshLodUsageList;
 
@@ -439,22 +440,6 @@ namespace Ogre {
         ushort getNumLodLevels(void) const;
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
-        /** Adds a new manual level-of-detail entry to this Mesh.
-        @remarks
-            As an alternative to generating lower level of detail versions of a mesh, you can
-            use your own manually modelled meshes as lower level versions. This lets you 
-            have complete control over the LOD, and in addition lets you scale down other
-            aspects of the model which cannot be done using the generated method; for example, 
-            you could use less detailed materials and / or use less bones in the skeleton if
-            this is an animated mesh. Therefore for complex models you are likely to be better off
-            modelling your LODs yourself and using this method, whilst for models with fairly
-            simple materials and no animation you can just use the generateLodLevels method.
-        @param value
-            The value from which this Lod will apply.
-        @param meshName
-            The name of the mesh which will be the lower level detail version.
-        */
-        void createManualLodLevel(Real value, const String& meshName, const String& groupName = Ogre::String());
 
         /** Changes the alternate mesh to use as a manual LOD at the given index.
         @remarks
@@ -475,18 +460,19 @@ namespace Ogre {
         */
         ushort getLodIndex(Real value) const;
 
-        /** Returns true if this mesh is using manual LOD.
-        @remarks
-            A mesh can either use automatically generated LOD, or it can use alternative
-            meshes as provided by an artist. A mesh can only use either all manual LODs 
-            or all generated LODs, not a mixture of both.
-        */
-        bool isLodManual(void) const { return mIsLodManual; }
+		/** Returns true if this mesh has a manual LOD level.
+		@remarks
+		    A mesh can either use automatically generated LOD, or it can use alternative
+		    meshes as provided by an artist.
+		*/
+		bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
 
         /** Internal methods for loading LOD, do not use. */
-        void _setLodInfo(unsigned short numLevels, bool isManual);
+        void _setLodInfo(unsigned short numLevels);
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, MeshLodUsage& usage);
+        /** Internal methods for loading LOD, do not use. */
+		bool _isManualLodLevel(unsigned short level) const;
         /** Internal methods for loading LOD, do not use. */
         void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
 
@@ -966,7 +952,7 @@ namespace Ogre {
     /** A way of recording the way each LODs is recorded this Mesh. */
     struct MeshLodUsage
     {
-        /** User-supplied values used to determine when th is lod applies.
+        /** User-supplied values used to determine on which distance the lod is applies.
         @remarks
             This is required in case the lod strategy changes.
         */
@@ -979,10 +965,9 @@ namespace Ogre {
         */
         Real value;
         
+
         /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
         String manualName;
-        /// Only relevant if mIsLodManual is true, the name of the group of the alternative mesh.
-        String manualGroup;
         /// Hard link to mesh to avoid looking up each time.
         mutable MeshPtr manualMesh;
         /// Edge list for this LOD level (may be derived from manual mesh).

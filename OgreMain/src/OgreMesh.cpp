@@ -103,7 +103,7 @@ namespace Ogre {
         : Resource(creator, name, handle, group, isManual, loader),
         mBoundRadius(0.0f),
         mBoneAssignmentsOutOfDate(false),
-        mIsLodManual(false),
+		mHasManualLodLevel(false),
         mNumLods(1),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
@@ -383,14 +383,16 @@ namespace Ogre {
                 newSub->blendIndexToBoneIndexMap = (*subi)->blendIndexToBoneIndexMap;
             }
 
-            // Copy index data
-            OGRE_DELETE newSub->indexData;
-			newSub->indexData = (*subi)->indexData->clone();
+            
             // Copy any bone assignments
             newSub->mBoneAssignments = (*subi)->mBoneAssignments;
             newSub->mBoneAssignmentsOutOfDate = (*subi)->mBoneAssignmentsOutOfDate;
             // Copy texture aliases
             newSub->mTextureAliases = (*subi)->mTextureAliases;
+
+            // Copy index data
+            OGRE_DELETE newSub->indexData;
+            newSub->mLodFaceList.clear();
 
             // Copy lod face lists
             newSub->mLodFaceList.reserve((*subi)->mLodFaceList.size());
@@ -418,7 +420,6 @@ namespace Ogre {
         newMesh->mBoundRadius = mBoundRadius;
 
         newMesh->mLodStrategy = mLodStrategy;
-		newMesh->mIsLodManual = mIsLodManual;
 		newMesh->mNumLods = mNumLods;
 		newMesh->mMeshLodUsageList = mMeshLodUsageList;
         newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
@@ -926,16 +927,14 @@ namespace Ogre {
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
         index = std::min(index, (ushort)(mMeshLodUsageList.size() - 1));
-        if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
+        if (this->_isManualLodLevel(index) && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
 			try {
-				String groupName = mMeshLodUsageList[index].manualGroup.empty() ? 
-					mGroup : mMeshLodUsageList[index].manualGroup;
 				mMeshLodUsageList[index].manualMesh =
 					MeshManager::getSingleton().load(
 						mMeshLodUsageList[index].manualName,
-						groupName);
+						getGroup());
 				// get the edge data, if required
 				if (!mMeshLodUsageList[index].edgeData)
 				{
@@ -956,31 +955,11 @@ namespace Ogre {
         return mMeshLodUsageList[index];
     }
     //---------------------------------------------------------------------
-	void Mesh::createManualLodLevel(Real lodValue, const String& meshName, const String& groupName)
-	{
-
-		// Basic prerequisites
-        assert((mIsLodManual || mNumLods == 1) && "Generated LODs already in use!");
-
-		mIsLodManual = true;
-		MeshLodUsage lod;
-		lod.userValue = lodValue;
-        lod.value = mLodStrategy->transformUserValue(lod.userValue);
-		lod.manualName = meshName;
-		lod.manualGroup = groupName.empty() ? mGroup : groupName;
-		lod.manualMesh.setNull();
-        lod.edgeData = 0;
-		mMeshLodUsageList.push_back(lod);
-		++mNumLods;
-
-        mLodStrategy->sort(mMeshLodUsageList);
-	}
     //---------------------------------------------------------------------
 	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
 	{
-
+		// TODO: Needs testing!
 		// Basic prerequisites
-		assert(mIsLodManual && "Not using manual LODs!");
 		assert(index != 0 && "Can't modify first lod level (full detail)");
 		assert(index < mMeshLodUsageList.size() && "Index out of bounds");
 		// get lod
@@ -998,7 +977,7 @@ namespace Ogre {
         return mLodStrategy->getIndex(value, mMeshLodUsageList);
 	}
     //---------------------------------------------------------------------
-	void Mesh::_setLodInfo(unsigned short numLevels, bool isManual)
+	void Mesh::_setLodInfo(unsigned short numLevels)
 	{
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
@@ -1010,9 +989,8 @@ namespace Ogre {
 		// Resize submesh face data lists too
 		for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
 		{
-			(*i)->mLodFaceList.resize(numLevels - 1);
+			(*i)->mLodFaceList.resize(numLevels);
 		}
-		mIsLodManual = isManual;
 	}
     //---------------------------------------------------------------------
 	void Mesh::_setLodUsage(unsigned short level, MeshLodUsage& usage)
@@ -1025,20 +1003,26 @@ namespace Ogre {
 
 		mMeshLodUsageList[level] = usage;
 	}
+	//---------------------------------------------------------------------
+	bool Mesh::_isManualLodLevel( unsigned short level ) const
+	{
+		return !mMeshLodUsageList[level].manualName.empty();
+	}
     //---------------------------------------------------------------------
 	void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
 		IndexData* facedata)
 	{
+		// TODO: Needs testing with manual mesh Lod!
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
-
+		
 		// Basic prerequisites
-		assert(!mIsLodManual && "Not using generated LODs!");
-        assert(subIdx <= mSubMeshList.size() && "Index out of bounds");
+		assert(mMeshLodUsageList[level].manualName.empty() && "Not using generated LODs!");
+        assert(subIdx < mSubMeshList.size() && "Index out of bounds");
 		assert(level != 0 && "Can't modify first lod level (full detail)");
-		assert(level <= mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
-
+		assert(level < mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
+		
 		SubMesh* sm = mSubMeshList[subIdx];
-		sm->mLodFaceList[level - 1] = facedata;
+		sm->mLodFaceList[level] = facedata;
 
 	}
     //---------------------------------------------------------------------
@@ -1054,31 +1038,21 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::removeLodLevels(void)
     {
-        if (!mIsLodManual)
+        // Remove data from SubMeshes
+        SubMeshList::iterator isub, isubend;
+        isubend = mSubMeshList.end();
+        for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
         {
-            // Remove data from SubMeshes
-            SubMeshList::iterator isub, isubend;
-            isubend = mSubMeshList.end();
-            for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
-            {
-                (*isub)->removeLodLevels();
-            }
+            (*isub)->removeLodLevels();
         }
 
         freeEdgeList();
-        mMeshLodUsageList.clear();
 
         // Reinitialise
         mNumLods = 1;
-		// Init first (manual) lod
-		MeshLodUsage lod;
-        lod.userValue = 0;
-		lod.value = mLodStrategy->getBaseValue();
-        lod.edgeData = 0;
-        lod.manualMesh.setNull();
-		mMeshLodUsageList.push_back(lod);
-		mIsLodManual = false;
-
+		mMeshLodUsageList.resize(1);
+		mMeshLodUsageList[0].edgeData = NULL;
+		// TODO: Shouldn't we rebuild edge lists after freeing them?
 
     }
     //---------------------------------------------------------------------
@@ -1490,12 +1464,13 @@ namespace Ogre {
 
 			bool atLeastOneIndexSet = false;
 
-            if (mIsLodManual && lodIndex != 0)
+            if (!usage.manualName.empty() && lodIndex != 0)
             {
                 // Delegate edge building to manual mesh
                 // It should have already built it's own edge list while loading
 				if (!usage.manualMesh.isNull())
 				{
+					//TODO: Is this really needed?
 					usage.edgeData = usage.manualMesh->getEdgeList(0);
 				}
             }
@@ -1526,33 +1501,16 @@ namespace Ogre {
                     if (s->useSharedVertices)
                     {
                         // Use shared vertex data, index as set 0
-                        if (lodIndex == 0)
-                        {
-                            eb.addIndexData(s->indexData, 0, s->operationType);
-                        }
-                        else
-                        {
-                            eb.addIndexData(s->mLodFaceList[lodIndex-1], 0,
+                        eb.addIndexData(s->mLodFaceList[lodIndex], 0,
                                 s->operationType);
-                        }
                     }
                     else if(s->isBuildEdgesEnabled())
                     {
                         // own vertex data, add it and reference it directly
                         eb.addVertexData(s->vertexData);
-                        if (lodIndex == 0)
-                        {
-                            // Base index data
-                            eb.addIndexData(s->indexData, vertexSetCount++,
-                                s->operationType);
-                        }
-                        else
-                        {
                             // LOD index data
-                            eb.addIndexData(s->mLodFaceList[lodIndex-1],
-                                vertexSetCount++, s->operationType);
-                        }
-
+                        eb.addIndexData(s->mLodFaceList[lodIndex],
+                            vertexSetCount++, s->operationType);
                     }
 					atLeastOneIndexSet = true;
                 }
@@ -1594,7 +1552,7 @@ namespace Ogre {
         {
             MeshLodUsage& usage = *i;
 
-            if (!mIsLodManual || index == 0)
+            if (usage.manualName.empty() || index == 0)
             {
                 // Only delete if we own this data
                 // Manual LODs > 0 own their own
@@ -2295,27 +2253,30 @@ namespace Ogre {
     //--------------------------------------------------------------------
     void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
     {
-        // In theory every mesh should have a submesh.
-        assert(getNumSubMeshes() > 0);
         setLodStrategy(lodConfig.strategy);
-        SubMesh* submesh = getSubMesh(0);
-        mNumLods = submesh->mLodFaceList.size() + 1;
-        mMeshLodUsageList.resize(mNumLods);
-        for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
+		MeshLodUsage usage;
+		size_t n = 0;
+		mMeshLodUsageList.resize(1); // remove old lod levels.
+        mMeshLodUsageList.reserve(lodConfig.levels.size() + 1);
+        for (size_t i = 0; i < lodConfig.levels.size(); i++) {
             // Record usages. First Lod usage is the mesh itself.
 
             // Skip lods, which have the same amount of vertices. No buffer generated for them.
             if (!lodConfig.levels[i].outSkipped) {
-                // Generated buffers are less then the reported by ProgressiveMesh.
-                // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before lod generation completes.
-                assert(mMeshLodUsageList.size() > n + 1);
-                MeshLodUsage& lod = mMeshLodUsageList[++n];
-                lod.userValue = lodConfig.levels[i].distance;
-                lod.value = getLodStrategy()->transformUserValue(lod.userValue);
-                lod.edgeData = 0;
-                lod.manualMesh.setNull();
+				
+                usage.userValue = lodConfig.levels[i].distance;
+                usage.value = getLodStrategy()->transformUserValue(usage.userValue);
+                usage.edgeData = NULL;
+                usage.manualMesh.setNull();
+                usage.manualName = lodConfig.levels[i].manualMeshName;
+				if(usage.manualName != "") {
+					mHasManualLodLevel = true;
+				}
+				n++;
+				mMeshLodUsageList.push_back(usage);
             }
         }
+		mNumLods = n + 1;
 
         // TODO: Fix this in PixelCountLodStrategy::getIndex()
         // Fix bug in Ogre with pixel count Lod strategy.
@@ -2329,6 +2290,6 @@ namespace Ogre {
             mMeshLodUsageList[0].value = 0;
         }
     }
-    //---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 }
 

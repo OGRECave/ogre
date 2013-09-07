@@ -319,7 +319,7 @@ namespace Ogre {
 
 		const MeshPtr& msh = ent->getMesh();
 		// Validate
-		if (msh->isLodManual())
+		if (msh->hasManualLodLevel())
 		{
 			LogManager::getSingleton().logMessage(
 				"WARNING (InstancedGeometry): Manual LOD is not supported. "
@@ -376,21 +376,17 @@ namespace Ogre {
 		// Otherwise, we have to create a new one
 		SubMeshLodGeometryLinkList* lodList = OGRE_NEW_T(SubMeshLodGeometryLinkList, MEMCATEGORY_GEOMETRY)();
 		mSubMeshGeometryLookup[sm] = lodList;
-		ushort numLods = sm->parent->isLodManual() ? 1 :
-			sm->parent->getNumLodLevels();
+		ushort numLods = sm->parent->getNumLodLevels();
 		lodList->resize(numLods);
 		for (ushort lod = 0; lod < numLods; ++lod)
 		{
+			if(sm->parent->_isManualLodLevel(lod))
+			{
+				continue;
+			}
 			SubMeshLodGeometryLink& geomLink = (*lodList)[lod];
-			IndexData *lodIndexData;
-			if (lod == 0)
-			{
-				lodIndexData = sm->indexData;
-			}
-			else
-			{
-				lodIndexData = sm->mLodFaceList[lod - 1];
-			}
+			IndexData *lodIndexData = sm->mLodFaceList[lod];
+
 			// Can use the original mesh geometry?
 			if (sm->useSharedVertices)
 			{

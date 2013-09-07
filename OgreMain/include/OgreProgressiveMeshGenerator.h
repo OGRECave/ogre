@@ -264,6 +264,7 @@ protected:
 	PMVertex* mLastReducedVertex;
 	Real mOutsideWeight;
 	Real mOutsideWalkAngle;
+	int mLastIndexBufferID;
 
 	size_t calcLodVertexCount(const LodLevel& lodConfig);
 	void tuneContainerSize();

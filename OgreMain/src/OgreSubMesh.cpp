@@ -47,14 +47,14 @@ namespace Ogre {
 		, mBuildEdgesEnabled(true)
     {
 		indexData = OGRE_NEW IndexData();
+		mLodFaceList.push_back(indexData);
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
+        removeLodLevels();
         OGRE_DELETE vertexData;
-		OGRE_DELETE indexData;
-
-		removeLodLevels();
+        OGRE_DELETE indexData;
     }
 
     //-----------------------------------------------------------------------
@@ -79,15 +79,8 @@ namespace Ogre {
     {
 
         ro.useIndexes = indexData->indexCount != 0;
-		if (lodIndex > 0 && static_cast< size_t >( lodIndex - 1 ) < mLodFaceList.size())
-		{
-			// lodIndex - 1 because we don't store full detail version in mLodFaceList
-			ro.indexData = mLodFaceList[lodIndex-1];
-        }
-        else
-        {
-    		ro.indexData = indexData;
-        }
+		assert(static_cast< size_t >(lodIndex) < mLodFaceList.size());
+		ro.indexData = mLodFaceList[lodIndex];
 		ro.operationType = operationType;
 		ro.vertexData = useSharedVertices? parent->sharedVertexData : vertexData;
 
@@ -212,14 +205,16 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
+		assert(!mLodFaceList.empty()); // Original mesh's index buffer should be there
         LODFaceList::iterator lodi, lodend;
 		lodend = mLodFaceList.end();
-		for (lodi = mLodFaceList.begin(); lodi != lodend; ++lodi)
+		lodi = mLodFaceList.begin() + 1; // Skip original
+		for (; lodi != lodend; ++lodi)
 		{
 			OGRE_DELETE *lodi;
 		}
 
-        mLodFaceList.clear();
+        mLodFaceList.resize(1);
 
     }
 	//---------------------------------------------------------------------

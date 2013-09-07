@@ -851,35 +851,46 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	mMesh.get()->_configureMeshLodUsage(lodConfig);
 }
 
-void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)
+void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfig)
 {
 	size_t vertexCount = mVertexList.size();
 	size_t lastBakeVertexCount = vertexCount;
-	size_t lodCount = lodConfigs.levels.size();
+	size_t lodCount = lodConfig.levels.size();
 	bool firstBuffPass = true;
 	for (unsigned short curLod = 0; curLod < lodCount; curLod++) {
-		size_t neededVertexCount = calcLodVertexCount(lodConfigs.levels[curLod]);
-		for (; neededVertexCount < vertexCount; vertexCount--) {
-			CollapseCostHeap::iterator nextVertex = mCollapseCostHeap.begin();
-			if (nextVertex != mCollapseCostHeap.end() && nextVertex->first < mCollapseCostLimit) {
-				mLastReducedVertex = nextVertex->second;
-				collapse(mLastReducedVertex);
-			} else {
-				break;
+		if(!lodConfig.levels[curLod].manualMeshName.empty()){
+			// Manual Lod level
+			lodConfig.levels[curLod].outSkipped = false;
+			lodConfig.levels[curLod].outUniqueVertexCount = 0;
+			unsigned short submeshCount = mMesh->getNumSubMeshes();
+			for (unsigned short i = 0; i < submeshCount; i++) {
+				SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+				lods.push_back(OGRE_NEW IndexData());
 			}
-		}
-		lodConfigs.levels[curLod].outUniqueVertexCount = vertexCount;
-		lodConfigs.levels[curLod].outSkipped = (lastBakeVertexCount == vertexCount);
-		if (!lodConfigs.levels[curLod].outSkipped) {
-			lastBakeVertexCount = vertexCount;
+		} else {
+			size_t neededVertexCount = calcLodVertexCount(lodConfig.levels[curLod]);
+			for (; neededVertexCount < vertexCount; vertexCount--) {
+				CollapseCostHeap::iterator nextVertex = mCollapseCostHeap.begin();
+				if (nextVertex != mCollapseCostHeap.end() && nextVertex->first < mCollapseCostLimit) {
+					mLastReducedVertex = nextVertex->second;
+					collapse(mLastReducedVertex);
+				} else {
+					break;
+				}
+			}
+			lodConfig.levels[curLod].outUniqueVertexCount = vertexCount;
+			lodConfig.levels[curLod].outSkipped = (lastBakeVertexCount == vertexCount);
+			if (!lodConfig.levels[curLod].outSkipped) {
+				lastBakeVertexCount = vertexCount;
 #if OGRE_DEBUG_MODE
-			assertValidMesh();
+				assertValidMesh();
 #endif // ifndef NDEBUG
-			if(lodConfigs.advanced.useCompression && (lodCount-1 != curLod || !firstBuffPass)) {
-				bakeMergedLods(firstBuffPass);
-				firstBuffPass = !firstBuffPass;
-			} else {
-				bakeLods(); // Last Lod level
+				if(lodConfig.advanced.useCompression && (lodCount-1 != curLod || !firstBuffPass)) {
+					bakeMergedLods(firstBuffPass);
+					firstBuffPass = !firstBuffPass;
+				} else {
+					bakeLods(); // Last Lod level
+				}
 			}
 		}
 	}
@@ -1205,6 +1216,7 @@ void ProgressiveMeshGenerator::bakeMergedLods(bool firstBufferPass)
 	unsigned short submeshCount = mMesh->getNumSubMeshes();
 
 	if(firstBufferPass){
+		mLastIndexBufferID =  mMesh->getSubMesh(0)->mLodFaceList.size();
 		// first buffer pass
 		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
@@ -1238,12 +1250,12 @@ void ProgressiveMeshGenerator::bakeMergedLods(bool firstBufferPass)
 			IndexData* prevLod;
 			IndexData* curLod;
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+			lods.reserve(lods.size() + 2);
 			int indexCount = mIndexBufferInfoList[i].indexCount + mIndexBufferInfoList[i].prevOnlyIndexCount;
 			assert(indexCount >= 0);
 			assert(mIndexBufferInfoList[i].prevIndexCount >= mIndexBufferInfoList[i].indexCount);
 			assert(mIndexBufferInfoList[i].prevIndexCount >= mIndexBufferInfoList[i].prevOnlyIndexCount);
-			lods.push_back(OGRE_NEW IndexData());
-			prevLod = lods.back();
+			prevLod = *lods.insert(lods.begin() + mLastIndexBufferID, OGRE_NEW IndexData());
 			prevLod->indexStart = 0;
 
 			//If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
@@ -1344,7 +1356,7 @@ void ProgressiveMeshGenerator::bakeMergedLods(bool firstBufferPass)
 		// Close buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-			IndexData* prevLod = *(++lods.rbegin());
+			IndexData* prevLod = lods.at(mLastIndexBufferID);
 			IndexData* curLod = lods.back();
 			prevLod->indexBuffer->unlock();
 			curLod->indexBuffer = prevLod->indexBuffer;

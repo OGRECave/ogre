@@ -98,6 +98,16 @@ struct LodLevel {
 	Real reductionValue;
 
 	/**
+	 * @brief Set's a mesh as the Lod Level for given distance.
+	 * 
+	 * This allows to generate the Lod levels in third party editors.
+	 * The mesh should have the same submeshes, same bones and animations, like the original mesh.
+	 * If you use this parameter, the reduction value and method will be ignored.
+	 * Using manual mesh is less efficient, because it needs separated vertex buffers.
+	 */
+	String manualMeshName;
+
+	/**
 	 * @brief This is set by ProgressiveMeshGenerator::build() function.
 	 *
 	 * Use Mesh::getNumLodLevels() for generated Lod count.

@@ -1439,7 +1439,7 @@ namespace Ogre {
 
         const LodStrategy *strategy = pMesh->getLodStrategy();
 		unsigned short numLvls = pMesh->getNumLodLevels();
-		bool manual = pMesh->isLodManual();
+		bool manual = pMesh->hasManualLodLevel();
         lodNode->SetAttribute("strategy", strategy->getName());
 		lodNode->SetAttribute("numlevels", StringConverter::toString(numLvls));
 		lodNode->SetAttribute("manual", StringConverter::toString(manual));
@@ -1613,31 +1613,23 @@ namespace Ogre {
 		bool manual = StringConverter::parseBool(val);
 
 		// Set up the basic structures
-		mMesh->_setLodInfo(numLevels, manual);
+		mMesh->_setLodInfo(numLevels);
 
 		// Parse the detail, start from 1 (the first sub-level of detail)
 		unsigned short i = 1;
-		TiXmlElement* usageElem;
-		if (manual)
-		{
-			usageElem = lodNode->FirstChildElement("lodmanual");
-		}
-		else
-		{
-			usageElem = lodNode->FirstChildElement("lodgenerated");
-		}
+		TiXmlElement* usageElem = lodNode->FirstChildElement();
 		while (usageElem)
 		{
-			if (manual)
+			if (usageElem->ValueStr() == "lodmanual")
 			{
 				readLodUsageManual(usageElem, i);
-				usageElem = usageElem->NextSiblingElement();
+				
 			}
-			else
+			else if (usageElem->ValueStr() == "lodgenerated")
 			{
 				readLodUsageGenerated(usageElem, i);
-				usageElem = usageElem->NextSiblingElement();
 			}
+			usageElem = usageElem->NextSiblingElement();
 			++i;
 		}
 		
