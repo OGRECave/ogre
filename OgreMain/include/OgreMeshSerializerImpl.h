@@ -55,7 +55,7 @@ namespace Ogre {
     will remain to load the latest version.
 
 	 @note
-		This mesh format was used from Ogre v1.8.
+		This mesh format was used from Ogre v1.9.
 
     */
     class _OgrePrivate MeshSerializerImpl : public Serializer
@@ -99,6 +99,7 @@ namespace Ogre {
         virtual void writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
         virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
         virtual void writeBoundsInfo(const Mesh* pMesh);
         virtual void writeEdgeList(const Mesh* pMesh);
 		virtual void writeAnimations(const Mesh* pMesh);
@@ -119,6 +120,7 @@ namespace Ogre {
         virtual size_t calcBoneAssignmentSize(void);
         virtual size_t calcSubMeshOperationSize(const SubMesh* pSub);
         virtual size_t calcSubMeshNameTableSize(const Mesh* pMesh);
+		virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
         virtual size_t calcEdgeListSize(const Mesh* pMesh);
         virtual size_t calcEdgeListLodSize(const EdgeData* data, bool isManual);
         virtual size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group);
@@ -150,10 +152,8 @@ namespace Ogre {
         virtual void readSubMeshBoneAssignment(DataStreamPtr& stream, Mesh* pMesh, 
             SubMesh* sub);
         virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, 
-            unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
-            unsigned short lodNum, MeshLodUsage& usage);
+		virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+		virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
         virtual void readBoundsInfo(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readEdgeList(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readEdgeListLodInfo(DataStreamPtr& stream, EdgeData* edgeData);
@@ -175,10 +175,9 @@ namespace Ogre {
         /// Flip the endianness of an entire vertex buffer, passed in as a 
         /// pointer to locked or temporary memory 
         virtual void flipEndian(void* pData, size_t vertexCount, size_t vertexSize, const VertexDeclaration::VertexElementList& elems);
-
-
-
-    };
+		
+		
+	};
 
 
 	/** Class for providing backwards-compatibility for loading version 1.8 of the .mesh format. 
@@ -190,10 +189,24 @@ namespace Ogre {
         MeshSerializerImpl_v1_8();
         ~MeshSerializerImpl_v1_8();
     protected:
+
+		// In the past we could select to use manual or automatic generated Lod levels,
+		// but now we can mix them. If it is mixed, we can't export it to older mesh formats.
+		bool isLodMixed(const Mesh* pMesh);
+
+		virtual void writeLodInfo(const Mesh* pMesh);
+		virtual void writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy);
 		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual void writeLodUsageManual(const MeshLodUsage& usage);
+
+		virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
 		virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
 			unsigned short lodNum, MeshLodUsage& usage);
-    };
+		virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+		
+
+
+	};
 
     /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 
 	 This mesh format was used from Ogre v1.7.
@@ -228,7 +241,8 @@ namespace Ogre {
 									unsigned short lodNum);
 
         virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
-    };
+		
+	};
 
     /** Class for providing backwards-compatibility for loading version 1.3 of the .mesh format. 
 	 This mesh format was used from Ogre v1.0 (and some pre-releases)
