@@ -54,7 +54,8 @@ protected:
 
 	void moveCameraToPixelDistance(Ogre::Real pixels); /// Moves camera to the swapping distance of PixelCountLodStrategy with given pixels.
 	Ogre::Real getCameraDistance(); /// Returns the distance between camera and mesh in pixels.
-	
+	void recreateEntity();
+
 
 // Variables:
 	int mForcedLodLevel; /// Currently forced Lod level or -1 for disabled.
@@ -72,6 +73,7 @@ protected:
 	OgreBites::CheckBox* mWireframe;
 	OgreBites::SelectMenu* mProfileList;
 	OgreBites::SelectMenu* mLodLevelList;
+	OgreBites::SelectMenu* mManualMeshes;
 	OgreBites::Slider* mReductionSlider;
 	OgreBites::Slider* mOutsideWeightSlider;
 	OgreBites::Slider* mOutsideWalkAngle;

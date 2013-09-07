@@ -137,6 +137,7 @@ namespace Ogre
 			readFloats(mStream, &level.distance, 1);
 			readInts(mStream, (Ogre::uint32*)&level.reductionMethod, 1);
 			readFloats(mStream, &level.reductionValue, 1);
+			level.manualMeshName = readString(mStream);
 			mLodConfig->levels.push_back(level);
 		}
 	}
@@ -253,6 +254,7 @@ namespace Ogre
 			writeFloats(&it->distance, 1);
 			writeInts((Ogre::uint32*)&it->reductionMethod, 1);
 			writeFloats(&it->reductionValue, 1);
+			writeString(it->manualMeshName);
 		}
 	}
 
@@ -273,6 +275,10 @@ namespace Ogre
 		size += sizeof(Ogre::uint32);
 
 		size += levelSize * mLodConfig->levels.size();
+
+		for(size_t i = 0; i < mLodConfig->levels.size(); i++) {
+			size += calcStringSize(mLodConfig->levels[i].manualMeshName);
+		}
 
 		return size;
 	}

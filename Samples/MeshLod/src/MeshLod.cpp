@@ -9,11 +9,7 @@ using namespace OgreBites;
 #include "OgreProgressiveMeshGenerator.h"
 #include "OgreMeshSerializer.h"
 
-Sample_MeshLod::Sample_MeshLod() :
-#if SHOW_MESH_HULL
-	mHullEntity(0),
-#endif
-	mMeshEntity(0)
+Sample_MeshLod::Sample_MeshLod()
 {
 	mInfo["Title"] = "Mesh Lod";
 	mInfo["Description"] = "Shows how to add Lod levels to a mesh using the ProgressiveMesh class.";
@@ -34,9 +30,11 @@ void Sample_MeshLod::setupContent()
 
 	// create a node for the model
 	mMeshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	mMeshEntity = NULL;
 #if SHOW_MESH_HULL
 	mHullNode = mMeshNode->createChildSceneNode();
 	mHullNode->scale(1.001,1.001,1.001);
+	mHullEntity = NULL;
 #endif
 	PMInjector::getSingleton().setInjectorListener(this);
 
@@ -62,16 +60,16 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
 {
 	cleanupControls();
 
-	SelectMenu* objectType = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "cmbModels", "Model:", 150, 8);
-	objectType->addItem("sinbad.mesh");
-	objectType->addItem("ogrehead.mesh");
-	objectType->addItem("knot.mesh");
-	objectType->addItem("fish.mesh");
-	objectType->addItem("penguin.mesh");
-	objectType->addItem("ninja.mesh");
-	objectType->addItem("dragon.mesh");
-	objectType->addItem("athene.mesh");
-	objectType->addItem("sibenik.mesh");
+	SelectMenu* models = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "cmbModels", "Model:", 150, 8);
+	models->addItem("sinbad.mesh");
+	models->addItem("ogrehead.mesh");
+	models->addItem("knot.mesh");
+	models->addItem("fish.mesh");
+	models->addItem("penguin.mesh");
+	models->addItem("ninja.mesh");
+	models->addItem("dragon.mesh");
+	models->addItem("athene.mesh");
+	models->addItem("sibenik.mesh");
 
 	// Add all meshes from popular:
 	StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames("Popular", "*.mesh");
@@ -79,14 +77,18 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
 	it = meshes->begin();
 	itEnd = meshes->end();
 	for(; it != itEnd; it++){
-		objectType->addItem(*it);
+		models->addItem(*it);
 	}
+
 
 	// Basic options:
 	mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "chkShowWireframe", "Show wireframe", 200);
 	mUseVertexNormals = mTrayMgr->createCheckBox(TL_TOPLEFT, "chkUseVertexNormals", "Use vertex normals", 200);
 	mOutsideWeightSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldOutsideWeight", "Weighten outside", 200, 50, 0, 100, 101);
 	mOutsideWalkAngle = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldOutsideWalkAngle", "Outside angle", 200, 50, -1, 1, 201);
+	mManualMeshes = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "cmbManualMesh", "Manual LOD:", 100, 8);
+	mManualMeshes->copyItemsFrom(models);
+	mManualMeshes->insertItem(0,"");
 	mReductionSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "sldReductionValue", "Reduced vertices", 200, 50, 0, 100, 101);
 	mTrayMgr->createButton(TL_TOPLEFT, "btnReduceMore","Reduce More");
 	mTrayMgr->createButton(TL_TOPLEFT, "btnReduceLess","Reduce Less");
@@ -120,7 +122,16 @@ void Sample_MeshLod::cleanupControls()
 	mTrayMgr->clearTray(TL_TOPRIGHT);
 	mTrayMgr->clearTray(TL_TOP);
 }
-
+void Sample_MeshLod::recreateEntity()
+{
+	// If you change the lod of a mesh, every entity referencing it should be recreated.
+	if(mMeshEntity){
+		mSceneMgr->destroyEntity(mMeshEntity);
+		mMeshEntity = 0; // createEntity may throw exception, so it is safer to reset to 0.
+	}
+	mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh->getName(), mLodConfig.mesh);
+	mMeshNode->attachObject(mMeshEntity);
+}
 void Sample_MeshLod::changeSelectedMesh( const String& name )
 {
 	if(mMeshEntity){
@@ -145,9 +156,11 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 	mOutsideWeightSlider->setValue(0, false);
 	mOutsideWalkAngle->setValue(0, false);
 	mLodLevelList->clearItems();
+	mManualMeshes->selectItem(0, false);
 	mWorkLevel.distance = std::numeric_limits<Real>::max();
 	mWorkLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 	mWorkLevel.reductionValue = 0.0;
+	mWorkLevel.manualMeshName = "";
 
 	loadConfig();
 
@@ -208,6 +221,7 @@ void Sample_MeshLod::loadAutomaticLod()
 	lodConfig.advanced.profile = mLodConfig.advanced.profile;
 	lodConfig.advanced.useVertexNormals = mLodConfig.advanced.useVertexNormals;
 	pm.generateLodLevels(lodConfig);
+	recreateEntity();
 }
 
 void Sample_MeshLod::loadUserLod( bool useWorkLod )
@@ -234,7 +248,7 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 		pm.generateLodLevels(config);
 		forceLodLevel(1);
 	}
-	getUniqueVertexCount(mLodConfig.mesh);
+	recreateEntity(); // This is only needed without threading.
 }
 void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
@@ -256,7 +270,6 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 		mHullNode->detachObject(mHullEntity);
 		mSceneMgr->destroyEntity(mHullEntity);
 		// Removes from the resources list.
-		MeshManager::getSingleton().remove(meshName);
 		mHullEntity = NULL;
 	}
 #endif
@@ -282,10 +295,8 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 
 void Sample_MeshLod::addLodLevel()
 {
-	LodLevel lvl;
+	LodLevel lvl(mWorkLevel);
 	lvl.distance = getCameraDistance();
-	lvl.reductionMethod = LodLevel::VRM_CONSTANT;
-	lvl.reductionValue = mReductionSlider->getValue();
 	Real distepsilon = lvl.distance + lvl.distance * 0.001;
 	size_t i = 0;
 	bool addLevel = true;
@@ -312,6 +323,7 @@ void Sample_MeshLod::loadLodLevel( int id )
 	mWorkLevel = mLodConfig.levels[id];
 	mReductionSlider->setValue(mWorkLevel.reductionValue, false);
 	mLodLevelList->selectItem(id, false);
+	mManualMeshes->selectItem(mWorkLevel.manualMeshName, false);
 	moveCameraToPixelDistance(mWorkLevel.distance);
 	loadUserLod();
 }
@@ -447,6 +459,9 @@ void Sample_MeshLod::itemSelected( SelectMenu* menu )
 		changeSelectedMesh(menu->getSelectedItem());
 	} else if(menu->getName() == "cmbLodLevels") {
 		loadLodLevel(menu->getSelectionIndex());
+	} else if(menu->getName() == "cmbManualMesh") {
+		mWorkLevel.manualMeshName = menu->getSelectedItem();
+		loadUserLod();
 	}
 }
 
@@ -536,4 +551,5 @@ bool Sample_MeshLod::shouldInject( PMGenRequest* request )
 void Sample_MeshLod::injectionCompleted( PMGenRequest* request )
 {
 	forceLodLevel(mForcedLodLevel, false);
+	recreateEntity();
 }

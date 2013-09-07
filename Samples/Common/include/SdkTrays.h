@@ -711,7 +711,14 @@ namespace OgreBites
 
 			setCaption(caption);
 		}
-
+		void copyItemsFrom(SelectMenu* other){
+			const Ogre::StringVector& items = other->getItems();
+			Ogre::StringVector::const_iterator it, itEnd;
+			itEnd = items.end();
+			for(it=items.begin(); it != itEnd; it++){
+				this->addItem(*it);
+			}
+		}
 		bool isExpanded()
 		{
 			return mExpanded;
