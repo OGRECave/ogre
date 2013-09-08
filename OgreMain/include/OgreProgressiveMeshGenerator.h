@@ -281,6 +281,7 @@ protected:
 	Real computeEdgeCollapseCost(PMVertex* src, PMEdge* dstEdge);
 	virtual void bakeLods();
 	virtual void bakeMergedLods(bool firstBufferPass);
+	virtual void bakeDummyLods();
 	void collapse(PMVertex* vertex);
 	void initialize(LodConfig& lodConfig);
 	void injectProfile(LodProfile& profile);

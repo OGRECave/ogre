@@ -850,7 +850,15 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	lodConfig.advanced.useVertexNormals = mUseVertexNormals;
 	mMesh.get()->_configureMeshLodUsage(lodConfig);
 }
-
+void ProgressiveMeshGenerator::bakeDummyLods()
+{
+	// Used for manual Lod levels
+	unsigned short submeshCount = mMesh->getNumSubMeshes();
+	for (unsigned short i = 0; i < submeshCount; i++) {
+		SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+		lods.push_back(OGRE_NEW IndexData());
+	}
+}
 void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfig)
 {
 	size_t vertexCount = mVertexList.size();
@@ -862,11 +870,7 @@ void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfig)
 			// Manual Lod level
 			lodConfig.levels[curLod].outSkipped = false;
 			lodConfig.levels[curLod].outUniqueVertexCount = 0;
-			unsigned short submeshCount = mMesh->getNumSubMeshes();
-			for (unsigned short i = 0; i < submeshCount; i++) {
-				SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-				lods.push_back(OGRE_NEW IndexData());
-			}
+			
 		} else {
 			size_t neededVertexCount = calcLodVertexCount(lodConfig.levels[curLod]);
 			for (; neededVertexCount < vertexCount; vertexCount--) {

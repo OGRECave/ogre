@@ -253,6 +253,9 @@ void PMWorker::addIndexBuffer(PMGenRequest::IndexBuffer& indexBuffer, bool useSh
 
 	// Lock the buffer for reading.
 	unsigned char* iStart = indexBuffer.indexBuffer;
+	if(!iStart) {
+		return;
+	}
 	unsigned char* iEnd = iStart + indexBuffer.indexCount * isize;
 	if (isize == sizeof(unsigned short)) {
 		addIndexDataImpl<unsigned short>((unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);
@@ -260,6 +263,21 @@ void PMWorker::addIndexBuffer(PMGenRequest::IndexBuffer& indexBuffer, bool useSh
 		// Unsupported index size.
 		OgreAssert(isize == sizeof(unsigned int), "");
 		addIndexDataImpl<unsigned int>((unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID);
+	}
+}
+
+void PMWorker::bakeDummyLods()
+{
+	// Used for manual Lod levels
+	unsigned short submeshCount = mRequest->submesh.size();
+	for (unsigned short i = 0; i < submeshCount; i++) {
+		vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
+		lods.push_back(PMGenRequest::IndexBuffer());
+		lods.back().indexStart = 0;
+		lods.back().indexCount = 0;
+		lods.back().indexSize = 2;
+		lods.back().indexBuffer = NULL;
+		lods.back().indexBufferSize = 0;
 	}
 }
 

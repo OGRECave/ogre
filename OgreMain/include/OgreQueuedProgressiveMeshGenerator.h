@@ -133,6 +133,7 @@ private:
 	void addIndexBuffer(PMGenRequest::IndexBuffer& indexBuffer, bool useSharedVertexLookup, unsigned short submeshID);
 	void bakeLods();
 	void bakeMergedLods(bool firstBufferPass);
+	void bakeDummyLods();
 
 };
 
