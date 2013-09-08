@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
 
@@ -204,7 +205,7 @@ namespace Ogre {
 
 				// Get buffer size
 				GLint binaryLength = 0;
-                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 
                 // Create microcode
@@ -212,7 +213,7 @@ namespace Ogre {
                     GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
 
 				// Get binary
-                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
                     OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
                                                           newMicrocode->getPtr() + sizeof(GLenum)));
 

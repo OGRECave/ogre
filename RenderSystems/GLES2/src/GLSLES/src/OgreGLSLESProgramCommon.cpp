@@ -30,6 +30,7 @@
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -180,7 +181,7 @@ namespace Ogre {
 		// get size of binary
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
-        if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+        if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
         {
             GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
 

@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareOcclusionQuery.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
+#include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2Util.h"
 
 namespace Ogre {
@@ -55,7 +57,7 @@ void GLES2HardwareOcclusionQuery::createQuery()
 {
 	// Check for hardware occlusion support
     
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mQueryID));
     }
@@ -70,7 +72,7 @@ void GLES2HardwareOcclusionQuery::createQuery()
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::destroyQuery()
 {
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mQueryID));
     }
@@ -90,7 +92,7 @@ void GLES2HardwareOcclusionQuery::notifyOnContextReset()
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::beginOcclusionQuery() 
 {
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
     }
@@ -98,7 +100,7 @@ void GLES2HardwareOcclusionQuery::beginOcclusionQuery()
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::endOcclusionQuery() 
 {
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT));
     }
@@ -106,7 +108,7 @@ void GLES2HardwareOcclusionQuery::endOcclusionQuery()
 //------------------------------------------------------------------
 bool GLES2HardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
         mPixelCount = *NumOfFragments;
@@ -120,7 +122,7 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
 {    
     GLuint available = GL_FALSE;
 
-    if(getGLSupport()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+    if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
     }

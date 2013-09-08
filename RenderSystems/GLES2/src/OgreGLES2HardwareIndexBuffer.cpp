@@ -190,7 +190,7 @@ namespace Ogre {
         }
         else
         {
-            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;

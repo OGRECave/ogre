@@ -51,7 +51,7 @@ namespace Ogre {
 
     void GLES2HardwareVertexBuffer::setFence(void)
     {
-        if(!mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
+        if(!mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
         {
             OGRE_CHECK_GL_ERROR(mFence = glFenceSyncAPPLE(GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE, 0));
         }
@@ -148,7 +148,7 @@ namespace Ogre {
                         "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
         }
 
-        if(mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
+        if(mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
         {
             GLenum result;
             OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
@@ -200,7 +200,7 @@ namespace Ogre {
         }
         else
         {
-            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;

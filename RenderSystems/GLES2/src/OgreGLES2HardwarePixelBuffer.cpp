@@ -26,13 +26,13 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreRenderSystem.h"
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2GpuProgram.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESLinkProgram.h"
@@ -853,7 +853,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tempTex));
 
-            if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
                 OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0));
 
             // Allocate temporary texture of the size of the destination area
@@ -1052,7 +1052,7 @@ namespace Ogre {
         // Set texture type
         OGRE_CHECK_GL_ERROR(glBindTexture(target, id));
 
-        if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+        if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
             OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000 ));
 
         // Allocate texture memory
@@ -1201,7 +1201,7 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
-            if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
             {
                 OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,
                                                                           mNumSamples, mGLInternalFormat, mWidth, mHeight));

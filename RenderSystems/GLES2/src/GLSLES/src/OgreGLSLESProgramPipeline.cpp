@@ -32,10 +32,12 @@
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2UniformCache.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLES2Util.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {

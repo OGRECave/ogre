@@ -451,6 +451,7 @@ namespace Ogre {
             void preExtraThreadsStarted();
             void postExtraThreadsStarted();
             void setClipPlanesImpl(const Ogre::PlaneList& planeList) {}
+            GLES2Support* getGLSupportRef() { return mGLSupport; }
 
             // ----------------------------------
             // GLES2RenderSystem specific members

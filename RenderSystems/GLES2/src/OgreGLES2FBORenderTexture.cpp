@@ -196,7 +196,7 @@ namespace Ogre {
             glBindTexture(GL_TEXTURE_2D, tid);
 
             // Set some default parameters
-            if(getGLSupport()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -360,7 +360,7 @@ namespace Ogre {
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
 #if OGRE_NO_GLES3_SUPPORT == 1
-                    if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") &&
+                    if (getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") &&
                         depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
 #else
                     if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
@@ -475,7 +475,7 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-            if (getGLSupport()->checkExtension("GL_OES_packed_depth_stencil") || gleswIsSupported(3, 0))
+            if (getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") || gleswIsSupported(3, 0))
                 if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
                     desirability += 5000;
 #if OGRE_NO_GLES3_SUPPORT == 0

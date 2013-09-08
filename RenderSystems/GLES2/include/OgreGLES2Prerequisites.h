@@ -108,10 +108,12 @@ THE SOFTWARE.
 
 #if defined(__APPLE__)
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
-    if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
+    if(static_cast<EAGL2Support*>(dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef())->getCurrentOSVersion() >= vers)
 #else
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers)
 #endif
+
+#define getGLES2SupportRef() dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef()
 
 // Copy this definition from desktop GL.  Used for polygon modes.
 #ifndef GL_FILL
