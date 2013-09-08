@@ -950,9 +950,6 @@ namespace Ogre {
 	{
 		RenderSystem::shutdown();
 
-		OGRE_DELETE mStateCacheManager;
-        mStateCacheManager = 0;
-
 		// Deleting the GLSL program factory
 		if (mGLSLProgramFactory)
 		{
@@ -990,6 +987,9 @@ namespace Ogre {
 
 		delete mTextureManager;
 		mTextureManager = 0;
+
+        OGRE_DELETE mStateCacheManager;
+        mStateCacheManager = 0;
 
 		// There will be a new initial window and so forth, thus any call to test
 		//  some params will access an invalid pointer, so it is best to reset

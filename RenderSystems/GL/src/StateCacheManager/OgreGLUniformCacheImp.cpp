@@ -28,6 +28,7 @@
 
 #include "OgreStableHeaders.h"
 #include "OgreGLUniformCacheImp.h"
+#include "OgreCommon.h"
 
 namespace Ogre {
     
