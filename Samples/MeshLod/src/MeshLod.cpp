@@ -214,7 +214,11 @@ void Sample_MeshLod::loadAutomaticLod()
 {
 	// Remove outdated Lod requests to reduce delay.
 	PMWorker::getSingleton().clearPendingLodRequests();
+#if DISABLE_THREADING
+	ProgressiveMeshGenerator pm;
+#else
 	QueuedProgressiveMeshGenerator pm;
+#endif
 	//pm.generateAutoconfiguredLodLevels(mLodConfig.mesh);
 	LodConfig lodConfig;
 	pm.getAutoconfig(mLodConfig.mesh, lodConfig);
@@ -236,19 +240,27 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 	mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
 	// Remove outdated Lod requests to reduce delay.
 	PMWorker::getSingleton().clearPendingLodRequests();
-	//QueuedProgressiveMeshGenerator pm; // Threaded
-	ProgressiveMeshGenerator pm; // Non-threaded
+#if DISABLE_THREADING
+	ProgressiveMeshGenerator pm;
+#else
+	QueuedProgressiveMeshGenerator pm;
+#endif
 	if(!useWorkLod){
 		pm.generateLodLevels(mLodConfig);
+#if DISABLE_THREADING
+		recreateEntity();
+#endif
 		forceLodLevel(-1);
 	} else {
 		LodConfig config(mLodConfig);
 		config.levels.clear();
 		config.levels.push_back(mWorkLevel);
 		pm.generateLodLevels(config);
+#if DISABLE_THREADING
+		recreateEntity();
+#endif
 		forceLodLevel(1);
 	}
-	recreateEntity(); // This is only needed without threading.
 }
 void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
@@ -324,8 +336,8 @@ void Sample_MeshLod::loadLodLevel( int id )
 	mReductionSlider->setValue(mWorkLevel.reductionValue, false);
 	mLodLevelList->selectItem(id, false);
 	mManualMeshes->selectItem(mWorkLevel.manualMeshName, false);
-	moveCameraToPixelDistance(mWorkLevel.distance);
 	loadUserLod();
+	moveCameraToPixelDistance(mWorkLevel.distance);
 }
 
 void Sample_MeshLod::removeLodLevel()
@@ -550,6 +562,6 @@ bool Sample_MeshLod::shouldInject( PMGenRequest* request )
 
 void Sample_MeshLod::injectionCompleted( PMGenRequest* request )
 {
-	forceLodLevel(mForcedLodLevel, false);
 	recreateEntity();
+	forceLodLevel(mForcedLodLevel, false);
 }

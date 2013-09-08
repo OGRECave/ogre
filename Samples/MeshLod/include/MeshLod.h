@@ -6,7 +6,9 @@
 #include "OgreLodConfig.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
+// To reduce checkboxes some developer features can be enabled with macros.
 #define SHOW_MESH_HULL 0
+#define DISABLE_THREADING 0
 
 class _OgreSampleClassExport Sample_MeshLod :
 	public OgreBites::SdkSample,
