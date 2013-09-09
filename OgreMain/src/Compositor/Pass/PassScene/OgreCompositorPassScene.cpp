@@ -104,6 +104,7 @@ namespace Ogre
 
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
 			mShadowNode->_update( mCamera );
+			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
 
 			//We need to restore the previous RT's update
 			mTarget->_beginUpdate();

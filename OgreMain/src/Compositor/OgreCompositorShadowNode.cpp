@@ -194,7 +194,7 @@ namespace Ogre
 		const Vector3 &camPos( newCamera->getDerivedPosition() );
 
 		size_t minIdx = -1;
-		Real minMaxDistance = -std::numeric_limits<Real>::max();
+		Real minMaxDistance = -std::numeric_limits<Real>::infinity();
 
 		//O(N*M) Complexity. Not my brightest moment. Feel free to improve this snippet,
 		//but profile it! (M tends to be very small, usually way below 8)
@@ -210,17 +210,27 @@ namespace Ogre
 				{
 					const Real fDist = camPos.distance( boundingSphere->getCenter() ) -
 										boundingSphere->getRadius();
-					if( fDist < minDistance && fDist > minMaxDistance )
+					if( fDist <= minDistance && fDist >= minMaxDistance )
 					{
 						bool bNewIdx = true;
-						if( Math::Abs( fDist - minMaxDistance ) < EPSILON && minIdx != j )
+						if( fDist == -std::numeric_limits<Real>::infinity() || //Direct. lights cause NaN
+							Math::Abs( fDist - minMaxDistance ) < EPSILON )
 						{
 							//Rare case where two or more lights are equally distant
 							//from the camera. Check whether we've already added it
-							LightIndexVec::const_iterator it = std::find( mShadowMapLightIndex.begin(),
-																		mShadowMapLightIndex.end(), j );
-							if( it != mShadowMapLightIndex.end() )
+							if( minIdx != j )
+							{
+								LightIndexVec::const_iterator it = std::find(
+																	mShadowMapLightIndex.begin(),
+																	mShadowMapLightIndex.end(), j );
+								if( it != mShadowMapLightIndex.end() )
+									bNewIdx = false;
+							}
+							else
+							{
+								//Quick path, we don't need the linear search
 								bNewIdx = false;
+							}
 						}
 
 						if( bNewIdx )
@@ -255,8 +265,13 @@ namespace Ogre
 		const AxisAlignedBoxVec &boxesVec = sceneManager->getReceiversBoxPerRq( camera );
 
 		mReceiverBox.setNull();
-		AxisAlignedBoxVec::const_iterator itor = boxesVec.begin() + mDefinition->mMinRq;
-		AxisAlignedBoxVec::const_iterator end  = boxesVec.begin() + mDefinition->mMaxRq;
+
+		//TODO: Finish the rqs that may be missing
+		const size_t minRq = std::min( mDefinition->mMinRq, boxesVec.size() );
+		const size_t maxRq = std::min( mDefinition->mMaxRq, boxesVec.size() );
+
+		AxisAlignedBoxVec::const_iterator itor = boxesVec.begin() + minRq;
+		AxisAlignedBoxVec::const_iterator end  = boxesVec.begin() + maxRq;
 
 		while( itor != end )
 			mReceiverBox.merge( *itor++ );

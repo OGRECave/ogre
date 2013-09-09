@@ -225,6 +225,15 @@ namespace Ogre
 									_mm_set1_epi32( -1 ) );
 		}
 
+		/** Returns the result of "a & ~b"
+		@return
+			r[i] = a[i] & ~b[i];
+		*/
+		static inline __m128i AndNot( __m128i a, __m128i b )
+		{
+			return _mm_andnot_si128( b, a );
+		}
+
 		/** Returns the result of "a | b"
 		@return
 			r[i] = a[i] | b[i];

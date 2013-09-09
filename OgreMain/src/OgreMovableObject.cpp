@@ -774,9 +774,9 @@ namespace Ogre {
 														Mathlib::SetAll( LAYER_SHADOW_CASTER ) );
 
 			//Fuse result with visibility flag
-			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			// finalMask = ( visible&!infiniteAabb & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
 			ArrayInt finalMask = Mathlib::TestFlags4( Mathlib::And( sceneFlags, *visibilityFlags ),
-												Mathlib::And( CastRealToInt( infMask ), isVisible ) );
+												Mathlib::AndNot( isVisible, CastRealToInt( infMask ) ) );
 			finalMask				= Mathlib::And( finalMask, isCaster );
 			ArrayReal casterMask	= CastIntToReal( finalMask );
 

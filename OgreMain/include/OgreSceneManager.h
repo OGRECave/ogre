@@ -307,8 +307,6 @@ namespace Ogre {
 			bool transparentShadowCastersMode;
 			/// Automatic light handling?
 			bool autoLights;
-			/// Manual light list
-			const LightList* manualLightList;
 			/// Scissoring if requested?
 			bool scissoring;
 
@@ -607,8 +605,10 @@ namespace Ogre {
         /// Internal method for firing the queue end event, returns true if queue is to be repeated
         virtual bool fireRenderQueueEnded(uint8 id, const String& invocation);
 		/// Internal method for firing when rendering a single object.
-		virtual void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, 
-			const LightList* pLightList, bool suppressRenderStateChanges);
+		virtual void fireRenderSingleObject(Renderable* rend, const Pass* pass,
+											const AutoParamDataSource* source,
+											const LightList* pLightList,
+											bool suppressRenderStateChanges);
 
 		/// Internal method for firing the texture shadows updated event
         virtual void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
@@ -649,8 +649,8 @@ namespace Ogre {
             method allows you to pass in a previously determined set of lights
             which will be used for a single render of this object.
         */
-        virtual void renderSingleObject(Renderable* rend, const Pass* pass, 
-			bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
+        virtual_l1 void renderSingleObject(Renderable* rend, const Pass* pass, 
+			bool lightScissoringClipping, bool doLightIteration);
 
 		/** Internal method for creating the AutoParamDataSource instance. */
 		virtual AutoParamDataSource* createAutoParamDataSource(void) const
@@ -667,9 +667,6 @@ namespace Ogre {
         ShadowTechnique mShadowTechnique;
         bool mDebugShadows;
         ColourValue mShadowColour;
-        Pass* mShadowDebugPass;
-        Pass* mShadowStencilPass;
-        Pass* mShadowModulativePass;
 		bool mShadowMaterialInitDone;
         HardwareIndexBufferSharedPtr mShadowIndexBuffer;
 		size_t mShadowIndexBufferSize;
@@ -703,29 +700,6 @@ namespace Ogre {
 		/// default shadow camera setup
 		ShadowCameraSetupPtr mDefaultShadowCameraSetup;
 
-		/** Default sorting routine which sorts lights which cast shadows
-			to the front of a list, sub-sorting by distance.
-		@remarks
-			Since shadow textures are generated from lights based on the
-			frustum rather than individual objects, a shadow and camera-wise sort is
-			required to pick the best lights near the start of the list. Up to 
-			the number of shadow textures will be generated from this.
-		*/
-		struct lightsForShadowTextureLess
-		{
-			_OgreExport bool operator()(const Light* l1, const Light* l2) const;
-		};
-
-
-        /** Internal method for locating a list of lights which could be affecting the frustum. 
-        @remarks
-            Custom scene managers are encouraged to override this method to make use of their
-            scene partitioning scheme to more efficiently locate lights, and to eliminate lights
-            which may be occluded by word geometry.
-        */
-        virtual void findLightsAffectingFrustum(const Camera* camera);
-        /// Internal method for setting up materials for shadows
-        virtual void initShadowVolumeMaterials(void);
         /// Internal method for creating shadow textures (texture-based shadows)
         virtual void ensureShadowTexturesCreated();
         /// Internal method for destroying shadow textures (texture-based shadows)
@@ -791,29 +765,6 @@ namespace Ogre {
 		virtual void _resumeRendering(RenderContext* context);
 
 	protected:
-        /** Internal method for rendering all the objects for a given light into the 
-            stencil buffer.
-        @param light The light source
-        @param cam The camera being viewed from
-		@param calcScissor Whether the method should set up any scissor state, or
-			false if that's already been done
-        */
-        virtual void renderShadowVolumesToStencil(const Light* light, const Camera* cam, 
-			bool calcScissor);
-        /** Internal utility method for setting stencil state for rendering shadow volumes. 
-        @param secondpass Is this the second pass?
-        @param zfail Should we be using the zfail method?
-        @param twosided Should we use a 2-sided stencil?
-        */
-        virtual void setShadowVolumeStencilState(bool secondpass, bool zfail, bool twosided);
-        /** Render a set of shadow renderables. */
-        void renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
-            Pass* pass, const LightList *manualLightList, unsigned long flags,
-            bool secondpass, bool zfail, bool twosided);
-        typedef vector<ShadowCaster*>::type ShadowCasterList;
-        ShadowCasterList mShadowCasterList;
-        SphereSceneQuery* mShadowCasterSphereQuery;
-        AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
         Real mDefaultShadowFarDist;
         Real mDefaultShadowFarDistSquared;
         Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
@@ -853,49 +804,6 @@ namespace Ogre {
 
         GpuProgramParametersSharedPtr mInfiniteExtrusionParams;
         GpuProgramParametersSharedPtr mFiniteExtrusionParams;
-
-        /// Inner class to use as callback for shadow caster scene query
-        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
-        {
-        protected:
-			SceneManager* mSceneMgr;
-            ShadowCasterList* mCasterList;
-            bool mIsLightInFrustum;
-            const PlaneBoundedVolumeList* mLightClipVolumeList;
-            const Camera* mCamera;
-            const Light* mLight;
-            Real mFarDistSquared;
-        public:
-            ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
-				mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0), 
-                mCamera(0) {}
-            // Prepare the listener for use with a set of parameters  
-            void prepare(bool lightInFrustum, 
-                const PlaneBoundedVolumeList* lightClipVolumes, 
-                const Light* light, const Camera* cam, ShadowCasterList* casterList, 
-                Real farDistSquared) 
-            {
-                mCasterList = casterList;
-                mIsLightInFrustum = lightInFrustum;
-                mLightClipVolumeList = lightClipVolumes;
-                mCamera = cam;
-                mLight = light;
-                mFarDistSquared = farDistSquared;
-            }
-            bool queryResult(MovableObject* object);
-            bool queryResult(SceneQuery::WorldFragment* fragment);
-        };
-
-        ShadowCasterSceneQueryListener* mShadowCasterQueryListener;
-
-        /** Internal method for locating a list of shadow casters which 
-            could be affecting the frustum for a given light. 
-        @remarks
-            Custom scene managers are encouraged to override this method to add optimisations, 
-            and to add their own custom shadow casters (perhaps for world geometry)
-        */
-        virtual_l1 const ShadowCasterList& findShadowCastersForLight(const Light* light, 
-            const Camera* camera);
         /** Render a group in the ordinary way */
 		virtual_l1 void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
 			QueuedRenderableCollection::OrganisationMode om);
@@ -903,13 +811,10 @@ namespace Ogre {
 		virtual_l1 void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group, 
 			QueuedRenderableCollection::OrganisationMode om);
 
-		/** Render a group with additive texture shadows. */
-		virtual_l1 void renderAdditiveTextureShadowedQueueGroupObjects(RenderQueueGroup* group, 
-			QueuedRenderableCollection::OrganisationMode om);
 		/** Render a set of objects, see renderSingleObject for param definitions */
 		virtual_l1 void renderObjects(const QueuedRenderableCollection& objs, 
 			QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration, const LightList* manualLightList = 0);
+            bool doLightIteration);
 		/** Render those objects in the transparent pass list which have shadow casting forced on
 		@remarks
 			This function is intended to be used to render the shadows of transparent objects which have
@@ -917,7 +822,7 @@ namespace Ogre {
 		*/
 		virtual_l1 void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs, 
 			QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-			bool doLightIteration, const LightList* manualLightList = 0);
+			bool doLightIteration);
 
 		/// Set up a scissor rectangle from a group of lights
 		virtual ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
@@ -1663,21 +1568,6 @@ namespace Ogre {
         */
         virtual void _renderVisibleObjects(void);
 
-        /** Prompts the class to send its contents to the renderer.
-            @remarks
-                This method prompts the scene manager to send the
-                contents of the scene it manages to the rendering
-                pipeline, possibly preceded by some sorting, culling
-                or other scene management tasks. Note that this method is not normally called
-                directly by the user application; it is called automatically
-                by the Ogre rendering loop.
-            @param camera Pointer to a camera from whose viewpoint the scene is to
-                be rendered.
-            @param vp The target viewport
-            @param includeOverlays Whether or not overlay objects should be rendered
-        */
-        virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
-
 		/// @See CompositorShadowNode remarks
 		void _swapVisibleObjectsForShadowMapping();
 
@@ -2302,8 +2192,8 @@ namespace Ogre {
 		which will be used for a single render of this object.
 		*/
 		virtual void manualRender(Renderable* rend, const Pass* pass, Viewport* vp, 
-			const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false, bool lightScissoringClipping = true, 
-			bool doLightIteration = true, const LightList* manualLightList = 0);
+			const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false,
+			bool lightScissoringClipping = true, bool doLightIteration = true);
 
 		/** Retrieves the internal render queue, for advanced users only.
         @remarks
@@ -3144,8 +3034,8 @@ namespace Ogre {
 			@param rend		Renderable to render
 			@param shadowDerivation Whether passes should be replaced with shadow caster passes
 		 */
-		virtual void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true,
-			bool doLightIteration = false, const LightList* manualLightList = 0);
+		virtual void _injectRenderWithPass( Pass *pass, Renderable *rend, bool shadowDerivation = true,
+											bool doLightIteration = false );
 
 		/** Indicates to the SceneManager whether it should suppress changing
 			the RenderSystem states when rendering objects.
