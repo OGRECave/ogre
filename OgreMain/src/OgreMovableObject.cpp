@@ -417,7 +417,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
 									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-									 VisibleObjectsBoundsInfo *outBoundsInfo )
+									 AxisAlignedBox *outReceiversBox )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
@@ -446,9 +446,6 @@ namespace Ogre {
 
 		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
 		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
-
-		ArrayVector3 vMinRcvBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
-		ArrayVector3 vMaxRcvBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
 
 		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
 		//In theory xor is faster, but some archs have a penalty for switching between integer
@@ -512,17 +509,15 @@ namespace Ogre {
 			ArrayReal finalMskAsReal= CastIntToReal( finalMask );
 			ArrayReal receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
-			//Merge with bounds only if they're visible. We first merge, then CMov its older
-			//value if the object isn't visible. Also do the same with the receiver-only aabb
+			//Merge with bounds only if they're visible & are receivers. We first merge,
+			//then CMov its older value if the object isn't visible/receiver.
 			ArrayVector3 newVal( vMinBounds );
 			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
-			vMinBounds.CmovRobust( finalMskAsReal, newVal );
-			vMinRcvBounds.CmovRobust( receiverMask, newVal );
+			vMinBounds.CmovRobust( receiverMask, newVal );
 
 			newVal = vMaxBounds;
 			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
-			vMaxBounds.CmovRobust( finalMskAsReal, newVal );
-			vMaxRcvBounds.CmovRobust( receiverMask, newVal );
+			vMaxBounds.CmovRobust( receiverMask, newVal );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
 
@@ -541,27 +536,14 @@ namespace Ogre {
 		}
 
 		//Merge the individual values and return the result.
-		if( outBoundsInfo )
+		if( outReceiversBox )
 		{
 			Vector3 vMin = vMinBounds.collapseMin();
 			Vector3 vMax = vMaxBounds.collapseMax();
 			if( vMin > vMax )
-				outBoundsInfo->aabb.setNull();
+				outReceiversBox->setNull();
 			else
-				outBoundsInfo->aabb.setExtents( vMin, vMax );
-
-			vMin = vMinRcvBounds.collapseMin();
-			vMax = vMaxRcvBounds.collapseMax();
-			if( vMin > vMax )
-			{
-				outBoundsInfo->receiverAabb.setNull();
-			}
-			else
-			{
-				outBoundsInfo->receiverAabb.setExtents( vMinRcvBounds.collapseMin(),
-														vMaxRcvBounds.collapseMax() );
-			}
-			
+				outReceiversBox->setExtents( vMin, vMax );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -727,7 +709,8 @@ namespace Ogre {
 
 				//Check if it intersects
 				ArrayInt rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
-				ArrayReal distSimd = objSphere.m_center.squaredDistance( lightSphere.m_center );
+				ArrayReal distSimd = objSphere.m_center.distance( lightSphere.m_center ) -
+										lightSphere.m_radius;
 				CastArrayToReal( distance, distSimd );
 
 				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
@@ -745,7 +728,7 @@ namespace Ogre {
 					if( IS_BIT_SET( k, r ) )
 					{
 						objData.mOwner[k]->mLightList.push_back(
-													LightClosest( *lightsIt, distance[k] ) );
+													LightClosest( *lightsIt, j, distance[k] ) );
 					}
 				}
 
@@ -762,6 +745,61 @@ namespace Ogre {
 
 			objData.advanceLightPack();
 		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::calculateCastersBox( const size_t numNodes, ObjectData objData,
+											 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox )
+	{
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+
+			objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize;
+
+			//Ignore casters with infinite boxes
+			ArrayReal infMask = Mathlib::Or( Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
+
+			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			ArrayInt isCaster  = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_CASTER ) );
+
+			//Fuse result with visibility flag
+			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			ArrayInt finalMask = Mathlib::TestFlags4( Mathlib::And( sceneFlags, *visibilityFlags ),
+												Mathlib::And( CastRealToInt( infMask ), isVisible ) );
+			finalMask				= Mathlib::And( finalMask, isCaster );
+			ArrayReal casterMask	= CastIntToReal( finalMask );
+
+			//Merge with bounds only if they're visible. We first merge, then CMov its older
+			//value if the object isn't visible. Also do the same with the receiver-only aabb
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			vMinBounds.CmovRobust( casterMask, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			vMaxBounds.CmovRobust( casterMask, newVal );
+
+			objData.advanceFrustumPack();
+		}
+
+		//Merge the individual values and return the result.
+		Vector3 vMin = vMinBounds.collapseMin();
+		Vector3 vMax = vMaxBounds.collapseMax();
+		if( vMin > vMax )
+			outBox->setNull();
+		else
+			outBox->setExtents( vMin, vMax );
 	}
     //-----------------------------------------------------------------------
     MovableObject::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
@@ -860,6 +898,8 @@ namespace Ogre {
 
 	inline bool LightClosest::operator < (const LightClosest &right) const
 	{
+		/*
+		Shouldn't be necessary. distance is insanely low (big negative number)
 		if( light->getType() == Light::LT_DIRECTIONAL &&
 			right.light->getType() != Light::LT_DIRECTIONAL )
 		{
@@ -869,9 +909,9 @@ namespace Ogre {
 				 right.light->getType() == Light::LT_DIRECTIONAL )
 		{
 			return false;
-		}
+		}*/
 
-		return sqDistance < right.sqDistance;
+		return distance < right.distance;
 	}
 }
 

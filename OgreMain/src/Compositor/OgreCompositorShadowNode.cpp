@@ -175,7 +175,8 @@ namespace Ogre
 		const Real EPSILON = 1e-6f;
 
 		mLastCamera = newCamera;
-		mShadowMapLightIndex.clear();
+
+		mergeReceiversBoxes( newCamera );
 
 		const Viewport *viewport = newCamera->getViewport();
 		const SceneManager *sceneManager = newCamera->getSceneManager();
@@ -185,7 +186,10 @@ namespace Ogre
 											sceneManager->getVisibilityMask();
 
 		const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
+		mShadowMapLightIndex.clear();
 		mShadowMapLightIndex.reserve( numLights );
+		mAffectedLights.clear();
+		mAffectedLights.resize( globalLightList.lights.size(), false );
 
 		const Vector3 &camPos( newCamera->getDerivedPosition() );
 
@@ -231,6 +235,7 @@ namespace Ogre
 				if( minIdx != -1 &&
 					(mShadowMapLightIndex.empty() || minIdx != mShadowMapLightIndex.back()) )
 				{
+					mAffectedLights[minIdx] = true;
 					mShadowMapLightIndex.push_back( minIdx );
 				}
 
@@ -238,6 +243,23 @@ namespace Ogre
 				++boundingSphere;
 			}
 		}
+
+		mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
+																 mDefinition->mMinRq,
+																 mDefinition->mMaxRq );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::mergeReceiversBoxes( const Camera* camera )
+	{
+		const SceneManager *sceneManager = camera->getSceneManager();
+		const AxisAlignedBoxVec &boxesVec = sceneManager->getReceiversBoxPerRq( camera );
+
+		mReceiverBox.setNull();
+		AxisAlignedBoxVec::const_iterator itor = boxesVec.begin() + mDefinition->mMinRq;
+		AxisAlignedBoxVec::const_iterator end  = boxesVec.begin() + mDefinition->mMaxRq;
+
+		while( itor != end )
+			mReceiverBox.merge( *itor++ );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::_update( Camera* camera )
@@ -309,5 +331,116 @@ namespace Ogre
 
 		smCamera.camera->_notifyViewport( pass->getViewport() );
 		pass->_setCustomCamera( smCamera.camera );
+	}
+	//-----------------------------------------------------------------------------------
+	const LightList* CompositorShadowNode::setShadowMapsToPass( Renderable* rend, const Pass* pass,
+																size_t startLight )
+	{
+		const size_t lightsPerPass = pass->getMaxSimultaneousLights();
+
+		mCurrentLightList.clear();
+		mCurrentLightList.reserve( lightsPerPass );
+
+		const LightList& renderableLights = rend->getLights();
+
+		/*
+		renderableLights contains a list of closest lights to the renderable
+		Let's take this example:
+			renderableLights contains 7 lights
+			We rendered 3 shadow maps
+			The material supports 4 lights per pass (because the user defined it so)
+		
+		We have to look among the first 4 lights for those that are casting shadows
+		and were actually rendered as a shadow map. We need to put those lights first
+		in the list so their texture unit binding matches the light idx in the shader.
+		
+		Being 'L' lights (regardles of what getCastShadows() says) and 'S' lights we
+		rendered into the shadow maps, consider the following arrangement in
+		renderableLights:
+			LSSL LSL
+			     ^
+			     5th light
+		So we have to take the first 4 lights and send them to the shader as the following:
+			SSLL
+		The shader material may have support for up to 3 shadow maps, but the truth is the
+		3rd shadow casting light was close to the camera, but too far from the object. It's
+		more reasonable to pass as 3rd & 4th light those that were actually closer.
+		
+		This approach diverges from Ogre 1.x, which would always pass all rendered shadow
+		casting lights first, even if they were extremely far from the object.
+
+		Check those lights within startLight & maxLights that are
+		also shadow maps, and send them first (sorted by distance)
+
+		If the number of lights per pass would be 7 or more, then we wouldn't have
+		any issues, and pass to the shader:
+			SSSLLLL
+		*/
+
+		size_t endLight = std::min( lightsPerPass, renderableLights.size() );
+
+		//Push all shadow casting lights first that are between range
+		//[startLight; startLight + lightsPerPass)
+		LightList::const_iterator itor = renderableLights.begin() + startLight;
+		LightList::const_iterator end  = renderableLights.begin() + endLight;
+		while( itor != end )
+		{
+			if( mAffectedLights[itor->globalIndex] )
+				mCurrentLightList.push_back( *itor );
+			++itor;
+		}
+
+		//Now again, but push non-shadow casting lights
+		itor = renderableLights.begin() + startLight;
+		end  = renderableLights.begin() + endLight;
+		while( itor != end )
+		{
+			if( !mAffectedLights[itor->globalIndex] )
+				mCurrentLightList.push_back( *itor );
+			++itor;
+		}
+
+		//Set the shadow map texture units
+		{
+			size_t shadowIdx=0;
+			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+														mDefinition->mShadowMapTexDefinitions.begin();
+			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
+														mDefinition->mShadowMapTexDefinitions.end();
+			while( itor != end && shadowIdx < pass->getNumShadowContentTextures() )
+			{
+				if( itor->light < mCurrentLightList.size() &&
+					mAffectedLights[mCurrentLightList[itor->light].globalIndex] )
+				{
+					size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
+													TextureUnitState::CONTENT_SHADOW, shadowIdx );
+					// I know, nasty const_cast
+					TextureUnitState *texUnit = const_cast<TextureUnitState*>(
+														pass->getTextureUnitState(texUnitIdx) );
+
+					
+					const LightClosest &light = mCurrentLightList[itor->light];
+
+					//TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
+					//changes need to be done so that UV calculations land on the right place
+					const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
+					texUnit->_setTexturePtr( shadowTex );
+				}
+				else
+				{
+					//TODO: Put blank texture
+				}
+				++shadowIdx;
+				++itor;
+			}
+
+			for( ; shadowIdx<pass->getNumShadowContentTextures(); ++shadowIdx )
+			{
+				//The material supports more shadow maps than the shadow
+				//node actually renders. This probably smells slopy setup
+			}
+		}
+
+		return &mCurrentLightList;
 	}
 }

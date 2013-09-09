@@ -86,8 +86,6 @@ namespace Ogre {
             virtual void objectMoved(MovableObject*) {}
         };
 
-		typedef vector<LightClosest>::type LightClosestVec;
-
     protected:
         /// node to which this object is attached
         Node* mParentNode;
@@ -256,13 +254,13 @@ namespace Ogre {
 		@param outCulledObjects
 			Out. List of objects that are (fully or partially) inside the frustum and
 			should be rendered
-		@param outBoundsInfo [out]
-			Bounds information from culled objects. Pointer can be null
+		@param outReceiversBox [out]
+			Bounds information from culled objects that are shadow receivers. Pointer can be null
 		*/
 		typedef FastArray<MovableObject*> MovableObjectArray;
 		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
 								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-								 VisibleObjectsBoundsInfo *outBoundsInfo );
+								 AxisAlignedBox *outReceiversBox );
 
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList
@@ -287,6 +285,9 @@ namespace Ogre {
 		*/
 		static void buildLightList( const size_t numNodes, ObjectData t,
 									const LightListInfo &globalLightList );
+
+		static void calculateCastersBox( const size_t numNodes, ObjectData t,
+										 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox );
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it

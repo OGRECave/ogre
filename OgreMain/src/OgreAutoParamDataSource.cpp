@@ -1056,6 +1056,7 @@ namespace Ogre {
 	{
 		static Vector4 dummy(0, 100000, 100000, 1/100000);
 
+		/* BIG TODO!!!! (dark_sylinc)
 		if (mSceneDepthRangeDirty)
 		{
 			// calculate depth information
@@ -1075,8 +1076,9 @@ namespace Ogre {
 			mSceneDepthRangeDirty = false;
 		}
 
-		return mSceneDepthRange;
+		return mSceneDepthRange;*/
 
+		return dummy;
 	}
 	//-----------------------------------------------------------------------------
 	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t index) const
@@ -1086,6 +1088,7 @@ namespace Ogre {
 		if (!mCurrentSceneManager->isShadowTechniqueTextureBased())
 			return dummy;
 
+		/* BIG TODO!!!! (dark_sylinc)
 		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
 			if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
@@ -1113,7 +1116,8 @@ namespace Ogre {
 			return mShadowCamDepthRanges[index];
 		}
 		else
-			return dummy;
+			return dummy;*/
+		return dummy;
 	}
 	//---------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getShadowColour() const

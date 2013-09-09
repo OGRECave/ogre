@@ -83,33 +83,6 @@ namespace Ogre {
 	class CompositorChain;
 	class CompositorShadowNode;
 
-	/** Structure collecting together information about the visible objects
-	that have been discovered in a scene.
-	*/
-	struct _OgreExport VisibleObjectsBoundsInfo
-	{
-		/// The axis-aligned bounds of the visible objects
-		AxisAlignedBox aabb;
-		/// The axis-aligned bounds of the visible shadow receiver objects
-		AxisAlignedBox receiverAabb;
-		/// The closest a object in the frustum regardless of visibility / shadow caster flags
-		Real minDistanceInFrustum;
-		/// The farthest object in the frustum regardless of visibility / shadow caster flags
-		Real maxDistanceInFrustum;
-
-		VisibleObjectsBoundsInfo();
-		void reset();
-		/*void merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
-			const Camera* cam, bool receiver=true);
-		/** Merge an object that is not being rendered because it's not a shadow caster, 
-			but is a shadow receiver so should be included in the range.
-		*//*
-		void mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-			const Sphere& sphereBounds, const Camera* cam);*/
-
-
-	};
-
     /** Manages the organisation and rendering of a 'scene' i.e. a collection 
 		of objects and potentially world geometry.
     @remarks
@@ -427,14 +400,13 @@ namespace Ogre {
         /// Current Viewport
         Viewport* mCurrentViewport;
 
-		typedef vector<VisibleObjectsBoundsInfo>::type VisibleObjectsBoundsInfoVec;
-		typedef vector<VisibleObjectsBoundsInfoVec>::type VisibleObjectsBoundsPerThread;
-		typedef map<const Camera*, VisibleObjectsBoundsInfoVec>::type VisibleObjectsRqMap;
+		typedef vector<AxisAlignedBoxVec>::type ReceiversBoxPerThread;
+		typedef map<const Camera*, AxisAlignedBoxVec>::type ReceiversBoxRqMap;
 
 		CompositorShadowNode*	mCurrentShadowNode;
-		VisibleObjectsRqMap		mVisibleObjsPerRenderQueue; //mVisibleObjsPerRenderQueue[camera][rqId]
-		/// Used to calculate the bounds in different threads, then merged into mVisibleObjsPerRenderQueue
-		VisibleObjectsBoundsPerThread mVisibleObjectBoundsPerThread;
+		ReceiversBoxRqMap		mReceiversBoxPerRenderQueue; //mReceiversBoxPerRenderQueue[camera][rqId]
+		/// Used to calculate the bounds in different threads, then merged into mReceiversBoxPerRenderQueue
+		ReceiversBoxPerThread	mReceiversBoxPerThread;
 
         /// Root scene node
 		SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
@@ -491,17 +463,6 @@ namespace Ogre {
 		CullingMode mPassCullingMode;
 
 	protected:
-
-		/** Visible objects bounding box list.
-			@remarks
-				Holds an ABB for each camera that contains the physical extends of the visible
-				scene elements by each camera. The map is crucial for shadow algorithms which
-				have a focus step to limit the shadow sample distribution to only valid visible
-				scene elements.
-		*/
-		typedef map< const Camera*, VisibleObjectsBoundsInfo>::type CamVisibleObjectsMap;
-		CamVisibleObjectsMap mCamVisibleObjectsMap; 
-
 		/// Array defining shadow count per light type.
 		size_t mShadowTextureCountPerType[3];
 
@@ -969,6 +930,7 @@ namespace Ogre {
 		virtual void resetLightClip();
 		virtual void checkCachedLightClippingInfo();
 
+		/// Merges the VisibleObjectsBoundsInfo data from all threads into one vobi per render queue
 		void collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq );
 
 		/// The active renderable visitor class - subclasses could override this
@@ -3275,8 +3237,30 @@ namespace Ogre {
 			valid during viewport update. */
 		Camera* getCameraInProgress(void) const		{ return mCameraInProgress; }
 
-		/** Returns a visibility boundary box for a specific camera. */
-		const VisibleObjectsBoundsInfo& getVisibleObjectsBoundsInfo(const Camera* cam) const;
+		/** Returns the bounding box of culled receivers from all render queues for a given camera
+		@remarks
+			Assumes a VisibleObjectsBoundsInfoVec exists for the given camera
+		*/
+		const AxisAlignedBoxVec& getReceiversBoxPerRq( const Camera* camera ) const;
+
+		/** Returns a visibility boundary box of culled receivers
+			calculated with the active shadow node (already merged with the right
+			render queue ids.)
+		@remarks
+			Returns a null box if no active shadow node.
+			@See CompositorShadowNode::getReceiversBox
+		*/
+		const AxisAlignedBox& getCurrentReceiversBox(void) const;
+
+		AxisAlignedBox _calculateCurrentCastersBox( uint32 viewportVisibilityMask,
+													uint8 firstRq, uint8 lastRq ) const;
+
+		/** @See CompositorShadowNode::getCastersBox
+		@remarks
+			Returns a null box if no active shadow node.
+		*/
+		const AxisAlignedBox& getCurrentCastersBox(void) const;
+
 
 		/** Set whether to use camera-relative co-ordinates when rendering, ie
 			to always place the camera at the origin and move the world around it.

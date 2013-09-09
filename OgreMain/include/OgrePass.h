@@ -227,9 +227,8 @@ namespace Ogre {
 		/// Constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
-		typedef vector<unsigned short>::type ContentTypeLookup;
-		mutable ContentTypeLookup mShadowContentTypeLookup;
-		mutable bool mContentTypeLookupBuilt;
+		typedef vector<size_t>::type ContentTypeLookup;
+		ContentTypeLookup mShadowContentTypeLookup;
 		/// Scissoring for the light?
 		bool mLightScissoring;
 		/// User clip planes for light?
@@ -571,7 +570,7 @@ namespace Ogre {
         TextureUnitState* getTextureUnitState(const String& name);
 		/** Retrieves a const pointer to a texture unit state.
 		*/
-		const TextureUnitState* getTextureUnitState(unsigned short index) const;
+		const TextureUnitState* getTextureUnitState( size_t index ) const;
 		/** Retrieves the Texture Unit State matching name.
 		Returns 0 if name match is not found.
 		*/
@@ -609,6 +608,22 @@ namespace Ogre {
         {
             return static_cast<unsigned short>(mTextureUnitStates.size());
         }
+
+		size_t getNumShadowContentTextures(void) const		{ return mShadowContentTypeLookup.size(); }
+
+		/// Recreates the contents of mShadowContentTypeLookup from scratch
+		void recreateShadowContentTypeLookup(void);
+
+		/** Call this function when a texture unit changed to type CONTENT_SHADOW
+		@param textureUnitIndex
+			Texture Unit index of the TU being changed
+		*/
+		void insertShadowContentTypeLookup( size_t textureUnitIndex );
+
+		/** Call this function when a texture unit is removed (any type), or when a tex unit
+			that used to be of type CONTENT_SHADOW, no longer is.
+		*/
+		void removeShadowContentTypeLookup( size_t textureUnitIndex );
 
         /** Sets the kind of blending this pass has with the existing contents of the scene.
         @remarks
@@ -1434,8 +1449,8 @@ namespace Ogre {
 			exist, then this method returns an arbitrary high-value outside the
 			valid range to index texture units.
 		*/
-		unsigned short _getTextureUnitWithContentTypeIndex(
-			TextureUnitState::ContentType contentType, unsigned short index) const;
+		size_t _getTextureUnitWithContentTypeIndex( TextureUnitState::ContentType contentType,
+													size_t index) const;
 
         /** Set texture filtering for every texture unit 
         @note

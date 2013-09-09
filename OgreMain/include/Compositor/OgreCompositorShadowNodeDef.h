@@ -99,10 +99,13 @@ namespace Ogre
 
 		/// Not the same as mShadowMapTexDefinitions.size(), because splits aren't included
 		size_t				mNumLights;
+		size_t				mMinRq;	//Minimum RQ included by one of our passes
+		size_t				mMaxRq;	//Maximum RQ included by one of our passes
 
 	public:
 		CompositorShadowNodeDef( IdString name ) :
-				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ), mNumLights( 0 ) {}
+				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ),
+				mNumLights( 0 ), mMinRq( ~0 ), mMaxRq( 0 ) {}
 
 		/// Overloaded to prevent creating input channels.
 		virtual IdString addTextureSourceName( const String &name, size_t index,

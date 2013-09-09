@@ -72,6 +72,7 @@ THE SOFTWARE.
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
+#include "Compositor/OgreCompositorShadowNode.h"
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -195,7 +196,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	mVisibleObjects.resize( 1 );
 	mVisibleObjectsBackup.resize( 1 );
 	mTmpVisibleObjects.resize( 1 );
-	mVisibleObjectBoundsPerThread.resize( 1 );
+	mReceiversBoxPerThread.resize( 1 );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -301,8 +302,7 @@ Camera* SceneManager::createCamera( const String &name )
 	mCamerasByName[name] = c;
 
 	// create visible bounds aab map entry
-	mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
-	mVisibleObjsPerRenderQueue[c] = VisibleObjectsBoundsInfoVec();
+	mReceiversBoxPerRenderQueue[c] = AxisAlignedBoxVec();
 
     return c;
 }
@@ -327,15 +327,11 @@ void SceneManager::destroyCamera(Camera *cam)
 	// Find in list
 	CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
 
-	// Remove visible boundary AAB entry
-	CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( cam );
-	if ( camVisObjIt != mCamVisibleObjectsMap.end() )
-		mCamVisibleObjectsMap.erase( camVisObjIt );
-
 	{
-		VisibleObjectsRqMap::iterator it = mVisibleObjsPerRenderQueue.find( cam );
-		if( it != mVisibleObjsPerRenderQueue.end() )
-			mVisibleObjsPerRenderQueue.erase( it );
+		// Remove visible boundary AAB entry
+		ReceiversBoxRqMap::iterator it = mReceiversBoxPerRenderQueue.find( cam );
+		if( it != mReceiversBoxPerRenderQueue.end() )
+			mReceiversBoxPerRenderQueue.erase( it );
 	}
 
 	IdString camName( cam->getName() );
@@ -1362,7 +1358,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 			// Assemble an AAB on the fly which contains the scene elements visible
 			// by the camera.
-			CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
+			/*CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
 
 			assert (camVisObjIt != mCamVisibleObjectsMap.end() &&
 				"Should never fail to find a visible object bound for a camera, "
@@ -1377,7 +1373,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 				mIlluminationStage == IRS_RENDER_TO_TEXTURE? true : false);
 			firePostFindVisibleObjects(vp);
 
-			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
+			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));*/
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
@@ -2377,18 +2373,18 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
 	outVisibleObjects.clear();
 
-	VisibleObjectsBoundsInfoVec &aabbInfo = *(mVisibleObjectBoundsPerThread.begin() + visObjsIdxStart);
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + visObjsIdxStart);
 	{
 		if( aabbInfo.size() < _lastRq )
 			aabbInfo.resize( _lastRq );
 
 		//Reset the aabb infos.
-		VisibleObjectsBoundsInfoVec::iterator itor = aabbInfo.begin() + _firstRq;
-		VisibleObjectsBoundsInfoVec::iterator end  = aabbInfo.begin() + _lastRq;
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + _firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + _lastRq;
 
 		while( itor != end )
 		{
-			itor->reset();
+			itor->setNull();
 			++itor;
 		}
 	}
@@ -2438,7 +2434,7 @@ void SceneManager::buildLightList()
 
 		//TODO: Send this to worker threads (dark_sylinc)
 
-		//TODO: Cull the lights against all cameras to build the list of visible lights.
+		//Cull the lights against all cameras to build the list of visible lights.
 		for( size_t i=0; i<numRenderQueues; ++i )
 		{
 			ObjectData objData;
@@ -4709,24 +4705,81 @@ void SceneManager::resetScissor()
 //---------------------------------------------------------------------
 void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq )
 {
-	VisibleObjectsRqMap::iterator boundsIt = mVisibleObjsPerRenderQueue.find( camera );
+	ReceiversBoxRqMap::iterator boundsIt = mReceiversBoxPerRenderQueue.find( camera );
 	if( boundsIt->second.size() < lastRq )
 		boundsIt->second.resize( lastRq );
 	for( size_t i=firstRq; i<lastRq; ++i )
-		boundsIt->second[i].reset();
+		boundsIt->second[i].setNull();
 
-	VisibleObjectsBoundsPerThread::const_iterator it = mVisibleObjectBoundsPerThread.begin();
-	VisibleObjectsBoundsPerThread::const_iterator en = mVisibleObjectBoundsPerThread.end();
+	ReceiversBoxPerThread::const_iterator it = mReceiversBoxPerThread.begin();
+	ReceiversBoxPerThread::const_iterator en = mReceiversBoxPerThread.end();
 	while( it != en )
 	{
-		const VisibleObjectsBoundsInfoVec &threadInfo = *it;
+		const AxisAlignedBoxVec &threadInfo = *it;
 		for( size_t i=firstRq; i<lastRq; ++i )
 		{
-			boundsIt->second[i].aabb.merge( threadInfo[i].aabb );
-			boundsIt->second[i].receiverAabb.merge( threadInfo[i].receiverAabb );
+			boundsIt->second[i].merge( threadInfo[i] );
 		}
 		++it;
 	}
+}
+//---------------------------------------------------------------------
+const AxisAlignedBoxVec& SceneManager::getReceiversBoxPerRq( const Camera* camera ) const
+{
+	return mReceiversBoxPerRenderQueue.find( camera )->second;
+}
+//---------------------------------------------------------------------
+const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
+{
+	if( mCurrentShadowNode )
+		return AxisAlignedBox::BOX_NULL;
+	else
+		return mCurrentShadowNode->getReceiversBox();
+}
+//---------------------------------------------------------------------
+const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const
+{
+	if( mCurrentShadowNode )
+		return AxisAlignedBox::BOX_NULL;
+	else
+		return mCurrentShadowNode->getCastersBox();
+}
+//---------------------------------------------------------------------
+AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibilityMask,
+															uint8 _firstRq, uint8 _lastRq ) const
+{
+	AxisAlignedBox retVal;
+
+	ObjectMemoryManagerVec::const_iterator it = mEntitiesMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mEntitiesMemoryManagerCulledList.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			AxisAlignedBox tmpBox;
+
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::calculateCastersBox( numObjs, objData,
+												viewportVisibilityMask|getVisibilityMask(),
+												&tmpBox );
+			retVal.merge( tmpBox );
+		}
+
+		++it;
+	}
+
+	return retVal;
 }
 //---------------------------------------------------------------------
 void SceneManager::checkCachedLightClippingInfo()
@@ -4892,7 +4945,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 	// Add light to internal list for use in render call
 	LightList lightList;
 	// const_cast is forgiveable here since we pass this const
-	lightList.push_back(LightClosest( const_cast<Light*>(light), 0 ));
+	lightList.push_back(LightClosest( const_cast<Light*>(light), 0, 0 ));
 
     // Set up scissor test (point & spot lights only)
     ClipResult scissored = CLIPPED_NONE;
@@ -5633,7 +5686,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 			shadowDist = cam->getNearClipDistance() * 300;
 		}
 		Real shadowOffset = shadowDist * mShadowTextureOffset;
-		// Precalculate fading info
+		// Precalculate fading info (TODO: Not used anymore)
 		Real shadowEnd = shadowDist + shadowOffset;
 		Real fadeStart = shadowEnd * mShadowTextureFadeStart;
 		Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
@@ -6298,19 +6351,6 @@ uint32 SceneManager::_getCombinedVisibilityMask(void) const
 
 }
 //---------------------------------------------------------------------
-const VisibleObjectsBoundsInfo& 
-SceneManager::getVisibleObjectsBoundsInfo(const Camera* cam) const
-{
-	static VisibleObjectsBoundsInfo nullBox;
-
-	CamVisibleObjectsMap::const_iterator camVisObjIt = mCamVisibleObjectsMap.find( cam );
-
-	if ( camVisObjIt == mCamVisibleObjectsMap.end() )
-		return nullBox;
-	else
-		return camVisObjIt->second;
-}
-//---------------------------------------------------------------------
 void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRenderableVisitor* visitor)
 {
 	if (visitor)
@@ -6564,7 +6604,7 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 }
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
+/*VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
 {
 	reset();
 }

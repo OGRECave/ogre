@@ -294,6 +294,14 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void TextureUnitState::setContentType(TextureUnitState::ContentType ct)
 	{
+		if( mContentType != ct && mParent )
+		{
+			if( mContentType == CONTENT_SHADOW )
+				mParent->removeShadowContentTypeLookup( mParent->getTextureUnitStateIndex( this ) );
+			else if( ct == CONTENT_SHADOW )
+				mParent->insertShadowContentTypeLookup( mParent->getTextureUnitStateIndex( this ) );
+		}
+
 		mContentType = ct;
 		if (ct == CONTENT_SHADOW || ct == CONTENT_COMPOSITOR)
 		{

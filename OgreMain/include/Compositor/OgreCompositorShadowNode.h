@@ -118,7 +118,38 @@ namespace Ogre
 		size_t					mLastFrame;
 		LightIndexVec			mShadowMapLightIndex;
 
+		/** Cached value. Contains the aabb of all culled receiver-only
+			objects during the camera render. We need to cache because the
+			SceneManager stores this data per RenderQueue, and we merge them
+			in @see mergeReceiversBoxes. The tighter the box, the higher the
+			shadow quality.
+		*/
+		AxisAlignedBox			mReceiverBox;
+
+		/** Cached value. Contains the aabb of all caster-only objects (filtered by
+			camera's visibility flags) from the minimum RQ used by our shadow render
+			passes, to the maximum RQ used. The tighter the box, the higher the
+			shadow quality.
+		*/
+		AxisAlignedBox			mCastersBox;
+
+		typedef vector<bool>::type LightsBitSet;
+		LightsBitSet			mAffectedLights;
+
+		/// Changes with each call to setShadowMapsToPass
+		LightList				mCurrentLightList;
+
+		/** Called by update to find out which lights are the ones closest to the given
+			camera. Early outs if we've already calculated our stuff for that camera in
+			a previous call.
+			Also updates internals lists for easy look up of lights <-> shadow maps
+		@param newCamera
+			User camera to base our shadow map cameras from.
+		*/
 		void buildClosestLightList( const Camera *newCamera );
+
+		/// Caches mReceiverBox merging all the RQs we may have to include w/ the given camera
+		void mergeReceiversBoxes( const Camera* camera );
 
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
@@ -133,6 +164,14 @@ namespace Ogre
 
 		/// We derive so we can override the camera with ours
 		virtual void postInitializePassScene( CompositorPassScene *pass );
+
+		const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass, size_t startLight );
+
+		/// @See mReceiverBox
+		const AxisAlignedBox& getReceiversBox(void) const	{ return mReceiverBox; }
+
+		/// @See mCastersBox
+		const AxisAlignedBox& getCastersBox(void) const		{ return mCastersBox; }
 	};
 
 	/** @} */

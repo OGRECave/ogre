@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorShadowNodeDef.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 #include "OgreLogManager.h"
 
@@ -119,6 +120,14 @@ namespace Ogre
 				}
 
 				pass->mIncludeOverlays = false;
+
+				if( pass->getType() == PASS_SCENE )
+				{
+					//assert( dynamic_cast<CompositorPassSceneDef*>( pass ) );
+					CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( pass );
+					mMinRq = std::min<size_t>( mMinRq, passScene->mFirstRQ );
+					mMaxRq = std::max<size_t>( mMaxRq, passScene->mLastRQ );
+				}
 
 				//Now check all PASS_SCENE from the same shadow map # render to
 				//the same viewport area (common mistake in case of UV atlas)

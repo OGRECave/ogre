@@ -480,7 +480,7 @@ namespace Ogre
 //	inline ArrayReal operator + ( ArrayReal l, ArrayReal r )	{ return _mm_add_ps( l, r ); }
 //	inline ArrayReal operator - ( ArrayReal l, Real r )			{ return _mm_sub_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator - ( Real l, ArrayReal r )			{ return _mm_sub_ps( _mm_set1_ps( l ), r ); }
-//	inline ArrayReal operator - ( ArrayReal l, ArrayReal r )	{ return _mm_sub_ps( l, r ); }
+	inline ArrayReal operator - ( ArrayReal l, ArrayReal r )	{ return _mm_sub_ps( l, r ); }
 //	inline ArrayReal operator * ( ArrayReal l, Real r )			{ return _mm_mul_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator * ( Real l, ArrayReal r )			{ return _mm_mul_ps( _mm_set1_ps( l ), r ); }
 	inline ArrayReal operator * ( ArrayReal l, ArrayReal r )	{ return _mm_mul_ps( l, r ); }

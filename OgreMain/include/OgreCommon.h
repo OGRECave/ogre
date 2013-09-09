@@ -598,11 +598,12 @@ namespace Ogre {
 	struct LightClosest
 	{
 		Light const *light;
-		Real sqDistance;
+		size_t		globalIndex; //Index to mGlobalLightList
+		Real distance;
 
-		LightClosest() : light( 0 ),sqDistance( 0.0f ) {}
-		LightClosest( Light *_light,  Real _sqDistance ) :
-			light( _light ), sqDistance( _sqDistance ) {}
+		LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ) {}
+		LightClosest( Light *_light, size_t _globalIndex, Real _distance ) :
+			light( _light ), globalIndex( _globalIndex ), distance( _distance ) {}
 
 		inline bool operator < ( const LightClosest &right ) const;
 	};
@@ -622,7 +623,7 @@ namespace Ogre {
 		}
 	};
 	typedef HashedVector<LightClosest> LightList;
-
+	typedef vector<LightClosest>::type LightClosestVec;
 
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;

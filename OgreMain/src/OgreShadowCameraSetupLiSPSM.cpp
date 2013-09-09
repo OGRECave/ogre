@@ -250,11 +250,10 @@ namespace Ogre
 		}
 
 		// build scene bounding box
-		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
-		AxisAlignedBox sceneBB = visInfo.aabb;
-		AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
-		sceneBB.merge(receiverAABB);
-		sceneBB.merge(cam->getDerivedPosition());
+		const AxisAlignedBox &sceneBB		= sm->getCurrentCastersBox();
+		const AxisAlignedBox &receiverAABB	= sm->getCurrentReceiversBox();
+		//sceneBB.merge(receiverAABB);
+		//sceneBB.merge(cam->getDerivedPosition());
 
 		// in case the sceneBB is empty (e.g. nothing visible to the cam) simply
 		// return the standard shadow mapping matrix

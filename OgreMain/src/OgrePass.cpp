@@ -196,7 +196,6 @@ namespace Ogre {
 		, mPointMaxSize(0.0f)
 		, mPointSpritesEnabled(false)
 		, mPointAttenuationEnabled(false)
-		, mContentTypeLookupBuilt(false)
 		, mLightScissoring(false)
 		, mLightClipPlanes(false)
 		, mIlluminationStage(IS_UNKNOWN)
@@ -302,7 +301,6 @@ namespace Ogre {
 		mPointAttenuationEnabled = oth.mPointAttenuationEnabled;
 		memcpy(mPointAttenuationCoeffs, oth.mPointAttenuationCoeffs, sizeof(Real)*3);
 		mShadowContentTypeLookup = oth.mShadowContentTypeLookup;
-		mContentTypeLookupBuilt = oth.mContentTypeLookupBuilt;
 		mLightScissoring = oth.mLightScissoring;
 		mLightClipPlanes = oth.mLightClipPlanes;
 		mIlluminationStage = oth.mIlluminationStage;
@@ -613,7 +611,6 @@ namespace Ogre {
     {
         TextureUnitState *t = OGRE_NEW TextureUnitState(this);
         addTextureUnitState(t);
-		mContentTypeLookupBuilt = false;
 	    return t;
     }
     //-----------------------------------------------------------------------
@@ -624,7 +621,6 @@ namespace Ogre {
 	    t->setTextureName(textureName);
 	    t->setTextureCoordSet(texCoordSet);
         addTextureUnitState(t);
-		mContentTypeLookupBuilt = false;
 	    return t;
     }
     //-----------------------------------------------------------------------
@@ -653,6 +649,10 @@ namespace Ogre {
                     */
                     state->setTextureNameAlias(StringUtil::BLANK);
                 }
+
+				if( state->getContentType() == TextureUnitState::CONTENT_SHADOW )
+					mShadowContentTypeLookup.push_back( mTextureUnitStates.size()-1 );
+
                 // Needs recompilation
                 mParent->_notifyNeedsRecompile();
                 _dirtyHash();
@@ -663,7 +663,6 @@ namespace Ogre {
 				    "Pass:addTextureUnitState");
 
             }
-			mContentTypeLookupBuilt = false;
         }
 	}
     //-----------------------------------------------------------------------
@@ -696,7 +695,7 @@ namespace Ogre {
         return foundTUS;
     }
 	//-----------------------------------------------------------------------
-	const TextureUnitState* Pass::getTextureUnitState(unsigned short index) const
+	const TextureUnitState* Pass::getTextureUnitState( size_t index ) const
 	{
 		OGRE_LOCK_MUTEX(mTexUnitChangeMutex)
 		assert (index < mTextureUnitStates.size() && "Index out of bounds");
@@ -764,6 +763,8 @@ namespace Ogre {
 		OGRE_LOCK_MUTEX(mTexUnitChangeMutex)
         assert (index < mTextureUnitStates.size() && "Index out of bounds");
 
+		removeShadowContentTypeLookup( index );
+
         TextureUnitStates::iterator i = mTextureUnitStates.begin() + index;
         OGRE_DELETE *i;
 	    mTextureUnitStates.erase(i);
@@ -773,7 +774,6 @@ namespace Ogre {
             mParent->_notifyNeedsRecompile();
         }
         _dirtyHash();
-		mContentTypeLookupBuilt = false;
     }
     //-----------------------------------------------------------------------
     void Pass::removeAllTextureUnitStates(void)
@@ -792,8 +792,55 @@ namespace Ogre {
             mParent->_notifyNeedsRecompile();
         }
         _dirtyHash();
-		mContentTypeLookupBuilt = false;
+		mShadowContentTypeLookup.clear();
     }
+	//-----------------------------------------------------------------------
+	void Pass::recreateShadowContentTypeLookup(void)
+	{
+		mShadowContentTypeLookup.clear();
+		for (unsigned short i = 0; i < mTextureUnitStates.size(); ++i)
+		{
+			if (mTextureUnitStates[i]->getContentType() == TextureUnitState::CONTENT_SHADOW)
+				mShadowContentTypeLookup.push_back(i);
+		}
+	}
+	//-----------------------------------------------------------------------
+	void Pass::insertShadowContentTypeLookup( size_t textureUnitIndex )
+	{
+		//Shadow content lookup indexes may have been shifted (and a new index must be inserted)
+		ContentTypeLookup::iterator itor = std::lower_bound( mShadowContentTypeLookup.begin(),
+															 mShadowContentTypeLookup.end(),
+															 textureUnitIndex );
+		itor = mShadowContentTypeLookup.insert( itor, textureUnitIndex ) + 1;
+		ContentTypeLookup::iterator end  = mShadowContentTypeLookup.end();
+
+		while( itor != end )
+		{
+			*itor += 1;
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
+	void Pass::removeShadowContentTypeLookup( size_t textureUnitIndex )
+	{
+		//Shadow content lookup indexes may have been shifted (or removed)
+		ContentTypeLookup::iterator itor = std::lower_bound( mShadowContentTypeLookup.begin(),
+															 mShadowContentTypeLookup.end(),
+															 textureUnitIndex );
+		if( itor != mShadowContentTypeLookup.end() && *itor == textureUnitIndex )
+		{
+			const size_t idx = itor - mShadowContentTypeLookup.begin();
+			mShadowContentTypeLookup.erase( itor );
+			itor = mShadowContentTypeLookup.begin() + idx;
+		}
+		ContentTypeLookup::iterator end  = mShadowContentTypeLookup.end();
+
+		while( itor != end )
+		{
+			*itor -= 1;
+			++itor;
+		}
+	}
 	//-----------------------------------------------------------------------
 	void Pass::_getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest)
 	{
@@ -1233,7 +1280,8 @@ namespace Ogre {
 			// been transferred
 			mTextureUnitStates.erase(istart, iend);
 			_dirtyHash();
-			mContentTypeLookupBuilt = false;
+			newPass->recreateShadowContentTypeLookup();
+			recreateShadowContentTypeLookup();
 			return newPass;
 		}
 		return NULL;
@@ -2113,22 +2161,9 @@ namespace Ogre {
 
     }
 	//-----------------------------------------------------------------------
-	unsigned short Pass::_getTextureUnitWithContentTypeIndex(
-		TextureUnitState::ContentType contentType, unsigned short index) const
+	size_t Pass::_getTextureUnitWithContentTypeIndex(
+		TextureUnitState::ContentType contentType, size_t index) const
 	{
-		if (!mContentTypeLookupBuilt)
-		{
-			mShadowContentTypeLookup.clear();
-			for (unsigned short i = 0; i < mTextureUnitStates.size(); ++i)
-			{
-				if (mTextureUnitStates[i]->getContentType() == TextureUnitState::CONTENT_SHADOW)
-				{
-					mShadowContentTypeLookup.push_back(i);
-				}
-			}
-			mContentTypeLookupBuilt = true;
-		}
-
 		switch(contentType)
 		{
 		case TextureUnitState::CONTENT_SHADOW:
