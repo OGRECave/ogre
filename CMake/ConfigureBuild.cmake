@@ -60,7 +60,7 @@ if (OGRE_CONFIG_THREADS)
 	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "tbb")
 		set(OGRE_THREAD_PROVIDER 3)
 		include_directories(${TBB_INCLUDE_DIRS})
-		if (WIN32)
+		if (WIN32 AND MINGW)
 			add_definitions(-D_WIN32_WINNT=0x0501)    
 		endif ()
 
