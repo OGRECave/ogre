@@ -737,6 +737,7 @@ namespace Ogre {
 		bool mShadowMaterialInitDone;
         HardwareIndexBufferSharedPtr mShadowIndexBuffer;
 		size_t mShadowIndexBufferSize;
+		size_t mShadowIndexBufferUsedSize;
         Rectangle2D* mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;

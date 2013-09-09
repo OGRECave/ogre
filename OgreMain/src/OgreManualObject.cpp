@@ -976,7 +976,7 @@ namespace Ogre {
 	ShadowCaster::ShadowRenderableListIterator
 	ManualObject::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
-		HardwareIndexBufferSharedPtr* indexBuffer,
+		HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
 		assert(indexBuffer && "Only external index buffers are supported right now");		
@@ -1058,8 +1058,8 @@ namespace Ogre {
 		updateEdgeListLightFacing(edgeList, lightPos);
 
 		// Generate indexes and update renderables
-		generateShadowVolume(edgeList, *indexBuffer, light,
-			mShadowRenderables, flags);
+		generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
+			light, mShadowRenderables, flags);
 
 
 		return ShadowRenderableListIterator(

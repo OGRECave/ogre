@@ -129,6 +129,7 @@ mShadowStencilPass(0),
 mShadowModulativePass(0),
 mShadowMaterialInitDone(false),
 mShadowIndexBufferSize(51200),
+mShadowIndexBufferUsedSize(0),
 mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
 mIlluminationStage(IRS_NONE),
@@ -5635,8 +5636,8 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
         // Get shadow renderables			
         ShadowCaster::ShadowRenderableListIterator iShadowRenderables =
             caster->getShadowVolumeRenderableIterator(mShadowTechnique,
-            light, &mShadowIndexBuffer, extrudeInSoftware, 
-            extrudeDist, flags);
+            light, &mShadowIndexBuffer, &mShadowIndexBufferUsedSize,
+            extrudeInSoftware, extrudeDist, flags);
 
         // Render a shadow volume here
         //  - if we have 2-sided stencil, one render with no culling
@@ -5868,6 +5869,7 @@ void SceneManager::setShadowIndexBufferSize(size_t size)
             false);
     }
     mShadowIndexBufferSize = size;
+	mShadowIndexBufferUsedSize = 0;
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 

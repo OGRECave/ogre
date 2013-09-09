@@ -48,8 +48,8 @@ namespace Ogre {
 	}
 	// ------------------------------------------------------------------------
 	void ShadowCaster::generateShadowVolume(EdgeData* edgeData, 
-		const HardwareIndexBufferSharedPtr& indexBuffer, const Light* light,
-		ShadowRenderableList& shadowRenderables, unsigned long flags)
+		const HardwareIndexBufferSharedPtr& indexBuffer, size_t& indexBufferUsedSize, 
+		const Light* light, ShadowRenderableList& shadowRenderables, unsigned long flags)
 	{
 		// Edge groups should be 1:1 with shadow renderables
 		assert(edgeData->edgeGroups.size() == shadowRenderables.size());
@@ -188,12 +188,16 @@ namespace Ogre {
 					"ShadowCaster::generateShadowVolume");
 			}
 		}
+		else if(indexBufferUsedSize + preCountIndexes > indexBuffer->getNumIndexes())
+		{
+			indexBufferUsedSize = 0;
+		}
 
 		// Lock index buffer for writing, just enough length as we need
 		unsigned short* pIdx = static_cast<unsigned short*>(
-			indexBuffer->lock(0, sizeof(unsigned short) * preCountIndexes, 
-			HardwareBuffer::HBL_DISCARD));
-		size_t numIndices = 0;
+			indexBuffer->lock(sizeof(unsigned short) * indexBufferUsedSize, sizeof(unsigned short) * preCountIndexes,
+			indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE));
+		size_t numIndices = indexBufferUsedSize;
 		
 		// Iterate over the groups and form renderables for each based on their
 		// lightFacing
@@ -372,16 +376,16 @@ namespace Ogre {
 
 		}
 
-
 		// Unlock index buffer
 		indexBuffer->unlock();
 
 		// In debug mode, check we didn't overrun the index buffer
-		assert(numIndices == preCountIndexes);
+		assert(numIndices == indexBufferUsedSize + preCountIndexes);
 		assert(numIndices <= indexBuffer->getNumIndexes() &&
 			"Index buffer overrun while generating shadow volume!! "
 			"You must increase the size of the shadow index buffer.");
 
+		indexBufferUsedSize = numIndices;
 	}
 	// ------------------------------------------------------------------------
 	void ShadowCaster::extrudeVertices(
