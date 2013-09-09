@@ -223,7 +223,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
 	{
-		mSaveMicrocodesToCache = val;		
+        // Check that saving shader microcode is supported
+        if(!canGetCompiledShaderBuffer())
+            mSaveMicrocodesToCache = false;
+        else
+            mSaveMicrocodesToCache = val;
 	}
 	//---------------------------------------------------------------------
 	bool GpuProgramManager::isCacheDirty( void ) const
