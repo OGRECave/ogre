@@ -4289,7 +4289,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::notifyOnDeviceLost(D3D9Device* device)
 	{	
-		std::stringstream ss;
+		StringStream ss;
 
 		ss << "D3D9 Device 0x[" << device->getD3D9Device() << "] entered lost state";
 		LogManager::getSingleton().logMessage(ss.str());
@@ -4316,7 +4316,7 @@ namespace Ogre
 		// Invalidate active view port.
 		mActiveViewport = NULL;
 
-		std::stringstream ss;
+		StringStream ss;
 
 		// Reset the texture stages, they will need to be rebound
 		for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)

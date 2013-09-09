@@ -42,7 +42,11 @@
 #endif
 
 #if OGRE_UNICODE_SUPPORT
-	#define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#	if	OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
+#		define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8_c_str())
+#	else
+#		define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#	endif
 #else
 	#define DISPLAY_STRING_TO_STRING(DS) (DS)
 #endif
@@ -2761,7 +2765,7 @@ namespace OgreBites
 				if (mStatsPanel->getOverlayElement()->isVisible())
 				{
 					Ogre::StringVector values;
-					std::ostringstream oss;
+					Ogre::StringStream oss;
 					
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.avgFPS;

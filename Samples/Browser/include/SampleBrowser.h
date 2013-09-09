@@ -111,7 +111,7 @@
 // If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
 #   endif // USE_RTSHADER_SYSTEM
-typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;
+typedef std::map<String, OgreBites::SdkSample *> PluginMap;
 #endif // OGRE_STATIC_LIB
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
