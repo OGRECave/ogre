@@ -141,8 +141,6 @@ namespace Ogre {
                 // Discard the buffer
                 access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
             }
-            // We explicitly flush when the buffer is unlocked
-            access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
         }
         else if (options == HBL_READ_ONLY)
             access = GL_MAP_READ_BIT_EXT;
