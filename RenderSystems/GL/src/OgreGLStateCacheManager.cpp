@@ -42,18 +42,40 @@ namespace Ogre {
     
     GLStateCacheManager::GLStateCacheManager() 
     {
-        mImp = OGRE_NEW GLStateCacheManagerImp();
+        mImp = 0;
     }
     
     GLStateCacheManager::~GLStateCacheManager()
     {
-        OGRE_DELETE mImp;
-        mImp = 0;
+        for (std::map<intptr_t, GLStateCacheManagerImp*>::iterator it = mCaches.begin(); it != mCaches.end(); ++it)
+            OGRE_DELETE it->second;
     }
 
-    void GLStateCacheManager::initializeCache()
+    void GLStateCacheManager::switchContext(intptr_t id)
     {
-        mImp->initializeCache();
+        std::map<intptr_t, GLStateCacheManagerImp*>::iterator it = mCaches.find(id);
+        if (it != mCaches.end())
+        { // already have a cache for this context
+            mImp = it->second;
+        }
+        else
+        { // no cache for this context yet
+            mImp = OGRE_NEW GLStateCacheManagerImp();
+            mImp->initializeCache();
+            mCaches[id] = mImp;
+        }
+    }
+
+    void GLStateCacheManager::unregisterContext(intptr_t id)
+    {
+        std::map<intptr_t, GLStateCacheManagerImp*>::iterator it = mCaches.find(id);
+        if (it != mCaches.end())
+        {
+            if (mImp == it->second)
+                mImp = NULL;
+            OGRE_DELETE it->second;
+            mCaches.erase(it);
+        }
     }
     
     void GLStateCacheManager::clearCache()

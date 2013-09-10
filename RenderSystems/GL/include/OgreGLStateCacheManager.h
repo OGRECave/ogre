@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __GLStateCacheManager_H__
 
 #include "OgreGLPrerequisites.h"
+#include "OgreStdHeaders.h"
 
 typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
@@ -55,14 +56,22 @@ namespace Ogre
     private:
 		GLStateCacheManagerImp* mImp;
 
+		std::map<intptr_t, GLStateCacheManagerImp*> mCaches;
+
     public:
         GLStateCacheManager(void);
         ~GLStateCacheManager(void);
 
-		/** Initialize our cache variables and sets the
-            GL states on the current context.
-        */
-        void initializeCache();
+        /**
+         * GL state is tracked per context, so call this function to drop all
+         * recorded state for a given context before you destroy it.
+         */
+        void unregisterContext (intptr_t id);
+
+        /**
+         * @param id new context to switch to for state tracking
+         */
+        void switchContext (intptr_t id);
         
         /** Clears all cached values
         */
