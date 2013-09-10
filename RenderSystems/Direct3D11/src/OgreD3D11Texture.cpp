@@ -222,6 +222,9 @@ namespace Ogre
 				loadImage(img);
 			}
 		}
+
+        _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
+
 	}
 	//---------------------------------------------------------------------
 #ifdef USE_D3DX11_LIBRARY		
