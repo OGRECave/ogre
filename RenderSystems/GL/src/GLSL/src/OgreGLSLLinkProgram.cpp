@@ -193,9 +193,8 @@ namespace Ogre {
 						sizeOfBuffer
 						);
 
-		GLint   success = 0;
-        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &success);
-        if (!success)
+        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &mLinked);
+        if (!mLinked)
         {
             //
             // Something must have changed since the program binaries
