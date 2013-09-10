@@ -1185,6 +1185,7 @@ namespace Ogre {
 		mMainContext = 0;
 		primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
 		mCurrentContext = mMainContext;
+		mStateCacheManager->switchContext((intptr_t)mCurrentContext);
 
 		// Set primary context as active
 		if(mCurrentContext)
@@ -3512,6 +3513,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		mCurrentContext = context;
 		mCurrentContext->setCurrent();
 
+		mStateCacheManager->switchContext((intptr_t)mCurrentContext);
+
 		// Check if the context has already done one-time initialisation
 		if(!mCurrentContext->getInitialized()) 
 		{
@@ -3601,6 +3604,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				mMainContext = 0;
 			}
 		}
+		mStateCacheManager->unregisterContext((intptr_t)context);
 	}
 	//---------------------------------------------------------------------
 	Real GLRenderSystem::getMinimumDepthInputValue(void)
