@@ -233,11 +233,20 @@ namespace Ogre
 		HRESULT hr;
 
 		MemoryDataStreamPtr memoryptr=MemoryDataStreamPtr(new MemoryDataStream(dstream));
+
+        D3DX11_IMAGE_LOAD_INFO loadInfo;
+        loadInfo.Usage          = D3D11Mappings::_getUsage(mUsage);
+        loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+        if(mIsDynamic)
+        {
+            loadInfo.MipLevels = 1;
+        }
+
 		// Load the Texture
 		hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
 			memoryptr->getPtr(),
 			memoryptr->size(),
-			NULL,
+			&loadInfo,
 			NULL, 
 			&mpTex, 
 			NULL );
