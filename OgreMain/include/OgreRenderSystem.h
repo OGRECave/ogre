@@ -1197,7 +1197,7 @@ namespace Ogre
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
 			bool twoSidedOperation = false,
-			bool readBackAsTexture = false) = 0;
+            bool readBackAsTexture = false) {};
 
 
 
