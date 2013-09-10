@@ -57,7 +57,7 @@ Texture2D texFromZNormal: register(s5);
 
 struct v2p
 {
-	//float4 oClipPos: SV_POSITION;
+	float4 oClipPos: SV_POSITION;
 	float3 position: TEXCOORD0;
 	float4 normalAndFogVal: TEXCOORD1;
 	float3 eyePos: TEXCOORD2;
