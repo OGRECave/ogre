@@ -46,7 +46,7 @@ extern char ***_NSGetArgv(void);
 class TestBatch;
 using namespace Ogre;
 
-typedef std::map<std::string, OgreBites::SamplePlugin *> PluginMap;
+typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
 
 #ifdef USE_RTSHADER_SYSTEM
 
