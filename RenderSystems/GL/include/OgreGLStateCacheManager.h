@@ -62,11 +62,6 @@ namespace Ogre
         GLStateCacheManager(void);
         ~GLStateCacheManager(void);
 
-		/** Initialize our cache variables and sets the
-            GL states on the current context.
-        */
-        void initializeCache();
-
         /**
          * GL state is tracked per context, so call this function to drop all
          * recorded state for a given context before you destroy it.

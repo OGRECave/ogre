@@ -1185,7 +1185,6 @@ namespace Ogre {
 		mMainContext = 0;
 		primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
 		mCurrentContext = mMainContext;
-		mStateCacheManager->switchContext((intptr_t)mCurrentContext);
 
 		// Set primary context as active
 		if(mCurrentContext)
@@ -1202,6 +1201,8 @@ namespace Ogre {
 #if OGRE_THREAD_SUPPORT != 1
 		glewContextInit(mGLSupport);
 #endif
+
+		mStateCacheManager->switchContext((intptr_t)mCurrentContext);
 	}
 
 
@@ -3455,7 +3456,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_oneTimeContextInitialization()
 	{
-		mStateCacheManager->initializeCache();
 		if (GLEW_VERSION_1_2)
 		{
             // Set nicer lighting model -- d3d9 has this by default

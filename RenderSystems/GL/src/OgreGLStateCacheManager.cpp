@@ -61,6 +61,7 @@ namespace Ogre {
         else
         { // no cache for this context yet
             mImp = OGRE_NEW GLStateCacheManagerImp();
+            mImp->initializeCache();
             mCaches[id] = mImp;
         }
     }
@@ -75,11 +76,6 @@ namespace Ogre {
             OGRE_DELETE it->second;
             mCaches.erase(it);
         }
-    }
-
-    void GLStateCacheManager::initializeCache()
-    {
-        mImp->initializeCache();
     }
     
     void GLStateCacheManager::clearCache()
