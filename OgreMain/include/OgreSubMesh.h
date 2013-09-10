@@ -85,8 +85,8 @@ namespace Ogre {
         */
         VertexData *vertexData;
 
-		/// Face index data
-		IndexData *indexData;
+        /// Face index data
+        IndexData *indexData;
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
             @remarks

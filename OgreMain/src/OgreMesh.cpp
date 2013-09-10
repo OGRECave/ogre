@@ -383,16 +383,14 @@ namespace Ogre {
                 newSub->blendIndexToBoneIndexMap = (*subi)->blendIndexToBoneIndexMap;
             }
 
-            
+            // Copy index data
+            OGRE_DELETE newSub->indexData;
+			newSub->indexData = (*subi)->indexData->clone();
             // Copy any bone assignments
             newSub->mBoneAssignments = (*subi)->mBoneAssignments;
             newSub->mBoneAssignmentsOutOfDate = (*subi)->mBoneAssignmentsOutOfDate;
             // Copy texture aliases
             newSub->mTextureAliases = (*subi)->mTextureAliases;
-
-            // Copy index data
-            OGRE_DELETE newSub->indexData;
-            newSub->mLodFaceList.clear();
 
             // Copy lod face lists
             newSub->mLodFaceList.reserve((*subi)->mLodFaceList.size());
@@ -958,7 +956,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
 	{
-		// TODO: Needs testing!
+
 		// Basic prerequisites
 		assert(index != 0 && "Can't modify first lod level (full detail)");
 		assert(index < mMeshLodUsageList.size() && "Index out of bounds");
@@ -989,7 +987,7 @@ namespace Ogre {
 		// Resize submesh face data lists too
 		for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
 		{
-			(*i)->mLodFaceList.resize(numLevels);
+			(*i)->mLodFaceList.resize(numLevels - 1);
 		}
 	}
     //---------------------------------------------------------------------
@@ -1012,7 +1010,6 @@ namespace Ogre {
 	void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
 		IndexData* facedata)
 	{
-		// TODO: Needs testing with manual mesh Lod!
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 		
 		// Basic prerequisites
@@ -1022,7 +1019,7 @@ namespace Ogre {
 		assert(level < mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
 		
 		SubMesh* sm = mSubMeshList[subIdx];
-		sm->mLodFaceList[level] = facedata;
+		sm->mLodFaceList[level - 1] = facedata;
 
 	}
     //---------------------------------------------------------------------
@@ -1470,7 +1467,6 @@ namespace Ogre {
                 // It should have already built it's own edge list while loading
 				if (!usage.manualMesh.isNull())
 				{
-					//TODO: Is this really needed?
 					usage.edgeData = usage.manualMesh->getEdgeList(0);
 				}
             }
@@ -1501,16 +1497,33 @@ namespace Ogre {
                     if (s->useSharedVertices)
                     {
                         // Use shared vertex data, index as set 0
-                        eb.addIndexData(s->mLodFaceList[lodIndex], 0,
+                        if (lodIndex == 0)
+                        {
+                            eb.addIndexData(s->indexData, 0, s->operationType);
+                        }
+                        else
+                        {
+                            eb.addIndexData(s->mLodFaceList[lodIndex-1], 0,
                                 s->operationType);
+                        }
                     }
                     else if(s->isBuildEdgesEnabled())
                     {
                         // own vertex data, add it and reference it directly
                         eb.addVertexData(s->vertexData);
+                        if (lodIndex == 0)
+                        {
+                            // Base index data
+                            eb.addIndexData(s->indexData, vertexSetCount++,
+                                s->operationType);
+                        }
+                        else
+                        {
                             // LOD index data
-                        eb.addIndexData(s->mLodFaceList[lodIndex],
-                            vertexSetCount++, s->operationType);
+                            eb.addIndexData(s->mLodFaceList[lodIndex-1],
+                                vertexSetCount++, s->operationType);
+                        }
+
                     }
 					atLeastOneIndexSet = true;
                 }

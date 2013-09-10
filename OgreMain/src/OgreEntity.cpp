@@ -178,7 +178,7 @@ namespace Ogre {
 			ushort i, numLod;
 			numLod = mMesh->getNumLodLevels();
 			// NB skip LOD 0 which is the original
-			for (i = 0; i < numLod; ++i)
+			for (i = 1; i < numLod; ++i)
 			{
 				const MeshLodUsage& usage = mMesh->getLodLevel(i);
 				Entity* lodEnt;
@@ -573,13 +573,13 @@ namespace Ogre {
 
         Entity* displayEntity = this;
 		// Check we're not using a manual LOD
-        if (mMesh->hasManualLodLevel())
+        if (mMeshLodIndex > 0 && mMesh->hasManualLodLevel())
         {
             // Use alternate entity
-            assert( static_cast< size_t >( mMeshLodIndex ) < mLodEntityList.size() &&
+            assert( static_cast< size_t >( mMeshLodIndex - 1 ) < mLodEntityList.size() &&
                 "No LOD EntityList - did you build the manual LODs after creating the entity?");
             // index - 1 as we skip index 0 (original lod)
-			displayEntity = mLodEntityList[mMeshLodIndex];
+			displayEntity = mLodEntityList[mMeshLodIndex-1];
 
 			if (displayEntity != this && hasSkeleton() && displayEntity->hasSkeleton())
 			{
@@ -1383,14 +1383,14 @@ namespace Ogre {
         return mDisplaySkeleton;
     }
     //-----------------------------------------------------------------------
-    Entity* Entity::getLodLevelEntity(size_t index) const
+    Entity* Entity::getManualLodLevel(size_t index) const
     {
         assert(index < mLodEntityList.size());
 
-        return mLodEntityList[index];
+        return mLodEntityList[index-1];
     }
     //-----------------------------------------------------------------------
-    size_t Entity::getNumLodEntities(void) const
+    size_t Entity::getNumManualLodLevels(void) const
     {
         return mLodEntityList.size();
     }
@@ -1861,27 +1861,27 @@ namespace Ogre {
         assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
             "Only 16-bit indexes supported for now");
         // Potentially delegate to LOD entity
-        if (mMesh->hasManualLodLevel())
+        if (mMesh->hasManualLodLevel() && mMeshLodIndex > 0)
         {
             // Use alternate entity
-            assert( static_cast< size_t >( mMeshLodIndex ) < mLodEntityList.size() &&
+            assert( static_cast< size_t >( mMeshLodIndex - 1 ) < mLodEntityList.size() &&
                 "No LOD EntityList - did you build the manual LODs after creating the entity?");
 
-			Entity* requiredEntity = mLodEntityList[mMeshLodIndex];
+			Entity* requiredEntity = mLodEntityList[mMeshLodIndex-1];
 			if (requiredEntity != this) {
 				// delegate, we're using manual LOD and not the top lod index
-				if (hasSkeleton() && mLodEntityList[mMeshLodIndex]->hasSkeleton())
+				if (hasSkeleton() && mLodEntityList[mMeshLodIndex-1]->hasSkeleton())
 				{
 					// Copy the animation state set to lod entity, we assume the lod
 					// entity only has a subset animation states
-					AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex]->mAnimationState;
+					AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex-1]->mAnimationState;
 					if (mAnimationState != targetState) // only copy if lods have different skeleton instances
 					{
 						if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
 							mAnimationState->copyMatchingState(targetState);
 					}
 				}
-				return mLodEntityList[mMeshLodIndex]->getShadowVolumeRenderableIterator(
+				return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
 					shadowTechnique, light, indexBuffer, extrude,
 					extrusionDistance, flags);
 			}

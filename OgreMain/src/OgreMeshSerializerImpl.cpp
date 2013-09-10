@@ -1215,14 +1215,14 @@ namespace Ogre {
 
 	void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum )
 	{
-		const IndexData* indexData = submesh->mLodFaceList[lodNum];
+		const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
 		HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
 		assert(!ibuf.isNull());
 		unsigned int bufferIndex = -1;
 		for(ushort i = 0; i < lodNum; i++){
 			// it will check any previous Lod levels for the same buffer.
 			// This will allow to use merged/shared/compressed buffers.
-			const IndexData* prevIndexData = submesh->mLodFaceList[i];
+			const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
 			if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
 				bufferIndex = i;
 			}
@@ -1264,14 +1264,14 @@ namespace Ogre {
 	{
 		size_t size = 0;
 		
-		const IndexData* indexData = submesh->mLodFaceList[lodNum];
+		const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
 		HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
 		assert(!ibuf.isNull());
 		unsigned int bufferIndex = -1;
 		for(ushort i = 0; i < lodNum; i++){
 			// it will check any previous Lod levels for the same buffer.
 			// This will allow to use merged/shared/compressed buffers.
-			const IndexData* prevIndexData = submesh->mLodFaceList[i];
+			const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
 			if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
 				bufferIndex = i;
 			}
@@ -1367,7 +1367,7 @@ namespace Ogre {
 		for (i = 0; i < numSubs; ++i)
 		{
 			SubMesh* sm = pMesh->getSubMesh(i);
-			sm->mLodFaceList.resize(pMesh->mNumLods);
+			sm->mLodFaceList.resize(pMesh->mNumLods-1);
 		}
 		// lodID=0 is the original mesh. We need to skip it.
 		for(int lodID = 1; lodID < pMesh->mNumLods; lodID++){
@@ -1404,7 +1404,7 @@ namespace Ogre {
 		{
 			
 			SubMesh* sm = pMesh->getSubMesh(i);
-			sm->mLodFaceList[lodNum] = OGRE_NEW IndexData();
+			sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
 		}
 	}
     //---------------------------------------------------------------------
@@ -1418,8 +1418,8 @@ namespace Ogre {
 		for (i = 0; i < numSubs; ++i)
 		{
 			SubMesh* sm = pMesh->getSubMesh(i);
-			sm->mLodFaceList[lodNum] = OGRE_NEW IndexData();
-			IndexData* indexData = sm->mLodFaceList[lodNum];
+			sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
+			IndexData* indexData = sm->mLodFaceList[lodNum-1];
 
 			unsigned int numIndexes;
 			readInts(stream, &numIndexes, 1);
@@ -1435,7 +1435,7 @@ namespace Ogre {
 			readInts(stream, &bufferIndex, 1);
 			if(bufferIndex != (unsigned int)-1) {
 				// copy buffer pointer
-				indexData->indexBuffer = sm->mLodFaceList[bufferIndex]->indexBuffer;
+				indexData->indexBuffer = sm->mLodFaceList[bufferIndex-1]->indexBuffer;
 			} else {
 				// generate buffers
 
@@ -2602,7 +2602,7 @@ namespace Ogre {
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
-			const IndexData* indexData = sm->mLodFaceList[lodNum];
+			const IndexData* indexData = sm->mLodFaceList[lodNum-1];
 
 			// bool indexes32Bit
 			size += sizeof(bool);
@@ -2632,7 +2632,7 @@ namespace Ogre {
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
-			const IndexData* indexData = sm->mLodFaceList[lodNum];
+			const IndexData* indexData = sm->mLodFaceList[lodNum-1];
 			// bool indexes32Bit
 			size += sizeof(bool);
 			// Lock index buffer to write
@@ -2719,7 +2719,7 @@ namespace Ogre {
 			for (i = 0; i < numsubs; ++i)
 			{
 				SubMesh* sm = pMesh->getSubMesh(i);
-				sm->mLodFaceList.resize(pMesh->mNumLods);
+				sm->mLodFaceList.resize(pMesh->mNumLods-1);
 			}
 		}
 
@@ -2778,7 +2778,7 @@ namespace Ogre {
 
 			SubMesh* sm = pMesh->getSubMesh(i);
 			IndexData* indexData = OGRE_NEW IndexData();
-			sm->mLodFaceList[lodNum] = indexData;
+			sm->mLodFaceList[lodNum-1] = indexData;
 			// unsigned int numIndexes
 			unsigned int numIndexes;
 			readInts(stream, &numIndexes, 1);
@@ -3065,7 +3065,7 @@ namespace Ogre {
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[lodNum];
+            const IndexData* indexData = sm->mLodFaceList[lodNum-1];
 			
             // bool indexes32Bit
 			size += sizeof(bool);
@@ -3097,7 +3097,7 @@ namespace Ogre {
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[lodNum];
+            const IndexData* indexData = sm->mLodFaceList[lodNum-1];
             // bool indexes32Bit
 			size += sizeof(bool);
 			// Lock index buffer to write
