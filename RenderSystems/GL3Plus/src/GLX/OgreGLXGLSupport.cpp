@@ -430,7 +430,7 @@ namespace Ogre
 
 		LogManager::getSingleton().stream() << "Supported GLX extensions: " << extensionsString;
 
-		std::stringstream ext;
+		StringStream ext;
 		String instr;
 
 		ext << extensionsString;
@@ -671,7 +671,7 @@ namespace Ogre
 	}
 
 	//-------------------------------------------------------------------------------------------------//
-	bool GLXGLSupport::loadIcon(const std::string &name, Pixmap *pixmap, Pixmap *bitmap)
+	bool GLXGLSupport::loadIcon(const String &name, Pixmap *pixmap, Pixmap *bitmap)
 	{
 		Image image;
 		int width, height;

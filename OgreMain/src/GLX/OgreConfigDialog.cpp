@@ -152,14 +152,14 @@ public:
 	/* Class that binds a callback to a certain configuration option/value */
 	class ConfigCallbackData {
 	public:
-		ConfigCallbackData(GLXConfigurator *parent_, const std::string &optionName_, const std::string &valueName_, Widget optionmenu_):
+		ConfigCallbackData(GLXConfigurator *parent_, const String &optionName_, const String &valueName_, Widget optionmenu_):
 			parent(parent_),
 			optionName(optionName_),
 			valueName(valueName_),
 			optionmenu(optionmenu_) {
 		}
 		GLXConfigurator *parent;
-		std::string optionName, valueName;
+		String optionName, valueName;
 		Widget optionmenu;
 	};
 	std::list<ConfigCallbackData> mConfigCallbackData;
@@ -195,7 +195,7 @@ private:
 
 	/* Functions reacting to GUI */
 	void SetRenderer(RenderSystem *);
-	void SetConfigOption(const std::string &optionName, const std::string &valueName);
+	void SetConfigOption(const String &optionName, const String &valueName);
 };
 
 GLXConfigurator::GLXConfigurator():
@@ -479,7 +479,7 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
 	}
 }
 
-void GLXConfigurator::SetConfigOption(const std::string &optionName, const std::string &valueName) {
+void GLXConfigurator::SetConfigOption(const String &optionName, const String &valueName) {
 	if(!mRenderer)
 		// No renderer set -- how can this be called?
 		return;
