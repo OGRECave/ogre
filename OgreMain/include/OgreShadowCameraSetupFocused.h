@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetup.h"
 #include "OgrePolygon.h"
 #include "OgreConvexBody.h"
+
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 #include "OgreHeaderPrefix.h"
 
 
@@ -67,6 +70,8 @@ namespace Ogre {
         */
         static const Matrix4 msNormalToLightSpace;
         static const Matrix4 msLightSpaceToNormal;
+
+		ObjectMemoryManager mObjectMemoryManager;
 
         /** Temporary preallocated frustum to set up a projection matrix in 
             calculateShadowMappingMatrix().

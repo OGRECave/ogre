@@ -190,6 +190,36 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	mVisibleObjectsBackup.resize( 1 );
 	mTmpVisibleObjects.resize( 1 );
 	mReceiversBoxPerThread.resize( 1 );
+
+	// Init shadow caster material for texture shadows
+    if (!mShadowCasterPlainBlackPass)
+    {
+        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
+            "Ogre/TextureShadowCaster");
+        if (matPlainBlack.isNull())
+        {
+            matPlainBlack = MaterialManager::getSingleton().create(
+                "Ogre/TextureShadowCaster",
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
+            // Lighting has to be on, because we need shadow coloured objects
+            // Note that because we can't predict vertex programs, we'll have to
+            // bind light values to those, and so we bind White to ambient
+            // reflectance, and we'll set the ambient colour to the shadow colour
+            mShadowCasterPlainBlackPass->setAmbient(ColourValue::White);
+            mShadowCasterPlainBlackPass->setDiffuse(ColourValue::Black);
+            mShadowCasterPlainBlackPass->setSelfIllumination(ColourValue::Black);
+            mShadowCasterPlainBlackPass->setSpecular(ColourValue::Black);
+			// Override fog
+			mShadowCasterPlainBlackPass->setFog(true, FOG_NONE);
+            // no textures or anything else, we will bind vertex programs
+            // every so often though
+        }
+        else
+        {
+            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
+        }
+    }
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -4025,7 +4055,7 @@ const AxisAlignedBoxVec& SceneManager::getReceiversBoxPerRq( const Camera* camer
 //---------------------------------------------------------------------
 const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
 {
-	if( mCurrentShadowNode )
+	if( !mCurrentShadowNode )
 		return AxisAlignedBox::BOX_NULL;
 	else
 		return mCurrentShadowNode->getReceiversBox();
@@ -4033,7 +4063,7 @@ const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
 //---------------------------------------------------------------------
 const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const
 {
-	if( mCurrentShadowNode )
+	if( !mCurrentShadowNode )
 		return AxisAlignedBox::BOX_NULL;
 	else
 		return mCurrentShadowNode->getCastersBox();

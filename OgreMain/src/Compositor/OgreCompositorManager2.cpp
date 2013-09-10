@@ -98,7 +98,10 @@ namespace Ogre
 		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
 		texDef->width	= 1024;
 		texDef->height	= 1024;
-		texDef->formatList.push_back( PF_FLOAT32_R );
+		//texDef->formatList.push_back( PF_FLOAT32_R );
+		texDef->formatList.push_back( PF_A8B8G8R8 );
+		//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
+		texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
 
 		shadowNode->setNumTargetPass( 1 );
 		{

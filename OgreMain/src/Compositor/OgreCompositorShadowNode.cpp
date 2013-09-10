@@ -165,7 +165,7 @@ namespace Ogre
 	void CompositorShadowNode::buildClosestLightList( const Camera *newCamera )
 	{
 		const size_t currentFrameCount = mWorkspace->getFrameCount();
-		if( mLastCamera == newCamera && mLastFrame != currentFrameCount )
+		if( mLastCamera == newCamera && mLastFrame == currentFrameCount )
 		{
 			return;
 		}

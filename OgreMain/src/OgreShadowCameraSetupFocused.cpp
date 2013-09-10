@@ -53,8 +53,8 @@ namespace Ogre
 		0,  0,  0,  1);	// w
 
 	FocusedShadowCameraSetup::FocusedShadowCameraSetup(void)
-		: mTempFrustum(OGRE_NEW Frustum( 0, 0 ))
-		, mLightFrustumCamera(OGRE_NEW Camera( 0, NULL, NULL ))
+		: mTempFrustum(OGRE_NEW Frustum( 0, &mObjectMemoryManager ))
+		, mLightFrustumCamera(OGRE_NEW Camera( 0, &mObjectMemoryManager, NULL ))
 		, mLightFrustumCameraCalculated(false)
 		, mUseAggressiveRegion(true)
 	{
