@@ -1180,7 +1180,10 @@ namespace Ogre {
     void D3D11HLSLProgram::createLowLevelImpl(void)
     {
         // Create a low-level program, give it the same name as us
-        mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        if(mAssemblerProgram.get() != this)
+        {
+            mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        }
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
