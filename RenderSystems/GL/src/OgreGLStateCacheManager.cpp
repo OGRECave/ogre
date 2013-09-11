@@ -76,6 +76,18 @@ namespace Ogre {
             OGRE_DELETE it->second;
             mCaches.erase(it);
         }
+
+        // Always keep a valid cache, even if no contexts are left.
+        // This is needed due to the way GLRenderSystem::shutdown works -
+        // HardwareBufferManager destructor may call deleteGLBuffer even after all contexts
+        // have been deleted
+        if (mImp == NULL)
+        {
+            // Therefore we add a "dummy" cache if none are left
+            if (!mCaches.size())
+                mCaches[0] = OGRE_NEW GLStateCacheManagerImp();
+            mImp = mCaches.begin()->second;
+        }
     }
     
     void GLStateCacheManager::clearCache()
