@@ -237,7 +237,7 @@ namespace Ogre
         D3DX11_IMAGE_LOAD_INFO loadInfo;
         loadInfo.Usage          = D3D11Mappings::_getUsage(mUsage);
         loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
-        if(mUsage & TU_DYNAMIC)
+		if(mUsage & TU_DYNAMIC)
         {
             loadInfo.MipLevels = 1;
         }

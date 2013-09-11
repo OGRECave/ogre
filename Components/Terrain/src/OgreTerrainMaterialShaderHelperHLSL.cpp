@@ -105,7 +105,7 @@ namespace Ogre
 			"{\n";
 
 		outStream <<
-			"float4 oPos : POSITION;\n"
+			"float4 oPos : SV_POSITION;\n"
 			"float4 oPosObj : TEXCOORD0; \n";
 
 		uint texCoordSet = 1;
@@ -406,7 +406,7 @@ namespace Ogre
 			"{\n";
 
 		outStream <<
-			"float4 oPos : POSITION;\n"
+			"float4 oPos : SV_POSITION;\n"
 			"float4 oPosObj : TEXCOORD0; \n";
 
 		uint texCoordSet = 1;
