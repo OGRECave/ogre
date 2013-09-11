@@ -91,7 +91,10 @@ namespace Ogre
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
 
-		mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
+		//Passes belonging to a ShadowNode should not override their parent.
+		if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
+			mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
+
 		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
 
 		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mDefinition->mFirstRQ,
@@ -105,6 +108,9 @@ namespace Ogre
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
 			mShadowNode->_update( mCamera );
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
+
+			//ShadowNode passes may've overriden this setting.
+			mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
 
 			//We need to restore the previous RT's update
 			mTarget->_beginUpdate();

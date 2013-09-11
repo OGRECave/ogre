@@ -68,7 +68,6 @@ namespace Ogre {
          mCurrentRenderTarget(0),
          mCurrentViewport(0), 
 		 mCurrentSceneManager(0),
-		 mMainCamBoundsInfo(0),
          mCurrentPass(0),
 		 mBlankLight( 0, &mObjectMemoryManager )
     {
@@ -249,12 +248,6 @@ namespace Ogre {
 			// therefore set x = 1 and y = 0 so divisor doesn't change scale
 			return Vector4(1.0, 0.0, 0.0, 1.0); // since the main op is pow(.., vec4.z), this will result in 1.0
 		}
-	}
-	//-----------------------------------------------------------------------------
-	void AutoParamDataSource::setMainCamBoundsInfo(VisibleObjectsBoundsInfo* info)
-	{
-		mMainCamBoundsInfo = info;
-		mSceneDepthRangeDirty = true;
 	}
 	//-----------------------------------------------------------------------------
 	void AutoParamDataSource::setCurrentSceneManager(const SceneManager* sm)
@@ -1054,70 +1047,48 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	const Vector4& AutoParamDataSource::getSceneDepthRange() const
 	{
-		static Vector4 dummy(0, 100000, 100000, 1/100000);
+		static Vector4 dummy(0, 100000.0, 100000.0, 1/100000.0);
 
-		/* BIG TODO!!!! (dark_sylinc)
 		if (mSceneDepthRangeDirty)
 		{
-			// calculate depth information
-			Real depthRange = mMainCamBoundsInfo->maxDistanceInFrustum - mMainCamBoundsInfo->minDistanceInFrustum;
+			Real fNear, fFar;
+			mCurrentSceneManager->getMinMaxDepthRange( mCurrentCamera, fNear, fFar );
+			const Real depthRange = fFar - fNear;
 			if (depthRange > std::numeric_limits<Real>::epsilon())
-			{
-				mSceneDepthRange = Vector4(
-					mMainCamBoundsInfo->minDistanceInFrustum,
-					mMainCamBoundsInfo->maxDistanceInFrustum,
-					depthRange,
-					1.0f / depthRange);
-			}
+				mSceneDepthRange = Vector4( fNear, fFar, depthRange, 1.0f / depthRange );
 			else
-			{
 				mSceneDepthRange = dummy;
-			}
-			mSceneDepthRangeDirty = false;
+
+			mSceneDepthRangeDirty = true; //<< TODO!
 		}
 
-		return mSceneDepthRange;*/
-
-		return dummy;
+		return mSceneDepthRange;
 	}
 	//-----------------------------------------------------------------------------
 	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t index) const
 	{
-		static Vector4 dummy(0, 100000, 100000, 1/100000);
+		static Vector4 dummy(0, 100000.0, 100000.0, 1/100000.0);
 
-		if (!mCurrentSceneManager->isShadowTechniqueTextureBased())
-			return dummy;
-
-		/* BIG TODO!!!! (dark_sylinc)
 		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
+			if( mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index] )
 			{
-				const VisibleObjectsBoundsInfo& info = 
-					mCurrentSceneManager->getVisibleObjectsBoundsInfo(
-						(Camera*)mCurrentTextureProjector[index]);
-
-				Real depthRange = info.maxDistanceInFrustum - info.minDistanceInFrustum;
+				Real fNear, fFar;
+				mCurrentSceneManager->getMinMaxDepthRange( mCurrentTextureProjector[index],
+															fNear, fFar );
+				const Real depthRange = fFar - fNear;
 				if (depthRange > std::numeric_limits<Real>::epsilon())
-				{
-					mShadowCamDepthRanges[index] = Vector4(
-						info.minDistanceInFrustum,
-						info.maxDistanceInFrustum,
-						depthRange,
-						1.0f / depthRange);
-				}
+					mShadowCamDepthRanges[index] = Vector4( fNear, fFar, depthRange, 1.0f / depthRange );
 				else
-				{
 					mShadowCamDepthRanges[index] = dummy;
-				}
 
 				mShadowCamDepthRangesDirty[index] = false;
 			}
+
 			return mShadowCamDepthRanges[index];
 		}
 		else
-			return dummy;*/
-		return dummy;
+			return dummy;
 	}
 	//---------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getShadowColour() const

@@ -46,7 +46,8 @@ namespace Ogre
 	{
 		SHADOW_NODE_RECALCULATE,
 		SHADOW_NODE_REUSE,
-		SHADOW_NODE_FIRST_ONLY
+		SHADOW_NODE_FIRST_ONLY,
+		SHADOW_NODE_CASTER_PASS		//Set automatically only when this pass is used by a ShadowNode
 	};
 
 	class _OgreExport CompositorPassSceneDef : public CompositorPassDef

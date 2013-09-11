@@ -106,6 +106,9 @@ namespace Ogre
 		{
 			ShadowCameraSetupPtr	shadowCameraSetup;
 			Camera					*camera;
+			/// @See ShadowCameraSetup mMinDistance
+			Real					minDistance;
+			Real					maxDistance;
 		};
 
 		typedef vector<ShadowMapCamera>::type ShadowMapCameraVec;
@@ -165,13 +168,21 @@ namespace Ogre
 		/// We derive so we can override the camera with ours
 		virtual void postInitializePassScene( CompositorPassScene *pass );
 
-		const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass, size_t startLight );
+		const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass,
+												AutoParamDataSource *autoParamDataSource,
+												size_t startLight );
 
 		/// @See mReceiverBox
 		const AxisAlignedBox& getReceiversBox(void) const	{ return mReceiverBox; }
 
 		/// @See mCastersBox
 		const AxisAlignedBox& getCastersBox(void) const		{ return mCastersBox; }
+
+		/** Outputs the min & max depth range for the given camera. 0 & 100000 if camera not found
+		@remarks
+			Performs linear search O(N)
+		*/
+		void getMinMaxDepthRange( const Frustum *shadowMapCamera, Real &outMin, Real &outMax ) const;
 	};
 
 	/** @} */

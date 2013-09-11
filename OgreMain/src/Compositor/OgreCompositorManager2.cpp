@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
+#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 namespace Ogre
@@ -82,7 +83,10 @@ namespace Ogre
 			CompositorTargetDef *targetDef = nodeDef->addTargetPass( "WindowRT" );
 			targetDef->setNumPasses( 2 );
 			{
-				targetDef->addPass( PASS_CLEAR );
+				{
+					CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>( targetDef->addPass( PASS_CLEAR ) );
+					passClear->mColourValue = ColourValue( 0.6f, 0.0f, 0.6f );
+				}
 				CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( targetDef->addPass( PASS_SCENE ) );
 
 				passScene->mShadowNode = "Default Shadow Node";
@@ -96,10 +100,10 @@ namespace Ogre
 		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
 		shadowNode->setNumShadowTextureDefinitions( 1 );
 		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
-		texDef->width	= 1024;
-		texDef->height	= 1024;
-		//texDef->formatList.push_back( PF_FLOAT32_R );
-		texDef->formatList.push_back( PF_A8B8G8R8 );
+		texDef->width	= 2048;
+		texDef->height	= 2048;
+		texDef->formatList.push_back( PF_FLOAT32_R );
+		//texDef->formatList.push_back( PF_A8B8G8R8 );
 		//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
 		texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
 
@@ -108,8 +112,10 @@ namespace Ogre
 			CompositorTargetDef *targetDef = shadowNode->addTargetPass( "MyFirstTex" );
 			targetDef->setNumPasses( 2 );
 			{
-				targetDef->addPass( PASS_CLEAR );
-				CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+				CompositorPassDef *passDef = targetDef->addPass( PASS_CLEAR );
+				((CompositorPassClearDef*)(passDef))->mColourValue = ColourValue::White;
+				//CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+				passDef = targetDef->addPass( PASS_SCENE );
 				passDef->mShadowMapIdx = 0;
 				passDef->mIncludeOverlays = false;
 			}

@@ -46,6 +46,7 @@ namespace Ogre
 		, mOptAdjustFactorTweak(1.0)
 		, mCosCamLightDirThreshold(0.9)
 	{
+		mMinDistance = 0.0f;
 	}
 	//-----------------------------------------------------------------------
 	LiSPSMShadowCameraSetup::~LiSPSMShadowCameraSetup(void)
@@ -96,7 +97,7 @@ namespace Ogre
 
 		// set up the LiSPSM perspective transformation
 		// build up frustum to map P onto the unit cube with (-1/-1/-1) and (+1/+1/+1)
-		Matrix4 P = buildFrustumProjection(-1, 1, -1, 1, n_opt + d, n_opt);
+		Matrix4 P = buildFrustumProjection(-1, 1, -1, 1, n_opt, n_opt - d);
 
 		return P * lightSpaceTranslation;
 	}
@@ -252,6 +253,21 @@ namespace Ogre
 		// build scene bounding box
 		const AxisAlignedBox &sceneBB		= sm->getCurrentCastersBox();
 		const AxisAlignedBox &receiverAABB	= sm->getCurrentReceiversBox();
+
+		//Will be overriden by n_opt, but not always (in case we early out to use uniform shadows)
+		mMaxDistance = sceneBB.getMinimum().distance( sceneBB.getMaximum() );
+
+		/*AxisAlignedBox sceneBB		= sm->getCurrentCastersBox();
+		AxisAlignedBox receiverAABB	= sm->getCurrentReceiversBox();
+
+		if( receiverAABB.isFinite() )
+			receiverAABB.setExtents( receiverAABB.getMinimum() - Vector3( 3.0f ), receiverAABB.getMaximum() + Vector3( 3.0f ) );
+		if( sceneBB.isFinite() )
+		{
+			sceneBB.setExtents( sceneBB.getMinimum() - Vector3( 3.0f ), sceneBB.getMaximum() + Vector3( 3.0f ) );
+			sceneBB.merge(receiverAABB);
+			sceneBB.merge(cam->getDerivedPosition());
+		}*/
 		//sceneBB.merge(receiverAABB);
 		//sceneBB.merge(cam->getDerivedPosition());
 
@@ -276,6 +292,9 @@ namespace Ogre
 			texCam->setCustomProjectionMatrix(true, LProj);
 			return;
 		}
+
+		mMaxDistance = mPointListBodyB.getAAB().getMinimum().distance(
+												mPointListBodyB.getAAB().getMaximum() );
 
 		// transform to light space: y -> -z, z -> y
 		LProj = msNormalToLightSpace * LProj;

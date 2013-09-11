@@ -123,7 +123,6 @@ namespace Ogre {
         const RenderTarget* mCurrentRenderTarget;
         const Viewport* mCurrentViewport;
 		const SceneManager* mCurrentSceneManager;
-		const VisibleObjectsBoundsInfo* mMainCamBoundsInfo;
         const Pass* mCurrentPass;
 
 		ObjectMemoryManager mObjectMemoryManager;
@@ -147,8 +146,6 @@ namespace Ogre {
         virtual void setCurrentViewport(const Viewport* viewport);
 		/** Sets the shadow extrusion distance to be used for point lights. */
 		virtual void setShadowDirLightExtrusionDistance(Real dist);
-		/** Sets the main camera's scene bounding information */
-		virtual void setMainCamBoundsInfo(VisibleObjectsBoundsInfo* info);
 		/** Set the current scene manager for enquiring on demand */
 		virtual void setCurrentSceneManager(const SceneManager* sm);
         /** Sets the current pass */

@@ -127,6 +127,10 @@ namespace Ogre
 					CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( pass );
 					mMinRq = std::min<size_t>( mMinRq, passScene->mFirstRQ );
 					mMaxRq = std::max<size_t>( mMaxRq, passScene->mLastRQ );
+
+					//Nested shadow maps are not allowed. Sorry!
+					passScene->mShadowNode				= IdString();
+					passScene->mShadowNodeRecalculation	= SHADOW_NODE_CASTER_PASS;
 				}
 
 				//Now check all PASS_SCENE from the same shadow map # render to

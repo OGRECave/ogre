@@ -119,6 +119,8 @@ namespace Ogre
 			shadowMapCamera.camera = sceneManager->createCamera( "ShadowNode Camera ID " +
 												StringConverter::toString( id ) + " Map " +
 												StringConverter::toString( shadowMapIdx ) );
+			shadowMapCamera.minDistance = 0.0f;
+			shadowMapCamera.maxDistance = 100000.0f;
 			switch( itor->shadowMapTechnique )
 			{
 			case SHADOWMAP_DEFAULT:
@@ -134,6 +136,13 @@ namespace Ogre
 			case SHADOWMAP_LiPSSM:
 				shadowMapCamera.shadowCameraSetup =
 								ShadowCameraSetupPtr( OGRE_NEW LiSPSMShadowCameraSetup() );
+				{
+					LiSPSMShadowCameraSetup *setup( (LiSPSMShadowCameraSetup *)shadowMapCamera.shadowCameraSetup.get() );
+					//setup->setOptimalAdjustFactor( 0.4f );
+					setup->setOptimalAdjustFactor( 5.0f );
+					//setup->setCameraLightDirectionThreshold( Degree( 25.0f ) );
+					setup->setUseSimpleOptimalAdjust( false );
+				}
 				break;
 			case SHADOWMAP_PSSM:
 				shadowMapCamera.shadowCameraSetup =
@@ -279,7 +288,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::_update( Camera* camera )
 	{
-		ShadowMapCameraVec::const_iterator itShadowCamera = mShadowMapCameras.begin();
+		ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
 		SceneManager *sceneManager	= camera->getSceneManager();
 		const Viewport *viewport	= camera->getViewport();
 
@@ -316,6 +325,9 @@ namespace Ogre
 
 				itShadowCamera->shadowCameraSetup->getShadowCamera( sceneManager, camera, light,
 																	texCamera, itor->split );
+
+				itShadowCamera->minDistance = itShadowCamera->shadowCameraSetup->getMinDistance();
+				itShadowCamera->maxDistance = itShadowCamera->shadowCameraSetup->getMaxDistance();
 			}
 			//Else... this shadow map shouldn't be rendered(TODO) and when used, return a blank one.
 			//The Nth closest lights don't cast shadows
@@ -349,6 +361,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	const LightList* CompositorShadowNode::setShadowMapsToPass( Renderable* rend, const Pass* pass,
+																AutoParamDataSource *autoParamDataSource,
 																size_t startLight )
 	{
 		const size_t lightsPerPass = pass->getMaxSimultaneousLights();
@@ -440,6 +453,11 @@ namespace Ogre
 					//changes need to be done so that UV calculations land on the right place
 					const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
 					texUnit->_setTexturePtr( shadowTex );
+
+					// Projective texturing needs to be disabled explicitly when using vertex shaders.
+					texUnit->setProjectiveTexturing( false, (const Frustum*)0 );
+					autoParamDataSource->setTextureProjector( mShadowMapCameras[shadowIdx].camera,
+																shadowIdx );
 				}
 				else
 				{
@@ -457,5 +475,26 @@ namespace Ogre
 		}
 
 		return &mCurrentLightList;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::getMinMaxDepthRange( const Frustum *shadowMapCamera,
+													Real &outMin, Real &outMax ) const
+	{
+		ShadowMapCameraVec::const_iterator itor = mShadowMapCameras.begin();
+		ShadowMapCameraVec::const_iterator end  = mShadowMapCameras.end();
+
+		while( itor != end )
+		{
+			if( itor->camera == shadowMapCamera )
+			{
+				outMin = itor->minDistance;
+				outMax = itor->maxDistance;
+				return;
+			}
+			++itor;
+		}
+
+		outMin = 0.0f;
+		outMax = 100000.0f;
 	}
 }

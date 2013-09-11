@@ -3151,6 +3151,12 @@ namespace Ogre {
 		*/
 		const AxisAlignedBox& getCurrentCastersBox(void) const;
 
+		/** @See CompositorShadowNode::getMinMaxDepthRange
+		@remarks
+			Outputs 0 & 100000 if no active shadow node or camera not found.
+		*/
+		void getMinMaxDepthRange( const Frustum *shadowMapCamera, Real &outMin, Real &outMax ) const;
+
 
 		/** Set whether to use camera-relative co-ordinates when rendering, ie
 			to always place the camera at the origin and move the world around it.

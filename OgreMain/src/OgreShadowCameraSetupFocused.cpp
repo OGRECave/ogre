@@ -429,6 +429,10 @@ namespace Ogre
 		// build scene bounding box
 		const AxisAlignedBox &sceneBB		= sm->getCurrentCastersBox();
 		const AxisAlignedBox &receiverAABB	= sm->getCurrentReceiversBox();
+
+		//Will be overriden, but not always (in case we early out to use uniform shadows)
+		mMaxDistance = sceneBB.getMinimum().distance( sceneBB.getMaximum() );
+
 		//sceneBB.merge(receiverAABB);
 		//sceneBB.merge(cam->getDerivedPosition());
 
@@ -453,6 +457,9 @@ namespace Ogre
 			texCam->setCustomProjectionMatrix(true, LProj);
 			return;
 		}
+
+		mMaxDistance = mPointListBodyB.getAAB().getMinimum().distance(
+												mPointListBodyB.getAAB().getMaximum() );
 
 		// transform to light space: y -> -z, z -> y
 		LProj = msNormalToLightSpace * LProj;

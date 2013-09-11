@@ -52,8 +52,10 @@ namespace Ogre
 		// reset custom view / projection matrix in case already set
 		texCam->setCustomViewMatrix(false);
 		texCam->setCustomProjectionMatrix(false);
-		texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
-		texCam->setFarClipDistance(light->_deriveShadowFarClipDistance(cam));
+		mMinDistance = light->_deriveShadowNearClipDistance(cam);
+		mMaxDistance = light->_deriveShadowFarClipDistance(cam);
+		texCam->setNearClipDistance( mMinDistance );
+		texCam->setFarClipDistance( mMaxDistance );
 
 		// get the shadow frustum's far distance
 		Real shadowDist = light->getShadowFarDistance();
@@ -67,6 +69,9 @@ namespace Ogre
 		// Directional lights 
 		if (light->getType() == Light::LT_DIRECTIONAL)
 		{
+			const AxisAlignedBox &casterBox = sm->getCurrentCastersBox();
+			mMaxDistance = casterBox.getMinimum().distance( casterBox.getMaximum() );
+
 			// set up the shadow texture
 			// Set ortho projection
 			texCam->setProjectionType(PT_ORTHOGRAPHIC);

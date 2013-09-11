@@ -211,6 +211,9 @@ namespace Ogre
 		especially if you expect to see more distant shadows (say if the viewpoint is
 		higher above the ground plane). Remember that you can supply separate
 		ShadowCameraSetup instances configured differently per light if you wish.
+		@par
+		Big negative values will force uniform shadow mapping, which is useful if
+		you're using PSSM without any kind of warping.
 		@param n The adjustment factor - default is 0.1f. 
 		*/
 		virtual void setOptimalAdjustFactor(Real n) { mOptAdjustFactor = n; }

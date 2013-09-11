@@ -2966,6 +2966,12 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Do we need to update GPU program parameters?
 				if (pass->isProgrammable())
 				{
+					if( mCurrentShadowNode )
+					{
+						mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
+																 pass->getStartLight() );
+					}
+
 					useLightsGpuProgram(pass, pLightListToUse);
 				}
 				// Do we need to update light states? 
@@ -3063,7 +3069,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				if( pass->isProgrammable() )
 				{
 					if( mCurrentShadowNode )
-						mCurrentShadowNode->setShadowMapsToPass( rend, pass, pass->getStartLight() );
+					{
+						mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
+																 pass->getStartLight() );
+					}
 
 					useLightsGpuProgram( pass, lightList );
 				}
@@ -4067,6 +4076,20 @@ const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const
 		return AxisAlignedBox::BOX_NULL;
 	else
 		return mCurrentShadowNode->getCastersBox();
+}
+//---------------------------------------------------------------------
+void SceneManager::getMinMaxDepthRange( const Frustum *shadowMapCamera,
+										Real &outMin, Real &outMax ) const
+{
+	if( !mCurrentShadowNode )
+	{
+		outMin = 0.0f;
+		outMax = 100000.0f;
+	}
+	else
+	{
+		mCurrentShadowNode->getMinMaxDepthRange( shadowMapCamera, outMin, outMax );
+	}
 }
 //---------------------------------------------------------------------
 AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibilityMask,
