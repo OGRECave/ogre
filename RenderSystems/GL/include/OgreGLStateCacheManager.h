@@ -55,8 +55,10 @@ namespace Ogre
     {
     private:
 		GLStateCacheManagerImp* mImp;
+        typedef map<intptr_t, GLStateCacheManagerImp*>::type CachesMap;
+        typedef MapIterator<CachesMap> CachesMapIterator;
 
-		std::map<intptr_t, GLStateCacheManagerImp*> mCaches;
+		CachesMap mCaches;
 
     public:
         GLStateCacheManager(void);
