@@ -288,7 +288,7 @@ namespace Ogre {
         bool calcVertexProcessing(void);
     
         /// Apply vertex animation.
-        void applyVertexAnimation(bool hardwareAnimation, bool stencilShadows);
+        void applyVertexAnimation(bool hardwareAnimation);
         /// Initialise the hardware animation elements for given vertex data.
         ushort initHardwareAnimationElements(VertexData* vdata, ushort numberOfElements, bool animateNormals);
         /// Are software vertex animation temp buffers bound?
@@ -296,50 +296,6 @@ namespace Ogre {
         /// Are software skeleton animation temp buffers bound?
         bool tempSkelAnimBuffersBound(bool requestNormals) const;
 
-    public:
-        /// Contains the child objects (attached to bones) indexed by name.
-        typedef map<String, MovableObject*>::type ChildObjectList;
-    protected:
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        ShadowRenderableList mShadowRenderables;
-#endif
-
-        /** Nested class to allow entity shadows. */
-        class _OgreExport EntityShadowRenderable : public ShadowRenderable
-        {
-        protected:
-            Entity* mParent;
-            /// Shared link to position buffer.
-            HardwareVertexBufferSharedPtr mPositionBuffer;
-            /// Shared link to w-coord buffer (optional).
-            HardwareVertexBufferSharedPtr mWBuffer;
-            /// Link to current vertex data used to bind (maybe changes).
-            const VertexData* mCurrentVertexData;
-            /// Original position buffer source binding.
-            unsigned short mOriginalPosBufferBinding;
-            /// Link to SubEntity, only present if SubEntity has it's own geometry.
-            SubEntity* mSubEntity;
-
-
-        public:
-            EntityShadowRenderable(Entity* parent,
-                HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
-                bool createSeparateLightCap, SubEntity* subent, bool isLightCap = false);
-            ~EntityShadowRenderable();
-            
-            /// Create the separate light cap if it doesn't already exists.
-            void _createSeparateLightCap();
-            /// @copydoc ShadowRenderable::getWorldTransforms.
-            void getWorldTransforms(Matrix4* xform) const;
-            HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-            /// Rebind the source positions (for temp buffer users).
-            void rebindPositionBuffer(const VertexData* vertexData, bool force);
-            /// @copydoc ShadowRenderable::isVisible.
-            bool isVisible(void) const;
-            /// @copydoc ShadowRenderable::rebindIndexBuffer.
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
-        };
     public:
         /** Default destructor.
         */
@@ -568,6 +524,8 @@ namespace Ogre {
         void detachAllObjectsFromBone(void);
 
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+		/// Contains the child objects (attached to bones) indexed by name.
+        typedef map<String, MovableObject*>::type ChildObjectList;
         typedef MapIterator<ChildObjectList> ChildObjectListIterator;
         /** Gets an iterator to the list of objects attached to bones on this entity. */
         ChildObjectListIterator getAttachedObjectIterator(void);

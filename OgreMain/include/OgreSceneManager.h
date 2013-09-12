@@ -129,17 +129,6 @@ namespace Ogre {
 		static uint32 FRUSTUM_TYPE_MASK;
 		/// User type mask limit
 		static uint32 USER_TYPE_MASK_LIMIT;
-        /** Comparator for material map, for sorting materials into render order (e.g. transparent last).
-        */
-        struct materialLess
-        {
-            _OgreExport bool operator()(const Material* x, const Material* y) const;
-        };
-        /// Comparator for sorting lights relative to a point
-        struct lightLess
-        {
-            _OgreExport bool operator()(const Light* a, const Light* b) const;
-        };
 
         /// Describes the stage of rendering when performing complex illumination
         enum IlluminationRenderStage
@@ -461,9 +450,6 @@ namespace Ogre {
 		CullingMode mPassCullingMode;
 
 	protected:
-		/// Array defining shadow count per light type.
-		size_t mShadowTextureCountPerType[3];
-
 		/// Array defining shadow texture index in light list.
 		vector<size_t>::type mShadowTextureIndexLightList;
 
@@ -489,11 +475,6 @@ namespace Ogre {
         };
 
         typedef vector<LightInfo>::type LightInfoList;
-
-        LightList mLightsAffectingFrustum;
-        LightInfoList mCachedLightInfos;
-		LightInfoList mTestLightInfos; // potentially new list
-		LightList mShadowTextureCurrentCasterLightList;
 
 		typedef vector<MovableObject*>::type MovableObjectVec;
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
@@ -664,25 +645,16 @@ namespace Ogre {
 		CompositorChain* mActiveCompositorChain;
 		bool mLateMaterialResolving;
 
-        ShadowTechnique mShadowTechnique;
-        bool mDebugShadows;
         ColourValue mShadowColour;
 		bool mShadowMaterialInitDone;
         HardwareIndexBufferSharedPtr mShadowIndexBuffer;
-		size_t mShadowIndexBufferSize;
         Rectangle2D* mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;
-		ShadowTextureConfigList mShadowTextureConfigList;
-		bool mShadowTextureConfigDirty;
-        ShadowTextureList mShadowTextures;
 		TexturePtr mNullShadowTexture;
 		typedef vector<Camera*>::type ShadowTextureCameraList;
 		ShadowTextureCameraList mShadowTextureCameras;
-        Texture* mCurrentShadowTexture;
-		bool mShadowUseInfiniteFarPlane;
 		bool mShadowCasterRenderBackFaces;
-		bool mShadowAdditiveLightClip;
 		/// Struct for caching light clipping information for re-use in a frame
 		struct LightClippingInfo
 		{
@@ -696,14 +668,6 @@ namespace Ogre {
 		typedef map<Light const *, LightClippingInfo>::type LightClippingInfoMap;
 		LightClippingInfoMap mLightClippingInfoMap;
 		unsigned long mLightClippingInfoMapFrameNumber;
-
-		/// default shadow camera setup
-		ShadowCameraSetupPtr mDefaultShadowCameraSetup;
-
-        /// Internal method for creating shadow textures (texture-based shadows)
-        virtual void ensureShadowTexturesCreated();
-        /// Internal method for destroying shadow textures (texture-based shadows)
-        virtual void destroyShadowTextures(void);
 
 		/** To be used with MovableObjects. Checks that the input pointer's mGlobalIndex
 			is consistent with the container, otherwise there's a bug and mGlobalIndex
@@ -740,10 +704,6 @@ namespace Ogre {
 		virtual void highLevelCull();
         
 	public:
-		/// Method for preparing shadow textures ready for use in a regular render
-		/// Do not call manually unless before frame start or rendering is paused
-		/// If lightList is not supplied, will render all lights in frustum
-        virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
 
 		//A render context, used to store internal data for pausing/resuming rendering
 		struct RenderContext
@@ -999,68 +959,6 @@ namespace Ogre {
         /** Removes and destroys all lights in the scene.
         */
         virtual void destroyAllLights(void);
-
-        /** Get the list of lights which could be affecting the frustum.
-        @remarks
-            Note that default implementation of this method returns a cached light list,
-            which is populated when rendering the scene. So by default the list of lights 
-			is only available during scene rendering.
-        */
-        virtual const LightList& _getLightsAffectingFrustum(void) const;
-
-        /** Populate a light list with an ordered set of the lights which are closest
-        to the position specified.
-        @remarks
-            Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence. 
-        @par
-            Subclasses of the default SceneManager may wish to take into account other issues
-            such as possible visibility of the light if that information is included in their
-            data structures. This basic scenemanager simply orders by distance, eliminating 
-            those lights which are out of range or could not be affecting the frustum (i.e.
-            only the lights returned by SceneManager::_getLightsAffectingFrustum are take into
-            account).
-        @par
-            The number of items in the list max exceed the maximum number of lights supported
-            by the renderer, but the extraneous ones will never be used. In fact the limit will
-            be imposed by Pass::getMaxSimultaneousLights.
-        @param position The position at which to evaluate the list of lights
-        @param radius The bounding radius to test
-        @param destList List to be populated with ordered set of lights; will be cleared by 
-            this method before population.
-		@param lightMask The mask with which to include / exclude lights
-        */
-        virtual void _populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
-
-		/** Populates a light list with an ordered set of the lights which are closest
-        to the position of the SceneNode given.
-        @remarks
-            Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence. 
-			This overloaded version will take the SceneNode's position and use the second method
-			to populate the list.
-        @par
-            Subclasses of the default SceneManager may wish to take into account other issues
-            such as possible visibility of the light if that information is included in their
-            data structures. This basic scenemanager simply orders by distance, eliminating 
-            those lights which are out of range or could not be affecting the frustum (i.e.
-            only the lights returned by SceneManager::_getLightsAffectingFrustum are take into
-            account). 
-		@par   
-			Also note that subclasses of the SceneNode might be used here to provide cached
-			scene related data, accelerating the list population (for example light lists for
-			SceneNodes could be cached inside subclassed SceneNode objects).
-        @par
-            The number of items in the list may exceed the maximum number of lights supported
-            by the renderer, but the extraneous ones will never be used. In fact the limit will
-            be imposed by Pass::getMaxSimultaneousLights.
-        @param sn The SceneNode for which to evaluate the list of lights
-        @param radius The bounding radius to test
-        @param destList List to be populated with ordered set of lights; will be cleared by 
-            this method before population.
-		@param lightMask The mask with which to include / exclude lights
-        */
-        virtual void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
 		/** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
 			Don't call this function directly
@@ -2397,48 +2295,6 @@ namespace Ogre {
             return mAnimationStates.getAnimationStateIterator();
         }
 
-        /** Sets the general shadow technique to be used in this scene.
-        @remarks   
-            There are multiple ways to generate shadows in a scene, and each has 
-            strengths and weaknesses. 
-            <ul><li>Stencil-based approaches can be used to 
-            draw very long, extreme shadows without loss of precision and the 'additive'
-            version can correctly show the shadowing of complex effects like bump mapping
-            because they physically exclude the light from those areas. However, the edges
-            are very sharp and stencils cannot handle transparency, and they involve a 
-            fair amount of CPU work in order to calculate the shadow volumes, especially
-            when animated objects are involved.</li>
-            <li>Texture-based approaches are good for handling transparency (they can, for
-            example, correctly shadow a mesh which uses alpha to represent holes), and they
-            require little CPU overhead, and can happily shadow geometry which is deformed
-            by a vertex program, unlike stencil shadows. However, they have a fixed precision 
-            which can introduce 'jaggies' at long range and have fillrate issues of their own.</li>
-            </ul>
-        @par
-            We support 2 kinds of stencil shadows, and 2 kinds of texture-based shadows, and one
-            simple decal approach. The 2 stencil approaches differ in the amount of multipass work 
-            that is required - the modulative approach simply 'darkens' areas in shadow after the 
-            main render, which is the least expensive, whilst the additive approach has to perform 
-            a render per light and adds the cumulative effect, which is more expensive but more 
-            accurate. The texture based shadows both work in roughly the same way, the only difference is
-            that the shadowmap approach is slightly more accurate, but requires a more recent
-            graphics card.
-        @par
-            Note that because mixing many shadow techniques can cause problems, only one technique
-            is supported at once. Also, you should call this method at the start of the 
-            scene setup. 
-        @param technique The shadowing technique to use for the scene.
-        */
-        virtual void setShadowTechnique(ShadowTechnique technique);
-        
-        /** Gets the current shadow technique. */
-        virtual ShadowTechnique getShadowTechnique(void) const { return mShadowTechnique; }
-
-        /** Enables / disables the rendering of debug information for shadows. */
-        virtual void setShowDebugShadows(bool debug) { mDebugShadows = debug; }
-        /** Are debug shadows shown? */
-        virtual bool getShowDebugShadows(void ) const { return mDebugShadows; }
-
         /** Set the colour used to modulate areas in shadow. 
         @remarks This is only applicable for shadow techniques which involve 
             darkening the area in shadow, as opposed to masking out the light. 
@@ -2492,131 +2348,6 @@ namespace Ogre {
         { return mDefaultShadowFarDist; }
         virtual Real getShadowFarDistanceSquared(void) const
         { return mDefaultShadowFarDistSquared; }
-
-		/** Sets the maximum size of the index buffer used to render shadow
-		 	primitives.
-		@remarks
-			This method allows you to tweak the size of the index buffer used
-			to render shadow primitives (including stencil shadow volumes). The
-			default size is 51,200 entries, which is 100k of GPU memory, or
-			enough to render approximately 17,000 triangles. You can reduce this
-			as long as you do not have any models / world geometry chunks which 
-			could require more than the amount you set.
-		@par
-			The maximum number of triangles required to render a single shadow 
-			volume (including light and dark caps when needed) will be 3x the 
-			number of edges on the light silhouette, plus the number of 
-			light-facing triangles.	On average, half the 
-			triangles will be facing toward the light, but the number of 
-			triangles in the silhouette entirely depends on the mesh - 
-			angular meshes will have a higher silhouette tris/mesh tris
-			ratio than a smooth mesh. You can estimate the requirements for
-			your particular mesh by rendering it alone in a scene with shadows
-			enabled and a single light - rotate it or the light and make a note
-			of how high the triangle count goes (remembering to subtract the 
-			mesh triangle count)
-		@param size The number of indexes; divide this by 3 to determine the
-			number of triangles.
-		*/
-		virtual void setShadowIndexBufferSize(size_t size);
-        /// Get the size of the shadow index buffer
-		virtual size_t getShadowIndexBufferSize(void) const
-		{ return mShadowIndexBufferSize; }
-        /** Set the size of the texture used for all texture-based shadows.
-        @remarks
-            The larger the shadow texture, the better the detail on 
-            texture based shadows, but obviously this takes more memory.
-            The default size is 512. Sizes must be a power of 2.
-		@note This is the simple form, see setShadowTextureConfig for the more 
-			complex form.
-        */
-        virtual void setShadowTextureSize(unsigned short size);
-
-		/** Set the detailed configuration for a shadow texture.
-		@param shadowIndex The index of the texture to configure, must be < the
-			number of shadow textures setting
-		@param width, height The dimensions of the texture
-		@param format The pixel format of the texture
-        @param fsaa The level of multisampling to use. Ignored if the device does not support it.
-		@param depthBufferPoolId The pool # it should query the depth buffers from
-		*/
-		virtual void setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-			unsigned short height, PixelFormat format, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
-		/** Set the detailed configuration for a shadow texture.
-		@param shadowIndex The index of the texture to configure, must be < the
-			number of shadow textures setting
-		@param config Configuration structure
-		*/
-		virtual void setShadowTextureConfig(size_t shadowIndex, 
-			const ShadowTextureConfig& config);
-
-		/** Get an iterator over the current shadow texture settings. */
-		ConstShadowTextureConfigIterator getShadowTextureConfigIterator() const;
-
-        /** Set the pixel format of the textures used for texture-based shadows.
-        @remarks
-			By default, a colour texture is used (PF_X8R8G8B8) for texture shadows,
-			but if you want to use more advanced texture shadow types you can 
-			alter this. If you do, you will have to also call
-			setShadowTextureCasterMaterial
-			to provide shader-based materials to use these customised shadow
-			texture formats.
-		@note This is the simple form, see setShadowTextureConfig for the more 
-			complex form.
-        */
-        virtual void setShadowTexturePixelFormat(PixelFormat fmt);
-        /** Set the level of multisample AA of the textures used for texture-based shadows.
-        @remarks
-            By default, the level of multisample AA is zero.
-        @note This is the simple form, see setShadowTextureConfig for the more 
-            complex form.
-        */
-        virtual void setShadowTextureFSAA(unsigned short fsaa);
-
-        /** Set the number of textures allocated for texture-based shadows.
-        @remarks
-            The default number of textures assigned to deal with texture based
-            shadows is 1; however this means you can only have one light casting
-            shadows at the same time. You can increase this number in order to 
-            make this more flexible, but be aware of the texture memory it will use.
-        */
-        virtual void setShadowTextureCount(size_t count);
-        /// Get the number of the textures allocated for texture based shadows
-        size_t getShadowTextureCount(void) const {return mShadowTextureConfigList.size(); }
-
-		/** Set the number of shadow textures a light type uses.
-		@remarks
-			The default for all light types is 1. This means that each light uses only 1 shadow
-			texture. Call this if you need more than 1 shadow texture per light, E.G. PSSM. 
-		@note
-			This feature only works with the Integrated shadow technique.
-			Also remember to increase the total number of shadow textures you request
-			appropriately (e.g. via setShadowTextureCount)!!
-		*/
-		void setShadowTextureCountPerLightType(Light::LightTypes type, size_t count)
-		{ mShadowTextureCountPerType[type] = count; }
-		/// Get the number of shadow textures is assigned for the given light type.
-		size_t getShadowTextureCountPerLightType(Light::LightTypes type) const
-		{return mShadowTextureCountPerType[type]; }
-
-        /** Sets the size and count of textures used in texture-based shadows. 
-        @remarks
-            @see setShadowTextureSize and setShadowTextureCount for details, this
-            method just allows you to change both at once, which can save on 
-            reallocation if the textures have already been created.
-		@note This is the simple form, see setShadowTextureConfig for the more 
-			complex form.
-        */
-        virtual void setShadowTextureSettings(unsigned short size, unsigned short count, 
-			PixelFormat fmt = PF_X8R8G8B8, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
-
-		/** Get a reference to the shadow texture currently in use at the given index.
-		@note
-			If you change shadow settings, this reference may no longer
-			be correct, so be sure not to hold the returned reference over 
-			texture shadow configuration changes.
-		*/
-		virtual const TexturePtr& getShadowTexture(size_t shadowIndex);
 
         /** Sets the proportional distance which a texture shadow which is generated from a
             directional light will be offset into the camera view to make best use of texture space.
@@ -2694,84 +2425,6 @@ namespace Ogre {
 			textures using their back faces rather than their front faces. 
 		*/
 		virtual bool getShadowCasterRenderBackFaces() const { return mShadowCasterRenderBackFaces; }
-
-		/** Set the shadow camera setup to use for all lights which don't have
-			their own shadow camera setup.
-		@see ShadowCameraSetup
-		*/
-		virtual void setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup);
-
-		/** Get the shadow camera setup in use for all lights which don't have
-			their own shadow camera setup.
-		@see ShadowCameraSetup
-		*/
-		virtual const ShadowCameraSetupPtr& getShadowCameraSetup() const;
-
-		/** Sets whether we should use an inifinite camera far plane
-			when rendering stencil shadows.
-		@remarks
-			Stencil shadow coherency is very reliant on the shadow volume
-			not being clipped by the far plane. If this clipping happens, you
-			get a kind of 'negative' shadow effect. The best way to achieve
-			coherency is to move the far plane of the camera out to infinity,
-			thus preventing the far plane from clipping the shadow volumes.
-			When combined with vertex program extrusion of the volume to 
-			infinity, which	Ogre does when available, this results in very
-			robust shadow volumes. For this reason, when you enable stencil 
-			shadows, Ogre automatically changes your camera settings to 
-			project to infinity if the card supports it. You can disable this
-			behaviour if you like by calling this method; although you can 
-			never enable infinite projection if the card does not support it.
-		@par	
-			If you disable infinite projection, or it is not available, 
-			you need to be far more careful with your light attenuation /
-			directional light extrusion distances to avoid clipping artefacts
-			at the far plane.
-		@note
-			Recent cards will generally support infinite far plane projection.
-			However, we have found some cases where they do not, especially
-			on Direct3D. There is no standard capability we can check to 
-			validate this, so we use some heuristics based on experience:
-			<UL>
-			<LI>OpenGL always seems to support it no matter what the card</LI>
-			<LI>Direct3D on non-vertex program capable systems (including 
-			vertex program capable cards on Direct3D7) does not
-			support it</LI>
-			<LI>Direct3D on GeForce3 and GeForce4 Ti does not seem to support
-			infinite projection<LI>
-			</UL>
-			Therefore in the RenderSystem implementation, we may veto the use
-			of an infinite far plane based on these heuristics. 
-		*/
-        virtual void setShadowUseInfiniteFarPlane(bool enable) {
-            mShadowUseInfiniteFarPlane = enable; }
-
-		/** Is there a stencil shadow based shadowing technique in use? */
-		virtual bool isShadowTechniqueStencilBased(void) const 
-		{ return (mShadowTechnique & SHADOWDETAILTYPE_STENCIL) != 0; }
-		/** Is there a texture shadow based shadowing technique in use? */
-		virtual bool isShadowTechniqueTextureBased(void) const 
-		{ return (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) != 0; }
-		/** Is there a modulative shadowing technique in use? */
-		virtual bool isShadowTechniqueModulative(void) const 
-		{ return (mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) != 0; }
-		/** Is there an additive shadowing technique in use? */
-		virtual bool isShadowTechniqueAdditive(void) const 
-		{ return (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) != 0; }
-		/** Is the shadow technique integrated into primary materials? */
-		virtual bool isShadowTechniqueIntegrated(void) const 
-		{ return (mShadowTechnique & SHADOWDETAILTYPE_INTEGRATED) != 0; }
-		/** Is there any shadowing technique in use? */
-		virtual bool isShadowTechniqueInUse(void) const 
-		{ return mShadowTechnique != SHADOWTYPE_NONE; }
-		/** Sets whether when using a built-in additive shadow mode, user clip
-			planes should be used to restrict light rendering.
-		*/
-		virtual void setShadowUseLightClipPlanes(bool enabled) { mShadowAdditiveLightClip = enabled; }
-		/** Gets whether when using a built-in additive shadow mode, user clip
-		planes should be used to restrict light rendering.
-		*/
-		virtual bool getShadowUseLightClipPlanes() const { return mShadowAdditiveLightClip; }
 
 		void _setCurrentShadowNode( CompositorShadowNode *shadowNode ) { mCurrentShadowNode = shadowNode; }
 

@@ -230,24 +230,6 @@ namespace Ogre {
 
 		virtual void setListener( Listener* listener );
 
-        /** Allows retrieval of the nearest lights to the centre of this SceneNode.
-        @remarks
-            This method allows a list of lights, ordered by proximity to the centre
-            of this SceneNode, to be retrieved. Can be useful when implementing
-            MovableObject::queryLights and Renderable::getLights.
-        @par
-            Note that only lights could be affecting the frustum will take into
-            account, which cached in scene manager.
-        @see SceneManager::_getLightsAffectingFrustum
-        @see SceneManager::_populateLightList
-        @param destList List to be populated with ordered set of lights; will be
-            cleared by this method before population.
-        @param radius Parameter to specify lights intersecting a given radius of
-            this SceneNode's centre.
-		@param lightMask The mask with which to include / exclude lights
-        */
-        virtual void findLights(LightList& destList, Real radius, uint32 lightMask = 0xFFFFFFFF) const;
-
         /** Tells the node whether to yaw around it's own local Y axis or a fixed axis of choice.
         @remarks
         This method allows you to change the yaw behaviour of the node - by default, it

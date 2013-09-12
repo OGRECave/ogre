@@ -57,7 +57,6 @@ THE SOFTWARE.
 #include "OgreSpotShadowFadePng.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGpuProgram.h"
-#include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreDataStream.h"
 #include "OgreStaticGeometry.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -123,18 +122,12 @@ mDisplayNodes(false),
 mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
-mShadowTechnique(SHADOWTYPE_NONE),
-mDebugShadows(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowMaterialInitDone(false),
-mShadowIndexBufferSize(51200),
 mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
 mIlluminationStage(IRS_NONE),
-mShadowTextureConfigDirty(true),
-mShadowUseInfiniteFarPlane(true),
 mShadowCasterRenderBackFaces(true),
-mShadowAdditiveLightClip(false),
 mLightClippingInfoMapFrameNumber(999),
 mDefaultShadowFarDist(0),
 mDefaultShadowFarDistSquared(0),
@@ -171,17 +164,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
 
 	// Setup default queued renderable visitor
 	mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
-
-	// set up default shadow camera setup
-	mDefaultShadowCameraSetup.bind(OGRE_NEW DefaultShadowCameraSetup());
-
-	// init shadow texture config
-	setShadowTextureCount(1);
-
-	// init shadow texture count per type.
-	mShadowTextureCountPerType[Light::LT_POINT] = 1;
-	mShadowTextureCountPerType[Light::LT_DIRECTIONAL] = 1;
-	mShadowTextureCountPerType[Light::LT_SPOTLIGHT] = 1;
 
 	// create the auto param data source instance
 	mAutoParamDataSource = createAutoParamDataSource();
@@ -225,7 +207,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
 SceneManager::~SceneManager()
 {
 	fireSceneManagerDestroyed();
-	destroyShadowTextures();
     clearScene();
     destroyAllCameras();
 
@@ -438,90 +419,6 @@ void SceneManager::destroyLight(Light *l)
 void SceneManager::destroyAllLights(void)
 {
 	destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-const LightList& SceneManager::_getLightsAffectingFrustum(void) const
-{
-    return mLightsAffectingFrustum;
-}
-//-----------------------------------------------------------------------
-bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
-{
-    return a->tempSquareDist < b->tempSquareDist;
-}
-//-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const Vector3& position, Real radius, 
-									  LightList& destList, uint32 lightMask)
-{
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-    // Really basic trawl of the lights, then sort
-    // Subclasses could do something smarter
-
-    // Pick up the lights that affecting frustum only, which should has been
-    // cached, so better than take all lights in the scene into account.
-    const LightList& candidateLights = _getLightsAffectingFrustum();
-
-    // Pre-allocate memory
-    destList.clear();
-    destList.reserve(candidateLights.size());
-
-    LightList::const_iterator it;
-    for (it = candidateLights.begin(); it != candidateLights.end(); ++it)
-    {
-		Light* lt = it->light;
-		// check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
-		if(!(lt->getLightMask() & lightMask))
-			continue; //skip this light
-
-		// Calc squared distance
-		lt->_calcTempSquareDist(position);
-
-        if (lt->getType() == Light::LT_DIRECTIONAL)
-        {
-            // Always included
-            destList.push_back(*it);
-        }
-        else
-        {
-            // only add in-range lights
-			if (lt->isInLightRange(Sphere(position,radius)))
-            {
-                destList.push_back(*it);
-            }
-        }
-    }
-
-    // Sort (stable to guarantee ordering on directional lights)
-	if (isShadowTechniqueTextureBased())
-	{
-		// Note that if we're using texture shadows, we actually want to use
-		// the first few lights unchanged from the frustum list, matching the
-		// texture shadows that were generated
-		// Thus we only allow object-relative sorting on the remainder of the list
-		if (destList.size() > getShadowTextureCount())
-		{
-			LightList::iterator start = destList.begin();
-			std::advance(start, getShadowTextureCount());
-			std::stable_sort(start, destList.end(), lightLess());
-		}
-	}
-	else
-	{
-		std::stable_sort(destList.begin(), destList.end(), lightLess());
-	}
-
-	// Now assign indexes in the list so they can be examined if needed
-	size_t lightIndex = 0;
-	for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
-	{
-		li->light->_notifyIndexInFrame(lightIndex);
-	}
-#endif
-}
-//-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
-{
-    _populateLightList(sn->_getDerivedPosition(), radius, destList, lightMask);
 }
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
@@ -1045,58 +942,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
 		Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
 		size_t unit = 0;
-		// Reset the shadow texture index for each pass
-		size_t startLightIndex = pass->getStartLight();
-		size_t shadowTexUnitIndex = 0;
-		size_t shadowTexIndex = mShadowTextures.size();
-		if (mShadowTextureIndexLightList.size() > startLightIndex)
-			shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
 		while(texIter.hasMoreElements())
 		{
 			TextureUnitState* pTex = texIter.getNext();
-			if (!pass->getIteratePerLight() && 
-				isShadowTechniqueTextureBased() && 
-				pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
-			{
-				// Need to bind the correct shadow texture, based on the start light
-				// Even though the light list can change per object, our restrictions
-				// say that when texture shadows are enabled, the lights up to the
-				// number of texture shadows will be fixed for all objects
-				// to match the shadow textures that have been generated
-				// see Listener::sortLightsAffectingFrustum and
-				// MovableObject::Listener::objectQueryLights
-				// Note that light iteration throws the indexes out so we don't bind here
-				// if that's the case, we have to bind when lights are iterated
-				// in renderSingleObject
-
-				TexturePtr shadowTex;
-				if (shadowTexIndex < mShadowTextures.size())
-				{
-					shadowTex = getShadowTexture(shadowTexIndex);
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-					// Hook up projection frustum
-					Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-					// Enable projective texturing if fixed-function, but also need to
-					// disable it explicitly for program pipeline.
-					pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-					mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
-#endif
-				}
-				else
-				{
-					// Use fallback 'null' shadow texture
-					// no projection since all uniform colour anyway
-					shadowTex = mNullShadowTexture;
-					pTex->setProjectiveTexturing(false);
-					mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
-
-				}
-				pTex->_setTexturePtr(shadowTex);
-
-				++shadowTexIndex;
-				++shadowTexUnitIndex;
-			}
-			else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
+			if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram() &&
+				pTex->getContentType() != TextureUnitState::CONTENT_SHADOW )
 			{
 				// Manually set texture projector for shaders if present
 				// This won't get set any other way if using manual projection
@@ -1495,29 +1345,6 @@ void SceneManager::setWorldGeometry(DataStreamPtr& stream,
         "World geometry is not supported by the generic SceneManager.",
         "SceneManager::setWorldGeometry");
 }
-
-//-----------------------------------------------------------------------
-bool SceneManager::materialLess::operator() (const Material* x, const Material* y) const
-{
-    // If x transparent and y not, x > y (since x has to overlap y)
-    if (x->isTransparent() && !y->isTransparent())
-    {
-        return false;
-    }
-    // If y is transparent and x not, x < y
-    else if (!x->isTransparent() && y->isTransparent())
-    {
-        return true;
-    }
-    else
-    {
-        // Otherwise don't care (both transparent or both solid)
-        // Just arbitrarily use pointer
-        return x < y;
-    }
-
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::_setSkyPlane(
                                bool enable,
@@ -2487,18 +2314,9 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs and fixed function to 
-	if (isShadowTechniqueAdditive())
-	{
-		// Use simple black / white mask if additive
-		mAutoParamDataSource->setAmbientLightColour(ColourValue::Black);
-		mDestRenderSystem->setAmbientLight(0, 0, 0);
-	}
-	else
-	{
-		// Use shadow colour as caster colour if modulative
-		mAutoParamDataSource->setAmbientLightColour(mShadowColour);
-		mDestRenderSystem->setAmbientLight(mShadowColour.r, mShadowColour.g, mShadowColour.b);
-	}
+	// Use shadow colour as caster colour if modulative
+	mAutoParamDataSource->setAmbientLightColour(mShadowColour);
+	mDestRenderSystem->setAmbientLight(mShadowColour.r, mShadowColour.g, mShadowColour.b);
 
     while (groupIt.hasMoreElements())
     {
@@ -2834,11 +2652,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Determine light list to use
 				if (iteratePerLight)
 				{
-					// Starting shadow texture index.
-					size_t shadowTexIndex = mShadowTextures.size();
-					if (mShadowTextureIndexLightList.size() > lightIndex)
-						shadowTexIndex = mShadowTextureIndexLightList[lightIndex];
-
 					localLightList.resize(pass->getLightCountPerIteration());
 
 					LightList::iterator destit = localLightList.begin();
@@ -2855,51 +2668,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							(pass->getLightMask() & currLight->getLightMask()) == 0)
 						{
 							// Skip
-							// Also skip shadow texture(s)
-							if (isShadowTechniqueTextureBased())
-							{
-								shadowTexIndex += mShadowTextureCountPerType[currLight->getType()];
-							}
 							continue;
 						}
 
 						destit->light = currLight;
 						++destit;
-
-						// potentially need to update content_type shadow texunit
-						// corresponding to this light
-						if (isShadowTechniqueTextureBased())
-						{
-							size_t textureCountPerLight = mShadowTextureCountPerType[currLight->getType()];
-							for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mShadowTextures.size(); ++j)
-							{
-								// link the numShadowTextureLights'th shadow texture unit
-								unsigned short tuindex = 
-									pass->_getTextureUnitWithContentTypeIndex(
-									TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
-								if (tuindex > pass->getNumTextureUnitStates()) break;
-
-								// I know, nasty const_cast
-								TextureUnitState* tu = 
-									const_cast<TextureUnitState*>(
-										pass->getTextureUnitState(tuindex));
-								const TexturePtr& shadowTex = mShadowTextures[shadowTexIndex];
-								tu->_setTexturePtr(shadowTex);
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-								Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-								tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-								mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
-#endif
-								++numShadowTextureLights;
-								++shadowTexIndex;
-								// Have to set TU on rendersystem right now, although
-								// autoparams will be set later
-								mDestRenderSystem->_setTextureUnitSettings(tuindex, *tu);
-							}
-						}
-
-
-
 					}
 					// Did we run out of lights before slots? e.g. 5 lights, 2 per iteration
 					if (destit != localLightList.end())
@@ -2913,7 +2686,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// since this is light iteration, we shouldn't render at all
 					if (pLightListToUse->empty())
 						return;
-
 				}
 				else // !iterate per light
 				{
@@ -3752,30 +3524,6 @@ void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTechnique(ShadowTechnique technique)
-{
-    mShadowTechnique = technique;
-
-    if (!isShadowTechniqueTextureBased())
-    {
-        // Destroy shadow textures to optimise resource usage
-        destroyShadowTextures();
-    }
-	else
-	{
-		// assure no custom shadow matrix is used accidentally in case we switch
-		// from a custom shadow mapping type to a non-custom (uniform shadow mapping)
-		for ( size_t i = 0; i < mShadowTextureCameras.size(); ++i )
-		{
-			Camera* texCam = mShadowTextureCameras[i];
-
-			texCam->setCustomViewMatrix(false);
-			texCam->setCustomProjectionMatrix(false);
-		}
-	}
-
-}
-//---------------------------------------------------------------------
 void SceneManager::_suppressRenderStateChanges(bool suppress)
 {
 	mSuppressRenderStateChanges = suppress;
@@ -3823,8 +3571,7 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 			// copy base state
 			(*tex) = *(pass->getTextureUnitState(t));
 			// override colour function
-			tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT,
-				isShadowTechniqueAdditive()? ColourValue::Black : mShadowColour);
+			tex->setColourOperationEx( LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, mShadowColour );
 
 		}
 		// Remove any extras
@@ -4303,148 +4050,6 @@ Real SceneManager::getShadowDirectionalLightExtrusionDistance(void) const
     return mShadowDirLightExtrudeDist;
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowIndexBufferSize(size_t size)
-{
-    if (!mShadowIndexBuffer.isNull() && size != mShadowIndexBufferSize)
-    {
-        // re-create shadow buffer with new size
-        mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-            createIndexBuffer(HardwareIndexBuffer::IT_16BIT, 
-            size, 
-            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-            false);
-    }
-    mShadowIndexBufferSize = size;
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-	unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
-{
-	ShadowTextureConfig conf;
-	conf.width = width;
-	conf.height = height;
-	conf.format = format;
-    conf.fsaa = fsaa;
-	conf.depthBufferPoolId = depthBufferPoolId;
-
-	setShadowTextureConfig(shadowIndex, conf);
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, 
-	const ShadowTextureConfig& config)
-{
-	if (shadowIndex >= mShadowTextureConfigList.size())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"shadowIndex out of bounds",
-			"SceneManager::setShadowTextureConfig");
-	}
-	mShadowTextureConfigList[shadowIndex] = config;
-
-	mShadowTextureConfigDirty = true;
-}
-//---------------------------------------------------------------------
-ConstShadowTextureConfigIterator SceneManager::getShadowTextureConfigIterator() const
-{
-	return ConstShadowTextureConfigIterator(
-		mShadowTextureConfigList.begin(), mShadowTextureConfigList.end());
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSize(unsigned short size)
-{
-	// default all current
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->width != size || i->height != size)
-		{
-			i->width = i->height = size;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureCount(size_t count)
-{
-    // Change size, any new items will need defaults
-	if (count != mShadowTextureConfigList.size())
-	{
-		// if no entries yet, use the defaults
-		if (mShadowTextureConfigList.empty())
-		{
-			mShadowTextureConfigList.resize(count);
-		}
-		else 
-		{
-			// create new instances with the same settings as the last item in the list
-			mShadowTextureConfigList.resize(count, *mShadowTextureConfigList.rbegin());
-		}
-		mShadowTextureConfigDirty = true;
-	}
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
-{
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->format != fmt)
-		{
-			i->format = fmt;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-}
-void SceneManager::setShadowTextureFSAA(unsigned short fsaa)
-{
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-                i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->fsaa != fsaa)
-        {
-            i->fsaa = fsaa;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSettings(unsigned short size, 
-	unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
-{
-	setShadowTextureCount(count);
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->width != size || i->height != size || i->format != fmt || i->fsaa != fsaa)
-		{
-			i->width = i->height = size;
-			i->format = fmt;
-            i->fsaa = fsaa;
-			i->depthBufferPoolId = depthBufferPoolId;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-}
-//---------------------------------------------------------------------
-const TexturePtr& SceneManager::getShadowTexture(size_t shadowIndex)
-{
-	if (shadowIndex >= mShadowTextureConfigList.size())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"shadowIndex out of bounds",
-			"SceneManager::getShadowTexture");
-	}
-	ensureShadowTexturesCreated();
-
-	return mShadowTextures[shadowIndex];
-
-
-}
-//---------------------------------------------------------------------
 void SceneManager::setShadowTextureCasterMaterial(const String& name)
 {
 	if (name.empty())
@@ -4490,140 +4095,6 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup)
-{
-	mDefaultShadowCameraSetup = shadowSetup;
-
-}
-//---------------------------------------------------------------------
-const ShadowCameraSetupPtr& SceneManager::getShadowCameraSetup() const
-{
-	return mDefaultShadowCameraSetup;
-}
-//---------------------------------------------------------------------
-void SceneManager::ensureShadowTexturesCreated()
-{
-	if (mShadowTextureConfigDirty)
-	{
-		destroyShadowTextures();
-		ShadowTextureManager::getSingleton().getShadowTextures(
-			mShadowTextureConfigList, mShadowTextures);
-
-		//Used to get the depth buffer ID setting for each RTT
-		size_t __i = 0;
-
-		// Recreate shadow textures
-		for (ShadowTextureList::iterator i = mShadowTextures.begin(); 
-			i != mShadowTextures.end(); ++i, ++__i) 
-		{
-			const TexturePtr& shadowTex = *i;
-
-			// Camera names are local to SM 
-			String camName = shadowTex->getName() + "Cam";
-			// Material names are global to SM, make specific
-			String matName = shadowTex->getName() + "Mat" + getName();
-
-			RenderTexture *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-
-			//Set appropriate depth buffer
-			shadowRTT->setDepthBufferPool( mShadowTextureConfigList[__i].depthBufferPoolId );
-
-			// Create camera for this texture, but note that we have to rebind
-			// in prepareShadowTextures to coexist with multiple SMs
-			Camera* cam = createCamera(camName);
-			cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
-			mShadowTextureCameras.push_back(cam);
-
-			// Create a viewport, if not there already
-			if (shadowRTT->getNumViewports() == 0)
-			{
-				// Note camera assignment is transient when multiple SMs
-				Viewport *v = shadowRTT->addViewport();
-				// remove overlays
-				v->setOverlaysEnabled(false);
-			}
-
-			// Also create corresponding Material used for rendering this shadow
-			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-			if (mat.isNull())
-			{
-				mat = MaterialManager::getSingleton().create(
-					matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			}
-			Pass* p = mat->getTechnique(0)->getPass(0);
-			if (p->getNumTextureUnitStates() != 1 ||
-				p->getTextureUnitState(0)->_getTexturePtr(0) != shadowTex)
-			{
-				mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-				// create texture unit referring to render target texture
-				TextureUnitState* texUnit = 
-					p->createTextureUnitState(shadowTex->getName());
-				// set projective based on camera
-				texUnit->setProjectiveTexturing(!p->hasVertexProgram(), cam);
-				// clamp to border colour
-				texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-				texUnit->setTextureBorderColour(ColourValue::White);
-				mat->touch();
-
-			}
-
-			// Get null shadow texture
-			if (mShadowTextureConfigList.empty())
-			{
-				mNullShadowTexture.setNull();
-			}
-			else
-			{
-				mNullShadowTexture = 
-					ShadowTextureManager::getSingleton().getNullShadowTexture(
-						mShadowTextureConfigList[0].format);
-			}
-
-
-		}
-		mShadowTextureConfigDirty = false;
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyShadowTextures(void)
-{
-	
-	ShadowTextureList::iterator i, iend;
-	iend = mShadowTextures.end();
-	for (i = mShadowTextures.begin(); i != iend; ++i)
-	{
-		TexturePtr &shadowTex = *i;
-
-		// Cleanup material that references this texture
-		String matName = shadowTex->getName() + "Mat" + getName();
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-		if (!mat.isNull())
-		{
-			// manually clear TUS to ensure texture ref released
-			mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-			MaterialManager::getSingleton().remove(mat->getHandle());
-		}
-
-	}
-
-	ShadowTextureCameraList::iterator ci, ciend;
-	ciend = mShadowTextureCameras.end();
-	for (ci = mShadowTextureCameras.begin(); ci != ciend; ++ci)
-	{
-		// Always destroy camera since they are local to this SM
-   		destroyCamera(*ci);
-    }
-    mShadowTextures.clear();
-	mShadowTextureCameras.clear();
-
-	// Will destroy if no other scene managers referencing
-	ShadowTextureManager::getSingleton().clearUnused();
-
-	mShadowTextureConfigDirty = true;
-        
-}
-//---------------------------------------------------------------------
 template<typename T>
 void SceneManager::checkMovableObjectIntegrity( typename const vector<T*>::type &container,
 												const T *mo ) const
@@ -4636,122 +4107,6 @@ void SceneManager::checkMovableObjectIntegrity( typename const vector<T*>::type 
 			"date!!! (or the MovableObject wasn't created with this SceneManager)",
 			"SceneManager::checkMovableObjectIntegrity" );
 	}
-}
-//---------------------------------------------------------------------
-void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
-{
-	// create shadow textures if needed
-	ensureShadowTexturesCreated();
-
-    // Set the illumination stage, prevents recursive calls
-    IlluminationRenderStage savedStage = mIlluminationStage;
-    mIlluminationStage = IRS_RENDER_TO_TEXTURE;
-
-	if (lightList == 0)
-		lightList = &mLightsAffectingFrustum;
-
-	try
-	{
-		// Determine far shadow distance
-		Real shadowDist = mDefaultShadowFarDist;
-		if (!shadowDist)
-		{
-			// need a shadow distance, make one up
-			shadowDist = cam->getNearClipDistance() * 300;
-		}
-		Real shadowOffset = shadowDist * mShadowTextureOffset;
-		// Precalculate fading info (TODO: Not used anymore)
-		Real shadowEnd = shadowDist + shadowOffset;
-		Real fadeStart = shadowEnd * mShadowTextureFadeStart;
-		Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
-
-		// Iterate over the lights we've found, max out at the limit of light textures
-		// Note that the light sorting must now place shadow casting lights at the
-		// start of the light list, therefore we do not need to deal with potential
-		// mismatches in the light<->shadow texture list any more
-
-		LightList::const_iterator i, iend;
-		ShadowTextureList::iterator si, siend;
-		ShadowTextureCameraList::iterator ci;
-		iend = lightList->end();
-		siend = mShadowTextures.end();
-		ci = mShadowTextureCameras.begin();
-		mShadowTextureIndexLightList.clear();
-		size_t shadowTextureIndex = 0;
-		for (i = lightList->begin(), si = mShadowTextures.begin();
-			i != iend && si != siend; ++i)
-		{
-			Light const * light = i->light;
-
-			// skip light if shadows are disabled
-			if (!light->getCastShadows())
-				continue;
-
-			if (mShadowTextureCurrentCasterLightList.empty())
-				mShadowTextureCurrentCasterLightList.push_back(*i);
-			else
-				mShadowTextureCurrentCasterLightList[0] = *i;
-
-
-			// texture iteration per light.
-			size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];
-			for (size_t j = 0; j < textureCountPerLight && si != siend; ++j)
-			{
-				TexturePtr &shadowTex = *si;
-				RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-				Viewport *shadowView = shadowRTT->getViewport(0);
-				Camera *texCam = *ci;
-				// rebind camera, incase another SM in use which has switched to its cam
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-				shadowView->setCamera(texCam);
-#endif
-
-				// Associate main view camera as LOD camera
-				texCam->setLodCamera(cam);
-				// set base
-				if (light->getType() != Light::LT_POINT)
-					texCam->setDirection(light->getDerivedDirection());
-				if (light->getType() != Light::LT_DIRECTIONAL)
-					texCam->setPosition(light->getDerivedPosition());
-
-				// Use the material scheme of the main viewport 
-				// This is required to pick up the correct shadow_caster_material and similar properties.
-				shadowView->setMaterialScheme(vp->getMaterialScheme());
-
-				/*if (light->getCustomShadowCameraSetup().isNull())
-					mDefaultShadowCameraSetup->getShadowCamera(this, cam, light, texCam, j);
-				else
-					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, light, texCam, j);*/
-
-				// Fire shadow caster update, callee can alter camera settings
-				fireShadowTexturesPreCaster(light, texCam, j);
-
-				// Update target
-				//shadowRTT->update();
-
-				++si; // next shadow texture
-				++ci; // next camera
-			}
-
-			// set the first shadow texture index for this light.
-			mShadowTextureIndexLightList.push_back(shadowTextureIndex);
-			shadowTextureIndex += textureCountPerLight;
-		}
-	}
-	catch (Exception& e) 
-	{
-		// we must reset the illumination stage if an exception occurs
-		mIlluminationStage = savedStage;
-		throw e;
-	}
-    // Set the illumination stage, prevents recursive calls
-    mIlluminationStage = savedStage;
-
-	fireShadowTexturesUpdated(
-		std::min(lightList->size(), mShadowTextures.size()));
-
-	ShadowTextureManager::getSingleton().clearUnused();
-
 }
 //---------------------------------------------------------------------
 SceneManager::RenderContext* SceneManager::_pauseRendering()

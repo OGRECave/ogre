@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreRenderQueue.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSphere.h"
-#include "OgreShadowCaster.h"
 #include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
 #include "OgreAny.h"
@@ -526,24 +525,6 @@ namespace Ogre {
 		*/
 		LightList* _getLightList() { return &mLightList; }
 
-		typedef vector<MovableObject*>::type ShadowRenderableList;
-        typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
-
-		/// Define a default implementation of method from ShadowCaster which implements no shadows
-        EdgeData* getEdgeList(void) { return NULL; }
-		/// Define a default implementation of method from ShadowCaster which implements no shadows
-		bool hasEdgeList(void) { return false; }
-        /// Define a default implementation of method from ShadowCaster which implements no shadows
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light, 
-            HardwareIndexBufferSharedPtr* indexBuffer, 
-            bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
-		
-        /** Overridden member from ShadowCaster. */
-		const Aabb getLightCapBounds() const;
-		const Aabb getLightCapBoundsUpdated();
-        /** Overridden member from ShadowCaster. */
-        const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const;
         /** Sets whether or not this object will cast shadows.
         @remarks
         This setting simply allows you to turn on/off shadows for a given object.
@@ -563,9 +544,7 @@ namespace Ogre {
 			the render queue will receive shadows. 
 		*/
 		bool getReceivesShadows();
-			
-        /** Get the distance to extrude for a point/spot light */
-        Real getPointExtrusionDistance(const Light* l) const;
+
 		/** Get the 'type flags' for this MovableObject.
 		@remarks
 			A type flag identifies the type of the MovableObject as a bitpattern. 

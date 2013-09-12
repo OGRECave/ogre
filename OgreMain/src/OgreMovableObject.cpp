@@ -801,50 +801,6 @@ namespace Ogre {
 		else
 			outBox->setExtents( vMin, vMax );
 	}
-    //-----------------------------------------------------------------------
-    MovableObject::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
-        ShadowTechnique shadowTechnique, const Light* light, 
-        HardwareIndexBufferSharedPtr* indexBuffer, 
-        bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
-    {
-        static ShadowRenderableList dummyList;
-        return ShadowRenderableListIterator(dummyList.begin(), dummyList.end());
-    }
-    //-----------------------------------------------------------------------
-    const Aabb MovableObject::getLightCapBounds(void) const
-    {
-		//TODO: (dark_sylinc) Avoid using this function completely (use SIMD)
-        // Same as original bounds
-		return getWorldAabb();
-    }
-	//-----------------------------------------------------------------------
-	const Aabb MovableObject::getLightCapBoundsUpdated(void)
-    {
-		//TODO: (dark_sylinc) Avoid using this function completely (use SIMD)
-        // Same as original bounds
-		return getWorldAabbUpdated();
-    }
-    //-----------------------------------------------------------------------
-    /*const AxisAlignedBox& MovableObject::getDarkCapBounds(const Light& light, Real extrusionDist) const
-    {
-        // Extrude own light cap bounds
-        mWorldDarkCapBounds = getLightCapBounds();
-        this->extrudeBounds(mWorldDarkCapBounds, light.getAs4DVector(), 
-            extrusionDist);
-        return mWorldDarkCapBounds;
-    }
-    //-----------------------------------------------------------------------
-    Real MovableObject::getPointExtrusionDistance(const Light* l) const
-    {
-        if (mParentNode)
-        {
-            return getExtrusionDistance(mParentNode->_getDerivedPosition(), l);
-        }
-        else
-        {
-            return 0;
-        }
-    }*/
 	//-----------------------------------------------------------------------
 	uint32 MovableObject::getTypeFlags(void) const
 	{

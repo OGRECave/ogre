@@ -353,26 +353,6 @@ namespace Ogre {
 			mCreator->registerSceneNodeListener( this );
 	}
     //-----------------------------------------------------------------------
-    void SceneNode::findLights(LightList& destList, Real radius, uint32 lightMask) const
-    {
-        // No any optimisation here, hope inherits more smart for that.
-        //
-        // If a scene node is static and lights have moved, light list won't change
-        // can't use a simple global boolean flag since this is only called for
-        // visible nodes, so temporarily visible nodes will not be updated
-        // Since this is only called for visible nodes, skip the check for now
-        //
-        if (mCreator)
-        {
-            // Use SceneManager to calculate
-            mCreator->_populateLightList(this, radius, destList, lightMask);
-        }
-        else
-        {
-            destList.clear();
-        }
-    }
-    //-----------------------------------------------------------------------
     void SceneNode::setAutoTracking(bool enabled, SceneNode* const target, 
         const Vector3& localDirectionVector,
         const Vector3& offset)

@@ -281,8 +281,6 @@ namespace Ogre {
 	class ScriptCompilerManager;
 	class ScriptLoader;
     class Serializer;
-    class ShadowCaster;
-    class ShadowRenderable;
 	class ShadowTextureManager;
     class SimpleRenderable;
     class SimpleSpline;

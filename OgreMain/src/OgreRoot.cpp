@@ -52,7 +52,6 @@ THE SOFTWARE.
 #include "OgreArchiveManager.h"
 #include "OgrePlugin.h"
 #include "OgreFileSystem.h"
-#include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreResourceBackgroundQueue.h"
 #include "OgreEntity.h"
 #include "OgreBillboardSet.h"
@@ -1041,7 +1040,6 @@ namespace Ogre {
 		SceneManagerEnumerator::getSingleton().shutdownAll();
 		shutdownPlugins();
 
-        ShadowVolumeExtrudeProgram::shutdown();
         ResourceGroupManager::getSingleton().shutdownAll();
 
 		// Destroy pools

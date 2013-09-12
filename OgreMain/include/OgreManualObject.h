@@ -378,12 +378,6 @@ namespace Ogre
 		EdgeData* getEdgeList(void);
 		/** Overridden member from ShadowCaster. */
 		bool hasEdgeList(void);
-		/** Implement this method to enable stencil shadows. */
-		ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-			ShadowTechnique shadowTechnique, const Light* light, 
-			HardwareIndexBufferSharedPtr* indexBuffer, 
-			bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
-
 
 		/// Built, renderable section of geometry
 		class _OgreExport ManualObjectSection : public Renderable, public MovableAlloc
@@ -429,31 +423,6 @@ namespace Ogre
 
 
 					
-		};
-		/** Nested class to allow shadows. */
-		class _OgreExport ManualObjectSectionShadowRenderable : public ShadowRenderable
-		{
-		protected:
-			ManualObject* mParent;
-			// Shared link to position buffer
-			HardwareVertexBufferSharedPtr mPositionBuffer;
-			// Shared link to w-coord buffer (optional)
-			HardwareVertexBufferSharedPtr mWBuffer;
-
-		public:
-			ManualObjectSectionShadowRenderable(ManualObject* parent, 
-				HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-				bool createSeparateLightCap, bool isLightCap = false);
-			~ManualObjectSectionShadowRenderable();
-			/// Overridden from ShadowRenderable
-			void getWorldTransforms(Matrix4* xform) const;
-			HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-			HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-			/// Overridden from ShadowRenderable
-			virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
-
-			
-
 		};
 
 		typedef vector<ManualObjectSection*>::type SectionList;
@@ -508,8 +477,6 @@ namespace Ogre
 		bool mAnyIndexed;
 		/// Edge list, used if stencil shadow casting is enabled 
 		EdgeData* mEdgeList;
-		/// List of shadow renderables
-		ShadowRenderableList mShadowRenderables;
 		/// Whether to use identity projection for sections
 		bool mUseIdentityProjection;
 		/// Whether to use identity view for sections

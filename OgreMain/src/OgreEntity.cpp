@@ -653,10 +653,7 @@ namespace Ogre {
 		bool isNeedUpdateHardwareAnim = hwAnimation && !mCurrentHWAnimationState;
 		bool forcedSwAnimation = getSoftwareAnimationRequests()>0;
 		bool forcedNormals = getSoftwareAnimationNormalsRequests()>0;
-		bool stencilShadows = false;
-		if (getCastShadows() && hasEdgeList() && root._getCurrentSceneManager())
-			stencilShadows =  root._getCurrentSceneManager()->isShadowTechniqueStencilBased();
-		bool softwareAnimation = !hwAnimation || stencilShadows || forcedSwAnimation;
+		bool softwareAnimation = !hwAnimation || forcedSwAnimation;
 		// Blend normals in s/w only if we're not using h/w animation,
 		// since shadows only require positions
 		bool blendNormals = !hwAnimation || forcedNormals;
@@ -708,7 +705,7 @@ namespace Ogre {
 
 					}
 				}
-				applyVertexAnimation(hwAnimation, stencilShadows);
+				applyVertexAnimation(hwAnimation);
 			}
 
 			if (hasSkeleton())
@@ -824,10 +821,10 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
-	void Entity::applyVertexAnimation(bool hardwareAnimation, bool stencilShadows)
+	void Entity::applyVertexAnimation(bool hardwareAnimation)
 	{
 		const MeshPtr& msh = getMesh();
-		bool swAnim = !hardwareAnimation || stencilShadows || (mSoftwareAnimationRequests>0);
+		bool swAnim = !hardwareAnimation || (mSoftwareAnimationRequests>0);
 
 		// make sure we have enough hardware animation elements to play with
 		if (hardwareAnimation)
@@ -1961,113 +1958,6 @@ namespace Ogre {
             (*i)->_notifyAttached(parent);
         }
     }
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::EntityShadowRenderable(Entity* parent,
-        HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
-        bool createSeparateLightCap, SubEntity* subent, bool isLightCap)
-        : mParent(parent), mSubEntity(subent)
-    {
-        // Save link to vertex data
-        mCurrentVertexData = vertexData;
-
-        // Initialise render op
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexBuffer = *indexBuffer;
-        mRenderOp.indexData->indexStart = 0;
-        // index start and count are sorted out later
-
-        // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = OGRE_NEW VertexData();
-        // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
-        mOriginalPosBufferBinding =
-            vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(mOriginalPosBufferBinding);
-        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(!vertexData->hardwareShadowVolWBuffer.isNull())
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
-        // Use same vertex start as input
-        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-        if (isLightCap)
-        {
-            // Use original vertex count, no extrusion
-            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-        }
-        else
-        {
-            // Vertex count must take into account the doubling of the buffer,
-            // because second half of the buffer is the extruded copy
-            mRenderOp.vertexData->vertexCount =
-                vertexData->vertexCount * 2;
-            if (createSeparateLightCap)
-            {
-				_createSeparateLightCap();
-            }
-        }
-    }
-
-	//-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::_createSeparateLightCap()
-	{
-		if (mLightCap == NULL)
-		{
-			// Create child light cap
-			mLightCap = OGRE_NEW EntityShadowRenderable(mParent,
-				&mRenderOp.indexData->indexBuffer, mCurrentVertexData, false, mSubEntity, true);
-		}   
-	}
-    //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::~EntityShadowRenderable()
-    {
-        OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-    }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::getWorldTransforms(Matrix4* xform) const
-    {
-        *xform = mParent->_getParentNodeFullTransform();
-    }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::rebindPositionBuffer(const VertexData* vertexData, bool force)
-    {
-        if (force || mCurrentVertexData != vertexData)
-        {
-            mCurrentVertexData = vertexData;
-            mPositionBuffer = mCurrentVertexData->vertexBufferBinding->getBuffer(
-                mOriginalPosBufferBinding);
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-            if (mLightCap)
-            {
-                static_cast<EntityShadowRenderable*>(mLightCap)->rebindPositionBuffer(vertexData, force);
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool Entity::EntityShadowRenderable::isVisible(void) const
-    {
-        if (mSubEntity)
-        {
-            return mSubEntity->isVisible();
-        }
-        else
-        {
-            return ShadowRenderable::isVisible();
-        }
-    }
-	//-----------------------------------------------------------------------
-	void Entity::EntityShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-	{
-		mRenderOp.indexData->indexBuffer = indexBuffer;
-		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
-	}
-
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroup(uint8 queueID)
     {

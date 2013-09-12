@@ -233,9 +233,7 @@ set (HEADER_FILES
   include/OgreShadowCameraSetupLiSPSM.h
   include/OgreShadowCameraSetupPlaneOptimal.h
   include/OgreShadowCameraSetupPSSM.h
-  include/OgreShadowCaster.h
   include/OgreShadowTextureManager.h
-  include/OgreShadowVolumeExtrudeProgram.h
   include/OgreSharedPtr.h
   src/OgreSIMDHelper.h
   include/OgreSimpleRenderable.h
@@ -445,9 +443,7 @@ set (SOURCE_FILES
   src/OgreShadowCameraSetupLiSPSM.cpp
   src/OgreShadowCameraSetupPlaneOptimal.cpp
   src/OgreShadowCameraSetupPSSM.cpp
-  src/OgreShadowCaster.cpp
   src/OgreShadowTextureManager.cpp
-  src/OgreShadowVolumeExtrudeProgram.cpp
   src/OgreSimpleRenderable.cpp
   src/OgreSimpleSpline.cpp
   src/OgreSkeleton.cpp
