@@ -29,6 +29,22 @@ set (HEADER_FILES
   include/OgreArchive.h
   include/OgreArchiveFactory.h
   include/OgreArchiveManager.h
+  include/Compositor/Pass/OgreCompositorPass.h
+  include/Compositor/Pass/OgreCompositorPassDef.h
+  include/Compositor/Pass/PassClear/OgreCompositorPassClear.h
+  include/Compositor/Pass/PassClear/OgreCompositorPassClearDef.h
+  include/Compositor/Pass/PassScene/OgreCompositorPassScene.h
+  include/Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h
+  include/Compositor/OgreCompositorChannel.h
+  include/Compositor/OgreCompositorCommon.h
+  include/Compositor/OgreCompositorManager2.h
+  include/Compositor/OgreCompositorNode.h
+  include/Compositor/OgreCompositorNodeDef.h
+  include/Compositor/OgreCompositorShadowNode.h
+  include/Compositor/OgreCompositorShadowNodeDef.h
+  include/Compositor/OgreCompositorWorkspace.h
+  include/Compositor/OgreCompositorWorkspaceDef.h
+  include/Compositor/OgreTextureDefinition.h
   include/Math/Array/OgreArrayAabb.h
   include/Math/Array/OgreArrayConfig.h
   include/Math/Array/OgreArrayMatrix4.h
@@ -287,6 +303,18 @@ set (SOURCE_FILES
   src/OgreAnimationState.cpp
   src/OgreAnimationTrack.cpp
   src/OgreArchiveManager.cpp
+  src/Compositor/Pass/OgreCompositorPass.cpp
+  src/Compositor/Pass/OgreCompositorPassDef.cpp
+  src/Compositor/Pass/PassClear/OgreCompositorPassClear.cpp
+  src/Compositor/Pass/PassScene/OgreCompositorPassScene.cpp
+  src/Compositor/OgreCompositorManager2.cpp
+  src/Compositor/OgreCompositorNode.cpp
+  src/Compositor/OgreCompositorNodeDef.cpp
+  src/Compositor/OgreCompositorShadowNode.cpp
+  src/Compositor/OgreCompositorShadowNodeDef.cpp
+  src/Compositor/OgreCompositorWorkspace.cpp
+  src/Compositor/OgreCompositorWorkspaceDef.cpp
+  src/Compositor/OgreTextureDefinition.cpp
   src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
   src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
   src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp

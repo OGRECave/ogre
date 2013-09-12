@@ -227,44 +227,5 @@ namespace Ogre {
 			pDstGroup->merge( pSrcGroup );
 		}
 	}
-
-	//---------------------------------------------------------------------
-	void RenderQueue::processVisibleObject(MovableObject* mo, 
-		Camera* cam, 
-		bool onlyShadowCasters, 
-		VisibleObjectsBoundsInfo* visibleBounds)
-	{
-		//--- !!!TODO: (dark_sylinc) VERY IMPORTANT!!! ---
-		if (mo->getVisible())
-			mo -> _updateRenderQueue( this, cam );
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		mo->_notifyCurrentCamera(cam);
-
-		if (mo->isVisible())
-		{
-			bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
-				&& mo->getReceivesShadows();
-
-			if (!onlyShadowCasters || mo->getCastShadows())
-			{
-				mo -> _updateRenderQueue( this );
-				if (visibleBounds)
-				{
-					visibleBounds->merge(mo->getWorldBoundingBox(true), 
-						mo->getWorldBoundingSphere(true), cam, 
-						receiveShadows);
-				}
-			}
-			// not shadow caster, receiver only?
-			else if (onlyShadowCasters && !mo->getCastShadows() && 
-				receiveShadows)
-			{
-				visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
-					mo->getWorldBoundingSphere(true), cam);
-			}
-		}
-#endif
-	}
-
 }
 

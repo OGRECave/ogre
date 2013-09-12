@@ -1443,26 +1443,13 @@ namespace Ogre {
 		*/
 		void updateSceneGraph();
 
-        /** Internal method which parses the scene to find visible objects to render.
-            @remarks
-                If you're implementing a custom scene manager, this is the most important method to
-                override since it's here you can apply your custom world partitioning scheme. Once you
-                have added the appropriate objects to the render queue, you can let the default
-                SceneManager objects _renderVisibleObjects handle the actual rendering of the objects
-                you pick.
-            @par
-                Any visible objects will be added to a rendering queue, which is indexed by material in order
-                to ensure objects with the same material are rendered together to minimise render state changes.
-        */
-        virtual void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
-
         /** Internal method for applying animations to scene nodes.
         @remarks
             Uses the internally stored AnimationState objects to apply animation to SceneNodes.
         */
         virtual void _applySceneAnimations(void);
 
-        /** Sends visible objects found in _findVisibleObjects to the rendering engine.
+        /** Sends visible objects found during _cullPhase01 to the rendering engine.
         */
         virtual void _renderVisibleObjects(void);
 

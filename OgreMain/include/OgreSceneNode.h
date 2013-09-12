@@ -143,28 +143,6 @@ namespace Ogre {
         */
         virtual void detachAllObjects(void);
 
-        /** Internal method which locates any visible objects attached to this node and adds them to the passed in queue.
-            @remarks
-                Should only be called by a SceneManager implementation, and only after the _updat method has been called to
-                ensure transforms and world bounds are up to date.
-                SceneManager implementations can choose to let the search cascade automatically, or choose to prevent this
-                and select nodes themselves based on some other criteria.
-            @param
-                cam The active camera
-            @param
-                queue The SceneManager's rendering queue
-			@param
-				visibleBounds bounding information created on the fly containing all visible objects by the camera
-            @param
-                includeChildren If true, the call is cascaded down to all child nodes automatically.
-            @param
-                displayNodes If true, the nodes themselves are rendered as a set of 3 axes as well
-                    as the objects being rendered. For debugging purposes.
-        */
-		virtual void _findVisibleObjects(Camera* cam, RenderQueue* queue, 
-			VisibleObjectsBoundsInfo* visibleBounds, 
-            bool includeChildren = true, bool displayNodes = false, bool onlyShadowCasters = false);
-
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
         @remarks

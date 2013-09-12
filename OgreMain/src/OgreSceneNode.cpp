@@ -219,55 +219,6 @@ namespace Ogre {
 			(*itr)->_notifyAttached( (SceneNode*)0 );
         mAttachments.clear();
     }
-    //-----------------------------------------------------------------------
-    void SceneNode::_findVisibleObjects(Camera* cam, RenderQueue* queue, 
-		VisibleObjectsBoundsInfo* visibleBounds, bool includeChildren, 
-		bool displayNodes, bool onlyShadowCasters)
-    {
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // Check self visible
-        if (!cam->isVisible(mWorldAABB))
-            return;
-
-        // Add all entities
-        ObjectMap::iterator iobj;
-        ObjectMap::iterator iobjend = mObjectsByName.end();
-        for (iobj = mObjectsByName.begin(); iobj != iobjend; ++iobj)
-        {
-			MovableObject* mo = iobj->second;
-
-			queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
-        }
-
-        if (includeChildren)
-        {
-            ChildNodeMap::iterator child, childend;
-            childend = mChildren.end();
-            for (child = mChildren.begin(); child != childend; ++child)
-            {
-                SceneNode* sceneChild = static_cast<SceneNode*>(child->second);
-                sceneChild->_findVisibleObjects(cam, queue, visibleBounds, includeChildren, 
-					displayNodes, onlyShadowCasters);
-            }
-        }
-
-        if (displayNodes)
-        {
-            // Include self in the render queue
-            queue->addRenderable(getDebugRenderable());
-        }
-
-		// Check if the bounding box should be shown.
-		// See if our flag is set or if the scene manager flag is set.
-		if ( !mHideBoundingBox &&
-             (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) )
-		{ 
-			_addBoundingBoxToQueue(queue);
-		}
-
-#endif
-    }
-
 	/*TODO
 	Node::DebugRenderable* SceneNode::getDebugRenderable()
 	{

@@ -2172,15 +2172,6 @@ void SceneManager::updateSceneGraph()
 	mStaticEntitiesDirty = false;
 }
 //-----------------------------------------------------------------------
-void SceneManager::_findVisibleObjects(
-	Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters)
-{
-    // Tell nodes to find, cascade down all nodes
-    getRootSceneNode()->_findVisibleObjects(cam, getRenderQueue(), visibleBounds, true, 
-        mDisplayNodes, onlyShadowCasters);
-
-}
-//-----------------------------------------------------------------------
 void SceneManager::_renderVisibleObjects(void)
 {
 	RenderQueueInvocationSequence* invocationSequence = 
@@ -2308,7 +2299,7 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     // This is like the basic group render, except we skip all transparents
     // and we also render any non-shadowed objects
     // Note that non-shadow casters will have already been eliminated during
-    // _findVisibleObjects
+    // _cullPhase01
 
     // Iterate through priorities
     RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
