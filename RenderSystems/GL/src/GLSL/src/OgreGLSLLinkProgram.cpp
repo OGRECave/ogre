@@ -585,7 +585,25 @@ namespace Ogre {
 		mTriedToLinkAndFailed = !mLinked;
 
 		// force logging and raise exception if not linked
-        GLenum glErr = glGetError();
+        
+		
+		//*************//
+
+		///*
+		if(mTriedToLinkAndFailed == true)
+		{
+			GLchar *msg = NULL;
+			GLint length;
+			glGetProgramiv(mGLHandle, GL_INFO_LOG_LENGTH, &length);
+			msg = new GLchar[length];
+			glGetProgramInfoLog(mGLHandle, length, NULL, msg);
+			logObjectInfo( getCombinedName() + String(", Error linking program: ") + msg, mGLHandle );
+			delete msg;
+		}
+		//*/
+		//*************//
+
+		GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)
         {
 		    reportGLSLError( glErr, "GLSLLinkProgram::compileAndLink",
