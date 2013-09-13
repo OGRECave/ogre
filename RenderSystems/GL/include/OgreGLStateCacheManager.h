@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreGLPrerequisites.h"
 #include "OgreStdHeaders.h"
+#include "OgreIteratorWrappers.h"
 
 typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
