@@ -547,6 +547,122 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+	void MovableObject::cullReceiversBox( const size_t numNodes, ObjectData objData,
+											const Frustum *frustum, uint32 sceneVisibilityFlags,
+											AxisAlignedBox *outReceiversBox )
+	{
+		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
+		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
+		// (we use method Method 5: "If you really don’t care whether a box is
+		// partially or fully inside"):
+		// vector4 signFlip = componentwise_and(plane, 0x80000000);
+		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
+
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+		ArrayPlane planes[6];
+		const Plane *frustumPlanes = frustum->getFrustumPlanes();
+
+		for( size_t i=0; i<6; ++i )
+		{
+			planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setToSign();
+			planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+		}
+
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
+
+		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
+		//In theory xor is faster, but some archs have a penalty for switching between integer
+		//& floating point, even if it's simd sse
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+
+			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
+			ArrayReal dotResult, mask;
+			ArrayVector3 centerPlusFlippedHS;
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[0].signFlip;
+			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
+
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[1].signFlip;
+			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[2].signFlip;
+			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[3].signFlip;
+			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[4].signFlip;
+			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+																 planes[5].signFlip;
+			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
+
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayReal tmpMask = Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
+								mask );
+
+			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
+
+			//Fuse result with visibility flag
+			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+														Mathlib::And( sceneFlags, *visibilityFlags ) );
+			finalMask				= Mathlib::And( finalMask, isVisible );
+			ArrayReal finalMskAsReal= CastIntToReal( finalMask );
+			ArrayReal receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+
+			//Merge with bounds only if they're visible & are receivers. We first merge,
+			//then CMov its older value if the object isn't visible/receiver.
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			vMinBounds.CmovRobust( receiverMask, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			vMaxBounds.CmovRobust( receiverMask, newVal );
+
+			objData.advanceFrustumPack();
+		}
+
+		//Merge the individual values and return the result.
+		Vector3 vMin = vMinBounds.collapseMin();
+		Vector3 vMax = vMaxBounds.collapseMax();
+		if( vMin > vMax )
+			outReceiversBox->setNull();
+		else
+			outReceiversBox->setExtents( vMin, vMax );
+	}
+	//-----------------------------------------------------------------------
 	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
 									LightListInfo &outGlobalLightList, const FrustumVec &frustums )
 	{

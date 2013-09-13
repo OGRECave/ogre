@@ -337,6 +337,16 @@ namespace Ogre
 		return mSceneManager->findCamera( cameraName );
 	}
 	//-----------------------------------------------------------------------------------
+	CompositorManager2* CompositorWorkspace::getCompositorManager()
+	{
+		return mDefinition->mCompositorManager;
+	}
+	//-----------------------------------------------------------------------------------
+	const CompositorManager2* CompositorWorkspace::getCompositorManager() const
+	{
+		return mDefinition->mCompositorManager;
+	}
+	//-----------------------------------------------------------------------------------
 	size_t CompositorWorkspace::getFrameCount(void) const
 	{
 		return mDefinition->mCompositorManager->getFrameCount();

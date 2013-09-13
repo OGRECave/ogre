@@ -1153,6 +1153,18 @@ namespace Ogre {
 		//this->setCullingFrustum(cam->getCullingFrustum());
 
 	}
+	//-----------------------------------------------------------------------
+	void Camera::_resetRenderedRqs( size_t numRqs )
+	{
+		mRenderedRqs.clear();
+		mRenderedRqs.resize( numRqs, false );
+	}
+	//-----------------------------------------------------------------------
+	void Camera::_setRenderedRqs( size_t rqStart, size_t rqEnd )
+	{
+		for( size_t i=rqStart; i<rqEnd; ++i )
+			mRenderedRqs[i] = true;
+	}
 
 
 } // namespace Ogre

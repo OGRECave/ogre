@@ -261,6 +261,18 @@ namespace Ogre {
 								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
 								 AxisAlignedBox *outReceiversBox );
 
+		/** Exactly the same as @see cullFrustum except that it doesn't produce outCulledObjects.
+			Only useful when a shadow node needs to know the receiver boxes of other Render queue
+			ranges that weren't calculated used in previous render scene passes.
+		@remarks
+			Because of the performance implication of this function, it's a copy-paste from cullFrustum,
+			instead of refactoring in such a way that the code base is shared by both calulcations
+			Ideally you shouldn't need this function (when a shadow node only renders the render queue
+			ranges already calculated)
+		*/
+		static void cullReceiversBox( const size_t numNodes, ObjectData t, const Frustum *frustum,
+										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox );
+
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList
 		@remarks

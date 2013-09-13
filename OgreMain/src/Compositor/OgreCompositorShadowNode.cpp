@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
+#include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
@@ -171,7 +172,7 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::buildClosestLightList( const Camera *newCamera )
+	void CompositorShadowNode::buildClosestLightList( Camera *newCamera )
 	{
 		const size_t currentFrameCount = mWorkspace->getFrameCount();
 		if( mLastCamera == newCamera && mLastFrame == currentFrameCount )
@@ -268,16 +269,30 @@ namespace Ogre
 																 mDefinition->mMaxRq );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::mergeReceiversBoxes( const Camera* camera )
+	void CompositorShadowNode::mergeReceiversBoxes( Camera* camera )
 	{
-		const SceneManager *sceneManager = camera->getSceneManager();
+		SceneManager *sceneManager = camera->getSceneManager();
 		const AxisAlignedBoxVec &boxesVec = sceneManager->getReceiversBoxPerRq( camera );
 
 		mReceiverBox.setNull();
 
-		//TODO: Finish the rqs that may be missing
+		//Finish the rqs that may be missing, i.e. those ranges that weren't drawn by a
+		//previous PASS_SCENE, thus we don't have all the receiver boxes we need.
 		const size_t minRq = std::min( mDefinition->mMinRq, boxesVec.size() );
 		const size_t maxRq = std::min( mDefinition->mMaxRq, boxesVec.size() );
+
+		for( size_t i=minRq; i<maxRq; ++i )
+		{
+			if( !camera->isRenderedRq( i ) )
+			{
+				size_t j = i+1;
+				while( j<maxRq && camera->isRenderedRq( j ) )
+					++j;
+
+				sceneManager->_cullReceiversBox( camera, i, j );
+				i = j;
+			}
+		}
 
 		AxisAlignedBoxVec::const_iterator itor = boxesVec.begin() + minRq;
 		AxisAlignedBoxVec::const_iterator end  = boxesVec.begin() + maxRq;
@@ -329,7 +344,7 @@ namespace Ogre
 				itShadowCamera->minDistance = itShadowCamera->shadowCameraSetup->getMinDistance();
 				itShadowCamera->maxDistance = itShadowCamera->shadowCameraSetup->getMaxDistance();
 			}
-			//Else... this shadow map shouldn't be rendered(TODO) and when used, return a blank one.
+			//Else... this shadow map shouldn't be rendered and when used, return a blank one.
 			//The Nth closest lights don't cast shadows
 
 			++itShadowCamera;
@@ -338,8 +353,6 @@ namespace Ogre
 
 		SceneManager::IlluminationRenderStage previous = sceneManager->_getCurrentRenderStage();
 		sceneManager->_setCurrentRenderStage( SceneManager::IRS_RENDER_TO_TEXTURE );
-
-		//TODO: Set SceneManager::mShadowTextureCurrentCasterLightList & mShadowTextureIndexLightList (or refactor)
 
 		//Now render all passes
 		CompositorNode::_update();
@@ -430,6 +443,8 @@ namespace Ogre
 
 		//Set the shadow map texture units
 		{
+			CompositorManager2 *compoMgr = mWorkspace->getCompositorManager();
+
 			size_t shadowIdx=0;
 			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
 														mDefinition->mShadowMapTexDefinitions.begin();
@@ -437,31 +452,32 @@ namespace Ogre
 														mDefinition->mShadowMapTexDefinitions.end();
 			while( itor != end && shadowIdx < pass->getNumShadowContentTextures() )
 			{
+				size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
+													TextureUnitState::CONTENT_SHADOW, shadowIdx );
+				// I know, nasty const_cast
+				TextureUnitState *texUnit = const_cast<TextureUnitState*>(
+													pass->getTextureUnitState(texUnitIdx) );
+
+				// Projective texturing needs to be disabled explicitly when using vertex shaders.
+				texUnit->setProjectiveTexturing( false, (const Frustum*)0 );
+				autoParamDataSource->setTextureProjector( mShadowMapCameras[shadowIdx].camera,
+															shadowIdx );
+
 				if( itor->light < mCurrentLightList.size() &&
 					mAffectedLights[mCurrentLightList[itor->light].globalIndex] )
 				{
-					size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
-													TextureUnitState::CONTENT_SHADOW, shadowIdx );
-					// I know, nasty const_cast
-					TextureUnitState *texUnit = const_cast<TextureUnitState*>(
-														pass->getTextureUnitState(texUnitIdx) );
-
-					
 					const LightClosest &light = mCurrentLightList[itor->light];
 
 					//TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
 					//changes need to be done so that UV calculations land on the right place
 					const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
 					texUnit->_setTexturePtr( shadowTex );
-
-					// Projective texturing needs to be disabled explicitly when using vertex shaders.
-					texUnit->setProjectiveTexturing( false, (const Frustum*)0 );
-					autoParamDataSource->setTextureProjector( mShadowMapCameras[shadowIdx].camera,
-																shadowIdx );
 				}
 				else
 				{
-					//TODO: Put blank texture
+					//Use blank texture
+					texUnit->_setTexturePtr( compoMgr->getNullShadowTexture( itor->formatList[0] ) );
+					
 				}
 				++shadowIdx;
 				++itor;
@@ -469,8 +485,19 @@ namespace Ogre
 
 			for( ; shadowIdx<pass->getNumShadowContentTextures(); ++shadowIdx )
 			{
-				//The material supports more shadow maps than the shadow
-				//node actually renders. This probably smells slopy setup
+				//If we're here, the material supports more shadow maps than the
+				//shadow node actually renders. This probably smells slopy setup.
+				//Put blank textures
+				size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
+													TextureUnitState::CONTENT_SHADOW, shadowIdx );
+				// I know, nasty const_cast
+				TextureUnitState *texUnit = const_cast<TextureUnitState*>(
+													pass->getTextureUnitState(texUnitIdx) );
+				texUnit->_setTexturePtr( compoMgr->getNullShadowTexture( PF_R8G8B8A8 ) );
+
+				// Projective texturing needs to be disabled explicitly when using vertex shaders.
+				texUnit->setProjectiveTexturing( false, (const Frustum*)0 );
+				autoParamDataSource->setTextureProjector( 0, shadowIdx );
 			}
 		}
 

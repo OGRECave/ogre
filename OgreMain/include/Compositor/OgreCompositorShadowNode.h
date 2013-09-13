@@ -146,13 +146,15 @@ namespace Ogre
 			camera. Early outs if we've already calculated our stuff for that camera in
 			a previous call.
 			Also updates internals lists for easy look up of lights <-> shadow maps
+		@remarks
+			Camera::mRenderedRqs may be modified by our call to mergeReceiversBoxes
 		@param newCamera
 			User camera to base our shadow map cameras from.
 		*/
-		void buildClosestLightList( const Camera *newCamera );
+		void buildClosestLightList( Camera *newCamera );
 
 		/// Caches mReceiverBox merging all the RQs we may have to include w/ the given camera
-		void mergeReceiversBoxes( const Camera* camera );
+		void mergeReceiversBoxes( Camera* camera );
 
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,

@@ -60,6 +60,8 @@ namespace Ogre
 
 		RenderSystem			*mRenderSystem;
 
+		TextureVec				mNullTextureList;
+
 		void validateNodes(void);
 
 	public:
@@ -84,7 +86,11 @@ namespace Ogre
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 
 		size_t getFrameCount(void) const					{ return mFrameCount; }
-		
+
+		/** Get an appropriately defined 'null' texture, i.e. one which will always
+			result in no shadows.
+		*/
+		TexturePtr getNullShadowTexture( PixelFormat format );
 
 		/**
 		@param defaultVp

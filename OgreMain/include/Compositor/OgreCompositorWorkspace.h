@@ -162,6 +162,12 @@ namespace Ogre
 
 		SceneManager* getSceneManager() const				{ return mSceneManager; }
 
+		/// Gets the compositor manager (non const)
+		CompositorManager2* getCompositorManager();
+
+		/// Gets the compositor manager (const version)
+		const CompositorManager2* getCompositorManager() const;
+
 		size_t getFrameCount(void) const;
 	};
 

@@ -366,29 +366,11 @@ void SceneManager::destroyAllCameras(void)
 
 	while( camIt != camEnd )
 	{
-		bool dontDelete = false;
-		 // dont destroy shadow texture cameras here. destroyAllCameras is public
-		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
-		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
-		{
-			if( (*camShadowTexIt) == *camIt )
-			{
-				dontDelete = true;
-				break;
-			}
-		}
-
-		if( dontDelete )	// skip this camera
-			++camIt;
-		else 
-		{
-			const size_t oldIdx = camIt - mCameras.begin();
-			destroyCamera( *camIt );
-			camIt  = mCameras.begin() + oldIdx;
-			camEnd = mCameras.end();
-		}
+		const size_t oldIdx = camIt - mCameras.begin();
+		destroyCamera( *camIt );
+		camIt  = mCameras.begin() + oldIdx;
+		camEnd = mCameras.end();
 	}
-
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
@@ -1097,6 +1079,17 @@ void SceneManager::_swapVisibleObjectsForShadowMapping()
 	mVisibleObjects.swap( mVisibleObjectsBackup );
 }
 //-----------------------------------------------------------------------
+void SceneManager::_cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq )
+{
+	camera->_setRenderedRqs( firstRq, lastRq );
+
+	size_t visibleObjsIdxStart = 0;
+	cullFrustum( mEntitiesMemoryManagerCulledList, camera, firstRq, lastRq, visibleObjsIdxStart );
+
+	//Now merge the bounds from all threads into one
+	collectVisibleBoundsInfoFromThreads( camera, firstRq, lastRq );
+}
+//-----------------------------------------------------------------------
 void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq )
 {
 	OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
@@ -1141,6 +1134,8 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 				}
 				realLastRq = std::min( realLastRq, lastRq );
 			}
+
+			camera->_setRenderedRqs( realFirstRq, realLastRq );
 
 			size_t visibleObjsIdxStart = 0;
 			size_t numThreads = 1;
@@ -2061,6 +2056,52 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 	}
 }
 //-----------------------------------------------------------------------
+void SceneManager::cullReceiversBox( const ObjectMemoryManagerVec &objectMemManager,
+										const Camera *camera, uint8 _firstRq, uint8 _lastRq,
+										size_t visObjsIdxStart )
+{
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + visObjsIdxStart);
+	{
+		if( aabbInfo.size() < _lastRq )
+			aabbInfo.resize( _lastRq );
+
+		//Reset the aabb infos.
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + _firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + _lastRq;
+
+		while( itor != end )
+		{
+			itor->setNull();
+			++itor;
+		}
+	}
+
+	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
+	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::cullReceiversBox( numObjs, objData, camera,
+					camera->getViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
 void SceneManager::buildLightList()
 {
 	mGlobalLightList.lights.clear();
@@ -2167,9 +2208,32 @@ void SceneManager::updateSceneGraph()
 	updateAllBounds( mLightsMemoryManagerCulledList );
 	buildLightList();
 
+	//Reset the list of render RQs for all cameras that are in a PASS_SCENE (except shadow passes)
+	uint8 numRqs = 0;
+	{
+		ObjectMemoryManagerVec::const_iterator itor = mEntitiesMemoryManagerCulledList.begin();
+		ObjectMemoryManagerVec::const_iterator end  = mEntitiesMemoryManagerCulledList.end();
+		while( itor != end )
+		{
+			numRqs = std::max<uint8>( numRqs, (*itor)->_getTotalRenderQueues() );
+			++itor;
+		}
+	}
+
+	CameraList::const_iterator itor = mCameras.begin();
+	CameraList::const_iterator end  = mCameras.end();
+	while( itor != end )
+	{
+		(*itor)->_resetRenderedRqs( numRqs );
+		++itor;
+	}
+
 	// Reset these
 	mStaticMinDepthLevelDirty = std::numeric_limits<uint16>::max();
 	mStaticEntitiesDirty = false;
+
+	for( size_t i=0; i<OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i )
+		mAutoParamDataSource->setTextureProjector( 0, i );
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderVisibleObjects(void)

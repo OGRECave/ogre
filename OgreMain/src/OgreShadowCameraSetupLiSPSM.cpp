@@ -295,6 +295,9 @@ namespace Ogre
 
 		mMaxDistance = mPointListBodyB.getAAB().getMinimum().distance(
 												mPointListBodyB.getAAB().getMaximum() );
+		// Don't know why, but when approaching the "parallel artifacts"
+		// max distance sky rockets. Compensate.
+		mMaxDistance *= mOptAdjustFactorTweak;
 
 		// transform to light space: y -> -z, z -> y
 		LProj = msNormalToLightSpace * LProj;

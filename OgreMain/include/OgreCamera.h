@@ -152,7 +152,6 @@ namespace Ogre {
         /// Inverted scene LOD factor, can be used by Renderables to adjust their LOD
         Real mSceneLodFactorInv;
 
-
         /** Viewing window. 
         @remarks
         Generalize camera class for the case, when viewing frustum doesn't cover all viewport.
@@ -181,6 +180,9 @@ namespace Ogre {
         bool mUseMinPixelSize;
         /// @see Camera::getPixelDisplayRatio
         Real mPixelDisplayRatio;
+
+		/// Each frame it is set to all false. After rendering each RQ, it is set to true
+		vector<bool>::type	mRenderedRqs;
 
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
@@ -675,6 +677,27 @@ namespace Ogre {
             This parameter is used in min display size calculations.
         */
         Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
+
+		/** Called at the beginning of each frame to know which RenderQueue IDs have been rendered
+		@param numRqs
+			Max number of total possible render queues in this frame
+		*/
+		void _resetRenderedRqs( size_t numRqs );
+
+		/** Tells the camera that render queues in the range [rqStart; rqEnd) were rendered
+		@remarks
+			This function may be called before having been actually rendered
+			(i.e. during the culling phase 01)
+		@param rqStart
+			The first render queue in the range to be rendered. Inclusive.
+		@param rqEnd
+			Next to last render queue id to be rendered. Must be below or equal than
+			the value passed to @see _resetRenderedRqs
+		*/
+		void _setRenderedRqs( size_t rqStart, size_t rqEnd );
+
+		/// Returns true if the asked render queue has been rendered. False otherwise
+		bool isRenderedRq( size_t rqId ) const			{ return mRenderedRqs[rqId]; }
         
     };
     /** @} */

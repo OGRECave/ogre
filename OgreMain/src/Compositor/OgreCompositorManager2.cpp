@@ -37,6 +37,9 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "OgreTextureManager.h"
+#include "OgreHardwarePixelBuffer.h"
+
 namespace Ogre
 {
 	template<typename T>
@@ -126,6 +129,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorManager2::~CompositorManager2()
 	{
+		for( TextureVec::iterator i = mNullTextureList.begin(); i != mNullTextureList.end(); ++i )
+			TextureManager::getSingleton().remove( (*i)->getHandle() );
+
 		deleteAllClear( mUnfinishedShadowNodes );
 		deleteAllSecondClear( mWorkspaceDefs );
 		deleteAllSecondClear( mNodeDefinitions );
@@ -263,6 +269,40 @@ namespace Ogre
 		}
 
 		return mWorkspaces.back();
+	}
+	//-----------------------------------------------------------------------------------
+	TexturePtr CompositorManager2::getNullShadowTexture( PixelFormat format )
+	{
+		for (TextureVec::iterator t = mNullTextureList.begin(); t != mNullTextureList.end(); ++t)
+		{
+			const TexturePtr& tex = *t;
+
+			if (format == tex->getFormat())
+			{
+				// Ok, a match
+				return tex;
+			}
+		}
+
+		// not found, create a new one
+		// A 1x1 texture of the correct format, not a render target
+		static const String baseName = "Ogre/ShadowTextureNull";
+		String targName = baseName + StringConverter::toString( mNullTextureList.size() );
+		TexturePtr shadowTex = TextureManager::getSingleton().createManual(
+			targName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
+			TEX_TYPE_2D, 1, 1, 0, format, TU_STATIC_WRITE_ONLY );
+		mNullTextureList.push_back( shadowTex );
+
+		// lock & populate the texture based on format
+		shadowTex->getBuffer()->lock(HardwareBuffer::HBL_DISCARD);
+		const PixelBox& box = shadowTex->getBuffer()->getCurrentLock();
+
+		// set high-values across all bytes of the format 
+		PixelUtil::packColour( 1.0f, 1.0f, 1.0f, 1.0f, format, box.data );
+
+		shadowTex->getBuffer()->unlock();
+
+		return shadowTex;
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorManager2::validateAllNodes()

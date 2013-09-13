@@ -651,9 +651,6 @@ namespace Ogre {
         Rectangle2D* mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;
-		TexturePtr mNullShadowTexture;
-		typedef vector<Camera*>::type ShadowTextureCameraList;
-		ShadowTextureCameraList mShadowTextureCameras;
 		bool mShadowCasterRenderBackFaces;
 		/// Struct for caching light clipping information for re-use in a frame
 		struct LightClippingInfo
@@ -922,10 +919,8 @@ namespace Ogre {
         /** Removes (and destroys) all cameras from the scene.
             @remarks
                 Some cameras are internal created to dealing with texture shadow,
-                their aren't supposed to destroy outside. So, while you are using
-                texture shadow, don't call this method, or you can set the shadow
-                technique other than texture-based, which will destroy all internal
-                created shadow cameras and textures.
+				or compositor nodes. They aren't supposed to be destroyed outside.
+				So, while you are using texture shadow, don't call this method.
         */
         virtual void destroyAllCameras(void);
 
@@ -1431,6 +1426,10 @@ namespace Ogre {
 		void cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
 							uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart );
 
+		/// @copydoc _cullReceiversBox
+		void cullReceiversBox( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
+								uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart );
+
 		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
 			Compositor). Then calls MovableObject::buildLightList with that list so that each
 			MovableObject gets it's own sorted list of the closest lights.
@@ -1455,6 +1454,9 @@ namespace Ogre {
 
 		/// @See CompositorShadowNode remarks
 		void _swapVisibleObjectsForShadowMapping();
+
+		/// @See _cullPhase01 and @see MovableObject::cullReceiversBox
+		virtual void _cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq );
 
 		/** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
