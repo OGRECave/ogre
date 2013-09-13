@@ -392,7 +392,9 @@ protected:
 	{
 		ControllerManager::getSingleton().destroyController(mController);
 
-        MeshManager::getSingleton().remove("Myplane");
+		MeshManager::getSingleton().remove("Myplane");
+
+		pColumns.clear();
 	}
 
 	/// Change basic shadow technique 
