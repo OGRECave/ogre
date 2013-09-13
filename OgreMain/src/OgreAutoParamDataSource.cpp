@@ -144,6 +144,7 @@ namespace Ogre {
         mCameraPositionDirty = true;
 		mLodCameraPositionObjectSpaceDirty = true;
 		mLodCameraPositionDirty = true;
+		mSceneDepthRangeDirty = true;
     }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
@@ -629,10 +630,13 @@ namespace Ogre {
     {
 		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			mCurrentTextureProjector[index] = frust;
-			mTextureViewProjMatrixDirty[index] = true;
-			mTextureWorldViewProjMatrixDirty[index] = true;
-			mShadowCamDepthRangesDirty[index] = true;
+			if( mCurrentTextureProjector[index] != frust )
+			{
+				mCurrentTextureProjector[index] = frust;
+				mTextureViewProjMatrixDirty[index] = true;
+				mTextureWorldViewProjMatrixDirty[index] = true;
+				mShadowCamDepthRangesDirty[index] = true;
+			}
 		}
 
     }
@@ -1059,7 +1063,7 @@ namespace Ogre {
 			else
 				mSceneDepthRange = dummy;
 
-			mSceneDepthRangeDirty = true; //<< TODO!
+			mSceneDepthRangeDirty = false;
 		}
 
 		return mSceneDepthRange;

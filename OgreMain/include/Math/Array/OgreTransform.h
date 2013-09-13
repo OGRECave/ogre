@@ -76,8 +76,8 @@ namespace Ogre
 
 		Transform() :
 			mIndex( 0 ),
-			mOwner( 0 ),
 			mParents( 0 ),
+			mOwner( 0 ),
 			mPosition( 0 ),
 			mOrientation( 0 ),
 			mScale( 0 ),

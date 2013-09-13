@@ -80,7 +80,6 @@ namespace Ogre
 		{
 			if( m_size + newElements > m_capacity )
 			{
-				const size_t oldCapacity = m_capacity;
 				m_capacity = std::max( m_size + newElements, m_capacity + (m_capacity >> 1) + 1 );
 				T *data = (T*)::operator new( m_capacity * sizeof(T) );
 				memcpy( data, m_data, m_size * sizeof(T) );

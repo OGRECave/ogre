@@ -133,7 +133,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Cmov4( const ArrayQuaternion &arg1,
-														const ArrayQuaternion &arg2, ArrayReal mask )
+													const ArrayQuaternion &arg2, ArrayReal mask )
 	{
 		return ArrayQuaternion(
 				MathlibSSE2::Cmov4( arg1.m_chunkBase[0], arg2.m_chunkBase[0], mask ),
@@ -430,9 +430,9 @@ namespace Ogre
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = m_chunkBase;
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.m_chunkBase;
-		aChunkBase[0] = MathlibSSE2::Cmov4( aChunkBase[0], replacement.m_chunkBase[0], mask );
-		aChunkBase[1] = MathlibSSE2::Cmov4( aChunkBase[1], replacement.m_chunkBase[1], mask );
-		aChunkBase[2] = MathlibSSE2::Cmov4( aChunkBase[2], replacement.m_chunkBase[2], mask );
-		aChunkBase[3] = MathlibSSE2::Cmov4( aChunkBase[3], replacement.m_chunkBase[3], mask );
+		aChunkBase[0] = MathlibSSE2::Cmov4( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibSSE2::Cmov4( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibSSE2::Cmov4( aChunkBase[2], bChunkBase[2], mask );
+		aChunkBase[3] = MathlibSSE2::Cmov4( aChunkBase[3], bChunkBase[3], mask );
 	}
 }

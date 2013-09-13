@@ -692,22 +692,10 @@ namespace Ogre
 
 		/** Clamp a value within an inclusive range. */
 		template <typename T>
-		static T Clamp(T val, T minval, T maxval)
+		inline static T Clamp(T val, T minval, T maxval)
 		{
 			assert (minval <= maxval && "Invalid clamp range");
 			return std::max(std::min(val, maxval), minval);
-		}
-		template <>
-		static float Clamp<float>(float val, float minval, float maxval)
-		{
-			assert (minval <= maxval && "Invalid clamp range");
-			return Ogre::max( Ogre::min(val, maxval), minval );
-		}
-		template <>
-		static double Clamp<double>(double val, double minval, double maxval)
-		{
-			assert (minval <= maxval && "Invalid clamp range");
-			return Ogre::max( Ogre::min(val, maxval), minval );
 		}
 
 		static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
@@ -727,6 +715,19 @@ namespace Ogre
 		static const Real fRad2Deg;
 
     };
+
+	template <>
+	inline float Math::Clamp<float>(float val, float minval, float maxval)
+	{
+		assert (minval <= maxval && "Invalid clamp range");
+		return Ogre::max( Ogre::min(val, maxval), minval );
+	}
+	template <>
+	inline double Math::Clamp<double>(double val, double minval, double maxval)
+	{
+		assert (minval <= maxval && "Invalid clamp range");
+		return Ogre::max( Ogre::min(val, maxval), minval );
+	}
 
 	// these functions must be defined down here, because they rely on the
 	// angle unit conversion functions in class Math:
