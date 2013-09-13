@@ -158,7 +158,9 @@ namespace Ogre
                 mTempFileName = macTempFileName();
 #else
                 char tmpname[L_tmpnam];
-                tmpnam(tmpname);
+                if (!tmpnam(tmpname))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Temporary file name generation failed.", "DeflateStream::init");
+
                 mTempFileName = tmpname;
 #endif
             }

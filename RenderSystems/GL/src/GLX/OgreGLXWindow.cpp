@@ -397,7 +397,10 @@ namespace Ogre
 				}
 				
 				XTextProperty titleprop;
-				char *lst = (char*)title.c_str();
+				vector<char>::type  title_ (title.begin(), title.end());
+				title_.push_back(0);
+
+				char *lst = &title_[0];
 				XStringListToTextProperty((char **)&lst, 1, &titleprop);
 				XSetWMProperties(xDisplay, mWindow, &titleprop, NULL, NULL, 0, sizeHints, wmHints, NULL);
 				

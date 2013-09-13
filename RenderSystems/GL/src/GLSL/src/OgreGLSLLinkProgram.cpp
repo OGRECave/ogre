@@ -266,20 +266,6 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
-        GLSLGpuProgram *prog = 0;
-        if(fromProgType == GPT_VERTEX_PROGRAM)
-        {
-            prog = mVertexProgram;
-        }
-        else if(fromProgType == GPT_FRAGMENT_PROGRAM)
-        {
-            prog = mFragmentProgram;
-        }
-        else if(fromProgType == GPT_GEOMETRY_PROGRAM)
-        {
-            prog = mGeometryProgram;
-        }
-
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
         if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
