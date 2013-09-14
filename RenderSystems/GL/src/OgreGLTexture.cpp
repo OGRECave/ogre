@@ -127,6 +127,10 @@ namespace Ogre {
 		mNumMipmaps = mNumRequestedMipmaps;
 		if(mNumMipmaps>maxMips)
 			mNumMipmaps = maxMips;
+
+		// Check if we can do HW mipmap generation
+		mMipmapsHardwareGenerated =
+			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
 		
 		// Generate texture name
         glGenTextures( 1, &mTextureID );
@@ -147,16 +151,12 @@ namespace Ogre {
 			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		}
-		
-		// If we can do automip generation and the user desires this, do so
-		mMipmapsHardwareGenerated = 
-			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
 
 		if((mUsage & TU_AUTOMIPMAP) &&
-		    mNumRequestedMipmaps && mMipmapsHardwareGenerated)
-        {
-            mGLSupport.getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
-        }
+			mNumRequestedMipmaps && mMipmapsHardwareGenerated)
+		{
+			mGLSupport.getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
+		}
 		
 		// Allocate internal buffer so that glTexSubImageXD can be used
 		// Internal format
@@ -372,7 +372,9 @@ namespace Ogre {
 
         // Generate mipmaps after all texture levels have been loaded
         // This is required for compressed formats such as DXT
-        if (mUsage & TU_AUTOMIPMAP)
+        // If we can do automip generation and the user desires this, do so
+        if((mUsage & TU_AUTOMIPMAP) &&
+            mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
             glGenerateMipmapEXT(getGLTextureTarget());
         }
