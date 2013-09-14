@@ -432,6 +432,11 @@ namespace Ogre {
 			ArrayReal		planeNegD;
 		};
 
+		// Flip the bit from shadow caster, and leave only that in "includeNonCasters"
+		ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
+														& LAYER_SHADOW_CASTER );
+		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
+
 		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
 		ArrayPlane planes[6];
 		const Plane *frustumPlanes = frustum->getFrustumPlanes();
@@ -496,8 +501,12 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
-			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
-														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			//isVisible = isVisible() && (isCaster || includeNonCasters)
+			ArrayInt isVisible = Mathlib::And(
+								Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) ),
+								Mathlib::TestFlags4( Mathlib::Or( *visibilityFlags, includeNonCasters ),
+														Mathlib::SetAll( LAYER_SHADOW_CASTER ) ) );
 			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
 
@@ -564,6 +573,8 @@ namespace Ogre {
 			ArrayReal		planeNegD;
 		};
 
+		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
+
 		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
 		ArrayPlane planes[6];
 		const Plane *frustumPlanes = frustum->getFrustumPlanes();
@@ -628,6 +639,7 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
+			//No need to check for casters as in cullFrustum. See function documentation
 			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
 			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,

@@ -66,7 +66,7 @@ namespace Ogre
 
 		CompositorPassSceneDef() :
 			CompositorPassDef( PASS_SCENE ),
-			mVisibilityMask( 0xffffffff ),
+			mVisibilityMask( MovableObject::RESERVED_VISIBILITY_FLAGS ),
 			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),
 			mLastRQ( -1 )

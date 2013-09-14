@@ -250,8 +250,11 @@ namespace Ogre {
 			between this mask and the objects visibility flags 
 			(@see MovableObject::setVisibilityFlags), and if a binary 'and'
 			returns zero, the object will not be rendered.
+		@par
+			Viewport's visibility mask assumes the user knows what he's doing
+			with the reserved flags!
 		*/
-		void setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
+		void _setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
 
 		/** Gets a per-viewport visibility mask.
 		@see Viewport::setVisibilityMask

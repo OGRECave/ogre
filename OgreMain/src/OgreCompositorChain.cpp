@@ -372,7 +372,7 @@ void CompositorChain::preTargetOperation(CompositorInstance::TargetOperation &op
 
     // Set the visibility mask
     mOldVisibilityMask = vp->getVisibilityMask();
-    vp->setVisibilityMask(op.visibilityMask);
+    vp->_setVisibilityMask(op.visibilityMask);
 	/// Set material scheme 
 	mOldMaterialScheme = vp->getMaterialScheme();
 	vp->setMaterialScheme(op.materialScheme);
@@ -394,7 +394,7 @@ void CompositorChain::postTargetOperation(CompositorInstance::TargetOperation &o
 		cam->setLodBias(mOldLodBias);
 	}
 
-    vp->setVisibilityMask(mOldVisibilityMask);
+    vp->_setVisibilityMask(mOldVisibilityMask);
 	vp->setMaterialScheme(mOldMaterialScheme);
 }
 //-----------------------------------------------------------------------

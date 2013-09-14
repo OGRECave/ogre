@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "OgreSceneManager.h"
-#include "OgreMovableObject.h"
 
 namespace Ogre
 {
@@ -72,8 +71,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorPassScene::execute()
 	{
-		assert( mDefinition->mVisibilityMask & MovableObject::LAYER_VISIBILITY );
-
 		/*if( mShadowNode && mUpdateShadowNode )
 		{
 			//We need to prepare for rendering another RT (we broke the contiguous chain)
@@ -95,7 +92,7 @@ namespace Ogre
 		if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
 			mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
 
-		mViewport->setVisibilityMask( mDefinition->mVisibilityMask );
+		mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
 
 		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mDefinition->mFirstRQ,
 											 mDefinition->mLastRQ );

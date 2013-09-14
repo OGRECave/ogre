@@ -249,7 +249,8 @@ namespace Ogre {
 		@param frustum
 			Frustum to clip against
 		@param sceneVisibilityFlags
-			Combined scene's visibility flags (i.e. viewport | scene)
+			Combined scene's visibility flags (i.e. viewport | scene). Set LAYER_SHADOW_CASTER
+			bit if you want to exclude non-shadow casters.
 		@param outCulledObjects
 			Out. List of objects that are (fully or partially) inside the frustum and
 			should be rendered
@@ -269,6 +270,9 @@ namespace Ogre {
 			instead of refactoring in such a way that the code base is shared by both calulcations
 			Ideally you shouldn't need this function (when a shadow node only renders the render queue
 			ranges already calculated)
+		@par
+			There's a small difference with cullFrustum, as this routine assumes non-shadow casters are
+			always included, since it's not meant to be called for casters-only (unlike cullFrustum).
 		*/
 		static void cullReceiversBox( const size_t numNodes, ObjectData t, const Frustum *frustum,
 										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox );
@@ -471,8 +475,8 @@ namespace Ogre {
         /** Sets the visibility flags for this object.
         @remarks
 			As well as a simple true/false value for visibility (as seen in setVisible), 
-			you can also set visibility flags which when 'and'ed with the SceneManager's
-			visibility mask can also make an object invisible.
+			you can also set visibility flags that is applied a binary 'and' with the SceneManager's
+			mask and a compositor node pass. To exclude particular objects from rendering.
 			Changes to reserved visibility flags are ignored (won't take effect).
         */
 		inline void setVisibilityFlags(uint32 flags);

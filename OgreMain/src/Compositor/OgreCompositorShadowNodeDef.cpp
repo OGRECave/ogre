@@ -128,6 +128,9 @@ namespace Ogre
 					mMinRq = std::min<size_t>( mMinRq, passScene->mFirstRQ );
 					mMaxRq = std::max<size_t>( mMaxRq, passScene->mLastRQ );
 
+					//Set to only render casters
+					passScene->mVisibilityMask |= MovableObject::LAYER_SHADOW_CASTER;
+
 					//Nested shadow maps are not allowed. Sorry!
 					passScene->mShadowNode				= IdString();
 					passScene->mShadowNodeRecalculation	= SHADOW_NODE_CASTER_PASS;
