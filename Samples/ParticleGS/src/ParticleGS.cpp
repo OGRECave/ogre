@@ -30,16 +30,16 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-//#define LOG_GENERATED_BUFFER
+#define LOG_GENERATED_BUFFER
 const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
 struct FireworkParticle
 {
-    float pos[3];
-    float timer;
-    float type;
-    float vel[3];
+    float pos[4];
+    // float timer;
+    // float type;
+    // float vel[3];
 };
 #endif
 
@@ -62,44 +62,46 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
             (mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
         mParticleSystem->setMaterial("Ogre/ParticleGS/Display");
 
-        //Generate the geometry that will seed the particle system
+        // Generate the geometry that will seed the particle system.
         ManualObject* particleSystemSeed = mSceneMgr->createManualObject("ParticleSeed");
-        //This needs to be the initial launcher particle
+        // This needs to be the initial launcher particle.
         particleSystemSeed->begin("Ogre/ParticleGS/Display", RenderOperation::OT_POINT_LIST);
-        //particleSystemSeed->begin("Ogre/ParticleGS/Display", RenderOperation::OT_TRIANGLE_LIST);
-        particleSystemSeed->position(0,0,0); //Position
-        particleSystemSeed->textureCoord(1); //Timer
-        particleSystemSeed->textureCoord(0); //Type
-        particleSystemSeed->textureCoord(0,0,0); //Velocity
+        particleSystemSeed->position(0,0,0); // Position
+        // particleSystemSeed->textureCoord(1); // Timer
+        // particleSystemSeed->textureCoord(0); // Type
+        // particleSystemSeed->textureCoord(0,0,0); // Velocity
         particleSystemSeed->end();
 
-        //Generate the RenderToBufferObject
+        // Generate the RenderToBufferObject.
         RenderToVertexBufferSharedPtr r2vbObject =
             HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
         r2vbObject->setRenderToBufferMaterialName("Ogre/ParticleGS/Generate");
 
-        //Apply the random texture
-        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
-            getTextureUnitState("RandomTexture")->setTextureName(
-                randomTexture->getName(), randomTexture->getTextureType());
-
         r2vbObject->setOperationType(RenderOperation::OT_POINT_LIST);
-        //r2vbObject->setOperationType(RenderOperation::OT_TRIANGLE_LIST);
         r2vbObject->setMaxVertexCount(16000);
         r2vbObject->setResetsEveryUpdate(false);
         VertexDeclaration* vertexDecl = r2vbObject->getVertexDeclaration();
         size_t offset = 0;
-        offset += vertexDecl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize(); //Position
-        offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize(); //Timer
-        offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 1).getSize(); //Type
-        vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize(); //Velocity
+        // Position
+        offset += vertexDecl->addElement(0, offset, VET_FLOAT4, VES_POSITION).getSize();
+        // // Timer
+        // offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
+        // // Type
+        // offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 1).getSize();
+        // // Velocity
+        // vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize(); 
 
-        //Bind the two together
+        // Apply the random texture.
+        // TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
+        // r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
+        //     getTextureUnitState("RandomTexture")->setTextureName(
+        //         randomTexture->getName(), randomTexture->getTextureType());
+
+        // Bind the two together.
         mParticleSystem->setRenderToVertexBuffer(r2vbObject);
         mParticleSystem->setManualObject(particleSystemSeed);
 
-        //Set bounds
+        // Set bounds.
         AxisAlignedBox aabb;
         aabb.setMinimum(-100,-100,-100);
         aabb.setMaximum(100,100,100);
@@ -126,24 +128,26 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     {
         demoTime = 0;
 
+        mCamera->setPosition(0,35,-100);
+        mCamera->lookAt(0,35,0);
+
+        mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
+
         mProceduralManualObjectFactory = OGRE_NEW ProceduralManualObjectFactory();
         Root::getSingleton().addMovableObjectFactory(mProceduralManualObjectFactory);
 
         createProceduralParticleSystem();
-
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem);
-        //mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem->getManualObject());
-        mCamera->setPosition(0,35,-100);
-        mCamera->lookAt(0,35,0);
+        // mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem->getManualObject());
 
-        //Add an ogre head to the scene
+        // Add an ogre head to the scene.
         SceneNode* ogreHeadSN = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         Entity *ogreHead = mSceneMgr->createEntity("head", "ogrehead.mesh");
         ogreHeadSN->scale(0.1,0.1,0.1);
         ogreHeadSN->yaw(Degree(180));
         ogreHeadSN->attachObject(ogreHead);
 
-        //Add a plane to the scene
+        // Add a plane to the scene.
         Plane plane;
         plane.normal = Vector3::UNIT_Y;
         plane.d = 100;
@@ -167,30 +171,31 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 
     bool frameStarted(const FrameEvent& evt)
     {
-        //Set shader parameters
-        GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-            getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-            getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
-        {
-            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-        }
-        demoTime += evt.timeSinceLastFrame;
-        if (geomParams->_findNamedConstantDefinition("globalTime"))
-        {
-            geomParams->setNamedConstant("globalTime", demoTime);
-        }
-        if (geomParams->_findNamedConstantDefinition("frameGravity"))
-        {
-            geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-        }
+        // Set shader parameters.
+        // GpuProgramParametersSharedPtr geomParams = mParticleSystem->
+        //     getRenderToVertexBuffer()->getRenderToBufferMaterial()->
+        //     getBestTechnique()->getPass(0)->getGeometryProgramParameters();
+        // if (geomParams->_findNamedConstantDefinition("elapsedTime"))
+        // {
+        //     geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
+        // }
+        // demoTime += evt.timeSinceLastFrame;
+        // if (geomParams->_findNamedConstantDefinition("globalTime"))
+        // {
+        //     geomParams->setNamedConstant("globalTime", demoTime);
+        // }
+        // if (geomParams->_findNamedConstantDefinition("frameGravity"))
+        // {
+        //     geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
+        // }
         return SdkSample::frameStarted(evt);
     }
 
 #ifdef LOG_GENERATED_BUFFER
     bool frameEnded(const FrameEvent& evt)
     {
-        //This will only work if the vertex buffer usage is dynamic (see R2VB implementation)
+        // This will only work if the vertex buffer usage is dynamic
+        // (see R2VB implementation).
         LogManager::getSingleton().getDefaultLog()->stream() <<
             "Particle system for frame " <<     Root::getSingleton().getNextFrameNumber();
         RenderOperation renderOp;
@@ -201,18 +206,20 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         assert(vertexBuffer->getVertexSize() == sizeof(FireworkParticle));
         FireworkParticle* particles = static_cast<FireworkParticle*>
             (vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
+        int vertexCount = renderOp.vertexData->vertexCount;
 
-        for (size_t i=0; i<renderOp.vertexData->vertexCount; i++)
+        for (size_t i = 0; i < renderOp.vertexData->vertexCount; i++)
         {
             FireworkParticle& p = particles[i];
             LogManager::getSingleton().getDefaultLog()->stream() <<
-                "FireworkParticle " << i+1 << " : " <<
-                "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
-                "Timer : " << p.timer << " , " <<
-                "Type : " << p.type << " , " <<
-                "Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
+                "FireworkParticle " << i + 1 << " : " <<
+                "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2];
+                // "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
+                // "Timer : " << p.timer << " , " <<
+                // "Type : " << p.type << " , " <<
+                // "Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
         }
-
+        
         vertexBuffer->unlock();
         return SdkSample::frameEnded(evt);
     }

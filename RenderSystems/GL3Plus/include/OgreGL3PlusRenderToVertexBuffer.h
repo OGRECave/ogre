@@ -61,6 +61,11 @@ namespace Ogre {
         size_t mFrontBufferIndex;
         GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
+        bool mFirstUpdate;
+        // GL4+
+        /* GLuint mFeedbackObject; */
+        GLuint VertexArray[2];
+        GLuint VertexBuffer[2];
     };
 }
 

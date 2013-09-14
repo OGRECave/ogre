@@ -68,12 +68,22 @@ namespace Ogre
         GLSLProgramPipelineManager(void);
         ~GLSLProgramPipelineManager(void);
 
-        /** Get the program object that links the two active program
-            objects together.  If a program pipeline object was not
+        /** Get the program pipeline that combines the current program
+            objects.  If the program pipeline object was not already
+            created a new one is created.  Note that this method does
+            NOT link the program.
+        */
+        GLSLProgramPipeline* getCurrentProgramPipeline(void);
+
+        /** Get the program pipeline that combines the current program
+            objects.  If the program pipeline object was not
             already created and linked a new one is created and
             linked.
         */
         GLSLProgramPipeline* getActiveProgramPipeline(void);
+        //TODO Replace the above method with the one below, and rename
+        // mActiveProgramPipeline -> mCurrentProgramPipeline.
+        //void activateCurrentProgramPipeline(void);
 
         /** Set the active link programs for the next rendering state.
             The active program pipeline object will be cleared.

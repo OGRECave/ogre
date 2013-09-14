@@ -1972,8 +1972,8 @@ namespace Ogre {
                 }
                 else
                 {
-                    //GLenum mode = (_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode();
-                    //OGRE_CHECK_GL_ERROR(glDrawArrays(mode, 0, op.vertexData->vertexCount));
+                    // GLenum mode = (_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode();
+                    // OGRE_CHECK_GL_ERROR(glDrawArrays(mode, 0, op.vertexData->vertexCount));
                     OGRE_CHECK_GL_ERROR(glDrawArrays(primType, 0, op.vertexData->vertexCount));
                 }
             } while (updatePassIterationRenderState());

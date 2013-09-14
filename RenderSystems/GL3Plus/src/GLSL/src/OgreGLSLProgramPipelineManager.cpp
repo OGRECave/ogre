@@ -122,8 +122,7 @@ namespace Ogre
         }
     }
 
-    //-----------------------------------------------------------------------
-    GLSLProgramPipeline* GLSLProgramPipelineManager::getActiveProgramPipeline(void)
+    GLSLProgramPipeline* GLSLProgramPipelineManager::getCurrentProgramPipeline(void)
     {
         // If there is an active link program then return it
         if (mActiveProgramPipeline)
@@ -183,6 +182,14 @@ namespace Ogre
                 mActiveProgramPipeline = programFound->second;
             }
         }
+
+        return mActiveProgramPipeline;
+    }
+    
+    GLSLProgramPipeline* GLSLProgramPipelineManager::getActiveProgramPipeline(void)
+    {
+        getCurrentProgramPipeline();
+
         // Make the program object active
         if (mActiveProgramPipeline)
             mActiveProgramPipeline->activate();
