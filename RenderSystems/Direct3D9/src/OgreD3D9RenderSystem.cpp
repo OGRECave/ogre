@@ -199,9 +199,7 @@ namespace Ogre
 		ConfigOption optSRGB;
 		ConfigOption optResourceCeationPolicy;
 		ConfigOption optMultiDeviceMemHint;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		ConfigOption optEnableFixedPipeline;
-#endif
 
 		driverList = this->getDirect3DDrivers();
 
@@ -305,13 +303,11 @@ namespace Ogre
 		optMultiDeviceMemHint.currentValue = "Use minimum system memory";
 		optMultiDeviceMemHint.immutable = false;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
 		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
 		optEnableFixedPipeline.possibleValues.push_back( "No" );
 		optEnableFixedPipeline.currentValue = "Yes";
 		optEnableFixedPipeline.immutable = false;
-#endif
 
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
@@ -326,9 +322,7 @@ namespace Ogre
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
 		mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
-#endif
 
 		refreshD3DSettings();
 
@@ -510,7 +504,6 @@ namespace Ogre
 				mResourceManager->setAutoHardwareBufferManagement(true);
 		}		
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if (name == "Fixed Pipeline Enabled")
 		{
 			if (value == "Yes")
@@ -520,7 +513,6 @@ namespace Ogre
 			else
 				mEnableFixedPipeline = false;
 		}
-#endif
 
 	}
 	//---------------------------------------------------------------------
@@ -896,9 +888,7 @@ namespace Ogre
 		rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
 		rsc->setRenderSystemName(getName());
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if(mEnableFixedPipeline)
-#endif
 		{
 			// Supports fixed-function
 			rsc->setCapability(RSC_FIXED_FUNCTION);
@@ -3431,7 +3421,6 @@ namespace Ogre
 		RenderSystem::_render(op);
 
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
@@ -3444,7 +3433,6 @@ namespace Ogre
 				"Attempted to render using the fixed pipeline when it is disabled.",
 				"D3D9RenderSystem::_render");
 		}
-#endif
 
 		// To think about: possibly remove setVertexDeclaration and 
 		// setVertexBufferBinding from RenderSystem since the sequence is

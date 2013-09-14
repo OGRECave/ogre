@@ -241,9 +241,7 @@ namespace Ogre {
 		else
 			rsc->setVendor(GPU_UNKNOWN);
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if(mEnableFixedPipeline)
-#endif
 		{
 			// Supports fixed-function
 			rsc->setCapability(RSC_FIXED_FUNCTION);
@@ -2851,7 +2849,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Call super class
 		RenderSystem::_render(op);
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	 	if ( ! mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
@@ -2864,7 +2861,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				"Attempted to render using the fixed pipeline when it is disabled.",
 				"GLRenderSystem::_render");
 		}
-#endif
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();

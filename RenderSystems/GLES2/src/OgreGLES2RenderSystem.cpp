@@ -85,9 +85,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 #endif
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mEnableFixedPipeline = false;
-#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         mResourceManager = OGRE_NEW AndroidResourceManager();
