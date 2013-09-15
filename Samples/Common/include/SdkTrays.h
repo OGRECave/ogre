@@ -2173,7 +2173,7 @@ namespace OgreBites
 		ParamsPanel* createParamsPanel(TrayLocation trayLoc, const Ogre::String& name, Ogre::Real width,
 			const Ogre::StringVector& paramNames)
 		{
-			ParamsPanel* pp = new ParamsPanel(name, width, (uint)paramNames.size());
+			ParamsPanel* pp = new ParamsPanel(name, width, (Ogre::uint)paramNames.size());
 			pp->setAllParamNames(paramNames);
 			moveWidgetToTray(pp, trayLoc);
 			return pp;
