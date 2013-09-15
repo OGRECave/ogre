@@ -339,12 +339,12 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	// Resolve pixel shader normal.
 	if (mNormalMapSpace == NMS_OBJECT)
 	{
-		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT4);
 		hasError |= !(mPSNormal.get());
 	}
 	else if (mNormalMapSpace == NMS_TANGENT)
 	{
-		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
+		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
 		hasError |= !(mPSNormal.get());
 	}
 	
@@ -1147,7 +1147,7 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
 		else
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Using iterative lighting method with RT Shader System requires specifieng explicit light type.",
+				"Using iterative lighting method with RT Shader System requires specifying explicit light type.",
 				"NormalMapLighting::preAddToRenderState");			
 		}
 	}
