@@ -579,12 +579,6 @@ namespace Ogre {
 		glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
 		mTriedToLinkAndFailed = !mLinked;
 
-		// force logging and raise exception if not linked
-        
-		
-		//*************//
-
-		///*
 		if(mTriedToLinkAndFailed == true)
 		{
 			GLchar *msg = NULL;
@@ -595,9 +589,8 @@ namespace Ogre {
 			logObjectInfo( getCombinedName() + String(", Error linking program: ") + msg, mGLHandle );
 			delete msg;
 		}
-		//*/
-		//*************//
-
+		
+		// force logging and raise exception if not linked
 		GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)
         {
