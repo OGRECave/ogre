@@ -96,9 +96,24 @@ namespace Ogre {
 
     void* mac_loadFramework(String name)
 	{
-		String fullPath=name + ".framework";
-		if(name[0]!='/')
-			fullPath = macFrameworksPath()+"/"+fullPath+"/"+name;
+        String fullPath;
+        if (name[0] != '/') { // just framework name, like "OgreTerrain"
+            // path/OgreTerrain.framework/OgreTerrain
+            fullPath = macFrameworksPath() + "/" + name + ".framework/" + name;
+        }
+        else { // absolute path, like "/Library/Frameworks/OgreTerrain.framework"
+            size_t lastSlashPos = name.find_last_of('/');
+            size_t extensionPos = name.rfind(".framework");
+
+            if (lastSlashPos != String::npos && extensionPos != String::npos) {
+                String realName = name.substr(lastSlashPos + 1, extensionPos - lastSlashPos - 1);
+
+                fullPath = name + "/" + realName; 
+            }
+            else {
+                fullPath = name;
+            }
+        }
 
 		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 	}
