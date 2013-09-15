@@ -35,16 +35,16 @@
 #include "InputContext.h"
 #include "OgreFileSystemLayer.h"
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
-#endif //USE_RTSHADER_SYSTEM
+#endif //INCLUDE_RTSHADER_SYSTEM
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #	include "macUtils.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(USE_RTSHADER_SYSTEM)
-#   define USE_RTSHADER_SYSTEM
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(INCLUDE_RTSHADER_SYSTEM)
+#   define INCLUDE_RTSHADER_SYSTEM
 #include "OgreShaderGenerator.h"
 #endif
 
@@ -74,7 +74,7 @@ namespace OgreBites
 			}
 		};
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		Sample() : mShaderGenerator(0)
 #else
 		Sample()
@@ -175,7 +175,7 @@ namespace OgreBites
 			mResourcesLoaded = false;
 			if (mSceneMgr) 
 			{
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
 				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
@@ -251,7 +251,7 @@ namespace OgreBites
 		virtual void createSceneManager()
 		{
 			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
             if(mOverlaySystem)
@@ -298,7 +298,7 @@ namespace OgreBites
 		bool mDone;                       // flag to mark the end of the sample
 		bool mResourcesLoaded;    // whether or not resources have been loaded
 		bool mContentSetup;       // whether or not scene was created
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
     public:
 		void setShaderGenerator(Ogre::RTShader::ShaderGenerator* shaderGenerator) 

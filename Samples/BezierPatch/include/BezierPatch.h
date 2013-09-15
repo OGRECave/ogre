@@ -22,7 +22,7 @@ public:
 	{
 		mPatchPass->setPolygonMode(box->isChecked() ? PM_WIREFRAME : PM_SOLID);
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 		// Invalidate material in order to reflect polygon mode change in the generated shader based pass.
 		mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, mPatchPass->getParent()->getParent()->getName());

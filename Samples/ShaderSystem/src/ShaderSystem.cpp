@@ -269,16 +269,16 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::setupView()
-{	
-	// setup default viewport layout and camera
-	mCamera = mSceneMgr->createCamera("MainCamera");
-	mViewport = mWindow->addViewport(mCamera);
-	mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
-	mCamera->setNearClipDistance(5);
-
-	mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
-}
+//void Sample_ShaderSystem::setupView()
+//{	
+//	// setup default viewport layout and camera
+//	mCamera = mSceneMgr->createCamera("MainCamera");
+//	mViewport = mWindow->addViewport(mCamera);
+//	mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+//	mCamera->setNearClipDistance(5);
+//
+//	mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
+//}
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()

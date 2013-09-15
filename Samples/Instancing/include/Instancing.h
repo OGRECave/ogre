@@ -259,7 +259,7 @@ protected:
 
 		MaterialPtr originalMaterial = MaterialManager::getSingleton ().getByName (originalMaterialName);
 
-#if defined(USE_RTSHADER_SYSTEM)
+#if defined(INCLUDE_RTSHADER_SYSTEM)
         originalMaterial->getBestTechnique()->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
 

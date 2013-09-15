@@ -209,8 +209,8 @@ namespace OgreBites
 			Ogre::Font* f = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
 			Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
-			int nl = s.find('\n');
-			if (nl != -1) s = s.substr(0, nl);
+			size_t nl = s.find('\n');
+			if (nl != Ogre::String::npos) s = s.substr(0, nl);
 
 			Ogre::Real width = 0;
 
@@ -741,7 +741,7 @@ namespace OgreBites
 			return mItems;
 		}
 
-		unsigned int getNumItems()
+		size_t getNumItems()
 		{
 			return mItems.size();
 		}
@@ -757,7 +757,7 @@ namespace OgreBites
 			}
 			mItemElements.clear();
 
-			mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, mItems.size()));
+			mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, (int)mItems.size()));
 
 			for (unsigned int i = 0; i < mItemsShown; i++)   // create all the item elements
 			{
@@ -797,7 +797,7 @@ namespace OgreBites
 				mItems.erase(it);
 				if (mItems.size() < mItemsShown)
 				{
-					mItemsShown = mItems.size();
+					mItemsShown = (int)mItems.size();
 					nukeOverlayElement(mItemElements.back());
 					mItemElements.pop_back();
 				}
@@ -825,7 +825,7 @@ namespace OgreBites
 				mItems.erase(it);
 				if (mItems.size() < mItemsShown)
 				{
-					mItemsShown = mItems.size();
+					mItemsShown = (int)mItems.size();
 					nukeOverlayElement(mItemElements.back());
 					mItemElements.pop_back();
 				}
@@ -1047,7 +1047,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void setDisplayIndex(unsigned int index)
 		{
-			index = std::min<int>(index, mItems.size() - mItemElements.size());
+			index = std::min<int>(index, (int)(mItems.size() - mItemElements.size()));
 			mDisplayIndex = index;
 			Ogre::BorderPanelOverlayElement* ie;
 			Ogre::TextAreaOverlayElement* ta;
@@ -2173,7 +2173,7 @@ namespace OgreBites
 		ParamsPanel* createParamsPanel(TrayLocation trayLoc, const Ogre::String& name, Ogre::Real width,
 			const Ogre::StringVector& paramNames)
 		{
-			ParamsPanel* pp = new ParamsPanel(name, width, paramNames.size());
+			ParamsPanel* pp = new ParamsPanel(name, width, (uint)paramNames.size());
 			pp->setAllParamNames(paramNames);
 			moveWidgetToTray(pp, trayLoc);
 			return pp;
@@ -2560,7 +2560,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Gets the number of widgets in a tray.
 		-----------------------------------------------------------------------------*/
-		unsigned int getNumWidgets(TrayLocation trayLoc)
+		size_t getNumWidgets(TrayLocation trayLoc)
 		{
 			return mWidgets[trayLoc].size();
 		}
@@ -2661,7 +2661,7 @@ namespace OgreBites
 			}
 
 			// insert widget into new tray at given position, or at the end if unspecified or invalid
-			if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
+			if (place == -1 || place > mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
 			mWidgets[trayLoc].insert(mWidgets[trayLoc].begin() + place, widget);
 			mTrays[trayLoc]->addChild(widget->getOverlayElement());
 

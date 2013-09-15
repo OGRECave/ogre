@@ -42,11 +42,11 @@
 #  endif
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES
 #    define OGRE_STATIC_GLES
-#    undef USE_RTSHADER_SYSTEM
+#    undef INCLUDE_RTSHADER_SYSTEM
 #  endif
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
 #    undef OGRE_STATIC_GLES
-#    define USE_RTSHADER_SYSTEM
+#    define INCLUDE_RTSHADER_SYSTEM
 #    define OGRE_STATIC_GLES2
 #  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -791,7 +791,7 @@ namespace OgreBites
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
 #		endif
 
-#		ifdef USE_RTSHADER_SYSTEM
+#		ifdef INCLUDE_RTSHADER_SYSTEM
             if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
             {
                 Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSLES", type, sec);
@@ -811,7 +811,7 @@ namespace OgreBites
 #			ifdef OGRE_BUILD_PLUGIN_CG
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/Cg", type, sec);
 #			endif
-#		endif /* USE_RTSHADER_SYSTEM */
+#		endif /* INCLUDE_RTSHADER_SYSTEM */
 #	endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 		}
