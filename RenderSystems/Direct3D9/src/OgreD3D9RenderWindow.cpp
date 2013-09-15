@@ -724,13 +724,18 @@ namespace Ogre
 
 	void D3D9RenderWindow::resize(unsigned int width, unsigned int height)
 	{
-		if (mHWnd && !mIsFullScreen)
+		if (!mIsExternal)
 		{
-			unsigned int winWidth, winHeight;
-			adjustWindow(width, height, &winWidth, &winHeight);
-			SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
-				SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			if (mHWnd && !mIsFullScreen)
+			{
+				unsigned int winWidth, winHeight;
+				adjustWindow(width, height, &winWidth, &winHeight);
+				SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			}
 		}
+		else
+			updateWindowRect();
 	}
 
 	void D3D9RenderWindow::windowMovedOrResized()
