@@ -379,8 +379,10 @@ namespace Ogre {
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
+#if OGRE_NO_GLES3_SUPPORT == 0
         if(dst.getWidth() != dst.rowPitch)
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+#endif
 		// Must change the packing to ensure no overruns!
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -391,7 +393,9 @@ namespace Ogre {
 
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+#if OGRE_NO_GLES3_SUPPORT == 0
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+#endif
         
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
