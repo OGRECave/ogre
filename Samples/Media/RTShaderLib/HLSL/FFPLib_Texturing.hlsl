@@ -77,6 +77,39 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in float4x4 mWorldIT,
 }
 
 //-----------------------------------------------------------------------------
+void FFP_GenerateTexCoord_EnvMap_Sphere(in float4x4		mWorld,
+										in  float4x4	mView,
+										in  float4x4	mWorldIT,
+										in  float4		vPos,
+										in  float3		vNormal,
+										in  float4x4	mTexture,
+										out float2		vOut)
+{
+	float4x4 worldview = mul(mView,mWorld);
+	float3 normal = normalize(mul(mWorldIT,float4(vNormal,0.0)).xyz); 
+	float3 eyedir =  normalize(mul(worldview, vPos)).xyz;
+	float3 r = reflect(eyedir, normal);
+	float two_p = 2 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = mul(mTexture, float4(0.5 + r.x / two_p,0.5 - r.y / two_p, 0, 0)).xy;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_GenerateTexCoord_EnvMap_Sphere(in	float4x4	mWorld,
+										in	float4x4	mView,
+										in	float4x4	mWorldIT,
+										in	float4		vPos,
+										in	float3		vNormal,
+										out float2		vOut)
+{
+	float4x4 worldview = mul(mView,mWorld);
+	float3 normal = normalize(mul(mWorldIT,float4(vNormal,0.0)).xyz); 
+	float3 eyedir =  normalize(mul(worldview, vPos)).xyz;
+	float3 r = reflect(eyedir, normal);
+	float two_p = 2 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = float2(0.5 + r.x / two_p,0.5 - r.y / two_p);
+}
+/*
+//-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Sphere(in float4x4 mWorld, 
 						   in float4x4 mView,
 						   in float3 vNormal,
@@ -105,7 +138,7 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in float4x4 mWorld,
 	
 	vOut = mul(mTexture, float4(vSphereCoords, 0, 0)).xy;
 }
-
+*/
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Reflect(in float4x4 mWorld, 
 							in float4x4 mWorldIT, 
