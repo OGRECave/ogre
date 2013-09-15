@@ -72,6 +72,8 @@ THE SOFTWARE.
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
 #include "Compositor/OgreCompositorShadowNode.h"
+#include "Threading/OgreBarrier.h"
+
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -87,7 +89,7 @@ uint32 SceneManager::LIGHT_TYPE_MASK			= 0x08000000;
 uint32 SceneManager::FRUSTUM_TYPE_MASK			= 0x04000000;
 uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
-SceneManager::SceneManager(const String& name) :
+SceneManager::SceneManager(const String& name, size_t numWorkerThreads) :
 mName(name),
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
@@ -137,6 +139,11 @@ mShadowTextureFadeEnd(0.9),
 mShadowTextureCustomCasterPass(0),
 mVisibilityMask(0xFFFFFFFF & MovableObject::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
+mNumWorkerThreads( numWorkerThreads ),
+mExitWorkerThreads( false ),
+mRequestType( NUM_REQUESTS ),
+mUpdateBoundsRequest( 0 ),
+mWorkerThreadsBarrier( 0 ),
 mSuppressRenderStateChanges(false),
 mCameraRelativeRendering(false),
 mLastLightHash(0),
@@ -168,10 +175,12 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	// create the auto param data source instance
 	mAutoParamDataSource = createAutoParamDataSource();
 
-	mVisibleObjects.resize( 1 );
-	mVisibleObjectsBackup.resize( 1 );
-	mTmpVisibleObjects.resize( 1 );
-	mReceiversBoxPerThread.resize( 1 );
+	mVisibleObjects.resize( mNumWorkerThreads );
+	mVisibleObjectsBackup.resize( mNumWorkerThreads );
+	mTmpVisibleObjects.resize( mNumWorkerThreads );
+	mReceiversBoxPerThread.resize( mNumWorkerThreads );
+
+	startWorkerThreads();
 
 	// Init shadow caster material for texture shadows
     if (!mShadowCasterPlainBlackPass)
@@ -228,6 +237,8 @@ SceneManager::~SceneManager()
     OGRE_DELETE mFullScreenQuad;
     OGRE_DELETE mRenderQueue;
 	OGRE_DELETE mAutoParamDataSource;
+
+	stopWorkerThreads();
 }
 //-----------------------------------------------------------------------
 RenderQueue* SceneManager::getRenderQueue(void)
@@ -1083,8 +1094,8 @@ void SceneManager::_cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastR
 {
 	camera->_setRenderedRqs( firstRq, lastRq );
 
-	size_t visibleObjsIdxStart = 0;
-	cullFrustum( mEntitiesMemoryManagerCulledList, camera, firstRq, lastRq, visibleObjsIdxStart );
+	CullFrustumRequest cullRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList, camera );
+	fireCullReceiversBoxThreads( cullRequest );
 
 	//Now merge the bounds from all threads into one
 	collectVisibleBoundsInfoFromThreads( camera, firstRq, lastRq );
@@ -1113,8 +1124,6 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 			prepareRenderQueue();
 		}*/
 
-		size_t visibleObjsIdxStart = 0;
-
 		if (mFindVisibleObjects)
 		{
 			OgreProfileGroup("cullFrusum", OGREPROF_CULLING);
@@ -1137,10 +1146,9 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 
 			camera->_setRenderedRqs( realFirstRq, realLastRq );
 
-			size_t visibleObjsIdxStart = 0;
-			size_t numThreads = 1;
-			cullFrustum( mEntitiesMemoryManagerCulledList, camera, realFirstRq, realLastRq,
-						 visibleObjsIdxStart );
+			CullFrustumRequest cullRequest( realFirstRq, realLastRq,
+											&mEntitiesMemoryManagerCulledList, camera );
+			fireCullFrustumThreads( cullRequest );
 
 			//Now merge the bounds from all threads into one
 			collectVisibleBoundsInfoFromThreads( camera, realFirstRq, realLastRq );
@@ -1212,20 +1220,13 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 			prepareRenderQueue();
 		}
 
-		size_t visibleObjsIdxStart = 0;
-
 		if (mFindVisibleObjects)
 		{
 			OgreProfileGroup("_updateRenderQueue", OGREPROF_CULLING);
 
 			//mVisibleObjects should be filled in phase 01
-			size_t visibleObjsIdxStart = 0;
-			size_t numThreads = 1;
-			VisibleObjectsPerThreadArray::const_iterator it =
-														mVisibleObjects.begin() + visibleObjsIdxStart;
-			VisibleObjectsPerThreadArray::const_iterator en =
-														mVisibleObjects.begin() + visibleObjsIdxStart
-														+ numThreads;
+			VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
+			VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
 
 			//TODO: _updateRenderQueue MIGHT be called in parallel
 			firePreFindVisibleObjects(vp);
@@ -1945,8 +1946,23 @@ void SceneManager::notifyStaticDirty( Node *node )
 	node->_notifyStaticDirty();
 }
 //-----------------------------------------------------------------------
+void SceneManager::updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx )
+{
+	Transform t( request.t );
+	const size_t toAdvance = std::min( threadIdx * request.numNodesPerThread,
+										request.numTotalNodes );
+
+	//Prevent going out of bounds (usually in the last threadIdx, or
+	//when there are less nodes than ARRAY_PACKED_REALS
+	const size_t numNodes = std::min( request.numNodesPerThread, request.numTotalNodes - toAdvance );
+	t.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+	Node::updateAllTransforms( numNodes, t );
+}
+//-----------------------------------------------------------------------
 void SceneManager::updateAllTransforms()
 {
+	mRequestType = UPDATE_ALL_TRANSFORMS;
 	NodeMemoryManagerVec::const_iterator it = mNodeMemoryManagerUpdateList.begin();
 	NodeMemoryManagerVec::const_iterator en = mNodeMemoryManagerUpdateList.end();
 
@@ -1958,32 +1974,40 @@ void SceneManager::updateAllTransforms()
 		size_t start = nodeMemoryManager->getMemoryManagerType() == SCENE_STATIC ?
 													mStaticMinDepthLevelDirty : 1;
 
-		//TODO: Send this to worker threads (dark_sylinc)
-
 		//Start from the first level (not root) unless static (start from first dirty)
 		for( size_t i=start; i<numDepths; ++i )
 		{
 			Transform t;
 			const size_t numNodes = nodeMemoryManager->getFirstNode( t, i );
 
-			Node::updateAllTransforms( numNodes, t );
-		}
+			//nodesPerThread must be multiple of ARRAY_PACKED_REALS
+			size_t nodesPerThread = ( numNodes + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			nodesPerThread		  = ( (nodesPerThread + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+									ARRAY_PACKED_REALS;
 
-		//Call all listeners
-		SceneNodeList::const_iterator itor = mSceneNodesWithListeners.begin();
-		SceneNodeList::const_iterator end  = mSceneNodesWithListeners.end();
-
-		while( itor != end )
-		{
-			(*itor)->getListener()->nodeUpdated( *itor );
-			++itor;
+			//Send them to worker threads (dark_sylinc). We need to go depth by depth because
+			//we may depend on parents which could be processed by different threads.
+			mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
+			mWorkerThreadsBarrier->sync(); //Fire threads
+			mWorkerThreadsBarrier->sync(); //Wait them to complete
+			//Node::updateAllTransforms( numNodes, t );
 		}
 
 		++it;
 	}
+
+	//Call all listeners
+	SceneNodeList::const_iterator itor = mSceneNodesWithListeners.begin();
+	SceneNodeList::const_iterator end  = mSceneNodesWithListeners.end();
+
+	while( itor != end )
+	{
+		(*itor)->getListener()->nodeUpdated( *itor );
+		++itor;
+	}
 }
 //-----------------------------------------------------------------------
-void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManager )
+void SceneManager::updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx )
 {
 	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
 	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
@@ -1993,12 +2017,23 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 		ObjectMemoryManager *memoryManager = *it;
 		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
 
-		//TODO: Send this to worker threads (dark_sylinc)
-
 		for( size_t i=0; i<numRenderQueues; ++i )
 		{
 			ObjectData objData;
-			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::updateAllBounds( numObjs, objData );
 		}
@@ -2007,20 +2042,27 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	}
 }
 //-----------------------------------------------------------------------
-void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-								uint8 _firstRq, uint8 _lastRq, size_t visObjsIdxStart )
+void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManager )
 {
-	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + visObjsIdxStart);
+	mUpdateBoundsRequest	= &objectMemManager;
+	mRequestType			= UPDATE_ALL_BOUNDS;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
+void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t threadIdx )
+{
+	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + threadIdx);
 	outVisibleObjects.clear();
 
-	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + visObjsIdxStart);
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
 	{
-		if( aabbInfo.size() < _lastRq )
-			aabbInfo.resize( _lastRq );
+		if( aabbInfo.size() < mCurrentCullFrustumRequest.lastRq )
+			aabbInfo.resize( mCurrentCullFrustumRequest.lastRq );
 
 		//Reset the aabb infos.
-		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + _firstRq;
-		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + _lastRq;
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
 
 		while( itor != end )
 		{
@@ -2029,23 +2071,35 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 		}
 	}
 
-	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
-	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+	const Camera *camera = request.camera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
 
 	while( it != en )
 	{
 		ObjectMemoryManager *memoryManager = *it;
 		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
 
-		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
-		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
-
-		//TODO: Send this to worker threads (dark_sylinc)
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
 
 		for( size_t i=firstRq; i<lastRq; ++i )
 		{
 			ObjectData objData;
-			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullFrustum( numObjs, objData, camera,
 					camera->getViewport()->getVisibilityMask()|getVisibilityMask(),
@@ -2056,18 +2110,16 @@ void SceneManager::cullFrustum( const ObjectMemoryManagerVec &objectMemManager, 
 	}
 }
 //-----------------------------------------------------------------------
-void SceneManager::cullReceiversBox( const ObjectMemoryManagerVec &objectMemManager,
-										const Camera *camera, uint8 _firstRq, uint8 _lastRq,
-										size_t visObjsIdxStart )
+void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t threadIdx )
 {
-	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + visObjsIdxStart);
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
 	{
-		if( aabbInfo.size() < _lastRq )
-			aabbInfo.resize( _lastRq );
+		if( aabbInfo.size() < request.lastRq )
+			aabbInfo.resize( request.lastRq );
 
 		//Reset the aabb infos.
-		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + _firstRq;
-		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + _lastRq;
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
 
 		while( itor != end )
 		{
@@ -2076,23 +2128,35 @@ void SceneManager::cullReceiversBox( const ObjectMemoryManagerVec &objectMemMana
 		}
 	}
 
-	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
-	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+	const Camera *camera = request.camera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
 
 	while( it != en )
 	{
 		ObjectMemoryManager *memoryManager = *it;
 		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
 
-		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
-		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
-
-		//TODO: Send this to worker threads (dark_sylinc)
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
 
 		for( size_t i=firstRq; i<lastRq; ++i )
 		{
 			ObjectData objData;
-			const size_t numObjs = memoryManager->getFirstObjectData( objData, i );
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullReceiversBox( numObjs, objData, camera,
 					camera->getViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
@@ -4985,5 +5049,88 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 		mGpuParamsDirty = 0;
 	}
 
+}
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
+{
+	mCurrentCullFrustumRequest = request;
+	mRequestType = CULL_FRUSTUM;
+	//This is where I figuratively kill whoever made mutable variables inside a
+	//const function, silencing a race condition: Update the frustum planes now
+	//in case they weren't up to date.
+	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &request )
+{
+	mCurrentCullFrustumRequest = request;
+	mRequestType = CALCULATE_RECEIVER_BOX;
+	//This is where I figuratively kill whoever made mutable variables inside a
+	//const function, silencing a race condition: Update the frustum planes now
+	//in case they weren't up to date.
+	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+unsigned long updateCullFrustumThread( ThreadHandle *threadHandle )
+{
+	SceneManager *sceneManager = reinterpret_cast<SceneManager*>( threadHandle->getUserParam() );
+	return sceneManager->_updateCullFrustumThread( threadHandle );
+}
+THREAD_DECLARE( updateCullFrustumThread );
+//---------------------------------------------------------------------
+void SceneManager::startWorkerThreads()
+{
+	mWorkerThreadsBarrier = new Barrier( mNumWorkerThreads+1 );
+	mWorkerThreads.reserve( mNumWorkerThreads );
+	for( size_t i=0; i<mNumWorkerThreads; ++i )
+	{
+		ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateCullFrustumThread ), i, this );
+		mWorkerThreads.push_back( th );
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::stopWorkerThreads()
+{
+	mExitWorkerThreads = true;
+	mWorkerThreadsBarrier->sync(); // Wake up worker threads so they stop
+	Threads::WaitForThreads( mWorkerThreads );
+
+	delete mWorkerThreadsBarrier;
+	mWorkerThreadsBarrier = 0;
+}
+//---------------------------------------------------------------------
+unsigned long SceneManager::_updateCullFrustumThread( ThreadHandle *threadHandle )
+{
+	size_t threadIdx = threadHandle->getThreadIdx();
+	while( !mExitWorkerThreads )
+	{
+		mWorkerThreadsBarrier->sync();
+		if( !mExitWorkerThreads )
+		{
+			switch( mRequestType )
+			{
+			case CULL_FRUSTUM:
+				cullFrustum( mCurrentCullFrustumRequest, threadIdx );
+				break;
+			case CALCULATE_RECEIVER_BOX:
+				cullReceiversBox( mCurrentCullFrustumRequest, threadIdx );
+				break;
+			case UPDATE_ALL_TRANSFORMS:
+				updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
+				break;
+			case UPDATE_ALL_BOUNDS:
+				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+				break;
+			}
+			mWorkerThreadsBarrier->sync();
+		}
+	}
+
+	return 0;
 }
 }

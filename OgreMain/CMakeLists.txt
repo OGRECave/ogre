@@ -523,6 +523,12 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
+  list(APPEND THREAD_SOURCE_FILES
+      Threading/OgreBarrierWin.cpp
+	  Threading/OgreLightweightMutexWin.cpp
+      Threading/OgreThreadsWin.cpp
+  )
+  list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
   if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
@@ -691,8 +697,11 @@ endif()
 
 # Configure threading files
 set(THREAD_HEADER_FILES
+	include/Threading/OgreBarrier.h
+	include/Threading/OgreLightweightMutex.h
 	include/Threading/OgreThreadDefines.h
 	include/Threading/OgreThreadHeaders.h
+	include/Threading/OgreThreads.h
 	include/Threading/OgreDefaultWorkQueue.h
 )
 if (OGRE_THREAD_PROVIDER EQUAL 0)

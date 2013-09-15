@@ -749,16 +749,16 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
-	SceneManager* Root::createSceneManager(const String& typeName, 
+	SceneManager* Root::createSceneManager(const String& typeName, size_t numWorkerThreads,
 		const String& instanceName)
 	{
-		return mSceneManagerEnum->createSceneManager(typeName, instanceName);
+		return mSceneManagerEnum->createSceneManager(typeName, numWorkerThreads, instanceName);
 	}
 	//-----------------------------------------------------------------------
-	SceneManager* Root::createSceneManager(SceneTypeMask typeMask, 
+	SceneManager* Root::createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads,
 		const String& instanceName)
 	{
-		return mSceneManagerEnum->createSceneManager(typeMask, instanceName);
+		return mSceneManagerEnum->createSceneManager(typeMask, numWorkerThreads, instanceName);
 	}
 	//-----------------------------------------------------------------------
 	void Root::destroySceneManager(SceneManager* sm)

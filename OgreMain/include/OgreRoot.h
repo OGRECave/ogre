@@ -394,7 +394,7 @@ namespace Ogre
 		@param instanceName Optional name to given the new instance that is
 			created. If you leave this blank, an auto name will be assigned.
 		*/
-		SceneManager* createSceneManager(const String& typeName, 
+		SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
 			const String& instanceName = StringUtil::BLANK);
 
 		/** Create a SceneManager instance based on scene type support.
@@ -409,7 +409,7 @@ namespace Ogre
 		@param instanceName Optional name to given the new instance that is
 			created. If you leave this blank, an auto name will be assigned.
 		*/
-		SceneManager* createSceneManager(SceneTypeMask typeMask, 
+		SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
 			const String& instanceName = StringUtil::BLANK);
 
 		/** Destroy an instance of a SceneManager. */

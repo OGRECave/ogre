@@ -141,6 +141,7 @@ namespace Ogre {
     class AutoParamDataSource;
     class AxisAlignedBox;
     class AxisAlignedBoxSceneQuery;
+	class Barrier;
     class Billboard;
     class BillboardChain;
     class BillboardSet;

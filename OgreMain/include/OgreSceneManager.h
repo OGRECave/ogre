@@ -56,6 +56,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
+#include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -82,6 +83,51 @@ namespace Ogre {
 	class DefaultAxisAlignedBoxSceneQuery;
 	class CompositorChain;
 	class CompositorShadowNode;
+
+	/// All variables are read-only for the worker threads.
+	struct CullFrustumRequest
+	{
+		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
+		/// First RenderQueue ID to render (inclusive)
+		uint8							firstRq;
+		/// Last RenderQueue ID to render (exclusive)
+		uint8							lastRq;
+		/** Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
+			Could be more than one depending on the high level cull system (i.e. tree-based sys)
+			Must be const (it is read only for all threads).
+		*/
+		ObjectMemoryManagerVec const	*objectMemManager;
+		/// Camera whose frustum we're to cull against. Must be const (read only for all threads).
+		Camera const					*camera;
+
+		CullFrustumRequest() :
+			firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 )
+		{
+		}
+		CullFrustumRequest( uint8 _firstRq, uint8 _lastRq,
+							const ObjectMemoryManagerVec *_objectMemManager,
+							const Camera *_camera ) :
+			firstRq( _firstRq ), lastRq( _lastRq ),
+			objectMemManager( _objectMemManager ), camera( _camera )
+		{
+		}
+	};
+
+	struct UpdateTransformRequest
+	{
+		Transform t;
+		/// Number of nodes to process for each thread. Must be multiple of ARRAY_PACKED_REALS
+		size_t numNodesPerThread;
+		size_t numTotalNodes;
+
+		UpdateTransformRequest() :
+			numNodesPerThread( 0 ), numTotalNodes( 0 ) {}
+
+		UpdateTransformRequest( const Transform &_t, size_t _numNodesPerThread, size_t _numTotalNodes ) :
+			t( _t ), numNodesPerThread( _numNodesPerThread ), numTotalNodes( _numTotalNodes )
+		{
+		}
+	};
 
     /** Manages the organisation and rendering of a 'scene' i.e. a collection 
 		of objects and potentially world geometry.
@@ -737,6 +783,25 @@ namespace Ogre {
 		uint32 mVisibilityMask;
 		bool mFindVisibleObjects;
 
+		enum RequestType
+		{
+			CULL_FRUSTUM,
+			CALCULATE_RECEIVER_BOX,
+			UPDATE_ALL_TRANSFORMS,
+			UPDATE_ALL_BOUNDS,
+			NUM_REQUESTS
+		};
+
+		size_t mNumWorkerThreads;
+
+		volatile bool		mExitWorkerThreads;
+		CullFrustumRequest	mCurrentCullFrustumRequest;
+		UpdateTransformRequest mUpdateTransformRequest;
+		ObjectMemoryManagerVec const *mUpdateBoundsRequest;
+		RequestType			mRequestType;
+		Barrier				*mWorkerThreadsBarrier;
+		ThreadHandleVec		mWorkerThreads;
+
 		/** Contains MovableObjects to be visited and rendered.
 		@rermarks
 			Declared here to avoid allocating and deallocating every frame. Declared as array of
@@ -841,10 +906,48 @@ namespace Ogre {
         typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
+		/** Updates the Nodes from the given request inside a thread. @See updateAllTransforms
+		@param request
+			Fully setup request. @See UpdateTransformRequest.
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx );
+
+		/** Updates the world aabbs from the given request inside a thread. @See updateAllTransforms
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx );
+
+		/** Low level culling, culls all objects against the given frustum active cameras. This
+			includes checking visibility flags (both scene and viewport's)
+			@See MovableObject::cullFrustum
+		@param request
+			Fully setup request. @See CullFrustumRequest.
+		@param threadIdx
+			Index to mVisibleObjects so we know which array we should start at.
+			Must be unique for each worker thread
+		*/
+		void cullFrustum( const CullFrustumRequest &request, size_t threadIdx );
+
+		/// @copydoc _cullReceiversBox
+		void cullReceiversBox( const CullFrustumRequest &request, size_t threadIdx );
+
+		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
+			Compositor). Then calls MovableObject::buildLightList with that list so that each
+			MovableObject gets it's own sorted list of the closest lights.
+		@remarks
+			@See MovableObject::buildLightList()
+		*/
+		void buildLightList();
+
     public:
         /** Constructor.
         */
-        SceneManager(const String& instanceName);
+        SceneManager(const String& instanceName, size_t numWorkerThreads);
 
         /** Default destructor.
         */
@@ -1398,6 +1501,9 @@ namespace Ogre {
 		@param objectMemManager
 			Memory manager containing all objects to be updated (i.e. Entities & Lights are both
 			MovableObjects but are kept separate)
+			Don't call this function from another thread other than Ogre's main one (we use worker
+			threads that may be in use for something else, and touching the sync barrier
+			could deadlock in the best of cases).
 		*/
 		void updateAllTransforms();
 
@@ -1405,38 +1511,11 @@ namespace Ogre {
 			updateAllTransforms. @See updateAllTransforms
 		@remarks
 			@See MovableObject::updateAllBounds
+			Don't call this function from another thread other than Ogre's main one (we use worker
+			threads that may be in use for something else, and touching the sync barrier
+			could deadlock in the best of cases).
 		*/
 		void updateAllBounds( const ObjectMemoryManagerVec &objectMemManager );
-
-		/** Low level culling, culls all objects against the given frustum active cameras. This
-			includes checking visibility flags (both scene and viewport's)
-			@See MovableObject::cullFrustum
-		@param objectMemManager
-			Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
-			Could be more than one depending on the high level cull system (i.e. tree-based sys)
-		@param Camera
-			Camera whose frustum we're to cull against
-		@param firstRq
-			First RenderQueue ID to render (inclusive)
-		@param lastRq
-			Last RenderQueue ID to render (exclusive)
-		@param visObjsIdxStart
-			Index to mVisibleObjects so we know which array we should start at.
-		*/
-		void cullFrustum( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-							uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart );
-
-		/// @copydoc _cullReceiversBox
-		void cullReceiversBox( const ObjectMemoryManagerVec &objectMemManager, const Camera *camera,
-								uint8 firstRq, uint8 lastRq, size_t visObjsIdxStart );
-
-		/** Builds a list of all lights that are visible by all queued cameras (this should be fed by
-			Compositor). Then calls MovableObject::buildLightList with that list so that each
-			MovableObject gets it's own sorted list of the closest lights.
-		@remarks
-			@See MovableObject::buildLightList()
-		*/
-		void buildLightList();
 
 		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
 		*/
@@ -2858,6 +2937,22 @@ namespace Ogre {
 
 		void _setCurrentRenderStage( IlluminationRenderStage stage ) { mIlluminationStage = stage; }
 		IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
+
+	protected:
+		/** Launches cullFrustum on all worker threads with the requested parameters
+		@remarks
+			Will block until all threads are done.
+		*/
+		void fireCullFrustumThreads( const CullFrustumRequest &request );
+		void fireCullReceiversBoxThreads( const CullFrustumRequest &request );
+		void startWorkerThreads();
+		void stopWorkerThreads();
+
+	public:
+		/** Called from the worker thread, polls to process frustum culling
+			requests when a sync is performed
+		*/
+		unsigned long _updateCullFrustumThread( ThreadHandle *threadHandle );
     };
 
     /** Default implementation of IntersectionSceneQuery. */
@@ -2969,7 +3064,7 @@ namespace Ogre {
 		@remarks
 		Don't call directly, use SceneManagerEnumerator::createSceneManager.
 		*/
-		virtual SceneManager* createInstance(const String& instanceName) = 0;
+		virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads) = 0;
 		/** Destroy an instance of a SceneManager. */
 		virtual void destroyInstance(SceneManager* instance) = 0;
 
