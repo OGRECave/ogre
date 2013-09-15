@@ -115,17 +115,17 @@ namespace Ogre {
             }
         }
 
-		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-	}
+    return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+}
 
-	void* mac_loadDylib(const char* name)
-	{
-		String fullPath=name;
-		if(name[0]!='/')
-			fullPath = macPluginPath()+"/"+fullPath;
-		
-		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-	}
+    void* mac_loadDylib(const char* name)
+    {
+        String fullPath=name;
+        if(name[0]!='/')
+            fullPath = macPluginPath()+"/"+fullPath;
+
+        return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    }
 	
     String macBundlePath()
     {
