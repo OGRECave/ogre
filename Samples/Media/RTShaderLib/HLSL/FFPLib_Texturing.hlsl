@@ -108,37 +108,7 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in	float4x4	mWorld,
 	float two_p = 2 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
 	vOut = float2(0.5 + r.x / two_p,0.5 - r.y / two_p);
 }
-/*
-//-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in float4x4 mWorld, 
-						   in float4x4 mView,
-						   in float3 vNormal,
-						   out float2 vOut)
-{	
-	float3 vWorldNormal = mul((float3x3)mWorld, vNormal);
-	float3 vViewNormal  = mul((float3x3)mView, vWorldNormal);
 
-	vOut.x = vViewNormal.x/2 + 0.5;
-	vOut.y = -vViewNormal.y/2 + 0.5;
-}
-
-//-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in float4x4 mWorld, 
-						   in float4x4 mView,
-						   in float4x4 mTexture,
-						   in float3 vNormal,
-						   out float2 vOut)
-{	
-	float3 vWorldNormal = mul((float3x3)mWorld, vNormal);
-	float3 vViewNormal  = mul((float3x3)mView, vWorldNormal);
-	float2 vSphereCoords;
-
-	vSphereCoords.x = vViewNormal.x/2 + 0.5;
-	vSphereCoords.y = -vViewNormal.y/2 + 0.5;
-	
-	vOut = mul(mTexture, float4(vSphereCoords, 0, 0)).xy;
-}
-*/
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Reflect(in float4x4 mWorld, 
 							in float4x4 mWorldIT, 
