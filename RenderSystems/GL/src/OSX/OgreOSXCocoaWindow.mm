@@ -306,7 +306,7 @@ namespace Ogre {
 
         [mGLContext update];
 
-        rs->clearFrameBuffer(FBT_COLOUR);
+//        rs->clearFrameBuffer(FBT_COLOUR);
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
@@ -646,8 +646,8 @@ namespace Ogre {
 
         _setWindowParameters();
 
-        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-        rs->clearFrameBuffer(FBT_COLOUR);
+//        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+//        rs->clearFrameBuffer(FBT_COLOUR);
 
         // Show window
         if(mWindow)
