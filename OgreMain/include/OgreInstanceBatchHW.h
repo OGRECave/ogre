@@ -60,6 +60,7 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW : public InstanceBatch
 	{
+	protected:
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
@@ -67,6 +68,9 @@ namespace Ogre
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
 		size_t updateVertexBuffer( Camera *currentCamera );
+
+		/// Overloaded to reserve enough space in mCulledInstances
+		virtual void createAllInstancedEntities(void);
 
 	public:
 		InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
@@ -87,6 +91,12 @@ namespace Ogre
 		/** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
 			per unit basis and finally updated the vertex buffer */
 		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+														uint32 combinedVisibilityFlags )
+		{
+			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+		}
 	};
 }
 

@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerThreadArray;
-
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -62,19 +60,6 @@ namespace Ogre
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
 	protected:
-		template <typename T> struct VisibleObjsPerThreadOperator
-		{
-			T &mSecondOperator;
-			size_t mNumRenderedObjects;
-
-			VisibleObjsPerThreadOperator( T &secondOperator ) :
-				mSecondOperator(secondOperator), mNumRenderedObjects(0) {}
-			void operator () ( const MovableObject::MovableObjectArray &visibleObjects )
-			{
-				mNumRenderedObjects += visibleObjects.size();
-				std::for_each( visibleObjects.begin(), visibleObjects.end(), mSecondOperator );
-			}
-		};
 		struct TransformsToTexture
 		{
 			float * RESTRICT_ALIAS mDest; //Pointer to VTF texture
@@ -169,8 +154,7 @@ namespace Ogre
 		*/
 		void fillVertexBufferOffsets(void);
 
-		void fillVertexBufferLUT( const VisibleObjectsPerThreadArray &visibleObjects,
-									size_t visibleObjsIdxStart, size_t visibleObjsListsPerThread );
+		void fillVertexBufferLUT( const MovableObjectArray *culledInstances );
 
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
@@ -178,6 +162,9 @@ namespace Ogre
 			and update visible instances' animation
 		*/
 		size_t updateVertexTexture( Camera *currentCamera );
+
+		/// Overloaded to reserve enough space in mCulledInstances
+		virtual void createAllInstancedEntities(void);
 
 		virtual bool matricesTogetherPerRow() const { return true; }
 	public:
@@ -194,6 +181,12 @@ namespace Ogre
 
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
 		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+														uint32 combinedVisibilityFlags )
+		{
+			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+		}
 	};
 
 }

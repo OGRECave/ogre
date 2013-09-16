@@ -182,20 +182,26 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	size_t InstanceBatchHW::updateVertexBuffer( Camera *camera )
 	{
-		size_t retVal = 0;
+		MovableObjectArray *visibleObjects = 0;
+		if( mManager->getInstancingThreadedCullingMethod() == INSTANCING_CULLING_SINGLETHREAD )
+		{
+			//Perform the culling now
+			ObjectData objData;
+			const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
-		ObjectData objData;
-		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+			visibleObjects = &mManager->_getTmpVisibleObjectsList()[0];
+			visibleObjects->clear();
 
-		VisibleObjectsPerThreadArray &visibleObjects = mManager->_getTmpVisibleObjectsList();
-
-		visibleObjects[0].clear();
-		
-		//TODO: (dark_sylinc) Thread this
-		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
-		MovableObject::cullFrustum( numObjs, objData, camera,
-					camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
-					visibleObjects[0], (AxisAlignedBox*)0 );
+			//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
+			MovableObject::cullFrustum( numObjs, objData, camera,
+						camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+						*visibleObjects, (AxisAlignedBox*)0 );
+		}
+		else
+		{
+			//Get the results from the time the threaded version ran.
+			visibleObjects = &mCulledInstances;
+		}
 
 		//Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
 		const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
@@ -205,47 +211,40 @@ namespace Ogre
 		unsigned char numCustomParams			= mCreator->getNumCustomParams();
 		size_t customParamIdx					= 0;
 
-		size_t visibleObjsIdxStart = 0;
-		size_t visibleObjsListsPerThread = 1;
-		VisibleObjectsPerThreadArray::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
-		VisibleObjectsPerThreadArray::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
-															+ visibleObjsListsPerThread;
-		while( it != en )
+		MovableObjectArray::const_iterator itor = visibleObjects->begin();
+		MovableObjectArray::const_iterator end  = visibleObjects->end();
+
+		while( itor != end )
 		{
-			MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-			MovableObject::MovableObjectArray::const_iterator end  = it->end();
+			assert( dynamic_cast<InstancedEntity*>(*itor) );
+			InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
 
-			while( itor != end )
+			//Write transform matrix
+			instancedEntity->writeSingleTransform3x4( pDest );
+			pDest += 12;
+
+			//Write custom parameters, if any
+			for( unsigned char i=0; i<numCustomParams; ++i )
 			{
-				//TODO: (dark_sylinc) Thread this. Although it could be just bandwidth limited
-				//and no real gain could be seen
-				assert( dynamic_cast<InstancedEntity*>(*itor) );
-				InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
-
-				//Write transform matrix
-				instancedEntity->writeSingleTransform3x4( pDest );
-				pDest += 12;
-
-				//Write custom parameters, if any
-				for( unsigned char i=0; i<numCustomParams; ++i )
-				{
-					*pDest++ = mCustomParams[customParamIdx+i].x;
-					*pDest++ = mCustomParams[customParamIdx+i].y;
-					*pDest++ = mCustomParams[customParamIdx+i].z;
-					*pDest++ = mCustomParams[customParamIdx+i].w;
-				}
-
-				++itor;
-				customParamIdx += numCustomParams;
+				*pDest++ = mCustomParams[customParamIdx+i].x;
+				*pDest++ = mCustomParams[customParamIdx+i].y;
+				*pDest++ = mCustomParams[customParamIdx+i].z;
+				*pDest++ = mCustomParams[customParamIdx+i].w;
 			}
 
-			retVal += it->size();
-			++it;
+			++itor;
+			customParamIdx += numCustomParams;
 		}
 
 		mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
 
-		return retVal;
+		return visibleObjects->size();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatchHW::createAllInstancedEntities(void)
+	{
+		mCulledInstances.reserve( mInstancesPerBatch );
+		InstanceBatch::createAllInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::getWorldTransforms( Matrix4* xform ) const

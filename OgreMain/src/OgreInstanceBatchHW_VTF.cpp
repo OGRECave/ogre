@@ -297,12 +297,8 @@ namespace Ogre
 		mInstanceVertexBuffer->unlock();
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW_VTF::fillVertexBufferLUT( const VisibleObjectsPerThreadArray &visibleObjects,
-													size_t visibleObjsIdxStart,
-													size_t visibleObjsListsPerThread )
+	void InstanceBatchHW_VTF::fillVertexBufferLUT( const MovableObjectArray *culledInstances )
 	{
-		size_t visibleEntityCount = 0;
-
 		//update the mTransformLookupNumber value in the entities if needed 
 		updateSharedLookupIndexes();
 
@@ -318,55 +314,46 @@ namespace Ogre
 
 		float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
-		//TODO: This can be threaded (unless bandwidth bound?)
 		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
 
-		VisibleObjectsPerThreadArray::const_iterator it = visibleObjects.begin() + visibleObjsIdxStart;
-		VisibleObjectsPerThreadArray::const_iterator en = visibleObjects.begin() + visibleObjsIdxStart
-															+ visibleObjsListsPerThread;
-		while( it != en )
+		MovableObjectArray::const_iterator itor = culledInstances->begin();
+		MovableObjectArray::const_iterator end  = culledInstances->end();
+
+		while( itor != end )
 		{
-			MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-			MovableObject::MovableObjectArray::const_iterator end  = it->end();
+			assert( dynamic_cast<InstancedEntity*>(*itor) );
+			const InstancedEntity *entity = static_cast<InstancedEntity*>(*itor);
+			size_t matrixIndex = entity->mTransformLookupNumber;
+			size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
+			*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - (float)(texelOffsets.x);
+			*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - (float)(texelOffsets.y);
+			thisVec += 2;
 
-			while( itor != end )
+			const Matrix4& mat =  entity->_getParentNodeFullTransform();
+			*(thisVec)     = static_cast<float>( mat[0][0] );
+			*(thisVec + 1) = static_cast<float>( mat[0][1] );
+			*(thisVec + 2) = static_cast<float>( mat[0][2] );
+			*(thisVec + 3) = static_cast<float>( mat[0][3] );
+			*(thisVec + 4) = static_cast<float>( mat[1][0] );
+			*(thisVec + 5) = static_cast<float>( mat[1][1] );
+			*(thisVec + 6) = static_cast<float>( mat[1][2] );
+			*(thisVec + 7) = static_cast<float>( mat[1][3] );
+			*(thisVec + 8) = static_cast<float>( mat[2][0] );
+			*(thisVec + 9) = static_cast<float>( mat[2][1] );
+			*(thisVec + 10)= static_cast<float>( mat[2][2] );
+			*(thisVec + 11)= static_cast<float>( mat[2][3] );
+
+			//TODO: This hurts my eyes (reading back from write-combining memory)
+			/*if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
 			{
-				assert( dynamic_cast<InstancedEntity*>(*itor) );
-				const InstancedEntity *entity = static_cast<InstancedEntity*>(*itor);
-				size_t matrixIndex = entity->mTransformLookupNumber;
-				size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
-				*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - (float)(texelOffsets.x);
-				*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - (float)(texelOffsets.y);
-				thisVec += 2;
+				const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
+				*(thisVec + 3) -= static_cast<float>( cameraRelativePosition.x );
+				*(thisVec + 7) -= static_cast<float>( cameraRelativePosition.y );
+				*(thisVec + 11) -=  static_cast<float>( cameraRelativePosition.z );
+			}*/
+			thisVec += 12;
 
-				const Matrix4& mat =  entity->_getParentNodeFullTransform();
-				*(thisVec)     = static_cast<float>( mat[0][0] );
-				*(thisVec + 1) = static_cast<float>( mat[0][1] );
-				*(thisVec + 2) = static_cast<float>( mat[0][2] );
-				*(thisVec + 3) = static_cast<float>( mat[0][3] );
-				*(thisVec + 4) = static_cast<float>( mat[1][0] );
-				*(thisVec + 5) = static_cast<float>( mat[1][1] );
-				*(thisVec + 6) = static_cast<float>( mat[1][2] );
-				*(thisVec + 7) = static_cast<float>( mat[1][3] );
-				*(thisVec + 8) = static_cast<float>( mat[2][0] );
-				*(thisVec + 9) = static_cast<float>( mat[2][1] );
-				*(thisVec + 10)= static_cast<float>( mat[2][2] );
-				*(thisVec + 11)= static_cast<float>( mat[2][3] );
-
-				//TODO: This hurts my eyes (reading back from write-combining memory)
-				/*if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
-				{
-					const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
-					*(thisVec + 3) -= static_cast<float>( cameraRelativePosition.x );
-					*(thisVec + 7) -= static_cast<float>( cameraRelativePosition.y );
-					*(thisVec + 11) -=  static_cast<float>( cameraRelativePosition.z );
-				}*/
-				thisVec += 12;
-
-				++itor;
-			}
-
-			++it;
+			++itor;
 		}
 
 		mInstanceVertexBuffer->unlock();
@@ -437,30 +424,33 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	size_t InstanceBatchHW_VTF::updateVertexTexture( Camera *camera )
 	{
-		size_t numRenderedInstances = 0;
+		MovableObjectArray *visibleObjects = 0;
+		if( mManager->getInstancingThreadedCullingMethod() == INSTANCING_CULLING_SINGLETHREAD )
+		{
+			//Perform the culling now
+			ObjectData objData;
+			const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
-		ObjectData objData;
-		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+			visibleObjects = &mManager->_getTmpVisibleObjectsList()[0];
+			visibleObjects->clear();
 
-		VisibleObjectsPerThreadArray &visibleObjects = mManager->_getTmpVisibleObjectsList();
-
-		visibleObjects[0].clear();
-		
-		//TODO: (dark_sylinc) Thread this
-		//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
-		MovableObject::cullFrustum( numObjs, objData, camera,
-					camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
-					visibleObjects[0], (AxisAlignedBox*)0 );
-
-		size_t visibleObjsIdxStart = 0;
-		size_t visibleObjsListsPerThread = 1;
+			//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
+			MovableObject::cullFrustum( numObjs, objData, camera,
+						camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+						*visibleObjects, (AxisAlignedBox*)0 );
+		}
+		else
+		{
+			//Get the results from the time the threaded version ran.
+			visibleObjects = &mCulledInstances;
+		}
 
 		bool useMatrixLookup = useBoneMatrixLookup();
 		if (useMatrixLookup)
 		{
 			//if we are using bone matrix look up we have to update the instance buffer for the 
 			//vertex texture to be relevant
-			fillVertexBufferLUT( visibleObjects, visibleObjsIdxStart, visibleObjsListsPerThread );
+			fillVertexBufferLUT( visibleObjects );
 		}
 
 		//Now lock the texture and copy the 4x3 matrices!
@@ -472,72 +462,52 @@ namespace Ogre
 
 		float *pDest = static_cast<float*>(pixelBox.data);
 
-		VisibleObjectsPerThreadArray::const_iterator threadDataStart = visibleObjects.begin() +
-																		visibleObjsIdxStart;
-		VisibleObjectsPerThreadArray::const_iterator threadDataEnd   = visibleObjects.begin() +
-																		visibleObjsIdxStart +
-																		visibleObjsListsPerThread;
-
-		//TODO: (dark_sylinc) Thread this. Although it could be just bandwidth limited
-		//and no real gain could be seen
 		if( mMeshReference->getSkeleton().isNull() )
 		{
 			//No animations, no anything (perhaps HW Basic is a better technique for this case)
-			numRenderedInstances +=
-				std::for_each( threadDataStart, threadDataEnd,
-							VisibleObjsPerThreadOperator<SendAllSingleTransformsToTexture>
-								( SendAllSingleTransformsToTexture( pDest,
-																	floatsPerEntity,
-																	entitiesPerPadding,
-																	mWidthFloatsPadding ) ) ).
-								mNumRenderedObjects;
+			std::for_each( visibleObjects->begin(), visibleObjects->end(),
+							SendAllSingleTransformsToTexture( pDest, floatsPerEntity,
+												entitiesPerPadding, mWidthFloatsPadding ) );
 		}
 		else
 		{
 			if( !useMatrixLookup && !mUseBoneDualQuaternions )
 			{
 				// Animations, normal
-				numRenderedInstances +=
-					std::for_each( threadDataStart, threadDataEnd,
-							VisibleObjsPerThreadOperator<SendAllAnimatedTransformsToTexture>
-								( SendAllAnimatedTransformsToTexture( pDest, floatsPerEntity,
-																		entitiesPerPadding,
-																		mWidthFloatsPadding,
-																		mIndexToBoneMap ) ) ).
-								mNumRenderedObjects;
-				
-				
+				std::for_each( visibleObjects->begin(), visibleObjects->end(),
+								SendAllAnimatedTransformsToTexture( pDest, floatsPerEntity,
+														entitiesPerPadding, mWidthFloatsPadding,
+														mIndexToBoneMap ) );
 			}
 			else if( mUseBoneDualQuaternions )
 			{
 				// Animations, Dual Quaternion Skinning
-				numRenderedInstances +=
-					std::for_each( threadDataStart, threadDataEnd,
-							VisibleObjsPerThreadOperator<SendAllDualQuatTexture>
-								( SendAllDualQuatTexture( pDest, floatsPerEntity,
-															entitiesPerPadding,
-															mWidthFloatsPadding,
-															mIndexToBoneMap ) ) ).
-								mNumRenderedObjects;
-				
+				std::for_each( visibleObjects->begin(), visibleObjects->end(),
+								SendAllDualQuatTexture( pDest, floatsPerEntity,
+														entitiesPerPadding,
+														mWidthFloatsPadding,
+														mIndexToBoneMap ) );
 			}
 			else
 			{
 				// Animations, LUT (lookup table)
-				numRenderedInstances +=
-					std::for_each( threadDataStart, threadDataEnd,
-							VisibleObjsPerThreadOperator<SendAllLUTToTexture>
-								( SendAllLUTToTexture( pDest, floatsPerEntity,
-														entitiesPerPadding, mWidthFloatsPadding,
-														mIndexToBoneMap,
-														getMaxLookupTableInstances() ) ) ).
-								mNumRenderedObjects;
+				std::for_each( visibleObjects->begin(), visibleObjects->end(),
+								SendAllLUTToTexture( pDest, floatsPerEntity,
+													 entitiesPerPadding, mWidthFloatsPadding,
+													 mIndexToBoneMap,
+													 getMaxLookupTableInstances() ) );
 			}
 		}
 
 		mMatrixTexture->getBuffer()->unlock();
 
-		return numRenderedInstances;
+		return visibleObjects->size();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatchHW_VTF::createAllInstancedEntities(void)
+	{
+		mCulledInstances.reserve( mInstancesPerBatch );
+		InstanceBatch::createAllInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue, Camera *camera )

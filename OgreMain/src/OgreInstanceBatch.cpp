@@ -596,6 +596,18 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
+	void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+																uint32 combinedVisibilityFlags )
+	{
+		mCulledInstances.clear();
+
+		ObjectData objData;
+		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+		MovableObject::cullFrustum( numObjs, objData, frustum, combinedVisibilityFlags,
+									mCulledInstances, (AxisAlignedBox*)0 );
+	}
+	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const
 	{
 		static String sType = "InstanceBatch";

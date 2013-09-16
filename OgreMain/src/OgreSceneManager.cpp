@@ -90,7 +90,8 @@ uint32 SceneManager::LIGHT_TYPE_MASK			= 0x08000000;
 uint32 SceneManager::FRUSTUM_TYPE_MASK			= 0x04000000;
 uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
-SceneManager::SceneManager(const String& name, size_t numWorkerThreads) :
+SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
+						   InstancingTheadedCullingMethod threadedCullingMethod) :
 mName(name),
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
@@ -143,6 +144,7 @@ mFindVisibleObjects(true),
 mNumWorkerThreads( numWorkerThreads ),
 mExitWorkerThreads( false ),
 mUpdateBoundsRequest( 0 ),
+mInstancingThreadedCullingMethod( threadedCullingMethod ),
 mUserTask( 0 ),
 mRequestType( NUM_REQUESTS ),
 mWorkerThreadsBarrier( 0 ),
@@ -1226,6 +1228,12 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 		{
 			OgreProfileGroup("_updateRenderQueue", OGREPROF_CULLING);
 
+			if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
+			{
+				fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera,
+													 vp->getVisibilityMask()|getVisibilityMask() ) );
+			}
+
 			//mVisibleObjects should be filled in phase 01
 			VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
 			VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
@@ -2050,6 +2058,19 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	mRequestType			= UPDATE_ALL_BOUNDS;
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
+void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
+													size_t threadIdx )
+{
+	MovableObject::MovableObjectArray::const_iterator itor = mVisibleObjects[threadIdx].begin();
+	MovableObject::MovableObjectArray::const_iterator end  = mVisibleObjects[threadIdx].end();
+
+	while( itor != end )
+	{
+		(*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.combinedVisibilityFlags );
+		++itor;
+	}
 }
 //-----------------------------------------------------------------------
 void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t threadIdx )
@@ -5096,7 +5117,16 @@ void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &reques
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-void SceneManager::processUserScalableTask( UniformScalableTask *task, bool bBlock )
+void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request )
+{
+	mInstanceBatchCullRequest = request;
+	mRequestType = CULL_FRUSTUM_INSTANCEDENTS;
+	mInstanceBatchCullRequest.frustum->getFrustumPlanes(); // Ensure they're up to date.
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlock )
 {
 	mRequestType = USER_UNIFORM_SCALABLE_TASK;
 	mUserTask = task;
@@ -5163,6 +5193,9 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 				break;
 			case UPDATE_INSTANCE_MANAGERS:
 				updateInstanceManagersThread( threadIdx );
+				break;
+			case CULL_FRUSTUM_INSTANCEDENTS:
+				instanceBatchCullFrustumThread( mInstanceBatchCullRequest, threadIdx );
 				break;
 			case USER_UNIFORM_SCALABLE_TASK:
 #ifndef NDEBUG

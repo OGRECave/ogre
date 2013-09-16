@@ -74,6 +74,67 @@ namespace Ogre {
         Quaternion orientation;
     };
 
+	/** There are two Instancing techniques that perform culling of their own:
+			* HW Basic
+			* HW VTF
+		Frustum culling is highly parallelizable & scalable. However, we first cull
+		InstanceBatches & regular entities, then ask the culled InstanceBatches to
+		perform their culling to the InstancedEntities they own.
+		This results performance boost for skipping large amounts of instanced entities
+		when the whole batch isn't visible.
+		However, this also means threading frustum culling of instanced entities got harder.
+	@par
+		There are four approaches:
+			* Ask all existing batches to frustum cull. Then use only the ones we want. Sheer
+			  brute force. Scales very well with cores, but sacrifices performance unnecessary
+			  when only a few batches are visible. This approach is not taken by Ogre.
+
+			* Sync every time an InstanceBatchHW or InstanceBatchHW_VTF tries to frustum cull to
+			  delegate the job on worker threads. Considering there could be hundreds of
+			  InstanceBatches, this would cause a huge amount of thread synchronization overhead &
+			  context switches. This approach is not taken by Ogre.
+
+		    * Each thread after having culled all InstancedBatches & Entities, will parse the
+			  culled list to ask all MovableObjects to perform culling of their own. Entities
+			  will ignore this call (however they add to a small overhead for traversing them
+			  and calling a virtual function) while InstanceBatchHW & InstanceBatchHW_VTF will
+			  perform their own culling from within the multiple threads. This approach scales
+			  well with cores and only visible batches. However load balancing may be an issue
+			  for certain scenes:
+			  eg. an InstanceBatch with 5000 InstancedEntities in one thread, while the other
+			  three threads get one InstanceBatch each with 50 InstancedEntities. The first
+			  thread will have considerably more work to do than the other three.
+			  This approach is a good balance when compared to the first two. This is the
+			  approach taken by Ogre when INSTANCING_CULLING_THREADED is on
+
+			* Don't multithread instanced entitites' frustum culling. Only the InstanceBatch &
+			  Entity's frustum culling will be threaded. This is what happens when
+			  INSTANCING_CULLING_SINGLE is on.
+
+		Whether INSTANCING_CULLING_THREADED improves or degrades performance depends highly on your
+		scene.
+	@par
+		<b>When to use INSTANCING_CULLING_SINGLETHREAD?</b>
+		If your scene doesn't use HW Basic or HW VTF instancing techniques, or you have very few
+		Instanced entities compared to the amount of regular Entities.
+		Turning threading on, you'll be wasting your time traversing the list from multiple threads
+		in search of InstanceBatchHW & InstanceBatchHW_VTF
+
+		<b>When to use INSTANCING_CULLING_THREADED?</b>
+		If your scene makes intensive use of HW Basic and/or HW VTF instancing techniques. Note
+		that threaded culling is performed in STATIC_SCENE instances too.
+		The most advantage is seen when doing many PASS_SCENE, which require frustum culling
+		multiple times per frame (eg. pssm shadows, multiple light sources with shadows, very
+		advanced compositing)
+
+		Note that you can switch between methods at any time at runtime.
+	*/
+	enum InstancingTheadedCullingMethod
+	{
+		INSTANCING_CULLING_SINGLETHREAD,
+		INSTANCING_CULLING_THREADED,
+	};
+
 	typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerThreadArray;
 
 	// Forward declarations
@@ -126,6 +187,17 @@ namespace Ogre {
 
 		UpdateTransformRequest( const Transform &_t, size_t _numNodesPerThread, size_t _numTotalNodes ) :
 			t( _t ), numNodesPerThread( _numNodesPerThread ), numTotalNodes( _numTotalNodes )
+		{
+		}
+	};
+
+	struct InstanceBatchCullRequest
+	{
+		Frustum const	*frustum;
+		uint32			combinedVisibilityFlags;
+		InstanceBatchCullRequest() : frustum( 0 ), combinedVisibilityFlags( 0 ) {}
+		InstanceBatchCullRequest( const Frustum *_frustum, uint32 _combinedVisibilityFlags ) :
+							frustum( _frustum ), combinedVisibilityFlags( _combinedVisibilityFlags )
 		{
 		}
 	};
@@ -795,7 +867,7 @@ namespace Ogre {
 			UPDATE_ALL_TRANSFORMS,
 			UPDATE_ALL_BOUNDS,
 			UPDATE_INSTANCE_MANAGERS,
-			CULL_FRUSTUM_CUSTOM,
+			CULL_FRUSTUM_INSTANCEDENTS,
 			USER_UNIFORM_SCALABLE_TASK,
 			NUM_REQUESTS
 		};
@@ -803,9 +875,11 @@ namespace Ogre {
 		size_t mNumWorkerThreads;
 
 		volatile bool		mExitWorkerThreads;
-		CullFrustumRequest	mCurrentCullFrustumRequest;
-		UpdateTransformRequest mUpdateTransformRequest;
-		ObjectMemoryManagerVec const *mUpdateBoundsRequest;
+		CullFrustumRequest				mCurrentCullFrustumRequest;
+		UpdateTransformRequest			mUpdateTransformRequest;
+		ObjectMemoryManagerVec const	*mUpdateBoundsRequest;
+		InstancingTheadedCullingMethod	mInstancingThreadedCullingMethod;
+		InstanceBatchCullRequest		mInstanceBatchCullRequest;
 		UniformScalableTask *mUserTask;
 		RequestType			mRequestType;
 		Barrier				*mWorkerThreadsBarrier;
@@ -931,6 +1005,14 @@ namespace Ogre {
 		*/
 		void updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx );
 
+		/** Traverses mVisibleObjects[threadIdx] from each thread to call
+			MovableObject::instanceBatchCullFrustumThreaded (which is supposed to cull objects)
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request, size_t threadIdx );
+
 		/** Low level culling, culls all objects against the given frustum active cameras. This
 			includes checking visibility flags (both scene and viewport's)
 			@See MovableObject::cullFrustum
@@ -956,7 +1038,8 @@ namespace Ogre {
     public:
         /** Constructor.
         */
-        SceneManager(const String& instanceName, size_t numWorkerThreads);
+        SceneManager(const String& instanceName, size_t numWorkerThreads,
+					InstancingTheadedCullingMethod threadedCullingMethod);
 
         /** Default destructor.
         */
@@ -1502,6 +1585,9 @@ namespace Ogre {
 
 		/// @See mTmpVisibleObjects
 		VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()			{ return mTmpVisibleObjects; }
+
+		InstancingTheadedCullingMethod getInstancingThreadedCullingMethod() const
+															{ return mInstancingThreadedCullingMethod; }
 
 		void notifyStaticDirty( MovableObject *movableObject );
 
@@ -2956,6 +3042,7 @@ namespace Ogre {
 		*/
 		void fireCullFrustumThreads( const CullFrustumRequest &request );
 		void fireCullReceiversBoxThreads( const CullFrustumRequest &request );
+		void fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request );
 		void startWorkerThreads();
 		void stopWorkerThreads();
 
@@ -2974,7 +3061,7 @@ namespace Ogre {
 			False if you want to do something in between, in this case you MUST
 			call waitForPendingUserScalableTask later.
 		*/
-		void processUserScalableTask( UniformScalableTask *task, bool bBlock );
+		void executeUserScalableTask( UniformScalableTask *task, bool bBlock );
 
 		/** Blocks until the the task from processUserScalableTask finishes.
 		@remarks
@@ -3097,7 +3184,8 @@ namespace Ogre {
 		@remarks
 		Don't call directly, use SceneManagerEnumerator::createSceneManager.
 		*/
-		virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads) = 0;
+		virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads,
+											InstancingTheadedCullingMethod threadedCullingMethod) = 0;
 		/** Destroy an instance of a SceneManager. */
 		virtual void destroyInstance(SceneManager* instance) = 0;
 

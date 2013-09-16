@@ -140,7 +140,8 @@ namespace Ogre
 
 		bool mStaticDirty;
 
-		vector<Aabb>::type	mThreadAabbs;
+		vector<Aabb>::type		mThreadAabbs;
+		MovableObjectArray		mCulledInstances; /// Only for HW Basic & HW VTF
 
         /// When true remove the memory of the VertexData we've created because no one else will
         bool mRemoveOwnVertexData;
@@ -175,6 +176,12 @@ namespace Ogre
             involving space partition), but this one is simple and works well enough
         */
         void defragmentBatchDoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );
+
+		/** Used by HW Basic & HW VTF techniques to cull from multiple threads.
+			@see InstancingTheadedCullingMethod
+		*/
+		void instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+													uint32 combinedVisibilityFlags );
 
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,

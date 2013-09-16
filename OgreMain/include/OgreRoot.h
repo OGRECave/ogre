@@ -397,7 +397,8 @@ namespace Ogre
 			created. If you leave this blank, an auto name will be assigned.
 		*/
 		SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
-			const String& instanceName = StringUtil::BLANK);
+										InstancingTheadedCullingMethod threadedCullingMethod,
+										const String& instanceName = StringUtil::BLANK);
 
 		/** Create a SceneManager instance based on scene type support.
 		@remarks
@@ -412,7 +413,8 @@ namespace Ogre
 			created. If you leave this blank, an auto name will be assigned.
 		*/
 		SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
-			const String& instanceName = StringUtil::BLANK);
+										InstancingTheadedCullingMethod threadedCullingMethod,
+										const String& instanceName = StringUtil::BLANK);
 
 		/** Destroy an instance of a SceneManager. */
 		void destroySceneManager(SceneManager* sm);

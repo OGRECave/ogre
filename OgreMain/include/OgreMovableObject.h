@@ -262,6 +262,10 @@ namespace Ogre {
 								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
 								 AxisAlignedBox *outReceiversBox );
 
+		/// @See InstancingTheadedCullingMethod, @see InstanceBatch::instanceBatchCullFrustumThreaded
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+														uint32 combinedVisibilityFlags ) {}
+
 		/** Exactly the same as @see cullFrustum except that it doesn't produce outCulledObjects.
 			Only useful when a shadow node needs to know the receiver boxes of other Render queue
 			ranges that weren't calculated used in previous render scene passes.
