@@ -98,28 +98,28 @@ public:
 		{
 			mRenderMStrands = !mRenderMStrands;
 			
-			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
 			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_RenderMStrands", mRenderMStrands );
 		}
 		if (box->getName() == "RenderSStrands")
 		{
 			mRenderSStrands = !mRenderSStrands;
 			
-			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
 			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_RenderSStrands", mRenderSStrands );
 		}
 		if (box->getName() == "HWTessellation")
 		{
 			mHWTessellation = !mHWTessellation;
 			
-			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
 			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_HWTessellation", mHWTessellation );
 		}
 		if (box->getName() == "DynamicLOD" && mHWTessellation)
 		{
 			mDynamicLOD = !mDynamicLOD;
 			
-			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
 			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_DynamicLOD", mDynamicLOD );
 		}
 		if (box->getName() == "WindForce")

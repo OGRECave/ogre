@@ -13,7 +13,8 @@ vertex_program Ogre/TerrainTessellation/InitializationVS hlsl
 	
 	default_params
 	{
-		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DeformMin float3 0.0 0.0 0.0
+		param_named g_DeformMax float3 1.0 1.0 1.0
 	}
 }
 
@@ -38,8 +39,7 @@ fragment_program Ogre/TerrainTessellation/GradientPS hlsl
 	
 	default_params
 	{
-		param_named g_FractalOctaves int3 0 0 0
-		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
+
 	}
 }
 
@@ -94,7 +94,6 @@ vertex_program Ogre/TerrainTessellation/HwTessellationPassThruVS hlsl
 
 	default_params
 	{
-		param_named_auto g_WorldViewProj worldviewproj_matrix
 		param_named g_DebugShowTiles int 0
 		param_named g_DetailNoiseScale float 5
 		param_named g_tileSize float 5
@@ -115,7 +114,6 @@ vertex_program Ogre/TerrainTessellation/VTFDisplacementVS hlsl
 		param_named g_DebugShowTiles int 0
 		param_named g_DebugShowPatches int 0
 		param_named g_DetailNoiseScale float 5
-		param_named g_fDiscplacementHeight float 5
 		param_named g_tileSize float 5
 		param_named g_DetailUVScale float2 0.0 0.0
 		param_named g_TextureWorldOffset float3 0.0 0.0 0.0

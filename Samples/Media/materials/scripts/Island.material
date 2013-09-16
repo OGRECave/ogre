@@ -347,6 +347,7 @@ fragment_program Ogre/Island/WaterPatchPS hlsl
 		param_named g_ScreenSizeInv float2 0.0 0.0
 		param_named g_ZNear float 0.0
 		param_named g_ZFar float 0.0
+		param_named g_something float 10.0
 	}
 }
 

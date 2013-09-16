@@ -210,8 +210,8 @@ namespace Ogre {
 			D3D11_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration(boundVertexProgram, binding);
 
 			// bad bug tracing. see what will happen next.
-			if (pVertexDecl->Format == DXGI_FORMAT_R16G16_SINT)
-				pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
+			//if (pVertexDecl->Format == DXGI_FORMAT_R16G16_SINT)
+			//	pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
 			HRESULT hr = mlpD3DDevice->CreateInputLayout( 
 				pVertexDecl, 
 				boundVertexProgram->getNumInputs(), 

@@ -9,7 +9,6 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 #include "TerrainTessellationINoise.hlsl"
 
 // z in both cases is the height scale.
-float3 g_DeformMin, g_DeformMax;
 
 // Null in that there is no associated VB set by the API.
 struct NullVertex
@@ -24,7 +23,9 @@ struct DeformVertex
     float2 texCoord : TEXCOORD1;
 };
 
-DeformVertex InitializationVS( NullVertex input )
+DeformVertex InitializationVS( NullVertex input,
+							   uniform float g_DeformMin,
+							   uniform float g_DeformMax)
 {
     DeformVertex output = (DeformVertex) 0;
     
@@ -94,9 +95,7 @@ float4 InitializationPS( DeformVertex input,
 
 Texture2D g_InputTexture;
 
-float4 GradientPS( DeformVertex input,
-	uniform int3 g_FractalOctaves,
-	uniform float3 g_TextureWorldOffset ) : SV_Target
+float4 GradientPS( DeformVertex input ) : SV_Target
 {
 	input.texCoord.y = 1 - input.texCoord.y;
 	float x0 = g_InputTexture.Sample(SamplerClampLinear, input.texCoord, int2( 1,0)).x;
