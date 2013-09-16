@@ -63,7 +63,7 @@
 #   include "NewInstancing.h"
 #   include "TextureArray.h"
 #   include "SSAO.h"
-//#   include "OceanDemo.h"
+#   include "OceanDemo.h"
 #	ifdef OGRE_BUILD_COMPONENT_VOLUME
 #		include "VolumeCSG.h"
 #		include "VolumeTerrain.h"
