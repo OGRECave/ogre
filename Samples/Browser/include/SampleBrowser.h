@@ -370,6 +370,8 @@ protected:
 				}
 				catch (Ogre::Exception e)   // if failed to start, show error and fall back to menu
 				{
+                    destroyDummyScene();
+
 					s->_shutdown();
 
 					createDummyScene();
