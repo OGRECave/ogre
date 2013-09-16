@@ -199,8 +199,8 @@ namespace Ogre
 		@remarks
 			'src' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS matrices
 		*/
-		inline void loadFromAoS( Matrix4 * RESTRICT_ALIAS src );
-		inline void loadFromAoS( SimpleMatrix4 * RESTRICT_ALIAS src );
+		inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS src );
+		inline void loadFromAoS( const SimpleMatrix4 * RESTRICT_ALIAS src );
 
 		/// @copydoc Matrix4::isAffine()
 		inline bool isAffine() const;

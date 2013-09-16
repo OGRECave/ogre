@@ -659,7 +659,11 @@ namespace Ogre {
             Applications using Ogre should just use the relative transforms.
 			Assumes the caches are already updated
         */
-        virtual_l2 const Matrix4& _getFullTransform(void) const;
+        virtual_l2 FORCEINLINE const Matrix4& _getFullTransform(void) const
+		{
+			assert( !mCachedTransformOutOfDate );
+			return mTransform.mDerivedTransform[mTransform.mIndex];
+		}
 
 		/** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
 		virtual_l2 const Matrix4& _getFullTransformUpdated(void);

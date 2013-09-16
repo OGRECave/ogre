@@ -62,6 +62,7 @@ THE SOFTWARE.
 #include "OgreRenderQueueInvocation.h"
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
+#include "OgreFrameStats.h"
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
@@ -118,6 +119,7 @@ namespace Ogre {
       , mLogManager(0)
 	  , mRenderSystemCapabilitiesManager(0)
 	  , mCompositorManager2(0)
+	  , mFrameStats(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
@@ -202,6 +204,8 @@ namespace Ogre {
 
 		// Compiler manager
 		//mCompilerManager = OGRE_NEW ScriptCompilerManager();
+
+		mFrameStats = OGRE_NEW FrameStats();
 
         mTimer = OGRE_NEW Timer();
 
@@ -289,6 +293,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Root::~Root()
     {
+		LogManager::getSingleton().stream(LML_TRIVIAL)
+			<< "Average FPS: " << mFrameStats->getAvgFps() << "\n"
+			<< "Average time: \t"<< mFrameStats->getAvgTime() << " ms\n"
+			<< "Best time: \t"	<< mFrameStats->getBestTime() << " ms\n"
+			<< "Worst time: \t"	<< mFrameStats->getWorstTime()<< " ms";
+
         shutdown();
         OGRE_DELETE mSceneManagerEnum;
 		OGRE_DELETE mShadowTextureManager;
@@ -349,6 +359,8 @@ namespace Ogre {
 		OGRE_DELETE mRibbonTrailFactory;
 
 		OGRE_DELETE mWorkQueue;
+
+		OGRE_DELETE mFrameStats;
 
 		OGRE_DELETE mTimer;
 
@@ -701,6 +713,7 @@ namespace Ogre {
 
         // Initialise timer
         mTimer->reset();
+		mFrameStats->reset( mTimer->getMicroseconds() );
 
 		// Init pools
 		ConvexBody::_initialisePool();
@@ -1004,6 +1017,8 @@ namespace Ogre {
 		if (!_updateAllRenderTargets())
 			return false;
 
+		mFrameStats->addSample( mTimer->getMicroseconds() );
+
         return _fireFrameEnded();
     }
 	//---------------------------------------------------------------------
@@ -1021,7 +1036,9 @@ namespace Ogre {
 		if (!_updateAllRenderTargets(evt))
 			return false;
 
-		now = mTimer->getMilliseconds();
+		now = mTimer->getMicroseconds();
+		mFrameStats->addSample( now );
+		now /= 1000; // Convert to milliseconds.
 		evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
 
 		return _fireFrameEnded(evt);

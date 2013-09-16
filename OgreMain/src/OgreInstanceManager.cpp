@@ -557,6 +557,27 @@ namespace Ogre
 		//mDirtyStaticBatches.clear();
 	}
 	//-----------------------------------------------------------------------
+	void InstanceManager::_updateDirtyBatchesThread( size_t threadIdx )
+	{
+		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateEntitiesBoundsThread( threadIdx );
+			++itor;
+		}
+
+		itor = mDirtyStaticBatches.begin();
+		end  = mDirtyStaticBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateEntitiesBoundsThread( threadIdx );
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
 	void InstanceManager::_updateDirtyBatches(void)
 	{
 		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();

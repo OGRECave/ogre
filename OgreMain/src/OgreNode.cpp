@@ -160,11 +160,11 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    const Matrix4& Node::_getFullTransform(void) const
+    /*const Matrix4& Node::_getFullTransform(void) const
     {
 		assert( !mCachedTransformOutOfDate );
 		return mTransform.mDerivedTransform[mTransform.mIndex];
-    }
+    }*/
 	//-----------------------------------------------------------------------
     const Matrix4& Node::_getFullTransformUpdated(void)
     {

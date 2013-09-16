@@ -140,6 +140,8 @@ namespace Ogre
 
 		bool mStaticDirty;
 
+		vector<Aabb>::type	mThreadAabbs;
+
         /// When true remove the memory of the VertexData we've created because no one else will
         bool mRemoveOwnVertexData;
         /// When true remove the memory of the IndexData we've created because no one else will
@@ -198,6 +200,13 @@ namespace Ogre
 
 		/// Updates animations from all our entities.
 		void _updateAnimations(void);
+
+		/** Updates the bounds of only our entities from multiple threads. To be called before
+			_updateBounds (which is single threaded). @see InstanceManager::updateDirtyBatches
+		@param threadIdx
+			The index of this thread, must be unique for each thread
+		*/
+		void _updateEntitiesBoundsThread( size_t threadIdx );
 
         /** @see InstanceManager::updateDirtyBatches */
         void _updateBounds(void);

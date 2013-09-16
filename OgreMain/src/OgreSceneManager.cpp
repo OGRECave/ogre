@@ -73,6 +73,7 @@ THE SOFTWARE.
 #include "OgreOldNode.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Threading/OgreBarrier.h"
+#include "Threading/OgreUniformScalableTask.h"
 
 // This class implements the most basic scene manager
 
@@ -141,8 +142,9 @@ mVisibilityMask(0xFFFFFFFF & MovableObject::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
 mNumWorkerThreads( numWorkerThreads ),
 mExitWorkerThreads( false ),
-mRequestType( NUM_REQUESTS ),
 mUpdateBoundsRequest( 0 ),
+mUserTask( 0 ),
+mRequestType( NUM_REQUESTS ),
 mWorkerThreadsBarrier( 0 ),
 mSuppressRenderStateChanges(false),
 mCameraRelativeRendering(false),
@@ -4481,8 +4483,26 @@ void SceneManager::updateInstanceManagerAnimations(void)
 	}
 }
 //---------------------------------------------------------------------
+void SceneManager::updateInstanceManagersThread( size_t threadIdx )
+{
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
+
+	while( itor != end )
+	{
+		(*itor)->_updateDirtyBatchesThread( threadIdx );
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
 void SceneManager::updateInstanceManagers(void)
 {
+	// First update the individual instances from multiple threads
+	mRequestType = UPDATE_INSTANCE_MANAGERS;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+
+	// Now perform the final pass from a single thread
 	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
 	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
 
@@ -5076,12 +5096,27 @@ void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &reques
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-unsigned long updateCullFrustumThread( ThreadHandle *threadHandle )
+void SceneManager::processUserScalableTask( UniformScalableTask *task, bool bBlock )
+{
+	mRequestType = USER_UNIFORM_SCALABLE_TASK;
+	mUserTask = task;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	if( bBlock )
+		mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+void SceneManager::waitForPendingUserScalableTask()
+{
+	assert( mRequestType == USER_UNIFORM_SCALABLE_TASK || mRequestType == NUM_REQUESTS );
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+unsigned long updateWorkerThread( ThreadHandle *threadHandle )
 {
 	SceneManager *sceneManager = reinterpret_cast<SceneManager*>( threadHandle->getUserParam() );
-	return sceneManager->_updateCullFrustumThread( threadHandle );
+	return sceneManager->_updateWorkerThread( threadHandle );
 }
-THREAD_DECLARE( updateCullFrustumThread );
+THREAD_DECLARE( updateWorkerThread );
 //---------------------------------------------------------------------
 void SceneManager::startWorkerThreads()
 {
@@ -5089,7 +5124,7 @@ void SceneManager::startWorkerThreads()
 	mWorkerThreads.reserve( mNumWorkerThreads );
 	for( size_t i=0; i<mNumWorkerThreads; ++i )
 	{
-		ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateCullFrustumThread ), i, this );
+		ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateWorkerThread ), i, this );
 		mWorkerThreads.push_back( th );
 	}
 }
@@ -5104,7 +5139,7 @@ void SceneManager::stopWorkerThreads()
 	mWorkerThreadsBarrier = 0;
 }
 //---------------------------------------------------------------------
-unsigned long SceneManager::_updateCullFrustumThread( ThreadHandle *threadHandle )
+unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 {
 	size_t threadIdx = threadHandle->getThreadIdx();
 	while( !mExitWorkerThreads )
@@ -5125,6 +5160,16 @@ unsigned long SceneManager::_updateCullFrustumThread( ThreadHandle *threadHandle
 				break;
 			case UPDATE_ALL_BOUNDS:
 				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+				break;
+			case UPDATE_INSTANCE_MANAGERS:
+				updateInstanceManagersThread( threadIdx );
+				break;
+			case USER_UNIFORM_SCALABLE_TASK:
+#ifndef NDEBUG
+				//Simple attempt to detect improper usage (not perfect, as race conditions may silent it)
+				mRequestType = NUM_REQUESTS;
+#endif
+				mUserTask->execute( threadIdx, mNumWorkerThreads );
 				break;
 			}
 			mWorkerThreadsBarrier->sync();

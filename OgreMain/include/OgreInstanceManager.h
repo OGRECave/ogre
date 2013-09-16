@@ -313,6 +313,9 @@ namespace Ogre
 		/// Called by SceneManager every frame
 		void _updateAnimations(void);
 
+		/** Called by SceneManager every frame from multiple threads */
+        void _updateDirtyBatchesThread( size_t threadIdx );
+
         /** Called by SceneManager every frame */
         void _updateDirtyBatches(void);
 

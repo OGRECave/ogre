@@ -83,6 +83,7 @@ namespace Ogre {
 	class DefaultAxisAlignedBoxSceneQuery;
 	class CompositorChain;
 	class CompositorShadowNode;
+	class UniformScalableTask;
 
 	/// All variables are read-only for the worker threads.
 	struct CullFrustumRequest
@@ -730,6 +731,10 @@ namespace Ogre {
 		/// Updates all instance managers' animations
 		void updateInstanceManagerAnimations(void);
 
+		/** Updates all instance managers with dirty instance batches from multiple threads.
+			@see updateInstanceManagers and @see InstanceBatch::_updateEntitiesBoundsThread */
+		void updateInstanceManagersThread( size_t threadIdx );
+
 		/** Updates all instance managers with dirty instance batches. @see _addDirtyInstanceManager */
 		void updateInstanceManagers(void);
 
@@ -789,6 +794,9 @@ namespace Ogre {
 			CALCULATE_RECEIVER_BOX,
 			UPDATE_ALL_TRANSFORMS,
 			UPDATE_ALL_BOUNDS,
+			UPDATE_INSTANCE_MANAGERS,
+			CULL_FRUSTUM_CUSTOM,
+			USER_UNIFORM_SCALABLE_TASK,
 			NUM_REQUESTS
 		};
 
@@ -798,6 +806,7 @@ namespace Ogre {
 		CullFrustumRequest	mCurrentCullFrustumRequest;
 		UpdateTransformRequest mUpdateTransformRequest;
 		ObjectMemoryManagerVec const *mUpdateBoundsRequest;
+		UniformScalableTask *mUserTask;
 		RequestType			mRequestType;
 		Barrier				*mWorkerThreadsBarrier;
 		ThreadHandleVec		mWorkerThreads;
@@ -991,6 +1000,8 @@ namespace Ogre {
 			the type name of the SceneManagerFactory which created it.
 		*/
 		virtual const String& getTypeName(void) const = 0;
+
+		size_t getNumWorkerThreads() const							{ return mNumWorkerThreads; }
 
         /** Creates a camera to be managed by this scene manager.
             @remarks
@@ -2949,10 +2960,32 @@ namespace Ogre {
 		void stopWorkerThreads();
 
 	public:
+
+		/** Processes a user-defined UniformScalableTask in the worker threads
+			spawned by SceneManager.
+		@remarks
+			If 'bBlock' is false, it is user responsibility to call
+			waitForPendingUserScalableTask before the next call to either
+			processUserScalableTask or renderOneFrame.
+		@param task
+			Task to perform. Pointer must be valid at least until the task is finished
+		@param bBlock
+			True if you want the function to block until the task is done.
+			False if you want to do something in between, in this case you MUST
+			call waitForPendingUserScalableTask later.
+		*/
+		void processUserScalableTask( UniformScalableTask *task, bool bBlock );
+
+		/** Blocks until the the task from processUserScalableTask finishes.
+		@remarks
+			Do NOT call this function if you passed bBlock = true to processUserScalableTask
+		*/
+		void waitForPendingUserScalableTask();
+
 		/** Called from the worker thread, polls to process frustum culling
 			requests when a sync is performed
 		*/
-		unsigned long _updateCullFrustumThread( ThreadHandle *threadHandle );
+		unsigned long _updateWorkerThread( ThreadHandle *threadHandle );
     };
 
     /** Default implementation of IntersectionSceneQuery. */

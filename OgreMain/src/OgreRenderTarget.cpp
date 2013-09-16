@@ -48,7 +48,6 @@ namespace Ogre {
 		, mHwGamma(false)
 		, mFSAA(0)
     {
-        mTimer = Root::getSingleton().getTimer();
         resetStatistics();
     }
 
@@ -65,14 +64,8 @@ namespace Ogre {
 		//DepthBuffer keeps track of us, avoid a dangling pointer
 		detachDepthBuffer();
 
-
         // Write closing message
-		LogManager::getSingleton().stream(LML_TRIVIAL)
-			<< "Render Target '" << mName << "' "
-			<< "Average FPS: " << mStats.avgFPS << " "
-			<< "Best FPS: " << mStats.bestFPS << " "
-			<< "Worst FPS: " << mStats.worstFPS; 
-
+		LogManager::getSingleton().stream(LML_TRIVIAL) << "Render Target '" << mName << "' ";
     }
 
     const String& RenderTarget::getName(void) const
@@ -165,9 +158,6 @@ namespace Ogre {
         firePostUpdate();
 
 		OgreProfileEndGPUEvent("RenderTarget: " + getName());
-
-        // Update statistics (always on top)
-        updateStats();
 	}
 
 	void RenderTarget::_updateViewportCullPhase01( Viewport* viewport, Camera *camera,
@@ -243,39 +233,9 @@ namespace Ogre {
         mViewportList.clear();
     }
 
-    void RenderTarget::getStatistics(float& lastFPS, float& avgFPS,
-        float& bestFPS, float& worstFPS) const
-    {
-
-        // Note - the will have been updated by the last render
-        lastFPS = mStats.lastFPS;
-        avgFPS = mStats.avgFPS;
-        bestFPS = mStats.bestFPS;
-        worstFPS = mStats.worstFPS;
-
-
-    }
-
     const RenderTarget::FrameStats& RenderTarget::getStatistics(void) const
     {
         return mStats;
-    }
-
-    float RenderTarget::getLastFPS() const
-    {
-        return mStats.lastFPS;
-    }
-    float RenderTarget::getAverageFPS() const
-    {
-        return mStats.avgFPS;
-    }
-    float RenderTarget::getBestFPS() const
-    {
-        return mStats.bestFPS;
-    }
-    float RenderTarget::getWorstFPS() const
-    {
-        return mStats.worstFPS;
     }
 
     size_t RenderTarget::getTriangleCount(void) const
@@ -288,63 +248,10 @@ namespace Ogre {
         return mStats.batchCount;
     }
 
-    float RenderTarget::getBestFrameTime() const
-    {
-        return (float)mStats.bestFrameTime;
-    }
-
-    float RenderTarget::getWorstFrameTime() const
-    {
-        return (float)mStats.worstFrameTime;
-    }
-
     void RenderTarget::resetStatistics(void)
     {
-        mStats.avgFPS = 0.0;
-        mStats.bestFPS = 0.0;
-        mStats.lastFPS = 0.0;
-        mStats.worstFPS = 999.0;
         mStats.triangleCount = 0;
         mStats.batchCount = 0;
-        mStats.bestFrameTime = 999999;
-        mStats.worstFrameTime = 0;
-
-        mLastTime = mTimer->getMilliseconds();
-        mLastSecond = mLastTime;
-        mFrameCount = 0;
-    }
-
-    void RenderTarget::updateStats(void)
-    {
-        ++mFrameCount;
-        unsigned long thisTime = mTimer->getMilliseconds();
-
-        // check frame time
-        unsigned long frameTime = thisTime - mLastTime ;
-        mLastTime = thisTime ;
-
-        mStats.bestFrameTime = std::min(mStats.bestFrameTime, frameTime);
-        mStats.worstFrameTime = std::max(mStats.worstFrameTime, frameTime);
-
-        // check if new second (update only once per second)
-        if (thisTime - mLastSecond > 1000) 
-        { 
-            // new second - not 100% precise
-            mStats.lastFPS = (float)mFrameCount / (float)(thisTime - mLastSecond) * 1000.0f;
-
-            if (mStats.avgFPS == 0)
-                mStats.avgFPS = mStats.lastFPS;
-            else
-                mStats.avgFPS = (mStats.avgFPS + mStats.lastFPS) / 2; // not strictly correct, but good enough
-
-            mStats.bestFPS = std::max(mStats.bestFPS, mStats.lastFPS);
-            mStats.worstFPS = std::min(mStats.worstFPS, mStats.lastFPS);
-
-            mLastSecond = thisTime ;
-            mFrameCount  = 0;
-
-        }
-
     }
 
     void RenderTarget::getCustomAttribute(const String& name, void* pData)
@@ -499,7 +406,8 @@ namespace Ogre {
             << "_" << std::setw(2) << std::setfill('0') << pTime->tm_hour
             << std::setw(2) << std::setfill('0') << pTime->tm_min
             << std::setw(2) << std::setfill('0') << pTime->tm_sec
-            << std::setw(3) << std::setfill('0') << (mTimer->getMilliseconds() % 1000);
+            << std::setw(3) << std::setfill('0') <<
+						(Root::getSingleton().getTimer()->getMilliseconds() % 1000);
         String filename = filenamePrefix + oss.str() + filenameSuffix;
         writeContentsToFile(filename);
         return filename;

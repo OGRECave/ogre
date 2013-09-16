@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgreCamera.h"
 #include "OgreLodStrategy.h"
+#include "OgreSceneManager.h"
 #include "OgreException.h"
 
 namespace Ogre
@@ -59,6 +60,8 @@ namespace Ogre
 				mRemoveOwnIndexData(false)
 	{
 		assert( mInstancesPerBatch );
+
+		mThreadAabbs.resize( mCreator->getSceneManager()->getNumWorkerThreads(), Aabb::BOX_INFINITE );
 
 		//No twin, but we have the same scene type as our creator
 		mLocalObjectMemoryManager._setTwin( mObjectMemoryManager->getMemoryManagerType(), 0 );
@@ -140,19 +143,31 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateBounds(void)
+	void InstanceBatch::_updateEntitiesBoundsThread( size_t threadIdx )
 	{
-		//If this assert triggers, then we did not properly remove ourselves from
-		//the Manager's update list (it's a performance optimization warning)
-		assert( mUnusedEntities.size() != mInstancedEntities.size() );
+		const size_t numWorkerThreads = mThreadAabbs.size();
 
-		//First update all bounds from our objects
+		//Update all bounds from our objects (our share only)
 		ObjectData objData;
-		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+		const size_t totalObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+		//Distribute the work evenly across all threads (not perfect), taking into
+		//account we need to distribute in multiples of ARRAY_PACKED_REALS
+		size_t numObjs	= ( totalObjs + (numWorkerThreads-1) ) / numWorkerThreads;
+		numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+							ARRAY_PACKED_REALS;
+
+		const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+		//Prevent going out of bounds (usually in the last threadIdx, or
+		//when there are less entities than ARRAY_PACKED_REALS
+		numObjs = std::min( numObjs, totalObjs - toAdvance );
+		objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
 		MovableObject::updateAllBounds( numObjs, objData );
 
 		//Now merge the bounds to ours
-		ArrayReal maxWorldRadius = ARRAY_REAL_ZERO;
+		//ArrayReal maxWorldRadius = ARRAY_REAL_ZERO;
 		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
 		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
 
@@ -175,18 +190,41 @@ namespace Ogre
 			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
 			vMaxBounds.CmovRobust( inUse, newVal );
 
-			maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
+			//maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
 
 			objData.advanceDirtyInstanceMgr();
 		}
 
 		//We've been merging and processing in bulks, but we now need to join all simd results
+		//Real maxRadius = Mathlib::ColapseMax( maxWorldRadius );
 		Vector3 vMin = vMinBounds.collapseMin();
 		Vector3 vMax = vMaxBounds.collapseMax();
 
-		Real maxRadius = Mathlib::ColapseMax( maxWorldRadius );
+		//Don't use newFromExtents on purpose because min > max is valid. Because we're
+		//threaded, we might've processed a full chunk of non-visible objects.
+		//Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
+		Aabb aabb;
+		aabb.m_center	= (vMax + vMin) * 0.5f;
+		aabb.m_halfSize	= (vMax - vMin) * 0.5f;
+		mThreadAabbs[threadIdx] = aabb;
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_updateBounds(void)
+	{
+		//If this assert triggers, then we did not properly remove ourselves from
+		//the Manager's update list (it's a performance optimization warning)
+		assert( mUnusedEntities.size() != mInstancedEntities.size() );
 
-		Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
+		//Collect Aabbs from the multiple threads
+		Aabb aabb = Aabb::BOX_NULL;
+		vector<Aabb>::type::const_iterator itor = mThreadAabbs.begin();
+		vector<Aabb>::type::const_iterator end  = mThreadAabbs.end();
+		while( itor != end )
+		{
+			aabb.merge( *itor );
+			++itor;
+		}
+
 		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
 		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 

@@ -109,6 +109,7 @@ set (HEADER_FILES
   include/OgreFileSystem.h
   include/OgreFileSystemLayer.h
   include/OgreFrameListener.h
+  include/OgreFrameStats.h
   include/OgreFrustum.h
   include/OgreGpuProgram.h
   include/OgreGpuProgramManager.h
@@ -703,6 +704,7 @@ set(THREAD_HEADER_FILES
 	include/Threading/OgreThreadHeaders.h
 	include/Threading/OgreThreads.h
 	include/Threading/OgreDefaultWorkQueue.h
+	include/Threading/OgreUniformScalableTask.h
 )
 if (OGRE_THREAD_PROVIDER EQUAL 0)
 	list(APPEND THREAD_HEADER_FILES

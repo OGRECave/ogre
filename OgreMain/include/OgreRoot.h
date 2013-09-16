@@ -53,8 +53,9 @@ namespace Ogre
 	*  @{
 	*/
 
+	class FrameStats;
     typedef vector<RenderSystem*>::type RenderSystemList;
-	
+
     /** The root class of the Ogre system.
         @remarks
             The Ogre::Root class represents a starting point for the client
@@ -112,6 +113,7 @@ namespace Ogre
         PMWorker* mPMWorker;
         PMInjector* mPMInjector;
 
+		FrameStats*	mFrameStats;
         Timer* mTimer;
         RenderWindow* mAutoWindow;
         Profiler* mProfiler;
@@ -498,6 +500,8 @@ namespace Ogre
                 Root, Root::queueEndRendering, Root::startRendering
         */
         bool endRenderingQueued(void);
+
+		const FrameStats* getFrameStats(void) const				{ return mFrameStats; }
 
         /** Starts / restarts the automatic rendering cycle.
             @remarks

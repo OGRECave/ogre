@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreControllerManager.h"
 #include "OgreMath.h"
 #include "OgreRoot.h"
+#include "OgreFrameStats.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
@@ -981,7 +982,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Real AutoParamDataSource::getFPS() const
 	{
-		return mCurrentRenderTarget->getLastFPS();
+		return Root::getSingleton().getFrameStats()->getFps();
 	}
 	//-----------------------------------------------------------------------------
 	Real AutoParamDataSource::getViewportWidth() const

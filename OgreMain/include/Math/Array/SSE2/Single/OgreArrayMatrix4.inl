@@ -509,7 +509,7 @@ namespace Ogre
 		_mm_stream_ps( dst[3]._m+12, m3 );
 	}
 	//-----------------------------------------------------------------------------------
-	inline void ArrayMatrix4::loadFromAoS( Matrix4 * RESTRICT_ALIAS src )
+	inline void ArrayMatrix4::loadFromAoS( const Matrix4 * RESTRICT_ALIAS src )
 	{
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							_mm_load_ps( src[0]._m ), _mm_load_ps( src[1]._m ), 
@@ -533,7 +533,7 @@ namespace Ogre
 							this->m_chunkBase[14], this->m_chunkBase[15] );
 	}
 	//-----------------------------------------------------------------------------------
-	inline void ArrayMatrix4::loadFromAoS( SimpleMatrix4 * RESTRICT_ALIAS src )
+	inline void ArrayMatrix4::loadFromAoS( const SimpleMatrix4 * RESTRICT_ALIAS src )
 	{
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							src[0].m_chunkBase[0], src[1].m_chunkBase[0],

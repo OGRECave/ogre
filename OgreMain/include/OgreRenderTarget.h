@@ -78,12 +78,6 @@ namespace Ogre {
 
         struct FrameStats
         {
-            float lastFPS;
-            float avgFPS;
-            float bestFPS;
-            float worstFPS;
-            unsigned long bestFrameTime;
-            unsigned long worstFrameTime;
             size_t triangleCount;
             size_t batchCount;
         };
@@ -192,52 +186,7 @@ namespace Ogre {
         */
         virtual void removeAllViewports(void);
 
-        /** Retieves details of current rendering performance.
-            @remarks
-                If the user application wishes to do it's own performance
-                display, or use performance for some other means, this
-                method allows it to retrieve the statistics.
-                @param
-                    lastFPS Pointer to a float to receive the number of frames per second (FPS)
-                    based on the last frame rendered.
-                @param
-                    avgFPS Pointer to a float to receive the FPS rating based on an average of all
-                    the frames rendered since rendering began (the call to
-                    Root::startRendering).
-                @param
-                    bestFPS Pointer to a float to receive the best FPS rating that has been achieved
-                    since rendering began.
-                @param
-                    worstFPS Pointer to a float to receive the worst FPS rating seen so far.
-        */
-        virtual void getStatistics(float& lastFPS, float& avgFPS,
-            float& bestFPS, float& worstFPS) const;  // Access to stats
-
         virtual const FrameStats& getStatistics(void) const;
-
-        /** Individual stats access - gets the number of frames per second (FPS) based on the last frame rendered.
-        */
-        virtual float getLastFPS() const;
-
-        /** Individual stats access - gets the average frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getAverageFPS() const;
-
-        /** Individual stats access - gets the best frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getBestFPS() const;
-
-        /** Individual stats access - gets the worst frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getWorstFPS() const;
-
-        /** Individual stats access - gets the best frame time
-        */
-        virtual float getBestFrameTime() const;
-
-        /** Individual stats access - gets the worst frame time
-        */
-        virtual float getWorstFrameTime() const;
 
         /** Resets saved frame-rate statistices.
         */
@@ -415,11 +364,6 @@ namespace Ogre {
 
         // Stats
 		FrameStats mStats;
-        
-        Timer* mTimer ;
-        unsigned long mLastSecond;
-        unsigned long mLastTime;
-        size_t mFrameCount;
 
         bool mActive;
 		// Hardware sRGB gamma conversion done on write?
@@ -427,8 +371,6 @@ namespace Ogre {
 		// FSAA performed?
 		uint mFSAA;
 		String mFSAAHint;
-
-        void updateStats(void);
 
 		typedef vector<Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order
