@@ -472,7 +472,6 @@ namespace Ogre
             (dst2) = _mm_shuffle_ps(tmp2, tmp3, 0x88);              \
             (dst3) = _mm_shuffle_ps(tmp2, tmp3, 0xDD);              \
         }
-		//ArrayMatrix4 * RESTRICT_ALIAS dst = reinterpret_cast<ArrayMatrix4 * RESTRICT_ALIAS>( _dst );
 		register ArrayReal m0, m1, m2, m3;
 
 		_MM_TRANSPOSE4_SRC_DST_PS(

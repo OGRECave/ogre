@@ -123,9 +123,9 @@ namespace Ogre {
 		<b>When to use INSTANCING_CULLING_THREADED?</b>
 		If your scene makes intensive use of HW Basic and/or HW VTF instancing techniques. Note
 		that threaded culling is performed in STATIC_SCENE instances too.
-		The most advantage is seen when doing many PASS_SCENE, which require frustum culling
-		multiple times per frame (eg. pssm shadows, multiple light sources with shadows, very
-		advanced compositing)
+		The most advantage is seen when the instances per batch is very high and when doing many
+		PASS_SCENE, which require frustum culling multiple times per frame (eg. pssm shadows,
+		multiple light sources with shadows, very advanced compositing, etc)
 
 		Note that you can switch between methods at any time at runtime.
 	*/

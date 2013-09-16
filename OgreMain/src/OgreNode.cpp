@@ -174,6 +174,9 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Node::_updateFromParent(void)
 	{
+		if( mParent )
+			_updateFromParent();
+
 		updateFromParentImpl();
 
 		// Call listener (note, this method only called if there's something to do)
@@ -185,51 +188,41 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::updateFromParentImpl(void)
     {
-		if( mParent )
+		//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+		ArrayVector3 parentPos, parentScale;
+		ArrayQuaternion parentRot;
+
+		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 		{
-			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
-			ArrayVector3 parentPos, parentScale;
-			ArrayQuaternion parentRot;
+			Vector3 pos, scale;
+			Quaternion qRot;
+			const Transform &parentTransform = mTransform.mParents[j]->mTransform;
+			parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
+			parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
+			parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
 
-			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-			{
-				Vector3 pos, scale;
-				Quaternion qRot;
-				const Transform &parentTransform = mTransform.mParents[j]->mTransform;
-				parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
-				parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
-				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
-
-				parentPos.setFromVector3( pos, j );
-				parentRot.setFromQuaternion( qRot, j );
-				parentScale.setFromVector3( scale, j );
-			}
-
-			parentRot.Cmov4( BooleanMask4::getMask( mTransform.mInheritOrientation ),
-							 ArrayQuaternion::IDENTITY );
-			parentScale.Cmov4( BooleanMask4::getMask( mTransform.mInheritScale ),
-								ArrayVector3::UNIT_SCALE );
-
-			// Scale own position by parent scale, NB just combine
-            // as equivalent axes, no shearing
-            *mTransform.mDerivedScale = parentScale * (*mTransform.mScale);
-
-			// Combine orientation with that of parent
-			*mTransform.mDerivedOrientation = parentRot * (*mTransform.mOrientation);
-
-			// Change position vector based on parent's orientation & scale
-			*mTransform.mDerivedPosition = parentRot * (parentScale * (*mTransform.mPosition));
-
-			// Add altered position vector to parents
-			*mTransform.mDerivedPosition += parentPos;
+			parentPos.setFromVector3( pos, j );
+			parentRot.setFromQuaternion( qRot, j );
+			parentScale.setFromVector3( scale, j );
 		}
-		else
-		{
-			// Root node, no parent
-			*mTransform.mDerivedPosition	= ArrayVector3::ZERO;
-			*mTransform.mDerivedOrientation	= ArrayQuaternion::IDENTITY;
-			*mTransform.mDerivedScale		= ArrayVector3::UNIT_SCALE;
-		}
+
+		parentRot.Cmov4( BooleanMask4::getMask( mTransform.mInheritOrientation ),
+						 ArrayQuaternion::IDENTITY );
+		parentScale.Cmov4( BooleanMask4::getMask( mTransform.mInheritScale ),
+							ArrayVector3::UNIT_SCALE );
+
+		// Scale own position by parent scale, NB just combine
+        // as equivalent axes, no shearing
+        *mTransform.mDerivedScale = parentScale * (*mTransform.mScale);
+
+		// Combine orientation with that of parent
+		*mTransform.mDerivedOrientation = parentRot * (*mTransform.mOrientation);
+
+		// Change position vector based on parent's orientation & scale
+		*mTransform.mDerivedPosition = parentRot * (parentScale * (*mTransform.mPosition));
+
+		// Add altered position vector to parents
+		*mTransform.mDerivedPosition += parentPos;
 
 		ArrayMatrix4 derivedTransform;
 		derivedTransform.makeTransform( *mTransform.mDerivedPosition,
