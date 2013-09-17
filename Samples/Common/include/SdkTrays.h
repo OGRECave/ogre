@@ -818,7 +818,7 @@ namespace OgreBites
 				nukeOverlayElement(mItemElements.back());
 				mItemElements.pop_back();
 			}
-			if(mSelectionIndex == index){
+			if((size_t)mSelectionIndex == index){
 				if(index < mItems.size()) {
 					// update the text of the menu
 					selectItem(index);

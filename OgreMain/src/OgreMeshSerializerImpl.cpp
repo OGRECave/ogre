@@ -674,7 +674,7 @@ namespace Ogre {
 			// We don't know the source type if it's VET_COLOUR, but assume ARGB
 			// since that's the most common. Won't get used unless the mesh is
 			// ambiguous anyway, which will have been warned about in the log
-			dest->convertPackedColour(VET_COLOUR_ARGB, 
+			dest->convertPackedColour(VET_COLOUR_ARGB,
 				VertexElement::getBestColourVertexElementType());
 		}
     }
@@ -1234,7 +1234,7 @@ namespace Ogre {
 		writeInts(&indexStart, 1);
 		writeInts(&bufferIndex, 1);
 
-		if(bufferIndex == -1) { // It has its own buffer (Not compressed).
+		if(bufferIndex == (unsigned int)-1) { // It has its own buffer (Not compressed).
 			bool is32BitIndices = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
 			writeBools(&is32BitIndices, 1);
 
@@ -1280,7 +1280,7 @@ namespace Ogre {
 		size += sizeof(unsigned int); // unsigned int indexData->indexCount;
 		size += sizeof(unsigned int); // unsigned int indexData->indexStart;
 		size += sizeof(unsigned int); // unsigned int bufferIndex;
-		if(bufferIndex == -1) {
+		if(bufferIndex == (unsigned int)-1) {
 			size += sizeof(bool); // bool indexes32Bit
 			size += sizeof(unsigned int); // unsigned int ibuf->getNumIndexes()
 			size += ibuf.isNull() ? 0 : static_cast<unsigned long>(ibuf->getIndexSize() * ibuf->getNumIndexes()); // faces

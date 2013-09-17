@@ -118,7 +118,7 @@ void ProgressiveMeshGenerator::tuneContainerSize()
 		const SubMesh* submesh = mMesh->getSubMesh(i);
 		if (!submesh->useSharedVertices) {
 			size_t count = submesh->vertexData->vertexCount;
-			vertexLookupSize = std::max(vertexLookupSize, count);
+			vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
 			vertexCount += count;
 		} else if (!sharedVerticesAdded) {
 			sharedVerticesAdded = true;
@@ -224,8 +224,8 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 	lookup.clear();
 
 	HardwareVertexBufferSharedPtr vNormalBuf;
-	unsigned char* vNormal;
-	int vNormSize;
+	unsigned char* vNormal = NULL;
+	int vNormSize = NULL;
 	const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 	
 	mUseVertexNormals &= (elemNormal != NULL);
@@ -693,7 +693,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 					// the edges are opposite each other, therefore less kinkiness
 					// Scale into [0..1]
 					Real kinkiness = otherBorderEdge.dotProduct(collapseEdge);
-					cost = std::max(cost, kinkiness);
+					cost = std::max<Real>(cost, kinkiness);
 				}
 			}
 			cost = (1.002f + cost) * 0.5f;
@@ -720,7 +720,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 					Real dotprod = triangle->normal.dotProduct(triangle2->normal);
 					// NB we do (1-..) to invert curvature where 1 is high curvature [0..1]
 					// Whilst dot product is high when angle difference is low
-					mincurv = std::max(mincurv, dotprod);
+					mincurv = std::max<Real>(mincurv, dotprod);
 				}
 			}
 			cost = std::min(cost, mincurv);
@@ -731,7 +731,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 	// check for texture seam ripping and multiple submeshes
 	if (src->seam) {
 		if (!dst->seam) {
-			cost = std::max(cost, (Real)0.05f);
+			cost = std::max<Real>(cost, (Real)0.05f);
 			cost *= 64;
 		} else {
 #ifdef PM_BEST_QUALITY
@@ -749,14 +749,14 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 				}
 			}
 			if(seamNeighbors != 2 || (seamNeighbors == 2 && dst->edges.has(PMEdge(otherSeam)))) {
-				cost = std::max(cost, (Real)0.05f);
+				cost = std::max<Real>(cost, (Real)0.05f);
 				cost *= 64;
 			} else {
-				cost = std::max(cost, (Real)0.005f);
+				cost = std::max<Real>(cost, (Real)0.005f);
 				cost *= 8;
 			}
 #else
-			cost = std::max(cost, (Real)0.005f);
+			cost = std::max<Real>(cost, (Real)0.005f);
 			cost *= 8;
 #endif
 			
@@ -777,15 +777,15 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 			Real afterDist = neighbor->position.distance(dst->position);
 			Real beforeDot = neighbor->normal.dotProduct(src->normal);
 			Real afterDot = neighbor->normal.dotProduct(dst->normal);
-			normalCost = std::max(normalCost, std::max(diff, std::abs(beforeDot - afterDot)) * std::max((Real)(afterDist/8.0), std::max(dist, std::abs(beforeDist - afterDist))));
+			normalCost = std::max<Real>(normalCost, std::max<Real>(diff, std::abs(beforeDot - afterDot)) * std::max<Real>((Real)(afterDist/8.0), std::max<Real>(dist, std::abs(beforeDist - afterDist))));
 		}
-		cost = std::max(normalCost * 0.25f, cost);
+		cost = std::max<Real>(normalCost * 0.25f, cost);
 	}
 
 	if(src->isOuterWallVertex || dst->isOuterWallVertex) {
 		if(mOutsideWeight != 0.0f) {
 			if(mOutsideWeight != 1.0f) {
-				cost *= std::max(0.0078125f, mOutsideWeight * 8.0f);
+				cost *= std::max<Real>(0.0078125f, mOutsideWeight * 8.0f);
 			} else {
 				return NEVER_COLLAPSE_COST;
 			}
@@ -1266,8 +1266,8 @@ void ProgressiveMeshGenerator::bakeMergedLods(bool firstBufferPass)
 			//The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
 			//This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
 			//ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-			indexCount = std::max(indexCount, 3);
-			prevLod->indexCount = std::max(mIndexBufferInfoList[i].prevIndexCount, 3u);
+			indexCount = std::max<size_t>(indexCount, 3);
+			prevLod->indexCount = std::max<size_t>(mIndexBufferInfoList[i].prevIndexCount, 3u);
 
 			prevLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 				mIndexBufferInfoList[i].indexSize == 2 ?

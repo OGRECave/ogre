@@ -406,10 +406,10 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 	FileInfo& info = locPtr->at(0);
 
 	outPath = info.archive->getName();
-	if(outPath.back() != '/' && outPath.back() != '\\')
+	if(!outPath.empty() && outPath[outPath.size()-1] != '/' && outPath[outPath.size()-1] != '\\')
 		outPath += '/';
 	outPath += info.path;
-	if(outPath.back() != '/' && outPath.back() != '\\')
+	if(!outPath.empty() && outPath[outPath.size()-1] != '/' && outPath[outPath.size()-1] != '\\')
 		outPath += '/';
 	outPath += info.filename;
 

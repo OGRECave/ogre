@@ -152,7 +152,7 @@ void PMWorker::tuneContainerSize()
 		const PMGenRequest::SubmeshInfo& submesh = mRequest->submesh[i];
 		if (!submesh.useSharedVertexBuffer) {
 			size_t count = submesh.vertexBuffer.vertexCount;
-			vertexLookupSize = std::max(vertexLookupSize, count);
+			vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
 			vertexCount += count;
 		} else if (!sharedVerticesAdded) {
 			sharedVerticesAdded = true;
@@ -388,8 +388,8 @@ void PMWorker::bakeMergedLods(bool firstBufferPass)
 			//The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
 			//This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
 			//ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-			indexCount = std::max(indexCount, 3);
-			prevLod.indexCount = std::max(mIndexBufferInfoList[i].prevIndexCount, 3u);
+			indexCount = std::max<size_t>(indexCount, 3);
+			prevLod.indexCount = std::max<size_t>(mIndexBufferInfoList[i].prevIndexCount, 3u);
 			prevLod.indexBufferSize = indexCount;
 			prevLod.indexBuffer = new unsigned char[indexCount * mIndexBufferInfoList[i].indexSize];
 			mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer;
@@ -518,16 +518,15 @@ void PMInjector::inject(PMGenRequest* request)
 	unsigned short submeshCount = request->submesh.size();
 	OgreAssert(mesh->getNumSubMeshes() == submeshCount, "");
 	mesh->removeLodLevels();
-	for (unsigned short i = 0; i < submeshCount; i++) {
-		SubMesh::LODFaceList& lods = mesh->getSubMesh(i)->mLodFaceList;
+	for (unsigned short submeshID = 0; submeshID < submeshCount; submeshID++) {
+		SubMesh::LODFaceList& lods = mesh->getSubMesh(submeshID)->mLodFaceList;
 		typedef vector<PMGenRequest::IndexBuffer>::type GenBuffers;
-		GenBuffers& buffers = request->submesh[i].genIndexBuffers;
-		
+		GenBuffers& buffers = request->submesh[submeshID].genIndexBuffers;
+
 		int buffCount = buffers.size();
 		for (int i=0; i<buffCount;i++) {
 			PMGenRequest::IndexBuffer& buff = buffers[i];
 			int indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
-			OgreAssert(buff.indexCount >= 0, "");
 			lods.push_back(OGRE_NEW IndexData());
 			lods.back()->indexStart = buff.indexStart;
 			lods.back()->indexCount = buff.indexCount;
@@ -597,9 +596,9 @@ void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenReq
 
 		const VertexElement* elemNormal = 0;
 		HardwareVertexBufferSharedPtr vNormalBuf;
-		unsigned char* vNormal;
-		Vector3* pNormalOut;
-		int vNormalSize;
+		unsigned char* vNormal = NULL;
+		Vector3* pNormalOut = NULL;
+		int vNormalSize = 0;
 		bool& useVertexNormals = config.advanced.useVertexNormals;
 
 		if(useVertexNormals) {

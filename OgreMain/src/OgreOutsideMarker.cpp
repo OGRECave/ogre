@@ -36,9 +36,9 @@ namespace Ogre
 {
 
 OutsideMarker::OutsideMarker(ProgressiveMeshGenerator::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle, int step) :
+	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0), // How much floating point math error you have for equal values. This may depend on compiler flags.
 	mVertexListOrig(vertexList),
 	mWalkAngle(walkAngle),
-	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0), // How much floating point math error you have for equal values. This may depend on compiler flags.
 	mStep(step)
 {
 	assert(!vertexList.empty());
@@ -82,7 +82,7 @@ void OutsideMarker::initHull()
 		v->isInsideHull = false;
 	}
 	// We need to find 4 vertices, which are on the convex hull to start the algorithm.
-	CHVertex* vertex[4] = { nullptr, nullptr, nullptr, nullptr };
+	CHVertex* vertex[4] = { NULL, NULL, NULL, NULL };
 
 	{
 		// Get 1. vertex: minimum y vertex
@@ -196,7 +196,7 @@ Real OutsideMarker::getTetrahedronVolume(CHVertex* a, CHVertex* b, CHVertex* c, 
 OutsideMarker::CHVertex* OutsideMarker::getFurthestVertex(CHTriangle* tri)
 {
 	// Find the furthest vertex from triangle plane towards the facing direction.
-	CHVertex* furthestVertex = nullptr;
+	CHVertex* furthestVertex = NULL;
 	Real furthestDistance = 0;
 	Plane plane(tri->normal, -tri->normal.dotProduct(tri->vertex[0]->position));
 	plane.normalise();
@@ -467,12 +467,12 @@ Ogre::MeshPtr OutsideMarker::createConvexHullMesh(const String& meshName, const 
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
-			minBounds.x = std::min(minBounds.x, mHull[i].vertex[n]->position.x);
-			minBounds.y = std::min(minBounds.y, mHull[i].vertex[n]->position.y);
-			minBounds.z = std::min(minBounds.z, mHull[i].vertex[n]->position.z);
-			maxBounds.x = std::max(maxBounds.x, mHull[i].vertex[n]->position.x);
-			maxBounds.y = std::max(maxBounds.y, mHull[i].vertex[n]->position.y);
-			maxBounds.z = std::max(maxBounds.z, mHull[i].vertex[n]->position.z);
+			minBounds.x = std::min<Real>(minBounds.x, mHull[i].vertex[n]->position.x);
+			minBounds.y = std::min<Real>(minBounds.y, mHull[i].vertex[n]->position.y);
+			minBounds.z = std::min<Real>(minBounds.z, mHull[i].vertex[n]->position.z);
+			maxBounds.x = std::max<Real>(maxBounds.x, mHull[i].vertex[n]->position.x);
+			maxBounds.y = std::max<Real>(maxBounds.y, mHull[i].vertex[n]->position.y);
+			maxBounds.z = std::max<Real>(maxBounds.z, mHull[i].vertex[n]->position.z);
 		}
 	}
 
