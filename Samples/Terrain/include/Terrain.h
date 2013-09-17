@@ -243,7 +243,6 @@ public:
 				mHeightUpdateCountDown = 0;
 
 			}
-
 		}
 
 		if (mTerrainGroup->isDerivedDataUpdateInProgress())
@@ -407,8 +406,6 @@ protected:
 	typedef std::list<Entity*> EntityList;
 	EntityList mHouseList;
 
-
-
 	void defineTerrain(long x, long y, bool flat = false)
 	{
 		// if a file is available, use it
@@ -435,7 +432,6 @@ protected:
 				mTerrainGroup->defineTerrain(x, y, &img);
 				mTerrainsImported = true;
 			}
-
 		}
 	}
 
@@ -446,7 +442,6 @@ protected:
 			img.flipAroundY();
 		if (flipY)
 			img.flipAroundX();
-
 	}
 
 	void initBlendMaps(Terrain* terrain)
@@ -492,7 +487,6 @@ protected:
 			terrain->getGlobalColourMap()->loadImage(colourMap);
 		}
 		*/
-
 	}
 
 	void configureTerrainDefaults(Light* l)
@@ -531,16 +525,14 @@ protected:
 		// textures
 		defaultimp.layerList.resize(3);
 		defaultimp.layerList[0].worldSize = 100;
-		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular2.dds");
-		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight2.dds");
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
 		defaultimp.layerList[1].worldSize = 30;
-		defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular2.dds");
-		defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight2.dds");
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
 		defaultimp.layerList[2].worldSize = 200;
-		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular2.dds");
-		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight2.dds");
-
-
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 	}
 
 	void addTextureDebugOverlay(TrayLocation loc, TexturePtr tex, size_t i)
@@ -580,7 +572,6 @@ protected:
 			w = mTrayMgr->createDecorWidget(loc, widgetName, "Ogre/DebugTexOverlay");
 		}
 		w->getOverlayElement()->setMaterialName(matName);
-
 	}
 
 	void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
@@ -589,9 +580,7 @@ protected:
 		{
 			TexturePtr shadowTex = mSceneMgr->getShadowTexture(i);
 			addTextureDebugOverlay(loc, shadowTex, i);
-
 		}
-
 	}
 		
 	MaterialPtr buildDepthShadowMaterial(const String& textureName)
@@ -614,8 +603,6 @@ protected:
 				splitPoints[i] = splitPointList[i];
 			}
 			p->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
-
-
 		}
 
 		return ret;
@@ -663,7 +650,6 @@ protected:
 				pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
 				mPSSMSetup.bind(pssmSetup);
-
 			}
 			mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 
@@ -681,7 +667,6 @@ protected:
 				{
 					(*i)->setMaterial(houseMat);
 				}
-
 			}
 			else
 			{
@@ -698,8 +683,6 @@ protected:
 			matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
 
 			//addTextureShadowDebugOverlay(TL_RIGHT, 3);
-
-
 		}
 		else
 		{
@@ -792,7 +775,6 @@ protected:
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
-
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
 		l->setDirection(lightdir);
@@ -800,7 +782,6 @@ protected:
 		l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
 
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
-
 
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
@@ -839,8 +820,6 @@ protected:
 
 		mTerrainGroup->freeTemporaryResources();
 
-
-
 		// create a few entities on the terrain
 		Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
 		Vector3 entPos(mTerrainPos.x + 2043, 0, mTerrainPos.z + 1715);
@@ -870,7 +849,7 @@ protected:
 		sn->attachObject(e);
 		mHouseList.push_back(e);
 
-		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
 
 
 	}

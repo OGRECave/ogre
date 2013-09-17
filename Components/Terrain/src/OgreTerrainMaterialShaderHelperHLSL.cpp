@@ -177,14 +177,14 @@ namespace Ogre
 			outStream << "float2 delta  : TEXCOORD1,\n"; // lodDelta, lodThreshold
 
 		outStream << 
-			"uniform float4x4 worldMatrix,\n"
-			"uniform float4x4 viewProjMatrix,\n"
+			"uniform matrix worldMatrix,\n"
+			"uniform matrix viewProjMatrix,\n"
 			"uniform float2   lodMorph,\n"; // morph amount, morph LOD target
 
 		if (compression)
 		{
 			outStream << 
-				"uniform float4x4   posIndexToObjectSpace,\n"
+				"uniform matrix   posIndexToObjectSpace,\n"
 				"uniform float    baseUVScale,\n";
 		}
 
@@ -332,7 +332,7 @@ namespace Ogre
 		for (uint i = 0; i < numTextures; ++i)
 		{
 			outStream <<
-				", uniform float4x4 texViewProjMatrix" << i << " \n";
+				", uniform matrix texViewProjMatrix" << i << " \n";
 			if (prof->getReceiveDynamicShadowsDepth())
 			{
 				outStream << 
@@ -540,7 +540,7 @@ namespace Ogre
 			"	float shadow = 1.0;\n"
 			"	float2 uv = input.oUVMisc.xy;\n"
 			// base colour
-			"	outputCol = float4(0,0,0,1);\n";
+			"	outputCol = float4(0.0,0.0,0.0,1.0);\n";
 
 		if (tt != LOW_LOD)
 		{

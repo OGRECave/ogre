@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreShadowCameraSetupPSSM.h"
+#include <fstream>
+#include <string>
 
 namespace Ogre
 {
@@ -97,7 +99,7 @@ namespace Ogre
         {
             mShaderLanguage = "glsles";
         }
-		if (hmgr.isLanguageSupported("cg"))
+		else if (hmgr.isLanguageSupported("cg"))
         {
             mShaderLanguage = "cg";
         }
@@ -470,14 +472,46 @@ namespace Ogre
 		HighLevelGpuProgramPtr ret = createVertexProgram(prof, terrain, tt);
 
 		StringUtil::StrStreamType sourceStr;
-		generateVertexProgramSource(prof, terrain, tt, sourceStr);
-		ret->setSource(sourceStr.str());
-		ret->load();
-		defaultVpParams(prof, terrain, tt, ret);
+		
+		static unsigned int count = 0;
+		StringStream progName;
+		progName << "vertex" << count++;
+		switch(tt)
+		{
+		case HIGH_LOD:
+			progName << "hlod.hlsl";
+			break;
+		case LOW_LOD:
+			progName << "llod.hlsl";
+			break;
+		case RENDER_COMPOSITE_MAP:
+			progName << "comp.hlsl";
+			break;
+		}
+
+		std::ifstream f(progName.str());
+		if (f.good()) {
+		  std::string content( (std::istreambuf_iterator<char>(f) ),
+                        (std::istreambuf_iterator<char>()    ) );
+		  sourceStr << content;
+		} else {
+			f.close();
+			generateVertexProgramSource(prof, terrain, tt, sourceStr);
+			std::ofstream ofs(progName.str());
+			//std::string content( (std::istreambuf_iterator<char>(ifs) ),
+			//               (std::istreambuf_iterator<char>()    ) );
+			ofs << sourceStr.str();
+			ofs.close();
 #if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Vertex Program: " 
 			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
 #endif
+		}
+
+		ret->setSource(sourceStr.str());
+
+		ret->load();
+		defaultVpParams(prof, terrain, tt, ret);
 
 		return ret;
 
@@ -490,15 +524,46 @@ namespace Ogre
 		HighLevelGpuProgramPtr ret = createFragmentProgram(prof, terrain, tt);
 
 		StringUtil::StrStreamType sourceStr;
-		generateFragmentProgramSource(prof, terrain, tt, sourceStr);
-		ret->setSource(sourceStr.str());
-		ret->load();
-		defaultFpParams(prof, terrain, tt, ret);
+		
+		static unsigned int count = 0;
+		StringStream progName;
+		progName << "fragment" << count++;
+		switch(tt)
+		{
+		case HIGH_LOD:
+			progName << "hlod.hlsl";
+			break;
+		case LOW_LOD:
+			progName << "llod.hlsl";
+			break;
+		case RENDER_COMPOSITE_MAP:
+			progName << "comp.hlsl";
+			break;
+		}
 
+		std::ifstream f(progName.str());
+		if (f.good()) {
+		  std::string content( (std::istreambuf_iterator<char>(f) ),
+                        (std::istreambuf_iterator<char>()    ) );
+		  sourceStr << content;
+		} else {
+			f.close();
+			generateFragmentProgramSource(prof, terrain, tt, sourceStr);
+			std::ofstream ofs(progName.str());
+			//std::string content( (std::istreambuf_iterator<char>(ifs) ),
+			//               (std::istreambuf_iterator<char>()    ) );
+			ofs << sourceStr.str();
+			ofs.close();			
 #if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Fragment Program: " 
-			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
+			<< ret->getName() << " ***\n" << ret->getSource() << "\n*** " << progName.str() << "  ***";
 #endif
+		}
+
+		ret->setSource(sourceStr.str());
+
+		ret->load();
+		defaultFpParams(prof, terrain, tt, ret);
 
 		return ret;
 	}
