@@ -272,7 +272,7 @@ namespace Ogre
 	void CompositorShadowNode::mergeReceiversBoxes( Camera* camera )
 	{
 		SceneManager *sceneManager = camera->getSceneManager();
-		const AxisAlignedBoxVec &boxesVec = sceneManager->getReceiversBoxPerRq( camera );
+		const AxisAlignedBoxVec &boxesVec = camera->getReceiversBoxPerRenderQueue();
 
 		mReceiverBox.setNull();
 

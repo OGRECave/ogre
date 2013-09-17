@@ -507,10 +507,8 @@ namespace Ogre {
         Viewport* mCurrentViewport;
 
 		typedef vector<AxisAlignedBoxVec>::type ReceiversBoxPerThread;
-		typedef map<const Camera*, AxisAlignedBoxVec>::type ReceiversBoxRqMap;
 
 		CompositorShadowNode*	mCurrentShadowNode;
-		ReceiversBoxRqMap		mReceiversBoxPerRenderQueue; //mReceiversBoxPerRenderQueue[camera][rqId]
 		/// Used to calculate the bounds in different threads, then merged into mReceiversBoxPerRenderQueue
 		ReceiversBoxPerThread	mReceiversBoxPerThread;
 
@@ -2945,12 +2943,6 @@ namespace Ogre {
 		/** Gets the current camera being rendered (advanced use only, only 
 			valid during viewport update. */
 		Camera* getCameraInProgress(void) const		{ return mCameraInProgress; }
-
-		/** Returns the bounding box of culled receivers from all render queues for a given camera
-		@remarks
-			Assumes a VisibleObjectsBoundsInfoVec exists for the given camera
-		*/
-		const AxisAlignedBoxVec& getReceiversBoxPerRq( const Camera* camera ) const;
 
 		/** Returns a visibility boundary box of culled receivers
 			calculated with the active shadow node (already merged with the right

@@ -317,9 +317,6 @@ Camera* SceneManager::createCamera( const String &name )
 	c->setName( name );
 	mCamerasByName[name] = c;
 
-	// create visible bounds aab map entry
-	mReceiversBoxPerRenderQueue[c] = AxisAlignedBoxVec();
-
     return c;
 }
 //-----------------------------------------------------------------------
@@ -342,13 +339,6 @@ void SceneManager::destroyCamera(Camera *cam)
 
 	// Find in list
 	CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
-
-	{
-		// Remove visible boundary AAB entry
-		ReceiversBoxRqMap::iterator it = mReceiversBoxPerRenderQueue.find( cam );
-		if( it != mReceiversBoxPerRenderQueue.end() )
-			mReceiversBoxPerRenderQueue.erase( it );
-	}
 
 	IdString camName( cam->getName() );
 
@@ -3927,11 +3917,11 @@ void SceneManager::resetScissor()
 //---------------------------------------------------------------------
 void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq )
 {
-	ReceiversBoxRqMap::iterator boundsIt = mReceiversBoxPerRenderQueue.find( camera );
-	if( boundsIt->second.size() < lastRq )
-		boundsIt->second.resize( lastRq );
+	AxisAlignedBoxVec &boxes = camera->_getReceiversBoxPerRenderQueue();
+	if( boxes.size() < lastRq )
+		boxes.resize( lastRq );
 	for( size_t i=firstRq; i<lastRq; ++i )
-		boundsIt->second[i].setNull();
+		boxes[i].setNull();
 
 	ReceiversBoxPerThread::const_iterator it = mReceiversBoxPerThread.begin();
 	ReceiversBoxPerThread::const_iterator en = mReceiversBoxPerThread.end();
@@ -3939,16 +3929,10 @@ void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 fi
 	{
 		const AxisAlignedBoxVec &threadInfo = *it;
 		for( size_t i=firstRq; i<lastRq; ++i )
-		{
-			boundsIt->second[i].merge( threadInfo[i] );
-		}
+			boxes[i].merge( threadInfo[i] );
+
 		++it;
 	}
-}
-//---------------------------------------------------------------------
-const AxisAlignedBoxVec& SceneManager::getReceiversBoxPerRq( const Camera* camera ) const
-{
-	return mReceiversBoxPerRenderQueue.find( camera )->second;
 }
 //---------------------------------------------------------------------
 const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
