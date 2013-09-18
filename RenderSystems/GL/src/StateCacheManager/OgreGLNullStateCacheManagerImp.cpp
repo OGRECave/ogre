@@ -499,4 +499,10 @@ namespace Ogre {
     {
         glDisable(type);
     }
+
+    void GLStateCacheManagerImp::setPolygonMode(GLenum mode)
+    {
+        mPolygonMode = mode;
+        glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode);
+    }
 }

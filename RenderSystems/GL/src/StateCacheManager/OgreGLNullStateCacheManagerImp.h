@@ -181,7 +181,7 @@ namespace Ogre
         GLenum getPolygonMode(void) const { return mPolygonMode; }
         
         /// See GLStateCacheManager.setPolygonMode.
-        void setPolygonMode(GLenum mode) { mPolygonMode = mode; }
+        void setPolygonMode(GLenum mode);
         
         /// See GLStateCacheManager.getCullFace.
         GLenum getCullFace(void) const { return mCullFace; }
