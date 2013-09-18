@@ -1192,6 +1192,7 @@ bail:
 			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE_3D);
 			rsc->setCapability(RSC_TEXTURE_1D);
 			rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+			rsc->setCapability(RSC_COMPLETE_TEXTURE_BINDING);
 		}
 
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);

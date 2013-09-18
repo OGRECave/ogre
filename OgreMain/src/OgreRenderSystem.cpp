@@ -319,7 +319,8 @@ namespace Ogre {
         const TexturePtr& tex = tl._getTexturePtr();
 		bool isValidBinding = false;
 
-		_setBindingType(tl.getBindingType());
+		if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
+			_setBindingType(tl.getBindingType());
 
 		// Vertex texture binding?
 		if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
