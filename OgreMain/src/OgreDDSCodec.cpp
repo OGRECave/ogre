@@ -458,7 +458,7 @@ namespace Ogre {
 			PixelFormat pf = static_cast<PixelFormat>(i);
 			if (PixelUtil::getNumElemBits(pf) == rgbBits)
 			{
-				uint32 testMasks[4];
+				uint64 testMasks[4];
 				PixelUtil::getBitMasks(pf, testMasks);
 				int testBits[4];
 				PixelUtil::getBitDepths(pf, testBits);
@@ -558,11 +558,11 @@ namespace Ogre {
 		const DXTInterpolatedAlphaBlock& block, ColourValue* pCol) const
 	{
 		// 8 derived alpha values to be indexed
-		Real derivedAlphas[8];
+		float derivedAlphas[8];
 
 		// Explicit extremes
-		derivedAlphas[0] = block.alpha_0 / (Real)0xFF;
-		derivedAlphas[1] = block.alpha_1 / (Real)0xFF;
+		derivedAlphas[0] = block.alpha_0 / (float)0xFF;
+		derivedAlphas[1] = block.alpha_1 / (float)0xFF;
 		
 		
 		if (block.alpha_0 <= block.alpha_1)
@@ -571,11 +571,11 @@ namespace Ogre {
 			// full range including extremes at [0] and [5]
 			// we want to fill in [1] through [4] at weights ranging
 			// from 1/5 to 4/5
-			Real denom = 1.0f / 5.0f;
+			float denom = 1.0f / 5.0f;
 			for (size_t i = 0; i < 4; ++i) 
 			{
-				Real factor0 = (4 - i) * denom;
-				Real factor1 = (i + 1) * denom;
+				float factor0 = (4 - i) * denom;
+				float factor1 = (i + 1) * denom;
 				derivedAlphas[i + 2] = 
 					(factor0 * block.alpha_0) + (factor1 * block.alpha_1);
 			}
@@ -589,11 +589,11 @@ namespace Ogre {
 			// full range including extremes at [0] and [7]
 			// we want to fill in [1] through [6] at weights ranging
 			// from 1/7 to 6/7
-			Real denom = 1.0f / 7.0f;
+			float denom = 1.0f / 7.0f;
 			for (size_t i = 0; i < 6; ++i) 
 			{
-				Real factor0 = (6 - i) * denom;
-				Real factor1 = (i + 1) * denom;
+				float factor0 = (6 - i) * denom;
+				float factor1 = (i + 1) * denom;
 				derivedAlphas[i + 2] = 
 					(factor0 * block.alpha_0) + (factor1 * block.alpha_1);
 			}
@@ -601,10 +601,10 @@ namespace Ogre {
 		}
 
 		// Ok, now we've built the reference values, process the indexes
-		for (size_t i = 0; i < 16; ++i)
+		for (uint8 i = 0; i < 16; ++i)
 		{
-			size_t baseByte = (i * 3) / 8;
-			size_t baseBit = (i * 3) % 8;
+			uint8 baseByte = (i * 3) / 8;
+			uint8 baseBit = (i * 3) % 8;
 			uint8 bits = static_cast<uint8>(block.indexes[baseByte] >> baseBit & 0x7);
 			// do we need to stitch in next byte too?
 			if (baseBit > 5)
@@ -713,7 +713,9 @@ namespace Ogre {
 		if (PixelUtil::isCompressed(sourceFormat))
 		{
 			if (Root::getSingleton().getRenderSystem() == NULL ||
-				Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) == false)
+				!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
+                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP)
+                && !imgData->num_mipmaps))
 			{
 				// We'll need to decompress
 				decompressDXT = true;
