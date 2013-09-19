@@ -33,6 +33,8 @@ set (HEADER_FILES
   include/Compositor/Pass/OgreCompositorPassDef.h
   include/Compositor/Pass/PassClear/OgreCompositorPassClear.h
   include/Compositor/Pass/PassClear/OgreCompositorPassClearDef.h
+  include/Compositor/Pass/PassQuad/OgreCompositorPassQuad.h
+  include/Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h
   include/Compositor/Pass/PassScene/OgreCompositorPassScene.h
   include/Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h
   include/Compositor/OgreCompositorChannel.h
@@ -307,6 +309,7 @@ set (SOURCE_FILES
   src/Compositor/Pass/OgreCompositorPass.cpp
   src/Compositor/Pass/OgreCompositorPassDef.cpp
   src/Compositor/Pass/PassClear/OgreCompositorPassClear.cpp
+  src/Compositor/Pass/PassQuad/OgreCompositorPassQuad.cpp
   src/Compositor/Pass/PassScene/OgreCompositorPassScene.cpp
   src/Compositor/OgreCompositorManager2.cpp
   src/Compositor/OgreCompositorNode.cpp
@@ -524,7 +527,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
-  list(APPEND THREAD_SOURCE_FILES
+  set(THREAD_SOURCE_FILES
       Threading/OgreBarrierWin.cpp
 	  Threading/OgreLightweightMutexWin.cpp
       Threading/OgreThreadsWin.cpp
@@ -711,7 +714,7 @@ if (OGRE_THREAD_PROVIDER EQUAL 0)
 		include/Threading/OgreThreadDefinesNone.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 1)
@@ -720,7 +723,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 1)
 		include/Threading/OgreThreadHeadersBoost.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 2)
@@ -729,7 +732,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 2)
 		include/Threading/OgreThreadHeadersPoco.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 3)
@@ -738,7 +741,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 3)
 		include/Threading/OgreThreadHeadersTBB.h
 		include/Threading/OgreDefaultWorkQueueTBB.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueTBB.cpp
 	)
 endif ()

@@ -142,7 +142,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 	if(!mRectangle)
 	{
 		/// 2D rectangle, to use for render_quad passes
-		mRectangle = OGRE_NEW Rectangle2D( -1, 0, true, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
+		mRectangle = OGRE_NEW Rectangle2D( true );
 	}
 	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 	Viewport* vp = rs->_getViewport();
@@ -209,10 +209,6 @@ void CompositorManager::_reconstructAllCompositorResources()
 			}
 		}
 	}
-
-	//UVs are lost, and will never be reconstructed unless we do them again, now
-	if( mRectangle )
-		mRectangle->setDefaultUVs();
 
 	for (InstVec::iterator i = instancesToReenable.begin(); i != instancesToReenable.end(); ++i)
 	{

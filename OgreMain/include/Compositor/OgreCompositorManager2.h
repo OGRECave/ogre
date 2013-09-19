@@ -37,23 +37,24 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	class Rectangle2D;
 	typedef vector<TexturePtr>::type TextureVec;
 
 	//class _OgreExport CompositorManager2 : public ResourceManager
 	class _OgreExport CompositorManager2 : public ResourceAlloc
 	{
-		typedef map<IdString, CompositorNodeDef*>::type CompositorNodeDefMap;
+		typedef map<IdString, CompositorNodeDef*>::type			CompositorNodeDefMap;
 		CompositorNodeDefMap	mNodeDefinitions;
 
-		typedef map<IdString, CompositorShadowNodeDef*>::type CompositorShadowNodeDefMap;
-		typedef vector<CompositorShadowNodeDef*>::type CompositorShadowNodeDefVec;
+		typedef map<IdString, CompositorShadowNodeDef*>::type	CompositorShadowNodeDefMap;
+		typedef vector<CompositorShadowNodeDef*>::type			CompositorShadowNodeDefVec;
 		CompositorShadowNodeDefMap mShadowNodeDefs;
 		CompositorShadowNodeDefVec mUnfinishedShadowNodes;
 
-		typedef map<IdString, CompositorWorkspaceDef*>::type CompositorWorkspaceDefMap;
+		typedef map<IdString, CompositorWorkspaceDef*>::type	CompositorWorkspaceDefMap;
 		CompositorWorkspaceDefMap mWorkspaceDefs;
 
-		typedef vector<CompositorWorkspace*>::type WorkspaceVec;
+		typedef vector<CompositorWorkspace*>::type				WorkspaceVec;
 		WorkspaceVec			mWorkspaces;
 
 		size_t					mFrameCount;
@@ -61,6 +62,8 @@ namespace Ogre
 		RenderSystem			*mRenderSystem;
 
 		TextureVec				mNullTextureList;
+		Rectangle2D				*mSharedTriangleFS;
+		Rectangle2D				*mSharedQuadFS;
 
 		void validateNodes(void);
 
@@ -91,6 +94,14 @@ namespace Ogre
 			result in no shadows.
 		*/
 		TexturePtr getNullShadowTexture( PixelFormat format );
+
+		/** Returns a shared fullscreen rectangle/triangle useful for PASS_QUAD passes
+		@remarks
+			Pointer is valid throughout the lifetime of this CompositorManager2
+		*/
+		Rectangle2D* getSharedFullscreenTriangle(void) const		{ return mSharedTriangleFS; }
+		/// @copydoc getSharedFullscreenTriangle
+		Rectangle2D* getSharedFullscreenQuad(void) const			{ return mSharedQuadFS; }
 
 		/**
 		@param defaultVp

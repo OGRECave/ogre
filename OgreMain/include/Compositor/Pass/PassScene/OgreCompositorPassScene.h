@@ -59,6 +59,7 @@ namespace Ogre
     */
 	class _OgreExport CompositorPassScene : public CompositorPass
 	{
+		CompositorPassSceneDef const *mDefinition;
 	protected:
 		CompositorShadowNode	*mShadowNode;
 		Camera					*mCamera;
@@ -86,9 +87,6 @@ namespace Ogre
 		void _setUpdateShadowNode( bool update )				{ mUpdateShadowNode = update; }
 
 		const CompositorPassSceneDef* getDefinition() const		{ return mDefinition; }
-
-	private:
-		CompositorPassSceneDef const *mDefinition;
 	};
 
 	/** @} */

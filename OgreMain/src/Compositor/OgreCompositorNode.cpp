@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
@@ -211,6 +212,37 @@ namespace Ogre
 		mInTextures[inChannelA].textures	= textures;
 	}
 	//-----------------------------------------------------------------------------------
+	TexturePtr CompositorNode::getDefinedTexture( IdString textureName, size_t mrtIndex ) const
+	{
+		CompositorChannel const * channel = 0;
+		size_t index;
+		TextureDefinitionBase::TextureSource textureSource;
+		mDefinition->getTextureSource( textureName, index, textureSource );
+		switch( textureSource )
+		{
+		case TextureDefinitionBase::TEXTURE_INPUT:
+			channel = &mInTextures[index];
+			break;
+		case TextureDefinitionBase::TEXTURE_LOCAL:
+			channel = &mLocalTextures[index];
+			break;
+		case TextureDefinitionBase::TEXTURE_GLOBAL:
+			channel = &mWorkspace->getGlobalTexture( textureName );
+			break;
+		}
+
+		TexturePtr retVal;
+		if( channel )
+		{
+			if( mrtIndex < channel->textures.size() )
+				retVal = channel->textures[mrtIndex];
+			else
+				retVal = channel->textures.back();
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorNode::createPasses(void)
 	{
 		CompositorTargetDefVec::const_iterator itor = mDefinition->mTargetPasses.begin();
@@ -248,6 +280,12 @@ namespace Ogre
 					newPass = OGRE_NEW CompositorPassClear(
 											static_cast<CompositorPassClearDef*>(*itPass),
 											channel->target );
+					break;
+				case PASS_QUAD:
+					newPass = OGRE_NEW CompositorPassQuad(
+											static_cast<CompositorPassQuadDef*>(*itPass),
+											mWorkspace->getDefaultCamera(), mWorkspace,
+											this, channel->target );
 					break;
 				case PASS_SCENE:
 					newPass = OGRE_NEW CompositorPassScene(

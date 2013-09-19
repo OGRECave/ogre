@@ -140,14 +140,16 @@ namespace Ogre
 				addTextureSourceName( "myRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
 
 			You're assigning an alias named "myRT" to channel Input #0
-			For local or global textures, use addLocalTextureDefinition
+			For local or global textures, the index parameter documentation
 
 		@param fullName
 			The name of the texture. Names are usually valid only throughout this node.
 			We need the name, not its hash because we need to validate the global_ prefix
 			is used correctly.
 		@param index
-			Index in the container where the texture is located, eg. mLocalTextureDefs[index]
+			Index in the container where the texture is located, eg. this->mLocalTextureDefs[index]
+			for local textures, workspace->mLocalTextureDefs[index] for global textures, and
+			this->mInTextures[index] for input channels.
 		@param textureSource
 			Source where the index must be used (eg. TEXTURE_LOCAL means mLocalTextureDefs)
 		@return

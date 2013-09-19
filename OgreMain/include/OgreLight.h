@@ -346,27 +346,6 @@ namespace Ogre {
         */
         Vector4 getAs4DVector(bool cameraRelativeIfSet = false) const;
 
-        /** Internal method for calculating the 'near clip volume', which is
-            the volume formed between the near clip rectangle of the 
-            camera and the light.
-        @remarks
-            This volume is a pyramid for a point/spot light and
-            a cuboid for a directional light. It can used to detect whether
-            an object could be casting a shadow on the viewport. Note that
-            the reference returned is to a shared volume which will be 
-            reused across calls to this method.
-        */
-        virtual const PlaneBoundedVolume& _getNearClipVolume(const Camera* const cam) const;
-
-        /** Internal method for calculating the clip volumes outside of the 
-            frustum which can be used to determine which objects are casting
-            shadow on the frustum as a whole. 
-        @remarks
-            Each of the volumes is a pyramid for a point/spot light and
-            a cuboid for a directional light. 
-        */
-        virtual const PlaneBoundedVolumeList& _getFrustumClipVolumes(const Camera* const cam) const;
-
         /// Override to return specific type flag
         uint32 getTypeFlags(void) const;
 

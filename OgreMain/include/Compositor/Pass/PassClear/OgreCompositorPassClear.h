@@ -37,9 +37,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 	class RenderTarget;
-	class Camera;
-	class CompositorShadowNode;
-	class CompositorWorkspace;
 
 	/** \addtogroup Core
 	*  @{
@@ -49,7 +46,7 @@ namespace Ogre
 	*/
 
 	/** Implementation of CompositorPass
-		This implementation will the RenderTarget using the parameters from definition
+		This implementation will clear the RenderTarget using the parameters from definition
 		(rectangle area, which buffers, what values, etc)
     @author
 		Matias N. Goldberg

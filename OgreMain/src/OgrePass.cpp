@@ -666,7 +666,7 @@ namespace Ogre {
         }
 	}
     //-----------------------------------------------------------------------
-    TextureUnitState* Pass::getTextureUnitState(unsigned short index)
+    TextureUnitState* Pass::getTextureUnitState( size_t index )
     {
 		OGRE_LOCK_MUTEX(mTexUnitChangeMutex)
         assert (index < mTextureUnitStates.size() && "Index out of bounds");

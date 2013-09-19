@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/OgreCompositorPassDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 namespace Ogre
@@ -55,6 +56,9 @@ namespace Ogre
 		{
 		case PASS_CLEAR:
 			retVal = OGRE_NEW CompositorPassClearDef();
+			break;
+		case PASS_QUAD:
+			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef );
 			break;
 		case PASS_SCENE:
 			retVal = OGRE_NEW CompositorPassSceneDef();

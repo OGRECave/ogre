@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	class CompositorNodeDef;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -107,8 +109,11 @@ namespace Ogre
 		IdString				mRenderTargetName;
 		CompositorPassDefVec	mCompositorPasses;
 
+		CompositorNodeDef		*mParentNodeDef;
+
 	public:
-		CompositorTargetDef( IdString renderTargetName ) : mRenderTargetName( renderTargetName ) {}
+		CompositorTargetDef( IdString renderTargetName, CompositorNodeDef *parentNodeDef ) :
+				mRenderTargetName( renderTargetName ), mParentNodeDef( parentNodeDef ) {}
 		~CompositorTargetDef();
 
 		IdString getRenderTargetName() const			{ return mRenderTargetName; }

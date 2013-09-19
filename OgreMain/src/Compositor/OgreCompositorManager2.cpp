@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "OgreRectangle2D.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 
@@ -68,8 +69,13 @@ namespace Ogre
 
 	CompositorManager2::CompositorManager2() :
 		mFrameCount( 0 ),
-		mRenderSystem( 0 )
+		mRenderSystem( 0 ),
+		mSharedTriangleFS( 0 ),
+		mSharedQuadFS( 0 )
 	{
+		mSharedTriangleFS	= OGRE_NEW Rectangle2D( false );
+		mSharedQuadFS		= OGRE_NEW Rectangle2D( true );
+
 		//----------------------------------------------------------------
 		// Create a default Node & Workspace for basic rendering:
 		//		* Clears the screen
@@ -101,16 +107,37 @@ namespace Ogre
 
 		//-------
 		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
-		shadowNode->setNumShadowTextureDefinitions( 1 );
-		CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
-		texDef->width	= 2048;
-		texDef->height	= 2048;
-		texDef->formatList.push_back( PF_FLOAT32_R );
-		//texDef->formatList.push_back( PF_A8B8G8R8 );
-		//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-		texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+		shadowNode->setNumShadowTextureDefinitions( 3 );
+		
+		{
+			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
+			texDef->width	= 2048;
+			texDef->height	= 2048;
+			texDef->formatList.push_back( PF_FLOAT32_R );
+			//texDef->formatList.push_back( PF_A8B8G8R8 );
+			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
+			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+		}
+		{
+			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
+			texDef->width	= 1024;
+			texDef->height	= 1024;
+			texDef->formatList.push_back( PF_FLOAT32_R );
+			//texDef->formatList.push_back( PF_A8B8G8R8 );
+			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
+			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+		}
+		{
+			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
+			texDef->width	= 1024;
+			texDef->height	= 1024;
+			texDef->formatList.push_back( PF_FLOAT32_R );
+			//texDef->formatList.push_back( PF_A8B8G8R8 );
+			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
+			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+		}
 
-		shadowNode->setNumTargetPass( 1 );
+		shadowNode->setNumTargetPass( 3 );
 		{
 			CompositorTargetDef *targetDef = shadowNode->addTargetPass( "MyFirstTex" );
 			targetDef->setNumPasses( 2 );
@@ -120,6 +147,26 @@ namespace Ogre
 				//CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
 				passDef = targetDef->addPass( PASS_SCENE );
 				passDef->mShadowMapIdx = 0;
+				passDef->mIncludeOverlays = false;
+			}
+			targetDef = shadowNode->addTargetPass( "MyFirstTex2" );
+			targetDef->setNumPasses( 2 );
+			{
+				CompositorPassDef *passDef = targetDef->addPass( PASS_CLEAR );
+				((CompositorPassClearDef*)(passDef))->mColourValue = ColourValue::White;
+				//CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+				passDef = targetDef->addPass( PASS_SCENE );
+				passDef->mShadowMapIdx = 1;
+				passDef->mIncludeOverlays = false;
+			}
+			targetDef = shadowNode->addTargetPass( "MyFirstTex3" );
+			targetDef->setNumPasses( 2 );
+			{
+				CompositorPassDef *passDef = targetDef->addPass( PASS_CLEAR );
+				((CompositorPassClearDef*)(passDef))->mColourValue = ColourValue::White;
+				//CompositorPassDef *passDef = targetDef->addPass( PASS_SCENE );
+				passDef = targetDef->addPass( PASS_SCENE );
+				passDef->mShadowMapIdx = 2;
 				passDef->mIncludeOverlays = false;
 			}
 		}
@@ -137,6 +184,11 @@ namespace Ogre
 		deleteAllSecondClear( mNodeDefinitions );
 		deleteAllSecondClear( mShadowNodeDefs );
 		deleteAllClear( mWorkspaces );
+
+		OGRE_DELETE mSharedTriangleFS;
+		mSharedTriangleFS = 0;
+		OGRE_DELETE mSharedQuadFS;
+		mSharedQuadFS = 0;
 	}
 	//-----------------------------------------------------------------------------------
 	bool CompositorManager2::hasNodeDefinition( IdString nodeDefName ) const

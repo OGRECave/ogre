@@ -563,7 +563,7 @@ namespace Ogre {
 		void addTextureUnitState(TextureUnitState* state);
         /** Retrieves a pointer to a texture unit state so it may be modified.
         */
-        TextureUnitState* getTextureUnitState(unsigned short index);
+        TextureUnitState* getTextureUnitState( size_t index );
         /** Retrieves the Texture Unit State matching name.
             Returns 0 if name match is not found.
         */

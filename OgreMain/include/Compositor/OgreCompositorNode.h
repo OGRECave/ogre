@@ -178,6 +178,23 @@ namespace Ogre
 		const CompositorChannelVec& getInputChannel() const			{ return mInTextures; }
 		const CompositorChannelVec& getLocalTextures() const		{ return mLocalTextures; }
 
+		/** Returns the texture pointer of a texture based on it's name & mrt index.
+		@remarks
+			The texture name must have been registered with
+			CompositorNodeDef::addTextureSourceName
+		@param textureName
+			The name of the texture. This name may only be valid at node scope. It can
+			refer to an input texture, a local texture, or a global one.
+			If the global texture wasn't registered with addTextureSourceName,
+			it will fail.
+		@param mrtIndex
+			The MRT (Multiple Render Target) index. If the texture isn't MRT or has
+			less RTs than the index, it returns the highest valid index found.
+		@return
+			Null if not found (or global texture not registered). The texture otherwise
+		*/
+		TexturePtr getDefinedTexture( IdString textureName, size_t mrtIndex ) const;
+
 		/** Creates all passes based on our definition
 		@remarks
 			Call this function after connecting all channels (at least our input)

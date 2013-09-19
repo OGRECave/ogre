@@ -363,14 +363,30 @@ namespace Ogre
         }
 
         //Simulate the shader function saturate that clamps a parameter value between 0 and 1
-        static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
-        static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
+		static inline float saturate(float t)
+		{
+			float tmp = Ogre::max( t, 0.0f );
+			tmp = Ogre::min( tmp, 1.0f );
+			return tmp;
+		}
+        static inline double saturate(double t)
+		{
+			double tmp = Ogre::max( t, 0.0 );
+			tmp = Ogre::min( tmp, 1.0 );
+			return tmp;
+		}
         
-        //Simulate the shader function lerp which performers linear interpolation
-        //given 3 parameters v0, v1 and t the function returns the value of (1 – t)* v0 + t * v1. 
-        //where v0 and v1 are matching vector or scalar types and t can be either a scalar or a vector of the same type as a and b.
-        template<typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t) { 
-            return v0 * (1 - t) + v1 * t; }
+        /** Linear interpolation. Given 3 parameters a, b and wthe function returns the value
+			of (1 – w)* a + w * b. Where a and b are matching vector or scalar types and w can
+			be either a scalar or a vector of the same type as a and b.
+		@remarks
+			lerp( a, b, 0 ) = a
+			lerp( a, b, 1 ) = b
+		*/
+        template<typename T, typename S> static T lerp( const T& a, const T& b, const S& w )
+		{ 
+            return a + w * (b - a);
+		}
 
         /** Sine function.
             @param fValue

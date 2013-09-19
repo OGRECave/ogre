@@ -254,7 +254,8 @@ namespace Ogre {
 		they won't be changing often.
 	@par
 		What it means for Nodes:
-			Nodes created with SCENE_STATIC won't update their derived position/rotation/scale every frame.
+			Nodes created with SCENE_STATIC won't update their derived position/rotation/scale every
+			frame.
 			This means that modifying (eg) a static node position won't actually take effect until
 			SceneManager::notifyStaticDirty( mySceneNode ) is called or some other similar call.
 
@@ -266,7 +267,7 @@ namespace Ogre {
 			SceneManager of the parent's change automatically causes the child to be updated as well
 
 			Having a dynamic node to be child of a static node is perfectly pausible and encouraged,
-			for example a moving pendulum hanging from a static clock
+			for example a moving pendulum hanging from a static clock.
 			Having a static node being child of a dynamic node doesn't make much sense, and is probably
 			a bug (unless the parent is the root node).
 	@par
@@ -274,17 +275,22 @@ namespace Ogre {
 			Static entities are scheduled for culling and rendering like dynamic ones, but won't update
 			their world AABB bounds (even if their scene node they're attached to changes)
 			
-			Static entities will update their aabb if user calls SceneManager::
-			notifyStaticDirty( myEntity ) or the static node they're attached to was also flagged as
-			dirty. Note that updating the node's position doesn't flag it as dirty (it's not implicit)
-			and hence the entity won't be updated either
+			Static entities will update their aabb if user calls
+			SceneManager::notifyStaticDirty( myEntity ) or the static node they're attached to was also
+			flagged as dirty. Note that updating the node's position doesn't flag the node as dirty
+			(it's not implicit) and hence the entity won't be updated either.
 			
 			Static entities can only be attached to static nodes, and dynamic entities can only be
 			attached to dynamic nodes.
 	@par	
 		Note that on most cases, changing a single static entity or node (or creating more) can cause
 		a lot of other static objects to be scheduled to update, so don't do it often, and do it all
-		in the same frame at startup preferably (i.e. during loading time)
+		in the same frame. An example is doing it at startup (i.e. during loading time)
+	@par
+		Entities & Nodes can switch between dynamic & static at runtime. However InstancedEntities can't.
+		You need to destroy the InstancedEntity and create a new one if you wish to switch (which, by
+		the way, isn't expensive because batches preallocate the instances)
+		InstancedEntities with different SceneMemoryMgrTypes will never share the same batch.
 	*/
 	enum SceneMemoryMgrTypes
 	{

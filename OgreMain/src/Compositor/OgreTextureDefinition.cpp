@@ -85,13 +85,13 @@ namespace Ogre
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 						"Local textures can't start with global_ prefix! '" + name + "'",
-						"TextureDefinitionBase::addLocalTextureDefinition" );
+						"TextureDefinitionBase::addTextureSourceName" );
 		}
 		else if( textureSource == TEXTURE_GLOBAL && findResult != 0 )
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 						"Global textures must start with global_ prefix! '" + name + "'",
-						"TextureDefinitionBase::addLocalTextureDefinition" );
+						"TextureDefinitionBase::addTextureSourceName" );
 		}
 
 		const uint32 value = encodeTexSource( index, textureSource );
@@ -103,7 +103,7 @@ namespace Ogre
 			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
 						"Texture with same name '" + name +
 						"' in the same scope already exists",
-						"TextureDefinitionBase::addLocalTextureDefinition" );
+						"TextureDefinitionBase::addTextureSourceName" );
 		}
 
 		mNameToChannelMap[hashedName] = value;

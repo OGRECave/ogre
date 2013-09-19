@@ -57,9 +57,11 @@ namespace Ogre
     */
 	class _OgreExport CompositorPass : public CompositorInstAlloc
 	{
+		CompositorPassDef const *mDefinition;
 	protected:
 		RenderTarget	*mTarget;
 		Viewport		*mViewport;
+
 	public:
 		CompositorPass( const CompositorPassDef *definition, RenderTarget *target );
 		virtual ~CompositorPass();
@@ -72,8 +74,6 @@ namespace Ogre
 		CompositorPassType getType() const	{ return mDefinition->getType(); }
 
 		Viewport* getViewport() const		{ return mViewport; }
-	private:
-		CompositorPassDef const *mDefinition;
 	};
 
 	/** @} */
