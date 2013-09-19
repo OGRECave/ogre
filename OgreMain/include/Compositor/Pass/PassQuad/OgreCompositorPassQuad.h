@@ -89,10 +89,13 @@ namespace Ogre
 		Pass		*mPass;
 		Camera		*mCamera;
 
+		Real		mHorizonalTexelOffset;
+		Real		mVerticalTexelOffset;
+
 	public:
 		CompositorPassQuad( const CompositorPassQuadDef *definition, Camera *defaultCamera,
 							CompositorWorkspace *workspace, CompositorNode *parentNode,
-							RenderTarget *target );
+							RenderTarget *target, Real horizonalTexelOffset, Real verticalTexelOffset );
 
 		virtual void execute();
 	};

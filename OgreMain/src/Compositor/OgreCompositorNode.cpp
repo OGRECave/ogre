@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
+#include "OgreRenderSystem.h"
+
 namespace Ogre
 {
 	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
@@ -285,7 +287,9 @@ namespace Ogre
 					newPass = OGRE_NEW CompositorPassQuad(
 											static_cast<CompositorPassQuadDef*>(*itPass),
 											mWorkspace->getDefaultCamera(), mWorkspace,
-											this, channel->target );
+											this, channel->target,
+											mRenderSystem->getHorizontalTexelOffset(),
+											mRenderSystem->getVerticalTexelOffset() );
 					break;
 				case PASS_SCENE:
 					newPass = OGRE_NEW CompositorPassScene(

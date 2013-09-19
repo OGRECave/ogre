@@ -254,7 +254,6 @@ namespace Ogre {
 
 		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
         mCompositorManager = OGRE_NEW CompositorManager();
-		mCompositorManager2 = OGRE_NEW CompositorManager2();
 
 		mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
@@ -306,7 +305,6 @@ namespace Ogre {
 
 		destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mCompositorManager;
-		OGRE_DELETE mCompositorManager2;
 		OGRE_DELETE mExternalTextureSourceManager;
 #if OGRE_NO_FREEIMAGE == 0
 		FreeImageCodec::shutdown();
@@ -616,6 +614,9 @@ namespace Ogre {
         if( mActiveRenderer && mActiveRenderer != system )
         {
             mActiveRenderer->shutdown();
+
+			OGRE_DELETE mCompositorManager2;
+			mCompositorManager2 = OGRE_NEW CompositorManager2( system );
         }
 
         mActiveRenderer = system;
@@ -710,6 +711,9 @@ namespace Ogre {
             oneTimePostWindowInit();
             mAutoWindow->_setPrimary();
         }
+
+		if( !mCompositorManager2 )
+			mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
 
         // Initialise timer
         mTimer->reset();
@@ -1064,6 +1068,8 @@ namespace Ogre {
 		// Destroy pools
 		ConvexBody::_destroyPool();
 
+		OGRE_DELETE mCompositorManager2;
+		mCompositorManager2 = 0;
 
 		mIsInitialised = false;
 

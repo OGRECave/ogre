@@ -35,11 +35,13 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
 #include "OgreRectangle2D.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
@@ -67,9 +69,9 @@ namespace Ogre
 		container.clear();
 	}
 
-	CompositorManager2::CompositorManager2() :
+	CompositorManager2::CompositorManager2( RenderSystem *renderSystem ) :
 		mFrameCount( 0 ),
-		mRenderSystem( 0 ),
+		mRenderSystem( renderSystem ),
 		mSharedTriangleFS( 0 ),
 		mSharedQuadFS( 0 )
 	{
@@ -95,6 +97,10 @@ namespace Ogre
 				{
 					CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>( targetDef->addPass( PASS_CLEAR ) );
 					passClear->mColourValue = ColourValue( 0.6f, 0.0f, 0.6f );
+				}
+				{
+					CompositorPassQuadDef *passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+					passQuad->mMaterialName = "MyQuadTest";
 				}
 				CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>( targetDef->addPass( PASS_SCENE ) );
 
@@ -376,6 +382,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorManager2::_update( bool swapFinalTargets, bool waitForVSync )
 	{
+		// Begin the frame
+		mRenderSystem->_beginFrame();
+
 		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
 		WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
@@ -398,6 +407,9 @@ namespace Ogre
 			}
 			++itor;
 		}
+
+		// End frame
+		mRenderSystem->_endFrame();
 
 		++mFrameCount;
 	}

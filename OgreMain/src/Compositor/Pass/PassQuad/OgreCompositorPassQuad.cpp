@@ -53,14 +53,16 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorPassQuad::CompositorPassQuad( const CompositorPassQuadDef *definition,
 											Camera *defaultCamera,
-											CompositorWorkspace *workspace,
-											CompositorNode *parentNode,
-											RenderTarget *target ) :
+											CompositorWorkspace *workspace, CompositorNode *parentNode,
+											RenderTarget *target, Real horizonalTexelOffset,
+											Real verticalTexelOffset ) :
 				CompositorPass( definition, target ),
 				mDefinition( definition ),
 				mFsRect( 0 ),
 				mPass( 0 ),
-				mCamera( 0 )
+				mCamera( 0 ),
+				mHorizonalTexelOffset( horizonalTexelOffset ),
+				mVerticalTexelOffset( verticalTexelOffset )
 	{
 		MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
 		if( material.isNull() )
@@ -107,6 +109,11 @@ namespace Ogre
 		{
 			mFsRect = workspace->getCompositorManager()->getSharedFullscreenTriangle();
 		}
+
+		if( mDefinition->mCameraName != IdString() )
+			mCamera = workspace->findCamera( mDefinition->mCameraName );
+		else
+			mCamera = defaultCamera;
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorPassQuad::execute()
@@ -115,8 +122,11 @@ namespace Ogre
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
 
+		const Real hOffset = mHorizonalTexelOffset / mTarget->getWidth();
+		const Real vOffset = mVerticalTexelOffset / mTarget->getHeight();
+
 		//The rectangle is shared, set the corners each time
-		mFsRect->setCorners( mDefinition->mVpLeft, mDefinition->mVpTop,
+		mFsRect->setCorners( mDefinition->mVpLeft + hOffset, mDefinition->mVpTop - vOffset,
 							 mDefinition->mVpWidth, mDefinition->mVpHeight );
 
 		if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
@@ -134,7 +144,8 @@ namespace Ogre
 		}
 
 		SceneManager *sceneManager = mCamera->getSceneManager();
-		sceneManager->_injectRenderWithPass( mPass, mFsRect, false, false );
+		sceneManager->_setViewport( mViewport );
+		sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
 
 		//Call endUpdate if we're the last pass in a row to use this RT
 		if( mDefinition->mEndRtUpdate )

@@ -1257,9 +1257,6 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 
     mDestRenderSystem->_beginGeometryCount();
 
-    // Begin the frame
-    mDestRenderSystem->_beginFrame();
-
     // Set rasterisation mode
     mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
 
@@ -1284,9 +1281,6 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 		_renderVisibleObjects();
 	}
 
-    // End frame
-    mDestRenderSystem->_endFrame();
-
     // Notify camera of vis faces
     camera->_notifyRenderedFaces(mDestRenderSystem->_getFaceCount());
 
@@ -1294,7 +1288,6 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
 	Root::getSingleton()._popCurrentSceneManager(this);
-
 }
 
 
@@ -4804,9 +4797,15 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::_injectRenderWithPass( Pass *pass, Renderable *rend, bool shadowDerivation,
-											bool doLightIteration )
+void SceneManager::_injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera,
+										  bool shadowDerivation, bool doLightIteration )
 {
+	if( activeCamera )
+	{
+		mCameraInProgress	= activeCamera;
+		mCurrentViewport	= activeCamera->getViewport();
+	}
+
 	// render something as if it came from the current queue
     const Pass *usedPass = _setPass(pass, false, shadowDerivation);
     renderSingleObject( rend, usedPass, false, doLightIteration );
@@ -5121,7 +5120,7 @@ void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlo
 //---------------------------------------------------------------------
 void SceneManager::waitForPendingUserScalableTask()
 {
-	assert( mRequestType == USER_UNIFORM_SCALABLE_TASK || mRequestType == NUM_REQUESTS );
+	assert( mRequestType == USER_UNIFORM_SCALABLE_TASK );
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
@@ -5182,10 +5181,6 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 				instanceBatchCullFrustumThread( mInstanceBatchCullRequest, threadIdx );
 				break;
 			case USER_UNIFORM_SCALABLE_TASK:
-#ifndef NDEBUG
-				//Simple attempt to detect improper usage (not perfect, as race conditions may silent it)
-				mRequestType = NUM_REQUESTS;
-#endif
 				mUserTask->execute( threadIdx, mNumWorkerThreads );
 				break;
 			}

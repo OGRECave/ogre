@@ -40,6 +40,9 @@ namespace Ogre
 			mQuad( bQuad )
 	{
 		initRectangle2D();
+
+		//By default we want Rectangle2Ds to still work in wireframe mode
+		setPolygonModeOverrideable( false );
 	}
 	//-----------------------------------------------------------------------------------
 	void Rectangle2D::initRectangle2D(void)

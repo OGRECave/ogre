@@ -1679,6 +1679,8 @@ namespace Ogre {
         */
         virtual void _setDestinationRenderSystem(RenderSystem* sys);
 
+		void _setViewport( Viewport *vp )									{ setViewport( vp ); }
+
         /** Enables / disables a 'sky plane' i.e. a plane at constant
             distance from the camera representing the sky.
             @remarks
@@ -2849,9 +2851,13 @@ namespace Ogre {
 		/** Render something as if it came from the current queue.
 			@param pass		Material pass to use for setting up this quad.
 			@param rend		Renderable to render
+			@param activeCamera When not null, it will override the current camera & viewport
+			settings. Won't restore them back after the call is finished. When null, uses
+			the old camera & viewport settings.
 			@param shadowDerivation Whether passes should be replaced with shadow caster passes
 		 */
-		virtual void _injectRenderWithPass( Pass *pass, Renderable *rend, bool shadowDerivation = true,
+		virtual void _injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera=0,
+											bool shadowDerivation = true,
 											bool doLightIteration = false );
 
 		/** Indicates to the SceneManager whether it should suppress changing

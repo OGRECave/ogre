@@ -68,7 +68,7 @@ namespace Ogre
 		void validateNodes(void);
 
 	public:
-		CompositorManager2();
+		CompositorManager2( RenderSystem *renderSystem );
 		~CompositorManager2();
 
 		/** The final rendering is done by passing the RenderWindow to one of the input
