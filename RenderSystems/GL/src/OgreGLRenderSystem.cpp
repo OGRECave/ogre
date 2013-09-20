@@ -2095,11 +2095,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_beginFrame(void)
 	{
-		if (!mActiveViewport)
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-			"Cannot begin frame - no viewport selected.",
-			"GLRenderSystem::_beginFrame");
-
 		// Activate the viewport clipping
 		glEnable(GL_SCISSOR_TEST);
 	}
