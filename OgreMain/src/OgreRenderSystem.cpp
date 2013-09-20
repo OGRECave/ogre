@@ -318,7 +318,7 @@ namespace Ogre {
 
         const TexturePtr& tex = tl._getTexturePtr();
 		bool isValidBinding = false;
-
+		
 		if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
 			_setBindingType(tl.getBindingType());
 
@@ -454,6 +454,7 @@ namespace Ogre {
         // Texture addressing mode
         const TextureUnitState::UVWAddressingMode& uvw = tl.getTextureAddressingMode();
         _setTextureAddressingMode(texUnit, uvw);
+
         // Set texture border colour only if required
         if (uvw.u == TextureUnitState::TAM_BORDER ||
             uvw.v == TextureUnitState::TAM_BORDER ||

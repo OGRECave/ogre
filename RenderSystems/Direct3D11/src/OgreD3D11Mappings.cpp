@@ -104,6 +104,7 @@ namespace Ogre
         if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
 			return D3D11_TEXTURE_ADDRESS_WRAP;
 
+		//return D3D11_TEXTURE_ADDRESS_WRAP;
 		switch( tam )
 		{
 		case TextureUnitState::TAM_WRAP:

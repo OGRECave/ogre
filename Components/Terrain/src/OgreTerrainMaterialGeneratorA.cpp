@@ -778,6 +778,7 @@ namespace Ogre
 				terrain->getLayerUVMultiplier(i * 4 + 3) 
 				);
 			params->setNamedConstant("uvMul_" + StringConverter::toString(i), uvMul);
+			//LogManager::getSingleton().logMessage("uvMul " + StringConverter::toString(uvMul));
 		}
 		
 		if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
