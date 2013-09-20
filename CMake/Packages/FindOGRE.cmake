@@ -162,7 +162,7 @@ if(NOT OGRE_STATIC)
 	use_pkgconfig(OGRE_PKGC "OGRE${OGRE_LIB_SUFFIX}")
 
 	# try to find framework on OSX
-	findpkg_framework(OGRE)
+	findpkg_framework(Ogre)
 else()
 	set(OGRE_LIBRARY_FWK "")
 endif()
