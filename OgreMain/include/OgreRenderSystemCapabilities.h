@@ -176,6 +176,8 @@ namespace Ogre
 		RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 21),
 		/// Supports asynchronous hardware occlusion queries
 		RSC_ATOMIC_COUNTERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 22),
+		/// Explicit FSAA resolves (i.e. sample MSAA textures directly in the shader without resolving)
+		RSC_EXPLICIT_FSAA_RESOLVE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

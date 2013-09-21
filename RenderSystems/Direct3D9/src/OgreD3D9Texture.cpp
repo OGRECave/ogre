@@ -1973,7 +1973,18 @@ namespace Ogre
 			textureResources = getTextureResources(d3d9Device);			
 		}
 		assert(textureResources); 
-		assert(textureResources->pBaseTex); 
+		assert(textureResources->pBaseTex);
+
+		if( mFSAA > 0 )
+		{
+			//D3D9 only supports implicit resolves.
+			for( size_t face=0; face<getNumFaces(); ++face )
+			{
+				RenderTarget *renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
+				if( renderTarget->isFsaaResolveDirty() )
+					renderTarget->swapBuffers( false );
+			}
+		}
 
 		return textureResources->pBaseTex;
 	}
@@ -2024,36 +2035,6 @@ namespace Ogre
 		mHwGamma = writeGamma;
 		mFSAA = fsaa;		
 	}
-	//---------------------------------------------------------------------
-	//!!!!!! TODO: (dark_sylinc) Do this at workspace level (compositor) !!!!!!!!
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-    void D3D9RenderTexture::update(bool swap)
-    {
-		
-		D3D9DeviceManager* deviceManager = D3D9RenderSystem::getDeviceManager();       	
-		D3D9Device* currRenderWindowDevice = deviceManager->getActiveRenderTargetDevice();
-
-		if (currRenderWindowDevice != NULL)
-		{
-			if (currRenderWindowDevice->isDeviceLost() == false)
-				RenderTexture::update(swap);
-		}
-		else
-		{
-			for (UINT i=0; i < deviceManager->getDeviceCount(); ++i)
-			{
-				D3D9Device* device = deviceManager->getDevice(i);
-
-				if (device->isDeviceLost() == false)
-				{
-					deviceManager->setActiveRenderTargetDevice(device);
-					RenderTexture::update(swap);
-					deviceManager->setActiveRenderTargetDevice(NULL);
-				}								
-			}
-		}
-	}
-#endif
 	//---------------------------------------------------------------------
 	void D3D9RenderTexture::getCustomAttribute( const String& name, void *pData )
 	{
@@ -2113,6 +2094,7 @@ namespace Ogre
 					}
 				}								
 			}																		
-		}			
-	}	
+		}
+		mFsaaResolveDirty = false;
+	}
 }

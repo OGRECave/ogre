@@ -3197,12 +3197,6 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-
-		// Clear left overs of previous viewport.
-		// I.E: Viewport A can use 3 different textures and light states
-		// When trying to render viewport B these settings should be cleared, otherwise 
-		// graphical artifacts might occur.
- 		mDeviceManager->getActiveDevice()->clearDeviceStreams();
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_endFrame()
@@ -3210,6 +3204,8 @@ namespace Ogre
 		HRESULT hr;
 		if( FAILED( hr = getActiveD3D9Device()->EndScene() ) )
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error ending frame", "D3D9RenderSystem::_endFrame" );
+
+		mDeviceManager->getActiveDevice()->clearDeviceStreams();
 
 		mDeviceManager->destroyInactiveRenderDevices();
 	}

@@ -83,4 +83,33 @@ namespace Ogre
 					"Cannot get MultiRenderTargets pixels",
 					"MultiRenderTarget::copyContentsToMemory");
 	}
+	//-----------------------------------------------------------------------------
+	void MultiRenderTarget::_beginUpdate(void)
+	{
+		BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
+		BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
+
+		while( itor != end )
+		{
+			(*itor)->setFsaaResolveDirty();
+			++itor;
+		}
+
+		RenderTarget::_beginUpdate();
+	}
+	//-----------------------------------------------------------------------------
+	void MultiRenderTarget::swapBuffers(bool waitForVSync)
+	{
+		BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
+		BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
+
+		bool bFirst = true & waitForVSync;
+
+		while( itor != end )
+		{
+			(*itor)->swapBuffers( bFirst );
+			bFirst = false;
+			++itor;
+		}
+	}
 }

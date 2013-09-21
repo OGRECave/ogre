@@ -50,6 +50,7 @@ namespace Ogre {
             mGamma(1.0f),
 			mHwGamma(false),
 			mFSAA(0),
+			mFsaaExplicitResolve( false ),
             mTextureType(TEX_TYPE_2D),            
             mFormat(PF_UNKNOWN),
             mUsage(TU_DEFAULT),

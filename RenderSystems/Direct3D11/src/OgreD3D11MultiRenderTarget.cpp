@@ -104,13 +104,6 @@ namespace Ogre
 		checkAndUpdate();
 	}
 	//---------------------------------------------------------------------
-	void D3D11MultiRenderTarget::update(void)
-	{
-		//D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-
-		MultiRenderTarget::update();
-	}
-	//---------------------------------------------------------------------
 	void D3D11MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
 	{
 		if(name == "DDBACKBUFFER")

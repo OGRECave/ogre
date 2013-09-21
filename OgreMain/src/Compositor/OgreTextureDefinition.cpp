@@ -183,7 +183,7 @@ namespace Ogre
 												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 												TEX_TYPE_2D, itor->width, itor->height, 0,
 												itor->formatList[0], TU_RENDERTARGET, 0, hwGamma,
-												fsaa, fsaaHint );
+												fsaa, fsaaHint, itor->fsaaExplicitResolve );
 				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
 				newChannel.target = rt;
 				newChannel.textures.push_back( tex );
@@ -205,7 +205,7 @@ namespace Ogre
 												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 												TEX_TYPE_2D, itor->width, itor->height, 0,
 												*pixIt, TU_RENDERTARGET, 0, hwGamma,
-												fsaa, fsaaHint );
+												fsaa, fsaaHint, itor->fsaaExplicitResolve );
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
 					mrt->bindSurface( rtNum, rt );
 					newChannel.textures.push_back( tex );

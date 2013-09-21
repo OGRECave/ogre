@@ -148,7 +148,9 @@ namespace Ogre {
                 in the progress of drawing the last frame).
         */
         virtual void swapBuffers(bool waitForVSync = true)
-        { (void)waitForVSync; }
+        { (void)waitForVSync; mFsaaResolveDirty = false; }
+
+		void setFsaaResolveDirty(void)									{ mFsaaResolveDirty = true; }
 
         /** Adds a viewport to the rendering target.
             @remarks
@@ -287,6 +289,8 @@ namespace Ogre {
 		*/
 		virtual const String& getFSAAHint() const { return mFSAAHint; }
 
+		bool isFsaaResolveDirty(void) const			{ return mFsaaResolveDirty; }
+
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
         */
@@ -371,6 +375,7 @@ namespace Ogre {
 		// FSAA performed?
 		uint mFSAA;
 		String mFSAAHint;
+		bool mFsaaResolveDirty;
 
 		typedef vector<Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order

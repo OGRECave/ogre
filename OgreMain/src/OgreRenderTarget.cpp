@@ -47,6 +47,7 @@ namespace Ogre {
 		, mActive(true)
 		, mHwGamma(false)
 		, mFSAA(0)
+		, mFsaaResolveDirty(false)
     {
         resetStatistics();
     }
@@ -148,6 +149,7 @@ namespace Ogre {
 
         mStats.triangleCount = 0;
         mStats.batchCount = 0;
+		mFsaaResolveDirty = true;
 
 		OgreProfileBeginGPUEvent("RenderTarget: " + getName());
 	}

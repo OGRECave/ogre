@@ -528,9 +528,9 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
   set(THREAD_SOURCE_FILES
-      Threading/OgreBarrierWin.cpp
-	  Threading/OgreLightweightMutexWin.cpp
-      Threading/OgreThreadsWin.cpp
+      src/Threading/OgreBarrierWin.cpp
+	  src/Threading/OgreLightweightMutexWin.cpp
+      src/Threading/OgreThreadsWin.cpp
   )
   list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
   if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
