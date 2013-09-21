@@ -489,6 +489,13 @@ namespace Ogre {
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);			
 		}
 
+		if( GLEW_VERSION_3_2 )
+		{
+			// GL_TEXTURE_2D_MULTISAMPLE and GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+			// http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml
+			rsc->setCapability(RSC_EXPLICIT_FSAA_RESOLVE);
+		}
+
 		if (GLEW_VERSION_3_3 || GLEW_ARB_instanced_arrays)
 		{
 			// states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml

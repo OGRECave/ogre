@@ -86,7 +86,7 @@ namespace Ogre {
 					}
 					else if( renderTarget->isFsaaResolveDirty() )
 					{
-						//GL 3.3+ supports explicit resolves. Only use the
+						//GL 3.2+ supports explicit resolves. Only use the
 						//Fsaa texture before it has been resolved
 						renderTarget->getCustomAttribute( "GL_MULTISAMPLEFBOID", &retVal );
 						isFsaa = true;

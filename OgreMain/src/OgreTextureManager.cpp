@@ -156,6 +156,9 @@ namespace Ogre {
             !caps->hasCapability(RSC_TEXTURE_3D))
             return ret;
 
+		if( !caps->hasCapability( RSC_EXPLICIT_FSAA_RESOLVE ) )
+			explicitResolve = false;
+
         if (((usage & (int)TU_STATIC) != 0) && (!Root::getSingleton().getRenderSystem()->isStaticBufferLockable()))
         {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
