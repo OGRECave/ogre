@@ -141,7 +141,7 @@ namespace Ogre {
 		// This needs to be set otherwise the texture doesn't get rendered
 		if (GLEW_VERSION_1_2)
 			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
-				GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+				GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
         mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);

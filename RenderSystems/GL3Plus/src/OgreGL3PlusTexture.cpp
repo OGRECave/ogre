@@ -127,8 +127,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL,
-                                            (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
+
         // Set some misc default parameters, these can of course be changed later
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST));
