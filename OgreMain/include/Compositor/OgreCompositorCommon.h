@@ -42,6 +42,8 @@ namespace Ogre
 	class CompositorNodeDef;
 	class CompositorShadowNodeDef;
 	class CompositorWorkspaceDef;
+	class CompositorTargetDef;
+	class CompositorPassDef;
 
 	class CompositorManager2;
 

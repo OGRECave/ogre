@@ -63,7 +63,8 @@ namespace Ogre
 		typedef vector<QuadTextureSource>::type TextureSources;
 
 	protected:
-		TextureSources mTextureSources;
+		TextureSources		mTextureSources;
+		CompositorNodeDef	*mParentNodeDef;
 
 	public:
 		enum FrustumCorners
@@ -80,6 +81,7 @@ namespace Ogre
 
 		/** When true, the user is telling Ogre this pass just performs a custom FSAA resolve filter.
 			Hence we should skip this pass for those APIs that don't support explicit resolving
+			TODO: Not really implemented yet!!!
 		@remarks
 			@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
 		*/
@@ -93,14 +95,12 @@ namespace Ogre
 		FrustumCorners	mFrustumCorners;
 		IdString		mCameraName;
 
-		CompositorNodeDef *mParentNodeDef;
-
 		CompositorPassQuadDef( CompositorNodeDef *parentNodeDef ) :
 			CompositorPassDef( PASS_QUAD ),
+			mParentNodeDef( parentNodeDef ),
 			mUseQuad( false ),
 			mIsResolve( false ),
-			mFrustumCorners( NO_CORNERS ),
-			mParentNodeDef( parentNodeDef )
+			mFrustumCorners( NO_CORNERS )
 		{
 		}
 

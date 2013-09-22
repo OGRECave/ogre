@@ -52,7 +52,7 @@ namespace Ogre {
     Real PixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
         // Get viewport
-        const Viewport *viewport = camera->getViewport();
+        const Viewport *viewport = camera->getLastViewport();
 
         // Get viewport area
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());

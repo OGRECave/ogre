@@ -2108,7 +2108,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullFrustum( numObjs, objData, camera,
-					camera->getViewport()->getVisibilityMask()|getVisibilityMask(),
+					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
 					outVisibleObjects, &aabbInfo[i] );
 		}
 
@@ -2165,7 +2165,7 @@ void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t t
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullReceiversBox( numObjs, objData, camera,
-					camera->getViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
+					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
 		}
 
 		++it;
@@ -4803,7 +4803,7 @@ void SceneManager::_injectRenderWithPass( Pass *pass, Renderable *rend, Camera *
 	if( activeCamera )
 	{
 		mCameraInProgress	= activeCamera;
-		mCurrentViewport	= activeCamera->getViewport();
+		mCurrentViewport	= activeCamera->getLastViewport();
 	}
 
 	// render something as if it came from the current queue

@@ -84,7 +84,7 @@ namespace Ogre
 					"MultiRenderTarget::copyContentsToMemory");
 	}
 	//-----------------------------------------------------------------------------
-	void MultiRenderTarget::_beginUpdate(void)
+	void MultiRenderTarget::setFsaaResolveDirty(void)
 	{
 		BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
 		BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
@@ -95,7 +95,7 @@ namespace Ogre
 			++itor;
 		}
 
-		RenderTarget::_beginUpdate();
+		RenderTarget::setFsaaResolveDirty();
 	}
 	//-----------------------------------------------------------------------------
 	void MultiRenderTarget::swapBuffers(bool waitForVSync)

@@ -67,7 +67,7 @@ namespace Ogre {
             assert(camera->getProjectionType() == PT_PERSPECTIVE && "Camera projection type must be perspective!");
 
             // Get camera viewport
-            Viewport *viewport = camera->getViewport();
+            Viewport *viewport = camera->getLastViewport();
 
             // Get viewport area
             Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());

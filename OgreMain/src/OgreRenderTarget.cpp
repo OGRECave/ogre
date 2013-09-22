@@ -149,7 +149,6 @@ namespace Ogre {
 
         mStats.triangleCount = 0;
         mStats.batchCount = 0;
-		mFsaaResolveDirty = true;
 
 		OgreProfileBeginGPUEvent("RenderTarget: " + getName());
 	}

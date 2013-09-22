@@ -6,3 +6,4 @@ Detaching an Entity from a Node will set its visibility to false. Attaching it t
 Behavior changes:
  Shadows. The calculation of lispSM's shadow & receiver bounding box is very different. It's more stable and robust for directional lights, but might impact quality negatively on spot & point lights
  The list of close lights passed to shaders is much more accurate when shadows are on. Ogre 1.x always passed shadow mapped lights first, even if they were too far from the object. Ogre 2.x prioritizes close lights. If any of them is shadow mapped, it is put first to match the texture unit bindings.
+ Compositor: When declaring texture, In 1.x HW gamma would be on by default if the global gamma settings were on; with no way to turn it off. But it could be forced always on using the keyword 'gamma'. In Ogre 2.x, leaving the option blank uses the system's settings, writing the keyword 'gamma' forces it on, using the keyword 'no_gamma' turns it off

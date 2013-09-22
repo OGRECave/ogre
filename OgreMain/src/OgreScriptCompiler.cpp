@@ -1202,6 +1202,7 @@ namespace Ogre
 		mIds["content_type"] = ID_CONTENT_TYPE;
         mIds["named"] = ID_NAMED;
         mIds["shadow"] = ID_SHADOW;
+		mIds["compositor"] = ID_COMPOSITOR;
 		mIds["texture_source"] = ID_TEXTURE_SOURCE;
 		mIds["shared_params"] = ID_SHARED_PARAMS;
 		mIds["shared_param_named"] = ID_SHARED_PARAM_NAMED;
@@ -1213,53 +1214,56 @@ namespace Ogre
 		mIds["affector"] = ID_AFFECTOR;
 
 		// Compositor
-		mIds["compositor"] = ID_COMPOSITOR;
+		mIds["workspace"]		= ID_WORKSPACE;
+		mIds["alias"]			= ID_ALIAS;
+		mIds["connect"]			= ID_CONNECT;
+		mIds["connect_output"]	= ID_CONNECT_OUTPUT;
+
+		mIds["compositor_node"]	= ID_COMPOSITOR_NODE;
+		mIds["in"]				= ID_IN;
+		mIds["out"]				= ID_OUT;
+		mIds["target_width"]		= ID_TARGET_WIDTH;
+        mIds["target_height"]		= ID_TARGET_HEIGHT;
+        mIds["target_width_scaled"]	= ID_TARGET_WIDTH_SCALED;
+        mIds["target_height_scaled"]= ID_TARGET_HEIGHT_SCALED;
+		mIds["no_gamma"]			= ID_NO_GAMMA;
+		mIds["no_fsaa"]				= ID_NO_FSAA;
+		mIds["explicit_resolve"]	= ID_EXPLICIT_RESOLVE;
+        mIds["depth_pool"]			= ID_DEPTH_POOL;
+
 		mIds["target"] = ID_TARGET;
-		mIds["target_output"] = ID_TARGET_OUTPUT;
 
-		mIds["input"] = ID_INPUT;
-        mIds["none"] = ID_NONE;
-        mIds["previous"] = ID_PREVIOUS;
-        mIds["target_width"] = ID_TARGET_WIDTH;
-        mIds["target_height"] = ID_TARGET_HEIGHT;
-        mIds["target_width_scaled"] = ID_TARGET_WIDTH_SCALED;
-        mIds["target_height_scaled"] = ID_TARGET_HEIGHT_SCALED;
-        mIds["pooled"] = ID_POOLED;
-        //mIds["gamma"] = ID_GAMMA; - already registered
-        mIds["no_fsaa"] = ID_NO_FSAA;
-        mIds["depth_pool"] = ID_DEPTH_POOL;
+		mIds["clear"]			= ID_CLEAR;
+		mIds["stencil"]			= ID_STENCIL;
+		mIds["render_scene"]	= ID_RENDER_SCENE;
+		mIds["render_quad"]		= ID_RENDER_QUAD;
 
-		mIds["texture_ref"] = ID_TEXTURE_REF;
-		mIds["local_scope"] = ID_SCOPE_LOCAL;
-		mIds["chain_scope"] = ID_SCOPE_CHAIN;
-		mIds["global_scope"] = ID_SCOPE_GLOBAL;
-		mIds["compositor_logic"] = ID_COMPOSITOR_LOGIC;
-			
-		mIds["only_initial"] = ID_ONLY_INITIAL;
-		mIds["visibility_mask"] = ID_VISIBILITY_MASK;
-		mIds["lod_bias"] = ID_LOD_BIAS;
+		mIds["viewport"]		= ID_VIEWPORT;
+		mIds["only_initial"]	= ID_ONLY_INITIAL;
+		mIds["identifier"]		= ID_IDENTIFIER;
+
+		mIds["lod_bias"]		= ID_LOD_BIAS;
 		mIds["material_scheme"] = ID_MATERIAL_SCHEME;
-		mIds["shadows"] = ID_SHADOWS_ENABLED;
+		mIds["visibility_mask"]	= ID_VISIBILITY_MASK;
+		mIds["shadows"]			= ID_SHADOWS_ENABLED;
+		mIds["camera"]			= ID_CAMERA;
+		mIds["rq_first"]		= ID_FIRST_RENDER_QUEUE;
+		mIds["rq_last"]			= ID_LAST_RENDER_QUEUE;
 
-		mIds["clear"] = ID_CLEAR;
-		mIds["stencil"] = ID_STENCIL;
-		mIds["render_scene"] = ID_RENDER_SCENE;
-		mIds["render_quad"] = ID_RENDER_QUAD;
-		mIds["identifier"] = ID_IDENTIFIER;
-		mIds["first_render_queue"] = ID_FIRST_RENDER_QUEUE;
-		mIds["last_render_queue"] = ID_LAST_RENDER_QUEUE;
-		mIds["quad_normals"] = ID_QUAD_NORMALS;
-        mIds["camera_far_corners_view_space"] = ID_CAMERA_FAR_CORNERS_VIEW_SPACE;
-        mIds["camera_far_corners_world_space"] = ID_CAMERA_FAR_CORNERS_WORLD_SPACE;
+		mIds["use_quad"]		= ID_USE_QUAD;
+		mIds["quad_normals"]	= ID_QUAD_NORMALS;
+        mIds["camera_far_corners_view_space"]	= ID_CAMERA_FAR_CORNERS_VIEW_SPACE;
+        mIds["camera_far_corners_world_space"]	= ID_CAMERA_FAR_CORNERS_WORLD_SPACE;
+		mIds["input"]			= ID_INPUT;
 
-		mIds["buffers"] = ID_BUFFERS;
-        mIds["colour"] = ID_COLOUR;
-        mIds["depth"] = ID_DEPTH;
-		mIds["colour_value"] = ID_COLOUR_VALUE;
-		mIds["depth_value"] = ID_DEPTH_VALUE;
-		mIds["stencil_value"] = ID_STENCIL_VALUE;
+		mIds["buffers"]			= ID_BUFFERS;
+        mIds["colour"]			= ID_COLOUR;
+        mIds["depth"]			= ID_DEPTH;
+		mIds["colour_value"]	= ID_COLOUR_VALUE;
+		mIds["depth_value"]		= ID_DEPTH_VALUE;
+		mIds["stencil_value"]	= ID_STENCIL_VALUE;
 
-		mIds["check"] = ID_CHECK;
+		/*mIds["check"] = ID_CHECK;
 		mIds["comp_func"] = ID_COMP_FUNC;
 		mIds["ref_value"] = ID_REF_VALUE;
 		mIds["mask"] = ID_MASK;
@@ -1272,7 +1276,8 @@ namespace Ogre
         mIds["invert"] = ID_INVERT;
 		mIds["depth_fail_op"] = ID_DEPTH_FAIL_OP;
 		mIds["pass_op"] = ID_PASS_OP;
-		mIds["two_sided"] = ID_TWO_SIDED;
+		mIds["two_sided"] = ID_TWO_SIDED;*/
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
 #endif

@@ -100,7 +100,7 @@ namespace Ogre
 			//~ pos.x -= fmod(pos.x, worldTexelSize);
 			//~ pos.y -= fmod(pos.y, worldTexelSize);
 			//~ pos.z -= fmod(pos.z, worldTexelSize);
-			Real worldTexelSize = (shadowDist * 2) / texCam->getViewport()->getActualWidth();
+			Real worldTexelSize = (shadowDist * 2) / texCam->getLastViewport()->getActualWidth();
 
 			 //get texCam orientation
 

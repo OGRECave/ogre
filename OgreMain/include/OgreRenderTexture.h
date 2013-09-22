@@ -107,7 +107,7 @@ namespace Ogre
 			to disk. 
 		*/
 		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-		virtual void _beginUpdate(void);
+		virtual void setFsaaResolveDirty(void);
 		virtual void swapBuffers(bool waitForVSync = true);
 
 		/// Irrelevant implementation since cannot copy

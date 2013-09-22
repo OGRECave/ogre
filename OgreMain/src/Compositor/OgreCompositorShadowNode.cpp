@@ -188,7 +188,7 @@ namespace Ogre
 
 		mergeReceiversBoxes( newCamera );
 
-		const Viewport *viewport = newCamera->getViewport();
+		const Viewport *viewport = newCamera->getLastViewport();
 		const SceneManager *sceneManager = newCamera->getSceneManager();
 		const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
 
@@ -305,7 +305,7 @@ namespace Ogre
 	{
 		ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
 		SceneManager *sceneManager	= camera->getSceneManager();
-		const Viewport *viewport	= camera->getViewport();
+		const Viewport *viewport	= camera->getLastViewport();
 
 		buildClosestLightList( camera );
 
@@ -327,7 +327,7 @@ namespace Ogre
 
 				//Use the material scheme of the main viewport 
 				//This is required to pick up the correct shadow_caster_material and similar properties.
-				texCamera->getViewport()->setMaterialScheme( viewport->getMaterialScheme() );
+				texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
 
 				// Associate main view camera as LOD camera
 				texCamera->setLodCamera( camera );
@@ -365,8 +365,8 @@ namespace Ogre
 		const CompositorPassSceneDef *passDef = pass->getDefinition();
 		const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
 
-		assert( (!smCamera.camera->getViewport() ||
-				smCamera.camera->getViewport() == pass->getViewport()) &&
+		assert( (!smCamera.camera->getLastViewport() ||
+				smCamera.camera->getLastViewport() == pass->getViewport()) &&
 				"Two scene passes to the same shadow map have different viewport!" );
 
 		smCamera.camera->_notifyViewport( pass->getViewport() );

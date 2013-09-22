@@ -61,18 +61,17 @@ namespace Ogre
 			NUM_TEXTURES_SOURCES
 		};
 
-	protected:
+		enum BoolSetting
+		{
+			Undefined = 0,
+			False,
+			True,
+		};
+
 		/// Local texture definition
         class TextureDefinition : public CompositorInstAlloc
         {
         public:
-			enum BoolSetting
-			{
-				Undefined = 0,
-				False,
-				True,
-			};
-
             IdString name;
             uint width;       // 0 means adapt to target width
             uint height;      // 0 means adapt to target height
@@ -107,6 +106,7 @@ namespace Ogre
 					fsaaExplicitResolve(false) {}
         };
 
+	protected:
 		typedef vector<TextureDefinition>::type		TextureDefinitionVec;
 		typedef map<IdString, uint32>::type			NameToChannelMap;
 
@@ -178,7 +178,7 @@ namespace Ogre
 		@param numPasses
 			The number of texture definitions expected to contain.
 		*/
-		void setLocalTextureDefinitions( size_t numTDs )		{ mLocalTextureDefs.reserve( numTDs ); }
+		void setNumLocalTextureDefinitions( size_t numTDs )		{ mLocalTextureDefs.reserve( numTDs ); }
 
 		/** Creates a TextureDefinition with a given name, must be unique.
 		@remarks

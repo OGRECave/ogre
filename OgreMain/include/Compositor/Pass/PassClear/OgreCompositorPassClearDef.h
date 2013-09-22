@@ -49,7 +49,7 @@ namespace Ogre
 		uint32					mClearBufferFlags;
 		ColourValue				mColourValue;
 		Real					mDepthValue;
-		int32					mStencilValue;
+		uint32					mStencilValue;
 
 		/** This value is only supported by a few APIs (D3D11 at the time of writting)
 			which instead of actually clearing the buffers, it informs the GPU that

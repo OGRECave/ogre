@@ -106,6 +106,32 @@ namespace Ogre
 			We need the full name, not just the hash; so we can check whether it has the global_ prefix
 		*/
 		CompositorTargetDef* addTargetPass( const String &renderTargetName );
+
+		/** Reserves enough memory for all output channel mappings (efficient allocation, better than
+			using linked lists or other containers with two level of indirections)
+		@remarks
+			Calling this function is not obligatory, but recommended
+		@param numPasses
+			The number of output channels expected to contain.
+		*/
+		void setNumOutputChannels( size_t numOuts )			{ mOutChannelMapping.reserve( numOuts ); }
+
+		/** Maps the output channel to the given texture name, which can be either a
+			local texture or a reference to an input channel. Global textures can't
+			be used as output.
+		@remarks
+			Don't leave gaps. (i.e. set channel 0 & 2, without setting channel 1)
+			It's ok to map them out of order (i.e. set channel 2, then 0, then 1)
+			Prefer calling @see setNumOutputChannels beforehand
+			Will throw if the local texture hasn't been declared yet or the input
+			channel name hasn't been set yet (declaration order is important!).
+		@param outChannel
+			Output channel # to map
+		@param textureName
+			Name of the texture, which can be to a local texture, or an input
+			channel's name. Global textures aren't supported.
+		*/
+		void mapOutputChannel( size_t outChannel, IdString textureName );
 	};
 
 	/** @} */

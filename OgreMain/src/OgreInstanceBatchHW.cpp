@@ -194,7 +194,7 @@ namespace Ogre
 
 			//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
 			MovableObject::cullFrustum( numObjs, objData, camera,
-						camera->getViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+						camera->getLastViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
 						*visibleObjects, (AxisAlignedBox*)0 );
 		}
 		else

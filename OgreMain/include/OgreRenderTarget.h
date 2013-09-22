@@ -150,7 +150,7 @@ namespace Ogre {
         virtual void swapBuffers(bool waitForVSync = true)
         { (void)waitForVSync; mFsaaResolveDirty = false; }
 
-		void setFsaaResolveDirty(void)									{ mFsaaResolveDirty = true; }
+		virtual void setFsaaResolveDirty(void)								{ mFsaaResolveDirty = true; }
 
         /** Adds a viewport to the rendering target.
             @remarks

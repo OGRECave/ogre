@@ -47,4 +47,24 @@ namespace Ogre
 		mTargetPasses.push_back( CompositorTargetDef( renderTargetName, this ) );
 		return &mTargetPasses.back();
 	}
+	//-----------------------------------------------------------------------------------
+	void CompositorNodeDef::mapOutputChannel( size_t outChannel, IdString textureName )
+	{
+		size_t index;
+		TextureSource textureSource;
+		getTextureSource( textureName, index, textureSource );
+
+		mOutChannelMapping.resize( outChannel+1 );
+
+		if( textureSource != TEXTURE_GLOBAL )
+		{
+			mOutChannelMapping[outChannel] = encodeTexSource( index, textureSource );
+		}
+		else
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+						"Can't use global textures as an output channel!. Node: '" +
+						mName.getFriendlyText() + "'", "CompositorNodeDef::mapOutputChannel" );
+		}
+	}
 }

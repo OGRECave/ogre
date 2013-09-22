@@ -567,7 +567,7 @@ namespace Ogre {
             using this camera, just the last once which was created referring
             to it.
         */
-        Viewport* getViewport(void) const {return mLastViewport;}
+        Viewport* getLastViewport(void) const {return mLastViewport;}
         /** Notifies this camera that a viewport is using it.*/
         void _notifyViewport(Viewport* viewport) {mLastViewport = viewport;}
 

@@ -30,10 +30,14 @@ THE SOFTWARE.
 #define __SCRIPTTRANSLATOR_H_
 
 #include "OgrePrerequisites.h"
+#include "Compositor/OgreCompositorCommon.h"
 #include "OgreScriptCompiler.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre{
+	struct IdString;
+	class TextureDefinitionBase;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -66,6 +70,8 @@ namespace Ogre{
 		static bool getBoolean(const AbstractNodePtr &node, bool *result);
 		/// Converts the node to a string and returns true if successful
 		static bool getString(const AbstractNodePtr &node, String *result);
+		/// Converts the node to an IdString and returns true if successful
+		static bool getIdString(const AbstractNodePtr &node, IdString *result);
 		/// Converts the node to a Real and returns true if successful
 		static bool getReal(const AbstractNodePtr &node, Real *result);
 		/// Converts the node to a float and returns true if successful
@@ -74,6 +80,8 @@ namespace Ogre{
 		static bool getInt(const AbstractNodePtr &node, int *result); 
 		/// Converts the node to an unsigned integer and returns true if successful
 		static bool getUInt(const AbstractNodePtr &node, uint32 *result); 
+		/// Converts the node to a an integer (from hexadecimal) and returns true if successful
+		static bool getHex(const AbstractNodePtr &node, uint32 *result);
 		/// Converts the range of nodes to a ColourValue and returns true if successful
 		static bool getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries = 4);
 		/// Converts the node to a SceneBlendFactor enum and returns true if successful
@@ -218,7 +226,53 @@ namespace Ogre{
 	/**************************************************************************
 	 * Compositor section
 	 *************************************************************************/
-	class _OgreExport CompositorTranslator : public ScriptTranslator
+	class _OgreExport CompositorTextureBaseTranslator : public ScriptTranslator
+	{
+	protected:
+		void translateTextureProperty( TextureDefinitionBase *defBase, PropertyAbstractNode *prop,
+										ScriptCompiler *compiler ) const;
+	};
+	class _OgreExport CompositorWorkspaceTranslator : public CompositorTextureBaseTranslator
+	{
+	protected:
+		CompositorWorkspaceDef *mWorkspaceDef;
+	public:
+		CompositorWorkspaceTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+	class _OgreExport CompositorNodeTranslator : public CompositorTextureBaseTranslator
+	{
+	protected:
+		CompositorNodeDef *mNodeDef;
+	public:
+		CompositorNodeTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+	class _OgreExport CompositorTargetTranslator : public ScriptTranslator
+	{
+	protected:
+		CompositorTargetDef *mTargetDef;
+	public:
+		CompositorTargetTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+	class _OgreExport CompositorPassTranslator : public ScriptTranslator
+	{
+	protected:
+		CompositorPassDef *mPassDef;
+
+		void translateClear( ScriptCompiler *compiler, const AbstractNodePtr &node,
+							 CompositorTargetDef *targetDef );
+		void translateQuad( ScriptCompiler *compiler, const AbstractNodePtr &node,
+							CompositorTargetDef *targetDef );
+		void translateScene( ScriptCompiler *compiler, const AbstractNodePtr &node,
+							 CompositorTargetDef *targetDef );
+
+	public:
+		CompositorPassTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+	/*class _OgreExport CompositorTranslator : public ScriptTranslator
 	{
 	protected:
 		Compositor *mCompositor;
@@ -249,7 +303,7 @@ namespace Ogre{
 	public:
 		CompositionPassTranslator();
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-	};
+	};*/
 
 	/**************************************************************************
 	 * BuiltinScriptTranslatorManager
@@ -268,10 +322,10 @@ namespace Ogre{
 		ParticleSystemTranslator mParticleSystemTranslator;
 		ParticleEmitterTranslator mParticleEmitterTranslator;
 		ParticleAffectorTranslator mParticleAffectorTranslator;
-		CompositorTranslator mCompositorTranslator;
-		CompositionTechniqueTranslator mCompositionTechniqueTranslator;
-		CompositionTargetPassTranslator mCompositionTargetPassTranslator;
-		CompositionPassTranslator mCompositionPassTranslator;
+		CompositorWorkspaceTranslator mCompositorWorkspaceTranslator;
+		CompositorNodeTranslator mCompositorNodeTranslator;
+		CompositorTargetTranslator mCompositorTargetTranslator;
+		CompositorPassTranslator mCompositorPassTranslator;
 	public:
 		BuiltinScriptTranslatorManager();
 		/// Returns the number of translators being managed

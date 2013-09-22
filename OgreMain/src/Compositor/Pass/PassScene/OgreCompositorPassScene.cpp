@@ -113,6 +113,7 @@ namespace Ogre
 			mTarget->_beginUpdate();
 		}
 
+		mTarget->setFsaaResolveDirty();
 		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mDefinition->mFirstRQ,
 												mDefinition->mLastRQ, true );
 

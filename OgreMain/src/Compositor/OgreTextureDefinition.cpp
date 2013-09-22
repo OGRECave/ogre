@@ -118,7 +118,8 @@ namespace Ogre
 		if( itor == mNameToChannelMap.end() )
 		{
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-						"Can't find texture with name: '" + name.getFriendlyText() + "'",
+						"Can't find texture with name: '" + name.getFriendlyText() + "'"
+						" If it's a global texture, trying to use it in the output channel will fail.",
 						"CompositorNodeDef::getTextureSource" );
 		}
 
@@ -163,9 +164,8 @@ namespace Ogre
 			CompositorChannel newChannel;
 
 			//If undefined, use main target's hw gamma settings, else use explicit setting
-			bool hwGamma	= itor->hwGammaWrite == TextureDefinition::Undefined ?
-								defaultHwGamma :
-								itor->hwGammaWrite == TextureDefinition::True;
+			bool hwGamma	= itor->hwGammaWrite == Undefined ? defaultHwGamma :
+																(itor->hwGammaWrite == True);
 			//If true, use main target's fsaa settings, else disable
 			uint fsaa		= itor->fsaa ? defaultFsaa : 0;
 			const String &fsaaHint = itor->fsaa ? defaultFsaaHint : StringUtil::BLANK;
