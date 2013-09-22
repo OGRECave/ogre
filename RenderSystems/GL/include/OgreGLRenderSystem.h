@@ -43,6 +43,8 @@ namespace Ogre {
         class GLSLProgramFactory;
     }
 
+    class GLStateCacheManager;
+
 	/**
       Implementation of GL as a rendering system.
      */
@@ -96,6 +98,9 @@ namespace Ogre {
 		/// Store last colour write state
 		bool mColourWrite[4];
 
+		/// Store scissor box
+		int mScissorBox[4];
+
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
@@ -134,6 +139,8 @@ namespace Ogre {
 		/// List of background thread contexts
 		GLContextList mBackgroundContextList;
 
+		GLStateCacheManager* mStateCacheManager;
+
         /** Manager object for creating render textures.
             Direct render to texture via GL_EXT_framebuffer_object is preferable 
 			to pbuffers, which depend on the GL support used and are generally 
@@ -151,7 +158,6 @@ namespace Ogre {
 
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
-		bool activateGLTextureUnit(size_t unit);
         void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
                 const size_t vertexStart, 
                 vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );
@@ -498,6 +504,7 @@ namespace Ogre {
         void unregisterThread();
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
+        GLSupport* getGLSupportRef() { return mGLSupport; }
 
         // ----------------------------------
         // GLRenderSystem specific members

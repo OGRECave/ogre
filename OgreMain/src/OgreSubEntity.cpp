@@ -83,7 +83,7 @@ namespace Ogre {
     {
 
 
-		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName).staticCast<Material>();
+		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
 
 		if( material.isNull() )
 		{
@@ -92,7 +92,7 @@ namespace Ogre {
 				"Material does not exist. Have you forgotten to define it in a "
 				".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
+			material = MaterialManager::getSingleton().getByName("BaseWhite");
 
 			if (material.isNull())
 			{
@@ -117,7 +117,7 @@ namespace Ogre {
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
 			
-            mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>();
+			mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
 			
             if (mMaterialPtr.isNull())
             {
@@ -163,7 +163,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void SubEntity::setIndexDataStartIndex(size_t start_index)
     {
-		if(start_index >= 0 && start_index < mSubMesh->indexData->indexCount)
+		if(start_index < mSubMesh->indexData->indexCount)
 	        mIndexStart = start_index;
     }
     //-----------------------------------------------------------------------

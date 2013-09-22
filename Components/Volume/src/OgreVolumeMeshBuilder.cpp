@@ -193,9 +193,9 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void MeshBuilder::executeCallback(MeshBuilderCallback *callback, size_t level, int inProcess) const
+    void MeshBuilder::executeCallback(MeshBuilderCallback *callback, const SimpleRenderable *simpleRenderable, size_t level, int inProcess) const
     {
-        callback->ready(mVertices, mIndices, level, inProcess);
+        callback->ready(simpleRenderable, mVertices, mIndices, level, inProcess);
     }
 
 }

@@ -22,20 +22,16 @@ varying vec2 oTexcoord2_0;
 
 void main()
 {
-#if SHADOW_CASTER
 	// transform by indexed matrix
 	vec4 transformedPos = vec4((worldMatrixArray[int(uv1)] * position).xyz, 1.0);
 
 	// view / projection
 	gl_Position = viewProjectionMatrix * transformedPos;
+
+#if SHADOW_CASTER
 	
 	oColor_0 = ambient;
 #else
-	// transform by indexed matrix
-	vec4 transformedPos = vec4((worldMatrixArray[int(uv1)] * position).xyz, 1.0);
-	
-	// view / projection
-	gl_Position = viewProjectionMatrix * transformedPos;
 	oTexcoord2_0 = uv0.xy;
 
 	vec3 norm = mat3(worldMatrixArray[int(uv1)]) * normal;

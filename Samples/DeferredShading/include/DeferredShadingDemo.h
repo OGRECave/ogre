@@ -252,13 +252,22 @@ protected:
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support vertex and fragment programs, so cannot "
                         "run this demo. Sorry!", 
-                        "DeferredShading::createScene");
+                        "DeferredShading::testCapabilities");
         }
 		if (caps->getNumMultiRenderTargets()<2)
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
                         "run this demo. Sorry!", 
-                        "DeferredShading::createScene");
+                        "DeferredShading::testCapabilities");
+        }
+
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
+			!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+        {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced vertex"
+                        " programs, so you cannot run this sample. Sorry!", "DeferredShading::testCapabilities");
         }
     }
 
@@ -399,7 +408,7 @@ protected:
 			String matname = light->getName()+"m";
 			// Create coloured material
 			MaterialPtr mat = MaterialManager::getSingleton().create(matname,
-                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+																	 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             Pass* pass = mat->getTechnique(0)->getPass(0);
             pass->setDiffuse(0.0f,0.0f,0.0f,1.0f);
 			pass->setAmbient(0.0f,0.0f,0.0f);

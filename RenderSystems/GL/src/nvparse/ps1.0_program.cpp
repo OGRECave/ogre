@@ -201,6 +201,8 @@ namespace
 	{
 		set_texture_shaders(vector<constdef> * cdef)
 		{
+            GLint activeTex = 0;
+            glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
 			for(stage = 0; stage < 4; stage++)
 			{
 				glActiveTextureARB(GL_TEXTURE0_ARB + stage);
@@ -208,12 +210,17 @@ namespace
 			}
 			stage = 0;
 			c = cdef;
+
+            glActiveTextureARB(activeTex);
 		}
 
 		void operator() (vector<string> & instr)
 		{
 			if(stage > 3)
 				return;
+            GLint activeTex = 0;
+            glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
+
 			glActiveTextureARB(GL_TEXTURE0_ARB + stage);
 
 			string op = instr[0];
@@ -394,6 +401,7 @@ namespace
 				glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV, GL_TEXTURE0_ARB + reg2stage[instr[2]]);
 			}
 			stage++;
+            glActiveTextureARB(activeTex);
 		}
 
 		map<string, int> reg2stage;
@@ -902,6 +910,8 @@ void ps10::invoke(vector<constdef> * c,
 {
 	const_to_combiner_reg_mapping_count = 0; // Hansong
 
+    GLint activeTex = 0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
 
 	glEnable(GL_PER_STAGE_CONSTANTS_NV); // should we require apps to do this?
 	if(c)
@@ -921,6 +931,7 @@ void ps10::invoke(vector<constdef> * c,
 	SetFinalCombinerStage();
 	// We can clear the stageToTarget map now.
 	stageToTargetMap.clear();
+    glActiveTextureARB(activeTex);
 }
 
 // simple identification - just look for magic substring

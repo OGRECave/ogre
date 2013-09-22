@@ -43,6 +43,11 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
+    //-----------------------------------------------------------------------
+    GpuProgramPtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    {
+        return getResourceByName(name, preferHighLevelPrograms).staticCast<GpuProgram>();
+    }
 	//---------------------------------------------------------------------------
 	GpuProgramManager::GpuProgramManager()
 	{
@@ -68,7 +73,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name).staticCast<GpuProgram>();
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgram(name, groupName, filename, gptype, syntaxCode);
@@ -86,7 +91,7 @@ namespace Ogre {
 		GpuProgramPtr prg;
 		{
                     OGRE_LOCK_AUTO_MUTEX;
-			prg = getByName(name).staticCast<GpuProgram>();
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);
@@ -154,16 +159,16 @@ namespace Ogre {
         return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    ResourcePtr GpuProgramManager::getResourceByName(const String& name, bool preferHighLevelPrograms)
     {
         ResourcePtr ret;
         if (preferHighLevelPrograms)
         {
-            ret = HighLevelGpuProgramManager::getSingleton().getByName(name);
+            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name);
             if (!ret.isNull())
                 return ret;
         }
-        return ResourceManager::getByName(name);
+        return ResourceManager::getResourceByName(name);
     }
 	//-----------------------------------------------------------------------------
 	GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
@@ -218,7 +223,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
 	{
-		mSaveMicrocodesToCache = val;		
+        // Check that saving shader microcode is supported
+        if(!canGetCompiledShaderBuffer())
+            mSaveMicrocodesToCache = false;
+        else
+            mSaveMicrocodesToCache = val;
 	}
 	//---------------------------------------------------------------------
 	bool GpuProgramManager::isCacheDirty( void ) const

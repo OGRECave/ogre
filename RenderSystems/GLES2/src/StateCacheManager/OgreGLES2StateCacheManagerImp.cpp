@@ -168,9 +168,20 @@ namespace Ogre {
             {
 				OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
             }
+
+            // Currently bound buffer is being deleted, update the cached value to 0,
+            // which it likely the buffer that will be bound by the driver.
+            // An update will be forced next time we try to bind on this target.
+            (*i).second = 0;
         }
     }
-    
+
+    void GLES2StateCacheManagerImp::invalidateStateForTexture(GLuint texture)
+    {
+        TexUnitsMap::iterator it = mTexUnitsMap.find(texture);
+        mTexUnitsMap.erase(it);
+    }
+
 //#pragma mark Texture settings and bindings
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)

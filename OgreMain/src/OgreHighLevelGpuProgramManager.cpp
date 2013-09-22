@@ -185,6 +185,11 @@ namespace Ogre {
         return getFactory(paramIt->second)->create(this, name, getNextHandle(), 
             group, isManual, loader);
     }
+    //-----------------------------------------------------------------------
+    HighLevelGpuProgramPtr HighLevelGpuProgramManager::getByName(const String& name, const String& groupName)
+    {
+        return getResourceByName(name, groupName).staticCast<HighLevelGpuProgram>();
+    }
     //---------------------------------------------------------------------------
     HighLevelGpuProgramPtr HighLevelGpuProgramManager::createProgram(
 			const String& name, const String& groupName, 

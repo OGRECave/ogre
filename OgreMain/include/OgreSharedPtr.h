@@ -51,14 +51,54 @@ namespace Ogre {
 	};
 
     struct SharedPtrInfo {
-        inline SharedPtrInfo(SharedPtrFreeMethod freeMethod) 
+        inline SharedPtrInfo() 
             : useCount(1)
-            , useFreeMethod(freeMethod) 
         {}
 
-        AtomicScalar<unsigned> useCount;
-        SharedPtrFreeMethod    useFreeMethod; /// If we should use OGRE_FREE instead of OGRE_DELETE
+        virtual ~SharedPtrInfo() {}
+
+        AtomicScalar<unsigned>  useCount;
     };
+
+	template <class T>
+	class SharedPtrInfoDelete : public SharedPtrInfo
+	{
+        T* mObject;
+    public:
+        inline SharedPtrInfoDelete(T* o) : mObject(o) {}
+
+		virtual ~SharedPtrInfoDelete()
+		{
+			OGRE_DELETE mObject;
+		}
+	};
+
+	template <class T>
+	class SharedPtrInfoDeleteT : public SharedPtrInfo
+	{
+        T* mObject;
+    public:
+        inline SharedPtrInfoDeleteT(T* o) : mObject(o) {}
+
+		virtual ~SharedPtrInfoDeleteT()
+		{
+			OGRE_DELETE_T(mObject, T, MEMCATEGORY_GENERAL);
+		}
+	};
+
+	template <class T>
+	class SharedPtrInfoFree : public SharedPtrInfo
+	{
+        T* mObject;
+    public:
+        inline SharedPtrInfoFree(T* o) : mObject(o) {}        
+
+		virtual ~SharedPtrInfoFree()
+		{
+			OGRE_FREE(mObject, MEMCATEGORY_GENERAL);
+		}
+	};
+
 
 	/** Reference-counted shared pointer, used for objects where implicit destruction is 
         required. 
@@ -72,10 +112,24 @@ namespace Ogre {
 	{
         template<typename Y> friend class SharedPtr;
 	protected:
+        /* DO NOT ADD MEMBERS TO THIS CLASS!
+         *
+         * The average Ogre application has *thousands* of them. Every extra
+         * member causes extra memory use in general, and causes extra padding
+         * to be added to a multitude of structures. 
+         *
+         * Everything you need to do can be acomplished by creatively working 
+         * with the SharedPtrInfo object.
+         *
+         * There is no reason for this object to ever have more than two members.
+         */
+
 		T*             pRep;
         SharedPtrInfo* pInfo;
 
-        SharedPtr(T* rep, SharedPtrInfo* info) : pRep(rep), pInfo(info) {}
+        SharedPtr(T* rep, SharedPtrInfo* info) : pRep(rep), pInfo(info)
+		{
+		}
 
 	public:
 		/** Constructor, does not initialise the SharedPtr.
@@ -85,6 +139,19 @@ namespace Ogre {
 		SharedPtr() : pRep(0), pInfo(0)
         {}
 
+    private:
+        static SharedPtrInfo* createInfoForMethod(T* rep, SharedPtrFreeMethod method)
+        {
+            switch(method) {
+                case SPFM_DELETE:   return OGRE_NEW_T(SharedPtrInfoDelete<T>,  MEMCATEGORY_GENERAL) (rep);
+                case SPFM_DELETE_T: return OGRE_NEW_T(SharedPtrInfoDeleteT<T>, MEMCATEGORY_GENERAL) (rep);
+                case SPFM_FREE:     return OGRE_NEW_T(SharedPtrInfoFree<T>,    MEMCATEGORY_GENERAL) (rep);
+            }
+            assert(!"Bad method");
+            return 0;
+        }
+    public:
+
 		/** Constructor.
 		@param rep The pointer to take ownership of
 		@param inFreeMethod The mechanism to use to free the pointer
@@ -92,7 +159,7 @@ namespace Ogre {
         template< class Y>
 		explicit SharedPtr(Y* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) 
             : pRep(rep)
-            , pInfo(rep ? OGRE_NEW_T(SharedPtrInfo, MEMCATEGORY_GENERAL)(inFreeMethod) : 0)
+            , pInfo(rep ? createInfoForMethod(rep, inFreeMethod) : 0)
 		{
 		}
 
@@ -168,7 +235,7 @@ namespace Ogre {
         {
             if(pRep) {
                 ++pInfo->useCount;
-                return SharedPtr<Y>(static_cast<Y*>(pRep), pInfo);
+				return SharedPtr<Y>(static_cast<Y*>(pRep), pInfo);
             } else return SharedPtr<Y>();
         }
 
@@ -178,7 +245,7 @@ namespace Ogre {
             if(pRep) {
                 Y* rep = dynamic_cast<Y*>(pRep);
                 ++pInfo->useCount;
-                return SharedPtr<Y>(rep, pInfo);
+				return SharedPtr<Y>(rep, pInfo);
             } else return SharedPtr<Y>();
         }
 
@@ -189,10 +256,13 @@ namespace Ogre {
 		/** Binds rep to the SharedPtr.
 			@remarks
 				Assumes that the SharedPtr is uninitialised!
+
+            @warning
+                The object must not be bound into a SharedPtr elsewhere
 		*/
 		void bind(T* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) {
 			assert(!pRep && !pInfo);
-			pInfo = OGRE_NEW_T(SharedPtrInfo, MEMCATEGORY_GENERAL)(inFreeMethod);
+			pInfo = createInfoForMethod(rep, inFreeMethod);
 			pRep = rep;
 		}
 
@@ -201,7 +271,6 @@ namespace Ogre {
         inline void setUseCount(unsigned value) { assert(pInfo); pInfo->useCount = value; }
 
 		inline T* getPointer() const { return pRep; }
-		inline SharedPtrFreeMethod freeMethod() const { return pInfo->useFreeMethod; }
 
 		inline bool isNull(void) const { return pRep == 0; }
 
@@ -234,19 +303,6 @@ namespace Ogre {
         inline void destroy(void)
         {
             assert(pRep && pInfo);
-			switch(pInfo->useFreeMethod)
-			{
-			case SPFM_DELETE:
-				OGRE_DELETE pRep;
-				break;
-			case SPFM_DELETE_T:
-				OGRE_DELETE_T(pRep, T, MEMCATEGORY_GENERAL);
-				break;
-			case SPFM_FREE:
-				OGRE_FREE(pRep, MEMCATEGORY_GENERAL);
-				break;
-			};
-
             OGRE_DELETE_T(pInfo, SharedPtrInfo, MEMCATEGORY_GENERAL);
         }
 

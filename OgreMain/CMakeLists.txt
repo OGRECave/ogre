@@ -255,8 +255,6 @@ if (OGRE_CONFIG_ENABLE_ZIP)
 
   if(ANDROID)
     ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
-    list(APPEND PLATFORM_HEADERS include/Android/OgreAPKZipArchive.h)
-    list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
 
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")

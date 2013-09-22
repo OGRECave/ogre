@@ -60,7 +60,7 @@ Description: Base class for all the OGRE examples
 #   include "macUtils.h"
 #endif
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 /** This class simply demonstrates basic usage of the CRTShader system.
 It sub class the material manager listener class and when a target scheme callback
@@ -140,7 +140,7 @@ public:
         mConfigPath = mResourcePath;
 #endif
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		mShaderGenerator	 = NULL;		
 		mMaterialMgrListener = NULL;
 #endif
@@ -175,7 +175,7 @@ public:
         // clean up
         destroyScene();	
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		// Finalize shader generator.
 		finalizeShaderGenerator();
 #endif
@@ -194,7 +194,7 @@ protected:
     RenderWindow* mWindow;
 	Ogre::String mResourcePath;
 	Ogre::String mConfigPath;
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 	RTShader::ShaderGenerator*					mShaderGenerator;			// The Shader generator instance.
 	ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Material manager listener.	
 #endif
@@ -229,7 +229,7 @@ protected:
         chooseSceneManager();
         createCamera();
         createViewports();
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		// Initialize shader generator.
 		carryOn = initializeShaderGenerator(mSceneMgr);
 		if (!carryOn) 
@@ -252,7 +252,7 @@ protected:
         return true;
 
     }
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 	virtual bool initializeShaderGenerator(SceneManager* sceneMgr)
 	{	
 		if (RTShader::ShaderGenerator::initialize())

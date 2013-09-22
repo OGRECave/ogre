@@ -4,7 +4,6 @@ uniform mat4 worldViewProj;
 uniform mat4 texViewProj;
 uniform vec4 lightPosition;
 uniform vec4 lightColour;
-uniform vec4 shadowDepthRange;
 
 
 void main()
@@ -23,10 +22,5 @@ void main()
 
 	// calculate shadow map coords
 	gl_TexCoord[0] = texViewProj * worldPos;
-#if LINEAR_RANGE
-	// adjust by fixed depth bias, rescale into range
-	gl_TexCoord[0].z = (gl_TexCoord[0].z - shadowDepthRange.x) * shadowDepthRange.w;
-#endif
-
 }
 

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESGpuProgram.h"
@@ -193,7 +194,7 @@ namespace Ogre {
 			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            if(getGLSupport()->checkExtension("GL_EXT_debug_label"))
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                     glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
@@ -204,7 +205,7 @@ namespace Ogre {
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                if(getGLSupport()->checkExtension("GL_EXT_debug_label"))
+                if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
                 {
                     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                         glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
@@ -433,7 +434,7 @@ namespace Ogre {
 				}
 			}	
 			// rebuild source
-			std::stringstream newSource;	
+			StringStream newSource;	
 			for(size_t i = 0; i < linesOfSource.size()  ; i++)
 			{
 				newSource << linesOfSource[i] << "\n";

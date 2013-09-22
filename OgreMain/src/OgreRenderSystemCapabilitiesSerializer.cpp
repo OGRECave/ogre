@@ -454,6 +454,9 @@ namespace Ogre
         addKeywordType("texture_compression_dxt", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_vtc", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_pvrtc", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_compression_atc", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_compression_etc1", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_compression_etc2", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_bc4_bc5", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_bc6h_bc7", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("gl1_5_novbo", SET_CAPABILITY_ENUM_BOOL);

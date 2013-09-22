@@ -28,10 +28,11 @@ THE SOFTWARE.
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreGLHardwareVertexBuffer.h"
 #include "OgreGLHardwareIndexBuffer.h"
+#include "OgreGLRenderSystem.h"
 #include "OgreGLRenderToVertexBuffer.h"
+#include "OgreGLUtil.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre {
@@ -50,6 +51,8 @@ namespace Ogre {
     GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
 		: mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
+		mStateCacheManager = dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef()->getStateCacheManager();
+
 		// Init scratch pool
 		// TODO make it a configurable size?
 		// 32-bit aligned buffer

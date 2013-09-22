@@ -62,6 +62,7 @@ namespace Ogre {
         bool mIsExternal;
         String mWindowTitle;
         bool mUseNSView;
+        float mContentScalingFactor;
 
         void _setWindowParameters(void);
     public:
@@ -100,6 +101,10 @@ namespace Ogre {
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
+        /** Overridden - see RenderWindow */
+        virtual unsigned int getWidth(void) const;
+        /** Overridden - see RenderWindow */
+        virtual unsigned int getHeight(void) const;
         /** Overridden - see RenderWindow */
 		void windowMovedOrResized(void);
 		void windowResized(void);

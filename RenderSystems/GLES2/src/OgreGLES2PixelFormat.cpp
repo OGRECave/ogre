@@ -42,7 +42,7 @@ namespace Ogre  {
             case PF_DEPTH:
                 return GL_DEPTH_COMPONENT;
 
-#if GL_OES_texture_half_float && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if GL_OES_texture_half_float || GL_EXT_color_buffer_half_float || (OGRE_NO_GLES3_SUPPORT == 0) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
                 return GL_RGB;
@@ -51,14 +51,29 @@ namespace Ogre  {
                 return GL_RGBA;
 #endif
 
-#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
+#if (OGRE_NO_GLES3_SUPPORT == 0)
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
             case PF_R8:
                 return GL_RED_EXT;
-
             case PF_FLOAT16_GR:
             case PF_FLOAT32_GR:
+            case PF_RG8:
+                return GL_RG_EXT;
+#endif
+
+#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
+            case PF_FLOAT16_R:
+                return GL_R16F_EXT;
+            case PF_FLOAT32_R:
+                return GL_R32F_EXT;
+            case PF_R8:
+                return GL_RED_EXT;
+
+            case PF_FLOAT16_GR:
+                return GL_RG16F_EXT;
+            case PF_FLOAT32_GR:
+                return GL_RG32F_EXT;
             case PF_RG8:
                 return GL_RG_EXT;
 #endif
@@ -112,35 +127,27 @@ namespace Ogre  {
             case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
+            case PF_X8B8G8R8:
             case PF_SHORT_RGB:
                 return GL_RGB;
                 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            case PF_A1R5G5B5:
-            case PF_A4R4G4B4:
-            case PF_X8R8G8B8:
-            case PF_A8R8G8B8:
-            case PF_B8G8R8A8:
-            case PF_X8B8G8R8:
-            case PF_A8B8G8R8:
-                return GL_RGBA;
-#else
 			case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
             case PF_B8G8R8A8:
 			case PF_R8G8B8A8:
             case PF_A2R10G10B10:
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                return GL_BGRA;
-#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             case PF_A8B8G8R8:
+                return GL_BGRA_EXT;
+#else
+            case PF_A8B8G8R8:
+#endif
             case PF_A4R4G4B4:
             case PF_A1R5G5B5:
-            case PF_X8B8G8R8:
             case PF_A2B10G10R10:
             case PF_SHORT_RGBA:
                 return GL_RGBA;
-#endif
+
             case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
                 return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
@@ -321,6 +328,7 @@ namespace Ogre  {
                 return 0;
         }
     }
+
 	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLInternalFormat(PixelFormat fmt, bool hwGamma)
     {
@@ -379,8 +387,6 @@ namespace Ogre  {
                 return GL_RGBA4;
             case PF_R8G8B8:
             case PF_B8G8R8:
-			case PF_X8B8G8R8:
-			case PF_X8R8G8B8:
 				if (hwGamma)
 					return GL_SRGB8;
 				else
@@ -389,6 +395,8 @@ namespace Ogre  {
             case PF_B8G8R8A8:
             case PF_A8B8G8R8:
             case PF_R8G8B8A8:
+			case PF_X8B8G8R8:
+			case PF_X8R8G8B8:
 				if (hwGamma)
 					return GL_SRGB8_ALPHA8;
 				else
@@ -467,8 +475,8 @@ namespace Ogre  {
             case PF_L8:
             case PF_A8:
                 return GL_R8;
-//            case PF_L16:
-//                return GL_R16F;
+            case PF_L16:
+                return GL_R16F_EXT;
 #else
             case PF_L8:
             case PF_L16:
@@ -479,19 +487,19 @@ namespace Ogre  {
 
             case PF_BYTE_LA:
                 return GL_LUMINANCE_ALPHA;
-			case PF_A8B8G8R8:
             case PF_A8R8G8B8:
+            case PF_A8B8G8R8:
             case PF_B8G8R8A8:
             case PF_A1R5G5B5:
             case PF_A4R4G4B4:
+            case PF_X8B8G8R8:
+            case PF_X8R8G8B8:
             case PF_SHORT_RGBA:
                 return GL_RGBA;
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
             case PF_R5G6B5:
             case PF_B5G6R5:
-            case PF_X8B8G8R8:
-            case PF_X8R8G8B8:
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_SHORT_RGB:
@@ -522,11 +530,15 @@ namespace Ogre  {
                 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
             case PF_FLOAT16_R:
+                return GL_R16F_EXT;
             case PF_FLOAT32_R:
+                return GL_R32F_EXT;
             case PF_R8:
                 return GL_RED_EXT;
             case PF_FLOAT16_GR:
+                return GL_RG16F_EXT;
             case PF_FLOAT32_GR:
+                return GL_RG32F_EXT;
             case PF_RG8:
                 return GL_RG_EXT;
 #endif
@@ -569,7 +581,12 @@ namespace Ogre  {
         switch (fmt)
         {
             case GL_DEPTH_COMPONENT:
+            case GL_DEPTH24_STENCIL8_OES:
+            case GL_DEPTH_COMPONENT16:
+            case GL_DEPTH_COMPONENT24_OES:
+            case GL_DEPTH_COMPONENT32_OES:
                 return PF_DEPTH;
+
 #if GL_IMG_texture_compression_pvrtc
             case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
                 return PF_PVRTC_RGB2;
@@ -620,6 +637,7 @@ namespace Ogre  {
                 return PF_BYTE_LA;
                 
             case GL_RGB:
+            case GL_RGB8_OES:
                 switch(dataType)
                 {
                     case GL_UNSIGNED_SHORT_5_6_5:
@@ -632,6 +650,7 @@ namespace Ogre  {
                         return PF_R8G8B8;
                 }
             case GL_RGBA:
+            case GL_RGBA8_OES:
                 switch(dataType)
                 {
                     case GL_UNSIGNED_SHORT_5_5_5_1:
@@ -643,17 +662,17 @@ namespace Ogre  {
                     case GL_FLOAT:
                         return PF_FLOAT32_RGBA;
                     default:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                        return PF_A8R8G8B8;
+#else
                         return PF_A8B8G8R8;
-                }
-#ifdef GL_BGRA
-            case GL_BGRA:
-                return PF_A8B8G8R8;
 #endif
-            case GL_RGB8_OES:
-                return PF_X8R8G8B8;
-            case GL_RGBA8_OES:
+                }
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            case GL_BGRA_EXT:
                 return PF_A8R8G8B8;
-                
+#endif
+
 #if GL_EXT_texture_compression_dxt1
             case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
             case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
@@ -740,10 +759,33 @@ namespace Ogre  {
                 return PF_X8R8G8B8;
             case GL_SRGB8_ALPHA8:
                 return PF_A8R8G8B8;
-
 #endif
+
+#if GL_EXT_color_buffer_half_float || (OGRE_NO_GLES3_SUPPORT == 0)
+            case GL_RGBA16F_EXT:
+                return PF_FLOAT16_RGBA;
+            case GL_RGB16F_EXT:
+                return PF_FLOAT16_RGB;
+            case GL_RG16F_EXT:
+                return PF_FLOAT16_GR;
+            case GL_R16F_EXT:
+                return PF_FLOAT16_R;
+#endif
+
+#if GL_EXT_color_buffer_float || (OGRE_NO_GLES3_SUPPORT == 0)
+            case GL_RGBA32F_EXT:
+                return PF_FLOAT32_RGBA;
+            case GL_RGB32F_EXT:
+                return PF_FLOAT32_RGB;
+            case GL_RG32F_EXT:
+                return PF_FLOAT32_GR;
+            case GL_R32F_EXT:
+                return PF_FLOAT32_R;
+#endif
+
             default:
-                return PF_A8R8G8B8;
+                LogManager::getSingleton().logMessage("Unhandled Pixel format: " + StringConverter::toString(fmt));
+                return PF_A8B8G8R8;
         };
     }
 	//-----------------------------------------------------------------------------

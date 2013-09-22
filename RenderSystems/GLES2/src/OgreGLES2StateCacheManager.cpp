@@ -32,7 +32,7 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-#if OGRE_NO_GLES2_STATE_CACHE_SUPPORT == 0
+#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
 #   include "OgreGLES2StateCacheManagerImp.h"
 #else
 #   include "OgreGLES2NullStateCacheManagerImp.h"
@@ -48,6 +48,7 @@ namespace Ogre {
     GLES2StateCacheManager::~GLES2StateCacheManager()
     {
         delete mImp;
+        mImp = 0;
     }
 
     void GLES2StateCacheManager::initializeCache()
@@ -69,7 +70,12 @@ namespace Ogre {
     {
         mImp->deleteGLBuffer(target, buffer, force);
     }
-    
+
+    void GLES2StateCacheManager::invalidateStateForTexture(GLuint texture)
+    {
+        mImp->invalidateStateForTexture(texture);
+    }
+
     void GLES2StateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         mImp->setTexParameteri(target, pname, param);

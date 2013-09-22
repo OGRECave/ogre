@@ -519,7 +519,7 @@ namespace Ogre {
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
         // Read pixel data from the framebuffer
-		OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                                          (GLsizei)width, (GLsizei)height,
                                          format, type, data));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
@@ -550,7 +550,7 @@ namespace Ogre {
         CGContextDrawImage(context, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
 
         // Retrieve the UIImage from the current context
-        memcpy(dst.data, CGBitmapContextGetData(context), CGBitmapContextGetBytesPerRow(context) * height);
+        memcpy(dst.data, CGBitmapContextGetData(context), CGBitmapContextGetBytesPerRow(context) * height); // TODO: support dst.rowPitch != dst.getWidth() case
         UIGraphicsEndImageContext();
 
         // Clean up

@@ -82,6 +82,18 @@ Resource* CompositorManager::createImpl(const String& name, ResourceHandle handl
     return OGRE_NEW Compositor(this, name, handle, group, isManual, loader);
 }
 //-----------------------------------------------------------------------
+CompositorPtr CompositorManager::create (const String& name, const String& group,
+								bool isManual, ManualResourceLoader* loader,
+								const NameValuePairList* createParams)
+{
+	return createResource(name,group,isManual,loader,createParams).staticCast<Compositor>();
+}
+//-----------------------------------------------------------------------
+CompositorPtr CompositorManager::getByName(const String& name, const String& groupName)
+{
+	return getResourceByName(name, groupName).staticCast<Compositor>();
+}
+//-----------------------------------------------------------------------
 void CompositorManager::initialise(void)
 {
 }
@@ -154,7 +166,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 //-----------------------------------------------------------------------
 CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String &compositor, int addPosition)
 {
-	CompositorPtr comp = getByName(compositor).staticCast<Compositor>();
+	CompositorPtr comp = getByName(compositor);
 	if(comp.isNull())
 		return 0;
 	CompositorChain *chain = getCompositorChain(vp);

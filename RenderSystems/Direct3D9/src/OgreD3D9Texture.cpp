@@ -1893,7 +1893,7 @@ namespace Ogre
 
 		if (it != mMapDeviceToTextureResources.end())
 		{			
-			std::stringstream ss;
+			StringStream ss;
 
 			ss << "D3D9 device: 0x[" << d3d9Device << "] destroy. Releasing D3D9 texture: " << mName;
 			LogManager::getSingleton().logMessage(ss.str());
@@ -1932,7 +1932,7 @@ namespace Ogre
 
 			if (it != mMapDeviceToTextureResources.end())
 			{
-				std::stringstream ss;
+				StringStream ss;
 
 				ss << "D3D9 device: 0x[" << d3d9Device << "] lost. Releasing D3D9 texture: " << mName;
 				LogManager::getSingleton().logMessage(ss.str());

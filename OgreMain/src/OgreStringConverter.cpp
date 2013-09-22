@@ -31,12 +31,14 @@ THE SOFTWARE.
 namespace Ogre {
 
     String StringConverter::msDefaultStringLocale = OGRE_DEFAULT_LOCALE;
+    std::locale StringConverter::msLocale = std::locale(msDefaultStringLocale.c_str());
 
     //-----------------------------------------------------------------------
     String StringConverter::toString(Real val, unsigned short precision, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -52,6 +54,7 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -66,6 +69,7 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -80,6 +84,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -93,6 +98,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -105,6 +111,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -118,6 +125,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -133,6 +141,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -145,6 +154,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -158,6 +168,7 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -169,6 +180,7 @@ namespace Ogre {
     String StringConverter::toString(const Vector2& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream << val.x << " " << val.y;
         return stream.str();
     }
@@ -176,6 +188,7 @@ namespace Ogre {
     String StringConverter::toString(const Vector3& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -183,6 +196,7 @@ namespace Ogre {
     String StringConverter::toString(const Vector4& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z << " " << val.w;
         return stream.str();
     }
@@ -190,7 +204,8 @@ namespace Ogre {
     String StringConverter::toString(const Matrix3& val)
     {
         StringStream stream;
-        stream << val[0][0] << " " 
+        stream.imbue(msLocale);
+        stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
             << val[1][0] << " "             
@@ -229,7 +244,8 @@ namespace Ogre {
     String StringConverter::toString(const Matrix4& val)
     {
         StringStream stream;
-        stream << val[0][0] << " " 
+        stream.imbue(msLocale);
+        stream << val[0][0] << " "
             << val[0][1] << " "             
             << val[0][2] << " "             
             << val[0][3] << " "             
@@ -251,6 +267,7 @@ namespace Ogre {
     String StringConverter::toString(const Quaternion& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream  << val.w << " " << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -258,6 +275,7 @@ namespace Ogre {
     String StringConverter::toString(const ColourValue& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         stream << val.r << " " << val.g << " " << val.b << " " << val.a;
         return stream.str();
     }
@@ -265,6 +283,7 @@ namespace Ogre {
     String StringConverter::toString(const StringVector& val)
     {
         StringStream stream;
+        stream.imbue(msLocale);
         StringVector::const_iterator i, iend, ibegin;
         ibegin = val.begin();
         iend = val.end();
@@ -278,11 +297,11 @@ namespace Ogre {
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    Real StringConverter::parseReal(const String& val, Real defaultValue, const std::locale &loc)
+    Real StringConverter::parseReal(const String& val, Real defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         Real ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -290,11 +309,11 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    int StringConverter::parseInt(const String& val, int defaultValue, const std::locale &loc)
+    int StringConverter::parseInt(const String& val, int defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         int ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -302,11 +321,11 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue, const std::locale &loc)
+    unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         unsigned int ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -314,11 +333,11 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    long StringConverter::parseLong(const String& val, long defaultValue, const std::locale &loc)
+    long StringConverter::parseLong(const String& val, long defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         long ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -326,11 +345,11 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue, const std::locale &loc)
+    unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         unsigned long ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -338,11 +357,11 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue, const std::locale &loc)
+    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         size_t ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -350,7 +369,7 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    bool StringConverter::parseBool(const String& val, bool defaultValue, const std::locale &loc)
+    bool StringConverter::parseBool(const String& val, bool defaultValue)
     {
         if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
             || StringUtil::startsWith(val, "1")))
@@ -362,7 +381,7 @@ namespace Ogre {
             return defaultValue;
     }
     //-----------------------------------------------------------------------
-    Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue, const std::locale &loc)
+    Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -373,11 +392,11 @@ namespace Ogre {
         }
         else
         {
-            return Vector2(parseReal(vec[0], defaultValue[0], loc), parseReal(vec[1], defaultValue[1], loc));
+            return Vector2(parseReal(vec[0], defaultValue[0]), parseReal(vec[1], defaultValue[1]));
         }
     }
     //-----------------------------------------------------------------------
-    Vector3 StringConverter::parseVector3(const String& val, const Vector3& defaultValue, const std::locale &loc)
+    Vector3 StringConverter::parseVector3(const String& val, const Vector3& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -388,13 +407,13 @@ namespace Ogre {
         }
         else
         {
-            return Vector3(parseReal(vec[0], defaultValue[0], loc),
-                           parseReal(vec[1], defaultValue[1], loc),
-                           parseReal(vec[2], defaultValue[2], loc));
+            return Vector3(parseReal(vec[0], defaultValue[0]),
+                           parseReal(vec[1], defaultValue[1]),
+                           parseReal(vec[2], defaultValue[2]));
         }
     }
     //-----------------------------------------------------------------------
-    Vector4 StringConverter::parseVector4(const String& val, const Vector4& defaultValue, const std::locale &loc)
+    Vector4 StringConverter::parseVector4(const String& val, const Vector4& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -405,14 +424,14 @@ namespace Ogre {
         }
         else
         {
-            return Vector4(parseReal(vec[0], defaultValue[0], loc),
-                           parseReal(vec[1], defaultValue[1], loc),
-                           parseReal(vec[2], defaultValue[2], loc),
-                           parseReal(vec[3], defaultValue[3], loc));
+            return Vector4(parseReal(vec[0], defaultValue[0]),
+                           parseReal(vec[1], defaultValue[1]),
+                           parseReal(vec[2], defaultValue[2]),
+                           parseReal(vec[3], defaultValue[3]));
         }
     }
     //-----------------------------------------------------------------------
-    Matrix3 StringConverter::parseMatrix3(const String& val, const Matrix3& defaultValue, const std::locale &loc)
+    Matrix3 StringConverter::parseMatrix3(const String& val, const Matrix3& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -423,21 +442,21 @@ namespace Ogre {
         }
         else
         {
-            return Matrix3(parseReal(vec[0], defaultValue[0][0], loc),
-                           parseReal(vec[1], defaultValue[0][1], loc),
-                           parseReal(vec[2], defaultValue[0][2], loc),
+            return Matrix3(parseReal(vec[0], defaultValue[0][0]),
+                           parseReal(vec[1], defaultValue[0][1]),
+                           parseReal(vec[2], defaultValue[0][2]),
 
-                           parseReal(vec[3], defaultValue[1][0], loc),
-                           parseReal(vec[4], defaultValue[1][1], loc),
-                           parseReal(vec[5], defaultValue[1][2], loc),
+                           parseReal(vec[3], defaultValue[1][0]),
+                           parseReal(vec[4], defaultValue[1][1]),
+                           parseReal(vec[5], defaultValue[1][2]),
 
-                           parseReal(vec[6], defaultValue[2][0], loc),
-                           parseReal(vec[7], defaultValue[2][1], loc),
-                           parseReal(vec[8], defaultValue[2][2], loc));
+                           parseReal(vec[6], defaultValue[2][0]),
+                           parseReal(vec[7], defaultValue[2][1]),
+                           parseReal(vec[8], defaultValue[2][2]));
         }
     }
     //-----------------------------------------------------------------------
-    Matrix4 StringConverter::parseMatrix4(const String& val, const Matrix4& defaultValue, const std::locale &loc)
+    Matrix4 StringConverter::parseMatrix4(const String& val, const Matrix4& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -448,29 +467,29 @@ namespace Ogre {
         }
         else
         {
-            return Matrix4(parseReal(vec[0], defaultValue[0][0], loc),
-                           parseReal(vec[1], defaultValue[0][1], loc),
-                           parseReal(vec[2], defaultValue[0][2], loc),
-                           parseReal(vec[3], defaultValue[0][3], loc),
+            return Matrix4(parseReal(vec[0], defaultValue[0][0]),
+                           parseReal(vec[1], defaultValue[0][1]),
+                           parseReal(vec[2], defaultValue[0][2]),
+                           parseReal(vec[3], defaultValue[0][3]),
                            
-                           parseReal(vec[4], defaultValue[1][0], loc),
-                           parseReal(vec[5], defaultValue[1][1], loc),
-                           parseReal(vec[6], defaultValue[1][2], loc),
-                           parseReal(vec[7], defaultValue[1][3], loc),
+                           parseReal(vec[4], defaultValue[1][0]),
+                           parseReal(vec[5], defaultValue[1][1]),
+                           parseReal(vec[6], defaultValue[1][2]),
+                           parseReal(vec[7], defaultValue[1][3]),
                            
-                           parseReal(vec[8], defaultValue[2][0], loc),
-                           parseReal(vec[9], defaultValue[2][1], loc),
-                           parseReal(vec[10], defaultValue[2][2], loc),
-                           parseReal(vec[11], defaultValue[2][3], loc),
+                           parseReal(vec[8], defaultValue[2][0]),
+                           parseReal(vec[9], defaultValue[2][1]),
+                           parseReal(vec[10], defaultValue[2][2]),
+                           parseReal(vec[11], defaultValue[2][3]),
                            
-                           parseReal(vec[12], defaultValue[3][0], loc),
-                           parseReal(vec[13], defaultValue[3][1], loc),
-                           parseReal(vec[14], defaultValue[3][2], loc),
-                           parseReal(vec[15], defaultValue[3][3], loc));
+                           parseReal(vec[12], defaultValue[3][0]),
+                           parseReal(vec[13], defaultValue[3][1]),
+                           parseReal(vec[14], defaultValue[3][2]),
+                           parseReal(vec[15], defaultValue[3][3]));
         }
     }
     //-----------------------------------------------------------------------
-    Quaternion StringConverter::parseQuaternion(const String& val, const Quaternion& defaultValue, const std::locale &loc)
+    Quaternion StringConverter::parseQuaternion(const String& val, const Quaternion& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -481,30 +500,30 @@ namespace Ogre {
         }
         else
         {
-            return Quaternion(parseReal(vec[0], defaultValue[0], loc),
-                              parseReal(vec[1], defaultValue[1], loc),
-                              parseReal(vec[2], defaultValue[2], loc),
-                              parseReal(vec[3], defaultValue[3], loc));
+            return Quaternion(parseReal(vec[0], defaultValue[0]),
+                              parseReal(vec[1], defaultValue[1]),
+                              parseReal(vec[2], defaultValue[2]),
+                              parseReal(vec[3], defaultValue[3]));
         }
     }
     //-----------------------------------------------------------------------
-    ColourValue StringConverter::parseColourValue(const String& val, const ColourValue& defaultValue, const std::locale &loc)
+    ColourValue StringConverter::parseColourValue(const String& val, const ColourValue& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() == 4)
         {
-            return ColourValue(parseReal(vec[0], defaultValue[0], loc),
-                               parseReal(vec[1], defaultValue[1], loc),
-                               parseReal(vec[2], defaultValue[2], loc),
-                               parseReal(vec[3], defaultValue[3], loc));
+            return ColourValue(parseReal(vec[0], defaultValue[0]),
+                               parseReal(vec[1], defaultValue[1]),
+                               parseReal(vec[2], defaultValue[2]),
+                               parseReal(vec[3], defaultValue[3]));
         }
         else if (vec.size() == 3)
         {
-            return ColourValue(parseReal(vec[0], defaultValue[0], loc),
-                               parseReal(vec[1], defaultValue[1], loc),
-                               parseReal(vec[2], defaultValue[2], loc),
+            return ColourValue(parseReal(vec[0], defaultValue[0]),
+                               parseReal(vec[1], defaultValue[1]),
+                               parseReal(vec[2], defaultValue[2]),
                                1.0f);
         }
         else
@@ -513,15 +532,15 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    StringVector StringConverter::parseStringVector(const String& val, const std::locale &loc)
+    StringVector StringConverter::parseStringVector(const String& val)
     {
         return StringUtil::split(val);
     }
     //-----------------------------------------------------------------------
-    bool StringConverter::isNumber(const String& val, const std::locale &loc)
+    bool StringConverter::isNumber(const String& val)
     {
         StringStream str(val);
-        str.imbue(loc);
+        str.imbue(msLocale);
         float tst;
         str >> tst;
         return !str.fail() && str.eof();

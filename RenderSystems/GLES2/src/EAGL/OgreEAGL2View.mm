@@ -70,13 +70,13 @@ using namespace Ogre;
 
     // Check if orientation is supported
     NSString *rotateToOrientation = @"";
-    if(deviceOrientation == UIInterfaceOrientationPortrait)
+    if(deviceOrientation == UIDeviceOrientationPortrait)
         rotateToOrientation = @"UIInterfaceOrientationPortrait";
-    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+    else if(deviceOrientation == UIDeviceOrientationPortraitUpsideDown)
         rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
+    else if(deviceOrientation == UIDeviceOrientationLandscapeLeft)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
+    else if(deviceOrientation == UIDeviceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
 
     NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];

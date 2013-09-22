@@ -381,8 +381,7 @@ namespace Ogre
 		@param size The requested composite map size
 		@param rect The region of the composite map to update, in image space
 		@param mat The material to use to render the map
-		@param outBox The box region of the texture which has been updated, and
-			should be copied into your final texture
+		@param destCompositeMap A TexturePtr for the composite map to be written into
 		*/
 		virtual void _renderCompositeMap(size_t size, const Rect& rect, 
 			const MaterialPtr& mat, const TexturePtr& destCompositeMap);

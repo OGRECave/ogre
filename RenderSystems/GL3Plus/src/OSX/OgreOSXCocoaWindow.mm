@@ -60,7 +60,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mWindowOrigin(NSZeroPoint),
-        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
+        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mUseNSView(false), mContentScalingFactor(1.0)
     {
     }
 
@@ -324,7 +325,7 @@ namespace Ogre {
     {
         NSRect winFrame;
         if(mContentScalingFactor > 1.0)
-            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
@@ -334,7 +335,7 @@ namespace Ogre {
     {
         NSRect winFrame;
         if(mContentScalingFactor > 1.0)
-            winFrame= [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
@@ -368,7 +369,6 @@ namespace Ogre {
                     [mGLPixelFormat release];
                     mGLPixelFormat = nil;
                 }
-
             }
 		}
 		
@@ -443,6 +443,10 @@ namespace Ogre {
                         "CocoaWindow::copyContentsToMemory" );
         }
         
+        if(dst.getWidth() != dst.rowPitch)
+        {
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch));
+        }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
@@ -450,29 +454,14 @@ namespace Ogre {
         }
         
         OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
-        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data));
+                     format, type, dst.getTopLeftFrontPixelPtr()));
         
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
         
-        //vertical flip
-        {
-            size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-            size_t height = dst.getHeight();
-            uchar *tmpData = (uchar *)OGRE_MALLOC_ALIGN(rowSpan * height, MEMCATEGORY_GENERAL, false);
-            uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-            
-            while (tmpRow >= tmpData)
-            {
-                memcpy(tmpRow, srcRow, rowSpan);
-                srcRow += rowSpan;
-                tmpRow -= rowSpan;
-            }
-            memcpy(dst.data, tmpData, rowSpan * height);
-            
-            OGRE_FREE_ALIGN(tmpData, MEMCATEGORY_GENERAL, false);
-        }
+        PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
     void CocoaWindow::reposition(int left, int top)
@@ -554,8 +543,7 @@ namespace Ogre {
             CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
             CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
             [mGLContext update];
-            
-            
+
             mLeft = viewFrame.origin.x; 
             mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
@@ -699,7 +687,12 @@ namespace Ogre {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
-                NSRect backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
+                NSRect backingRect = NSZeroRect;
+                if(mContentScalingFactor > 1.0)
+                    backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
+                else
+                    backingRect = mainDisplayRect;
+
                 GLint backingStoreDimensions[2] = { static_cast<GLint>(backingRect.size.width), static_cast<GLint>(backingRect.size.height) };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);

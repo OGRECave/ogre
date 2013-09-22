@@ -209,6 +209,8 @@ namespace Ogre
 		wq->removeRequestHandler(mWorkQueueChannel, this);
 		wq->removeResponseHandler(mWorkQueueChannel, this);	
 
+		removeFromNeighbours();
+
 		freeLodData();
 		freeTemporaryResources();
 		freeGPUResources();
@@ -2363,6 +2365,7 @@ namespace Ogre
 		{
 			if (cascadeToNeighbours)
 			{
+				OGRE_LOCK_RW_MUTEX_READ(mNeighbourMutex);
 				Terrain* neighbour = raySelectNeighbour(ray, distanceLimit);
 				if (neighbour)
 					return neighbour->rayIntersects(ray, cascadeToNeighbours, distanceLimit);
@@ -4701,5 +4704,22 @@ namespace Ogre
 		int lodLevel = mLodManager->getTargetLodLevel() + 1;
 		if( lodLevel>0 && lodLevel<mNumLodLevels )
 			mLodManager->updateToLodLevel(lodLevel);
+	}
+
+	void Terrain::removeFromNeighbours()
+	{
+		// We are reading the list of neighbours here
+		OGRE_LOCK_RW_MUTEX_READ(mNeighbourMutex);
+		for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
+		{
+			NeighbourIndex ni = static_cast<NeighbourIndex>(i);
+			Terrain* neighbour = getNeighbour(ni);
+			if (!neighbour)
+				continue;
+
+			OGRE_LOCK_RW_MUTEX_WRITE(neighbour->mNeighbourMutex);
+			// TODO: do we want to re-calculate? probably not, but not sure
+			neighbour->setNeighbour(getOppositeNeighbour(ni), 0, false, false);
+		}
 	}
 }

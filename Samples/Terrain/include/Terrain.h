@@ -543,11 +543,11 @@ protected:
 	{
 		// Create material
 		String matName = "Ogre/DebugTexture" + StringConverter::toString(i);
-		MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+		MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName);
 		if (debugMat.isNull())
 		{
 			debugMat = MaterialManager::getSingleton().create(matName,
-				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		}
 		Pass* p = debugMat->getTechnique(0)->getPass(0);
 		p->removeAllTextureUnitStates();
@@ -587,10 +587,10 @@ protected:
 	{
 		String matName = "DepthShadows/" + textureName;
 
-		MaterialPtr ret = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+		MaterialPtr ret = MaterialManager::getSingleton().getByName(matName);
 		if (ret.isNull())
 		{
-			MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm").staticCast<Material>();
+			MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm");
 			ret = baseMat->clone(matName);
 			Pass* p = ret->getTechnique(0)->getPass(0);
 			p->getTextureUnitState("diffuse")->setTextureName(textureName);

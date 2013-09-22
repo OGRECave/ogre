@@ -91,6 +91,93 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_glsl_vs g
 }
 
 //--------------------------------------------------------------
+// GLSL ES Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HW_VTF_LUT_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWCASTER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
+vertex_program Ogre/Instancing/HW_VTF_LUT_dq_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWRECEIVER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWCASTER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
+vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWRECEIVER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_glsles_vs glsles
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWCASTER=1,BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
+//--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/HW_VTF_LUT_cg_vs cg
@@ -237,6 +324,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_hlsl_vs h
 vertex_program Ogre/Instancing/HW_VTF_LUT_vs unified
 {
 	delegate Ogre/Instancing/HW_VTF_LUT_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_glsles_vs	
 	delegate Ogre/Instancing/HW_VTF_LUT_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_cg_vs
 	
@@ -252,6 +340,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_vs unified
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsles_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs
 
@@ -264,7 +353,8 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs unified
 
 vertex_program Ogre/Instancing/HW_VTF_LUT_dq_vs unified
 {
-	delegate Ogre/Instancing/HW_VTF_LUT_dq_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_dq_glsl_vs	
+	delegate Ogre/Instancing/HW_VTF_LUT_dq_glsles_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_cg_vs
 
@@ -280,6 +370,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_vs unified
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_glsles_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_cg_vs
 
@@ -293,6 +384,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_vs unified
 vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_glsles_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_cg_vs
 
@@ -308,6 +400,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_vs unified
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_glsles_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs
 

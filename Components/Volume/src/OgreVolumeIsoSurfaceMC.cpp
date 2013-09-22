@@ -124,10 +124,9 @@ namespace Volume {
         // Create the triangles according to the table.
         for (int i = 0; mcTriangles[cubeIndex][i] != -1; i += 3)
         {
-            mb->addTriangle(Triangle(
-                intersectionPoints[mcTriangles[cubeIndex][i]], intersectionNormals[mcTriangles[cubeIndex][i]],
+            mb->addTriangle(intersectionPoints[mcTriangles[cubeIndex][i]], intersectionNormals[mcTriangles[cubeIndex][i]],
                 intersectionPoints[mcTriangles[cubeIndex][i + 1]], intersectionNormals[mcTriangles[cubeIndex][i + 1]],
-                intersectionPoints[mcTriangles[cubeIndex][i + 2]], intersectionNormals[mcTriangles[cubeIndex][i + 2]]));
+                intersectionPoints[mcTriangles[cubeIndex][i + 2]], intersectionNormals[mcTriangles[cubeIndex][i + 2]]);
         }
     }
     
@@ -227,10 +226,9 @@ namespace Volume {
         // Create the triangles according to the table.
         for (int i = 0; mcTriangles[squareIndex][i] != -1; i += 3)
         {
-            mb->addTriangle(Triangle(
-                intersectionPoints[msTriangles[squareIndex][i]], intersectionNormals[msTriangles[squareIndex][i]],
+            mb->addTriangle(intersectionPoints[msTriangles[squareIndex][i]], intersectionNormals[msTriangles[squareIndex][i]],
                 intersectionPoints[msTriangles[squareIndex][i + 1]], intersectionNormals[msTriangles[squareIndex][i + 1]],
-                intersectionPoints[msTriangles[squareIndex][i + 2]], intersectionNormals[msTriangles[squareIndex][i + 2]]));
+                intersectionPoints[msTriangles[squareIndex][i + 2]], intersectionNormals[msTriangles[squareIndex][i + 2]]);
         }
     }
 

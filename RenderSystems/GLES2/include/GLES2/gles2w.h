@@ -217,9 +217,9 @@ typedef void (GL_APIENTRY* PFNGLDRAWARRAYSINSTANCEDANGLEPROC) (GLenum mode, GLin
 typedef void (GL_APIENTRY* PFNGLDRAWELEMENTSINSTANCEDANGLEPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
 typedef void (GL_APIENTRY* PFNGLVERTEXATTRIBDIVISORANGLEPROC) (GLuint index, GLuint divisor);
 typedef void (GL_APIENTRY* PFNGLGETTRANSLATEDSHADERSOURCEANGLEPROC) (GLuint shader, GLsizei bufsize, GLsizei *length, GLchar *source);
-typedef void (GL_APIENTRY* PFNGLDRAWARRAYSINSTANCEDAPPLEPROC) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
-typedef void (GL_APIENTRY* PFNGLDRAWELEMENTSINSTANCEDAPPLEPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
-typedef void (GL_APIENTRY* PFNGLVERTEXATTRIBDIVISORAPPLEPROC) (GLuint index, GLuint divisor);
+typedef void (GL_APIENTRY* PFNGLDRAWARRAYSINSTANCEDEXTPROC) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+typedef void (GL_APIENTRY* PFNGLDRAWELEMENTSINSTANCEDEXTPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
+typedef void (GL_APIENTRY* PFNGLVERTEXATTRIBDIVISOREXTPROC) (GLuint index, GLuint divisor);
 typedef void (GL_APIENTRY* PFNGLCOPYTEXTURELEVELSAPPLEPROC) (GLuint destinationTexture, GLuint sourceTexture, GLint sourceBaseLevel, GLsizei sourceLevelCount);
 typedef void (GL_APIENTRY* PFNGLRENDERBUFFERSTORAGEMULTISAMPLEAPPLEPROC) (GLenum, GLsizei, GLenum, GLsizei, GLsizei);
 typedef void (GL_APIENTRY* PFNGLRESOLVEMULTISAMPLEFRAMEBUFFERAPPLEPROC) (void);
@@ -521,9 +521,9 @@ extern PFNGLDRAWARRAYSINSTANCEDANGLEPROC gleswDrawArraysInstancedANGLE;
 extern PFNGLDRAWELEMENTSINSTANCEDANGLEPROC gleswDrawElementsInstancedANGLE;
 extern PFNGLVERTEXATTRIBDIVISORANGLEPROC gleswVertexAttribDivisorANGLE;
 extern PFNGLGETTRANSLATEDSHADERSOURCEANGLEPROC gleswGetTranslatedShaderSourceANGLE;
-extern PFNGLDRAWARRAYSINSTANCEDAPPLEPROC gleswDrawArraysInstancedAPPLE;
-extern PFNGLDRAWELEMENTSINSTANCEDAPPLEPROC gleswDrawElementsInstancedAPPLE;
-extern PFNGLVERTEXATTRIBDIVISORAPPLEPROC gleswVertexAttribDivisorAPPLE;
+extern PFNGLDRAWARRAYSINSTANCEDEXTPROC gleswDrawArraysInstancedEXT;
+extern PFNGLDRAWELEMENTSINSTANCEDEXTPROC gleswDrawElementsInstancedEXT;
+extern PFNGLVERTEXATTRIBDIVISOREXTPROC gleswVertexAttribDivisorEXT;
 extern PFNGLCOPYTEXTURELEVELSAPPLEPROC gleswCopyTextureLevelsAPPLE;
 extern PFNGLRENDERBUFFERSTORAGEMULTISAMPLEAPPLEPROC gleswRenderbufferStorageMultisampleAPPLE;
 extern PFNGLRESOLVEMULTISAMPLEFRAMEBUFFERAPPLEPROC gleswResolveMultisampleFramebufferAPPLE;
@@ -825,9 +825,9 @@ extern PFNGLENDTILINGQCOMPROC gleswEndTilingQCOM;
 #define glDrawElementsInstancedANGLE		gleswDrawElementsInstancedANGLE
 #define glVertexAttribDivisorANGLE		gleswVertexAttribDivisorANGLE
 #define glGetTranslatedShaderSourceANGLE		gleswGetTranslatedShaderSourceANGLE
-#define glDrawArraysInstancedAPPLE		gleswDrawArraysInstancedAPPLE
-#define glDrawElementsInstancedAPPLE		gleswDrawElementsInstancedAPPLE
-#define glVertexAttribDivisorAPPLE		gleswVertexAttribDivisorAPPLE
+#define glDrawArraysInstancedEXT		gleswDrawArraysInstancedEXT
+#define glDrawElementsInstancedEXT		gleswDrawElementsInstancedEXT
+#define glVertexAttribDivisorEXT		gleswVertexAttribDivisorEXT
 #define glCopyTextureLevelsAPPLE		gleswCopyTextureLevelsAPPLE
 #define glRenderbufferStorageMultisampleAPPLE		gleswRenderbufferStorageMultisampleAPPLE
 #define glResolveMultisampleFramebufferAPPLE		gleswResolveMultisampleFramebufferAPPLE

@@ -2380,7 +2380,7 @@ namespace Ogre {
             you have to call methods on Node and Animation in a particular order (namely
             Node::resetToInitialState and Animation::apply). To make this easier and to
             help track the current time position of animations, the AnimationState object
-            is provided. </p>
+            is provided.
             So if you don't want to control animation application manually, call this method,
             update the returned object as you like every frame and let SceneManager apply 
             the animation state for you.
@@ -2448,7 +2448,6 @@ namespace Ogre {
             bool doBeginEndFrame = false) ;
 
 		/** Manual rendering method for rendering a single object. 
-		@remarks
 		@param rend The renderable to issue to the pipeline
 		@param pass The pass to use
 		@param vp Pointer to the viewport to render to, or 0 to use the existing viewport

@@ -16,6 +16,8 @@ if(ANDROID)
 	else()		
 		add_dependencies(OgreJNIDummy OgreMain RenderSystem_GLES)
 	endif()
+	
+	add_dependencies(OgreJNIDummy OgreTerrain OgreRTShaderSystem OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)	
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")

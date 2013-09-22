@@ -44,7 +44,7 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 // Read-write mutex
-#define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name;
+#define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
 #define OGRE_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, false)
 #define OGRE_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, true)
 // Thread-local pointer

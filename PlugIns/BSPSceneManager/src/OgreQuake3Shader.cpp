@@ -69,7 +69,7 @@ namespace Ogre {
 		matName = str.str();
 
         MaterialPtr mat = MaterialManager::getSingleton().create(matName, 
-            resourceGroup).staticCast<Material>();
+            resourceGroup);
 		Ogre::Pass* ogrePass = mat->getTechnique(0)->getPass(0);
 
         LogManager::getSingleton().logMessage("Using Q3 shader " + mName, LML_CRITICAL);

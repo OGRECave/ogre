@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class CocoaContext : public GL3PlusContext, public GeneralAllocatedObject
+    class _OgreGL3PlusExport CocoaContext : public GL3PlusContext, public GeneralAllocatedObject
     {
     public:
         CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat);

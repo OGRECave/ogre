@@ -608,7 +608,6 @@ namespace Ogre
 		*/
         void setGlobalNumberOfInstances(const size_t val);
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/** Sets if fixed pipeline rendering is enabled on the system.
 		*/
 		void setFixedPipelineEnabled(bool enabled);
@@ -616,7 +615,6 @@ namespace Ogre
 		/** Returns true if fixed pipeline rendering is enabled on the system.
 		*/
 		bool getFixedPipelineEnabled(void) const;
-#endif
 
 		/** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
 			and sets it.
@@ -848,7 +846,7 @@ namespace Ogre
 		virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.
@@ -860,7 +858,7 @@ namespace Ogre
 		virtual void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.
@@ -1596,10 +1594,8 @@ namespace Ogre
         /// the number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/// is fixed pipeline enabled
 		bool mEnableFixedPipeline;
-#endif
 
 		/** updates pass iteration rendering state including bound gpu program parameter
 		pass iteration auto constant entry

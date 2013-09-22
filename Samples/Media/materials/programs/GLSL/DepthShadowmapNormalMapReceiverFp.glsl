@@ -2,7 +2,6 @@ uniform float inverseShadowmapSize;
 uniform float fixedDepthBias;
 uniform float gradientClamp;
 uniform float gradientScaleBias;
-uniform float shadowFuzzyWidth;
 uniform vec4 lightColour;
 
 uniform sampler2D shadowMap;
@@ -28,11 +27,7 @@ void main()
 
 	vec4 shadowUV = gl_TexCoord[0];
 	// point on shadowmap
-#if LINEAR_RANGE
 	shadowUV.xy = shadowUV.xy / shadowUV.w;
-#else
-	shadowUV = shadowUV / shadowUV.w;
-#endif
 	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -52,15 +47,6 @@ void main()
 	float finalCenterDepth = centerdepth + depthAdjust;
 
 	// shadowUV.z contains lightspace position of current object
-
-#if FUZZY_TEST
-	// fuzzy test - introduces some ghosting in result and doesn't appear to be needed?
-	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
-	float visibility = saturate(1 + (finalCenterDepth - shadowUV.z) * shadowFuzzyWidth * shadowUV.w);
-
-	gl_FragColor = vertexColour * visibility;
-#else
-	// hard test
 #if PCF
 	// use depths from prev, calculate diff
 	depths += depthAdjust;
@@ -77,8 +63,5 @@ void main()
 #else
 	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0,0,0,1);
 #endif
-
-#endif
-   
 }
 

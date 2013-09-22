@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
 
@@ -204,7 +205,7 @@ namespace Ogre {
 
 				// Get buffer size
 				GLint binaryLength = 0;
-                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 
                 // Create microcode
@@ -212,7 +213,7 @@ namespace Ogre {
                     GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
 
 				// Get binary
-                if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+                if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
                     OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
                                                           newMicrocode->getPtr() + sizeof(GLenum)));
 
@@ -253,7 +254,7 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
-        GLSLESGpuProgram *prog;
+        GLSLESGpuProgram *prog = 0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
             prog = mVertexProgram;
@@ -288,12 +289,12 @@ namespace Ogre {
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getIntPointer(def->physicalIndex),
                                                                                   def->elementSize * def->arraySize * sizeof(int));
                             break;
                         default:
-                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getFloatPointer(def->physicalIndex),
                                                                                   def->elementSize * def->arraySize * sizeof(float));
                             break;
@@ -465,24 +466,11 @@ namespace Ogre {
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
-                     {
-                         if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                              params->getFloatPointer(index),
-                                                                              currentUniform->mConstantDef->elementSize *
-                                                                              currentUniform->mConstantDef->arraySize *
-                                                                              sizeof(float)))
-                             return;
-                     }
-                     else
-                     {
-                         if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
-                                                                              params->getFloatPointer(index),
-                                                                              currentUniform->mConstantDef->elementSize *
-                                                                              currentUniform->mConstantDef->arraySize *
-                                                                              sizeof(float)))
-                             return;
-                     }
+                     mUniformCache->updateUniform(currentUniform->mLocation,
+                                                  params->getFloatPointer(index),
+                                                  currentUniform->mConstantDef->elementSize *
+                                                  currentUniform->mConstantDef->arraySize *
+                                                  sizeof(float));
 					// There will only be one multipass entry
 					return;
 				}

@@ -71,9 +71,7 @@ namespace Ogre {
         , mDerivedDepthBiasSlopeScale(0.0f)
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		, mEnableFixedPipeline(true)
-#endif
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
 		, mTesselationHullProgramBound(false)
@@ -521,7 +519,7 @@ namespace Ogre {
 	void RenderSystem::_setTexture(size_t unit, bool enabled, 
 		const String &texname)
 	{
-		TexturePtr t = TextureManager::getSingleton().getByName(texname).staticCast<Texture>();
+		TexturePtr t = TextureManager::getSingleton().getByName(texname);
 		_setTexture(unit, enabled, t);
 	}
 	//-----------------------------------------------------------------------
@@ -637,7 +635,6 @@ namespace Ogre {
         return mVSync;
     }
     //-----------------------------------------------------------------------
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     bool RenderSystem::getFixedPipelineEnabled(void) const
     {
         return mEnableFixedPipeline;
@@ -647,7 +644,6 @@ namespace Ogre {
     {
         mEnableFixedPipeline = enabled;
     }
-#endif
     //-----------------------------------------------------------------------
 	void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
 	{

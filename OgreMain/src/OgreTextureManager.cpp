@@ -61,6 +61,18 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
+    TexturePtr TextureManager::getByName(const String& name, const String& groupName)
+    {
+        return getResourceByName(name, groupName).staticCast<Texture>();
+    }
+    //-----------------------------------------------------------------------
+    TexturePtr TextureManager::create (const String& name, const String& group,
+                                    bool isManual, ManualResourceLoader* loader,
+                                    const NameValuePairList* createParams)
+    {
+        return createResource(name,group,isManual,loader,createParams).staticCast<Texture>();
+    }
+    //-----------------------------------------------------------------------
     TextureManager::ResourceCreateOrRetrieveResult TextureManager::createOrRetrieve(
             const String &name, const String& group, bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams, TextureType texType, int numMipmaps, Real gamma,
@@ -110,7 +122,7 @@ namespace Ogre {
         const Image &img, TextureType texType, int numMipmaps, Real gamma, bool isAlpha, 
 		PixelFormat desiredFormat, bool hwGamma)
     {
-        TexturePtr tex = create(name, group, true).staticCast<Texture>();
+        TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -129,7 +141,7 @@ namespace Ogre {
         PixelFormat format, TextureType texType, 
         int numMipmaps, Real gamma, bool hwGamma)
 	{
-        TexturePtr tex = create(name, group, true).staticCast<Texture>();
+		TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
@@ -160,7 +172,7 @@ namespace Ogre {
         {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
         }
-        ret = create(name, group, true, loader).staticCast<Texture>();
+        ret = createResource(name, group, true, loader).staticCast<Texture>();
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);

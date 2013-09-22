@@ -1,13 +1,13 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename manual.info
-@settitle OGRE Manual v1.8 ('Byatis')
+@settitle OGRE Manual v1.9 ('Ghadamon')
 @c %**end of header
 @contents
 @shortcontents
 
 @titlepage
-@title OGRE Manual v1.8 ('Byatis')
+@title OGRE Manual v1.9 ('Ghadamon')
 @author Steve Streeting
 @page
 @vskip 0pt plus 1fill
@@ -18,7 +18,7 @@ This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unpo
 @end titlepage
 
 @node Top
-@top OGRE Manual v1.8 ('Byatis')
+@top OGRE Manual v1.9 ('Ghadamon')
 @ifinfo
 Copyright @copyright{} The OGRE Team@*@*
 
@@ -2190,7 +2190,7 @@ The syntax of the link to a vertex program and a fragment or geometry program ar
 
 For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programmable vertex fixed function pipeline and then provide a fragment_program_ref in a pass i.e. there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
 
-The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://developer.3dlabs.com/documents/index.htm}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{http://developer.nvidia.com/object/cg_toolkit.html}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
+The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://www.opengl.org/registry/}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{https://developer.nvidia.com/cg-toolkit}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
 
 @anchor{Program Parameter Specification}
 @subheading Parameter specification
@@ -4015,7 +4015,7 @@ There are a few rules when creating an animated model for OGRE:
 @end itemize
 If you're creating non-animated meshes, then you do not need to be concerned with the above.
 
-Full documentation for each exporter is provided along with the exporter itself, and there is a list of the currently supported modelling tools in the OGRE Wiki at @url{http://www.ogre3d.org/wiki/index.php/Exporters}.
+Full documentation for each exporter is provided along with the exporter itself, and there is a list of the currently supported modelling tools in the OGRE Wiki at @url{http://www.ogre3d.org/tikiwiki/tiki-index.php?page=OGRE+Exporters&structure=Tools}.
 
 @node XMLConverter
 @section XMLConverter
@@ -4038,7 +4038,7 @@ When converting XML to .mesh, you will be prompted to (re)generate level-of-deta
 @section MeshUpgrader
 This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date. This tools has a very simple syntax:
 @example
-OgreMeshUpgrade <oldmesh> <newmesh>
+OgreMeshUpgrader <oldmesh> <newmesh>
 @end example
 The OGRE release notes will notify you when this is necessary with a new release.
 

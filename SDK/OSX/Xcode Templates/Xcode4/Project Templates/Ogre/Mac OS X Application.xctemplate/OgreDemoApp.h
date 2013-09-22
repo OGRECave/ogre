@@ -9,7 +9,7 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
 
 /** This class demonstrates basic usage of the RTShader system.
@@ -92,17 +92,17 @@ public:
 private:
     void setupDemoScene();
 	void runDemo();
-    bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr);
-    void finalizeRTShaderSystem();
+    bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr);
+    void finaliseRTShaderSystem();
 
 	Ogre::SceneNode*			m_pCubeNode;
 	Ogre::Entity*				m_pCubeEntity;
     
 	bool					m_bShutdown;
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
     ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.	
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 };
 

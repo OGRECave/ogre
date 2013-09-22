@@ -456,7 +456,7 @@ void Sample_Ocean::itemSelected(SelectMenu *menu)
 {
 	//Only one selection menu - the material one
 	mCurrentMaterial = menu->getSelectionIndex();
-	mActiveMaterial = Ogre::MaterialManager::getSingleton().getByName( mMaterialControlsContainer[mCurrentMaterial].getMaterialName() ).staticCast<Material>();
+	mActiveMaterial = Ogre::MaterialManager::getSingleton().getByName( mMaterialControlsContainer[mCurrentMaterial].getMaterialName() );
 	mActiveMaterial->load();
 	size_t numShaders = mMaterialControlsContainer[mCurrentMaterial].getShaderControlCount();
 	mNumPages = (numShaders / CONTROLS_PER_PAGE) + (numShaders % CONTROLS_PER_PAGE == 0 ? 0 : 1);

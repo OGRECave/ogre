@@ -54,25 +54,23 @@
 #   ifdef OGRE_BUILD_PLUGIN_BSP
 #       include "BSP.h"
 #   endif
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#       ifdef USE_RTSHADER_SYSTEM
-#           include "ShaderSystem.h"
-#       endif
-#		include "DualQuaternion.h"
-#       include "DeferredShadingDemo.h"
-#       include "Instancing.h"
-#       include "NewInstancing.h"
-#       include "TextureArray.h"
-#       include "SSAO.h"
-#       include "OceanDemo.h"
-#		ifdef OGRE_BUILD_COMPONENT_VOLUME
-#			include "VolumeCSG.h"
-#			include "VolumeTerrain.h"
-#		endif
-#       ifdef OGRE_BUILD_COMPONENT_TERRAIN
-#           include "EndlessWorld.h"
-#           include "Terrain.h"
-#       endif
+#   ifdef INCLUDE_RTSHADER_SYSTEM
+#       include "ShaderSystem.h"
+#   endif
+#	include "DualQuaternion.h"
+#   include "DeferredShadingDemo.h"
+#   include "Instancing.h"
+#   include "NewInstancing.h"
+#   include "TextureArray.h"
+#   include "SSAO.h"
+#   include "OceanDemo.h"
+#	ifdef OGRE_BUILD_COMPONENT_VOLUME
+#		include "VolumeCSG.h"
+#		include "VolumeTerrain.h"
+#	endif
+#   ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#       include "EndlessWorld.h"
+#       include "Terrain.h"
 #   endif
 #   include "CelShading.h"
 #   include "Compositor.h"
@@ -110,13 +108,13 @@
      PlayPenPlugin* playPenPlugin = 0;
      PlaypenTestPlugin* playPenTestPlugin = 0;
 #   endif
-#   ifdef USE_RTSHADER_SYSTEM
+#   ifdef INCLUDE_RTSHADER_SYSTEM
 #       include "OgreRTShaderSystem.h"
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
-#   endif // USE_RTSHADER_SYSTEM
-typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;
+#   endif // INCLUDE_RTSHADER_SYSTEM
+typedef std::map<String, OgreBites::SdkSample *> PluginMap;
 #endif // OGRE_STATIC_LIB
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -140,7 +138,7 @@ namespace OgreBites
 
 namespace OgreBites
 {
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 /** This class demonstrates basic usage of the RTShader system.
 It sub class the material manager listener class and when a target scheme callback
@@ -206,7 +204,7 @@ public:
 protected:	
 	Ogre::RTShader::ShaderGenerator*	mShaderGenerator;			// The shader generator instance.		
 };
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 
 	/*=============================================================================
@@ -244,10 +242,10 @@ protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 			mGestureView = 0;
 #endif
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			mShaderGenerator	 = NULL;		
 			mMaterialMgrListener = NULL;
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -331,12 +329,20 @@ protected:
 		{
 			if (mCurrentSample)  // sample quitting
 			{
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
                 mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
 #endif
 				mCurrentSample->_shutdown();
 				mCurrentSample = 0;
 				mSamplePaused = false;     // don't pause next sample
+
+#ifdef INCLUDE_RTSHADER_SYSTEM
+                if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
+                {
+                    destroyDummyScene();
+                    finaliseRTShaderSystem();
+                }
+#endif
 
 				// create dummy scene and modify controls
 				createDummyScene();
@@ -355,13 +361,20 @@ protected:
 
 				try
 				{
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
+                    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
+                    {
+                        createDummyScene();
+                    }
+
 					s->setShaderGenerator(mShaderGenerator);
 #endif
 					SampleContext::runSample(s);
 				}
 				catch (Ogre::Exception e)   // if failed to start, show error and fall back to menu
 				{
+                    destroyDummyScene();
+
 					s->_shutdown();
 
 					createDummyScene();
@@ -620,7 +633,7 @@ protected:
 
 				bool all = selectedCategory == "All";
 				Ogre::StringVector sampleTitles;
-				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail").staticCast<Ogre::Material>();
+				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail");
 
 				// populate the sample menu and carousel with filtered samples
 				for (SampleSet::iterator i = mLoadedSamples.begin(); i != mLoadedSamples.end(); i++)
@@ -1059,7 +1072,7 @@ protected:
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
             const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
-#if defined(USE_RTSHADER_SYSTEM)
+#if defined(INCLUDE_RTSHADER_SYSTEM)
             bool hasProgrammableGPU = (profiles.size() != 0);
 #endif
 
@@ -1071,6 +1084,7 @@ protected:
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
+			
 #		if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
  			mPluginNameMap["Sample_Instancing"]			= (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
@@ -1100,7 +1114,7 @@ protected:
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
 
-#if defined(USE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if defined(INCLUDE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             if(hasProgrammableGPU)
             {
 #   ifdef OGRE_BUILD_PLUGIN_BSP
@@ -1109,16 +1123,14 @@ protected:
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                 mPluginNameMap["Sample_DeferredShading"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_DeferredShading();
 				mPluginNameMap["Sample_SSAO"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_SSAO();
                 mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
                 mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
                 mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
-#       ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#   ifdef OGRE_BUILD_COMPONENT_TERRAIN
                 mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
                 mPluginNameMap["Sample_EndlessWorld"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_EndlessWorld();
-#       endif
 #   endif
                 mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
                 mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
@@ -1157,12 +1169,12 @@ protected:
 
 			createDummyScene();
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
                 Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
             }
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 			loadResources();
 
@@ -1176,7 +1188,7 @@ protected:
 			Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
             
 			// create template material for sample thumbnails
-			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential").staticCast<Ogre::Material>();
+			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
 			thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
             
 			setupWidgets();
@@ -1295,10 +1307,10 @@ protected:
 			sm->addRenderQueueListener(mOverlaySystem);
 			Ogre::Camera* cam = sm->createCamera("DummyCamera");
 			mWindow->addViewport(cam);
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			// Initialize shader generator.
 			// Must be before resource loading in order to allow parsing extended material attributes.
-			bool success = initializeRTShaderSystem(sm);
+			bool success = initialiseRTShaderSystem(sm);
 			if (!success) 
 			{
 				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
@@ -1310,7 +1322,7 @@ protected:
 				//newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 				
 				// creates shaders for base material BaseWhite using the RTSS
-				Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();				
+				Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 				baseWhite->setLightingEnabled(false);
 				mShaderGenerator->createShaderBasedTechnique(
 					"BaseWhite", 
@@ -1333,7 +1345,7 @@ protected:
 					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);	
 			    mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
 					"BaseWhiteNoLighting");
-				Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
+				Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
                 if(baseWhite->getNumTechniques() > 1)
                 {
 				    baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
@@ -1342,7 +1354,7 @@ protected:
 				    baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
                 }
 			}
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -1369,7 +1381,7 @@ protected:
             sampleList.push_back("Sample_FacialAnimation");
             sampleList.push_back("Sample_Fresnel");
             sampleList.push_back("Sample_ParticleFX");
-#   ifdef USE_RTSHADER_SYSTEM
+#   ifdef INCLUDE_RTSHADER_SYSTEM
             sampleList.push_back("Sample_ShaderSystem");
 #	endif
             sampleList.push_back("Sample_Lighting");
@@ -1556,7 +1568,7 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void unloadSamples()
 		{
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
             mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
 #endif
 #ifdef OGRE_STATIC_LIB
@@ -1766,10 +1778,10 @@ protected:
 
 			unloadSamples();
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			// Finalize the RT Shader System.
-			finalizeRTShaderSystem();
-#endif // USE_RTSHADER_SYSTEM
+			finaliseRTShaderSystem();
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 		}
     protected:
@@ -1779,7 +1791,7 @@ protected:
 		virtual void destroyDummyScene()
 		{
 			Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			mShaderGenerator->removeSceneManager(dummyScene);
 #endif
 			dummyScene->removeRenderQueueListener(mOverlaySystem);
@@ -1835,12 +1847,12 @@ protected:
 #endif
 		}
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 		/*-----------------------------------------------------------------------------
 		| Initialize the RT Shader system.	
 		-----------------------------------------------------------------------------*/
-		virtual bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
+		virtual bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 		{			
 			if (Ogre::RTShader::ShaderGenerator::initialize())
 			{
@@ -1908,7 +1920,7 @@ protected:
 		/*-----------------------------------------------------------------------------
 		| Finalize the RT Shader system.	
 		-----------------------------------------------------------------------------*/
-		virtual void finalizeRTShaderSystem()
+		virtual void finaliseRTShaderSystem()
 		{
 			// Restore default scheme.
 			Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -1928,7 +1940,7 @@ protected:
 				mShaderGenerator = NULL;
 			}
 		}
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
         bool mNoGrabInput;                             // don't grab input devices
 		SdkTrayManager* mTrayMgr;                      // SDK tray interface
@@ -1964,10 +1976,10 @@ protected:
         Ogre::uint32 mInitWidth;
         Ogre::uint32 mInitHeight;
 #endif
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
 		ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.	
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
     public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         SampleBrowserGestureView *mGestureView;

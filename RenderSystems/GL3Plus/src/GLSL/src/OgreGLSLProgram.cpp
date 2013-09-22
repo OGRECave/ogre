@@ -579,7 +579,7 @@ namespace Ogre {
 				}
 			}	
 			// rebuild source
-			std::stringstream newSource;	
+			StringStream newSource;
 			for(size_t i = 0; i < linesOfSource.size()  ; i++)
 			{
 				newSource << linesOfSource[i] << "\n";

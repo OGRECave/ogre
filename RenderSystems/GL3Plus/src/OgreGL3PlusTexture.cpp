@@ -116,9 +116,7 @@ namespace Ogre {
         GLenum texTarget = getGL3PlusTextureTarget();
 
         // Calculate size for all mip levels of the texture
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        size_t width, height, depth;
 
         if((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
             // Standard alignment of 4 is not right for some formats
@@ -129,8 +127,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL,
-                                            (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
+
         // Set some misc default parameters, these can of course be changed later
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -176,7 +174,7 @@ namespace Ogre {
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
-            size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+            size_t size;
 
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {

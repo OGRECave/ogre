@@ -108,18 +108,16 @@ THE SOFTWARE.
 
 #if defined(__APPLE__)
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers) \
-    if(static_cast<EAGL2Support*>(getGLSupport())->getCurrentOSVersion() >= vers)
+    if(static_cast<EAGL2Support*>(dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef())->getCurrentOSVersion() >= vers)
 #else
 #define OGRE_IF_IOS_VERSION_IS_GREATER_THAN(vers)
 #endif
 
+#define getGLES2SupportRef() dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef()
+
 // Copy this definition from desktop GL.  Used for polygon modes.
 #ifndef GL_FILL
 #   define GL_FILL    0x1B02
-#endif
-
-#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_NO_GLES3_SUPPORT == 1
-#   define GL_BGRA  0x80E1
 #endif
 
 namespace Ogre {
@@ -140,10 +138,6 @@ namespace Ogre {
 #   define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT    0x84FF
 #endif
 
-#ifndef GL_PACK_IMAGE_HEIGHT
-#   define GL_PACK_IMAGE_HEIGHT                 0x806C
-#endif
-
 // Defines for extensions that were made core in OpenGL ES 3
 #if OGRE_NO_GLES3_SUPPORT == 0
 #define glProgramBinaryOES glProgramBinary
@@ -157,6 +151,14 @@ namespace Ogre {
 #define GL_RED_EXT GL_RED
 #define GL_RG_EXT GL_RG
 #define GL_R8_EXT GL_R8
+#define GL_R16F_EXT GL_R16F
+#define GL_R32F_EXT GL_R32F
+#define GL_RG16F_EXT GL_RG16F
+#define GL_RG32F_EXT GL_RG32F
+#define GL_RGB16F_EXT GL_RGB16F
+#define GL_RGB32F_EXT GL_RGB32F
+#define GL_RGBA16F_EXT GL_RGBA16F
+#define GL_RGBA32F_EXT GL_RGBA32F
 #define GL_PROGRAM_BINARY_LENGTH_OES GL_PROGRAM_BINARY_LENGTH
 #define GL_MIN_EXT GL_MIN
 #define GL_MAX_EXT GL_MAX
@@ -174,9 +176,27 @@ namespace Ogre {
 #define GL_ANY_SAMPLES_PASSED_EXT GL_ANY_SAMPLES_PASSED
 #define GL_QUERY_RESULT_EXT GL_QUERY_RESULT
 #define GL_QUERY_RESULT_AVAILABLE_EXT GL_QUERY_RESULT_AVAILABLE
-#define glDrawElementsInstancedAPPLE glDrawElementsInstanced
-#define glDrawArraysInstancedAPPLE glDrawArraysInstanced
-#define glVertexAttribDivisorAPPLE glVertexAttribDivisor
+#define glDrawElementsInstancedEXT glDrawElementsInstanced
+#define glDrawArraysInstancedEXT glDrawArraysInstanced
+#define glVertexAttribDivisorEXT glVertexAttribDivisor
+#define glMapBufferRangeEXT glMapBufferRange
+#define GL_MAP_WRITE_BIT_EXT GL_MAP_WRITE_BIT
+#define GL_MAP_FLUSH_EXPLICIT_BIT_EXT GL_MAP_FLUSH_EXPLICIT_BIT
+#define GL_MAP_INVALIDATE_RANGE_BIT_EXT GL_MAP_INVALIDATE_RANGE_BIT
+#define GL_MAP_UNSYNCHRONIZED_BIT_EXT GL_MAP_UNSYNCHRONIZED_BIT
+#define GL_MAP_READ_BIT_EXT GL_MAP_READ_BIT
+#define GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE GL_SYNC_GPU_COMMANDS_COMPLETE
+#define glFenceSyncAPPLE glFenceSync
+#define glClientWaitSyncAPPLE glClientWaitSync
+#define GL_SYNC_FLUSH_COMMANDS_BIT_APPLE GL_SYNC_FLUSH_COMMANDS_BIT
+#define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
+#define GL_WAIT_FAILED_APPLE GL_WAIT_FAILED
+#define glDeleteSyncAPPLE glDeleteSync
+#define glFlushMappedBufferRangeEXT glFlushMappedBufferRange
+#define glBindVertexArrayOES glBindVertexArray
+#define glGenVertexArraysOES glGenVertexArrays
+#define glDeleteVertexArraysOES glDeleteVertexArrays
+
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)

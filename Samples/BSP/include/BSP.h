@@ -66,7 +66,7 @@ protected:
 	void createSceneManager()
 	{
 		mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
 		if(mOverlaySystem)

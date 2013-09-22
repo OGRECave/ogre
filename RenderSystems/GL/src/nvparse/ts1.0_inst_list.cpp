@@ -41,16 +41,16 @@ InstList& InstList::operator+=(InstPtr t)
 void InstList::Invoke()
 {
         int i;
+    GLint activeTex = 0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
+
 	for (i = 0; i < size; i++) {
 		// set active texture
 		glActiveTextureARB(GL_TEXTURE0_ARB + i);
 		list[i].Invoke();
 	}
-	// Reset active texture to unit 0
-	// Could do a glGet to figure out what the initial active texunit was,
-	// and reset to that, but the glGet would not behave well within
-	// a display list...
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+
+	glActiveTextureARB(activeTex);
 }
 
 void InstList::Validate()

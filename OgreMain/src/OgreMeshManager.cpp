@@ -71,6 +71,11 @@ namespace Ogre
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
+    MeshPtr MeshManager::getByName(const String& name, const String& groupName)
+    {
+        return getResourceByName(name, groupName).staticCast<Mesh>();
+    }
+    //-----------------------------------------------------------------------
     void MeshManager::_initialise(void)
     {
         // Create prefab objects
@@ -124,11 +129,18 @@ namespace Ogre
         return pMesh;
     }
     //-----------------------------------------------------------------------
+    MeshPtr MeshManager::create (const String& name, const String& group,
+                                    bool isManual, ManualResourceLoader* loader,
+                                    const NameValuePairList* createParams)
+    {
+        return createResource(name,group,isManual,loader,createParams).staticCast<Mesh>();
+    }
+    //-----------------------------------------------------------------------
     MeshPtr MeshManager::createManual( const String& name, const String& groupName, 
         ManualResourceLoader* loader)
     {
 		// Don't try to get existing, create should fail if already exists
-        return create(name, groupName, true, loader).staticCast<Mesh>();
+		return create(name, groupName, true, loader);
     }
     //-----------------------------------------------------------------------
     MeshPtr MeshManager::createPlane( const String& name, const String& groupName,
@@ -341,7 +353,7 @@ namespace Ogre
             "Prefab_Plane", 
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
             true, // manually loaded
-            this).staticCast<Mesh>();
+            this);
 		// Planes can never be manifold
 		msh->setAutoBuildEdgeLists(false);
         // to preserve previous behaviour, load immediately
@@ -354,7 +366,7 @@ namespace Ogre
 			"Prefab_Cube", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded
-			this).staticCast<Mesh>();
+			this);
 
 		// to preserve previous behaviour, load immediately
 		msh->load();
@@ -366,7 +378,7 @@ namespace Ogre
 			"Prefab_Sphere", 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 			true, // manually loaded
-			this).staticCast<Mesh>();
+			this);
 
 		// to preserve previous behaviour, load immediately
 		msh->load();
@@ -927,7 +939,7 @@ namespace Ogre
                 "MeshManager::createBezierPatch");
         }
 
-        MeshPtr pMesh = getByName(name).staticCast<Mesh>();
+        MeshPtr pMesh = getByName(name);
         if (!pMesh.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A mesh called " + name + 

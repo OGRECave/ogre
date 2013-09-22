@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2DepthBuffer.h"
 #include "OgreGLES2Util.h"
 #include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
 
@@ -46,7 +47,7 @@ namespace Ogre {
         mMultisampleFB = 0;
 
         // Check multisampling if supported
-        if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
+        if(getGLES2SupportRef()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
@@ -280,7 +281,7 @@ namespace Ogre {
 		if (mMultisampleFB)
 		{
 #if OGRE_NO_GLES3_SUPPORT == 1
-            if(getGLSupport()->checkExtension("GL_APPLE_framebuffer_multisample"))
+            if(getGLES2SupportRef()->checkExtension("GL_APPLE_framebuffer_multisample"))
             {
                 // Blit from multisample buffer to final buffer, triggers resolve
                 OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB));

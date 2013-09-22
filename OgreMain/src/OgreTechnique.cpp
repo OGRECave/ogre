@@ -677,7 +677,7 @@ namespace Ogre {
 		else if (!mShadowCasterMaterialName.empty())
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
-			mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName).staticCast<Material>();
+			mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName);
             if (!mShadowCasterMaterial.isNull())
 			    mShadowCasterMaterial->load();
 		}
@@ -688,7 +688,7 @@ namespace Ogre {
 		else if (!mShadowReceiverMaterialName.empty())
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
-			mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName).staticCast<Material>();
+			mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName);
             if (!mShadowReceiverMaterial.isNull())
 			    mShadowReceiverMaterial->load();
 		}
@@ -1327,7 +1327,7 @@ namespace Ogre {
 	void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
 	{ 
 		mShadowCasterMaterialName = name;
-		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name).staticCast<Material>(); 
+		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name);
 	}
 	//-----------------------------------------------------------------------
 	Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const 
@@ -1352,7 +1352,7 @@ namespace Ogre {
 	void  Technique::setShadowReceiverMaterial(const Ogre::String &name)  
 	{ 
 		mShadowReceiverMaterialName = name;
-		mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name).staticCast<Material>(); 
+		mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name);
 	}
 	//---------------------------------------------------------------------
 	void Technique::addGPUVendorRule(GPUVendor vendor, Technique::IncludeOrExclude includeOrExclude)

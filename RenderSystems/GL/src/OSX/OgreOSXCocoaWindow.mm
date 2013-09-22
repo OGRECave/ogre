@@ -60,7 +60,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mWindowOrigin(NSZeroPoint),
-        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
+        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mUseNSView(false), mContentScalingFactor(1.0)
     {
     }
 
@@ -167,6 +168,9 @@ namespace Ogre {
             if(opt != miscParams->end())
                 fullScreen = StringConverter::parseBool(opt->second);
 
+            opt = miscParams->find("contentScalingFactor");
+            if(opt != miscParams->end())
+                mContentScalingFactor = StringConverter::parseReal(opt->second);
         }
 
         NSOpenGLPixelFormatAttribute attribs[30];
@@ -275,9 +279,14 @@ namespace Ogre {
 
         // Create register the context with the rendersystem and associate it with this window
         mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
+        mContext->mBackingWidth = mWidth * mContentScalingFactor;
+        mContext->mBackingHeight = mHeight * mContentScalingFactor;
 
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+
+        if(mContentScalingFactor > 1.0)
+            [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
@@ -286,14 +295,49 @@ namespace Ogre {
         if([mGLContext view] != mView)
             [mGLContext setView:mView];
         [mGLContext makeCurrentContext];
+
+#if OGRE_DEBUG_MODE
+        // Crash on functions that have been removed from the API
+        CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCECrashOnRemovedFunctions);
+#endif
+
+        // Enable GL multithreading
+        CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
+
         [mGLContext update];
 
-        rs->clearFrameBuffer(FBT_COLOUR);
+//        rs->clearFrameBuffer(FBT_COLOUR);
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
         [pool drain];
+
+        StringStream ss;
+        ss  << "Cocoa: Window created " << mWidth << " x " << mHeight
+        << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight
+        << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
+        LogManager::getSingleton().logMessage(ss.str());
+    }
+
+    unsigned int OSXCocoaWindow::getWidth() const
+    {
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
+        return (unsigned int) winFrame.size.width;
+    }
+
+    unsigned int OSXCocoaWindow::getHeight() const
+    {
+        NSRect winFrame;
+        if(mContentScalingFactor > 1.0)
+            winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
+        else
+            winFrame = [mView frame];
+        return (unsigned int) winFrame.size.height;
     }
 
     void OSXCocoaWindow::destroy(void)
@@ -399,6 +443,10 @@ namespace Ogre {
                         "CocoaWindow::copyContentsToMemory" );
         }
         
+        if(dst.getWidth() != dst.rowPitch)
+        {
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
@@ -406,29 +454,14 @@ namespace Ogre {
         }
         
         glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)dst.left, (GLint)dst.top,
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data);
+                     format, type, dst.getTopLeftFrontPixelPtr());
         
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
         
-        //vertical flip
-        {
-            size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-            size_t height = dst.getHeight();
-            uchar *tmpData = (uchar *)OGRE_MALLOC_ALIGN(rowSpan * height, MEMCATEGORY_GENERAL, false);
-            uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-            
-            while (tmpRow >= tmpData)
-            {
-                memcpy(tmpRow, srcRow, rowSpan);
-                srcRow += rowSpan;
-                tmpRow -= rowSpan;
-            }
-            memcpy(dst.data, tmpData, rowSpan * height);
-            
-            OGRE_FREE_ALIGN(tmpData, MEMCATEGORY_GENERAL, false);
-        }
+        PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
     void OSXCocoaWindow::reposition(int left, int top)
@@ -458,8 +491,9 @@ namespace Ogre {
         // Check if the window size really changed
         if(mWidth == width && mHeight == height)
             return;
-        mWidth = width;
-        mHeight = height;
+
+        mWidth = width * mContentScalingFactor;
+        mHeight = height * mContentScalingFactor;
 
         if(mIsExternal)
         {
@@ -510,7 +544,6 @@ namespace Ogre {
             CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
             [mGLContext update];
 
-            
             mLeft = viewFrame.origin.x; 
             mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
@@ -530,18 +563,15 @@ namespace Ogre {
     
     void OSXCocoaWindow::windowMovedOrResized()
     {
-        if(!mIsFullScreen)
-        {
-            NSRect winFrame = [mWindow frame];
-            NSRect viewFrame = [mView frame];
-            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
-            mWidth = (unsigned int)viewFrame.size.width;
-            mHeight = (unsigned int)viewFrame.size.height;
-            mLeft = (int)winFrame.origin.x;
-            mTop = screenFrame.size.height - winFrame.size.height;
+        NSRect winFrame = [mWindow frame];
+        NSRect viewFrame = [mView frame];
+        NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
+        mWidth = (unsigned int)viewFrame.size.width;
+        mHeight = (unsigned int)viewFrame.size.height;
+        mLeft = (int)winFrame.origin.x;
+        mTop = screenFrame.size.height - winFrame.size.height;
 
-            mWindowOrigin = NSMakePoint(mLeft, mTop);
-        }
+        mWindowOrigin = NSMakePoint(mLeft, mTop);
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
@@ -599,7 +629,7 @@ namespace Ogre {
         NSRect windowRect = NSZeroRect;
         if(mIsFullScreen)
         {
-            NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
+            NSRect mainDisplayRect = [[NSScreen mainScreen] visibleFrame];
             windowRect = NSMakeRect(0.0, 0.0, mainDisplayRect.size.width, mainDisplayRect.size.height);
         }
         else
@@ -616,8 +646,8 @@ namespace Ogre {
 
         _setWindowParameters();
 
-        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-        rs->clearFrameBuffer(FBT_COLOUR);
+//        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+//        rs->clearFrameBuffer(FBT_COLOUR);
 
         // Show window
         if(mWindow)
@@ -631,7 +661,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("Creating external window");
 
-        NSRect viewBounds = [mView bounds];
+        NSRect viewBounds = [mView convertRectToBacking:[mView bounds]];
 
         mWindow = [viewRef window];
 
@@ -656,11 +686,17 @@ namespace Ogre {
             {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
-                GLint backingStoreDimensions[2] = { (GLint)mWidth, (GLint)mHeight };
+                NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
+                NSRect backingRect = NSZeroRect;
+                if(mContentScalingFactor > 1.0)
+                    backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
+                else
+                    backingRect = mainDisplayRect;
+
+                GLint backingStoreDimensions[2] = { static_cast<GLint>(backingRect.size.width), static_cast<GLint>(backingRect.size.height) };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 
-                NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
                 NSRect windowRect = NSMakeRect(0.0, 0.0, mainDisplayRect.size.width, mainDisplayRect.size.height);
                 [mWindow setFrame:windowRect display:YES];
                 [mView setFrame:windowRect];

@@ -44,7 +44,7 @@ protected:
 
     virtual Ogre::String getOutput()
     {
-        std::stringstream output;
+        StringStream output;
 
         // just dump the doctype in beforehand, since it's formatted strangely
         output<<"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\t"

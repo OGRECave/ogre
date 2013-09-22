@@ -770,15 +770,20 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowHwnd::resize(unsigned int width, unsigned int height)
 	{
-		if (mHWnd && !mIsFullScreen)
+		if (!mIsExternal)
 		{
-			RECT rc = { 0, 0, width, height };
-			AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
-			width = rc.right - rc.left;
-			height = rc.bottom - rc.top;
-			SetWindowPos(mHWnd, 0, 0, 0, width, height,
-				SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			if (mHWnd && !mIsFullScreen)
+			{
+				RECT rc = { 0, 0, width, height };
+				AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
+				width = rc.right - rc.left;
+				height = rc.bottom - rc.top;
+				SetWindowPos(mHWnd, 0, 0, 0, width, height,
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			}
 		}
+		else
+			windowMovedOrResized();
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowHwnd::windowMovedOrResized()

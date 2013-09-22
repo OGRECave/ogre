@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 
 #include "OgreGLFBORenderTexture.h"
+#include "OgreGLStateCacheManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #  define WIN32_LEAN_AND_MEAN
@@ -61,7 +62,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, GLSupport& support) 
         : Texture(creator, name, handle, group, isManual, loader),
-        mTextureID(0)
+          mTextureID(0), mGLSupport(support)
     {
     }
 
@@ -126,35 +127,36 @@ namespace Ogre {
 		mNumMipmaps = mNumRequestedMipmaps;
 		if(mNumMipmaps>maxMips)
 			mNumMipmaps = maxMips;
+
+		// Check if we can do HW mipmap generation
+		mMipmapsHardwareGenerated =
+			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
 		
 		// Generate texture name
         glGenTextures( 1, &mTextureID );
 		
 		// Set texture type
-		glBindTexture( getGLTextureTarget(), mTextureID );
+		mGLSupport.getStateCacheManager()->bindGLTexture( getGLTextureTarget(), mTextureID );
         
 		// This needs to be set otherwise the texture doesn't get rendered
 		if (GLEW_VERSION_1_2)
-			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
+				GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
-        glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		if (GLEW_VERSION_1_2)
 		{
-			glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		}
-		
-		// If we can do automip generation and the user desires this, do so
-		mMipmapsHardwareGenerated = 
-			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
 
 		if((mUsage & TU_AUTOMIPMAP) &&
-		    mNumRequestedMipmaps && mMipmapsHardwareGenerated)
-        {
-            glTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
-        }
+			mNumRequestedMipmaps && mMipmapsHardwareGenerated)
+		{
+			mGLSupport.getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
+		}
 		
 		// Allocate internal buffer so that glTexSubImageXD can be used
 		// Internal format
@@ -370,7 +372,9 @@ namespace Ogre {
 
         // Generate mipmaps after all texture levels have been loaded
         // This is required for compressed formats such as DXT
-        if (mUsage & TU_AUTOMIPMAP)
+        // If we can do automip generation and the user desires this, do so
+        if((mUsage & TU_AUTOMIPMAP) &&
+            mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
             glGenerateMipmapEXT(getGLTextureTarget());
         }
@@ -382,8 +386,8 @@ namespace Ogre {
     {
 		mSurfaceList.clear();
         glDeleteTextures( 1, &mTextureID );
+		mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
     }
-
 	
 	//---------------------------------------------------------------------------------------------
 	void GLTexture::_createSurfaceList()
@@ -401,7 +405,7 @@ namespace Ogre {
 		{
 			for(size_t mip=0; mip<=getNumMipmaps(); mip++)
 			{
-                GLHardwarePixelBuffer *buf = new GLTextureBuffer(mName, getGLTextureTarget(), mTextureID, face, mip,
+				GLHardwarePixelBuffer *buf = new GLTextureBuffer(mGLSupport, mName, getGLTextureTarget(), mTextureID, face, mip,
 						static_cast<HardwareBuffer::Usage>(mUsage), doSoftware && mip==0, mHwGamma, mFSAA);
 				mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
                 
