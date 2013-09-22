@@ -33,10 +33,18 @@ fragment_program Blur1_ps20 hlsl
 vertex_program Blur0_vs_glsl glsl
 {
 	source Blur0_vs.glsl
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 vertex_program Blur1_vs_glsl glsl
 {
 	source Blur1_vs.glsl
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 fragment_program Blur_ps_glsl glsl
 {

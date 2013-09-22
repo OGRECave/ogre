@@ -251,7 +251,7 @@ vertex_program Fury/HeatVision/LightToHeat_GLSL_vp glsl
 
     default_params
     {
-        param_named_auto flipping render_target_flipping
+        param_named_auto worldViewProj worldviewproj_matrix
     }
 }
 
@@ -407,7 +407,7 @@ vertex_program Fury/HeatVision/Blur_GLSL_vp glsl
 
     default_params
     {
-        param_named_auto flipping render_target_flipping
+        param_named_auto worldViewProj worldviewproj_matrix
     }
 }
 
