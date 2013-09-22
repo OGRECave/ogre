@@ -292,8 +292,8 @@ protected:
 		mTerrainGlobals->getDefaultMaterialGenerator()->setLightmapEnabled(false);
 
 		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-		//mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
 		mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
+		mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
 
 		// Configure default import settings for if we use imported image
 		Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
