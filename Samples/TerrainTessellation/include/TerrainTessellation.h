@@ -62,6 +62,9 @@ public:
 
 	void testCapabilities(const RenderSystemCapabilities* caps)
 	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample is not yet finished."
+				" Sorry!", "Sample_TerrainTessellation::testCapabilities");
+
 		if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"

@@ -387,7 +387,14 @@ namespace Ogre
 			"	Filter = MIN_MAG_MIP_LINEAR;\n"
 			"	AddressU = Wrap;\n"
 			"	AddressV = Wrap;\n"
-			"};\n";
+			"};\n"
+			"SamplerState g_SamClamp\n"
+			"{\n"
+			"	Filter = MIN_MAG_MIP_LINEAR;\n"
+			"	AddressU = Clamp;\n"
+			"	AddressV = Clamp;\n"
+			"};\n"
+			;
 
 		// Main header
 		outStream << 
@@ -546,7 +553,7 @@ namespace Ogre
 		{
 			outStream << 
 				// global normal
-				"	float3 normal = expand(globalNormal.Sample(g_SamLinear, uv)).rgb;\n";
+				"	float3 normal = expand(globalNormal.Sample(g_SamClamp, uv)).rgb;\n";
 
 		}
 
@@ -564,7 +571,7 @@ namespace Ogre
 		{
 			// we just do a single calculation from composite map
 			outStream <<
-				"	float4 composite = compositeMap.Sample(g_SamLinear, uv);\n"
+				"	float4 composite = compositeMap.Sample(g_SamClamp, uv);\n"
 				"	diffuse = composite.rgb;\n";
 			// TODO - specular; we'll need normals for this!
 		}
@@ -573,7 +580,7 @@ namespace Ogre
 			// set up the blend values
 			for (uint i = 0; i < numBlendTextures; ++i)
 			{
-				outStream << "	float4 blendTexVal" << i << " = blendTex" << i << ".Sample(g_SamLinear, uv);\n";
+				outStream << "	float4 blendTexVal" << i << " = blendTex" << i << ".Sample(g_SamClamp, uv);\n";
 			}
 
 			if (prof->isLayerNormalMappingEnabled())
@@ -715,12 +722,12 @@ namespace Ogre
 			if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
 			{
 				// sample colour map and apply to diffuse
-				outStream << "	diffuse *= globalColourMap.Sample(g_SamLinear, uv).rgb;\n";
+				outStream << "	diffuse *= globalColourMap.Sample(g_SamClamp, uv).rgb;\n";
 			}
 			if (prof->isLightmapEnabled())
 			{
 				// sample lightmap
-				outStream << "	shadow = lightMap.Sample(g_SamLinear, uv).r;\n";
+				outStream << "	shadow = lightMap.Sample(g_SamClamp, uv).r;\n";
 			}
 
 			if (prof->isShadowingEnabled(tt, terrain))
