@@ -544,7 +544,7 @@ namespace Ogre {
         // Get the size of the CPU subtype struct
         size_t size;
         sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
-        
+
         // Get the ARM CPU subtype
         cpu_subtype_t cpusubtype = 0;
         sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
@@ -559,6 +559,9 @@ namespace Ogre {
                 break;
             case CPU_SUBTYPE_ARM_V7F:
                 cpuID = "ARM Cortex-A9";
+                break;
+            case CPU_SUBTYPE_ARM_V8:
+                cpuID = "ARMv8";
                 break;
             default:
                 cpuID = "Unknown ARM";
