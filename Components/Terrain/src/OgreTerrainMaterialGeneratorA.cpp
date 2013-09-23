@@ -378,20 +378,21 @@ namespace Ogre
 			// global normal map
 			TextureUnitState* tu = pass->createTextureUnitState();
 			tu->setTextureName(terrain->getTerrainNormalMap()->getName());
-			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+			// Bugfix for D3D11 Render System
+			// tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 
 			// global colour map
 			if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
 			{
 				tu = pass->createTextureUnitState(terrain->getGlobalColourMap()->getName());
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// light map
 			if (isLightmapEnabled())
 			{
 				tu = pass->createTextureUnitState(terrain->getLightmap()->getName());
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// blend maps
@@ -401,7 +402,7 @@ namespace Ogre
 			for (uint i = 0; i < numBlendTextures; ++i)
 			{
 				tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// layer textures
@@ -715,7 +716,6 @@ namespace Ogre
 				terrain->getLayerUVMultiplier(i * 4 + 3) 
 				);
 			params->setNamedConstant("uvMul_" + StringConverter::toString(i), uvMul);
-			//LogManager::getSingleton().logMessage("uvMul " + StringConverter::toString(uvMul));
 		}
 		
 		if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
