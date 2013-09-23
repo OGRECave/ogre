@@ -176,12 +176,22 @@ namespace Ogre
 			else
 				textureName = itor->name.getFriendlyText();
 
+			uint width	= itor->width;
+			uint height	= itor->height;
+			if( finalTarget )
+			{
+				if( itor->widthFactor != 1.0f )
+					width = static_cast<uint>( ceilf( finalTarget->getWidth() * itor->widthFactor ) );
+				if( itor->heightFactor != 1.0f )
+					height = static_cast<uint>( ceilf( finalTarget->getHeight() * itor->heightFactor ) );
+			}
+
 			if( itor->formatList.size() == 1 )
 			{
 				//Normal RT
 				TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
 												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
+												TEX_TYPE_2D, width, height, 0,
 												itor->formatList[0], TU_RENDERTARGET, 0, hwGamma,
 												fsaa, fsaaHint, itor->fsaaExplicitResolve );
 				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
@@ -203,7 +213,7 @@ namespace Ogre
 					TexturePtr tex = TextureManager::getSingleton().createManual(
 												textureName + StringConverter::toString( rtNum ),
 												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-												TEX_TYPE_2D, itor->width, itor->height, 0,
+												TEX_TYPE_2D, width, height, 0,
 												*pixIt, TU_RENDERTARGET, 0, hwGamma,
 												fsaa, fsaaHint, itor->fsaaExplicitResolve );
 					RenderTexture* rt = tex->getBuffer()->getRenderTarget();

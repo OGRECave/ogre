@@ -44,10 +44,10 @@ namespace Ogre
 
 	enum ShadowMapTechniques
 	{
-		SHADOWMAP_DEFAULT,
+		SHADOWMAP_UNIFORM,			//Default
 		SHADOWMAP_PLANEOPTIMAL,
 		SHADOWMAP_FOCUSED,
-		SHADOWMAP_LiPSSM,
+		SHADOWMAP_LISPSM,
 		SHADOWMAP_PSSM
 	};
 
@@ -76,6 +76,8 @@ namespace Ogre
             
             uint		width;
             uint		height;
+			float		widthFactor;
+			float		heightFactor;
             PixelFormatList formatList; // more than one means MRT
 			uint		fsaa;			// FSAA level
 			bool		hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats)
@@ -84,12 +86,17 @@ namespace Ogre
 			size_t		light;	//Render Nth closest light
 			size_t		split;	//Split for that light (only for PSSM/CSM)
 			ShadowMapTechniques	shadowMapTechnique;
+
+		protected:
 			IdString	name;
 
+		public:
 			ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
 									size_t _light, size_t _split ) :
 					width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
 					light(_light), split(_split), shadowMapTechnique(t), name( _name ) {}
+
+			IdString getName() const			{ return name; }
         };
 
 	protected:
@@ -104,12 +111,14 @@ namespace Ogre
 
 	public:
 		CompositorShadowNodeDef( IdString name ) :
-				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_DEFAULT ),
+				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_UNIFORM ),
 				mNumLights( 0 ), mMinRq( ~0 ), mMaxRq( 0 ) {}
 
 		/// Overloaded to prevent creating input channels.
 		virtual IdString addTextureSourceName( const String &name, size_t index,
 												TextureSource textureSource );
+
+		void setDefaultTechnique( ShadowMapTechniques techn )	{ mDefaultTechnique = techn; }
 
 		/** Reserves enough memory for all texture definitions
 		@remarks
@@ -130,14 +139,14 @@ namespace Ogre
 			Split for the given light. Only valid for CSM/PSSM shadow maps.
 			Must be unique for the same lightIdx.
 		@param name
-			Name to alias this texture for reference. Can be blank. If not blank, must be
-			unique and not contain the "global_" prefix. We need a hard copy
+			Name to alias this texture for reference. Must be unique and not contain the
+			"global_" prefix.
 		@param isAtlas
 			True if this shadow map is rendered in an UV atlas; which means we don't create
 			our own texture, but rather reference another through the local name.
 		*/
 		ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
-															 String name, bool isAtlas );
+															 const String &name, bool isAtlas );
 
 		/** Checks that paremeters are correctly set, and finalizes whatever needs to be
 			done, probably because not enough data was available at the time of creation.

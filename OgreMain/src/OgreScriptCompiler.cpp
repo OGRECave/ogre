@@ -1278,6 +1278,13 @@ namespace Ogre
 		mIds["pass_op"] = ID_PASS_OP;
 		mIds["two_sided"] = ID_TWO_SIDED;*/
 
+		mIds["compositor_node_shadow"]	= ID_SHADOW_NODE;
+		mIds["shadow_map"]				= ID_SHADOW_MAP;
+		mIds["shadow_atlas"]			= ID_SHADOW_ATLAS;
+		mIds["fsaa"]					= ID_FSAA;
+		mIds["light"]					= ID_LIGHT;
+		mIds["split"]					= ID_SPLIT;
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
 #endif

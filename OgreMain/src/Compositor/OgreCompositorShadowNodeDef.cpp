@@ -50,13 +50,20 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNodeDef::ShadowTextureDefinition*
 			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 String name, bool isAtlas )
+																 const String &name, bool isAtlas )
 	{
 		if( name.empty() && isAtlas )
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 							"Shadow maps used as atlas can't have empty names."
 							" Light index #" + StringConverter::toString( lightIdx ),
+							"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
+		}
+
+		if( !mLocalTextureDefs.empty() )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+							"Shadow maps need to be defined before normal textures in a Shadow Node.",
 							"OgreCompositorShadowNodeDef::addShadowTextureDefinition" );
 		}
 
@@ -80,12 +87,6 @@ namespace Ogre
 		}
 
 		mNumLights += newLight;
-
-		if( name.empty() )
-		{
-			name = "[Light " + StringConverter::toString( lightIdx ) + "; Split " +
-					StringConverter::toString( split ) + "]";
-		}
 
 		if( !isAtlas )
 			addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );

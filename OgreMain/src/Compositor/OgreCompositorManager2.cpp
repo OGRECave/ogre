@@ -122,7 +122,7 @@ namespace Ogre
 			texDef->formatList.push_back( PF_FLOAT32_R );
 			//texDef->formatList.push_back( PF_A8B8G8R8 );
 			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+			texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
 		}
 		{
 			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
@@ -131,7 +131,7 @@ namespace Ogre
 			texDef->formatList.push_back( PF_FLOAT32_R );
 			//texDef->formatList.push_back( PF_A8B8G8R8 );
 			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+			texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
 		}
 		{
 			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
@@ -140,7 +140,7 @@ namespace Ogre
 			texDef->formatList.push_back( PF_FLOAT32_R );
 			//texDef->formatList.push_back( PF_A8B8G8R8 );
 			//texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-			texDef->shadowMapTechnique = SHADOWMAP_LiPSSM;
+			texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
 		}
 
 		shadowNode->setNumTargetPass( 3 );
@@ -311,6 +311,8 @@ namespace Ogre
 											 RenderTarget *finalRenderTarget, Camera *defaultCam,
 											 IdString definitionName, bool bEnabled )
 	{
+		validateAllNodes();
+
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
 		if( itor == mWorkspaceDefs.end() )
 		{

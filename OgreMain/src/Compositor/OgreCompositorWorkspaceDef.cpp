@@ -50,7 +50,9 @@ namespace Ogre
 			if( !mCompositorManager->hasNodeDefinition( nodeName ) )
 			{
 				OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-							 "Can't find node " + nodeName.getFriendlyText(),
+							 "Can't find node '" + nodeName.getFriendlyText() + "'. "
+							 "Note declaration order is important. You may need to define "
+							 "it earlier if the name is correct.",
 							 "CompositorWorkspaceDef::createImplicitAlias" );
 			}
 			else

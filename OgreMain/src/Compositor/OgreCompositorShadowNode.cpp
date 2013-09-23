@@ -54,7 +54,10 @@ namespace Ogre
 			mLastFrame( -1 )
 	{
 		mShadowMapCameras.reserve( definition->mShadowMapTexDefinitions.size() );
-		mLocalTextures.reserve( definition->mShadowMapTexDefinitions.size() );
+		mLocalTextures.reserve( mLocalTextures.size() + definition->mShadowMapTexDefinitions.size() );
+
+		//Normal textures must be defined last but were already created.
+		const size_t numNormalTextures = mLocalTextures.size();
 
 		//Create the local textures
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
@@ -69,7 +72,7 @@ namespace Ogre
 			//When format list is empty, then this definition is for a shadow map atlas.
 			if( !itor->formatList.empty() )
 			{
-				String textureName = (itor->name + IdString( id )).getFriendlyText();
+				String textureName = (itor->getName() + IdString( id )).getFriendlyText();
 				if( itor->formatList.size() == 1 )
 				{
 					//Normal RT
@@ -110,7 +113,8 @@ namespace Ogre
 				}
 			}
 
-			// Push a null RT & Texture so we preserve the index order from getTextureSource.
+			// We could still end up pushing a null RT & Texture
+			// to preserve the index order from getTextureSource.
 			mLocalTextures.push_back( newChannel );
 
 			// One map, one camera
@@ -124,7 +128,7 @@ namespace Ogre
 			shadowMapCamera.maxDistance = 100000.0f;
 			switch( itor->shadowMapTechnique )
 			{
-			case SHADOWMAP_DEFAULT:
+			case SHADOWMAP_UNIFORM:
 				shadowMapCamera.shadowCameraSetup =
 								ShadowCameraSetupPtr( OGRE_NEW DefaultShadowCameraSetup() );
 				break;
@@ -134,7 +138,7 @@ namespace Ogre
 				shadowMapCamera.shadowCameraSetup =
 								ShadowCameraSetupPtr( OGRE_NEW FocusedShadowCameraSetup() );
 				break;
-			case SHADOWMAP_LiPSSM:
+			case SHADOWMAP_LISPSM:
 				shadowMapCamera.shadowCameraSetup =
 								ShadowCameraSetupPtr( OGRE_NEW LiSPSMShadowCameraSetup() );
 				{
@@ -160,6 +164,13 @@ namespace Ogre
 
 			++itor;
 		}
+
+		//Put normal textures in the back; we couldn't split the list earlier (less moves)
+		//because an Exception in the 'for' loop above would cause memory leaks
+		CompositorChannelVec normalTextures( mLocalTextures.begin(),
+											 mLocalTextures.begin() + numNormalTextures );
+		mLocalTextures.erase( mLocalTextures.begin(), mLocalTextures.begin() + numNormalTextures );
+		mLocalTextures.insert( mLocalTextures.end(), normalTextures.begin(), normalTextures.end() );
 
 		// Shadow Nodes don't have input; and global textures should be ready by
 		// the time we get created. Therefore, we can safely initialize now as our

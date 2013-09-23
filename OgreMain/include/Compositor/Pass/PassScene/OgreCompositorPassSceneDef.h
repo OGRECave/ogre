@@ -74,6 +74,11 @@ namespace Ogre
 			//Change base defaults
 			mIncludeOverlays = true;
 		}
+
+		void setVisibilityMask( uint32 visibilityMask )
+		{
+			mVisibilityMask = visibilityMask & MovableObject::RESERVED_VISIBILITY_FLAGS;
+		}
 	};
 
 	/** @} */

@@ -51,7 +51,7 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
-#include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
@@ -5410,7 +5410,6 @@ namespace Ogre{
 		bool fsaa = true;
 		bool fsaaExplicitResolve = false;
 		uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
-		CompositionTechnique::TextureScope scope = CompositionTechnique::TS_LOCAL;
 		Ogre::PixelFormatList formats;
 
 		while (atomIndex < prop->values.size())
@@ -5909,6 +5908,442 @@ namespace Ogre{
 	}
 
 	/**************************************************************************
+	 * CompositorShadowNodeTranslator
+	 *************************************************************************/
+	CompositorShadowNodeTranslator::CompositorShadowNodeTranslator() : mShadowNodeDef(0)
+	{
+	}
+	//-------------------------------------------------------------------------
+	void CompositorShadowNodeTranslator::translateShadowMapProperty(PropertyAbstractNode *prop,
+																	ScriptCompiler *compiler,
+																	bool isAtlas ) const
+	{
+		size_t atomIndex = 1;
+		AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
+
+		if((*it)->type != ANT_ATOM)
+		{
+			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+			return;
+		}
+
+		// Save the first atom, should be shadow map name.
+		AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
+
+		size_t width = 0, height = 0;
+		float widthFactor = 1.0f, heightFactor = 1.0f;
+		bool widthSet = false, heightSet = false, formatSet = false;
+		bool hwGammaWrite = false;
+		uint fsaa = 0;
+		uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+		Ogre::PixelFormatList formats;
+		size_t lightIdx = ~0;
+		size_t splitIdx = 0;
+		bool shadowMapTechniqueSet = false;
+		ShadowMapTechniques shadowMapTechnique = SHADOWMAP_UNIFORM;
+
+		while (atomIndex < prop->values.size())
+		{
+			it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+			if((*it)->type != ANT_ATOM)
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return;
+			}
+			AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
+
+			switch(atom->id)
+			{
+			case ID_TARGET_WIDTH:
+				width = 0;
+				widthSet = true;
+				break;
+			case ID_TARGET_HEIGHT:
+				height = 0;
+				heightSet = true;
+				break;
+			case ID_TARGET_WIDTH_SCALED:
+			case ID_TARGET_HEIGHT_SCALED:
+				{
+					bool *pSetFlag;
+					size_t *pSize;
+					float *pFactor;
+
+					if (atom->id == ID_TARGET_WIDTH_SCALED)
+					{
+						pSetFlag = &widthSet;
+						pSize = &width;
+						pFactor = &widthFactor;
+					}
+					else
+					{
+						pSetFlag = &heightSet;
+						pSize = &height;
+						pFactor = &heightFactor;
+					}
+					// advance to next to get scaling
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					atom = (AtomAbstractNode*)(*it).get();
+					if (!StringConverter::isNumber(atom->value))
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+
+					*pSize = 0;
+					*pFactor = StringConverter::parseReal(atom->value);
+					*pSetFlag = true;
+				}
+				break;
+			case ID_GAMMA:
+				hwGammaWrite = true;
+				break;
+			case ID_FSAA:
+				{
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					if( !getUInt( *it, &fsaa ) )
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+				}
+				break;
+			case ID_DEPTH_POOL:
+				{
+					// advance to next to get the ID
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					atom = (AtomAbstractNode*)(*it).get();
+					if (!StringConverter::isNumber(atom->value))
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						return;
+					}
+
+					depthBufferId = StringConverter::parseInt(atom->value);
+				}
+				break;
+			case ID_LIGHT:
+				{
+					// advance to next to get the ID
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					atom = (AtomAbstractNode*)(*it).get();
+					if (!StringConverter::isNumber(atom->value))
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						return;
+					}
+
+					lightIdx = StringConverter::parseInt(atom->value);
+				}
+				break;
+			case ID_SPLIT:
+				{
+					// advance to next to get the ID
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					atom = (AtomAbstractNode*)(*it).get();
+					if (!StringConverter::isNumber(atom->value))
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						return;
+					}
+
+					splitIdx = StringConverter::parseInt(atom->value);
+				}
+				break;
+			case ID_TECHNIQUE:
+				{
+					// advance to next to get the ID
+					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+
+					String str;
+					if( getString( *it, &str ) )
+					{
+						shadowMapTechniqueSet = true;
+						if( str == "uniform" )
+							shadowMapTechnique = SHADOWMAP_UNIFORM;
+						else if( str == "planeoptimal" )
+							shadowMapTechnique = SHADOWMAP_PLANEOPTIMAL;
+						else if( str == "focused" )
+							shadowMapTechnique = SHADOWMAP_FOCUSED;
+						else if( str == "lispsm" )
+							shadowMapTechnique = SHADOWMAP_LISPSM;
+						else if( str == "pssm" )
+							shadowMapTechnique = SHADOWMAP_PSSM;
+						else
+						{
+							shadowMapTechniqueSet = false;
+							 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
+								 prop->file, prop->line, "shadow techniques can be: technique "
+								"[uniform|planeoptimal|focused|lispsm|pssm]");
+						}
+					}
+					else
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+				}
+				break;
+			default:
+				if (StringConverter::isNumber(atom->value))
+				{
+					if (atomIndex == 2)
+					{
+						width = StringConverter::parseInt(atom->value);
+						widthSet = true;
+					}
+					else if (atomIndex == 3)
+					{
+						height = StringConverter::parseInt(atom->value);
+						heightSet = true;
+					}
+					else
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+				}
+				else
+				{
+					// pixel format or optional name?
+					PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
+					if (format == PF_UNKNOWN)
+					{
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						return;
+					}
+					else
+					{
+						formats.push_back(format);
+						formatSet = true;
+					}
+				}
+
+			}
+		}
+		if ( (!isAtlas && (!widthSet || !heightSet || !formatSet)) || lightIdx == ~0 )
+		{
+			compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+			return;
+		}
+
+		CompositorShadowNodeDef::ShadowTextureDefinition *td =
+												mShadowNodeDef->addShadowTextureDefinition(
+													lightIdx, splitIdx, atom0->value, isAtlas );
+
+		// No errors, create
+		td->width			= width;
+		td->height			= height;
+		td->widthFactor		= widthFactor;
+		td->heightFactor	= heightFactor;
+		td->formatList		= formats;
+		td->fsaa			= fsaa;
+		td->hwGammaWrite	= hwGammaWrite;
+		td->depthBufferId	= depthBufferId;
+
+		if( shadowMapTechniqueSet )
+			td->shadowMapTechnique = shadowMapTechnique;
+	}
+	//-------------------------------------------------------------------------
+	void CompositorShadowNodeTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+		if(obj->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+			return;
+		}
+
+		// Create the Node definition
+		CreateCompositorScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup());
+		bool processed = compiler->_fireEvent(&evt, (void*)&mShadowNodeDef);
+		
+		if(!processed)
+		{
+			CompositorManager2 *compositorMgr = Root::getSingleton().getCompositorManager2();
+			mShadowNodeDef = compositorMgr->addShadowNodeDefinition( obj->name );
+		}
+
+		if(mShadowNodeDef == 0)
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+			return;
+		}
+
+		// Prepare the compositor
+		obj->context = Any(static_cast<CompositorNodeDef*>( mShadowNodeDef ));
+
+		size_t numTextureDefinitions = 0;
+		size_t numShadowMaps = 0;
+		size_t numTargetPasses = 0;
+		size_t numOutputChannels = 0;
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				if( prop->id == ID_TEXTURE )
+					++numTextureDefinitions;
+				else if( prop->id == ID_SHADOW_MAP )
+					++numShadowMaps;
+				else if( prop->id == ID_OUT )
+					++numOutputChannels;
+			}
+			else if((*i)->type == ANT_OBJECT)
+			{
+				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !obj->abstract )
+				{
+					if( obj->id == ID_TARGET )
+						++numTargetPasses;
+					else if( obj->id == ID_SHADOW_MAP )
+					{
+						numTargetPasses += obj->values.size() + 1;
+					}
+				}
+			}
+		}
+
+		mShadowNodeDef->setNumLocalTextureDefinitions( numTextureDefinitions );
+		mShadowNodeDef->setNumShadowTextureDefinitions( numShadowMaps );
+		mShadowNodeDef->setNumTargetPass( numTargetPasses );
+		mShadowNodeDef->setNumOutputChannels( numOutputChannels );
+
+		AbstractNodeList::iterator i = obj->children.begin();
+		try
+		{
+		for(i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
+				case ID_TEXTURE:
+					translateTextureProperty( mShadowNodeDef, prop, compiler );
+					break;
+				case ID_TECHNIQUE:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() != 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+					}
+					else
+					{
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+
+						String str;
+						if( getString( *it0, &str ) )
+						{
+							if( str == "uniform" )
+								mShadowNodeDef->setDefaultTechnique( SHADOWMAP_UNIFORM );
+							else if( str == "planeoptimal" )
+								mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PLANEOPTIMAL );
+							else if( str == "focused" )
+								mShadowNodeDef->setDefaultTechnique( SHADOWMAP_FOCUSED );
+							else if( str == "lispsm" )
+								mShadowNodeDef->setDefaultTechnique( SHADOWMAP_LISPSM );
+							else if( str == "pssm" )
+								mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PSSM );
+							else
+							{
+								 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
+									 prop->file, prop->line, "shadow techniques can be: technique "
+									"[uniform|planeoptimal|focused|lispsm|pssm]");
+							}
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
+				case ID_SHADOW_MAP:
+				case ID_SHADOW_ATLAS:
+					translateShadowMapProperty( prop, compiler, prop->id == ID_SHADOW_ATLAS );
+					break;
+				case ID_OUT:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() != 2)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"'in' only supports 2 arguments");
+					}
+					else
+					{
+						AbstractNodeList::const_iterator it1 = prop->values.begin();
+						AbstractNodeList::const_iterator it0 = it1++;
+
+						uint32 outChannel;
+						String textureName;
+						if( getUInt( *it0, &outChannel ) && getString( *it1, &textureName ) )
+							mShadowNodeDef->mapOutputChannel( outChannel, textureName );
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+			else
+			{
+				compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
+					"token not recognized");
+			}
+		}
+		}
+		catch( Exception &e )
+		{
+			if( i != obj->children.end() )
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, (*i)->file, (*i)->line);
+			throw e;
+		}
+	}
+
+	/**************************************************************************
 	 * CompositorTargetTranslator
 	 *************************************************************************/
 	CompositorTargetTranslator::CompositorTargetTranslator() : mTargetDef(0)
@@ -5956,6 +6391,88 @@ namespace Ogre{
 			{
 				compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
 									"token not recognized");
+			}
+		}
+	}
+
+	/**************************************************************************
+	 * CompositorShadowMapTargetTranslator
+	 *************************************************************************/
+	CompositorShadowMapTargetTranslator::CompositorShadowMapTargetTranslator() : mTargetDef(0)
+	{
+	}
+	//-------------------------------------------------------------------------
+	void CompositorShadowMapTargetTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		mTargetDef = 0;
+		CompositorNodeDef *nodeDef = 0;
+		
+		ObjectAbstractNode *parent = reinterpret_cast<ObjectAbstractNode*>(obj->parent);
+
+		nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
+		if( obj->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line);
+			return;
+		}
+
+		size_t numPasses = 0;
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !obj->abstract && obj->id == ID_PASS )
+					++numPasses;
+			}
+		}
+
+		String targetPassName;
+		AbstractNodeList::const_iterator namesIt = obj->values.begin();
+		for( size_t j=0; j<obj->values.size() + 1; ++j )
+		{
+			if( !j )
+				targetPassName = obj->name;
+			else
+			{
+				if( !getString( *namesIt++, &targetPassName ) )
+				{
+					compiler->addError( ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line );
+					return;
+				}
+			}
+
+			mTargetDef = nodeDef->addTargetPass( targetPassName );
+			mTargetDef->setNumPasses( numPasses );
+			obj->context = Any(mTargetDef);
+
+			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+			{
+				if((*i)->type == ANT_OBJECT)
+				{
+					processNode(compiler, *i);
+				}
+				else
+				{
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
+										"token not recognized");
+				}
+			}
+
+			size_t shadowMapIdx;
+			TextureDefinitionBase::TextureSource texSource;
+			nodeDef->getTextureSource( mTargetDef->getRenderTargetName(), shadowMapIdx, texSource );
+
+			const CompositorPassDefVec &compositorPasses = mTargetDef->getCompositorPasses();
+			CompositorPassDefVec::const_iterator itor = compositorPasses.begin();
+			CompositorPassDefVec::const_iterator end  = compositorPasses.end();
+
+			while( itor != end )
+			{
+				(*itor)->mShadowMapIdx = shadowMapIdx;
+				++itor;
 			}
 		}
 	}
@@ -6218,8 +6735,13 @@ namespace Ogre{
 							return;
 						}
 
+						uint32 var;
 						AbstractNodeList::const_iterator it0 = prop->values.begin();
-						if( !getHex( *it0, &passScene->mVisibilityMask ) )
+						if( getHex( *it0, &var ) )
+						{
+							passScene->setVisibilityMask( var );
+						}
+						else
 						{
 							 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 						}
@@ -6595,9 +7117,13 @@ namespace Ogre{
 				translator = &mCompositorWorkspaceTranslator;
 			else if(obj->id == ID_COMPOSITOR_NODE)
 				translator = &mCompositorNodeTranslator;
+			else if(obj->id == ID_SHADOW_NODE)
+				translator = &mCompositorShadowNodeTranslator;
 			else if(obj->id == ID_TARGET && parent && (parent->id == ID_COMPOSITOR_NODE || parent->id == ID_SHADOW_NODE))
 				translator = &mCompositorTargetTranslator;
-			else if(obj->id == ID_PASS && parent && parent->id == ID_TARGET)
+			else if(obj->id == ID_SHADOW_MAP && parent && ID_SHADOW_NODE)
+				translator = &mCompositorShadowMapTargetTranslator;
+			else if(obj->id == ID_PASS && parent && (parent->id == ID_TARGET || parent->id == ID_SHADOW_MAP))
 				translator = &mCompositorPassTranslator;
 		}
 

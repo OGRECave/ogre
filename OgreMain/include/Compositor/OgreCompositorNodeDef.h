@@ -89,10 +89,10 @@ namespace Ogre
 		*/
 		void getTextureSource( size_t outputChannel, size_t &index, TextureSource &textureSource ) const;
 
-		/** Reserves enough memory for all passes (efficient allocation, better than using
-			linked lists or other containers with two level of indirections)
+		/** Reserves enough memory for all passes
 		@remarks
-			Calling this function is not obligatory, but recommended
+			Calling this function is obligatory, otherwise unexpected crashes may occur.
+			CompositorTargetDef doesn't follow the Rule of Three.
 		@param numPasses
 			The number of passes expected to contain.
 		*/
