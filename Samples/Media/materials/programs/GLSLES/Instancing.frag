@@ -5,6 +5,9 @@
 
 #version 300 es
 
+precision mediump int;
+precision mediump float;
+
 uniform sampler2D diffuseMap;
 
 uniform vec4	lightPosition;
@@ -17,7 +20,7 @@ uniform float	lightGloss;
 
 #if DEPTH_SHADOWRECEIVER
 uniform float invShadowMapSize;
-uniform sampler2DShadow shadowMap;
+uniform lowp sampler2DShadow shadowMap;
 
 //declare external function
 
@@ -33,7 +36,7 @@ vec4 offsetSample(vec4 uv, vec2 offset, float invMapSize)
 	return vec4(uv.xy + offset * invMapSize * uv.w, uv.z, uv.w);
 }
 
-float calcDepthShadow(sampler2DShadow shadowMap, vec4 uv, float invShadowMapSize)
+float calcDepthShadow(lowp sampler2DShadow shadowMap, vec4 uv, float invShadowMapSize)
 {
 	// 4-sample PCF
 	
