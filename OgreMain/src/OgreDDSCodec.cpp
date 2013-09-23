@@ -458,7 +458,7 @@ namespace Ogre {
 			PixelFormat pf = static_cast<PixelFormat>(i);
 			if (PixelUtil::getNumElemBits(pf) == rgbBits)
 			{
-				uint32 testMasks[4];
+				uint64 testMasks[4];
 				PixelUtil::getBitMasks(pf, testMasks);
 				int testBits[4];
 				PixelUtil::getBitDepths(pf, testBits);

@@ -1122,11 +1122,6 @@ namespace Ogre {
 				loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
 				grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
 			}
-			else
-			{
-				loadList = li->second;
-			}
-
 		}
 
 	}
