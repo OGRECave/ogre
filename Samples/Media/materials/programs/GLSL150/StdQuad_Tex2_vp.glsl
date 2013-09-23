@@ -5,7 +5,6 @@ in vec4 vertex;
 in vec2 uv0;
 out vec2 oUv0;
 out vec2 oUv1;
-out vec4 pos;
 
 void main()
 {
