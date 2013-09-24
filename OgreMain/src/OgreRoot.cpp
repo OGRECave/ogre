@@ -64,7 +64,6 @@ THE SOFTWARE.
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "Threading/OgreDefaultWorkQueue.h"
-#include "OgreQueuedProgressiveMeshGenerator.h"
 
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
@@ -206,12 +205,6 @@ namespace Ogre {
         // Lod strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
 
-        // Queued Progressive Mesh Generator Worker
-        mPMWorker = OGRE_NEW PMWorker();
-
-        // Queued Progressive Mesh Generator Injector
-        mPMInjector = OGRE_NEW PMInjector();
-
 #if OGRE_PROFILING
         // Profiler
         mProfiler = OGRE_NEW Profiler();
@@ -312,8 +305,6 @@ namespace Ogre {
 #endif
 
 		OGRE_DELETE mLodStrategyManager;
-		OGRE_DELETE mPMWorker;
-		OGRE_DELETE mPMInjector;
 
         OGRE_DELETE mArchiveManager;
 

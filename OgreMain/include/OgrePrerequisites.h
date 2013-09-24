@@ -244,10 +244,7 @@ namespace Ogre {
     class Plane;
     class PlaneBoundedVolume;
     class Plugin;
-    class PMWorker;
-    class PMInjector;
     class Pose;
-    class ProgressiveMeshGenerator;
     class Profile;
 	class Profiler;
     class Quaternion;

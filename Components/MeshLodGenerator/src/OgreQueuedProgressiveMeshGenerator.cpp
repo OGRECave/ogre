@@ -26,8 +26,6 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "OgreStableHeaders.h"
-
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
 #include "OgreSubMesh.h"

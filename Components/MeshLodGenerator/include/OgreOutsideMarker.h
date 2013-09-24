@@ -28,18 +28,17 @@ THE SOFTWARE.
 #ifndef __OutsideMarker_H__
 #define __OutsideMarker_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreLodPrerequisites.h"
 #include "OgreProgressiveMeshGenerator.h"
 #include "OgreResourceGroupManager.h"
 #include <vector>
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
 
 /// This class will mark vertices of a mesh, which are visible from far away (from outside).
 /// Triangle is visible if each vertex of it is visible.
-class _OgreExport OutsideMarker
+class _OgreLodExport OutsideMarker
 {
 public:
 	/**

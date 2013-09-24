@@ -29,12 +29,11 @@
 #ifndef __QueuedProgressiveMeshGenerator_H_
 #define __QueuedProgressiveMeshGenerator_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreLodPrerequisites.h"
 #include "OgreProgressiveMeshGenerator.h"
 #include "OgreSingleton.h"
 #include "OgreWorkQueue.h"
 #include "OgreFrameListener.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -42,8 +41,8 @@ namespace Ogre
 /**
  * @brief Request data structure.
  */
-struct PMGenRequest {
-	struct VertexBuffer {
+struct _OgreLodExport PMGenRequest {
+	struct _OgreLodExport VertexBuffer {
 		size_t vertexCount;
 		Vector3* vertexBuffer;
 		Vector3* vertexNormalBuffer;
@@ -51,7 +50,7 @@ struct PMGenRequest {
 			vertexBuffer(0), vertexNormalBuffer(0)
 		{ }
 	};
-	struct IndexBuffer {
+	struct _OgreLodExport IndexBuffer {
 		size_t indexSize;
 		size_t indexCount;
 		size_t indexStart;
@@ -60,7 +59,7 @@ struct PMGenRequest {
 		IndexBuffer() :
 			indexBuffer(0) { }
 	};
-	struct SubmeshInfo {
+	struct _OgreLodExport SubmeshInfo {
 		vector<IndexBuffer>::type genIndexBuffers; // order: lodlevel/generated index buffer
 		IndexBuffer indexBuffer;
 		VertexBuffer vertexBuffer;
@@ -76,7 +75,7 @@ struct PMGenRequest {
 /**
  * @brief Processes requests.
  */
-class _OgreExport PMWorker :
+class _OgreLodExport PMWorker :
 	public Singleton<PMWorker>,
 	private WorkQueue::RequestHandler,
 	private ProgressiveMeshGenerator,
@@ -137,7 +136,7 @@ private:
 
 };
 
-class _OgreExport PMInjectorListener
+class _OgreLodExport PMInjectorListener
 {
 public:
 	PMInjectorListener(){}
@@ -149,7 +148,7 @@ public:
 /**
  * @brief Injects the output of a request to the mesh in a thread safe way.
  */
-class _OgreExport PMInjector :
+class _OgreLodExport PMInjector :
 	public Singleton<PMInjector>,
 	public WorkQueue::ResponseHandler,
 	public LodAlloc
@@ -206,7 +205,7 @@ protected:
 /**
  * @brief Creates a request for the worker. The interface is compatible with ProgressiveMeshGenerator.
  */
-class _OgreExport QueuedProgressiveMeshGenerator :
+class _OgreLodExport QueuedProgressiveMeshGenerator :
 	public ProgressiveMeshGeneratorBase
 {
 public:

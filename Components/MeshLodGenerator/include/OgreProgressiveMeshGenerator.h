@@ -29,19 +29,18 @@
 #ifndef __ProgressiveMeshGenerator_H_
 #define __ProgressiveMeshGenerator_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreLodPrerequisites.h"
 #include "OgreVector3.h"
 #include "OgreSmallVector.h"
 #include "OgreMesh.h"
 #include "OgreLodConfig.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
 
 class OutsideMarker;
 
-class _OgreExport ProgressiveMeshGeneratorBase
+class _OgreLodExport ProgressiveMeshGeneratorBase
 {
 public:
 	/**
@@ -72,7 +71,7 @@ public:
 /**
  * @brief Improved version of ProgressiveMesh.
  */
-class _OgreExport ProgressiveMeshGenerator :
+class _OgreLodExport ProgressiveMeshGenerator :
 	public ProgressiveMeshGeneratorBase
 {
 public:

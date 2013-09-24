@@ -38,7 +38,7 @@
 // Optimize for best performance.
 // #define PM_WORST_QUALITY
 
-#include "OgreStableHeaders.h"
+
 #include "OgreProgressiveMeshGenerator.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareBufferManager.h"

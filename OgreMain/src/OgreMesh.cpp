@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreLodConfig.h"
 #include "OgrePixelCountLodStrategy.h"
 
 namespace Ogre {
@@ -1000,6 +999,10 @@ namespace Ogre {
 		assert(level < mMeshLodUsageList.size() && "Index out of bounds");
 
 		mMeshLodUsageList[level] = usage;
+
+		if(!mMeshLodUsageList[level].manualName.empty()){
+			mHasManualLodLevel = true;
+		}
 	}
 	//---------------------------------------------------------------------
 	bool Mesh::_isManualLodLevel( unsigned short level ) const
@@ -1016,7 +1019,7 @@ namespace Ogre {
 		assert(mMeshLodUsageList[level].manualName.empty() && "Not using generated LODs!");
         assert(subIdx < mSubMeshList.size() && "Index out of bounds");
 		assert(level != 0 && "Can't modify first lod level (full detail)");
-		assert(level < mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
+		assert(level-1 < mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
 		
 		SubMesh* sm = mSubMeshList[subIdx];
 		sm->mLodFaceList[level - 1] = facedata;
@@ -2259,50 +2262,10 @@ namespace Ogre {
         mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 
         // Re-transform user lod values (starting at index 1, no need to transform base value)
-		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin()+1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
     }
-    //--------------------------------------------------------------------
-    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
-    {
-        setLodStrategy(lodConfig.strategy);
-		MeshLodUsage usage;
-		size_t n = 0;
-		mMeshLodUsageList.resize(1); // remove old lod levels.
-        mMeshLodUsageList.reserve(lodConfig.levels.size() + 1);
-        for (size_t i = 0; i < lodConfig.levels.size(); i++) {
-            // Record usages. First Lod usage is the mesh itself.
 
-            // Skip lods, which have the same amount of vertices. No buffer generated for them.
-            if (!lodConfig.levels[i].outSkipped) {
-				
-                usage.userValue = lodConfig.levels[i].distance;
-                usage.value = getLodStrategy()->transformUserValue(usage.userValue);
-                usage.edgeData = NULL;
-                usage.manualMesh.setNull();
-                usage.manualName = lodConfig.levels[i].manualMeshName;
-				if(usage.manualName != "") {
-					mHasManualLodLevel = true;
-				}
-				n++;
-				mMeshLodUsageList.push_back(usage);
-            }
-        }
-		mNumLods = n + 1;
-
-        // TODO: Fix this in PixelCountLodStrategy::getIndex()
-        // Fix bug in Ogre with pixel count Lod strategy.
-        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
-        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
-        if (lodConfig.strategy == PixelCountLodStrategy::getSingletonPtr()) {
-            mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
-            mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
-        } else {
-            mMeshLodUsageList[0].userValue = 0;
-            mMeshLodUsageList[0].value = 0;
-        }
-    }
-	//---------------------------------------------------------------------
 }
 

@@ -29,7 +29,7 @@
 #ifndef __LogConfigSerializer_H_
 #define __LogConfigSerializer_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreLodPrerequisites.h"
 
 #include "OgreLodConfig.h"
 #include "OgreSerializer.h"
@@ -38,7 +38,7 @@
 namespace Ogre
 {
 
-class _OgreExport LodConfigSerializer :
+class _OgreLodExport LodConfigSerializer :
 	public Ogre::Serializer
 {
 

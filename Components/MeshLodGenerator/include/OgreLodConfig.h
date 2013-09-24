@@ -29,14 +29,14 @@
 #ifndef __LogConfig_H_
 #define __LogConfig_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreLodPrerequisites.h"
 #include "OgreMesh.h"
 #include "OgreLodStrategy.h"
 
 namespace Ogre
 {
 
-struct ProfiledEdge {
+struct _OgreLodExport ProfiledEdge {
 	Vector3 src; // Vertex identifier
 	Vector3 dst; // Direction of collapse
 	Real cost; // Requested collapse cost
@@ -47,7 +47,7 @@ typedef vector<ProfiledEdge>::type LodProfile;
 /**
  * @brief Structure for automatic Lod configuration.
  */
-struct LodLevel {
+struct _OgreLodExport LodLevel {
 	/**
 	 * @brief Type of the reduction.
 	 *
@@ -120,7 +120,7 @@ struct LodLevel {
 	bool outSkipped;
 };
 
-struct LodConfig {
+struct _OgreLodExport LodConfig {
 	MeshPtr mesh;
 	LodStrategy* strategy;
 

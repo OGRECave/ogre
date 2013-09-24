@@ -109,8 +109,6 @@ namespace Ogre
 		RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;
         ScriptCompilerManager *mCompilerManager;
         LodStrategyManager *mLodStrategyManager;
-        PMWorker* mPMWorker;
-        PMInjector* mPMInjector;
 
         Timer* mTimer;
         RenderWindow* mAutoWindow;
