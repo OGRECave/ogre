@@ -30,9 +30,18 @@ THE SOFTWARE.
 #define __Threads_H__
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+	#define OGRE_THREAD_CALL_CONVENTION __stdcall
+#else
+	#if OGRE_COMPILER == OGRE_COMPILER_GNUC
+		#define __cdecl __attribute__((__cdecl__))
+	#endif
+	#define OGRE_THREAD_CALL_CONVENTION __cdecl
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	/// @See Threads::CreateThread for an example on how to use
 	#define THREAD_DECLARE( threadFunction ) \
-	unsigned long __stdcall threadFunction##_internal( void *argName )\
+	unsigned long OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
 	{\
 		unsigned long retVal = 0;\
 		ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
@@ -45,9 +54,28 @@ THE SOFTWARE.
 		delete threadHandle;\
 		return retVal;\
 	}
+#else
+	/// @See Threads::CreateThread for an example on how to use
+	#define THREAD_DECLARE( threadFunction ) \
+	void* OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
+	{\
+		unsigned long retVal = 0;\
+		ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
+		try {\
+			unsigned long retVal = threadFunction( threadHandle );\
+		}\
+		catch( ... )\
+		{\
+		}\
+		delete threadHandle;\
+	}
+#endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	//No need to include the heavy windows.h header for something like this!
 	typedef void* HANDLE;
+#else
+	#include <pthread.h>
 #endif
 
 namespace Ogre
@@ -56,6 +84,8 @@ namespace Ogre
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		HANDLE	mThread;
+#else
+		pthread_t mThread;
 #endif
 		size_t	mThreadIdx;
 		void	*mUserParam;
@@ -67,17 +97,26 @@ namespace Ogre
 		size_t getThreadIdx() const			{ return mThreadIdx; }
 		void* getUserParam() const			{ return mUserParam; }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		/// Internal use
 		void _setOsHandle( HANDLE handle )	{ mThread = handle; }
 		/// Internal use
 		HANDLE _getOsHandle() const			{ return mThread; }
+#else
+		/// Internal use
+		void _setOsHandle( pthread_t &handle )	{ mThread = handle; }
+		/// Internal use
+		pthread_t _getOsHandle() const			{ return mThread; }
+#endif
 	};
 
 	typedef SharedPtr<ThreadHandle> ThreadHandlePtr;
 	typedef vector<ThreadHandlePtr>::type ThreadHandleVec;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	typedef unsigned long (__stdcall *THREAD_ENTRY_POINT)( void *lpThreadParameter );
+	typedef unsigned long (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );
+#else
+	typedef void* (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );
 #endif
 
 	class _OgreExport Threads

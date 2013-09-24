@@ -6471,7 +6471,8 @@ namespace Ogre{
 
 			while( itor != end )
 			{
-				(*itor)->mShadowMapIdx = shadowMapIdx;
+				(*itor)->mShadowMapIdx		= shadowMapIdx;
+				(*itor)->mIncludeOverlays	= false;
 				++itor;
 			}
 		}

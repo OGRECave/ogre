@@ -41,6 +41,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName )
 	{
+		assert( mTargetPasses.size() < mTargetPasses.capacity() &&
+				"setNumTargetPass called improperly!" );
+
 		if( renderTargetName.find( "global_" ) == 0 )
 			addTextureSourceName( renderTargetName, 0, TEXTURE_GLOBAL );
 
