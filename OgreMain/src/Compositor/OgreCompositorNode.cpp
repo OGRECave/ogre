@@ -41,19 +41,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-									CompositorWorkspace *workspace, RenderSystem *renderSys ) :
-			IdObject( id ),
-			mName( name ),
-			mNumConnectedInputs( 0 ),
-			mWorkspace( workspace ),
-			mRenderSystem( renderSys ),
-			mDefinition( definition )
-	{
-		mInTextures.resize( mDefinition->getNumInputChannels(), CompositorChannel() );
-		mOutTextures.resize( mDefinition->mOutChannelMapping.size() );
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
 									CompositorWorkspace *workspace, RenderSystem *renderSys,
 									const RenderTarget *finalTarget ) :
 			IdObject( id ),

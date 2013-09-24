@@ -143,8 +143,6 @@ namespace Ogre
 			The name is only unique across the workspace
 		*/
 		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
-						CompositorWorkspace *workspace, RenderSystem *renderSys );
-		CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
 						CompositorWorkspace *workspace, RenderSystem *renderSys,
 						const RenderTarget *finalTarget );
 		virtual ~CompositorNode();

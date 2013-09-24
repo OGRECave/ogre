@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreBarrier.h"
+#include "Threading/OgreBarrier.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

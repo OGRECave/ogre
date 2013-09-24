@@ -82,7 +82,8 @@ namespace Ogre
 		{
 			const CompositorNodeDef *nodeDef = compoManager->getNodeDefinition( itor->second );
 			CompositorNode *newNode = OGRE_NEW CompositorNode( Id::generateNewId<CompositorNode>(),
-																itor->first, nodeDef, this, mRenderSys );
+																itor->first, nodeDef, this, mRenderSys,
+																mRenderWindow );
 			mNodeSequence.push_back( newNode );
 			++itor;
 		}
@@ -402,7 +403,7 @@ namespace Ogre
 			const CompositorManager2 *compoManager = mDefinition->mCompositorManager;
 			const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
 			retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
-													def, this, mRenderSys );
+													def, this, mRenderSys, mRenderWindow );
 			mShadowNodes.push_back( retVal );
 			bCreated = true;
 		}

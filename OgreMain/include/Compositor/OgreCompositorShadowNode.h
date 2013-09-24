@@ -158,7 +158,8 @@ namespace Ogre
 
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
-								CompositorWorkspace *workspace, RenderSystem *renderSys );
+								CompositorWorkspace *workspace, RenderSystem *renderSys,
+								const RenderTarget *finalTarget );
 		~CompositorShadowNode();
 
 		/** Renders into the shadow map, executes passes
