@@ -134,7 +134,8 @@ v2p hardwareSkinningTwoWeights_vp(
 	uniform float4x4 viewProjectionMatrix,
 	uniform float4   lightPos[2],
 	uniform float4   lightDiffuseColour[2],
-	uniform float4   ambient)
+	uniform float4   ambient,
+	uniform float4   diffuse)
 {
 	v2p output;
 
@@ -166,9 +167,9 @@ v2p hardwareSkinningTwoWeights_vp(
 
 	
 	output.oUv = input.uv;
-	output.colour = ambient + 
+	output.colour = diffuse * (ambient + 
 		(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
-		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]));
 	return output;
 }
 

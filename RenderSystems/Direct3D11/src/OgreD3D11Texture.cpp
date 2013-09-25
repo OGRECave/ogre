@@ -242,14 +242,31 @@ namespace Ogre
             loadInfo.MipLevels = 1;
         }
 
+		// TO DO: check cpu access flags and use loadInfo only when it is needed.
+		// this is the first try
+
 		// Load the Texture
-		hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
-			memoryptr->getPtr(),
-			memoryptr->size(),
-			&loadInfo,
-			NULL, 
-			&mpTex, 
-			NULL );
+		if (loadInfo.CpuAccessFlags == D3D11_CPU_ACCESS_WRITE)
+		{
+			hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
+				memoryptr->getPtr(),
+				memoryptr->size(),
+				&loadInfo,
+				NULL, 
+				&mpTex, 
+				NULL );
+		}
+		else
+		{
+			hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
+				memoryptr->getPtr(),
+				memoryptr->size(),
+				NULL,
+				NULL, 
+				&mpTex, 
+				NULL );
+		}
+
 		if( FAILED( hr ) )
 		{
 			LogManager::getSingleton().logMessage("D3D11 : " + mName + " Could not be loaded");

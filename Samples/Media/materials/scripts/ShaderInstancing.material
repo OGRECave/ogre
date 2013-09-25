@@ -265,7 +265,7 @@ vertex_program Ogre/Instancing/ShaderBased_vs unified
 {
 	delegate Ogre/Instancing/ShaderBased_glsl_vs
 	delegate Ogre/Instancing/ShaderBased_glsles_vs
-	//delegate Ogre/Instancing/ShaderBased_hlsl_vs
+	delegate Ogre/Instancing/ShaderBased_hlsl_vs
 	delegate Ogre/Instancing/ShaderBased_cg_vs
 
 	default_params
@@ -282,7 +282,7 @@ vertex_program Ogre/Instancing/shadow_caster_vs unified
 {
 	delegate Ogre/Instancing/shadow_caster_glsl_vs
 	delegate Ogre/Instancing/shadow_caster_glsles_vs
-	//delegate Ogre/Instancing/shadow_caster_hlsl_vs
+	delegate Ogre/Instancing/shadow_caster_hlsl_vs
 	delegate Ogre/Instancing/shadow_caster_cg_vs
 
 	default_params
@@ -297,7 +297,7 @@ vertex_program Ogre/Instancing/ShaderBased_dq_vs unified
 {
 	delegate Ogre/Instancing/ShaderBased_dq_glsl_vs
 	delegate Ogre/Instancing/ShaderBased_dq_glsles_vs
-	//delegate Ogre/Instancing/ShaderBased_dq_hlsl_vs
+	delegate Ogre/Instancing/ShaderBased_dq_hlsl_vs
 	delegate Ogre/Instancing/ShaderBased_dq_cg_vs
 
 	default_params
@@ -313,7 +313,7 @@ vertex_program Ogre/Instancing/shadow_caster_dq_vs unified
 {
 	delegate Ogre/Instancing/shadow_caster_dq_glsl_vs
 	delegate Ogre/Instancing/shadow_caster_dq_glsles_vs
-	//delegate Ogre/Instancing/shadow_caster_dq_hlsl_vs
+	delegate Ogre/Instancing/shadow_caster_dq_hlsl_vs
 	delegate Ogre/Instancing/shadow_caster_dq_cg_vs
 
 	default_params
@@ -328,7 +328,7 @@ vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/ShaderBased_dq_two_weights_glsl_vs
 	delegate Ogre/Instancing/ShaderBased_dq_two_weights_glsles_vs
-	//delegate Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs
+	delegate Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/ShaderBased_dq_two_weights_cg_vs
 
 	default_params
@@ -344,7 +344,7 @@ vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_vs unified
 {
 	delegate Ogre/Instancing/shadow_caster_dq_two_weights_glsl_vs
 	delegate Ogre/Instancing/shadow_caster_dq_two_weights_glsles_vs
-	//delegate Ogre/Instancing/shadow_caster_dq_two_weights_hlsl_vs
+	delegate Ogre/Instancing/shadow_caster_dq_two_weights_hlsl_vs
 	delegate Ogre/Instancing/shadow_caster_dq_two_weights_cg_vs
 
 	default_params

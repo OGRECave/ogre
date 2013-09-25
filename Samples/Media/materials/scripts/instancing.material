@@ -276,7 +276,7 @@ vertex_program Instancing unified
 	delegate InstancingGLSL150
 	delegate InstancingGLSL
 	delegate InstancingGLSLES
-	delegate Instancinghlsl
+	//delegate Instancinghlsl
 	delegate InstancingCg
 }
 vertex_program InstancingShadowCaster unified

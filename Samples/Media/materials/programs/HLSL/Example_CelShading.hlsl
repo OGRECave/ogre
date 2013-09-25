@@ -41,7 +41,7 @@ fragment_in main_vp(
 	// Calculate specular component
 	float3 E = normalize(eyePosition - input.position.xyz);
 	float3 H = normalize(L + E);
-	output.specular = pow(max(dot(N, H), 0), shininess);
+	output.specular = pow(max(dot(N, H), 0), shininess).x;
 	// Mask off specular if diffuse is 0
 	if (output.diffuse == 0) output.specular = 0;
 
@@ -67,6 +67,6 @@ float4 main_fp( fragment_in input,
 	input.specular = specularRamp.Sample(SampleType, input.specular).x;
 	input.edge = edgeRamp.Sample(SampleType, input.edge).x;
 
-	return edge * ((diffuse * diffuseIn) + 
-					(specular * specularIn));
+	return input.edge * ((diffuse * input.diffuse) + 
+					(specular * input.specular));
 }
