@@ -13,6 +13,6 @@ void main()
     gl_Position = worldViewProj * vertex;
 
     oUv0 = uv0;
-    oUv1 = inPos.xy;
+    oUv1 = -vertex.xy;
     pos = gl_Position;
 }

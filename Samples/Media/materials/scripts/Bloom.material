@@ -58,10 +58,18 @@ fragment_program Blur_ps_glsl glsl
 vertex_program Blur0_vs_glsles glsles
 {
 	source Blur0_vs.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 vertex_program Blur1_vs_glsles glsles
 {
 	source Blur1_vs.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 fragment_program Blur_ps_glsles glsles
 {
