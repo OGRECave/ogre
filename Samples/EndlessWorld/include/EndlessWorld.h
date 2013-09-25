@@ -64,7 +64,7 @@ public:
 		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
 			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down."
-			"Use G to generate another random terrain";
+			"Use C to generate another random terrain";
 	}
 
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -182,7 +182,7 @@ public:
 			}
 			break;
 		// generate new random offset, to make terrains different
-		case OIS::KC_G:
+		case OIS::KC_C:
 			if(mPerlinNoiseTerrainGenerator)
 			{
 				// random a new origin point
