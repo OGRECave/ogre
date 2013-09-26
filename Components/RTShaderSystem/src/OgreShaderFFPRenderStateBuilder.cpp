@@ -50,7 +50,6 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 FFPRenderStateBuilder* FFPRenderStateBuilder::getSingletonPtr()
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 

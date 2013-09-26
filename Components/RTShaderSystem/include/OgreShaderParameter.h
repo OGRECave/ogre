@@ -373,7 +373,7 @@ typedef ShaderParameterList::const_iterator		ShaderParameterConstIterator;
 
 /** Uniform parameter class. Allow fast access to GPU parameter updates.
 */
-class UniformParameter : public Parameter
+class _OgreRTSSExport UniformParameter : public Parameter
 {
 public:
 

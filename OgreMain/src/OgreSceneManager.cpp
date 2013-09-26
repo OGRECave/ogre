@@ -6366,11 +6366,11 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 			shadowTextureIndex += textureCountPerLight;
 		}
 	}
-	catch (Exception& e) 
+	catch (Exception&) 
 	{
 		// we must reset the illumination stage if an exception occurs
 		mIlluminationStage = savedStage;
-		throw e;
+		throw;
 	}
     // Set the illumination stage, prevents recursive calls
     mIlluminationStage = savedStage;
