@@ -100,9 +100,7 @@ public:
 	@param boneCount The maximum number of bones in the model this material
 		 is assigned to. Note that this parameter can be higher but not
 		 lower than the actual number of bones.
-	@param weightCount The maximum number of weights/bones affecting
-		a vertex. Note that this parameter can be higher but not
-		 lower than the actual number of affecting bones.
+	@param weightCount The maximum number of weights/bones affecting a vertex.
 	@param skinningType The type of skinning desired.
 	@param correctAntipodalityHandling If correct antipodality handling should be utilized (Only applicable for dual quaternion skinning).
 	@param scalingShearingSupport If scaling and shearing support should be enabled (Only applicable for dual quaternion skinning).
@@ -303,15 +301,16 @@ public:
 protected:
 	/** 
 		@brief
-			Extracts the maximum amount of bones and weights used in an entity.
+			Extracts the maximum amount of bones and weights used in an specific subentity of given entity.
 		
 		@param pEntity The entity from which the information needs to be extracted.
+		@param subEntityIndex The index of subentity from which the information needs to be extracted.
 		@param boneCount The maximum number of bones used by the entity.
 		@param weightCount The maximum number of weights used by the entity.
 		@return Returns true if the entity can use HS. False if not. 
 	*/
-	bool extractSkeletonData(const Entity* pEntity, ushort& boneCount,
-		ushort& weightCount);
+	bool extractSkeletonData(const Entity* pEntity, unsigned int subEntityIndex,
+		ushort& boneCount, ushort& weightCount);
 
 	/** 
 		@brief
