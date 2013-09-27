@@ -712,9 +712,6 @@ namespace Ogre {
             mAutoWindow->_setPrimary();
         }
 
-		if( !mCompositorManager2 )
-			mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
-
         // Initialise timer
         mTimer->reset();
 		mFrameStats->reset( mTimer->getMicroseconds() );
@@ -727,6 +724,12 @@ namespace Ogre {
         return mAutoWindow;
 
     }
+	//-----------------------------------------------------------------------
+	void Root::initialiseCompositor(void)
+	{
+		if( !mCompositorManager2 )
+			mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
+	}
     //-----------------------------------------------------------------------
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
     {
