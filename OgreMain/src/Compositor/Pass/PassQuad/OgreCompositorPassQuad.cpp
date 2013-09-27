@@ -118,6 +118,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorPassQuad::execute()
 	{
+		//Execute a limited number of times?
+		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+		{
+			if( !mNumPassesLeft )
+				return;
+			--mNumPassesLeft;
+		}
+
 		//Call beginUpdate if we're the first to use this RT
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();

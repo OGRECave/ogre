@@ -95,7 +95,7 @@ namespace Ogre
 		return &mShadowMapTexDefinitions.back();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNodeDef::_validateAndFinish()
+	void CompositorShadowNodeDef::_validateAndFinish(void)
 	{
 		const Real EPSILON = 1e-6f;
 

@@ -65,6 +65,8 @@ namespace Ogre
 		RenderSystem			*mRenderSys;
 
 		RenderTarget			*mRenderWindow;
+		uint					mCurrentWidth;
+		uint					mCurrentHeight;
 
 		/// Creates all the node instances from our definition
 		void createAllNodes(void);
@@ -123,6 +125,11 @@ namespace Ogre
 
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapFinalTarget( bool waitForVSync );
+
+		/** For compatibility with D3D9, forces a device lost check
+			on the RenderWindow, so that BeginScene doesn't fail.
+		*/
+		void _validateFinalTarget(void);
 
 		/** Finds a shadow node instance with a given name.
 			Note that unlike nodes, there can only be one ShadowNode instance per definition

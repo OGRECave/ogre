@@ -81,6 +81,9 @@ namespace Ogre
 		/// Shadow map index it belongs to (only filled in passes owned by Shadow Nodes)
 		uint32				mShadowMapIdx;
 
+		/// Number of times to perform the pass before stopping. -1 to never stop.
+		uint32				mNumInitialPasses;
+
 		/// Custom value in case there's a listener attached (to identify the pass)
 		uint32				mIdentifier;
 
@@ -100,7 +103,8 @@ namespace Ogre
 			mPassType( passType ),
 			mVpLeft( 0 ), mVpTop( 0 ),
 			mVpWidth( 1 ), mVpHeight( 1 ), mShadowMapIdx( 0 ),
-			mIdentifier( 0 ), mBeginRtUpdate( true ), mEndRtUpdate( true ),
+			mNumInitialPasses( -1 ), mIdentifier( 0 ),
+			mBeginRtUpdate( true ), mEndRtUpdate( true ),
 			mIncludeOverlays( false ) {}
 		CompositorPassType getType() const				{ return mPassType; }
 	};

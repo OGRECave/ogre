@@ -43,6 +43,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorPassClear::execute()
 	{
+		//Execute a limited number of times?
+		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+		{
+			if( !mNumPassesLeft )
+				return;
+			--mNumPassesLeft;
+		}
+
 		//TODO: Implement mDiscardOnly
 		mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
 							mDefinition->mDepthValue, mDefinition->mStencilValue );

@@ -698,6 +698,14 @@ elseif (UNIX)
   endif ()
 endif()
 
+if (NOT WIN32)
+  set(THREAD_SOURCE_FILES
+      src/Threading/OgreBarrierPThreads.cpp
+	  src/Threading/OgreLightweightMutexPThreads.cpp
+      src/Threading/OgreThreadsPThreads.cpp
+  )
+endif
+
 
 # Configure threading files
 set(THREAD_HEADER_FILES

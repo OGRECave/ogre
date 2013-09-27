@@ -224,8 +224,36 @@ namespace Ogre
 									IdType id, bool uniqueNames,
 									const RenderTarget *finalTarget, RenderSystem *renderSys );
 
+		static CompositorChannel createTexture( const TextureDefinition &textureDef,
+												const String &texName, const RenderTarget *finalTarget,
+												RenderSystem *renderSys );
+
 		/// @See createTextures
 		static void destroyTextures( CompositorChannelVec &inOutTexContainer, RenderSystem *renderSys );
+
+		/** Destroys & recreates only the textures that depend on the main RT
+			(i.e. the RenderWindow) resolution
+		@param textureDefs
+			Array of texture definitions, so we know which ones depend on main RT's resolution
+		@param inOutTexContainer
+			Where we'll replace the RTs & textures
+		@param finalTarget
+			The final render target (usually the render window) we have to clone parameters from
+			(eg. when using auto width & height, or fsaa settings)
+		@param renderSys
+			The RenderSystem to use
+		@param connectedNodes
+			Array of connected nodes that may be using our textures and need to be notified.
+		@param passes
+			Array of Compositor Passes which may contain the texture being recreated
+			When the pointer is null, we don't iterate through it.
+		*/
+		static void recreateResizableTextures( const TextureDefinitionVec &textureDefs,
+												CompositorChannelVec &inOutTexContainer,
+												const RenderTarget *finalTarget,
+												RenderSystem *renderSys,
+												const CompositorNodeVec &connectedNodes,
+												const CompositorPassVec *passes );
 	};
 
 	/** @} */

@@ -384,11 +384,22 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorManager2::_update( bool swapFinalTargets, bool waitForVSync )
 	{
-		// Begin the frame
-		mRenderSystem->_beginFrame();
-
 		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
 		WorkspaceVec::const_iterator end  = mWorkspaces.end();
+
+		// We need to validate the device (D3D9) before calling _beginFrame()
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() )
+				workspace->_validateFinalTarget();
+			++itor;
+		}
+
+		itor = mWorkspaces.begin();
+
+		// Begin the frame
+		mRenderSystem->_beginFrame();
 
 		while( itor != end )
 		{

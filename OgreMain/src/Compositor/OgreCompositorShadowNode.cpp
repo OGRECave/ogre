@@ -67,71 +67,9 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			CompositorChannel newChannel;
-
-			//When format list is empty, then this definition is for a shadow map atlas.
-			if( !itor->formatList.empty() )
-			{
-				uint width	= itor->width;
-				uint height	= itor->height;
-				if( finalTarget )
-				{
-					if( itor->widthFactor != 1.0f )
-					{
-						width = static_cast<uint>( ceilf( finalTarget->getWidth() *
-															itor->widthFactor ) );
-					}
-					if( itor->heightFactor != 1.0f )
-					{
-						height = static_cast<uint>( ceilf( finalTarget->getHeight() *
-															itor->heightFactor ) );
-					}
-				}
-
-				String textureName = (itor->getName() + IdString( id )).getFriendlyText();
-				if( itor->formatList.size() == 1 )
-				{
-					//Normal RT
-					TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
-													ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-													TEX_TYPE_2D, width, height, 0,
-													itor->formatList[0], TU_RENDERTARGET, 0,
-													itor->hwGammaWrite, itor->fsaa );
-					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-					rt->setDepthBufferPool( itor->depthBufferId );
-					newChannel.target = rt;
-					newChannel.textures.push_back( tex );
-				}
-				else
-				{
-					//MRT
-					MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
-					PixelFormatList::const_iterator pixIt = itor->formatList.begin();
-					PixelFormatList::const_iterator pixEn = itor->formatList.end();
-
-					mrt->setDepthBufferPool( itor->depthBufferId );
-					newChannel.target = mrt;
-
-					while( pixIt != pixEn )
-					{
-						size_t rtNum = pixIt - itor->formatList.begin();
-						TexturePtr tex = TextureManager::getSingleton().createManual(
-													textureName + StringConverter::toString( rtNum ),
-													ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-													TEX_TYPE_2D, width, height, 0,
-													*pixIt, TU_RENDERTARGET, 0, itor->hwGammaWrite,
-													itor->fsaa );
-						RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-						mrt->bindSurface( rtNum, rt );
-						newChannel.textures.push_back( tex );
-						++pixIt;
-					}
-				}
-			}
-
 			// We could still end up pushing a null RT & Texture
 			// to preserve the index order from getTextureSource.
-			mLocalTextures.push_back( newChannel );
+			mLocalTextures.push_back( createShadowTexture( *itor, finalTarget ) );
 
 			// One map, one camera
 			const size_t shadowMapIdx = itor - definition->mShadowMapTexDefinitions.begin();
@@ -197,6 +135,75 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNode::~CompositorShadowNode()
 	{
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorChannel CompositorShadowNode::createShadowTexture(
+								const CompositorShadowNodeDef::ShadowTextureDefinition &textureDef,
+								const RenderTarget *finalTarget )
+	{
+		CompositorChannel newChannel;
+
+		//When format list is empty, then this definition is for a shadow map atlas.
+		if( !textureDef.formatList.empty() )
+		{
+			uint width	= textureDef.width;
+			uint height	= textureDef.height;
+			if( finalTarget )
+			{
+				if( textureDef.width == 0 )
+				{
+					width = static_cast<uint>( ceilf( finalTarget->getWidth() *
+														textureDef.widthFactor ) );
+				}
+				if( textureDef.height == 0 )
+				{
+					height = static_cast<uint>( ceilf( finalTarget->getHeight() *
+														textureDef.heightFactor ) );
+				}
+			}
+
+			String textureName = (textureDef.getName() + IdString( getId() )).getFriendlyText();
+			if( textureDef.formatList.size() == 1 )
+			{
+				//Normal RT
+				TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
+												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+												TEX_TYPE_2D, width, height, 0,
+												textureDef.formatList[0], TU_RENDERTARGET, 0,
+												textureDef.hwGammaWrite, textureDef.fsaa );
+				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+				rt->setDepthBufferPool( textureDef.depthBufferId );
+				newChannel.target = rt;
+				newChannel.textures.push_back( tex );
+			}
+			else
+			{
+				//MRT
+				MultiRenderTarget* mrt = mRenderSystem->createMultiRenderTarget( textureName );
+				PixelFormatList::const_iterator pixIt = textureDef.formatList.begin();
+				PixelFormatList::const_iterator pixEn = textureDef.formatList.end();
+
+				mrt->setDepthBufferPool( textureDef.depthBufferId );
+				newChannel.target = mrt;
+
+				while( pixIt != pixEn )
+				{
+					size_t rtNum = pixIt - textureDef.formatList.begin();
+					TexturePtr tex = TextureManager::getSingleton().createManual(
+												textureName + StringConverter::toString( rtNum ),
+												ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+												TEX_TYPE_2D, width, height, 0,
+												*pixIt, TU_RENDERTARGET, 0, textureDef.hwGammaWrite,
+												textureDef.fsaa );
+					RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+					mrt->bindSurface( rtNum, rt );
+					newChannel.textures.push_back( tex );
+					++pixIt;
+				}
+			}
+		}
+
+		return newChannel;
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::buildClosestLightList( Camera *newCamera )
@@ -550,5 +557,64 @@ namespace Ogre
 
 		outMin = 0.0f;
 		outMax = 100000.0f;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )
+	{
+		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+														mDefinition->mShadowMapTexDefinitions.begin();
+		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
+														mDefinition->mShadowMapTexDefinitions.end();
+
+		CompositorChannelVec::iterator itorTex = mLocalTextures.begin();
+
+		while( itor != end )
+		{
+			if( (itor->width == 0 || itor->height == 0) && itorTex->isValid() )
+			{
+				for( size_t i=0; i<itorTex->textures.size(); ++i )
+					TextureManager::getSingleton().remove( itorTex->textures[i]->getName() );
+
+				CompositorChannel newChannel = createShadowTexture( *itor, finalTarget );
+
+				CompositorPassVec::const_iterator passIt = mPasses.begin();
+				CompositorPassVec::const_iterator passEn = mPasses.end();
+				while( passIt != passEn )
+				{
+					(*passIt)->notifyRecreated( *itorTex, newChannel );
+					++passIt;
+				}
+
+				CompositorNodeVec::const_iterator itNodes = mConnectedNodes.begin();
+				CompositorNodeVec::const_iterator enNodes = mConnectedNodes.end();
+
+				while( itNodes != enNodes )
+				{
+					(*itNodes)->notifyRecreated( *itorTex, newChannel );
+					++itNodes;
+				}
+
+				if( !itorTex->isMrt() )
+					mRenderSystem->destroyRenderTarget( itorTex->target->getName() );
+
+				*itorTex = newChannel;
+			}
+			++itorTex;
+			++itor;
+		}
+
+		//Now recreate the regular textures (i.e. local textures used for
+		//postprocessing and ping-ponging, which aren't shadow maps)
+		CompositorChannelVec normalLocalTextures;
+		const size_t normalStart = mDefinition->mShadowMapTexDefinitions.size();
+		normalLocalTextures.reserve( mLocalTextures.size() - normalStart );
+		normalLocalTextures.insert( normalLocalTextures.end(), mLocalTextures.begin() + normalStart,
+																mLocalTextures.end() );
+		TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs, normalLocalTextures,
+															finalTarget, mRenderSystem, mConnectedNodes,
+															&mPasses );
+		mLocalTextures.erase( mLocalTextures.begin() + normalStart, mLocalTextures.end() );
+		mLocalTextures.insert( mLocalTextures.end(), normalLocalTextures.begin(),
+													 normalLocalTextures.end() );
 	}
 }

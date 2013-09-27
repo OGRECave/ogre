@@ -37,10 +37,13 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPass::CompositorPass( const CompositorPassDef *definition, RenderTarget *target ) :
+			mDefinition( definition ),
 			mTarget( target ),
 			mViewport( 0 ),
-			mDefinition( definition )
+			mNumPassesLeft( definition->mNumInitialPasses )
 	{
+		assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
+
 		const Real EPSILON = 1e-6f;
 
 		const unsigned short numViewports = mTarget->getNumViewports();
@@ -69,9 +72,43 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,
+											const CompositorChannel &newChannel )
+	{
+		const Real EPSILON = 1e-6f;
+
+		if( mTarget == oldChannel.target )
+		{
+			mTarget = newChannel.target;
+
+			mNumPassesLeft = mDefinition->mNumInitialPasses;
+
+			const unsigned short numViewports = mTarget->getNumViewports();
+			for( unsigned short i=0; i<numViewports && !mViewport; ++i )
+			{
+				Viewport *vp = mTarget->getViewport(i);
+				if( Math::Abs( vp->getLeft() - mDefinition->mVpLeft )	< EPSILON &&
+					Math::Abs( vp->getTop() - mDefinition->mVpTop )		< EPSILON &&
+					Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
+					Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON &&
+					vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
+				{
+					mViewport = vp;
+				}
+			}
+
+			if( !mViewport )
+			{
+				mViewport = mTarget->addViewport( mDefinition->mVpLeft, mDefinition->mVpTop,
+													mDefinition->mVpWidth, mDefinition->mVpHeight );
+				mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
+			}
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorPass::notifyDestroyed( const CompositorChannel &channel )
 	{
-		if( channel.target == mTarget )
+		if( mTarget == channel.target )
 			mTarget = 0;
 	}
 }

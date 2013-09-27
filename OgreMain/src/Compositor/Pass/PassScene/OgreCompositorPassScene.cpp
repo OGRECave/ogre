@@ -71,6 +71,13 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorPassScene::execute()
 	{
+		//Execute a limited number of times?
+		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+		{
+			if( !mNumPassesLeft )
+				return;
+			--mNumPassesLeft;
+		}
 		/*if( mShadowNode && mUpdateShadowNode )
 		{
 			//We need to prepare for rendering another RT (we broke the contiguous chain)

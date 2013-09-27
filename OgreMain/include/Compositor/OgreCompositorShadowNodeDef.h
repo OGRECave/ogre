@@ -156,7 +156,7 @@ namespace Ogre
 			We should validate here if it's not possible to validate at any other time
 			or if it's substantially easier to do so here.
 		*/
-		virtual void _validateAndFinish();
+		virtual void _validateAndFinish(void);
 	};
 
 	/** @} */

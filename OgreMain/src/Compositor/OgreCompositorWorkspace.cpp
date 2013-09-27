@@ -59,6 +59,9 @@ namespace Ogre
 
 		createAllNodes();
 		connectAllNodes();
+
+		mCurrentWidth	= mRenderWindow->getWidth();
+		mCurrentHeight	= mRenderWindow->getHeight();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorWorkspace::~CompositorWorkspace()
@@ -355,6 +358,46 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_update( bool swapFinalTargets, bool waitForVSync )
 	{
+		if( mCurrentWidth != mRenderWindow->getWidth() || mCurrentHeight != mRenderWindow->getHeight() )
+		{
+			//Main RenderTarget reference changed resolution. Some nodes may need to rebuild
+			//their textures if they're based on mRenderWindow's resolution.
+			mCurrentWidth	= mRenderWindow->getWidth();
+			mCurrentHeight	= mRenderWindow->getHeight();
+
+			{
+				CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+				CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+
+				while( itor != end )
+				{
+					CompositorNode *node = *itor;
+					node->finalTargetResized( mRenderWindow );
+					++itor;
+				}
+			}
+
+			{
+				CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
+				CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
+
+				while( itor != end )
+				{
+					CompositorShadowNode *node = *itor;
+					node->finalTargetResized( mRenderWindow );
+					++itor;
+				}
+			}
+
+			CompositorNodeVec allNodes;
+			allNodes.reserve( mNodeSequence.size() + mShadowNodes.size() );
+			allNodes.insert( allNodes.end(), mNodeSequence.begin(), mNodeSequence.end() );
+			allNodes.insert( allNodes.end(), mShadowNodes.begin(), mShadowNodes.end() );
+			TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs,
+																mGlobalTextures, mRenderWindow,
+																mRenderSys, allNodes, 0 );
+		}
+
 		CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
 		CompositorNodeVec::const_iterator end  = mNodeSequence.end();
 
@@ -373,6 +416,11 @@ namespace Ogre
 	{
 		if( mRenderWindow )
 			mRenderWindow->swapBuffers( waitForVSync );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::_validateFinalTarget(void)
+	{
+		mRenderSys->_setRenderTarget( mRenderWindow );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const

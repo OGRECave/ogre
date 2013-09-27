@@ -124,13 +124,6 @@ namespace Ogre
 		*/
 		void disconnectOutput();
 
-		/** Call this function when caller has destroyed a RenderTarget in which the callee
-			may have a reference to that pointer, so that we can clean it up.
-		@param channel
-			Channel containing the pointer about to be destroyed (must still be valid)
-		*/
-		void notifyDestroyed( const CompositorChannel &channel );
-
 		/** Called right after we create a PASS_SCENE pass. Derived
 			classes may want to do something with it
 		@param pass
@@ -205,6 +198,33 @@ namespace Ogre
 
 		/// Calling this function every frame will cause us to execute all our passes (ie. render)
 		void _update(void);
+
+		/** Call this function when you're replacing the textures from oldChannel with the
+			ones in newChannel. Useful when recreating textures (i.e. resolution changed)
+		@param oldChannel
+			The old textures that are going to be removed. Pointers in it must be still valid
+		@param newChannel
+			The new replacement textures
+		*/
+		void notifyRecreated( const CompositorChannel &oldChannel, const CompositorChannel &newChannel );
+
+		/** Call this function when caller has destroyed a RenderTarget in which the callee
+			may have a reference to that pointer, so that we can clean it up.
+		@param channel
+			Channel containing the pointer about to be destroyed (must still be valid)
+		*/
+		void notifyDestroyed( const CompositorChannel &channel );
+
+		/** Called by CompositorManager2 when (i.e.) the RenderWindow was resized, thus our
+			RTs that depend on their resolution need to be recreated.
+		@remarks
+			We inform all connected nodes and passes related to us of RenderTargets/Textures
+			that may have been recreated (pointers could become danlging otherwise).
+		@param finalTarget
+			The Final Target (i.e. RenderWindow) from which we'll base our local textures'
+			resolution.
+		*/
+		virtual void finalTargetResized( const RenderTarget *finalTarget );
 
 	private:
 		CompositorNodeDef const *mDefinition;

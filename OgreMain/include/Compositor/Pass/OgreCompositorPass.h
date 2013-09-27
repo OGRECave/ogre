@@ -62,11 +62,17 @@ namespace Ogre
 		RenderTarget	*mTarget;
 		Viewport		*mViewport;
 
+		uint32			mNumPassesLeft;
+
 	public:
 		CompositorPass( const CompositorPassDef *definition, RenderTarget *target );
 		virtual ~CompositorPass();
 
 		virtual void execute() = 0;
+
+		/// @See CompositorNode::notifyRecreated
+		virtual void notifyRecreated( const CompositorChannel &oldChannel,
+										const CompositorChannel &newChannel );
 
 		/// @See CompositorNode::notifyDestroyed
 		virtual void notifyDestroyed( const CompositorChannel &channel );

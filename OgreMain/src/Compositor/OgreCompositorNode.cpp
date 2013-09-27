@@ -119,6 +119,59 @@ namespace Ogre
 		mConnectedNodes.clear();
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorNode::notifyRecreated( const CompositorChannel &oldChannel,
+											const CompositorChannel &newChannel )
+	{
+		//Clear out outputs
+		CompositorChannelVec::iterator texIt = mInTextures.begin();
+		CompositorChannelVec::iterator texEn = mInTextures.end();
+
+		//We can't early out, it's possible to assign the same output to two different
+		//input channels (though it would work very unintuitively...)
+		while( texIt != texEn )
+		{
+			if( *texIt == oldChannel )
+				*texIt = newChannel;
+			++texIt;
+		}
+
+		//Clear out outputs
+		bool bFoundOuts = false;
+		texIt = mOutTextures.begin();
+		texEn = mOutTextures.end();
+
+		while( texIt != texEn )
+		{
+			if( *texIt == oldChannel )
+			{
+				bFoundOuts = true;
+				*texIt = newChannel;
+			}
+			++texIt;
+		}
+
+		if( bFoundOuts )
+		{
+			//Our attachees may have that texture too.
+			CompositorNodeVec::const_iterator itor = mConnectedNodes.begin();
+			CompositorNodeVec::const_iterator end  = mConnectedNodes.end();
+
+			while( itor != end )
+			{
+				(*itor)->notifyRecreated( oldChannel, newChannel );
+				++itor;
+			}
+		}
+
+		CompositorPassVec::const_iterator passIt = mPasses.begin();
+		CompositorPassVec::const_iterator passEn = mPasses.end();
+		while( passIt != passEn )
+		{
+			(*passIt)->notifyRecreated( oldChannel, newChannel );
+			++passIt;
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorNode::notifyDestroyed( const CompositorChannel &channel )
 	{
 		//Clear out outputs
@@ -311,5 +364,12 @@ namespace Ogre
 			pass->execute();
 			++itor;
 		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorNode::finalTargetResized( const RenderTarget *finalTarget )
+	{
+		TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs, mLocalTextures,
+															finalTarget, mRenderSystem, mConnectedNodes,
+															&mPasses );
 	}
 }
