@@ -116,7 +116,7 @@ namespace Ogre
 		shadowNode->setNumShadowTextureDefinitions( 3 );
 		
 		{
-			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
+			ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 0, 0, "MyFirstTex", false );
 			texDef->width	= 2048;
 			texDef->height	= 2048;
 			texDef->formatList.push_back( PF_FLOAT32_R );
@@ -125,7 +125,7 @@ namespace Ogre
 			texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
 		}
 		{
-			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
+			ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
 			texDef->width	= 1024;
 			texDef->height	= 1024;
 			texDef->formatList.push_back( PF_FLOAT32_R );
@@ -134,7 +134,7 @@ namespace Ogre
 			texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
 		}
 		{
-			CompositorShadowNodeDef::ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
+			ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
 			texDef->width	= 1024;
 			texDef->height	= 1024;
 			texDef->formatList.push_back( PF_FLOAT32_R );

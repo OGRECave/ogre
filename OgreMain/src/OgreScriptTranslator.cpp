@@ -5915,8 +5915,8 @@ namespace Ogre{
 	}
 	//-------------------------------------------------------------------------
 	void CompositorShadowNodeTranslator::translateShadowMapProperty(PropertyAbstractNode *prop,
-																	ScriptCompiler *compiler,
-																	bool isAtlas ) const
+											ScriptCompiler *compiler, bool isAtlas,
+											const ShadowTextureDefinition &defaultParams) const
 	{
 		size_t atomIndex = 1;
 		AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
@@ -5939,8 +5939,6 @@ namespace Ogre{
 		Ogre::PixelFormatList formats;
 		size_t lightIdx = ~0;
 		size_t splitIdx = 0;
-		bool shadowMapTechniqueSet = false;
-		ShadowMapTechniques shadowMapTechnique = SHADOWMAP_UNIFORM;
 
 		while (atomIndex < prop->values.size())
 		{
@@ -6075,45 +6073,6 @@ namespace Ogre{
 					splitIdx = StringConverter::parseInt(atom->value);
 				}
 				break;
-			case ID_TECHNIQUE:
-				{
-					// advance to next to get the ID
-					it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
-					if(prop->values.end() == it || (*it)->type != ANT_ATOM)
-					{
-						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-						return;
-					}
-
-					String str;
-					if( getString( *it, &str ) )
-					{
-						shadowMapTechniqueSet = true;
-						if( str == "uniform" )
-							shadowMapTechnique = SHADOWMAP_UNIFORM;
-						else if( str == "planeoptimal" )
-							shadowMapTechnique = SHADOWMAP_PLANEOPTIMAL;
-						else if( str == "focused" )
-							shadowMapTechnique = SHADOWMAP_FOCUSED;
-						else if( str == "lispsm" )
-							shadowMapTechnique = SHADOWMAP_LISPSM;
-						else if( str == "pssm" )
-							shadowMapTechnique = SHADOWMAP_PSSM;
-						else
-						{
-							shadowMapTechniqueSet = false;
-							 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
-								 prop->file, prop->line, "shadow techniques can be: technique "
-								"[uniform|planeoptimal|focused|lispsm|pssm]");
-						}
-					}
-					else
-					{
-						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-						return;
-					}
-				}
-				break;
 			default:
 				if (StringConverter::isNumber(atom->value))
 				{
@@ -6157,10 +6116,8 @@ namespace Ogre{
 			return;
 		}
 
-		CompositorShadowNodeDef::ShadowTextureDefinition *td =
-												mShadowNodeDef->addShadowTextureDefinition(
-													lightIdx, splitIdx, atom0->value, isAtlas );
-
+		ShadowTextureDefinition *td = mShadowNodeDef->addShadowTextureDefinition( lightIdx, splitIdx,
+																				atom0->value, isAtlas );
 		// No errors, create
 		td->width			= width;
 		td->height			= height;
@@ -6171,8 +6128,11 @@ namespace Ogre{
 		td->hwGammaWrite	= hwGammaWrite;
 		td->depthBufferId	= depthBufferId;
 
-		if( shadowMapTechniqueSet )
-			td->shadowMapTechnique = shadowMapTechnique;
+		td->aggressiveFocusRegion	= defaultParams.aggressiveFocusRegion;
+		td->optimalAdjustFactor		= defaultParams.optimalAdjustFactor;
+		td->lightDirThreshold		= defaultParams.lightDirThreshold;
+		td->pssmLambda				= defaultParams.pssmLambda;
+		td->numSplits				= defaultParams.numSplits;
 	}
 	//-------------------------------------------------------------------------
 	void CompositorShadowNodeTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
@@ -6239,6 +6199,8 @@ namespace Ogre{
 		mShadowNodeDef->setNumTargetPass( numTargetPasses );
 		mShadowNodeDef->setNumOutputChannels( numOutputChannels );
 
+		ShadowTextureDefinition defaultParams( SHADOWMAP_UNIFORM, IdString(), 0, 0 );
+
 		AbstractNodeList::iterator i = obj->children.begin();
 		try
 		{
@@ -6296,9 +6258,114 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_NUM_SPLITS:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						uint32 val;
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( getUInt( *it0, &val ) )
+						{
+							defaultParams.numSplits = val;
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
+				case ID_PSSM_LAMBDA:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getReal( *it0, &defaultParams.pssmLambda ) )
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
+				case ID_USE_AGGRESSIVE_FOCUS_REGION:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &defaultParams.aggressiveFocusRegion ) )
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
+				case ID_OPTIMAL_AJUST_FACTOR:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &defaultParams.aggressiveFocusRegion ) )
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
+				case ID_LIGHT_DIR_THRESHOLD:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						Real val;
+						if( getReal( *it0, &val ) )
+						{
+							defaultParams.lightDirThreshold = Degree( val );
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
 				case ID_SHADOW_MAP:
 				case ID_SHADOW_ATLAS:
-					translateShadowMapProperty( prop, compiler, prop->id == ID_SHADOW_ATLAS );
+					translateShadowMapProperty( prop, compiler, prop->id == ID_SHADOW_ATLAS, defaultParams );
 					break;
 				case ID_OUT:
 					if(prop->values.empty())
@@ -6755,6 +6822,11 @@ namespace Ogre{
 							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 							return;
 						}
+						else if(prop->values.size() > 2)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+							return;
+						}
 
 						AbstractNodeList::const_iterator it0 = prop->values.begin();
 						AbstractNodeList::const_iterator it1 = it0;
@@ -6785,12 +6857,6 @@ namespace Ogre{
 												prop->file, prop->line,
 												"Valid options are reuse, recalculate and first");
 									}
-								}
-								else
-								{
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
-											prop->file, prop->line,
-											"Valid options are reuse, recalculate and first");
 								}
 							}
 						}

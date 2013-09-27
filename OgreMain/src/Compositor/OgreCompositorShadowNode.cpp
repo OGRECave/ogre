@@ -80,38 +80,57 @@ namespace Ogre
 												StringConverter::toString( shadowMapIdx ) );
 			shadowMapCamera.minDistance = 0.0f;
 			shadowMapCamera.maxDistance = 100000.0f;
-			switch( itor->shadowMapTechnique )
+
+
+			const size_t sharingSetupIdx = itor->getSharesSetupWith();
+			if( sharingSetupIdx != std::numeric_limits<size_t>::max() )
 			{
-			case SHADOWMAP_UNIFORM:
-				shadowMapCamera.shadowCameraSetup =
-								ShadowCameraSetupPtr( OGRE_NEW DefaultShadowCameraSetup() );
-				break;
-			/*case SHADOWMAP_PLANEOPTIMAL:
-				break;*/
-			case SHADOWMAP_FOCUSED:
-				shadowMapCamera.shadowCameraSetup =
-								ShadowCameraSetupPtr( OGRE_NEW FocusedShadowCameraSetup() );
-				break;
-			case SHADOWMAP_LISPSM:
-				shadowMapCamera.shadowCameraSetup =
-								ShadowCameraSetupPtr( OGRE_NEW LiSPSMShadowCameraSetup() );
+				shadowMapCamera.shadowCameraSetup = mShadowMapCameras[sharingSetupIdx].shadowCameraSetup;
+			}
+			else
+			{
+				switch( itor->shadowMapTechnique )
 				{
-					LiSPSMShadowCameraSetup *setup( (LiSPSMShadowCameraSetup *)shadowMapCamera.shadowCameraSetup.get() );
-					//setup->setOptimalAdjustFactor( 0.4f );
-					setup->setOptimalAdjustFactor( 5.0f );
-					//setup->setCameraLightDirectionThreshold( Degree( 25.0f ) );
-					setup->setUseSimpleOptimalAdjust( false );
+				case SHADOWMAP_UNIFORM:
+					shadowMapCamera.shadowCameraSetup =
+									ShadowCameraSetupPtr( OGRE_NEW DefaultShadowCameraSetup() );
+					break;
+				/*case SHADOWMAP_PLANEOPTIMAL:
+					break;*/
+				case SHADOWMAP_FOCUSED:
+					{
+						FocusedShadowCameraSetup *setup = OGRE_NEW FocusedShadowCameraSetup();
+						shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
+						setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
+					}
+					break;
+				case SHADOWMAP_LISPSM:
+					{
+						LiSPSMShadowCameraSetup *setup = OGRE_NEW LiSPSMShadowCameraSetup();
+						shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
+						setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
+						setup->setOptimalAdjustFactor( itor->optimalAdjustFactor );
+						setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
+						setup->setUseSimpleOptimalAdjust( false );
+					}
+					break;
+				case SHADOWMAP_PSSM:
+					{
+						PSSMShadowCameraSetup *setup = OGRE_NEW PSSMShadowCameraSetup();
+						shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
+						setup->calculateSplitPoints( itor->numSplits, 0.0f, 100.0f, 0.95f );
+						setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
+						setup->setOptimalAdjustFactor( itor->split, itor->optimalAdjustFactor );
+						setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
+						setup->setUseSimpleOptimalAdjust( false );
+					}
+					break;
+				default:
+					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+								"Shadow Map technique not implemented or not recognized.",
+								"CompositorShadowNode::CompositorShadowNode");
+					break;
 				}
-				break;
-			case SHADOWMAP_PSSM:
-				shadowMapCamera.shadowCameraSetup =
-								ShadowCameraSetupPtr( OGRE_NEW PSSMShadowCameraSetup() );
-				break;
-			default:
-				OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-							"Shadow Map technique not implemented or not recognized.",
-							"CompositorShadowNode::CompositorShadowNode");
-				break;
 			}
 
 			mShadowMapCameras.push_back( shadowMapCamera );
@@ -138,8 +157,8 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorChannel CompositorShadowNode::createShadowTexture(
-								const CompositorShadowNodeDef::ShadowTextureDefinition &textureDef,
-								const RenderTarget *finalTarget )
+															const ShadowTextureDefinition &textureDef,
+															const RenderTarget *finalTarget )
 	{
 		CompositorChannel newChannel;
 
@@ -341,6 +360,8 @@ namespace Ogre
 		SceneManager *sceneManager	= camera->getSceneManager();
 		const Viewport *viewport	= camera->getLastViewport();
 
+		bool bDifferentCamera = mLastCamera != camera;
+
 		buildClosestLightList( camera );
 
 		const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
@@ -371,6 +392,18 @@ namespace Ogre
 					texCamera->setDirection( light->getDerivedDirection() );
 				if( light->getType() != Light::LT_DIRECTIONAL )
 					texCamera->setPosition( light->getDerivedPosition() );
+
+				if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
+				{
+					PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>
+														( itShadowCamera->shadowCameraSetup.get() );
+					if( pssmSetup->getSplitPoints()[0] != camera->getNearClipDistance() ||
+						pssmSetup->getSplitPoints()[itor->numSplits-1] != light->getShadowFarDistance() )
+					{
+						pssmSetup->calculateSplitPoints( itor->numSplits, camera->getNearClipDistance(),
+													light->getShadowFarDistance(), itor->pssmLambda );
+					}
+				}
 
 				itShadowCamera->shadowCameraSetup->getShadowCamera( sceneManager, camera, light,
 																	texCamera, itor->split );

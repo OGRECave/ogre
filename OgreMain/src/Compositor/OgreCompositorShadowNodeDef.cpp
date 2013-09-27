@@ -48,9 +48,8 @@ namespace Ogre
 		return CompositorNodeDef::addTextureSourceName( name, index, textureSource );
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorShadowNodeDef::ShadowTextureDefinition*
-			CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx, size_t split,
-																 const String &name, bool isAtlas )
+	ShadowTextureDefinition* CompositorShadowNodeDef::addShadowTextureDefinition( size_t lightIdx,
+													size_t split, const String &name, bool isAtlas )
 	{
 		if( name.empty() && isAtlas )
 		{
@@ -166,6 +165,64 @@ namespace Ogre
 			}
 
 			++itor;
+		}
+
+		//See which shadow maps can share the camera setup
+		ShadowMapTexDefVec::iterator it1 = mShadowMapTexDefinitions.begin();
+		ShadowMapTexDefVec::iterator en1 = mShadowMapTexDefinitions.end();
+
+		while( itor != end )
+		{
+			if( it1->split != 0 && it1->shadowMapTechnique != SHADOWMAP_PSSM )
+			{
+				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+					"Trying to use a split with non-PSSM shadow map techniques.",
+					"CompositorShadowNodeDef::_validateAndFinish");
+			}
+
+			bool bShared = false;
+
+			ShadowMapTexDefVec::const_iterator it2 = mShadowMapTexDefinitions.begin();
+			ShadowMapTexDefVec::const_iterator en2 = it1;
+
+			while( it2 != en2 && !bShared )
+			{
+				if( it2->light == it1->light )
+				{
+					if( it2->split == it1->split )
+					{
+						//Do not share the setups, the user may be trying to do tricky stuff
+						//(like comparing two shadow mapping techniques on the same light)
+						LogManager::getSingleton().logMessage( "WARNING: Two shadow maps refer to the "
+							"same light & split. Ignore this if it is intentional" );
+					}
+					else if( it2->split != it1->split )
+					{
+						if( it2->numSplits != it1->numSplits )
+						{
+							LogManager::getSingleton().logMessage( "WARNING: All pssm shadow maps with "
+									"the same light but different split must have the same number of "
+									"splits. Attempting to fix. ShadowNode: '" +
+									mName.getFriendlyText() + "'." );
+							it1->numSplits = it2->numSplits;
+						}
+
+						it1->_setSharesSetupWithIdx( it2 - mShadowMapTexDefinitions.begin() );
+						bShared = true;
+					}
+				}
+				else if( it2->shadowMapTechnique == it1->shadowMapTechnique &&
+						 it2->aggressiveFocusRegion == it1->aggressiveFocusRegion &&
+						 it2->optimalAdjustFactor == it1->optimalAdjustFactor &&
+						 it2->lightDirThreshold == it1->lightDirThreshold )
+				{
+					it1->_setSharesSetupWithIdx( it2 - mShadowMapTexDefinitions.begin() );
+					bShared = true;
+				}
+				++it2;
+			}
+
+			++it1;
 		}
 	}
 }

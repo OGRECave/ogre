@@ -51,6 +51,52 @@ namespace Ogre
 		SHADOWMAP_PSSM
 	};
 
+	/// Local texture definition
+    class ShadowTextureDefinition : public CompositorInstAlloc
+    {
+    public:
+        uint		width;
+        uint		height;
+		float		widthFactor;
+		float		heightFactor;
+        PixelFormatList formatList; // more than one means MRT
+		uint		fsaa;			// FSAA level
+		bool		hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats)
+		uint16		depthBufferId;	// Depth Buffer's pool ID
+
+		size_t		light;	//Render Nth closest light
+		size_t		split;	//Split for that light (only for PSSM/CSM)
+
+		ShadowMapTechniques	shadowMapTechnique;
+
+		//Foccused params (+ LispSM + PSSM)
+		bool				aggressiveFocusRegion;
+		//LispSM params (+ PSSM)
+		Real				optimalAdjustFactor;
+		Degree				lightDirThreshold;
+		//PSSM params
+		Real				pssmLambda;
+		size_t				numSplits;
+
+	protected:
+		IdString	name;
+		size_t		sharesSetupWith;
+
+	public:
+		ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
+								size_t _light, size_t _split ) :
+				width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
+				light(_light), split(_split), shadowMapTechnique(t), name( _name ),
+				aggressiveFocusRegion( true ), optimalAdjustFactor( 5.0f ),
+				lightDirThreshold( 25.0f ), pssmLambda( 0.95f ), numSplits( 3 ),
+				sharesSetupWith( -1 ) {}
+
+		IdString getName() const			{ return name; }
+
+		void _setSharesSetupWithIdx( size_t idx )	{ sharesSetupWith = idx; }
+		size_t getSharesSetupWith() const			{ return sharesSetupWith; }
+    };
+
 	/** Shadow Nodes are special nodes (not to be confused with @see CompositorNode)
 		that are only used for rendering shadow maps.
 		Normal Compositor Nodes can share or own a ShadowNode. The ShadowNode will
@@ -67,37 +113,6 @@ namespace Ogre
 	class _OgreExport CompositorShadowNodeDef : public CompositorNodeDef
 	{
 		friend class CompositorShadowNode;
-
-	public:
-		/// Local texture definition
-        class ShadowTextureDefinition : public CompositorInstAlloc
-        {
-        public:
-            
-            uint		width;
-            uint		height;
-			float		widthFactor;
-			float		heightFactor;
-            PixelFormatList formatList; // more than one means MRT
-			uint		fsaa;			// FSAA level
-			bool		hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats)
-			uint16		depthBufferId;	// Depth Buffer's pool ID
-
-			size_t		light;	//Render Nth closest light
-			size_t		split;	//Split for that light (only for PSSM/CSM)
-			ShadowMapTechniques	shadowMapTechnique;
-
-		protected:
-			IdString	name;
-
-		public:
-			ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
-									size_t _light, size_t _split ) :
-					width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
-					light(_light), split(_split), shadowMapTechnique(t), name( _name ) {}
-
-			IdString getName() const			{ return name; }
-        };
 
 	protected:
 		typedef vector<ShadowTextureDefinition>::type	ShadowMapTexDefVec;

@@ -1279,6 +1279,11 @@ namespace Ogre
 		mIds["two_sided"] = ID_TWO_SIDED;*/
 
 		mIds["compositor_node_shadow"]	= ID_SHADOW_NODE;
+		mIds["num_splits"]					= ID_NUM_SPLITS;
+		mIds["pssm_lambda"]					= ID_PSSM_LAMBDA;
+		mIds["use_aggressive_focus_region"] = ID_USE_AGGRESSIVE_FOCUS_REGION;
+		mIds["optimal_adjust_factor"]		= ID_OPTIMAL_AJUST_FACTOR;
+		mIds["light_direction_threshold"]	= ID_LIGHT_DIR_THRESHOLD;
 		mIds["shadow_map"]				= ID_SHADOW_MAP;
 		mIds["shadow_atlas"]			= ID_SHADOW_ATLAS;
 		mIds["fsaa"]					= ID_FSAA;

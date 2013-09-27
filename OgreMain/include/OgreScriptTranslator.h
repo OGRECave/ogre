@@ -253,7 +253,7 @@ namespace Ogre{
 	protected:
 		CompositorShadowNodeDef *mShadowNodeDef;
 		void translateShadowMapProperty( PropertyAbstractNode *prop, ScriptCompiler *compiler,
-										 bool isAtlas ) const;
+										 bool isAtlas, const ShadowTextureDefinition &defaultParams ) const;
 	public:
 		CompositorShadowNodeTranslator();
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);

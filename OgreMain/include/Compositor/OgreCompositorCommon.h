@@ -45,6 +45,8 @@ namespace Ogre
 	class CompositorTargetDef;
 	class CompositorPassDef;
 
+	class ShadowTextureDefinition;
+
 	class CompositorManager2;
 
 	typedef vector<CompositorNode*>::type		CompositorNodeVec;

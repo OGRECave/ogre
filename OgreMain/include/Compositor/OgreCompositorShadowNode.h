@@ -156,9 +156,8 @@ namespace Ogre
 		/// Caches mReceiverBox merging all the RQs we may have to include w/ the given camera
 		void mergeReceiversBoxes( Camera* camera );
 
-		CompositorChannel createShadowTexture(
-								const CompositorShadowNodeDef::ShadowTextureDefinition &textureDef,
-								const RenderTarget *finalTarget );
+		CompositorChannel createShadowTexture( const ShadowTextureDefinition &textureDef,
+												const RenderTarget *finalTarget );
 
 	public:
 		CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
