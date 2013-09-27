@@ -704,7 +704,7 @@ if (NOT WIN32)
 	  src/Threading/OgreLightweightMutexPThreads.cpp
       src/Threading/OgreThreadsPThreads.cpp
   )
-endif
+endif()
 
 
 # Configure threading files
