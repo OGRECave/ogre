@@ -102,12 +102,11 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
 
 	if (mDoBoneCalculations == true)
 	{
-		GpuProgramParameters::AutoConstantType worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4;
 		if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
 		{
-			//given that hlsl shaders use column major matrices which are not compatible with the cg
-			//and glsl method of row major matrices, we will use a full matrix instead.
-			worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY;
+			//set hlsl shader to use row-major matrices instead of column-major.
+			//it enables the use of 3x4 matrices in hlsl shader instead of full 4x4 matrix.
+			vsProgram->setUseColumnMajorMatrices(false);
 		}
 
 		//input parameters
@@ -116,7 +115,7 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
 		mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 		mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
 		mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(worldMatrixType, 0, mBoneCount);
+		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, 0, mBoneCount);
 		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
 		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
 
@@ -262,18 +261,12 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
 
 	FunctionInvocation* curFuncInvocation;
 
-	int outputMask = Operand::OPM_XYZ;
-	if (mParamInWorldMatrices->getType() == GCT_MATRIX_4X4)
-	{
-		outputMask = Operand::OPM_ALL;
-	}
-
 	//multiply position with world matrix and put into temporary param
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
 	curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, outputMask);
+	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_XYZ);
 	vsMain->addAtomInstance(curFuncInvocation);
 
 	//set w value of temporary param to 1

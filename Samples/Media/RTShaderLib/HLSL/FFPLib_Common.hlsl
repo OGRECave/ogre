@@ -56,6 +56,18 @@ void FFP_Assign(in float4 vIn, out float4 vOut)
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Assign(in float2x4 vIn, out float2x4 vOut)
+{
+	vOut = vIn;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Assign(in float3x4 vIn, out float3x4 vOut)
+{
+	vOut = vIn;
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Construct(in float r, 
 				   in float g,
 				   in float b,
@@ -138,6 +150,18 @@ void FFP_Add(in float4 vIn0, in float4 vIn1, out float4 vOut)
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Add(in float2x4 vIn0, in float2x4 vIn1, out float2x4 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in float3x4 vIn0, in float3x4 vIn1, out float3x4 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Subtract(in float vIn0, in float vIn1, out float vOut)
 {
 	vOut = vIn0 - vIn1;
@@ -213,6 +237,12 @@ void FFP_DotProduct(in float3 vIn0, in float3 vIn1, out float3 vOut)
 void FFP_DotProduct(in float4 vIn0, in float4 vIn1, out float4 vOut)
 {
 	vOut = dot(vIn0, vIn1);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Normalize(inout float3 vIn)
+{
+	vIn = normalize(vIn);
 }
 
 

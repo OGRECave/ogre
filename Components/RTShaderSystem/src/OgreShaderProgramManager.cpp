@@ -465,9 +465,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		
 		pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
-		// HLSL program requires specific target profile settings - we have to split the profile string.
 		if (language == "hlsl")
 		{
+			// HLSL program requires specific target profile settings - we have to split the profile string.
 			StringVector::const_iterator it = profilesList.begin();
 			StringVector::const_iterator itEnd = profilesList.end();
 			
@@ -481,6 +481,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 			}
 
 			pGpuProgram->setParameter("enable_backwards_compatibility", "true");
+			pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
 		}
 		
 		pGpuProgram->setParameter("profiles", profiles);
