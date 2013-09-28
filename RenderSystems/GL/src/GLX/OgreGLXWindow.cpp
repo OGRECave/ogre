@@ -569,9 +569,16 @@ namespace Ogre
 		
 		mContext->setCurrent();
 		
-		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
+		if (! mIsExternalGLControl)
 		{
-			glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+			if (GLXEW_MESA_swap_control)
+				glXSwapIntervalMESA (vsync ? mVSyncInterval : 0);
+			else if (GLXEW_EXT_swap_control)
+				glXSwapIntervalEXT (mGLSupport->getGLDisplay(), glXGetCurrentDrawable(),
+									vsync ? mVSyncInterval : 0);
+			else if (GLXEW_SGI_swap_control)
+				if (vsync && mVSyncInterval)
+					glXSwapIntervalSGI (mVSyncInterval);
 		}
 		
 		mContext->endCurrent();
