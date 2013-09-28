@@ -35,6 +35,13 @@ THE SOFTWARE.
 // See http://msdn.microsoft.com/en-us/library/bb206269.aspx
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+void FFP_Transform(in float3x3 m, 
+				   in float3 v, 
+				   out float3 vOut)
+{
+	vOut = mul(m, v);
+}
 
 //-----------------------------------------------------------------------------
 void FFP_Transform(in float4x4 m, 
