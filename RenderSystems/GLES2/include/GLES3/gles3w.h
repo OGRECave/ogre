@@ -273,6 +273,47 @@ typedef void           (GL_APIENTRY* PFNGLINVALIDATESUBFRAMEBUFFERPROC) (GLenum 
 typedef void           (GL_APIENTRY* PFNGLTEXSTORAGE2DPROC) (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
 typedef void           (GL_APIENTRY* PFNGLTEXSTORAGE3DPROC) (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
 typedef void           (GL_APIENTRY* PFNGLGETINTERNALFORMATIVPROC) (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
+typedef void (GL_APIENTRY* PFNGLLABELOBJECTEXTPROC) (GLenum type, GLuint object, GLsizei length, const GLchar *label);
+typedef void (GL_APIENTRY* PFNGLGETOBJECTLABELEXTPROC) (GLenum type, GLuint object, GLsizei bufSize, GLsizei *length, GLchar *label);
+typedef void (GL_APIENTRY* PFNGLINSERTEVENTMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (GL_APIENTRY* PFNGLPUSHGROUPMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (GL_APIENTRY* PFNGLPOPGROUPMARKEREXTPROC) (void);
+typedef void (GL_APIENTRY* PFNGLUSEPROGRAMSTAGESEXTPROC) (GLuint pipeline, GLbitfield stages, GLuint program);
+typedef void (GL_APIENTRY* PFNGLACTIVESHADERPROGRAMEXTPROC) (GLuint pipeline, GLuint program);
+typedef GLuint (GL_APIENTRY* PFNGLCREATESHADERPROGRAMVEXTPROC) (GLenum type, GLsizei count, const GLchar **strings);
+typedef void (GL_APIENTRY* PFNGLBINDPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRY* PFNGLDELETEPROGRAMPIPELINESEXTPROC) (GLsizei n, const GLuint *pipelines);
+typedef void (GL_APIENTRY* PFNGLGENPROGRAMPIPELINESEXTPROC) (GLsizei n, GLuint *pipelines);
+typedef GLboolean (GL_APIENTRY* PFNGLISPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRY* PFNGLPROGRAMPARAMETERIEXTPROC) (GLuint program, GLenum pname, GLint value);
+typedef void (GL_APIENTRY* PFNGLGETPROGRAMPIPELINEIVEXTPROC) (GLuint pipeline, GLenum pname, GLint *params);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM1IEXTPROC) (GLuint program, GLint location, GLint x);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM2IEXTPROC) (GLuint program, GLint location, GLint x, GLint y);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM3IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM4IEXTPROC) (GLuint program, GLint location, GLint x, GLint y, GLint z, GLint w);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM1FEXTPROC) (GLuint program, GLint location, GLfloat x);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM2FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM3FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM4FEXTPROC) (GLuint program, GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM1IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM2IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM3IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM4IVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM1FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM2FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM3FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORM4FVEXTPROC) (GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX2X3FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX3X2FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX2X4FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX4X2FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX3X4FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLPROGRAMUNIFORMMATRIX4X3FVEXTPROC) (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY* PFNGLVALIDATEPROGRAMPIPELINEEXTPROC) (GLuint pipeline);
+typedef void (GL_APIENTRY* PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC) (GLuint pipeline, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 
 extern PFNGLACTIVETEXTUREPROC gleswActiveTexture;
 extern PFNGLATTACHSHADERPROC gleswAttachShader;
@@ -520,6 +561,47 @@ extern PFNGLINVALIDATESUBFRAMEBUFFERPROC gleswInvalidateSubFramebuffer;
 extern PFNGLTEXSTORAGE2DPROC gleswTexStorage2D;
 extern PFNGLTEXSTORAGE3DPROC gleswTexStorage3D;
 extern PFNGLGETINTERNALFORMATIVPROC gleswGetInternalformativ;
+extern PFNGLLABELOBJECTEXTPROC gleswLabelObjectEXT;
+extern PFNGLGETOBJECTLABELEXTPROC gleswGetObjectLabelEXT;
+extern PFNGLINSERTEVENTMARKEREXTPROC gleswInsertEventMarkerEXT;
+extern PFNGLPUSHGROUPMARKEREXTPROC gleswPushGroupMarkerEXT;
+extern PFNGLPOPGROUPMARKEREXTPROC gleswPopGroupMarkerEXT;
+extern PFNGLUSEPROGRAMSTAGESEXTPROC gleswUseProgramStagesEXT;
+extern PFNGLACTIVESHADERPROGRAMEXTPROC gleswActiveShaderProgramEXT;
+extern PFNGLCREATESHADERPROGRAMVEXTPROC gleswCreateShaderProgramvEXT;
+extern PFNGLBINDPROGRAMPIPELINEEXTPROC gleswBindProgramPipelineEXT;
+extern PFNGLDELETEPROGRAMPIPELINESEXTPROC gleswDeleteProgramPipelinesEXT;
+extern PFNGLGENPROGRAMPIPELINESEXTPROC gleswGenProgramPipelinesEXT;
+extern PFNGLISPROGRAMPIPELINEEXTPROC gleswIsProgramPipelineEXT;
+extern PFNGLPROGRAMPARAMETERIEXTPROC gleswProgramParameteriEXT;
+extern PFNGLGETPROGRAMPIPELINEIVEXTPROC gleswGetProgramPipelineivEXT;
+extern PFNGLPROGRAMUNIFORM1IEXTPROC gleswProgramUniform1iEXT;
+extern PFNGLPROGRAMUNIFORM2IEXTPROC gleswProgramUniform2iEXT;
+extern PFNGLPROGRAMUNIFORM3IEXTPROC gleswProgramUniform3iEXT;
+extern PFNGLPROGRAMUNIFORM4IEXTPROC gleswProgramUniform4iEXT;
+extern PFNGLPROGRAMUNIFORM1FEXTPROC gleswProgramUniform1fEXT;
+extern PFNGLPROGRAMUNIFORM2FEXTPROC gleswProgramUniform2fEXT;
+extern PFNGLPROGRAMUNIFORM3FEXTPROC gleswProgramUniform3fEXT;
+extern PFNGLPROGRAMUNIFORM4FEXTPROC gleswProgramUniform4fEXT;
+extern PFNGLPROGRAMUNIFORM1IVEXTPROC gleswProgramUniform1ivEXT;
+extern PFNGLPROGRAMUNIFORM2IVEXTPROC gleswProgramUniform2ivEXT;
+extern PFNGLPROGRAMUNIFORM3IVEXTPROC gleswProgramUniform3ivEXT;
+extern PFNGLPROGRAMUNIFORM4IVEXTPROC gleswProgramUniform4ivEXT;
+extern PFNGLPROGRAMUNIFORM1FVEXTPROC gleswProgramUniform1fvEXT;
+extern PFNGLPROGRAMUNIFORM2FVEXTPROC gleswProgramUniform2fvEXT;
+extern PFNGLPROGRAMUNIFORM3FVEXTPROC gleswProgramUniform3fvEXT;
+extern PFNGLPROGRAMUNIFORM4FVEXTPROC gleswProgramUniform4fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC gleswProgramUniformMatrix2fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC gleswProgramUniformMatrix3fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC gleswProgramUniformMatrix4fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX2X3FVEXTPROC gleswProgramUniformMatrix2x3fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX3X2FVEXTPROC gleswProgramUniformMatrix3x2fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX2X4FVEXTPROC gleswProgramUniformMatrix2x4fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX4X2FVEXTPROC gleswProgramUniformMatrix4x2fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX3X4FVEXTPROC gleswProgramUniformMatrix3x4fvEXT;
+extern PFNGLPROGRAMUNIFORMMATRIX4X3FVEXTPROC gleswProgramUniformMatrix4x3fvEXT;
+extern PFNGLVALIDATEPROGRAMPIPELINEEXTPROC gleswValidateProgramPipelineEXT;
+extern PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC gleswGetProgramPipelineInfoLogEXT;
 
 #define glActiveTexture		gleswActiveTexture
 #define glAttachShader		gleswAttachShader
@@ -767,6 +849,47 @@ extern PFNGLGETINTERNALFORMATIVPROC gleswGetInternalformativ;
 #define glTexStorage2D		gleswTexStorage2D
 #define glTexStorage3D		gleswTexStorage3D
 #define glGetInternalformativ		gleswGetInternalformativ
+#define glLabelObjectEXT		gleswLabelObjectEXT
+#define glGetObjectLabelEXT		gleswGetObjectLabelEXT
+#define glInsertEventMarkerEXT		gleswInsertEventMarkerEXT
+#define glPushGroupMarkerEXT		gleswPushGroupMarkerEXT
+#define glPopGroupMarkerEXT		gleswPopGroupMarkerEXT
+#define glUseProgramStagesEXT		gleswUseProgramStagesEXT
+#define glActiveShaderProgramEXT		gleswActiveShaderProgramEXT
+#define glCreateShaderProgramvEXT		gleswCreateShaderProgramvEXT
+#define glBindProgramPipelineEXT		gleswBindProgramPipelineEXT
+#define glDeleteProgramPipelinesEXT		gleswDeleteProgramPipelinesEXT
+#define glGenProgramPipelinesEXT		gleswGenProgramPipelinesEXT
+#define glIsProgramPipelineEXT		gleswIsProgramPipelineEXT
+#define glProgramParameteriEXT		gleswProgramParameteriEXT
+#define glGetProgramPipelineivEXT		gleswGetProgramPipelineivEXT
+#define glProgramUniform1iEXT		gleswProgramUniform1iEXT
+#define glProgramUniform2iEXT		gleswProgramUniform2iEXT
+#define glProgramUniform3iEXT		gleswProgramUniform3iEXT
+#define glProgramUniform4iEXT		gleswProgramUniform4iEXT
+#define glProgramUniform1fEXT		gleswProgramUniform1fEXT
+#define glProgramUniform2fEXT		gleswProgramUniform2fEXT
+#define glProgramUniform3fEXT		gleswProgramUniform3fEXT
+#define glProgramUniform4fEXT		gleswProgramUniform4fEXT
+#define glProgramUniform1ivEXT		gleswProgramUniform1ivEXT
+#define glProgramUniform2ivEXT		gleswProgramUniform2ivEXT
+#define glProgramUniform3ivEXT		gleswProgramUniform3ivEXT
+#define glProgramUniform4ivEXT		gleswProgramUniform4ivEXT
+#define glProgramUniform1fvEXT		gleswProgramUniform1fvEXT
+#define glProgramUniform2fvEXT		gleswProgramUniform2fvEXT
+#define glProgramUniform3fvEXT		gleswProgramUniform3fvEXT
+#define glProgramUniform4fvEXT		gleswProgramUniform4fvEXT
+#define glProgramUniformMatrix2fvEXT		gleswProgramUniformMatrix2fvEXT
+#define glProgramUniformMatrix3fvEXT		gleswProgramUniformMatrix3fvEXT
+#define glProgramUniformMatrix4fvEXT		gleswProgramUniformMatrix4fvEXT
+#define glProgramUniformMatrix2x3fvEXT		gleswProgramUniformMatrix2x3fvEXT
+#define glProgramUniformMatrix3x2fvEXT		gleswProgramUniformMatrix3x2fvEXT
+#define glProgramUniformMatrix2x4fvEXT		gleswProgramUniformMatrix2x4fvEXT
+#define glProgramUniformMatrix4x2fvEXT		gleswProgramUniformMatrix4x2fvEXT
+#define glProgramUniformMatrix3x4fvEXT		gleswProgramUniformMatrix3x4fvEXT
+#define glProgramUniformMatrix4x3fvEXT		gleswProgramUniformMatrix4x3fvEXT
+#define glValidateProgramPipelineEXT		gleswValidateProgramPipelineEXT
+#define glGetProgramPipelineInfoLogEXT		gleswGetProgramPipelineInfoLogEXT
 
 #ifdef __cplusplus
 }

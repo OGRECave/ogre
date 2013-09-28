@@ -2661,7 +2661,7 @@ namespace OgreBites
 			}
 
 			// insert widget into new tray at given position, or at the end if unspecified or invalid
-			if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
+			if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = (int)mWidgets[trayLoc].size();
 			mWidgets[trayLoc].insert(mWidgets[trayLoc].begin() + place, widget);
 			mTrays[trayLoc]->addChild(widget->getOverlayElement());
 

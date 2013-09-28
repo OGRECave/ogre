@@ -35,6 +35,9 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 
+#import <UIKit/UIWindow.h>
+#import <UIKit/UIGraphics.h>
+
 namespace Ogre {
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
         :   mClosed(false),

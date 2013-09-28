@@ -193,7 +193,7 @@ namespace Ogre {
 			}
 			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
-#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
@@ -204,7 +204,7 @@ namespace Ogre {
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
                 {
                     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
@@ -217,11 +217,36 @@ namespace Ogre {
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
 		{
+            // Add preprocessor extras and main source
+            if (!mSource.empty())
+            {
+                // Fix up the source in case someone forgot to redeclare gl_Position
+                if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                   mType == GPT_VERTEX_PROGRAM)
+                {
+                    size_t versionPos = mSource.find("#version");
+                    int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+
+                    // Check that it's missing and that this shader has a main function, ie. not a child shader.
+                    if(mSource.find("out highp vec4 gl_Position") == String::npos)
+                    {
+                        if(shaderVersion >= 300)
+                            mSource.insert(versionPos+16, "out highp vec4 gl_Position;\nout highp float gl_PointSize;\n");
+                    }
+                    if(mSource.find("#extension GL_EXT_separate_shader_objects : require") == String::npos)
+                    {
+                        if(shaderVersion >= 300)
+                            mSource.insert(versionPos+16, "#extension GL_EXT_separate_shader_objects : require\n");
+                    }
+                }
+            }
+    
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 			const char *source = (getOptimiserEnabled() && getIsOptimised()) ? mOptimisedSource.c_str() : mSource.c_str();
 #else
 			const char *source = mSource.c_str();
 #endif
+
 			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
 		}
 

@@ -25,9 +25,24 @@ fragment_program Ogre/Compositor/NightVisionFPGLSL glsl
 	}
 }
 
+fragment_program Ogre/Compositor/NightVisionFPGLSLES glsles
+{
+	source NightVisionFP.glsles
+	syntax glsles
+	
+	default_params
+	{
+		param_named lum float4 0.30 0.59 0.11 0.0
+		param_named_auto time time_0_1 1
+		param_named RT int 0
+		param_named noiseVol int 1
+	}
+}
+
 fragment_program Ogre/Compositor/NightVisionFP unified
 {
 	delegate Ogre/Compositor/NightVisionFPGLSL
+	delegate Ogre/Compositor/NightVisionFPGLSLES
 	delegate Ogre/Compositor/NightVisionFPCg
 }
 

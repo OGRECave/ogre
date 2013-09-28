@@ -127,13 +127,13 @@ namespace Ogre {
              * After rendering, the contents of this will be blitted into mFSAAFramebuffer */
             OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mFSAARenderbuffer));
             OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mFSAARenderbuffer));
-            OGRE_CHECK_GL_ERROR(gleswRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, samplesToUse, GL_RGBA8_OES, mBackingWidth, mBackingHeight));
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, samplesToUse, GL_RGBA8_OES, mBackingWidth, mBackingHeight));
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFSAARenderbuffer));
 
             // Create the FSAA depth buffer
             OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mDepthRenderbuffer));
             OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mDepthRenderbuffer));
-            OGRE_CHECK_GL_ERROR(gleswRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, samplesToUse, GL_DEPTH_COMPONENT24_OES, mBackingWidth, mBackingHeight));
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, samplesToUse, GL_DEPTH_COMPONENT24_OES, mBackingWidth, mBackingHeight));
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthRenderbuffer));
 
             // Validate the FSAA framebuffer
@@ -170,7 +170,7 @@ namespace Ogre {
 
     void EAGLES2Context::destroyFramebuffer()
     {
-        OGRE_CHECK_GL_ERROR(gleswDeleteFramebuffers(1, &mViewFramebuffer));
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mViewFramebuffer));
         mViewFramebuffer = 0;
         OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mViewRenderbuffer));
         mViewRenderbuffer = 0;

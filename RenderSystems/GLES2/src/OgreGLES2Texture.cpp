@@ -144,11 +144,27 @@ namespace Ogre {
         mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        // Set up texture swizzling
+        if(gleswIsSupported(3, 0))
+        {
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
+
+            if(mFormat == PF_L8 || mFormat == PF_L16)
+            {
+                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
+                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED));
+                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED));
+                OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_RED));
+            }
+        }
+
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat);
         GLenum internalformat = GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
-        GLenum datatype = GLES2PixelUtil::getGLOriginDataType(mFormat);
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
@@ -166,14 +182,14 @@ namespace Ogre {
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
-//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
-//                                                      " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
-//                                                      " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
-//                                                      );
-
+#if OGRE_DEBUG_MODE
+                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
+                                                      " Width: " + StringConverter::toString(width) +
+                                                      " Height: " + StringConverter::toString(height) +
+                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
+                                                      " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex)
+                                                      );
+#endif
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
                 
 				switch(mTextureType)
@@ -225,11 +241,13 @@ namespace Ogre {
         else
         {
 #if OGRE_NO_GLES3_SUPPORT == 0
-//            LogManager::getSingleton().logMessage("GLES2Texture::create - Name: " + mName +
-//                                                      " ID: " + StringConverter::toString(mTextureID) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex));
+#if OGRE_DEBUG_MODE
+            LogManager::getSingleton().logMessage("GLES2Texture::create - Name: " + mName +
+                                                      " ID: " + StringConverter::toString(mTextureID) +
+                                                      " Width: " + StringConverter::toString(width) +
+                                                      " Height: " + StringConverter::toString(height) +
+                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex));
+#endif
             switch(mTextureType)
             {
                 case TEX_TYPE_1D:
@@ -248,19 +266,22 @@ namespace Ogre {
                     break;
             }
 #else
+            GLenum datatype = GLES2PixelUtil::getGLOriginDataType(mFormat);
+
             // Run through this process to pregenerate mipmap pyramid
             for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
-//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Name: " + mName +
-//                                                      " ID: " + StringConverter::toString(mTextureID) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
-//                                                      " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
-//                                                      " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
-//                                                      );
-
+#if OGRE_DEBUG_MODE
+                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
+                                                      " Name: " + mName +
+                                                      " ID: " + StringConverter::toString(mTextureID) +
+                                                      " Width: " + StringConverter::toString(width) +
+                                                      " Height: " + StringConverter::toString(height) +
+                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
+                                                      " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
+                                                      " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
+                                                      );
+#endif
 				// Normal formats
 				switch(mTextureType)
 				{

@@ -264,6 +264,9 @@ protected:
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
+#if OGRE_NO_GLES3_SUPPORT == 0
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
+#endif
 			!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced vertex"

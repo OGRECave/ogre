@@ -38,6 +38,7 @@ namespace Ogre {
     
     void GLES2UniformCacheImp::clearCache()
     {
+        mUniformValueMap.reserve(16);
         mUniformValueMap.clear();
     }
     
@@ -49,7 +50,7 @@ namespace Ogre {
     bool GLES2UniformCacheImp::updateUniform(GLint location, const void *value, GLsizei length)
     {
         uint32 current = mUniformValueMap[location];
-        uint32 hash = Ogre::FastHash((const char *)value, length);
+        uint32 hash = Ogre::FastHash(static_cast<const char*>(value), length);
         // First check if the uniform name is in the map. If not, this is new so insert it into the map.
         if (!current || (current != hash))
         {

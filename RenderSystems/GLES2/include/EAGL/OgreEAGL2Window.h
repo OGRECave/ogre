@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 
 #ifdef __OBJC__
-#import <UIKit/UIKit.h>
 #import "OgreEAGL2View.h"
 #import "OgreEAGL2ViewController.h"
 
