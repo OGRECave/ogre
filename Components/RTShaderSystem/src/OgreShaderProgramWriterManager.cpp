@@ -38,7 +38,6 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 ProgramWriterManager* ProgramWriterManager::getSingletonPtr(void)
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 //-----------------------------------------------------------------------

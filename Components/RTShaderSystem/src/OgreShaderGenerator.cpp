@@ -63,7 +63,6 @@ String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 //-----------------------------------------------------------------------
 ShaderGenerator* ShaderGenerator::getSingletonPtr()
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 
