@@ -32,13 +32,15 @@ namespace Ogre {
 
     String StringConverter::msDefaultStringLocale = OGRE_DEFAULT_LOCALE;
     std::locale StringConverter::msLocale = std::locale(msDefaultStringLocale.c_str());
+    bool StringConverter::msUseLocale = false;
 
     //-----------------------------------------------------------------------
     String StringConverter::toString(Real val, unsigned short precision, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -54,7 +56,8 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -69,7 +72,8 @@ namespace Ogre {
                                      unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -84,7 +88,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -98,7 +103,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -111,7 +117,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -125,7 +132,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -141,7 +149,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -154,7 +163,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -168,7 +178,8 @@ namespace Ogre {
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -180,7 +191,8 @@ namespace Ogre {
     String StringConverter::toString(const Vector2& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream << val.x << " " << val.y;
         return stream.str();
     }
@@ -188,7 +200,8 @@ namespace Ogre {
     String StringConverter::toString(const Vector3& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -196,7 +209,8 @@ namespace Ogre {
     String StringConverter::toString(const Vector4& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream << val.x << " " << val.y << " " << val.z << " " << val.w;
         return stream.str();
     }
@@ -267,7 +281,8 @@ namespace Ogre {
     String StringConverter::toString(const Quaternion& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream  << val.w << " " << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
@@ -275,7 +290,8 @@ namespace Ogre {
     String StringConverter::toString(const ColourValue& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         stream << val.r << " " << val.g << " " << val.b << " " << val.a;
         return stream.str();
     }
@@ -283,7 +299,8 @@ namespace Ogre {
     String StringConverter::toString(const StringVector& val)
     {
         StringStream stream;
-        stream.imbue(msLocale);
+        if (msUseLocale)
+            stream.imbue(msLocale);
         StringVector::const_iterator i, iend, ibegin;
         ibegin = val.begin();
         iend = val.end();
@@ -301,7 +318,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         Real ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -313,7 +331,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         int ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -325,7 +344,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         unsigned int ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -337,7 +357,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         long ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -349,7 +370,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         unsigned long ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -361,7 +383,8 @@ namespace Ogre {
     {
         // Use iStringStream for direct correspondence with toString
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         size_t ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
@@ -540,7 +563,8 @@ namespace Ogre {
     bool StringConverter::isNumber(const String& val)
     {
         StringStream str(val);
-        str.imbue(msLocale);
+        if (msUseLocale)
+            str.imbue(msLocale);
         float tst;
         str >> tst;
         return !str.fail() && str.eof();

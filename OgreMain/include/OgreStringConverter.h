@@ -264,7 +264,7 @@ namespace Ogre {
         */
         static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black);
 
-        /** Pareses a StringVector from a string.
+        /** Parses a StringVector from a string.
         @remarks
             Strings must not contain spaces since space is used as a delimiter in
             the output.
@@ -281,10 +281,16 @@ namespace Ogre {
         }
         //-----------------------------------------------------------------------
         static String getDefaultStringLocale(void) { return msDefaultStringLocale; }
+        //-----------------------------------------------------------------------
+        static void setUseLocale(bool useLocale) { msUseLocale = useLocale; }
+        //-----------------------------------------------------------------------
+        static bool isUseLocale() { return msUseLocale; }
+        //-----------------------------------------------------------------------
 
     protected:
         static String msDefaultStringLocale;
         static std::locale msLocale;
+        static bool msUseLocale;
     };
 
     /** @} */
