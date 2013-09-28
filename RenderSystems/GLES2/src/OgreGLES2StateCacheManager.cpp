@@ -80,7 +80,17 @@ namespace Ogre {
     {
         mImp->setTexParameteri(target, pname, param);
     }
-    
+
+    void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
+    {
+        mImp->setTexParameterf(target, pname, param);
+    }
+
+    void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat *param)
+    {
+        mImp->getTexParameterfv(target, pname, param);
+    }
+
     void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mImp->bindGLTexture(target, texture);
@@ -140,7 +150,17 @@ namespace Ogre {
     {
         mImp->setDisabled(flag);
     }
-    
+
+    void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
+    {
+        mImp->setVertexAttribEnabled(attrib);
+    }
+
+    void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
+    {
+        mImp->setVertexAttribDisabled(attrib);
+    }
+
     void GLES2StateCacheManager::setCullFace(GLenum face)
     {
         mImp->setCullFace(face);

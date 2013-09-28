@@ -127,6 +127,10 @@ if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
 
     set(OGRE_BIN_SEARCH_PATH ${dir}/bin ${OGRE_BIN_SEARCH_PATH})
     set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
+
+    if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+      set(OGRE_BIN_SEARCH_PATH ${dir}/bin/macosx ${OGRE_BIN_SEARCH_PATH})
+    endif()
   endforeach(dir)
   
   if (OGRE_PREFIX_DEPENDENCIES_DIR)

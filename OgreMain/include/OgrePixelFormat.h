@@ -497,7 +497,7 @@ namespace Ogre {
 		/** Gives the masks for the R, G, B and A component
 		  @note			Only valid for native endian formats
         */
-        static void getBitMasks(PixelFormat format, uint32 rgba[4]);
+        static void getBitMasks(PixelFormat format, uint64 rgba[4]);
 
 		/** Gives the bit shifts for R, G, B and A component
 		@note			Only valid for native endian formats

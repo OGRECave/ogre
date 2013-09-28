@@ -1060,7 +1060,7 @@ namespace Ogre
 				// vertex data goes at this level, at bakedresolution
 				// applies to all lower levels (except those with a closer vertex data)
 				// determine physical size (as opposed to resolution)
-				size_t sz = ((bakedresolution-1) / splits) + 1;
+				uint sz = ((bakedresolution-1) / splits) + 1;
 				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution, sz);
 
 				// next set to look for

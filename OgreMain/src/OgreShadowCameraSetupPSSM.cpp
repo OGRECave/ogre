@@ -50,7 +50,7 @@ namespace Ogre
 	{
 	}
 	//---------------------------------------------------------------------
-	void PSSMShadowCameraSetup::calculateSplitPoints(size_t splitCount, Real nearDist, Real farDist, Real lambda)
+	void PSSMShadowCameraSetup::calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda)
 	{
 		if (splitCount < 2)
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 

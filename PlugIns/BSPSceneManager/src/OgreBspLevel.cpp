@@ -312,7 +312,7 @@ namespace Ogre {
         String shaderName;
         int face;
         face = q3lvl.mNumFaces;
-        int matHandle;
+        ResourceHandle matHandle;
         String meshName;
 
         String resourceGroup = ResourceGroupManager::getSingleton().getWorldResourceGroupName();

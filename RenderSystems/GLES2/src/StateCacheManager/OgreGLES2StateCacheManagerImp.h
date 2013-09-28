@@ -43,15 +43,18 @@ namespace Ogre
     private:
         typedef HashMap<GLenum, GLuint> BindBufferMap;
         typedef HashMap<GLenum, GLint> TexParameteriMap;
+        typedef HashMap<GLenum, GLfloat> TexParameterfMap;
 
         struct TextureUnitParams
         {
             ~TextureUnitParams()
             {
                 mTexParameteriMap.clear();
+                mTexParameterfMap.clear();
             }
 
             TexParameteriMap mTexParameteriMap;
+            TexParameterfMap mTexParameterfMap;
         };
 
         typedef HashMap<GLuint, TextureUnitParams> TexUnitsMap;
@@ -71,6 +74,8 @@ namespace Ogre
         vector<GLclampf>::type mClearColour;
         /// Stores the current colour write mask
         vector<GLboolean>::type mColourMask;
+        /// Stores the currently enabled vertex attributes
+        vector<GLuint>::type mEnabledVertexAttribs;
         /// Stores the current depth write mask
         GLboolean mDepthMask;
         /// Stores the current polygon rendering mode
@@ -87,8 +92,8 @@ namespace Ogre
         GLenum mDepthFunc;
         /// Stores the current stencil mask
         GLuint mStencilMask;
-		/// Stores the last bounded texture id
-        GLuint mLastBoundedTexID;
+		/// Stores the last bound texture id
+        GLuint mLastBoundTexID;
         /// Stores the currently active texture unit
         GLenum mActiveTextureUnit;
         /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
@@ -117,6 +122,12 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.setTexParameteri.
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
+
+        /// See GLES2StateCacheManager.setTexParameterf.
+        void setTexParameterf(GLenum target, GLenum pname, GLfloat params);
+
+        /// See GLES2StateCacheManager.getTexParameterfv.
+        void getTexParameterfv(GLenum target, GLenum pname, GLfloat *params);
 
         /// See GLES2StateCacheManager.invalidateStateForTexture.
         void invalidateStateForTexture(GLuint texture);
@@ -171,7 +182,13 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.setDisabled.
         void setDisabled(GLenum flag);
-        
+
+        /// See GLES2StateCacheManager.setVertexAttribEnabled.
+        void setVertexAttribEnabled(GLuint attrib);
+
+        /// See GLES2StateCacheManager.setVertexAttribDisabled.
+        void setVertexAttribDisabled(GLuint attrib);
+
         /// See GLES2StateCacheManager.getDiscardBuffers.
         unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
         

@@ -34,7 +34,8 @@ public:
       mBaseName(baseName)
       {
           mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-          mIsGLSL = GpuProgramManager::getSingleton().isSyntaxSupported("glsl") && !(GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") || GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"));
+          mIsGLSL = (GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles")) &&
+                    !(GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") || GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"));
       }
 	
 protected:
@@ -61,7 +62,15 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
     if(mIsGLSL)
     {
-        ss << "#version 150" << std::endl;
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        {
+            ss << "#version 300 es" << std::endl;
+            ss << "precision mediump int;" << std::endl;
+            ss << "precision mediump float;" << std::endl;
+        }
+        else
+            ss << "#version 150" << std::endl;
+
         ss << "in vec4 vertex;" << std::endl;
         ss << "in vec3 normal;" << std::endl;
 
@@ -131,11 +140,22 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 #endif
 
         // Create shader object
-        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-                                                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                                                     "glsl", GPT_VERTEX_PROGRAM);
+        HighLevelGpuProgramPtr ptrProgram;
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsles", GPT_VERTEX_PROGRAM);
+            ptrProgram->setParameter("syntax", "glsles");
+        }
+        else
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsl", GPT_VERTEX_PROGRAM);
+            ptrProgram->setParameter("syntax", "glsl150");
+        }
         ptrProgram->setSource(programSource);
-        ptrProgram->setParameter("syntax", "glsl150");
 
         const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
         params->setNamedAutoConstant("cWorldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
@@ -262,8 +282,18 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
     if(mIsGLSL)
     {
-        ss << "#version 150" << std::endl;
-        ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        {
+            ss << "#version 300 es" << std::endl;
+            ss << "precision mediump int;" << std::endl;
+            ss << "precision mediump float;" << std::endl;
+//            ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
+        }
+        else
+        {
+            ss << "#version 150" << std::endl;
+            ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
+        }
 #ifdef WRITE_LINEAR_DEPTH
         ss << "in vec3 oViewPos;" << std::endl;
 #else
@@ -327,7 +357,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         ss << "	oColor0.a = cSpecularity;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	vec3 texNormal = (texture(sNormalMap, oUv0).rgb-0.5)*2;" << std::endl;
+            ss << "	vec3 texNormal = (texture(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
             ss << "	mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
             ss << "	oColor1.rgb = normalize(texNormal * normalRotation);" << std::endl;
         }
@@ -352,11 +382,22 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 #endif
 
         // Create shader object
-        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-                                                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                                                     "glsl", GPT_FRAGMENT_PROGRAM);
+        HighLevelGpuProgramPtr ptrProgram;
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsles", GPT_FRAGMENT_PROGRAM);
+            ptrProgram->setParameter("syntax", "glsles");
+        }
+        else
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsl", GPT_FRAGMENT_PROGRAM);
+            ptrProgram->setParameter("syntax", "glsl150");
+        }
         ptrProgram->setSource(programSource);
-        ptrProgram->setParameter("syntax", "glsl150");
 
         const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
         params->setNamedAutoConstant("cSpecularity", GpuProgramParameters::ACT_SURFACE_SHININESS);

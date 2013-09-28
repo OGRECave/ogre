@@ -931,9 +931,9 @@ namespace Ogre {
 
 			// indices
 			// 6 arrows
-			for (size_t i = 0; i < 6; ++i)
+			for (uint32 i = 0; i < 6; ++i)
 			{
-				size_t base = i * 7; 
+				uint32 base = i * 7;
 				mo.triangle(base + 0, base + 1, base + 2);
 				mo.triangle(base + 0, base + 2, base + 3);
 				mo.triangle(base + 4, base + 5, base + 6);

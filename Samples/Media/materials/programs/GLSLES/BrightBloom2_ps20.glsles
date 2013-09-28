@@ -14,7 +14,7 @@ precision mediump float;
 //-------------------------------
 
 uniform sampler2D RT;
-varying vec2 uv;
+varying vec2 uv0;
 
 void main()
 {
@@ -22,7 +22,7 @@ void main()
     vec4 bright4;
     float bright;
 
-    tex = texture2D(RT, uv);
+    tex = texture2D(RT, uv0);
     tex -= 1.00000;
     bright4 = -6.00000 * tex * tex + 2.00000;
     bright = dot( bright4, vec4( 0.333333, 0.333333, 0.333333, 0.000000) );

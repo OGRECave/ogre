@@ -138,6 +138,16 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
     }
 
+    void GLES2StateCacheManagerImp::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
+    {
+        OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
+    }
+
+    void GLES2StateCacheManagerImp::getTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
+    {
+        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(target, pname, params));
+    }
+
     void GLES2StateCacheManagerImp::invalidateStateForTexture(GLuint texture) { }
 
     void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
@@ -258,7 +268,17 @@ namespace Ogre {
     {
         OGRE_CHECK_GL_ERROR(glDisable(flag));
     }
-    
+
+    void GLES2StateCacheManagerImp::setVertexAttribEnabled(GLuint attrib)
+    {
+        OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
+    }
+
+    void GLES2StateCacheManagerImp::setVertexAttribDisabled(GLuint attrib)
+    {
+        OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
+    }
+
     void GLES2StateCacheManagerImp::setCullFace(GLenum face)
     {
         if(mCullFace != face)

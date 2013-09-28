@@ -36,6 +36,8 @@ THE SOFTWARE.
 
 #include "macUtils.h"
 
+#import <UIKit/UIScreen.h>
+
 namespace Ogre {
 
     EAGL2Support::EAGL2Support()
@@ -91,6 +93,7 @@ namespace Ogre {
         optFSAA.possibleValues.push_back( "0" );
         optFSAA.possibleValues.push_back( "2" );
         optFSAA.possibleValues.push_back( "4" );
+        optFSAA.possibleValues.push_back( "8" );
         optFSAA.currentValue = "0";
         optFSAA.immutable = false;
 

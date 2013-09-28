@@ -663,6 +663,15 @@ namespace OgreBites
                 pl.insert(std::make_pair("w32_keyboard", "DISCL_NONEXCLUSIVE"));
             }
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            // Pass the view to OIS so the contentScalingFactor can be used
+			std::ostringstream viewHandleStr;
+			size_t viewHandle = 0;
+			mWindow->getCustomAttribute("VIEW", &viewHandle);
+			viewHandleStr << viewHandle;
+            pl.insert(std::make_pair("VIEW", viewHandleStr.str()));
+#endif
+
 			mInputMgr = OIS::InputManager::createInputSystem(pl);
 
 			createInputDevices();      // create the specific input devices

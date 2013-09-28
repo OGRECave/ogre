@@ -46,7 +46,7 @@ namespace Ogre
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             OGRE_CHECK_GL_ERROR(glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
 #endif
@@ -54,7 +54,7 @@ namespace Ogre
 
     void GLSLESProgramPipeline::compileAndLink()
 	{
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLint linkStatus = 0;
         
         OGRE_CHECK_GL_ERROR(glGenProgramPipelinesEXT(1, &mGLProgramPipelineHandle));
@@ -136,7 +136,7 @@ namespace Ogre
 
             // Validate pipeline
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(mVertexProgram && mFragmentProgram)
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                     glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
@@ -150,7 +150,7 @@ namespace Ogre
     {
 		if (mLinked)
 		{
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramPipelineHandle));
 #endif
 		}
@@ -256,18 +256,15 @@ namespace Ogre
 		// Iterate through uniform reference list and update uniform values
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLuint progID = 0;
-        GLSLESGpuProgram *prog;
         if(fromProgType == GPT_VERTEX_PROGRAM)
         {
             progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
-            prog = mVertexProgram;
         }
         else if(fromProgType == GPT_FRAGMENT_PROGRAM)
         {
             progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
-            prog = mFragmentProgram;
         }
 
 		for (;currentUniform != endUniform; ++currentUniform)
@@ -282,7 +279,6 @@ namespace Ogre
 				{
 					GLsizei glArraySize = (GLsizei)def->arraySize;
                     bool shouldUpdate = true;
-
                     switch (def->constType)
                     {
                         case GCT_INT1:
@@ -295,16 +291,18 @@ namespace Ogre
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
+#if OGRE_NO_GLES3_SUPPORT == 0
+                        case GCT_SAMPLER2DARRAY:
+#endif
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
-                                                                        def->elementSize * def->arraySize * sizeof(int));
+                                                                        (GLsizei)def->elementSize * def->arraySize * sizeof(int));
                             break;
                         default:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getFloatPointer(def->physicalIndex),
-                                                                        def->elementSize * def->arraySize * sizeof(float));
+                                                                        (GLsizei)def->elementSize * def->arraySize * sizeof(float));
                             break;
-
                     }
 
                     if(!shouldUpdate)
@@ -363,10 +361,39 @@ namespace Ogre
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
+#if OGRE_NO_GLES3_SUPPORT == 0
+                        case GCT_SAMPLER2DARRAY:
+#endif
                             // Samplers handled like 1-element ints
                             OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, 1,
                                                                        params->getIntPointer(def->physicalIndex)));
                             break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+                        case GCT_MATRIX_2X3:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix2x3fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_2X4:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix2x4fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_3X2:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix3x2fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_3X4:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix3x4fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_4X2:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4x2fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+                        case GCT_MATRIX_4X3:
+                            OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4x3fvEXT(progID, currentUniform->mLocation, glArraySize,
+                                                                            GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                            break;
+#else
                         case GCT_MATRIX_2X3:
                         case GCT_MATRIX_2X4:
                         case GCT_MATRIX_3X2:
@@ -374,6 +401,7 @@ namespace Ogre
                         case GCT_MATRIX_4X2:
                         case GCT_MATRIX_4X3:
                         case GCT_SAMPLER2DARRAY:
+#endif
                         case GCT_UNKNOWN:
                         case GCT_SUBROUTINE:
                         case GCT_DOUBLE1:
@@ -444,7 +472,7 @@ namespace Ogre
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
                     GLuint progID = 0;
                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)

@@ -176,7 +176,7 @@ namespace Ogre {
 
         logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
@@ -254,16 +254,6 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
-        GLSLESGpuProgram *prog = 0;
-        if(fromProgType == GPT_VERTEX_PROGRAM)
-        {
-            prog = mVertexProgram;
-        }
-        else if(fromProgType == GPT_FRAGMENT_PROGRAM)
-        {
-            prog = mFragmentProgram;
-        }
-
 		for (;currentUniform != endUniform; ++currentUniform)
 		{
 			// Only pull values from buffer it's supposed to be in (vertex or fragment)
@@ -298,7 +288,6 @@ namespace Ogre {
                                                                                   params->getFloatPointer(def->physicalIndex),
                                                                                   def->elementSize * def->arraySize * sizeof(float));
                             break;
-
                     }
 
                     if(!shouldUpdate)

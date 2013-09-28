@@ -1,4 +1,6 @@
 #version 300 es
+precision mediump int;
+precision mediump float;
 
 in vec4 uv0;
 in vec4 vertex;
