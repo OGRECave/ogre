@@ -121,6 +121,7 @@ namespace Ogre
 						setup->calculateSplitPoints( itor->numSplits, 0.0f, 100.0f, 0.95f );
 						setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
 						setup->setOptimalAdjustFactor( itor->split, itor->optimalAdjustFactor );
+						setup->setSplitPadding( itor->splitPadding );
 						setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
 						setup->setUseSimpleOptimalAdjust( false );
 					}
@@ -249,8 +250,8 @@ namespace Ogre
 											sceneManager->getVisibilityMask();
 
 		const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
-		mShadowMapLightIndex.clear();
-		mShadowMapLightIndex.reserve( numLights );
+		mShadowMapCastingLights.clear();
+		mShadowMapCastingLights.reserve( numLights );
 		mAffectedLights.clear();
 		mAffectedLights.resize( globalLightList.lights.size(), false );
 
@@ -283,10 +284,11 @@ namespace Ogre
 							//from the camera. Check whether we've already added it
 							if( minIdx != j )
 							{
-								LightIndexVec::const_iterator it = std::find(
-																	mShadowMapLightIndex.begin(),
-																	mShadowMapLightIndex.end(), j );
-								if( it != mShadowMapLightIndex.end() )
+								LightArray::const_iterator it = std::find(
+																	mShadowMapCastingLights.begin(),
+																	mShadowMapCastingLights.end(),
+																	globalLightList.lights[j] );
+								if( it != mShadowMapCastingLights.end() )
 									bNewIdx = false;
 							}
 							else
@@ -306,10 +308,11 @@ namespace Ogre
 				}
 
 				if( minIdx != -1 &&
-					(mShadowMapLightIndex.empty() || minIdx != mShadowMapLightIndex.back()) )
+					(mShadowMapCastingLights.empty() ||
+					globalLightList.lights[minIdx] != mShadowMapCastingLights.back()) )
 				{
 					mAffectedLights[minIdx] = true;
-					mShadowMapLightIndex.push_back( minIdx );
+					mShadowMapCastingLights.push_back( globalLightList.lights[minIdx] );
 				}
 
 				++visibilityMask;
@@ -364,8 +367,6 @@ namespace Ogre
 
 		buildClosestLightList( camera );
 
-		const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
-
 		//Setup all the cameras
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
 															mDefinition->mShadowMapTexDefinitions.begin();
@@ -374,9 +375,9 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			if( itor->light < mShadowMapLightIndex.size() )
+			if( itor->light < mShadowMapCastingLights.size() )
 			{
-				Light const *light = globalLightList.lights[mShadowMapLightIndex[itor->light]];
+				Light const *light = mShadowMapCastingLights[itor->light];
 
 				Camera *texCamera = itShadowCamera->camera;
 
@@ -395,6 +396,9 @@ namespace Ogre
 
 				if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
 				{
+					assert( dynamic_cast<PSSMShadowCameraSetup*>
+							( itShadowCamera->shadowCameraSetup.get() ) );
+
 					PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>
 														( itShadowCamera->shadowCameraSetup.get() );
 					if( pssmSetup->getSplitPoints()[0] != camera->getNearClipDistance() ||
@@ -590,6 +594,27 @@ namespace Ogre
 
 		outMin = 0.0f;
 		outMax = 100000.0f;
+	}
+	//-----------------------------------------------------------------------------------
+	const vector<Real>::type* CompositorShadowNode::getPssmSplits( size_t shadowMapIdx ) const
+	{
+		vector<Real>::type const *retVal = 0;
+
+		if( shadowMapIdx < mShadowMapCastingLights.size() )
+		{
+			if( mDefinition->mShadowMapTexDefinitions[shadowMapIdx].shadowMapTechnique ==
+				SHADOWMAP_PSSM )
+			{
+				assert( dynamic_cast<PSSMShadowCameraSetup*>(
+						mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() ) );
+
+				PSSMShadowCameraSetup *pssmSetup = static_cast<PSSMShadowCameraSetup*>(
+											mShadowMapCameras[shadowMapIdx].shadowCameraSetup.get() );
+				retVal = &pssmSetup->getSplitPoints();
+			}
+		}
+
+		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorShadowNode::finalTargetResized( const RenderTarget *finalTarget )

@@ -36,9 +36,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	// forward decl
-	struct VisibleObjectsBoundsInfo;
-
 	/** \addtogroup Core
 	*  @{
 	*/

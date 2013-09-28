@@ -6132,6 +6132,7 @@ namespace Ogre{
 		td->optimalAdjustFactor		= defaultParams.optimalAdjustFactor;
 		td->lightDirThreshold		= defaultParams.lightDirThreshold;
 		td->pssmLambda				= defaultParams.pssmLambda;
+		td->splitPadding			= defaultParams.splitPadding;
 		td->numSplits				= defaultParams.numSplits;
 	}
 	//-------------------------------------------------------------------------
@@ -6282,6 +6283,25 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_PSSM_SPLIT_PADDING:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+						else if(prop->values.size() != 1)
+						{
+							compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getReal( *it0, &defaultParams.splitPadding ) )
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+					}
+					break;
 				case ID_PSSM_LAMBDA:
 					{
 						if(prop->values.empty())
@@ -6332,7 +6352,7 @@ namespace Ogre{
 						}
 
 						AbstractNodeList::const_iterator it0 = prop->values.begin();
-						if( !getBoolean( *it0, &defaultParams.aggressiveFocusRegion ) )
+						if( !getReal( *it0, &defaultParams.optimalAdjustFactor ) )
 						{
 							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 							return;

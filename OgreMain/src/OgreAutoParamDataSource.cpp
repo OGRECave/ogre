@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreFrameStats.h"
 #include "OgreRenderSystem.h"
 
+#include "Compositor/OgreCompositorShadowNode.h"
+
 namespace Ogre {
     const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
         0.5,    0,    0,  0.5, 
@@ -70,6 +72,7 @@ namespace Ogre {
          mCurrentViewport(0), 
 		 mCurrentSceneManager(0),
          mCurrentPass(0),
+		 mCurrentShadowNode(0),
 		 mBlankLight( 0, &mObjectMemoryManager )
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);
@@ -84,7 +87,7 @@ namespace Ogre {
 			mCurrentTextureProjector[i] = 0;
 			mShadowCamDepthRangesDirty[i] = false;
 		}
-
+		mNullPssmSplitPoint.resize( 4, Real( 0.0f ) );
     }
     //-----------------------------------------------------------------------------
     AutoParamDataSource::~AutoParamDataSource()
@@ -522,6 +525,11 @@ namespace Ogre {
 		return mAmbientLight;
 		
 	}
+	//-----------------------------------------------------------------------------
+	void AutoParamDataSource::setCurrentShadowNode(const CompositorShadowNode *sn)
+    {
+        mCurrentShadowNode = sn;
+    }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentPass(const Pass* pass)
     {
@@ -784,6 +792,23 @@ namespace Ogre {
       return Matrix4::IDENTITY;
     }
   }
+	//-----------------------------------------------------------------------------
+	const vector<Real>::type& AutoParamDataSource::getPssmSplits( size_t shadowMapIdx ) const
+	{
+		vector<Real>::type const *retVal;
+		if( !mCurrentShadowNode )
+		{
+			retVal = &mNullPssmSplitPoint;
+		}
+		else
+		{
+			retVal = mCurrentShadowNode->getPssmSplits( shadowMapIdx );
+			if( !retVal )
+				retVal = &mNullPssmSplitPoint;
+		}
+		
+		return *retVal;
+	}
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentRenderTarget(const RenderTarget* target)
     {

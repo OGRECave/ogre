@@ -76,6 +76,7 @@ namespace Ogre
 		Degree				lightDirThreshold;
 		//PSSM params
 		Real				pssmLambda;
+		Real				splitPadding;
 		size_t				numSplits;
 
 	protected:
@@ -88,7 +89,7 @@ namespace Ogre
 				width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
 				light(_light), split(_split), shadowMapTechnique(t), name( _name ),
 				aggressiveFocusRegion( true ), optimalAdjustFactor( 5.0f ),
-				lightDirThreshold( 25.0f ), pssmLambda( 0.95f ), numSplits( 3 ),
+				lightDirThreshold( 25.0f ), pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
 				sharesSetupWith( -1 ) {}
 
 		IdString getName() const			{ return name; }

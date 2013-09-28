@@ -36,7 +36,6 @@ namespace Ogre {
 
 	class Camera;
 	class MovableObject;
-	struct VisibleObjectsBoundsInfo;
 
 	/** \addtogroup Core
 	*  @{

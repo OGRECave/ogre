@@ -145,6 +145,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_SPOTLIGHT_VIEWPROJ_MATRIX,       "spotlight_viewproj_matrix",     16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY, "spotlight_viewproj_matrix_array", 16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,  "spotlight_worldviewproj_matrix",16, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_PSSM_SPLITS,                   "pssm_splits",                  1, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_CUSTOM,                        "custom",                       4, ET_REAL, ACDT_INT),  // *** needs to be tested
 		AutoConstantDefinition(ACT_TIME,                               "time",                               1, ET_REAL, ACDT_REAL),
 		AutoConstantDefinition(ACT_TIME_0_X,                      "time_0_x",                     4, ET_REAL, ACDT_REAL),
@@ -1233,6 +1234,7 @@ namespace Ogre
 		case ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY:
 		case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
 		case ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
+		case ACT_PSSM_SPLITS:
 		case ACT_LIGHT_CUSTOM:
 
 			return (uint16)GPV_LIGHTS;
@@ -2143,6 +2145,12 @@ namespace Ogre
 					break;
 				case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
 					_writeRawConstant(i->physicalIndex, source->getSpotlightWorldViewProjMatrix(i->data),i->elementCount);
+					break;
+				case ACT_PSSM_SPLITS:
+					{
+						const vector<Real>::type &pssmSplitPoints = source->getPssmSplits( i->data );
+						_writeRawConstants(i->physicalIndex, &pssmSplitPoints[1], pssmSplitPoints.size()-1);
+					}
 					break;
 				case ACT_LIGHT_POSITION_OBJECT_SPACE:
 					_writeRawConstant(i->physicalIndex, 

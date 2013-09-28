@@ -3484,6 +3484,13 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
 		}
 	}
 }
+//---------------------------------------------------------------------
+void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode )
+{
+	mCurrentShadowNode = shadowNode;
+	mAutoParamDataSource->setCurrentShadowNode( shadowNode );
+}
+//---------------------------------------------------------------------
 void SceneManager::addListener(Listener* newListener)
 {
     mListeners.push_back(newListener);

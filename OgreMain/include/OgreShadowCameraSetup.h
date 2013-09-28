@@ -104,35 +104,6 @@ namespace Ogre {
 									  const Light *light, Camera *texCam, size_t iteration) const;
 	};
 
-	/** Structure collecting together information about the visible objects
-		that have been discovered in a scene.
-	*/
-	/*struct _OgreExport VisibleObjectsBoundsInfo
-	{
-		/// The axis-aligned bounds of the visible objects
-		AxisAlignedBox aabb;
-		/// The axis-aligned bounds of the visible shadow receiver objects
-		AxisAlignedBox receiverAabb;
-		/// The closest a object in the frustum regardless of visibility / shadow caster flags
-		Real minDistanceInFrustum;
-		/// The farthest object in the frustum regardless of visibility / shadow caster flags
-		Real maxDistanceInFrustum;
-
-		VisibleObjectsBoundsInfo();
-		void reset();
-		/*void merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
-			const Camera* cam, bool receiver=true);
-		/** Merge an object that is not being rendered because it's not a shadow caster, 
-			but is a shadow receiver so should be included in the range.
-		*//*
-		void mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-			const Sphere& sphereBounds, const Camera* cam);*//*
-
-
-	};
-
-	typedef vector<VisibleObjectsBoundsInfo>::type VisibleObjectsBoundsInfoVec;*/
-
 	typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
 	/** @} */
 	/** @} */

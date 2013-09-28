@@ -93,6 +93,17 @@ namespace Ogre
 		with lots of branches and called itself recursively to render the shadow maps.
 		This separation also provides a way to isolate & encapsulate systems (SceneManager now has
 		no idea of how to take care of shadow map rendering)
+	@par
+	@par
+		On forward lighting passes, shadow mapping is handled in the following way:
+			1) Build a list of all lights visible by all cameras (SceneManager does this)
+			2) Traverse the list to get the closest lights to the current camera.
+			   These lights will cast shadows.
+			3) Build a list of the closest lights for each object (SceneManager does this)
+			4) Traverse this list and find those that are actually casting a shadow
+			5) Send to the GPU & engine the list in step 4, but shadow casting lights are
+			   put first, then sorted by proximity.
+		See the comments inside the function setShadowMapsToPass for more information.
     @author
 		Matias N. Goldberg
     @version
@@ -115,11 +126,11 @@ namespace Ogre
 		/// One per shadow map (whether texture or atlas)
 		ShadowMapCameraVec		mShadowMapCameras;
 
-		typedef vector<size_t>::type LightIndexVec;
+		typedef FastArray<Light const *> LightArray;
 
 		Camera const *			mLastCamera;
 		size_t					mLastFrame;
-		LightIndexVec			mShadowMapLightIndex;
+		LightArray				mShadowMapCastingLights;
 
 		/** Cached value. Contains the aabb of all culled receiver-only
 			objects during the camera render. We need to cache because the
@@ -189,6 +200,18 @@ namespace Ogre
 			Performs linear search O(N)
 		*/
 		void getMinMaxDepthRange( const Frustum *shadowMapCamera, Real &outMin, Real &outMax ) const;
+
+		/** Returns a list of points with the limits of each PSSM split in projection space
+			for the given shadow map index.
+		@remarks
+			If shadow map 0, 1 & 2 use light 0 with different splits, the return value should
+			be the same for all of them.
+		@return
+			An array with the split points. The number of elements is N+1 where N is the number
+			of splits for that shadow map.
+			Returns null if shadowMapIdx is out of bounds, or is not a PSSM technique.
+		*/
+		const vector<Real>::type* getPssmSplits( size_t shadowMapIdx ) const;
 
 		/// @copydoc CompositorNode::finalTargetResized
 		virtual void finalTargetResized( const RenderTarget *finalTarget );

@@ -974,6 +974,10 @@ namespace Ogre {
 			combined with the current world matrix
 			*/
 			ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,
+			/** Array of PSSM split points (pixel depth must be lower) in projection space.
+				Extra param indicates which shadow map it comes from.
+			*/
+			ACT_PSSM_SPLITS,
 			/// A custom parameter which will come from the renderable, using 'data' as the identifier
 			ACT_CUSTOM,
 			/** provides current elapsed time

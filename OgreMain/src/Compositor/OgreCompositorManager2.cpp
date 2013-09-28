@@ -112,7 +112,7 @@ namespace Ogre
 		workDef->connectOutput( 0, "Default Node RenderScene" );
 
 		//-------
-		CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
+		/*CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
 		shadowNode->setNumShadowTextureDefinitions( 3 );
 		
 		{
@@ -175,7 +175,7 @@ namespace Ogre
 				passDef->mShadowMapIdx = 2;
 				passDef->mIncludeOverlays = false;
 			}
-		}
+		}*/
 
 		validateAllNodes();
 	}

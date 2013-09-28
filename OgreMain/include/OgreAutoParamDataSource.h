@@ -40,7 +40,7 @@ THE SOFTWARE.
 namespace Ogre {
 
 	// forward decls
-	struct VisibleObjectsBoundsInfo;
+	class CompositorShadowNode;
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -124,6 +124,8 @@ namespace Ogre {
         const Viewport* mCurrentViewport;
 		const SceneManager* mCurrentSceneManager;
         const Pass* mCurrentPass;
+		const CompositorShadowNode *mCurrentShadowNode;
+		vector<Real>::type			mNullPssmSplitPoint;
 
 		ObjectMemoryManager mObjectMemoryManager;
         Light mBlankLight;
@@ -131,133 +133,134 @@ namespace Ogre {
         AutoParamDataSource();
         virtual ~AutoParamDataSource();
         /** Updates the current renderable */
-        virtual void setCurrentRenderable(const Renderable* rend);
+         void setCurrentRenderable(const Renderable* rend);
         /** Sets the world matrices, avoid query from renderable again */
-        virtual void setWorldMatrices(const Matrix4* m, size_t count);
+         void setWorldMatrices(const Matrix4* m, size_t count);
         /** Updates the current camera */
-        virtual void setCurrentCamera(const Camera* cam, bool useCameraRelative);
+         void setCurrentCamera(const Camera* cam, bool useCameraRelative);
         /** Sets the light list that should be used, and it's base index from the global list */
-        virtual void setCurrentLightList(const LightList* ll);
+         void setCurrentLightList(const LightList* ll);
         /** Sets the current texture projector for a index */
-        virtual void setTextureProjector(const Frustum* frust, size_t index);
+         void setTextureProjector(const Frustum* frust, size_t index);
         /** Sets the current render target */
-        virtual void setCurrentRenderTarget(const RenderTarget* target);
+         void setCurrentRenderTarget(const RenderTarget* target);
         /** Sets the current viewport */
-        virtual void setCurrentViewport(const Viewport* viewport);
+         void setCurrentViewport(const Viewport* viewport);
 		/** Sets the shadow extrusion distance to be used for point lights. */
-		virtual void setShadowDirLightExtrusionDistance(Real dist);
+		 void setShadowDirLightExtrusionDistance(Real dist);
 		/** Set the current scene manager for enquiring on demand */
-		virtual void setCurrentSceneManager(const SceneManager* sm);
+		 void setCurrentSceneManager(const SceneManager* sm);
         /** Sets the current pass */
-        virtual void setCurrentPass(const Pass* pass);
+         void setCurrentPass(const Pass* pass);
+		 void setCurrentShadowNode(const CompositorShadowNode *sn);
 
 
-
-        virtual const Matrix4& getWorldMatrix(void) const;
-        virtual const Matrix4* getWorldMatrixArray(void) const;
-        virtual size_t getWorldMatrixCount(void) const;
-        virtual const Matrix4& getViewMatrix(void) const;
-        virtual const Matrix4& getViewProjectionMatrix(void) const;
-        virtual const Matrix4& getProjectionMatrix(void) const;
-        virtual const Matrix4& getWorldViewProjMatrix(void) const;
-        virtual const Matrix4& getWorldViewMatrix(void) const;
-        virtual const Matrix4& getInverseWorldMatrix(void) const;
-        virtual const Matrix4& getInverseWorldViewMatrix(void) const;
-        virtual const Matrix4& getInverseViewMatrix(void) const;
-        virtual const Matrix4& getInverseTransposeWorldMatrix(void) const;
-        virtual const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
-        virtual const Vector4& getCameraPosition(void) const;
-        virtual const Vector4& getCameraPositionObjectSpace(void) const;
-		virtual const Vector4& getLodCameraPosition(void) const;
-		virtual const Vector4& getLodCameraPositionObjectSpace(void) const;
-		virtual bool hasLightList() const { return mCurrentLightList != 0; }
+         const Matrix4& getWorldMatrix(void) const;
+         const Matrix4* getWorldMatrixArray(void) const;
+         size_t getWorldMatrixCount(void) const;
+         const Matrix4& getViewMatrix(void) const;
+         const Matrix4& getViewProjectionMatrix(void) const;
+         const Matrix4& getProjectionMatrix(void) const;
+         const Matrix4& getWorldViewProjMatrix(void) const;
+         const Matrix4& getWorldViewMatrix(void) const;
+         const Matrix4& getInverseWorldMatrix(void) const;
+         const Matrix4& getInverseWorldViewMatrix(void) const;
+         const Matrix4& getInverseViewMatrix(void) const;
+         const Matrix4& getInverseTransposeWorldMatrix(void) const;
+         const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
+         const Vector4& getCameraPosition(void) const;
+         const Vector4& getCameraPositionObjectSpace(void) const;
+		 const Vector4& getLodCameraPosition(void) const;
+		 const Vector4& getLodCameraPositionObjectSpace(void) const;
+		 bool hasLightList() const { return mCurrentLightList != 0; }
         /** Get the light which is 'index'th closest to the current object */        
-		virtual float getLightNumber(size_t index) const;
-		virtual float getLightCount() const;
-		virtual float getLightCastsShadows(size_t index) const;
-		virtual const ColourValue& getLightDiffuseColour(size_t index) const;
-		virtual const ColourValue& getLightSpecularColour(size_t index) const;
-		virtual const ColourValue getLightDiffuseColourWithPower(size_t index) const;
-		virtual const ColourValue getLightSpecularColourWithPower(size_t index) const;
-		virtual const Vector3& getLightPosition(size_t index) const;
-		virtual Vector4 getLightAs4DVector(size_t index) const;
-		virtual const Vector3& getLightDirection(size_t index) const;
-		virtual Real getLightPowerScale(size_t index) const;
-		virtual Vector4 getLightAttenuation(size_t index) const;
-		virtual Vector4 getSpotlightParams(size_t index) const;
-		virtual void setAmbientLightColour(const ColourValue& ambient);
-		virtual const ColourValue& getAmbientLightColour(void) const;
-        virtual const ColourValue& getSurfaceAmbientColour(void) const;
-        virtual const ColourValue& getSurfaceDiffuseColour(void) const;
-        virtual const ColourValue& getSurfaceSpecularColour(void) const;
-        virtual const ColourValue& getSurfaceEmissiveColour(void) const;
-        virtual Real getSurfaceShininess(void) const;
-        virtual Real getSurfaceAlphaRejectionValue(void) const;
-        virtual ColourValue getDerivedAmbientLightColour(void) const;
-        virtual ColourValue getDerivedSceneColour(void) const;
-        virtual void setFog(FogMode mode, const ColourValue& colour, Real expDensity, Real linearStart, Real linearEnd);
-        virtual const ColourValue& getFogColour(void) const;
-        virtual const Vector4& getFogParams(void) const;
-        virtual const Matrix4& getTextureViewProjMatrix(size_t index) const;
-		virtual const Matrix4& getTextureWorldViewProjMatrix(size_t index) const;
-		virtual const Matrix4& getSpotlightViewProjMatrix(size_t index) const;
-		virtual const Matrix4& getSpotlightWorldViewProjMatrix(size_t index) const;
-        virtual const Matrix4& getTextureTransformMatrix(size_t index) const;
-        virtual const RenderTarget* getCurrentRenderTarget(void) const;
-        virtual const Renderable* getCurrentRenderable(void) const;
-        virtual const Pass* getCurrentPass(void) const;
-        virtual Vector4 getTextureSize(size_t index) const;
-        virtual Vector4 getInverseTextureSize(size_t index) const;
-        virtual Vector4 getPackedTextureSize(size_t index) const;
-		virtual Real getShadowExtrusionDistance(void) const;
-		virtual const Vector4& getSceneDepthRange() const;
-		virtual const Vector4& getShadowSceneDepthRange(size_t index) const;
-		virtual const ColourValue& getShadowColour() const;
-		virtual Matrix4 getInverseViewProjMatrix(void) const;
-		virtual Matrix4 getInverseTransposeViewProjMatrix() const;
-		virtual Matrix4 getTransposeViewProjMatrix() const;
-		virtual Matrix4 getTransposeViewMatrix() const;
-        virtual Matrix4 getInverseTransposeViewMatrix() const;
-		virtual Matrix4 getTransposeProjectionMatrix() const;
-		virtual Matrix4 getInverseProjectionMatrix() const;
-		virtual Matrix4 getInverseTransposeProjectionMatrix() const;
-		virtual Matrix4 getTransposeWorldViewProjMatrix() const;
-		virtual Matrix4 getInverseWorldViewProjMatrix() const;
-		virtual Matrix4 getInverseTransposeWorldViewProjMatrix() const;
-		virtual Matrix4 getTransposeWorldViewMatrix() const;
-		virtual Matrix4 getTransposeWorldMatrix() const;
-        virtual Real getTime(void) const;
-		virtual Real getTime_0_X(Real x) const;
-		virtual Real getCosTime_0_X(Real x) const;
-		virtual Real getSinTime_0_X(Real x) const;
-		virtual Real getTanTime_0_X(Real x) const;
-		virtual Vector4 getTime_0_X_packed(Real x) const;
-		virtual Real getTime_0_1(Real x) const;
-		virtual Real getCosTime_0_1(Real x) const;
-		virtual Real getSinTime_0_1(Real x) const;
-		virtual Real getTanTime_0_1(Real x) const;
-		virtual Vector4 getTime_0_1_packed(Real x) const;
-		virtual Real getTime_0_2Pi(Real x) const;
-		virtual Real getCosTime_0_2Pi(Real x) const;
-		virtual Real getSinTime_0_2Pi(Real x) const;
-		virtual Real getTanTime_0_2Pi(Real x) const;
-		virtual Vector4 getTime_0_2Pi_packed(Real x) const;
-        virtual Real getFrameTime(void) const;
-		virtual Real getFPS() const;
-		virtual Real getViewportWidth() const;
-		virtual Real getViewportHeight() const;
-		virtual Real getInverseViewportWidth() const;
-		virtual Real getInverseViewportHeight() const;
-		virtual Vector3 getViewDirection() const;
-		virtual Vector3 getViewSideVector() const;
-		virtual Vector3 getViewUpVector() const;
-		virtual Real getFOV() const;
-		virtual Real getNearClipDistance() const;
-		virtual Real getFarClipDistance() const;
-        virtual int getPassNumber(void) const;
-        virtual void setPassNumber(const int passNumber);
-        virtual void incPassNumber(void);
-		virtual void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
+		 float getLightNumber(size_t index) const;
+		 float getLightCount() const;
+		 float getLightCastsShadows(size_t index) const;
+		 const ColourValue& getLightDiffuseColour(size_t index) const;
+		 const ColourValue& getLightSpecularColour(size_t index) const;
+		 const ColourValue getLightDiffuseColourWithPower(size_t index) const;
+		 const ColourValue getLightSpecularColourWithPower(size_t index) const;
+		 const Vector3& getLightPosition(size_t index) const;
+		 Vector4 getLightAs4DVector(size_t index) const;
+		 const Vector3& getLightDirection(size_t index) const;
+		 Real getLightPowerScale(size_t index) const;
+		 Vector4 getLightAttenuation(size_t index) const;
+		 Vector4 getSpotlightParams(size_t index) const;
+		 void setAmbientLightColour(const ColourValue& ambient);
+		 const ColourValue& getAmbientLightColour(void) const;
+         const ColourValue& getSurfaceAmbientColour(void) const;
+         const ColourValue& getSurfaceDiffuseColour(void) const;
+         const ColourValue& getSurfaceSpecularColour(void) const;
+         const ColourValue& getSurfaceEmissiveColour(void) const;
+         Real getSurfaceShininess(void) const;
+         Real getSurfaceAlphaRejectionValue(void) const;
+         ColourValue getDerivedAmbientLightColour(void) const;
+         ColourValue getDerivedSceneColour(void) const;
+         void setFog(FogMode mode, const ColourValue& colour, Real expDensity, Real linearStart, Real linearEnd);
+         const ColourValue& getFogColour(void) const;
+         const Vector4& getFogParams(void) const;
+         const Matrix4& getTextureViewProjMatrix(size_t index) const;
+		 const Matrix4& getTextureWorldViewProjMatrix(size_t index) const;
+		 const Matrix4& getSpotlightViewProjMatrix(size_t index) const;
+		 const Matrix4& getSpotlightWorldViewProjMatrix(size_t index) const;
+         const Matrix4& getTextureTransformMatrix(size_t index) const;
+		 const vector<Real>::type& getPssmSplits( size_t shadowMapIdx ) const;
+         const RenderTarget* getCurrentRenderTarget(void) const;
+         const Renderable* getCurrentRenderable(void) const;
+         const Pass* getCurrentPass(void) const;
+         Vector4 getTextureSize(size_t index) const;
+         Vector4 getInverseTextureSize(size_t index) const;
+         Vector4 getPackedTextureSize(size_t index) const;
+		 Real getShadowExtrusionDistance(void) const;
+		 const Vector4& getSceneDepthRange() const;
+		 const Vector4& getShadowSceneDepthRange(size_t index) const;
+		 const ColourValue& getShadowColour() const;
+		 Matrix4 getInverseViewProjMatrix(void) const;
+		 Matrix4 getInverseTransposeViewProjMatrix() const;
+		 Matrix4 getTransposeViewProjMatrix() const;
+		 Matrix4 getTransposeViewMatrix() const;
+         Matrix4 getInverseTransposeViewMatrix() const;
+		 Matrix4 getTransposeProjectionMatrix() const;
+		 Matrix4 getInverseProjectionMatrix() const;
+		 Matrix4 getInverseTransposeProjectionMatrix() const;
+		 Matrix4 getTransposeWorldViewProjMatrix() const;
+		 Matrix4 getInverseWorldViewProjMatrix() const;
+		 Matrix4 getInverseTransposeWorldViewProjMatrix() const;
+		 Matrix4 getTransposeWorldViewMatrix() const;
+		 Matrix4 getTransposeWorldMatrix() const;
+         Real getTime(void) const;
+		 Real getTime_0_X(Real x) const;
+		 Real getCosTime_0_X(Real x) const;
+		 Real getSinTime_0_X(Real x) const;
+		 Real getTanTime_0_X(Real x) const;
+		 Vector4 getTime_0_X_packed(Real x) const;
+		 Real getTime_0_1(Real x) const;
+		 Real getCosTime_0_1(Real x) const;
+		 Real getSinTime_0_1(Real x) const;
+		 Real getTanTime_0_1(Real x) const;
+		 Vector4 getTime_0_1_packed(Real x) const;
+		 Real getTime_0_2Pi(Real x) const;
+		 Real getCosTime_0_2Pi(Real x) const;
+		 Real getSinTime_0_2Pi(Real x) const;
+		 Real getTanTime_0_2Pi(Real x) const;
+		 Vector4 getTime_0_2Pi_packed(Real x) const;
+         Real getFrameTime(void) const;
+		 Real getFPS() const;
+		 Real getViewportWidth() const;
+		 Real getViewportHeight() const;
+		 Real getInverseViewportWidth() const;
+		 Real getInverseViewportHeight() const;
+		 Vector3 getViewDirection() const;
+		 Vector3 getViewSideVector() const;
+		 Vector3 getViewUpVector() const;
+		 Real getFOV() const;
+		 Real getNearClipDistance() const;
+		 Real getFarClipDistance() const;
+         int getPassNumber(void) const;
+         void setPassNumber(const int passNumber);
+         void incPassNumber(void);
+		 void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
     };
 	/** @} */
 	/** @} */

@@ -180,6 +180,22 @@ namespace Ogre
 					"CompositorShadowNodeDef::_validateAndFinish");
 			}
 
+#ifndef OGRE_REMOVE_PSSM_SPLIT_LIMIT
+			if( it1->numSplits > 5 )
+			{
+				//The risk is that, because of how Ogre deals with constant params, we have no way
+				//to tell whether the shader has enough room to hold all the floats we'll sent.
+				//At 5 splits, we send 4 floats (i.e. a float4). If there were 6 splits, we would
+				//send 5 floats, which means the variable needs to be declared as float [5] or
+				//float4 [2], float4x2 etc. If you're sure the shader has enough room, you
+				//can define this macro to remove the limit.
+				it1->numSplits = 5;
+				LogManager::getSingleton().logMessage( "WARNING: Limiting the number of PSSM splits per "
+							"light to 5. If you wish to use more & understand the risks, recompile Ogre "
+							"defining the macro OGRE_REMOVE_PSSM_SPLIT_LIMIT." );
+			}
+#endif
+
 			bool bShared = false;
 
 			ShadowMapTexDefVec::const_iterator it2 = mShadowMapTexDefinitions.begin();

@@ -109,6 +109,7 @@ namespace Ogre
 		if (iteration > 0)
 		{
 			nearDist -= mSplitPadding;
+			nearDist = std::max( nearDist, mSplitPoints[0] );
 		}
 		if (iteration < mSplitCount - 1)
 		{
