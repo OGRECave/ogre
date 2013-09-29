@@ -25,20 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArraySphere_H__
-#define __ArraySphere_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
+namespace Ogre
+{
+	inline ArrayMaskR BooleanMask4::getMask( bool x )
+	{
+		return x;
+	}
 
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
-#else
-	#include "C/OgreArraySphere.h"
-#endif
+	inline ArrayMaskR BooleanMask4::getMask( bool b[1] )
+	{
+		return b[0];
+	}
+	//--------------------------------------------------------------------------------------
+	inline uint32 BooleanMask4::getScalarMask( ArrayMaskR mask )
+	{
+		return static_cast<uint32>( mask );
+	}
 
-#endif
+	#define IS_BIT_SET( bit, intMask ) ( (intMask & (1 << bit) ) != 0)
+}

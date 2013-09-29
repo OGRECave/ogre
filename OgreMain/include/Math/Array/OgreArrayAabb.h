@@ -31,13 +31,13 @@ THE SOFTWARE.
 //This file is a proxy, it redirects to the proper file depending on platform
 #include "OgreArrayConfig.h"
 
-#if OGRE_CPU == OGRE_CPU_X86 && defined( OGRE_USE_SIMD )
+#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
 	#if OGRE_DOUBLE_PRECISION == 1
 		#include "SSE2/Double/OgreArrayAabb.h"
 	#else
 		#include "SSE2/Single/OgreArrayAabb.h"
 	#endif
-#elif OGRE_CPU == OGRE_CPU_ARM && defined( OGRE_USE_SIMD )
+#elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD == 1
 //    #if OGRE_DOUBLE_PRECISION == 1
 //        #include "NEON/Double/OgreArrayAabb.h"
 //    #else

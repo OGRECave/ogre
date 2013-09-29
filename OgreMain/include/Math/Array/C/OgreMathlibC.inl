@@ -25,20 +25,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArraySphere_H__
-#define __ArraySphere_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
-
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
-#else
-	#include "C/OgreArraySphere.h"
-#endif
-
-#endif
+namespace Ogre
+{
+	//-----------------------------------------------------------------------------------
+	inline ArrayReal MathlibC::Modf4( ArrayReal x, ArrayReal &outIntegral )
+	{
+		return modf( x, &outIntegral );
+	}
+	//-----------------------------------------------------------------------------------
+	inline ArrayReal MathlibC::ACos4( ArrayReal x)
+	{
+		return acos( x );
+	}
+	//-----------------------------------------------------------------------------------
+	inline ArrayReal MathlibC::Sin4( ArrayReal x )
+	{
+		return sin( x );
+	}
+	//-----------------------------------------------------------------------------------
+	inline ArrayReal MathlibC::Cos4( ArrayReal x )
+	{
+		return cos( x );
+	}
+	//-----------------------------------------------------------------------------------
+	inline void MathlibC::SinCos4( ArrayReal x, ArrayReal &outSin, ArrayReal &outCos )
+	{
+		outSin = sin( x );
+		outCos = cos( x );
+	}
+}

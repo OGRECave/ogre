@@ -47,8 +47,8 @@ namespace Ogre
 		ArrayVector3 min( m_center - m_halfSize );
 		min.makeFloor( rhs.m_center - rhs.m_halfSize );
 
-		m_center	= ( max + min ) * Mathlib::HALF;
-		m_halfSize	= ( max - min ) * Mathlib::HALF;
+		m_center	= ( max + min ) * 0.5f;
+		m_halfSize	= ( max - min ) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayAabb::merge( const ArrayVector3& points )
@@ -59,8 +59,8 @@ namespace Ogre
 		ArrayVector3 min( m_center - m_halfSize );
 		min.makeFloor( points );
 
-		m_center	= ( max + min ) * Mathlib::HALF;
-		m_halfSize	= ( max - min ) * Mathlib::HALF;
+		m_center	= ( max + min ) * 0.5f;
+		m_halfSize	= ( max - min ) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayMaskR ArrayAabb::intersects( const ArrayAabb& b2 ) const
@@ -71,26 +71,23 @@ namespace Ogre
 		// ( abs( center.x - center2.x ) <= halfSize.x + halfSize2.x &&
 		//   abs( center.y - center2.y ) <= halfSize.y + halfSize2.y &&
 		//   abs( center.z - center2.z ) <= halfSize.z + halfSize2.z )
-		ArrayReal maskX = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[0] ),
-										sumHalfSizes.m_chunkBase[0] );
-		ArrayReal maskY = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[1] ),
-										sumHalfSizes.m_chunkBase[1] );
-		ArrayReal maskZ = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[2] ),
-										sumHalfSizes.m_chunkBase[2] );
+		ArrayMaskR maskX = Math::Abs( distance.m_chunkBase[0] ) <= sumHalfSizes.m_chunkBase[0];
+		ArrayMaskR maskY = Math::Abs( distance.m_chunkBase[1] ) <= sumHalfSizes.m_chunkBase[1];
+		ArrayMaskR maskZ = Math::Abs( distance.m_chunkBase[2] ) <= sumHalfSizes.m_chunkBase[2];
 		
-		return _mm_and_ps( _mm_and_ps( maskX, maskY ), maskZ );
+		return maskX & maskY & maskZ;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayAabb::volume(void) const
 	{
-		ArrayReal w = _mm_add_ps( m_halfSize.m_chunkBase[0], m_halfSize.m_chunkBase[0] ); // x * 2
-		ArrayReal h = _mm_add_ps( m_halfSize.m_chunkBase[1], m_halfSize.m_chunkBase[1] ); // y * 2
-		ArrayReal d = _mm_add_ps( m_halfSize.m_chunkBase[2], m_halfSize.m_chunkBase[2] ); // z * 2
+		ArrayReal w = m_halfSize.m_chunkBase[0] + m_halfSize.m_chunkBase[0]; // x * 2
+		ArrayReal h = m_halfSize.m_chunkBase[1] + m_halfSize.m_chunkBase[1]; // y * 2
+		ArrayReal d = m_halfSize.m_chunkBase[2] + m_halfSize.m_chunkBase[2]; // z * 2
 
-		return _mm_mul_ps( _mm_mul_ps( w, h ), d ); // w * h * d
+		return w * h * d;
 	}
 	//-----------------------------------------------------------------------------------
-	inline ArrayReal ArrayAabb::contains( const ArrayAabb &other ) const
+	inline ArrayMaskR ArrayAabb::contains( const ArrayAabb &other ) const
 	{
 		ArrayVector3 distance( m_center - other.m_center );
 
@@ -102,31 +99,25 @@ namespace Ogre
 		// ( abs( distance.x ) + other.m_halfSize.x <= m_halfSize.x &&
 		//   abs( distance.y ) + other.m_halfSize.y <= m_halfSize.y &&
 		//   abs( distance.z ) + other.m_halfSize.z <= m_halfSize.z )
-		ArrayReal maskX = _mm_cmple_ps( _mm_add_ps( MathlibSSE2::Abs4( distance.m_chunkBase[0] ),
-										other.m_halfSize.m_chunkBase[0] ), m_halfSize.m_chunkBase[0] );
-		ArrayReal maskY = _mm_cmple_ps( _mm_add_ps( MathlibSSE2::Abs4( distance.m_chunkBase[1] ),
-										other.m_halfSize.m_chunkBase[1] ), m_halfSize.m_chunkBase[1] );
-		ArrayReal maskZ = _mm_cmple_ps( _mm_add_ps( MathlibSSE2::Abs4( distance.m_chunkBase[2] ),
-										other.m_halfSize.m_chunkBase[2] ), m_halfSize.m_chunkBase[2] );
+		ArrayMaskR maskX = (Math::Abs( distance.m_chunkBase[0] ) + other.m_halfSize.m_chunkBase[0]) <= m_halfSize.m_chunkBase[0];
+		ArrayMaskR maskY = (Math::Abs( distance.m_chunkBase[1] ) + other.m_halfSize.m_chunkBase[1]) <= m_halfSize.m_chunkBase[1];
+		ArrayMaskR maskZ = (Math::Abs( distance.m_chunkBase[2] ) + other.m_halfSize.m_chunkBase[2]) <= m_halfSize.m_chunkBase[2];
 
-		return _mm_and_ps( _mm_and_ps( maskX, maskY ), maskZ );
+		return maskX & maskY & maskZ;
 	}
 	//-----------------------------------------------------------------------------------
-	inline ArrayReal ArrayAabb::contains( const ArrayVector3 &v ) const
+	inline ArrayMaskR ArrayAabb::contains( const ArrayVector3 &v ) const
 	{
 		ArrayVector3 distance( m_center - v );
 
 		// ( abs( distance.x ) <= m_halfSize.x &&
 		//   abs( distance.y ) <= m_halfSize.y &&
 		//   abs( distance.z ) <= m_halfSize.z )
-		ArrayReal maskX = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[0] ),
-										m_halfSize.m_chunkBase[0] );
-		ArrayReal maskY = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[1] ),
-										m_halfSize.m_chunkBase[1] );
-		ArrayReal maskZ = _mm_cmple_ps( MathlibSSE2::Abs4( distance.m_chunkBase[2] ),
-										m_halfSize.m_chunkBase[2] );
+		ArrayMaskR maskX = Math::Abs( distance.m_chunkBase[0] ) <= m_halfSize.m_chunkBase[0];
+		ArrayMaskR maskY = Math::Abs( distance.m_chunkBase[1] ) <= m_halfSize.m_chunkBase[1];
+		ArrayMaskR maskZ = Math::Abs( distance.m_chunkBase[2] ) <= m_halfSize.m_chunkBase[2];
 
-		return _mm_and_ps( _mm_and_ps( maskX, maskY ), maskZ );
+		return maskX & maskY & maskZ;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayAabb::distance( const ArrayVector3 &v ) const
@@ -137,15 +128,12 @@ namespace Ogre
 		// y = abs( distance.y ) - halfSize.y
 		// z = abs( distance.z ) - halfSize.z
 		// return max( min( x, y, z ), 0 ); //Return minimum between xyz, clamp to zero
-		distance.m_chunkBase[0] = _mm_sub_ps( MathlibSSE2::Abs4( distance.m_chunkBase[0] ),
-												m_halfSize.m_chunkBase[0] );
-		distance.m_chunkBase[1] = _mm_sub_ps( MathlibSSE2::Abs4( distance.m_chunkBase[1] ),
-												m_halfSize.m_chunkBase[1] );
-		distance.m_chunkBase[2] = _mm_sub_ps( MathlibSSE2::Abs4( distance.m_chunkBase[2] ),
-												m_halfSize.m_chunkBase[2] );
+		distance.m_chunkBase[0] = Math::Abs( distance.m_chunkBase[0] ) - m_halfSize.m_chunkBase[0];
+		distance.m_chunkBase[1] = Math::Abs( distance.m_chunkBase[1] ) - m_halfSize.m_chunkBase[1];
+		distance.m_chunkBase[2] = Math::Abs( distance.m_chunkBase[2] ) - m_halfSize.m_chunkBase[2];
 
-		return _mm_max_ps( _mm_min_ps( _mm_min_ps( distance.m_chunkBase[0],
-					distance.m_chunkBase[1] ), distance.m_chunkBase[2] ), _mm_setzero_ps() );
+		return Ogre::max( Ogre::min( Ogre::min(
+				distance.m_chunkBase[0], distance.m_chunkBase[1] ), distance.m_chunkBase[2] ), 0.0f );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayAabb::transformAffine( const ArrayMatrix4 &m )
@@ -154,26 +142,23 @@ namespace Ogre
 
 		m_center = m * m_center;
 
-		ArrayReal x = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[2] ), m_halfSize.m_chunkBase[2] );	// abs( m02 ) * z +
-		x = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[1] ), m_halfSize.m_chunkBase[1], x );			// abs( m01 ) * y +
-		x = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[0], x );			// abs( m00 ) * x
+		ArrayReal x = Math::Abs( m.m_chunkBase[2] ) * m_halfSize.m_chunkBase[2];			// abs( m02 ) * z +
+		x = ogre_madd( Math::Abs( m.m_chunkBase[1] ), m_halfSize.m_chunkBase[1], x );	// abs( m01 ) * y +
+		x = ogre_madd( Math::Abs( m.m_chunkBase[0] ), m_halfSize.m_chunkBase[0], x );	// abs( m00 ) * x
 
-		ArrayReal y = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[6] ), m_halfSize.m_chunkBase[2] );	// abs( m12 ) * z +
-		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[5] ), m_halfSize.m_chunkBase[1], y );			// abs( m11 ) * y +
-		y = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[4] ), m_halfSize.m_chunkBase[0], y );			// abs( m10 ) * x
+		ArrayReal y = Math::Abs( m.m_chunkBase[6] ) * m_halfSize.m_chunkBase[2];			// abs( m12 ) * z +
+		y = ogre_madd( Math::Abs( m.m_chunkBase[5] ), m_halfSize.m_chunkBase[1], y );	// abs( m11 ) * y +
+		y = ogre_madd( Math::Abs( m.m_chunkBase[4] ), m_halfSize.m_chunkBase[0], y );	// abs( m10 ) * x
 
-		ArrayReal z = _mm_mul_ps( Mathlib::Abs4( m.m_chunkBase[10] ), m_halfSize.m_chunkBase[2] );	// abs( m22 ) * z +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[9] ), m_halfSize.m_chunkBase[1], z );			// abs( m21 ) * y +
-		z = _mm_madd_ps( Mathlib::Abs4( m.m_chunkBase[8] ), m_halfSize.m_chunkBase[0], z );			// abs( m20 ) * x
+		ArrayReal z = Math::Abs( m.m_chunkBase[10] ) * m_halfSize.m_chunkBase[2];		// abs( m22 ) * z +
+		z = ogre_madd( Math::Abs( m.m_chunkBase[9] ), m_halfSize.m_chunkBase[1], z );	// abs( m21 ) * y +
+		z = ogre_madd( Math::Abs( m.m_chunkBase[8] ), m_halfSize.m_chunkBase[0], z );	// abs( m20 ) * x
 
 		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
 		//(which is ok since we need them to say 'false' to intersection tests)
-		x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, x,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[0], MathlibSSE2::INFINITY ) );
-		y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, y,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[1], MathlibSSE2::INFINITY ) );
-		z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, z,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[2], MathlibSSE2::INFINITY ) );
+		x = MathlibC::CmovRobust( MathlibC::INFINITY, x, m_halfSize.m_chunkBase[0] == MathlibC::INFINITY );
+		y = MathlibC::CmovRobust( MathlibC::INFINITY, y, m_halfSize.m_chunkBase[1] == MathlibC::INFINITY );
+		z = MathlibC::CmovRobust( MathlibC::INFINITY, z, m_halfSize.m_chunkBase[2] == MathlibC::INFINITY );
 
 		m_halfSize = ArrayVector3( x, y, z );
 	}

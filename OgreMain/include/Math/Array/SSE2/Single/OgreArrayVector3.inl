@@ -30,34 +30,9 @@ namespace Ogre
 {
 	/** HOW THIS WORKS:
 
-		As you may have been explained in OgreArrayVector3.h, ArraVector3 uses heap memory,
-		but operators can produce intermediate results that will live in stack memory, hence
-		ArrayVector3 comes into play.
-		The problem is that doing a = a + b, either a or b could intermediate vectors or
-		real arrayvectors. Hence we need the operators:
-		+ ( ArrayVector3, ArrayVector3 );		// -> Both are array vectors
-		+ ( ArrayVector3, ArrayVector3 );		// -> Both are intermediate vectors
-		+ ( ArrayVector3, ArrayInterVector );	// -> Mix (ver. 1)
-		+ ( ArrayInterVector, ArrayVector3 );	// -> Mix (ver. 2)
-
-		And repeat for every function & operator we've got. Some have to be written twice
-		(i.e. those taking one argument), some have to be written 4 times (two arguments)
-		In other words the number of variations is 2^args
-
-		In some cases we want to add scalars, so we also need the operators:
-		+ ( ArrayVector3, float scalar );		// -> a * 2.0f
-		+ ( float scalar, ArrayVector3 );		// -> 2.0f * a
-		+ ( ArrayInterVector, float scalar );	// -> a * 2.0f, a is intermediate
-		+ ( float scalar, ArrayInterVector );	// -> 2.0f * a, a is intermediate
-
-		Also consider that ArrayReal is a scalar but at vector level (not array level) i.e.
-		a * b.dotProduct( c ) -> where the result of b.dot( c ) is a ArrayReal scalar, then
-		we need another 4 '+' operators.
-		In total we would need 12 '+' operators where the code is almost identical.
-
-		Instead of writing 12 times the same code, we use macros:
+		Instead of writing like 12 times the same code, we use macros:
 		DEFINE_OPERATION( ArrayVector3, ArrayVector3, +, _mm_add_ps );
-		Means "define '+' operator that takes both arguments as ArrayVector3 and use
+		Means: "define '+' operator that takes both arguments as ArrayVector3 and use
 		the _mm_add_ps intrinsic to do the job"
 
 		Note that for scalars (i.e. floats) we use DEFINE_L_SCALAR_OPERATION/DEFINE_R_SCALAR_OPERATION
@@ -484,7 +459,7 @@ namespace Ogre
 	inline ArrayVector3 ArrayVector3::reflect( const ArrayVector3& normal ) const
 	{
         const ArrayReal twoPointZero = _mm_set_ps1( 2.0f );
- 		return ( *this - ( _mm_mul_ss( twoPointZero, this->dotProduct( normal ) ) * normal ) );
+ 		return ( *this - ( _mm_mul_ps( twoPointZero, this->dotProduct( normal ) ) * normal ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline int ArrayVector3::isNaN( void ) const
@@ -515,20 +490,17 @@ namespace Ogre
 		//xVec = x > 0 ? Vector3::UNIT_X : Vector3::NEGATIVE_UNIT_X;
 		ArrayReal sign = MathlibSSE2::Cmov4( _mm_set1_ps( 1.0f ), _mm_set1_ps( -1.0f ),
 											_mm_cmpgt_ps( m_chunkBase[0], _mm_setzero_ps() ) );
-		ArrayVector3 xVec( _mm_mul_ps( _mm_set1_ps( 1.0f ), sign ),
-								_mm_setzero_ps(), _mm_setzero_ps() );
+		ArrayVector3 xVec( sign, _mm_setzero_ps(), _mm_setzero_ps() );
 
 		//yVec = y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
 		sign = MathlibSSE2::Cmov4( _mm_set1_ps( 1.0f ), _mm_set1_ps( -1.0f ),
 									_mm_cmpgt_ps( m_chunkBase[1], _mm_setzero_ps() ) );
-		ArrayVector3 yVec( _mm_setzero_ps(), _mm_mul_ps( _mm_set1_ps( 1.0f ), sign ),
-								_mm_setzero_ps() );
+		ArrayVector3 yVec( _mm_setzero_ps(), sign, _mm_setzero_ps() );
 
 		//zVec = z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
 		sign = MathlibSSE2::Cmov4( _mm_set1_ps( 1.0f ), _mm_set1_ps( -1.0f ),
 									_mm_cmpgt_ps( m_chunkBase[2], _mm_setzero_ps() ) );
-		ArrayVector3 zVec( _mm_setzero_ps(), _mm_setzero_ps(),
-								_mm_mul_ps( _mm_set1_ps( 1.0f ), sign ) );
+		ArrayVector3 zVec( _mm_setzero_ps(), _mm_setzero_ps(), sign );
 
 		//xVec = absx > absz ? xVec : zVec
 		ArrayReal mask = _mm_cmpgt_ps( absx, absz );
@@ -614,10 +586,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 
 #undef DEFINE_OPERATION
+#undef DEFINE_L_SCALAR_OPERATION
 #undef DEFINE_R_SCALAR_OPERATION
+#undef DEFINE_L_OPERATION
 #undef DEFINE_R_OPERATION
 #undef DEFINE_DIVISION
+#undef DEFINE_L_DIVISION
 #undef DEFINE_R_SCALAR_DIVISION
+#undef DEFINE_L_SCALAR_DIVISION
 #undef DEFINE_R_DIVISION
 
 #undef DEFINE_UPDATE_OPERATION

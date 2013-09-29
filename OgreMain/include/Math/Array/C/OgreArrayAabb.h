@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __SSE2_ArrayAabb_H__
-#define __SSE2_ArrayAabb_H__
+#ifndef __C_ArrayAabb_H__
+#define __C_ArrayAabb_H__
 
 #ifndef __ArrayAabb_H__
 	#error "Don't include this file directly. include Math/Array/OgreArrayAabb.h"

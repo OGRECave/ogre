@@ -25,20 +25,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArraySphere_H__
-#define __ArraySphere_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
+#ifndef __C_BooleanMask_H__
+#define __C_BooleanMask_H___
 
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
-#else
-	#include "C/OgreArraySphere.h"
+#ifndef __BooleanMask_H__
+	#error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
 #endif
+
+namespace Ogre
+{
+	class BooleanMask4
+	{
+	public:
+		enum
+		{
+			MASK_NONE			= 0,
+			MASK_X				= 1,
+			NUM_MASKS			= 2
+		};
+	public:
+		inline static ArrayMaskR getMask( bool x );
+		inline static ArrayMaskR getMask( bool booleans[1] );
+
+		/** Converts a SIMD mask into a mask that fits in 32-bit number
+		@remarks
+			@See IS_SET_MASK_X & co. to read the mask, since the result may need
+			byteswapping in some architectures (i.e. SSE2)
+		*/
+		inline static uint32 getScalarMask( ArrayMaskR mask );
+	};
+}
+
+#include "OgreBooleanMask.inl"
 
 #endif

@@ -129,7 +129,7 @@ namespace Ogre
 					else
 						arg2[i];
 		*/
-		static inline ArrayReal Cmov4( ArrayReal arg1, ArrayReal arg2, ArrayReal mask )
+		static inline ArrayReal Cmov4( ArrayReal arg1, ArrayReal arg2, ArrayMaskR mask )
 		{
 			assert( _mm_movemask_ps( _mm_cmpeq_ps( arg1, arg1 ) ) == 0x0f &&
 					_mm_movemask_ps( _mm_cmpeq_ps( arg2, arg2 ) ) == 0x0f &&
@@ -181,7 +181,7 @@ namespace Ogre
 		{
 			return _mm_or_pd( _mm_and_pd( arg1, mask ), _mm_andnot_pd( mask, arg2 ) );
 		}
-		static inline __m128i CmovRobust( __m128i arg1, __m128i arg2, __m128i mask )
+		static inline ArrayInt CmovRobust( ArrayInt arg1, ArrayInt arg2, ArrayMaskI mask )
 		{
 			return _mm_or_si128( _mm_and_si128( arg1, mask ), _mm_andnot_si128( mask, arg2 ) );
 		}
@@ -190,11 +190,11 @@ namespace Ogre
 		@return
 			r[i] = a[i] & b[i];
 		*/
-		static inline __m128 And( __m128 a, __m128 b )
+		static inline ArrayReal And( ArrayReal a, ArrayReal b )
 		{
 			return _mm_and_ps( a, b );
 		}
-		static inline __m128i And( __m128i a, __m128i b )
+		static inline ArrayInt And( ArrayInt a, ArrayInt b )
 		{
 			return _mm_and_si128( a, b );
 		}
@@ -335,7 +335,7 @@ namespace Ogre
 				x1 = x0 * (2 - d * x0) = 2 * x0 - d * x0 * x0
 				where x0 is the first approximation to the reciprocal of the divisor d, and x1 is a
 				better approximation. You must use this formula before multiplying with the dividend."
-			@param
+			@param val
 				4 floating point values. If it's zero, the returned value will be infinite,
 				which is the correct result, but it's slower than InvNonZero4
 			@return
@@ -367,7 +367,7 @@ namespace Ogre
 				x1 = x0 * (2 - d * x0) = 2 * x0 - d * x0 * x0
 				where x0 is the first approximation to the reciprocal of the divisor d, and x1 is a
 				better approximation. You must use this formula before multiplying with the dividend."
-			@param
+			@param val
 				4 floating point values. If it's zero, the returned value will be NaN
 			@return
 				1 / x (packed as 4 floats)
@@ -393,7 +393,7 @@ namespace Ogre
 				where x0 is the first approximation to the reciprocal square root of a, and x1 is a
 				better approximation. The order of evaluation is important. You must use this formula
 				before multiplying with a to get the square root."
-			@param
+			@param f
 				4 floating point values
 			@return
 				1 / sqrt( x ) (packed as 4 floats)
@@ -423,7 +423,7 @@ namespace Ogre
 				before multiplying with a to get the square root."
 
 				Warning: Passing a zero will return a NaN instead of infinity
-			@param
+			@param f
 				4 floating point values
 			@return
 				1 / sqrt( x ) (packed as 4 floats)
@@ -438,9 +438,9 @@ namespace Ogre
 		}
 
 		/**	Break x into fractional and integral parts
-			@param
+			@param x
 				4 floating point values. i.e. "2.57" (x4)
-			@param
+			@param outIntegral
 				The integral part of x. i.e. 2
 			@return
 				The fractional part of x. i.e. 0.57
@@ -448,7 +448,7 @@ namespace Ogre
 		static inline ArrayReal Modf4( ArrayReal x, ArrayReal &outIntegral );
 
 		/**	Returns the arccos of x
-			@param
+			@param x
 				4 floating point values
 			@return
 				arccos( x ) (packed as 4 floats)
@@ -456,7 +456,7 @@ namespace Ogre
 		static inline ArrayReal ACos4( ArrayReal x );
 
 		/**	Returns the sine of x
-			@param
+			@param x
 				4 floating point values
 			@return
 				sin( x ) (packed as 4 floats)
@@ -464,7 +464,7 @@ namespace Ogre
 		static ArrayReal Sin4( ArrayReal x );
 
 		/**	Returns the cosine of x
-			@param
+			@param x
 				4 floating point values
 			@return
 				cos( x ) (packed as 4 floats)
@@ -473,11 +473,11 @@ namespace Ogre
 
 		/**	Calculates the cosine & sine of x. Use this function if you need to calculate
 			both, as it is faster than calling Cos4 & Sin4 together.
-			@param
+			@param x
 				4 floating point values
-			@param
+			@param outSin
 				Output value, sin( x ) (packed as 4 floats)
-			@param
+			@param outCos
 				Output value, cos( x ) (packed as 4 floats)
 		*/
 		static void SinCos4( ArrayReal x, ArrayReal &outSin, ArrayReal &outCos );

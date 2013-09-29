@@ -25,20 +25,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArraySphere_H__
-#define __ArraySphere_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
+namespace Ogre
+{
+	//-----------------------------------------------------------------------------------
+	inline ArrayMaskR ArraySphere::intersects( const ArraySphere &s ) const
+	{
+		ArrayReal sqRadius	= m_radius + s.m_radius;
+		sqRadius			= sqRadius * sqRadius;
+		ArrayReal sqDist	= m_center.squaredDistance( s.m_center );
 
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
-#else
-	#include "C/OgreArraySphere.h"
-#endif
+		return sqDist <= sqRadius;
+	}
+	//-----------------------------------------------------------------------------------
+	inline ArrayMaskR ArraySphere::intersects( const ArrayVector3 &v ) const
+	{
+		ArrayReal sqRadius	= m_radius * m_radius;
+		ArrayReal sqDist	= m_center.squaredDistance( v );
 
-#endif
+		return sqDist <= sqRadius;
+	}
+}

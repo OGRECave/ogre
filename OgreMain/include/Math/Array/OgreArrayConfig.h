@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgrePlatformInformation.h"
 
-#ifdef OGRE_USE_SIMD
+#if OGRE_USE_SIMD == 1
 	#if OGRE_CPU == OGRE_CPU_X86
 		//x86/x64 - SSE2
 		#if OGRE_DOUBLE_PRECISION == 1
@@ -46,6 +46,7 @@ THE SOFTWARE.
 			#define ARRAY_PACKED_REALS 4
 			namespace Ogre {
 				typedef __m128 ArrayReal;
+				typedef __m128 ArrayMaskR;
 
 				#define ARRAY_REAL_ZERO _mm_setzero_ps()
 				#define ARRAY_INT_ZERO _mm_setzero_si128()
@@ -65,6 +66,7 @@ THE SOFTWARE.
 
 		namespace Ogre {
 			typedef __m128i ArrayInt;
+			typedef __m128i ArrayMaskI;
 		}
 
         ///r = (a * b) + c
@@ -106,6 +108,29 @@ THE SOFTWARE.
 	namespace Ogre {
 		typedef Real ArrayReal;
 		typedef Radian ArrayRadian;
+		typedef Radian ArrayRadian;
+		typedef uint32 ArrayInt;
+		typedef bool ArrayMaskR;
+		typedef bool ArrayMaskI;
+
+		#define CastIntToReal( x ) x
+		#define CastRealToInt( x ) x
+
+		#define ogre_madd( a, b, c )		( (c) + ( (a) * (b) ) )
+
+		#define OGRE_PREFETCH_T0( x ) ((void)0)
+		#define OGRE_PREFETCH_T1( x ) ((void)0)
+		#define OGRE_PREFETCH_T2( x ) ((void)0)
+		#define OGRE_PREFETCH_NTA( x ) ((void)0)
+
+		#define ARRAY_INT_ZERO 0
+
+		/// Input must be 16-byte aligned
+		#define CastArrayToReal( outFloatPtr, arraySimd )		(*(outFloatPtr) = arraySimd)
+
+		//Distance (in ArrayMemoryManager's slots) used to keep fetching data. This also
+		//means the memory manager needs to allocate extra memory for them.
+		#define OGRE_PREFETCH_SLOT_DISTANCE		0 //Must be multiple of ARRAY_PACKED_REALS
 	}
 #endif
 

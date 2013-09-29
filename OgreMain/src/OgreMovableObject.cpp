@@ -461,7 +461,8 @@ namespace Ogre {
 																		(objData.mVisibilityFlags);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
-			ArrayReal dotResult, mask;
+			ArrayReal dotResult;
+			ArrayMaskR mask;
 			ArrayVector3 centerPlusFlippedHS;
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[0].signFlip;
@@ -495,28 +496,28 @@ namespace Ogre {
 
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
-			ArrayReal tmpMask = Mathlib::Or(
+			ArrayMaskR tmpMask = Mathlib::Or(
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
 			//isVisible = isVisible() && (isCaster || includeNonCasters)
-			ArrayInt isVisible = Mathlib::And(
+			ArrayMaskI isVisible = Mathlib::And(
 								Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) ),
 								Mathlib::TestFlags4( Mathlib::Or( *visibilityFlags, includeNonCasters ),
 														Mathlib::SetAll( LAYER_SHADOW_CASTER ) ) );
-			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskI isReceiver= Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
 			finalMask				= Mathlib::And( finalMask, isVisible );
-			ArrayReal finalMskAsReal= CastIntToReal( finalMask );
-			ArrayReal receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+			ArrayMaskR finalMskAsReal= CastIntToReal( finalMask );
+			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
@@ -599,7 +600,8 @@ namespace Ogre {
 																		(objData.mVisibilityFlags);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
-			ArrayReal dotResult, mask;
+			ArrayReal dotResult;
+			ArrayMaskR mask;
 			ArrayVector3 centerPlusFlippedHS;
 			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
 																 planes[0].signFlip;
@@ -633,25 +635,25 @@ namespace Ogre {
 
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
-			ArrayReal tmpMask = Mathlib::Or(
+			ArrayMaskR tmpMask = Mathlib::Or(
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
 								mask );
 
 			//No need to check for casters as in cullFrustum. See function documentation
-			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
-			ArrayInt isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskI isReceiver= Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayInt finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
 			finalMask				= Mathlib::And( finalMask, isVisible );
-			ArrayReal finalMskAsReal= CastIntToReal( finalMask );
-			ArrayReal receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+			ArrayMaskR finalMskAsReal= CastIntToReal( finalMask );
+			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
@@ -722,11 +724,11 @@ namespace Ogre {
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Initialize mask to 0
-			ArrayInt mask = ARRAY_INT_ZERO;
+			ArrayMaskI mask = ARRAY_INT_ZERO;
 
 			for( size_t j=0; j<numFrustums; ++j )
 			{
-				ArrayReal tmpMask;
+				ArrayMaskR tmpMask;
 
 				//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 				ArrayReal dotResult;
@@ -772,7 +774,7 @@ namespace Ogre {
 
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
-			ArrayReal tmpMask = Mathlib::Or( Mathlib::Or(
+			ArrayMaskR tmpMask = Mathlib::Or( Mathlib::Or(
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
@@ -836,7 +838,7 @@ namespace Ogre {
 				lightSphere.setAll( *boundingSphere );
 
 				//Check if it intersects
-				ArrayInt rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
+				ArrayMaskI rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
 				ArrayReal distSimd = objSphere.m_center.distance( lightSphere.m_center ) -
 										lightSphere.m_radius;
 				CastArrayToReal( distance, distSimd );
@@ -891,22 +893,22 @@ namespace Ogre {
 			objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize;
 
 			//Ignore casters with infinite boxes
-			ArrayReal infMask = Mathlib::Or( Mathlib::Or(
+			ArrayMaskR infMask = Mathlib::Or( Mathlib::Or(
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
 							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
 
-			ArrayInt isVisible = Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
-			ArrayInt isCaster  = Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskI isCaster  = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_SHADOW_CASTER ) );
 
 			//Fuse result with visibility flag
 			// finalMask = ( visible&!infiniteAabb & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayInt finalMask = Mathlib::TestFlags4( Mathlib::And( sceneFlags, *visibilityFlags ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( Mathlib::And( sceneFlags, *visibilityFlags ),
 												Mathlib::AndNot( isVisible, CastRealToInt( infMask ) ) );
 			finalMask				= Mathlib::And( finalMask, isCaster );
-			ArrayReal casterMask	= CastIntToReal( finalMask );
+			ArrayMaskR casterMask	= CastIntToReal( finalMask );
 
 			//Merge with bounds only if they're visible. We first merge, then CMov its older
 			//value if the object isn't visible. Also do the same with the receiver-only aabb

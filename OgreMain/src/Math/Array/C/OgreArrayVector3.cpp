@@ -25,26 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArrayMatrix4_H__
-#define __ArrayMatrix4_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
+#include <OgreStableHeaders.h>
 
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArrayMatrix4.h"
-	#else
-		#include "SSE2/Single/OgreArrayMatrix4.h"
-	#endif
-#elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD == 1
-//    #if OGRE_DOUBLE_PRECISION == 1
-//        #include "NEON/Double/OgreArrayMatrix4.h"
-//    #else
-        #include "NEON/Single/OgreArrayMatrix4.h"
-//    #endif
-#else
-	#include "C/OgreArrayMatrix4.h"
-#endif
+#include "Math/Array/OgreArrayVector3.h"
 
-#endif
+namespace Ogre
+{
+	const ArrayVector3 ArrayVector3::ZERO( 0, 0, 0 );
+	const ArrayVector3 ArrayVector3::UNIT_X( 1, 0, 0 );
+	const ArrayVector3 ArrayVector3::UNIT_Y( 0, 1, 0 );
+	const ArrayVector3 ArrayVector3::UNIT_Z( 0, 0, 1 );
+	const ArrayVector3 ArrayVector3::NEGATIVE_UNIT_X( -1, 0, 0 );
+	const ArrayVector3 ArrayVector3::NEGATIVE_UNIT_Y( 0, -1, 0 );
+	const ArrayVector3 ArrayVector3::NEGATIVE_UNIT_Z( 0, 0, -1 );
+	const ArrayVector3 ArrayVector3::UNIT_SCALE( 1, 1, 1 );
+}

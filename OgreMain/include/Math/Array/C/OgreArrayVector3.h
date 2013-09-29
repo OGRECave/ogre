@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __SSE2_ArrayVector3_H__
-#define __SSE2_ArrayVector3_H__
+#ifndef __C_ArrayVector3_H__
+#define __C_ArrayVector3_H__
 
 #ifndef __ArrayVector3_H__
 	#error "Don't include this file directly. include Math/Array/OgreArrayVector3.h"
@@ -105,9 +105,9 @@ namespace Ogre
 		/// Sets all packed vectors to the same value as the scalar input vector
 		void setAll( const Vector3 &v )
 		{
-			m_chunkBase[0] = _mm_set_ps1( v.x );
-			m_chunkBase[1] = _mm_set_ps1( v.y );
-			m_chunkBase[2] = _mm_set_ps1( v.z );
+			m_chunkBase[0] = v.x;
+			m_chunkBase[1] = v.y;
+			m_chunkBase[2] = v.z;
 		}
 
 		/// Copies only one vector, by looking at the indexes
@@ -120,14 +120,9 @@ namespace Ogre
 
         inline ArrayVector3& operator = ( const Real fScalar )
         {
-			//set1_ps is a composite instrinsic using shuffling instructions.
-			//Store the actual result in a tmp variable and copy. We don't
-			//do m_chunkBase[1] = m_chunkBase[0]; because of a potential LHS
-			//depending on how smart the compiler was
-			ArrayReal tmp = _mm_set1_ps( fScalar );
-            m_chunkBase[0] = tmp;
-			m_chunkBase[1] = tmp;
-			m_chunkBase[2] = tmp;
+            m_chunkBase[0] = fScalar;
+			m_chunkBase[1] = fScalar;
+			m_chunkBase[2] = fScalar;
 
             return *this;
         }
@@ -165,19 +160,15 @@ namespace Ogre
 		inline friend ArrayVector3 operator / ( const ArrayVector3 &lhs, ArrayReal fScalar );
 
 		inline void operator += ( const ArrayVector3 &a );
-		inline void operator += ( const Real fScalar );
 		inline void operator += ( const ArrayReal fScalar );
 
 		inline void operator -= ( const ArrayVector3 &a );
-		inline void operator -= ( const Real fScalar );
 		inline void operator -= ( const ArrayReal fScalar );
 
 		inline void operator *= ( const ArrayVector3 &a );
-		inline void operator *= ( const Real fScalar );
 		inline void operator *= ( const ArrayReal fScalar );
 
 		inline void operator /= ( const ArrayVector3 &a );
-		inline void operator /= ( const Real fScalar );
 		inline void operator /= ( const ArrayReal fScalar );
 
 		/// @copydoc Vector3::length()
@@ -271,7 +262,7 @@ namespace Ogre
 		*/
 		inline Vector3 collapseMax( void ) const;
 
-		/** Conditional move update. @See MathlibSSE2::Cmov4
+		/** Conditional move update. @See MathlibC::Cmov4
 			Changes each of the four vectors contained in 'this' with
 			the replacement provided
 			@remarks
@@ -293,7 +284,7 @@ namespace Ogre
 		*/
 		inline void Cmov4( ArrayMaskR mask, const ArrayVector3 &replacement );
 
-		/** Conditional move update. @See MathlibSSE2::CmovRobust
+		/** Conditional move update. @See MathlibC::CmovRobust
 			Changes each of the four vectors contained in 'this' with
 			the replacement provided
 			@remarks
@@ -315,7 +306,7 @@ namespace Ogre
 		*/
 		inline void CmovRobust( ArrayMaskR mask, const ArrayVector3 &replacement );
 
-		/** Conditional move. @See MathlibSSE2::Cmov4
+		/** Conditional move. @See MathlibC::Cmov4
 			Selects between arg1 & arg2 according to mask
 			@remarks
 				If mask param contains anything other than 0's or 0xffffffff's

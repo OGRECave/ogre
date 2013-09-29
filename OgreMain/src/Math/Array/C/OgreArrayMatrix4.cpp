@@ -25,20 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ArraySphere_H__
-#define __ArraySphere_H__
 
-//This file is a proxy, it redirects to the proper file depending on platform
-#include "OgreArrayConfig.h"
+#include <OgreStableHeaders.h>
 
-#if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
-#else
-	#include "C/OgreArraySphere.h"
-#endif
+#include "Math/Array/OgreArrayMatrix4.h"
 
-#endif
+namespace Ogre
+{
+	const ArrayMatrix4 ArrayMatrix4::IDENTITY( ArrayMatrix4::createAllFromMatrix4(
+				Matrix4(	1, 0, 0, 0,
+							0, 1, 0, 0,
+							0, 0, 1, 0,
+							0, 0, 0, 1 ) ) );
+}

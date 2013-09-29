@@ -177,7 +177,7 @@ namespace Ogre
 																		(objData.mWorldRadius);
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
-			ArrayReal inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
+			ArrayMaskR inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
 																 Mathlib::SetAll( LAYER_VISIBILITY ) ));
 
 			//Merge with bounds only if they're in use (and not explicitly hidden,
