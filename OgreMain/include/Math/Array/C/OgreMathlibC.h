@@ -149,6 +149,16 @@ namespace Ogre
 			return a & b;
 		}
 
+		static inline ArrayMaskI And( ArrayMaskI a, ArrayInt b )
+		{
+			return (a ? 0xffffffff : 0) & b;
+		}
+
+		static inline ArrayMaskI And( ArrayInt a, ArrayMaskI b )
+		{
+			return a & (b ? 0xffffffff : 0);
+		}
+
 		static inline ArrayMaskI And( ArrayMaskI a, ArrayMaskI b )
 		{
 			return a & b;
@@ -167,6 +177,7 @@ namespace Ogre
 		{
 			return ( (a ? 0xffffffff : 0) & b ) != 0;
 		}
+
 		static inline ArrayMaskI TestFlags4( ArrayInt a,  ArrayMaskI b )
 		{
 			return ( a & (b ? 0xffffffff : 0) ) != 0;
@@ -181,6 +192,16 @@ namespace Ogre
 			return a & ~b;
 		}
 
+		static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayInt b )
+		{
+			return (a ? 0xffffffff : 0) & ~b;
+		}
+
+		static inline ArrayMaskI AndNot( ArrayInt a, ArrayMaskI b )
+		{
+			return a & (b ? 0 : 0xffffffff);
+		}
+
 		/** Returns the result of "a | b"
 		@return
 			r[i] = a[i] | b[i];
@@ -192,6 +213,15 @@ namespace Ogre
 		static inline ArrayMaskI Or( ArrayMaskI a, ArrayMaskI b )
 		{
 			return a | b;
+		}
+
+		static inline ArrayMaskI Or( ArrayMaskI a, ArrayInt b )
+		{
+			return ( (a ? 0xffffffff : 0) | b ) != 0;
+		}
+		static inline ArrayMaskI Or( ArrayInt a,  ArrayMaskI b )
+		{
+			return ( a | (b ? 0xffffffff : 0) ) != 0;
 		}
 
 		/** Returns the result of "a < b"
