@@ -41,9 +41,12 @@ namespace Ogre
 
 	class LodInputProvider;
 	class LodInputProviderMesh;
+	class LodInputProviderBuffer;
 	class LodOutputProvider;
 	class LodOutputProviderMesh;
 	class LodOutputProviderCompressedMesh;
+	class LodOutputProviderBuffer;
+	class LodOutputProviderCompressedBuffer;
 	class LodOutsideMarker;
 
 
@@ -52,6 +55,10 @@ namespace Ogre
 	struct LodLevel;
 	class LodConfigSerializer;
 	class MeshLodGenerator;
+	class LodWorkQueueWorker;
+	class LodWorkQueueInjector;
+	struct LodWorkQueueRequest;
+	class LodWorkQueueInjectorListener;
 	struct LodData;
 
 

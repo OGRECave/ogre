@@ -28,11 +28,17 @@
 
 #include "OgreMeshLodGenerator.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreLodWorkQueueWorker.h"
+#include "OgreLodWorkQueueInjector.h"
+#include "OgreLodWorkQueueInjectorListener.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodInputProviderMesh.h"
+#include "OgreLodInputProviderBuffer.h"
 #include "OgreLodOutputProvider.h"
 #include "OgreLodOutputProviderMesh.h"
 #include "OgreLodOutputProviderCompressedMesh.h"
+#include "OgreLodOutputProviderBuffer.h"
+#include "OgreLodOutputProviderCompressedBuffer.h"
 #include "OgreLodCollapseCost.h"
 #include "OgreLodCollapseCostCurvature.h"
 #include "OgreLodCollapseCostProfiler.h"
@@ -118,10 +124,22 @@ void MeshLodGenerator::_configureMeshLodUsage( const LodConfig& lodConfig )
 
 MeshLodGenerator::MeshLodGenerator()
 {
+	if(!LodWorkQueueWorker::getSingletonPtr()){
+		mWQWorker = new LodWorkQueueWorker();
+	} else {
+		mWQWorker = NULL;
+	}
+	if(!LodWorkQueueInjector::getSingletonPtr()){
+		mWQInjector = new LodWorkQueueInjector();
+	} else {
+		mWQWorker = NULL;
+	}
 }
 
 MeshLodGenerator::~MeshLodGenerator()
 {
+	delete mWQWorker;
+	delete mWQInjector;
 }
 void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser )
 {
@@ -141,14 +159,27 @@ void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCost
 	if(collapser.isNull()) {
 		collapser = LodCollapserPtr(new LodCollapser());
 	}
-	if(input.isNull()) {
-		input = LodInputProviderPtr(new LodInputProviderMesh(lodConfig.mesh));
-	}
-	if(output.isNull()) {
-		if(lodConfig.advanced.useCompression){
-			output = LodOutputProviderPtr(new LodOutputProviderCompressedMesh(lodConfig.mesh));
-		} else {
-			output = LodOutputProviderPtr(new LodOutputProviderMesh(lodConfig.mesh));
+	if(lodConfig.advanced.useBackgroundQueue){
+		if(input.isNull()) {
+			input = LodInputProviderPtr(new LodInputProviderBuffer(lodConfig.mesh));
+		}
+		if(output.isNull()) {
+			if(lodConfig.advanced.useCompression){
+				output = LodOutputProviderPtr(new LodOutputProviderCompressedBuffer(lodConfig.mesh));
+			} else {
+				output = LodOutputProviderPtr(new LodOutputProviderBuffer(lodConfig.mesh));
+			}
+		}
+	} else {
+		if(input.isNull()) {
+			input = LodInputProviderPtr(new LodInputProviderMesh(lodConfig.mesh));
+		}
+		if(output.isNull()) {
+			if(lodConfig.advanced.useCompression){
+				output = LodOutputProviderPtr(new LodOutputProviderCompressedMesh(lodConfig.mesh));
+			} else {
+				output = LodOutputProviderPtr(new LodOutputProviderMesh(lodConfig.mesh));
+			}
 		}
 	}
 }
@@ -160,14 +191,22 @@ void MeshLodGenerator::_process( LodConfig& lodConfig, LodCollapseCost* cost, Lo
 	output->prepare(data);
 	computeLods(lodConfig, data, cost, output, collapser);
 	output->finalize(data);
-	output->inject();
-	_configureMeshLodUsage(lodConfig);
-	//lodConfig.mesh->buildEdgeList();
+	if(!lodConfig.advanced.useBackgroundQueue){
+		// This will be processed in LodWorkQueueInjector if we use background queue.
+		output->inject();
+		_configureMeshLodUsage(lodConfig);
+		//lodConfig.mesh->buildEdgeList();
+	}
 }
 void MeshLodGenerator::generateLodLevels( LodConfig& lodConfig, LodCollapseCostPtr cost, LodDataPtr data, LodInputProviderPtr input, LodOutputProviderPtr output, LodCollapserPtr collapser)
 {
 	_resolveComponents(lodConfig, cost, data, input, output, collapser);
-	_process(lodConfig, cost.get(), data.get(), input.get(), output.get(), collapser.get());
+	if(lodConfig.advanced.useBackgroundQueue){
+		LodWorkQueueWorker::getSingleton().addRequestToQueue(lodConfig, cost, data, input, output, collapser);
+	} else {
+		_process(lodConfig, cost.get(), data.get(), input.get(), output.get(), collapser.get());
+	}
+
 }
 
 void MeshLodGenerator::computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser)

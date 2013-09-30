@@ -83,6 +83,9 @@ public:
 protected:
 	void computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser);
 	void calcLodVertexCount(const LodLevel& lodLevel, size_t uniqueVertexCount, size_t& outVertexCountLimit, Real& outCollapseCostLimit);
+	
+	LodWorkQueueWorker* mWQWorker;
+	LodWorkQueueInjector* mWQInjector;
 };
 
 }

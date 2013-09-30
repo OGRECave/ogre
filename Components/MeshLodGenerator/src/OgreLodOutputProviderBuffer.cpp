@@ -1,0 +1,147 @@
+/*
+ * -----------------------------------------------------------------------------
+ * This source file is part of OGRE
+ * (Object-oriented Graphics Rendering Engine)
+ * For the latest info, see http://www.ogre3d.org/
+ *
+ * Copyright (c) 2000-2013 Torus Knot Software Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "OgreLodOutputProviderBuffer.h"
+#include "OgreLodData.h"
+#include "OgreMesh.h"
+#include "OgreSubMesh.h"
+#include "OgreHardwareBufferManager.h"
+
+namespace Ogre
+{
+	LodOutputBuffer& LodOutputProviderBuffer::getBuffer()
+	{
+		return mBuffer;
+	}
+
+	void LodOutputProviderBuffer::prepare( LodData* data )
+	{
+		
+		mBuffer.submesh.resize(data->mIndexBufferInfoList.size());
+	}
+
+	void LodOutputProviderBuffer::bakeManualLodLevel( LodData* data, String& manualMeshName )
+	{
+		// placeholder dummy
+		unsigned short submeshCount = mBuffer.submesh.size();
+		LodIndexBuffer buffer;
+		buffer.indexSize = 2;
+		buffer.indexCount = 0;
+		buffer.indexStart = 0;
+		buffer.indexBufferSize = 0;
+		for (unsigned short i = 0; i < submeshCount; i++) {
+			mBuffer.submesh[i].genIndexBuffers.push_back(buffer);
+		}
+	}
+
+	void LodOutputProviderBuffer::bakeLodLevel(LodData* data)
+	{
+		unsigned short submeshCount = mBuffer.submesh.size();
+
+		// Create buffers.
+		for (unsigned short i = 0; i < submeshCount; i++) {
+			vector<LodIndexBuffer>::type& lods = mBuffer.submesh[i].genIndexBuffers;
+			int indexCount = data->mIndexBufferInfoList[i].indexCount;
+			OgreAssert(indexCount >= 0, "");
+
+			lods.push_back(LodIndexBuffer());
+			if (indexCount == 0) {
+				lods.back().indexCount = 3;
+			} else {
+				lods.back().indexCount = indexCount;
+			}
+			lods.back().indexStart = 0;
+			lods.back().indexSize = data->mIndexBufferInfoList[i].indexSize;
+			lods.back().indexBufferSize = 0; // It means same as index count
+			lods.back().indexBuffer = new unsigned char[lods.back().indexCount * lods.back().indexSize];
+			if (data->mIndexBufferInfoList[i].indexSize == 2) {
+				data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) lods.back().indexBuffer;
+			} else {
+				data->mIndexBufferInfoList[i].buf.pint = (unsigned int*) lods.back().indexBuffer;
+			}
+
+			if (indexCount == 0) {
+				memset(data->mIndexBufferInfoList[i].buf.pshort, 0, 3 * data->mIndexBufferInfoList[i].indexSize);
+			}
+		}
+
+		// Fill buffers.
+		size_t triangleCount = data->mTriangleList.size();
+		for (size_t i = 0; i < triangleCount; i++) {
+			if (!data->mTriangleList[i].isRemoved) {
+				if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+					for (int m = 0; m < 3; m++) {
+						*(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
+							static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
+					}
+				} else {
+					for (int m = 0; m < 3; m++) {
+						*(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
+							static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
+					}
+				}
+			}
+		}
+	}
+
+void LodOutputProviderBuffer::inject()
+{
+	unsigned short submeshCount = mBuffer.submesh.size();
+	OgreAssert(mMesh->getNumSubMeshes() == submeshCount, "");
+	mMesh->removeLodLevels();
+	for (unsigned short i = 0; i < submeshCount; i++) {
+		SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+		typedef vector<LodIndexBuffer>::type GenBuffers;
+		GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
+
+		int buffCount = buffers.size();
+		for (int i=0; i<buffCount;i++) {
+			LodIndexBuffer& buff = buffers[i];
+			int indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
+			OgreAssert(buff.indexCount >= 0, "");
+			lods.push_back(OGRE_NEW IndexData());
+			lods.back()->indexStart = buff.indexStart;
+			lods.back()->indexCount = buff.indexCount;
+			if(indexCount != 0) {
+				if(i > 0 && buffers[i-1].indexBuffer == buff.indexBuffer){
+					lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
+				} else {
+					lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+						buff.indexSize == 2 ?
+						HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
+						indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+					int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
+					void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
+					memcpy(pOutBuff, buff.indexBuffer, sizeInBytes);
+					lods.back()->indexBuffer->unlock();
+				}
+			}
+		}
+	}
+}
+}
