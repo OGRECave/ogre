@@ -33,6 +33,28 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	// forward decls
+	class LodCollapseCost;
+	class LodCollapseCostCurvature;
+	class LodCollapseCostOutside;
+	class LodCollapseCostProfiler;
+
+	class LodInputProvider;
+	class LodInputProviderMesh;
+	class LodOutputProvider;
+	class LodOutputProviderMesh;
+	class LodOutputProviderCompressedMesh;
+	class LodOutsideMarker;
+
+
+	class LodCollapser;
+	struct LodConfig;
+	struct LodLevel;
+	class LodConfigSerializer;
+	class MeshLodGenerator;
+	struct LodData;
+
+
 	typedef GeneralAllocatedObject MeshLodAlloc;
 }
 

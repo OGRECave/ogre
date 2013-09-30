@@ -30,6 +30,7 @@
 #define __LogConfig_H_
 
 #include "OgreLodPrerequisites.h"
+
 #include "OgreMesh.h"
 #include "OgreLodStrategy.h"
 
@@ -121,34 +122,20 @@ struct _OgreLodExport LodLevel {
 };
 
 struct _OgreLodExport LodConfig {
-	MeshPtr mesh; /// The mesh which we want to reduce.
-	LodStrategy* strategy; /// Lod strategy to use.
+	MeshPtr mesh;
+	LodStrategy* strategy;
 
 	typedef vector<LodLevel>::type LodLevelList;
-	LodLevelList levels; /// Info about Lod levels
+	LodLevelList levels;
 
 	struct Advanced {
-		/// Whether you want to process it immediatelly on main thread or you want to use Ogre::WorkQueue.
-		/// If you use workqueue the generator will return immediately, after processed in background,
-		/// the LodWorkQueueInjector will inject it in frameEnd event when rendering next frame. (enabled by default)
 		bool useBackgroundQueue;
-		/// If enabled, it allows up to 50% smaller index buffers by storing once shared faces with frame shifting.
-		/// There is no performance disadvantage! (enabled by default)
 		bool useCompression;
-		/// Use vertex normals to improve quality. Bit slower to generate, but it has better quality most of the time.
-		/// (enabled by default)
 		bool useVertexNormals;
-		/// Faces inside a house can't be seen from far away. Weightening outside allows to remove those internal faces.
-		/// It makes generation smaller and it is not 100% accurate. Set it to 0.0 to disable.
-		/// (disabled by default)
 		Ogre::Real outsideWeight;
-		/// If outsideWeight is enabled, this will set the angle how deep the algorithm can walk inside the mesh.
-		/// This value is an acos number between -1 and 1. (by default it is 0 which means 90 degree)
 		Ogre::Real outsideWalkAngle;
-		/// If the algorithm makes errors, you can fix it, by adding the edge to the profile.
 		LodProfile profile;
 		Advanced() :
-			useBackgroundQueue(true),
 			useCompression(true),
 			useVertexNormals(true),
 			outsideWeight(0.0),

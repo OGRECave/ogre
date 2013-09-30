@@ -25,8 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-#include "OgreOutsideMarker.h"
+#include "OgreLodOutsideMarker.h"
 #include "OgreMeshManager.h"
 #include "OgreRoot.h"
 #include "OgreHardwareBufferManager.h"
@@ -35,24 +34,23 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-OutsideMarker::OutsideMarker(ProgressiveMeshGenerator::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle, int step) :
-	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0), // How much floating point math error you have for equal values. This may depend on compiler flags.
+LodOutsideMarker::LodOutsideMarker(LodData::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle) :
 	mVertexListOrig(vertexList),
 	mWalkAngle(walkAngle),
-	mStep(step)
+	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0) // How much floating point math error you have for equal values. This may depend on compiler flags.
 {
 	assert(!vertexList.empty());
 	assert(mWalkAngle >= -1.0001f && mWalkAngle <= 1.0001f); // dot product range
 	assert(boundingSphereRadius > 0.0f); // invalid meshes are having a bounding sphere radius of 0.0!
 }
 
-void OutsideMarker::markOutside()
+void LodOutsideMarker::markOutside()
 {
 	generateHull();
 	markVertices();
 }
 
-void OutsideMarker::generateHull()
+void LodOutsideMarker::generateHull()
 {
 	initHull();
 	{
@@ -69,24 +67,27 @@ void OutsideMarker::generateHull()
 	cleanHull();
 }
 
-void OutsideMarker::initHull()
+void LodOutsideMarker::initHull()
 {
 	mHull.clear();
 	mHull.reserve(mVertexListOrig.size());
-	ProgressiveMeshGenerator::VertexList::iterator v, vEnd;
-	v = mVertexListOrig.begin();
-	vEnd = mVertexListOrig.end();
-	for (; v != vEnd; v++) {
+	mOutsideData.clear();
+	OutsideDataList::iterator itOut, itOutEnd;
+	mOutsideData.resize(mVertexListOrig.size());
+	itOut = mOutsideData.begin();
+	itOutEnd = mOutsideData.end();
+	for (; itOut != itOutEnd; itOut++) {
 		// reset output variables
-		v->isOuterWallVertex = false;
-		v->isInsideHull = false;
+		itOut->isOuterWallVertex = false;
+		itOut->isInsideHull = false;
 	}
 	// We need to find 4 vertices, which are on the convex hull to start the algorithm.
-	CHVertex* vertex[4] = { NULL, NULL, NULL, NULL };
+	CHVertex* vertex[4] = { nullptr, nullptr, nullptr, nullptr };
 
 	{
 		// Get 1. vertex: minimum y vertex
 		Real miny = std::numeric_limits<Real>::max();
+		LodData::VertexList::iterator v, vEnd;
 		v = mVertexListOrig.begin();
 		vEnd = mVertexListOrig.end();
 		for (; v != vEnd; v++) {
@@ -102,6 +103,7 @@ void OutsideMarker::initHull()
 	{
 		// Get 2. vertex: furthest from 1. vertex
 		Real maxdist = 0.0;
+		LodData::VertexList::iterator v, vEnd;
 		v = mVertexListOrig.begin();
 		vEnd = mVertexListOrig.end();
 		for (; v != vEnd; v++) {
@@ -117,6 +119,7 @@ void OutsideMarker::initHull()
 	{
 		// Get 3. vertex: furthest from 1. vertex and 2. vertex
 		Real maxdist = 0.0;
+		LodData::VertexList::iterator v, vEnd;
 		v = mVertexListOrig.begin();
 		vEnd = mVertexListOrig.end();
 		for (; v != vEnd; v++) {
@@ -134,6 +137,7 @@ void OutsideMarker::initHull()
 		Real maxdist = 0.0f;
 		Plane plane(vertex[0]->position, vertex[1]->position, vertex[2]->position);
 		plane.normalise();
+		LodData::VertexList::iterator v, vEnd;
 		v = mVertexListOrig.begin();
 		vEnd = mVertexListOrig.end();
 		for (; v != vEnd; v++) {
@@ -153,10 +157,10 @@ void OutsideMarker::initHull()
 	mCentroid /= 4.0f;
 
 	// Mark vertices, so that they will not be processed again.
-	vertex[0]->isInsideHull = true;
-	vertex[1]->isInsideHull = true;
-	vertex[2]->isInsideHull = true;
-	vertex[3]->isInsideHull = true;
+	getOutsideData(vertex[0])->isInsideHull = true;
+	getOutsideData(vertex[1])->isInsideHull = true;
+	getOutsideData(vertex[2])->isInsideHull = true;
+	getOutsideData(vertex[3])->isInsideHull = true;
 
 	// Create the triangles
 	createTriangle(vertex[0], vertex[1], vertex[2]);
@@ -165,7 +169,7 @@ void OutsideMarker::initHull()
 	createTriangle(vertex[1], vertex[2], vertex[3]);
 }
 
-void OutsideMarker::createTriangle( CHVertex* v1, CHVertex* v2, CHVertex* v3 )
+void LodOutsideMarker::createTriangle( CHVertex* v1, CHVertex* v2, CHVertex* v3 )
 {
 	CHTriangle tri;
 	tri.removed = false;
@@ -180,31 +184,31 @@ void OutsideMarker::createTriangle( CHVertex* v1, CHVertex* v2, CHVertex* v3 )
 	mHull.push_back(tri);
 }
 
-Real OutsideMarker::getPointToLineSqraredDistance(CHVertex* x1, CHVertex* x2, CHVertex* p)
+Real LodOutsideMarker::getPointToLineSqraredDistance(CHVertex* x1, CHVertex* x2, CHVertex* p)
 {
 	Real up = ((x2->position - x1->position).crossProduct(x1->position - p->position)).squaredLength();
 	Real down = (x2->position - x1->position).squaredLength();
 	return up / down;
 }
 
-Real OutsideMarker::getTetrahedronVolume(CHVertex* a, CHVertex* b, CHVertex* c, CHVertex* d)
+Real LodOutsideMarker::getTetrahedronVolume(CHVertex* a, CHVertex* b, CHVertex* c, CHVertex* d)
 {
 	// V = |(a-d)*[(b-d)x(c-d)]| / 6
 	return std::abs((a->position - d->position).dotProduct((b->position - d->position).crossProduct(c->position - d->position))) / 6.0f;
 }
 
-OutsideMarker::CHVertex* OutsideMarker::getFurthestVertex(CHTriangle* tri)
+LodOutsideMarker::CHVertex* LodOutsideMarker::getFurthestVertex(CHTriangle* tri)
 {
 	// Find the furthest vertex from triangle plane towards the facing direction.
-	CHVertex* furthestVertex = NULL;
+	CHVertex* furthestVertex = nullptr;
 	Real furthestDistance = 0;
 	Plane plane(tri->normal, -tri->normal.dotProduct(tri->vertex[0]->position));
 	plane.normalise();
-	ProgressiveMeshGenerator::VertexList::iterator v, vEnd;
+	LodData::VertexList::iterator v, vEnd;
 	v = mVertexListOrig.begin();
 	vEnd = mVertexListOrig.end();
 	for (; v != vEnd; v++) {
-		if (v->isInsideHull) {
+		if (getOutsideData(&*v)->isInsideHull) {
 			continue;
 		}
 		Real dist = plane.getDistance(v->position);
@@ -216,9 +220,9 @@ OutsideMarker::CHVertex* OutsideMarker::getFurthestVertex(CHTriangle* tri)
 	return furthestVertex;
 }
 
-int OutsideMarker::addVertex( CHVertex* vertex )
+int LodOutsideMarker::addVertex( CHVertex* vertex )
 {
-	vertex->isInsideHull = true;
+	getOutsideData(vertex)->isInsideHull = true;
 	// We use class members for triangles and edges only to prevent allocation.
 	mVisibleTriangles.clear();
 	mEdges.clear();
@@ -231,7 +235,7 @@ int OutsideMarker::addVertex( CHVertex* vertex )
 	return mEdges.size();
 }
 
-void OutsideMarker::getVisibleTriangles( const CHVertex* target, CHTrianglePList& visibleTriangles )
+void LodOutsideMarker::getVisibleTriangles( const CHVertex* target, CHTrianglePList& visibleTriangles )
 {
 
 	CHTriangleList::iterator it = mHull.begin();
@@ -259,7 +263,7 @@ void OutsideMarker::getVisibleTriangles( const CHVertex* target, CHTrianglePList
 	}
 }
 
-void OutsideMarker::addEdge(CHEdgeList& edges, CHVertex* a, CHVertex* b)
+void LodOutsideMarker::addEdge(CHEdgeList& edges, CHVertex* a, CHVertex* b)
 {
 	// We need undirectional edges, so we sort the vertices by their pointer like integers.
 	// This is needed, because we want to remove edges which were inside multiple triangles,
@@ -271,7 +275,7 @@ void OutsideMarker::addEdge(CHEdgeList& edges, CHVertex* a, CHVertex* b)
 	}
 }
 
-bool OutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle& tri){
+bool LodOutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle& tri){
 
 	// The idea is that if all angle is smaller to that point, than it should be inside.
 	// NOTE: We assume that the vertex is on the triangle plane!
@@ -321,17 +325,17 @@ bool OutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle& t
 	return (b1 == b2);
 }
 
-bool OutsideMarker::isSamePosition( const Vector3& p0, const Vector3& p1 )
+bool LodOutsideMarker::isSamePosition( const Vector3& p0, const Vector3& p1 )
 {
 	return (std::abs(p0.x - p1.x) <= mEpsilon && std::abs(p0.y - p1.y) <= mEpsilon && std::abs(p0.z - p1.z) <= mEpsilon);
 }
 
-Real OutsideMarker::pointToLineDir(const Vector3& ptarget, const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& n)
+Real LodOutsideMarker::pointToLineDir(const Vector3& ptarget, const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& n)
 {
 	return n.crossProduct(p1 - p0).dotProduct(ptarget - p0);
 }
 
-bool OutsideMarker::isInsideLine( const Vector3& ptarget, const Vector3& p0, const Vector3& p1 )
+bool LodOutsideMarker::isInsideLine( const Vector3& ptarget, const Vector3& p0, const Vector3& p1 )
 {
 	// This function returns whether ptarget is between p0 and p1.
 	// It is outside if:
@@ -350,7 +354,7 @@ bool OutsideMarker::isInsideLine( const Vector3& ptarget, const Vector3& p0, con
 		&& len1 > len2); // Shorter
 }
 
-void OutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horizon)
+void LodOutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horizon)
 {
 	// Create edge list and remove triangles
 	CHTrianglePList::const_iterator it2 = tri.begin();
@@ -386,7 +390,7 @@ void OutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horizon)
 	horizon.resize(result);
 }
 
-void OutsideMarker::fillHorizon(CHEdgeList& horizon, CHVertex* target)
+void LodOutsideMarker::fillHorizon(CHEdgeList& horizon, CHVertex* target)
 {
 	CHTriangle tri;
 	tri.vertex[2] = target;
@@ -405,13 +409,13 @@ void OutsideMarker::fillHorizon(CHEdgeList& horizon, CHVertex* target)
 	}
 }
 
-bool OutsideMarker::isVisible(CHTriangle* t, Vector3& v)
+bool LodOutsideMarker::isVisible(CHTriangle* t, Vector3& v)
 {
 	// We don't need epsilon here, because we assume, that the centroid is not on the triangle.
 	return t->normal.dotProduct(t->vertex[0]->position) < t->normal.dotProduct(v);
 }
 
-void OutsideMarker::cleanHull()
+void LodOutsideMarker::cleanHull()
 {
 	// cleanHull will remove triangles, which are marked as "removed"
 	// For fast performance, it will swap last item into the place of removed items.
@@ -434,7 +438,7 @@ void OutsideMarker::cleanHull()
 	mHull.resize(end);
 }
 
-Ogre::MeshPtr OutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
+Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
 {
 	// Based on the wiki sample: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Generating+A+Mesh
 
@@ -467,12 +471,12 @@ Ogre::MeshPtr OutsideMarker::createConvexHullMesh(const String& meshName, const 
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
-			minBounds.x = std::min<Real>(minBounds.x, mHull[i].vertex[n]->position.x);
-			minBounds.y = std::min<Real>(minBounds.y, mHull[i].vertex[n]->position.y);
-			minBounds.z = std::min<Real>(minBounds.z, mHull[i].vertex[n]->position.z);
-			maxBounds.x = std::max<Real>(maxBounds.x, mHull[i].vertex[n]->position.x);
-			maxBounds.y = std::max<Real>(maxBounds.y, mHull[i].vertex[n]->position.y);
-			maxBounds.z = std::max<Real>(maxBounds.z, mHull[i].vertex[n]->position.z);
+			minBounds.x = std::min(minBounds.x, mHull[i].vertex[n]->position.x);
+			minBounds.y = std::min(minBounds.y, mHull[i].vertex[n]->position.y);
+			minBounds.z = std::min(minBounds.z, mHull[i].vertex[n]->position.z);
+			maxBounds.x = std::max(maxBounds.x, mHull[i].vertex[n]->position.x);
+			maxBounds.y = std::max(maxBounds.y, mHull[i].vertex[n]->position.y);
+			maxBounds.z = std::max(maxBounds.z, mHull[i].vertex[n]->position.z);
 		}
 	}
 
@@ -529,30 +533,35 @@ Ogre::MeshPtr OutsideMarker::createConvexHullMesh(const String& meshName, const 
 }
 
 template<typename T>
-void OutsideMarker::addHullTriangleVertices(std::vector<CHVertex*>& stack, T tri)
+void LodOutsideMarker::addHullTriangleVertices(std::vector<CHVertex*>& stack, T tri)
 {
-	if (!tri->vertex[0]->isOuterWallVertexInPass) {
-		tri->vertex[0]->isOuterWallVertexInPass = true;
-		tri->vertex[0]->isOuterWallVertex = true;
+	OutsideData* v0 = getOutsideData(tri->vertex[0]);
+	OutsideData* v1 = getOutsideData(tri->vertex[1]);
+	OutsideData* v2 = getOutsideData(tri->vertex[2]);
+
+	if (!v0->isOuterWallVertexInPass) {
+		v0->isOuterWallVertexInPass = true;
+		v0->isOuterWallVertex = true;
 		stack.push_back(tri->vertex[0]);
 	}
-	if (!tri->vertex[1]->isOuterWallVertexInPass) {
-		tri->vertex[1]->isOuterWallVertexInPass = true;
-		tri->vertex[1]->isOuterWallVertex = true;
+	if (!v1->isOuterWallVertexInPass) {
+		v1->isOuterWallVertexInPass = true;
+		v1->isOuterWallVertex = true;
 		stack.push_back(tri->vertex[1]);
 	}
-	if (!tri->vertex[2]->isOuterWallVertexInPass) {
-		tri->vertex[2]->isOuterWallVertexInPass = true;
-		tri->vertex[2]->isOuterWallVertex = true;
+
+	if (!v2->isOuterWallVertexInPass) {
+		v2->isOuterWallVertexInPass = true;
+		v2->isOuterWallVertex = true;
 		stack.push_back(tri->vertex[2]);
 	}
 }
 
-void OutsideMarker::markVertices()
+void LodOutsideMarker::markVertices()
 {
-	ProgressiveMeshGenerator::VertexList::iterator v, vEnd;
-	v = mVertexListOrig.begin();
-	vEnd = mVertexListOrig.end();
+	OutsideDataList::iterator v, vEnd;
+	v = mOutsideData.begin();
+	vEnd = mOutsideData.end();
 	for (;v != vEnd; v++) {
 		v->isOuterWallVertex = false;
 	}
@@ -562,16 +571,16 @@ void OutsideMarker::markVertices()
 	triEnd = mHull.end();
 	for (; tri != triEnd; tri++) {
 		stack.clear();
-		v = mVertexListOrig.begin();
-		vEnd = mVertexListOrig.end();
-		for (; v != vEnd; v++) {
+		v = mOutsideData.begin();
+		vEnd = mOutsideData.end();
+		for (;v != vEnd; v++) {
 			v->isOuterWallVertexInPass = false;
 		}
 		addHullTriangleVertices(stack, &*tri);
 		while (!stack.empty()) {
 			CHVertex* vert = stack.back();
 			stack.pop_back();
-			ProgressiveMeshGenerator::VTriangles::iterator it, itEnd;
+			LodData::VTriangles::iterator it, itEnd;
 			it = vert->triangles.begin();
 			itEnd = vert->triangles.end();
 			for (; it != itEnd; it++) {
@@ -583,7 +592,7 @@ void OutsideMarker::markVertices()
 	}
 }
 
-void OutsideMarker::CHTriangle::computeNormal()
+void LodOutsideMarker::CHTriangle::computeNormal()
 {
 	Vector3 e1 = vertex[1]->position - vertex[0]->position;
 	Vector3 e2 = vertex[2]->position - vertex[1]->position;
