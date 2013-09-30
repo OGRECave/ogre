@@ -4,9 +4,15 @@ using namespace Ogre;
 using namespace OgreBites;
 
 #include "OgreLodConfigSerializer.h"
+#include "OgreLodWorkQueueInjector.h"
+#include "OgreLodWorkQueueWorker.h"
+#include "OgreMeshLodGenerator.h"
+#include "OgreLodCollapseCostQuadric.h"
+#include "OgreLodInputProviderMesh.h"
+#include "OgreLodOutsideMarker.h"
+#include "OgreLodData.h"
+
 #include "OgrePixelCountLodStrategy.h"
-#include "OgreQueuedProgressiveMeshGenerator.h"
-#include "OgreProgressiveMeshGenerator.h"
 #include "OgreMeshSerializer.h"
 
 Sample_MeshLod::Sample_MeshLod()
@@ -36,7 +42,10 @@ void Sample_MeshLod::setupContent()
 	mHullNode->scale(1.001,1.001,1.001);
 	mHullEntity = NULL;
 #endif
-	PMInjector::getSingleton().setInjectorListener(this);
+	if(!MeshLodGenerator::getSingletonPtr()) {
+		new MeshLodGenerator();
+	}
+	Ogre::LodWorkQueueInjector::getSingleton().setInjectorListener(this);
 
 	// setup gui
 	setupControls();
@@ -47,7 +56,7 @@ void Sample_MeshLod::setupContent()
 
 void Sample_MeshLod::cleanupContent()
 {
-	PMInjector::getSingleton().removeInjectorListener();
+	Ogre::LodWorkQueueInjector::getSingleton().removeInjectorListener();
 	if(mMeshEntity){
 		mSceneMgr->destroyEntity(mMeshEntity);
 		mMeshEntity = 0;
@@ -157,7 +166,7 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 	mOutsideWalkAngle->setValue(0, false);
 	mLodLevelList->clearItems();
 	mManualMeshes->selectItem(0, false);
-	mWorkLevel.distance = std::numeric_limits<Real>::max();
+	mWorkLevel.distance = 1.0;
 	mWorkLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 	mWorkLevel.reductionValue = 0.0;
 	mWorkLevel.manualMeshName = "";
@@ -169,6 +178,25 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 	} else {
 		loadUserLod();
 	}
+#if SHOW_MESH_HULL
+	const String meshHullName("ConvexHull.mesh");
+	if(mHullEntity){
+		mHullNode->detachObject(mHullEntity);
+		mSceneMgr->destroyEntity(mHullEntity);
+		// Removes from the resources list.
+		mHullEntity = NULL;
+		Ogre::MeshManager::getSingleton().remove(meshHullName);
+	}
+
+	LodData data;
+	LodInputProviderMesh input(mLodConfig.mesh);
+	input.initData(&data);
+	LodOutsideMarker outsideMarker(data.mVertexList, data.mMeshBoundingSphereRadius, 0.0);
+	MeshPtr meshHull = outsideMarker.createConvexHullMesh(meshHullName);
+
+	mHullEntity = mSceneMgr->createEntity(meshHull);
+	mHullNode->attachObject(mHullEntity);
+#endif
 }
 
 bool Sample_MeshLod::loadConfig()
@@ -213,18 +241,16 @@ void Sample_MeshLod::saveConfig()
 void Sample_MeshLod::loadAutomaticLod()
 {
 	// Remove outdated Lod requests to reduce delay.
-	PMWorker::getSingleton().clearPendingLodRequests();
-#if DISABLE_THREADING
-	ProgressiveMeshGenerator pm;
-#else
-	QueuedProgressiveMeshGenerator pm;
-#endif
-	//pm.generateAutoconfiguredLodLevels(mLodConfig.mesh);
+	LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+
+	MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+	//gen.generateAutoconfiguredLodLevels(mLodConfig.mesh);
 	LodConfig lodConfig;
-	pm.getAutoconfig(mLodConfig.mesh, lodConfig);
+	gen.getAutoconfig(mLodConfig.mesh, lodConfig);
+	lodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
 	lodConfig.advanced.profile = mLodConfig.advanced.profile;
 	lodConfig.advanced.useVertexNormals = mLodConfig.advanced.useVertexNormals;
-	pm.generateLodLevels(lodConfig);
+	gen.generateLodLevels(lodConfig);
 	recreateEntity();
 }
 
@@ -239,25 +265,24 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 	}
 	mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
 	// Remove outdated Lod requests to reduce delay.
-	PMWorker::getSingleton().clearPendingLodRequests();
-#if DISABLE_THREADING
-	ProgressiveMeshGenerator pm;
-#else
-	QueuedProgressiveMeshGenerator pm;
-#endif
+	LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+
+	MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+	mLodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
 	if(!useWorkLod){
-		pm.generateLodLevels(mLodConfig);
-#if DISABLE_THREADING
-		recreateEntity();
+		gen.generateLodLevels(mLodConfig);
+#if !ENABLE_THREADING
+		recreateEntity(); // Needed for manual Lod levels
 #endif
 		forceLodLevel(-1);
 	} else {
 		LodConfig config(mLodConfig);
 		config.levels.clear();
 		config.levels.push_back(mWorkLevel);
-		pm.generateLodLevels(config);
-#if DISABLE_THREADING
-		recreateEntity();
+		gen.generateLodLevels(config);
+		//gen.generateLodLevels(config, new LodCollapseCostQuadric()); // Use quadric error
+#if !ENABLE_THREADING
+		recreateEntity(); // Needed for manual Lod levels
 #endif
 		forceLodLevel(1);
 	}
@@ -265,43 +290,34 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
 	mForcedLodLevel = lodLevelID;
-	if(!forceDelayed){
+	//if(!forceDelayed){
 		if(lodLevelID == -1 || mLodConfig.mesh->getNumLodLevels() <= 1) {
 			// Clear forced Lod level
 			mMeshEntity->setMeshLodBias(1.0, 0, std::numeric_limits<unsigned short>::max());
 		} else {
 			mMeshEntity->setMeshLodBias(1.0, lodLevelID, lodLevelID);
 		}
-	}
+	//}
 }
 size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 {
-#if SHOW_MESH_HULL
-	const String meshName("ConvexHull.mesh");
-	if(mHullEntity){
-		mHullNode->detachObject(mHullEntity);
-		mSceneMgr->destroyEntity(mHullEntity);
-		// Removes from the resources list.
-		mHullEntity = NULL;
-	}
-#endif
+
 	// The vertex buffer contains the same vertex position multiple times.
 	// To get the count of the vertices, which has unique positions, we can use progressive mesh.
 	// It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
 	LodConfig lodConfig;
 	lodConfig.mesh = mesh;
 	lodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
+	lodConfig.advanced.useBackgroundQueue = false; // Non-threaded
 	LodLevel lodLevel;
 	lodLevel.distance = 0;
 	lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 	lodLevel.reductionValue = 0.0;
 	lodConfig.levels.push_back(lodLevel);
-	ProgressiveMeshGenerator pm;
-	pm.generateLodLevels(lodConfig);
-#if SHOW_MESH_HULL
-	mHullEntity = mSceneMgr->createEntity(pm._generateConvexHull(meshName, (int)mWorkLevel.reductionValue - 1));
-	mHullNode->attachObject(mHullEntity);
-#endif
+	MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+	gen.generateLodLevels(lodConfig);
+	//ProgressiveMeshGenerator pm;
+	//pm.generateLodLevels(lodConfig);
 	return lodConfig.levels[0].outUniqueVertexCount;
 }
 
@@ -406,10 +422,10 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 	FileInfo& info = locPtr->at(0);
 
 	outPath = info.archive->getName();
-	if(!outPath.empty() && outPath[outPath.size()-1] != '/' && outPath[outPath.size()-1] != '\\')
+	if(outPath.back() != '/' && outPath.back() != '\\')
 		outPath += '/';
 	outPath += info.path;
-	if(!outPath.empty() && outPath[outPath.size()-1] != '/' && outPath[outPath.size()-1] != '\\')
+	if(outPath.back() != '/' && outPath.back() != '\\')
 		outPath += '/';
 	outPath += info.filename;
 
@@ -421,12 +437,15 @@ void Sample_MeshLod::addToProfile( Real cost )
 	LodConfig config(mLodConfig);
 	config.levels.clear();
 	config.levels.push_back(mWorkLevel);
-	ProgressiveMeshGenerator pm;
-	pm.generateLodLevels(config);
-
+	config.advanced.useBackgroundQueue = false;
+	MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+	LodCollapserPtr collapser(new LodCollapser());
+	LodDataPtr data(new LodData());
+	gen.generateLodLevels(config, LodCollapseCostPtr(), data, LodInputProviderPtr(), LodOutputProviderPtr(), collapser);
+	
 	ProfiledEdge pv;
-	if(pm._getLastVertexPos(pv.src)){
-		pm._getLastVertexCollapseTo(pv.dst);
+	if(collapser->_getLastVertexPos(data.get(), pv.src)){
+		collapser->_getLastVertexCollapseTo(data.get(), pv.dst);
 		// Prevent duplicates if you edit the same vertex twice.
 		int size = mLodConfig.advanced.profile.size();
 		for(int i=0;i<size;i++){
@@ -483,7 +502,11 @@ void Sample_MeshLod::sliderMoved(Slider* slider)
 		mWorkLevel.reductionValue = slider->getValue();
 		loadUserLod();
 	} else if (slider->getName() == "sldOutsideWeight") {
-		mLodConfig.advanced.outsideWeight = (mOutsideWeightSlider->getValue() * mOutsideWeightSlider->getValue()) / 10000;
+		if(mOutsideWeightSlider->getValue() == 100){
+			mLodConfig.advanced.outsideWeight = LodData::NEVER_COLLAPSE_COST;
+		} else {
+			mLodConfig.advanced.outsideWeight = (mOutsideWeightSlider->getValue() * mOutsideWeightSlider->getValue()) / 10000;
+		}
 		loadUserLod();
 	} else if (slider->getName() == "sldOutsideWalkAngle") {
 		mLodConfig.advanced.outsideWalkAngle = mOutsideWalkAngle->getValue();
@@ -505,6 +528,7 @@ void Sample_MeshLod::buttonHit( Button* button )
 			LodProfile& profile = mLodConfig.advanced.profile;
 			profile.erase(profile.begin() + mProfileList->getSelectionIndex());
 			mProfileList->removeItem(mProfileList->getSelectionIndex());
+			loadUserLod();
 		}
 	} else if(button->getName() == "btnRemoveSelectedLodLevel") {
 		removeLodLevel();
@@ -536,9 +560,10 @@ void Sample_MeshLod::buttonHit( Button* button )
 		//mTrayMgr->showOkDialog("Success", "Showing mesh from: " + filename);
 	} else if(button->getName() == "btnSaveMesh") {
 		if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible() && !mLodConfig.levels.empty()){
-			PMWorker::getSingleton().clearPendingLodRequests();
-			ProgressiveMeshGenerator pm; // Non-threaded
-			pm.generateLodLevels(mLodConfig);
+			LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+			MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+			mLodConfig.advanced.useBackgroundQueue = false; // Non-threaded
+			gen.generateLodLevels(mLodConfig);
 			forceLodLevel(-1); // disable Lod level forcing
 		}
 		String filename("");
@@ -555,13 +580,13 @@ void Sample_MeshLod::buttonHit( Button* button )
 	}
 }
 
-bool Sample_MeshLod::shouldInject( PMGenRequest* request )
+bool Sample_MeshLod::shouldInject( LodWorkQueueRequest* request )
 {
 	return true;
 }
 
-void Sample_MeshLod::injectionCompleted( PMGenRequest* request )
+void Sample_MeshLod::injectionCompleted( LodWorkQueueRequest* request )
 {
-	recreateEntity();
+	recreateEntity(); // Needed for manual lod levels.
 	forceLodLevel(mForcedLodLevel, false);
 }

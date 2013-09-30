@@ -4,18 +4,18 @@
 #include "SamplePlugin.h"
 #include "SdkSample.h"
 #include "OgreLodConfig.h"
-#include "OgreQueuedProgressiveMeshGenerator.h"
+#include "OgreMeshLodGenerator.h"
+#include "OgreLodWorkQueueInjectorListener.h"
 
 // To reduce checkboxes some developer features can be enabled with macros.
 #define SHOW_MESH_HULL 0
-#define DISABLE_THREADING 0
+#define ENABLE_THREADING 1
 
 class _OgreSampleClassExport Sample_MeshLod :
 	public OgreBites::SdkSample,
-	public Ogre::PMInjectorListener
+	public Ogre::LodWorkQueueInjectorListener
 {
 public:
-
 	Sample_MeshLod();
 protected:
 
@@ -33,8 +33,8 @@ protected:
 	void checkBoxToggled(OgreBites::CheckBox * box);
 
 // Queued Lod injector events:
-	bool shouldInject(Ogre::PMGenRequest* request);
-	void injectionCompleted(Ogre::PMGenRequest* request);
+	bool shouldInject(Ogre::LodWorkQueueRequest* request);
+	void injectionCompleted(Ogre::LodWorkQueueRequest* request);
 
 // Other functions:
 	void changeSelectedMesh(const Ogre::String& name); // Changes current mesh to a mesh with given mesh name.
