@@ -302,7 +302,7 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 	return mWorldGeometryRenderQueue;
 }
 //-----------------------------------------------------------------------
-Camera* SceneManager::createCamera( const String &name )
+Camera* SceneManager::createCamera( const String &name, bool isVisible )
 {
 	if( mCamerasByName.find( name ) != mCamerasByName.end() )
 	{
@@ -316,6 +316,9 @@ Camera* SceneManager::createCamera( const String &name )
 	c->mGlobalIndex = mCameras.size() - 1;
 	c->setName( name );
 	mCamerasByName[name] = c;
+
+	if( isVisible )
+		mVisibleCameras.push_back( c );
 
     return c;
 }
@@ -345,6 +348,12 @@ void SceneManager::destroyCamera(Camera *cam)
 	itor = efficientVectorRemove( mCameras, itor );
     OGRE_DELETE cam;
 	cam = 0;
+
+	{
+		FrustumVec::iterator it = std::find( mVisibleCameras.begin(), mVisibleCameras.end(), cam );
+		if( it != mVisibleCameras.end() )
+			efficientVectorRemove( mVisibleCameras, it );
+	}
 
 	//The node that was at the end got swapped and has now a different index
 	if( itor != mCameras.end() )
@@ -2176,10 +2185,6 @@ void SceneManager::buildLightList()
 {
 	mGlobalLightList.lights.clear();
 
-	//TODO: (dark_sylinc) Some cameras in mCamera may not be in use.
-	//Compo Mgr. will know which cameras will be active
-	FrustumVec frustums( mCameras.begin(), mCameras.end() );
-
 	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
 	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
@@ -2196,7 +2201,7 @@ void SceneManager::buildLightList()
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			Light::cullLights( numObjs, objData, mGlobalLightList, frustums );
+			Light::cullLights( numObjs, objData, mGlobalLightList, mVisibleCameras );
 		}
 
 		++it;
@@ -4618,7 +4623,7 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
 	{
-		return createCamera( "" );
+		return createCamera( "", true );
 	}
 	MovableObjectFactory* factory = 
 		Root::getSingleton().getMovableObjectFactory(typeName);

@@ -40,7 +40,57 @@ namespace Ogre
 	class Rectangle2D;
 	typedef vector<TexturePtr>::type TextureVec;
 
-	//class _OgreExport CompositorManager2 : public ResourceManager
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+
+	/** Main system for managing Render Targets through the use of nodes. All applications
+		must at least define a workspace definition and create a workspace instance in order
+		to start rendering.
+	@remarks
+		The CompositorManager2 works by defining definitions which tell how the instance will
+		behave.
+		The top down view is the following:
+			* Workspace
+				* Node
+					* Target
+						* PASS_SCENE
+						* PASS_QUAD
+						* PASS_CLEAR 
+						* PASS_STENCIL
+						* PASS_RESOLVE
+				* Shadow Node
+		A Node definition must be created first. Inside the Node Def. different passes can be defined
+		including which targets they should render to.
+		Once the definitions are set, a workspace instance must be created using addWorkspace
+		and rendering will start automatically.
+		Each definition is shared by all instances, and is assumed to be immutable (read only) for
+		the life time of those objects.
+	@par
+		If you wish to change the definitions, you should destroy all instances first. In theory
+		many changes can actually happen in real time without any harm, but that depends on how
+		the code was written and thus the behavior is undefined.
+	@par
+		A node has inputs (textures), local textures, and outputs. It can also directly global textures
+		that are defined in a workspace definition. There a few basic rules:
+			* Global Textures use the "global_" prefix. For example "global_myRT" is a global texture.
+			  Trying to create a Local texture with that name will throw.
+			* Global Textures can't be used as node input nor output.
+			* Textures that came as Input can be used as Output.
+			* A node may have no Input nor Output.
+			* Shadow Nodes can't have input, but can have output to be used with other nodes.
+	@par
+		Shadow Nodes are particular case of Nodes which are used for rendering shadow maps, and can
+		only be references from a PASS_SCENE object; and will be executed when that pass is.
+		After the pass is executed, its output can be used for other regular Nodes (i.e. for
+		postprocessing), which enables the possibility of easily creating RSM (Reflective Shadow
+		Maps) for Global Illumination calculations.
+	@par
+		For more information @see CompositorNode & @see CompositorShadowNode
+		*/
 	class _OgreExport CompositorManager2 : public ResourceAlloc
 	{
 		typedef map<IdString, CompositorNodeDef*>::type			CompositorNodeDefMap;
@@ -76,18 +126,29 @@ namespace Ogre
 		*/
 		void connectOutput( CompositorNode *finalNode, size_t inputChannel );
 
+		/// Returns true if a node definition with the given name exists
 		bool hasNodeDefinition( IdString nodeDefName ) const;
 
+		/// Returns the node definition with the given name. Throws if not found
 		const CompositorNodeDef* getNodeDefinition( IdString nodeDefName ) const;
 
+		/// Returns a new node definition. The name must be unique, throws otherwise.
 		CompositorNodeDef* addNodeDefinition( IdString name );
 
+		/// Returns the node definition with the given name. Throws if not found
 		const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
 
+		/// Returns a new node definition. The name must be unique, throws otherwise.
 		CompositorShadowNodeDef* addShadowNodeDefinition( IdString name );
 
+		/** Returns a new workspace definition. The name must be unique, throws otherwise.
+		@remarks
+			Setting workspace def's connections must be done *after* all node
+			definitions have been created
+		*/
 		CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 
+		/// Returns how many times _update has been called.
 		size_t getFrameCount(void) const					{ return mFrameCount; }
 
 		/** Get an appropriately defined 'null' texture, i.e. one which will always
@@ -103,11 +164,30 @@ namespace Ogre
 		/// @copydoc getSharedFullscreenTriangle
 		Rectangle2D* getSharedFullscreenQuad(void) const			{ return mSharedQuadFS; }
 
-		/**
-		@param defaultVp
-			Default viewport to use when a camera name wasn't specified explicitly in a
-			pass definition. This pointer can be null if you promise to use all explicit
-			camera names in your passes (and those cameras already exist)
+		/** Main function to start rendering. Creates a workspace instance based on a
+			workspace definition.
+		@param sceneManager
+			The SceneManager this workspace will be associated with. You can have manage
+			multiple scene managers within multiple workspace. It is also possible
+			for two workspaces to share the same scene manager.
+		@param finalRenderTarget
+			The final RT where the workspace will be rendered to. Usually the RenderWindow.
+			We need this pointer in order to correctly create RTTs that depend on
+			the final target's width, height, gamma & fsaa settings.
+			This pointer will be used for "connectOutput" channels
+			(@see CompositorWorkspaceDef::connectOutput)
+			In theory if none of your nodes use width & height relative to final RT &
+			you don't use connectOutput, this pointer could be null. Although it's not
+			recommended nor explicitly supported.
+		@param defaultCam
+			Default camera to use when a camera name wasn't specified explicitly in a
+			pass definition (i.e. PASS_SCENE passes). This pointer can be null if you
+			promise to use all explicit camera names in your passes (and those cameras
+			have already been created)
+		@param definitionName
+			The unique name of the workspace definition
+		@param bEnabled
+			True if this workspace should start enabled, false otherwise.
 		*/
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
@@ -118,6 +198,9 @@ namespace Ogre
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapAllFinalTargets( bool waitForVSync );
 	};
+
+	/** @} */
+	/** @} */
 }
 
 #include "OgreHeaderSuffix.h"
