@@ -145,6 +145,7 @@ namespace Ogre {
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         // Set up texture swizzling
+#if OGRE_NO_GLES3_SUPPORT == 0
         if(gleswIsSupported(3, 0))
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
@@ -160,6 +161,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_RED));
             }
         }
+#endif
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
