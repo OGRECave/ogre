@@ -641,7 +641,7 @@ namespace Ogre {
         else
             val = op.vertexData->vertexCount;
 
-		int trueInstanceNum = std::max<size_t>(op.numberOfInstances,1);
+		size_t trueInstanceNum = std::max<size_t>(op.numberOfInstances,1);
 		val *= trueInstanceNum;
 
         // account for a pass having multiple iterations

@@ -61,8 +61,8 @@ namespace Ogre {
     void GLES2TextureManager::createWarningTexture()
     {
         // Generate warning texture
-        size_t width = 8;
-        size_t height = 8;
+        uint32 width = 8;
+        uint32 height = 8;
 
         uint16* data = new uint16[width * height];
 

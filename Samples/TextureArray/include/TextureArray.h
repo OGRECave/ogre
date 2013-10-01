@@ -85,7 +85,7 @@ protected:
 
 
         // add all the textures to a 2d texture array
-		for (size_t i = 0; i < texNames.size(); i++)
+		for (uint32 i = 0; i < static_cast<uint32>(texNames.size()); i++)
 		{
             Image terrainTex;
             terrainTex.load(texNames[i], ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);

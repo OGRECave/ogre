@@ -658,7 +658,7 @@ namespace Ogre {
          */
         struct Box
         {
-            size_t left, top, right, bottom, front, back;
+            uint32 left, top, right, bottom, front, back;
 			/// Parameterless constructor for setting the members manually
             Box()
 				: left(0), top(0), right(1), bottom(1), front(0), back(1)
@@ -673,7 +673,7 @@ namespace Ogre {
             	@note Note that the left, top, and front edges are included 
  		           	but the right, bottom and back ones are not.
             */
-            Box( size_t l, size_t t, size_t r, size_t b ):
+            Box( uint32 l, uint32 t, uint32 r, uint32 b ):
                 left(l),
                 top(t),   
                 right(r),
@@ -694,7 +694,7 @@ namespace Ogre {
             	@note Note that the left, top, and front edges are included 
  		           	but the right, bottom and back ones are not.
             */
-            Box( size_t l, size_t t, size_t ff, size_t r, size_t b, size_t bb ):
+            Box( uint32 l, uint32 t, uint32 ff, uint32 r, uint32 b, uint32 bb ):
                 left(l),
                 top(t),   
                 right(r),
@@ -713,11 +713,11 @@ namespace Ogre {
             }
             
             /// Get the width of this box
-            size_t getWidth() const { return right-left; }
+            uint32 getWidth() const { return right-left; }
             /// Get the height of this box
-            size_t getHeight() const { return bottom-top; }
+            uint32 getHeight() const { return bottom-top; }
             /// Get the depth of this box
-            size_t getDepth() const { return back-front; }
+            uint32 getDepth() const { return back-front; }
         };
 
     

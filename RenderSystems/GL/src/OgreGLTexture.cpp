@@ -161,23 +161,23 @@ namespace Ogre {
 		// Allocate internal buffer so that glTexSubImageXD can be used
 		// Internal format
 		GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
-		size_t width = mWidth;
-		size_t height = mHeight;
-		size_t depth = mDepth;
+		uint32 width = mWidth;
+		uint32 height = mHeight;
+		uint32 depth = mDepth;
 
 		if(PixelUtil::isCompressed(mFormat))
 		{
 			// Compressed formats
-			size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+			GLsizei size = static_cast<GLsizei>(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat));
 			// Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
 			// accept a 0 pointer like normal glTexImageXD
 			// Run through this process for every mipmap to pregenerate mipmap piramid
 			uint8 *tmpdata = new uint8[size];
 			memset(tmpdata, 0, size);
 			
-			for(size_t mip=0; mip<=mNumMipmaps; mip++)
+			for(uint8 mip=0; mip<=mNumMipmaps; mip++)
 			{
-				size = PixelUtil::getMemorySize(width, height, depth, mFormat);
+				size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
 				switch(mTextureType)
 				{
 					case TEX_TYPE_1D:
@@ -218,7 +218,7 @@ namespace Ogre {
 		else
 		{
 			// Run through this process to pregenerate mipmap pyramid
-			for(size_t mip=0; mip<=mNumMipmaps; mip++)
+			for(uint8 mip=0; mip<=mNumMipmaps; mip++)
 			{
 				// Normal formats
 				switch(mTextureType)
@@ -401,9 +401,9 @@ namespace Ogre {
 		// only when mipmap generation is desired.
 		bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps(); 
 		
-		for(size_t face=0; face<getNumFaces(); face++)
+		for(GLint face=0; face<static_cast<GLint>(getNumFaces()); face++)
 		{
-			for(size_t mip=0; mip<=getNumMipmaps(); mip++)
+			for(uint8 mip=0; mip<=getNumMipmaps(); mip++)
 			{
 				GLHardwarePixelBuffer *buf = new GLTextureBuffer(mGLSupport, mName, getGLTextureTarget(), mTextureID, face, mip,
 						static_cast<HardwareBuffer::Usage>(mUsage), doSoftware && mip==0, mHwGamma, mFSAA);
@@ -433,7 +433,7 @@ namespace Ogre {
 		if(mipmap > mNumMipmaps)
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range",
 					"GLTexture::getBuffer");
-		unsigned int idx = face*(mNumMipmaps+1) + mipmap;
+		unsigned long idx = face*(mNumMipmaps+1) + mipmap;
 		assert(idx < mSurfaceList.size());
 		return mSurfaceList[idx];
 	}

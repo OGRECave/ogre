@@ -88,7 +88,7 @@ namespace Ogre {
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */
-        GL3PlusSurfaceDesc requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa);
+        GL3PlusSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
         /** Request the specify render buffer in case shared somewhere. Ignore
             silently if surface.buffer is 0.
         */

@@ -245,7 +245,7 @@ namespace Volume {
             const Vector3 &c5,
             const Vector3 &c6,
             const Vector3 &c7,
-            size_t &baseIndex
+            uint32 &baseIndex
             )
         {
             manual->position(c0);

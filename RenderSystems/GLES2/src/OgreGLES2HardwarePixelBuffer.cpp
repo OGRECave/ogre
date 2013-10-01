@@ -63,8 +63,8 @@ static int computeLog(GLuint value)
 }
 
 namespace Ogre {
-    GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(size_t width, size_t height,
-                                                     size_t depth, PixelFormat format,
+    GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
+                                                     uint32 depth, PixelFormat format,
                                                      HardwareBuffer::Usage usage)
         : HardwarePixelBuffer(width, height, depth, format, usage, false, false),
           mBuffer(width, height, depth, format),

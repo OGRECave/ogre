@@ -123,8 +123,8 @@ namespace Ogre {
 		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
         // Store basic stats
-        size_t width = mColour[0].buffer->getWidth();
-        size_t height = mColour[0].buffer->getHeight();
+        uint32 width = mColour[0].buffer->getWidth();
+        uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
@@ -132,7 +132,7 @@ namespace Ogre {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
 
         // Bind all attachment points to frame buffer
-        for(size_t x=0; x<maxSupportedMRTs; ++x)
+        for(unsigned int x=0; x<maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
@@ -188,7 +188,7 @@ namespace Ogre {
 		// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		for(unsigned int x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
@@ -261,8 +261,8 @@ namespace Ogre {
             glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &oldfb);
 
 			// Blit from multisample buffer to final buffer, triggers resolve
-			size_t width = mColour[0].buffer->getWidth();
-			size_t height = mColour[0].buffer->getHeight();
+			uint32 width = mColour[0].buffer->getWidth();
+			uint32 height = mColour[0].buffer->getHeight();
 			glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, mMultisampleFB);
 			glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, mFB);
 			glBlitFramebufferEXT(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -308,12 +308,12 @@ namespace Ogre {
 									  GL_RENDERBUFFER_EXT, 0 );
 	}
 
-    size_t GLFrameBufferObject::getWidth()
+    uint32 GLFrameBufferObject::getWidth()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getWidth();
     }
-    size_t GLFrameBufferObject::getHeight()
+    uint32 GLFrameBufferObject::getHeight()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getHeight();

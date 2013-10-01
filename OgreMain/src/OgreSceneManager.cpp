@@ -6713,7 +6713,7 @@ void SceneManager::updateDirtyInstanceManagers(void)
 }
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery* 
-SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
+SceneManager::createAABBQuery(const AxisAlignedBox& box, uint32 mask)
 {
     DefaultAxisAlignedBoxSceneQuery* q = OGRE_NEW DefaultAxisAlignedBoxSceneQuery(this);
     q->setBox(box);
@@ -6722,7 +6722,7 @@ SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
 }
 //---------------------------------------------------------------------
 SphereSceneQuery* 
-SceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
+SceneManager::createSphereQuery(const Sphere& sphere, uint32 mask)
 {
     DefaultSphereSceneQuery* q = OGRE_NEW DefaultSphereSceneQuery(this);
     q->setSphere(sphere);
@@ -6732,7 +6732,7 @@ SceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
 //---------------------------------------------------------------------
 PlaneBoundedVolumeListSceneQuery* 
 SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, 
-                                            unsigned long mask)
+                                            uint32 mask)
 {
     DefaultPlaneBoundedVolumeListSceneQuery* q = OGRE_NEW DefaultPlaneBoundedVolumeListSceneQuery(this);
     q->setVolumes(volumes);
@@ -6742,7 +6742,7 @@ SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volume
 
 //---------------------------------------------------------------------
 RaySceneQuery* 
-SceneManager::createRayQuery(const Ray& ray, unsigned long mask)
+SceneManager::createRayQuery(const Ray& ray, uint32 mask)
 {
     DefaultRaySceneQuery* q = OGRE_NEW DefaultRaySceneQuery(this);
     q->setRay(ray);
@@ -6751,7 +6751,7 @@ SceneManager::createRayQuery(const Ray& ray, unsigned long mask)
 }
 //---------------------------------------------------------------------
 IntersectionSceneQuery* 
-SceneManager::createIntersectionQuery(unsigned long mask)
+SceneManager::createIntersectionQuery(uint32 mask)
 {
 
     DefaultIntersectionSceneQuery* q = OGRE_NEW DefaultIntersectionSceneQuery(this);

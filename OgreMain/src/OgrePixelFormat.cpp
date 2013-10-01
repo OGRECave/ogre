@@ -96,7 +96,7 @@ namespace Ogre {
         return getDescriptionFor(format).elemBytes;
     }
 	//-----------------------------------------------------------------------
-	size_t PixelUtil::getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format)
+	size_t PixelUtil::getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format)
 	{
 		if(isCompressed(format))
 		{

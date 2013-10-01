@@ -327,7 +327,7 @@ namespace Ogre {
     		@param pixelFormat	Format of this buffer
     		@param pixelData    Pointer to the actual data
     	*/
-    	PixelBox(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, void *pixelData=0):
+    	PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
     		Box(0, 0, 0, width, height, depth),
     		data(pixelData), format(pixelFormat)
     	{
@@ -449,7 +449,7 @@ namespace Ogre {
 				width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
 				case, this does serious magic.
 		*/
-		static size_t getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format);
+		static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
 		
         /** Returns the property flags for this pixel format
           @return

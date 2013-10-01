@@ -190,7 +190,7 @@ namespace Ogre {
 		glProgramBinary(mGLHandle, 
 						binaryFormat, 
 						programBuffer,
-						sizeOfBuffer
+						static_cast<GLsizei>(sizeOfBuffer)
 						);
 
         glGetProgramiv(mGLHandle, GL_LINK_STATUS, &mLinked);
@@ -304,12 +304,12 @@ namespace Ogre {
                         case GCT_SAMPLERCUBE:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
-                                                                        def->elementSize * def->arraySize * sizeof(int));
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
                             break;
                         default:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getFloatPointer(def->physicalIndex),
-                                                                        def->elementSize * def->arraySize * sizeof(float));
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
                             break;
 
                     }
@@ -452,9 +452,9 @@ namespace Ogre {
 				{
                     if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                      params->getFloatPointer(index),
-                                                     currentUniform->mConstantDef->elementSize *
+                                                     static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
                                                      currentUniform->mConstantDef->arraySize *
-                                                     sizeof(float)))
+                                                     sizeof(float))))
                         return;
 				}
 			}

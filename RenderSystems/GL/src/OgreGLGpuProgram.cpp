@@ -198,7 +198,7 @@ void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params
 	{
 		if (i->second.variability & mask)
 		{
-			size_t logicalIndex = i->first;
+			GLuint logicalIndex = static_cast<GLuint>(i->first);
 			const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
 			// Iterate over the params, set in 4-float chunks (low-level)
 			for (size_t j = 0; j < i->second.currentSize; j+=4)

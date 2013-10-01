@@ -167,14 +167,14 @@ namespace Ogre {
         // Internal format
         GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat);
         GLenum internalformat = GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        uint32 width = mWidth;
+        uint32 height = mHeight;
+        uint32 depth = mDepth;
         
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
-            size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+            GLsizei size = static_cast<GLsizei>(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat));
             
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
@@ -182,7 +182,7 @@ namespace Ogre {
             
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
-            for (size_t mip = 0; mip <= mNumMipmaps; mip++)
+            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
@@ -192,7 +192,7 @@ namespace Ogre {
                                                       " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex)
                                                       );
 #endif
-                size = PixelUtil::getMemorySize(width, height, depth, mFormat);
+                size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 
 				switch(mTextureType)
 				{
@@ -521,11 +521,11 @@ namespace Ogre {
 
         for (size_t face = 0; face < getNumFaces(); face++)
         {
-			size_t width = mWidth;
-			size_t height = mHeight;
-			size_t depth = mDepth;
+			uint32 width = mWidth;
+			uint32 height = mHeight;
+			uint32 depth = mDepth;
 
-            for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
+            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLES2HardwarePixelBuffer *buf = OGRE_NEW GLES2TextureBuffer(mName,
                                                                             getGLES2TextureTarget(),
@@ -533,7 +533,7 @@ namespace Ogre {
                                                                             width, height, depth,
                                                                             GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma),
                                                                             GLES2PixelUtil::getGLOriginDataType(mFormat),
-                                                                            face,
+                                                                            static_cast<GLint>(face),
                                                                             mip,
                                                                             static_cast<HardwareBuffer::Usage>(mUsage),
                                                                             doSoftware && mip==0, mHwGamma, mFSAA);
@@ -573,7 +573,7 @@ namespace Ogre {
                         "GLES2Texture::getBuffer");
         }
 
-        unsigned int idx = face * (mNumMipmaps + 1) + mipmap;
+        unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }

@@ -579,7 +579,7 @@ namespace Ogre {
 	{
 	protected:
 		/// Type flag, allocated if requested
-		unsigned long mTypeFlag;
+		uint32 mTypeFlag;
 
 		/// Internal implementation of create method - must be overridden
 		virtual MovableObject* createInstanceImpl(
@@ -625,14 +625,14 @@ namespace Ogre {
 			to a number of different types of object, should you always wish them
 			to be treated the same in queries.
 		*/
-		void _notifyTypeFlags(unsigned long flag) { mTypeFlag = flag; }
+		void _notifyTypeFlags(uint32 flag) { mTypeFlag = flag; }
 
 		/** Gets the type flag for this factory.
 		@remarks
 			A type flag is like a query flag, except that it applies to all instances
 			of a certain type of object.
 		*/
-		unsigned long getTypeFlags(void) const { return mTypeFlag; }
+		uint32 getTypeFlags(void) const { return mTypeFlag; }
 
 	};
 	/** @} */

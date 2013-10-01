@@ -38,7 +38,7 @@ namespace Ogre
     class OSXPBuffer : public GLPBuffer, public GeneralAllocatedObject
     {
     public:
-        OSXPBuffer(PixelComponentType format, size_t width, size_t height );
+        OSXPBuffer(PixelComponentType format, uint32 width, uint32 height );
         ~OSXPBuffer();
         
         virtual GLContext *getContext();

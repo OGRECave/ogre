@@ -504,7 +504,7 @@ static const size_t depthBits[] =
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
     
-    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested

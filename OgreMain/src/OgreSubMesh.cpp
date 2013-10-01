@@ -361,7 +361,7 @@ namespace Ogre {
 			// just insert all indexes
 			for (size_t i = vertexData->vertexStart; i < vertexData->vertexCount; i++)
 			{
-				boxes [0].mIndices.insert (i);
+				boxes [0].mIndices.insert (static_cast<int>(i));
 			}
 
 		}

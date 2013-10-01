@@ -41,7 +41,7 @@ namespace Volume {
     protected:
         
         /// To have a little bit faster data access.
-        int mWidthTimesHeight;
+        unsigned long mWidthTimesHeight;
 
         /// The raw volume data.
         float *mData;

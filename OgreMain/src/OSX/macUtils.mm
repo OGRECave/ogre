@@ -44,7 +44,7 @@ namespace Ogre {
         //cut off .bundle if present
         if(CFStringHasSuffix(nameRef, CFSTR(".bundle"))) {
             CFStringRef nameTempRef = nameRef;
-            int end = CFStringGetLength(nameTempRef) - CFStringGetLength(CFSTR(".bundle"));
+            long end = CFStringGetLength(nameTempRef) - CFStringGetLength(CFSTR(".bundle"));
             nameRef = CFStringCreateWithSubstring(NULL, nameTempRef, CFRangeMake(0, end));
             CFRelease(nameTempRef);
         }

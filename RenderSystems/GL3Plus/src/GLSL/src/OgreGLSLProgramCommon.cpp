@@ -198,7 +198,7 @@ namespace Ogre {
 		// get size of binary
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
-        GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+        GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
 
         // load binary
 		OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,

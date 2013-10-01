@@ -318,10 +318,10 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 	if (ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy() == VSOCP_LOW ||
 		ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy() == VSOCP_MEDIUM)
 	{
-		const int curUsedSlots = mergedParams.size();
-		const int float1ParamCount = paramsTable[0].size();
-		const int float2ParamCount = paramsTable[1].size();
-		const int float3ParamCount = paramsTable[2].size();
+		const int curUsedSlots = static_cast<int>(mergedParams.size());
+		const int float1ParamCount = static_cast<int>(paramsTable[0].size());
+		const int float2ParamCount = static_cast<int>(paramsTable[1].size());
+		const int float3ParamCount = static_cast<int>(paramsTable[2].size());
 		int       reqSlots = 0;
 
 		// Compute the required slots.
@@ -453,7 +453,7 @@ bool ProgramProcessor::mergeParametersByCombination(const MergeCombination& comb
 	for (int i=0; i < 4; ++i)
 	{
 		ShaderParameterList& curParamList = paramsTable[i];		
-		int srcParameterTypeCount = combination.srcParameterTypeCount[i];
+		int srcParameterTypeCount = static_cast<int>(combination.srcParameterTypeCount[i]);
 		int srcParameterCount = 0;
 
 		while (srcParameterTypeCount > 0)

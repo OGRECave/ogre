@@ -78,7 +78,7 @@ namespace Ogre
 		if (newSplitPoints.size() < 3) // 3, not 2 since splits + 1 points
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
 			"PSSMShadowCameraSetup::setSplitPoints");
-		mSplitCount = newSplitPoints.size() - 1;
+		mSplitCount = static_cast<uint>(newSplitPoints.size() - 1);
 		mSplitPoints = newSplitPoints;
 		mOptimalAdjustFactors.resize(mSplitCount);
 	}
