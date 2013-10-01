@@ -89,11 +89,6 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    Light::LightTypes Light::getType(void) const
-    {
-        return mLightType;
-    }
-    //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)
     {
 		assert( dynamic_cast<SceneNode*>( mParentNode ) );
@@ -136,60 +131,6 @@ namespace Ogre {
 			//TODO: (dark_sylinc) Change bounds
 		}
 	}
-	//-----------------------------------------------------------------------
-	void Light::setSpotlightFalloff(Real val)
-	{
-		mSpotFalloff = val;
-	}
-    //-----------------------------------------------------------------------
-    const Radian& Light::getSpotlightInnerAngle(void) const
-    {
-        return mSpotInner;
-    }
-    //-----------------------------------------------------------------------
-    const Radian& Light::getSpotlightOuterAngle(void) const
-    {
-        return mSpotOuter;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getSpotlightFalloff(void) const
-    {
-        return mSpotFalloff;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDiffuseColour(Real red, Real green, Real blue)
-    {
-        mDiffuse.r = red;
-        mDiffuse.b = blue;
-        mDiffuse.g = green;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDiffuseColour(const ColourValue& colour)
-    {
-        mDiffuse = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Light::getDiffuseColour(void) const
-    {
-        return mDiffuse;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setSpecularColour(Real red, Real green, Real blue)
-    {
-        mSpecular.r = red;
-        mSpecular.b = blue;
-        mSpecular.g = green;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setSpecularColour(const ColourValue& colour)
-    {
-        mSpecular = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Light::getSpecularColour(void) const
-    {
-        return mSpecular;
-    }
     //-----------------------------------------------------------------------
     void Light::setAttenuation(Real range, Real constant,
                         Real linear, Real quadratic)
@@ -211,34 +152,9 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    Real Light::getAttenuationRange(void) const
-    {
-        return mRange;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationConstant(void) const
-    {
-        return mAttenuationConst;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationLinear(void) const
-    {
-        return mAttenuationLinear;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationQuadric(void) const
-    {
-        return mAttenuationQuad;
-    }
-    //-----------------------------------------------------------------------
 	void Light::setPowerScale(Real power)
 	{
 		mPowerScale = power;
-	}
-    //-----------------------------------------------------------------------
-	Real Light::getPowerScale(void) const
-	{
-		return mPowerScale;
 	}
     //-----------------------------------------------------------------------
     const String& Light::getMovableType(void) const
@@ -304,7 +220,6 @@ namespace Ogre {
 		vec.push_back("spotlightInner");
 		vec.push_back("spotlightOuter");
 		vec.push_back("spotlightFalloff");
-
 	}
 	//-----------------------------------------------------------------------
 	class LightDiffuseColourValue : public AnimableValue

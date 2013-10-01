@@ -97,7 +97,7 @@ namespace Ogre {
 
         /** Returns the light type.
         */
-        LightTypes getType(void) const;
+		LightTypes getType(void) const								{ return mLightType; }
 
         /** Sets the colour of the diffuse light given off by this source.
         @remarks
@@ -108,7 +108,7 @@ namespace Ogre {
             Diffuse light simulates the typical light emanating from light sources and affects the base colour
             of objects together with ambient light.
         */
-        void setDiffuseColour(Real red, Real green, Real blue);
+        inline void setDiffuseColour(Real red, Real green, Real blue);
 
         /** Sets the colour of the diffuse light given off by this source.
         @remarks
@@ -119,11 +119,11 @@ namespace Ogre {
             Diffuse light simulates the typical light emanating from light sources and affects the base colour
             of objects together with ambient light.
         */
-        void setDiffuseColour(const ColourValue& colour);
+        inline void setDiffuseColour(const ColourValue& colour);
 
         /** Returns the colour of the diffuse light given off by this light source (see setDiffuseColour for more info).
         */
-        const ColourValue& getDiffuseColour(void) const;
+		const ColourValue& getDiffuseColour(void) const				{ return mDiffuse; }
 
         /** Sets the colour of the specular light given off by this source.
         @remarks
@@ -134,7 +134,7 @@ namespace Ogre {
             Specular light affects the appearance of shiny highlights on objects, and is also dependent on the
             'shininess' Material value.
         */
-        void setSpecularColour(Real red, Real green, Real blue);
+        inline void setSpecularColour(Real red, Real green, Real blue);
 
         /** Sets the colour of the specular light given off by this source.
         @remarks
@@ -145,11 +145,11 @@ namespace Ogre {
             Specular light affects the appearance of shiny highlights on objects, and is also dependent on the
             'shininess' Material value.
         */
-        void setSpecularColour(const ColourValue& colour);
+		inline void setSpecularColour(const ColourValue& colour);
 
         /** Returns the colour of specular light given off by this light source.
         */
-        const ColourValue& getSpecularColour(void) const;
+        const ColourValue& getSpecularColour(void) const			{ return mSpecular; }
 
         /** Sets the attenuation parameters of the light source i.e. how it diminishes with distance.
         @remarks
@@ -174,19 +174,19 @@ namespace Ogre {
 
         /** Returns the absolute upper range of the light.
         */
-        Real getAttenuationRange(void) const;
+		Real getAttenuationRange(void) const						{ return mRange; }
 
         /** Returns the constant factor in the attenuation formula.
         */
-        Real getAttenuationConstant(void) const;
+		Real getAttenuationConstant(void) const						{ return mAttenuationConst; }
 
         /** Returns the linear factor in the attenuation formula.
         */
-        Real getAttenuationLinear(void) const;
+		Real getAttenuationLinear(void) const						{ return mAttenuationLinear; }
 
         /** Returns the quadric factor in the attenuation formula.
         */
-        Real getAttenuationQuadric(void) const;
+		Real getAttenuationQuadric(void) const						{ return mAttenuationQuad; }
 
         /** Sets the direction in which a light points.
         @remarks
@@ -219,15 +219,15 @@ namespace Ogre {
 
         /** Returns the angle covered by the spotlights inner cone.
         */
-        const Radian& getSpotlightInnerAngle(void) const;
+		const Radian& getSpotlightInnerAngle(void) const			{ return mSpotInner; }
 
         /** Returns the angle covered by the spotlights outer cone.
         */
-        const Radian& getSpotlightOuterAngle(void) const;
+		const Radian& getSpotlightOuterAngle(void) const			{ return mSpotOuter; }
 
         /** Returns the falloff between the inner and outer cones of the spotlight.
         */
-        Real getSpotlightFalloff(void) const;
+		Real getSpotlightFalloff(void) const						{ return mSpotFalloff; }
 
         /** Sets the angle covered by the spotlights inner cone.
         */
@@ -239,7 +239,7 @@ namespace Ogre {
 
         /** Sets the falloff between the inner and outer cones of the spotlight.
         */
-        void setSpotlightFalloff(Real val);
+        inline void setSpotlightFalloff(Real val);
 
         /** Set the near clip plane distance to be used by spotlights that use light
             clipping, allowing you to render spots as if they start from further
@@ -267,7 +267,7 @@ namespace Ogre {
         /** Set the scaling factor which indicates the relative power of a 
             light.
         */
-        Real getPowerScale(void) const;
+		Real getPowerScale(void) const								{ return mPowerScale; }
 
         /** @copydoc MovableObject::_updateRenderQueue */
 		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) {}
@@ -497,6 +497,8 @@ namespace Ogre {
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreLight.inl"
 
 #include "OgreHeaderPrefix.h"
 

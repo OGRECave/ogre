@@ -147,6 +147,7 @@ set (HEADER_FILES
   include/OgreIteratorWrappers.h
   include/OgreKeyFrame.h
   include/OgreLight.h
+  include/OgreLight.inl
   include/OgreLodConfig.h
   include/OgreLodListener.h
   include/OgreLodStrategy.h
