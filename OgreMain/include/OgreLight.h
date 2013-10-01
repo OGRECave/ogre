@@ -25,18 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _LIGHT_H__
-#define _LIGHT_H__
+#ifndef __LIGHT_H__
+#define __LIGHT_H__
 
 #include "OgrePrerequisites.h"
 
-#include "OgreColourValue.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreString.h"
 #include "OgreMovableObject.h"
-#include "OgrePlaneBoundedVolume.h"
-#include "OgreShadowCameraSetup.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -194,49 +188,20 @@ namespace Ogre {
         */
         Real getAttenuationQuadric(void) const;
 
-        /** Sets the position of the light.
-        @remarks
-            Applicable to point lights and spotlights only.
-        @note
-            This will be overridden if the light is attached to a SceneNode.
-        */
-        void setPosition(Real x, Real y, Real z);
-
-        /** Sets the position of the light.
-        @remarks
-            Applicable to point lights and spotlights only.
-        @note
-            This will be overridden if the light is attached to a SceneNode.
-        */
-        void setPosition(const Vector3& vec);
-
-        /** Returns the position of the light.
-        @note
-            Applicable to point lights and spotlights only.
-        */
-        const Vector3& getPosition(void) const;
-
         /** Sets the direction in which a light points.
         @remarks
             Applicable only to the spotlight and directional light types.
         @note
-            This will be overridden if the light is attached to a SceneNode.
-        */
-        void setDirection(Real x, Real y, Real z);
-
-        /** Sets the direction in which a light points.
-        @remarks
-            Applicable only to the spotlight and directional light types.
-        @note
-            This will be overridden if the light is attached to a SceneNode.
+            This direction will be concatenated with the parent SceneNode.
         */
         void setDirection(const Vector3& vec);
 
         /** Returns the light's direction.
         @remarks
             Applicable only to the spotlight and directional light types.
+			Try to cache the value instead of calling it multiple times in the same scope
         */
-        const Vector3& getDirection(void) const;
+        Vector3 getDirection(void) const;
 
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
@@ -304,35 +269,22 @@ namespace Ogre {
         */
         Real getPowerScale(void) const;
 
-        /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
-
-        /** @copydoc MovableObject::_notifyMoved */
-        void _notifyMoved(void);
-
-        /** @copydoc MovableObject::getBoundingBox */
-        const AxisAlignedBox& getBoundingBox(void) const;
-
         /** @copydoc MovableObject::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) {}
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
 
-        /** Retrieves the position of the light including any transform from nodes it is attached to. 
-        @param cameraRelativeIfSet If set to true, returns data in camera-relative units if that's been set up (render use)
-        */
-        const Vector3& getDerivedPosition(bool cameraRelativeIfSet = false) const;
-
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
-        const Vector3& getDerivedDirection(void) const;
+        Vector3 getDerivedDirection(void) const;
+		Vector3 getDerivedDirectionUpdated(void) const;
 
         /** @copydoc MovableObject::setVisible.
         @remarks
             Although lights themselves are not 'visible', setting a light to invisible
             means it no longer affects the scene.
         */
-        void setVisible(bool visible);
+        //void setVisible(bool visible);
 
         /** Gets the details of this light as a 4D vector.
         @remarks
@@ -341,10 +293,8 @@ namespace Ogre {
             example the vector can represent both position lights (w=1.0f)
             and directional lights (w=0.0f) and be used in the same 
             calculations.
-        @param cameraRelativeIfSet
-            If set to @c true, returns data in camera-relative units if that's been set up (render use).
         */
-        Vector4 getAs4DVector(bool cameraRelativeIfSet = false) const;
+        Vector4 getAs4DVector(void) const;
 
         /// Override to return specific type flag
         uint32 getTypeFlags(void) const;
@@ -352,37 +302,10 @@ namespace Ogre {
         /// @copydoc AnimableObject::createAnimableValue
         AnimableValuePtr createAnimableValue(const String& valueName);
 
-        /** Set this light to use a custom shadow camera when rendering texture shadows.
-        @remarks
-            This changes the shadow camera setup for just this light,  you can set
-            the shadow camera setup globally using SceneManager::setShadowCameraSetup
-        @see ShadowCameraSetup
-        */
-        void setCustomShadowCameraSetup(const ShadowCameraSetupPtr& customShadowSetup);
-
-        /** Reset the shadow camera setup to the default. 
-        @see ShadowCameraSetup
-        */
-        void resetCustomShadowCameraSetup(void);
-
-        /** Return a pointer to the custom shadow camera setup (null means use SceneManager global version). */
-        const ShadowCameraSetupPtr& getCustomShadowCameraSetup(void) const;
-
         /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+        virtual void visitRenderables(Renderable::Visitor* visitor, 
+										bool debugRenderables = false) {}
 
-        /** Gets the index at which this light is in the current render. 
-        @remarks
-            Lights will be present in the in a list for every renderable,
-            detected and sorted appropriately, and sometimes it's useful to know 
-            what position in that list a given light occupies. This can vary 
-            from frame to frame (and object to object) so you should not use this
-            value unless you're sure the context is correct.
-        */
-        size_t _getIndexInFrame() const { return mIndexInFrame; }
-        void _notifyIndexInFrame(size_t i) { mIndexInFrame = i; }
-        
         /** Sets the maximum distance away from the camera that shadows
             by this light will be visible.
         @remarks
@@ -451,9 +374,6 @@ namespace Ogre {
             from the main camera if the light doesn't have its own setting.
         */
         Real _deriveShadowFarClipDistance(const Camera* maincam) const;
-
-        /// Set the camera which this light should be relative to, for camera-relative rendering
-        void _setCameraRelative(Camera* cam);
 
         /** Sets a custom parameter for this Light, which may be used to 
             drive calculations for this specific Renderable, like GPU program parameters.
@@ -524,20 +444,14 @@ namespace Ogre {
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
     
     protected:
-        /// Internal method for synchronising with parent node (if any)
-        virtual void update(void) const;
-
         /// @copydoc AnimableObject::getAnimableDictionaryName
         const String& getAnimableDictionaryName(void) const;
         /// @copydoc AnimableObject::initialiseAnimableDictionary
         void initialiseAnimableDictionary(StringVector& vec) const;
 
         LightTypes mLightType;
-        Vector3 mPosition;
         ColourValue mDiffuse;
         ColourValue mSpecular;
-
-        Vector3 mDirection;
 
         Radian mSpotOuter;
         Radian mSpotInner;
@@ -548,32 +462,15 @@ namespace Ogre {
         Real mAttenuationLinear;
         Real mAttenuationQuad;
         Real mPowerScale;
-        size_t mIndexInFrame;
         bool mOwnShadowFarDist;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
-        
+
         Real mShadowNearClipDist;
         Real mShadowFarClipDist;
 
-
-        mutable Vector3 mDerivedPosition;
-        mutable Vector3 mDerivedDirection;
-        // Slightly hacky but unless we separate observed light render state from main Light...
-        mutable Vector3 mDerivedCamRelativePosition;
-        mutable bool mDerivedCamRelativeDirty;
-        Camera* mCameraToBeRelativeTo;
-
         /// Shared class-level name for Movable type.
         static String msMovableType;
-
-        mutable PlaneBoundedVolume mNearClipVolume;
-        mutable PlaneBoundedVolumeList mFrustumClipVolumes;
-        /// Is the derived transform dirty?
-        mutable bool mDerivedTransformDirty;
-
-        /// Pointer to a custom shadow camera setup.
-        mutable ShadowCameraSetupPtr mCustomShadowCameraSetup;
 
         typedef map<uint16, Vector4>::type CustomParameterMap;
         /// Stores the custom parameters for the light.
@@ -599,7 +496,8 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+} // namespace Ogre
+
 #include "OgreHeaderPrefix.h"
 
-} // namespace Ogre
-#endif // _LIGHT_H__
+#endif // __LIGHT_H__

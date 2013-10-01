@@ -109,6 +109,8 @@ namespace Ogre
 		@remarks
 			Do NOT call this function twice in a row without having called
 			nodeAttached in the middle
+		@par
+			outTransform.mParents[outTransform.mIndex] is reset to a dummy parent node
 		@param outTransform
 			Transform with filled pointers
 		@param depth

@@ -87,18 +87,9 @@ namespace Ogre
 			// generate view matrix if requested
 			if (out_view != NULL)
 			{
-				Vector3 pos;
-				if (sm.getCameraRelativeRendering())
-				{
-					pos = Vector3::ZERO;
-				}
-				else
-				{
-					pos = cam.getDerivedPosition();
-				}
-				*out_view = buildViewMatrix(pos, 
-					light.getDerivedDirection(), 
-					cam.getDerivedUp());
+				*out_view = buildViewMatrix(cam.getDerivedPosition(),
+											light.getDerivedDirection(), 
+											cam.getDerivedUp());
 			}
 
 			// generate projection matrix if requested
@@ -120,22 +111,19 @@ namespace Ogre
 		}
 		else if (light.getType() == Light::LT_POINT)
 		{
+			const Vector3 lightDerivedPos( light.getParentNode()->_getDerivedPosition() );
 			// target analogue to the default shadow textures
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane
 			// 0.5 is a little too close for angles
 			Vector3 target = cam.getDerivedPosition() + 
 				(cam.getDerivedDirection() * shadowOffset);
-			Vector3 lightDir = target - light.getDerivedPosition();
+			Vector3 lightDir = target - lightDerivedPos;
 			lightDir.normalise();
 
 			// generate view matrix if requested
 			if (out_view != NULL)
-			{
-				*out_view = buildViewMatrix(light.getDerivedPosition(), 
-					lightDir, 
-					cam.getDerivedUp());
-			}
+				*out_view = buildViewMatrix( lightDerivedPos, lightDir, cam.getDerivedUp());
 
 			// generate projection matrix if requested
 			if (out_proj != NULL)
@@ -154,7 +142,7 @@ namespace Ogre
 			{
 				out_cam->setProjectionType(PT_PERSPECTIVE);
 				out_cam->setDirection(lightDir);
-				out_cam->setPosition(light.getDerivedPosition());
+				out_cam->setPosition(lightDerivedPos);
 				out_cam->setFOVy(Degree(120));
 				out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
 				out_cam->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
@@ -162,12 +150,13 @@ namespace Ogre
 		}
 		else if (light.getType() == Light::LT_SPOTLIGHT)
 		{
+			const Vector3 lightDerivedPos( light.getParentNode()->_getDerivedPosition() );
 			// generate view matrix if requested
 			if (out_view != NULL)
 			{
-				*out_view = buildViewMatrix(light.getDerivedPosition(), 
-					light.getDerivedDirection(), 
-					cam.getDerivedUp());
+				*out_view = buildViewMatrix( lightDerivedPos,
+											light.getDerivedDirection(), 
+											cam.getDerivedUp());
 			}
 
 			// generate projection matrix if requested
@@ -187,7 +176,7 @@ namespace Ogre
 			{
 				out_cam->setProjectionType(PT_PERSPECTIVE);
 				out_cam->setDirection(light.getDerivedDirection());
-				out_cam->setPosition(light.getDerivedPosition());
+				out_cam->setPosition(lightDerivedPos);
 				out_cam->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
 				out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
 				out_cam->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
@@ -231,7 +220,7 @@ namespace Ogre
 				mBodyB.clip(sceneBB);
 
 			// form a convex hull of bodyB with the light position
-			mBodyB.extend(light.getDerivedPosition());
+			mBodyB.extend( light.getParentNode()->_getDerivedPosition() );
 
 			// clip bodyB with sceneBB
 			mBodyB.clip(sceneBB);

@@ -702,27 +702,21 @@ namespace Ogre {
     bool Frustum::isViewOutOfDate(void) const
     {
         // Attached to node?
-        if (mParentNode)
-        {
-            if (mRecalcView ||
-                mParentNode->_getDerivedOrientation() != mLastParentOrientation ||
-                mParentNode->_getDerivedPosition() != mLastParentPosition)
-            {
-                // Ok, we're out of date with SceneNode we're attached to
-                mLastParentOrientation = mParentNode->_getDerivedOrientation();
-                mLastParentPosition = mParentNode->_getDerivedPosition();
-                mRecalcView = true;
-            }
-        }
-        // Deriving reflection from linked plane?
-        if (mLinkedReflectPlane && 
-            !(mLastLinkedReflectionPlane == mLinkedReflectPlane->_getDerivedPlane()))
-        {
-            mReflectPlane = mLinkedReflectPlane->_getDerivedPlane();
-            mReflectMatrix = Math::buildReflectionMatrix(mReflectPlane);
-            mLastLinkedReflectionPlane = mLinkedReflectPlane->_getDerivedPlane();
-            mRecalcView = true;
-        }
+		if( mParentNode )
+		{
+			const Quaternion derivedOrient( mParentNode->_getDerivedOrientationUpdated() );
+			const Vector3 derivedPos( mParentNode->_getDerivedPosition() );
+
+			if (mRecalcView ||
+				derivedOrient != mLastParentOrientation ||
+				derivedPos != mLastParentPosition)
+			{
+				// Ok, we're out of date with SceneNode we're attached to
+				mLastParentOrientation = derivedOrient;
+				mLastParentPosition = derivedPos;
+				mRecalcView = true;
+			}
+		}
 
         return mRecalcView;
     }
@@ -962,20 +956,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::getWorldTransforms(Matrix4* xform) const 
     {
-        if (mParentNode)
-            *xform = mParentNode->_getFullTransform();
-        else
-            *xform = Matrix4::IDENTITY;
+		*xform = mParentNode->_getFullTransform();
     }
     //-----------------------------------------------------------------------
     Real Frustum::getSquaredViewDepth(const Camera* cam) const 
     {
         // Calc from centre
-        if (mParentNode)
-            return (cam->getDerivedPosition() 
-                - mParentNode->_getDerivedPosition()).squaredLength();
-        else
-            return 0;
+        return (cam->getDerivedPosition() - mParentNode->_getDerivedPosition()).squaredLength();
     }
     //-----------------------------------------------------------------------
     const LightList& Frustum::getLights(void) const 

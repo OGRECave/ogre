@@ -210,15 +210,7 @@ namespace Ogre {
         }
 
         // transform to parent space
-        if (mParentNode)
-        {
-            mOrientation =
-                mParentNode->_getDerivedOrientation().Inverse() * targetWorldOrientation;
-        }
-		else
-		{
-			mOrientation = targetWorldOrientation;
-		}
+		mOrientation = mParentNode->_getDerivedOrientationUpdated().Inverse() * targetWorldOrientation;
 
         // TODO If we have a fixed yaw axis, we mustn't break it by using the
         // shortest arc because this will sometimes cause a relative yaw
@@ -328,28 +320,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Camera::isViewOutOfDate(void) const
     {
+		const Quaternion derivedOrient( mParentNode->_getDerivedOrientationUpdated() );
+		const Vector3 derivedPos( mParentNode->_getDerivedPosition() );
+
         // Overridden from Frustum to use local orientation / position offsets
-        // Attached to node?
-        if (mParentNode != 0)
+        if (mRecalcView ||
+			derivedOrient != mLastParentOrientation ||
+			derivedPos != mLastParentPosition)
         {
-            if (mRecalcView ||
-                mParentNode->_getDerivedOrientation() != mLastParentOrientation ||
-                mParentNode->_getDerivedPosition() != mLastParentPosition)
-            {
-                // Ok, we're out of date with SceneNode we're attached to
-                mLastParentOrientation = mParentNode->_getDerivedOrientation();
-                mLastParentPosition = mParentNode->_getDerivedPosition();
-                mRealOrientation = mLastParentOrientation * mOrientation;
-                mRealPosition = (mLastParentOrientation * mPosition) + mLastParentPosition;
-                mRecalcView = true;
-                mRecalcWindow = true;
-            }
-        }
-        else
-        {
-            // Rely on own updates
-            mRealOrientation = mOrientation;
-            mRealPosition = mPosition;
+            // Ok, we're out of date with SceneNode we're attached to
+            mLastParentOrientation = derivedOrient;
+            mLastParentPosition = derivedPos;
+            mRealOrientation = mLastParentOrientation * mOrientation;
+            mRealPosition = (mLastParentOrientation * mPosition) + mLastParentPosition;
+            mRecalcView = true;
+            mRecalcWindow = true;
         }
 
         // Deriving reflection from linked plane?
@@ -584,13 +569,9 @@ namespace Ogre {
     {
         updateView();
 
-        Vector3 scale(1.0, 1.0, 1.0);
-        if (mParentNode)
-          scale = mParentNode->_getDerivedScale();
-
         mat->makeTransform(
                 mDerivedPosition,
-                scale,
+                mParentNode->_getDerivedScale(),
                 mDerivedOrientation);
     }
     //-----------------------------------------------------------------------

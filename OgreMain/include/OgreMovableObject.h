@@ -102,9 +102,6 @@ namespace Ogre {
 		Real mMinPixelSize;
 		/// User objects binding.
 		UserObjectBindings mUserObjectBindings;
-		/// World space AABB of this object's dark cap.
-		/// TODO: Move mWorldDarkCapBounds out of here. It's only used by stencil shadows. (dark_sylinc)
-        AxisAlignedBox mWorldDarkCapBounds;
 
         /// MovableObject listener - only one allowed (no list) for size & performance reasons.
         Listener* mListener;

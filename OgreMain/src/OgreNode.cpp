@@ -69,6 +69,8 @@ namespace Ogre {
 		//Will initialize mTransform
 		mNodeMemoryManager->nodeCreated( mTransform, mDepthLevel );
 		mTransform.mOwner[mTransform.mIndex] = this;
+		if( mParent )
+			mTransform.mParents[mTransform.mIndex] = mParent;
     }
 	//-----------------------------------------------------------------------
 	Node::Node( const Transform &transformPtrs ) :
@@ -140,7 +142,6 @@ namespace Ogre {
 		bool different = (parent != mParent);
 
         mParent = parent;
-		mTransform.mParents[mTransform.mIndex] = parent;
 
 		// Call listener (note, only called if there's something to do)
 		if( mListener && different )
@@ -150,11 +151,14 @@ namespace Ogre {
 			else
 				mListener->nodeDetached(this);
 
+			//NodeMemoryManager will set mTransform.mParents to a dummy parent node
+			//(as well as transfering the memory)
 			mNodeMemoryManager->nodeDettached( mTransform, mDepthLevel );
 
 			if( mParent )
 			{
 				mDepthLevel = mParent->mDepthLevel + 1;
+				mTransform.mParents[mTransform.mIndex] = parent;
 				mNodeMemoryManager->nodeAttached( mTransform, mDepthLevel );
 			}
 		}
@@ -175,7 +179,7 @@ namespace Ogre {
 	void Node::_updateFromParent(void)
 	{
 		if( mParent )
-			_updateFromParent();
+			mParent->_updateFromParent();
 
 		updateFromParentImpl();
 

@@ -146,6 +146,7 @@ namespace Ogre
 		m_memoryManagers[0].createNewNode( tmp );
 
 		tmp.copy( outTransform );
+		tmp.mParents[tmp.mIndex] = m_dummyNode;
 
 		NodeArrayMemoryManager &mgr = m_memoryManagers[depth];
 		mgr.destroyNode( outTransform );

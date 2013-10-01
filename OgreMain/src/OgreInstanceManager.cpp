@@ -293,11 +293,6 @@ namespace Ogre
 		const BatchSettings &batchSettings = mBatchSettings[materialHashGeneric];
 		batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
 
-		//Batches need to be part of a scene node so that their renderable can be rendered
-		SceneNode *rootNode = mSceneManager->getRootSceneNode( sceneType );
-		rootNode->attachObject( batch );
-		//sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
-
 		batch->setStatic( sceneType == SCENE_STATIC );
 
 		materialInstanceBatch.push_back( batch );

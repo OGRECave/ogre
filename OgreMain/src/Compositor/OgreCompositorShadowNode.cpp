@@ -393,7 +393,7 @@ namespace Ogre
 				if( light->getType() != Light::LT_POINT )
 					texCamera->setDirection( light->getDerivedDirection() );
 				if( light->getType() != Light::LT_DIRECTIONAL )
-					texCamera->setPosition( light->getDerivedPosition() );
+					texCamera->setPosition( light->getParentNode()->_getDerivedPosition() );
 
 				if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
 				{

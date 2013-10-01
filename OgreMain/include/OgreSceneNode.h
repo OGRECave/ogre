@@ -221,6 +221,8 @@ namespace Ogre {
         */
         void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
 
+		bool isYawFixed(void) const										{ return mYawFixed; }
+
 		/** Rotate the node around the Y-axis.
 		*/
 		void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);

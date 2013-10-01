@@ -535,14 +535,6 @@ namespace Ogre {
         /** @copydoc ShadowCaster::hasEdgeList. */
         bool hasEdgeList(void);
 
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light,
-            HardwareIndexBufferSharedPtr* indexBuffer,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
-#endif
-
         /** Internal method for retrieving bone matrix information. */
         const Matrix4* _getBoneMatrices(void) const { return mBoneMatrices;}
         /** Internal method for retrieving bone matrix information. */

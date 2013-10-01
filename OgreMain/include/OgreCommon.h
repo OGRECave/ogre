@@ -518,12 +518,14 @@ namespace Ogre {
 	struct LightClosest
 	{
 		Light const *light;
-		size_t		globalIndex; //Index to mGlobalLightList
-		Real distance;
+		size_t		globalIndex; //Index to SceneManager::mGlobalLightList
+		Real		distance;
+		size_t		localIndex; //Index to MovableObject::mLightList
 
-		LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ) {}
-		LightClosest( Light *_light, size_t _globalIndex, Real _distance ) :
-			light( _light ), globalIndex( _globalIndex ), distance( _distance ) {}
+		LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ), localIndex(0) {}
+		LightClosest( Light *_light, size_t _globalIndex, Real _distance, size_t _localIndex ) :
+			light( _light ), globalIndex( _globalIndex ),
+			distance( _distance ), localIndex( _localIndex ) {}
 
 		inline bool operator < ( const LightClosest &right ) const;
 	};

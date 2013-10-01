@@ -355,6 +355,8 @@ namespace Ogre {
         // Do nothing if given a zero vector
         if (vec == Vector3::ZERO) return;
 
+		_updateFromParent();
+
         // The direction we want the local direction point to
         Vector3 targetDir = vec.normalisedCopy();
 

@@ -149,7 +149,6 @@ mUserTask( 0 ),
 mRequestType( NUM_REQUESTS ),
 mWorkerThreadsBarrier( 0 ),
 mSuppressRenderStateChanges(false),
-mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
@@ -215,6 +214,14 @@ mGpuParamsDirty((uint16)GPV_ALL)
             mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
         }
     }
+
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+	{
+		// Create root scene node
+		mSceneRoot[i] = createSceneNodeImpl( (SceneNode*)0, static_cast<SceneMemoryMgrTypes>( i ) );
+		mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
+		mSceneRoot[i]->_getDerivedPositionUpdated();
+	}
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -320,6 +327,7 @@ Camera* SceneManager::createCamera( const String &name, bool isVisible )
 	if( isVisible )
 		mVisibleCameras.push_back( c );
 
+	mSceneRoot[SCENE_DYNAMIC]->attachObject( c );
     return c;
 }
 //-----------------------------------------------------------------------
@@ -403,8 +411,9 @@ Light* SceneManager::createLight()
 															MEMCATEGORY_SCENE_CONTROL );
 	}
 
-	return static_cast<Light*>(
-		createMovableObject(LightFactory::FACTORY_TYPE_NAME, &mLightMemoryManager));
+	Light *newLight = static_cast<Light*>(
+							createMovableObject(LightFactory::FACTORY_TYPE_NAME, &mLightMemoryManager));
+	return newLight;
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyLight(Light *l)
@@ -417,31 +426,25 @@ void SceneManager::destroyAllLights(void)
 	destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
+Entity* SceneManager::createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType )
 {
     switch (ptype)
     {
     case PT_PLANE:
-        return createEntity(entityName, "Prefab_Plane");
+        return createEntity( "Prefab_Plane", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 	case PT_CUBE:
-		return createEntity(entityName, "Prefab_Cube");
+		return createEntity( "Prefab_Cube", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 	case PT_SPHERE:
-		return createEntity(entityName, "Prefab_Sphere");
+		return createEntity( "Prefab_Sphere", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 
         break;
     }
 
-    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-        "Unknown prefab type for entity " + entityName,
-        "SceneManager::createEntity");
+    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Unknown prefab type", "SceneManager::createEntity" );
 }
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(PrefabType ptype)
-{
-	String name = mMovableNameGenerator.generate();
-	return createEntity(name, ptype);
-}
-
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& meshName,
 								   const String& groupName, /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */
@@ -665,13 +668,6 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode( SceneMemoryMgrTypes sceneType )
 {
-	if( !mSceneRoot[sceneType] )
-	{
-		// Create root scene node
-		mSceneRoot[sceneType] = createSceneNodeImpl( (SceneNode*)0, sceneType );
-		mSceneRoot[sceneType]->setName( "Ogre/SceneRoot" + StringConverter::toString( sceneType ) );
-	}
-
     return mSceneRoot[sceneType];
 }
 //-----------------------------------------------------------------------
@@ -1194,7 +1190,7 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 		setViewport(vp);
 
 		// Tell params about camera
-		mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+		mAutoParamDataSource->setCurrentCamera(camera);
 		// Set autoparams for finite dir light extrusion
 		mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -1252,10 +1248,6 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 				++it;
 			}
 			firePostFindVisibleObjects(vp);
-
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-#endif
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
@@ -1273,14 +1265,6 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
 	
 	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
-
-	if (mCameraRelativeRendering)
-	{
-		mCachedViewMatrix.setTrans(Vector3::ZERO);
-		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
-	}
-	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
-
 	
 	setViewMatrix(mCachedViewMatrix);
 
@@ -2637,14 +2621,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	{
 	    rend->getWorldTransforms(mTempXform);
 
-		if (mCameraRelativeRendering && !rend->getUseIdentityView())
-		{
-			for (unsigned short i = 0; i < numMatrices; ++i)
-			{
-				mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
-			}
-		}
-
 		if (passTransformState)
 		{
 			if (numMatrices > 1)
@@ -2749,7 +2725,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             // Create local light list for faster light iteration setup
             static LightList localLightList;
 
-
 			// Here's where we issue the rendering operation to the render system
 			// Note that we may do this once per light, therefore it's in a loop
 			// and the light parameters are updated once per traversal through the
@@ -2770,7 +2745,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					lightsLeft = static_cast<int>(pass->getMaxSimultaneousLights());
 				}
 			}
-
 
 			const LightList* pLightListToUse;
 			// Start counting from the start light
@@ -2801,7 +2775,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							continue;
 						}
 
-						destit->light = currLight;
+						*destit = rendLightList[lightIndex];
 						++destit;
 					}
 					// Did we run out of lights before slots? e.g. 5 lights, 2 per iteration
@@ -3298,7 +3272,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		Camera dummyCam( 0, &mEntityMemoryManager[SCENE_DYNAMIC], 0 );
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
-		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam);
 		updateGpuProgramParameters(pass);
 	}
     mDestRenderSystem->_render(*rend);
@@ -3335,7 +3309,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
-		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam);
 		updateGpuProgramParameters(pass);
 	}
 	if (vp)
@@ -3908,7 +3882,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
 void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect& rect)
 {
 	// Project the sphere onto the camera
-	Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
+	Sphere sphere(light->getParentNode()->_getDerivedPosition(), light->getAttenuationRange());
 	cam->projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
 }
 //---------------------------------------------------------------------
@@ -4007,6 +3981,14 @@ AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibil
 	return retVal;
 }
 //---------------------------------------------------------------------
+void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin )
+{
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		mSceneRoot[i]->setPosition( -relativeOrigin );
+
+	notifyStaticDirty( mSceneRoot[SCENE_STATIC] );
+}
+//---------------------------------------------------------------------
 void SceneManager::checkCachedLightClippingInfo()
 {
 	unsigned long frame = Root::getSingleton().getNextFrameNumber();
@@ -4083,7 +4065,7 @@ void SceneManager::buildLightClip(const Light* l, PlaneList& planes)
 
 	planes.clear();
 
-	Vector3 pos = l->getDerivedPosition();
+	Vector3 pos = l->getParentNode()->_getDerivedPosition();
 	Real r = l->getAttenuationRange();
 	switch(l->getType())
 	{
@@ -4270,7 +4252,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	setViewport(vp);
 
 	// Tell params about camera
-	mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+	mAutoParamDataSource->setCurrentCamera(camera);
 	// Set autoparams for finite dir light extrusion
 	mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -4303,14 +4285,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	
 	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
 
-	if (mCameraRelativeRendering)
-	{
-		mCachedViewMatrix.setTrans(Vector3::ZERO);
-		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
-	}
-	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
-
-	
 	setViewMatrix(mCachedViewMatrix);
 	delete context;
 }

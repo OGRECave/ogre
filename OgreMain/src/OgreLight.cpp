@@ -38,10 +38,8 @@ namespace Ogre {
     Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager )
 		: MovableObject( id, objectMemoryManager ),
 		  mLightType(LT_POINT),
-          mPosition(Vector3::ZERO),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),
-          mDirection(Vector3::UNIT_Z),
 		  mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
@@ -51,19 +49,11 @@ namespace Ogre {
 		  mAttenuationLinear(0.0f),
           mAttenuationQuad(0.0f),
 		  mPowerScale(1.0f),
-		  mIndexInFrame(0),
 		  mOwnShadowFarDist(false),
 		  mShadowFarDist(0),
 		  mShadowFarDistSquared(0),
 		  mShadowNearClipDist(-1),
-		  mShadowFarClipDist(-1),
-          mDerivedPosition(Vector3::ZERO),
-          mDerivedDirection(Vector3::UNIT_Z),
-		  mDerivedCamRelativePosition(Vector3::ZERO),
-		  mDerivedCamRelativeDirty(false),
-		  mCameraToBeRelativeTo(0),
-          mDerivedTransformDirty(false),
-		  mCustomShadowCameraSetup()
+		  mShadowFarClipDist(-1)
     {
 		//mMinPixelSize should always be zero for lights otherwise lights will disapear
     	mMinPixelSize = 0;
@@ -104,42 +94,17 @@ namespace Ogre {
         return mLightType;
     }
     //-----------------------------------------------------------------------
-    void Light::setPosition(Real x, Real y, Real z)
-    {
-        mPosition.x = x;
-        mPosition.y = y;
-        mPosition.z = z;
-        mDerivedTransformDirty = true;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setPosition(const Vector3& vec)
-    {
-        mPosition = vec;
-        mDerivedTransformDirty = true;
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Light::getPosition(void) const
-    {
-        return mPosition;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDirection(Real x, Real y, Real z)
-    {
-        mDirection.x = x;
-        mDirection.y = y;
-        mDirection.z = z;
-        mDerivedTransformDirty = true;
-    }
-    //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)
     {
-        mDirection = vec;
-        mDerivedTransformDirty = true;
+		assert( dynamic_cast<SceneNode*>( mParentNode ) );
+		assert( !static_cast<SceneNode*>( mParentNode )->isYawFixed() && "Attach Lights to a "
+				"SceneNode without a fixed yaw! (SceneNode::setFixedYawAxis(false))" );
+		static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT, Vector3::UNIT_Z );
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDirection(void) const
+    Vector3 Light::getDirection(void) const
     {
-        return mDirection;
+        return mParentNode->getOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
@@ -276,97 +241,22 @@ namespace Ogre {
 		return mPowerScale;
 	}
     //-----------------------------------------------------------------------
-    void Light::update(void) const
-    {
-        if (mDerivedTransformDirty)
-        {
-            if (mParentNode)
-            {
-                // Ok, update with SceneNode we're attached to
-                const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-                const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-                mDerivedDirection = parentOrientation * mDirection;
-                mDerivedPosition = (parentOrientation * mPosition) + parentPosition;
-            }
-            else
-            {
-                mDerivedPosition = mPosition;
-                mDerivedDirection = mDirection;
-            }
-
-            mDerivedTransformDirty = false;
-            //if the position has been updated we must update also the relative position
-            mDerivedCamRelativeDirty = true;
-        }
-		if (mCameraToBeRelativeTo && mDerivedCamRelativeDirty)
-		{
-			mDerivedCamRelativePosition = mDerivedPosition - mCameraToBeRelativeTo->getDerivedPosition();
-			mDerivedCamRelativeDirty = false;
-		}
-    }
-    //-----------------------------------------------------------------------
-    void Light::_notifyAttached(Node* parent, bool isTagPoint)
-    {
-        mDerivedTransformDirty = true;
-
-        MovableObject::_notifyAttached( parent );
-    }
-    //-----------------------------------------------------------------------
-    void Light::_notifyMoved(void)
-    {
-        mDerivedTransformDirty = true;
-
-        MovableObject::_notifyMoved();
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& Light::getBoundingBox(void) const
-    {
-        // Null, lights are not visible
-        static AxisAlignedBox box;
-        return box;
-    }
-    //-----------------------------------------------------------------------
-    void Light::_updateRenderQueue(RenderQueue* queue, Camera *camera)
-    {
-        // Do nothing
-    }
-	//-----------------------------------------------------------------------
-	void Light::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		// nothing to render
-	}
-    //-----------------------------------------------------------------------
     const String& Light::getMovableType(void) const
     {
 		return LightFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDerivedPosition(bool cameraRelative) const
+    Vector3 Light::getDerivedDirection(void) const
     {
-        update();
-		if (cameraRelative && mCameraToBeRelativeTo)
-		{
-			return mDerivedCamRelativePosition;
-		}
-		else
-		{
-			return mDerivedPosition;
-		}
+        return mParentNode->_getDerivedOrientation().zAxis();
+    }
+	//-----------------------------------------------------------------------
+    Vector3 Light::getDerivedDirectionUpdated(void) const
+    {
+        return mParentNode->_getDerivedOrientationUpdated().zAxis();
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDerivedDirection(void) const
-    {
-        update();
-        return mDerivedDirection;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setVisible(bool visible)
-    {
-        MovableObject::setVisible(visible);
-    }
-    //-----------------------------------------------------------------------
-	Vector4 Light::getAs4DVector(bool cameraRelativeIfSet) const
+	Vector4 Light::getAs4DVector(void) const
 	{
 		Vector4 ret;
         if (mLightType == Light::LT_DIRECTIONAL)
@@ -376,7 +266,7 @@ namespace Ogre {
         }	
 		else
         {
-            ret = getDerivedPosition(cameraRelativeIfSet);
+            ret = mParentNode->_getDerivedPosition();
             ret.w = 1.0;
         }
 		return ret;
@@ -396,7 +286,7 @@ namespace Ogre {
 		else
 		{
 			tempSquareDist = 
-				(worldPos - getDerivedPosition()).squaredLength();
+				(worldPos - mParentNode->_getDerivedPosition()).squaredLength();
 		}
 
 	}
@@ -587,21 +477,6 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void Light::setCustomShadowCameraSetup(const ShadowCameraSetupPtr& customShadowSetup)
-	{
-		mCustomShadowCameraSetup = customShadowSetup;
-	}
-	//-----------------------------------------------------------------------
-	void Light::resetCustomShadowCameraSetup()
-	{
-		mCustomShadowCameraSetup.setNull();
-	}
-	//-----------------------------------------------------------------------
-	const ShadowCameraSetupPtr& Light::getCustomShadowCameraSetup() const
-	{
-		return mCustomShadowCameraSetup;
-	}
-	//-----------------------------------------------------------------------
 	void Light::setShadowFarDistance(Real distance)
 	{
 		mOwnShadowFarDist = true;
@@ -628,12 +503,6 @@ namespace Ogre {
 			return mShadowFarDistSquared;
 		else
 			return mManager->getShadowFarDistanceSquared ();
-	}
-	//---------------------------------------------------------------------
-	void Light::_setCameraRelative(Camera* cam)
-	{
-		mCameraToBeRelativeTo = cam;
-		mDerivedCamRelativeDirty = true;
 	}
 	//---------------------------------------------------------------------
 	Real Light::_deriveShadowNearClipDistance(const Camera* maincam) const
@@ -687,75 +556,6 @@ namespace Ogre {
         }
 	}
 	//-----------------------------------------------------------------------
-	bool Light::isInLightRange(const Ogre::Sphere& container) const
-	{
-		bool isIntersect = true;
-		//directional light always intersects (check only spotlight and point)
-		if (mLightType != LT_DIRECTIONAL)
-		{
-			//Check that the sphere is within the sphere of the light
-			isIntersect = container.intersects(Sphere(mDerivedPosition, mRange));
-			//If this is a spotlight, check that the sphere is within the cone of the spot light
-			if ((isIntersect) && (mLightType == LT_SPOTLIGHT))
-			{
-				//check first check of the sphere surrounds the position of the light
-				//(this covers the case where the center of the sphere is behind the position of the light
-				// something which is not covered in the next test).
-				isIntersect = container.intersects(mDerivedPosition);
-				//if not test cones
-				if (!isIntersect)
-				{
-					//Calculate the cone that exists between the sphere and the center position of the light
-					Ogre::Vector3 lightSphereConeDirection = container.getCenter() - mDerivedPosition;
-					Ogre::Radian halfLightSphereConeAngle = Math::ASin(container.getRadius() / lightSphereConeDirection.length());
-
-					//Check that the light cone and the light-position-to-sphere cone intersect)
-					Radian angleBetweenConeDirections = lightSphereConeDirection.angleBetween(mDerivedDirection);
-					isIntersect = angleBetweenConeDirections <=  halfLightSphereConeAngle + mSpotOuter * 0.5;
-				}
-			}
-		}
-		return isIntersect;
-	}
-
-	//-----------------------------------------------------------------------
-	bool Light::isInLightRange(const Ogre::AxisAlignedBox& container) const
-	{
-		bool isIntersect = true;
-		//Check the 2 simple / obvious situations. Light is directional or light source is inside the container
-		if ((mLightType != LT_DIRECTIONAL) && (container.intersects(mDerivedPosition) == false))
-		{
-			//Check that the container is within the sphere of the light
-			isIntersect = Math::intersects(Sphere(mDerivedPosition, mRange),container);
-			//If this is a spotlight, do a more specific check
-			if ((isIntersect) && (mLightType == LT_SPOTLIGHT) && (mSpotOuter.valueRadians() <= Math::PI))
-			{
-				//Create a rough bounding box around the light and check if
-				Quaternion localToWorld = Vector3::NEGATIVE_UNIT_Z.getRotationTo(mDerivedDirection);
-
-				Real boxOffset = Math::Sin(mSpotOuter * 0.5) * mRange;
-				AxisAlignedBox lightBoxBound;
-				lightBoxBound.merge(Vector3::ZERO);
-				lightBoxBound.merge(localToWorld * Vector3(boxOffset, boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, -boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(boxOffset, -boxOffset, -mRange));
-				lightBoxBound.setMaximum(lightBoxBound.getMaximum() + mDerivedPosition);
-				lightBoxBound.setMinimum(lightBoxBound.getMinimum() + mDerivedPosition);
-				isIntersect = lightBoxBound.intersects(container);
-				
-				//If the bounding box check succeeded do one more test
-				if (isIntersect)
-				{
-					//Check intersection again with the bounding sphere of the container
-					//Helpful for when the light is at an angle near one of the vertexes of the bounding box
-					isIntersect = isInLightRange(Sphere(container.getCenter(), 
-						container.getHalfSize().length()));
-				}
-			}
-		}
-		return isIntersect;
-	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	String LightFactory::FACTORY_TYPE_NAME = "Light";
@@ -790,14 +590,6 @@ namespace Ogre {
 						"Invalid light type '" + ni->second + "'.",
 						"LightFactory::createInstance");
 			}
-
-			// Common properties
-			if ((ni = params->find("position")) != params->end())
-				light->setPosition(StringConverter::parseVector3(ni->second));
-
-			if ((ni = params->find("direction")) != params->end())
-				light->setDirection(StringConverter::parseVector3(ni->second));
-
 			if ((ni = params->find("diffuseColour")) != params->end())
 				light->setDiffuseColour(StringConverter::parseColourValue(ni->second));
 

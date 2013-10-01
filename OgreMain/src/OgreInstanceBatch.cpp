@@ -77,26 +77,29 @@ namespace Ogre
 		}
 
 		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
+
+		//We need some sort of node so that some MovableObject functions don't crash.
+		//We don't conventionally attach the object. The dummy node doesn't know we're
+		//attached to it. InstanceBatch could be nodeless with a very large refactor.
+		//It's the InstancedEntity(s) that need a Node. The user doesn't need access
+		//to the batch's node (Aka. hack)
+		//We used to use the Root node, but doesn't play nice with SceneManager::setRelativeOrigin
+		//(the offset is applied twice, but only the AABB is displaced, causing culling errors)
+		mParentNode = mObjectData.mParents[mObjectData.mIndex];
+		setVisible( true );
 	}
 
 	InstanceBatch::~InstanceBatch()
 	{
 		deleteAllInstancedEntities();
 
-		//Remove the parent scene node automatically
-		SceneNode *sceneNode = getParentSceneNode();
-		if( sceneNode )
-		{
-			sceneNode->detachObject( this );
-			if( sceneNode->getParentSceneNode() )
-				sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
-		}
+		//Remove the hacked parent scene node before MovableObject's destructor kicks in
+		mParentNode = 0;
 
 		if( mRemoveOwnVertexData )
 			OGRE_DELETE mRenderOperation.vertexData;
 		if( mRemoveOwnIndexData )
 			OGRE_DELETE mRenderOperation.indexData;
-
 	}
 
 	void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
@@ -231,26 +234,6 @@ namespace Ogre
 		mStaticDirty = false;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::updateVisibility(void)
-	{
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		mVisible = false;
-
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-		while( itor != end && !mVisible )
-		{
-			//Trick to force Ogre not to render us if none of our instances is visible
-			//Because we do Camera::isVisible(), it is better if the SceneNode from the
-			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
-			//to avoid unnecessary wasteful calculations
-			mVisible |= (*itor)->findVisible( mCurrentCamera );
-			++itor;
-		}
-#endif
-	}
-	//-----------------------------------------------------------------------
 	void InstanceBatch::createAllInstancedEntities()
 	{
 		mInstancedEntities.reserve( mInstancesPerBatch );
@@ -294,22 +277,6 @@ namespace Ogre
 			OGRE_DELETE *itor++;
 
 		mUnusedEntities.clear();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats )
-	{
-		const Vector3 &cameraRelativePosition = mCurrentCamera->getDerivedPosition();
-
-		for( size_t i=0; i<numFloats >> 2; i += 3 )
-		{
-			const Vector3 worldTrans( mat3x4[(i+0) * 4 + 3], mat3x4[(i+1) * 4 + 3],
-										mat3x4[(i+2) * 4 + 3] );
-			const Vector3 newPos( worldTrans - cameraRelativePosition );
-
-			mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
-			mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
-			mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
-		}
 	}
 	//-----------------------------------------------------------------------
 	RenderOperation InstanceBatch::build( const SubMesh* baseSubMesh )

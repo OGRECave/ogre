@@ -948,9 +948,8 @@ namespace Ogre {
 		SceneMgrQueuedRenderableVisitor mDefaultQueuedRenderableVisitor;
 
 		/// Whether to use camera-relative rendering
-		bool mCameraRelativeRendering;
 		Matrix4 mCachedViewMatrix;
-		Vector3 mCameraRelativePosition;
+		Vector3 mRelativeOffset;
 
 		/// Last light sets
 		uint32 mLastLightHash;
@@ -1264,18 +1263,10 @@ namespace Ogre {
 			PT_SPHERE
         };
 
-        /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes.
-            @param
-                entityName The name to be given to the entity (must be unique).
-            @param
-                ptype The prefab type.
-        */
-        virtual Entity* createEntity(const String& entityName, PrefabType ptype);
-
-        /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes, generating the name.
+        /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes
             @param ptype The prefab type.
         */
-        virtual Entity* createEntity(PrefabType ptype);
+        virtual Entity* createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Removes & destroys an Entity from the SceneManager.
             @warning
@@ -2980,26 +2971,24 @@ namespace Ogre {
 		void getMinMaxDepthRange( const Frustum *shadowMapCamera, Real &outMin, Real &outMax ) const;
 
 
-		/** Set whether to use camera-relative co-ordinates when rendering, ie
-			to always place the camera at the origin and move the world around it.
+		/** Set whether to use relative offset co-ordinates when rendering, ie
+			offset to subtract to the camera, lights & objects.
 		@remarks
 			This is a technique to alleviate some of the precision issues associated with 
 			rendering far from the origin, where single-precision floats as used in most
-			GPUs begin to lose their precision. Instead of including the camera
-			translation in the view matrix, it only includes the rotation, and
-			the world matrices of objects must be expressed relative to this.
+			GPUs begin to lose their precision. The origin "translates" to this new
+			relativeOffset.
+		@param
+			All that this function performs is just offseting the root scene node, and
+			as such, will force to update the static nodes as well. Call this at a low
+			frequency (i.e. when camera has gone too far from origin)
 		@note
 			If you need this option, you will probably also need to enable double-precision
 			mode in Ogre (OGRE_DOUBLE_PRECISION), since even though this will 
 			alleviate the rendering precision, the source camera and object positions will still 
 			suffer from precision issues leading to jerky movement. 
 		*/
-		virtual void setCameraRelativeRendering(bool rel) { mCameraRelativeRendering = rel; }
-
-		/** Get whether to use camera-relative co-ordinates when rendering, ie
-			to always place the camera at the origin and move the world around it.
-		*/
-		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
+		virtual void setRelativeOrigin( const Vector3 &relativeOrigin );
 
 		//Derived from ArrayMemoryManager::RebaseListener
 		/*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,

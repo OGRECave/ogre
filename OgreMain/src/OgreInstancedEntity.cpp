@@ -252,12 +252,6 @@ namespace Ogre
 		{
 			//check object is explicitly visible
 			retVal = isVisible();
-
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0 
-			//Object's bounding box is viewed by the camera
-			if( retVal && camera )
-				retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
-#endif
 		}
 
 		return retVal;

@@ -156,16 +156,8 @@ namespace Ogre
         /// Creates a new InstancedEntity instance
         virtual InstancedEntity* generateInstancedEntity(size_t num);
 
-        /** Takes an array of 3x4 matrices and makes it camera relative. Note the second argument
-            takes number of floats in the array, not number of matrices. Assumes mCachedCamera
-            contains the camera which is about to be rendered to.
-        */
-        void makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats );
-
         /// Returns false on errors that would prevent building this batch from the given submesh
         virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
-
-        void updateVisibility(void);
 
         /** @see _defragmentBatch */
         void defragmentBatchNoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );

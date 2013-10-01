@@ -1795,7 +1795,7 @@ namespace Ogre
 			Vector3 vec;
 			if( lt->getType() != Light::LT_DIRECTIONAL )
 			{
-				vec = lt->getDerivedPosition(true);
+				vec = lt->getParentNode()->_getDerivedPosition();
 				d3dLight.Position = D3DXVECTOR3( vec.x, vec.y, vec.z );
 			}
 			if( lt->getType() != Light::LT_POINT )

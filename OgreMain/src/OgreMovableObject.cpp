@@ -857,8 +857,9 @@ namespace Ogre {
 					//we set lightMask to 0 on slot removals
 					if( IS_BIT_SET( k, r ) )
 					{
-						objData.mOwner[k]->mLightList.push_back(
-													LightClosest( *lightsIt, j, distance[k] ) );
+						LightList &lightList = objData.mOwner[k]->mLightList;
+						lightList.push_back( LightClosest( *lightsIt, j, distance[k],
+															lightList.size() ) );
 					}
 				}
 

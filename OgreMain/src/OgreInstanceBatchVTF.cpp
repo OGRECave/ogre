@@ -372,9 +372,6 @@ namespace Ogre
 		{
 			size_t floatsWritten = (*itor)->getTransforms3x4( transforms );
 
-			if( mManager->getCameraRelativeRendering() )
-				makeMatrixCameraRelative3x4( transforms, floatsWritten );
-
 			if(mUseBoneDualQuaternions)
 			{
 				floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
@@ -467,9 +464,6 @@ namespace Ogre
 	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
 		InstanceBatch::_updateRenderQueue( queue, camera );
-
-		if( mManager->getCameraRelativeRendering() )
-			updateVertexTexture();
 	}
 	//-----------------------------------------------------------------------
 	// InstanceBatchVTF

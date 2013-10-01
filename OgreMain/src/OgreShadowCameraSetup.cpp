@@ -144,7 +144,7 @@ namespace Ogre
 			texCam->setFOVy(fovy);
 
 			// Calculate position, which same as spotlight position
-			pos = light->getDerivedPosition();
+			pos = light->getParentNode()->_getDerivedPosition();
 
 			// Calculate direction, which same as spotlight direction
 			dir = - light->getDerivedDirection(); // backwards since point down -z
@@ -165,7 +165,7 @@ namespace Ogre
 				(cam->getDerivedDirection() * shadowOffset);
 
 			// Calculate position, which same as point light position
-			pos = light->getDerivedPosition();
+			pos = light->getParentNode()->_getDerivedPosition();
 
 			dir = (pos - target); // backwards since point down -z
 			dir.normalise();
