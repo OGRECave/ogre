@@ -99,6 +99,9 @@ namespace Ogre {
         */
 		LightTypes getType(void) const								{ return mLightType; }
 
+		/// Sets the Aabb (local space) for this light when it's of type spot
+		void setSpotAabb(void);
+
         /** Sets the colour of the diffuse light given off by this source.
         @remarks
             Material objects have ambient, diffuse and specular values which indicate how much of each type of

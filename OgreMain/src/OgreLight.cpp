@@ -82,12 +82,23 @@ namespace Ogre {
 			mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
 			break;
 		case LT_SPOTLIGHT:
-			//TODO: (dark_sylinc)
-			//mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
-			//mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ) );
+			setSpotAabb();
 			break;
 		}
     }
+	//-----------------------------------------------------------------------
+	void Light::setSpotAabb(void)
+	{
+		assert( mLightType == LT_SPOTLIGHT );
+
+		//In local space, lights are centered at origin, facing towards +Z
+		Aabb aabb;
+		Real lenOpposite = Math::Tan( mSpotOuter ) * mRange;
+		aabb.m_center	= Vector3::ZERO;
+		aabb.m_halfSize	= Vector3( lenOpposite, mRange, lenOpposite );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+		mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ), mObjectData.mIndex );
+	}
     //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)
     {
@@ -104,51 +115,51 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
     {
+		bool boundsChanged = mSpotOuter != outerAngle;
+
         mSpotInner = innerAngle;
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
 
-		if( mLightType == LT_SPOTLIGHT )
-		{
-			//TODO: (dark_sylinc) Change bounds
-		}
+		if( boundsChanged && mLightType == LT_SPOTLIGHT )
+			setSpotAabb();
     }
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightInnerAngle(const Radian& val)
 	{
 		mSpotInner = val;
-		if( mLightType == LT_SPOTLIGHT )
-		{
-			//TODO: (dark_sylinc) Change bounds
-		}
 	}
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightOuterAngle(const Radian& val)
 	{
+		bool boundsChanged = mSpotOuter != val;
 		mSpotOuter = val;
-		if( mLightType == LT_SPOTLIGHT )
-		{
-			//TODO: (dark_sylinc) Change bounds
-		}
+		if( boundsChanged && mLightType == LT_SPOTLIGHT )
+			setSpotAabb();
 	}
     //-----------------------------------------------------------------------
     void Light::setAttenuation(Real range, Real constant,
                         Real linear, Real quadratic)
     {
+		bool boundsChanged = mRange != range;
+
         mRange = range;
         mAttenuationConst = constant;
         mAttenuationLinear = linear;
         mAttenuationQuad = quadratic;
 
-		if( mLightType == LT_POINT )
+		if( boundsChanged )
 		{
-			mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
-			mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
-												 mObjectData.mIndex );
-		}
-		else if( mLightType == LT_SPOTLIGHT )
-		{
-			//TODO: (dark_sylinc)
+			if( mLightType == LT_POINT )
+			{
+				mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+				mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+													 mObjectData.mIndex );
+			}
+			else if( mLightType == LT_SPOTLIGHT )
+			{
+				setSpotAabb();
+			}
 		}
     }
     //-----------------------------------------------------------------------
