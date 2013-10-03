@@ -462,19 +462,6 @@ namespace Ogre
 
 		}
 
-		if( name == "VSync" )
-		{
-			if (value == "Yes")
-				mVSync = true;
-			else
-				mVSync = false;
-		}
-
-		if( name == "VSync Interval" )
-		{
-			mVSyncInterval = StringConverter::parseUnsignedInt(value);
-		}
-
 		if( name == "Allow NVPerfHUD" )
 		{
 			if (value == "Yes")
@@ -596,12 +583,6 @@ namespace Ogre
 				"the 'Rendering Device' has been changed.";
 		}
 
-		it = mOptions.find( "VSync" );
-		if( it->second.currentValue == "Yes" )
-			mVSync = true;
-		else
-			mVSync = false;
-
 		return StringUtil::BLANK;
 	}
 	//---------------------------------------------------------------------
@@ -704,16 +685,24 @@ namespace Ogre
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
 			hwGamma = opt->second.currentValue == "Yes";
 
-			
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
 			miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
 			miscParams["FSAAHint"] = mFSAAHint;
-			miscParams["vsync"] = StringConverter::toString(mVSync);
-			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
 			miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
 			miscParams["gamma"] = StringConverter::toString(hwGamma);
 			miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
+
+            opt = mOptions.find("VSync");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
+            bool vsync = (opt->second.currentValue == "Yes");
+            miscParams["vsync"] = StringConverter::toString(vsync);
+
+            opt = mOptions.find("VSync Interval");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "D3D9RenderSystem::initialise");
+            miscParams["vsyncInterval"] = opt->second.currentValue;
 
 			autoWindow = _createRenderWindow( windowTitle, width, height, 
 				fullScreen, &miscParams );
@@ -794,10 +783,12 @@ namespace Ogre
 		StringStream ss;
 		ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
 			width << "x" << height << " ";
+
 		if(fullScreen)
 			ss << "fullscreen ";
 		else
 			ss << "windowed ";
+
 		if(miscParams)
 		{
 			ss << " miscParams: ";

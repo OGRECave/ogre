@@ -190,9 +190,19 @@ namespace Ogre {
         }
     }
 
-    void SDLWindow::swapBuffers(bool waitForVSync)
+    void SDLWindow::setVSyncEnabled(bool vsync)
+	{
+        mVSync = vsync;
+	}
+
+	bool SDLWindow::isVSyncEnabled() const
+	{
+        return mVSync;
+	}
+
+    void SDLWindow::swapBuffers()
     {
-        if ( waitForVSync && glXGetVideoSyncSGI && glXWaitVideoSyncSGI )
+        if ( mVSync && glXGetVideoSyncSGI && glXWaitVideoSyncSGI )
         {
             unsigned int retraceCount;
             glXGetVideoSyncSGI( &retraceCount );

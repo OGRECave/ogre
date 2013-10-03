@@ -47,7 +47,7 @@ namespace Ogre {
         virtual void getCustomAttribute(const String& name, void* pData);
 
 		/// Override needed to deal with multisample buffers
-		virtual void swapBuffers(bool waitForVSync = true);
+		virtual void swapBuffers();
 
 		/// Override so we can attach the depth buffer to the FBO
 		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );

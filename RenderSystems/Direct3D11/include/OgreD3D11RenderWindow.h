@@ -110,7 +110,7 @@ namespace Ogre
 		/// Get the presentation parameters used with this window
 		DXGI_SWAP_CHAIN_DESC_N* getPresentationParameters(void)	{ return &mSwapChainDesc; }
 
-		void swapBuffers( bool waitForVSync = true );
+		void swapBuffers( );
 
 	protected:
 		void _createSizeDependedD3DResources(); // obtains mpBackBuffer from mpSwapChain
@@ -200,7 +200,7 @@ namespace Ogre
 
 		virtual void resize(unsigned int width, unsigned int height);
 		virtual void update(bool swapBuffers = true);
-		virtual void swapBuffers(bool waitForVSync = true);
+		virtual void swapBuffers();
 
 		virtual bool isVisible() const							{ return mImageSourceNative != NULL; }
 

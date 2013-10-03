@@ -616,7 +616,7 @@ namespace Ogre {
 		if (swap)
 		{
 			// Swap buffers
-    	    swapBuffers(Root::getSingleton().getRenderSystem()->getWaitForVerticalBlank());
+    	    swapBuffers();
 		}
         OgreProfileEndGPUEvent("RenderTarget: " + getName());
     }

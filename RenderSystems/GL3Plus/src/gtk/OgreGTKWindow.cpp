@@ -190,7 +190,7 @@ void GTKWindow::resize(unsigned int width, unsigned int height)
     		mGtkWindow->resize(width, height);
 }
 
-void GTKWindow::swapBuffers(bool waitForVSync)
+void GTKWindow::swapBuffers()
 {
     	Glib::RefPtr<Gdk::GL::Window> glwindow = ogre->get_gl_window();
     	glwindow->swap_buffers();

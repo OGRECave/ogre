@@ -146,7 +146,7 @@ namespace Ogre {
 
   
 
-    void EGLWindow::swapBuffers(bool waitForVSync)
+    void EGLWindow::swapBuffers()
     {
         if (mClosed || mIsExternalGLControl)
         {

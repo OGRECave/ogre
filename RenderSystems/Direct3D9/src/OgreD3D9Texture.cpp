@@ -2082,7 +2082,7 @@ namespace Ogre
 		}
 	}    
 	//---------------------------------------------------------------------
-	void D3D9RenderTexture::swapBuffers(bool waitForVSync /* = true */)
+	void D3D9RenderTexture::swapBuffers()
 	{
 		// Only needed if we have to blit from AA surface
 		if (mFSAA > 0)

@@ -400,7 +400,7 @@ namespace Ogre {
 		mClosed = false;
     }
 
-    void EAGL2Window::swapBuffers(bool waitForVSync)
+    void EAGL2Window::swapBuffers()
     {
         if (mClosed)
         {

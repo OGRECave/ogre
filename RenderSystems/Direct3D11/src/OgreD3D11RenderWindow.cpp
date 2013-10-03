@@ -485,12 +485,12 @@ namespace Ogre
 		_updateViewportsDimensions();
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderWindowSwapChainBased::swapBuffers( bool waitForVSync )
+	void D3D11RenderWindowSwapChainBased::swapBuffers( )
 	{
 		if( !mDevice.isNull() )
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-			HRESULT hr = mpSwapChain->Present(waitForVSync ? mVSyncInterval : 0, 0);
+			HRESULT hr = mpSwapChain->Present(mVSync ? mVSyncInterval : 0, 0);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 			HRESULT hr = mpSwapChain->Present(1, 0); // flip presentation model swap chains have another semantic for first parameter
 #endif
@@ -1181,7 +1181,7 @@ namespace Ogre
 		D3D11RenderWindowBase::update(swapBuffers);
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderWindowImageSource::swapBuffers(bool waitForVSync)
+	void D3D11RenderWindowImageSource::swapBuffers()
 	{
 		if(mImageSourceNative == NULL)
 			return;

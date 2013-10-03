@@ -163,21 +163,8 @@ namespace Ogre {
                 during rendering. Once rendering has completed (to
                 an off-screen version of the window) the buffers
                 are swapped to display the new frame.
-
-            @param
-                waitForVSync If true, the system waits for the
-                next vertical blank period (when the CRT beam turns off
-                as it travels from bottom-right to top-left at the
-                end of the pass) before flipping. If false, flipping
-                occurs no matter what the beam position. Waiting for
-                a vertical blank can be slower (and limits the
-                framerate to the monitor refresh rate) but results
-                in a steadier image with no 'tearing' (a flicker
-                resulting from flipping buffers when the beam is
-                in the progress of drawing the last frame).
         */
-        virtual void swapBuffers(bool waitForVSync = true)
-        { (void)waitForVSync; }
+        virtual void swapBuffers() {}
 
         /** Adds a viewport to the rendering target.
             @remarks
@@ -427,7 +414,7 @@ namespace Ogre {
 			renderTarget->_updateViewport(2); // which is not auto updated
 			renderTarget->_updateAutoUpdatedViewports();
 			renderTarget->_endUpdate();
-			renderTarget->swapBuffers(true);
+			renderTarget->swapBuffers();
 		</pre>
 			Please note that in that case, the zorder may not work as you expect,
 			since you are responsible for calling _updateViewport in the correct order.

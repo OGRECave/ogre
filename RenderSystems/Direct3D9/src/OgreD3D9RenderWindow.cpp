@@ -746,7 +746,7 @@ namespace Ogre
 		updateWindowRect();
 	}
 
-	void D3D9RenderWindow::swapBuffers( bool waitForVSync )
+	void D3D9RenderWindow::swapBuffers( )
 	{
 		if (mDeviceValid)
 			mDevice->present(this);		

@@ -290,13 +290,11 @@ namespace Ogre {
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "Win32GLSupport::createWindow");
 			bool vsync = (opt->second.currentValue == "Yes");
 			winOptions["vsync"] = StringConverter::toString(vsync);
-			renderSystem->setWaitForVerticalBlank(vsync);
 
 			opt = mOptions.find("VSync Interval");
 			if (opt == mOptions.end())
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "Win32GLSupport::createWindow");
 			winOptions["vsyncInterval"] = opt->second.currentValue;
-
 
 			opt = mOptions.find("Display Frequency");
 			if (opt != mOptions.end())

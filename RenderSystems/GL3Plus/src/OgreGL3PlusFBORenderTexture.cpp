@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GL3PlusFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GL3PlusFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}

@@ -580,7 +580,7 @@ namespace Ogre {
 		[mGLContext update];
     }
 
-    void CocoaWindow::swapBuffers(bool waitForVSync)
+    void CocoaWindow::swapBuffers()
     {
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
         [mGLContext makeCurrentContext];

@@ -59,7 +59,7 @@ namespace Ogre {
         }
     }
 
-	void GLES2FBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLES2FBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}

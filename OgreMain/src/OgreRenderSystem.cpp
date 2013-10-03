@@ -58,8 +58,6 @@ namespace Ogre {
         // This means CULL clockwise vertices, i.e. front of poly is counter-clockwise
         // This makes it the same as OpenGL and other right-handed systems
         , mCullingMode(CULL_CLOCKWISE)
-        , mVSync(true)
-		, mVSyncInterval(1)
 		, mWBuffer(false)
         , mInvertVertexWinding(false)
         , mDisabledTexUnitsFrom(0)
@@ -124,7 +122,7 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_swapAllRenderTargetBuffers(bool waitForVSync)
+    void RenderSystem::_swapAllRenderTargetBuffers()
     {
         // Update all in order of priority
         // This ensures render-to-texture targets get updated before render windows
@@ -133,7 +131,7 @@ namespace Ogre {
 		for( itarg = mPrioritisedRenderTargets.begin(); itarg != itargend; ++itarg )
 		{
 			if( itarg->second->isActive() && itarg->second->isAutoUpdated())
-				itarg->second->swapBuffers(waitForVSync);
+				itarg->second->swapBuffers();
 		}
     }
     //-----------------------------------------------------------------------
@@ -503,11 +501,6 @@ namespace Ogre {
         return mCullingMode;
     }
     //-----------------------------------------------------------------------
-    bool RenderSystem::getWaitForVerticalBlank(void) const
-    {
-        return mVSync;
-    }
-    //-----------------------------------------------------------------------
     bool RenderSystem::getFixedPipelineEnabled(void) const
     {
         return mEnableFixedPipeline;
@@ -552,11 +545,6 @@ namespace Ogre {
 													   "for RT: " + renderTarget->getName() );
 		}
 	}
-    //-----------------------------------------------------------------------
-    void RenderSystem::setWaitForVerticalBlank(bool enabled)
-    {
-        mVSync = enabled;
-    }
     bool RenderSystem::getWBufferEnabled(void) const
     {
         return mWBuffer;

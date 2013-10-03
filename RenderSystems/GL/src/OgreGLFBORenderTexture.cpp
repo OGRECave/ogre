@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}

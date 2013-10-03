@@ -570,25 +570,6 @@ namespace Ogre
 		*/
 		virtual String getErrorDescription(long errorNumber) const = 0;
 
-		/** Defines whether or now fullscreen render windows wait for the vertical blank before flipping buffers.
-		@remarks
-		By default, all rendering windows wait for a vertical blank (when the CRT beam turns off briefly to move
-		from the bottom right of the screen back to the top left) before flipping the screen buffers. This ensures
-		that the image you see on the screen is steady. However it restricts the frame rate to the refresh rate of
-		the monitor, and can slow the frame rate down. You can speed this up by not waiting for the blank, but
-		this has the downside of introducing 'tearing' artefacts where part of the previous frame is still displayed
-		as the buffers are switched. Speed vs quality, you choose.
-		@note
-		Has NO effect on windowed mode render targets. Only affects fullscreen mode.
-		@param
-		enabled If true, the system waits for vertical blanks - quality over speed. If false it doesn't - speed over quality.
-		*/
-		void setWaitForVerticalBlank(bool enabled);
-
-		/** Returns true if the system is synchronising frames with the monitor vertical blank.
-		*/
-		bool getWaitForVerticalBlank(void) const;
-
 		/** Returns the global instance vertex buffer.
 		*/
         HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
@@ -1286,7 +1267,7 @@ namespace Ogre
 		virtual void _updateAllRenderTargets(bool swapBuffers = true);
 		/** Internal method for swapping all the buffers on all render targets,
 		if _updateAllRenderTargets was called with a 'false' parameter. */
-		virtual void _swapAllRenderTargetBuffers(bool waitForVsync = true);
+		virtual void _swapAllRenderTargetBuffers();
 
 		/** Sets whether or not vertex windings set should be inverted; this can be important
 		for rendering reflections. */
@@ -1297,7 +1278,7 @@ namespace Ogre
 		*/
 		virtual bool getInvertVertexWinding(void) const;
 
-		/** Sets the 'scissor region' ie the region of the target in which rendering can take place.
+		/** Sets the 'scissor region' i.e. the region of the target in which rendering can take place.
 		@remarks
 		This method allows you to 'mask off' rendering in all but a given rectangular area
 		as identified by the parameters to this method.
@@ -1539,8 +1520,6 @@ namespace Ogre
 
 		CullingMode mCullingMode;
 
-		bool mVSync;
-		unsigned int mVSyncInterval;
 		bool mWBuffer;
 
 		size_t mBatchCount;

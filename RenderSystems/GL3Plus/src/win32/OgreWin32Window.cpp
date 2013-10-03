@@ -805,7 +805,7 @@ namespace Ogre {
 	}
 
 
-	void Win32Window::swapBuffers(bool waitForVSync)
+	void Win32Window::swapBuffers()
 	{
 	  if (!mIsExternalGLControl) {
 	  	SwapBuffers(mHDC);
