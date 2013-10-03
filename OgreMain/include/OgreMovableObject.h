@@ -497,7 +497,7 @@ namespace Ogre {
         /// Define a default implementation of method from ShadowCaster which implements no shadows
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light, 
-            HardwareIndexBufferSharedPtr* indexBuffer, 
+            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
 		
         /** Overridden member from ShadowCaster. */

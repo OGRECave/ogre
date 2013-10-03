@@ -159,7 +159,7 @@ namespace Ogre {
         */
         virtual ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light, 
-            HardwareIndexBufferSharedPtr* indexBuffer, 
+            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) = 0;
 
         /** Utility method for extruding vertices based on a light. 
@@ -211,6 +211,10 @@ namespace Ogre {
         @param indexBuffer
             The buffer into which to write data into; current 
             contents are assumed to be discardable.
+        @param indexBufferUsedSize
+            If the rest of buffer is enough than it would be locked with
+            HBL_NO_OVERWRITE semantic and indexBufferUsedSize would be increased,
+            otherwise HBL_DISCARD would be used and indexBufferUsedSize would be reset.
         @param light
             The light, mainly for type info as silhouette calculations
             should already have been done in updateEdgeListLightFacing
@@ -222,8 +226,8 @@ namespace Ogre {
             Additional controller flags, see ShadowRenderableFlags.
         */
         virtual void generateShadowVolume(EdgeData* edgeData, 
-            const HardwareIndexBufferSharedPtr& indexBuffer, const Light* light,
-            ShadowRenderableList& shadowRenderables, unsigned long flags);
+            const HardwareIndexBufferSharedPtr& indexBuffer, size_t& indexBufferUsedSize,
+            const Light* light, ShadowRenderableList& shadowRenderables, unsigned long flags);
         /** Utility method for extruding a bounding box. 
         @param box
             Original bounding box, will be updated in-place.
