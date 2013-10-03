@@ -116,7 +116,7 @@ namespace Ogre {
         {
             access = GL_MAP_WRITE_BIT_EXT;
             access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
-            if(options == HBL_DISCARD)
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
                 access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
@@ -130,7 +130,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, access));
 #else
-        if(options == HBL_DISCARD)
+        if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
         {
             // Discard the buffer
             OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
