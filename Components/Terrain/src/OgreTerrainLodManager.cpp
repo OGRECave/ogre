@@ -195,7 +195,7 @@ namespace Ogre
 					{
 						mLodInfoTable[level].treeStart = depth;
 						mLodInfoTable[level].treeEnd = prevdepth;
-						mLodInfoTable[level].isLast = level == last+prevdepth-depth-1;
+						mLodInfoTable[level].isLast = level == last+prevdepth-depth-static_cast<uint>(1);
 						mLodInfoTable[level].resolution = bakedresolution;
 						mLodInfoTable[level].size = ((bakedresolution-1) / splits) + 1;
 						// this lod info has been filled
@@ -369,12 +369,12 @@ namespace Ogre
 		for (uint16 y = 0; y < size; y += inc)
 		{
 			for (uint16 x = 0; x < size-1; x += inc)
-				if ((lodLevel == numLodLevels - 1) || (x % prev != 0) || (y % prev != 0))
+				if ((lodLevel == numLodLevels - static_cast<uint>(1)) || (x % prev) || (y % prev))
 				{
 					mTerrain->mHeightData[y*size + x] = *(heightDataPtr++);
 					mTerrain->mDeltaData[y*size + x] = *(deltaDataPtr++);
 				}
-			if ((lodLevel == numLodLevels - 1) || (y % prev) != 0)
+			if ((lodLevel == numLodLevels - static_cast<uint>(1)) || (y % prev))
 			{
 				mTerrain->mHeightData[y*size + size-1] = *(heightDataPtr++);
 				mTerrain->mDeltaData[y*size + size-1] = *(deltaDataPtr++);
