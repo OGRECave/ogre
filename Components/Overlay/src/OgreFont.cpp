@@ -318,11 +318,11 @@ namespace Ogre
 		// Now round up to nearest power of two
 		uint32 roundUpSize = Bitwise::firstPO2From(tex_side);
 
-		// Would we benefit from using a non-square texture (2X width(
+		// Would we benefit from using a non-square texture (2X width)
 		uint32 finalWidth, finalHeight;
-		if (roundUpSize*roundUpSize*0.5 >= rawSize)
+		if (roundUpSize * roundUpSize * 0.5 >= rawSize)
 		{
-			finalHeight = roundUpSize * 0.5;
+			finalHeight = static_cast<uint32>(roundUpSize * 0.5);
 		}
 		else
 		{

@@ -259,12 +259,12 @@ namespace Ogre
 			// No specified top left -> Center the window in the middle of the monitor
 			if (left == INT_MAX || top == INT_MAX)
 			{				
-				int screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-				int screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+				uint32 screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+				uint32 screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 
 				// clamp window dimensions to screen size
-				int outerw = (winWidth < screenw)? winWidth : screenw;
-				int outerh = (winHeight < screenh)? winHeight : screenh;
+				uint32 outerw = (winWidth < screenw)? winWidth : screenw;
+				uint32 outerh = (winHeight < screenh)? winHeight : screenh;
 
 				if (left == INT_MAX)
 					left = monitorInfo.rcWork.left + (screenw - outerw) / 2;

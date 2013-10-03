@@ -264,15 +264,15 @@ namespace Ogre {
 			// No specified top left -> Center the window in the middle of the monitor
 			if (left == -1 || top == -1)
 			{				
-				int screenw = monitorInfoEx.rcWork.right  - monitorInfoEx.rcWork.left;
-				int screenh = monitorInfoEx.rcWork.bottom - monitorInfoEx.rcWork.top;
+				uint32 screenw = monitorInfoEx.rcWork.right  - monitorInfoEx.rcWork.left;
+				uint32 screenh = monitorInfoEx.rcWork.bottom - monitorInfoEx.rcWork.top;
 
-				unsigned int winWidth, winHeight;
+				uint32 winWidth, winHeight;
 				adjustWindow(width, height, &winWidth, &winHeight);
 
 				// clamp window dimensions to screen size
-				int outerw = (winWidth < screenw)? winWidth : screenw;
-				int outerh = (winHeight < screenh)? winHeight : screenh;
+				uint32 outerw = (winWidth < screenw)? winWidth : screenw;
+				uint32 outerh = (winHeight < screenh)? winHeight : screenh;
 
 				if (left == -1)
 					left = monitorInfoEx.rcWork.left + (screenw - outerw) / 2;
@@ -583,7 +583,7 @@ namespace Ogre {
 				ChangeDisplaySettingsEx(mDeviceName, NULL, NULL, 0, NULL);
 
 				// calculate overall dimensions for requested client area
-				unsigned int winWidth, winHeight;
+				uint32 winWidth, winHeight;
 				adjustWindow(width, height, &winWidth, &winHeight);
 
 				// deal with centering when switching down to smaller resolution
@@ -594,12 +594,11 @@ namespace Ogre {
 				monitorInfo.cbSize = sizeof(MONITORINFO);
 				GetMonitorInfo(hMonitor, &monitorInfo);
 
-				LONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-				LONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
-
-
-				int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
-				int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
+				uint32 screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+				uint32 screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+                
+				uint32 left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
+				uint32 top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
 
 				SetWindowLong(mHWnd, GWL_STYLE, getWindowStyle(mIsFullScreen));
 				SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
