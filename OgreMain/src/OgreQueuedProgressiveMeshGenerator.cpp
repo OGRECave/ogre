@@ -247,7 +247,6 @@ void PMWorker::bakeLods()
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
 		size_t indexCount = mIndexBufferInfoList[i].indexCount;
-		OgreAssert(indexCount >= 0, "");
 
 		lods.push_back(PMGenRequest::IndexBuffer());
 		if (indexCount == 0) {
@@ -356,7 +355,6 @@ void PMInjector::inject(PMGenRequest* request)
 		for (; it != itEnd; it++) {
 			PMGenRequest::IndexBuffer& buff = *it;
 			size_t indexCount = buff.indexCount;
-			OgreAssert(indexCount >= 0, "");
 			lods.push_back(OGRE_NEW IndexData());
 			lods.back()->indexStart = 0;
 			lods.back()->indexCount = indexCount;

@@ -995,7 +995,6 @@ void ProgressiveMeshGenerator::bakeLods()
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
 		size_t indexCount = mIndexBufferInfoList[i].indexCount;
-		OgreAssert(indexCount >= 0, "");
 		lods.push_back(OGRE_NEW IndexData());
 		lods.back()->indexStart = 0;
 

@@ -285,7 +285,7 @@ namespace Ogre
 			};
 			
 			int maxAttribs[] = {
-				GLX_SAMPLES,		samples,
+				GLX_SAMPLES,		static_cast<int>(samples),
 				GLX_DOUBLEBUFFER,   1,
 				GLX_STENCIL_SIZE,   INT_MAX,
 				GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, 1,
