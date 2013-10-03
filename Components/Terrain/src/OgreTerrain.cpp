@@ -2098,9 +2098,9 @@ namespace Ogre
 			if (lodRect.bottom % step)
 				lodRect.bottom += step - (lodRect.bottom % step);
 
-			for (int j = lodRect.top; j < lodRect.bottom - step; j += step )
+			for (long j = lodRect.top; j < lodRect.bottom - step; j += step )
 			{
-				for (int i = lodRect.left; i < lodRect.right - step; i += step )
+				for (long i = lodRect.left; i < lodRect.right - step; i += step )
 				{
 					// Form planes relating to the lower detail tris to be produced
 					// For even tri strip rows, they are this shape:
@@ -2141,8 +2141,8 @@ namespace Ogre
 						int xubound = (i == (mSize - step)? step : step - 1);
 						for ( int x = 0; x <= xubound; x++ )
 						{
-							int fulldetailx = i + x;
-							int fulldetaily = j + y;
+							int fulldetailx = static_cast<int>(i + x);
+							int fulldetaily = static_cast<int>(j + y);
 							if ( fulldetailx % step == 0 && 
 								fulldetaily % step == 0 )
 							{
@@ -3322,7 +3322,8 @@ namespace Ogre
 		uint8* pData = static_cast<uint8*>(
 			OGRE_MALLOC(widenedRect.width() * widenedRect.height() * 3, MEMCATEGORY_GENERAL));
 
-		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_BYTE_RGB, pData);
+		PixelBox* pixbox = OGRE_NEW PixelBox(static_cast<uint32>(widenedRect.width()),
+                                             static_cast<uint32>(widenedRect.height()), 1, PF_BYTE_RGB, pData);
 
 		// Evaluate normal like this
 		//  3---2---1
@@ -3395,10 +3396,10 @@ namespace Ogre
 				// content of normalsBox is already inverted in Y, but rect is still 
 				// in terrain space for dealing with sub-rect, so invert
 				Image::Box dstBox;
-				dstBox.left = rect.left;
-				dstBox.right = rect.right;
-				dstBox.top = mSize - rect.bottom;
-				dstBox.bottom = mSize - rect.top;
+				dstBox.left = static_cast<uint32>(rect.left);
+				dstBox.right = static_cast<uint32>(rect.right);
+				dstBox.top = static_cast<uint32>(mSize - rect.bottom);
+				dstBox.bottom = static_cast<uint32>(mSize - rect.top);
 				mTerrainNormalMap->getBuffer()->blitFromMemory(*normalsBox, dstBox);
 			}
 		}
@@ -3505,7 +3506,8 @@ namespace Ogre
 		uint8* pData = static_cast<uint8*>(
 			OGRE_MALLOC(widenedRect.width() * widenedRect.height(), MEMCATEGORY_GENERAL));
 
-		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_L8, pData);
+		PixelBox* pixbox = OGRE_NEW PixelBox(static_cast<uint32>(widenedRect.width()),
+                                             static_cast<uint32>(widenedRect.height()), 1, PF_L8, pData);
 
 		Real heightPad = (getMaxHeight() - getMinHeight()) * 1.0e-3f;
 
@@ -3566,10 +3568,10 @@ namespace Ogre
 				// content of PixelBox is already inverted in Y, but rect is still 
 				// in terrain space for dealing with sub-rect, so invert
 				Image::Box dstBox;
-				dstBox.left = rect.left;
-				dstBox.right = rect.right;
-				dstBox.top = mLightmapSizeActual - rect.bottom;
-				dstBox.bottom = mLightmapSizeActual - rect.top;
+				dstBox.left = static_cast<uint32>(rect.left);
+				dstBox.right = static_cast<uint32>(rect.right);
+				dstBox.top = static_cast<uint32>(mLightmapSizeActual - rect.bottom);
+				dstBox.bottom = static_cast<uint32>(mLightmapSizeActual - rect.top);
 				mLightmap->getBuffer()->blitFromMemory(*lightmapBox, dstBox);
 			}
 		}

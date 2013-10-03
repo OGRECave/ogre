@@ -89,10 +89,10 @@ namespace Volume {
         ser.read<size_t>(&width);
         ser.read<size_t>(&height);
         ser.read<size_t>(&depth);
-        mWidth = (int)width;
-        mHeight = (int)height;
-        mDepth = (int)depth;
-        mDepthTimesHeight = mDepth * mHeight;
+        mWidth = static_cast<int>(width);
+        mHeight = static_cast<int>(height);
+        mDepth = static_cast<int>(depth);
+        mDepthTimesHeight = static_cast<int>(mDepth * mHeight);
         
         Vector3 worldDimension = readTo - readFrom;
         mPosXScale = (Real)1.0 / (Real)worldDimension.x * (Real)mWidth;

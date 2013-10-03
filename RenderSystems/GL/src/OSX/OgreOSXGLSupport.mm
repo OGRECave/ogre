@@ -454,7 +454,7 @@ bool OSXGLSupport::supportsPBuffers()
 	return true;
 }
 
-GLPBuffer* OSXGLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
+GLPBuffer* OSXGLSupport::createPBuffer(PixelComponentType format, uint32 width, uint32 height)
 {
 //	if(mContextType == "NSOpenGL")
 //		return OGRE_NEW OSXCocoaPBuffer(format, width, height);

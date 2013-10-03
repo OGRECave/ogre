@@ -162,10 +162,10 @@ namespace Ogre {
 			@remarks 
 				The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
          */
-		Image& loadDynamicImage( uchar* data, size_t width, size_t height, 
-							size_t depth,
+		Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
+							uint32 depth,
 							 PixelFormat format, bool autoDelete = false, 
-							 size_t numFaces = 1, size_t numMipMaps = 0);
+							 size_t numFaces = 1, uint8 numMipMaps = 0);
 		
 		/** Stores a pointer to raw data in memory. The pixel format has to be specified.
             @remarks
@@ -202,8 +202,8 @@ namespace Ogre {
 				Image::loadDynamicImage(data, width, height, depth, format, ...) to be compatible
 				with future Ogre versions.
          */
- 		Image& loadDynamicImage( uchar* data, size_t width,
-								 size_t height, PixelFormat format)
+ 		Image& loadDynamicImage( uchar* data, uint32 width,
+								 uint32 height, PixelFormat format)
 		{
 			return loadDynamicImage(data, width, height, 1, format);
 		}
@@ -228,7 +228,7 @@ namespace Ogre {
         */
         Image & loadRawData( 
             DataStreamPtr& stream, 
-            size_t width, size_t height, size_t depth,
+            uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
 			size_t numFaces = 1, size_t numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
@@ -252,7 +252,7 @@ namespace Ogre {
         */
         Image & loadRawData( 
             DataStreamPtr& stream, 
-            size_t width, size_t height, 
+            uint32 width, uint32 height,
             PixelFormat format )
 		{
 			return loadRawData(stream, width, height, 1, format);
@@ -379,7 +379,7 @@ namespace Ogre {
 
         /** Returns the number of mipmaps contained in the image.
         */
-        size_t getNumMipmaps() const;
+        uint8 getNumMipmaps() const;
 
         /** Returns true if the image has the appropriate flag set.
         */
@@ -387,15 +387,15 @@ namespace Ogre {
 
         /** Gets the width of the image in pixels.
         */
-        size_t getWidth(void) const;
+        uint32 getWidth(void) const;
 
         /** Gets the height of the image in pixels.
         */
-        size_t getHeight(void) const;
+        uint32 getHeight(void) const;
 
         /** Gets the depth of the image.
         */
-        size_t getDepth(void) const;
+        uint32 getDepth(void) const;
 		
 		/** Get the number of faces of the image. This is usually 6 for a cubemap, and
 		    1 for a normal image.
@@ -469,22 +469,22 @@ namespace Ogre {
 		void resize(ushort width, ushort height, Filter filter = FILTER_BILINEAR);
 		
         /// Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
-        static size_t calculateSize(size_t mipmaps, size_t faces, size_t width, size_t height, size_t depth, PixelFormat format);
+        static size_t calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);
 
 		/// Static function to get an image type string from a stream via magic numbers
 		static String getFileExtFromMagic(DataStreamPtr stream);
 
     protected:
         /// The width of the image in pixels
-		size_t mWidth;
+		uint32 mWidth;
         /// The height of the image in pixels
-		size_t mHeight;
+		uint32 mHeight;
         /// The depth of the image
-		size_t mDepth;
+		uint32 mDepth;
         /// The size of the image buffer
 		size_t mBufSize;
         /// The number of mipmaps the image contains
-		size_t mNumMipmaps;
+		uint8 mNumMipmaps;
         /// Image specific flags.
 		int mFlags;
 

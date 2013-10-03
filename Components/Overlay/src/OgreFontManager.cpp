@@ -258,8 +258,8 @@ namespace Ogre
 				if (itemVec.size() == 2)
 				{
 					pFont->addCodePointRange(Font::CodePointRange(
-						StringConverter::parseLong(itemVec[0]), 
-						StringConverter::parseLong(itemVec[1])));
+						StringConverter::parseUnsignedInt(itemVec[0]),
+						StringConverter::parseUnsignedInt(itemVec[1])));
 				}
 			}
 		}

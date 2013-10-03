@@ -91,7 +91,7 @@ namespace Ogre {
             {
 				access |= GL_MAP_WRITE_BIT;
                 access |= GL_MAP_FLUSH_EXPLICIT_BIT;
-                if(options == HBL_DISCARD)
+                if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
                 {
                     // Discard the buffer
                     access |= GL_MAP_INVALIDATE_RANGE_BIT;

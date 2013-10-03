@@ -285,7 +285,7 @@ namespace Ogre
 			};
 			
 			int maxAttribs[] = {
-				GLX_SAMPLES,		samples,
+				GLX_SAMPLES,		static_cast<int>(samples),
 				GLX_DOUBLEBUFFER,   1,
 				GLX_STENCIL_SIZE,   INT_MAX,
 				GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, 1,
@@ -569,9 +569,16 @@ namespace Ogre
 		
 		mContext->setCurrent();
 		
-		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
+		if (! mIsExternalGLControl)
 		{
-			glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+			if (GLXEW_MESA_swap_control)
+				glXSwapIntervalMESA (vsync ? mVSyncInterval : 0);
+			else if (GLXEW_EXT_swap_control)
+				glXSwapIntervalEXT (mGLSupport->getGLDisplay(), glXGetCurrentDrawable(),
+									vsync ? mVSyncInterval : 0);
+			else if (GLXEW_SGI_swap_control)
+				if (vsync && mVSyncInterval)
+					glXSwapIntervalSGI (mVSyncInterval);
 		}
 		
 		mContext->endCurrent();

@@ -1,5 +1,4 @@
 syntax: glob
-testTerrain*.dat
 *.dll
 #*.vcxproj
 #*.filters

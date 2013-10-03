@@ -394,7 +394,7 @@ namespace Ogre
 		/** Implement this method to enable stencil shadows. */
 		ShadowRenderableListIterator getShadowVolumeRenderableIterator(
 			ShadowTechnique shadowTechnique, const Light* light, 
-			HardwareIndexBufferSharedPtr* indexBuffer, 
+			HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
 			bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
 
 

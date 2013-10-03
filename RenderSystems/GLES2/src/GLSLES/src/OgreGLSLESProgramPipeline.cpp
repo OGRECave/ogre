@@ -296,12 +296,12 @@ namespace Ogre
 #endif
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
-                                                                        (GLsizei)def->elementSize * def->arraySize * sizeof(int));
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
                             break;
                         default:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getFloatPointer(def->physicalIndex),
-                                                                        (GLsizei)def->elementSize * def->arraySize * sizeof(float));
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
                             break;
                     }
 
@@ -479,9 +479,9 @@ namespace Ogre
                     {
                         if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                                              params->getFloatPointer(index),
-                                                                             currentUniform->mConstantDef->elementSize *
+                                                                             static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
                                                                              currentUniform->mConstantDef->arraySize *
-                                                                             sizeof(float)))
+                                                                             sizeof(float))))
                             return;
                         
                         progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
@@ -492,9 +492,9 @@ namespace Ogre
                     {
                         if(!mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                params->getFloatPointer(index),
-                                                                               currentUniform->mConstantDef->elementSize *
+                                                                               static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
                                                                                currentUniform->mConstantDef->arraySize *
-                                                                               sizeof(float)))
+                                                                               sizeof(float))))
                             return;
                         progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));

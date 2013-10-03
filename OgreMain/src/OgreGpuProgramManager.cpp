@@ -300,7 +300,7 @@ namespace Ogre {
 		}
 		
 		// write the size of the array
-		uint32 sizeOfArray = mMicrocodeCache.size();
+		uint32 sizeOfArray = static_cast<uint32>(mMicrocodeCache.size());
 		stream->write(&sizeOfArray, sizeof(uint32));
 		
 		// loop the array and save it
@@ -311,14 +311,14 @@ namespace Ogre {
 			// saves the name of the shader
 			{
 				const String & nameOfShader = iter->first;
-				uint32 stringLength = nameOfShader.size();
+				uint32 stringLength = static_cast<uint32>(nameOfShader.size());
 				stream->write(&stringLength, sizeof(uint32));				
 				stream->write(&nameOfShader[0], stringLength);
 			}
 			// saves the microcode
 			{
 				const Microcode & microcodeOfShader = iter->second;
-				uint32 microcodeLength = microcodeOfShader->size();
+				uint32 microcodeLength = static_cast<uint32>(microcodeOfShader->size());
 				stream->write(&microcodeLength, sizeof(uint32));				
 				stream->write(microcodeOfShader->getPtr(), microcodeLength);
 			}

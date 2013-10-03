@@ -313,7 +313,7 @@ namespace Ogre {
 			}
 
 			// Initalise the SizeOrPitch flags (power two textures for now)
-			ddsHeaderSizeOrPitch = ddsHeaderRgbBits * imgData->width;
+			ddsHeaderSizeOrPitch = static_cast<uint32>(ddsHeaderRgbBits * imgData->width);
 
 			// Initalise the caps flags
 			ddsHeaderCaps1 = (isVolume||isCubeMap) ? DDSCAPS_COMPLEX|DDSCAPS_TEXTURE : DDSCAPS_TEXTURE;
@@ -766,9 +766,9 @@ namespace Ogre {
 		// all mips for a face, then each face
 		for(size_t i = 0; i < numFaces; ++i)
 		{   
-			size_t width = imgData->width;
-			size_t height = imgData->height;
-			size_t depth = imgData->depth;
+			uint32 width = imgData->width;
+			uint32 height = imgData->height;
+			uint32 depth = imgData->depth;
 
 			for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)
 			{
@@ -785,8 +785,8 @@ namespace Ogre {
 						// 4x4 block of decompressed colour
 						ColourValue tempColours[16];
 						size_t destBpp = PixelUtil::getNumElemBytes(imgData->format);
-						size_t sx = std::min(width, (size_t)4);
-						size_t sy = std::min(height, (size_t)4);
+						size_t sx = std::min((size_t)width, (size_t)4);
+						size_t sy = std::min((size_t)height, (size_t)4);
 						size_t destPitchMinus4 = dstPitch - destBpp * sx;
 						// slices are done individually
 						for(size_t z = 0; z < depth; ++z)

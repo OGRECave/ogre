@@ -445,7 +445,7 @@ namespace Ogre {
         
         if(dst.getWidth() != dst.rowPitch)
         {
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+            glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch));
         }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {

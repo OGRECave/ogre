@@ -183,7 +183,7 @@ namespace Ogre {
 
         if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
         {
-            GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+            GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
 
             // load binary
             OGRE_CHECK_GL_ERROR(glProgramBinaryOES(mGLProgramHandle,

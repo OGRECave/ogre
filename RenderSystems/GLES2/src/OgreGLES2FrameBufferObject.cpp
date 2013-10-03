@@ -292,8 +292,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
 			// Blit from multisample buffer to final buffer, triggers resolve
-			size_t width = mColour[0].buffer->getWidth();
-			size_t height = mColour[0].buffer->getHeight();
+			uint32 width = mColour[0].buffer->getWidth();
+			uint32 height = mColour[0].buffer->getHeight();
 			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
 			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
 			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
@@ -338,12 +338,12 @@ namespace Ogre {
                                                       GL_RENDERBUFFER, 0 ));
 	}
 
-    size_t GLES2FrameBufferObject::getWidth()
+    uint32 GLES2FrameBufferObject::getWidth()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getWidth();
     }
-    size_t GLES2FrameBufferObject::getHeight()
+    uint32 GLES2FrameBufferObject::getHeight()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getHeight();

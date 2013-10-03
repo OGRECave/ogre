@@ -330,12 +330,12 @@ namespace Ogre {
 									  GL_RENDERBUFFER_OES, 0 );
 	}
 
-    size_t GLESFrameBufferObject::getWidth()
+    uint32 GLESFrameBufferObject::getWidth()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getWidth();
     }
-    size_t GLESFrameBufferObject::getHeight()
+    uint32 GLESFrameBufferObject::getHeight()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getHeight();

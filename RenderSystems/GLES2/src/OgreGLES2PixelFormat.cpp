@@ -799,7 +799,7 @@ namespace Ogre {
         };
     }
 	//-----------------------------------------------------------------------------
-    size_t GLES2PixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth,
+    size_t GLES2PixelUtil::getMaxMipmaps(uint32 width, uint32 height, uint32 depth,
                                       PixelFormat format)
     {
 		size_t count = 0;
@@ -827,7 +827,7 @@ namespace Ogre {
     }
 	//-----------------------------------------------------------------------------
     // TODO: Remove
-    size_t GLES2PixelUtil::optionalPO2(size_t value)
+    uint32 GLES2PixelUtil::optionalPO2(uint32 value)
     {
         const RenderSystemCapabilities *caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
@@ -838,7 +838,7 @@ namespace Ogre {
         }
         else
         {
-            return Bitwise::firstPO2From((uint32)value);
+            return Bitwise::firstPO2From(value);
         }
     }
 }

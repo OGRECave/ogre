@@ -1096,7 +1096,7 @@ void OctreeSceneManager::clearScene(void)
 
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery*
-OctreeSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
+OctreeSceneManager::createAABBQuery(const AxisAlignedBox& box, uint32 mask)
 {
     OctreeAxisAlignedBoxSceneQuery* q = OGRE_NEW OctreeAxisAlignedBoxSceneQuery(this);
     q->setBox(box);
@@ -1105,7 +1105,7 @@ OctreeSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mas
 }
 //---------------------------------------------------------------------
 SphereSceneQuery*
-OctreeSceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
+OctreeSceneManager::createSphereQuery(const Sphere& sphere, uint32 mask)
 {
     OctreeSphereSceneQuery* q = OGRE_NEW OctreeSphereSceneQuery(this);
     q->setSphere(sphere);
@@ -1115,7 +1115,7 @@ OctreeSceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
 //---------------------------------------------------------------------
 PlaneBoundedVolumeListSceneQuery*
 OctreeSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes,
-        unsigned long mask)
+        uint32 mask)
 {
     OctreePlaneBoundedVolumeListSceneQuery* q = OGRE_NEW OctreePlaneBoundedVolumeListSceneQuery(this);
     q->setVolumes(volumes);
@@ -1125,7 +1125,7 @@ OctreeSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& 
 
 //---------------------------------------------------------------------
 RaySceneQuery*
-OctreeSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
+OctreeSceneManager::createRayQuery(const Ray& ray, uint32 mask)
 {
     OctreeRaySceneQuery* q = OGRE_NEW OctreeRaySceneQuery(this);
     q->setRay(ray);
@@ -1134,7 +1134,7 @@ OctreeSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
 }
 //---------------------------------------------------------------------
 IntersectionSceneQuery*
-OctreeSceneManager::createIntersectionQuery(unsigned long mask)
+OctreeSceneManager::createIntersectionQuery(uint32 mask)
 {
 
     // Octree implementation performs WORSE for < 500 objects

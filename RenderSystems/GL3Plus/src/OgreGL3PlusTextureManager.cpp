@@ -62,8 +62,8 @@ namespace Ogre {
     void GL3PlusTextureManager::createWarningTexture()
     {
         // Generate warning texture
-        size_t width = 8;
-        size_t height = 8;
+        uint32 width = 8;
+        uint32 height = 8;
 
         uint32* data = new uint32[width * height]; // 0xXXRRGGBB
 

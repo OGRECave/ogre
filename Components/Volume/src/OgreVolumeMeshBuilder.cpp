@@ -134,7 +134,7 @@ namespace Volume {
     
             for (VecIndices::const_iterator iter = mIndices.begin(); iter != endIndices; ++iter)
             {
-                *indices++ = *iter;
+                *indices++ = static_cast<uint32>(*iter);
             }
         }
         else
@@ -180,7 +180,7 @@ namespace Volume {
             }
             for (VecIndices::const_iterator iter = mIndices.begin(); iter != mIndices.end(); ++iter)
             {
-                manual->index(*iter);
+                manual->index(static_cast<uint32>(*iter));
             }
 
             manual->end();

@@ -210,7 +210,7 @@ namespace Ogre {
 
                 // Create microcode
                 GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
+                    GpuProgramManager::getSingleton().createMicrocode(static_cast<uint32>(binaryLength + sizeof(GLenum)));
 
 				// Get binary
                 if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
@@ -281,12 +281,12 @@ namespace Ogre {
                         case GCT_SAMPLERCUBE:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getIntPointer(def->physicalIndex),
-                                                                                  def->elementSize * def->arraySize * sizeof(int));
+                                                                                  static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
                             break;
                         default:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
                                                                                   params->getFloatPointer(def->physicalIndex),
-                                                                                  def->elementSize * def->arraySize * sizeof(float));
+                                                                                  static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
                             break;
                     }
 
@@ -457,9 +457,9 @@ namespace Ogre {
 				{
                      mUniformCache->updateUniform(currentUniform->mLocation,
                                                   params->getFloatPointer(index),
-                                                  currentUniform->mConstantDef->elementSize *
+                                                  static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
                                                   currentUniform->mConstantDef->arraySize *
-                                                  sizeof(float));
+                                                  sizeof(float)));
 					// There will only be one multipass entry
 					return;
 				}

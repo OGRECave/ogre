@@ -1837,12 +1837,10 @@ namespace Ogre {
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
                 OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
-//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
             else
             {
                 OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
-//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
 		}
         else if (op.useIndexes)
@@ -1964,7 +1962,7 @@ namespace Ogre {
         //  GL measures from the bottom, not the top
         size_t targetHeight = mActiveRenderTarget->getHeight();
         // Calculate the "lower-left" corner of the viewport
-        GLsizei x = 0, y = 0, w = 0, h = 0;
+        uint64 x = 0, y = 0, w = 0, h = 0;
 
         if (enabled)
         {
@@ -1977,7 +1975,10 @@ namespace Ogre {
                 y = targetHeight - bottom;
             w = right - left;
             h = bottom - top;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
         else
         {
@@ -1990,7 +1991,10 @@ namespace Ogre {
                 y = mActiveViewport->getActualTop();
             else
                 y = targetHeight - mActiveViewport->getActualTop() - h;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
     }
 
@@ -2606,7 +2610,7 @@ namespace Ogre {
     {
         markProfileEvent("Begin Event: " + eventName);
         if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
-            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, eventName.length(), eventName.c_str()));
+            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
     //---------------------------------------------------------------------
@@ -2628,7 +2632,7 @@ namespace Ogre {
                                  GL_DEBUG_TYPE_PERFORMANCE,
                                  GL_DEBUG_SEVERITY_LOW,
                                  0,
-                                 eventName.length(),
+                                 static_cast<GLint>(eventName.length()),
                                  eventName.c_str());
     }
 
@@ -2638,8 +2642,8 @@ namespace Ogre {
 		{
 			if (unit < getCapabilities()->getNumTextureUnits())
 			{
-				OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
-				mActiveTextureUnit = unit;
+				OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<uint32>(GL_TEXTURE0 + unit)));
+				mActiveTextureUnit = static_cast<GLenum>(unit);
 				return true;
 			}
 			else if (!unit)

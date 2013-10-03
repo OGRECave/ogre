@@ -660,7 +660,7 @@ namespace Ogre {
         newEmbeddedFileData.fileSize = fileSize;
         newEmbeddedFileData.decryptFunc = decryptFunc;
         EmbeddedZipArchiveFactory_mEmbbedFileDataList->push_back(newEmbeddedFileData);
-        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = EmbeddedZipArchiveFactory_mEmbbedFileDataList->size();
+        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = static_cast<int>(EmbeddedZipArchiveFactory_mEmbbedFileDataList->size());
     }
     //-----------------------------------------------------------------------
     void EmbeddedZipArchiveFactory::removeEmbbeddedFile( const String& name )

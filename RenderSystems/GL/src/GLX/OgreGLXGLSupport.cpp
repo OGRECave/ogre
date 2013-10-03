@@ -910,8 +910,8 @@ namespace Ogre
 		
 		for(mode = mVideoModes.begin(); mode != end; size++)
 		{
-			if (mode->first.first >= static_cast<int>(width) &&
-				mode->first.second >= static_cast<int>(height))
+			if (mode->first.first >= width &&
+				mode->first.second >= height)
 			{
 				if (! newMode || 
 					mode->first.first < newMode->first.first ||

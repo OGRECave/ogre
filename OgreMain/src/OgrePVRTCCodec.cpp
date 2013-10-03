@@ -197,11 +197,11 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian((void *)flags, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
         formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
 
         uint32 bitmaskAlpha = header.bitmaskAlpha;
-        flipEndian((void *)bitmaskAlpha, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(bitmaskAlpha), sizeof(uint32));
 
         if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
         {
@@ -286,7 +286,7 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian((void *)flags, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
 
         imgData->depth = header.depth;
         imgData->width = header.width;
@@ -312,9 +312,9 @@ namespace Ogre {
 		// Now deal with the data
 		void *destPtr = output->getPtr();
         
-        size_t width = imgData->width;
-        size_t height = imgData->height;
-        size_t depth = imgData->depth;
+        uint width = imgData->width;
+        uint height = imgData->height;
+        uint depth = imgData->depth;
 
         // All mips for a surface, then each face
         for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)

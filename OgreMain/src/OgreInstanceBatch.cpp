@@ -197,7 +197,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
-		return OGRE_NEW InstancedEntity( this, num);
+		return OGRE_NEW InstancedEntity(this, static_cast<uint32>(num));
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()

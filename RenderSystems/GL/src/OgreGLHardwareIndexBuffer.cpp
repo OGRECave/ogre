@@ -87,7 +87,7 @@ namespace Ogre {
 				mScratchPtr = retPtr;
 				mScratchUploadOnUnlock = (options != HBL_READ_ONLY);
 
-				if (options != HBL_DISCARD)
+				if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
 				{
 					// have to read back the data before returning the pointer
 					readData(offset, length, retPtr);
@@ -100,7 +100,7 @@ namespace Ogre {
             GLenum access = 0;
             static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 			// Use glMapBuffer
-			if(options == HBL_DISCARD)
+			if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
 			{
 				// Discard the buffer
 				glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
