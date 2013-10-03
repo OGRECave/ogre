@@ -43,10 +43,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::SubEntity (Entity* parent, SubMesh* subMeshBasis)
         : Renderable(), mParentEntity(parent), //mMaterialName("BaseWhite"),
-		mSubMesh(subMeshBasis), mCachedCamera(0)
+		mSubMesh(subMeshBasis), mCachedCamera(0), mMaterialLodIndex(0)
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
-        mMaterialLodIndex = 0;
         mVisible = true;
         mRenderQueueIDSet = false;
         mRenderQueuePrioritySet = false;

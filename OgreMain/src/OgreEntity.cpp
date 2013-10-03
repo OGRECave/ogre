@@ -171,7 +171,7 @@ namespace Ogre {
 
 		// Build main subentity list
 		buildSubEntityList(mMesh, &mSubEntityList);
-
+#if !OGRE_NO_MESHLOD
 		// Check if mesh is using manual LOD
 		if (mMesh->hasManualLodLevel())
 		{
@@ -193,7 +193,7 @@ namespace Ogre {
 				mLodEntityList.push_back(lodEnt);
 			}
 		}
-
+#endif
 
 		// Initialise the AnimationState, if Mesh has animation
 		if (hasSkeleton())
@@ -238,7 +238,8 @@ namespace Ogre {
             *i = 0;
 		}
 		mSubEntityList.clear();
-		
+
+#if !OGRE_NO_MESHLOD
 		// Delete LOD entities
 		LODEntityList::iterator li, liend;
 		liend = mLodEntityList.end();
@@ -251,7 +252,7 @@ namespace Ogre {
 			}
 		}
         mLodEntityList.clear();
-        
+#endif
 		// Delete shadow renderables
 		ShadowRenderableList::iterator si, siend;
 		siend = mShadowRenderables.end();
@@ -403,6 +404,7 @@ namespace Ogre {
         // Calculate the LOD
         if (mParentNode)
         {
+#if !OGRE_NO_MESHLOD
             // Get mesh lod strategy
             const LodStrategy *meshStrategy = mMesh->getLodStrategy();
             // Get the appropriate lod value
@@ -434,13 +436,14 @@ namespace Ogre {
 
             // Now do material LOD
             lodValue *= mMaterialLodFactorTransformed;
-
+#endif
 
 
             SubEntityList::iterator i, iend;
             iend = mSubEntityList.end();
             for (i = mSubEntityList.begin(); i != iend; ++i)
             {
+#if !OGRE_NO_MESHLOD
                 // Get sub-entity material
                 const MaterialPtr& material = (*i)->getMaterial();
                 
@@ -474,7 +477,7 @@ namespace Ogre {
 
                 // Change lod index
                 (*i)->mMaterialLodIndex = subEntEvt.newLodIndex;
-
+#endif
 				// Also invalidate any camera distance cache
 				(*i)->_invalidateCameraCache ();
             }
@@ -572,6 +575,7 @@ namespace Ogre {
 		}
 
         Entity* displayEntity = this;
+#if !OGRE_NO_MESHLOD
 		// Check we're not using a manual LOD
         if (mMeshLodIndex > 0 && mMesh->hasManualLodLevel())
         {
@@ -593,6 +597,7 @@ namespace Ogre {
 				}
 			}
 		}
+#endif
 
         // Add each visible SubEntity to the queue
         SubEntityList::iterator i, iend;
@@ -628,7 +633,7 @@ namespace Ogre {
                 }
             }
         }
-
+#if !OGRE_NO_MESHLOD
 		if (getAlwaysUpdateMainSkeleton() && hasSkeleton() && (mMeshLodIndex > 0))
 		{
 			//check if an update was made
@@ -641,7 +646,7 @@ namespace Ogre {
 				getSkeleton()->_notifyManualBonesDirty();
 			}
 		}
-
+#endif
         // Since we know we're going to be rendered, take this opportunity to
         // update the animation
         if (displayEntity->hasSkeleton() || displayEntity->hasVertexAnimation())
@@ -1383,34 +1388,44 @@ namespace Ogre {
         return mDisplaySkeleton;
     }
     //-----------------------------------------------------------------------
-    Entity* Entity::getManualLodLevel(size_t index) const
-    {
-        assert(index < mLodEntityList.size());
-
-        return mLodEntityList[index-1];
-    }
-    //-----------------------------------------------------------------------
     size_t Entity::getNumManualLodLevels(void) const
     {
-        return mLodEntityList.size();
+#if !OGRE_NO_MESHLOD
+		return mLodEntityList.size();
+#else
+		return 0;
+#endif
     }
+
+	//-----------------------------------------------------------------------
+	Entity* Entity::getManualLodLevel(size_t index) const
+	{
+#if !OGRE_NO_MESHLOD
+		assert(index < mLodEntityList.size());
+
+		return mLodEntityList[index];
+#else
+		OgreAssert(0, "This feature is disabled in ogre configuration!");
+		return NULL;
+#endif
+	}
+#if !OGRE_NO_MESHLOD
     //-----------------------------------------------------------------------
     void Entity::setMeshLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
     {
-        mMeshLodFactorTransformed = mMesh->getLodStrategy()->transformBias(factor);
-        mMaxMeshLodIndex = maxDetailIndex;
-        mMinMeshLodIndex = minDetailIndex;
-
+		mMeshLodFactorTransformed = mMesh->getLodStrategy()->transformBias(factor);
+		mMaxMeshLodIndex = maxDetailIndex;
+		mMinMeshLodIndex = minDetailIndex;
     }
     //-----------------------------------------------------------------------
     void Entity::setMaterialLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
     {
-        mMaterialLodFactor = factor;
-        mMaterialLodFactorTransformed = mMesh->getLodStrategy()->transformBias(factor);
-        mMaxMaterialLodIndex = maxDetailIndex;
-        mMinMaterialLodIndex = minDetailIndex;
-
+		mMaterialLodFactor = factor;
+		mMaterialLodFactorTransformed = mMesh->getLodStrategy()->transformBias(factor);
+		mMaxMaterialLodIndex = maxDetailIndex;
+		mMinMaterialLodIndex = minDetailIndex;
     }
+#endif
     //-----------------------------------------------------------------------
     void Entity::buildSubEntityList(MeshPtr& mesh, SubEntityList* sublist)
     {
@@ -1689,12 +1704,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     EdgeData* Entity::getEdgeList(void)
     {
+#if OGRE_NO_MESHLOD
+		unsigned short mMeshLodIndex = 0;
+#endif
         // Get from Mesh
         return mMesh->getEdgeList(mMeshLodIndex);
     }
 	//-----------------------------------------------------------------------
     bool Entity::hasEdgeList(void)
     {
+#if OGRE_NO_MESHLOD
+		unsigned short mMeshLodIndex = 0;
+#endif
         // check if mesh has an edge list attached
         // give mesh a chance to built it if scheduled
         return (mMesh->getEdgeList(mMeshLodIndex) != NULL);
@@ -1845,6 +1866,7 @@ namespace Ogre {
 
 		return hasHardwareAnimation;
     }
+
     //-----------------------------------------------------------------------
     Real Entity::_getMeshLodFactorTransformed() const
     {
@@ -1860,6 +1882,7 @@ namespace Ogre {
         assert(indexBuffer && "Only external index buffers are supported right now");
         assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
             "Only 16-bit indexes supported for now");
+#if !OGRE_NO_MESHLOD
         // Potentially delegate to LOD entity
         if (mMesh->hasManualLodLevel() && mMeshLodIndex > 0)
         {
@@ -1886,7 +1909,7 @@ namespace Ogre {
 					extrusionDistance, flags);
 			}
         }
-
+#endif
 
         // Prepare temp buffers if required
         if (!mPreparedForShadowVolumes)
@@ -2097,6 +2120,7 @@ namespace Ogre {
     void Entity::_notifyAttached(Node* parent, bool isTagPoint)
     {
         MovableObject::_notifyAttached(parent, isTagPoint);
+#if !OGRE_NO_MESHLOD
         // Also notify LOD entities
         LODEntityList::iterator i, iend;
         iend = mLodEntityList.end();
@@ -2105,7 +2129,7 @@ namespace Ogre {
 			if(*i != this)
 				(*i)->_notifyAttached(parent, isTagPoint);
         }
-
+#endif
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -2218,7 +2242,7 @@ namespace Ogre {
     void Entity::setRenderQueueGroup(uint8 queueID)
     {
         MovableObject::setRenderQueueGroup(queueID);
-
+#if !OGRE_NO_MESHLOD
         // Set render queue for all manual LOD entities
         if (mMesh->hasManualLodLevel())
         {
@@ -2230,12 +2254,13 @@ namespace Ogre {
 					(*li)->setRenderQueueGroup(queueID);
             }
         }
+#endif
     }
 	//-----------------------------------------------------------------------
 	void Entity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
 	{
 		MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
-
+#if !OGRE_NO_MESHLOD
 		// Set render queue for all manual LOD entities
 		if (mMesh->hasManualLodLevel())
 		{
@@ -2247,6 +2272,7 @@ namespace Ogre {
 					(*li)->setRenderQueueGroupAndPriority(queueID, priority);
 			}
 		}
+#endif
 	}
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)
@@ -2410,6 +2436,7 @@ namespace Ogre {
 		{
 			visitor->visit(*i, 0, false);
 		}
+#if !OGRE_NO_MESHLOD
 		// if manual LOD is in use, visit those too
 		ushort lodi = 1;
 		for (LODEntityList::iterator e = mLodEntityList.begin(); 
@@ -2423,7 +2450,7 @@ namespace Ogre {
 				}
 			}
 		}
-
+#endif
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------

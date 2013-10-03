@@ -335,6 +335,10 @@ elseif (OGRE_BUILD_PLATFORM_WINRT)
   set(OGRE_BUILD_RENDERSYSTEM_D3D11 TRUE CACHE BOOL "Forcing Direct3D11 RenderSystem for WinRT" FORCE)
 endif ()
 
+if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
+  set(OGRE_CONFIG_ENABLE_MESHLOD TRUE CACHE BOOL "Forcing Mesh Lod" FORCE)
+endif()
+
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
@@ -404,6 +408,7 @@ option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mod
 # determine threading options
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
+option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." FALSE)
@@ -452,6 +457,7 @@ mark_as_advanced(
   OGRE_CONFIG_MEMTRACK_DEBUG
   OGRE_CONFIG_MEMTRACK_RELEASE
   OGRE_CONFIG_NEW_COMPILERS
+  OGRE_CONFIG_ENABLE_MESHLOD
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC

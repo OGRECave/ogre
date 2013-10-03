@@ -111,6 +111,9 @@ if (DEFINED _programs)
 endif ()
 
 # summarise core features
+if (OGRE_CONFIG_ENABLE_MESHLOD)
+	set(_core "${_core}  + Mesh Lod\n")
+endif ()
 if (OGRE_CONFIG_ENABLE_DDS)
 	set(_core "${_core}  + DDS image codec\n")
 endif ()

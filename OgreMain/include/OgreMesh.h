@@ -55,7 +55,6 @@ namespace Ogre {
     */
 
     struct MeshLodUsage;
-    struct LodConfig;
     class LodStrategy;
 
     /** Resource holding data about 3D mesh.
@@ -159,12 +158,17 @@ namespace Ogre {
             unsigned short numBlendWeightsPerVertex, 
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
-
+#if !OGRE_NO_MESHLOD
         const LodStrategy *mLodStrategy;
 		bool mHasManualLodLevel;
         ushort mNumLods;
         MeshLodUsageList mMeshLodUsageList;
-
+#else
+		const LodStrategy *mLodStrategy;
+		const bool mHasManualLodLevel;
+		const ushort mNumLods;
+		MeshLodUsageList mMeshLodUsageList;
+#endif
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
@@ -432,7 +436,6 @@ namespace Ogre {
         */
         const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
-
         /** Returns the number of levels of detail that this mesh supports. 
         @remarks
             This number includes the original model.
@@ -440,17 +443,6 @@ namespace Ogre {
         ushort getNumLodLevels(void) const;
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
-
-        /** Changes the alternate mesh to use as a manual LOD at the given index.
-        @remarks
-            Note that the index of a LOD may change if you insert other LODs. If in doubt,
-            use getLodIndex().
-        @param index
-            The index of the level to be changed.
-        @param meshName
-            The name of the mesh which will be the lower level detail version.
-        */
-        void updateManualLodLevel(ushort index, const String& meshName);
 
         /** Retrieves the level of detail index for the given lod value. 
         @note
@@ -466,15 +458,28 @@ namespace Ogre {
 		    meshes as provided by an artist.
 		*/
 		bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
+#if !OGRE_NO_MESHLOD
+        /** Changes the alternate mesh to use as a manual LOD at the given index.
+        @remarks
+            Note that the index of a LOD may change if you insert other LODs. If in doubt,
+            use getLodIndex().
+        @param index
+            The index of the level to be changed.
+        @param meshName
+            The name of the mesh which will be the lower level detail version.
+        */
+        void updateManualLodLevel(ushort index, const String& meshName);
 
         /** Internal methods for loading LOD, do not use. */
         void _setLodInfo(unsigned short numLevels);
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
-		bool _isManualLodLevel(unsigned short level) const;
-        /** Internal methods for loading LOD, do not use. */
         void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
+#endif
+        /** Internal methods for loading LOD, do not use. */
+        bool _isManualLodLevel(unsigned short level) const;
+
 
         /** Removes all LOD data from this Mesh. */
         void removeLodLevels(void);
@@ -589,8 +594,6 @@ namespace Ogre {
 			successful merges.
         */
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
-
-		void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks
@@ -924,9 +927,10 @@ namespace Ogre {
 
         /** Get lod strategy used by this mesh. */
         const LodStrategy *getLodStrategy() const;
+#if !OGRE_NO_MESHLOD
         /** Set the lod strategy used by this mesh. */
         void setLodStrategy(LodStrategy *lodStrategy);
-
+#endif
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to MeshPtr 

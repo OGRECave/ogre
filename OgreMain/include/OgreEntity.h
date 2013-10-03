@@ -226,7 +226,7 @@ namespace Ogre {
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
 
-
+#if !OGRE_NO_MESHLOD
         /// The LOD number of the mesh to use, calculated by _notifyCurrentCamera.
         ushort mMeshLodIndex;
 
@@ -253,7 +253,16 @@ namespace Ogre {
         */
         typedef vector<Entity*>::type LODEntityList;
         LODEntityList mLodEntityList;
-
+#else
+		const ushort mMeshLodIndex;
+		const Real mMeshLodFactorTransformed;
+		const ushort mMinMeshLodIndex;
+		const ushort mMaxMeshLodIndex;
+		const Real mMaterialLodFactor;
+		const Real mMaterialLodFactorTransformed;
+		const ushort mMinMaterialLodIndex;
+		const ushort mMaxMaterialLodIndex;
+#endif
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
         SkeletonInstance* mSkeletonInstance;
@@ -454,14 +463,6 @@ namespace Ogre {
         */
         bool getDisplaySkeleton(void) const;
 
-
-        /** Gets a pointer to the entity representing the numbered manual level of detail.
-        @remarks
-            The zero-based index never includes the original entity, unlike
-            Mesh::getLodLevel.
-        */
-        Entity* getManualLodLevel(size_t index) const;
-
         /** Returns the number of manual levels of detail that this entity supports.
         @remarks
             This number never includes the original entity, it is difference
@@ -473,6 +474,14 @@ namespace Ogre {
         */
         ushort getCurrentLodIndex() { return mMeshLodIndex; }
 
+        /** Gets a pointer to the entity representing the numbered manual level of detail.
+        @remarks
+            The zero-based index never includes the original entity, unlike
+            Mesh::getLodLevel.
+        */
+        Entity* getManualLodLevel(size_t index) const;
+
+#if !OGRE_NO_MESHLOD
         /** Sets a level-of-detail bias for the mesh detail of this entity.
         @remarks
             Level of detail reduction is normally applied automatically based on the Mesh
@@ -534,7 +543,7 @@ namespace Ogre {
             LOD will be limited by the number of lod indexes used in the Material).
         */
         void setMaterialLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
-
+#endif
         /** Sets whether the polygon mode of this entire entity may be
             overridden by the camera detail settings.
         */

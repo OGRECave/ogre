@@ -168,7 +168,7 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("Shared geometry bone assignments exported.");
             }
         }
-
+#if !OGRE_NO_MESHLOD
 		// Write LOD data if any
 		if (pMesh->getNumLodLevels() > 1)
 		{
@@ -177,7 +177,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("LOD information exported.");
 
 		}
-
+#endif
         
         // Write bounds information
         LogManager::getSingleton().logMessage("Exporting bounds information....");
@@ -1167,6 +1167,7 @@ namespace Ogre {
         return size;
     }
     //---------------------------------------------------------------------
+#if !OGRE_NO_MESHLOD
 	void MeshSerializerImpl::writeLodInfo(const Mesh* pMesh)
 	{
 		const LodStrategy *strategy = pMesh->getLodStrategy();
@@ -1307,6 +1308,7 @@ namespace Ogre {
 			writeLodUsageGeneratedSubmesh(submesh, lodNum);
 		}
     }
+#endif
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeBoundsInfo(const Mesh* pMesh)
     {
@@ -1350,9 +1352,12 @@ namespace Ogre {
         pMesh->_setBoundingSphereRadius(radius);
     }
     //---------------------------------------------------------------------
+
 	void MeshSerializerImpl::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
 	{
-
+#if OGRE_NO_MESHLOD
+		stream->skip(mCurrentstreamLen);
+#else
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
         LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
@@ -1390,7 +1395,9 @@ namespace Ogre {
 			usage.manualMesh.setNull(); // will trigger load later with manual Lod
 			usage.edgeData = NULL;
 		}
+#endif
 	}
+#if !OGRE_NO_MESHLOD
 	//---------------------------------------------------------------------
 	void MeshSerializerImpl::readMeshLodUsageManual( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage )
 	{
@@ -1465,6 +1472,7 @@ namespace Ogre {
 			}
 		}
 	}
+#endif
     //---------------------------------------------------------------------
     void MeshSerializerImpl::flipFromLittleEndian(void* pData, size_t vertexCount,
         size_t vertexSize, const VertexDeclaration::VertexElementList& elems)
@@ -2537,6 +2545,7 @@ namespace Ogre {
 	MeshSerializerImpl_v1_8::~MeshSerializerImpl_v1_8()
 	{
 	}
+#if !OGRE_NO_MESHLOD
 	//--------------------------------------------------------------------
 	bool MeshSerializerImpl_v1_8::isLodMixed(const Mesh* pMesh)
 	{
@@ -2835,6 +2844,7 @@ namespace Ogre {
 		usage.manualName = readString(stream);
 		usage.manualMesh.setNull(); // will trigger load later
 	}
+#endif
 	//---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -3005,6 +3015,7 @@ namespace Ogre {
     MeshSerializerImpl_v1_4::~MeshSerializerImpl_v1_4()
     {
     }
+#if !OGRE_NO_MESHLOD
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_4::writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy)
     {
@@ -3205,6 +3216,7 @@ namespace Ogre {
 
 
 	}
+#endif
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
