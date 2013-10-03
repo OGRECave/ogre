@@ -3981,10 +3981,70 @@ AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibil
 	return retVal;
 }
 //---------------------------------------------------------------------
-void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin )
+void SceneManager::propagateRelativeOrigin( SceneNode *sceneNode, const Vector3 &relativeOrigin )
 {
-	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
-		mSceneRoot[i]->setPosition( -relativeOrigin );
+	if( sceneNode->numAttachedObjects() > 0 )
+	{
+		size_t numAttachedCameras = 0;
+		for( size_t i=0; i<sceneNode->numAttachedObjects(); ++i )
+		{
+			MovableObject *attachedObj = sceneNode->getAttachedObject( i );
+
+			CameraMap::const_iterator itor = mCamerasByName.find( attachedObj->getName() ); 
+			if( itor != mCamerasByName.end() && attachedObj == itor->second )
+				++numAttachedCameras;
+		}
+
+		if( numAttachedCameras == sceneNode->numAttachedObjects() )
+		{
+			//All of the attached objects are actually cameras. We can propagate
+			//the change to them and continue with this node's children.
+			for( size_t i=0; i<sceneNode->numAttachedObjects(); ++i )
+			{
+				MovableObject *attachedObj = sceneNode->getAttachedObject( i );
+				assert( dynamic_cast<Camera*>( attachedObj ) );
+				Camera *camera = static_cast<Camera*>( attachedObj );
+				camera->setPosition( camera->getPosition() - relativeOrigin );
+			}
+
+			for( size_t i=0; i<sceneNode->numChildren(); ++i )
+			{
+				propagateRelativeOrigin( static_cast<SceneNode*>(sceneNode->getChild( i )),
+										 relativeOrigin );
+			}
+		}
+		else
+		{
+			//There are attachments here. We can't keep propagating. Change here.
+			sceneNode->setPosition( sceneNode->getPosition() - relativeOrigin );
+		}
+	}
+	else if( sceneNode->numChildren() == 0 )
+	{
+		sceneNode->setPosition( sceneNode->getPosition() - relativeOrigin );
+	}
+	else
+	{
+		for( size_t i=0; i<sceneNode->numChildren(); ++i )
+			propagateRelativeOrigin( static_cast<SceneNode*>(sceneNode->getChild( i )), relativeOrigin );
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin, bool bPermanent )
+{
+	if( !bPermanent )
+	{
+		for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+			mSceneRoot[i]->setPosition( -relativeOrigin );
+	}
+	else
+	{
+		for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		{
+			mSceneRoot[i]->setPosition( Vector3::ZERO );
+			propagateRelativeOrigin( mSceneRoot[i], relativeOrigin );
+		}
+	}
 
 	notifyStaticDirty( mSceneRoot[SCENE_STATIC] );
 }

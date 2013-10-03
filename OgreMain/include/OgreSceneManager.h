@@ -821,6 +821,16 @@ namespace Ogre {
 			@see updateSceneGraph
 		*/
 		virtual void highLevelCull();
+
+		/** Permanently applies the relative origin change and propagates to children nodes
+		@remarks
+			Relative origins should happen at the root level. If both a parent & children apply
+			the relative origin, we would be applying the offset twice.
+			This algorithm works by analyzing if we can keep moving the change to children nodes.
+			We can only do so if the parent node doesn't have attachments, or if their attachments
+			are all Cameras.
+		*/
+		void propagateRelativeOrigin( SceneNode *sceneNode, const Vector3 &relativeOrigin );
         
 	public:
 
@@ -2978,7 +2988,7 @@ namespace Ogre {
 			rendering far from the origin, where single-precision floats as used in most
 			GPUs begin to lose their precision. The origin "translates" to this new
 			relativeOffset.
-		@param
+		@par
 			All that this function performs is just offseting the root scene node, and
 			as such, will force to update the static nodes as well. Call this at a low
 			frequency (i.e. when camera has gone too far from origin)
@@ -2987,8 +2997,21 @@ namespace Ogre {
 			mode in Ogre (OGRE_DOUBLE_PRECISION), since even though this will 
 			alleviate the rendering precision, the source camera and object positions will still 
 			suffer from precision issues leading to jerky movement. 
+		@param bPermanent
+			When false, it only affects the root nodes (static & dynamic) so that everything is
+			shifted by the relative origin, causing world & view matrices to contain smaller
+			values. This improves the quality of skeletal animations and "Z fighting"-like
+			artifacts because vertices don't snap to the right place.
+			However, it won't fix the jittering of objects observed while translating them by
+			small increments, including camera movement.
+
+			Setting this value to true will force the SceneManager to propagate the change
+			as much as possible to child nodes (including attached Cameras), causing
+			the change to become permanent/irreversible. This achieves greater quality
+			since translating objects or camera by small amounts now gets more accuracy.
+			@See propagateRelativeOrigin.
 		*/
-		virtual void setRelativeOrigin( const Vector3 &relativeOrigin );
+		virtual void setRelativeOrigin( const Vector3 &relativeOrigin, bool bPermanent );
 
 		//Derived from ArrayMemoryManager::RebaseListener
 		/*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
