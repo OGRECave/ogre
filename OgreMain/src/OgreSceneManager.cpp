@@ -4049,6 +4049,11 @@ void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin, bool bPerma
 	notifyStaticDirty( mSceneRoot[SCENE_STATIC] );
 }
 //---------------------------------------------------------------------
+Vector3 SceneManager::getRelativeOrigin(void) const
+{
+	return mSceneRoot[SCENE_DYNAMIC]->getPosition();
+}
+//---------------------------------------------------------------------
 void SceneManager::checkCachedLightClippingInfo()
 {
 	unsigned long frame = Root::getSingleton().getNextFrameNumber();

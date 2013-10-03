@@ -243,7 +243,7 @@ namespace Ogre {
     void Camera::lookAt(const Vector3& targetPoint)
     {
         updateView();
-        this->setDirection(targetPoint - mRealPosition);
+		this->setDirection( (targetPoint + mSceneMgr->getRelativeOrigin()) - mRealPosition);
     }
 
     //-----------------------------------------------------------------------

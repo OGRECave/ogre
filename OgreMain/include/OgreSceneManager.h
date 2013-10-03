@@ -2988,6 +2988,7 @@ namespace Ogre {
 			rendering far from the origin, where single-precision floats as used in most
 			GPUs begin to lose their precision. The origin "translates" to this new
 			relativeOffset.
+			Any previous non-permanent origin is overriden
 		@par
 			All that this function performs is just offseting the root scene node, and
 			as such, will force to update the static nodes as well. Call this at a low
@@ -3012,6 +3013,9 @@ namespace Ogre {
 			@See propagateRelativeOrigin.
 		*/
 		virtual void setRelativeOrigin( const Vector3 &relativeOrigin, bool bPermanent );
+
+		/// Returns the current relative origin. (Only when non-permanent)
+		Vector3 getRelativeOrigin(void) const;
 
 		//Derived from ArrayMemoryManager::RebaseListener
 		/*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,

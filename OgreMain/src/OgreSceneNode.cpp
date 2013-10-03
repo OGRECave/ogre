@@ -450,7 +450,7 @@ namespace Ogre {
 			mTransform.mPosition->getAsVector3( origin, mTransform.mIndex );
             break;
         case TS_LOCAL:
-            origin = Vector3::ZERO;
+			origin = -mCreator->getRelativeOrigin();
             break;
         }
 
