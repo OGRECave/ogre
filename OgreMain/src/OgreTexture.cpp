@@ -254,7 +254,7 @@ namespace Ogre {
                 ")";
             if (!(mMipmapsHardwareGenerated && mNumMipmaps == 0))
             {
-                str << " with " << mNumMipmaps;
+                str << " with " << static_cast<int>(mNumMipmaps);
                 if(mUsage & TU_AUTOMIPMAP)
                 {
                     if (mMipmapsHardwareGenerated)
