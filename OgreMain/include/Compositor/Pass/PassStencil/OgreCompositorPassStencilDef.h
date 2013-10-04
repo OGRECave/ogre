@@ -26,52 +26,45 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef __CompositorPassStencilDef_H__
+#define __CompositorPassStencilDef_H__
 
-#include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
-#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
-#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
-#include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
+#include "OgreHeaderPrefix.h"
+
+#include "../OgreCompositorPassDef.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
-	CompositorTargetDef::~CompositorTargetDef()
+	enum CompareFunction;
+	enum StencilOperation;
+
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	class _OgreExport CompositorPassStencilDef : public CompositorPassDef
 	{
-		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
-		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
+	public:
+		bool					mStencilCheck;
+		bool					mTwoSided;
+		StencilOperation		mStencilPassOp;
+		StencilOperation		mStencilFailOp;
+		StencilOperation		mStencilDepthFailOp;
+		CompareFunction			mCompareFunc;
+		uint32					mStencilMask;
+		uint32					mStencilRef;
 
-		while( itor != end )
-		{
-			OGRE_DELETE *itor;
-			++itor;
-		}
+		CompositorPassStencilDef();
+	};
 
-		mCompositorPasses.clear();
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
-	{
-		CompositorPassDef *retVal = 0;
-		switch( passType )
-		{
-		case PASS_CLEAR:
-			retVal = OGRE_NEW CompositorPassClearDef();
-			break;
-		case PASS_QUAD:
-			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef );
-			break;
-		case PASS_SCENE:
-			retVal = OGRE_NEW CompositorPassSceneDef();
-			break;
-		case PASS_STENCIL:
-			retVal = OGRE_NEW CompositorPassStencilDef();
-			break;
-		}
-
-		mCompositorPasses.push_back( retVal );
-		
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
+	/** @} */
+	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
+#endif

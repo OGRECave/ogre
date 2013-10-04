@@ -838,7 +838,6 @@ namespace Ogre
 					ID_DEPTH_VALUE,
 					ID_STENCIL_VALUE,
 
-					/*TODO: Used by PASS_STENCIL
 					ID_CHECK,
 					ID_COMP_FUNC,
 					ID_REF_VALUE,
@@ -853,7 +852,7 @@ namespace Ogre
 					ID_DEPTH_FAIL_OP,
 					ID_PASS_OP,
 					ID_TWO_SIDED,
-					*/
+
 		ID_SHADOW_NODE,
 			ID_NUM_SPLITS,
 			ID_PSSM_SPLIT_PADDING,

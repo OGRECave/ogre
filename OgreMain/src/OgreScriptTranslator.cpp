@@ -55,6 +55,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
+#include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
 
 namespace Ogre{
 	
@@ -408,9 +409,8 @@ namespace Ogre{
 		if(node->type != ANT_ATOM)
 			return false;
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-		/*switch(atom->id)
+		switch(atom->id)
 		{
-		TODO: Used by PASS_STENCIL
 		case ID_KEEP:
 			*op = SOP_KEEP;
 			break;
@@ -437,7 +437,7 @@ namespace Ogre{
 			break;
 		default:
 			return false;
-		}*/
+		}
 		return true;
 	}
 	//---------------------------------------------------------------------
@@ -6960,6 +6960,109 @@ namespace Ogre{
 		}
 	}
 
+	void CompositorPassTranslator::translateStencil(ScriptCompiler *compiler, const AbstractNodePtr &node,
+													CompositorTargetDef *targetDef)
+	{
+		mPassDef = targetDef->addPass( PASS_STENCIL );
+		CompositorPassStencilDef *passStencil = static_cast<CompositorPassStencilDef*>( mPassDef );
+
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+		obj->context = Any(mPassDef);
+
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
+				case ID_CHECK:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getBoolean(prop->values.front(), &passStencil->mStencilCheck))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_COMP_FUNC:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getCompareFunction(prop->values.front(), &passStencil->mCompareFunc))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_REF_VALUE:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getUInt(prop->values.front(), &passStencil->mStencilRef))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_MASK:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getUInt(prop->values.front(), &passStencil->mStencilMask))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_FAIL_OP:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getStencilOp(prop->values.front(), &passStencil->mStencilFailOp))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_DEPTH_FAIL_OP:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getStencilOp(prop->values.front(), &passStencil->mStencilDepthFailOp))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_PASS_OP:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getStencilOp(prop->values.front(), &passStencil->mStencilPassOp))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_TWO_SIDED:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					if(!getBoolean(prop->values.front(), &passStencil->mTwoSided))
+						compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					break;
+				case ID_VIEWPORT:
+				case ID_IDENTIFIER:
+					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+		}
+	}
+
 	void CompositorPassTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
 	{
 		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
@@ -6975,8 +7078,8 @@ namespace Ogre{
 
 		if(obj->name == "clear")
 			translateClear( compiler, node, target );
-		/*else if(obj->name == "stencil")
-			translateStencil( compiler, node, target );*/
+		else if(obj->name == "stencil")
+			translateStencil( compiler, node, target );
 		else if(obj->name == "render_quad")
 			translateQuad( compiler, node, target );
 		else if(obj->name == "render_scene")
@@ -6998,118 +7101,7 @@ namespace Ogre{
 				switch(prop->id)
 				{
 				/*TODO: To be ported to stencil pass
-				case ID_CHECK:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						bool val;
-						if(getBoolean(prop->values.front(), &val))
-							mPass->setStencilCheck(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_COMP_FUNC:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						CompareFunction func;
-						if(getCompareFunction(prop->values.front(), &func))
-							mPass->setStencilFunc(func);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_REF_VALUE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						uint32 val;
-						if(getUInt(prop->values.front(), &val))
-							mPass->setStencilRefValue(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_MASK:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						uint32 val;
-						if(getUInt(prop->values.front(), &val))
-							mPass->setStencilMask(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_FAIL_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilFailOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_DEPTH_FAIL_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilDepthFailOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_PASS_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilPassOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_TWO_SIDED:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						bool val;
-						if(getBoolean(prop->values.front(), &val))
-							mPass->setStencilTwoSidedOperation(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;*/
+				*/
 				case ID_VIEWPORT:
 					{
 						if(prop->values.size() != 4)

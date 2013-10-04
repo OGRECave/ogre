@@ -28,50 +28,49 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
-#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
-#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
-#include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
+#include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
+
+#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
-	CompositorTargetDef::~CompositorTargetDef()
+	CompositorPassStencilDef::CompositorPassStencilDef() :
+			CompositorPassDef( PASS_STENCIL ),
+			mStencilCheck( false ),
+			mTwoSided( false ),
+			mStencilPassOp( SOP_KEEP ),
+			mStencilFailOp( SOP_KEEP ),
+			mStencilDepthFailOp( SOP_KEEP ),
+			mCompareFunc( CMPF_ALWAYS_PASS ),
+			mStencilMask( 0xFFFFFFFF ),
+			mStencilRef( 0 )
 	{
-		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
-		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
-
-		while( itor != end )
-		{
-			OGRE_DELETE *itor;
-			++itor;
-		}
-
-		mCompositorPasses.clear();
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
+	//-----------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------
+	CompositorPassStencil::CompositorPassStencil( const CompositorPassStencilDef *definition,
+													RenderTarget *target, RenderSystem *renderSystem ) :
+				CompositorPass( definition, target ),
+				mDefinition( definition ),
+				mRenderSystem( renderSystem )
 	{
-		CompositorPassDef *retVal = 0;
-		switch( passType )
-		{
-		case PASS_CLEAR:
-			retVal = OGRE_NEW CompositorPassClearDef();
-			break;
-		case PASS_QUAD:
-			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef );
-			break;
-		case PASS_SCENE:
-			retVal = OGRE_NEW CompositorPassSceneDef();
-			break;
-		case PASS_STENCIL:
-			retVal = OGRE_NEW CompositorPassStencilDef();
-			break;
-		}
-
-		mCompositorPasses.push_back( retVal );
-		
-		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorPassStencil::execute()
+	{
+		//Execute a limited number of times?
+		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+		{
+			if( !mNumPassesLeft )
+				return;
+			--mNumPassesLeft;
+		}
+
+		mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
+		mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,
+									mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,
+									mDefinition->mStencilDepthFailOp, mDefinition->mStencilPassOp,
+									mDefinition->mTwoSided );
+	}
 }

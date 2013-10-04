@@ -154,6 +154,9 @@ mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
+	if( numWorkerThreads <= 1 )
+		mInstancingThreadedCullingMethod = INSTANCING_CULLING_SINGLETHREAD;
+
 	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
 		mSceneRoot[i] = 0;
 

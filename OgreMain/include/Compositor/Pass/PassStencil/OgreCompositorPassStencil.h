@@ -26,52 +26,51 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef __CompositorPassStencil_H__
+#define __CompositorPassStencil_H__
 
-#include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
-#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
-#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
+#include "OgreHeaderPrefix.h"
+
+#include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
 
 namespace Ogre
 {
-	CompositorTargetDef::~CompositorTargetDef()
+	class RenderTarget;
+
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	/** Implementation of CompositorPass
+		This implementation will clear the RenderTarget using the parameters from definition
+		(rectangle area, which buffers, what values, etc)
+    @author
+		Matias N. Goldberg
+    @version
+        1.0
+    */
+	class _OgreExport CompositorPassStencil : public CompositorPass
 	{
-		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
-		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
+		CompositorPassStencilDef const *mDefinition;
 
-		while( itor != end )
-		{
-			OGRE_DELETE *itor;
-			++itor;
-		}
+	protected:
+		RenderSystem *mRenderSystem;
 
-		mCompositorPasses.clear();
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
-	{
-		CompositorPassDef *retVal = 0;
-		switch( passType )
-		{
-		case PASS_CLEAR:
-			retVal = OGRE_NEW CompositorPassClearDef();
-			break;
-		case PASS_QUAD:
-			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef );
-			break;
-		case PASS_SCENE:
-			retVal = OGRE_NEW CompositorPassSceneDef();
-			break;
-		case PASS_STENCIL:
-			retVal = OGRE_NEW CompositorPassStencilDef();
-			break;
-		}
+	public:
+		CompositorPassStencil( const CompositorPassStencilDef *definition, RenderTarget *target,
+								RenderSystem *renderSystem );
 
-		mCompositorPasses.push_back( retVal );
-		
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
+		virtual void execute();
+	};
+
+	/** @} */
+	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
+#endif

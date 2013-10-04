@@ -1263,20 +1263,20 @@ namespace Ogre
 		mIds["depth_value"]		= ID_DEPTH_VALUE;
 		mIds["stencil_value"]	= ID_STENCIL_VALUE;
 
-		/*mIds["check"] = ID_CHECK;
-		mIds["comp_func"] = ID_COMP_FUNC;
-		mIds["ref_value"] = ID_REF_VALUE;
-		mIds["mask"] = ID_MASK;
-		mIds["fail_op"] = ID_FAIL_OP;
-        mIds["keep"] = ID_KEEP;
-        mIds["increment"] = ID_INCREMENT;
-        mIds["decrement"] = ID_DECREMENT;
-        mIds["increment_wrap"] = ID_INCREMENT_WRAP;
-        mIds["decrement_wrap"] = ID_DECREMENT_WRAP;
-        mIds["invert"] = ID_INVERT;
-		mIds["depth_fail_op"] = ID_DEPTH_FAIL_OP;
-		mIds["pass_op"] = ID_PASS_OP;
-		mIds["two_sided"] = ID_TWO_SIDED;*/
+		mIds["check"]			= ID_CHECK;
+		mIds["comp_func"]		= ID_COMP_FUNC;
+		mIds["ref_value"]		= ID_REF_VALUE;
+		mIds["mask"]			= ID_MASK;
+		mIds["fail_op"]			= ID_FAIL_OP;
+        mIds["keep"]			= ID_KEEP;
+        mIds["increment"]		= ID_INCREMENT;
+        mIds["decrement"]		= ID_DECREMENT;
+        mIds["increment_wrap"]	= ID_INCREMENT_WRAP;
+        mIds["decrement_wrap"]	= ID_DECREMENT_WRAP;
+        mIds["invert"]			= ID_INVERT;
+		mIds["depth_fail_op"]	= ID_DEPTH_FAIL_OP;
+		mIds["pass_op"]			= ID_PASS_OP;
+		mIds["two_sided"]		= ID_TWO_SIDED;
 
 		mIds["compositor_node_shadow"]	= ID_SHADOW_NODE;
 		mIds["num_splits"]					= ID_NUM_SPLITS;

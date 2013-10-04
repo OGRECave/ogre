@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+#include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreRenderSystem.h"
@@ -337,6 +338,11 @@ namespace Ogre
 											mWorkspace->getDefaultCamera(), mWorkspace,
 											channel->target );
 					postInitializePassScene( static_cast<CompositorPassScene*>( newPass ) );
+					break;
+				case PASS_STENCIL:
+					newPass = OGRE_NEW CompositorPassStencil(
+											static_cast<CompositorPassStencilDef*>(*itPass),
+											channel->target, mRenderSystem );
 					break;
 				default:
 					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
