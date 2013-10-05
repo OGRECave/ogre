@@ -183,6 +183,14 @@ namespace Ogre {
 				const MeshLodUsage& usage = mMesh->getLodLevel(i);
 				Entity* lodEnt;
 				if(!usage.manualName.empty()){
+					// Disabled to prevent recursion when a.mesh has manualLod to b.mesh and b.mesh has manualLod to a.mesh.
+					OgreAssert(usage.manualMesh->getNumLodLevels() == 1, "Manual Lod Mesh can't have Lod levels!");
+
+					if(usage.manualMesh->getNumLodLevels() != 1) {
+						// To prevent crash in release builds, we will remove Lod levels.
+						usage.manualMesh->removeLodLevels();
+					}
+
 					// Manually create entity
 					lodEnt = OGRE_NEW Entity(mName + "Lod" + StringConverter::toString(i),
 						usage.manualMesh);
@@ -416,9 +424,9 @@ namespace Ogre {
             // Get the index at this biased depth
             ushort newMeshLodIndex = mMesh->getLodIndex(biasedMeshLodValue);
             // Apply maximum detail restriction (remember lower = higher detail)
-            newMeshLodIndex = std::max(mMaxMeshLodIndex, newMeshLodIndex);
+            newMeshLodIndex = std::max<ushort>(mMaxMeshLodIndex, newMeshLodIndex);
             // Apply minimum detail restriction (remember higher = lower detail)
-            newMeshLodIndex = std::min(mMinMeshLodIndex, newMeshLodIndex);
+            newMeshLodIndex = std::min<ushort>(mMinMeshLodIndex, newMeshLodIndex);
 
             // Construct event object
             EntityMeshLodChangedEvent evt;
