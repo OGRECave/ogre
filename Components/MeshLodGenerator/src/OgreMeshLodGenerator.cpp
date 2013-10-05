@@ -218,6 +218,7 @@ void MeshLodGenerator::computeLods(LodConfig& lodConfig, LodData* data, LodColla
 			// Manual Lod level
 			lodConfig.levels[curLod].outSkipped = (curLod != 0 && lodConfig.levels[curLod].manualMeshName == lodConfig.levels[curLod - 1].manualMeshName);
 			lodConfig.levels[curLod].outUniqueVertexCount = 0;
+			lastBakeVertexCount = -1;
 			if (!lodConfig.levels[curLod].outSkipped) {
 				output->bakeManualLodLevel(data, lodConfig.levels[curLod].manualMeshName, lodID++);
 			}
@@ -228,9 +229,9 @@ void MeshLodGenerator::computeLods(LodConfig& lodConfig, LodData* data, LodColla
 			collapser->collapse(data, cost, output, vertexCountLimit, collapseCostLimit);
 			size_t vertexCount = data->mCollapseCostHeap.size();
 			lodConfig.levels[curLod].outUniqueVertexCount = vertexCount;
-			lodConfig.levels[curLod].outSkipped = (vertexCount == data->mVertexList.size());
+			lodConfig.levels[curLod].outSkipped = (vertexCount == lastBakeVertexCount);
 			if (!lodConfig.levels[curLod].outSkipped) {
-				lastBakeVertexCount = data->mVertexList.size();
+				lastBakeVertexCount = vertexCount;
 				output->bakeLodLevel(data, lodID++);
 			}
 		}
