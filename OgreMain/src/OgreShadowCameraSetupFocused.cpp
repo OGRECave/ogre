@@ -56,16 +56,28 @@ namespace Ogre
 		: mTempFrustum(OGRE_NEW Frustum( 0, &mObjectMemoryManager ))
 		, mLightFrustumCamera(OGRE_NEW Camera( 0, &mObjectMemoryManager, NULL ))
 		, mLightFrustumCameraCalculated(false)
+		, mLocalNodeMemoryManager(0)
 		, mUseAggressiveRegion(true)
 	{
 		mLightFrustumCamera->setName( "TEMP LIGHT INTERSECT CAM" );
 		mTempFrustum->setProjectionType(PT_PERSPECTIVE);
+
+		mLocalNodeMemoryManager = new NodeMemoryManager();
+		SceneNode *dummyNode = OGRE_NEW SceneNode( 0, 0, mLocalNodeMemoryManager, 0 );
+		dummyNode->attachObject( mLightFrustumCamera );
 	}
 	//-----------------------------------------------------------------------
 	FocusedShadowCameraSetup::~FocusedShadowCameraSetup(void)
 	{
+		SceneNode *dummyNode = mTempFrustum->getParentSceneNode();
+		dummyNode->detachAllObjects();
+		OGRE_DELETE dummyNode;
+
 		OGRE_DELETE mTempFrustum;
+		delete mLocalNodeMemoryManager;
 		OGRE_DELETE mLightFrustumCamera;
+
+		mLocalNodeMemoryManager = 0;
 	}
 	//-----------------------------------------------------------------------
 	void FocusedShadowCameraSetup::calculateShadowMappingMatrix(const SceneManager& sm,

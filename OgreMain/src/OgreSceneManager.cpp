@@ -1463,7 +1463,7 @@ void SceneManager::_setSkyBox(
         // Create node 
         if (!mSkyBoxNode)
         {
-			mSkyBoxNode = createSceneNode( SCENE_STATIC );
+			mSkyBoxNode = createSceneNode( SCENE_DYNAMIC );
 			mSkyBoxNode->setName( "SkyBoxNode" );
         }
 
@@ -1471,7 +1471,7 @@ void SceneManager::_setSkyBox(
 		if (!mSkyBoxObj)
 		{
 			mSkyBoxObj = OGRE_NEW ManualObject( Id::generateNewId<MovableObject>(),
-												&mEntityMemoryManager[SCENE_STATIC] );
+												&mEntityMemoryManager[SCENE_DYNAMIC] );
 			mSkyBoxObj->setCastShadows(false);
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}

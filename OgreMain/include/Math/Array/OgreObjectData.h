@@ -105,7 +105,8 @@ namespace Ogre
 		/// @copydoc Transform::copy
 		void copy( const ObjectData &copy )
 		{
-			mParents[mIndex] = copy.mParents[copy.mIndex];
+			mParents[mIndex]	= copy.mParents[copy.mIndex];
+			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
 
 			Aabb tmp;
 			copy.mLocalAabb->getAsAabb( tmp, copy.mIndex );
@@ -114,6 +115,7 @@ namespace Ogre
 			copy.mWorldAabb->getAsAabb( tmp, copy.mIndex );
 			mWorldAabb->setFromAabb( tmp, mIndex );
 
+			mLocalRadius[mIndex]			= copy.mLocalRadius[copy.mIndex];
 			mWorldRadius[mIndex]			= copy.mWorldRadius[copy.mIndex];
 			mSquaredUpperDistance[mIndex]	= copy.mSquaredUpperDistance[copy.mIndex];
 			mVisibilityFlags[mIndex]		= copy.mVisibilityFlags[copy.mIndex];

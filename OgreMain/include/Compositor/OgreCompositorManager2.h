@@ -223,8 +223,19 @@ namespace Ogre
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapAllFinalTargets( bool waitForVSync );
 
+		/** Utility helper to create a basic workspace to get you out of the rush. Advanced users will
+			probably prefer to create the workspace definition using scripts or manipulating functions
+			directly
+		@param workspaceDefName
+			Name to give to the workspace definition. Must be unique
+		@param backgroundColour
+			Clear colour
+		@param shadowNodeName
+			Name of the shadow node. Leave blank if no shadows.
+			Caller is supposed to have set the shadow node correctly
+		*/
 		void createBasicWorkspaceDef( IdString workspaceDefName, const ColourValue &backgroundColour,
-										IdString shadowNodeName );
+										IdString shadowNodeName=IdString() );
 	};
 
 	/** @} */

@@ -2761,8 +2761,6 @@ namespace OgreBites
 				float avgTime = frameStats->getAvgTime();
 				sprintf( m, "%.2fms - %.2ffps", avgTime, 1000.0f / avgTime );
 				s += m;
-				
-				for (int i = s.length() - 5; i > 5; i -= 3) { s.insert(i, 1, ','); }
 				mFpsLabel->setCaption(s);
 
 				if (mStatsPanel->getOverlayElement()->isVisible())

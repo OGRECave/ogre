@@ -82,6 +82,7 @@ namespace Ogre {
         */
         Camera* mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
+		NodeMemoryManager *mLocalNodeMemoryManager;
 
         /// Use tighter focus region?
         bool mUseAggressiveRegion;

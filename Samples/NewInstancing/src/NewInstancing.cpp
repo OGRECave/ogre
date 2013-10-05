@@ -169,7 +169,7 @@ void Sample_NewInstancing::setupContent()
 	mEntities.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
 	mSceneNodes.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
 	
-	//mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+	mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
 	// create a mesh for our ground
 	MeshManager::getSingleton().createPlane("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -307,7 +307,6 @@ void Sample_NewInstancing::switchInstancingTechnique()
 		mInstancingTechnique == InstanceManager::HWInstancingVTF ||
 		mInstancingTechnique == InstanceManager::HWInstancingVTF + 1) // instancing with lookup
 	{
-		//TODO (dark_sylinc)
 		/**if( mSetStatic->isChecked() )
 			mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );*/
 		mSetStatic->show();
@@ -367,13 +366,14 @@ void Sample_NewInstancing::createEntities()
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::createInstancedEntities()
 {
-
+	SceneMemoryMgrTypes sceneMemoryMgrType = mSetStatic->isChecked() ? SCENE_STATIC : SCENE_DYNAMIC;
 	for( int i=0; i<NUM_INST_ROW; ++i )
 	{
 		for( int j=0; j<NUM_INST_COLUMN; ++j )
 		{
 			//Create the instanced entity
-		InstancedEntity *ent = mCurrentManager->createInstancedEntity(mCurrentMaterialSet[mInstancingTechnique] );
+			InstancedEntity *ent = mCurrentManager->createInstancedEntity(
+										mCurrentMaterialSet[mInstancingTechnique], sceneMemoryMgrType );
 			mEntities.push_back( ent );
 
 			//HWInstancingBasic is the only technique without animation support
@@ -393,14 +393,15 @@ void Sample_NewInstancing::createSceneNodes()
 {
 	//Here the SceneNodes are created. Since InstancedEntities derive from MovableObject,
 	//they behave like regular Entities on this.
-	SceneNode *rootNode = mSceneMgr->getRootSceneNode();
+	SceneMemoryMgrTypes sceneMemoryMgrType = mSetStatic->isChecked() ? SCENE_STATIC : SCENE_DYNAMIC;
+	SceneNode *rootNode = mSceneMgr->getRootSceneNode( sceneMemoryMgrType );
 
 	for( int i=0; i<NUM_INST_ROW; ++i )
 	{
 		for( int j=0; j<NUM_INST_COLUMN; ++j )
 		{
 			int idx = i * NUM_INST_COLUMN + j;
-			SceneNode *sceneNode = rootNode->createChildSceneNode();
+			SceneNode *sceneNode = rootNode->createChildSceneNode( sceneMemoryMgrType );
 			sceneNode->attachObject( mEntities[idx] );
 			sceneNode->yaw( Radian( randGenerator.nextFloat() * 10 * 3.14159265359f )); //Random orientation
 			sceneNode->setPosition( mEntities[idx]->getWorldRadiusUpdated() * (i - NUM_INST_ROW * 0.5f), 0,
@@ -635,7 +636,8 @@ void Sample_NewInstancing::checkBoxToggled( CheckBox* box )
 	}
 	else if( box == mSetStatic && mCurrentManager )
 	{
-		//TODO: dark_sylinc
+		clearScene();
+		switchInstancingTechnique();
 		//mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
 	}
 }
