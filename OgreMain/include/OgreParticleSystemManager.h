@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreScriptLoader.h"
 #include "OgreResourceGroupManager.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -102,6 +103,8 @@ namespace Ogre {
 
 		// Factory instance
 		ParticleSystemFactory* mFactory;
+
+		ObjectMemoryManager mTemplatesObjectMemMgr;
 
         /** Internal script parsing method. */
         void parseNewEmitter(const String& type, DataStreamPtr& chunk, ParticleSystem* sys);

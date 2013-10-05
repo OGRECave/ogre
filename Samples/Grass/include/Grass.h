@@ -102,14 +102,16 @@ protected:
 			Plane(Vector3::UNIT_Y, 0), 1000, 1000, 20, 20, true, 1, 6, 6, Vector3::UNIT_Z);
 		
 		// create a ground entity from our mesh and attach it to the origin
-		Entity* ground = mSceneMgr->createEntity("Ground", "ground");
+		Entity* ground = mSceneMgr->createEntity( "ground",
+													ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+													SCENE_STATIC );
 		ground->setMaterialName("Examples/GrassFloor");
 		ground->setCastShadows(false);
-		mSceneMgr->getRootSceneNode()->attachObject(ground);
+		mSceneMgr->getRootSceneNode( SCENE_STATIC )->attachObject( ground );
 
 		// create our grass mesh, and create a grass entity from it
 		createGrassMesh();
-		Entity* grass = mSceneMgr->createEntity("Grass", "grass");
+		Entity* grass = mSceneMgr->createEntity( "grass" );
 
 		// create a static geometry field, which we will populate with grass
 		mField = mSceneMgr->createStaticGeometry("Field");
@@ -138,13 +140,15 @@ protected:
 			headMesh->buildTangentVectors(VES_TANGENT, src, dest);
 
 		// put an ogre head in the middle of the field
-		Entity* head = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		Entity* head = mSceneMgr->createEntity( "ogrehead.mesh",
+												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC );
 		head->setMaterialName("Examples/OffsetMapping/Specular");
 #if defined(USE_RTSHADER_SYSTEM)
         MaterialPtr headMat = MaterialManager::getSingleton().getByName("Examples/OffsetMapping/Specular");
         headMat->getBestTechnique()->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 30, 0))->attachObject(head);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_STATIC, Vector3(0, 30, 0) )->attachObject(head);
 
 		setupLighting();
 
@@ -265,6 +269,9 @@ protected:
         Animation* anim = mSceneMgr->createAnimation("LightTrack", 20);
         anim->setInterpolationMode(Animation::IM_SPLINE);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+		// >> TODO: This needs to be back <<
+
 		// create a track to animate the camera's node
         NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
 
@@ -282,6 +289,7 @@ protected:
         track->createNodeKeyFrame(20)->setTranslate(Vector3(42, 77, -42));
 
 		lightNode->setPosition(track->getNodeKeyFrame(0)->getTranslate());
+#endif
 
 		// create a new animation state to track this
 		mLightAnimState = mSceneMgr->createAnimationState("LightTrack");

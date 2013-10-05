@@ -56,7 +56,6 @@ namespace OgreBites
 			mTrayMgr = 0;
 			mCameraMan = 0;
 			mCamera = 0;
-			mViewport = 0;
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
 			mDragLook = false;
@@ -127,7 +126,8 @@ namespace OgreBites
 
 		virtual void windowResized(Ogre::RenderWindow* rw)
 		{
-			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+			//Commented, Camera has auto AR
+			//mCamera->setAspectRatio((Ogre::Real)rw->getWidth() / (Ogre::Real)rw->getHeight());
 		}
 
 		virtual bool keyPressed(const OIS::KeyEvent& evt)
@@ -510,8 +510,6 @@ namespace OgreBites
 		{
 			// setup default viewport layout and camera
 			mCamera = mSceneMgr->createCamera("MainCamera");
-			mViewport = mWindow->addViewport(mCamera);
-			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
 			mCamera->setNearClipDistance(5);
 
@@ -534,7 +532,6 @@ namespace OgreBites
 			}
 		}
 
-		Ogre::Viewport* mViewport;    		// main viewport
 		Ogre::Camera* mCamera;        		// main camera
 		SdkTrayManager* mTrayMgr;     		// tray interface manager
 		SdkCameraMan* mCameraMan;     		// basic camera controller

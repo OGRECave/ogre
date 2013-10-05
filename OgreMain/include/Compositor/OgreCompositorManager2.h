@@ -141,6 +141,12 @@ namespace Ogre
 		/// Returns a new node definition. The name must be unique, throws otherwise.
 		CompositorShadowNodeDef* addShadowNodeDefinition( IdString name );
 
+		/// Returns true if a workspace definition with the given name exists
+		bool hasWorkspaceDefinition( IdString name ) const;
+
+		/// Returns the workspace definition with the given name. Throws if not found
+		CompositorWorkspaceDef* getWorkspaceDefinition( IdString name ) const;
+
 		/** Returns a new workspace definition. The name must be unique, throws otherwise.
 		@remarks
 			Setting workspace def's connections must be done *after* all node
@@ -192,11 +198,33 @@ namespace Ogre
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
 
+		/// Removes the given workspace. Pointer is no longer valid after this call
+		void removeWorkspace( CompositorWorkspace *workspace );
+
+		/// Removes all workspaces. Make sure you don't hold any reference to a CompositorWorkpace!
+		void removeAllWorkspaces(void);
+		void removeAllWorkspaceDefinitions(void);
+
+		/** Removes all shadow nodes defs. Make sure there are no active nodes using the definition!
+		@remarks
+			Call removeAllWorkspaceDefinitions first
+		*/
+		void removeAllShadowNodeDefinitions(void);
+
+		/** Removes all node defs. Make sure there are no active nodes using the definition!
+		@remarks
+			Call removeAllWorkspaceDefinitions first
+		*/
+		void removeAllNodeDefinitions(void);
+
 		/// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
 		void validateAllNodes();
 
 		void _update( bool swapFinalTargets, bool waitForVSync );
 		void _swapAllFinalTargets( bool waitForVSync );
+
+		void createBasicWorkspaceDef( IdString workspaceDefName, const ColourValue &backgroundColour,
+										IdString shadowNodeName );
 	};
 
 	/** @} */

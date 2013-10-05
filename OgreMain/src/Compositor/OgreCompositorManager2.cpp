@@ -185,11 +185,11 @@ namespace Ogre
 		for( TextureVec::iterator i = mNullTextureList.begin(); i != mNullTextureList.end(); ++i )
 			TextureManager::getSingleton().remove( (*i)->getHandle() );
 
-		deleteAllClear( mUnfinishedShadowNodes );
-		deleteAllSecondClear( mWorkspaceDefs );
-		deleteAllSecondClear( mNodeDefinitions );
-		deleteAllSecondClear( mShadowNodeDefs );
-		deleteAllClear( mWorkspaces );
+		removeAllWorkspaces();
+
+		removeAllWorkspaceDefinitions();
+		removeAllShadowNodeDefinitions();
+		removeAllNodeDefinitions();
 
 		OGRE_DELETE mSharedTriangleFS;
 		mSharedTriangleFS = 0;
@@ -307,6 +307,26 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
+	bool CompositorManager2::hasWorkspaceDefinition( IdString name ) const
+	{
+		return mWorkspaceDefs.find( name ) != mWorkspaceDefs.end();
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinition( IdString name ) const
+	{
+		CompositorWorkspaceDef *retVal = 0;
+		
+		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+		if( itor == mWorkspaceDefs.end() )
+		{
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
+							name.getFriendlyText() + "' not found",
+							"CompositorManager2::getWorkspaceDefinition" );
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 	CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
 											 RenderTarget *finalRenderTarget, Camera *defaultCam,
 											 IdString definitionName, bool bEnabled )
@@ -329,6 +349,42 @@ namespace Ogre
 		}
 
 		return mWorkspaces.back();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::removeWorkspace( CompositorWorkspace *workspace )
+	{
+		WorkspaceVec::iterator itor = std::find( mWorkspaces.begin(), mWorkspaces.end(), workspace );
+		if( itor == mWorkspaces.end() )
+		{
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace not created with this "
+							"Compositor Manager", "CompositorManager2::removeWorkspace" );
+		}
+		else
+		{
+			OGRE_DELETE *itor;
+			mWorkspaces.erase( itor ); //Preserve the order of workspace execution
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::removeAllWorkspaces(void)
+	{
+		deleteAllClear( mWorkspaces );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::removeAllWorkspaceDefinitions(void)
+	{
+		deleteAllSecondClear( mWorkspaceDefs );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::removeAllShadowNodeDefinitions(void)
+	{
+		deleteAllClear( mUnfinishedShadowNodes );
+		deleteAllSecondClear( mShadowNodeDefs );
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::removeAllNodeDefinitions(void)
+	{
+		deleteAllSecondClear( mNodeDefinitions );
 	}
 	//-----------------------------------------------------------------------------------
 	TexturePtr CompositorManager2::getNullShadowTexture( PixelFormat format )
@@ -440,5 +496,36 @@ namespace Ogre
 
 			++itor;
 		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorManager2::createBasicWorkspaceDef( IdString workspaceDefName,
+														const ColourValue &backgroundColour,
+														IdString shadowNodeName )
+	{
+		CompositorNodeDef *nodeDef = this->addNodeDefinition( workspaceDefName + IdString( "/Node" ) );
+
+		//Input texture
+		nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
+
+		nodeDef->setNumTargetPass( 1 );
+		{
+			CompositorTargetDef *targetDef = nodeDef->addTargetPass( "WindowRT" );
+			targetDef->setNumPasses( 2 );
+			{
+				{
+					CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>
+															( targetDef->addPass( PASS_CLEAR ) );
+					passClear->mColourValue = backgroundColour;
+				}
+				{
+					CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>
+																( targetDef->addPass( PASS_SCENE ) );
+					passScene->mShadowNode = shadowNodeName;
+				}
+			}
+		}
+
+		CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( workspaceDefName );
+		workDef->connectOutput( 0, nodeDef->getName() );
 	}
 }

@@ -34,6 +34,8 @@
 
 #include "InputContext.h"
 #include "OgreFileSystemLayer.h"
+#include "OgreSceneManager.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 #ifdef USE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
@@ -178,8 +180,13 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
+				Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+				compositorManager->removeAllWorkspaces();
+				compositorManager->removeAllWorkspaceDefinitions();
+				compositorManager->removeAllNodeDefinitions();
+				compositorManager->removeAllShadowNodeDefinitions();
 				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
-				mRoot->destroySceneManager(mSceneMgr);				
+				mRoot->destroySceneManager(mSceneMgr);
 			}
 			mSceneMgr = 0;
 
@@ -250,7 +257,10 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void createSceneManager()
 		{
-			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+			const size_t numThreads = 1;
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+			//Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif

@@ -1463,7 +1463,7 @@ void SceneManager::_setSkyBox(
         // Create node 
         if (!mSkyBoxNode)
         {
-            mSkyBoxNode = createSceneNode();
+			mSkyBoxNode = createSceneNode( SCENE_STATIC );
 			mSkyBoxNode->setName( "SkyBoxNode" );
         }
 

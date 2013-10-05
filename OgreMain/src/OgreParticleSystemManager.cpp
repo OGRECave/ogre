@@ -206,8 +206,8 @@ namespace Ogre {
 #endif
 		}
 
-		ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(), 0,
-														resourceGroup );
+		ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(),
+														&mTemplatesObjectMemMgr, resourceGroup );
 		tpl->setName( name );
         addTemplate(name, tpl);
         return tpl;

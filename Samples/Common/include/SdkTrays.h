@@ -33,6 +33,7 @@
 #include <math.h>
 
 #include "OgreTimer.h"
+#include "OgreFrameStats.h"
 
 #include "InputContext.h"
 
@@ -2750,11 +2751,16 @@ namespace OgreBites
 			if (areFrameStatsVisible() && currentTime - mLastStatUpdateTime > 250)
 			{
                 Ogre::RenderTarget::FrameStats stats = mWindow->getStatistics();
+				const Ogre::FrameStats *frameStats = Ogre::Root::getSingleton().getFrameStats();
 
                 mLastStatUpdateTime = currentTime;
 
 				Ogre::String s("FPS: ");
-				s += Ogre::StringConverter::toString((int)stats.lastFPS);
+
+				char m[32];
+				float avgTime = frameStats->getAvgTime();
+				sprintf( m, "%.2fms - %.2ffps", avgTime, 1000.0f / avgTime );
+				s += m;
 				
 				for (int i = s.length() - 5; i > 5; i -= 3) { s.insert(i, 1, ','); }
 				mFpsLabel->setCaption(s);
@@ -2764,20 +2770,20 @@ namespace OgreBites
 					Ogre::StringVector values;
 					std::ostringstream oss;
 					
-					oss.str("");
+					/*oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.avgFPS;
+					Ogre::String str = oss.str();
+					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
+					values.push_back(str);*/
+
+					oss.str("");
+					oss << std::fixed << std::setprecision(1) << frameStats->getBestTime();
 					Ogre::String str = oss.str();
 					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					oss.str("");
-					oss << std::fixed << std::setprecision(1) << stats.bestFPS;
-					str = oss.str();
-					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
-					values.push_back(str);
-
-					oss.str("");
-					oss << std::fixed << std::setprecision(1) << stats.worstFPS;
+					oss << std::fixed << std::setprecision(1) << frameStats->getWorstTime();
 					str = oss.str();
 					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
@@ -2799,9 +2805,6 @@ namespace OgreBites
 
         void windowUpdate()
         {
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            mWindow->update();
-#endif
         }
 
 		void resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount)

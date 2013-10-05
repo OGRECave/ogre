@@ -30,6 +30,7 @@
 
 #include "SampleContext.h"
 #include "SamplePlugin.h"
+#include "Compositor/OgreCompositorManager2.h"
 #include "SdkTrays.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -1046,7 +1047,10 @@ protected:
 		virtual void setup()
 		{
             if(mWindow == NULL)
+			{
                 mWindow = createWindow();
+				mRoot->initialiseCompositor();
+			}
             
 			setupInput(mNoGrabInput);
 			locateResources();
@@ -1284,11 +1288,22 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void createDummyScene()
 		{
-			mWindow->removeAllViewports();
-			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+			const size_t numThreads = 1;
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads,
+																threadedCullingMethod, "DummyScene");
 			sm->addRenderQueueListener(mOverlaySystem);
 			Ogre::Camera* cam = sm->createCamera("DummyCamera");
-			mWindow->addViewport(cam);
+
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+			if( !compositorManager->hasWorkspaceDefinition( "SampleBrowserWorkspace" ) )
+			{
+				compositorManager->createBasicWorkspaceDef( "SampleBrowserWorkspace",
+															Ogre::ColourValue( 0.6f, 0.0f, 0.6f ),
+															Ogre::IdString() );
+			}
+			compositorManager->addWorkspace( sm, mWindow, cam,
+											"SampleBrowserWorkspace", true );
 #ifdef USE_RTSHADER_SYSTEM
 			// Initialize shader generator.
 			// Must be before resource loading in order to allow parsing extended material attributes.
@@ -1773,8 +1788,13 @@ protected:
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->removeSceneManager(dummyScene);
 #endif
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+			compositorManager->removeAllWorkspaces();
+			compositorManager->removeAllWorkspaceDefinitions();
+			compositorManager->removeAllNodeDefinitions();
+			compositorManager->removeAllShadowNodeDefinitions();
+
 			dummyScene->removeRenderQueueListener(mOverlaySystem);
-			mWindow->removeAllViewports();
 			mRoot->destroySceneManager(dummyScene);
 		}	
 

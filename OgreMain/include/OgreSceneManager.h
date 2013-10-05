@@ -1100,12 +1100,12 @@ namespace Ogre {
                 the attachObject method of the SceneNode class.
             @param name
 				Name to give the new camera. Must be unique.
-			@param isVisible
+			@param notShadowCaster
 				True if this camera should be considered when creating the global light list
 				of culled lights against all cameras. For example, cameras used for
 				shadow mapping shouldn't be taken into account (set to false)
         */
-        virtual Camera* createCamera(const String& name, bool isVisible);
+        virtual Camera* createCamera(const String& name, bool notShadowCaster=true);
 
 		/** Finds the camera with the given name. Throws if not found.
 		@param name
