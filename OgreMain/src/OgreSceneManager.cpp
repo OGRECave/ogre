@@ -66,8 +66,6 @@ THE SOFTWARE.
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreProfiler.h"
-#include "OgreCompositorManager.h"
-#include "OgreCompositorChain.h"
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
@@ -954,30 +952,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
 			{
-				CompositorChain* currentChain = _getActiveCompositorChain();
-				if (!currentChain)
-				{
-					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-						"A pass that wishes to reference a compositor texture "
-						"attempted to render in a pipeline without a compositor",
-						"SceneManager::_setPass");
-				}
-				CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
-				if (refComp == 0)
-				{
-					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-						"Invalid compositor content_type compositor name",
-						"SceneManager::_setPass");
-				}
-				Ogre::TexturePtr refTex = refComp->getTextureInstance(
-					pTex->getReferencedTextureName(), pTex->getReferencedMRTIndex());
-				if (refTex.isNull())
-				{
-					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-						"Invalid compositor content_type texture name",
-						"SceneManager::_setPass");
-				}
-				pTex->_setTexturePtr(refTex);
+				//TODO: (dark_sylinc) Add CONTENT_COMPOSITOR back!
+				//(should be able to read from global tex. or local to current node)
+				//pTex->_setTexturePtr( compoTex );
 			}
 			mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
 			++unit;

@@ -48,7 +48,6 @@ THE SOFTWARE.
 #include "OgreD3D9HardwareOcclusionQuery.h"
 #include "OgreFrustum.h"
 #include "OgreD3D9MultiRenderTarget.h"
-#include "OgreCompositorManager.h"
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
@@ -4298,11 +4297,6 @@ namespace Ogre
 		mFragmentProgramBound = false;
 		mLastVertexSourceCount = 0;
 
-		
-		// Force all compositors to reconstruct their internal resources
-		// render textures will have been changed without their knowledge
-		CompositorManager::getSingleton()._reconstructAllCompositorResources();
-		
 		// Restore previous active device.
 
 		// Invalidate active view port.

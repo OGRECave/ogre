@@ -119,7 +119,6 @@ namespace Ogre
         Profiler* mProfiler;
         HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
 		ExternalTextureSourceManager* mExternalTextureSourceManager;
-        CompositorManager* mCompositorManager;      
 		CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
 		Real mFrameSmoothingTime;

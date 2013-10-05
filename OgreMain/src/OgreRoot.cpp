@@ -81,7 +81,6 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
-#include "OgreCompositorManager.h"
 #include "OgreScriptCompiler.h"
 #include "OgreWindowEventUtilities.h"
 
@@ -253,7 +252,6 @@ namespace Ogre {
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
 		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
-        mCompositorManager = OGRE_NEW CompositorManager();
 
 		mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
@@ -304,7 +302,6 @@ namespace Ogre {
 		OGRE_DELETE mRenderSystemCapabilitiesManager;
 
 		destroyAllRenderQueueInvocationSequences();
-        OGRE_DELETE mCompositorManager;
 		OGRE_DELETE mExternalTextureSourceManager;
 #if OGRE_NO_FREEIMAGE == 0
 		FreeImageCodec::shutdown();

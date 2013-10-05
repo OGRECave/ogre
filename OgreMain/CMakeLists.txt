@@ -37,6 +37,8 @@ set (HEADER_FILES
   include/Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h
   include/Compositor/Pass/PassScene/OgreCompositorPassScene.h
   include/Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h
+  include/Compositor/Pass/PassStencil/OgreCompositorPassStencil.h
+  include/Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h
   include/Compositor/OgreCompositorChannel.h
   include/Compositor/OgreCompositorCommon.h
   include/Compositor/OgreCompositorManager2.h
@@ -76,14 +78,6 @@ set (HEADER_FILES
   include/OgreCodec.h
   include/OgreColourValue.h
   include/OgreCommon.h
-  include/OgreCompositionPass.h
-  include/OgreCompositionTargetPass.h
-  include/OgreCompositionTechnique.h
-  include/OgreCompositor.h
-  include/OgreCompositorChain.h
-  include/OgreCompositorLogic.h
-  include/OgreCompositorInstance.h
-  include/OgreCompositorManager.h
   include/OgreConfig.h
   include/OgreConfigDialog.h
   include/OgreConfigFile.h
@@ -91,7 +85,6 @@ set (HEADER_FILES
   include/OgreController.h
   include/OgreControllerManager.h
   include/OgreConvexBody.h
-  include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
   include/OgreDefaultHardwareBufferManager.h
   include/OgreDeflate.h
@@ -312,6 +305,7 @@ set (SOURCE_FILES
   src/Compositor/Pass/PassClear/OgreCompositorPassClear.cpp
   src/Compositor/Pass/PassQuad/OgreCompositorPassQuad.cpp
   src/Compositor/Pass/PassScene/OgreCompositorPassScene.cpp
+  src/Compositor/Pass/PassStencil/OgreCompositorPassStencil.cpp
   src/Compositor/OgreCompositorManager2.cpp
   src/Compositor/OgreCompositorNode.cpp
   src/Compositor/OgreCompositorNodeDef.cpp
@@ -342,13 +336,6 @@ set (SOURCE_FILES
   src/OgreCodec.cpp
   src/OgreColourValue.cpp
   src/OgreCommon.cpp
-  src/OgreCompositionPass.cpp
-  src/OgreCompositionTargetPass.cpp
-  src/OgreCompositionTechnique.cpp
-  src/OgreCompositor.cpp
-  src/OgreCompositorChain.cpp
-  src/OgreCompositorInstance.cpp
-  src/OgreCompositorManager.cpp
   src/OgreConfigFile.cpp
   src/OgreControllerManager.cpp
   src/OgreConvexBody.cpp

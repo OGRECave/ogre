@@ -320,16 +320,7 @@ namespace Ogre {
 	class VertexMorphKeyFrame;
     class WireBoundingBox;
 	class WorkQueue;
-    class Compositor;
-    class CompositorManager;
 	class CompositorManager2;
-    class CompositorChain;
-    class CompositorInstance;
-	class CompositorLogic;
-    class CompositionTechnique;
-    class CompositionPass;
-    class CompositionTargetPass;
-	class CustomCompositionPass;
 }
 
 /* Include all the standard header *after* all the configuration
