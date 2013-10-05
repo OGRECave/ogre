@@ -45,8 +45,8 @@ public:
 	~LodOutputProviderCompressedMesh();
 	virtual void prepare(LodData* data);
 	virtual void finalize(LodData* data);
-	virtual void bakeManualLodLevel(LodData* data, String& manualMeshName);
-	virtual void bakeLodLevel(LodData* data);
+	virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
+	virtual void bakeLodLevel(LodData* data, int lodIndex);
 	virtual void inject();
 
 	virtual void triangleRemoved(LodData* data, LodData::Triangle* tri);
@@ -76,8 +76,8 @@ protected:
 
 	int mLastIndexBufferID;
 
-	virtual void bakeFirstPass(LodData* data);
-	virtual void bakeSecondPass(LodData* data);
+	virtual void bakeFirstPass(LodData* data, int lodIndex);
+	virtual void bakeSecondPass(LodData* data, int lodIndex);
 };
 
 }

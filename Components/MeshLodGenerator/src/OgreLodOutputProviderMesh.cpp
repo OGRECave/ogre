@@ -46,17 +46,17 @@ namespace Ogre
 		}
 	}
 
-	void LodOutputProviderMesh::bakeManualLodLevel( LodData* data, String& manualMeshName )
+	void LodOutputProviderMesh::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex)
 	{
 		// placeholder dummy
 		unsigned short submeshCount = mMesh->getNumSubMeshes();
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-			lods.push_back(OGRE_NEW IndexData());
+			lods.insert(lods.begin() + lodIndex, OGRE_NEW IndexData());
 		}
 	}
 
-	void LodOutputProviderMesh::bakeLodLevel(LodData* data)
+	void LodOutputProviderMesh::bakeLodLevel(LodData* data, int lodIndex)
 	{
 		unsigned short submeshCount = mMesh->getNumSubMeshes();
 
@@ -64,27 +64,26 @@ namespace Ogre
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
 			int indexCount = data->mIndexBufferInfoList[i].indexCount;
-			assert(indexCount >= 0);
-			lods.push_back(OGRE_NEW IndexData());
-			lods.back()->indexStart = 0;
-
+			IndexData* curLod = OGRE_NEW IndexData();
+			curLod->indexStart = 0;
+			lods.insert(lods.begin() + lodIndex, curLod);
 			if (indexCount == 0) {
 				//If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
 				//The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
 				//This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
 				//ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-				lods.back()->indexCount = 3;
+				curLod->indexCount = 3;
 			} else {
-				lods.back()->indexCount = indexCount;
+				curLod->indexCount = indexCount;
 			}
 
-			lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+			curLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 				data->mIndexBufferInfoList[i].indexSize == 2 ?
 				HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-				lods.back()->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+				curLod->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 
 			data->mIndexBufferInfoList[i].buf.pshort =
-				static_cast<unsigned short*>(lods.back()->indexBuffer->lock(0, lods.back()->indexBuffer->getSizeInBytes(),
+				static_cast<unsigned short*>(curLod->indexBuffer->lock(0, curLod->indexBuffer->getSizeInBytes(),
 				HardwareBuffer::HBL_DISCARD));
 
 			//Check if we should fill it with a "dummy" triangle.
@@ -115,7 +114,7 @@ namespace Ogre
 		// Close buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-			lods.back()->indexBuffer->unlock();
+			lods[lodIndex]->indexBuffer->unlock();
 		}
 	}
 

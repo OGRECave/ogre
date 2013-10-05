@@ -34,16 +34,6 @@
 namespace Ogre
 {
 
-	LodIndexBuffer::LodIndexBuffer() :
-		indexBuffer(0)
-	{
-
-	}
-
-	LodIndexBuffer::~LodIndexBuffer()
-	{
-		delete indexBuffer;
-	}
 
 
 	void LodIndexBuffer::fillBuffer( Ogre::IndexData* data )
@@ -54,24 +44,12 @@ namespace Ogre
 		if (indexCount > 0) {
 			unsigned char* pBuffer = (unsigned char*) hwIndexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
 			size_t offset = data->indexStart * indexSize;
-			indexBuffer = new unsigned char[indexCount * indexSize];
+			indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[indexCount * indexSize]);
 			indexStart = 0;
 			indexBufferSize = 0;
-			memcpy(indexBuffer, pBuffer + offset, indexCount * indexSize);
+			memcpy(indexBuffer.get(), pBuffer + offset, indexCount * indexSize);
 			hwIndexBuffer->unlock();
 		}
-	}
-
-	LodVertexBuffer::LodVertexBuffer() :
-		vertexBuffer(0), vertexNormalBuffer(0)
-	{
-
-	}
-
-	LodVertexBuffer::~LodVertexBuffer()
-	{
-		delete vertexBuffer;
-		delete vertexNormalBuffer;
 	}
 
 	void LodVertexBuffer::fillBuffer( Ogre::VertexData* data )
@@ -87,7 +65,7 @@ namespace Ogre
 		vertexCount = data->vertexCount;
 
 		if (vertexCount > 0) {
-			vertexBuffer = new Vector3[vertexCount];
+			vertexBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
 
 			// Lock the buffer for reading.
 			unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -103,8 +81,8 @@ namespace Ogre
 			elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 			useVertexNormals = useVertexNormals && (elemNormal != 0);
 			if(useVertexNormals){
-				vertexNormalBuffer = new Vector3[vertexCount];
-				pNormalOut = vertexNormalBuffer;
+				vertexNormalBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
+				pNormalOut = vertexNormalBuffer.get();
 				if(elemNormal->getSource() == elemPos->getSource()){
 					vNormalBuf = vbuf;
 					vNormal = vStart;
@@ -118,8 +96,8 @@ namespace Ogre
 			}
 
 			// Loop through all vertices and insert them to the Unordered Map.
-			Vector3* pOut = vertexBuffer;
-			Vector3* pEnd = vertexBuffer + vertexCount;
+			Vector3* pOut = vertexBuffer.get();
+			Vector3* pEnd = pOut + vertexCount;
 			for (; pOut < pEnd; pOut++) {
 				float* pFloat;
 				elemPos->baseVertexPointerToElement(vertex, &pFloat);

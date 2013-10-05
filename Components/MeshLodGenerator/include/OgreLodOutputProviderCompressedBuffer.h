@@ -44,9 +44,8 @@ public:
 	LodOutputProviderCompressedBuffer(MeshPtr mesh);
 
 protected:
-	virtual void bakeFirstPass(LodData* data);
-	virtual void bakeSecondPass(LodData* data);
-	void finalize( LodData* data );
+	virtual void bakeFirstPass(LodData* data, int lodIndex);
+	virtual void bakeSecondPass(LodData* data, int lodIndex);
 };
 
 }

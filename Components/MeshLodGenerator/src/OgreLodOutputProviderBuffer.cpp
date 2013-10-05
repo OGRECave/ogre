@@ -45,7 +45,7 @@ namespace Ogre
 		mBuffer.submesh.resize(data->mIndexBufferInfoList.size());
 	}
 
-	void LodOutputProviderBuffer::bakeManualLodLevel( LodData* data, String& manualMeshName )
+	void LodOutputProviderBuffer::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex )
 	{
 		// placeholder dummy
 		unsigned short submeshCount = mBuffer.submesh.size();
@@ -54,12 +54,18 @@ namespace Ogre
 		buffer.indexCount = 0;
 		buffer.indexStart = 0;
 		buffer.indexBufferSize = 0;
-		for (unsigned short i = 0; i < submeshCount; i++) {
-			mBuffer.submesh[i].genIndexBuffers.push_back(buffer);
+		if(lodIndex < 0) {
+			for (unsigned short i = 0; i < submeshCount; i++) {
+				mBuffer.submesh[i].genIndexBuffers.push_back(buffer);
+			}
+		} else {
+			for (unsigned short i = 0; i < submeshCount; i++) {
+				mBuffer.submesh[i].genIndexBuffers.insert(mBuffer.submesh[i].genIndexBuffers.begin() + lodIndex, buffer);
+			}
 		}
 	}
 
-	void LodOutputProviderBuffer::bakeLodLevel(LodData* data)
+	void LodOutputProviderBuffer::bakeLodLevel(LodData* data, int lodIndex)
 	{
 		unsigned short submeshCount = mBuffer.submesh.size();
 
@@ -67,23 +73,19 @@ namespace Ogre
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			vector<LodIndexBuffer>::type& lods = mBuffer.submesh[i].genIndexBuffers;
 			int indexCount = data->mIndexBufferInfoList[i].indexCount;
-			OgreAssert(indexCount >= 0, "");
-
-			lods.push_back(LodIndexBuffer());
+			lods.reserve(lods.size() + 1);
+			LodIndexBuffer& curLod = *lods.insert(lods.begin() + lodIndex, LodIndexBuffer());
 			if (indexCount == 0) {
-				lods.back().indexCount = 3;
+				curLod.indexCount = 3;
 			} else {
-				lods.back().indexCount = indexCount;
+				curLod.indexCount = indexCount;
 			}
-			lods.back().indexStart = 0;
-			lods.back().indexSize = data->mIndexBufferInfoList[i].indexSize;
-			lods.back().indexBufferSize = 0; // It means same as index count
-			lods.back().indexBuffer = new unsigned char[lods.back().indexCount * lods.back().indexSize];
-			if (data->mIndexBufferInfoList[i].indexSize == 2) {
-				data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) lods.back().indexBuffer;
-			} else {
-				data->mIndexBufferInfoList[i].buf.pint = (unsigned int*) lods.back().indexBuffer;
-			}
+			curLod.indexStart = 0;
+			curLod.indexSize = data->mIndexBufferInfoList[i].indexSize;
+			curLod.indexBufferSize = 0; // It means same as index count
+			curLod.indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[curLod.indexCount * curLod.indexSize]);
+			// buf is an union, so pint=pshort
+			data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) curLod.indexBuffer.get();
 
 			if (indexCount == 0) {
 				memset(data->mIndexBufferInfoList[i].buf.pshort, 0, 3 * data->mIndexBufferInfoList[i].indexSize);
@@ -137,7 +139,7 @@ void LodOutputProviderBuffer::inject()
 						indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 					int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
 					void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
-					memcpy(pOutBuff, buff.indexBuffer, sizeInBytes);
+					memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);
 					lods.back()->indexBuffer->unlock();
 				}
 			}

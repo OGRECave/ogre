@@ -35,7 +35,8 @@
 
 namespace Ogre
 {
-	LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh( MeshPtr mesh ) : mMesh(mesh)
+	LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh( MeshPtr mesh ) :
+		mMesh(mesh)
 	{
 		fallback = new LodOutputProviderMesh(mesh);
 	}
@@ -62,20 +63,17 @@ namespace Ogre
 	{
 		if(!mFirstBufferPass){
 			// Uneven number of Lod levels. We need to bake the last one separately.
-			unsigned short submeshCount = mMesh->getNumSubMeshes();
-			for (unsigned short i = 0; i < submeshCount; i++) {
-				SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-				OGRE_DELETE lods.back();
-				lods.pop_back();
-			}
-			fallback->bakeLodLevel(data);
+			fallback->bakeLodLevel(data, mLastIndexBufferID);
 		}
 		fallback->finalize(data);
 	}
 
-	void LodOutputProviderCompressedMesh::bakeManualLodLevel( LodData* data, String& manualMeshName )
+	void LodOutputProviderCompressedMesh::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex )
 	{
-		fallback->bakeManualLodLevel(data, manualMeshName);
+		if(!mFirstBufferPass){
+			lodIndex--;
+		}
+		fallback->bakeManualLodLevel(data, manualMeshName, lodIndex);
 	}
 
 	void LodOutputProviderCompressedMesh::inject()
@@ -83,19 +81,19 @@ namespace Ogre
 		fallback->inject();
 	}
 
-	void LodOutputProviderCompressedMesh::bakeLodLevel(LodData* data)
+	void LodOutputProviderCompressedMesh::bakeLodLevel(LodData* data, int lodIndex)
 	{
 		if(mFirstBufferPass){
-			bakeFirstPass(data);
+			bakeFirstPass(data, lodIndex);
 		} else {
-			bakeSecondPass(data);
+			bakeSecondPass(data, lodIndex);
 		}
 		mFirstBufferPass = !mFirstBufferPass;
 	}
-	void LodOutputProviderCompressedMesh::bakeFirstPass(LodData* data) {
+	void LodOutputProviderCompressedMesh::bakeFirstPass(LodData* data, int lodIndex) {
 		unsigned short submeshCount = mMesh->getNumSubMeshes();
 		assert(mTriangleCacheList.size() == data->mTriangleList.size());
-		mLastIndexBufferID =  mMesh->getSubMesh(0)->mLodFaceList.size();
+		mLastIndexBufferID =  lodIndex;
 
 		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
@@ -114,29 +112,27 @@ namespace Ogre
 			}
 		}
 	}
-	void LodOutputProviderCompressedMesh::bakeSecondPass(LodData* data) {
+	void LodOutputProviderCompressedMesh::bakeSecondPass(LodData* data, int lodIndex) {
 		unsigned short submeshCount = mMesh->getNumSubMeshes();
 		assert(mTriangleCacheList.size() == data->mTriangleList.size());
-
+		assert(lodIndex > mLastIndexBufferID); // Implementation limitation
 		// Create buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
-			IndexData* prevLod;
-			IndexData* curLod;
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
 			lods.reserve(lods.size() + 2);
 			int indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
-			assert(indexCount >= 0);
 			assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);
 			assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].prevOnlyIndexCount);
-			prevLod = *lods.insert(lods.begin() + mLastIndexBufferID, OGRE_NEW IndexData());
+			
+			IndexData* prevLod = *lods.insert(lods.begin() + mLastIndexBufferID, OGRE_NEW IndexData());
 			prevLod->indexStart = 0;
 
 			//If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
 			//The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
 			//This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
 			//ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-			indexCount = std::max(indexCount, 3);
-			prevLod->indexCount = std::max(data->mIndexBufferInfoList[i].prevIndexCount, 3u);
+			indexCount = std::max<size_t>(indexCount, 3);
+			prevLod->indexCount = std::max<size_t>(data->mIndexBufferInfoList[i].prevIndexCount, 3u);
 
 			prevLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 				data->mIndexBufferInfoList[i].indexSize == 2 ?
@@ -153,8 +149,7 @@ namespace Ogre
 			}
 
 			// Set up the other Lod
-			lods.push_back(OGRE_NEW IndexData());
-			curLod = lods.back();
+			IndexData* curLod = *lods.insert(lods.begin() + lodIndex, OGRE_NEW IndexData());
 			curLod->indexStart = indexCount - data->mIndexBufferInfoList[i].indexCount;
 			curLod->indexCount = data->mIndexBufferInfoList[i].indexCount;
 			if(curLod->indexCount == 0){
@@ -232,8 +227,8 @@ namespace Ogre
 		// Close buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-			IndexData* prevLod = lods.at(mLastIndexBufferID);
-			IndexData* curLod = lods.back();
+			IndexData* prevLod = lods[mLastIndexBufferID];
+			IndexData* curLod = lods[lodIndex];
 			prevLod->indexBuffer->unlock();
 			curLod->indexBuffer = prevLod->indexBuffer;
 		}
