@@ -57,7 +57,7 @@ namespace Ogre
 			const SubMesh* submesh = mMesh->getSubMesh(i);
 			if (!submesh->useSharedVertices) {
 				size_t count = submesh->vertexData->vertexCount;
-				vertexLookupSize = std::max(vertexLookupSize, count);
+				vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
 				vertexCount += count;
 			} else if (!sharedVerticesAdded) {
 				sharedVerticesAdded = true;

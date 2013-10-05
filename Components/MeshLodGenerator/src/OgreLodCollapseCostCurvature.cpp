@@ -110,7 +110,7 @@ namespace Ogre
 						// the edges are opposite each other, therefore less kinkiness
 						// Scale into [0..1]
 						Real kinkiness = otherBorderEdge.dotProduct(collapseEdge);
-						cost = std::max(cost, kinkiness);
+						cost = std::max<Real>(cost, kinkiness);
 					}
 				}
 				cost = (1.002f + cost) * 0.5f;
@@ -137,10 +137,10 @@ namespace Ogre
 						Real dotprod = triangle->normal.dotProduct(triangle2->normal);
 						// NB we do (1-..) to invert curvature where 1 is high curvature [0..1]
 						// Whilst dot product is high when angle difference is low
-						mincurv = std::max(mincurv, dotprod);
+						mincurv = std::max<Real>(mincurv, dotprod);
 					}
 				}
-				cost = std::min(cost, mincurv);
+				cost = std::min<Real>(cost, mincurv);
 			}
 			cost = (1.002f - cost) * 0.5f;
 		}
@@ -148,7 +148,7 @@ namespace Ogre
 		// check for texture seam ripping and multiple submeshes
 		if (src->seam) {
 			if (!dst->seam) {
-				cost = std::max(cost, (Real)0.05f);
+				cost = std::max<Real>(cost, (Real)0.05f);
 				cost *= 64;
 			} else {
 				if(MESHLOD_QUALITY >= 3) {
@@ -166,14 +166,14 @@ namespace Ogre
 						}
 					}
 					if(seamNeighbors != 2 || (seamNeighbors == 2 && dst->edges.has(LodData::Edge(otherSeam)))) {
-						cost = std::max(cost, (Real)0.05f);
+						cost = std::max<Real>(cost, 0.05f);
 						cost *= 64;
 					} else {
-						cost = std::max(cost, (Real)0.005f);
+						cost = std::max<Real>(cost, 0.005f);
 						cost *= 8;
 					}
 				} else {
-					cost = std::max(cost, (Real)0.005f);
+					cost = std::max<Real>(cost, 0.005f);
 					cost *= 8;
 				}
 
@@ -194,9 +194,10 @@ namespace Ogre
 				Real afterDist = neighbor->position.distance(dst->position);
 				Real beforeDot = neighbor->normal.dotProduct(src->normal);
 				Real afterDot = neighbor->normal.dotProduct(dst->normal);
-				normalCost = std::max(normalCost, std::max(diff, std::abs(beforeDot - afterDot)) * std::max((Real)(afterDist/8.0), std::max(dist, std::abs(beforeDist - afterDist))));
+				normalCost = std::max<Real>(normalCost, std::max<Real>(diff, std::abs(beforeDot - afterDot)) *
+					std::max<Real>(afterDist/8.0, std::max<Real>(dist, std::abs(beforeDist - afterDist))));
 			}
-			cost = std::max(normalCost * 0.25f, cost);
+			cost = std::max<Real>(normalCost * 0.25f, cost);
 		}
 
 		OgreAssert(cost >= 0 && cost != LodData::UNINITIALIZED_COLLAPSE_COST, "Invalid collapse cost");

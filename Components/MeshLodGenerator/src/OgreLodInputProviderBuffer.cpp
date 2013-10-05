@@ -57,7 +57,7 @@ namespace Ogre
 			const LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
 			if (!submesh.useSharedVertexBuffer) {
 				size_t count = submesh.vertexBuffer.vertexCount;
-				vertexLookupSize = std::max(vertexLookupSize, count);
+				vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
 				vertexCount += count;
 			} else if (!sharedVerticesAdded) {
 				sharedVerticesAdded = true;
@@ -107,12 +107,12 @@ namespace Ogre
 		VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 		lookup.clear();
 
-		Vector3* pNormalOut = vertexBuffer.vertexNormalBuffer;
+		Vector3* pNormalOut = vertexBuffer.vertexNormalBuffer.get();
 		data->mUseVertexNormals = data->mUseVertexNormals && (pNormalOut != NULL);
 
 		// Loop through all vertices and insert them to the Unordered Map.
-		Vector3* pOut = vertexBuffer.vertexBuffer;
-		Vector3* pEnd = vertexBuffer.vertexBuffer + vertexBuffer.vertexCount;
+		Vector3* pOut = vertexBuffer.vertexBuffer.get();
+		Vector3* pEnd = pOut + vertexBuffer.vertexCount;
 		for (; pOut < pEnd; pOut++) {
 			data->mVertexList.push_back(LodData::Vertex());
 			LodData::Vertex* v = &data->mVertexList.back();
@@ -191,7 +191,7 @@ namespace Ogre
 		VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
 		// Lock the buffer for reading.
-		unsigned char* iStart = indexBuffer.indexBuffer;
+		unsigned char* iStart = indexBuffer.indexBuffer.get();
 		if(!iStart) {
 			return;
 		}

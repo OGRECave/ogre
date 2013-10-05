@@ -471,12 +471,12 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
 			vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
-			minBounds.x = std::min(minBounds.x, mHull[i].vertex[n]->position.x);
-			minBounds.y = std::min(minBounds.y, mHull[i].vertex[n]->position.y);
-			minBounds.z = std::min(minBounds.z, mHull[i].vertex[n]->position.z);
-			maxBounds.x = std::max(maxBounds.x, mHull[i].vertex[n]->position.x);
-			maxBounds.y = std::max(maxBounds.y, mHull[i].vertex[n]->position.y);
-			maxBounds.z = std::max(maxBounds.z, mHull[i].vertex[n]->position.z);
+			minBounds.x = std::min<Real>(minBounds.x, mHull[i].vertex[n]->position.x);
+			minBounds.y = std::min<Real>(minBounds.y, mHull[i].vertex[n]->position.y);
+			minBounds.z = std::min<Real>(minBounds.z, mHull[i].vertex[n]->position.z);
+			maxBounds.x = std::max<Real>(maxBounds.x, mHull[i].vertex[n]->position.x);
+			maxBounds.y = std::max<Real>(maxBounds.y, mHull[i].vertex[n]->position.y);
+			maxBounds.z = std::max<Real>(maxBounds.z, mHull[i].vertex[n]->position.z);
 		}
 	}
 
