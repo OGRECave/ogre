@@ -290,14 +290,15 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
 	mForcedLodLevel = lodLevelID;
-	//if(!forceDelayed){
+	// These are the requirements for async Lod generation
+	if(!forceDelayed || !ENABLE_THREADING || OGRE_THREAD_SUPPORT == 0){
 		if(lodLevelID == -1 || mLodConfig.mesh->getNumLodLevels() <= 1) {
 			// Clear forced Lod level
 			mMeshEntity->setMeshLodBias(1.0, 0, std::numeric_limits<unsigned short>::max());
 		} else {
 			mMeshEntity->setMeshLodBias(1.0, lodLevelID, lodLevelID);
 		}
-	//}
+	}
 }
 size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 {
