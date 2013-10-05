@@ -2330,7 +2330,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     const LodStrategy *Mesh::getLodStrategy() const
     {
+#if !OGRE_NO_MESHLOD
+		return mLodStrategy;
+#else
         return LodStrategyManager::getSingleton().getDefaultStrategy();
+#endif
     }
 #if !OGRE_NO_MESHLOD
     //---------------------------------------------------------------------
