@@ -419,6 +419,12 @@ namespace Ogre {
 									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
 									 AxisAlignedBox *outReceiversBox )
 	{
+		//On threaded environments, the internal variables from outCulledObjects cause
+		//a false cache sharing because they're too close to each other. Perfoming
+		//a swap places those internal vars in the local stack, increasing scalability
+		MovableObjectArray culledObjects;
+		culledObjects.swap( outCulledObjects );
+
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
 		// (we use method Method 5: "If you really don’t care whether a box is
@@ -538,7 +544,7 @@ namespace Ogre {
 				//we set mVisibilityFlags to 0 on slot removals
 				if( IS_BIT_SET( j, scalarMask ) )
 				{
-					outCulledObjects.push_back( objData.mOwner[j] );
+					culledObjects.push_back( objData.mOwner[j] );
 				}
 			}
 
@@ -555,6 +561,8 @@ namespace Ogre {
 			else
 				outReceiversBox->setExtents( vMin, vMax );
 		}
+
+		culledObjects.swap( outCulledObjects );
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullReceiversBox( const size_t numNodes, ObjectData objData,

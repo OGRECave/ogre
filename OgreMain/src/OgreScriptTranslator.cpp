@@ -6686,6 +6686,21 @@ namespace Ogre{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 				switch(prop->id)
 				{
+				case ID_USE_QUAD:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &passQuad->mUseQuad ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
 				case ID_QUAD_NORMALS:
 					{
 						if(prop->values.empty())
