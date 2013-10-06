@@ -217,7 +217,7 @@ namespace Ogre {
 		/// Node has changed position, update
 		virtual void updateTrail(size_t index, const Node* node);
         /// Reset the tracked chain to initial state
-        virtual void resetTrail(size_t index, const Node* node);
+        virtual void resetTrail(size_t index, Node* node);
         /// Reset all tracked chains to initial state
         virtual void resetAllTrails(void);
 

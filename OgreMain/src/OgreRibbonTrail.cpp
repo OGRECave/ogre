@@ -460,7 +460,7 @@ namespace Ogre
 		mVertexContentDirty = true;
 	}
     //-----------------------------------------------------------------------
-    void RibbonTrail::resetTrail(size_t index, const Node* node)
+    void RibbonTrail::resetTrail(size_t index, Node* node)
     {
         assert(index < mChainCount);
 
@@ -469,7 +469,7 @@ namespace Ogre
         seg.head = seg.tail = SEGMENT_EMPTY;
         // Create new element, v coord is always 0.0f
 		// need to convert to take parent node's position into account
-		Vector3 position = node->_getDerivedPosition();
+		Vector3 position = node->_getDerivedPositionUpdated();
 		if (mParentNode)
 		{
 			position = mParentNode->_getDerivedOrientation().Inverse() 

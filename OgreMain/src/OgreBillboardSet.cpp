@@ -77,6 +77,8 @@ namespace Ogre {
         setPoolSize( poolSize );
 		setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
+
+		mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------
     BillboardSet::~BillboardSet()
@@ -559,6 +561,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
+		_notifyCurrentCamera( camera );
+
         // If we're driving this from our own data, update geometry if need to.
         if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))
         {
