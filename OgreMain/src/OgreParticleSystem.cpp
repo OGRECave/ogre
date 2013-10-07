@@ -83,12 +83,9 @@ namespace Ogre {
     ParticleSystem::ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
 									const String& resourceGroup )
       : MovableObject( id, objectMemoryManager ),
-        mAABB(),
-        mBoundingRadius(1.0f),
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),
-        mWorldAABB(),
         mResourceGroupName(resourceGroup),
         mIsRendererConfigured(false),
         mSpeedFactor(1.0f),
@@ -797,33 +794,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_updateBounds()
     {
-
         if (mParentNode && (mBoundsAutoUpdate || mBoundsUpdateTime > 0.0f))
         {
+			Aabb aabb;
             if (mActiveParticles.empty())
             {
                 // No particles, reset to null if auto update bounds
                 if (mBoundsAutoUpdate)
-                {
-                    mWorldAABB.setNull();
-                }
+					aabb = Aabb::BOX_NULL;
             }
             else
             {
                 Vector3 min;
                 Vector3 max;
-                if (!mBoundsAutoUpdate && mWorldAABB.isFinite())
-                {
-                    // We're on a limit, grow rather than reset each time
-                    // so that we pick up the worst case scenario
-                    min = mWorldAABB.getMinimum();
-                    max = mWorldAABB.getMaximum();
-                }
-                else
-                {
-                    min.x = min.y = min.z = Math::POS_INFINITY;
-                    max.x = max.y = max.z = Math::NEG_INFINITY;
-                }
+                min.x = min.y = min.z = Math::POS_INFINITY;
+                max.x = max.y = max.z = Math::NEG_INFINITY;
+
                 ActiveParticleList::iterator p;
                 Vector3 halfScale = Vector3::UNIT_SCALE * 0.5;
                 Vector3 defaultPadding = 
@@ -843,26 +829,21 @@ namespace Ogre {
                         max.makeCeil((*p)->position + defaultPadding);
                     }
                 }
-                mWorldAABB.setExtents(min, max);
+				aabb.setExtents(min, max);
             }
 
 
-            if (mLocalSpace)
-            {
-                // Merge calculated box with current AABB to preserve any user-set AABB
-                mAABB.merge(mWorldAABB);
-            }
-            else
+            if (!mLocalSpace)
             {
                 // We've already put particles in world space to decouple them from the
                 // node transform, so reverse transform back since we're expected to 
                 // provide a local AABB
-                AxisAlignedBox newAABB(mWorldAABB);
-                newAABB.transformAffine(mParentNode->_getFullTransform().inverseAffine());
+				//TODO: (dark_sylinc) refactor the "Updated" part
+				aabb.transformAffine( mParentNode->_getFullTransformUpdated().inverseAffine() );
+			}
 
-                // Merge calculated box with current AABB to preserve any user-set AABB
-                mAABB.merge(newAABB);
-            }
+			mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
         }
     }
     //-----------------------------------------------------------------------
@@ -1115,13 +1096,6 @@ namespace Ogre {
 			(*i)->_notifyVisualData(0);
 		}
 	}
-    //-----------------------------------------------------------------------
-    void ParticleSystem::setBounds(const AxisAlignedBox& aabb)
-    {
-        mAABB = aabb;
-        mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
-
-    }
     //-----------------------------------------------------------------------
     void ParticleSystem::setBoundsAutoUpdated(bool autoUpdate, Real stopIn)
     {

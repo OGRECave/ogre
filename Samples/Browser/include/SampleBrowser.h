@@ -1288,8 +1288,21 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void createDummyScene()
 		{
+#ifdef _DEBUG
+			//Debugging multithreaded code is a PITA, disable it.
 			const size_t numThreads = 1;
 			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+#else
+			//getNumLogicalCores() may return 0 if couldn't detect
+			const size_t numThreads = std::max( 1, PlatformInformation::getNumLogicalCores() );
+
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+			//See doxygen documentation regarding culling methods.
+			//In some cases you may still want to use single thread.
+			if( numThreads > 1 )
+				Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+#endif
 			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads,
 																threadedCullingMethod, "DummyScene");
 			sm->addRenderQueueListener(mOverlaySystem);

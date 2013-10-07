@@ -809,7 +809,7 @@ namespace Ogre
 				ID_RENDER_SCENE,
 				ID_RENDER_QUAD,
 					ID_VIEWPORT,
-					ID_ONLY_INITIAL,	//TODO
+					ID_NUM_INITIAL,
 					ID_IDENTIFIER,		//TODO
 
 					//Used by PASS_SCENE

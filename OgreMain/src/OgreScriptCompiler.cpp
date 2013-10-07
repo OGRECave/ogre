@@ -1241,7 +1241,7 @@ namespace Ogre
 		mIds["render_quad"]		= ID_RENDER_QUAD;
 
 		mIds["viewport"]		= ID_VIEWPORT;
-		mIds["only_initial"]	= ID_ONLY_INITIAL;
+		mIds["num_initial"]		= ID_NUM_INITIAL;
 		mIds["identifier"]		= ID_IDENTIFIER;
 
 		mIds["lod_bias"]		= ID_LOD_BIAS;

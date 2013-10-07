@@ -6657,6 +6657,7 @@ namespace Ogre{
 					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
+				case ID_NUM_INITIAL:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -6797,6 +6798,7 @@ namespace Ogre{
 					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
+				case ID_NUM_INITIAL:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -6962,6 +6964,7 @@ namespace Ogre{
 					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
+				case ID_NUM_INITIAL:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7065,6 +7068,7 @@ namespace Ogre{
 					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
+				case ID_NUM_INITIAL:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7111,8 +7115,6 @@ namespace Ogre{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 				switch(prop->id)
 				{
-				/*TODO: To be ported to stencil pass
-				*/
 				case ID_VIEWPORT:
 					{
 						if(prop->values.size() != 4)
@@ -7148,6 +7150,25 @@ namespace Ogre{
 					else
 					{
 						if( !getUInt(prop->values.front(), &mPassDef->mIdentifier) )
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						}
+					}
+					break;
+				case ID_NUM_INITIAL:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else if (prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else
+					{
+						if( !getUInt(prop->values.front(), &mPassDef->mNumInitialPasses) )
 						{
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 						}

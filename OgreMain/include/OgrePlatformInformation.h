@@ -189,6 +189,12 @@ namespace Ogre {
 		*/
 		static bool hasCpuFeature(CpuFeatures feature);
 
+		/** Returns the number of logical cores. Hyper Threaded cores do not count
+		@note
+			Returns 0 if couldn't detect.
+		*/
+		static uint32 getNumLogicalCores(void);
+
 
 		/** Write the CPU information to the passed in Log */
 		static void log(Log* pLog);

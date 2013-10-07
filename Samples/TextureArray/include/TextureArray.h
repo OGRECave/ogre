@@ -105,7 +105,7 @@ protected:
         pState->setTextureName(tex->getName(), TEX_TYPE_2D_ARRAY);
 
         // create a plane with float3 tex coord - the third value will be the texture index in our case
-	    ManualObject* textureArrayObject = mSceneMgr->createManualObject("TextureAtlasObject");
+	    ManualObject* textureArrayObject = mSceneMgr->createManualObject();
         
         // create a quad that uses our material 
         int quadSize = 100;

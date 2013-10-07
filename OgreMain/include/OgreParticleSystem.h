@@ -370,12 +370,6 @@ namespace Ogre {
             @see
                 MovableObject
         */
-        virtual const AxisAlignedBox& getBoundingBox(void) const { return mAABB; }
-
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
 		/// @copydoc MovableObject::visitRenderables
@@ -549,17 +543,6 @@ namespace Ogre {
 		/// Gets whether particles are sorted relative to the camera.
 		bool getSortingEnabled(void) const { return mSorted; }
 
-        /** Set the (initial) bounds of the particle system manually. 
-        @remarks
-            If you can, set the bounds of a particle system up-front and 
-            call setBoundsAutoUpdated(false); this is the most efficient way to
-            organise it. Otherwise, set an initial bounds and let the bounds increase
-            for a little while (the default is 5 seconds), after which time the 
-            AABB is fixed to save time.
-        @param aabb Bounds in local space.
-        */
-        void setBounds(const AxisAlignedBox& aabb);
-
         /** Sets whether the bounds will be automatically updated
             for the life of the particle system
         @remarks
@@ -644,15 +627,9 @@ namespace Ogre {
 		static CmdIterationInterval msIterationIntervalCmd;
 		static CmdNonvisibleTimeout msNonvisibleTimeoutCmd;
 
-
-        AxisAlignedBox mAABB;
-        Real mBoundingRadius;
         bool mBoundsAutoUpdate;
         Real mBoundsUpdateTime;
         Real mUpdateRemainTime;
-
-        /// World AABB, only used to compare world-space positions to calc bounds
-        AxisAlignedBox mWorldAABB;
 
         /// Name of the resource group to use to load materials
         String mResourceGroupName;

@@ -152,6 +152,8 @@ mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
+	assert( numWorkerThreads >= 1 );
+
 	if( numWorkerThreads <= 1 )
 		mInstancingThreadedCullingMethod = INSTANCING_CULLING_SINGLETHREAD;
 
@@ -1381,7 +1383,7 @@ void SceneManager::_setSkyPlane(
 		params["mesh"] = meshName;
 		mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(
 											Id::generateNewId<MovableObject>(),
-											&mEntityMemoryManager[SCENE_STATIC], this, &params ));
+											&mEntityMemoryManager[SCENE_DYNAMIC], this, &params ));
 		mSkyPlaneEntity->setName( meshName );
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
@@ -1682,7 +1684,7 @@ void SceneManager::_setSkyDome(
         // Create node 
         if (!mSkyDomeNode)
         {
-            mSkyDomeNode = createSceneNode();
+			mSkyDomeNode = createSceneNode( SCENE_DYNAMIC );
 			mSkyDomeNode->setName( "SkyDomeNode" );
         }
         else
@@ -1714,7 +1716,7 @@ void SceneManager::_setSkyDome(
 			params["mesh"] = planeMesh->getName();
 			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(
 												Id::generateNewId<MovableObject>(),
-												&mEntityMemoryManager[SCENE_STATIC], this, &params ));
+												&mEntityMemoryManager[SCENE_DYNAMIC], this, &params ));
 			mSkyDomeEntity[i]->setName( entName );
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
@@ -3366,16 +3368,19 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	{
 		// The plane position relative to the camera has already been set up
 		mSkyPlaneNode->setPosition(cam->getDerivedPosition());
+		mSkyPlaneNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyBoxNode)
 	{
 		mSkyBoxNode->setPosition(cam->getDerivedPosition());
+		mSkyBoxNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyDomeNode)
 	{
 		mSkyDomeNode->setPosition(cam->getDerivedPosition());
+		mSkyDomeNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyPlaneEnabled
@@ -4024,6 +4029,10 @@ void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin, bool bPerma
 			mSceneRoot[i]->setPosition( Vector3::ZERO );
 			propagateRelativeOrigin( mSceneRoot[i], relativeOrigin );
 		}
+
+		propagateRelativeOrigin( mSkyBoxNode, relativeOrigin );
+		propagateRelativeOrigin( mSkyDomeNode, relativeOrigin );
+		propagateRelativeOrigin( mSkyBoxNode, relativeOrigin );
 	}
 
 	notifyStaticDirty( mSceneRoot[SCENE_STATIC] );
