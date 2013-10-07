@@ -987,10 +987,7 @@ int main(int numargs, char** args)
 		}
 		stat( source.c_str(), &tagStat );
 		MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-		size_t result = fread( (void*)memstream->getPtr(), tagStat.st_size, 1, pFile );
-		if (result != tagStat.st_size)
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-				"Unexpected error while reading file " + source, "OgreMeshUpgrade");
+		fread( (void*)memstream->getPtr(), tagStat.st_size, 1, pFile );
 		fclose( pFile );
 
 		Mesh mesh(meshMgr, "conversion", 0, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);

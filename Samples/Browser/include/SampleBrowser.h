@@ -1070,7 +1070,7 @@ protected:
             const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
 #if defined(INCLUDE_RTSHADER_SYSTEM)
-            bool hasProgrammableGPU = (profiles.size() != 0);
+            bool hasProgrammableGPU = (!profiles.empty());
 #endif
 
 //            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
