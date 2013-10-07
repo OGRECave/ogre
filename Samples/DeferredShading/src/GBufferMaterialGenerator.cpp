@@ -17,6 +17,7 @@ same license as the rest of the engine.
 
 #include "OgreMaterialManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreRoot.h"
 #include "OgreStringConverter.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreTechnique.h"
@@ -62,6 +63,10 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
     if(mIsGLSL)
     {
+        int shadingLangVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+        const char *inSemantic = shadingLangVersion >= 150 ? "in" : "attribute";
+        const char *outSemantic = shadingLangVersion >= 150 ? "out" : "varying";
+
         if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
         {
             ss << "#version 300 es" << std::endl;
@@ -69,39 +74,39 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
             ss << "precision mediump float;" << std::endl;
         }
         else
-            ss << "#version 150" << std::endl;
+            ss << "#version " << shadingLangVersion << std::endl;
 
-        ss << "in vec4 vertex;" << std::endl;
-        ss << "in vec3 normal;" << std::endl;
+        ss << inSemantic << " vec4 vertex;" << std::endl;
+        ss << inSemantic << " vec3 normal;" << std::endl;
 
         uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
-        for (uint32 i=0; i<numTexCoords; i++)
+        for (uint32 i = 0; i < numTexCoords; i++)
         {
-            ss << "in vec2 uv" << i << ';' << std::endl;
+            ss << inSemantic << " vec2 uv" << i << ';' << std::endl;
         }
 
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "in vec3 tangent;" << std::endl;
+            ss << inSemantic << " vec3 tangent;" << std::endl;
         }
 
         //TODO : Skinning inputs
         ss << std::endl;
 
 #ifdef WRITE_LINEAR_DEPTH
-        ss << "out vec3 oViewPos;" << std::endl;
+        ss << outSemantic << " vec3 oViewPos;" << std::endl;
 #else
-        ss << "out float oDepth;" << std::endl;
+        ss << outSemantic << " float oDepth;" << std::endl;
 #endif
-        ss << "out vec3 oNormal;" << std::endl;
+        ss << outSemantic << " vec3 oNormal;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "out vec3 oTangent;" << std::endl;
-            ss << "out vec3 oBiNormal;" << std::endl;
+            ss << outSemantic << " vec3 oTangent;" << std::endl;
+            ss << outSemantic << " vec3 oBiNormal;" << std::endl;
         }
-        for (uint32 i=0; i<numTexCoords; i++)
+        for (uint32 i = 0; i < numTexCoords; i++)
         {
-            ss << "out vec2 oUv" << i << ";" << std::endl;
+            ss << outSemantic << " vec2 oUv" << i << ";" << std::endl;
         }
 
         ss << std::endl;
@@ -153,7 +158,6 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
             ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
                                                                                   ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                                   "glsl", GPT_VERTEX_PROGRAM);
-            ptrProgram->setParameter("syntax", "glsl150");
         }
         ptrProgram->setSource(programSource);
 
@@ -282,38 +286,42 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
     if(mIsGLSL)
     {
+        int shadingLangVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+        const char *inSemantic = shadingLangVersion >= 150 ? "in" : "varying";
+        const char *outData = shadingLangVersion >= 150 ? "fragData" : "gl_FragData";
+        const char *textureFunc = shadingLangVersion >= 150 ? "texture" : "texture2D";
         if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
         {
             ss << "#version 300 es" << std::endl;
             ss << "precision mediump int;" << std::endl;
             ss << "precision mediump float;" << std::endl;
-//            ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
         }
         else
         {
-            ss << "#version 150" << std::endl;
-            ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
+            ss << "#version " << shadingLangVersion << std::endl;
+            if(shadingLangVersion >= 150)
+            {
+                ss << "out vec4 fragData[2];";
+            }
         }
 #ifdef WRITE_LINEAR_DEPTH
-        ss << "in vec3 oViewPos;" << std::endl;
+        ss << inSemantic << " vec3 oViewPos;" << std::endl;
 #else
-        ss << "in float oDepth;" << std::endl;
+        ss << inSemantic << " float oDepth;" << std::endl;
 #endif
-        ss << "in vec3 oNormal;" << std::endl;
+        ss << inSemantic << " vec3 oNormal;" << std::endl;
 
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "in vec3 oTangent;" << std::endl;
-            ss << "in vec3 oBiNormal;" << std::endl;
+            ss << inSemantic << " vec3 oTangent;" << std::endl;
+            ss << inSemantic << " vec3 oBiNormal;" << std::endl;
         }
 
         uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
-        for (uint32 i=0; i<numTexCoords; i++)
+        for (uint32 i = 0; i < numTexCoords; i++)
         {
-            ss << "in vec2 oUv" << i << ';' << std::endl;
+            ss << inSemantic << " vec2 oUv" << i << ';' << std::endl;
         }
-        ss << "layout(location = 0) out vec4 oColor0;" << std::endl;
-        ss << "layout(location = 1) out vec4 oColor1;" << std::endl;
 
         ss << std::endl;
 
@@ -323,7 +331,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         }
 
         uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-        for (uint32 i=0; i<numTextures; i++)
+        for (uint32 i = 0; i < numTextures; i++)
         {
             ss << "uniform sampler2D sTex" << i << ";" << std::endl;
         }
@@ -343,33 +351,33 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
         if (numTexCoords > 0 && numTextures > 0)
         {
-            ss << "	oColor0.rgb = texture(sTex0, oUv0).rgb;" << std::endl;
+            ss << outData << "[0].rgb = " << textureFunc << "(sTex0, oUv0).rgb;" << std::endl;
             if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
             {
-                ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
+                ss << outData << "[0].rgb *= cDiffuseColour.rgb;" << std::endl;
             }
         }
         else
         {
-            ss << "	oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
+            ss << outData << "[0].rgb = cDiffuseColour.rgb;" << std::endl;
         }
 
-        ss << "	oColor0.a = cSpecularity;" << std::endl;
+        ss << outData << "[0].a = cSpecularity;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	vec3 texNormal = (texture(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
+            ss << "	vec3 texNormal = (" << textureFunc << "(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
             ss << "	mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
-            ss << "	oColor1.rgb = normalize(texNormal * normalRotation);" << std::endl;
+            ss << outData << "[1].rgb = normalize(texNormal * normalRotation);" << std::endl;
         }
         else
         {
-            ss << "	oColor1.rgb = normalize(oNormal);" << std::endl;
+            ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
         }
-        ss << "	oColor1.rgb = normalize(oNormal);" << std::endl;
+        ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
 #ifdef WRITE_LINEAR_DEPTH
-        ss << "	oColor1.a = length(oViewPos) / cFarDistance;" << std::endl;
+        ss << outData << "[1].a = length(oViewPos) / cFarDistance;" << std::endl;
 #else
-        ss << "	oColor1.a = oDepth;" << std::endl;
+        ss << outData << "[1].a = oDepth;" << std::endl;
 #endif
 
         ss << "}" << std::endl;
@@ -395,7 +403,6 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
             ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
                                                                                   ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                                   "glsl", GPT_FRAGMENT_PROGRAM);
-            ptrProgram->setParameter("syntax", "glsl150");
         }
         ptrProgram->setSource(programSource);
 
@@ -412,7 +419,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             params->setNamedConstant("sNormalMap", samplerNum++);
         }
-        for (uint32 i=0; i<numTextures; i++, samplerNum++)
+        for (uint32 i = 0; i < numTextures; i++, samplerNum++)
         {
             params->setNamedConstant("sTex" + StringConverter::toString(i), samplerNum);
         }
