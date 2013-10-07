@@ -262,6 +262,7 @@ public:
 			{
 				mInfoLabel->setCaption("Updating textures, patience...");
 			}
+
 		}
 		else
 		{
@@ -769,8 +770,11 @@ protected:
 
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-        ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
-        ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        ResourceGroupManager::getSingleton().addResourceLocation(macBundlePath() + "/../Documents", "FileSystem", "General");
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        ResourceGroupManager::getSingleton().addResourceLocation(macBundlePath() + "/../", "FileSystem", "General");
+#endif
 
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -806,7 +810,6 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
-		mTerrainGroup->setResourceGroup("Terrain");
 
 		configureTerrainDefaults(l);
 #ifdef PAGING
