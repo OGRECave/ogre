@@ -84,8 +84,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
-  ${OPENGL_INCLUDE_DIR}
 )
+
+if(NOT APPLE)
+  include_directories(
+    ${OPENGL_INCLUDE_DIR}
+  )
+endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
