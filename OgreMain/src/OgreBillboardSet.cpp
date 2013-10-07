@@ -49,8 +49,8 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     BillboardSet::BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
-								unsigned int poolSize, bool externalData) :
-        MovableObject( id, objectMemoryManager ),
+								unsigned int poolSize, bool externalData, uint8 renderQueueId ) :
+        MovableObject( id, objectMemoryManager, renderQueueId ),
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
         mAllDefaultSize( true ),
@@ -342,11 +342,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_notifyCurrentCamera( Camera* cam )
     {
-        mCurrentCamera = cam;
-
         // Calculate camera orientation and position
-        mCamQ = mCurrentCamera->getDerivedOrientation();
-        mCamPos = mCurrentCamera->getDerivedPosition();
+        mCamQ = cam->getDerivedOrientation();
+        mCamPos = cam->getDerivedPosition();
         if (!mWorldSpace)
         {
             // Default behaviour is that billboards are in local node space
@@ -445,13 +443,13 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::injectBillboard(const Billboard& bb)
+    void BillboardSet::injectBillboard(const Billboard& bb, const Camera *camera)
     {
 		// Don't accept injections beyond pool size
 		if (mNumVisibleBillboards == mPoolSize) return;
 
 		// Skip if not visible (NB always true if not bounds checking individual billboards)
-        if (!billboardVisible(mCurrentCamera, bb)) return;
+        if (!billboardVisible(camera, bb)) return;
 
         if (!mPointRendering &&
 			(mBillboardType == BBT_ORIENTED_SELF ||
@@ -568,7 +566,7 @@ namespace Ogre {
         {
             if (mSortingEnabled)
             {
-                _sortBillboards(mCurrentCamera);
+                _sortBillboards(camera);
             }
 
             beginBillboards(mActiveBillboards.size());
@@ -577,7 +575,7 @@ namespace Ogre {
                 it != mActiveBillboards.end();
                 ++it )
             {
-                injectBillboard(*(*it));
+                injectBillboard(*(*it), camera);
             }
             endBillboards();
 			mBillboardDataChanged = false;
@@ -935,7 +933,7 @@ namespace Ogre {
         mCullIndividual = cullIndividual;
     }
     //-----------------------------------------------------------------------
-    bool BillboardSet::billboardVisible(Camera* cam, const Billboard& bill)
+    bool BillboardSet::billboardVisible(const Camera* cam, const Billboard& bill)
     {
         // Return always visible if not culling individually
         if (!mCullIndividual) return true;

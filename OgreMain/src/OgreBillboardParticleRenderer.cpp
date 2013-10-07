@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreParticle.h"
 #include "OgreStringConverter.h"
 
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 namespace Ogre {
     String rendererTypeName = "billboard";
 
@@ -105,7 +107,7 @@ namespace Ogre {
         }
 
         // Create billboard set
-        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, 0, true );
+        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, 0, true, 0 );
         // World-relative axes
         mBillboardSet->setBillboardsInWorldSpace(true);
     }
@@ -152,7 +154,7 @@ namespace Ogre {
                 bb.mWidth = p->mWidth;
                 bb.mHeight = p->mHeight;
             }
-            mBillboardSet->injectBillboard(bb);
+            mBillboardSet->injectBillboard(bb, camera);
 
         }
         
@@ -287,15 +289,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
+	BillboardParticleRendererFactory::BillboardParticleRendererFactory()
+	{
+		mDummyObjectMemoryManager = new ObjectMemoryManager();
+	}
+	//-----------------------------------------------------------------------
+	BillboardParticleRendererFactory::~BillboardParticleRendererFactory()
+	{
+		delete mDummyObjectMemoryManager;
+		mDummyObjectMemoryManager = 0;
+	}
+	//-----------------------------------------------------------------------
     const String& BillboardParticleRendererFactory::getType() const
     {
         return rendererTypeName;
     }
     //-----------------------------------------------------------------------
-    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
-        IdType id, ObjectMemoryManager *objectMemoryManager )
+    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( const String &name )
     {
-        return OGRE_NEW BillboardParticleRenderer( id, objectMemoryManager );
+		return OGRE_NEW BillboardParticleRenderer( Id::generateNewId<ParticleSystemRenderer>(),
+													mDummyObjectMemoryManager );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRendererFactory::destroyInstance( 

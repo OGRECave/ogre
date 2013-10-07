@@ -48,13 +48,13 @@ protected:
 	void setupContent()
 	{
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( "CellShadingWorkspace" ) )
+		const IdString workspaceName( "CellShadingWorkspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
 		{
-			compositorManager->createBasicWorkspaceDef( "CellShadingWorkspace",
-														ColourValue::White,
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White,
 														IdString() );
 		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, "CellShadingWorkspace", true );
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
 		// set our camera to orbit around the origin and show cursor
 		mCameraMan->setStyle(CS_ORBIT);

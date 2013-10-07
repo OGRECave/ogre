@@ -247,13 +247,16 @@ namespace Ogre {
     /** Factory class for BillboardParticleRenderer */
     class _OgreExport BillboardParticleRendererFactory : public ParticleSystemRendererFactory
     {
+		ObjectMemoryManager *mDummyObjectMemoryManager;
+		
     public:
+		BillboardParticleRendererFactory();
+		~BillboardParticleRendererFactory();
+
         /// @copydoc FactoryObj::getType
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
-        ParticleSystemRenderer* createInstance( IdType id, ObjectMemoryManager *objectMemoryManager );
-		//TODO: (dark_sylinc)
-		ParticleSystemRenderer* createInstance( const String &name ) { return 0; }
+		ParticleSystemRenderer* createInstance( const String &name );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };

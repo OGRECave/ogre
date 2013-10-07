@@ -535,6 +535,12 @@ namespace Ogre {
 
 		Real timeInc = timeElapsed / requested;
 
+		//TODO: (dark_sylinc) Refactor this. ControllerManager gets executed before us
+		//(because it doesn't know if we'll update a SceneNode)
+		const Quaternion derivedOrientation( mParentNode->_getDerivedOrientationUpdated() );
+		const Vector3 derivedPosition( mParentNode->_getDerivedPosition() );
+		const Vector3 derivedScale( mParentNode->_getDerivedScale() );
+
 		for (unsigned int j = 0; j < requested; ++j)
 		{
 			// Create a new particle & init using emitter
@@ -556,11 +562,8 @@ namespace Ogre {
 			if (!mLocalSpace)
 			{
 				p->position  = 
-					(mParentNode->_getDerivedOrientation() *
-					(mParentNode->_getDerivedScale() * p->position))
-					+ mParentNode->_getDerivedPosition();
-				p->direction = 
-					(mParentNode->_getDerivedOrientation() * p->direction);
+					(derivedOrientation * (derivedScale * p->position)) + derivedPosition;
+				p->direction = (derivedOrientation * p->direction);
 			}
 
 			// apply partial frame motion to this particle
@@ -702,10 +705,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
-        if (mRenderer)
-        {
-            mRenderer->_updateRenderQueue(queue, camera, mActiveParticles, mCullIndividual);
-        }
+		mLastVisibleFrame = Root::getSingleton().getNextFrameNumber();
+		mTimeSinceLastVisible = 0.0f;
+
+		if (mSorted)
+			_sortParticles(camera);
+
+		if (mRenderer)
+		{
+			if (!mIsRendererConfigured)
+				configureRenderer();
+
+			mRenderer->_updateRenderQueue(queue, camera, mActiveParticles, mCullIndividual);
+		}
     }
 	//---------------------------------------------------------------------
 	void ParticleSystem::visitRenderables(Renderable::Visitor* visitor, 
@@ -931,29 +943,6 @@ namespace Ogre {
     Real ParticleSystem::getDefaultHeight(void) const
     {
         return mDefaultHeight;
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystem::_notifyCurrentCamera(Camera* cam)
-    {
-		// Record visible
-		if (isVisible())
-		{			
-			mLastVisibleFrame = Root::getSingleton().getNextFrameNumber();
-			mTimeSinceLastVisible = 0.0f;
-
-			if (mSorted)
-			{
-				_sortParticles(cam);
-			}
-
-			if (mRenderer)
-			{
-				if (!mIsRendererConfigured)
-					configureRenderer();
-
-				mRenderer->_notifyCurrentCamera(cam);
-			}
-		}
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::_notifyAttached(Node* parent)

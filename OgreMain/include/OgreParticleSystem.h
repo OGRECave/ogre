@@ -361,12 +361,6 @@ namespace Ogre {
         virtual const String& getMaterialName(void) const;
 
         /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual void _notifyCurrentCamera(Camera* cam);
-
-        /** Overridden from MovableObject
         @see
         MovableObject
         */

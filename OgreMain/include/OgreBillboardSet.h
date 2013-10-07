@@ -179,8 +179,6 @@ namespace Ogre {
         /// Vector3 vLeftOff, vRightOff, vTopOff, vBottomOff;
         /// Final vertex offsets, used where sizes all default to save calcs
         Vector3 mVOffset[4];
-        /// Current camera
-        Camera* mCurrentCamera;
         /// Parametric offsets of origin
         Real mLeftOff, mRightOff, mTopOff, mBottomOff;
         /// Camera axes in billboard space
@@ -210,7 +208,7 @@ namespace Ogre {
         Vector3 mCommonUpVector;
 
         /// Internal method for culling individual billboards
-        inline bool billboardVisible(Camera* cam, const Billboard& bill);
+        inline bool billboardVisible(const Camera* cam, const Billboard& bill);
 
         /// Number of visible billboards (will be == getNumBillboards if mCullIndividual == false)
         unsigned short mNumVisibleBillboards;
@@ -321,7 +319,8 @@ namespace Ogre {
             BillboardSet::setAutoextend
         */
         BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
-						unsigned int poolSize = 20, bool externalDataSource = false );
+						unsigned int poolSize = 20, bool externalDataSource = false,
+						uint8 renderQueueId=RENDER_QUEUE_MAIN );
 
         virtual ~BillboardSet();
 
@@ -540,7 +539,7 @@ namespace Ogre {
         */
         void beginBillboards(size_t numBillboards = 0);
         /** Define a billboard. */
-        void injectBillboard(const Billboard& bb);
+        void injectBillboard(const Billboard& bb, const Camera *camera);
         /** Finish defining billboards. */
         void endBillboards(void);
         /** Set the bounds of the BillboardSet.
