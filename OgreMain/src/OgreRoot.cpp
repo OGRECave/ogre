@@ -613,7 +613,6 @@ namespace Ogre {
             mActiveRenderer->shutdown();
 
 			OGRE_DELETE mCompositorManager2;
-			mCompositorManager2 = OGRE_NEW CompositorManager2( system );
         }
 
         mActiveRenderer = system;

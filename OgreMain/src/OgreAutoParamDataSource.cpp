@@ -77,6 +77,12 @@ namespace Ogre {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);
         mBlankLight.setAttenuation(0,1,0,0);
+
+		mNodeMemoryManager = new NodeMemoryManager();
+        mBlankLightNode = OGRE_NEW SceneNode( 0, 0, mNodeMemoryManager, 0 );
+		mBlankLightNode->attachObject( &mBlankLight );
+		mBlankLightNode->_getDerivedPositionUpdated();
+
 		for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
 		{
 			mTextureViewProjMatrixDirty[i] = true;
@@ -91,6 +97,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     AutoParamDataSource::~AutoParamDataSource()
     {
+		OGRE_DELETE mBlankLightNode;
+		mBlankLightNode = 0;
+		delete mNodeMemoryManager;
+		mNodeMemoryManager = 0;
     }
 	//-----------------------------------------------------------------------------
     const Light& AutoParamDataSource::getLight(size_t index) const

@@ -656,6 +656,8 @@ namespace Ogre {
 			rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 		}
 
+		bool what = mGLSupport->checkExtension("GL_ARB_map_buffer_alignment");
+
 		// Alpha to coverage?
 		if (mGLSupport->checkExtension("GL_ARB_multisample"))
 		{
@@ -2862,7 +2864,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Set position / direction
 		Vector4 vec;
 		// Use general 4D vector which is the same as GL's approach
-		vec = lt->getAs4DVector(true);
+		vec = lt->getAs4DVector();
 
 #if OGRE_DOUBLE_PRECISION
 		// Must convert to float*

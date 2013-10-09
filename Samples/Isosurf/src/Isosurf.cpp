@@ -61,6 +61,15 @@ public:
     // Just override the mandatory create scene method
     void setupContent(void)
     {
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "IsoSurf Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		mCamera->setPosition(0, 0, -40);
         mCamera->lookAt(0,0,0);
 		mCamera->setNearClipDistance(0.1);
@@ -68,7 +77,7 @@ public:
 
 		mTetrahedraMesh = ProceduralTools::generateTetrahedra();
 		//Create tetrahedra and add it to the root scene node
-		tetrahedra = mSceneMgr->createEntity("TetrahedraEntity", mTetrahedraMesh->getName());
+		tetrahedra = mSceneMgr->createEntity(mTetrahedraMesh->getName());
 		//tetraHedra->setDebugDisplayEnabled(true);
 		Ogre::SceneNode* parentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		parentNode->attachObject(tetrahedra);

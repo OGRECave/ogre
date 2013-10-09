@@ -126,6 +126,8 @@ namespace Ogre {
 		vector<Real>::type			mNullPssmSplitPoint;
 
 		ObjectMemoryManager mObjectMemoryManager;
+		NodeMemoryManager *mNodeMemoryManager;
+        SceneNode *mBlankLightNode;
         Light mBlankLight;
     public:
         AutoParamDataSource();

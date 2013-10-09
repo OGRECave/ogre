@@ -67,7 +67,7 @@ public:
 		{
 			// change to the selected entity
 			mObjectNode->detachAllObjects();
-			mObjectNode->attachObject(mSceneMgr->getEntity(mMeshMenu->getSelectedItem()));
+			mObjectNode->attachObject(mEntities[String(mMeshMenu->getSelectedItem())]);
 
 			// remember which material is currently selected
 			int index = std::max<int>(0, mMaterialMenu->getSelectionIndex());
@@ -187,15 +187,24 @@ protected:
             }
 
 			// create an entity from the mesh and set the first available material
-			Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());
+			Entity* ent = mSceneMgr->createEntity(mesh->getName());
 			ent->setMaterialName(it->second.front());
+			mEntities[mesh->getName()] = ent;
 		}
 	}
 
 	void setupLights()
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "PNTrianglesTessellation Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue(0.41f, 0.41f, 0.41f),
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		mSceneMgr->setAmbientLight(ColourValue::Black); 
-		mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
 
 		// create pivot nodes
 		mLightPivot1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -205,25 +214,28 @@ protected:
 		BillboardSet* bbs;
 
 		// create white light
+		SceneNode *lightNode = mLightPivot1->createChildSceneNode();
 		l = mSceneMgr->createLight();
+		lightNode->attachObject( l );
 		l->setDiffuseColour(1.0f, 1.0f, 1.0f);
 		l->setSpecularColour(1.0f, 1.0f, 1.0f);
 		l->setDirection(Ogre::Vector3::UNIT_X*-1.0f);
-		l->setPosition(200, 0, 0);
+		lightNode->setPosition(200, 0, 0);
 		// create white flare
 		bbs = mSceneMgr->createBillboardSet();
 		bbs->setMaterialName("Examples/Flare");
 		bbs->createBillboard(200, 0, 0)->setColour(ColourValue::White);
 
-		mLightPivot1->attachObject(l);
 		mLightPivot1->attachObject(bbs);
 
 		// create red light
+		lightNode = mLightPivot2->createChildSceneNode();
 		l = mSceneMgr->createLight();
+		lightNode->attachObject( l );
 		l->setDiffuseColour(1.0f, 0.0f, 0.0f);
 		l->setSpecularColour(1.0f, 0.0f, 0.0f);
 		l->setDirection(Ogre::Vector3::UNIT_X);
-		l->setPosition(-200, 0, 0);
+		lightNode->setPosition(-200, 0, 0);
 		// create white flare
 		bbs = mSceneMgr->createBillboardSet();
 		bbs->setMaterialName("Examples/Flare");
@@ -276,6 +288,7 @@ protected:
 	}
 
 	std::map<String, StringVector> mPossibilities;
+	std::map<IdString, Entity*> mEntities;
 	SceneNode* mObjectNode;
 	SceneNode* mLightPivot1;
 	SceneNode* mLightPivot2;

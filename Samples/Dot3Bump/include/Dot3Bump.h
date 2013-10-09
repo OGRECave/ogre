@@ -68,7 +68,7 @@ public:
 		{
 			// change to the selected entity
 			mObjectNode->detachAllObjects();
-			mObjectNode->attachObject(mSceneMgr->getEntity(mMeshMenu->getSelectedItem()));
+			mObjectNode->attachObject( mEntities[String(mMeshMenu->getSelectedItem())] );
 
 			// remember which material is currently selected
 			int index = std::max<int>(0, mMaterialMenu->getSelectionIndex());
@@ -110,6 +110,16 @@ protected:
 
 	void setupContent()
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+		const IdString workspaceName( "Dot3Bump Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		// create our main node to attach our entities to
 		mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
@@ -216,8 +226,9 @@ protected:
             }
 
 			// create an entity from the mesh and set the first available material
-			Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());
+			Entity* ent = mSceneMgr->createEntity(mesh->getName());
 			ent->setMaterialName(it->second.front());
+			mEntities[mesh->getName()] = ent;
 		}
 	}
 
@@ -233,8 +244,10 @@ protected:
 		BillboardSet* bbs;
 
 		// create white light
+		SceneNode *lightNode = mLightPivot1->createChildSceneNode();
 		l = mSceneMgr->createLight();
-		l->setPosition(200, 0, 0);
+		lightNode->attachObject( l );
+		lightNode->setPosition(200, 0, 0);
 		l->setDiffuseColour(1, 1, 1);
 		l->setSpecularColour(1, 1, 1);
 		// create white flare
@@ -242,12 +255,13 @@ protected:
 		bbs->setMaterialName("Examples/Flare");
 		bbs->createBillboard(200, 0, 0)->setColour(ColourValue::White);
 
-		mLightPivot1->attachObject(l);
 		mLightPivot1->attachObject(bbs);
 
 		// create red light
+		lightNode = mLightPivot2->createChildSceneNode();
 		l = mSceneMgr->createLight();
-		l->setPosition(40, 200, 50);
+		lightNode->attachObject( l );
+		lightNode->setPosition(40, 200, 50);
 		l->setDiffuseColour(1, 0, 0);
 		l->setSpecularColour(1, 0.8, 0.8);
 		// create white flare
@@ -255,7 +269,6 @@ protected:
 		bbs->setMaterialName("Examples/Flare");
 		bbs->createBillboard(50, 200, 50)->setColour(ColourValue::Red);
 
-		mLightPivot2->attachObject(l);
 		mLightPivot2->attachObject(bbs);
 	}
 
@@ -298,6 +311,7 @@ protected:
 	}
 
 	std::map<String, StringVector> mPossibilities;
+	std::map<IdString, Entity*> mEntities;
 	SceneNode* mObjectNode;
 	SceneNode* mLightPivot1;
 	SceneNode* mLightPivot2;

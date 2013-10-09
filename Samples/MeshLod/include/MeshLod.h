@@ -30,13 +30,20 @@ protected:
 
 	void setupContent()
 	{
+		const IdString workspaceName( "MeshLod Workspace" );
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black );
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
 		mCameraMan->setStyle(CS_ORBIT);
 
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light
 
         // make the scene's main light come from above
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         Light* l = mSceneMgr->createLight();
+		lightNode->attachObject( l );
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(Vector3::NEGATIVE_UNIT_Y);
 
@@ -90,7 +97,7 @@ protected:
 			mHeadEntity = 0;
 		}
 		mHeadMesh = Ogre::MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		mHeadEntity = mSceneMgr->createEntity(name, mHeadMesh);
+		mHeadEntity = mSceneMgr->createEntity(mHeadMesh);
 		mHeadNode->attachObject(mHeadEntity);
 		mCamera->setPosition(Ogre::Vector3(0, 0, 0));
 		mCamera->moveRelative(Ogre::Vector3(0, 0, mHeadMesh->getBoundingSphereRadius() * 2));

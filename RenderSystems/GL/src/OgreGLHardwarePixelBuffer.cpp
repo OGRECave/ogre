@@ -52,7 +52,8 @@ GLHardwarePixelBuffer::GLHardwarePixelBuffer(size_t inWidth, size_t inHeight, si
 GLHardwarePixelBuffer::~GLHardwarePixelBuffer()
 {
 	// Force free buffer
-	delete [] (uint8*)mBuffer.data;
+	OGRE_FREE_SIMD( mBuffer.data, MEMCATEGORY_RESOURCE );
+	mBuffer.data = 0;
 }
 //-----------------------------------------------------------------------------  
 void GLHardwarePixelBuffer::allocateBuffer()
@@ -60,7 +61,7 @@ void GLHardwarePixelBuffer::allocateBuffer()
 	if(mBuffer.data)
 		// Already allocated
 		return;
-	mBuffer.data = new uint8[mSizeInBytes];
+	mBuffer.data = OGRE_MALLOC_SIMD( mSizeInBytes, MEMCATEGORY_RESOURCE );
 	// TODO: use PBO if we're HBU_DYNAMIC
 }
 //-----------------------------------------------------------------------------  
@@ -69,7 +70,7 @@ void GLHardwarePixelBuffer::freeBuffer()
 	// Free buffer if we're STATIC to save memory
 	if(mUsage & HBU_STATIC)
 	{
-		delete [] (uint8*)mBuffer.data;
+		OGRE_FREE_SIMD( mBuffer.data, MEMCATEGORY_RESOURCE );
 		mBuffer.data = 0;
 	}
 }

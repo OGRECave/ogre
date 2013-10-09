@@ -263,7 +263,7 @@ namespace OgreBites
 			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 #else
 			//getNumLogicalCores() may return 0 if couldn't detect
-			const size_t numThreads = std::max( 1, PlatformInformation::getNumLogicalCores() );
+			const size_t numThreads = std::max<size_t>( 1, Ogre::PlatformInformation::getNumLogicalCores() );
 
 			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 
