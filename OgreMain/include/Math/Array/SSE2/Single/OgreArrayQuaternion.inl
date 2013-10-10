@@ -118,7 +118,28 @@ namespace Ogre
 
 		return rkT;
 	}
+	//-----------------------------------------------------------------------------------
+	inline ArrayQuaternion ArrayQuaternion::nlerpShortest( ArrayReal fT, const ArrayQuaternion &rkP,
+															const ArrayQuaternion &rkQ )
+	{
+		//Flip the sign of rkQ when p.dot( q ) < 0 to get the shortest path
+		ArrayReal signMask = _mm_set1_ps( -0.0f );
+		ArrayReal sign = _mm_and_ps( signMask, rkP.Dot( rkQ ) );
+		ArrayQuaternion tmpQ = ArrayQuaternion( _mm_xor_ps( rkQ.m_chunkBase[0], sign ),
+												_mm_xor_ps( rkQ.m_chunkBase[1], sign ),
+												_mm_xor_ps( rkQ.m_chunkBase[2], sign ),
+												_mm_xor_ps( rkQ.m_chunkBase[3], sign ) );
 
+		ArrayQuaternion retVal(
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[0], rkP.m_chunkBase[0] ), rkP.m_chunkBase[0] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[1], rkP.m_chunkBase[1] ), rkP.m_chunkBase[1] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[2], rkP.m_chunkBase[2] ), rkP.m_chunkBase[2] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[3], rkP.m_chunkBase[3] ), rkP.m_chunkBase[3] ) );
+		retVal.normalise();
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::nlerp( ArrayReal fT, const ArrayQuaternion &rkP,
 														const ArrayQuaternion &rkQ )
 	{

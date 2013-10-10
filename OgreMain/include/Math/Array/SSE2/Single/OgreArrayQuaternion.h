@@ -165,13 +165,19 @@ namespace Ogre
 		/// @remarks
 		///		shortestPath is always true
 		static inline ArrayQuaternion Slerp( ArrayReal fT, const ArrayQuaternion &rkP,
-													const ArrayQuaternion &rkQ );
+												const ArrayQuaternion &rkQ );
+
+		/// @See Quaternion::nlerp
+		/// @remarks
+		///		shortestPath is always true
+		static inline ArrayQuaternion nlerpShortest( ArrayReal fT, const ArrayQuaternion& rkP, 
+													const ArrayQuaternion& rkQ );
 
 		/// @See Quaternion::nlerp
 		/// @remarks
 		///		shortestPath is always false
 		static inline ArrayQuaternion nlerp( ArrayReal fT, const ArrayQuaternion& rkP, 
-													const ArrayQuaternion& rkQ );
+												const ArrayQuaternion& rkQ );
 
 		/** Conditional move update. @See MathlibSSE2::Cmov4
 			Changes each of the four vectors contained in 'this' with
