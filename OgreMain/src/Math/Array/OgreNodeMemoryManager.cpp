@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreNodeMemoryManager.h"
 
+#include "OgreSceneNode.h"
+
 namespace Ogre
 {
 	NodeMemoryManager::NodeMemoryManager() :

@@ -26,65 +26,32 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorPassSceneDef_H__
-#define __CompositorPassSceneDef_H__
+#ifndef __VisibilityFlags_H__
+#define __VisibilityFlags_H__
 
+// Precompiler options
+#include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
-#include "../OgreCompositorPassDef.h"
+namespace Ogre {
 
-#include "OgreVisibilityFlags.h"
-
-namespace Ogre
-{
 	/** \addtogroup Core
 	*  @{
 	*/
-	/** \addtogroup Effects
+	/** \addtogroup Scene
 	*  @{
 	*/
 
-	enum ShadowNodeRecalculation
-	{
-		SHADOW_NODE_RECALCULATE,
-		SHADOW_NODE_REUSE,
-		SHADOW_NODE_FIRST_ONLY,
-		SHADOW_NODE_CASTER_PASS		//Set automatically only when this pass is used by a ShadowNode
+	namespace VisibilityFlags
+    {
+		extern _OgreExport const uint32 LAYER_SHADOW_RECEIVER;	///When this is bit is set, object receives shadows
+		extern _OgreExport const uint32 LAYER_SHADOW_CASTER;	///Object casts shadows (is rendered to shadow camera)
+		extern _OgreExport const uint32 LAYER_VISIBILITY;		///When this is bit is clear, the obj is not rendered at all.
+		extern _OgreExport const uint32 RESERVED_VISIBILITY_FLAGS;
 	};
-
-	class _OgreExport CompositorPassSceneDef : public CompositorPassDef
-	{
-	public:
-		/// Viewport's visibility mask while rendering our pass
-		uint32					mVisibilityMask;
-		IdString				mShadowNode;
-		ShadowNodeRecalculation mShadowNodeRecalculation; //Only valid if mShadowNode is not empty
-		IdString				mCameraName;
-
-		/// First Render Queue ID to render. Inclusive
-		uint8			mFirstRQ;
-		/// Last Render Queue ID to render. Not inclusive
-		uint8			mLastRQ;
-
-		CompositorPassSceneDef() :
-			CompositorPassDef( PASS_SCENE ),
-			mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
-			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
-			mFirstRQ( 0 ),
-			mLastRQ( -1 )
-		{
-			//Change base defaults
-			mIncludeOverlays = true;
-		}
-
-		void setVisibilityMask( uint32 visibilityMask )
-		{
-			mVisibilityMask = visibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
-		}
-	};
-
 	/** @} */
 	/** @} */
+
 }
 
 #include "OgreHeaderSuffix.h"

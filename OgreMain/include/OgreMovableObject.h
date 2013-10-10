@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"
+#include "OgreVisibilityFlags.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -63,11 +64,6 @@ namespace Ogre {
 	class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
-		static const uint32 LAYER_SHADOW_RECEIVER;	///When this is bit is set, object receives shadows
-		static const uint32 LAYER_SHADOW_CASTER;	///Object casts shadows (is rendered to shadow camera)
-		static const uint32 LAYER_VISIBILITY;		///When this is bit is clear, the obj is not rendered at all.
-		static const uint32 RESERVED_VISIBILITY_FLAGS;
-
         /** Listener which gets called back on MovableObject events.
         */
         class _OgreExport Listener

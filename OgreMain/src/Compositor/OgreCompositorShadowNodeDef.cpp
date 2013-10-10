@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
 namespace Ogre
@@ -129,7 +130,7 @@ namespace Ogre
 					mMaxRq = std::max<size_t>( mMaxRq, passScene->mLastRQ );
 
 					//Set to only render casters
-					passScene->mVisibilityMask |= MovableObject::LAYER_SHADOW_CASTER;
+					passScene->mVisibilityMask |= VisibilityFlags::LAYER_SHADOW_CASTER;
 
 					//Nested shadow maps are not allowed. Sorry!
 					passScene->mShadowNode				= IdString();

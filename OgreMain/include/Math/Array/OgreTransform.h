@@ -177,32 +177,6 @@ namespace Ogre
 									newBasePtrs[NodeArrayMemoryManager::InheritScale] + diff );
 		}
 
-		/** Rebases all the pointers by an offset. The offset may not be multiple of ARRAY_PACKED_REALS,
-			thus the index is recalculated.
-		@remarks
-			@See RebaseListener This function is intended to be used when the pool memory is
-			cleaning up.
-		*/
-		void rebasePtrs( ptrdiff_t diffInstances )
-		{
-			Node **newPtr = mParents + mIndex - diffInstances;
-			mIndex = (uintptr_t)newPtr % ARRAY_PACKED_REALS;
-
-			diffInstances = mParents - newPtr;
-
-			mParents			-= diffInstances;
-			mOwner				-= diffInstances;
-			mPosition			-= diffInstances;
-			mOrientation		-= diffInstances;
-			mScale				-= diffInstances;
-			mDerivedPosition	-= diffInstances;
-			mDerivedOrientation	-= diffInstances;
-			mDerivedScale		-= diffInstances;
-			mDerivedTransform	-= diffInstances;
-			mInheritOrientation	-= diffInstances;
-			mInheritScale		-= diffInstances;
-		}
-
 		/** Advances all pointers to the next pack, i.e. if we're processing 4 elements at a time, move to
 			the next 4 elements.
 		*/

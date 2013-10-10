@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreImageCodec.h"
+#include "OgrePixelBox.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreWin32GLSupport.h"

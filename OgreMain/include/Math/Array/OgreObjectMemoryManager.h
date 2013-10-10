@@ -28,12 +28,15 @@ THE SOFTWARE.
 #ifndef __ObjectMemoryManager_H__
 #define __ObjectMemoryManager_H__
 
-#include "OgreObjectData.h"
-#include "OgreArrayMemoryManager.h"
+#include "Math/Array/OgreObjectData.h"
+#include "Math/Array/OgreArrayMemoryManager.h"
+
+#include "Math/Array/OgreTransform.h"
 
 namespace Ogre
 {
 	enum SceneMemoryMgrTypes;
+	class NullEntity;
 
 	/** \addtogroup Core
 	*  @{

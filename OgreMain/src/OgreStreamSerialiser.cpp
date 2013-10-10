@@ -548,9 +548,12 @@ namespace Ogre
 	{
 		for (size_t i = 0; i < count; ++i, ++node)
 		{
-			write(&node->getPosition());
-			write(&node->getOrientation());
-			write(&node->getScale());
+			Vector3 vPos = node->getPosition();
+			Quaternion qRot = node->getOrientation();
+			Vector3 vScale = node->getScale();
+			write(&vPos);
+			write(&qRot);
+			write(&vScale);
 		}
 	}
 	//---------------------------------------------------------------------

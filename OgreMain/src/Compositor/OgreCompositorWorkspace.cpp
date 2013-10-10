@@ -46,12 +46,12 @@ namespace Ogre
 												RenderSystem *renderSys, bool bEnabled ) :
 			IdObject( id ),
 			mDefinition( definition ),
-			mRenderWindow( finalRenderTarget ),
 			mValid( false ),
 			mEnabled( bEnabled ),
 			mDefaultCamera( defaultCam ),
 			mSceneManager( sceneManager ),
-			mRenderSys( renderSys )
+			mRenderSys( renderSys ),
+			mRenderWindow( finalRenderTarget )
 	{
 		//Create global textures
 		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
@@ -108,8 +108,8 @@ namespace Ogre
 		{
 			//First connect the RenderWindow, otherwise the node could end up not being processed
 			CompositorNode *finalNode = findNode( mDefinition->mFinalNode );
-			finalNode->connectFinalRT( mRenderWindow, CompositorChannel::TextureVec(),
-										mDefinition->mFinalInChannel );
+			CompositorChannel::TextureVec emptyVec;
+			finalNode->connectFinalRT( mRenderWindow, emptyVec, mDefinition->mFinalInChannel );
 		}
 
 		CompositorNodeVec unprocessedList( mNodeSequence.begin(), mNodeSequence.end() );

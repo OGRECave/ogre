@@ -188,6 +188,7 @@ set (HEADER_FILES
   include/OgrePatchMesh.h
   include/OgrePatchSurface.h
   src/OgrePixelConversions.h
+  include/OgrePixelBox.h
   include/OgrePixelCountLodStrategy.h
   include/OgrePixelFormat.h
   include/OgrePlane.h

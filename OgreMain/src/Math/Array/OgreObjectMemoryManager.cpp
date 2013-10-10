@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreObjectMemoryManager.h"
 
+#include "OgreMovableObject.h"
+
 namespace Ogre
 {
 	ObjectMemoryManager::ObjectMemoryManager() :

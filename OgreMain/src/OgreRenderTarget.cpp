@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreRenderTargetListener.h"
+#include "OgrePixelBox.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreDepthBuffer.h"

@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #include "../OgreCompositorPassDef.h"
 #include "OgreCommon.h"
+#include "OgreColourValue.h"
 
 namespace Ogre
 {

@@ -46,11 +46,11 @@ THE SOFTWARE.
 namespace Ogre
 {
 	template<typename T>
-	typename void deleteAllSecondClear( T& container )
+	void deleteAllSecondClear( T& container )
 	{
 		//Delete all workspace definitions
-		T::const_iterator itor = container.begin();
-		T::const_iterator end  = container.end();
+		typename T::const_iterator itor = container.begin();
+		typename T::const_iterator end  = container.end();
 		while( itor != end )
 		{
 			OGRE_DELETE itor->second;
@@ -59,11 +59,11 @@ namespace Ogre
 		container.clear();
 	}
 	template<typename T>
-	typename void deleteAllClear( T& container )
+	void deleteAllClear( T& container )
 	{
 		//Delete all workspace definitions
-		T::const_iterator itor = container.begin();
-		T::const_iterator end  = container.end();
+		typename T::const_iterator itor = container.begin();
+		typename T::const_iterator end  = container.end();
 		while( itor != end )
 			OGRE_DELETE *itor++;
 		container.clear();

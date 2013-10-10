@@ -94,7 +94,8 @@ namespace Ogre
 		static const ArrayReal fRad2Deg;	//Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg
 		static const ArrayReal FLOAT_MIN;	//FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN
 		static const ArrayReal SIGN_MASK;	//0x80000000, 0x80000000, 0x80000000, 0x80000000
-		static const ArrayReal INFINITY;	//Inf, Inf, Inf, Inf
+		//INFINITE is taken in Windows, INFINITY by C99 (bloody macros). A joke on Infinite Tea
+		static const ArrayReal INFINITEA;	//Inf, Inf, Inf, Inf
 		static const ArrayReal MAX_NEG;		//Max negative number (x4)
 		static const ArrayReal MAX_POS;		//Max negative number (x4)
 
@@ -281,7 +282,7 @@ namespace Ogre
 		*/
 		static inline ArrayReal isInfinity( ArrayReal a )
 		{
-			return _mm_cmpeq_ps( a, MathlibSSE2::INFINITY );
+			return _mm_cmpeq_ps( a, MathlibSSE2::INFINITEA );
 		}
 
 		/// Returns the maximum value between a and b
@@ -483,7 +484,7 @@ namespace Ogre
 		static void SinCos4( ArrayReal x, ArrayReal &outSin, ArrayReal &outCos );
 	};
 
-#if OGRE_COMPILER != OGRE_COMPILER_CLANG
+#if OGRE_COMPILER != OGRE_COMPILER_CLANG && OGRE_COMPILER != OGRE_COMPILER_GNUC
 //	inline ArrayReal operator - ( ArrayReal l )					{ return _mm_xor_ps( l, MathlibSSE2::SIGN_MASK ); }
 //	inline ArrayReal operator + ( ArrayReal l, Real r )			{ return _mm_add_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator + ( Real l, ArrayReal r )			{ return _mm_add_ps( _mm_set1_ps( l ), r ); }

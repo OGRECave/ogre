@@ -30,7 +30,8 @@ THE SOFTWARE.
 #define __OgreIdString__
 
 #include "Hash/MurmurHash3.h"
-#include <string.h>
+#include <stdio.h>	// sprintf
+#include <string.h>	// strlen
 #include <string>
 
 #define OGRE_HASH_FUNC MurmurHash3_x86_32

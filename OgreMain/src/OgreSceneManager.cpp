@@ -137,7 +137,7 @@ mShadowTextureOffset(0.6),
 mShadowTextureFadeStart(0.7), 
 mShadowTextureFadeEnd(0.9),
 mShadowTextureCustomCasterPass(0),
-mVisibilityMask(0xFFFFFFFF & MovableObject::RESERVED_VISIBILITY_FLAGS),
+mVisibilityMask(0xFFFFFFFF & VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
 mNumWorkerThreads( numWorkerThreads ),
 mExitWorkerThreads( false ),
@@ -4263,7 +4263,7 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
 }
 //---------------------------------------------------------------------
 template<typename T>
-void SceneManager::checkMovableObjectIntegrity( typename const vector<T*>::type &container,
+void SceneManager::checkMovableObjectIntegrity( const typename vector<T*>::type &container,
 												const T *mo ) const
 {
 	if( mo->mGlobalIndex >= container.size() || mo != *(container.begin() + mo->mGlobalIndex) )
@@ -4408,9 +4408,9 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 													  size_t numInstancesPerBatch, uint16 flags,
 													  unsigned short subMeshIdx )
 {
-	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
-																mInstanceManagers.end(),
-																customName, InstanceManagerCmp() );
+	InstanceManagerVec::iterator itor = std::lower_bound( mInstanceManagers.begin(),
+															mInstanceManagers.end(),
+															customName, InstanceManagerCmp() );
 	if (itor != mInstanceManagers.end() && (*itor)->getName() == customName )
 	{
 		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
@@ -4450,13 +4450,13 @@ bool SceneManager::hasInstanceManager( IdString managerName ) const
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( IdString name )
 {
-	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
-																mInstanceManagers.end(),
-																name, InstanceManagerCmp() );
+	InstanceManagerVec::iterator itor = std::lower_bound( mInstanceManagers.begin(),
+															mInstanceManagers.end(),
+															name, InstanceManagerCmp() );
 	if (itor != mInstanceManagers.end() && (*itor)->getName() == name )
 	{
 		OGRE_DELETE *itor;
-		mInstanceManagers.erase(itor);
+		mInstanceManagers.erase( itor );
 	}
 }
 //---------------------------------------------------------------------

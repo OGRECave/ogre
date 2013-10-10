@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorCommon.h"
 #include "Compositor/OgreCompositorChannel.h"
 #include "OgreIdString.h"
+#include "OgreId.h"
 
 namespace Ogre
 {

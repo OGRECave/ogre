@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #include "Compositor/OgreCompositorNodeDef.h"
+#include "OgreMath.h"
 
 namespace Ogre
 {
@@ -87,10 +88,9 @@ namespace Ogre
 		ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
 								size_t _light, size_t _split ) :
 				width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
-				light(_light), split(_split), shadowMapTechnique(t), name( _name ),
-				aggressiveFocusRegion( true ), optimalAdjustFactor( 5.0f ),
-				lightDirThreshold( 25.0f ), pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
-				sharesSetupWith( -1 ) {}
+				light(_light), split(_split), shadowMapTechnique(t), aggressiveFocusRegion( true ),
+				optimalAdjustFactor( 5.0f ), lightDirThreshold( 25.0f ), pssmLambda( 0.95f ),
+				splitPadding( 1.0f ), numSplits( 3 ), name( _name ), sharesSetupWith( -1 ) {}
 
 		IdString getName() const			{ return name; }
 

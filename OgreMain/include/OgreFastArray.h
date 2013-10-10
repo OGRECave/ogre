@@ -135,12 +135,12 @@ namespace Ogre
 			}
 		}
 
-		/// Creates an array reserving the amount of bytes (memory is not initialized)
-		FastArray( size_t reserve ) :
+		/// Creates an array reserving the amount of elements (memory is not initialized)
+		FastArray( size_t reserveAmount ) :
 			m_size( 0 ),
-			m_capacity( reserve )
+			m_capacity( reserveAmount )
 		{
-			m_data = (T*)::operator new( reserve * sizeof(T) );
+			m_data = (T*)::operator new( reserveAmount * sizeof(T) );
 		}
 
 		/// Creates an array pushing the value N times
@@ -187,13 +187,13 @@ namespace Ogre
 
 		bool empty() const						{ return m_size == 0; }
 
-		void reserve( size_t size )
+		void reserve( size_t reserveAmount )
 		{
-			if( size > m_capacity )
+			if( reserveAmount > m_capacity )
 			{
 				//We don't use growToFit because it will try to increase capacity by 50%,
 				//which is not the desire when calling reserve() explicitly
-				m_capacity = size;
+				m_capacity = reserveAmount;
 				T *data = (T*)::operator new( m_capacity * sizeof(T) );
 				memcpy( data, m_data, m_size * sizeof(T) );
 				::operator delete( m_data );

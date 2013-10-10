@@ -41,18 +41,20 @@ THE SOFTWARE.
 #include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre {
+	using namespace VisibilityFlags;
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	const String NullEntity::msMovableType = "NullEntity";
-	const uint32 MovableObject::LAYER_SHADOW_RECEIVER	= 1 << 31;
-	const uint32 MovableObject::LAYER_SHADOW_CASTER		= 1 << 30;
-	const uint32 MovableObject::LAYER_VISIBILITY		= 1 << 29;
-	const uint32 MovableObject::RESERVED_VISIBILITY_FLAGS= ~(LAYER_SHADOW_RECEIVER|LAYER_SHADOW_CASTER|
-															LAYER_VISIBILITY);
+	const uint32 VisibilityFlags::LAYER_SHADOW_RECEIVER		= 1 << 31;
+	const uint32 VisibilityFlags::LAYER_SHADOW_CASTER		= 1 << 30;
+	const uint32 VisibilityFlags::LAYER_VISIBILITY			= 1 << 29;
+	const uint32 VisibilityFlags::RESERVED_VISIBILITY_FLAGS	= ~(LAYER_SHADOW_RECEIVER|LAYER_SHADOW_CASTER|
+																LAYER_VISIBILITY);
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
 	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
-    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager, uint8 renderQueueId )
+    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
+									uint8 renderQueueId )
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)

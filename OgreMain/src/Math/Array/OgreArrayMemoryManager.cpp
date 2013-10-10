@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "Math/Array/OgreArrayConfig.h"
 #include "Math/Array/OgreArrayMemoryManager.h"
 
+#include "OgreException.h"
+
 namespace Ogre
 {
 	const size_t ArrayMemoryManager::MAX_MEMORY_SLOTS = (size_t)(-ARRAY_PACKED_REALS) - 1

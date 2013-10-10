@@ -39,6 +39,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	using namespace VisibilityFlags;
+
 	InstanceBatch::InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
 									InstanceManager *creator, MeshPtr &meshReference,
 									const MaterialPtr &material, size_t instancesPerBatch,

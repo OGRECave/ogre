@@ -271,7 +271,7 @@ namespace Ogre
 			for( size_t j=0; j<globalLightList.lights.size(); ++j )
 			{
 				if( *visibilityMask & combinedVisibilityFlags &&
-					*visibilityMask & MovableObject::LAYER_SHADOW_CASTER )
+					*visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER )
 				{
 					const Real fDist = camPos.distance( boundingSphere->getCenter() ) -
 										boundingSphere->getRadius();

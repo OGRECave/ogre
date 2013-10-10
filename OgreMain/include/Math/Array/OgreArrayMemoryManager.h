@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include <stddef.h>
+
 namespace Ogre
 {
 	typedef vector<char*>::type MemoryPoolVec;

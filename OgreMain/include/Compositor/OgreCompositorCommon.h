@@ -29,6 +29,8 @@ THE SOFTWARE.
 #ifndef __CompositorCommon_H__
 #define __CompositorCommon_H__
 
+#include "OgrePixelFormat.h"
+
 namespace Ogre
 {
 	class CompositorNode;
@@ -53,7 +55,6 @@ namespace Ogre
 	typedef vector<CompositorPass*>::type		CompositorPassVec;
 	typedef vector<CompositorShadowNode*>::type	CompositorShadowNodeVec;
 
-	enum PixelFormat;
 	typedef vector<PixelFormat>::type PixelFormatList;
 }
 

@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 #include "OgreException.h"
 
+#include "OgrePixelBox.h"
+
 
 namespace {
 #include "OgrePixelConversions.h"

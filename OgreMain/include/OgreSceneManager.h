@@ -2799,7 +2799,7 @@ namespace Ogre {
 			through an 'and' operation. @see Viewport::setVisibilityMask
 		*/
 		virtual_l2 void setVisibilityMask(uint32 vmask)
-								{ mVisibilityMask = vmask & MovableObject::RESERVED_VISIBILITY_FLAGS; }
+								{ mVisibilityMask = vmask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS; }
 
 		/** Gets a mask which is bitwise 'and'ed with objects own visibility masks
 			to determine if the object is visible.

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLRenderSystem.h"
 #include "OgreImageCodec.h"
+#include "OgrePixelBox.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -613,7 +614,7 @@ namespace Ogre
 				mHeight = height;
 				
 				for (ViewportList::iterator it = mViewportList.begin();	it != mViewportList.end(); ++it)
-					(*it).second->_updateDimensions();
+					(*it)->_updateDimensions();
 			}
 		}
 	}
@@ -652,7 +653,7 @@ namespace Ogre
 		mHeight = windowAttrib.height;
 		
 		for (ViewportList::iterator it = mViewportList.begin();	it != mViewportList.end(); ++it)
-			(*it).second->_updateDimensions();
+			(*it)->_updateDimensions();
 	}
 	
 	//-------------------------------------------------------------------------------------------------//

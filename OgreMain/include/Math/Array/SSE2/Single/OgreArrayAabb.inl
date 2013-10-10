@@ -168,12 +168,12 @@ namespace Ogre
 
 		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
 		//(which is ok since we need them to say 'false' to intersection tests)
-		x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, x,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[0], MathlibSSE2::INFINITY ) );
-		y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, y,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[1], MathlibSSE2::INFINITY ) );
-		z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITY, z,
-									_mm_cmpeq_ps( m_halfSize.m_chunkBase[2], MathlibSSE2::INFINITY ) );
+		x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, x,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[0], MathlibSSE2::INFINITEA ) );
+		y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, y,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[1], MathlibSSE2::INFINITEA ) );
+		z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, z,
+									_mm_cmpeq_ps( m_halfSize.m_chunkBase[2], MathlibSSE2::INFINITEA ) );
 
 		m_halfSize = ArrayVector3( x, y, z );
 	}

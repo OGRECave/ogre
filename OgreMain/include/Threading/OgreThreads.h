@@ -29,6 +29,8 @@ THE SOFTWARE.
 #ifndef __Threads_H__
 #define __Threads_H__
 
+#include "OgreSharedPtr.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	#define OGRE_THREAD_CALL_CONVENTION __stdcall
 #else

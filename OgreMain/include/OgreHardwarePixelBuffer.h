@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgrePixelFormat.h"
+#include "OgrePixelBox.h"
 #include "OgreImage.h"
 #include "OgreHeaderPrefix.h"
 

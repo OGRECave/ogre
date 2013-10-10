@@ -49,7 +49,7 @@ namespace Ogre
 	const ArrayReal MathlibSSE2::OneMinusEpsilon= _mm_set_ps1( 1.0f - 1e-6f );
 	const ArrayReal MathlibSSE2::FLOAT_MIN	= _mm_set_ps1( std::numeric_limits<Real>::min() );
 	const ArrayReal MathlibSSE2::SIGN_MASK	= _mm_set_ps1( -0.0f );
-	const ArrayReal MathlibSSE2::INFINITY	= _mm_set_ps1( std::numeric_limits<Real>::infinity() );
+	const ArrayReal MathlibSSE2::INFINITEA	= _mm_set_ps1( std::numeric_limits<Real>::infinity() );
 	const ArrayReal MathlibSSE2::MAX_NEG	= _mm_set_ps1( -std::numeric_limits<Real>::max() );
 	const ArrayReal MathlibSSE2::MAX_POS	= _mm_set_ps1( std::numeric_limits<Real>::max() );
 
