@@ -55,7 +55,6 @@ namespace Ogre
 }
 #else
 	#include "C/OgreMathlibC.h"
-
 namespace Ogre
 {
 	typedef MathlibC Mathlib;

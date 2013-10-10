@@ -344,10 +344,6 @@ typedef signed char int8;
 	typedef long long int64;
 #endif
 
-//TODO: Move these to OgreBuildSettings.h (CMake)
-#define OGRE_USE_SIMD				1
-#define OGRE_RESTRICT_ALIASING		1
-
 #ifndef OGRE_RESTRICT_ALIASING
 	#define OGRE_RESTRICT_ALIASING 0
 #endif
