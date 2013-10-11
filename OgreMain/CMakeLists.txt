@@ -57,6 +57,8 @@ set (HEADER_FILES
   include/Math/Array/OgreArrayQuaternion.h
   include/Math/Array/OgreArrayVector3.h
   include/Math/Array/OgreBooleanMask.h
+  include/Math/Array/OgreKfTransform.h
+  include/Math/Array/OgreKfTransformArrayMemoryManager.h
   include/Math/Array/OgreMathlib.h
   include/Math/Array/OgreNodeMemoryManager.h
   include/Math/Array/OgreObjectData.h
@@ -321,6 +323,7 @@ set (SOURCE_FILES
   src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
   src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp
   src/Math/Array/OgreArrayMemoryManager.cpp
+  src/Math/Array/OgreKfTransformArrayMemoryManager.cpp
   src/Math/Array/OgreNodeArrayMemoryManager.cpp
   src/Math/Array/OgreNodeMemoryManager.cpp
   src/Math/Array/OgreObjectDataArrayMemoryManager.cpp

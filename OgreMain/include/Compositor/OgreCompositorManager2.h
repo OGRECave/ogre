@@ -173,9 +173,9 @@ namespace Ogre
 		/** Main function to start rendering. Creates a workspace instance based on a
 			workspace definition.
 		@param sceneManager
-			The SceneManager this workspace will be associated with. You can have manage
-			multiple scene managers within multiple workspace. It is also possible
-			for two workspaces to share the same scene manager.
+			The SceneManager this workspace will be associated with. You can have multiple
+			scene managers, each with multiple workspaces. Those workspaces can be set to
+			render to the same final render target, regardless of scene manager (or not).
 		@param finalRenderTarget
 			The final RT where the workspace will be rendered to. Usually the RenderWindow.
 			We need this pointer in order to correctly create RTTs that depend on

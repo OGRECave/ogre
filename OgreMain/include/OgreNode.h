@@ -139,6 +139,9 @@ namespace Ogre {
         /// Only available internally - notification of parent.
         void setParent( Node* parent );
 
+		/// Notification from parent that we need to migrate to a different depth level
+		void parentDepthLevelChanged(void);
+
         /** Triggers the node to update it's combined transforms.
         @par
             This method is called internally by Ogre to ask the node
@@ -757,6 +760,13 @@ namespace Ogre {
         @see UserObjectBindings::setUserAny.
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
+
+		/** Manually set the mNodeMemoryManager to a null ptr.
+		@remarks
+			Node doesn't follow the rule of three. This function is useful when you make multiple
+			hard copies but only the destructor must release the mTransform only slots once.
+		*/
+		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
 
     };
     /** @} */

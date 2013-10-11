@@ -100,7 +100,7 @@ namespace Ogre
 		void objectCreated( ObjectData &outObjectData, size_t renderQueue );
 
 		/** Requests memory for the given ObjectData to be moved to a different render queue,
-			transferring existing values inside to the new memory block
+			transferring existing values inside to the new memory slot
 		@param inOutObjectData
 			ObjectData with filled pointers
 		@param oldRenderQueue

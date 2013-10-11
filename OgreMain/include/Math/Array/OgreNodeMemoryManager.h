@@ -126,6 +126,17 @@ namespace Ogre
 		*/
 		void nodeDestroyed( Transform &outTransform, size_t depth );
 
+		/** Requests memory for the given Node to be moved to a different depth level,
+			transferring existing values inside to the new memory slot
+		@param inOutTransform
+			Transform with filled pointers
+		@param oldDepth
+			Current hierarchy level depth it belongs to.
+		@param newDepth
+			Hierarchy level depth it wants to belongs to.
+		*/
+		void nodeMoved( Transform &inOutTransform, size_t oldDepth, size_t newDepth );
+
 		/** Releases memory belonging to us, not before copying it into another manager.
 		@remarks
 			This function is useful when implementing multiple Memory Managers in Scene Managers

@@ -162,6 +162,21 @@ namespace Ogre
 		mgr.destroyNode( outTransform );
 	}
 	//-----------------------------------------------------------------------------------
+	void NodeMemoryManager::nodeMoved( Transform &inOutTransform, size_t oldDepth, size_t newDepth )
+	{
+		growToDepth( newDepth );
+
+		Transform tmp;
+		m_memoryManagers[newDepth].createNewNode( tmp );
+
+		tmp.copy( inOutTransform );
+
+		NodeArrayMemoryManager &mgr = m_memoryManagers[oldDepth];
+		mgr.destroyNode( inOutTransform );
+
+		inOutTransform = tmp;
+	}
+	//-----------------------------------------------------------------------------------
 	void NodeMemoryManager::migrateTo( Transform &inOutTransform, size_t depth,
 										NodeMemoryManager *dstNodeMemoryManager )
 	{

@@ -642,6 +642,11 @@ namespace Ogre {
     {
         return BoneIterator(mBoneList.begin(), mBoneList.end());
     }
+	//---------------------------------------------------------------------
+    Skeleton::ConstBoneIterator Skeleton::getBoneIteratorConst(void) const
+    {
+        return ConstBoneIterator(mBoneList.begin(), mBoneList.end());
+    }
     //---------------------------------------------------------------------
     void Skeleton::_updateTransforms(void)
     {

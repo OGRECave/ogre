@@ -322,7 +322,7 @@ namespace Ogre
 				Try to create everything static first, then dynamic content.
 				Values are initialized (position to zero, orientation to identity,
 				scale to unit, etc)
-			@param
+			@param outTransform
 				Out: The transform with filled memory pointers
 		*/
 		void createNewNode( Transform &outTransform );
@@ -330,7 +330,7 @@ namespace Ogre
 		/** Releases memory acquired through @see createNewNode
 			@remarks
 				For optimal results, try to respect LIFO order in the removals
-			@param
+			@param inOutTransform
 				Out: Transform to destroy. Pointers are nullified
 		*/
 		void destroyNode( Transform &inOutTransform );
@@ -338,7 +338,7 @@ namespace Ogre
 		/** Retrieves a Transform pointing to the first Node
 		@remarks
 			@See NodeMemoryManager::getStart
-		@param
+		@param outTransform
 			[out] Transform with filled pointers to the first Node in this depth
 		@return
 			Number of Nodes in this depth level

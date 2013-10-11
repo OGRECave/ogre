@@ -177,10 +177,12 @@ namespace Ogre {
 
         typedef vector<Bone*>::type BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
+		typedef ConstVectorIterator<BoneList> ConstBoneIterator;
         /// Get an iterator over the root bones in the skeleton, ie those with no parents
         virtual BoneIterator getRootBoneIterator(void);
         /// Get an iterator over all the bones in the skeleton
         virtual BoneIterator getBoneIterator(void);
+		ConstBoneIterator getBoneIteratorConst(void) const;
 
         /** Gets a bone by it's handle. */
         virtual Bone* getBone(unsigned short handle) const;
