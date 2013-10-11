@@ -114,7 +114,7 @@ THE SOFTWARE.
 		typedef bool ArrayMaskI;
 
 		#define CastIntToReal( x ) static_cast<Ogre::Real>(x)
-		#define CastRealToInt( x ) static_cast<int>(x)
+		#define CastRealToInt( x ) static_cast<ArrayInt>(x)
 
 		#define ogre_madd( a, b, c )		( (c) + ( (a) * (b) ) )
 
