@@ -383,7 +383,7 @@ namespace Ogre
 			lerp( a, b, 0 ) = a
 			lerp( a, b, 1 ) = b
 		*/
-        template<typename T, typename S> static T lerp( const T& a, const T& b, const S& w )
+        template<typename T, typename S> static FORCEINLINE T lerp( const T& a, const T& b, const S& w )
 		{ 
             return a + w * (b - a);
 		}

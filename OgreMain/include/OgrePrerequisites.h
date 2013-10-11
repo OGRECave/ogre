@@ -215,7 +215,6 @@ namespace Ogre {
     class MovablePlane;
     class Node;
 	class NodeAnimationTrack;
-	class NodeKeyFrame;
 	class NodeMemoryManager;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
