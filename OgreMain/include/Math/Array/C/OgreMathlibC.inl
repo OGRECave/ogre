@@ -29,7 +29,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	inline ArrayReal MathlibC::Modf4( ArrayReal x, ArrayReal &outIntegral )
+	inline ArrayReal MathlibC::Modf4( ArrayReal x, double &outIntegral )
 	{
 		return modf( x, &outIntegral );
 	}

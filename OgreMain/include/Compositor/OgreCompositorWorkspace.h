@@ -107,7 +107,7 @@ namespace Ogre
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
 								RenderTarget *finalRenderTarget, SceneManager *sceneManager,
 								Camera *defaultCam, RenderSystem *renderSys, bool bEnabled );
-		~CompositorWorkspace();
+		virtual ~CompositorWorkspace();
 
 		const CompositorChannel& getGlobalTexture( IdString name ) const;
 

@@ -37,6 +37,10 @@ THE SOFTWARE.
 	typedef void* HANDLE;
 #else
 	#include <pthread.h>
+
+    #if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        #include "PthreadBarrierSurrogate.h"
+    #endif
 #endif
 
 namespace Ogre

@@ -30,6 +30,7 @@ THE SOFTWARE.
 // Common stuff
 
 #include "OgreString.h"
+#include "OgrePlatformInformation.h"
 
 #if OGRE_CPU == OGRE_CPU_X86
 	#include <xmmintrin.h>
