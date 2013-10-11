@@ -37,9 +37,14 @@ THE SOFTWARE.
 	typedef void* HANDLE;
 #else
 	#include <pthread.h>
-
     #if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        #include "PthreadBarrierSurrogate.h"
+    typedef struct
+    {
+        pthread_mutex_t mutex;
+        pthread_cond_t cond;
+        int count;
+        int tripCount;
+    } pthread_barrier_t;
     #endif
 #endif
 
