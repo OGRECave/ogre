@@ -94,7 +94,7 @@ namespace Ogre {
 #   if !defined(FORCEINLINE)
 #       define FORCEINLINE __inline
 #   endif
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#elif !defined(ANDROID) && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
 #   define FORCEINLINE __attribute__((always_inline))
 #else
 #   define FORCEINLINE __inline

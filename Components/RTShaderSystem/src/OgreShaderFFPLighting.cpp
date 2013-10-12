@@ -44,7 +44,7 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPLighting::Type = "FFP_Lighting";
-Light FFPLighting::msBlankLight;
+Light FFPLighting::msBlankLight();
 
 //-----------------------------------------------------------------------
 FFPLighting::FFPLighting()
@@ -99,9 +99,9 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		// Search a matching light from the current sorted lights of the given renderable.
 		for (unsigned int j = curSearchLightIndex; j < pLightList->size(); ++j)
 		{
-			if (pLightList->at(j)->getType() == curLightType)
+			if (pLightList->at(j).light->getType() == curLightType)
 			{				
-				srcLight = pLightList->at(j);
+				srcLight = const_cast<Light*>(pLightList->at(j).light);
 				curSearchLightIndex = j + 1;
 				break;
 			}			
@@ -119,14 +119,14 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		case Light::LT_DIRECTIONAL:
 
 			// Update light direction.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView.transformAffine(srcLight->getAs4DVector());
 			curParams.mDirection->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_POINT:
 
 			// Update light position.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView.transformAffine(srcLight->getAs4DVector());
 			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
@@ -146,7 +146,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 
 			
 			// Update light position.
-			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
+			vParameter = matView.transformAffine(srcLight->getAs4DVector());
 			curParams.mPosition->setGpuParameter(vParameter);
 			
 							
