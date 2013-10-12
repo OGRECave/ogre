@@ -1,12 +1,18 @@
+#version 120
+
 uniform mat4 worldViewProj;
 uniform vec4 texelOffsets;
+
+attribute vec4 vertex;
+
 varying vec2 depth;
 
 void main()
 {
-	gl_Position = ftransform();
+	vec4 outPos = worldViewProj * vertex;
+	outPos.xy += texelOffsets.zw * outPos.w;
 	// fix pixel / texel alignment
-	gl_Position.xy += texelOffsets.zw * gl_Position.w;
-	depth = gl_Position.zw;
+	depth = outPos.zw;
+	gl_Position = outPos;
 }
 
