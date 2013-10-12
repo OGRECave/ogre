@@ -29,8 +29,6 @@ THE SOFTWARE.
 #ifndef __MathlibC_H__
 #define __MathlibC_H__
 
-#if __OGRE_HAVE_SSE
-
 #ifndef __Mathlib_H__
 	#error "Don't include this file directly. include Math/Array/OgreMathlib.h"
 #endif
