@@ -29,12 +29,13 @@ THE SOFTWARE.
 #ifndef __MathlibC_H__
 #define __MathlibC_H__
 
+#if __OGRE_HAVE_SSE
+
 #ifndef __Mathlib_H__
 	#error "Don't include this file directly. include Math/Array/OgreMathlib.h"
 #endif
 
 #include "OgrePrerequisites.h"
-#include "OgreMath.h"
 
 namespace Ogre
 {
@@ -263,7 +264,7 @@ namespace Ogre
 		/// Returns the maximum value between a and b
 		static inline ArrayReal Max( ArrayReal a, ArrayReal b )
 		{
-			return std::max( a, b );
+			return Ogre::max( a, b );
 		}
 
 		/** Returns the minimum value of all elements in a
@@ -339,7 +340,7 @@ namespace Ogre
 			@return outIntegral
 				The fractional part of x. i.e. 0.57
 		*/
-		static inline ArrayReal Modf4( ArrayReal x, double &outIntegral );
+		static inline ArrayReal Modf4( ArrayReal x, ArrayReal &outIntegral );
 
 		/**	Returns the arccos of x
 			@param x
@@ -380,4 +381,5 @@ namespace Ogre
 
 #include "OgreMathlibC.inl"
 
+#endif
 #endif
