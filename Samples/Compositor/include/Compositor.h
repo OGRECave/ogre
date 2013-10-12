@@ -34,6 +34,7 @@ public:
 
     void setupContent(void);
     void cleanupContent(void);
+    StringVector getRequiredPlugins();
 
 	bool frameRenderingQueued(const FrameEvent& evt);
 	
@@ -130,6 +131,13 @@ void Sample_Compositor::setupContent(void)
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 	setDragLook(true);
 #endif
+}
+StringVector Sample_Compositor::getRequiredPlugins()
+{
+    StringVector names;
+    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+        names.push_back("Cg Program Manager");
+    return names;
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::registerCompositors(void)

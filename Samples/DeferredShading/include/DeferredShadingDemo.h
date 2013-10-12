@@ -246,6 +246,14 @@ protected:
         
 	}
 
+    StringVector getRequiredPlugins()
+	{
+		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            names.push_back("Cg Program Manager");
+		return names;
+	}
+
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))

@@ -40,6 +40,13 @@ public:
 
 
 protected:
+	StringVector getRequiredPlugins()
+	{
+		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+            names.push_back("Cg Program Manager");
+		return names;
+	}
 
 	void setupContent()
 	{
