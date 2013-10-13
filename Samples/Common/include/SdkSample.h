@@ -228,7 +228,7 @@ namespace OgreBites
 			{	
 				if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
 				{
-					Ogre::Viewport* mainVP = mCamera->getViewport();
+					Ogre::Viewport* mainVP = mCamera->getLastViewport();
 					const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
 					if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
@@ -473,7 +473,7 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 			mDetailsPanel->setParamValue(11, "Off");
 
-            Ogre::Viewport* mainVP = mCamera->getViewport();
+            Ogre::Viewport* mainVP = mCamera->getLastViewport();
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {

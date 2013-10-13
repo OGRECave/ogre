@@ -44,17 +44,12 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPLighting::Type = "FFP_Lighting";
-Light FFPLighting::msBlankLight();
 
 //-----------------------------------------------------------------------
 FFPLighting::FFPLighting()
 {
 	mTrackVertexColourType			= TVC_NONE;
 	mSpecularEnable					= false;
-
-	msBlankLight.setDiffuseColour(ColourValue::Black);
-	msBlankLight.setSpecularColour(ColourValue::Black);
-	msBlankLight.setAttenuation(0,1,0,0);
 }
 
 //-----------------------------------------------------------------------
@@ -109,11 +104,11 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 
 		// No matching light found -> use a blank dummy light for parameter update.
 		if (srcLight == NULL)
-		{						
-			srcLight = &msBlankLight;
+		{
+			assert("No matching light found");
+			return;
 		}
-					
-		
+
 		switch (curParams.mType)
 		{
 		case Light::LT_DIRECTIONAL:

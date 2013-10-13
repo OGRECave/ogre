@@ -317,11 +317,6 @@ set (SOURCE_FILES
   src/Compositor/OgreCompositorWorkspace.cpp
   src/Compositor/OgreCompositorWorkspaceDef.cpp
   src/Compositor/OgreTextureDefinition.cpp
-  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
-  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
-  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
-  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
-  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp
   src/Math/Array/OgreArrayMemoryManager.cpp
   src/Math/Array/OgreKfTransformArrayMemoryManager.cpp
   src/Math/Array/OgreNodeArrayMemoryManager.cpp
@@ -500,6 +495,23 @@ set (SOURCE_FILES
   src/OgreWireBoundingBox.cpp
   src/OgreWorkQueue.cpp
 )
+
+if (OGRE_SIMD)
+	set (SOURCE_FILES ${SOURCE_FILES}
+	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
+	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
+else()
+	set (SOURCE_FILES ${SOURCE_FILES}
+	  src/Math/Array/C/OgreArrayAabb.cpp
+	  src/Math/Array/C/OgreArrayMatrix4.cpp
+	  src/Math/Array/C/OgreArrayQuaternion.cpp
+	  src/Math/Array/C/OgreArrayVector3.cpp
+	  src/Math/Array/C/OgreMathlibC.cpp)
+endif ()
+
 
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
