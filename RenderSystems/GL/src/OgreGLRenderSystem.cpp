@@ -200,6 +200,9 @@ namespace Ogre {
 	{
 		mGLSupport->start();
 
+        if(!mStateCacheManager)
+            mStateCacheManager = OGRE_NEW GLStateCacheManager();
+
         // Create the texture manager        
 		mTextureManager = new GLTextureManager(*mGLSupport); 
 
