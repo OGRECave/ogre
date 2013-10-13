@@ -262,11 +262,6 @@ namespace Ogre
 				MathlibSSE2::Cmov4( arg1.m_chunkBase[2], arg2.m_chunkBase[2], mask ) );
 	}
 
-	//-----------------------------------------------------------------------------------
-	// START CODE TO BE COPIED TO OgreArrayVector3.inl
-	//	Copy paste and replace "ArrayVector3::" for "ArrayVector3::"
-	//-----------------------------------------------------------------------------------
-
 	// Update operations
 	// +=
 	DEFINE_UPDATE_OPERATION(			ArrayVector3,		+=, _mm_add_ps );
@@ -602,8 +597,4 @@ namespace Ogre
 #undef DEFINE_UPDATE_DIVISION
 #undef DEFINE_UPDATE_R_SCALAR_DIVISION
 #undef DEFINE_UPDATE_R_DIVISION
-
-	//-----------------------------------------------------------------------------------
-	// END CODE TO BE COPIED TO OgreArrayVector3.inl
-	//-----------------------------------------------------------------------------------
 }

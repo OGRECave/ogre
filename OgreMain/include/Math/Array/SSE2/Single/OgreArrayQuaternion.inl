@@ -28,6 +28,77 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	// Arithmetic operations
+#define DEFINE_OPERATION( leftClass, rightClass, op, op_func )\
+	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightClass &rhs )\
+	{\
+		const ArrayReal * RESTRICT_ALIAS lhsChunkBase = lhs.m_chunkBase;\
+		const ArrayReal * RESTRICT_ALIAS rhsChunkBase = rhs.m_chunkBase;\
+		return ArrayQuaternion(\
+				op_func( lhsChunkBase[0], rhsChunkBase[0] ),\
+				op_func( lhsChunkBase[1], rhsChunkBase[1] ),\
+				op_func( lhsChunkBase[2], rhsChunkBase[2] ),\
+				op_func( lhsChunkBase[3], rhsChunkBase[3] ) );\
+	}
+#define DEFINE_L_OPERATION( leftType, rightClass, op, op_func )\
+	inline ArrayQuaternion operator op ( const leftType lhs, const rightClass &rhs )\
+	{\
+		return ArrayQuaternion(\
+				op_func( lhs, rhs.m_chunkBase[0] ),\
+				op_func( lhs, rhs.m_chunkBase[1] ),\
+				op_func( lhs, rhs.m_chunkBase[2] ),\
+				op_func( lhs, rhs.m_chunkBase[3] ) );\
+	}
+#define DEFINE_R_OPERATION( leftClass, rightType, op, op_func )\
+	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightType rhs )\
+	{\
+		return ArrayQuaternion(\
+				op_func( lhs.m_chunkBase[0], rhs ),\
+				op_func( lhs.m_chunkBase[1], rhs ),\
+				op_func( lhs.m_chunkBase[2], rhs ),\
+				op_func( lhs.m_chunkBase[3], rhs ) );\
+	}
+
+	// Update operations
+#define DEFINE_UPDATE_OPERATION( leftClass, op, op_func )\
+	inline void ArrayQuaternion::operator op ( const leftClass &a )\
+	{\
+		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;\
+		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.m_chunkBase;\
+		chunkBase[0] = op_func( chunkBase[0], aChunkBase[0] );\
+		chunkBase[1] = op_func( chunkBase[1], aChunkBase[1] );\
+		chunkBase[2] = op_func( chunkBase[2], aChunkBase[2] );\
+		chunkBase[3] = op_func( chunkBase[3], aChunkBase[3] );\
+	}
+#define DEFINE_UPDATE_R_OPERATION( rightType, op, op_func )\
+	inline void ArrayQuaternion::operator op ( const rightType a )\
+	{\
+		m_chunkBase[0] = op_func( m_chunkBase[0], a );\
+		m_chunkBase[1] = op_func( m_chunkBase[1], a );\
+		m_chunkBase[2] = op_func( m_chunkBase[2], a );\
+		m_chunkBase[3] = op_func( m_chunkBase[3], a );\
+	}
+
+	// + Addition
+	DEFINE_OPERATION( ArrayQuaternion, ArrayQuaternion, +, _mm_add_ps );
+
+	// - Subtraction
+	DEFINE_OPERATION( ArrayQuaternion, ArrayQuaternion, -, _mm_sub_ps );
+
+	// * Multiplication (scalar only)
+	DEFINE_L_OPERATION( ArrayReal, ArrayQuaternion, *, _mm_mul_ps );
+	DEFINE_R_OPERATION( ArrayQuaternion, ArrayReal, *, _mm_mul_ps );
+
+	// Update operations
+	// +=
+	DEFINE_UPDATE_OPERATION(			ArrayQuaternion,		+=, _mm_add_ps );
+
+	// -=
+	DEFINE_UPDATE_OPERATION(			ArrayQuaternion,		-=, _mm_sub_ps );
+
+	// *=
+	DEFINE_UPDATE_R_OPERATION(			ArrayReal,			*=, _mm_mul_ps );
+
 	// Notes: This operator doesn't get inlined. The generated instruction count is actually high so
 	// the compiler seems to be clever in not inlining. There is no gain in doing a "mul()" equivalent
 	// like we did with mul( const ArrayQuaternion&, ArrayVector3& ) because we would still need
@@ -65,7 +136,7 @@ namespace Ogre
 					_mm_mul_ps( lhs.m_chunkBase[1], rhs.m_chunkBase[2] ),
 					_mm_mul_ps( lhs.m_chunkBase[2], rhs.m_chunkBase[1] ) ) ) );
     }
-
+	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Slerp( ArrayReal fT, const ArrayQuaternion &rkP,
 														const ArrayQuaternion &rkQ /*, bool shortestPath*/ )
 	{
