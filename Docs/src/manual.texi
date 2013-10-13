@@ -249,6 +249,17 @@ Overlays allow you to render 2D and 3D elements on top of the normal scene conte
 
 You can create overlays either through the SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their 'show()' method. You can also show multiple overlays at once, and their Z order is determined by the Overlay::setZOrder() method.@*@*
 
+@heading Notes on Integration
+
+The OverlaySystem is now its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager): 
+
+@example
+Ogre::OverlaySystem* pOverlaySystem = new Ogre::OverlaySystem();
+mSceneMgr->addRenderQueueListener(pOverlaySystem);
+@end example
+
+One Ogre::OverlaySystem per application is enough but you need to call addRenderQueueListener once per SceneManager.
+
 @heading Creating 2D Elements
 
 The OverlayElement class abstracts the details of 2D elements which are added to overlays. All items which can be added to overlays are derived from this class. It is possible (and encouraged) for users of OGRE to define their own custom subclasses of OverlayElement in order to provide their own user controls. The key common features of all OverlayElements are things like size, position, basic material name etc. Subclasses extend this behaviour to include more complex properties and behaviour.@*@*
