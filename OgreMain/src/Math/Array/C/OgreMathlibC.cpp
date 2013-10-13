@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #define __Mathlib_H__ //Neded to directly include OgreMathlibC
 
-#if __OGRE_HAVE_SSE
 #include "Math/Array/OgreArrayConfig.h"
 #include "Math/Array/C/OgreMathlibC.h"
 #include "Math/Array/OgreBooleanMask.h"
@@ -62,4 +61,3 @@ namespace Ogre
 
 	const ArrayReal MathlibC::ONE_DIV_2PI= 1.0f / (2.0f * _PI);
 }
-#endif

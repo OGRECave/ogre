@@ -107,15 +107,15 @@ namespace Ogre {
 #   define __OGRE_HAVE_NEON  1
 #endif
 
-#ifndef __OGRE_HAVE_SSE
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_SSE)
 #   define __OGRE_HAVE_SSE  0
 #endif
 
-#ifndef __OGRE_HAVE_VFP
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_VFP)
 #   define __OGRE_HAVE_VFP  0
 #endif
 
-#ifndef __OGRE_HAVE_NEON
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_NEON)
 #   define __OGRE_HAVE_NEON  0
 #endif
     
