@@ -87,24 +87,26 @@ namespace Ogre {
 
 /* Define whether or not Ogre compiled with SSE supports.
 */
-#if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
-    OGRE_PLATFORM != OGRE_PLATFORM_NACL
-#   define __OGRE_HAVE_SSE  1
-#elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
-      OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-#   define __OGRE_HAVE_SSE  1
-#endif
+#if OGRE_USE_SIMD == 1
+	#if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
+		OGRE_PLATFORM != OGRE_PLATFORM_NACL
+	#   define __OGRE_HAVE_SSE  1
+	#elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
+		  OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+	#   define __OGRE_HAVE_SSE  1
+	#endif
 
-/* Define whether or not Ogre compiled with VFP supports.
- */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
-#   define __OGRE_HAVE_VFP  1
-#endif
+	/* Define whether or not Ogre compiled with VFP supports.
+	 */
+	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
+	#   define __OGRE_HAVE_VFP  1
+	#endif
 
-/* Define whether or not Ogre compiled with NEON supports.
- */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
-#   define __OGRE_HAVE_NEON  1
+	/* Define whether or not Ogre compiled with NEON supports.
+	 */
+	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
+	#   define __OGRE_HAVE_NEON  1
+	#endif
 #endif
 
 #if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_SSE)

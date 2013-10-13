@@ -263,7 +263,7 @@ namespace Ogre
 		/// Returns the maximum value between a and b
 		static inline ArrayReal Max( ArrayReal a, ArrayReal b )
 		{
-			return std::max( a, b );
+			return Ogre::max( a, b );
 		}
 
 		/** Returns the minimum value of all elements in a
@@ -339,7 +339,7 @@ namespace Ogre
 			@return outIntegral
 				The fractional part of x. i.e. 0.57
 		*/
-		static inline ArrayReal Modf4( ArrayReal x, double &outIntegral );
+		static inline ArrayReal Modf4( ArrayReal x, ArrayReal &outIntegral );
 
 		/**	Returns the arccos of x
 			@param x
