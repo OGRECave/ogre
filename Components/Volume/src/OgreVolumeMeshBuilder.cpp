@@ -68,7 +68,7 @@ namespace Volume {
     size_t MeshBuilder::generateBuffers(RenderOperation &operation)
     {
         // Early out if nothing to do.
-        if (mIndices.size() == 0)
+        if (mIndices.empty())
         {
             return 0;
         }

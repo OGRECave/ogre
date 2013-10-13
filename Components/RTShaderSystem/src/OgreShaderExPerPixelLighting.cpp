@@ -73,7 +73,7 @@ int	PerPixelLighting::getExecutionOrder() const
 void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {
-	if (mLightParamsList.size() == 0)
+	if (mLightParamsList.empty())
 		return;
 
 	const Matrix4& matView = source->getViewMatrix();

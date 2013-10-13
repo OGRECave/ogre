@@ -41,8 +41,8 @@
 #       define ENABLE_SHADERS_CACHE_LOAD 1
 #endif
 
-#define ENABLE_SHADERS_CACHE_SAVE 1
-#define ENABLE_SHADERS_CACHE_LOAD 1
+#define ENABLE_SHADERS_CACHE_SAVE 0
+#define ENABLE_SHADERS_CACHE_LOAD 0
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
@@ -1070,7 +1070,7 @@ protected:
             const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
 #if defined(INCLUDE_RTSHADER_SYSTEM)
-            bool hasProgrammableGPU = (profiles.size() != 0);
+            bool hasProgrammableGPU = (!profiles.empty());
 #endif
 
 //            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
@@ -1136,11 +1136,11 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
-#if defined(ENABLE_SHADERS_CACHE_SAVE)
+#if ENABLE_SHADERS_CACHE_SAVE == 1
             if(Ogre::GpuProgramManager::getSingleton().canGetCompiledShaderBuffer())
                 Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 #endif
-#if	defined(ENABLE_SHADERS_CACHE_LOAD)
+#if	ENABLE_SHADERS_CACHE_LOAD == 1
 			// Load for a package version of the shaders.
 			Ogre::String path = getShaderCacheFileName();
 			FILE * inFile = NULL;
@@ -1726,7 +1726,7 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void shutdown()
 		{
-#if defined(ENABLE_SHADERS_CACHE_SAVE) 
+#if ENABLE_SHADERS_CACHE_SAVE == 1
 			if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
 			{
 				Ogre::String path = mFSLayer->getWritablePath(getShaderCacheFileName());

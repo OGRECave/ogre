@@ -1036,6 +1036,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1145,6 +1146,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())

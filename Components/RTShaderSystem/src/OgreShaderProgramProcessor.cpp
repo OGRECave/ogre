@@ -290,7 +290,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 {
 
 	// Make sure the merge combinations are ready.
-	if (mParamMergeCombinations.size() == 0)
+	if (mParamMergeCombinations.empty())
 	{
 		buildMergeCombinations();
 	}
@@ -302,7 +302,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 
 		// Case all parameters have been merged.
 		if (paramsTable[0].size() + paramsTable[1].size() + 
-			paramsTable[2].size() + paramsTable[3].size() == 0)		
+			paramsTable[2].size() + paramsTable[3].empty())		
 			return;		
 
 		MergeParameter curMergeParam;
@@ -421,7 +421,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 			const MergeCombination& curCombination = simpleCombinations[i];
 
 			// Case all parameters have been merged.
-			if (paramsTable[0].size() + paramsTable[1].size() + paramsTable[2].size() + paramsTable[3].size() == 0)		
+			if (paramsTable[0].size() + paramsTable[1].size() + paramsTable[2].size() + paramsTable[3].empty())		
 				break;		
 
 			MergeParameter curMergeParam;
@@ -618,7 +618,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
 												   ShaderParameterList& splitParams, LocalParameterMap& localParamsMap)
 {
 	// No split params created.
-	if (splitParams.size() == 0)	
+	if (splitParams.empty())	
 		return;	
 
 	// Create the local parameters + map from source to local.

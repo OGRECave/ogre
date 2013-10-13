@@ -56,7 +56,7 @@ int	RTShaderSRSSegmentedLights::getExecutionOrder() const
 void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {
-	if ((mLightParamsList.size() == 0) && (!mUseSegmentedLightTexture))
+	if ((mLightParamsList.empty()) && (!mUseSegmentedLightTexture))
 		return;
 
 	const Matrix4& matWorld = source->getWorldMatrix();

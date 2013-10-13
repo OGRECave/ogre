@@ -2,6 +2,7 @@
 #define __BSP_H__
 
 #include "SdkSample.h"
+#include "OgreFileSystemLayer.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -28,13 +29,14 @@ public:
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
+                        "so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
         }
 	}
 
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
+        names.push_back("Cg Program Manager");
 		names.push_back("BSP Scene Manager");
 		return names;
 	}

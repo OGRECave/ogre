@@ -11,8 +11,7 @@ void casterVP(
 	out float2 outDepth		: TEXCOORD0,
 
 	uniform float4x4 worldViewProj,
-	uniform float4 texelOffsets
-	)
+	uniform float4 texelOffsets)
 {
 	outPos = mul(worldViewProj, position);
 	// fix pixel / texel alignment
@@ -25,7 +24,6 @@ void casterVP(
 void casterFP(
 	float2 depth			: TEXCOORD0,
 	out float4 result		: COLOR)
-	
 {
     float finalDepth = depth.x / depth.y;
     result = float4(finalDepth, finalDepth, finalDepth, 1);
