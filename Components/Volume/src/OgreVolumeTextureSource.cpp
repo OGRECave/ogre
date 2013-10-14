@@ -35,14 +35,11 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    float TextureSource::getVolumeGridValue(int x, int y, int z) const
+    float TextureSource::getVolumeGridValue(size_t x, size_t y, size_t z) const
     {
         x = x >= mWidth ? mWidth - 1 : x;
-        x = x < 0 ? 0 : x;
         y = y >= mHeight ? mHeight - 1 : y;
-        y = y < 0 ? 0 : y;
         z = z >= mDepth ? mDepth - 1 : z;
-        z = z < 0 ? 0 : z;
         return mData[(mDepth - z - 1) * mWidthTimesHeight + y * mWidth + x];
     }
     
@@ -65,7 +62,7 @@ namespace Volume {
         Ogre::ResourceManager::ResourceCreateOrRetrieveResult res =
             TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
             Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
-            false,0,0,Ogre::TEX_TYPE_3D);
+            false, 0, 0, Ogre::TEX_TYPE_3D, 0);
         Ogre::TexturePtr tex = res.first.staticCast<Texture>();
         tex->setUsage(TU_DYNAMIC);
         tex->load();

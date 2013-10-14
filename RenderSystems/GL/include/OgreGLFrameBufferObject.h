@@ -71,8 +71,8 @@ namespace Ogre {
 		GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
         
         /// Accessors
-        size_t getWidth();
-        size_t getHeight();
+        uint32 getWidth();
+        uint32 getHeight();
         PixelFormat getFormat();
 		GLsizei getFSAA();
         

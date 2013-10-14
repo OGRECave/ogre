@@ -78,39 +78,6 @@ namespace Volume {
         }
     } Vertex;
 
-    /** Lightweight triangle.
-    */
-    typedef struct _OgreVolumeExport Triangle
-    {
-        /// The first triangle corner.
-        const Vertex mV0;
-        
-        /// The second triangle corner.
-        const Vertex mV1;
-        
-        /// The third triangle corner.
-        const Vertex mV2;
-        
-        /** Convenience constructor.
-        @param v0
-            The first vertex of the triangle.
-        @param n0
-            The normal of the first vertex.
-        @param v1
-            The second vertex of the triangle.
-        @param n1
-            The normal of the second vertex.
-        @param v2
-            The third vertex of the triangle.
-        @param n2
-            The normal of the third vertex.
-        */
-        Triangle(const Vector3 &v0, const Vector3 &n0, const Vector3 &v1, const Vector3 &n1, const Vector3 &v2, const Vector3 &n2) :
-            mV0(v0, n0), mV1(v1, n1), mV2(v2, n2)
-        {
-        }
-    } Triangle;
-
     /** == operator for two vertices.
     @param a
         The first vertex to test.
@@ -278,7 +245,7 @@ namespace Volume {
             const Vector3 &c5,
             const Vector3 &c6,
             const Vector3 &c7,
-            size_t &baseIndex
+            uint32 &baseIndex
             )
         {
             manual->position(c0);
@@ -312,14 +279,24 @@ namespace Volume {
         MeshBuilder(void);
         
         /** Adds a triangle to the mesh with reusing already existent vertices via their index.
-        @param t
-            The triangle to add.
+        @param v0
+            The first vertex of the triangle.
+        @param n0
+            The normal of the first vertex.
+        @param v1
+            The second vertex of the triangle.
+        @param n1
+            The normal of the second vertex.
+        @param v2
+            The third vertex of the triangle.
+        @param n2
+            The normal of the third vertex.
         */
-        inline void addTriangle(Triangle t)
+        inline void addTriangle(const Vector3 &v0, const Vector3 &n0, const Vector3 &v1, const Vector3 &n1, const Vector3 &v2, const Vector3 &n2)
         {
-            addVertex(t.mV0);
-            addVertex(t.mV1);
-            addVertex(t.mV2);
+            addVertex(Vertex(v0, n0));
+            addVertex(Vertex(v1, n1));
+            addVertex(Vertex(v2, n2));
         }
 
         /** Generates the vertex- and indexbuffer of this mesh on the given

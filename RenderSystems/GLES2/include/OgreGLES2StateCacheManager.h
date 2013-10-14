@@ -88,12 +88,31 @@ namespace Ogre
          */
         void bindGLTexture(GLenum target, GLuint texture);
 
+        /** Invalidates the state associated with a particular texture ID.
+         @param texture The texture ID.
+         */
+        void invalidateStateForTexture(GLuint texture);
+
         /** Sets an integer parameter value per texture target.
          @param target The texture target.
          @param pname The parameter name.
          @param param The parameter value.
          */
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
+
+        /** Sets a float parameter value per texture target.
+         @param target The texture target.
+         @param pname The parameter name.
+         @param params The parameter value.
+         */
+        void setTexParameterf(GLenum target, GLenum pname, GLfloat param);
+
+        /** Sets a float parameter value per texture target.
+         @param target The texture target.
+         @param pname The parameter name.
+         @param params The parameter value.
+         */
+        void getTexParameterfv(GLenum target, GLenum pname, GLfloat *param);
 
         /** Activate an OpenGL texture unit.
          @param offset The texture unit to activate.
@@ -187,6 +206,16 @@ namespace Ogre
          @param flag The function to disable.
          */
         void setDisabled(GLenum flag);
+
+        /** Enables a vertex attribute.
+         @param attrib The attribute to enable.
+         */
+        void setVertexAttribEnabled(GLuint attrib);
+
+        /** Disables a vertex attribute.
+         @param attrib The attribute to disable.
+         */
+        void setVertexAttribDisabled(GLuint attrib);
 
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.

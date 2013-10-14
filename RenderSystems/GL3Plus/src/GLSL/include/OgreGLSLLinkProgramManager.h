@@ -55,7 +55,7 @@ namespace Ogre {
 
 	private:
 	
-		typedef map<uint64, GLSLLinkProgram*>::type LinkProgramMap;
+		typedef map<uint32, GLSLLinkProgram*>::type LinkProgramMap;
 		typedef LinkProgramMap::iterator LinkProgramIterator;
 
 		/// container holding previously created program objects 

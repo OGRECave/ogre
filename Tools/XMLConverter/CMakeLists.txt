@@ -41,4 +41,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
 add_definitions(-DTIXML_USE_STL)
 ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES})
+
+if (APPLE)
+    set_target_properties(OgreXMLConverter PROPERTIES
+        LINK_FLAGS "-framework Cocoa")
+endif ()
+
 ogre_config_tool(OgreXMLConverter)

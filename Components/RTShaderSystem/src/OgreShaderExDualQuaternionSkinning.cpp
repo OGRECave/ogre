@@ -121,6 +121,13 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 				
 		if(mScalingShearingSupport)
 		{
+			if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
+			{
+				//set hlsl shader to use row-major matrices instead of column-major.
+				//it enables the use of auto-bound 3x4 matrices in generated hlsl shader.
+				vsProgram->setUseColumnMajorMatrices(false);
+			}
+				
 			mParamInScaleShearMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, 0, mBoneCount);
 			mParamBlendS = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendS", GCT_MATRIX_3X4);
 			mParamTempFloat3x3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3x3", GCT_MATRIX_3X3);

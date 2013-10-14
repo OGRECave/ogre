@@ -186,7 +186,7 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 	// Lock the buffer for reading.
 	unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 	unsigned char* vertex = vStart;
-	int vSize = vbuf->getVertexSize();
+	size_t vSize = vbuf->getVertexSize();
 	unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
 
 	VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
@@ -385,7 +385,7 @@ ProgressiveMeshGenerator::PMTriangle* ProgressiveMeshGenerator::isDuplicateTrian
 }
 int ProgressiveMeshGenerator::getTriangleID(PMTriangle* triangle)
 {
-	return (triangle - &mTriangleList[0]) / sizeof(PMTriangle);
+	return static_cast<int>((triangle - &mTriangleList[0]) / sizeof(PMTriangle));
 }
 void ProgressiveMeshGenerator::addTriangleToEdges(PMTriangle* triangle)
 {
@@ -994,8 +994,7 @@ void ProgressiveMeshGenerator::bakeLods()
 	// Create buffers.
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-		int indexCount = mIndexBufferInfoList[i].indexCount;
-		OgreAssert(indexCount >= 0, "");
+		size_t indexCount = mIndexBufferInfoList[i].indexCount;
 		lods.push_back(OGRE_NEW IndexData());
 		lods.back()->indexStart = 0;
 

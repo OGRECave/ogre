@@ -163,7 +163,7 @@ namespace Ogre {
                 mScratchPtr = retPtr;
                 mScratchUploadOnUnlock = (options != HBL_READ_ONLY);
 
-                if (options != HBL_DISCARD)
+                if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
                 {
                     readData(offset, length, retPtr);
                 }
@@ -182,7 +182,7 @@ namespace Ogre {
             GLenum access = 0;
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
 			// Use glMapBuffer
-			if(options == HBL_DISCARD)
+			if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
 			{
 				// Discard the buffer
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL, 

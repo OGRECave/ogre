@@ -35,10 +35,11 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreGLFBORenderTexture.h"
 #include "OgreRoot.h"
+#include "OgreGLStateCacheManager.h"
 
 namespace Ogre {
 //----------------------------------------------------------------------------- 
-GLHardwarePixelBuffer::GLHardwarePixelBuffer(size_t inWidth, size_t inHeight, size_t inDepth,
+GLHardwarePixelBuffer::GLHardwarePixelBuffer(uint32 inWidth, uint32 inHeight, uint32 inDepth,
                 PixelFormat inFormat,
                 HardwareBuffer::Usage usage):
       HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
@@ -187,23 +188,23 @@ void GLHardwarePixelBuffer::download(const PixelBox &data)
         "GLHardwarePixelBuffer::download");
 }
 //-----------------------------------------------------------------------------  
-void GLHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+void GLHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
 {
     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Framebuffer bind not possible for this pixelbuffer type",
         "GLHardwarePixelBuffer::bindToFramebuffer");
 }
 //********* GLTextureBuffer
-GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint id, 
+GLTextureBuffer::GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id,
 								 GLint face, GLint level, Usage usage, bool crappyCard, 
 								 bool writeGamma, uint fsaa):
 	GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
 	mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
-    mSoftwareMipmap(crappyCard), mHwGamma(writeGamma), mSliceTRT(0)
+	mSoftwareMipmap(crappyCard), mHwGamma(writeGamma), mSliceTRT(0), mGLSupport(support)
 {
 	// devise mWidth, mHeight and mDepth and mFormat
 	GLint value = 0;
 	
-	glBindTexture( mTarget, mTextureID );
+	mGLSupport.getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 	
 	// Get face identifier
 	mFaceTarget = mTarget;
@@ -263,7 +264,7 @@ GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint i
     {
         // Create render target for each slice
         mSliceTRT.reserve(mDepth);
-        for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+        for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
         {
             String name;
 			name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
@@ -291,7 +292,7 @@ GLTextureBuffer::~GLTextureBuffer()
 //-----------------------------------------------------------------------------
 void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 {
-	glBindTexture( mTarget, mTextureID );
+	mGLSupport.getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 	if(PixelUtil::isCompressed(data.format))
 	{
 		if(data.format != mFormat || !data.isConsecutive())
@@ -473,7 +474,7 @@ void GLTextureBuffer::download(const PixelBox &data)
 		data.getDepth() != getDepth())
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
 		 	"GLTextureBuffer::download");
-	glBindTexture( mTarget, mTextureID );
+	mGLSupport.getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
 	if(PixelUtil::isCompressed(data.format))
 	{
 		if(data.format != mFormat || !data.isConsecutive())
@@ -508,7 +509,7 @@ void GLTextureBuffer::download(const PixelBox &data)
 	}
 }
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+void GLTextureBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
 {
     assert(zoffset < mDepth);
     switch(mTarget)
@@ -530,9 +531,9 @@ void GLTextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
     }
 }
 //-----------------------------------------------------------------------------
-void GLTextureBuffer::copyFromFramebuffer(size_t zoffset)
+void GLTextureBuffer::copyFromFramebuffer(uint32 zoffset)
 {
-    glBindTexture(mTarget, mTextureID);
+    mGLSupport.getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
     switch(mTarget)
     {
     case GL_TEXTURE_1D:
@@ -595,21 +596,20 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
 	rsys->_disableTextureUnitsFrom(0);
 	if (GLEW_VERSION_1_2)
 	{
-		glActiveTextureARB(GL_TEXTURE0);
+		mGLSupport.getStateCacheManager()->activateGLTextureUnit(0);
 	}
 
 
     /// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
     /// colour.
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_SCISSOR_TEST);
-    glDisable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_FOG);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_ALPHA_TEST);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_DEPTH_TEST);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_SCISSOR_TEST);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_BLEND);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_CULL_FACE);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_LIGHTING);
+    mGLSupport.getStateCacheManager()->setDisabled(GL_FOG);
     
     /// Save and reset matrices
     glMatrixMode(GL_MODELVIEW);
@@ -623,7 +623,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     glLoadIdentity();
     
     /// Set up source texture
-    glBindTexture(src->mTarget, src->mTextureID);
+    mGLSupport.getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
     
     /// Set filtering modes depending on the dimensions and source
     if(srcBox.getWidth()==dstBox.getWidth() &&
@@ -631,8 +631,8 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         srcBox.getDepth()==dstBox.getDepth())
     {
         /// Dimensions match -- use nearest filtering (fastest and pixel correct)
-        glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
     else
     {
@@ -642,25 +642,26 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         {
             /// Automatic mipmaps, we can safely use trilinear filter which
             /// brings greatly imporoved quality for minimisation.
-            glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+            mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
         else
         {
             /// Manual mipmaps, stay safe with bilinear filtering so that no
             /// intermipmap leakage occurs.
-            glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
     }
+
     /// Clamp to edge (fastest)
-    glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     
     /// Set origin base level mipmap to make sure we source from the right mip
     /// level.
-    glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, src->mLevel);
+    mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, src->mLevel);
     
     /// Store old binding so it can be restored later
     GLint oldfb;
@@ -675,8 +676,8 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         /// If target format not directly supported, create intermediate texture
         GLenum tempFormat = GLPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat), mHwGamma);
         glGenTextures(1, &tempTex);
-        glBindTexture(GL_TEXTURE_2D, tempTex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        mGLSupport.getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
+        mGLSupport.getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
         /// Allocate temporary texture of the size of the destination area
         glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
             GLPixelUtil::optionalPO2(dstBox.getWidth()), GLPixelUtil::optionalPO2(dstBox.getHeight()), 
@@ -684,16 +685,16 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
             GL_TEXTURE_2D, tempTex, 0);
         /// Set viewport to size of destination slice
-        glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
+        mGLSupport.getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
     }
     else
     {
         /// We are going to bind directly, so set viewport to size and position of destination slice
-        glViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
+        mGLSupport.getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
     }
     
     /// Process each destination slice
-    for(size_t slice=dstBox.front; slice<dstBox.back; ++slice)
+    for(uint32 slice=dstBox.front; slice<dstBox.back; ++slice)
     {
         if(!tempTex)
         {
@@ -713,8 +714,8 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         w = (w+0.5f) / (float)src->mDepth;
         
         /// Finally we're ready to rumble	
-        glBindTexture(src->mTarget, src->mTextureID);
-        glEnable(src->mTarget);
+        mGLSupport.getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
+        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget);
         glBegin(GL_QUADS);
         glTexCoord3f(u1, v1, w);
         glVertex2f(-1.0f, -1.0f);
@@ -725,12 +726,12 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         glTexCoord3f(u1, v2, w);
         glVertex2f(-1.0f, 1.0f);
         glEnd();
-        glDisable(src->mTarget);
+        mGLSupport.getStateCacheManager()->setDisabled(src->mTarget);
         
         if(tempTex)
         {
             /// Copy temporary texture
-            glBindTexture(mTarget, mTextureID);
+            mGLSupport.getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
@@ -759,14 +760,14 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         /// Generate mipmaps
         if(mUsage & TU_AUTOMIPMAP)
         {
-            glBindTexture(mTarget, mTextureID);
+            mGLSupport.getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
             glGenerateMipmapEXT(mTarget);
         }
     }
 
     /// Reset source texture to sane state
-    glBindTexture(src->mTarget, src->mTextureID);
-    glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0);
+    mGLSupport.getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
+    mGLSupport.getStateCacheManager()->setTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0);
     
     /// Detach texture from temporary framebuffer
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
@@ -836,11 +837,11 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
     glGenTextures(1, &id);
     
     /// Set texture type
-    glBindTexture(target, id);
+    mGLSupport.getStateCacheManager()->bindGLTexture(target, id);
     
     /// Set automatic mipmap generation; nice for minimisation
-    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 );
-    glTexParameteri(target, GL_GENERATE_MIPMAP, GL_TRUE );
+    mGLSupport.getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 );
+    mGLSupport.getStateCacheManager()->setTexParameteri(target, GL_GENERATE_MIPMAP, GL_TRUE );
     
     /// Allocate texture memory
     if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY_EXT)
@@ -849,7 +850,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
         glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     /// GL texture buffer
-    GLTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
+    GLTextureBuffer tex(mGLSupport, StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
     
     /// Upload data to 0,0,0 in temporary texture
 	Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
@@ -871,7 +872,7 @@ RenderTexture *GLTextureBuffer::getRenderTarget(size_t zoffset)
 }
 //********* GLRenderBuffer
 //----------------------------------------------------------------------------- 
-GLRenderBuffer::GLRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
+GLRenderBuffer::GLRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
     GLHardwarePixelBuffer(width, height, 1, GLPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY),
     mRenderbufferID(0)
 {
@@ -900,7 +901,7 @@ GLRenderBuffer::~GLRenderBuffer()
     glDeleteRenderbuffersEXT(1, &mRenderbufferID);
 }
 //-----------------------------------------------------------------------------  
-void GLRenderBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+void GLRenderBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
 {
     assert(zoffset < mDepth);
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, attachment,

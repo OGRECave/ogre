@@ -123,7 +123,8 @@ namespace Ogre {
             default:                                                            break; \
         } \
         char msgBuf[4096]; \
-        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, #glFunc); \
+        StringVector tokens = StringUtil::split(#glFunc, "("); \
+        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
         LogManager::getSingleton().logMessage(msgBuf); \
     } \
 }

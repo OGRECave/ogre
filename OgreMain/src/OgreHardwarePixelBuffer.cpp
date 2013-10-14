@@ -34,7 +34,7 @@ namespace Ogre
 {
   
     //-----------------------------------------------------------------------------    
-    HardwarePixelBuffer::HardwarePixelBuffer(size_t width, size_t height, size_t depth,
+    HardwarePixelBuffer::HardwarePixelBuffer(uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
             HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer):
         HardwareBuffer(usage, useSystemMemory, useShadowBuffer),

@@ -3,6 +3,8 @@
 //Written by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
 #version 300 es
+precision mediump int;
+precision mediump float;
 
 //Vertex input
 in vec4 vertex;

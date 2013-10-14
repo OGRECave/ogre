@@ -327,7 +327,7 @@ namespace Ogre {
     		@param pixelFormat	Format of this buffer
     		@param pixelData    Pointer to the actual data
     	*/
-    	PixelBox(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, void *pixelData=0):
+    	PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
     		Box(0, 0, 0, width, height, depth),
     		data(pixelData), format(pixelFormat)
     	{
@@ -390,6 +390,11 @@ namespace Ogre {
       	*/
       	PixelBox getSubVolume(const Box &def) const;
         
+      	/** Return a data pointer pointing to top left front pixel of the pixel box.
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        void* getTopLeftFrontPixelPtr() const;
+        
         /**
          * Get colour value from a certain location in the PixelBox. The z coordinate
          * is only valid for cubemaps and volume textures. This uses the first (largest)
@@ -444,7 +449,7 @@ namespace Ogre {
 				width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
 				case, this does serious magic.
 		*/
-		static size_t getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format);
+		static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
 		
         /** Returns the property flags for this pixel format
           @return
@@ -492,7 +497,7 @@ namespace Ogre {
 		/** Gives the masks for the R, G, B and A component
 		  @note			Only valid for native endian formats
         */
-        static void getBitMasks(PixelFormat format, uint32 rgba[4]);
+        static void getBitMasks(PixelFormat format, uint64 rgba[4]);
 
 		/** Gives the bit shifts for R, G, B and A component
 		@note			Only valid for native endian formats

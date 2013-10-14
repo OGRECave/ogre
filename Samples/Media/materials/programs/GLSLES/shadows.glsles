@@ -22,6 +22,8 @@ Adapted by Matias N. Goldberg (Dark Sylinc) to GLSL based on the Cg file shadows
 */
 
 #version 300 es
+precision mediump int;
+precision mediump float;
 
 // Simple PCF 
 // Number of samples in one dimension (square for total samples)

@@ -51,7 +51,7 @@ namespace Ogre {
 
     void GLES2HardwareVertexBuffer::setFence(void)
     {
-        if(!mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
+        if(!mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
         {
             OGRE_CHECK_GL_ERROR(mFence = glFenceSyncAPPLE(GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE, 0));
         }
@@ -116,7 +116,7 @@ namespace Ogre {
         {
             access = GL_MAP_WRITE_BIT_EXT;
             access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
-            if(options == HBL_DISCARD)
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
                 access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
@@ -130,7 +130,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ARRAY_BUFFER, offset, length, access));
 #else
-        if(options == HBL_DISCARD)
+        if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
         {
             // Discard the buffer
             OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
@@ -148,7 +148,7 @@ namespace Ogre {
                         "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
         }
 
-        if(mFence && (getGLSupport()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
+        if(mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
         {
             GLenum result;
             OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
@@ -200,7 +200,7 @@ namespace Ogre {
         }
         else
         {
-            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;

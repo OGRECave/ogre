@@ -65,6 +65,17 @@ namespace Ogre {
         /** Initialises the manager, only to be called by OGRE internally. */
         void _initialise(void);
 
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+
+		/// Create a new mesh
+		/// @see ResourceManager::createResource
+		MeshPtr create (const String& name, const String& group,
+							bool isManual = false, ManualResourceLoader* loader = 0,
+							const NameValuePairList* createParams = 0);
+
         /** Create a new mesh, or retrieve an existing one with the same
             name if it already exists.
             @param vertexBufferUsage The usage flags with which the vertex buffer(s)

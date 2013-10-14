@@ -232,7 +232,7 @@ namespace Ogre {
 		bool requiresTextureFlipping() const { return false; }
 
 		/// Override needed to deal with FSAA
-		void swapBuffers(bool waitForVSync = true);
+		void swapBuffers();
 
 	};
 

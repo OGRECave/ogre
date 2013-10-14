@@ -1403,7 +1403,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     AxisAlignedBoxSceneQuery*
-    PCZSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
+    PCZSceneManager::createAABBQuery(const AxisAlignedBox& box, uint32 mask)
     {
         PCZAxisAlignedBoxSceneQuery* q = OGRE_NEW PCZAxisAlignedBoxSceneQuery(this);
         q->setBox(box);
@@ -1412,7 +1412,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     SphereSceneQuery*
-    PCZSceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
+    PCZSceneManager::createSphereQuery(const Sphere& sphere, uint32 mask)
     {
         PCZSphereSceneQuery* q = OGRE_NEW PCZSphereSceneQuery(this);
         q->setSphere(sphere);
@@ -1422,7 +1422,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     PlaneBoundedVolumeListSceneQuery*
     PCZSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes,
-            unsigned long mask)
+            uint32 mask)
     {
         PCZPlaneBoundedVolumeListSceneQuery* q = OGRE_NEW PCZPlaneBoundedVolumeListSceneQuery(this);
         q->setVolumes(volumes);
@@ -1432,7 +1432,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     RaySceneQuery*
-    PCZSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
+    PCZSceneManager::createRayQuery(const Ray& ray, uint32 mask)
     {
         PCZRaySceneQuery* q = OGRE_NEW PCZRaySceneQuery(this);
         q->setRay(ray);
@@ -1441,7 +1441,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     IntersectionSceneQuery*
-    PCZSceneManager::createIntersectionQuery(unsigned long mask)
+    PCZSceneManager::createIntersectionQuery(uint32 mask)
     {
 
         PCZIntersectionSceneQuery* q = OGRE_NEW PCZIntersectionSceneQuery(this);

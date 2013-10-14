@@ -487,7 +487,7 @@ namespace Ogre {
     void BorderPanelOverlayElement::setBorderMaterialName(const String& name)
     {
         mBorderMaterialName = name;
-        mBorderMaterial = MaterialManager::getSingleton().getByName(name).staticCast<Material>();
+        mBorderMaterial = MaterialManager::getSingleton().getByName(name);
         if (mBorderMaterial.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
 				"BorderPanelOverlayElement::setBorderMaterialName" );

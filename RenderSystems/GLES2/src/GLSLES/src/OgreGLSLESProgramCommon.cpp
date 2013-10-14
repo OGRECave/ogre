@@ -30,6 +30,7 @@
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -67,12 +68,18 @@ namespace Ogre {
                         "Attempted to create a shader program without both a vertex and fragment program.",
                         "GLSLESProgramCommon::GLSLESProgramCommon");
         }
+
+        // Initialise uniform cache
+		mUniformCache = new GLES2UniformCache();
 	}
     
 	//-----------------------------------------------------------------------
 	GLSLESProgramCommon::~GLSLESProgramCommon(void)
 	{
 		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+
+        delete mUniformCache;
+        mUniformCache = 0;
 	}
     
 	//-----------------------------------------------------------------------
@@ -174,9 +181,9 @@ namespace Ogre {
 		// get size of binary
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
-        if(getGLSupport()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+        if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
         {
-            GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+            GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
 
             // load binary
             OGRE_CHECK_GL_ERROR(glProgramBinaryOES(mGLProgramHandle,

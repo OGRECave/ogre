@@ -312,7 +312,7 @@ namespace Ogre {
         String shaderName;
         int face;
         face = q3lvl.mNumFaces;
-        int matHandle;
+        ResourceHandle matHandle;
         String meshName;
 
         String resourceGroup = ResourceGroupManager::getSingleton().getWorldResourceGroupName();
@@ -344,7 +344,7 @@ namespace Ogre {
 			tmp << q3lvl.mShaders[shadIdx].name << "#" << q3lvl.mFaces[face].lm_texture;
 			shaderName = tmp.str();
 
-            MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName).staticCast<Material>();
+            MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName);
             if (shadMat.isNull())
             {
                 // Build new material
@@ -368,7 +368,7 @@ namespace Ogre {
                 else
                 {
                     // No shader script, try default type texture
-                    shadMat = mm.create(shaderName, resourceGroup).staticCast<Material>();
+                    shadMat = mm.create(shaderName, resourceGroup);
                     Pass *shadPass = shadMat->getTechnique(0)->getPass(0);
                     // Try jpg
                     TextureUnitState* tex = 0;
@@ -888,13 +888,13 @@ namespace Ogre {
 
                 if (params[0] == "origin")
                 {
-                    origin.x = atof(params[1].c_str());
-                    origin.y = atof(params[2].c_str());
-                    origin.z = atof(params[3].c_str());
+                    origin.x = static_cast<Real>(atof(params[1].c_str()));
+                    origin.y = static_cast<Real>(atof(params[2].c_str()));
+                    origin.z = static_cast<Real>(atof(params[3].c_str()));
                 }
                 if (params[0] == "angle")
                 {
-                    angle = Degree(atof(params[1].c_str()));
+                    angle = Degree(static_cast<Real>(atof(params[1].c_str())));
                 }
                 if (params[0] == "classname" && params[1] == "info_player_deathmatch")
                 {

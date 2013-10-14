@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre
 {
@@ -46,7 +47,11 @@ namespace Ogre
             {
                 OGRE_CHECK_GL_ERROR(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            else if(glIsProgram(obj))
+            {
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
+            }
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
@@ -56,10 +61,6 @@ namespace Ogre
                 }
             }
 #endif
-            else if(glIsProgram(obj))
-            {
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
-            }
 
 			if (infologLength > 1)
 			{
@@ -72,7 +73,11 @@ namespace Ogre
                 {
                     OGRE_CHECK_GL_ERROR(glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog));
                 }
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+                else if(glIsProgram(obj))
+                {
+                    OGRE_CHECK_GL_ERROR(glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog));
+                }
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
                     OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
@@ -82,17 +87,13 @@ namespace Ogre
                     }
                 }
 #endif
-                else if(glIsProgram(obj))
-                {
-                    OGRE_CHECK_GL_ERROR(glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog));
-                }
 
 				if (strlen(infoLog) > 0)
 				{
 					logMessage += "\n" + String(infoLog);
 				}
 
-				OGRE_DELETE [] infoLog;
+				delete [] infoLog;
 
 				if (logMessage.size() > 0)
 				{
@@ -105,7 +106,6 @@ namespace Ogre
 				}
 			}
 		}
-
 
 		return logMessage;
 	}

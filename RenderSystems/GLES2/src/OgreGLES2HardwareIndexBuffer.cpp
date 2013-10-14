@@ -136,13 +136,11 @@ namespace Ogre {
         {
             access = GL_MAP_WRITE_BIT_EXT;
             access |= GL_MAP_FLUSH_EXPLICIT_BIT_EXT;
-            if(options == HBL_DISCARD)
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
                 access |= GL_MAP_INVALIDATE_RANGE_BIT_EXT;
             }
-            // We explicitly flush when the buffer is unlocked
-            access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
         }
         else if (options == HBL_READ_ONLY)
             access = GL_MAP_READ_BIT_EXT;
@@ -152,7 +150,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));
 #else
         // Use glMapBuffer
-        if(options == HBL_DISCARD)
+        if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
         {
             // Discard the buffer
             OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
@@ -190,7 +188,7 @@ namespace Ogre {
         }
         else
         {
-            if(getGLSupport()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;

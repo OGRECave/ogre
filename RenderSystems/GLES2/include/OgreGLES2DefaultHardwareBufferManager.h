@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {

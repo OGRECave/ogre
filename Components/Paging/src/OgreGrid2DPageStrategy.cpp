@@ -159,8 +159,8 @@ namespace Ogre
 		relPos.x += offset;
 		relPos.y += offset;
 
-		*x = static_cast<long>(floor(relPos.x / mCellSize));
-		*y = static_cast<long>(floor(relPos.y / mCellSize));
+		*x = static_cast<int32>(floor(relPos.x / mCellSize));
+		*y = static_cast<int32>(floor(relPos.y / mCellSize));
 
 	}
 	//---------------------------------------------------------------------
@@ -400,10 +400,10 @@ namespace Ogre
 			}
 
 			String matName = "Ogre/G2D/Debug";
-			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
 			if (mat.isNull())
 			{
-				mat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+				mat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 				Pass* pass = mat->getTechnique(0)->getPass(0);
 				pass->setLightingEnabled(false);
 				pass->setVertexColourTracking(TVC_AMBIENT);

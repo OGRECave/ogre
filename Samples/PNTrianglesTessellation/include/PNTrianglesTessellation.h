@@ -121,7 +121,7 @@ public:
 	{
 		if( slider->getName() == "tessellationAmount" )
 		{
-			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( mMaterialMenu->getSelectedItem() ).staticCast<Material>();
+			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( mMaterialMenu->getSelectedItem() );
 			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
 		}
 	}

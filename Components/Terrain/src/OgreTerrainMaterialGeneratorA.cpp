@@ -233,10 +233,10 @@ namespace Ogre
 			--freeTextureUnits;
 		if (isShadowingEnabled(HIGH_LOD, terrain))
 		{
-			uint numShadowTextures = 1;
+			uint8 numShadowTextures = 1;
 			if (getReceiveDynamicShadowsPSSM())
 			{
-				numShadowTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
+				numShadowTextures = (uint8)getReceiveDynamicShadowsPSSM()->getSplitCount();
 			}
 			freeTextureUnits -= numShadowTextures;
 		}
@@ -258,10 +258,10 @@ namespace Ogre
 			// it's important that the names are deterministic for a given terrain, so
 			// use the terrain pointer as an ID
 			const String& matName = terrain->getMaterialName();
-			mat = matMgr.getByName(matName).staticCast<Material>();
+			mat = matMgr.getByName(matName);
 			if (mat.isNull())
 			{
-				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 			}
 		}
 		// clear everything
@@ -308,10 +308,10 @@ namespace Ogre
 			// it's important that the names are deterministic for a given terrain, so
 			// use the terrain pointer as an ID
 			const String& matName = terrain->getMaterialName() + "/comp";
-			mat = matMgr.getByName(matName).staticCast<Material>();
+			mat = matMgr.getByName(matName);
 			if (mat.isNull())
 			{
-				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+				mat = matMgr.create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 			}
 		}
 		// clear everything
@@ -432,7 +432,7 @@ namespace Ogre
 			uint numTextures = 1;
 			if (getReceiveDynamicShadowsPSSM())
 			{
-				numTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
+				numTextures = (uint)getReceiveDynamicShadowsPSSM()->getSplitCount();
 			}
 			for (uint i = 0; i < numTextures; ++i)
 			{
@@ -556,7 +556,7 @@ namespace Ogre
 			uint numTextures = 1;
 			if (prof->getReceiveDynamicShadowsPSSM())
 			{
-				numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+				numTextures = (uint)prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 			}
 			for (uint i = 0; i < numTextures; ++i)
 			{
@@ -600,7 +600,7 @@ namespace Ogre
 			if (prof->getReceiveDynamicShadowsPSSM())
 			{
 				PSSMShadowCameraSetup* pssm = prof->getReceiveDynamicShadowsPSSM();
-				numTextures = pssm->getSplitCount();
+				numTextures = (uint)pssm->getSplitCount();
 				Vector4 splitPoints;
 				const PSSMShadowCameraSetup::SplitPointList& splitPointList = pssm->getSplitPoints();
 				// Populate from split point 1, not 0, since split 0 isn't useful (usually 0)
@@ -661,7 +661,7 @@ namespace Ogre
 
                 uint numShadowTextures = 1;
                 if (prof->getReceiveDynamicShadowsPSSM())
-                    numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+                    numShadowTextures = (uint)prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 
                 for (uint i = 0; i < numShadowTextures; ++i)
                 {

@@ -122,7 +122,7 @@ namespace Ogre
 	{
 		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() ).staticCast<Material>();
+																	mMeshReference->getGroup() );
 		InstanceBatch *batch = 0;
 
 		//Base material couldn't be found
@@ -207,7 +207,7 @@ namespace Ogre
 
 		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() ).staticCast<Material>();
+																	mMeshReference->getGroup() );
 
 		//Get the array of batches grouped by this material
 		InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialName];
@@ -619,7 +619,7 @@ namespace Ogre
 					break;
 
 				VertexBoneAssignment boneAssignment = (*it).second;
-				boneAssignment.vertexIndex = boneAssignment.vertexIndex - curVertexOffset;
+				boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
 				subMesh->addBoneAssignment(boneAssignment);
 			}
 			curVertexOffset = newVertexData->vertexCount + 1;

@@ -287,7 +287,7 @@ namespace Ogre
 
 			float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
-			const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+			const size_t maxPixelsPerLine = std::min( static_cast<size_t>(mMatrixTexture->getWidth()), mMaxFloatsPerLine >> 2 );
 
 			//Calculate UV offsets, which change per instance
 			for( size_t i=0; i<mInstancesPerBatch; ++i )

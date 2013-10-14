@@ -61,7 +61,6 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 ProgramManager* ProgramManager::getSingletonPtr()
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 
@@ -410,14 +409,14 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	}
 
 	// Try to get program by name.
-	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName).staticCast<HighLevelGpuProgram>();
+	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
 	{
 		// Create new GPU program.
 		pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType()).staticCast<HighLevelGpuProgram>();
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
 
 		// Case cache directory specified -> create program from file.
 		if (cachePath.empty() == false)
@@ -466,9 +465,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		
 		pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
-		// HLSL program requires specific target profile settings - we have to split the profile string.
 		if (language == "hlsl")
 		{
+			// HLSL program requires specific target profile settings - we have to split the profile string.
 			StringVector::const_iterator it = profilesList.begin();
 			StringVector::const_iterator itEnd = profilesList.end();
 			
@@ -482,6 +481,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 			}
 
 			pGpuProgram->setParameter("enable_backwards_compatibility", "true");
+			pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
 		}
 		
 		pGpuProgram->setParameter("profiles", profiles);

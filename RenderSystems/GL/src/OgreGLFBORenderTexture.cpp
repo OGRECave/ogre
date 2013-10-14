@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}
@@ -143,6 +143,9 @@ static const size_t depthBits[] =
 
     void GLFBOManager::_createTempFramebuffer(GLuint fmt, GLuint &fb, GLuint &tid)
     {
+        // NB we bypass state cache, this method is only called on startup and not after
+        // GLStateCacheManager::initializeCache
+
         glGenFramebuffersEXT(1, &fb);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
         if (fmt != GL_NONE)
@@ -501,7 +504,7 @@ static const size_t depthBits[] =
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
     
-    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested

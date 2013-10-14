@@ -585,7 +585,7 @@ static size_t dummyCounter = 0;
         MaterialManager::getSingleton().create(
             "c" + StringConverter::toString(dummyCounter) + "/" + srcName,
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME
-        ).staticCast<Material>();
+        );
     ++dummyCounter;
     /// This is safe, as we hold a private reference
     /// XXX does not compile due to ResourcePtr conversion :
@@ -1016,7 +1016,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
  		if(refTexDef == 0)
   		{
  			//Still NULL. Try global search.
- 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName).staticCast<Compositor>();
+            const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
  			if(!refComp.isNull())
  			{
  				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(name);
@@ -1036,6 +1036,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1069,7 +1070,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 			case CompositionTechnique::TS_GLOBAL:
 			{
 				//Chain and global case - the referenced compositor will know how to handle
-				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName).staticCast<Compositor>();
+				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
 				if(refComp.isNull())
 				{
 					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
@@ -1125,7 +1126,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
  		if(refTexDef == 0)
  		{
  			//Still NULL. Try global search.
- 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName).staticCast<Compositor>();
+            const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
  			if(!refComp.isNull())
  			{
  				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(texDef->refTexName);
@@ -1145,6 +1146,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1178,7 +1180,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
 			case CompositionTechnique::TS_GLOBAL:
 			{
 				//Chain and global case - the referenced compositor will know how to handle
-				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName).staticCast<Compositor>();
+				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
 				if(refComp.isNull())
 				{
 					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",

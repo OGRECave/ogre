@@ -898,7 +898,7 @@ namespace Ogre {
 	ShadowCaster::ShadowRenderableListIterator
 	StaticGeometry::Region::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
-		HardwareIndexBufferSharedPtr* indexBuffer,
+		HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
 		// Calculate the object space light details
@@ -920,8 +920,8 @@ namespace Ogre {
 		updateEdgeListLightFacing(edgeList, lightPos);
 
 		// Generate indexes and update renderables
-		generateShadowVolume(edgeList, *indexBuffer, light,
-			shadowRendList, flags);
+		generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
+			light, shadowRendList, flags);
 
 
 		return ShadowCaster::ShadowRenderableListIterator(shadowRendList.begin(), shadowRendList.end());
@@ -1308,7 +1308,7 @@ namespace Ogre {
 	void StaticGeometry::MaterialBucket::build(bool stencilShadows)
 	{
 		mTechnique = 0;
-		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName).staticCast<Material>();
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 		if (mMaterial.isNull())
 		{
 			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,

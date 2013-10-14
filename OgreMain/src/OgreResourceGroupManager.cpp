@@ -1111,7 +1111,7 @@ namespace Ogre {
 			// Retrieve the appropriate manager
 			ResourceManager* mgr = _getResourceManager(dcl.resourceType);
 			// Create the resource
-			ResourcePtr res = mgr->create(dcl.resourceName, grp->name,
+			ResourcePtr res = mgr->createResource(dcl.resourceName, grp->name,
                 dcl.loader != 0, dcl.loader, &dcl.parameters);
 			// Add resource to load list
 			ResourceGroup::LoadResourceOrderMap::iterator li = 
@@ -1122,11 +1122,6 @@ namespace Ogre {
 				loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
 				grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
 			}
-			else
-			{
-				loadList = li->second;
-			}
-
 		}
 
 	}

@@ -470,7 +470,7 @@ namespace Ogre {
 	{
 		// is the name valid and already loaded?
 		// check with the high level program manager to see if it was loaded
-		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name).staticCast<HighLevelGpuProgram>();
+		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
 		if (!hlProgram.isNull())
 		{
 			if (hlProgram->getSyntaxCode() == "glsl")
@@ -559,7 +559,7 @@ namespace Ogre {
 			vector< String >::type errors = StringUtil::split(message, "\n");
 
 			// going from the end so when we delete a line the numbers of the lines before will not change
-			for(int i = errors.size() - 1 ; i != -1 ; i--)
+			for(int i = (int)errors.size() - 1 ; i != -1 ; i--)
 			{
 				String & curError = errors[i];
 				size_t foundPos = curError.find(precisionQualifierErrorString);
@@ -579,7 +579,7 @@ namespace Ogre {
 				}
 			}	
 			// rebuild source
-			std::stringstream newSource;	
+			StringStream newSource;
 			for(size_t i = 0; i < linesOfSource.size()  ; i++)
 			{
 				newSource << linesOfSource[i] << "\n";

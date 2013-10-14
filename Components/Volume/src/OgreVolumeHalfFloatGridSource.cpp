@@ -36,14 +36,11 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    float HalfFloatGridSource::getVolumeGridValue(int x, int y, int z) const
+    float HalfFloatGridSource::getVolumeGridValue(size_t x, size_t y, size_t z) const
     {
         x = x >= mWidth ? mWidth - 1 : x;
-        x = x < 0 ? 0 : x;
         y = y >= mHeight ? mHeight - 1 : y;
-        y = y < 0 ? 0 : y;
         z = z >= mDepth ? mDepth - 1 : z;
-        z = z < 0 ? 0 : z;
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
 
@@ -92,10 +89,10 @@ namespace Volume {
         ser.read<size_t>(&width);
         ser.read<size_t>(&height);
         ser.read<size_t>(&depth);
-        mWidth = (int)width;
-        mHeight = (int)height;
-        mDepth = (int)depth;
-        mDepthTimesHeight = mDepth * mHeight;
+        mWidth = static_cast<int>(width);
+        mHeight = static_cast<int>(height);
+        mDepth = static_cast<int>(depth);
+        mDepthTimesHeight = static_cast<int>(mDepth * mHeight);
         
         Vector3 worldDimension = readTo - readFrom;
         mPosXScale = (Real)1.0 / (Real)worldDimension.x * (Real)mWidth;

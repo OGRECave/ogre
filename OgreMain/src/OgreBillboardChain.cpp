@@ -729,7 +729,7 @@ namespace Ogre {
 	void BillboardChain::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
 	{
 		mMaterialName = name;
-		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName).staticCast<Material>();
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName);
 
 		if (mMaterial.isNull())
 		{
@@ -737,7 +737,7 @@ namespace Ogre {
 				" to BillboardChain " + mName + " because this "
 				"Material does not exist. Have you forgotten to define it in a "
 				".material script?");
-			mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting").staticCast<Material>();
+			mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
 			if (mMaterial.isNull())
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "

@@ -1,11 +1,12 @@
 varying vec2 texCoord[5];
+attribute vec2 uv0;
+uniform mat4 worldViewProj;
 
 void main()                    
 {
-	vec2 inPos = sign(gl_Vertex.xy);
-	gl_Position = vec4(inPos.xy, 0.0, 1.0);
+	gl_Position = worldViewProj * gl_Vertex;
 	
-	texCoord[0]  = (vec2(inPos.x, -inPos.y) + 1.0)/2.0;
+	texCoord[0]  = uv0;
 	
 	const float size = 0.01;
 	texCoord[1] = texCoord[0] + vec2(0.0, 1.0)*size;

@@ -88,7 +88,7 @@ namespace Ogre
 		void windowMovedOrResized();
 		
 		/** @copydoc RenderWindow::swapBuffers */
-		void swapBuffers(bool waitForVSync);
+		void swapBuffers();
 		
 		/** @copydoc RenderTarget::copyContentsToMemory */
 		void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);

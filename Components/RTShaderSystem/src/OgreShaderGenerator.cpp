@@ -63,7 +63,6 @@ String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 //-----------------------------------------------------------------------
 ShaderGenerator* ShaderGenerator::getSingletonPtr()
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 
@@ -719,7 +718,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
     OGRE_LOCK_AUTO_MUTEX;
 
 	// Make sure material exists.
-	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
+	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	if (srcMat.isNull() == true)
 		return false;
 
@@ -913,8 +912,8 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
 	//
 
 	// Make sure material exists.
-	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(srcMaterialName, srcGroupName).staticCast<Material>();
-	MaterialPtr dstMat = MaterialManager::getSingleton().getByName(dstMaterialName, dstGroupName).staticCast<Material>();
+	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(srcMaterialName, srcGroupName);
+	MaterialPtr dstMat = MaterialManager::getSingleton().getByName(dstMaterialName, dstGroupName);
 	if ((srcMat.isNull() == true) || (dstMat.isNull() == true) || (srcMat == dstMat))
 		return false;
 
@@ -1035,7 +1034,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
  Technique* ShaderGenerator::findSourceTechnique(const String& materialName, 
 				const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable)
  {
-	 MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
+     MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	 Material::TechniqueIterator itMatTechniques = mat->getTechniqueIterator();
 	 
 
@@ -1648,7 +1647,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 
 	if (MaterialManager::getSingleton().resourceExists(materialName))
 	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName).staticCast<Material>();
+		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	
 		// Remove the destination technique from parent material.
 		for (unsigned int i=0; i < mat->getNumTechniques(); ++i)

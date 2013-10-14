@@ -190,7 +190,7 @@ void GTKWindow::resize(unsigned int width, unsigned int height)
     		mGtkWindow->resize(width, height);
 }
 
-void GTKWindow::swapBuffers(bool waitForVSync)
+void GTKWindow::swapBuffers()
 {
     	Glib::RefPtr<Gdk::GL::Window> glwindow = ogre->get_gl_window();
     	glwindow->swap_buffers();
@@ -233,9 +233,9 @@ void GTKWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     }
 
 	glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-	glReadPixels((GLint)dst.left, (GLint)dst.top,
-				 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-				 format, type, dst.data);
+    glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                 format, type, dst.getTopLeftFrontPixelPtr());
 
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);

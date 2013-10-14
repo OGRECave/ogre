@@ -87,7 +87,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
             {
                 materialName = cf.getSetting("material", secName);
 				
-				Ogre::MaterialPtr curMat = Ogre::MaterialManager::getSingleton().getByName(materialName).staticCast<Ogre::Material>();
+				Ogre::MaterialPtr curMat = Ogre::MaterialManager::getSingleton().getByName(materialName);
 				curMat->load();
 				Ogre::Technique * curTec = curMat->getBestTechnique();
 				if (!curTec || !curTec->isSupported())

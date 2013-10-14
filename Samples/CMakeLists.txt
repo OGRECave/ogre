@@ -31,7 +31,7 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-	add_definitions(-DUSE_RTSHADER_SYSTEM)
+	add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
   endif ()

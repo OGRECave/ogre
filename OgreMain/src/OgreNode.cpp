@@ -538,13 +538,15 @@ namespace Ogre {
 	void Node::_setDerivedPosition( const Vector3& pos )
 	{
 		//find where the node would end up in parent's local space
-		setPosition( mParent->convertWorldToLocalPosition( pos ) );
+        if(mParent)
+            setPosition( mParent->convertWorldToLocalPosition( pos ) );
 	}
 	//-----------------------------------------------------------------------
 	void Node::_setDerivedOrientation( const Quaternion& q )
 	{
 		//find where the node would end up in parent's local space
-		setOrientation( mParent->convertWorldToLocalOrientation( q ) );
+        if(mParent)
+            setOrientation( mParent->convertWorldToLocalOrientation( q ) );
 	}
 
     //-----------------------------------------------------------------------
@@ -856,10 +858,10 @@ namespace Ogre {
 		: mParent(parent)
 	{
 		String matName = "Ogre/Debug/AxesMat";
-		mMat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+		mMat = MaterialManager::getSingleton().getByName(matName);
 		if (mMat.isNull())
 		{
-			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
+			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 			Pass* p = mMat->getTechnique(0)->getPass(0);
 			p->setLightingEnabled(false);
 			p->setPolygonModeOverrideable(false);
@@ -870,7 +872,7 @@ namespace Ogre {
 		}
 
 		String meshName = "Ogre/Debug/AxesMesh";
-		mMeshPtr = MeshManager::getSingleton().getByName(meshName).staticCast<Mesh>();
+		mMeshPtr = MeshManager::getSingleton().getByName(meshName);
 		if (mMeshPtr.isNull())
 		{
 			ManualObject mo("tmp");
@@ -929,9 +931,9 @@ namespace Ogre {
 
 			// indices
 			// 6 arrows
-			for (size_t i = 0; i < 6; ++i)
+			for (uint32 i = 0; i < 6; ++i)
 			{
-				size_t base = i * 7; 
+				uint32 base = i * 7;
 				mo.triangle(base + 0, base + 1, base + 2);
 				mo.triangle(base + 0, base + 2, base + 3);
 				mo.triangle(base + 4, base + 5, base + 6);

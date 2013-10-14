@@ -59,7 +59,7 @@ namespace Ogre
         /** Overridden - see RenderWindow */
         virtual void resize( unsigned int width, unsigned int height ) = 0;
         /** Overridden - see RenderWindow */
-        virtual void swapBuffers( bool waitForVSync ) = 0;
+        virtual void swapBuffers( ) = 0;
         /** Overridden - see RenderTarget */
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 		/** Overridden - see RenderTarget */

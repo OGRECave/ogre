@@ -1,24 +1,28 @@
-#version 100
+#version 300 es
 
 precision mediump int;
 precision mediump float;
 
-sampler2D RT : register(s0);
-sampler3D pattern : register(s1);
+in vec4 pos;
+in vec2 oUv0;
 
-float4 Halftone_ps(	float4 pos : POSITION,
-      float2 TexCoord : TEXCOORD0,
-			uniform float2 numTiles,
-			uniform float2 iNumTiles,
-			uniform float2 iNumTiles2,
-			uniform float4 lum) : COLOR
-{	
-	float3 local;
-	local.xy = fmod(TexCoord, iNumTiles);
-	float2 middle = TexCoord - local.xy;
+uniform vec2 numTiles;
+uniform vec2 iNumTiles;
+uniform vec2 iNumTiles2;
+uniform vec4 lum;
+uniform sampler2D RT;
+uniform lowp sampler3D noise;
+
+out vec4 fragColour;
+
+void main()
+{
+	vec3 local;
+	local.xy = mod(oUv0, iNumTiles);
+	vec2 middle = oUv0 - local.xy;
 	local.xy = local.xy * numTiles;
 	middle +=  iNumTiles2;
-	local.z = dot(tex2D(RT, middle ) , lum);
-	float4 c = tex3D(pattern,local).a;
-	return c;
+	local.z = dot(texture(RT, middle), lum);
+	vec4 c = vec4(texture(noise,local).r);
+	fragColour = c;
 }

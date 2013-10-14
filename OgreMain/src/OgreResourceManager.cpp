@@ -51,7 +51,7 @@ namespace Ogre {
         removeAll();
     }
 	//-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::create(const String& name, const String& group, 
+	ResourcePtr ResourceManager::createResource(const String& name, const String& group,
 		bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
 	{
 		// Call creation implementation
@@ -76,12 +76,12 @@ namespace Ogre {
 		// Lock for the whole get / insert
             OGRE_LOCK_AUTO_MUTEX;
 
-		ResourcePtr res = getByName(name, group);
+		ResourcePtr res = getResourceByName(name, group);
 		bool created = false;
 		if (res.isNull())
 		{
 			created = true;
-			res = create(name, group, isManual, loader, params);
+			res = createResource(name, group, isManual, loader, params);
 		}
 
 		return ResourceCreateOrRetrieveResult(res, created);
@@ -234,7 +234,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::unload(const String& name)
 	{
-		ResourcePtr res = getByName(name);
+		ResourcePtr res = getResourceByName(name);
 
 		if (!res.isNull())
 		{
@@ -337,7 +337,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::remove(const String& name)
 	{
-		ResourcePtr res = getByName(name);
+		ResourcePtr res = getResourceByName(name);
 
 		if (!res.isNull())
 		{
@@ -391,7 +391,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+    ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {		
 		ResourcePtr res;
 

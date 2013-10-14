@@ -241,7 +241,7 @@ namespace Ogre {
         // bool useSharedVertices
         writeBools(&s->useSharedVertices, 1);
 
-		unsigned int indexCount = s->indexData->indexCount;
+		unsigned int indexCount = static_cast<unsigned int>(s->indexData->indexCount);
         writeInts(&indexCount, 1);
 
         // bool indexes32Bit
@@ -395,7 +395,7 @@ namespace Ogre {
 		// Header
         writeChunkHeader(M_GEOMETRY, size);
 
-        unsigned int vertexCount = vertexData->vertexCount;
+        unsigned int vertexCount = static_cast<unsigned int>(vertexData->vertexCount);
         writeInts(&vertexCount, 1);
 
 		// Vertex declaration
@@ -1707,20 +1707,20 @@ namespace Ogre {
                     const EdgeData::Triangle& tri = *t;
                     // unsigned long indexSet;
                     uint32 tmp[3];
-                    tmp[0] = tri.indexSet;
+                    tmp[0] = static_cast<uint32>(tri.indexSet);
                     writeInts(tmp, 1);
                     // unsigned long vertexSet;
-                    tmp[0] = tri.vertexSet;
+                    tmp[0] = static_cast<uint32>(tri.vertexSet);
                     writeInts(tmp, 1);
                     // unsigned long vertIndex[3];
-                    tmp[0] = tri.vertIndex[0];
-                    tmp[1] = tri.vertIndex[1];
-                    tmp[2] = tri.vertIndex[2];
+                    tmp[0] = static_cast<uint32>(tri.vertIndex[0]);
+                    tmp[1] = static_cast<uint32>(tri.vertIndex[1]);
+                    tmp[2] = static_cast<uint32>(tri.vertIndex[2]);
                     writeInts(tmp, 3);
                     // unsigned long sharedVertIndex[3];
-                    tmp[0] = tri.sharedVertIndex[0];
-                    tmp[1] = tri.sharedVertIndex[1];
-                    tmp[2] = tri.sharedVertIndex[2];
+                    tmp[0] = static_cast<uint32>(tri.sharedVertIndex[0]);
+                    tmp[1] = static_cast<uint32>(tri.sharedVertIndex[1]);
+                    tmp[2] = static_cast<uint32>(tri.sharedVertIndex[2]);
                     writeInts(tmp, 3);
                     // float normal[4];
                     writeFloats(&(fni->x), 4);
@@ -1752,16 +1752,16 @@ namespace Ogre {
                         const EdgeData::Edge& edge = *ei;
                         uint32 tmp[2];
                         // unsigned long  triIndex[2]
-                        tmp[0] = edge.triIndex[0];
-                        tmp[1] = edge.triIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.triIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.triIndex[1]);
                         writeInts(tmp, 2);
                         // unsigned long  vertIndex[2]
-                        tmp[0] = edge.vertIndex[0];
-                        tmp[1] = edge.vertIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.vertIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.vertIndex[1]);
                         writeInts(tmp, 2);
                         // unsigned long  sharedVertIndex[2]
-                        tmp[0] = edge.sharedVertIndex[0];
-                        tmp[1] = edge.sharedVertIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.sharedVertIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.sharedVertIndex[1]);
                         writeInts(tmp, 2);
                         // bool degenerate
                         writeBools(&(edge.degenerate), 1);
@@ -3208,20 +3208,20 @@ namespace Ogre {
                     const EdgeData::Triangle& tri = *t;
                     // unsigned long indexSet;
                     uint32 tmp[3];
-                    tmp[0] = tri.indexSet;
+                    tmp[0] = static_cast<uint32>(tri.indexSet);
                     writeInts(tmp, 1);
                     // unsigned long vertexSet;
-                    tmp[0] = tri.vertexSet;
+                    tmp[0] = static_cast<uint32>(tri.vertexSet);
                     writeInts(tmp, 1);
                     // unsigned long vertIndex[3];
-                    tmp[0] = tri.vertIndex[0];
-                    tmp[1] = tri.vertIndex[1];
-                    tmp[2] = tri.vertIndex[2];
+                    tmp[0] = static_cast<uint32>(tri.vertIndex[0]);
+                    tmp[1] = static_cast<uint32>(tri.vertIndex[1]);
+                    tmp[2] = static_cast<uint32>(tri.vertIndex[2]);
                     writeInts(tmp, 3);
                     // unsigned long sharedVertIndex[3];
-                    tmp[0] = tri.sharedVertIndex[0];
-                    tmp[1] = tri.sharedVertIndex[1];
-                    tmp[2] = tri.sharedVertIndex[2];
+                    tmp[0] = static_cast<uint32>(tri.sharedVertIndex[0]);
+                    tmp[1] = static_cast<uint32>(tri.sharedVertIndex[1]);
+                    tmp[2] = static_cast<uint32>(tri.sharedVertIndex[2]);
                     writeInts(tmp, 3);
                     // float normal[4];
                     writeFloats(&(fni->x), 4);
@@ -3247,16 +3247,16 @@ namespace Ogre {
                         const EdgeData::Edge& edge = *ei;
                         uint32 tmp[2];
                         // unsigned long  triIndex[2]
-                        tmp[0] = edge.triIndex[0];
-                        tmp[1] = edge.triIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.triIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.triIndex[1]);
                         writeInts(tmp, 2);
                         // unsigned long  vertIndex[2]
-                        tmp[0] = edge.vertIndex[0];
-                        tmp[1] = edge.vertIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.vertIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.vertIndex[1]);
                         writeInts(tmp, 2);
                         // unsigned long  sharedVertIndex[2]
-                        tmp[0] = edge.sharedVertIndex[0];
-                        tmp[1] = edge.sharedVertIndex[1];
+                        tmp[0] = static_cast<uint32>(edge.sharedVertIndex[0]);
+                        tmp[1] = static_cast<uint32>(edge.sharedVertIndex[1]);
                         writeInts(tmp, 2);
                         // bool degenerate
                         writeBools(&(edge.degenerate), 1);

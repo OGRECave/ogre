@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 
-namespace Ogre  {
+namespace Ogre {
 	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat mFormat)
     {
@@ -60,6 +60,10 @@ namespace Ogre  {
             case PF_FLOAT32_GR:
             case PF_RG8:
                 return GL_RG_EXT;
+#else
+            case PF_BYTE_LA:
+            case PF_SHORT_GR:
+                return GL_LUMINANCE_ALPHA;
 #endif
 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
@@ -77,9 +81,6 @@ namespace Ogre  {
             case PF_RG8:
                 return GL_RG_EXT;
 #endif
-            case PF_BYTE_LA:
-            case PF_SHORT_GR:
-                return GL_LUMINANCE_ALPHA;
 
             // PVRTC compressed formats
 #if GL_IMG_texture_compression_pvrtc && OGRE_PLATFORM != OGRE_PLATFORM_NACL
@@ -130,23 +131,28 @@ namespace Ogre  {
             case PF_X8B8G8R8:
             case PF_SHORT_RGB:
                 return GL_RGB;
-                
-			case PF_X8R8G8B8:
+
+            case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
-            case PF_B8G8R8A8:
-			case PF_R8G8B8A8:
-            case PF_A2R10G10B10:
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            case PF_A8B8G8R8:
-                return GL_BGRA_EXT;
-#else
-            case PF_A8B8G8R8:
-#endif
             case PF_A4R4G4B4:
             case PF_A1R5G5B5:
+            case PF_B8G8R8A8:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                return GL_BGRA_EXT;
+#else
+                return GL_RGBA;
+#endif
+
+            case PF_A8B8G8R8:
+			case PF_R8G8B8A8:
+            case PF_A2R10G10B10:
             case PF_A2B10G10R10:
             case PF_SHORT_RGBA:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && OGRE_NO_GLES3_SUPPORT == 1
+                return GL_BGRA_EXT;
+#else
                 return GL_RGBA;
+#endif
 
             case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
@@ -392,6 +398,9 @@ namespace Ogre  {
 				else
 					return GL_RGB8;
             case PF_A8R8G8B8:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                return GL_BGRA8_EXT;
+#endif
             case PF_B8G8R8A8:
             case PF_A8B8G8R8:
             case PF_R8G8B8A8:
@@ -557,7 +566,11 @@ namespace Ogre  {
             if (hwGamma)
                 return GL_SRGB8;
             else
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                return GL_BGRA8_EXT;
+#else
                 return GL_RGBA8;
+#endif
 #else
             if (hwGamma)
             {
@@ -662,13 +675,10 @@ namespace Ogre  {
                     case GL_FLOAT:
                         return PF_FLOAT32_RGBA;
                     default:
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                        return PF_A8R8G8B8;
-#else
                         return PF_A8B8G8R8;
-#endif
                 }
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            case GL_BGRA8_EXT:
             case GL_BGRA_EXT:
                 return PF_A8R8G8B8;
 #endif
@@ -789,16 +799,19 @@ namespace Ogre  {
         };
     }
 	//-----------------------------------------------------------------------------
-    size_t GLES2PixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth,
+    size_t GLES2PixelUtil::getMaxMipmaps(uint32 width, uint32 height, uint32 depth,
                                       PixelFormat format)
     {
 		size_t count = 0;
         if((width > 0) && (height > 0) && (depth > 0))
         {
             do {
-                if(width>1)		width = width/2;
-                if(height>1)	height = height/2;
-                if(depth>1)		depth = depth/2;
+                if(width > 1)
+                    width = width / 2;
+                if(height > 1)
+                    height = height / 2;
+                if(depth > 1)
+                    depth = depth / 2;
                 /*
                  NOT needed, compressed formats will have mipmaps up to 1x1
                  if(PixelUtil::isValidExtent(width, height, depth, format))
@@ -807,14 +820,14 @@ namespace Ogre  {
                  break;
                  */
                 
-                count ++;
+                count++;
             } while(!(width == 1 && height == 1 && depth == 1));
         }		
 		return count;
     }
 	//-----------------------------------------------------------------------------
     // TODO: Remove
-    size_t GLES2PixelUtil::optionalPO2(size_t value)
+    uint32 GLES2PixelUtil::optionalPO2(uint32 value)
     {
         const RenderSystemCapabilities *caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
@@ -825,7 +838,7 @@ namespace Ogre  {
         }
         else
         {
-            return Bitwise::firstPO2From((uint32)value);
+            return Bitwise::firstPO2From(value);
         }
     }
 }

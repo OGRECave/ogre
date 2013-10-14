@@ -31,7 +31,7 @@ else()
 endif()
 
 include_directories(src/StateCacheManager)
-if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
   list(APPEND HEADER_FILES
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
       src/StateCacheManager/OgreGLES2UniformCacheImp.h

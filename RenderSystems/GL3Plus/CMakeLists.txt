@@ -46,8 +46,13 @@ include_directories(
 )
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
-  ${OPENGL_INCLUDE_DIR}
 )
+
+if(NOT APPLE)
+  include_directories(
+    ${OPENGL_INCLUDE_DIR}
+  )
+endif()
 
 if (UNIX AND NOT APPLE)
   # Separate GLSupport and Window out to fix Unity builds

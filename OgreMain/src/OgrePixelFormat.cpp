@@ -74,6 +74,10 @@ namespace Ogre {
 
 		return rval;
 	}
+    void* PixelBox::getTopLeftFrontPixelPtr() const
+    {
+        return (uint8*)data + (left + top * rowPitch + front * slicePitch) * PixelUtil::getNumElemBytes(format);
+    }
     //-----------------------------------------------------------------------
     /**
     * Directly get the description record for provided pixel format. For debug builds,
@@ -92,7 +96,7 @@ namespace Ogre {
         return getDescriptionFor(format).elemBytes;
     }
 	//-----------------------------------------------------------------------
-	size_t PixelUtil::getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format)
+	size_t PixelUtil::getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format)
 	{
 		if(isCompressed(format))
 		{
@@ -236,7 +240,7 @@ namespace Ogre {
         rgba[3] = des.abits;
     }
 	//-----------------------------------------------------------------------
-	void PixelUtil::getBitMasks(PixelFormat format, uint32 rgba[4])
+	void PixelUtil::getBitMasks(PixelFormat format, uint64 rgba[4])
     {
         const PixelFormatDescription &des = getDescriptionFor(format);
         rgba[0] = des.rmask;

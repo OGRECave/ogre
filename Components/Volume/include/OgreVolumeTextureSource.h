@@ -41,14 +41,14 @@ namespace Volume {
     protected:
         
         /// To have a little bit faster data access.
-        int mWidthTimesHeight;
+        unsigned long mWidthTimesHeight;
 
         /// The raw volume data.
         float *mData;
         
         /** Overridden from GridSource.
         */
-        virtual float getVolumeGridValue(int x, int y, int z) const;
+        virtual float getVolumeGridValue(size_t x, size_t y, size_t z) const;
 
         /** Overridden from GridSource.
         */

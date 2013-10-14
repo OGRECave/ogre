@@ -1,13 +1,13 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename manual.info
-@settitle OGRE Manual v1.9 ('Ghadamon')
+@settitle OGRE Manual v1.10 ('Xalafu')
 @c %**end of header
 @contents
 @shortcontents
 
 @titlepage
-@title OGRE Manual v1.9 ('Ghadamon')
+@title OGRE Manual v1.10 ('Xalafu')
 @author Steve Streeting
 @page
 @vskip 0pt plus 1fill
@@ -18,7 +18,7 @@ This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unpo
 @end titlepage
 
 @node Top
-@top OGRE Manual v1.9 ('Ghadamon')
+@top OGRE Manual v1.10 ('Xalafu')
 @ifinfo
 Copyright @copyright{} The OGRE Team@*@*
 
@@ -248,6 +248,17 @@ Entities automatically have Material's associated with them if they use a Mesh o
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.@*@*
 
 You can create overlays either through the SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their 'show()' method. You can also show multiple overlays at once, and their Z order is determined by the Overlay::setZOrder() method.@*@*
+
+@heading Notes on Integration
+
+The OverlaySystem is now its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager): 
+
+@example
+Ogre::OverlaySystem* pOverlaySystem = new Ogre::OverlaySystem();
+mSceneMgr->addRenderQueueListener(pOverlaySystem);
+@end example
+
+One Ogre::OverlaySystem per application is enough but you need to call addRenderQueueListener once per SceneManager.
 
 @heading Creating 2D Elements
 

@@ -69,7 +69,7 @@ void prepareCircleMaterial()
                                                imgstream, 256, 256, PF_A8R8G8B8);
 	MaterialPtr material =
     MaterialManager::getSingleton().create( CIRCLES_MATERIAL,
-                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 	TextureUnitState *texLayer = material->getTechnique(0)->getPass(0)->createTextureUnitState( CIRCLES_MATERIAL );
 	texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
 	material->setSceneBlending( SBT_ADD );
@@ -404,7 +404,7 @@ protected:
 	{
 		// If when you finish the application is still raining there
  		// are water circles that are still being processed
- 		unsigned int activeCircles = this->circles.size ();
+ 		unsigned int activeCircles = (unsigned int)this->circles.size ();
         
  		// Kill the active water circles
  		for (unsigned int i = 0; i < activeCircles; i++)
@@ -514,7 +514,7 @@ protected:
 	{
 		//Only one menu in this demo
 		const String& materialName = menu->getSelectedItem();
-		MaterialPtr material = MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
+		MaterialPtr material = MaterialManager::getSingleton().getByName(materialName);
 		if (material.isNull())
         {
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,

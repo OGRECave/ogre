@@ -3,7 +3,7 @@
 precision mediump int;
 precision mediump float;
 
-uniform sampler2DArray TextureArrayTex;
+uniform lowp sampler2DArray TextureArrayTex;
 in vec4 oUv;
 out vec4 fragColour;
 

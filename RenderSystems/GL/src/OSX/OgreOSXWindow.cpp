@@ -106,7 +106,7 @@ namespace Ogre
 
         if(dst.getWidth() != dst.rowPitch)
         {
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+            glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch));
         }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
@@ -115,9 +115,9 @@ namespace Ogre
         }
         
         glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)dst.left, (GLint)dst.top,
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data);
+                     format, type, dst.getTopLeftFrontPixelPtr());
         
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
@@ -130,7 +130,7 @@ namespace Ogre
     {
         // Find the best match to what was requested
         boolean_t exactMatch = 0;
-        unsigned int reqWidth = 0, reqHeight = 0, reqDepth = 0;
+        size_t reqWidth = 0, reqHeight = 0, reqDepth = 0;
         CGLError cglErr = kCGLNoError;
         CGError cgErr = kCGErrorSuccess;
         
@@ -342,9 +342,9 @@ namespace Ogre
         }
 
         // Set some other variables.  Just in case we got a different value from CGDisplayBestModeForParameters than we requested
-        mWidth = reqWidth;
-        mHeight = reqHeight;
-        mColourDepth = reqDepth;
+        mWidth = static_cast<uint32>(reqWidth);
+        mHeight = static_cast<uint32>(reqHeight);
+        mColourDepth = static_cast<uint32>(reqDepth);
 
         cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
                                                 &reservationToken);

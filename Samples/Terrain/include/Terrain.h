@@ -28,6 +28,10 @@ same license as the rest of the engine.
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPaging.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
+
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
 #define TERRAIN_WORLD_SIZE 12000.0f
@@ -77,6 +81,8 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            names.push_back("Cg Program Manager");
 		return names;
 	}
 
@@ -258,7 +264,6 @@ public:
 			{
 				mInfoLabel->setCaption("Updating textures, patience...");
 			}
-
 		}
 		else
 		{
@@ -551,11 +556,11 @@ protected:
 	{
 		// Create material
 		String matName = "Ogre/DebugTexture" + StringConverter::toString(i);
-		MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+		MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName);
 		if (debugMat.isNull())
 		{
 			debugMat = MaterialManager::getSingleton().create(matName,
-				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Material>();
+				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		}
 		Pass* p = debugMat->getTechnique(0)->getPass(0);
 		p->removeAllTextureUnitStates();
@@ -598,10 +603,10 @@ protected:
 	{
 		String matName = "DepthShadows/" + textureName;
 
-		MaterialPtr ret = MaterialManager::getSingleton().getByName(matName).staticCast<Material>();
+		MaterialPtr ret = MaterialManager::getSingleton().getByName(matName);
 		if (ret.isNull())
 		{
-			MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm").staticCast<Material>();
+			MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm");
 			ret = baseMat->clone(matName);
 			Pass* p = ret->getTechnique(0)->getPass(0);
 			p->getTextureUnitState("diffuse")->setTextureName(textureName);
@@ -766,6 +771,9 @@ protected:
 
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
+        ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
+        ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
+
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
@@ -800,6 +808,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
+		mTerrainGroup->setResourceGroup("Terrain");
 
 		configureTerrainDefaults(l);
 #ifdef PAGING

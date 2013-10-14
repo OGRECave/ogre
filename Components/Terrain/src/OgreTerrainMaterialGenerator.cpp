@@ -145,7 +145,7 @@ namespace Ogre
 		{
 			mCompositeMapRTT = TextureManager::getSingleton().createManual(
 				mCompositeMapSM->getName() + "/compRTT", 
-				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, size, size, 0, PF_BYTE_RGBA, 
+				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, static_cast<uint>(size), static_cast<uint>(size), 0, PF_BYTE_RGBA,
 				TU_RENDERTARGET).get();
 			RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
 			// don't render all the time, only on demand
@@ -171,7 +171,10 @@ namespace Ogre
 		// That's because in non-update scenarios we don't want to keep an RTT
 		// around. We use a single RTT to serve all terrain pages which is more
 		// efficient.
-		Image::Box box(rect.left, rect.top, rect.right, rect.bottom);
+		Image::Box box(static_cast<uint32>(rect.left),
+                       static_cast<uint32>(rect.top),
+                       static_cast<uint32>(rect.right),
+                       static_cast<uint32>(rect.bottom));
 		destCompositeMap->getBuffer()->blit(mCompositeMapRTT->getBuffer(), box, box);
 
 		

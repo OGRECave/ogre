@@ -146,7 +146,7 @@ namespace Ogre {
 
   
 
-    void EGLWindow::swapBuffers(bool waitForVSync)
+    void EGLWindow::swapBuffers()
     {
         if (mClosed || mIsExternalGLControl)
         {
@@ -226,9 +226,9 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 #endif
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-			(GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-			format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);

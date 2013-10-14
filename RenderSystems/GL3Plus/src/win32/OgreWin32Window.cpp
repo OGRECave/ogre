@@ -805,7 +805,7 @@ namespace Ogre {
 	}
 
 
-	void Win32Window::swapBuffers(bool waitForVSync)
+	void Win32Window::swapBuffers()
 	{
 	  if (!mIsExternalGLControl) {
 	  	SwapBuffers(mHDC);
@@ -849,9 +849,9 @@ namespace Ogre {
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-					 format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);

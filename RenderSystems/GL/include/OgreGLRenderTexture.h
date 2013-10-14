@@ -38,7 +38,7 @@ namespace Ogre {
     {
     public:
         GLHardwarePixelBuffer *buffer;
-        size_t zoffset;
+        uint32 zoffset;
 		uint numSamples;
 
 		GLSurfaceDesc() :buffer(0), zoffset(0), numSamples(0) {}

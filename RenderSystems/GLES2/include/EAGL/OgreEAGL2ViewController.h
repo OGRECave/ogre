@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __EAGL2ViewController_H__
 #define __EAGL2ViewController_H__
 
-#import <UIKit/UIKit.h>
+#import <UIKit/UIViewController.h>
 #import "OgreRoot.h"
 #import "OgreEAGL2Support.h"
 

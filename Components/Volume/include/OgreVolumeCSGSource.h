@@ -63,7 +63,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -94,7 +94,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -158,7 +158,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -236,7 +236,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -263,7 +263,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -291,7 +291,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -351,7 +351,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -378,7 +378,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
     };
@@ -456,7 +456,7 @@ namespace Volume {
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
 
-        /** Overridden from VolumeSource.
+        /** Overridden from Source.
         */
         virtual Real getValue(const Vector3 &position) const;
         

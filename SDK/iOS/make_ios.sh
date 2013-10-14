@@ -6,8 +6,6 @@
 LIPO=lipo
 SDKBUILDDIR=`pwd`
 
-set IPHONEOS_DEPLOYMENT_TARGET 4.3
-
 # Clean up files from previous builds
 echo Cleaning previous builds...
 if [ "$1" = "clean" ];then
@@ -50,12 +48,12 @@ OGRE_VERSION=`cat version.txt`
 # location that the target expects them then copy them to the correct location
 
 echo Building for simulator...
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator
 mkdir -p sdk/lib/iphonesimulator/Release
 mv -v lib/iphonesimulator/Release/*.a sdk/lib/iphonesimulator/Release
 
 echo Building for devices...
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos
 mkdir -p sdk/lib/iphoneos/Release
 mv -v lib/iphoneos/Release/*.a sdk/lib/iphoneos/Release
 
@@ -68,7 +66,7 @@ for LIBNAME in $SDKBUILDDIR/build/sdk/lib/iphoneos/Release/lib*
 do
 	echo lipo $LIBNAME
 	BASELIBNAME=`basename $LIBNAME`
-	$LIPO $SDKBUILDDIR/build/sdk/lib/iphoneos/Release/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/sdk/lib/iphonesimulator/Release/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
+	$LIPO $SDKBUILDDIR/build/sdk/lib/iphoneos/Release/$BASELIBNAME $SDKBUILDDIR/build/sdk/lib/iphonesimulator/Release/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
 done
 
 # Remove some unnecessary files. Single arch libs and duplicate headers.

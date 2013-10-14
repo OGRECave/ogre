@@ -40,7 +40,7 @@ namespace Ogre {
  	: MovableObject()
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>())
+    , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
  	, mCamera(NULL)
 
@@ -55,7 +55,7 @@ namespace Ogre {
  	: MovableObject(name)
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite").staticCast<Material>())
+    , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
  	, mCamera(NULL)
  	{
@@ -64,7 +64,7 @@ namespace Ogre {
     void SimpleRenderable::setMaterial( const String& matName )
     {
         mMatName = matName;
-        mMaterial = MaterialManager::getSingleton().getByName(mMatName).staticCast<Material>();
+        mMaterial = MaterialManager::getSingleton().getByName(mMatName);
 		if (mMaterial.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
 				"SimpleRenderable::setMaterial" );

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreBuildSettings.h"
 
 #if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
-#  define USE_RTSHADER_SYSTEM
+#  define INCLUDE_RTSHADER_SYSTEM
 #endif
 
 //#define _RTSS_WRITE_SHADERS_TO_DISK
@@ -129,12 +129,12 @@ void TestContext::setup()
 
     locateResources();
     createDummyScene();
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
     {
         Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
     }
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -338,7 +338,7 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 
         if (mCurrentTest->isDone())
         {
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
             mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
 #endif
 
@@ -400,7 +400,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     if (mCurrentTest)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     if (sampleToRun) {
         sampleToRun->setShaderGenerator(mShaderGenerator);
     }
@@ -615,10 +615,10 @@ void TestContext::createDummyScene()
     sm->addRenderQueueListener(mOverlaySystem);
     Ogre::Camera* cam = sm->createCamera("DummyCamera");
     mWindow->addViewport(cam);
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.
-    bool success = initializeRTShaderSystem(sm);
+    bool success = initialiseRTShaderSystem(sm);
     if (!success)
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
@@ -662,13 +662,13 @@ void TestContext::createDummyScene()
                 baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
         }
     }
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 }
 
 void TestContext::destroyDummyScene()
 {
     Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     mShaderGenerator->removeSceneManager(dummyScene);
 #endif
     dummyScene->removeRenderQueueListener(mOverlaySystem);
@@ -676,12 +676,12 @@ void TestContext::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 /*-----------------------------------------------------------------------------
   | Initialize the RT Shader system.
   -----------------------------------------------------------------------------*/
-bool TestContext::initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
+bool TestContext::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 {
     if (Ogre::RTShader::ShaderGenerator::initialize())
     {
@@ -749,7 +749,7 @@ bool TestContext::initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
 /*-----------------------------------------------------------------------------
   | Finalize the RT Shader system.
   -----------------------------------------------------------------------------*/
-void TestContext::finalizeRTShaderSystem()
+void TestContext::finaliseRTShaderSystem()
 {
     // Restore default scheme.
     Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -769,7 +769,7 @@ void TestContext::finalizeRTShaderSystem()
         mShaderGenerator = NULL;
     }
 }
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 

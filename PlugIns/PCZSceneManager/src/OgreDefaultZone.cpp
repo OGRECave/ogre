@@ -502,9 +502,9 @@ namespace Ogre
     {
 
         //return immediately if nothing is in the zone.
-		if (mHomeNodeList.size() == 0 &&
-			mVisitorNodeList.size() == 0 &&
-			mPortals.size() == 0)
+		if (mHomeNodeList.empty() &&
+			mVisitorNodeList.empty() &&
+			mPortals.empty())
             return ;
 
         // Else, the zone is automatically assumed to be visible since either

@@ -474,7 +474,7 @@ namespace Ogre {
         // indexes are sometimes reused to address different vertex chunks
         for (size_t elem = 0; elem < numIdx; ++elem)
         {
-            *pIndexes++ = *pSrc++ + vertexStart;
+            *pIndexes++ = *pSrc++ + static_cast<unsigned int>(vertexStart);
         }
         mLevel->mIndexes->unlock();
 
@@ -571,7 +571,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ViewPoint BspSceneManager::getSuggestedViewpoint(bool random)
     {
-        if (mLevel.isNull() || mLevel->mPlayerStarts.size() == 0)
+        if (mLevel.isNull() || mLevel->mPlayerStarts.empty())
         {
             // No level, use default
             return SceneManager::getSuggestedViewpoint(random);
@@ -645,7 +645,7 @@ namespace Ogre {
     */
     //-----------------------------------------------------------------------
     RaySceneQuery* BspSceneManager::
-    createRayQuery(const Ray& ray, unsigned long mask)
+    createRayQuery(const Ray& ray, uint32 mask)
     {
         BspRaySceneQuery* q = OGRE_NEW BspRaySceneQuery(this);
         q->setRay(ray);
@@ -654,7 +654,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     IntersectionSceneQuery* BspSceneManager::
-    createIntersectionQuery(unsigned long mask)
+    createIntersectionQuery(uint32 mask)
     {
         BspIntersectionSceneQuery* q = OGRE_NEW BspIntersectionSceneQuery(this);
         q->setQueryMask(mask);

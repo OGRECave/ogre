@@ -383,7 +383,7 @@ namespace Ogre {
 		else
 		{
 			// everything is going all right, relative seek
-			skip(newPos - prevPos);
+			skip((long)(newPos - prevPos));
 		}
     }
     //-----------------------------------------------------------------------
@@ -563,13 +563,13 @@ namespace Ogre {
         switch(whence)
         {
             case SEEK_CUR:
-                newPos = curEmbeddedFileData.curPos + offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.curPos + offset);
                 break;
             case SEEK_END:
-                newPos = curEmbeddedFileData.fileSize - offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.fileSize - offset);
                 break;
             case SEEK_SET:
-                newPos = offset;
+                newPos = (zzip_size_t)offset;
                 break;
             default:
                 // bad whence - return an error - nonzero value.
@@ -660,7 +660,7 @@ namespace Ogre {
         newEmbeddedFileData.fileSize = fileSize;
         newEmbeddedFileData.decryptFunc = decryptFunc;
         EmbeddedZipArchiveFactory_mEmbbedFileDataList->push_back(newEmbeddedFileData);
-        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = EmbeddedZipArchiveFactory_mEmbbedFileDataList->size();
+        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = static_cast<int>(EmbeddedZipArchiveFactory_mEmbbedFileDataList->size());
     }
     //-----------------------------------------------------------------------
     void EmbeddedZipArchiveFactory::removeEmbbeddedFile( const String& name )

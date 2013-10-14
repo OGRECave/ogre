@@ -111,7 +111,7 @@ namespace RTShader {
         Program* vsProgram = programSet->getCpuVertexProgram();
         Function* vsMain = vsProgram->getEntryPointFunction();
 
-        size_t internalCounter = 0;
+        int internalCounter = 0;
     
         FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++); 
         curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);

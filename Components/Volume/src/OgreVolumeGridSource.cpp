@@ -94,7 +94,7 @@ namespace Volume {
     Vector4 GridSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
-        Vector3 normal;
+        Vector3 gradient;
         if (mTrilinearGradient)
         {
             size_t x0 = (size_t)scaledPosition.x;
@@ -123,7 +123,7 @@ namespace Volume {
             Real oneMinXoneMinY = oneMinX * oneMinY;
             Real dXOneMinY = dX * oneMinY;
 
-            normal = oneMinZ * (f000 * oneMinXoneMinY
+            gradient = oneMinZ * (f000 * oneMinXoneMinY
                 + f100 * dXOneMinY
                 + f010 * oneMinX * dY)
                 + dZ * (f001 * oneMinXoneMinY
@@ -132,14 +132,14 @@ namespace Volume {
                 + dX * dY * (f110 * oneMinZ
                 + f111 * dZ);
 
-            normal *= (Real)-1.0;
+            gradient *= (Real)-1.0;
         }
         else
         {
-            normal = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
-            normal *= (Real)-1.0;
+            gradient = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
+            gradient *= (Real)-1.0;
         }
-        return Vector4(normal.x, normal.y, normal.z, getValue(position));
+        return Vector4(gradient.x, gradient.y, gradient.z, getValue(position));
     }
     
     //-----------------------------------------------------------------------
@@ -235,12 +235,12 @@ namespace Volume {
         float value;
         int x, y;
         Vector3 scaledCenter(center.x * mPosXScale, center.y * mPosYScale, center.z * mPosZScale);
-        int xStart = Math::Clamp((int)(scaledCenter.x - radius * mPosXScale), 0, mWidth);
-        int xEnd = Math::Clamp((int)(scaledCenter.x + radius * mPosXScale), 0, mWidth);
-        int yStart = Math::Clamp((int)(scaledCenter.y - radius * mPosYScale), 0, mHeight);
-        int yEnd = Math::Clamp((int)(scaledCenter.y + radius * mPosYScale), 0, mHeight);
-        int zStart = Math::Clamp((int)(scaledCenter.z - radius * mPosZScale), 0, mDepth);
-        int zEnd = Math::Clamp((int)(scaledCenter.z + radius * mPosZScale), 0, mDepth);
+        int xStart = Math::Clamp(static_cast<int>(scaledCenter.x - radius * mPosXScale), 0, static_cast<int>(mWidth));
+        int xEnd = Math::Clamp(static_cast<int>(scaledCenter.x + radius * mPosXScale), 0, static_cast<int>(mWidth));
+        int yStart = Math::Clamp(static_cast<int>(scaledCenter.y - radius * mPosYScale), 0, static_cast<int>(mHeight));
+        int yEnd = Math::Clamp(static_cast<int>(scaledCenter.y + radius * mPosYScale), 0, static_cast<int>(mHeight));
+        int zStart = Math::Clamp(static_cast<int>(scaledCenter.z - radius * mPosZScale), 0, static_cast<int>(mDepth));
+        int zEnd = Math::Clamp(static_cast<int>(scaledCenter.z + radius * mPosZScale), 0, static_cast<int>(mDepth));
         Vector3 pos;
         for (int z = zStart; z < zEnd; ++z)
         {
@@ -249,7 +249,7 @@ namespace Volume {
                 for (x = xStart; x < xEnd; ++x)
                 {
                     pos.x = x * worldWidthScale;
-                    pos.y =  y * worldHeightScale;
+                    pos.y = y * worldHeightScale;
                     pos.z = z * worldDepthScale;
                     value = operation->getValue(pos);
                     setVolumeGridValue(x, y, z, value);

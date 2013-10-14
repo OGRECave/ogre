@@ -58,12 +58,12 @@ namespace Ogre {
 				num_mipmaps(0), flags(0), format(PF_UNKNOWN)
 			{
 			}
-            size_t height;
-            size_t width;
-			size_t depth;
+            uint32 height;
+            uint32 width;
+			uint32 depth;
             size_t size;
             
-            ushort num_mipmaps;
+            uint8 num_mipmaps;
             uint flags;
 
             PixelFormat format;

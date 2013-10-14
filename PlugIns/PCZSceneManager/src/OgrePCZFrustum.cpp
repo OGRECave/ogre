@@ -160,7 +160,7 @@ namespace Ogre
 		if (!portal->getEnabled()) return false;
 
 		// if the frustum has no planes, just return true
-        if (mActiveCullingPlanes.size() == 0)
+        if (mActiveCullingPlanes.empty())
         {
             return true;
         }
@@ -339,7 +339,7 @@ namespace Ogre
 		if (!portal->getEnabled()) return false;
 
 		// if the frustum has no planes, just return true
-		if (mActiveCullingPlanes.size() == 0)
+		if (mActiveCullingPlanes.empty())
 		{
 			return true;
 		}

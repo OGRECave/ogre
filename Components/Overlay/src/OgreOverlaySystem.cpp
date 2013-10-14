@@ -34,14 +34,11 @@ namespace Ogre {
 	OverlaySystem::OverlaySystem()
 	{
 		mOverlayManager = OGRE_NEW Ogre::OverlayManager();
-	    mPanelFactory = OGRE_NEW Ogre::PanelOverlayElementFactory();
-		mOverlayManager->addOverlayElementFactory(mPanelFactory);
+		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::PanelOverlayElementFactory());
 
-		mBorderPanelFactory = OGRE_NEW Ogre::BorderPanelOverlayElementFactory();
-		mOverlayManager->addOverlayElementFactory(mBorderPanelFactory);
+		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::BorderPanelOverlayElementFactory());
 
-		mTextAreaFactory = OGRE_NEW Ogre::TextAreaOverlayElementFactory();
-		mOverlayManager->addOverlayElementFactory(mTextAreaFactory);
+		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::TextAreaOverlayElementFactory());
 
 		mFontManager = OGRE_NEW FontManager();
 #if OGRE_PROFILING

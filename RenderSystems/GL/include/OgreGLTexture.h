@@ -94,6 +94,7 @@ namespace Ogre {
 
     private:
         GLuint mTextureID;
+        GLSupport& mGLSupport;
 		
 		/// Vector of pointers to subsurfaces
 		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
