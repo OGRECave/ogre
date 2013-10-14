@@ -1,13 +1,13 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename manual.info
-@settitle OGRE Manual v1.9 ('Ghadamon')
+@settitle OGRE Manual v1.10 ('Xalafu')
 @c %**end of header
 @contents
 @shortcontents
 
 @titlepage
-@title OGRE Manual v1.9 ('Ghadamon')
+@title OGRE Manual v1.10 ('Xalafu')
 @author Steve Streeting
 @page
 @vskip 0pt plus 1fill
@@ -18,7 +18,7 @@ This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unpo
 @end titlepage
 
 @node Top
-@top OGRE Manual v1.9 ('Ghadamon')
+@top OGRE Manual v1.10 ('Xalafu')
 @ifinfo
 Copyright @copyright{} The OGRE Team@*@*
 
