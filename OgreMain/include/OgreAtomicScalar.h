@@ -34,6 +34,16 @@ THE SOFTWARE.
 
 #if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
+#if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+    #define BUILTIN_FETCH_ADD(var, add) __atomic_fetch_add (var, add, __ATOMIC_SEQ_CST);
+    #define BUILTIN_ADD_FETCH(var, add) __atomic_add_fetch (var, add, __ATOMIC_SEQ_CST);
+    #define BUILTIN_SUB_FETCH(var, sub) __atomic_sub_fetch (var, sub, __ATOMIC_SEQ_CST);
+#else
+    #define BUILTIN_FETCH_ADD(var, add) __sync_fetch_and_add (var, add);
+    #define BUILTIN_ADD_FETCH(var, add) __sync_add_and_fetch (var, add);
+    #define BUILTIN_SUB_FETCH(var, sub) __sync_sub_and_fetch (var, sub);
+#endif
+
 namespace Ogre {
 
 	/** \addtogroup Core
@@ -80,32 +90,32 @@ namespace Ogre {
             
         T operator++ (void)
         {
-            return __sync_add_and_fetch (&mField, 1);
+            return BUILTIN_ADD_FETCH (&mField, 1);
         }
             
         T operator-- (void)
         {
-            return __sync_add_and_fetch (&mField, -1);
+            return BUILTIN_ADD_FETCH (&mField, -1);
         }
 
         T operator++ (int)
         {
-            return __sync_fetch_and_add (&mField, 1);
+            return BUILTIN_FETCH_ADD (&mField, 1);
         }
             
         T operator-- (int)
         {
-            return __sync_fetch_and_add (&mField, -1);
+            return BUILTIN_FETCH_ADD (&mField, -1);
         }
 
 		T operator+=(const T &add)
 		{
-			return __sync_add_and_fetch (&mField, add);
+			return BUILTIN_ADD_FETCH (&mField, add);
 		}
 
 		T operator-=(const T &sub)
 		{
-			return __sync_sub_and_fetch (&mField, sub);
+			return BUILTIN_SUB_FETCH (&mField, sub);
 		}
 
         // Need special alignment for atomic functions on ARM CPU's
@@ -369,21 +379,21 @@ namespace Ogre {
 
 		T operator+=(const T &add)
 		{
-                    OGRE_LOCK_AUTO_MUTEX;
+            OGRE_LOCK_AUTO_MUTEX;
 			mField += add;
 			return mField;
 		}
 
 		T operator-=(const T &sub)
 		{
-                    OGRE_LOCK_AUTO_MUTEX;
+            OGRE_LOCK_AUTO_MUTEX;
 			mField -= sub;
 			return mField;
 		}
 
         protected:
 
-                OGRE_AUTO_MUTEX;
+        OGRE_AUTO_MUTEX;
 
         volatile T mField;
 

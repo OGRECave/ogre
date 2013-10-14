@@ -289,6 +289,10 @@ else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
+if(OGRE_GCC_VERSION GREATER 470)
+  list(APPEND LIBRARIES "-latomic")
+endif()
+
 if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
