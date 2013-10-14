@@ -131,9 +131,7 @@ bail:
 	{
 		LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mEnableFixedPipeline = false;
-#endif
 
 		mRenderSystemWasInited = false;
 		initRenderSystem();
@@ -442,15 +440,6 @@ bail:
             }
 		}
 
-
-		if( name == "VSync" )
-		{
-			if (value == "Yes")
-				mVSync = true;
-			else
-				mVSync = false;
-		}
-
         if( name == "Min Requested Feature Levels" )
         {
             if (value == "9.1")
@@ -490,12 +479,6 @@ bail:
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 #endif
         }
-
-
-		if( name == "VSync Interval" )
-		{
-			mVSyncInterval = StringConverter::parseUnsignedInt(value);
-		}
 
 		if( name == "Allow NVPerfHUD" )
 		{
@@ -590,12 +573,6 @@ bail:
 			return "Your DirectX driver name has changed since the last time you ran OGRE; "
 				"the 'Rendering Device' has been changed.";
 		}
-
-        it = mOptions.find( "VSync" );
-		if( it->second.currentValue == "Yes" )
-			mVSync = true;
-		else
-			mVSync = false;
 
         return StringUtil::BLANK;
 	}
@@ -775,7 +752,7 @@ bail:
             {
                 OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                     "Requested min level feature is bigger the requested max level feature.", 
-                    "D3D11RenderSystem::D3D11RenderSystem" );
+                    "D3D11RenderSystem::initialise" );
 
             }
 
@@ -896,7 +873,7 @@ bail:
 			bool hwGamma = false;
 			opt = mOptions.find( "sRGB Gamma Conversion" );
 			if( opt == mOptions.end() )
-				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
+				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D11RenderSystem::initialise" );
 			hwGamma = opt->second.currentValue == "Yes";
 			uint fsaa = 0;
 			String fsaaHint;
@@ -906,17 +883,25 @@ bail:
 				fsaa = StringConverter::parseUnsignedInt(values[0]);
 				if (values.size() > 1)
 					fsaaHint = values[1];
-			}				
-			
+			}						
 
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
 			miscParams["FSAA"] = StringConverter::toString(fsaa);
 			miscParams["FSAAHint"] = fsaaHint;
-			miscParams["vsync"] = StringConverter::toString(mVSync);
-			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
 			miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
 			miscParams["gamma"] = StringConverter::toString(hwGamma);
+
+            opt = mOptions.find("VSync");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D11RenderSystem::initialise");
+            bool vsync = (opt->second.currentValue == "Yes");
+            miscParams["vsync"] = StringConverter::toString(vsync);
+
+            opt = mOptions.find("VSync Interval");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "D3D11RenderSystem::initialise");
+            miscParams["vsyncInterval"] = opt->second.currentValue;
 
 			autoWindow = this->_createRenderWindow( windowTitle, width, height, 
 				fullScreen, &miscParams );
@@ -1194,8 +1179,8 @@ bail:
 
 #ifdef D3D_FEATURE_LEVEL_9_3
 		int numMultiRenderTargets = (mFeatureLevel > D3D_FEATURE_LEVEL_9_3) ? D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT :		// 8
-									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT :	// 4
-									D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT;												// 1
+									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? 4/*D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT*/ :	// 4
+									1/*D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT*/;												// 1
 #else
         int numMultiRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;		// 8
 #endif
@@ -1751,7 +1736,7 @@ bail:
 	void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
 	{
 		static D3D11TexturePtr dt;
-		dt = tex;
+		dt = tex.staticCast<D3D11Texture>();
 		if (enabled && !dt.isNull() && dt->getSize() > 0)
 		{
 			// note used
@@ -2275,7 +2260,7 @@ bail:
 
         bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+                || op.vertexData->vertexBufferBinding->hasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 

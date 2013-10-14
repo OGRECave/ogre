@@ -429,11 +429,12 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
 			const Entity* pCurEntity = pEntity;
 			if (indexLod > 0) pCurEntity = pEntity->getManualLodLevel(indexLod - 1);
 
-			ushort boneCount = 0,weightCount = 0;
-			bool isValid = extractSkeletonData(pCurEntity,boneCount,weightCount);
 			unsigned int numSubEntities = pCurEntity->getNumSubEntities();
 			for(unsigned int indexSub = 0 ; indexSub < numSubEntities ; ++indexSub)
 			{
+				ushort boneCount = 0,weightCount = 0;
+				bool isValid = extractSkeletonData(pCurEntity, indexSub, boneCount, weightCount);
+
 				SubEntity* pSubEntity = pCurEntity->getSubEntity(indexSub);
 				const MaterialPtr& pMat = pSubEntity->getMaterial();
 				imprintSkeletonData(pMat, isValid, boneCount, weightCount, skinningType, correctAntidpodalityHandling, shearScale);
@@ -443,7 +444,7 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
 }
 
 //-----------------------------------------------------------------------
-bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort& boneCount, ushort& weightCount)
+bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, unsigned int subEntityIndex, ushort& boneCount, ushort& weightCount)
 {
 	bool isValidData = false;
 	boneCount = 0;
@@ -458,37 +459,28 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort&
 	{
 		//get weights count
 		MeshPtr pMesh = pEntity->getMesh();
-		boneCount = pMesh->sharedBlendIndexToBoneIndexMap.size();
 
-		short totalMeshes = pMesh->getNumSubMeshes();
-		for(short i = 0 ; i < totalMeshes ; ++i)
-		{
-			RenderOperation ro;
-			SubMesh* pSubMesh = pMesh->getSubMesh(i);
-			pSubMesh->_getRenderOperation(ro,0);
+		RenderOperation ro;
+		SubMesh* pSubMesh = pMesh->getSubMesh(subEntityIndex);
+		pSubMesh->_getRenderOperation(ro,0);
 
-			//get the largest bone assignment
-			boneCount = std::max<ushort>(boneCount, pSubMesh->blendIndexToBoneIndexMap.size());
+		//get the largest bone assignment
+		boneCount = std::max<ushort>(pMesh->sharedBlendIndexToBoneIndexMap.size(), pSubMesh->blendIndexToBoneIndexMap.size());
 			
-			//go over vertex deceleration 
-			//check that they have blend indices and blend weights
-			const VertexElement* pDeclWeights = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS,0);
-			const VertexElement* pDeclIndexes = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES,0);
-			if ((pDeclWeights != NULL) && (pDeclIndexes != NULL))
+		//go over vertex deceleration 
+		//check that they have blend indices and blend weights
+		const VertexElement* pDeclWeights = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS,0);
+		const VertexElement* pDeclIndexes = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES,0);
+		if ((pDeclWeights != NULL) && (pDeclIndexes != NULL))
+		{
+			isValidData = true;
+			switch (pDeclWeights->getType())
 			{
-				isValidData = true;
-				switch (pDeclWeights->getType())
-				{
-				case VET_FLOAT1: weightCount = std::max<ushort>(weightCount, 1); break;
-				case VET_FLOAT2: weightCount = std::max<ushort>(weightCount, 2); break;
-				case VET_FLOAT3: weightCount = std::max<ushort>(weightCount, 3); break;
-				case VET_FLOAT4: weightCount = std::max<ushort>(weightCount, 4); break;
-				default: isValidData = false; 
-				}
-				if (isValidData == false)
-				{
-					break;
-				}
+			case VET_FLOAT1: weightCount = 1; break;
+			case VET_FLOAT2: weightCount = 2; break;
+			case VET_FLOAT3: weightCount = 3; break;
+			case VET_FLOAT4: weightCount = 4; break;
+			default: isValidData = false; 
 			}
 		}
 	}

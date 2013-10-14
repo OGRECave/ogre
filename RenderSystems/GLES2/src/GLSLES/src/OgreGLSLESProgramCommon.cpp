@@ -29,6 +29,8 @@
 #include "OgreGLSLESProgramCommon.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2Util.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -66,12 +68,18 @@ namespace Ogre {
                         "Attempted to create a shader program without both a vertex and fragment program.",
                         "GLSLESProgramCommon::GLSLESProgramCommon");
         }
+
+        // Initialise uniform cache
+		mUniformCache = new GLES2UniformCache();
 	}
     
 	//-----------------------------------------------------------------------
 	GLSLESProgramCommon::~GLSLESProgramCommon(void)
 	{
 		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+
+        delete mUniformCache;
+        mUniformCache = 0;
 	}
     
 	//-----------------------------------------------------------------------
@@ -158,8 +166,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void GLSLESProgramCommon::getMicrocodeFromCache(void)
 	{
-		GpuProgramManager::Microcode cacheMicrocode = 
-        GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
+		GpuProgramManager::Microcode cacheMicrocode =
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 
 		// add to the microcode to the cache
 		String name;
@@ -173,16 +181,17 @@ namespace Ogre {
 		// get size of binary
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
-#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
-        GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+        if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+        {
+            GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
 
-        // load binary
-		OGRE_CHECK_GL_ERROR(glProgramBinaryOES( mGLProgramHandle,
-                           binaryFormat, 
-                           cacheMicrocode->getPtr(),
-                           binaryLength
-                           ));
-#endif
+            // load binary
+            OGRE_CHECK_GL_ERROR(glProgramBinaryOES(mGLProgramHandle,
+                               binaryFormat, 
+                               cacheMicrocode->getPtr(),
+                               binaryLength));
+        }
+
 		GLint success = 0;
 		OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
 		if (!success)

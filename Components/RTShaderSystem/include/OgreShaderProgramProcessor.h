@@ -130,7 +130,7 @@ protected:
 		// The actual source parameters count.
 		size_t mSrcParameterCount;
 		// The number of used floats.
-		size_t mUsedFloatCount;
+		int mUsedFloatCount;
 	};
 	typedef vector<MergeParameter>::type	MergeParameterList;
 

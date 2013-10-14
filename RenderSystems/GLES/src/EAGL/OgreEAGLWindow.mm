@@ -66,7 +66,7 @@ namespace Ogre {
     {
         destroy();
 
-        if (mContext == NULL)
+        if (mContext != NULL)
         {
             OGRE_DELETE mContext;
         }
@@ -396,7 +396,7 @@ namespace Ogre {
 		mClosed = false;
     }
 
-    void EAGLWindow::swapBuffers(bool waitForVSync)
+    void EAGLWindow::swapBuffers()
     {
         if (mClosed)
         {
@@ -521,7 +521,7 @@ namespace Ogre {
         // Read pixel data from the framebuffer
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
         GL_CHECK_ERROR
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      GL_RGBA, GL_UNSIGNED_BYTE, data);
         GL_CHECK_ERROR
@@ -551,7 +551,7 @@ namespace Ogre {
 
         // Retrieve the UIImage from the current context
         size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-        memcpy(dst.data, CGBitmapContextGetData(context), rowSpan * dst.getHeight());
+        memcpy(dst.data, CGBitmapContextGetData(context), rowSpan * dst.getHeight()); // TODO: support dst.rowPitch != dst.getWidth() case
         UIGraphicsEndImageContext();
 
         // Clean up

@@ -194,7 +194,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite");
+            material = MaterialManager::getSingleton().getByName("BaseWhite");
 
 			if (material.isNull())
 			{
@@ -618,13 +618,27 @@ namespace Ogre {
 				for (ushort t = 0; t < dims; ++t)
 					*pFloat++ = mTempVertex.texCoord[elem.getIndex()][t];
 				break;
-			case VES_DIFFUSE:
-				rs = Root::getSingleton().getRenderSystem();
-				if (rs)
-					rs->convertColourValue(mTempVertex.colour, pRGBA++);
-				else
-					*pRGBA++ = mTempVertex.colour.getAsRGBA(); // pick one!
-				break;
+            case VES_DIFFUSE:
+                rs = Root::getSingleton().getRenderSystem();
+                if (rs)
+                {
+                    rs->convertColourValue(mTempVertex.colour, pRGBA++);
+                }
+                else
+                {
+                    switch(elem.getType())
+                    {
+                        case VET_COLOUR_ABGR:
+                            *pRGBA++ = mTempVertex.colour.getAsABGR();
+                            break;
+                        case VET_COLOUR_ARGB:
+                            *pRGBA++ = mTempVertex.colour.getAsARGB();
+                            break;
+                        default:
+                            *pRGBA++ = mTempVertex.colour.getAsRGBA();
+                    }
+                }
+                break;
 			default:
 				// nop ?
 				break;
@@ -962,7 +976,7 @@ namespace Ogre {
 	ShadowCaster::ShadowRenderableListIterator
 	ManualObject::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
-		HardwareIndexBufferSharedPtr* indexBuffer,
+		HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
 		assert(indexBuffer && "Only external index buffers are supported right now");		
@@ -1044,8 +1058,8 @@ namespace Ogre {
 		updateEdgeListLightFacing(edgeList, lightPos);
 
 		// Generate indexes and update renderables
-		generateShadowVolume(edgeList, *indexBuffer, light,
-			mShadowRenderables, flags);
+		generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
+			light, mShadowRenderables, flags);
 
 
 		return ShadowRenderableListIterator(
@@ -1086,7 +1100,7 @@ namespace Ogre {
 		{
 			// Load from default group. If user wants to use alternate groups,
 			// they can define it and preload
-			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName);
+			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName).staticCast<Material>();
 		}
 		return mMaterial;
 	}

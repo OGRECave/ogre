@@ -68,8 +68,8 @@ namespace Ogre {
                 extension libraries.
             @param filename
                 The filename that will be opened
-            @param refLibrary
-                The library that contains the data-handling code
+            @param archiveType
+                The type of archive that this is. For example: "Zip".
             @return
                 If the function succeeds, a valid pointer to an Archive
                 object is returned.

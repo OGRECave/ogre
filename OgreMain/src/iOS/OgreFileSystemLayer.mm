@@ -28,6 +28,7 @@
 #include "OgreFileSystemLayer.h"
 #include "macUtils.h"
 #import <Foundation/NSPathUtilities.h>
+#import <Foundation/NSFileManager.h>
 
 namespace Ogre
 {
@@ -41,7 +42,7 @@ namespace Ogre
 	{
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 
-        mHomePath = std::string([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
+        mHomePath = Ogre::String([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
 	}
     //---------------------------------------------------------------------
     bool FileSystemLayer::fileExists(const Ogre::String& path) const
@@ -51,6 +52,16 @@ namespace Ogre
     //---------------------------------------------------------------------
 	bool FileSystemLayer::createDirectory(const Ogre::String& path)
 	{
-		return false;
+        NSString *directoryPath = [NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding];
+        NSError *error;
+
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:directoryPath
+                                       withIntermediateDirectories:NO
+                                                        attributes:nil
+                                                             error:&error])
+        {
+            return false;
+        }
+        return true;
 	}
 }

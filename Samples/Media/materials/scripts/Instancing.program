@@ -33,6 +33,34 @@ fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl
 }
 
 //--------------------------------------------------------------
+// GLSL ES Programs
+//--------------------------------------------------------------
+fragment_program Ogre/Shadow/Utils glsles
+{
+	source shadows.glsles
+}
+
+fragment_program Ogre/Instancing_glsles_ps glsles
+{
+	source Instancing.frag
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
+
+	default_params
+	{
+		param_named			diffuseMap				int 0
+		param_named			shadowMap				int 1
+	}
+}
+
+fragment_program Ogre/Instancing/shadow_caster_glsles_ps glsles
+{
+    source DepthShadowmapCasterFp.glsles
+
+	preprocessor_defines LINEAR_RANGE=1
+}
+
+//--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
 fragment_program Ogre/Instancing_cg_ps cg
@@ -88,6 +116,7 @@ fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
 fragment_program Ogre/Instancing_ps unified
 {
 	delegate Ogre/Instancing_glsl_ps
+	delegate Ogre/Instancing_glsles_ps
 	//delegate Ogre/Instancing_hlsl_ps
 	delegate Ogre/Instancing_cg_ps
 	
@@ -107,6 +136,7 @@ fragment_program Ogre/Instancing_ps unified
 fragment_program Ogre/Instancing/shadow_caster_ps unified
 {
 	delegate Ogre/Instancing/shadow_caster_glsl_ps
+	delegate Ogre/Instancing/shadow_caster_glsles_ps
 	//delegate Ogre/Instancing/shadow_caster_hlsl_ps
 	delegate Ogre/Instancing/shadow_caster_cg_ps
 }

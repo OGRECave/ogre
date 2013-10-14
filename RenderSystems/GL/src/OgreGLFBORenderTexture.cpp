@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}
@@ -141,6 +141,42 @@ static const size_t depthBits[] =
         glDeleteFramebuffersEXT(1, &mTempFBO);      
 	}
 
+    void GLFBOManager::_createTempFramebuffer(GLuint fmt, GLuint &fb, GLuint &tid)
+    {
+        // NB we bypass state cache, this method is only called on startup and not after
+        // GLStateCacheManager::initializeCache
+
+        glGenFramebuffersEXT(1, &fb);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+        if (fmt != GL_NONE)
+        {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
+            // Create and attach texture
+            glGenTextures(1, &tid);
+            glBindTexture(GL_TEXTURE_2D, tid);
+
+            // Set some default parameters so it won't fail on NVidia cards
+            if (GLEW_VERSION_1_2)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                      GL_TEXTURE_2D, tid, 0);
+        }
+        else
+        {
+            // Draw to nowhere -- stencil/depth only
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
+    }
+
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @return true    if this combo is supported
                  false   if this combo is not supported
@@ -190,6 +226,7 @@ static const size_t depthBits[] =
         // Detach and destroy
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
+
         if (depthRB)
             glDeleteRenderbuffersEXT(1, &depthRB);
         if (stencilRB)
@@ -248,7 +285,6 @@ static const size_t depthBits[] =
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
         GLint old_drawbuffer = 0, old_readbuffer = 0;
-        GLenum target = GL_TEXTURE_2D;
 
         glGetIntegerv (GL_DRAW_BUFFER, &old_drawbuffer);
         glGetIntegerv (GL_READ_BUFFER, &old_readbuffer);
@@ -259,7 +295,7 @@ static const size_t depthBits[] =
 
 			// Fetch GL format token
 			GLenum fmt = GLPixelUtil::getGLInternalFormat((PixelFormat)x);
-            if(fmt == GL_NONE && x!=0)
+            if(fmt == GL_NONE && x != 0)
                 continue;
 
 			// No test for compressed formats
@@ -273,32 +309,8 @@ static const size_t depthBits[] =
 				continue;
 
             // Create and attach framebuffer
-            glGenFramebuffersEXT(1, &fb);
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-            if (fmt!=GL_NONE)
-            {
-				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
-				
-                // Set some default parameters so it won't fail on NVidia cards         
-				if (GLEW_VERSION_1_2)
-					glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                            
-				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-				glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                                target, tid, 0);
-            }
-			else
-			{
-				// Draw to nowhere -- stencil/depth only
-				glDrawBuffer(GL_NONE);
-				glReadBuffer(GL_NONE);
-			}
+            _createTempFramebuffer(fmt, fb, tid);
+
             // Check status
             GLuint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
@@ -336,6 +348,19 @@ static const size_t depthBits[] =
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
                             }
+                            else
+                            {
+                                // There is a small edge case that FBO is trashed during the test
+                                // on some drivers resulting in undefined behavior
+                                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                                glDeleteFramebuffersEXT(1, &fb);
+
+                                // Workaround for NVIDIA / Linux 169.21 driver problem
+                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                glFinish();
+
+                                _createTempFramebuffer(fmt, fb, tid);
+                            }
                         }
                     }
                     else
@@ -364,6 +389,19 @@ static const size_t depthBits[] =
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
                         }
+                        else
+                        {
+                            // There is a small edge case that FBO is trashed during the test
+                            // on some drivers resulting in undefined behavior
+                            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                            glDeleteFramebuffersEXT(1, &fb);
+
+                            // Workaround for NVIDIA / Linux 169.21 driver problem
+                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                            glFinish();
+
+                            _createTempFramebuffer(fmt, fb, tid);
+                        }
                     }
                 }
 
@@ -378,8 +416,11 @@ static const size_t depthBits[] =
 			// see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
 			glFinish();
 			
-            if (fmt!=GL_NONE)
+            if (fmt != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         // It seems a bug in nVidia driver: glBindFramebufferEXT should restore
@@ -463,7 +504,7 @@ static const size_t depthBits[] =
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
     
-    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested

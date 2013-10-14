@@ -28,6 +28,10 @@ same license as the rest of the engine.
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPaging.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
+
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
 #define TERRAIN_WORLD_SIZE 12000.0f
@@ -77,6 +81,8 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            names.push_back("Cg Program Manager");
 		return names;
 	}
 
@@ -258,7 +264,6 @@ public:
 			{
 				mInfoLabel->setCaption("Updating textures, patience...");
 			}
-
 		}
 		else
 		{
@@ -675,7 +680,6 @@ protected:
 				mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
 				mSceneMgr->setShadowTextureSelfShadow(true);
 				mSceneMgr->setShadowCasterRenderBackFaces(true);
-				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 
 				MaterialPtr houseMat = buildDepthShadowMaterial("fw12b.jpg");
 				for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
@@ -767,6 +771,9 @@ protected:
 
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
+        ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
+        ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
+
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
@@ -801,6 +808,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
+		mTerrainGroup->setResourceGroup("Terrain");
 
 		configureTerrainDefaults(l);
 #ifdef PAGING

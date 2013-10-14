@@ -209,6 +209,8 @@ namespace Ogre
 		wq->removeRequestHandler(mWorkQueueChannel, this);
 		wq->removeResponseHandler(mWorkQueueChannel, this);	
 
+		removeFromNeighbours();
+
 		freeLodData();
 		freeTemporaryResources();
 		freeGPUResources();
@@ -594,9 +596,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const String& filename)
 	{
-		freeLodData();
-		mLodManager = OGRE_NEW TerrainLodManager( this, filename );
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 		DataStreamPtr stream = Root::getSingleton().openFileStream(macBundlePath() + "/../Documents/" + filename,
                                                                    _getDerivedResourceGroup());
@@ -604,10 +603,15 @@ namespace Ogre
 		DataStreamPtr stream = Root::getSingleton().openFileStream(filename,
                                                                    _getDerivedResourceGroup());
 #endif
-		
+		return prepare(stream);
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::prepare(DataStreamPtr& stream)
+	{
+		freeLodData();
+		mLodManager = OGRE_NEW TerrainLodManager( this, stream );
 		StreamSerialiser ser(stream);
 		return prepare(ser);
-
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)
@@ -617,13 +621,19 @@ namespace Ogre
 		freeTemporaryResources();
 		freeCPUResources();
 
+		if(mLodManager == NULL)
+		{
+			mLodManager = OGRE_NEW TerrainLodManager( this );
+		}
+
 		copyGlobalOptions();
 
 		const StreamSerialiser::Chunk *mainChunk = stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
 		if (!mainChunk)
 			return false;
 
-		stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
+        if(mainChunk->version > 1)
+            stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
 		uint8 align;
 		stream.read(&align);
 		mAlign = (Alignment)align;
@@ -636,7 +646,9 @@ namespace Ogre
 		mRootNode->setPosition(mPos);
 		updateBaseScale();
 		determineLodLevels();
-		stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
+
+        if(mainChunk->version > 1)
+            stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
 
 		size_t numVertices = mSize * mSize;
 		mHeightData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
@@ -645,15 +657,22 @@ namespace Ogre
 		memset(mHeightData, 0.0f, sizeof(float)*numVertices);
 		memset(mDeltaData, 0.0f, sizeof(float)*numVertices);
 
-		// skip height/delta data
-		for (int i = 0; i < mNumLodLevels; i++)
-		{
-			stream.readChunkBegin(TerrainLodManager::TERRAINLODDATA_CHUNK_ID, TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION);
-			stream.readChunkEnd(TerrainLodManager::TERRAINLODDATA_CHUNK_ID);
-		}
+        if(mainChunk->version > 1)
+        {
+            // skip height/delta data
+            for (int i = 0; i < mNumLodLevels; i++)
+            {
+                stream.readChunkBegin(TerrainLodManager::TERRAINLODDATA_CHUNK_ID, TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION);
+                stream.readChunkEnd(TerrainLodManager::TERRAINLODDATA_CHUNK_ID);
+            }
 
-		// start uncompressing
-		stream.startDeflate( mainChunk->length - stream.getOffsetFromChunkStart() );
+            // start uncompressing
+            stream.startDeflate( mainChunk->length - stream.getOffsetFromChunkStart() );
+        }
+        else
+        {
+            stream.read(mHeightData, numVertices);
+        }
 
 		// Layer declaration
 		if (!readLayerDeclaration(stream, mLayerDecl))
@@ -728,12 +747,20 @@ namespace Ogre
 
 		}
 
+        if(mainChunk->version == 1)
+        {
+            // Load delta data
+            mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+            stream.read(mDeltaData, numVertices);
+        }
+
 		// Create & load quadtree
 		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare(stream);
 
 		// stop uncompressing
-		stream.stopDeflate();
+        if(mainChunk->version > 1)
+            stream.stopDeflate();
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -1033,7 +1060,7 @@ namespace Ogre
 				// vertex data goes at this level, at bakedresolution
 				// applies to all lower levels (except those with a closer vertex data)
 				// determine physical size (as opposed to resolution)
-				size_t sz = ((bakedresolution-1) / splits) + 1;
+				uint sz = ((bakedresolution-1) / splits) + 1;
 				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution, sz);
 
 				// next set to look for
@@ -1151,7 +1178,8 @@ namespace Ogre
 		y = std::min(y, (long)mSize - 1L);
 		y = std::max(y, 0L);
 
-		long skip = 1 << mLodManager->getHighestLodPrepared();
+		int highestLod = mLodManager->getHighestLodPrepared();
+		long skip = 1 << (highestLod != -1 ? highestLod : 0);
 		if (x % skip == 0 && y % skip == 0)
 		return *getHeightData(x, y);
 
@@ -2070,9 +2098,9 @@ namespace Ogre
 			if (lodRect.bottom % step)
 				lodRect.bottom += step - (lodRect.bottom % step);
 
-			for (int j = lodRect.top; j < lodRect.bottom - step; j += step )
+			for (long j = lodRect.top; j < lodRect.bottom - step; j += step )
 			{
-				for (int i = lodRect.left; i < lodRect.right - step; i += step )
+				for (long i = lodRect.left; i < lodRect.right - step; i += step )
 				{
 					// Form planes relating to the lower detail tris to be produced
 					// For even tri strip rows, they are this shape:
@@ -2113,8 +2141,8 @@ namespace Ogre
 						int xubound = (i == (mSize - step)? step : step - 1);
 						for ( int x = 0; x <= xubound; x++ )
 						{
-							int fulldetailx = i + x;
-							int fulldetaily = j + y;
+							int fulldetailx = static_cast<int>(i + x);
+							int fulldetaily = static_cast<int>(j + y);
 							if ( fulldetailx % step == 0 && 
 								fulldetaily % step == 0 )
 							{
@@ -2337,6 +2365,7 @@ namespace Ogre
 		{
 			if (cascadeToNeighbours)
 			{
+				OGRE_LOCK_RW_MUTEX_READ(mNeighbourMutex);
 				Terrain* neighbour = raySelectNeighbour(ray, distanceLimit);
 				if (neighbour)
 					return neighbour->rayIntersects(ray, cascadeToNeighbours, distanceLimit);
@@ -2711,7 +2740,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureCount(uint8 numLayers) const
 	{
-		return ((numLayers - 1) / 4) + 1;
+		return ((numLayers - 2) / 4) + 1;
 	}
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureCount() const
@@ -2971,14 +3000,14 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
+	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index) const
 	{
 		assert(index < mBlendTextureList.size());
 
 		return mBlendTextureList[index];
 	}
 	//---------------------------------------------------------------------
-	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex)
+	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex) const
 	{
 		assert(layerIndex > 0 && layerIndex < mLayers.size());
 		uint8 idx = layerIndex - 1;
@@ -3293,7 +3322,8 @@ namespace Ogre
 		uint8* pData = static_cast<uint8*>(
 			OGRE_MALLOC(widenedRect.width() * widenedRect.height() * 3, MEMCATEGORY_GENERAL));
 
-		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_BYTE_RGB, pData);
+		PixelBox* pixbox = OGRE_NEW PixelBox(static_cast<uint32>(widenedRect.width()),
+                                             static_cast<uint32>(widenedRect.height()), 1, PF_BYTE_RGB, pData);
 
 		// Evaluate normal like this
 		//  3---2---1
@@ -3366,10 +3396,10 @@ namespace Ogre
 				// content of normalsBox is already inverted in Y, but rect is still 
 				// in terrain space for dealing with sub-rect, so invert
 				Image::Box dstBox;
-				dstBox.left = rect.left;
-				dstBox.right = rect.right;
-				dstBox.top = mSize - rect.bottom;
-				dstBox.bottom = mSize - rect.top;
+				dstBox.left = static_cast<uint32>(rect.left);
+				dstBox.right = static_cast<uint32>(rect.right);
+				dstBox.top = static_cast<uint32>(mSize - rect.bottom);
+				dstBox.bottom = static_cast<uint32>(mSize - rect.top);
 				mTerrainNormalMap->getBuffer()->blitFromMemory(*normalsBox, dstBox);
 			}
 		}
@@ -3476,7 +3506,8 @@ namespace Ogre
 		uint8* pData = static_cast<uint8*>(
 			OGRE_MALLOC(widenedRect.width() * widenedRect.height(), MEMCATEGORY_GENERAL));
 
-		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_L8, pData);
+		PixelBox* pixbox = OGRE_NEW PixelBox(static_cast<uint32>(widenedRect.width()),
+                                             static_cast<uint32>(widenedRect.height()), 1, PF_L8, pData);
 
 		Real heightPad = (getMaxHeight() - getMinHeight()) * 1.0e-3f;
 
@@ -3537,10 +3568,10 @@ namespace Ogre
 				// content of PixelBox is already inverted in Y, but rect is still 
 				// in terrain space for dealing with sub-rect, so invert
 				Image::Box dstBox;
-				dstBox.left = rect.left;
-				dstBox.right = rect.right;
-				dstBox.top = mLightmapSizeActual - rect.bottom;
-				dstBox.bottom = mLightmapSizeActual - rect.top;
+				dstBox.left = static_cast<uint32>(rect.left);
+				dstBox.right = static_cast<uint32>(rect.right);
+				dstBox.top = static_cast<uint32>(mLightmapSizeActual - rect.bottom);
+				dstBox.bottom = static_cast<uint32>(mLightmapSizeActual - rect.top);
 				mLightmap->getBuffer()->blitFromMemory(*lightmapBox, dstBox);
 			}
 		}
@@ -3634,7 +3665,7 @@ namespace Ogre
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
-				PF_BYTE_RGB, TU_STATIC);
+				PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
 			if (mCpuColourMapStorage)
 			{
@@ -4675,5 +4706,22 @@ namespace Ogre
 		int lodLevel = mLodManager->getTargetLodLevel() + 1;
 		if( lodLevel>0 && lodLevel<mNumLodLevels )
 			mLodManager->updateToLodLevel(lodLevel);
+	}
+
+	void Terrain::removeFromNeighbours()
+	{
+		// We are reading the list of neighbours here
+		OGRE_LOCK_RW_MUTEX_READ(mNeighbourMutex);
+		for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
+		{
+			NeighbourIndex ni = static_cast<NeighbourIndex>(i);
+			Terrain* neighbour = getNeighbour(ni);
+			if (!neighbour)
+				continue;
+
+			OGRE_LOCK_RW_MUTEX_WRITE(neighbour->mNeighbourMutex);
+			// TODO: do we want to re-calculate? probably not, but not sure
+			neighbour->setNeighbour(getOppositeNeighbour(ni), 0, false, false);
+		}
 	}
 }

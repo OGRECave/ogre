@@ -1,6 +1,6 @@
 #version 100
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 uniform mat4 world;
 uniform mat4 worldIT;
@@ -8,27 +8,27 @@ uniform mat4 worldViewProj;
 uniform mat4 texViewProj;
 uniform vec4 lightPosition;
 uniform vec4 lightColour;
+#if LINEAR_RANGE
 uniform vec4 shadowDepthRange;
+#endif
 
 attribute vec4 position;
 attribute vec3 normal;
-attribute vec4 ambient;
 
 varying vec4 shadowUV;
-varying vec4 vColor;
-varying vec4 oColour;
+varying vec4 vColour;
 
 void main()
 {
-	gl_Position = position * worldViewProj;
-	oColour = ambient;
+	gl_Position = worldViewProj * position;
 	vec4 worldPos = world * position;
 	vec3 worldNorm = (worldIT * vec4(normal, 1.0)).xyz;
 
+vec4 lightPos = vec4(300.0, 750.0, -700.0, 1.0);
 	// Calculate lighting (simple vertex lighting)
-	vec3 lightDir = normalize(lightPosition.xyz - (worldPos.xyz * lightPosition.w));
+	vec3 lightDir = normalize(lightPos.xyz - (worldPos.xyz * lightPos.w));
 
-	vColor = lightColour * max(dot(lightDir, worldNorm), 0.0);
+	vColour = vec4(0.590839, 0.36056, 0.13028, 1.0) * max(dot(lightDir, worldNorm), 0.0);
 
 	// Calculate shadow map coords
 	shadowUV = texViewProj * worldPos;

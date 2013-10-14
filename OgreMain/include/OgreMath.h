@@ -208,13 +208,14 @@ namespace Ogre
        class RandomValueProvider
        {
        public:
+            virtual ~RandomValueProvider() {}
             /** When called should return a random values in the range of [0,1] */
             virtual Real getRandomUnit() = 0;
        };
 
     protected:
-       // angle units used by the api
-       static AngleUnit msAngleUnit;
+        /// Angle units used by the api
+        static AngleUnit msAngleUnit;
 
         /// Size of the trig tables as determined by constructor.
         static int mTrigTableSize;
@@ -224,7 +225,7 @@ namespace Ogre
         static Real* mSinTable;
         static Real* mTanTable;
 
-        // A random value provider. overriding the default random number generator.
+        /// A random value provider. overriding the default random number generator.
         static RandomValueProvider* mRandProvider;
 
         /** Private function to build trig tables.

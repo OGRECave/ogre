@@ -37,7 +37,7 @@ namespace Ogre {
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false)//useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
@@ -91,18 +91,17 @@ namespace Ogre {
             {
 				access |= GL_MAP_WRITE_BIT;
                 access |= GL_MAP_FLUSH_EXPLICIT_BIT;
-                if(options == HBL_DISCARD)
+                if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
                 {
                     // Discard the buffer
                     access |= GL_MAP_INVALIDATE_RANGE_BIT;
                 }
+                access |= GL_MAP_UNSYNCHRONIZED_BIT;
             }
 			else if (options == HBL_READ_ONLY)
 				access |= GL_MAP_READ_BIT;
 			else
 				access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
-
-            access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
             // FIXME: Big stall here
             void* pBuffer;

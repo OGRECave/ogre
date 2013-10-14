@@ -54,7 +54,7 @@ namespace Ogre {
         ParticleIterator(list<Particle*>::type::iterator start, list<Particle*>::type::iterator end);
 
     public:
-        // Returns true when at the end of the particle list
+        /// Returns true when at the end of the particle list
         bool end(void);
 
         /** Returns a pointer to the next particle, and moves the iterator on by 1 element. */

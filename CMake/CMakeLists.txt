@@ -31,6 +31,15 @@ set(INST_FILES
   Utils/OgreGetVersion.cmake
   Utils/OgreFindFrameworks.cmake
 ) 
+
+if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "poco")
+  set(INST_FILES ${INST_FILES} Packages/FindPOCO.cmake)
+endif ()
+
+if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "tbb")
+  set(INST_FILES ${INST_FILES} Packages/FindTBB.cmake)
+endif ()
+
 set(STATIC_INST_FILES
   Packages/FindCg.cmake
   Packages/FindDirectX.cmake
@@ -38,8 +47,6 @@ set(STATIC_INST_FILES
   Packages/FindFreetype.cmake
   Packages/FindOpenGLES.cmake
   Packages/FindOpenGLES2.cmake
-  Packages/FindPOCO.cmake
-  Packages/FindTBB.cmake
   Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
   Packages/FindSoftimage.cmake
@@ -54,10 +61,6 @@ endif ()
 if (APPLE)
   set(INST_FILES ${INST_FILES}
     Packages/FindCg.cmake
-    Packages/FindIOKit.cmake
-    Packages/FindCarbon.cmake
-    Packages/FindCocoa.cmake
-    Packages/FindCoreVideo.cmake
   )
   set(STATIC_INST_FILES ${STATIC_INST_FILES}
     Packages/FindGLSLOptimizer.cmake

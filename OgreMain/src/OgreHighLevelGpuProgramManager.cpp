@@ -65,6 +65,7 @@ namespace Ogre {
 		bool isSupported(void) const { return false; }
 		/// Overridden from GpuProgram
 		const String& getLanguage(void) const { return sNullLang; }
+        size_t calculateSize(void) const { return 0; }
 
 		/// Overridden from StringInterface
 		bool setParameter(const String& name, const String& value)
@@ -184,6 +185,11 @@ namespace Ogre {
         return getFactory(paramIt->second)->create(this, name, getNextHandle(), 
             group, isManual, loader);
     }
+    //-----------------------------------------------------------------------
+    HighLevelGpuProgramPtr HighLevelGpuProgramManager::getByName(const String& name, const String& groupName)
+    {
+        return getResourceByName(name, groupName).staticCast<HighLevelGpuProgram>();
+    }
     //---------------------------------------------------------------------------
     HighLevelGpuProgramPtr HighLevelGpuProgramManager::createProgram(
 			const String& name, const String& groupName, 
@@ -193,7 +199,7 @@ namespace Ogre {
             getFactory(language)->create(this, name, getNextHandle(), 
             groupName, false, 0));
 
-        HighLevelGpuProgramPtr prg = ret;
+        HighLevelGpuProgramPtr prg = ret.staticCast<HighLevelGpuProgram>();
         prg->setType(gptype);
         prg->setSyntaxCode(language);
 

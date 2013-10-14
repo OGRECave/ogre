@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre {
 
@@ -75,7 +76,7 @@ namespace Ogre {
 		DWORD mLockFlags;
 
 		// Device access mutex.
-		OGRE_STATIC_MUTEX(msDeviceAccessMutex)		
+		OGRE_STATIC_MUTEX(msDeviceAccessMutex);
 	protected:
 		/// Lock a box
 		PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);

@@ -2904,6 +2904,10 @@ namespace Ogre {
 			case GPT_GEOMETRY_PROGRAM:
 				ogrePass->setGeometryProgram(ogreProgram->getName());
 				break;
+            case GPT_DOMAIN_PROGRAM:
+            case GPT_COMPUTE_PROGRAM:
+            case GPT_HULL_PROGRAM:
+                break;
 			}
 
 		}

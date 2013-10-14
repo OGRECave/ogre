@@ -38,21 +38,25 @@ namespace Ogre
 	const uint32 TerrainLodManager::TERRAINLODDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TLDA");
 	const uint16 TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION = 1;
 
-	TerrainLodManager::TerrainLodManager(Terrain* t)
+	TerrainLodManager::TerrainLodManager(Terrain* t, DataStreamPtr& stream)
+		: mTerrain(t)
 	{
-		init(t);
-		mHighestLodPrepared = 0;
+		init();
+		mDataStream = stream;
+		mStreamOffset = mDataStream.isNull() ? 0 : mDataStream->tell();
 	}
 
 	TerrainLodManager::TerrainLodManager(Terrain* t, const String& filename)
+		: mTerrain(t), mStreamOffset(0)
 	{
-		init(t);
-		mDatafile = filename;
+		init();
+
+		if(!filename.empty() && filename.length() > 0)
+			mDataStream = Root::getSingleton().openFileStream(filename, mTerrain->_getDerivedResourceGroup());
 	}
 
-	void TerrainLodManager::init(Terrain* t)
+	void TerrainLodManager::init()
 	{
-		mTerrain = t;
 		mHighestLodPrepared = -1;
 		mHighestLodLoaded = -1;
 		mTargetLodLevel = -1;
@@ -127,7 +131,7 @@ namespace Ogre
 
 		if (res->succeeded())
 		{
-			// no others update Lod status
+			// no others update LOD status
 			if(lreq.currentPreparedLod == mHighestLodPrepared && lreq.currentLoadedLod == mHighestLodLoaded )
 			{
 				if( lreq.requestedLod < mHighestLodPrepared )
@@ -191,7 +195,7 @@ namespace Ogre
 					{
 						mLodInfoTable[level].treeStart = depth;
 						mLodInfoTable[level].treeEnd = prevdepth;
-						mLodInfoTable[level].isLast = level == last+prevdepth-depth-1;
+						mLodInfoTable[level].isLast = level == last+prevdepth-depth-static_cast<uint>(1);
 						mLodInfoTable[level].resolution = bakedresolution;
 						mLodInfoTable[level].size = ((bakedresolution-1) / splits) + 1;
 						// this lod info has been filled
@@ -306,45 +310,51 @@ namespace Ogre
 
 	void TerrainLodManager::readLodData(uint16 lowerLodBound, uint16 higherLodBound)
 	{
+		if(mDataStream.isNull()) // No file to read from
+			return;
+
 		uint16 numLodLevels = mTerrain->getNumLodLevels();
+		mDataStream->seek(mStreamOffset);
+		StreamSerialiser stream(mDataStream);
 
-		DataStreamPtr dStream = Root::getSingleton().openFileStream(mDatafile,
-			mTerrain->_getDerivedResourceGroup());
-		StreamSerialiser stream(dStream);
+        const StreamSerialiser::Chunk *mainChunk = stream.readChunkBegin(Terrain::TERRAIN_CHUNK_ID, Terrain::TERRAIN_CHUNK_VERSION);
 
-		stream.readChunkBegin(Terrain::TERRAIN_CHUNK_ID, Terrain::TERRAIN_CHUNK_VERSION);
-		// skip the general information
-		stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
-		stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
-		// skip the previous lod data
-		for(int skip=numLodLevels-1-lowerLodBound; skip>0; skip--)
-		{
-			stream.readChunkBegin(TERRAINLODDATA_CHUNK_ID, TERRAINLODDATA_CHUNK_VERSION);
-			stream.readChunkEnd(TERRAINLODDATA_CHUNK_ID);
-		}
+        if(mainChunk->version > 1)
+        {
+            // skip the general information
+            stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
+            stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
 
-		// uncompress
-		uint maxSize = 2 * mTerrain->getGeoDataSizeAtLod(higherLodBound);
-		float *lodData = OGRE_ALLOC_T(float, maxSize, MEMCATEGORY_GENERAL);
+            // skip the previous lod data
+            for(int skip=numLodLevels-1-lowerLodBound; skip>0; skip--)
+            {
+                stream.readChunkBegin(TERRAINLODDATA_CHUNK_ID, TERRAINLODDATA_CHUNK_VERSION);
+                stream.readChunkEnd(TERRAINLODDATA_CHUNK_ID);
+            }
 
-		for(int level=lowerLodBound; level>=higherLodBound; level-- )
-		{
-			// both height data and delta data
-			uint dataSize = 2 * mTerrain->getGeoDataSizeAtLod(level);
+            // uncompress
+            uint maxSize = 2 * mTerrain->getGeoDataSizeAtLod(higherLodBound);
+            float *lodData = OGRE_ALLOC_T(float, maxSize, MEMCATEGORY_GENERAL);
 
-			// reach and read the target lod data
-			const StreamSerialiser::Chunk *c = stream.readChunkBegin(TERRAINLODDATA_CHUNK_ID,
-					TERRAINLODDATA_CHUNK_VERSION);
-			stream.startDeflate(c->length);
-			stream.read(lodData, dataSize);
-			stream.stopDeflate();
-			stream.readChunkEnd(TERRAINLODDATA_CHUNK_ID);
+            for(int level=lowerLodBound; level>=higherLodBound; level-- )
+            {
+                // both height data and delta data
+                uint dataSize = 2 * mTerrain->getGeoDataSizeAtLod(level);
 
-			fillBufferAtLod(level, lodData, dataSize);
-		}
-		stream.readChunkEnd(Terrain::TERRAIN_CHUNK_ID);
+                // reach and read the target lod data
+                const StreamSerialiser::Chunk *c = stream.readChunkBegin(TERRAINLODDATA_CHUNK_ID,
+                        TERRAINLODDATA_CHUNK_VERSION);
+                stream.startDeflate(c->length);
+                stream.read(lodData, dataSize);
+                stream.stopDeflate();
+                stream.readChunkEnd(TERRAINLODDATA_CHUNK_ID);
 
-		OGRE_FREE(lodData, MEMCATEGORY_GENERAL);
+                fillBufferAtLod(level, lodData, dataSize);
+            }
+            stream.readChunkEnd(Terrain::TERRAIN_CHUNK_ID);
+
+            OGRE_FREE(lodData, MEMCATEGORY_GENERAL);
+        }
 	}
 	void TerrainLodManager::fillBufferAtLod(uint lodLevel, const float* data, uint dataSize )
 	{
@@ -359,12 +369,12 @@ namespace Ogre
 		for (uint16 y = 0; y < size; y += inc)
 		{
 			for (uint16 x = 0; x < size-1; x += inc)
-				if ((lodLevel == numLodLevels - 1) || (x % prev != 0) || (y % prev != 0))
+				if ((lodLevel == numLodLevels - static_cast<uint>(1)) || (x % prev) || (y % prev))
 				{
 					mTerrain->mHeightData[y*size + x] = *(heightDataPtr++);
 					mTerrain->mDeltaData[y*size + x] = *(deltaDataPtr++);
 				}
-			if ((lodLevel == numLodLevels - 1) || (y % prev) != 0)
+			if ((lodLevel == numLodLevels - static_cast<uint>(1)) || (y % prev))
 			{
 				mTerrain->mHeightData[y*size + size-1] = *(heightDataPtr++);
 				mTerrain->mDeltaData[y*size + size-1] = *(deltaDataPtr++);

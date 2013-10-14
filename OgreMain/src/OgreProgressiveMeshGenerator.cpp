@@ -57,7 +57,7 @@ namespace Ogre
 void ProgressiveMeshGeneratorBase::getAutoconfig( MeshPtr& inMesh, LodConfig& outLodConfig )
 {
 	outLodConfig.mesh = inMesh;
-	outLodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
+	outLodConfig.strategy = AbsolutePixelCountLodStrategy::getSingletonPtr();
 	LodLevel lodLevel;
 	lodLevel.reductionMethod = LodLevel::VRM_COLLAPSE_COST;
 	Real radius = inMesh->getBoundingSphereRadius();
@@ -65,21 +65,21 @@ void ProgressiveMeshGeneratorBase::getAutoconfig( MeshPtr& inMesh, LodConfig& ou
 	Real i4 = (Real) (i * i * i * i);
 	Real i5 = i4 * (Real) i;
 		// Distance = pixel count
-		// Constant: zoom of the Lod. This could be scaled based on resolution.
-		//     Higher constant means first Lod is nearer to camera. Smaller constant means the first Lod is further away from camera.
-		// i4: The stretching. Normally you want to have more Lods in the near, then in far away.
+		// Constant: zoom of the LOD. This could be scaled based on resolution.
+		//     Higher constant means first LOD is nearer to camera. Smaller constant means the first LOD is further away from camera.
+		// i4: The stretching. Normally you want to have more LOD level in the near, then in far away.
 		//     i4 means distance is divided by 16=(2*2*2*2), 81, 256, 625=(5*5*5*5).
-		//     if 16 would be smaller, the first Lod would be nearer. if 625 would be bigger, the last Lod would be further awaay.
-		// if you increase 16 and decrease 625, first and Last Lod distance would be smaller.
+		//     if 16 would be smaller, the first LOD would be nearer. if 625 would be bigger, the last LOD would be further away.
+		// if you increase 16 and decrease 625, first and Last LOD distance would be smaller.
 		lodLevel.distance = 3388608.f / i4;
 		
 		// reductionValue = collapse cost
 		// Radius: Edges are multiplied by the length, when calculating collapse cost. So as a base value we use radius, which should help in balancing collapse cost to any mesh size.
 		// The constant and i5 are playing together. 1/(1/100k*i5)
-		// You need to determine the quality of nearest Lod and the furthest away first.
-		// I have chosen 1/(1/100k*(2^5)) = 3125 for nearest Lod and 1/(1/100k*(5^5)) = 32 for nearest Lod.
-		// if you divide radius by a bigger number, it means smaller reduction. So radius/3125 is very small reduction for nearest Lod.
-		// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means aggressive reduction for furthest away lod.
+		// You need to determine the quality of nearest LOD and the furthest away first.
+		// I have chosen 1/(1/100k*(2^5)) = 3125 for nearest LOD and 1/(1/100k*(5^5)) = 32 for nearest LOD.
+		// if you divide radius by a bigger number, it means smaller reduction. So radius/3125 is very small reduction for nearest LOD.
+		// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means aggressive reduction for furthest away LOD.
 		// current values: 3125, 411, 97, 32
 		lodLevel.reductionValue = radius / 100000.f * i5;
 		outLodConfig.levels.push_back(lodLevel);
@@ -95,7 +95,7 @@ void ProgressiveMeshGeneratorBase::generateAutoconfiguredLodLevels( MeshPtr& mes
 
 ProgressiveMeshGenerator::ProgressiveMeshGenerator() :
     mUniqueVertexSet((UniqueVertexSet::size_type) 0, (const UniqueVertexSet::hasher&) PMVertexHash(this)),
-    mMesh(NULL), mMeshBoundingSphereRadius(0.0f),
+    mMesh(), mMeshBoundingSphereRadius(0.0f),
     mCollapseCostLimit(NEVER_COLLAPSE_COST)
 {
 	OgreAssert(NEVER_COLLAPSE_COST < UNINITIALIZED_COLLAPSE_COST && NEVER_COLLAPSE_COST != UNINITIALIZED_COLLAPSE_COST, "");
@@ -186,7 +186,7 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 	// Lock the buffer for reading.
 	unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 	unsigned char* vertex = vStart;
-	int vSize = vbuf->getVertexSize();
+	size_t vSize = vbuf->getVertexSize();
 	unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
 
 	VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
@@ -245,7 +245,7 @@ void ProgressiveMeshGenerator::addIndexDataImpl(IndexType* iPos, const IndexType
 			str << "In " << mMeshName << " malformed triangle found with ID: " << getTriangleID(tri) << ". " <<
 			std::endl;
 			printTriangle(tri, str);
-			str << "It will be excluded from Lod level calculations.";
+			str << "It will be excluded from LOD level calculations.";
 			LogManager::getSingleton().stream() << str.str();
 #endif
 			tri->isRemoved = true;
@@ -385,7 +385,7 @@ ProgressiveMeshGenerator::PMTriangle* ProgressiveMeshGenerator::isDuplicateTrian
 }
 int ProgressiveMeshGenerator::getTriangleID(PMTriangle* triangle)
 {
-	return (triangle - &mTriangleList[0]) / sizeof(PMTriangle);
+	return static_cast<int>((triangle - &mTriangleList[0]) / sizeof(PMTriangle));
 }
 void ProgressiveMeshGenerator::addTriangleToEdges(PMTriangle* triangle)
 {
@@ -399,7 +399,7 @@ void ProgressiveMeshGenerator::addTriangleToEdges(PMTriangle* triangle)
 		printTriangle(triangle, str);
 		str << "Triangle " << getTriangleID(duplicate) << " positions:" << std::endl;
 		printTriangle(duplicate, str);
-		str << "Triangle " << getTriangleID(triangle) << " will be excluded from Lod level calculations.";
+		str << "Triangle " << getTriangleID(triangle) << " will be excluded from LOD level calculations.";
 		LogManager::getSingleton().stream() << str;
 #endif
 		triangle->isRemoved = true;
@@ -466,7 +466,7 @@ void ProgressiveMeshGenerator::computeCosts()
 			    << it->position.x << ", "
 			    << it->position.y << ", "
 			    << it->position.z << ") "
-			    << "It will be excluded from Lod level calculations.";
+			    << "It will be excluded from LOD level calculations.";
 #endif
 		}
 	}
@@ -500,7 +500,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 	// 30% speedup if disabled.
 
 	// Degenerate case check
-	// Are we going to invert a face normal of one of the neighbouring faces?
+	// Are we going to invert a face normal of one of the neighboring faces?
 	// Can occur when we have a very small remaining edge and collapse crosses it
 	// Look for a face normal changing by > 90 degrees
 	{
@@ -696,13 +696,13 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 {
 #if OGRE_DEBUG_MODE
 
-	// Do not call this with empty Lod.
+	// Do not call this with empty LOD.
 	OgreAssert(!lodConfig.levels.empty(), "");
 
-	// Too many lod levels.
+	// Too many LOD levels.
 	OgreAssert(lodConfig.levels.size() <= 0xffff, "");
 
-	// Lod distances needs to be sorted.
+	// LOD distances needs to be sorted.
 	Mesh::LodValueList values;
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);
@@ -844,8 +844,8 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 			// Remove a triangle
 			// Tasks:
 			// 1. Add it to the collapsed edges list.
-			// 2. Reduce index count for the Lods, which will not have this triangle.
-			// 3. Mark as removed, so it will not be added in upcoming Lod levels.
+			// 2. Reduce index count for the LOD levels, which will not have this triangle.
+			// 3. Mark as removed, so it will not be added in upcoming LOD levels.
 			// 4. Remove references/pointers to this triangle.
 
 			// 1. task
@@ -994,8 +994,7 @@ void ProgressiveMeshGenerator::bakeLods()
 	// Create buffers.
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-		int indexCount = mIndexBufferInfoList[i].indexCount;
-		OgreAssert(indexCount >= 0, "");
+		size_t indexCount = mIndexBufferInfoList[i].indexCount;
 		lods.push_back(OGRE_NEW IndexData());
 		lods.back()->indexStart = 0;
 

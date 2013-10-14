@@ -36,33 +36,11 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    float HalfFloatGridSource::getVolumeGridValue(int x, int y, int z) const
+    float HalfFloatGridSource::getVolumeGridValue(size_t x, size_t y, size_t z) const
     {
-        if (x >= mWidth)
-        {
-            x = mWidth - 1;
-        }
-        else if (x < 0)
-        {
-            x = 0;
-        }
-
-        if (y >= mHeight)
-        {
-            y = mHeight - 1;
-        } else if (y < 0)
-        {
-            y = 0;
-        }
-
-        if (z >= mDepth)
-        {
-            z = mDepth - 1;
-        } else if (z < 0)
-        {
-            z = 0;
-        }
-
+        x = x >= mWidth ? mWidth - 1 : x;
+        y = y >= mHeight ? mHeight - 1 : y;
+        z = z >= mDepth ? mDepth - 1 : z;
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
 
@@ -88,8 +66,12 @@ namespace Volume {
     
         Timer t;
         DataStreamPtr streamRead = Root::getSingleton().openFileStream(serializedVolumeFile);
+#if OGRE_NO_ZIP_ARCHIVE == 0
         DataStreamPtr uncompressStream(OGRE_NEW DeflateStream(serializedVolumeFile, streamRead));
         StreamSerialiser ser(uncompressStream);
+#else
+        StreamSerialiser ser(streamRead);
+#endif
         if (!ser.readChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION))
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
@@ -107,15 +89,17 @@ namespace Volume {
         ser.read<size_t>(&width);
         ser.read<size_t>(&height);
         ser.read<size_t>(&depth);
-        mWidth = (int)width;
-        mHeight = (int)height;
-        mDepth = (int)depth;
-        mDepthTimesHeight = mDepth * mHeight;
+        mWidth = static_cast<int>(width);
+        mHeight = static_cast<int>(height);
+        mDepth = static_cast<int>(depth);
+        mDepthTimesHeight = static_cast<int>(mDepth * mHeight);
         
         Vector3 worldDimension = readTo - readFrom;
         mPosXScale = (Real)1.0 / (Real)worldDimension.x * (Real)mWidth;
         mPosYScale = (Real)1.0 / (Real)worldDimension.y * (Real)mHeight;
         mPosZScale = (Real)1.0 / (Real)worldDimension.z * (Real)mDepth;
+
+        mVolumeSpaceToWorldSpaceFactor = (Real)worldDimension.x * (Real)mWidth;
 
         // Read data
         size_t elementCount = mWidth * mHeight * mDepth;

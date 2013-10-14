@@ -1,6 +1,9 @@
-#version 300
+#version 300 es
 
-uniform sampler2DArray TextureArrayTex;
+precision mediump int;
+precision mediump float;
+
+uniform lowp sampler2DArray TextureArrayTex;
 in vec4 oUv;
 out vec4 fragColour;
 

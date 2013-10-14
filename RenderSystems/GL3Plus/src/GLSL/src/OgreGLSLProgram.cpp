@@ -232,6 +232,24 @@ namespace Ogre {
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
 		{
+            // Fix up the source in case someone forgot to redeclare gl_Position
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+               mType == GPT_VERTEX_PROGRAM)
+            {
+                // Check that it's missing and that this shader has a main function, ie. not a child shader.
+                if(mSource.find("vec4 gl_Position") == String::npos)
+                {
+                    size_t mainPos = mSource.find("void main");
+                    if(mainPos != String::npos)
+                    {
+                        size_t versionPos = mSource.find("#version");
+                        int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+                        if(shaderVersion >= 150)
+                            mSource.insert(mainPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n");
+                    }
+                }
+            }
+
 			const char *source = mSource.c_str();
 			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
 		}
@@ -239,7 +257,7 @@ namespace Ogre {
 		OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
 		// Check for compile errors
-		glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled);
+		OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
         if(!mCompiled && checkErrors)
 		{
             String message = logObjectInfo("GLSL compile log: " + mName, mGLShaderHandle);
@@ -251,10 +269,33 @@ namespace Ogre {
             logObjectInfo("GLSL compiled: " + mName, mGLShaderHandle);
 
         if(!mCompiled)
+        {
+			String progType = "Fragment";
+			if (mType == GPT_VERTEX_PROGRAM)
+			{
+				progType = "Vertex";
+			}
+			else if (mType == GPT_GEOMETRY_PROGRAM)
+			{
+				progType = "Geometry";
+			}
+			else if (mType == GPT_DOMAIN_PROGRAM)
+			{
+				progType = "Tesselation Evaluation";
+			}
+			else if (mType == GPT_HULL_PROGRAM)
+			{
+				progType = "Tesselation Control";
+			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				progType = "Compute";
+			}
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        ((mType == GPT_VERTEX_PROGRAM) ? "Vertex Program " : "Fragment Program ") + mName +
+                        progType + " Program " + mName +
                         " failed to compile. See compile log above for details.",
                         "GLSLProgram::compile");
+        }
 
 		return (mCompiled == 1);
 	}
@@ -283,7 +324,7 @@ namespace Ogre {
 		{
 			OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(mGLProgramHandle)
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
             {
                 OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
             }
@@ -518,7 +559,7 @@ namespace Ogre {
 			vector< String >::type errors = StringUtil::split(message, "\n");
 
 			// going from the end so when we delete a line the numbers of the lines before will not change
-			for(int i = errors.size() - 1 ; i != -1 ; i--)
+			for(int i = (int)errors.size() - 1 ; i != -1 ; i--)
 			{
 				String & curError = errors[i];
 				size_t foundPos = curError.find(precisionQualifierErrorString);
@@ -538,7 +579,7 @@ namespace Ogre {
 				}
 			}	
 			// rebuild source
-			std::stringstream newSource;	
+			StringStream newSource;
 			for(size_t i = 0; i < linesOfSource.size()  ; i++)
 			{
 				newSource << linesOfSource[i] << "\n";

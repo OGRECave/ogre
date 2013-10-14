@@ -80,7 +80,7 @@ namespace Ogre {
         
 		// no active link program so find one or make a new one
 		// is there an active key?
-		uint64 activeKey = 0;
+		uint32 activeKey = 0;
         GLuint progID = 0;
 
 		if (mActiveVertexGpuProgram)

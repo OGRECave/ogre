@@ -9,201 +9,63 @@
 
 # Configure OpenGL RenderSystem build
 
-set(HEADER_FILES
-  include/OgreGLATIFSInit.h
-  include/OgreGLContext.h
-  include/OgreGLDefaultHardwareBufferManager.h
-  include/OgreGLDepthBuffer.h
-  include/OgreGLFBOMultiRenderTarget.h
-  include/OgreGLFBORenderTexture.h
-  include/OgreGLFrameBufferObject.h
-  include/OgreGLGpuNvparseProgram.h
-  include/OgreGLGpuProgram.h
-  include/OgreGLGpuProgramManager.h
-  include/OgreGLHardwareBufferManager.h
-  include/OgreGLHardwareIndexBuffer.h
-  include/OgreGLHardwareOcclusionQuery.h
-  include/OgreGLHardwarePixelBuffer.h
-  include/OgreGLHardwareVertexBuffer.h
-  include/OgreGLPBRenderTexture.h
-  include/OgreGLPBuffer.h
-  include/OgreGLPixelFormat.h
-  include/OgreGLPlugin.h
-  include/OgreGLPrerequisites.h
-  include/OgreGLRenderSystem.h
-  include/OgreGLRenderTexture.h
-  include/OgreGLRenderToVertexBuffer.h
-  include/OgreGLSupport.h
-  include/OgreGLTexture.h
-  include/OgreGLTextureManager.h
-)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+file(GLOB NVPARSE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.cpp")
+file(GLOB NVPARSE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.h")
 
-set(SOURCE_FILES
-  src/OgreGLATIFSInit.cpp
-  src/OgreGLContext.cpp
-  src/OgreGLDefaultHardwareBufferManager.cpp
-  src/OgreGLDepthBuffer.cpp
-  src/OgreGLEngineDll.cpp
-  src/OgreGLFBOMultiRenderTarget.cpp
-  src/OgreGLFBORenderTexture.cpp
-  src/OgreGLFrameBufferObject.cpp
-  src/OgreGLGpuNvparseProgram.cpp
-  src/OgreGLGpuProgram.cpp
-  src/OgreGLGpuProgramManager.cpp
-  src/OgreGLHardwareBufferManager.cpp
-  src/OgreGLHardwareIndexBuffer.cpp
-  src/OgreGLHardwareOcclusionQuery.cpp
-  src/OgreGLHardwarePixelBuffer.cpp
-  src/OgreGLHardwareVertexBuffer.cpp
-  src/OgreGLPBRenderTexture.cpp
-  src/OgreGLPixelFormat.cpp
-  src/OgreGLPlugin.cpp
-  src/OgreGLRenderSystem.cpp
-  src/OgreGLRenderTexture.cpp
-  src/OgreGLRenderToVertexBuffer.cpp
-  src/OgreGLSupport.cpp
-  src/OgreGLTexture.cpp
-  src/OgreGLTextureManager.cpp
-  src/glew.cpp
-)
+# Remove test app file
+list(REMOVE_ITEM NVPARSE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/ps1.0__test_main.cpp")
 
-set(NVPARSE_FILES
-  src/nvparse/macro.h
-  src/nvparse/nvparse_errors.h
-  src/nvparse/nvparse_externs.h
-  src/nvparse/nvparse.h
-  src/nvparse/_ps1.0_parser.h
-  src/nvparse/ps1.0_program.h
-  src/nvparse/rc1.0_combiners.h
-  src/nvparse/rc1.0_final.h
-  src/nvparse/rc1.0_general.h
-  src/nvparse/_rc1.0_parser.h
-  src/nvparse/rc1.0_register.h
-  src/nvparse/ts1.0_inst.h
-  src/nvparse/ts1.0_inst_list.h
-  src/nvparse/_ts1.0_parser.h
-  src/nvparse/vs1.0_inst.h
-  src/nvparse/vs1.0_inst_list.h
-  src/nvparse/_vs1.0_parser.h
-  src/nvparse/avp1.0_impl.cpp
-  src/nvparse/nvparse.cpp
-  src/nvparse/nvparse_errors.cpp
-  src/nvparse/_ps1.0_lexer.cpp
-  src/nvparse/_ps1.0_parser.cpp
-  src/nvparse/ps1.0_program.cpp
-  src/nvparse/rc1.0_combiners.cpp
-  src/nvparse/rc1.0_final.cpp
-  src/nvparse/rc1.0_general.cpp
-  src/nvparse/_rc1.0_lexer.cpp
-  src/nvparse/_rc1.0_parser.cpp
-  src/nvparse/ts1.0_inst.cpp
-  src/nvparse/ts1.0_inst_list.cpp
-  src/nvparse/_ts1.0_lexer.cpp
-  src/nvparse/_ts1.0_parser.cpp
-  src/nvparse/vcp1.0_impl.cpp
-  src/nvparse/vp1.0_impl.cpp
-  src/nvparse/vs1.0_inst.cpp
-  src/nvparse/vs1.0_inst_list.cpp
-  src/nvparse/_vs1.0_lexer.cpp
-  src/nvparse/_vs1.0_parser.cpp
-  src/nvparse/vsp1.0_impl.cpp
-)
+file(GLOB ATIFS_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/src/*.cpp")
+file(GLOB ATIFS_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/*.h")
 
-set(GLSL_HEADERS
-  src/GLSL/include/OgreGLSLExtSupport.h
-  src/GLSL/include/OgreGLSLGpuProgram.h
-  src/GLSL/include/OgreGLSLLinkProgram.h
-  src/GLSL/include/OgreGLSLLinkProgramManager.h
-  src/GLSL/include/OgreGLSLPreprocessor.h
-  src/GLSL/include/OgreGLSLProgramFactory.h
-  src/GLSL/include/OgreGLSLProgram.h)
+file(GLOB GLSL_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/*.h")
+file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/src/*.cpp")
 
-set(GLSL_SOURCE
-  src/GLSL/src/OgreGLSLExtSupport.cpp
-  src/GLSL/src/OgreGLSLGpuProgram.cpp
-  src/GLSL/src/OgreGLSLLinkProgram.cpp
-  src/GLSL/src/OgreGLSLLinkProgramManager.cpp
-  src/GLSL/src/OgreGLSLPreprocessor.cpp
-  src/GLSL/src/OgreGLSLProgram.cpp
-  src/GLSL/src/OgreGLSLProgramFactory.cpp)
+source_group(NVparse FILES ${NVPARSE_SOURCE} ${NVPARSE_HEADERS})
+source_group(ATIFS FILES ${ATIFS_SOURCE} ${ATIFS_HEADERS})
+source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
-set(ATIFS_FILES
-  src/atifs/include/ATI_FS_GLGpuProgram.h
-  src/atifs/include/Compiler2Pass.h
-  src/atifs/include/ps_1_4.h
-  src/atifs/src/ATI_FS_GLGpuProgram.cpp
-  src/atifs/src/Compiler2Pass.cpp
-  src/atifs/src/ps_1_4.cpp
-)
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLUniformCacheImp.cpp
+  )
+else()
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLNullUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLNullUniformCacheImp.cpp
+  )
+endif()
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_HEADERS 
-    include/OgreWin32Context.h
-    include/OgreWin32GLSupport.h
-    include/OgreWin32Prerequisites.h
-    include/OgreWin32RenderTexture.h
-    include/OgreWin32Window.h
-    src/win32/OgreGLUtil.h
-  )
-  set(PLATFORM_SOURCES
-    src/OgreWin32GLSupport.cpp
-    src/OgreWin32RenderTexture.cpp
-    src/OgreWin32Window.cpp
-    src/win32/OgreWin32Context.cpp
-  )
-  include_directories(src/nvparse/winheaders src/win32)
-  source_group(NVparse FILES ${NVPARSE_FILES})
-  source_group(ATIFS FILES ${ATIFS_FILES})
-  source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
+  file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
+  file(GLOB PLATFORM_SOURCES "src/Win32/*.cpp")
+
+  include_directories(src/nvparse/winheaders include/Win32 src/Win32)
   set(PLATFORM_HEADER_INSTALL "")
 elseif (APPLE)
-  set(PLATFORM_HEADERS
-    include/OSX/OgreOSXCGLContext.h
-    include/OSX/OgreOSXCarbonContext.h
-    include/OSX/OgreOSXCarbonWindow.h
-    include/OSX/OgreOSXCocoaContext.h
-	include/OSX/OgreOSXCocoaView.h
-    include/OSX/OgreOSXCocoaWindow.h
-    include/OSX/OgreOSXCocoaWindowDelegate.h
-    include/OSX/OgreOSXContext.h
-    include/OSX/OgreOSXGLSupport.h
-    include/OSX/OgreOSXRenderTexture.h
-    include/OSX/OgreOSXWindow.h
-    src/OSX/OgreGLUtil.h
-  )
-  set(PLATFORM_SOURCES
-    src/OSX/OgreOSXCarbonContext.cpp
-    src/OSX/OgreOSXCocoaContext.mm
-    src/OSX/OgreOSXContext.cpp
-    src/OSX/OgreOSXRenderTexture.cpp
-    src/OSX/OgreOSXCGLContext.cpp
-    src/OSX/OgreOSXCarbonWindow.cpp
-	src/OSX/OgreOSXCocoaView.mm
-    src/OSX/OgreOSXCocoaWindow.mm
-    src/OSX/OgreOSXCocoaWindowDelegate.mm
-    src/OSX/OgreOSXGLSupport.mm
-    src/OSX/OgreOSXWindow.cpp
-  )
+  file(GLOB PLATFORM_HEADERS "include/OSX/*.h" "src/OSX/*.h")
+  file(GLOB PLATFORM_SOURCES "src/OSX/*.cpp" "src/OSX/*.mm")
+
   include_directories(src/OSX include/OSX "${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
-  set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
-  set(PLATFORM_HEADERS
-    include/GLX/OgreGLXContext.h
-    include/GLX/OgreGLXGLSupport.h
-    include/GLX/OgreGLXRenderTexture.h
-    include/GLX/OgreGLXUtils.h
-    include/GLX/OgreGLXWindow.h
-    src/GLX/OgreGLUtil.h
-  )
-  set(PLATFORM_SOURCES
-    src/GLX/OgreGLXContext.cpp
-    src/GLX/OgreGLXGLSupport.cpp
-    src/GLX/OgreGLXRenderTexture.cpp
-    src/GLX/OgreGLXWindow.cpp
-  )
+  file(GLOB PLATFORM_HEADERS "include/GLX/*.h" "src/GLX/*.h")
+  file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp")
+
   include_directories(src/GLX include/GLX)
   set(PLATFORM_HEADER_INSTALL "GLX")
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
@@ -211,26 +73,8 @@ endif ()
 
 list(APPEND HEADER_FILES
   ${GLSL_HEADERS}
-  src/atifs/include/ATI_FS_GLGpuProgram.h
-  src/atifs/include/Compiler2Pass.h
-  src/atifs/include/ps_1_4.h
-  src/nvparse/macro.h
-  src/nvparse/nvparse_errors.h
-  src/nvparse/nvparse_externs.h
-  src/nvparse/nvparse.h
-  src/nvparse/_ps1.0_parser.h
-  src/nvparse/ps1.0_program.h
-  src/nvparse/rc1.0_combiners.h
-  src/nvparse/rc1.0_final.h
-  src/nvparse/rc1.0_general.h
-  src/nvparse/_rc1.0_parser.h
-  src/nvparse/rc1.0_register.h
-  src/nvparse/ts1.0_inst.h
-  src/nvparse/ts1.0_inst_list.h
-  src/nvparse/_ts1.0_parser.h
-  src/nvparse/vs1.0_inst.h
-  src/nvparse/vs1.0_inst_list.h
-  src/nvparse/_vs1.0_parser.h
+  ${NVPARSE_HEADERS}
+  ${ATIFS_HEADERS}
 )
 
 include_directories(
@@ -240,12 +84,17 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
-  ${OPENGL_INCLUDE_DIR}
 )
+
+if(NOT APPLE)
+  include_directories(
+    ${OPENGL_INCLUDE_DIR}
+  )
+endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
-ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_FILES} ${NVPARSE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
+ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -255,6 +104,11 @@ if (NOT OGRE_STATIC)
 endif ()
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
+endif ()
+
+if (APPLE)
+    set_target_properties(RenderSystem_GL PROPERTIES
+        LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL")
 endif ()
 
 ogre_config_framework(RenderSystem_GL)

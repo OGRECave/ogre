@@ -146,6 +146,11 @@ namespace Volume {
         */
         bool getFirstRayIntersection(const Ray &ray, Vector3 &result, Real scale = (Real)1.0, size_t maxIterations = 5000, Real maxDistance = (Real)10000.0) const;
 
+        /** Gets a factor to come from volume coordinate to world coordinate.
+        @return
+            The factor, 1.0 in the default implementation.
+        */
+        Real getVolumeSpaceToWorldSpaceFactor(void) const;
     };
 
 }

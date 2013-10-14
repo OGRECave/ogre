@@ -6,6 +6,7 @@ vertex_program ssao_vs unified
 	delegate ssao_vs_pCg
 	delegate ssao_vs_pCg_sm4
 	delegate ssao_vs_pGLSL
+	delegate ssao_vs_pGLSLES
 }
 vertex_program ssao_vs_pCg cg
 {
@@ -36,12 +37,21 @@ vertex_program ssao_vs_pGLSL glsl
         param_named_auto worldViewProj worldviewproj_matrix
     }
 }
-
+vertex_program ssao_vs_pGLSLES glsles
+{
+    source ssao_vs.glsles
+    syntax glsles
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
 fragment_program ssao_ps unified
 {
 	delegate ssao_ps_pCg
 	delegate ssao_ps_pCg_sm4
 	delegate ssao_ps_pGLSL
+	delegate ssao_ps_pGLSLES
 }
 fragment_program ssao_ps_pCg cg
 {
@@ -74,12 +84,23 @@ fragment_program ssao_ps_pGLSL glsl
         param_named randMap int 1
     }
 }
-
+fragment_program ssao_ps_pGLSLES glsles
+{
+    source ssao_ps.glsles
+    // will run on anything with GLSL 1.50 and up
+    syntax glsles
+	default_params
+	{
+        param_named geomMap int 0
+        param_named randMap int 1
+    }
+}
 fragment_program ssaoBlurX_ps unified
 {
 	delegate ssaoBlurX_ps_pCg
 	delegate ssaoBlurX_ps_pCg_sm4
 	delegate ssaoBlurX_ps_pGLSL
+	delegate ssaoBlurX_ps_pGLSLES
 }
 fragment_program ssaoBlurX_ps_pCg cg
 {
@@ -112,12 +133,24 @@ fragment_program ssaoBlurX_ps_pGLSL glsl
         param_named geomMap int 1
     }
 }
+fragment_program ssaoBlurX_ps_pGLSLES glsles
+{
+    source ssao_blurx_ps.glsles
+    syntax glsles
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+        param_named map int 0
+        param_named geomMap int 1
+    }
+}
 
 fragment_program ssaoBlurY_ps unified
 {
 	delegate ssaoBlurY_ps_pCg
 	delegate ssaoBlurY_ps_pCg_sm4
 	delegate ssaoBlurY_ps_pGLSL
+	delegate ssaoBlurY_ps_pGLSLES
 }
 fragment_program ssaoBlurY_ps_pCg cg
 {
@@ -150,6 +183,18 @@ fragment_program ssaoBlurY_ps_pGLSL glsl
         param_named geomMap int 1
     }
 }
+fragment_program ssaoBlurY_ps_pGLSLES glsles
+{
+    source ssao_blury_ps.glsles
+    syntax glsles
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+        param_named map int 0
+        param_named geomMap int 1
+    }
+}
+
 material ssao
 {
     technique

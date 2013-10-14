@@ -52,8 +52,8 @@ namespace Ogre {
         */
         enum InputMode
         {
-            IM_NONE,        // No input
-            IM_PREVIOUS     // Output of previous Composition in chain
+            IM_NONE,        /// No input
+            IM_PREVIOUS     /// Output of previous Composition in chain
         };
         typedef vector<CompositionPass *>::type Passes;
         typedef VectorIterator<Passes> PassIterator;
@@ -149,7 +149,7 @@ namespace Ogre {
     private:
         /// Parent technique
         CompositionTechnique *mParent;
-        /// Input name
+        /// Input mode
         InputMode mInputMode;
         /// (local) output texture
         String mOutputName;

@@ -15,7 +15,18 @@ fragment_program Ogre/Compositor/OldTV_FPGLSL glsl
    		param_named Rand int 1
    		param_named Noise int 2
 	}
+}
 
+fragment_program Ogre/Compositor/OldTV_FPGLSLES glsles
+{
+	source OldTV.glsles
+	syntax glsles
+    default_params
+	{
+   		param_named Image int 0
+   		param_named Rand int 1
+   		param_named Noise int 2
+	}
 }
 
 fragment_program Ogre/Compositor/OldTV_FPHLSL hlsl
@@ -28,6 +39,7 @@ fragment_program Ogre/Compositor/OldTV_FPHLSL hlsl
 fragment_program Ogre/Compositor/OldTV_FP unified
 {
 	delegate Ogre/Compositor/OldTV_FPGLSL
+	delegate Ogre/Compositor/OldTV_FPGLSLES
 	delegate Ogre/Compositor/OldTV_FPHLSL
 	delegate Ogre/Compositor/OldTV_FPCg
 }

@@ -40,7 +40,7 @@ namespace Ogre {
  	: MovableObject()
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
+    , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
  	, mCamera(NULL)
 
@@ -55,7 +55,7 @@ namespace Ogre {
  	: MovableObject(name)
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
+    , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
  	, mCamera(NULL)
  	{

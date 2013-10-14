@@ -40,8 +40,9 @@
 #define USE_DISPLAYLINK 0
 
 #import "OgreOSXCocoaWindow.h"
-#import <Cocoa/Cocoa.h>
 #import <QuartzCore/CVDisplayLink.h>
+
+#include "SampleBrowser.h"
 
 using namespace Ogre;
 
@@ -72,7 +73,7 @@ using namespace Ogre;
 - (void)renderOneFrame:(id)sender;
 - (void)shutdown;
 
-@property (retain) NSTimer *mTimer;
+@property (retain, atomic) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
 @end

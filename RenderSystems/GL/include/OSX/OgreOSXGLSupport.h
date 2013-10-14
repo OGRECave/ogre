@@ -76,7 +76,7 @@ public:
 	void* getProcAddress( const String& procname );
 
 	virtual bool supportsPBuffers();
-	virtual GLPBuffer* createPBuffer( PixelComponentType format, size_t width, size_t height );
+	virtual GLPBuffer* createPBuffer( PixelComponentType format, uint32 width, uint32 height );
 	
 	// Core Foundation Array callback function for sorting, must be static for the function ptr
 	static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);

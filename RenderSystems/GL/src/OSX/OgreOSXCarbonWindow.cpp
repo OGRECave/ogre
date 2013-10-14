@@ -600,7 +600,7 @@ namespace Ogre
     }
     
     //-------------------------------------------------------------------------------------------------//
-    void OSXCarbonWindow::swapBuffers( bool waitForVSync )
+    void OSXCarbonWindow::swapBuffers( )
     {
         if(!mIsFullScreen)
         {
@@ -656,8 +656,6 @@ namespace Ogre
 
             if (mIsFullScreen)
             {
-                GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-
                 CGLContextObj share = NULL;
                 aglGetCGLContext(mAGLContext, (void**)&share);
 
@@ -671,7 +669,6 @@ namespace Ogre
 
                 // Create the context, keeping the current colour depth and FSAA settings
                 createCGLFullscreen(width, height, getColourDepth(), getFSAA(), share);
-                rs->_switchContext(mContext);
 
                 // Hide the Carbon window
                 HideWindow(mWindow);

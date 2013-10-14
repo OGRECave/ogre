@@ -31,13 +31,13 @@ THE SOFTWARE.
 
 #include "SdkSample.h"
 
+// resource group that will be automatically unloaded after the close of the sample
+#define TRANSIENT_RESOURCE_GROUP "VisualTestTransient"
+
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::Sample
 {
 public:
-
-    // resource group that will be automatically unloaded after the close of the sample
-    static Ogre::String TRANSIENT_RESOURCE_GROUP;
 
     VisualTest()
     {
@@ -46,7 +46,6 @@ public:
         mInfo["Category"] = "Tests";
         mInfo["Thumbnail"] = "thumb_visual_tests.png";
         mInfo["Help"] = "";
-
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
@@ -63,9 +62,9 @@ public:
 
     /** Does some basic setup tasks */
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+    virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
     {
-        OgreBites::Sample::_setup(window, mouse, fsLayer, overlaySys);
+        OgreBites::Sample::_setup(window, inputContext, fsLayer, overlaySys);
     }
 #else
     virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)

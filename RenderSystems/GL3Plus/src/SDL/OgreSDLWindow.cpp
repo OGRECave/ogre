@@ -190,9 +190,19 @@ namespace Ogre {
         }
     }
 
-    void SDLWindow::swapBuffers(bool waitForVSync)
+    void SDLWindow::setVSyncEnabled(bool vsync)
+	{
+        mVSync = vsync;
+	}
+
+	bool SDLWindow::isVSyncEnabled() const
+	{
+        return mVSync;
+	}
+
+    void SDLWindow::swapBuffers()
     {
-        if ( waitForVSync && glXGetVideoSyncSGI && glXWaitVideoSyncSGI )
+        if ( mVSync && glXGetVideoSyncSGI && glXWaitVideoSyncSGI )
         {
             unsigned int retraceCount;
             glXGetVideoSyncSGI( &retraceCount );
@@ -229,27 +239,24 @@ namespace Ogre {
 						"SDLWindow::copyContentsToMemory" );
 		}
 	
+        if(dst.getWidth() != dst.rowPitch)
+        {
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        }
+        if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
+        {
+            // Standard alignment of 4 is not right
+            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        }
+
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-					 format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 	
-		//vertical flip
-		{
-			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-			size_t height = dst.getHeight();
-			uchar *tmpData = new uchar[rowSpan * height];
-			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-	
-			while (tmpRow >= tmpData)
-			{
-				memcpy(tmpRow, srcRow, rowSpan);
-				srcRow += rowSpan;
-				tmpRow -= rowSpan;
-			}
-			memcpy(dst.data, tmpData, rowSpan * height);
-	
-			delete [] tmpData;
-		}
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+        
+        PixelUtil::bulkPixelVerticalFlip(dst);
 	}
 }

@@ -15,4 +15,10 @@ set(SOURCE_FILES
 
 ogre_add_executable(OgreMeshUpgrader ${SOURCE_FILES})
 target_link_libraries(OgreMeshUpgrader ${OGRE_LIBRARIES})
+
+if (APPLE)
+    set_target_properties(OgreMeshUpgrader PROPERTIES
+        LINK_FLAGS "-framework Cocoa")
+endif ()
+
 ogre_config_tool(OgreMeshUpgrader)

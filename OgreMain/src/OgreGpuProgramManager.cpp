@@ -43,6 +43,11 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
+    //-----------------------------------------------------------------------
+    GpuProgramPtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    {
+        return getResourceByName(name, preferHighLevelPrograms).staticCast<GpuProgram>();
+    }
 	//---------------------------------------------------------------------------
 	GpuProgramManager::GpuProgramManager()
 	{
@@ -67,8 +72,8 @@ namespace Ogre {
     {
 		GpuProgramPtr prg;
 		{
-			OGRE_LOCK_AUTO_MUTEX
-			prg = getByName(name);
+                    OGRE_LOCK_AUTO_MUTEX;
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgram(name, groupName, filename, gptype, syntaxCode);
@@ -85,8 +90,8 @@ namespace Ogre {
     {
 		GpuProgramPtr prg;
 		{
-			OGRE_LOCK_AUTO_MUTEX
-			prg = getByName(name);
+                    OGRE_LOCK_AUTO_MUTEX;
+            prg = getByName(name);
 			if (prg.isNull())
 			{
 				prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);
@@ -115,7 +120,7 @@ namespace Ogre {
 		const String& groupName, const String& filename, 
 		GpuProgramType gptype, const String& syntaxCode)
     {
-		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode);
+		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode).staticCast<GpuProgram>();
         // Set all prarmeters (create does not set, just determines factory)
 		prg->setType(gptype);
 		prg->setSyntaxCode(syntaxCode);
@@ -127,7 +132,7 @@ namespace Ogre {
 		const String& groupName, const String& code, GpuProgramType gptype, 
 		const String& syntaxCode)
     {
-		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode);
+		GpuProgramPtr prg = create(name, groupName, gptype, syntaxCode).staticCast<GpuProgram>();
         // Set all prarmeters (create does not set, just determines factory)
 		prg->setType(gptype);
 		prg->setSyntaxCode(syntaxCode);
@@ -154,16 +159,16 @@ namespace Ogre {
         return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    ResourcePtr GpuProgramManager::getResourceByName(const String& name, bool preferHighLevelPrograms)
     {
         ResourcePtr ret;
         if (preferHighLevelPrograms)
         {
-            ret = HighLevelGpuProgramManager::getSingleton().getByName(name);
+            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name);
             if (!ret.isNull())
                 return ret;
         }
-        return ResourceManager::getByName(name);
+        return ResourceManager::getResourceByName(name);
     }
 	//-----------------------------------------------------------------------------
 	GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
@@ -218,7 +223,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
 	{
-		mSaveMicrocodesToCache = val;		
+        // Check that saving shader microcode is supported
+        if(!canGetCompiledShaderBuffer())
+            mSaveMicrocodesToCache = false;
+        else
+            mSaveMicrocodesToCache = val;
 	}
 	//---------------------------------------------------------------------
 	bool GpuProgramManager::isCacheDirty( void ) const
@@ -244,7 +253,7 @@ namespace Ogre {
 		return mMicrocodeCache.find(addRenderSystemToName(name))->second;
 	}
 	//---------------------------------------------------------------------
-    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const size_t size ) const
+    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const uint32 size ) const
 	{	
 		return Microcode(OGRE_NEW MemoryDataStream(size));	
 	}
@@ -291,8 +300,8 @@ namespace Ogre {
 		}
 		
 		// write the size of the array
-		size_t sizeOfArray = mMicrocodeCache.size();
-		stream->write(&sizeOfArray, sizeof(size_t));
+		uint32 sizeOfArray = static_cast<uint32>(mMicrocodeCache.size());
+		stream->write(&sizeOfArray, sizeof(uint32));
 		
 		// loop the array and save it
 		MicrocodeMap::const_iterator iter = mMicrocodeCache.begin();
@@ -302,15 +311,15 @@ namespace Ogre {
 			// saves the name of the shader
 			{
 				const String & nameOfShader = iter->first;
-				size_t stringLength = nameOfShader.size();
-				stream->write(&stringLength, sizeof(size_t));				
+				uint32 stringLength = static_cast<uint32>(nameOfShader.size());
+				stream->write(&stringLength, sizeof(uint32));				
 				stream->write(&nameOfShader[0], stringLength);
 			}
 			// saves the microcode
 			{
 				const Microcode & microcodeOfShader = iter->second;
-				size_t microcodeLength = microcodeOfShader->size();
-				stream->write(&microcodeLength, sizeof(size_t));				
+				uint32 microcodeLength = static_cast<uint32>(microcodeOfShader->size());
+				stream->write(&microcodeLength, sizeof(uint32));				
 				stream->write(microcodeOfShader->getPtr(), microcodeLength);
 			}
 		}
@@ -321,23 +330,23 @@ namespace Ogre {
 		mMicrocodeCache.clear();
 
 		// write the size of the array
-		size_t sizeOfArray = 0;
-		stream->read(&sizeOfArray, sizeof(size_t));
+		uint32 sizeOfArray = 0;
+		stream->read(&sizeOfArray, sizeof(uint32));
 		
 		// loop the array and load it
 
-		for ( size_t i = 0 ; i < sizeOfArray ; i++ )
+		for ( uint32 i = 0 ; i < sizeOfArray ; i++ )
 		{
 			String nameOfShader;
 			// loads the name of the shader
-			size_t stringLength  = 0;
-			stream->read(&stringLength, sizeof(size_t));
+			uint32 stringLength  = 0;
+			stream->read(&stringLength, sizeof(uint32));
 			nameOfShader.resize(stringLength);				
 			stream->read(&nameOfShader[0], stringLength);
 
 			// loads the microcode
-			size_t microcodeLength = 0;
-			stream->read(&microcodeLength, sizeof(size_t));		
+			uint32 microcodeLength = 0;
+			stream->read(&microcodeLength, sizeof(uint32));		
 
 			Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(nameOfShader, microcodeLength)); 		
 			microcodeOfShader->seek(0);

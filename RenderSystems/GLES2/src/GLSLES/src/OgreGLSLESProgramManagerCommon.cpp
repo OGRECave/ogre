@@ -35,12 +35,6 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLSLESProgram.h"
 
-// Apple doesn't define this in their extension.  We'll do it just for convenience.
-// Using the value from desktop GL
-#if GL_EXT_shadow_samplers
-#define GL_SAMPLER_2D_SHADOW_EXT 0x8B62
-#endif
-
 namespace Ogre {
 
 	//-----------------------------------------------------------------------
@@ -54,9 +48,7 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("vec4", GL_FLOAT_VEC4));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2D", GL_SAMPLER_2D));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCube", GL_SAMPLER_CUBE));
-#if GL_EXT_shadow_samplers
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW_EXT));
-#endif
 		mTypeEnumMap.insert(StringToEnumMap::value_type("int", GL_INT));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec2", GL_INT_VEC2));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec3", GL_INT_VEC3));
@@ -153,14 +145,9 @@ namespace Ogre {
 		case GL_SAMPLER_CUBE:
 			defToUpdate.constType = GCT_SAMPLERCUBE;
 			break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-        case GL_SAMPLER_2D_SHADOW:
-#endif
-#if GL_EXT_shadow_samplers
         case GL_SAMPLER_2D_SHADOW_EXT:
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
             break;
-#endif
         case GL_INT:
 			defToUpdate.constType = GCT_INT1;
 			break;
@@ -360,7 +347,7 @@ namespace Ogre {
 		
 		if( uniformName != NULL ) 
 		{
-			delete uniformName;
+			delete[] uniformName;
 		}
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -423,6 +410,7 @@ namespace Ogre {
 			if (!inLargerString)
 			{
                 String::size_type endPos;
+                String typeString;
                 GpuSharedParametersPtr blockSharedParams;
 
                 // Check for a type. If there is one, then the semicolon is missing
@@ -430,7 +418,16 @@ namespace Ogre {
 				String::size_type lineEndPos = src.find_first_of("\n\r", currPos);
 				line = src.substr(currPos, lineEndPos - currPos);
                 StringVector parts = StringUtil::split(line, " \t");
-                StringToEnumMap::iterator typei = mTypeEnumMap.find(parts.front());
+
+                // Skip over precision keywords
+                if(StringUtil::match((parts.front()), "lowp") ||
+                   StringUtil::match((parts.front()), "mediump") ||
+                   StringUtil::match((parts.front()), "highp"))
+                    typeString = parts[1];
+                else
+                    typeString = parts[0];
+
+                StringToEnumMap::iterator typei = mTypeEnumMap.find(typeString);
                 if (typei == mTypeEnumMap.end())
                 {
                     // Gobble up the external name
@@ -460,55 +457,6 @@ namespace Ogre {
                         // problem, missing semicolon, abort
                         break;
                     }
-
-                    // TODO: We don't need the internal name. Just skip over to the end of the block
-                    // But we do need to know if this is an array of blocks. Is that legal?
-
-                    // Find the internal name.
-                    // This can be an array.
-                    //                    line = src.substr(currPos, endPos - currPos);
-                    //                    StringVector internalParts = StringUtil::split(line, ", \t\r\n");
-                    //                    String internalName = "";
-                    //                    uint16 arraySize = 0;
-                    //                    for (StringVector::iterator i = internalParts.begin(); i != internalParts.end(); ++i)
-                    //                    {
-                    //                        StringUtil::trim(*i);
-                    //                        String::size_type arrayStart = i->find("[", 0);
-                    //                        if (arrayStart != String::npos)
-                    //                        {
-                    //                            // potential name (if butted up to array)
-                    //                            String name = i->substr(0, arrayStart);
-                    //                            StringUtil::trim(name);
-                    //                            if (!name.empty())
-                    //                                internalName = name;
-                    //
-                    //                            String::size_type arrayEnd = i->find("]", arrayStart);
-                    //                            String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
-                    //                            StringUtil::trim(arrayDimTerm);
-                    //                            arraySize = StringConverter::parseUnsignedInt(arrayDimTerm);
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            internalName = *i;
-                    //                        }
-                    //                    }
-                    //
-                    //                    // Ok, now rewind and parse the individual uniforms in this block
-                    //                    currPos = openBracePos + 1;
-                    //                    blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(externalName);
-                    //                    if(blockSharedParams.isNull())
-                    //                        blockSharedParams = GpuProgramManager::getSingleton().createSharedParameters(externalName);
-                    //                    do
-                    //                    {
-                    //                        lineEndPos = src.find_first_of("\n\r", currPos);
-                    //                        endPos = src.find(";", currPos);
-                    //                        line = src.substr(currPos, endPos - currPos);
-                    //
-                    //                        // TODO: Give some sort of block id
-                    //                        // Parse the normally structured uniform
-                    //                        parseIndividualConstant(src, defs, currPos, filename, blockSharedParams);
-                    //                        currPos = lineEndPos + 1;
-                    //                    } while (endBracePos > currPos);
                 }
                 else
                 {

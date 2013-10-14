@@ -148,9 +148,9 @@ namespace Ogre {
         Real mPixelScaleX;
         Real mPixelScaleY;
 
-        // Parent pointer
+        /// Parent pointer
         OverlayContainer* mParent;
-        // Overlay attached to
+        /// Overlay attached to
         Overlay* mOverlay;
 
         // Derived positions from parent
@@ -163,20 +163,20 @@ namespace Ogre {
 		/// Flag indicating if the vertex uvs need recalculating
 		bool mGeomUVsOutOfDate;
 
-        // Zorder for when sending to render queue
-        // Derived from parent
+        /** Zorder for when sending to render queue.
+            Derived from parent */
         ushort mZOrder;
 
-        // world transforms
+        /// World transforms
         Matrix4 mXForm;
 
-        // is element enabled
+        /// Is element enabled?
         bool mEnabled;
 
-		// is element initialised
+		/// Is element initialised?
 		bool mInitialised;
 
-        // Used to see if this element is created from a Template
+        /// Used to see if this element is created from a Template
         OverlayElement* mSourceTemplate ;
 
         /** Internal method which is triggered when the positions of the element get updated,
@@ -483,7 +483,7 @@ namespace Ogre {
         virtual void copyFromTemplate(OverlayElement* templateOverlay);
         virtual OverlayElement* clone(const String& instanceName);
 
-        // Returns the SourceTemplate for this element
+        /// Returns the SourceTemplate for this element
         const OverlayElement* getSourceTemplate () const {
           return mSourceTemplate ;
         }

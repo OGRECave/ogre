@@ -4,7 +4,7 @@ set(HEADER_FILES include/PNTrianglesTessellation.h)
 set(SOURCE_FILES src/PNTrianglesTessellation.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(Sample_PNTriangles ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_add_library(Sample_PNTriangles ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_PNTriangles ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_PNTriangles)

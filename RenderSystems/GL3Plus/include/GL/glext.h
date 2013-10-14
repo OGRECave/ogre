@@ -4131,6 +4131,12 @@ extern "C" {
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
 #endif
 
+#ifndef GL_AMD_compressed_ATC_texture
+#define ATC_RGB_AMD						  0x8C92
+#define ATC_RGBA_EXPLICIT_ALPHA_AMD		  0x8C93
+#define ATC_RGBA_INTERPOLATED_ALPHA_AMD	  0x87EE
+#endif
+
 #ifndef GL_IBM_cull_vertex
 #define GL_CULL_VERTEX_IBM                103050
 #endif

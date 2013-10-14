@@ -239,8 +239,14 @@ public:
 		/// Create shader
 		if (mMasterSource.empty())
 		{
-			DataStreamPtr ptrMasterSource = ResourceGroupManager::getSingleton().openResource("DeferredShading/post/LightMaterial_ps.glsl",
-                                                                                              ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			DataStreamPtr ptrMasterSource;
+            if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("DeferredShading/post/LightMaterial_ps.glsles",
+                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            else
+                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("DeferredShading/post/LightMaterial_ps.glsl",
+                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
 			assert(ptrMasterSource.isNull()==false);
 			mMasterSource = ptrMasterSource->getAsString();
 		}
@@ -251,10 +257,20 @@ public:
 		String name = mBaseName+StringConverter::toString(permutation)+"_ps";
 
 		// Create shader object
-		HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                                                     "glsl", GPT_FRAGMENT_PROGRAM);
-		ptrProgram->setSource(mMasterSource);
-	    ptrProgram->setParameter("profiles", "glsl150");
+		HighLevelGpuProgramPtr ptrProgram;
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsles", GPT_FRAGMENT_PROGRAM);
+            ptrProgram->setParameter("profiles", "glsles");
+        }
+        else
+        {
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                  "glsl", GPT_FRAGMENT_PROGRAM);
+            ptrProgram->setParameter("profiles", "glsl150");
+        }
+        ptrProgram->setSource(mMasterSource);
 		// set up the preprocessor defines
 		// Important to do this before any call to get parameters, i.e. before the program gets loaded
 		ptrProgram->setParameter("preprocessor_defines", getPPDefines(permutation));
@@ -302,7 +318,7 @@ protected:
         String strPPD;
 
         //Get the type of light
-        Ogre::uint lightType;
+        Ogre::uint lightType = 0;
         if (permutation & LightMaterialGenerator::MI_POINT)
         {
             lightType = 1;
@@ -380,7 +396,8 @@ LightMaterialGenerator::LightMaterialGenerator()
 				LightMaterialGenerator::MI_SHADOW_CASTER;
 	
 	materialBaseName = "DeferredShading/LightMaterial/";
-    if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl") && !(GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_x") ||GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1")))
+    if ((GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles")) &&
+        !(GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_x") ||GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1")))
         mImpl = new LightMaterialGeneratorGLSL("DeferredShading/LightMaterial/");
     else
         mImpl = new LightMaterialGeneratorCG("DeferredShading/LightMaterial/");

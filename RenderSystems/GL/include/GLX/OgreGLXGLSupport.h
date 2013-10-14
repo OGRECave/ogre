@@ -106,7 +106,7 @@ namespace Ogre {
 		 * @param mask	   Receiver for the output mask (alpha bitmap)
 		 * @return		  true on success
 		 */		
-		bool loadIcon(const std::string &name, Pixmap *pix, Pixmap *mask);
+		bool loadIcon(const String &name, Pixmap *pix, Pixmap *mask);
 		
 		/**
 		 * Get the GLXFBConfig used to create a GLXContext
@@ -194,6 +194,10 @@ namespace Ogre {
 		
 		StringVector mSampleLevels;
 	};
+
+#if OGRE_THREAD_SUPPORT == 1
+        GLXEWContext* glxewGetContext();
+#endif
 }
 
 #endif // OGRE_GLXGLSupport_H

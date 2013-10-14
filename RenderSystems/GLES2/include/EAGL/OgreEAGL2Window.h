@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 
 #ifdef __OBJC__
-#import <UIKit/UIKit.h>
 #import "OgreEAGL2View.h"
 #import "OgreEAGL2ViewController.h"
 
@@ -95,8 +94,9 @@ namespace Ogre {
 
             void setVisible(bool visible) { mVisible = visible; }
             void setClosed(bool closed) { mClosed = closed; }
-            void swapBuffers(bool waitForVSync);
+            void swapBuffers();
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+            PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
 
             /**
                @remarks

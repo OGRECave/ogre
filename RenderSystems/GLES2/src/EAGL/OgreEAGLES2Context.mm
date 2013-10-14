@@ -46,15 +46,20 @@ namespace Ogre {
 
         mDrawable = [drawable retain];
 
+#if OGRE_NO_GLES3_SUPPORT == 0
+        NSUInteger renderingAPI = kEAGLRenderingAPIOpenGLES3;
+#else
+        NSUInteger renderingAPI = kEAGLRenderingAPIOpenGLES2;
+#endif
         // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
         // is to be used and a context is created using that group.
         if(group)
         {
-            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:group];
+            mContext = [[EAGLContext alloc] initWithAPI:renderingAPI sharegroup:group];
         }
         else
         {
-            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+            mContext = [[EAGLContext alloc] initWithAPI:renderingAPI];
         }
 
         if (!mContext || ![EAGLContext setCurrentContext:mContext])
@@ -207,7 +212,7 @@ namespace Ogre {
 
     GLES2Context * EAGLES2Context::clone() const
     {
-        return const_cast<EAGLES2Context *>(this);
+		return new EAGLES2Context(mDrawable, [mContext sharegroup]);
     }
 
 	CAEAGLLayer * EAGLES2Context::getDrawable() const

@@ -118,8 +118,8 @@ namespace Ogre {
 		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
         // Store basic stats
-        size_t width = mColour[0].buffer->getWidth();
-        size_t height = mColour[0].buffer->getHeight();
+        uint32 width = mColour[0].buffer->getWidth();
+        uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
@@ -127,7 +127,7 @@ namespace Ogre {
 		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
         // Bind all attachment points to frame buffer
-        for(size_t x=0; x<maxSupportedMRTs; ++x)
+        for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
@@ -155,14 +155,7 @@ namespace Ogre {
             else
             {
                 // Detach
-                if(getFormat() == PF_DEPTH)
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
-                }
+                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
             }
         }
 
@@ -191,7 +184,7 @@ namespace Ogre {
 		// Do glDrawBuffer calls
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
-		for(size_t x=0; x<maxSupportedMRTs; ++x)
+		for(unsigned int x=0; x<maxSupportedMRTs; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
@@ -210,7 +203,8 @@ namespace Ogre {
 		}
 
         // Drawbuffer extension supported, use it
-        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        if(getFormat() != PF_DEPTH)
+            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
 		if (mMultisampleFB)
 		{
@@ -259,11 +253,11 @@ namespace Ogre {
 		if (mMultisampleFB)
 		{
             GLint oldfb = 0;
-            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
 			// Blit from multisample buffer to final buffer, triggers resolve
-			size_t width = mColour[0].buffer->getWidth();
-			size_t height = mColour[0].buffer->getHeight();
+			uint32 width = mColour[0].buffer->getWidth();
+			uint32 height = mColour[0].buffer->getHeight();
 			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
 			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
 			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
@@ -306,12 +300,12 @@ namespace Ogre {
                                                       GL_RENDERBUFFER, 0 ));
 	}
 
-    size_t GL3PlusFrameBufferObject::getWidth()
+    uint32 GL3PlusFrameBufferObject::getWidth()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getWidth();
     }
-    size_t GL3PlusFrameBufferObject::getHeight()
+    uint32 GL3PlusFrameBufferObject::getHeight()
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getHeight();

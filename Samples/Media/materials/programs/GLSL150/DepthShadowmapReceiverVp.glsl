@@ -13,12 +13,11 @@ in vec3 normal;
 in vec4 ambient;
 
 out vec4 shadowUV;
-out vec4 vColor;
 out vec4 oColour;
 
 void main()
 {
-	gl_Position = position * worldViewProj;
+	gl_Position = worldViewProj * position;
 	vec4 worldPos = world * position;
 	vec3 worldNorm = (worldIT * vec4(normal, 1)).xyz;
 
@@ -26,7 +25,7 @@ void main()
 	vec3 lightDir = normalize(
 		lightPosition.xyz - (worldPos.xyz * lightPosition.w));
 
-	vColour = lightColour * max(dot(lightDir, worldNorm), 0.0);
+	oColour = lightColour * max(dot(lightDir, worldNorm), 0.0);
 
 	// calculate shadow map coords
 	shadowUV = texViewProj * worldPos;

@@ -238,7 +238,7 @@ namespace Ogre {
 
 /// Same as _mm_load_ps, but can help VC generate more optimised code.
 #define __MM_LOAD_PS(p)                                                             \
-    (*(__m128*)(p))
+    (*(const __m128*)(p))
 
 /// Same as _mm_store_ps, but can help VC generate more optimised code.
 #define __MM_STORE_PS(p, v)                                                         \

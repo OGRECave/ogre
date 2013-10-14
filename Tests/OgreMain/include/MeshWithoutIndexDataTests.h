@@ -53,6 +53,7 @@ protected:
     HardwareBufferManager* mBufMgr;
     MeshManager* mMeshMgr;
     ArchiveManager* archiveMgr;
+    LogManager *mLogManager;
 
 public:
     void setUp();

@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreD3D11HardwareUniformBuffer.h"
 #include "OgreD3D11RenderSystem.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -217,7 +218,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::loadFromSource(void)
     {
-        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getNameForMicrocodeCache()) )
         {
             getMicrocodeFromCache();
         }
@@ -230,21 +231,50 @@ namespace Ogre {
     void D3D11HLSLProgram::getMicrocodeFromCache(void)
     {
         GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(getNameForMicrocodeCache());
 
-#define READ_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
-    uint16 length = 0;          \
-    cacheMicrocode->read(&length, sizeof(uint16));  \
-    list[i].member = ""; \
-    if(length > 0) \
-    { \
-        String * inString = new String(); \
-        inString->resize(length); \
-        cacheMicrocode->read(&(*inString)[0], length); \
-        mSerStrings.push_back(inString); \
-        list[i].member = &(*inString)[0]; \
-    }  \
+		cacheMicrocode->seek(0);
+
+#define READ_START(curlist, memberType) {							\
+	uint16 listSize = curlist.size();								\
+    cacheMicrocode->read(&listSize, sizeof(uint16));				\
+    if(listSize > 0){												\
+		curlist.resize(listSize);									\
+		for(unsigned i = 0 ; i < curlist.size() ; i++){				\
+			memberType & curItem = curlist[i];
+
+#define READ_END }}}
+
+#define READ_UINT(member) {										\
+	uint32 tmpVal;												\
+	cacheMicrocode->read(&tmpVal, sizeof(uint32));				\
+	curItem.member = tmpVal;									\
+	}
+
+#define READ_ENUM(member, enumType) {							\
+	uint32 tmpVal;												\
+	cacheMicrocode->read(&tmpVal, sizeof(uint32));				\
+	curItem.member = (enumType)tmpVal;							\
+	}
+
+#define READ_BYTE(member) {									\
+	cacheMicrocode->read(&curItem.member, sizeof(BYTE));	\
+	}
+				
+#define READ_NAME(member) {									\
+    uint16 length = 0;										\
+    cacheMicrocode->read(&length, sizeof(uint16));			\
+    curItem.member = "";									\
+    if(length > 0)											\
+    {														\
+        String * inString = new String();					\
+        inString->resize(length);							\
+        cacheMicrocode->read(&(*inString)[0], length);		\
+        mSerStrings.push_back(inString);					\
+        curItem.member = &(*inString)[0];					\
+    }														\
         }
+
 
         uint32 microCodeSize = 0;
         cacheMicrocode->read(&microCodeSize, sizeof(uint32));
@@ -254,87 +284,108 @@ namespace Ogre {
         cacheMicrocode->read(&mConstantBufferSize, sizeof(uint32));        
         cacheMicrocode->read(&mConstantBufferNr, sizeof(uint32));
         cacheMicrocode->read(&mNumSlots, sizeof(uint32));
+		
+		READ_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+		READ_NAME(SemanticName)
+		READ_UINT(SemanticIndex)
+		READ_UINT(Register)
+		READ_ENUM(SystemValueType,D3D_NAME)
+		READ_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+		READ_BYTE(Mask)
+		READ_BYTE(ReadWriteMask)
+		READ_UINT(Stream)
+//		READ_ENUM(MinPrecision, D3D_MIN_PRECISION) // not needed and doesn't exist in June 2010 SDK
+		READ_END
 
-        uint16 mD3d11ShaderInputParametersSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderInputParametersSize, sizeof(uint16));
-        if(mD3d11ShaderInputParametersSize > 0)
-        {
-            mD3d11ShaderInputParameters.resize(mD3d11ShaderInputParametersSize);
-            cacheMicrocode->read(&mD3d11ShaderInputParameters[0], mD3d11ShaderInputParametersSize * sizeof(D3D11_SIGNATURE_PARAMETER_DESC));
-            READ_NAMES(mD3d11ShaderInputParameters, SemanticName);
-        }
+		READ_START(mD3d11ShaderOutputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+		READ_NAME(SemanticName)
+		READ_UINT(SemanticIndex)
+		READ_UINT(Register)
+		READ_ENUM(SystemValueType, D3D_NAME)
+		READ_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+		READ_BYTE(Mask)
+		READ_BYTE(ReadWriteMask)
+		READ_UINT(Stream)
+//		READ_ENUM(MinPrecision, D3D_MIN_PRECISION) // not needed and doesn't exist in June 2010 SDK
+		READ_END
 
-        uint16 mD3d11ShaderOutputParametersSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderOutputParametersSize, sizeof(uint16));
-        if(mD3d11ShaderOutputParametersSize > 0)
-        {
-            mD3d11ShaderOutputParameters.resize(mD3d11ShaderOutputParametersSize);
-            cacheMicrocode->read(&mD3d11ShaderOutputParameters[0], mD3d11ShaderOutputParametersSize * sizeof(D3D11_SIGNATURE_PARAMETER_DESC));
-            READ_NAMES(mD3d11ShaderOutputParameters, SemanticName);
-        }
+		READ_START(mD3d11ShaderVariables, D3D11_SHADER_VARIABLE_DESC)
+		READ_NAME(Name)
+		READ_UINT(StartOffset)
+		READ_UINT(Size)
+		READ_UINT(uFlags)
+		//todo DefaultValue
+		READ_UINT(StartTexture)
+		READ_UINT(TextureSize)
+		READ_UINT(StartSampler)
+		READ_UINT(SamplerSize)
+		READ_END
 
-        uint16 mD3d11ShaderVariablesSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderVariablesSize, sizeof(uint16));
-        if(mD3d11ShaderVariablesSize > 0)
-        {
-            mD3d11ShaderVariables.resize(mD3d11ShaderVariablesSize);
-            cacheMicrocode->read(&mD3d11ShaderVariables[0], mD3d11ShaderVariablesSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-            READ_NAMES(mD3d11ShaderVariables, Name);
-        }
+		READ_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
+		READ_NAME(Name)
+		READ_ENUM(constType, GpuConstantType)
+		READ_UINT(physicalIndex)
+		READ_UINT(logicalIndex)
+		READ_UINT(elementSize)
+		READ_UINT(arraySize)
+		READ_UINT(variability)
+		READ_END
 
-        uint16 mD3d11ShaderVariableSubpartsSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderVariableSubpartsSize, sizeof(uint16));
-        if(mD3d11ShaderVariableSubpartsSize > 0)
-        {
-            mD3d11ShaderVariableSubparts.resize(mD3d11ShaderVariableSubpartsSize);
-            cacheMicrocode->read(&mD3d11ShaderVariableSubparts[0], mD3d11ShaderVariableSubpartsSize * sizeof(GpuConstantDefinitionWithName));
-            READ_NAMES(mD3d11ShaderVariableSubparts, Name);
-        }
+		READ_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
+		READ_NAME(Name)
+		READ_ENUM(Type, D3D_CBUFFER_TYPE)
+		READ_UINT(Variables)
+		READ_UINT(Size)
+		READ_UINT(uFlags)
+		READ_END
 
-        uint16 mD3d11ShaderBufferDescsSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderBufferDescsSize, sizeof(uint16));
-        if(mD3d11ShaderBufferDescsSize > 0)
-        {
-            mD3d11ShaderBufferDescs.resize(mD3d11ShaderBufferDescsSize);
-            cacheMicrocode->read(&mD3d11ShaderBufferDescs[0], mD3d11ShaderBufferDescsSize * sizeof(D3D11_SHADER_BUFFER_DESC));
-            READ_NAMES(mD3d11ShaderBufferDescs, Name);
-        }
+		READ_START(mVarDescBuffer, D3D11_SHADER_VARIABLE_DESC)
+		READ_NAME(Name)
+		READ_UINT(StartOffset)
+		READ_UINT(Size)
+		READ_UINT(uFlags)
+		//todo DefaultValue
+		READ_UINT(StartTexture)
+		READ_UINT(TextureSize)
+		READ_UINT(StartSampler)
+		READ_UINT(SamplerSize)
+		READ_END
 
-        uint16 mVarDescBufferSize = 0;
-        cacheMicrocode->read(&mVarDescBufferSize, sizeof(uint16));
-        if(mVarDescBufferSize > 0)
-        {
-            mVarDescBuffer.resize(mVarDescBufferSize);
-            cacheMicrocode->read(&mVarDescBuffer[0], mVarDescBufferSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-            READ_NAMES(mVarDescBuffer, Name);
-        }
+		READ_START(mVarDescPointer, D3D11_SHADER_VARIABLE_DESC)
+		READ_NAME(Name)
+		READ_UINT(StartOffset)
+		READ_UINT(Size)
+		READ_UINT(uFlags)
+		//todo DefaultValue
+		READ_UINT(StartTexture)
+		READ_UINT(TextureSize)
+		READ_UINT(StartSampler)
+		READ_UINT(SamplerSize)
+		READ_END
 
-        uint16 mVarDescPointerSize = 0;
-        cacheMicrocode->read(&mVarDescPointerSize, sizeof(uint16));
-        if(mVarDescPointerSize > 0)
-        {
-            mVarDescPointer.resize(mVarDescPointerSize);
-            cacheMicrocode->read(&mVarDescPointer[0], mVarDescPointerSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-            READ_NAMES(mVarDescPointer, Name);
-        }
+		READ_START(mD3d11ShaderTypeDescs, D3D11_SHADER_TYPE_DESC)
+		READ_NAME(Name)
+		READ_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+		READ_UINT(Rows)
+		READ_UINT(Columns)
+		READ_UINT(Elements)
+		READ_UINT(Members)
+		READ_UINT(Offset)
+		READ_END
 
-        uint16 mD3d11ShaderTypeDescsSize = 0;
-        cacheMicrocode->read(&mD3d11ShaderTypeDescsSize, sizeof(uint16));
-        if(mD3d11ShaderTypeDescsSize > 0)
-        {
-            mD3d11ShaderTypeDescs.resize(mD3d11ShaderTypeDescsSize);
-            cacheMicrocode->read(&mD3d11ShaderTypeDescs[0], mD3d11ShaderTypeDescsSize * sizeof(D3D11_SHADER_TYPE_DESC));
-            READ_NAMES(mD3d11ShaderTypeDescs, Name);
-        }
+		READ_START(mMemberTypeDesc, D3D11_SHADER_TYPE_DESC)
+		READ_NAME(Name)
+		READ_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+		READ_UINT(Rows)
+		READ_UINT(Columns)
+		READ_UINT(Elements)
+		READ_UINT(Members)
+		READ_UINT(Offset)
+		READ_END
 
-        uint16 mMemberTypeDescSize = 0;
-        cacheMicrocode->read(&mMemberTypeDescSize, sizeof(uint16));
-        if(mMemberTypeDescSize > 0)
-        {
-            mMemberTypeDesc.resize(mMemberTypeDescSize);
-            cacheMicrocode->read(&mMemberTypeDesc[0], mMemberTypeDescSize * sizeof(D3D11_SHADER_TYPE_DESC));
-            READ_NAMES(mMemberTypeDesc, Name);
-        }
+		READ_START(mMemberTypeName, MemberTypeName)
+		READ_NAME(Name)
+		READ_END
 
 		uint16 mInterfaceSlotsSize = 0;
         cacheMicrocode->read(&mInterfaceSlotsSize, sizeof(uint16));
@@ -344,12 +395,6 @@ namespace Ogre {
             cacheMicrocode->read(&mInterfaceSlots[0], mInterfaceSlotsSize * sizeof(UINT));
         }
 
-		uint16 mMemberTypeNameSize = 0;
-        cacheMicrocode->read(&mMemberTypeNameSize, sizeof(uint16));
-        if(mMemberTypeNameSize > 0)
-        {
-            READ_NAMES(mMemberTypeName, Name);
-        }
 
         analizeMicrocode();
     }
@@ -654,6 +699,17 @@ namespace Ogre {
 
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
+
+#define SIZE_OF_DATA_START(curlist, memberType) + sizeof(uint16) +  curlist.size() * ( 0
+#define SIZE_OF_DATA_END )
+
+#define SIZE_OF_DATA_UINT(member) + sizeof(uint32)
+#define	SIZE_OF_DATA_ENUM(member, memberType) SIZE_OF_DATA_UINT(member)
+
+#define SIZE_OF_DATA_BYTE(member) +  sizeof(BYTE)
+
+#define SIZE_OF_DATA_NAME(member) // we get the size in GET_SIZE_OF_NAMES - so do nothing
+
 #define GET_SIZE_OF_NAMES(result, list, member)                     \
                 uint32 result = 0;                                  \
                 {                                                   \
@@ -680,18 +736,121 @@ namespace Ogre {
                                  + sizeof(uint32) // mConstantBufferSize
                                  + sizeof(uint32) // mConstantBufferNr
                                  + sizeof(uint32) // mNumSlots
-                                 + sizeof(uint16) +  mD3d11ShaderInputParameters.size() * sizeof(D3D11_SIGNATURE_PARAMETER_DESC)  + inputNamesSize
-                                 + sizeof(uint16) +  mD3d11ShaderOutputParameters.size() * sizeof(D3D11_SIGNATURE_PARAMETER_DESC) + outputNamesSize
-                                 + sizeof(uint16) +  mD3d11ShaderVariables.size() * sizeof(D3D11_SHADER_VARIABLE_DESC) + varNamesSize
-                                 + sizeof(uint16) +  mD3d11ShaderVariableSubparts.size() * sizeof(GpuConstantDefinitionWithName) + varSubpartSize
+								SIZE_OF_DATA_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+								SIZE_OF_DATA_NAME(SemanticName)
+								SIZE_OF_DATA_UINT(SemanticIndex)
+								SIZE_OF_DATA_UINT(Register)
+								SIZE_OF_DATA_ENUM(SystemValueType,D3D_NAME)
+								SIZE_OF_DATA_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+								SIZE_OF_DATA_BYTE(Mask)
+								SIZE_OF_DATA_BYTE(ReadWriteMask)
+								SIZE_OF_DATA_UINT(Stream)
+//								SIZE_OF_DATA_ENUM(MinPrecision, D3D_MIN_PRECISION)  // not needed and doesn't exist in June 2010 SDK
+								SIZE_OF_DATA_END
 
-                                 + sizeof(uint16) +  mD3d11ShaderBufferDescs.size() * sizeof(D3D11_SHADER_BUFFER_DESC) + d3d11ShaderBufferDescsSize
-                                 + sizeof(uint16) +  mVarDescBuffer.size() * sizeof(D3D11_SHADER_VARIABLE_DESC) + varDescBufferSize
-                                 + sizeof(uint16) +  mVarDescPointer.size() * sizeof(D3D11_SHADER_VARIABLE_DESC) + varDescPointerSize
-                                 + sizeof(uint16) +  mD3d11ShaderTypeDescs.size() * sizeof(D3D11_SHADER_TYPE_DESC) + d3d11ShaderTypeDescsSize
-                                 + sizeof(uint16) +  mMemberTypeDesc.size() * sizeof(D3D11_SHADER_TYPE_DESC) + memberTypeDescSize
+								SIZE_OF_DATA_START(mD3d11ShaderOutputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+								SIZE_OF_DATA_NAME(SemanticName)
+								SIZE_OF_DATA_UINT(SemanticIndex)
+								SIZE_OF_DATA_UINT(Register)
+								SIZE_OF_DATA_ENUM(SystemValueType, D3D_NAME)
+								SIZE_OF_DATA_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+								SIZE_OF_DATA_BYTE(Mask)
+								SIZE_OF_DATA_BYTE(ReadWriteMask)
+								SIZE_OF_DATA_UINT(Stream)
+//								SIZE_OF_DATA_ENUM(MinPrecision, D3D_MIN_PRECISION)  // not needed and doesn't exist in June 2010 SDK
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mD3d11ShaderVariables, D3D11_SHADER_VARIABLE_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_UINT(StartOffset)
+								SIZE_OF_DATA_UINT(Size)
+								SIZE_OF_DATA_UINT(uFlags)
+								//todo DefaultValue
+								SIZE_OF_DATA_UINT(StartTexture)
+								SIZE_OF_DATA_UINT(TextureSize)
+								SIZE_OF_DATA_UINT(StartSampler)
+								SIZE_OF_DATA_UINT(SamplerSize)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_ENUM(constType, GpuConstantType)
+								SIZE_OF_DATA_UINT(physicalIndex)
+								SIZE_OF_DATA_UINT(logicalIndex)
+								SIZE_OF_DATA_UINT(elementSize)
+								SIZE_OF_DATA_UINT(arraySize)
+								SIZE_OF_DATA_UINT(variability)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_ENUM(Type, D3D_CBUFFER_TYPE)
+								SIZE_OF_DATA_UINT(Variables)
+								SIZE_OF_DATA_UINT(Size)
+								SIZE_OF_DATA_UINT(uFlags)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mVarDescBuffer, D3D11_SHADER_VARIABLE_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_UINT(StartOffset)
+								SIZE_OF_DATA_UINT(Size)
+								SIZE_OF_DATA_UINT(uFlags)
+								//todo DefaultValue
+								SIZE_OF_DATA_UINT(StartTexture)
+								SIZE_OF_DATA_UINT(TextureSize)
+								SIZE_OF_DATA_UINT(StartSampler)
+								SIZE_OF_DATA_UINT(SamplerSize)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mVarDescPointer, D3D11_SHADER_VARIABLE_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_UINT(StartOffset)
+								SIZE_OF_DATA_UINT(Size)
+								SIZE_OF_DATA_UINT(uFlags)
+								//todo DefaultValue
+								SIZE_OF_DATA_UINT(StartTexture)
+								SIZE_OF_DATA_UINT(TextureSize)
+								SIZE_OF_DATA_UINT(StartSampler)
+								SIZE_OF_DATA_UINT(SamplerSize)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mD3d11ShaderTypeDescs, D3D11_SHADER_TYPE_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+								SIZE_OF_DATA_UINT(Rows)
+								SIZE_OF_DATA_UINT(Columns)
+								SIZE_OF_DATA_UINT(Elements)
+								SIZE_OF_DATA_UINT(Members)
+								SIZE_OF_DATA_UINT(Offset)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mMemberTypeDesc, D3D11_SHADER_TYPE_DESC)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+								SIZE_OF_DATA_UINT(Rows)
+								SIZE_OF_DATA_UINT(Columns)
+								SIZE_OF_DATA_UINT(Elements)
+								SIZE_OF_DATA_UINT(Members)
+								SIZE_OF_DATA_UINT(Offset)
+								SIZE_OF_DATA_END
+
+								SIZE_OF_DATA_START(mMemberTypeName, MemberTypeName)
+								SIZE_OF_DATA_NAME(Name)
+								SIZE_OF_DATA_END
+
+
+                                 + inputNamesSize
+                                 + outputNamesSize
+                                 + varNamesSize
+                                 + varSubpartSize
+                                 + d3d11ShaderBufferDescsSize
+                                 + varDescBufferSize
+                                 + varDescPointerSize
+                                 + d3d11ShaderTypeDescsSize
+                                 + memberTypeDescSize
+                                 + memberTypeNameSize
+
                                  + sizeof(uint16) +  mInterfaceSlots.size() * sizeof(UINT)
-                                 + sizeof(uint16) +  memberTypeNameSize
                                  ;
 
 
@@ -699,13 +858,35 @@ namespace Ogre {
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(sizeOfData);
 
-#define STORE_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
+
+#define WRITE_START(curlist, memberType) {							\
+	uint16 listSize = curlist.size();								\
+    newMicrocode->write(&listSize, sizeof(uint16));					\
+    if(listSize > 0){												\
+	for(unsigned i = 0 ; i < curlist.size() ; i++){					\
+		memberType & curItem = curlist[i];
+
+#define WRITE_END }}}
+
+#define WRITE_UINT(member) {										\
+	uint32 tmpVal;													\
+	tmpVal = (uint32)curItem.member;								\
+	newMicrocode->write(&tmpVal, sizeof(uint32));					\
+	}
+
+#define	WRITE_ENUM(member, memberType) WRITE_UINT(member)
+
+#define WRITE_BYTE(member) {										\
+	newMicrocode->write(&curItem.member, sizeof(BYTE));	\
+	}
+
+#define WRITE_NAME(member) {						 \
     uint16 length = 0;                               \
-    if(list[i].member != NULL)                       \
-        length = strlen(list[i].member);      \
+    if(curItem.member != NULL)                       \
+        length = strlen(curItem.member);             \
     newMicrocode->write(&length, sizeof(uint16));    \
-    if(length == 0) continue;                        \
-    newMicrocode->write(list[i].member, length);     \
+    if(length != 0)                                  \
+    newMicrocode->write(curItem.member, length);     \
                 }
 
                 uint32 microCodeSize = mMicroCode.size();
@@ -716,77 +897,107 @@ namespace Ogre {
                 newMicrocode->write(&mConstantBufferNr, sizeof(uint32));
                 newMicrocode->write(&mNumSlots, sizeof(uint32));
 
-                uint16 mD3d11ShaderInputParametersSize = mD3d11ShaderInputParameters.size();
-                newMicrocode->write(&mD3d11ShaderInputParametersSize, sizeof(uint16));
-                if(mD3d11ShaderInputParametersSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderInputParameters[0],  mD3d11ShaderInputParametersSize * sizeof(D3D11_SIGNATURE_PARAMETER_DESC));
-                    STORE_NAMES(mD3d11ShaderInputParameters, SemanticName);
-                }
+				WRITE_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+				WRITE_NAME(SemanticName)
+				WRITE_UINT(SemanticIndex)
+				WRITE_UINT(Register)
+				WRITE_ENUM(SystemValueType,D3D_NAME)
+				WRITE_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+				WRITE_BYTE(Mask)
+				WRITE_BYTE(ReadWriteMask)
+				WRITE_UINT(Stream)
+//				WRITE_ENUM(MinPrecision, D3D_MIN_PRECISION)  // not needed and doesn't exist in June 2010 SDK
+				WRITE_END
 
-                uint16 mD3d11ShaderOutputParametersSize = mD3d11ShaderOutputParameters.size();
-                newMicrocode->write(&mD3d11ShaderOutputParametersSize, sizeof(uint16));
-                if(mD3d11ShaderOutputParametersSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderOutputParameters[0],  mD3d11ShaderOutputParametersSize * sizeof(D3D11_SIGNATURE_PARAMETER_DESC));
-                    STORE_NAMES(mD3d11ShaderOutputParameters, SemanticName);
-                }
+				WRITE_START(mD3d11ShaderOutputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
+				WRITE_NAME(SemanticName)
+				WRITE_UINT(SemanticIndex)
+				WRITE_UINT(Register)
+				WRITE_ENUM(SystemValueType, D3D_NAME)
+				WRITE_ENUM(ComponentType, D3D_REGISTER_COMPONENT_TYPE)
+				WRITE_BYTE(Mask)
+				WRITE_BYTE(ReadWriteMask)
+				WRITE_UINT(Stream)
+//				WRITE_ENUM(MinPrecision, D3D_MIN_PRECISION)  // not needed and doesn't exist in June 2010 SDK
+				WRITE_END
 
-                uint16 mD3d11ShaderVariablesSize = mD3d11ShaderVariables.size();
-                newMicrocode->write(&mD3d11ShaderVariablesSize, sizeof(uint16));
-                if(mD3d11ShaderVariablesSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderVariables[0], mD3d11ShaderVariablesSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-                    STORE_NAMES(mD3d11ShaderVariables, Name);
-                }
+				WRITE_START(mD3d11ShaderVariables, D3D11_SHADER_VARIABLE_DESC)
+				WRITE_NAME(Name)
+				WRITE_UINT(StartOffset)
+				WRITE_UINT(Size)
+				WRITE_UINT(uFlags)
+				//todo DefaultValue
+				WRITE_UINT(StartTexture)
+				WRITE_UINT(TextureSize)
+				WRITE_UINT(StartSampler)
+				WRITE_UINT(SamplerSize)
+				WRITE_END
 
-                uint16 mD3d11ShaderVariableSubpartsSize = mD3d11ShaderVariableSubparts.size();
-                newMicrocode->write(&mD3d11ShaderVariableSubpartsSize, sizeof(uint16));
-                if(mD3d11ShaderVariableSubpartsSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderVariableSubparts[0],  mD3d11ShaderVariableSubpartsSize * sizeof(GpuConstantDefinitionWithName));
-                    STORE_NAMES(mD3d11ShaderVariableSubparts, Name);
-                }
+				WRITE_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
+				WRITE_NAME(Name)
+				WRITE_ENUM(constType, GpuConstantType)
+				WRITE_UINT(physicalIndex)
+				WRITE_UINT(logicalIndex)
+				WRITE_UINT(elementSize)
+				WRITE_UINT(arraySize)
+				WRITE_UINT(variability)
+				WRITE_END
 
-				uint16 mD3d11ShaderBufferDescsSize = mD3d11ShaderBufferDescs.size();
-				newMicrocode->write(&mD3d11ShaderBufferDescsSize, sizeof(uint16));
-				if(mD3d11ShaderBufferDescsSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderBufferDescs[0],  mD3d11ShaderBufferDescsSize * sizeof(D3D11_SHADER_BUFFER_DESC));
-                    STORE_NAMES(mD3d11ShaderBufferDescs, Name);
-                }
+				WRITE_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
+				WRITE_NAME(Name)
+				WRITE_ENUM(Type, D3D_CBUFFER_TYPE)
+				WRITE_UINT(Variables)
+				WRITE_UINT(Size)
+				WRITE_UINT(uFlags)
+				WRITE_END
 
-				uint16 mVarDescBufferSize = mVarDescBuffer.size();
-				newMicrocode->write(&mVarDescBufferSize, sizeof(uint16));
-				if(mVarDescBufferSize > 0)
-                {
-                    newMicrocode->write(&mVarDescBuffer[0],  mVarDescBufferSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-                    STORE_NAMES(mVarDescBuffer, Name);
-                }
+				WRITE_START(mVarDescBuffer, D3D11_SHADER_VARIABLE_DESC)
+				WRITE_NAME(Name)
+				WRITE_UINT(StartOffset)
+				WRITE_UINT(Size)
+				WRITE_UINT(uFlags)
+				//todo DefaultValue
+				WRITE_UINT(StartTexture)
+				WRITE_UINT(TextureSize)
+				WRITE_UINT(StartSampler)
+				WRITE_UINT(SamplerSize)
+				WRITE_END
 
-				uint16 mVarDescPointerSize = mVarDescPointer.size();
-				newMicrocode->write(&mVarDescPointerSize, sizeof(uint16));
-				if(mVarDescPointerSize > 0)
-                {
-                    newMicrocode->write(&mVarDescPointer[0],  mVarDescPointerSize * sizeof(D3D11_SHADER_VARIABLE_DESC));
-                    STORE_NAMES(mVarDescPointer, Name);
-                }
+				WRITE_START(mVarDescPointer, D3D11_SHADER_VARIABLE_DESC)
+				WRITE_NAME(Name)
+				WRITE_UINT(StartOffset)
+				WRITE_UINT(Size)
+				WRITE_UINT(uFlags)
+				//todo DefaultValue
+				WRITE_UINT(StartTexture)
+				WRITE_UINT(TextureSize)
+				WRITE_UINT(StartSampler)
+				WRITE_UINT(SamplerSize)
+				WRITE_END
 
-				uint16 mD3d11ShaderTypeDescsSize = mD3d11ShaderTypeDescs.size();
-				newMicrocode->write(&mD3d11ShaderTypeDescsSize, sizeof(uint16));
-				if(mD3d11ShaderTypeDescsSize > 0)
-                {
-                    newMicrocode->write(&mD3d11ShaderTypeDescs[0],  mD3d11ShaderTypeDescsSize * sizeof(D3D11_SHADER_TYPE_DESC));
-                    STORE_NAMES(mD3d11ShaderTypeDescs, Name);
-                }
+				WRITE_START(mD3d11ShaderTypeDescs, D3D11_SHADER_TYPE_DESC)
+				WRITE_NAME(Name)
+				WRITE_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+				WRITE_UINT(Rows)
+				WRITE_UINT(Columns)
+				WRITE_UINT(Elements)
+				WRITE_UINT(Members)
+				WRITE_UINT(Offset)
+				WRITE_END
 
-				uint16 mMemberTypeDescSize = mMemberTypeDesc.size();
-				newMicrocode->write(&mMemberTypeDescSize, sizeof(uint16));
-				if(mMemberTypeDescSize > 0)
-                {
-                    newMicrocode->write(&mMemberTypeDesc[0],  mMemberTypeDescSize * sizeof(D3D11_SHADER_TYPE_DESC));
-                    STORE_NAMES(mMemberTypeDesc, Name);
-                }
+				WRITE_START(mMemberTypeDesc, D3D11_SHADER_TYPE_DESC)
+				WRITE_NAME(Name)
+				WRITE_ENUM(Type, D3D_SHADER_VARIABLE_TYPE)
+				WRITE_UINT(Rows)
+				WRITE_UINT(Columns)
+				WRITE_UINT(Elements)
+				WRITE_UINT(Members)
+				WRITE_UINT(Offset)
+				WRITE_END
+
+				WRITE_START(mMemberTypeName, MemberTypeName)
+				WRITE_NAME(Name)
+				WRITE_END
 
 				uint16 mInterfaceSlotsSize = mInterfaceSlots.size();
 				newMicrocode->write(&mInterfaceSlotsSize, sizeof(uint16));
@@ -795,15 +1006,9 @@ namespace Ogre {
                     newMicrocode->write(&mInterfaceSlots[0],  mInterfaceSlotsSize * sizeof(UINT));
                 }
 
-				uint16 mMemberTypeNameSize = mMemberTypeName.size();
-				newMicrocode->write(&mMemberTypeNameSize, sizeof(uint16));
-				if(mMemberTypeNameSize > 0)
-                {
-                    STORE_NAMES(mMemberTypeName, Name);                    
-                }
 
                 // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(getNameForMicrocodeCache(), newMicrocode);
             }
         }
 
@@ -1004,7 +1209,7 @@ namespace Ogre {
             if (def.isFloat())
             {
                 def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
                     mFloatLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -1014,7 +1219,7 @@ namespace Ogre {
             else
             {
                 def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
                     mIntLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -1264,7 +1469,7 @@ namespace Ogre {
         // this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
         if ( !mAssemblerProgram.isNull() )
         {
-            *( mAssemblerProgram.useCountPointer() ) = 0;
+            mAssemblerProgram.setUseCount(0);
             mAssemblerProgram.setNull();
         }
 
@@ -1312,13 +1517,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        static const String compatibleVsTarget = "vs_4_0";
-        static const String compatiblePsTarget = "ps_4_0";
+        static const String
+			vs_4_0			 = "vs_4_0",
+			vs_4_0_level_9_3 = "vs_4_0_level_9_3",
+			vs_4_0_level_9_1 = "vs_4_0_level_9_1",
+			ps_4_0			 = "ps_4_0",
+			ps_4_0_level_9_3 = "ps_4_0_level_9_3",
+			ps_4_0_level_9_1 = "ps_4_0_level_9_1";
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0" || mTarget == "vs_2_x" || mTarget == "vs_3_0")	return compatibleVsTarget;
-            if(mTarget == "ps_2_0" || mTarget == "ps_2_x" || mTarget == "ps_3_0")	return compatiblePsTarget;
+            if(mTarget == "vs_2_0") return vs_4_0_level_9_1;
+            if(mTarget == "vs_2_a") return vs_4_0_level_9_3;
+            if(mTarget == "vs_2_x") return vs_4_0_level_9_3;
+            if(mTarget == "vs_3_0") return vs_4_0;
+
+            if(mTarget == "ps_2_0") return ps_4_0_level_9_1;
+            if(mTarget == "ps_2_a") return ps_4_0_level_9_3;
+            if(mTarget == "ps_2_b") return ps_4_0_level_9_3;
+            if(mTarget == "ps_2_x") return ps_4_0_level_9_3;
+            if(mTarget == "ps_3_0") return ps_4_0;
+            if(mTarget == "ps_3_x") return ps_4_0;
         }
 
         return mTarget;
@@ -1794,5 +2013,10 @@ namespace Ogre {
         return mD3d11ShaderOutputParameters.size();
     }
     //-----------------------------------------------------------------------------
+	String D3D11HLSLProgram::getNameForMicrocodeCache()
+	{
+		return mName + "_" + mTarget;
+	}
+
 
 }

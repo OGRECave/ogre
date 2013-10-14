@@ -30,17 +30,83 @@ include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Browser/include)
 include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 
+if (OGRE_STATIC)
+  include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/VTests/include)
+  include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
+  list(APPEND SAMPLE_LIBRARIES VTests)
+  list(APPEND SAMPLE_LIBRARIES PlayPenTests)
+endif()
+
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
 ogre_add_component_include_dir(Overlay)
+ogre_add_component_include_dir(Volume)
 
 ogre_add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay)
+target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem)
 ogre_config_common(TestContext)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    set(OGRE_OSX_BUILD_CONFIGURATION "$(CONFIGURATION)/")
+# Make sure all plugins are built
+if (OGRE_BUILD_PLUGIN_OCTREE)
+    add_dependencies(TestContext Plugin_OctreeSceneManager)
+endif ()
+if (OGRE_BUILD_PLUGIN_BSP)
+    add_dependencies(TestContext Plugin_BSPSceneManager)
+endif ()
+if (OGRE_BUILD_PLUGIN_CG)
+    add_dependencies(TestContext Plugin_CgProgramManager)
+endif (OGRE_BUILD_PLUGIN_CG)
+if (OGRE_BUILD_PLUGIN_PFX)
+    add_dependencies(TestContext Plugin_ParticleFX)
+endif ()
+
+if (OGRE_BUILD_PLUGIN_PCZ)
+    add_dependencies(TestContext Plugin_PCZSceneManager)
+    add_dependencies(TestContext Plugin_OctreeZone)
+endif ()
+
+if (OGRE_BUILD_RENDERSYSTEM_D3D9)
+    add_dependencies(TestContext RenderSystem_Direct3D9)
+endif ()
+if (OGRE_BUILD_RENDERSYSTEM_D3D11)
+    add_dependencies(TestContext RenderSystem_Direct3D11)
+endif ()
+if (OGRE_BUILD_RENDERSYSTEM_GL)
+    add_dependencies(TestContext RenderSystem_GL)
+endif ()
+if (OGRE_BUILD_RENDERSYSTEM_GLPLUS)
+    add_dependencies(TestContext RenderSystem_GL3Plus)
+endif ()
+if (OGRE_BUILD_RENDERSYSTEM_GLES)
+    add_dependencies(TestContext RenderSystem_GLES)
+endif ()
+if (OGRE_BUILD_RENDERSYSTEM_GLES2)
+    add_dependencies(TestContext RenderSystem_GLES2)
+endif ()
+
+add_dependencies(TestContext VTests PlayPenTests)
+
+if (APPLE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
+	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
+    set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+    set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
+	set (OGRE_TESTCONTEXT_CONTENTS_PATH
+		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app)
+    add_custom_command(TARGET TestContext POST_BUILD
+      COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
+      COMMAND ditto ${OGRE_BINARY_DIR}/bin/*.cfg ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
+    )
+    add_custom_command(TARGET TestContext POST_BUILD
+      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+      COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
+      COMMAND ditto ${OGRE_SOURCE_DIR}/Tests/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
+    )
+  else()
+    set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
@@ -52,7 +118,7 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app/Contents)
 	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Ogre.framework
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
@@ -68,91 +134,96 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/tests.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
+		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
         COMMAND ditto
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
 		)
 
 	# now plugins
-	add_custom_command(TARGET TestContext POST_BUILD
-		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins)
-	add_custom_command(TARGET TestContext POST_BUILD
-		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components)
-	if (OGRE_BUILD_RENDERSYSTEM_GL)
+	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()
-	if (OGRE_BUILD_PLUGIN_BSP)
+	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_BSPSceneManager.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL3Plus.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
+			)
+	endif ()
+	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET TestContext POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_BSPSceneManager.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_CG)
+	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_CgProgramManager.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_CgProgramManager.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_OCTREE)
+	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeSceneManager.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeSceneManager.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_PCZ)
+	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_PCZSceneManager.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_PCZSceneManager.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/    
 			)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeZone.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_PFX)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_ParticleFX.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeZone.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-
+	if (OGRE_BUILD_PLUGIN_PFX OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET TestContext POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_ParticleFX.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
+			)
+	endif()
+	
 	# Components
-	if (OGRE_BUILD_COMPONENT_PAGING)
+	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgrePaging.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgrePaging.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_PROPERTY)
+	if (OGRE_BUILD_COMPONENT_PROPERTY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreProperty.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreProperty.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreRTShaderSystem.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreRTShaderSystem.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_TERRAIN)
+	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreTerrain.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreTerrain.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_VOLUME)
+	if (OGRE_BUILD_COMPONENT_VOLUME OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreVolume.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreVolume.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_OVERLAY)
+	if (OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreOverlay.dylib
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreOverlay.framework 
+			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
+	endif()
 	endif()
 endif()

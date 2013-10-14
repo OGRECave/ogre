@@ -273,7 +273,7 @@ namespace Ogre {
         String mBorderMaterialName;
         MaterialPtr mBorderMaterial;
 
-        // Render operation for the border area
+        /// Render operation for the border area
         RenderOperation mRenderOp2;
 
         static String msTypeName;

@@ -269,8 +269,8 @@ bool DLight::isCameraInsideLight(Ogre::Camera* camera)
 		Ogre::Real cosAngle = lightToCamDir.dotProduct(lightDir);
 		Ogre::Radian angle = Ogre::Math::ACos(cosAngle);
 		//Check whether we will see the cone from our current POV.
-		return (distanceFromLight <= (mParentLight->getAttenuationRange() + clipRangeFix.length()))
-			&& (angle <= attAngle);
+        return (distanceFromLight <= (mParentLight->getAttenuationRange() / cosAngle + clipRangeFix.length()))
+            && (angle <= attAngle);
 		}
 	default:
 		//Please the compiler

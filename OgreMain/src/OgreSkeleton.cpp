@@ -87,7 +87,7 @@ namespace Ogre {
 			i != mLinkedSkeletonAnimSourceList.end(); ++i)
 		{
 			i->pSkeleton = SkeletonManager::getSingleton().load(
-				i->skeletonName, mGroup);
+				i->skeletonName, mGroup).staticCast<Skeleton>();
 		}
 
 
@@ -706,7 +706,7 @@ namespace Ogre {
 		{
 			// Load immediately
 			SkeletonPtr skelPtr = 
-				SkeletonManager::getSingleton().load(skelName, mGroup);
+				SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 			mLinkedSkeletonAnimSourceList.push_back(
 				LinkedSkeletonAnimationSource(skelName, scale, skelPtr));
 
@@ -1025,5 +1025,19 @@ namespace Ogre {
         }
     }
 
+    size_t Skeleton::calculateSize(void) const
+    {
+        size_t memSize = 0;
+        memSize += sizeof(SkeletonAnimationBlendMode);
+        memSize += mBoneList.size() * sizeof(Bone);
+        memSize += mRootBones.size() * sizeof(Bone);
+        memSize += mBoneListByName.size() * (sizeof(String) + sizeof(Bone*));
+        memSize += mAnimationsList.size() * (sizeof(String) + sizeof(Animation*));
+        memSize += mManualBones.size() * sizeof(Bone*);
+        memSize += mLinkedSkeletonAnimSourceList.size() * sizeof(LinkedSkeletonAnimationSource);
+        memSize += sizeof(bool);
+
+        return memSize;
+    }
 }
 

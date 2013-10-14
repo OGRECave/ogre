@@ -118,24 +118,24 @@ struct LinearResampler {
 		for (size_t z = dst.front; z < dst.back; z++, sz_48+=stepz) {
 			temp = static_cast<unsigned int>(sz_48 >> 32);
 			temp = (temp > 0x8000)? temp - 0x8000 : 0;
-			size_t sz1 = temp >> 16;				 // src z, sample #1
-			size_t sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
+			uint32 sz1 = temp >> 16;				 // src z, sample #1
+			uint32 sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
 			float szf = (temp & 0xFFFF) / 65536.f; // weight of sample #2
 
 			uint64 sy_48 = (stepy >> 1) - 1;
 			for (size_t y = dst.top; y < dst.bottom; y++, sy_48+=stepy) {
 				temp = static_cast<unsigned int>(sy_48 >> 32);
 				temp = (temp > 0x8000)? temp - 0x8000 : 0;
-				size_t sy1 = temp >> 16;					// src y #1
-				size_t sy2 = std::min(sy1+1,src.getHeight()-1);// src y #2
+				uint32 sy1 = temp >> 16;					// src y #1
+				uint32 sy2 = std::min(sy1+1,src.getHeight()-1);// src y #2
 				float syf = (temp & 0xFFFF) / 65536.f; // weight of #2
 				
 				uint64 sx_48 = (stepx >> 1) - 1;
 				for (size_t x = dst.left; x < dst.right; x++, sx_48+=stepx) {
 					temp = static_cast<unsigned int>(sx_48 >> 32);
 					temp = (temp > 0x8000)? temp - 0x8000 : 0;
-					size_t sx1 = temp >> 16;					// src x #1
-					size_t sx2 = std::min(sx1+1,src.getWidth()-1);// src x #2
+					uint32 sx1 = temp >> 16;					// src x #1
+					uint32 sx2 = std::min(sx1+1,src.getWidth()-1);// src x #2
 					float sxf = (temp & 0xFFFF) / 65536.f; // weight of #2
 				
 					ColourValue x1y1z1, x2y1z1, x1y2z1, x2y2z1;
@@ -203,24 +203,24 @@ struct LinearResampler_Float32 {
 		for (size_t z = dst.front; z < dst.back; z++, sz_48+=stepz) {
 			temp = static_cast<unsigned int>(sz_48 >> 32);
 			temp = (temp > 0x8000)? temp - 0x8000 : 0;
-			size_t sz1 = temp >> 16;				 // src z, sample #1
-			size_t sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
+			uint32 sz1 = temp >> 16;				 // src z, sample #1
+			uint32 sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
 			float szf = (temp & 0xFFFF) / 65536.f; // weight of sample #2
 
 			uint64 sy_48 = (stepy >> 1) - 1;
 			for (size_t y = dst.top; y < dst.bottom; y++, sy_48+=stepy) {
 				temp = static_cast<unsigned int>(sy_48 >> 32);
 				temp = (temp > 0x8000)? temp - 0x8000 : 0;
-				size_t sy1 = temp >> 16;					// src y #1
-				size_t sy2 = std::min(sy1+1,src.getHeight()-1);// src y #2
+				uint32 sy1 = temp >> 16;					// src y #1
+				uint32 sy2 = std::min(sy1+1,src.getHeight()-1);// src y #2
 				float syf = (temp & 0xFFFF) / 65536.f; // weight of #2
 				
 				uint64 sx_48 = (stepx >> 1) - 1;
 				for (size_t x = dst.left; x < dst.right; x++, sx_48+=stepx) {
 					temp = static_cast<unsigned int>(sx_48 >> 32);
 					temp = (temp > 0x8000)? temp - 0x8000 : 0;
-					size_t sx1 = temp >> 16;					// src x #1
-					size_t sx2 = std::min(sx1+1,src.getWidth()-1);// src x #2
+					uint32 sx1 = temp >> 16;					// src x #1
+					uint32 sx2 = std::min(sx1+1,src.getWidth()-1);// src x #2
 					float sxf = (temp & 0xFFFF) / 65536.f; // weight of #2
 					
 					// process R,G,B,A simultaneously for cache coherence?
@@ -312,8 +312,8 @@ template<unsigned int channels> struct LinearResampler_Byte {
 			temp = static_cast<unsigned int>(sy_48 >> 36);
 			temp = (temp > 0x800)? temp - 0x800: 0;
 			unsigned int syf = temp & 0xFFF;
-			size_t sy1 = temp >> 12;
-			size_t sy2 = std::min(sy1+1, src.bottom-src.top-1);
+			uint32 sy1 = temp >> 12;
+			uint32 sy2 = std::min(sy1+1, src.bottom-src.top-1);
 			size_t syoff1 = sy1 * src.rowPitch;
 			size_t syoff2 = sy2 * src.rowPitch;
 
@@ -322,8 +322,8 @@ template<unsigned int channels> struct LinearResampler_Byte {
 				temp = static_cast<unsigned int>(sx_48 >> 36);
 				temp = (temp > 0x800)? temp - 0x800 : 0;
 				unsigned int sxf = temp & 0xFFF;
-				size_t sx1 = temp >> 12;
-				size_t sx2 = std::min(sx1+1, src.right-src.left-1);
+				uint32 sx1 = temp >> 12;
+				uint32 sx2 = std::min(sx1+1, src.right-src.left-1);
 
 				unsigned int sxfsyf = sxf*syf;
 				for (unsigned int k = 0; k < channels; k++) {

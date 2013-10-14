@@ -26,9 +26,12 @@
  -----------------------------------------------------------------------------
  */
 #include "OgreStableHeaders.h"
+
+#if OGRE_NO_ZIP_ARCHIVE == 0
+
 #include "OgreDeflate.h"
 #include "OgreException.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
@@ -100,7 +103,7 @@ namespace Ogre
 			size_t restorePoint = mCompressedStream->tell();
 			// read early chunk
 			mZStream->next_in = mTmp;
-			mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());
+			mZStream->avail_in = static_cast<uint>(mCompressedStream->read(mTmp, getAvailInForSinglePass()));
 			
 			if (inflateInit(mZStream) != Z_OK)
 			{
@@ -120,7 +123,7 @@ namespace Ogre
 				if (inflate(mZStream, Z_SYNC_FLUSH) != Z_OK)
 					mIsCompressedValid = false;
 				// restore for reading
-				mZStream->avail_in = savedIn;
+				mZStream->avail_in = static_cast<uint>(savedIn);
 				mZStream->next_in = mTmp;
 
 				inflateReset(mZStream);
@@ -151,11 +154,13 @@ namespace Ogre
                     mTempFileName = tmpname;
                     free(tmpname);
                 }
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
                 mTempFileName = macTempFileName();
 #else
                 char tmpname[L_tmpnam];
-                tmpnam(tmpname);
+                if (!tmpnam(tmpname))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Temporary file name generation failed.", "DeflateStream::init");
+
                 mTempFileName = tmpname;
 #endif
             }
@@ -207,7 +212,7 @@ namespace Ogre
 
 			if (cachereads < count)
 			{
-				mZStream->avail_out = count - cachereads;
+				mZStream->avail_out = static_cast<uint>(count - cachereads);
 				mZStream->next_out = (Bytef*)buf + cachereads;
 				
 				while (mZStream->avail_out)
@@ -215,7 +220,7 @@ namespace Ogre
 					// Pull next chunk of compressed data from the underlying stream
 					if (!mZStream->avail_in && !mCompressedStream->eof())
 					{
-						mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());
+						mZStream->avail_in = static_cast<uint>(mCompressedStream->read(mTmp, getAvailInForSinglePass()));
 						mZStream->next_in = mTmp;
 					}
 					
@@ -321,7 +326,7 @@ namespace Ogre
 			/* done when last data in file processed */
 		} while (flush != Z_FINISH);
 		assert(ret == Z_STREAM_END);        /* stream will be complete */
-		
+                (void)ret;
 		deflateEnd(mZStream);
 
         inFile.close();
@@ -385,7 +390,7 @@ namespace Ogre
 				mCurrentPos = 0;
 				mZStream->next_in = mTmp;
 				mCompressedStream->seek(0);
-				mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());			
+				mZStream->avail_in = static_cast<uint>(mCompressedStream->read(mTmp, getAvailInForSinglePass()));
 				inflateReset(mZStream);
 			}
 			else 
@@ -439,4 +444,4 @@ namespace Ogre
 	
 }
 
-
+#endif

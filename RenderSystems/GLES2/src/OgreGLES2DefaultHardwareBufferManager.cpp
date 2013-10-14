@@ -104,14 +104,13 @@ namespace Ogre {
         : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
-#if OGRE_NO_GLES3_SUPPORT == 1
-		if (!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT)
+		if ((!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT) || !gleswIsSupported(3, 0))
 		{
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2DefaultHardwareIndexBuffer");
 		}
-#endif
+
         mData = new unsigned char[mSizeInBytes];
     }
 
@@ -156,7 +155,7 @@ namespace Ogre {
         // ignore discard, memory is not guaranteed to be zeroised
         memcpy(mData + offset, pSource, length);
     }
-#if OGRE_NO_GLES3_SUPPORT == 0
+
     GLES2DefaultHardwareUniformBuffer::GLES2DefaultHardwareUniformBuffer(size_t bufferSize,
                                                                              HardwareBuffer::Usage usage,
                                                                              bool useShadowBuffer, const String& name)
@@ -222,7 +221,6 @@ namespace Ogre {
         // ignore discard, memory is not guaranteed to be zeroised
         memcpy(mData + offset, pSource, length);
     }
-#endif
 
     GLES2DefaultHardwareBufferManagerBase::GLES2DefaultHardwareBufferManagerBase()
     {
@@ -250,19 +248,23 @@ namespace Ogre {
             OGRE_NEW GLES2DefaultHardwareIndexBuffer(itype, numIndexes, usage));
     }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
     HardwareUniformBufferSharedPtr
     GLES2DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
 	{
-        return HardwareUniformBufferSharedPtr(
-                                              new GLES2DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name));
+        if(!gleswIsSupported(3, 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "GLES2 does not support uniform buffer objects",
+                        "GLES2DefaultHardwareBufferManager::createUniformBuffer");
+        }
+
+        return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name));
 	}
-#endif
     
 	Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
 	{
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                 "Cannot create RenderToVertexBuffer in GLES2DefaultHardwareBufferManagerBase", 
                 "GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
 	}

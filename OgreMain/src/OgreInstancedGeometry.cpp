@@ -686,19 +686,19 @@ namespace Ogre {
 
 
 		BatchInstance::LODIterator lodIterator = lastBatchInstance->getLODIterator();
-		//parse all the lod buckets of the BatchInstance
+		//parse all the LOD buckets of the BatchInstance
 		while (lodIterator.hasMoreElements())
 		{
 		
 			LODBucket* lod = lodIterator.getNext();
-			//create a new lod bucket for the new BatchInstance
+			//create a new LOD bucket for the new BatchInstance
 			LODBucket* lodBucket= OGRE_NEW LODBucket(ret, lod->getLod(), lod->getLodValue());
 
-			//add the lod bucket to the BatchInstance list
+			//add the LODBucket to the BatchInstance list
 			ret->updateContainers(lodBucket);
 			
 			LODBucket::MaterialIterator matIt = lod->getMaterialIterator();
-			//parse all the material buckets of the lod bucket
+			//parse all the material buckets of the LOD bucket
 			while (matIt.hasMoreElements())
 			{
 				
@@ -707,7 +707,7 @@ namespace Ogre {
 				String materialName=mat->getMaterialName();
 				MaterialBucket* matBucket = OGRE_NEW MaterialBucket(lodBucket,materialName);
 
-				//add the material bucket to the lod buckets list and map
+				//add the material bucket to the LOD buckets list and map
 				lodBucket->updateContainers(matBucket, materialName);
 
 				MaterialBucket::GeometryIterator geomIt = mat->getGeometryIterator();
@@ -1170,13 +1170,13 @@ namespace Ogre {
 	{
 		mQueuedSubMeshes.push_back(qmesh);
 
-        // Set/check lod strategy
+        // Set/check LOD strategy
         const LodStrategy *lodStrategy = qmesh->submesh->parent->getLodStrategy();
         if (mLodStrategy == 0)
         {
             mLodStrategy = lodStrategy;
 
-            // First LOD mandatory, and always from base lod value
+            // First LOD mandatory, and always from base LOD value
             mLodValues.push_back(mLodStrategy->getBaseValue());
         }
         else
@@ -1186,7 +1186,7 @@ namespace Ogre {
                     "InstancedGeometry::InstancedObject::assign");
         }
 
-		// update lod values
+		// update LOD values
 		ushort lodLevels = qmesh->submesh->parent->getNumLodLevels();
 		assert(qmesh->geometryLodList->size() == lodLevels);
 
@@ -1352,20 +1352,20 @@ namespace Ogre {
         // Cache squared view depth for use by GeometryBucket
         mSquaredViewDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
-        // No lod strategy set yet, skip (this indicates that there are no submeshes)
+        // No LOD strategy set yet, skip (this indicates that there are no submeshes)
         if (mLodStrategy == 0)
             return;
 
         // Sanity check
         assert(!mLodValues.empty());
 
-        // Calculate lod value
+        // Calculate LOD value
         Real lodValue = mLodStrategy->getValue(this, cam);
 
-        // Store lod value for this strategy
+        // Store LOD value for this strategy
         mLodValue = lodValue;
 
-        // Get lod index
+        // Get LOD index
         mCurrentLod = mLodStrategy->getIndex(lodValue, mLodValues);
 	}
 	//--------------------------------------------------------------------------
@@ -1566,7 +1566,7 @@ namespace Ogre {
 		, mTechnique(0)
 		, mLastIndex(0)
 	{
-						mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
+		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 	}
 	//--------------------------------------------------------------------------
 	InstancedGeometry::MaterialBucket::~MaterialBucket()
@@ -1641,10 +1641,10 @@ namespace Ogre {
         // Get batch instance
         BatchInstance *batchInstance = mParent->getParent();
 
-        // Get material lod strategy
+        // Get material LOD strategy
         const LodStrategy *materialLodStrategy = mMaterial->getLodStrategy();
 
-        // If material strategy doesn't match, recompute lod value with correct strategy
+        // If material strategy doesn't match, recompute LOD value with correct strategy
         if (materialLodStrategy != batchInstance->mLodStrategy)
             lodValue = materialLodStrategy->getValue(batchInstance, batchInstance->mCamera);
 

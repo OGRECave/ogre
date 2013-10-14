@@ -112,7 +112,7 @@ namespace Ogre
         */
         static ExternalTextureSourceManager* getSingletonPtr(void);
 	protected:
-		//The current texture controller selected
+		/// The current texture controller selected
 		ExternalTextureSource* mCurrExternalTextureSource;
 		
         // Collection of loaded texture System PlugIns, keyed by registered type

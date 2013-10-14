@@ -1,9 +1,7 @@
 syntax: glob
-testTerrain*.dat
 *.dll
 #*.vcxproj
 #*.filters
-#*.vcxproj
 *.vcxproj.user
 *.pdb
 *.ilk
@@ -24,3 +22,6 @@ Samples/Browser/WinRT.Xaml/Debug
 Samples/Browser/WinRT.Xaml/Release
 Samples/Browser/WinRT.Xaml/Generated Files
 Samples/Browser/WinRT.Xaml/Media
+AndroidBuild/
+AndroidDependencies/
+Build/

@@ -1,13 +1,13 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename manual.info
-@settitle OGRE Manual v1.8 ('Byatis')
+@settitle OGRE Manual v1.10 ('Xalafu')
 @c %**end of header
 @contents
 @shortcontents
 
 @titlepage
-@title OGRE Manual v1.8 ('Byatis')
+@title OGRE Manual v1.10 ('Xalafu')
 @author Steve Streeting
 @page
 @vskip 0pt plus 1fill
@@ -18,7 +18,7 @@ This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unpo
 @end titlepage
 
 @node Top
-@top OGRE Manual v1.8 ('Byatis')
+@top OGRE Manual v1.10 ('Xalafu')
 @ifinfo
 Copyright @copyright{} The OGRE Team@*@*
 
@@ -248,6 +248,17 @@ Entities automatically have Material's associated with them if they use a Mesh o
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.@*@*
 
 You can create overlays either through the SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their 'show()' method. You can also show multiple overlays at once, and their Z order is determined by the Overlay::setZOrder() method.@*@*
+
+@heading Notes on Integration
+
+The OverlaySystem is now its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager): 
+
+@example
+Ogre::OverlaySystem* pOverlaySystem = new Ogre::OverlaySystem();
+mSceneMgr->addRenderQueueListener(pOverlaySystem);
+@end example
+
+One Ogre::OverlaySystem per application is enough but you need to call addRenderQueueListener once per SceneManager.
 
 @heading Creating 2D Elements
 
@@ -1288,7 +1299,7 @@ The default type which is assumed if you omit it, your texture has a width and a
 @item 3d
 A 3 dimensional texture i.e. volume texture. Your texture has a width, a height, both of which should be powers of 2, and has depth. These can be addressed with 3d texture coordinates i.e. through a pixel shader.
 @item cubic
-This texture is made up of 6 2D textures which are pasted around the inside of a cube. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
+This texture is made up of 6 2D textures which are pasted around the inside of a cube.  Alternatively 1 cube texture can be used if supported by the texture format(DDS for example) and rendersystem. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
 @end table
 The 'numMipMaps' option allows you to specify the number of mipmaps to generate for this texture. The default is 'unlimited' which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture_unit used to load the texture - so be consistent with your usage.@*@*
 
@@ -1413,7 +1424,7 @@ Default: none@*@*
 @anchor{cubic_texture}
 @subheading cubic_texture
 
-Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.@*@*
+Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube or 1 cube texture if supported by the texture format(DDS for example) and rendersystem.. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.@*@*
 
 Format1 (short): cubic_texture <base_name> <combinedUVW|separateUV>@*@*
 
@@ -1467,6 +1478,8 @@ Example: content_type compositor DepthCompositor OutputTexture @*@*
 @subheading tex_coord_set
 
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.@*@*
+
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
 
 Format: tex_coord_set <set_num>@*@*
 
@@ -2188,7 +2201,7 @@ The syntax of the link to a vertex program and a fragment or geometry program ar
 
 For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programmable vertex fixed function pipeline and then provide a fragment_program_ref in a pass i.e. there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
 
-The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://developer.3dlabs.com/documents/index.htm}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{http://developer.nvidia.com/object/cg_toolkit.html}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
+The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://www.opengl.org/registry/}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{https://developer.nvidia.com/cg-toolkit}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
 
 @anchor{Program Parameter Specification}
 @subheading Parameter specification
@@ -4013,7 +4026,7 @@ There are a few rules when creating an animated model for OGRE:
 @end itemize
 If you're creating non-animated meshes, then you do not need to be concerned with the above.
 
-Full documentation for each exporter is provided along with the exporter itself, and there is a list of the currently supported modelling tools in the OGRE Wiki at @url{http://www.ogre3d.org/wiki/index.php/Exporters}.
+Full documentation for each exporter is provided along with the exporter itself, and there is a list of the currently supported modelling tools in the OGRE Wiki at @url{http://www.ogre3d.org/tikiwiki/tiki-index.php?page=OGRE+Exporters&structure=Tools}.
 
 @node XMLConverter
 @section XMLConverter
@@ -4036,7 +4049,7 @@ When converting XML to .mesh, you will be prompted to (re)generate level-of-deta
 @section MeshUpgrader
 This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date. This tools has a very simple syntax:
 @example
-OgreMeshUpgrade <oldmesh> <newmesh>
+OgreMeshUpgrader <oldmesh> <newmesh>
 @end example
 The OGRE release notes will notify you when this is necessary with a new release.
 

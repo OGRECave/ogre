@@ -210,7 +210,7 @@ namespace Ogre {
 
         if(glIsProgram(mGLProgramHandle))
         {
-            glValidateProgram(mGLProgramHandle);
+            OGRE_CHECK_GL_ERROR(glValidateProgram(mGLProgramHandle));
         }
 		logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
 
@@ -224,14 +224,14 @@ namespace Ogre {
 
 				// get buffer size
 				GLint binaryLength = 0;
-				glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
                 // create microcode
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
 
 				// get binary
-				glGetProgramBinary(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
+				OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
 
         		// add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);

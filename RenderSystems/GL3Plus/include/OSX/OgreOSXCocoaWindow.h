@@ -43,7 +43,7 @@ THE SOFTWARE.
 @end
 
 namespace Ogre {
-    class CocoaWindow : public RenderWindow
+    class _OgreGL3PlusExport CocoaWindow : public RenderWindow
     {
     private:
         NSWindow *mWindow;
@@ -96,7 +96,7 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         void resize(unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
-        void swapBuffers(bool waitForVSync);
+        void swapBuffers();
         /** Overridden - see RenderTarget */
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */

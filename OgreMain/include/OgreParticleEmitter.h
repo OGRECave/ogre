@@ -109,12 +109,12 @@ namespace Ogre {
         String mType;
         /// Base direction of the emitter, may not be used by some emitters
         Vector3 mDirection;
-        // Notional up vector, used to speed up generation of variant directions, and also to orient some emitters.
+        /// Notional up vector, used to speed up generation of variant directions, and also to orient some emitters.
         Vector3 mUp;
-		// When true, mDirPositionRef is used instead of mDirection to generate particles
+		/// When true, mDirPositionRef is used instead of mDirection to generate particles
 		bool mUseDirPositionRef;
-		// Center position to tell in which direction will particles be emitted according to their position,
-		// useful for explosions & implosions, some emitters (i.e. point emitter) may not need it.
+		/* Center position to tell in which direction will particles be emitted according to their position,
+            useful for explosions & implosions, some emitters (i.e. point emitter) may not need it. */
         Vector3 mDirPositionRef;
         /// Angle around direction which particles may be emitted, internally radians but angleunits for interface
         Radian mAngle;

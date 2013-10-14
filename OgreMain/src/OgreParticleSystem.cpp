@@ -1025,7 +1025,7 @@ namespace Ogre {
         if (mIsRendererConfigured)
         {
             MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName);
+                mMaterialName, mResourceGroupName).staticCast<Material>();
             mRenderer->_setMaterial(mat);
         }
     }
@@ -1102,7 +1102,7 @@ namespace Ogre {
             mRenderer->_notifyDefaultDimensions(mDefaultWidth, mDefaultHeight);
             createVisualParticles(0, mParticlePool.size());
             MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName);
+                mMaterialName, mResourceGroupName).staticCast<Material>();
             mRenderer->_setMaterial(mat);
 			if (mRenderQueueIDSet)
 				mRenderer->setRenderQueueGroup(mRenderQueueID);
@@ -1325,7 +1325,7 @@ namespace Ogre {
 					emitter->setEmitted(true);
 					break;
 				}
-				else
+				else if(emitter)
 				{
 					// Set explicitly to 'false' although the default value is already 'false'
 					emitter->setEmitted(false);

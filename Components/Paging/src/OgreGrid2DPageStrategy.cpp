@@ -159,8 +159,8 @@ namespace Ogre
 		relPos.x += offset;
 		relPos.y += offset;
 
-		*x = static_cast<long>(floor(relPos.x / mCellSize));
-		*y = static_cast<long>(floor(relPos.y / mCellSize));
+		*x = static_cast<int32>(floor(relPos.x / mCellSize));
+		*y = static_cast<int32>(floor(relPos.y / mCellSize));
 
 	}
 	//---------------------------------------------------------------------

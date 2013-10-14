@@ -560,6 +560,11 @@ namespace Ogre {
         */
         bool getIsAlpha(void) const;
 
+        /// @copydoc Texture::getGamma
+        Real getGamma() const { return mGamma; }
+        /// @copydoc Texture::setGamma
+        void setGamma(Real gamma) { mGamma = gamma; }
+
         /// @copydoc Texture::setHardwareGammaEnabled
         void setHardwareGammaEnabled(bool enabled);
         /// @copydoc Texture::isHardwareGammaEnabled
@@ -567,7 +572,7 @@ namespace Ogre {
 
         /** Gets the index of the set of texture co-ords this layer uses.
         @note
-            Applies to both fixed-function and programmable pipeline.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         unsigned int getTextureCoordSet(void) const;
 
@@ -576,7 +581,7 @@ namespace Ogre {
             Default is 0 for all layers. Only change this if you have provided multiple texture co-ords per
             vertex.
         @note
-            Has no effect if a fragment program is used.
+        Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
         void setTextureCoordSet(unsigned int set);
 
@@ -692,6 +697,9 @@ namespace Ogre {
         /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
         @note
             The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+		@note This is a shortcut method which sets the addressing mode for all
+			coordinates at once; you can also call the more specific method
+			to set the addressing mode per coordinate.
         @note
             This is a shortcut method which sets the addressing mode for all
             coordinates at once; you can also call the more specific method
@@ -931,9 +939,8 @@ namespace Ogre {
             generated coordinates rather than static model texture coordinates.
         @param enable
             True to enable, false to disable
-        @param planar
-            If set to @c true, instead of being based on normals the environment effect is based on
-            vertex positions. This is good for planar surfaces.
+        @param envMapType
+            The type of environment mapping to perform. Planar, curved, reflection or normal. @see EnvMapType
         @note
             This option has no effect in the programmable pipeline.
         */
@@ -1195,6 +1202,8 @@ namespace Ogre {
         /** Set the texture pointer for a given frame (internal use only!). */
         void _setTexturePtr(const TexturePtr& texptr, size_t frame);
 
+		size_t calculateSize(void) const;
+
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
         */
@@ -1224,6 +1233,7 @@ protected:
         mutable bool mTextureLoadFailed;
         bool mIsAlpha;
         bool mHwGamma;
+        Real mGamma;
 
         mutable bool mRecalcTexMatrix;
         Real mUMod, mVMod;

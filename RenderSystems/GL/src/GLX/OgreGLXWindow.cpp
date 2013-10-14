@@ -285,7 +285,7 @@ namespace Ogre
 			};
 			
 			int maxAttribs[] = {
-				GLX_SAMPLES,		samples,
+				GLX_SAMPLES,		static_cast<int>(samples),
 				GLX_DOUBLEBUFFER,   1,
 				GLX_STENCIL_SIZE,   INT_MAX,
 				GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, 1,
@@ -293,6 +293,11 @@ namespace Ogre
 			};
 
 			fbConfig = mGLSupport->selectFBConfig(minAttribs, maxAttribs);
+
+			// Now check the actual supported fsaa value
+			GLint maxSamples;
+			mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &maxSamples);
+			mFSAA = maxSamples;
 
 			if (gamma != 0)
 			{
@@ -392,7 +397,10 @@ namespace Ogre
 				}
 				
 				XTextProperty titleprop;
-				char *lst = (char*)title.c_str();
+				vector<char>::type  title_ (title.begin(), title.end());
+				title_.push_back(0);
+
+				char *lst = &title_[0];
 				XStringListToTextProperty((char **)&lst, 1, &titleprop);
 				XSetWMProperties(xDisplay, mWindow, &titleprop, NULL, NULL, 0, sizeHints, wmHints, NULL);
 				
@@ -561,9 +569,16 @@ namespace Ogre
 		
 		mContext->setCurrent();
 		
-		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
+		if (! mIsExternalGLControl)
 		{
-			glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+			if (GLXEW_MESA_swap_control)
+				glXSwapIntervalMESA (vsync ? mVSyncInterval : 0);
+			else if (GLXEW_EXT_swap_control)
+				glXSwapIntervalEXT (mGLSupport->getGLDisplay(), glXGetCurrentDrawable(),
+									vsync ? mVSyncInterval : 0);
+			else if (GLXEW_SGI_swap_control)
+				if (vsync && mVSyncInterval)
+					glXSwapIntervalSGI (mVSyncInterval);
 		}
 		
 		mContext->endCurrent();
@@ -656,7 +671,7 @@ namespace Ogre
 	}
 	
 	//-------------------------------------------------------------------------------------------------//
-	void GLXWindow::swapBuffers(bool waitForVSync)
+	void GLXWindow::swapBuffers()
 	{
 		if (mClosed || mIsExternalGLControl) 
 			return;
@@ -729,34 +744,21 @@ namespace Ogre
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 		
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
 		// Must change the packing to ensure no overruns!
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 		
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-					 format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 		
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);
-		
-		//vertical flip
-		{
-			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-			size_t height = dst.getHeight();
-			uchar *tmpData = new uchar[rowSpan * height];
-			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-			
-			while (tmpRow >= tmpData)
-			{
-				memcpy(tmpRow, srcRow, rowSpan);
-				srcRow += rowSpan;
-				tmpRow -= rowSpan;
-			}
-			memcpy(dst.data, tmpData, rowSpan * height);
-			
-			delete [] tmpData;
-		}
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+        
+        PixelUtil::bulkPixelVerticalFlip(dst);
 	}
 
 	//-------------------------------------------------------------------------------------------------//

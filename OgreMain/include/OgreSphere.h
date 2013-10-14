@@ -99,7 +99,7 @@ namespace Ogre {
 		/** Merges another Sphere into the current sphere */
 		void merge(const Sphere& oth)
 		{
-			Vector3 diff =  oth.getCenter() - mCenter;
+			Vector3 diff = oth.getCenter() - mCenter;
 			Real lengthSq = diff.squaredLength();
 			Real radiusDiff = oth.getRadius() - mRadius;
 			
@@ -116,22 +116,11 @@ namespace Ogre {
 					return;
 				}
 			}
-			
+
 			Real length = Math::Sqrt(lengthSq);
-			
-			Vector3 newCenter;
-			Real newRadius;
-			if ((length + oth.getRadius()) > mRadius) 
-			{
-				Real t = (length + radiusDiff) / (2.0f * length);
-				newCenter = mCenter + diff * t;
-			} 
-			// otherwise, we keep our existing center
-			
-			newRadius = 0.5f * (length + mRadius + oth.getRadius());
-			
-			mCenter = newCenter;
-			mRadius = newRadius;
+            Real t = (length + radiusDiff) / (2.0f * length);
+            mCenter = mCenter + diff * t;
+			mRadius = 0.5f * (length + mRadius + oth.getRadius());
 		}
         
 

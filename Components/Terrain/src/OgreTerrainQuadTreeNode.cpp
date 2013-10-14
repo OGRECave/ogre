@@ -536,8 +536,14 @@ namespace Ogre
 				// if so, destroy it to free RAM, this should be fast enough to 
 				// to direct
 				HardwareVertexBufferSharedPtr posbuf, deltabuf;
-				VertexData* targetVertexData = cpuData ?
-					mVertexDataRecord->cpuVertexData : mVertexDataRecord->gpuVertexData;
+				VertexData* targetVertexData = mVertexDataRecord->cpuVertexData;
+				if(!cpuData)
+				{
+					if(mVertexDataRecord->gpuVertexData == NULL) 
+						createGpuVertexData();
+					targetVertexData = mVertexDataRecord->gpuVertexData;
+				}
+
 				if (positions) 
 					posbuf = targetVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER);
 				if (deltas)

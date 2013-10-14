@@ -172,6 +172,25 @@ public:
     */
     bool getSkeletalAnimationIncluded() const { return mSkeletalAnimation; }
 
+	/** Tells Ogre whether auto-bound matrices should be sent in column or row-major order.
+	@remarks
+		This method has the same effect as column_major_matrices option used when declaring manually written hlsl program.
+		You want to use this method only when you use float3x4 type in a shader, e.g. for bone matrices.
+		In mentioned case you should call this method with false as parameter.
+	@par
+		For more detail see OGRE Manual, section <b>3.1.6 DirectX9 HLSL</b>.
+	@note
+		This setting has any effect only when the target language is HLSL.
+	@param value Should Ogre pass auto-bound matrices as column-major? The default is true.
+	*/
+	void setUseColumnMajorMatrices(bool value) { mColumnMajorMatrices = value; }
+	
+	/** Returns whether Ogre will pass auto-bound matrices as column-major.
+	@return
+	true, when the matrices will be passed in column-major order, false, when they will be passed as row-major.
+	*/
+	bool getUseColumnMajorMatrices() const { return mColumnMajorMatrices; }
+
 // Protected methods.
 protected:
 
@@ -210,6 +229,8 @@ protected:
 	StringVector mDependencies;
 	// Skeletal animation calculation
 	bool mSkeletalAnimation;
+	// Whether to pass matrices as column-major.
+	bool mColumnMajorMatrices;
 private:
 	friend class ProgramManager;
 };

@@ -73,8 +73,12 @@ namespace Volume {
     {
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
+#if OGRE_NO_ZIP_ARCHIVE == 0
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
         StreamSerialiser ser(compressStream);
+#else
+        StreamSerialiser ser(stream);
+#endif
         ser.writeChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION);
 
         // Write Metadata
@@ -143,7 +147,7 @@ namespace Volume {
         Vector3 dir = scaledRay.getDirection().normalisedCopy();
 
         size_t count = 0;
-        Vector3 prev, prevPrev;
+        Vector3 prev = Vector3::ZERO, prevPrev = Vector3::ZERO;
         bool atEnd = false;
         Real totalLength = (start - end).length();
         while (Math::Abs(densityCur) > (Real)0.01 && !atEnd)
@@ -180,6 +184,12 @@ namespace Volume {
         }
         return false;
     }
+    
+    //-----------------------------------------------------------------------
 
+    Real Source::getVolumeSpaceToWorldSpaceFactor(void) const
+    {
+        return (Real)1.0;
+    }
 }
 }

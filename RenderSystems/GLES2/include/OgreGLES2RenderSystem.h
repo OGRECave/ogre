@@ -90,6 +90,11 @@ namespace Ogre {
 
             /* The current GL context  - main thread only */
             GLES2Context *mCurrentContext;
+
+            typedef list<GLES2Context*>::type GLES2ContextList;
+            /// List of background thread contexts
+            GLES2ContextList mBackgroundContextList;
+
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -440,11 +445,13 @@ namespace Ogre {
             Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
             Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
             Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
-            void registerThread() {}
-            void unregisterThread() {}
-            void preExtraThreadsStarted() {}
-            void postExtraThreadsStarted() {}
+            OGRE_MUTEX(mThreadInitMutex);
+            void registerThread();
+            void unregisterThread();
+            void preExtraThreadsStarted();
+            void postExtraThreadsStarted();
             void setClipPlanesImpl(const Ogre::PlaneList& planeList) {}
+            GLES2Support* getGLSupportRef() { return mGLSupport; }
 
             // ----------------------------------
             // GLES2RenderSystem specific members

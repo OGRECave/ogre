@@ -53,15 +53,15 @@ namespace Ogre {
 
             void freeBuffer();
 
-            // Upload a box of pixels to this buffer on the card
+            /// Upload a box of pixels to this buffer on the card
             virtual void upload(const PixelBox &data, const Image::Box &dest);
 
-            // Download a box of pixels from the card
+            /// Download a box of pixels from the card
             virtual void download(const PixelBox &data);
 
         public:
             /// Should be called by HardwareBufferManager
-            GL3PlusHardwarePixelBuffer(size_t mWidth, size_t mHeight, size_t mDepth,
+            GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
                                   PixelFormat mFormat,
                                   HardwareBuffer::Usage usage);
 
@@ -75,7 +75,7 @@ namespace Ogre {
 
             /** Bind surface to frame buffer. Needs FBO extension.
             */
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
+            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
             GLenum getGLFormat() { return mGLInternalFormat; }
     };
 
@@ -90,7 +90,7 @@ namespace Ogre {
             ~GL3PlusTextureBuffer();
 
             /// @copydoc HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
+            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
 
             /// @copydoc HardwarePixelBuffer::getRenderTarget
             RenderTexture* getRenderTarget(size_t);
@@ -111,7 +111,7 @@ namespace Ogre {
             }
 
             /// Copy from framebuffer
-            void copyFromFramebuffer(size_t zoffset);
+            void copyFromFramebuffer(uint32 zoffset);
 
             /// @copydoc HardwarePixelBuffer::blit
             void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
@@ -135,11 +135,11 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusRenderBuffer: public GL3PlusHardwarePixelBuffer
     {
         public:
-            GL3PlusRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
+            GL3PlusRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
             ~GL3PlusRenderBuffer();
 
-        /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
+            /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
+            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
 
         protected:
             // In case this is a render buffer

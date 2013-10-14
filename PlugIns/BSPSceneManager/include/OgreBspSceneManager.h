@@ -65,7 +65,7 @@ namespace Ogre {
     {
     protected:
 
-        // World geometry
+        /// World geometry
         BspLevelPtr mLevel;
 
         // State variables for rendering WIP
@@ -174,7 +174,7 @@ namespace Ogre {
         */
         /*
         virtual AxisAlignedBoxSceneQuery* 
-            createAABBQuery(const AxisAlignedBox& box, unsigned long mask = 0xFFFFFFFF);
+            createAABBQuery(const AxisAlignedBox& box, uint32 mask = 0xFFFFFFFF);
         */
         /* Creates a SphereSceneQuery for this scene manager. 
         @remarks
@@ -190,7 +190,7 @@ namespace Ogre {
         */
         /*
         virtual SphereSceneQuery* 
-            createSphereQuery(const Sphere& sphere, unsigned long mask = 0xFFFFFFFF);
+            createSphereQuery(const Sphere& sphere, uint32 mask = 0xFFFFFFFF);
         */
         /** Creates a RaySceneQuery for this scene manager. 
         @remarks
@@ -205,7 +205,7 @@ namespace Ogre {
             certain objects; see SceneQuery for details.
         */
         virtual RaySceneQuery* 
-            createRayQuery(const Ray& ray, unsigned long mask = 0xFFFFFFFF);
+            createRayQuery(const Ray& ray, uint32 mask = 0xFFFFFFFF);
         /** Creates an IntersectionSceneQuery for this scene manager. 
         @remarks
             This method creates a new instance of a query object for locating
@@ -218,7 +218,7 @@ namespace Ogre {
             certain objects; see SceneQuery for details.
         */
         virtual IntersectionSceneQuery* 
-            createIntersectionQuery(unsigned long mask = 0xFFFFFFFF);
+            createIntersectionQuery(uint32 mask = 0xFFFFFFFF);
 
     };
 

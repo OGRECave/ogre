@@ -223,7 +223,7 @@ namespace Ogre {
 
 #include "OgreHeaderSuffix.h"
 
-#if _DEBUG && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+#if defined(_DEBUG) && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 #   pragma push_macro("NOMINMAX")
 #   define NOMINMAX
 #   include <windows.h>

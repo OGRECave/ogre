@@ -33,23 +33,24 @@ THE SOFTWARE.
 #  include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #endif
 
+#include "Threading/OgreThreadHeaders.h"
+
 #if OGRE_THREAD_SUPPORT
-#define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
-#define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock();
+#   define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
+#   define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock();
 #else
-#define OGRE_LOCK_RECURSIVE_MUTEX(name) 
-#define OGRE_UNLOCK_RECURSIVE_MUTEX(name)
+#   define OGRE_LOCK_RECURSIVE_MUTEX(name) 
+#   define OGRE_UNLOCK_RECURSIVE_MUTEX(name)
 #endif
 
-
 #if OGRE_THREAD_SUPPORT == 1
-#define D3D9_DEVICE_ACCESS_LOCK				OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D9_DEVICE_ACCESS_UNLOCK			OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D9_DEVICE_ACCESS_CRITICAL_SECTION	OGRE_LOCK_MUTEX(msDeviceAccessMutex)
+#   define D3D9_DEVICE_ACCESS_LOCK				OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#   define D3D9_DEVICE_ACCESS_UNLOCK			OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#   define D3D9_DEVICE_ACCESS_CRITICAL_SECTION	OGRE_LOCK_MUTEX(msDeviceAccessMutex);
 #else
-#define D3D9_DEVICE_ACCESS_LOCK	
-#define D3D9_DEVICE_ACCESS_UNLOCK
-#define D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+#   define D3D9_DEVICE_ACCESS_LOCK	
+#   define D3D9_DEVICE_ACCESS_UNLOCK
+#   define D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 #endif
 
 // Define versions for if DirectX is in use (Win32 only)
@@ -94,6 +95,10 @@ namespace Ogre
     class D3D9HLSLProgram;
     class D3D9VertexDeclaration;
 	class D3D9Resource;
+
+    typedef SharedPtr<D3D9GpuProgram>  D3D9GpuProgramPtr;
+    typedef SharedPtr<D3D9HLSLProgram> D3D9HLSLProgramPtr;
+    typedef SharedPtr<D3D9Texture>     D3D9TexturePtr;
 
 // Should we ask D3D to manage vertex/index buffers automatically?
 // Doing so avoids lost devices, but also has a performance impact

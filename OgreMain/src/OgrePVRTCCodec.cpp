@@ -130,7 +130,7 @@ namespace Ogre {
 	{
 		if(msInstance)
 		{
-			Codec::unRegisterCodec(msInstance);
+			Codec::unregisterCodec(msInstance);
 			OGRE_DELETE msInstance;
 			msInstance = 0;
 		}
@@ -141,19 +141,19 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr PVRTCCodec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
+    DataStreamPtr PVRTCCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "PVRTC encoding not supported",
-                    "PVRTCCodec::code" ) ;
+                    "PVRTCCodec::encode" ) ;
     }
     //---------------------------------------------------------------------
-    void PVRTCCodec::codeToFile(MemoryDataStreamPtr& input, 
+    void PVRTCCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "PVRTC encoding not supported",
-                    "PVRTCCodec::codeToFile" ) ;
+                    "PVRTCCodec::encodeToFile" ) ;
 	}
     //---------------------------------------------------------------------
     Codec::DecodeResult PVRTCCodec::decode(DataStreamPtr& stream) const
@@ -197,11 +197,11 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian((void *)flags, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
         formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
 
         uint32 bitmaskAlpha = header.bitmaskAlpha;
-        flipEndian((void *)bitmaskAlpha, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(bitmaskAlpha), sizeof(uint32));
 
         if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
         {
@@ -286,7 +286,7 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian((void *)flags, sizeof(uint32));
+        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
 
         imgData->depth = header.depth;
         imgData->width = header.width;
@@ -312,9 +312,9 @@ namespace Ogre {
 		// Now deal with the data
 		void *destPtr = output->getPtr();
         
-        size_t width = imgData->width;
-        size_t height = imgData->height;
-        size_t depth = imgData->depth;
+        uint width = imgData->width;
+        uint height = imgData->height;
+        uint depth = imgData->depth;
 
         // All mips for a surface, then each face
         for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)

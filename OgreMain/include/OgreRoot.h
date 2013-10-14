@@ -79,7 +79,7 @@ namespace Ogre
         String mVersion;
 		String mConfigFileName;
 	    bool mQueuedEnd;
-        // In case multiple render windows are created, only once are the resources loaded.
+        /// In case multiple render windows are created, only once are the resources loaded.
         bool mFirstTimePostWindowInit;
 
         // Singletons
@@ -178,7 +178,7 @@ namespace Ogre
         */
         void unloadPlugins();
 
-        // Internal method for one-time tasks after first window creation
+        /// Internal method for one-time tasks after first window creation
         void oneTimePostWindowInit(void);
 
         /** Set of registered frame listeners */

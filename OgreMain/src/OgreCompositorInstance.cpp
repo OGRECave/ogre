@@ -1016,7 +1016,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
  		if(refTexDef == 0)
   		{
  			//Still NULL. Try global search.
- 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+            const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
  			if(!refComp.isNull())
  			{
  				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(name);
@@ -1036,6 +1036,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1125,7 +1126,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
  		if(refTexDef == 0)
  		{
  			//Still NULL. Try global search.
- 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+            const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
  			if(!refComp.isNull())
  			{
  				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(texDef->refTexName);
@@ -1145,6 +1146,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
   			{
   				//Find the instance and check if it is before us
   				CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())

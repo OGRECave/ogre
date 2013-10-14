@@ -77,8 +77,8 @@ namespace Ogre {
         // Only 1 BSP level allowed loaded at once
         removeAll();
 
-		ResourcePtr ret = create("bsplevel", group, true, 0);
-		BspLevelPtr bspLevel = ret;
+		ResourcePtr ret = createResource("bsplevel", group, true, 0);
+		BspLevelPtr bspLevel = ret.staticCast<BspLevel>();
 		bspLevel->load(stream);
 		
         return ret;

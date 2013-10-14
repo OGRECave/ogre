@@ -107,6 +107,18 @@ namespace Ogre {
 	{
 		return OGRE_NEW Material(this, name, handle, group, isManual, loader);
 	}
+	//-----------------------------------------------------------------------
+	MaterialPtr MaterialManager::create (const String& name, const String& group,
+									bool isManual, ManualResourceLoader* loader,
+									const NameValuePairList* createParams)
+	{
+		return createResource(name,group,isManual,loader,createParams).staticCast<Material>();
+	}
+	//-----------------------------------------------------------------------
+	MaterialPtr MaterialManager::getByName(const String& name, const String& groupName)
+	{
+		return getResourceByName(name, groupName).staticCast<Material>();
+	}
     //-----------------------------------------------------------------------
 	void MaterialManager::initialise(void)
 	{
@@ -115,14 +127,14 @@ namespace Ogre {
         // Add a single technique and pass, non-programmable
         mDefaultSettings->createTechnique()->createPass();
 
-        // Set the default lod strategy
+        // Set the default LOD strategy
         mDefaultSettings->setLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy());
 
 	    // Set up a lit base white material
 	    create("BaseWhite", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 	    // Set up an unlit base white material
         MaterialPtr baseWhiteNoLighting = create("BaseWhiteNoLighting",
-			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         baseWhiteNoLighting->setLightingEnabled(false);
 
 	}

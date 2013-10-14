@@ -230,7 +230,7 @@ namespace Ogre {
         /// The LOD number of the mesh to use, calculated by _notifyCurrentCamera.
         ushort mMeshLodIndex;
 
-        /// LOD bias factor, transformed for optimisation when calculating adjusted lod value.
+        /// LOD bias factor, transformed for optimisation when calculating adjusted LOD value.
         Real mMeshLodFactorTransformed;
         /// Index of minimum detail LOD (NB higher index is lower detail).
         ushort mMinMeshLodIndex;
@@ -239,7 +239,7 @@ namespace Ogre {
 
         /// LOD bias factor, not transformed.
         Real mMaterialLodFactor;
-        /// LOD bias factor, transformed for optimisation when calculating adjusted lod value.
+        /// LOD bias factor, transformed for optimisation when calculating adjusted LOD value.
         Real mMaterialLodFactorTransformed;
         /// Index of minimum detail LOD (NB higher index is lower detail).
         ushort mMinMaterialLodIndex;
@@ -531,7 +531,7 @@ namespace Ogre {
         @param minDetailIndex
             The index of the minimum LOD this entity is allowed to use (higher
             indexes are lower detail. Use something like 99 if you want unlimited LODs (the actual
-            LOD will be limited by the number of lod indexes used in the Material).
+            LOD will be limited by the number of LOD indexes used in the Material).
         */
         void setMaterialLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
 
@@ -573,7 +573,7 @@ namespace Ogre {
         /** Detaches an object by pointer.
         @remarks
             Use this method to destroy a MovableObject which is attached to a bone of belonging this entity.
-            But sometimes the object may be not in the child object list because it is a lod entity,
+            But sometimes the object may be not in the child object list because it is a LOD entity,
             this method can safely detect and ignore in this case and won't raise an exception.
         */
         void detachObjectFromBone(MovableObject* obj);
@@ -599,7 +599,7 @@ namespace Ogre {
         /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light,
-            HardwareIndexBufferSharedPtr* indexBuffer,
+            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
 
         /** Internal method for retrieving bone matrix information. */
@@ -820,7 +820,7 @@ namespace Ogre {
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
-        /** Get the lod strategy transformation of the mesh lod factor. */
+        /** Get the LOD strategy transformation of the mesh LOD factor. */
         Real _getMeshLodFactorTransformed() const;
         
         /** Entity's skeleton's AnimationState will not be automatically updated when set to true.
@@ -836,7 +836,6 @@ namespace Ogre {
         bool getSkipAnimationStateUpdate() const {
             return mSkipAnimStateUpdates;
         }
-
 
         /** The skeleton of the main entity will be updated even if the an LOD entity is being displayed.
             useful if you have entities attached to the main entity. Otherwise position of attached

@@ -21,8 +21,12 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CM
 	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
 endif()
 
-# Just debug / release since that's all that's included in SDK
-set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+# Just debug / release since that's all that's included in SDK. Only release for iOS/OS X
+if(APPLE)
+  set (CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
+else()
+  set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+endif()
 
 # Use relative paths
 # Note that up to CMake 2.8.0 on MSVC the .pdbs are still referenced absolutely
@@ -90,11 +94,14 @@ if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
+  set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+  set(XCODE_ATTRIBUTE_LLVM_VECTORIZE_LOOPS "YES")
+  set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
-  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_INCLUDING_64_BIT)")
 
   remove_definitions(-msse)
 endif ()
@@ -147,8 +154,12 @@ if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 	add_definitions(-DBOOST_ALL_NO_LIB)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
 else()
-	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/iOSDependencies/lib/Release")
+	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/boost/lib")
+	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/boost/include")
 	set(Boost_USE_STATIC_LIBS TRUE)
+	set(Boost_NO_SYSTEM_PATHS TRUE)
+    set(Boost_USE_MULTITHREADED OFF)
+
     set(Boost_ADDITIONAL_VERSIONS "1.54" "1.54.0" "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
     # Components that need linking (NB does not include header-only components like bind)
     set(OGRE_BOOST_COMPONENTS thread date_time)

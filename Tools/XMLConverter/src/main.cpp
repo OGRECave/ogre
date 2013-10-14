@@ -478,6 +478,8 @@ void meshToXML(XmlOptions opts)
    
     xmlMeshSerializer->exportMesh(mesh.getPointer(), opts.dest);
 
+    // Clean up the conversion mesh
+    MeshManager::getSingleton().remove("conversion");
 }
 
 void XMLToBinary(XmlOptions opts)
@@ -631,7 +633,7 @@ void XMLToBinary(XmlOptions opts)
             LodConfig lodConfig;
             lodConfig.levels.clear();
             lodConfig.mesh = newMesh->clone(newMesh->getName());
-            lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+            lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
 
             LodLevel lodLevel;
             lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
@@ -641,7 +643,7 @@ void XMLToBinary(XmlOptions opts)
                 cout << "\nHow many extra LOD levels would you like to generate? ";
                 cin >> numLod;
 
-                cout << "\nWhat lod strategy should be used? ";
+                cout << "\nWhat LOD strategy should be used? ";
                 cin >> opts.lodStrategy;
 
                 cout << "\nWhat unit of reduction would you like to use:" <<
@@ -832,6 +834,9 @@ void XMLToBinary(XmlOptions opts)
         }
 
         meshSerializer->exportMesh(newMesh.getPointer(), opts.dest, opts.endian);
+
+        // Clean up the conversion mesh
+        MeshManager::getSingleton().remove("conversion");
     }
     else if (!stricmp(root->Value(), "skeleton"))
     {
@@ -844,6 +849,9 @@ void XMLToBinary(XmlOptions opts)
 			newSkel->optimiseAllAnimations();
 		}
         skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
+
+        // Clean up the conversion skeleton
+        SkeletonManager::getSingleton().remove("conversion");
     }
     else
     {
@@ -872,6 +880,8 @@ void skeletonToXML(XmlOptions opts)
    
     xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
 
+    // Clean up the conversion skeleton
+    SkeletonManager::getSingleton().remove("conversion");
 }
 
 int main(int numargs, char** args)
@@ -938,6 +948,8 @@ int main(int numargs, char** args)
 		cerr << "ABORTING!" << std::endl;
 		retCode = 1;
 	}
+
+    Pass::processPendingPassUpdates(); // make sure passes are cleaned up
 
     delete xmlSkeletonSerializer;
     delete skeletonSerializer;

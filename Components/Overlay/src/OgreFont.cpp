@@ -168,7 +168,7 @@ namespace Ogre
     {
         // Create a new material
         mMaterial =  MaterialManager::getSingleton().create(
-			"Fonts/" + mName,  mGroup);
+            "Fonts/" + mName,  mGroup);
 
 		if (mMaterial.isNull())
         {
@@ -279,7 +279,7 @@ namespace Ogre
 
         //FILE *fo_def = stdout;
 
-        int max_height = 0, max_width = 0;
+        FT_Pos max_height = 0, max_width = 0;
 
 		// Backwards compatibility - if codepoints not supplied, assume 33-166
 		if (mCodePointRangeList.empty())
@@ -300,7 +300,7 @@ namespace Ogre
 				if( ( 2 * ( face->glyph->bitmap.rows << 6 ) - face->glyph->metrics.horiBearingY ) > max_height )
 					max_height = ( 2 * ( face->glyph->bitmap.rows << 6 ) - face->glyph->metrics.horiBearingY );
 				if( face->glyph->metrics.horiBearingY > mTtfMaxBearingY )
-					mTtfMaxBearingY = face->glyph->metrics.horiBearingY;
+					mTtfMaxBearingY = static_cast<int>(face->glyph->metrics.horiBearingY);
 
 				if( (face->glyph->advance.x >> 6 ) + ( face->glyph->metrics.horiBearingX >> 6 ) > max_width)
 					max_width = (face->glyph->advance.x >> 6 ) + ( face->glyph->metrics.horiBearingX >> 6 );
@@ -318,11 +318,11 @@ namespace Ogre
 		// Now round up to nearest power of two
 		uint32 roundUpSize = Bitwise::firstPO2From(tex_side);
 
-		// Would we benefit from using a non-square texture (2X width(
-		size_t finalWidth, finalHeight;
-		if (roundUpSize*roundUpSize*0.5 >= rawSize)
+		// Would we benefit from using a non-square texture (2X width)
+		uint32 finalWidth, finalHeight;
+		if (roundUpSize * roundUpSize * 0.5 >= rawSize)
 		{
-			finalHeight = static_cast<size_t>(roundUpSize * 0.5);
+			finalHeight = static_cast<uint32>(roundUpSize * 0.5);
 		}
 		else
 		{
@@ -366,7 +366,7 @@ namespace Ogre
 					continue;
 				}
 
-				FT_Int advance = face->glyph->advance.x >> 6;
+				FT_Pos advance = face->glyph->advance.x >> 6;
 
 				unsigned char* buffer = face->glyph->bitmap.buffer;
 
@@ -378,8 +378,8 @@ namespace Ogre
 					continue;
 				}
 
-				int y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
-				int x_bearing = face->glyph->metrics.horiBearingX >> 6;
+				FT_Pos y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
+				FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
 				for(int j = 0; j < face->glyph->bitmap.rows; j++ )
 				{
@@ -536,8 +536,8 @@ namespace Ogre
 			if (itemVec.size() == 2)
 			{
 				f->addCodePointRange(CodePointRange(
-					StringConverter::parseLong(itemVec[0]), 
-					StringConverter::parseLong(itemVec[1])));
+					StringConverter::parseUnsignedInt(itemVec[0]),
+					StringConverter::parseUnsignedInt(itemVec[1])));
 			}
 		}
 	}

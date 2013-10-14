@@ -403,7 +403,7 @@ namespace Ogre {
 			// Record logical / physical mapping
 			if (def.isFloat())
 			{
-				OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+                            OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
 				mFloatLogicalToPhysical->map.insert(
 					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -411,7 +411,7 @@ namespace Ogre {
 			}
 			else
 			{
-				OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+                            OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
 				mIntLogicalToPhysical->map.insert(
 					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -479,7 +479,7 @@ namespace Ogre {
 				if (def.isFloat())
 				{
 					def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
 					mFloatLogicalToPhysical->map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -488,18 +488,18 @@ namespace Ogre {
 				else
 				{
 					def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-					OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+					OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
 					mIntLogicalToPhysical->map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 					mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 				}
 
-				if( mParametersMap.find(paramName) == mParametersMap.end())
+				if( mParametersMap.find(name) == mParametersMap.end())
 				{
-					mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+					mParametersMap.insert(GpuConstantDefinitionMap::value_type(name, def));
 					mParametersMapSizeAsBuffer += sizeof(size_t);
-					mParametersMapSizeAsBuffer += paramName.size();
+					mParametersMapSizeAsBuffer += name.size();
 					mParametersMapSizeAsBuffer += sizeof(GpuConstantDefinition);
 				}
                 

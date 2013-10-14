@@ -61,10 +61,13 @@ namespace Ogre {
             mLinkProgramManager = NULL;
         }
 
-        if (mProgramPipelineManager)
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            delete mProgramPipelineManager;
-            mProgramPipelineManager = NULL;
+            if (mProgramPipelineManager)
+            {
+                delete mProgramPipelineManager;
+                mProgramPipelineManager = NULL;
+            }
         }
     }
     //-----------------------------------------------------------------------

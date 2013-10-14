@@ -160,12 +160,35 @@ vertex_program Examples/BumpMapVP unified
 }
 
 // Bump map vertex program, with tangent parity support for this is required
-vertex_program Examples/BumpMapVPTangentParity cg
+vertex_program Examples/BumpMapVPTangentParityCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
 	compile_arguments -DTANGENTS_HAVE_PARITY=1
+}
+
+// Bump map vertex program, with tangent parity support for this is required
+vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
+{
+	source BumpMapVPTangentParity.glsles
+}
+
+vertex_program Examples/BumpMapVPTangentParityGLSL glsl
+{
+	source BumpMapVPTangentParity.glsl
+	syntax glsl150
+	default_params
+	{
+        param_named_auto lightDiffuse light_diffuse_colour 0 
+    }
+}
+
+vertex_program Examples/BumpMapVPTangentParity unified
+{
+	delegate Examples/BumpMapVPTangentParityGLSL
+	delegate Examples/BumpMapVPTangentParityGLSLES
+	delegate Examples/BumpMapVPTangentParityCg
 }
 
 // Bump map fragment program, support for this is optional
@@ -708,58 +731,59 @@ material Examples/FresnelReflectionRefraction
 			
 	}
 
+        // Please test this code on OpenGL before reenabling it
 	// ATI 8500 +
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Examples/FresnelRefractReflectVPold
-			{
-				param_named_auto worldViewProjMatrix worldviewproj_matrix
-				param_named_auto eyePosition camera_position_object_space
-				param_named fresnelBias float -0.3
-				param_named fresnelScale float 1.4
-				param_named fresnelPower float 8
-				param_named_auto timeVal time_0_1 20
-				param_named scroll float 1 
-				param_named scale float 4 
-				param_named noise float 1
-				// scroll and noisePos will need updating per frame
-			}
+	// technique
+	// {
+	// 	pass
+	// 	{
+	// 		vertex_program_ref Examples/FresnelRefractReflectVPold
+	// 		{
+	// 			param_named_auto worldViewProjMatrix worldviewproj_matrix
+	// 			param_named_auto eyePosition camera_position_object_space
+	// 			param_named fresnelBias float -0.3
+	// 			param_named fresnelScale float 1.4
+	// 			param_named fresnelPower float 8
+	// 			param_named_auto timeVal time_0_1 20
+	// 			param_named scroll float 1 
+	// 			param_named scale float 4 
+	// 			param_named noise float 1
+	// 			// scroll and noisePos will need updating per frame
+	// 		}
 
-			// for ATI RADEON 8500 - 9200
-			fragment_program_ref Examples/FresnelRefractReflectPS
-			{
-				// distortionRange
-				param_indexed 0  float 0.025  
-				// tintColour
-				param_indexed 1  float4 0.05 0.12 0.15 1
-			}
+	// 		// for ATI RADEON 8500 - 9200
+	// 		fragment_program_ref Examples/FresnelRefractReflectPS
+	// 		{
+	// 			// distortionRange
+	// 			param_indexed 0  float 0.025  
+	// 			// tintColour
+	// 			param_indexed 1  float4 0.05 0.12 0.15 1
+	// 		}
 
-			// Noise
-			texture_unit
-			{
-				// Perlin noise volume
-				texture perlinvolume.dds 3d
-				// min / mag filtering, no mip
-				filtering linear linear none
-			}
-			// Reflection
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture Reflection
-				tex_address_mode clamp
-			}
-			// Refraction
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture Refraction
-				tex_address_mode clamp
-			}
-		}
-	}
+	// 		// Noise
+	// 		texture_unit
+	// 		{
+	// 			// Perlin noise volume
+	// 			texture perlinvolume.dds 3d
+	// 			// min / mag filtering, no mip
+	// 			filtering linear linear none
+	// 		}
+	// 		// Reflection
+	// 		texture_unit
+	// 		{
+	// 			// Will be filled in at runtime
+	// 			texture Reflection
+	// 			tex_address_mode clamp
+	// 		}
+	// 		// Refraction
+	// 		texture_unit
+	// 		{
+	// 			// Will be filled in at runtime
+	// 			texture Refraction
+	// 			tex_address_mode clamp
+	// 		}
+	// 	}
+	// }
 
 }
 
@@ -884,6 +908,26 @@ fragment_program Examples/TextureArrayPSglsl glsl
 	}
 }
 
+vertex_program Examples/TextureArrayVSglsles glsles
+{
+	source Example_TextureArrayVS.glsles
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program Examples/TextureArrayPSglsles glsles
+{
+	source Example_TextureArrayPS.glsles
+
+	default_params
+	{
+		param_named TextureArrayTex int 0
+	}
+}
+
 fragment_program Examples/TextureArrayPShlsl4 hlsl
 {
 	entry_point textureArray_p
@@ -934,6 +978,27 @@ material Examples/TextureArray
 			}
 
 			fragment_program_ref Examples/TextureArrayPSglsl
+			{
+			}
+
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture TextureArrayTex
+				tex_address_mode clamp
+			}
+		}
+	}
+
+	technique GLSLES
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVSglsles
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPSglsles
 			{
 			}
 

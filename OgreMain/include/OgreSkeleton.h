@@ -457,65 +457,11 @@ namespace Ogre {
         */
         void unloadImpl(void);
 		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // TODO 
+		size_t calculateSize(void) const;
 
     };
 
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to SkeletonPtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport SkeletonPtr : public SharedPtr<Skeleton> 
-    {
-    public:
-        SkeletonPtr() : SharedPtr<Skeleton>() {}
-        explicit SkeletonPtr(Skeleton* rep) : SharedPtr<Skeleton>(rep) {}
-        SkeletonPtr(const SkeletonPtr& r) : SharedPtr<Skeleton>(r) {} 
-        SkeletonPtr(const ResourcePtr& r) : SharedPtr<Skeleton>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<Skeleton*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a SkeletonPtr
-        SkeletonPtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<Skeleton*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<Skeleton*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
-    };
+    typedef SharedPtr<Skeleton> SkeletonPtr;
 
 	/// Link to another skeleton to share animations
 	struct LinkedSkeletonAnimationSource

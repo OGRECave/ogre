@@ -67,7 +67,7 @@ namespace Ogre {
         mPixelRightBorderSize(0),
         mPixelTopBorderSize(0),
         mPixelBottomBorderSize(0),
-        mBorderMaterial(0),
+        mBorderMaterial(),
         mBorderRenderable(0)
     {   
         if (createParamDictionary("BorderPanelOverlayElement"))

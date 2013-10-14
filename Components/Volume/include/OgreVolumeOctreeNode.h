@@ -50,7 +50,7 @@ namespace Volume {
         static const Real NEAR_FACTOR;
 
         /// To count some indices while creating the debug view and recursing through the instances.
-        static size_t mGridPositionCount;
+        static uint32 mGridPositionCount;
 
         /// To give the debug manual object an unique name.
         static size_t mNodeI;
@@ -116,7 +116,7 @@ namespace Volume {
         @param to
             The front upper right corner of the cell.
         */
-        OctreeNode(Vector3 from = Vector3::ZERO, Vector3 to = Vector3::ZERO);
+        OctreeNode(const Vector3 &from = Vector3::ZERO, const Vector3 &to = Vector3::ZERO);
 
         /** Destructor.
         */

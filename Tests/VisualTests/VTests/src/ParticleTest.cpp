@@ -28,8 +28,6 @@ THE SOFTWARE.
 
 #include "ParticleTest.h"
 
-String VisualTest::TRANSIENT_RESOURCE_GROUP = "VisualTestTransient";
-
 ParticleTest::ParticleTest()
 {
     mInfo["Title"] = "VTests_Particles";

@@ -83,6 +83,10 @@ namespace Ogre
 			{
 				progType = "hull";
 			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				progType = "compute";
+			}
 
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Unable to locate " + progType + " program called " + name + ".",
@@ -123,6 +127,22 @@ namespace Ogre
         mParameters = mProgram->createParameters();
     }
     //-----------------------------------------------------------------------------
+    size_t GpuProgramUsage::calculateSize(void) const
+    {
+        size_t memSize = 0;
+
+        memSize += sizeof(GpuProgramType);
+        memSize += sizeof(bool);
+
+        // Tally up passes
+        if(!mProgram.isNull())
+            memSize += mProgram->calculateSize();
+        if(!mParameters.isNull())
+            memSize += mParameters->calculateSize();
+
+        return memSize;
+    }
+    //-----------------------------------------------------------------------------
     void GpuProgramUsage::_load(void)
     {
         if (!mProgram->isLoaded())
@@ -148,6 +168,10 @@ namespace Ogre
 			{
 				myType = "hull";
 			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				myType = "compute";
+			}
 
 			String yourType = "fragment";
 			if (mProgram->getType() == GPT_VERTEX_PROGRAM)
@@ -165,6 +189,10 @@ namespace Ogre
 			else if (mProgram->getType() == GPT_HULL_PROGRAM)
 			{
 				yourType = "hull";
+			}
+			else if (mType == GPT_COMPUTE_PROGRAM)
+			{
+				yourType = "compute";
 			}
 
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 

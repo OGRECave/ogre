@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLPrerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreGLUniformCache.h"
 
 namespace Ogre {
     namespace GLSL {
@@ -65,6 +66,7 @@ namespace Ogre {
 		GLSLGpuProgram* mGeometryProgram;
 		/// Linked fragment program
 		GLSLGpuProgram* mFragmentProgram;
+        GLUniformCache *mUniformCache;
 
 		/// Flag to indicate that uniform references have already been built
 		bool		mUniformRefsBuilt;

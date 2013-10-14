@@ -22,6 +22,14 @@ public:
 
 protected:
 
+    StringVector getRequiredPlugins()
+	{
+		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            names.push_back("Cg Program Manager");
+		return names;
+	}
+
     void testCapabilities( const RenderSystemCapabilities* caps )
     {
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
@@ -33,7 +41,7 @@ protected:
 
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") && 
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150") &&
 #if OGRE_NO_GLES3_SUPPORT == 0
             !GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
 #endif
@@ -79,13 +87,13 @@ protected:
         TexturePtr tex = TextureManager::getSingleton().createManual("TextureArrayTex", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
             TEX_TYPE_2D_ARRAY, 
-            512, 512, texNames.size(), 
+            512, 512, (uint)texNames.size(),
             0, 
             PF_X8R8G8B8 );
 
 
         // add all the textures to a 2d texture array
-		for (size_t i = 0; i < texNames.size(); i++)
+		for (uint32 i = 0; i < static_cast<uint32>(texNames.size()); i++)
 		{
             Image terrainTex;
             terrainTex.load(texNames[i], ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -97,7 +105,7 @@ protected:
 
         // create material and set the texture unit to our texture
         MaterialManager& matMgr = MaterialManager::getSingleton();
-        MaterialPtr texArrayMat = matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+        MaterialPtr texArrayMat = matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first.staticCast<Material>();
         texArrayMat->compile();
         Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
         pass->setLightingEnabled(false);

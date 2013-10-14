@@ -1,15 +1,17 @@
+#version 120
+
 uniform float inverseShadowmapSize;
 uniform float fixedDepthBias;
 uniform float gradientClamp;
 uniform float gradientScaleBias;
-uniform float shadowFuzzyWidth;
 uniform vec4 lightColour;
 
 uniform sampler2D shadowMap;
 uniform sampler2D normalMap;
 
 varying vec3 tangentLightDir;
-
+varying	vec4 oUv;
+varying	vec2 oUv2;
 
 // Expand a range-compressed vector
 vec3 expand(vec3 v)
@@ -21,18 +23,14 @@ void main()
 {
 
 	// get the new normal and diffuse values
-	vec3 normal = normalize(expand(texture2D(normalMap, gl_TexCoord[1].xy).xyz));
+	vec3 normal = normalize(expand(texture2D(normalMap, oUv2).xyz));
 	
 	vec4 vertexColour = clamp(dot(normal, tangentLightDir),0.0,1.0) * lightColour;
 
 
-	vec4 shadowUV = gl_TexCoord[0];
+	vec4 shadowUV = oUv;
 	// point on shadowmap
-#if LINEAR_RANGE
 	shadowUV.xy = shadowUV.xy / shadowUV.w;
-#else
-	shadowUV = shadowUV / shadowUV.w;
-#endif
 	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -52,15 +50,6 @@ void main()
 	float finalCenterDepth = centerdepth + depthAdjust;
 
 	// shadowUV.z contains lightspace position of current object
-
-#if FUZZY_TEST
-	// fuzzy test - introduces some ghosting in result and doesn't appear to be needed?
-	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
-	float visibility = saturate(1 + (finalCenterDepth - shadowUV.z) * shadowFuzzyWidth * shadowUV.w);
-
-	gl_FragColor = vertexColour * visibility;
-#else
-	// hard test
 #if PCF
 	// use depths from prev, calculate diff
 	depths += depthAdjust;
@@ -77,8 +66,5 @@ void main()
 #else
 	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0,0,0,1);
 #endif
-
-#endif
-   
 }
 

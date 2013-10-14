@@ -82,7 +82,7 @@ int	NormalMapLighting::getExecutionOrder() const
 void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {		
-	if (mLightParamsList.size() == 0)
+	if (mLightParamsList.empty())
 		return;
 
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 

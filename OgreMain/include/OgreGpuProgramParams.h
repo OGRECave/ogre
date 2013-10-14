@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreSerializer.h"
 #include "OgreRenderOperation.h"
 #include "OgreAny.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -398,6 +399,8 @@ namespace Ogre {
 		*/
 		void load(DataStreamPtr& stream);
 
+        size_t calculateSize(void) const;
+
 	protected:
 		/** Indicates whether all array entries will be generated and added to the definitions map
 		@remarks
@@ -443,12 +446,13 @@ namespace Ogre {
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
 	struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
 	{
-		OGRE_MUTEX(mutex)
-			/// Map from logical index to physical buffer location
-			GpuLogicalIndexUseMap map;
-		/// Shortcut to know the buffer size needs
-		size_t bufferSize;
-		GpuLogicalBufferStruct() : bufferSize(0) {}
+            OGRE_MUTEX(mutex);
+            
+            /// Map from logical index to physical buffer location
+            GpuLogicalIndexUseMap map;
+            /// Shortcut to know the buffer size needs
+            size_t bufferSize;
+            GpuLogicalBufferStruct() : bufferSize(0) {}
 	};
 	typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
 
@@ -530,6 +534,8 @@ namespace Ogre {
 		*/
 		unsigned long getVersion() const { return mVersion; }
 
+        size_t calculateSize(void) const;
+
 		/** Mark the shared set as being dirty (values modified).
 		@remarks
 		You do not need to call this yourself, set is marked as dirty whenever
@@ -560,6 +566,8 @@ namespace Ogre {
 		void setNamedConstant(const String& name, const Vector4& vec);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector3& vec) */
 		void setNamedConstant(const String& name, const Vector3& vec);
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector2& vec) */
+		void setNamedConstant(const String& name, const Vector2& vec);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
 		void setNamedConstant(const String& name, const Matrix4& m);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
@@ -578,7 +586,7 @@ namespace Ogre {
 		/// Get a pointer to the 'nth' item in the float buffer
 		const float* getFloatPointer(size_t pos) const { return &mFloatConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
-		double* geDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
+		double* getDoublePointer(size_t pos) { _markDirty(); return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the double buffer
 		const double* getDoublePointer(size_t pos) const { return &mDoubleConstants[pos]; }
 		/// Get a pointer to the 'nth' item in the int buffer
@@ -942,6 +950,8 @@ namespace Ogre {
 			ACT_LIGHT_NUMBER,
 			/// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
 			ACT_LIGHT_CASTS_SHADOWS,
+			/// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
+			ACT_LIGHT_CASTS_SHADOWS_ARRAY,
 
 
 			/** The distance a shadow volume should be extruded when using
@@ -970,6 +980,10 @@ namespace Ogre {
 			combined with the current world matrix
 			*/
 			ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,
+			/** An array of the view/projection matrix of a given spotlight projection frustum,
+             combined with the current world matrix
+             */
+			ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,
 			/// A custom parameter which will come from the renderable, using 'data' as the identifier
 			ACT_CUSTOM,
 			/** provides current elapsed time
@@ -1107,6 +1121,13 @@ namespace Ogre {
 			Passed as float4(minDepth, maxDepth, depthRange, 1 / depthRange)
 			*/
 			ACT_SHADOW_SCENE_DEPTH_RANGE,
+
+            /** Provides an array of information about the depth range of the scene as viewed
+             from a given shadow camera. Requires an index parameter which maps
+             to a light index relative to the current light list.
+             Passed as float4(minDepth, maxDepth, depthRange, 1 / depthRange)
+             */
+			ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY,
 
 			/** Provides the fixed shadow colour as configured via SceneManager::setShadowColour;
 			useful for integrated modulative shadows.
@@ -1330,6 +1351,14 @@ namespace Ogre {
 		@param vec The value to set
 		*/
 		void setConstant(size_t index, const Vector3& vec);
+		/** Sets a 4-element floating-point parameter to the program via Vector2.
+         @param index The logical constant index at which to place the parameter (each constant is
+         a 4D float).
+         Note that since you're passing a Vector2, the last 2 elements of the 4-element
+         value will be set to 1 (a homogeneous vector)
+         @param vec The value to set
+         */
+		void setConstant(size_t index, const Vector2& vec);
 		/** Sets a Matrix4 parameter to the program.
 		@param index The logical constant index at which to place the parameter (each constant is
 		a 4D float).
@@ -1438,6 +1467,14 @@ namespace Ogre {
 		@param val The value to set
 		*/
 		void _writeRawConstant(size_t physicalIndex, Real val);
+		/** Write a variable number of floating-point parameters to the program.
+         @note You can use these methods if you have already derived the physical
+         constant buffer location, for a slight speed improvement over using
+         the named / logical index versions.
+         @param physicalIndex The physical buffer index at which to place the parameter
+         @param val The value to set
+         */
+		void _writeRawConstant(size_t physicalIndex, Real val, size_t count);
 		/** Write a single integer parameter to the program.
 		@note You can use these methods if you have already derived the physical
 		constant buffer location, for a slight speed improvement over using
@@ -1454,6 +1491,14 @@ namespace Ogre {
 		@param vec The value to set
 		*/
 		void _writeRawConstant(size_t physicalIndex, const Vector3& vec);
+		/** Write a 2-element floating-point parameter to the program via Vector2.
+         @note You can use these methods if you have already derived the physical
+         constant buffer location, for a slight speed improvement over using
+         the named / logical index versions.
+         @param physicalIndex The physical buffer index at which to place the parameter
+         @param vec The value to set
+         */
+		void _writeRawConstant(size_t physicalIndex, const Vector2& vec);
 		/** Write a Matrix4 parameter to the program.
 		@note You can use these methods if you have already derived the physical
 		constant buffer location, for a slight speed improvement over using
@@ -1726,15 +1771,15 @@ namespace Ogre {
 		@note
 		This named option will only work if you are using a parameters object created
 		from a high-level program (HighLevelGpuProgram).
-		@param index The index at which to place the parameter
-		NB this index refers to the number of floats, so a Vector3 is 3. Note that many 
-		rendersystems & programs assume that every floating point parameter is passed in
-		as a vector of 4 items, so you are strongly advised to check with 
-		RenderSystemCapabilities before using this version - if in doubt use Vector4
-		or ColourValue instead (both are 4D).
+        @param name The name of the parameter
 		@param vec The value to set
 		*/
 		void setNamedConstant(const String& name, const Vector3& vec);
+		/** Sets a Vector2 parameter to the program.
+         @param name The name of the parameter
+         @param vec The value to set
+         */
+		void setNamedConstant(const String& name, const Vector2& vec);
 		/** Sets a Matrix4 parameter to the program.
 		@param name The name of the parameter
 		@param m The value to set
@@ -1984,6 +2029,7 @@ namespace Ogre {
 		*/
 		void _copySharedParams();
 
+		size_t calculateSize(void) const;
 
 		/** Set subroutine name by slot name
 		 */

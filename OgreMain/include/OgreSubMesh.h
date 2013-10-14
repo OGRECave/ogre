@@ -254,6 +254,14 @@ namespace Ogre {
         */		
 		bool isBuildEdgesEnabled(void) const { return mBuildEdgesEnabled; }
 		void setBuildEdgesEnabled(bool b);
+        /** Makes a copy of this submesh object and gives it a new name.
+         @param newName
+         The name to give the clone.
+         @param parentMesh
+         Optional mesh to make the parent of the newly created clone.
+         If you leave this blank, the clone will be parented to the same Mesh as the original.
+         */
+        SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
     protected:
 

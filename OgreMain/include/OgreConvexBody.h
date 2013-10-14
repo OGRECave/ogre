@@ -31,6 +31,9 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgrePolygon.h"
+#if OGRE_THREAD_SUPPORT
+#include "Threading/OgreThreadHeaders.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 
@@ -60,7 +63,7 @@ namespace Ogre
 		// Static 'free list' of polygons to save reallocation, shared between all bodies
 		static PolygonList msFreePolygons;
 #if OGRE_THREAD_SUPPORT
-		OGRE_STATIC_MUTEX(msFreePolygonsMutex)
+		OGRE_STATIC_MUTEX(msFreePolygonsMutex);
 #endif
 
 	public:

@@ -69,7 +69,7 @@ namespace Ogre {
 		    /// Get the number of vertices in this buffer
 		    size_t getNumVertices(void) const { return mNumVertices; }
 		    /// Get if this vertex buffer is an "instance data" buffer (per instance)
-		    bool getIsInstanceData() const { return mIsInstanceData; }
+		    bool isInstanceData() const { return mIsInstanceData; }
 		    /// Set if this vertex buffer is an "instance data" buffer (per instance)
 		    void setIsInstanceData(const bool val);
 			/// Get the number of instances to draw using the same per-instance data before advancing in the buffer by one element.
@@ -586,8 +586,8 @@ namespace Ogre {
         */
         virtual void closeGaps(BindingIndexMap& bindingIndexMap);
 
-        /// Returns true if has an element that is instance data
-        virtual bool getHasInstanceData() const;
+        /// Returns true if this binding has an element that contains instance data
+        virtual bool hasInstanceData() const;
 
 
 	};

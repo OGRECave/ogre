@@ -90,6 +90,7 @@ namespace Ogre {
 			const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
 		~UnifiedHighLevelGpuProgram();
 
+		virtual size_t calculateSize(void) const;
 
 		/** Adds a new delegate program to the list.
 		@remarks

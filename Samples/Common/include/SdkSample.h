@@ -32,7 +32,7 @@
 #include "SdkTrays.h"
 #include "SdkCameraMan.h"
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
 #endif
 
@@ -115,7 +115,7 @@ namespace OgreBites
 					mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
 					mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 					mDetailsPanel->setParamValue(14, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
 					mDetailsPanel->setParamValue(15, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));		
 #endif
@@ -222,7 +222,7 @@ namespace OgreBites
 				mWindow->writeContentsToTimestampedFile("screenshot", ".png");
 			}
 
-#ifdef USE_RTSHADER_SYSTEM		
+#ifdef INCLUDE_RTSHADER_SYSTEM		
 			// Toggle schemes.			
 			else if (evt.key == OIS::KC_F2)
 			{	
@@ -317,7 +317,7 @@ namespace OgreBites
 				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			}	
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 			mCameraMan->injectKeyDown(evt);
 			return true;
@@ -451,7 +451,7 @@ namespace OgreBites
 			items.push_back("Filtering");
 			items.push_back("Poly Mode");
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			items.push_back("RT Shaders");
 			items.push_back("Lighting Model");
 			items.push_back("Compact Policy");
@@ -470,7 +470,7 @@ namespace OgreBites
 			mDetailsPanel->setParamValue(9, "Bilinear");
 			mDetailsPanel->setParamValue(10, "Solid");
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 			mDetailsPanel->setParamValue(11, "Off");
 
             Ogre::Viewport* mainVP = mCamera->getViewport();

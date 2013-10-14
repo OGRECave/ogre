@@ -104,19 +104,19 @@ namespace Ogre {
             {
 				access |= GL_MAP_WRITE_BIT;
                 access |= GL_MAP_FLUSH_EXPLICIT_BIT;
-                if(options == HBL_DISCARD)
+                if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
                 {
                     // Discard the buffer
                     access |= GL_MAP_INVALIDATE_RANGE_BIT;
                 }
+                // We explicitly flush when the buffer is unlocked
+                access |= GL_MAP_UNSYNCHRONIZED_BIT;
             }
 			else if (options == HBL_READ_ONLY)
 				access |= GL_MAP_READ_BIT;
 			else
 				access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
-            // We explicitly flush when the buffer is unlocked
-//            access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
             void* pBuffer;
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));

@@ -29,18 +29,14 @@ public:
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
+                        "so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
         }
-		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"))
-		{
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
-						"so you cannot run this sample. Sorry!", "Sample_BSP::testCapabilities");
-		}
 	}
 
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
+        names.push_back("Cg Program Manager");
 		names.push_back("BSP Scene Manager");
 		return names;
 	}
@@ -71,7 +67,7 @@ protected:
 	void createSceneManager()
 	{
 		mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
 		if(mOverlaySystem)

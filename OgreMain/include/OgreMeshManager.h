@@ -65,6 +65,17 @@ namespace Ogre {
         /** Initialises the manager, only to be called by OGRE internally. */
         void _initialise(void);
 
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+
+		/// Create a new mesh
+		/// @see ResourceManager::createResource
+		MeshPtr create (const String& name, const String& group,
+							bool isManual = false, ManualResourceLoader* loader = 0,
+							const NameValuePairList* createParams = 0);
+
         /** Create a new mesh, or retrieve an existing one with the same
             name if it already exists.
             @param vertexBufferUsage The usage flags with which the vertex buffer(s)
@@ -337,7 +348,7 @@ namespace Ogre {
             @param height
                 Specifies the height of the patch in control points. 
                 Note this parameter must greater than or equal to 3.
-            @param uMaxSubdivisionLevel, vMaxSubdivisionLevel 
+            @param uMaxSubdivisionLevel, vMaxSubdivisionLevel
                 If you want to manually set the top level of subdivision, 
                 do it here, otherwise let the system decide.
             @param visibleSide 

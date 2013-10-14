@@ -57,10 +57,6 @@ namespace Ogre {
 		GPT_COMPUTE_PROGRAM
 	};
 
-
-    // Forward declaration 
-    class GpuProgramPtr;
-
 	/** Defines a program which runs on the GPU such as a vertex or fragment program. 
 	@remarks
 		This class defines the low-level program in assembler code, the sort used to
@@ -193,9 +189,6 @@ namespace Ogre {
         /** Internal method returns whether required capabilities for this program is supported.
         */
         bool isRequiredCapabilitiesSupported(void) const;
-
-		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // TODO 
 
 		/// @copydoc Resource::loadImpl
 		void loadImpl(void);
@@ -424,70 +417,13 @@ namespace Ogre {
 		*/
 		virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
+		/// @copydoc Resource::calculateSize
+		virtual size_t calculateSize(void) const;
 
     protected:
         /// Virtual method which must be implemented by subclasses, load from mSource
         virtual void loadFromSource(void) = 0;
 
-	};
-
-
-	/** Specialisation of SharedPtr to allow SharedPtr to be assigned to GpuProgramPtr 
-	@note Has to be a subclass since we need operator=.
-	We could templatise this instead of repeating per Resource subclass, 
-	except to do so requires a form VC6 does not support i.e.
-	ResourceSubclassPtr<T> : public SharedPtr<T>
-	*/
-	class _OgreExport GpuProgramPtr : public SharedPtr<GpuProgram> 
-	{
-	public:
-		GpuProgramPtr() : SharedPtr<GpuProgram>() {}
-		explicit GpuProgramPtr(GpuProgram* rep) : SharedPtr<GpuProgram>(rep) {}
-		GpuProgramPtr(const GpuProgramPtr& r) : SharedPtr<GpuProgram>(r) {} 
-		GpuProgramPtr(const ResourcePtr& r) : SharedPtr<GpuProgram>()
-		{
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-			    pRep = static_cast<GpuProgram*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-		}
-
-		/// Operator used to convert a ResourcePtr to a GpuProgramPtr
-		GpuProgramPtr& operator=(const ResourcePtr& r)
-		{
-			if (pRep == static_cast<GpuProgram*>(r.getPointer()))
-				return *this;
-			release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-			    pRep = static_cast<GpuProgram*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-			return *this;
-		}
-        /// Operator used to convert a HighLevelGpuProgramPtr to a GpuProgramPtr
-        GpuProgramPtr& operator=(const HighLevelGpuProgramPtr& r);
 	};
 	/** @} */
 	/** @} */

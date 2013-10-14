@@ -244,8 +244,20 @@ namespace Ogre {
         PF_R16G16B16A16_SNORM = 87,
         /// ETC1 (Ericsson Texture Compression)
         PF_ETC1_RGB8 = 88,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGB8 = 89,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGBA8 = 90,
+        /// ETC2 (Ericsson Texture Compression)
+        PF_ETC2_RGB8A1 = 91,
+		/// ATC (AMD_compressed_ATC_texture)
+		PF_ATC_RGB = 92,
+		/// ATC (AMD_compressed_ATC_texture)
+		PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
+		/// ATC (AMD_compressed_ATC_texture)
+		PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
 		// Number of pixel formats currently defined
-        PF_COUNT = 89
+        PF_COUNT = 95
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 
@@ -253,22 +265,22 @@ namespace Ogre {
      * Flags defining some on/off properties of pixel formats
      */
     enum PixelFormatFlags {
-        // This format has an alpha channel
+        /// This format has an alpha channel
         PFF_HASALPHA        = 0x00000001,      
-        // This format is compressed. This invalidates the values in elemBytes,
-        // elemBits and the bit counts as these might not be fixed in a compressed format.
+        /** This format is compressed. This invalidates the values in elemBytes,
+            elemBits and the bit counts as these might not be fixed in a compressed format. */
         PFF_COMPRESSED    = 0x00000002,
-        // This is a floating point format
+        /// This is a floating point format
         PFF_FLOAT           = 0x00000004,         
-        // This is a depth format (for depth textures)
+        /// This is a depth format (for depth textures)
         PFF_DEPTH           = 0x00000008,
-        // Format is in native endian. Generally true for the 16, 24 and 32 bits
-        // formats which can be represented as machine integers.
+        /** Format is in native endian. Generally true for the 16, 24 and 32 bits
+            formats which can be represented as machine integers. */
         PFF_NATIVEENDIAN    = 0x00000010,
-        // This is an intensity format instead of a RGB one. The luminance
-        // replaces R,G and B. (but not A)
+        /** This is an intensity format instead of a RGB one. The luminance
+            replaces R,G and B. (but not A) */
         PFF_LUMINANCE       = 0x00000020,
-        // This is an integer format
+        /// This is an integer format
         PFF_INTEGER         = 0x00000040
     };
     
@@ -315,7 +327,7 @@ namespace Ogre {
     		@param pixelFormat	Format of this buffer
     		@param pixelData    Pointer to the actual data
     	*/
-    	PixelBox(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, void *pixelData=0):
+    	PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
     		Box(0, 0, 0, width, height, depth),
     		data(pixelData), format(pixelFormat)
     	{
@@ -378,6 +390,11 @@ namespace Ogre {
       	*/
       	PixelBox getSubVolume(const Box &def) const;
         
+      	/** Return a data pointer pointing to top left front pixel of the pixel box.
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        void* getTopLeftFrontPixelPtr() const;
+        
         /**
          * Get colour value from a certain location in the PixelBox. The z coordinate
          * is only valid for cubemaps and volume textures. This uses the first (largest)
@@ -432,7 +449,7 @@ namespace Ogre {
 				width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
 				case, this does serious magic.
 		*/
-		static size_t getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format);
+		static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
 		
         /** Returns the property flags for this pixel format
           @return
@@ -480,7 +497,7 @@ namespace Ogre {
 		/** Gives the masks for the R, G, B and A component
 		  @note			Only valid for native endian formats
         */
-        static void getBitMasks(PixelFormat format, uint32 rgba[4]);
+        static void getBitMasks(PixelFormat format, uint64 rgba[4]);
 
 		/** Gives the bit shifts for R, G, B and A component
 		@note			Only valid for native endian formats
@@ -547,7 +564,9 @@ namespace Ogre {
         */
         static void packColour(const ColourValue &colour, const PixelFormat pf,  void* dest);
         /** Pack a colour value to memory
-        	@param r,g,b,a	The four colour components, range 0x00 to 0xFF
+            @param r,g,b,a	The four colour components, range 0.0f to 1.0f
+                            (an exception to this case exists for floating point pixel
+                            formats, which don't clamp to 0.0f..1.0f)
         	@param pf		Pixelformat in which to write the colour
         	@param dest		Destination memory location
         */
@@ -568,7 +587,10 @@ namespace Ogre {
         */
         static void unpackColour(ColourValue *colour, PixelFormat pf,  const void* src);
         /** Unpack a colour value from memory
-        	@param r,g,b,a	The colour is returned here (as byte)
+        	@param r        The red channel is returned here (as byte)
+            @param g        The blue channel is returned here (as byte)
+            @param b        The green channel is returned here (as byte)
+            @param a        The alpha channel is returned here (as byte)
         	@param pf		Pixelformat in which to read the colour
         	@param src		Source memory location
         	@remarks 	This function returns the colour components in 8 bit precision,
@@ -577,7 +599,10 @@ namespace Ogre {
         */
         static void unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src);
         /** Unpack a colour value from memory
-        	@param r,g,b,a	The colour is returned here (as float)
+            @param r        The red channel is returned here (as float)
+            @param g        The blue channel is returned here (as float)
+            @param b        The green channel is returned here (as float)
+            @param a        The alpha channel is returned here (as float)
         	@param pf		Pixelformat in which to read the colour
         	@param src		Source memory location
         */
@@ -601,6 +626,12 @@ namespace Ogre {
          	dimensions. In case the source and destination format match, a plain copy is done.
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
+
+      	/** Flips pixels inplace in vertical direction.
+            @param	src			PixelBox containing pixels, pitches and format
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        static void bulkPixelVerticalFlip(const PixelBox &box);
     };
 	/** @} */
 	/** @} */

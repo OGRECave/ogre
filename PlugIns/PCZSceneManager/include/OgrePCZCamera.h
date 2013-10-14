@@ -48,9 +48,7 @@ namespace Ogre
 
     class PCZone;
 
-
     /** Specialized viewpoint from which an PCZone Scene can be rendered.
-    @remarks
     */
 
     class _OgrePCZPluginExport PCZCamera : public Camera

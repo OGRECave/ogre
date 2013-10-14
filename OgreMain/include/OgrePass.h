@@ -257,10 +257,10 @@ namespace Ogre {
 		/// The Pass hash functor
 		static HashFunc* msHashFunc;
     public:
-		OGRE_STATIC_MUTEX(msDirtyHashListMutex)
-		OGRE_STATIC_MUTEX(msPassGraveyardMutex)
-		OGRE_MUTEX(mTexUnitChangeMutex)
-		OGRE_MUTEX(mGpuProgramChangeMutex)
+		OGRE_STATIC_MUTEX(msDirtyHashListMutex);
+		OGRE_STATIC_MUTEX(msPassGraveyardMutex);
+		OGRE_MUTEX(mTexUnitChangeMutex);
+		OGRE_MUTEX(mGpuProgramChangeMutex);
         /// Default constructor
 		Pass(Technique* parent, unsigned short index);
         /// Copy constructor
@@ -294,6 +294,7 @@ namespace Ogre {
         /// Returns true if this pass uses a shadow receiver fragment program
         bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
 
+        size_t calculateSize(void) const;
 
         /// Gets the index of this Pass in the parent Technique
         unsigned short getIndex(void) const { return mIndex; }
@@ -485,8 +486,9 @@ namespace Ogre {
 			The resulting size is clamped to the minimum and maximum point
 			size.
 		@param enabled Whether point attenuation is enabled
-		@param constant, linear, quadratic Parameters to the attenuation
-			function defined above
+		@param constant Parameters to the attenuation function defined above
+        @param linear Parameters to the attenuation function defined above
+        @param quadratic Parameters to the attenuation function defined above
 		*/
 		void setPointAttenuation(bool enabled,
 			Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
@@ -1486,7 +1488,7 @@ namespace Ogre {
 		void _load(void);
 		/** Internal method for unloading this pass. */
 		void _unload(void);
-        // Is this loaded?
+        /// Is this loaded?
         bool isLoaded(void) const;
 
         /** Gets the 'hash' of this pass, ie a precomputed number to use for sorting

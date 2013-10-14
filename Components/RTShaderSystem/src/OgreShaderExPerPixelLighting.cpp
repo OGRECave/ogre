@@ -73,7 +73,7 @@ int	PerPixelLighting::getExecutionOrder() const
 void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {
-	if (mLightParamsList.size() == 0)
+	if (mLightParamsList.empty())
 		return;
 
 	const Matrix4& matView = source->getViewMatrix();
@@ -798,7 +798,7 @@ bool PerPixelLighting::preAddToRenderState(const RenderState* renderState, Pass*
 		else
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Using iterative lighting method with RT Shader System requires specifieng explicit light type.",
+				"Using iterative lighting method with RT Shader System requires specifying explicit light type.",
 				"PerPixelLighting::preAddToRenderState");			
 		}
 	}

@@ -40,7 +40,7 @@ namespace Ogre {
     {
         public:
             GL3PlusHardwarePixelBuffer *buffer;
-            size_t zoffset;
+            uint32 zoffset;
             uint numSamples;
 
             GL3PlusSurfaceDesc() :buffer(0), zoffset(0), numSamples(0) {}
