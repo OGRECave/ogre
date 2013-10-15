@@ -216,7 +216,6 @@ namespace Ogre {
             of the currently active scene node.
         @param out_LVS
             Intersection body LVS (world coordinates).
-	@param light: current light
         */
         void calculateLVS(const SceneManager& sm, const Camera& cam, const Light& light,
             const AxisAlignedBox& sceneBB, PointListBody *out_LVS) const;

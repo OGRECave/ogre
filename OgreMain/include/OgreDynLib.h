@@ -49,15 +49,6 @@ typedef struct HINSTANCE__* hInstance;
 struct HINSTANCE__;
 typedef struct HINSTANCE__* hInstance;
 
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#    define DYNLIB_HANDLE hInstance
-#    define DYNLIB_LOAD( a ) LoadPackagedLibrary( UTFString(a).asWStr_c_str(), 0 )
-#    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
-#    define DYNLIB_UNLOAD( a ) !FreeLibrary( a )
-
-struct HINSTANCE__;
-typedef struct HINSTANCE__* hInstance;
-
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 #    define DYNLIB_HANDLE void*
 #    define DYNLIB_LOAD( a ) dlopen( a, RTLD_LAZY | RTLD_GLOBAL)

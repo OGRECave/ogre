@@ -57,7 +57,6 @@ namespace Ogre
 		mUseNVPerfHUD = false;
 		mWindowedWinStyle = 0;
 		mFullscreenWinStyle = 0;
-		mForcedDeviceMonitor = 0;
 	}
 
 	D3D9RenderWindow::~D3D9RenderWindow()
@@ -179,10 +178,6 @@ namespace Ogre
 			if(opt != miscParams->end())
 				enableDoubleClick = StringConverter::parseBool(opt->second);
 
-			// enable double click messages
-			opt = miscParams->find("forcedDeviceMonitor");
-			if(opt != miscParams->end())
-				mForcedDeviceMonitor = (HMONITOR)StringConverter::parseLong(opt->second);
 		}
 		mIsFullScreen = fullScreen;
 
@@ -517,17 +512,9 @@ namespace Ogre
 
 		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
 		presentParams->Windowed					= !mIsFullScreen;
-		
-		DWORD version = GetVersion();
-		DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
-		DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
-		bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));
-
-		bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && mFSAA == 0;
-			
-		presentParams->SwapEffect				= useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
+		presentParams->SwapEffect				= D3DSWAPEFFECT_DISCARD;
 		// triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
-		presentParams->BackBufferCount			= mVSync || useFlipSwap ? 2 : 1;
+		presentParams->BackBufferCount			= mVSync ? 2 : 1;
 		presentParams->EnableAutoDepthStencil	= (mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH);
 		presentParams->hDeviceWindow			= mHWnd;
 		presentParams->BackBufferWidth			= mWidth;
@@ -862,18 +849,7 @@ namespace Ogre
 
 		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(NULL);	
 
-	
 	}
-	//---------------------------------------------------------------------
-	HMONITOR D3D9RenderWindow::getDeviceMonitorHandle() const
-	{
-		if (mForcedDeviceMonitor == 0)
-		{
-			return MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
-		}
-		else return mForcedDeviceMonitor;
-	}
-	
 	//-----------------------------------------------------------------------------
 	IDirect3DDevice9* D3D9RenderWindow::getD3D9Device()
 	{
@@ -969,16 +945,4 @@ namespace Ogre
 		mDeviceValid = mDevice->validate(this);
 		return mDeviceValid;
 	}
-
-	/// Forces the device of this window to be created for a specific monitor.
-	bool D3D9RenderWindow::_setForcedDeviceMonitor(HMONITOR monitorHandle)
-	{
-		if (monitorHandle != mForcedDeviceMonitor)
-		{
-			mForcedDeviceMonitor = monitorHandle;
-			return _validateDevice();
-		}
-		return true;
-	}
-	
 }

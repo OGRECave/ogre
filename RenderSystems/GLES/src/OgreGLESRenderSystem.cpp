@@ -2984,15 +2984,4 @@ namespace Ogre {
         //no effect in GLES rendersystem
     }
     //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void GLESRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-    {
-        //no effect in GLES rendersystem
-    }
-    //---------------------------------------------------------------------
-    void GLESRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-    {
-        //no effect in GLES rendersystem
-    }
-    //---------------------------------------------------------------------
 }

@@ -110,7 +110,7 @@ namespace Ogre {
 		// Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
         GLenum texTarget = getGLES2TextureTarget();
-        
+
 		// Check requested number of mipmaps
         size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
         
@@ -134,15 +134,6 @@ namespace Ogre {
         if(mGLSupport.checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
             mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps);
 
-		default:
-	        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-			break;
-		}
-#endif
-        
 		// Set some misc default parameters, these can of course be changed later
 		mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MIN_FILTER, (mUsage & TU_AUTOMIPMAP) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);

@@ -73,7 +73,6 @@ namespace Ogre {
             static GLenum getGLType(unsigned int type);
 
 			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
-
     };
 
 	/// GLES2HardwareBufferManagerBase as a Singleton

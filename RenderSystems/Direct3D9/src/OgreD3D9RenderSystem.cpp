@@ -94,9 +94,9 @@ namespace Ogre
 			mLights[i] = 0;
 
 		// Create our Direct3D object
-		if ( NULL == (mD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
-				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Failed to create Direct3D9 object", "D3D9RenderSystem::D3D9RenderSystem" );
-		
+		if( NULL == (mD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Failed to create Direct3D9 object", "D3D9RenderSystem::D3D9RenderSystem" );
+
 		// set config options defaults
 		initConfigOptions();
 

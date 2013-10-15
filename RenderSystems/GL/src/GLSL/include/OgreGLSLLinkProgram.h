@@ -78,8 +78,6 @@ namespace Ogre {
 		bool		mTriedToLinkAndFailed;
 		/// Flag indicating skeletal animation is being performed
 		bool mSkeletalAnimation;
-        /// Whether to bind matrices in column major order
-        bool mColumnMajorMatrices;
 
 		/// Build uniform references from active named uniforms
 		void buildGLUniformReferences(void);
