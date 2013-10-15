@@ -54,13 +54,13 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon glsl
 {
 	source DualQuaternion_Common.glsl
-    syntax glsl150
+    syntax glsl
 }
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL glsl
 {
 	source DualQuaternion.glsl
-    syntax glsl150
+    syntax glsl
 	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
 	includes_skeletal_animation true
 }
@@ -69,7 +69,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL glsl
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL glsl
 {
 	source DualQuaternion_TwoPhase.glsl
-    syntax glsl150
+    syntax glsl
 	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
 	includes_skeletal_animation true
 }
@@ -80,7 +80,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL glsl
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL glsl
 {
 	source DualQuaternion_ShadowCaster.glsl
-    syntax glsl150
+    syntax glsl
 	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
 	includes_skeletal_animation true
 }
@@ -88,7 +88,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL gls
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL glsl
 {
 	source DualQuaternion_TwoPhaseShadowCaster.glsl
-    syntax glsl150
+    syntax glsl
 	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
 	includes_skeletal_animation true
 }

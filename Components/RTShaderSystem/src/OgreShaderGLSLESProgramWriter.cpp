@@ -105,6 +105,10 @@ namespace Ogre {
                 // 3. The name
                 if(paramTokens.size() == 3)
                 {
+					StringUtil::trim(paramTokens[0]);
+					StringUtil::trim(paramTokens[1]);
+					StringUtil::trim(paramTokens[2]);
+
                     Operand::OpSemantic semantic = Operand::OPS_IN;
                     GpuConstantType gpuType = GCT_UNKNOWN;
 
@@ -181,18 +185,26 @@ namespace Ogre {
                 {
                     StringVector moreTokens = StringUtil::split(*it, " ");
 
+					if (!moreTokens.empty())
+					{
                     FunctionMap::const_iterator itFuncCache = mFunctionCacheMap.begin();
-                    for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
-                    {
-                        if(itFuncCache->first.getFunctionName() == moreTokens.back())
-                        {
-                            // Add the function declaration
-                            depVector.push_back(FunctionInvocation((*itFuncCache).first));
 
-                            discoverFunctionDependencies(itFuncCache->first, depVector);
-                        }
-                    }
-                }
+						for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
+						{
+
+							FunctionInvocation fi = itFuncCache->first;
+						
+							if(fi.getFunctionName() == moreTokens.back())
+							{
+								// Add the function declaration
+								depVector.push_back(FunctionInvocation((*itFuncCache).first));
+
+								discoverFunctionDependencies(itFuncCache->first, depVector);
+							}
+						}
+					}
+				}
+                
             }
             else
             {
