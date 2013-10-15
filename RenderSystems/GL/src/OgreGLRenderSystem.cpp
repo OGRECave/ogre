@@ -203,6 +203,8 @@ namespace Ogre {
         if(!mStateCacheManager)
             mStateCacheManager = OGRE_NEW GLStateCacheManager();
 
+        mGLSupport->setStateCacheManager(mStateCacheManager);
+
         // Create the texture manager        
 		mTextureManager = new GLTextureManager(*mGLSupport); 
 
