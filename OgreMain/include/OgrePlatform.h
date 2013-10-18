@@ -273,6 +273,7 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 1
 #   else
 #       define OGRE_DEBUG_MODE 0
+#   endif
 #   ifndef CLOCKS_PER_SEC
 #	    define CLOCKS_PER_SEC  1000
 #   endif
