@@ -4,7 +4,7 @@ mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 
 uniform vec4 worldDualQuaternion2x4Array[24];
-uniform mat4x4 viewProjectionMatrix;
+uniform mat4 viewProjectionMatrix;
 uniform vec4   ambient;
 
 attribute vec4 vertex;

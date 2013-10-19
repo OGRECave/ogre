@@ -10,6 +10,8 @@ attribute vec4 vertex;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
 
+varying vec4 colour;
+
 //Shadow caster pass
 void main()
 {
@@ -23,6 +25,6 @@ void main()
 	// view / projection
 	gl_Position = viewProjectionMatrix * vec4(blendPosition, 1.0);
 	
-	gl_FrontColor = ambient;
+	colour = ambient;
 }
 

@@ -1,6 +1,6 @@
 #version 120
 
-attribute vec4 colour;
+varying vec4 colour;
 
 void main()
 {
