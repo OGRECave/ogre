@@ -176,7 +176,7 @@ namespace Ogre {
 		// Derive space with from a number 0
 		if (mSpaceWidth == 0)
 		{
-			mSpaceWidth = mFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight * 2.0f * mViewportAspectCoef;
+			mSpaceWidth = mFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight;
 		}
 
 		// Use iterator
@@ -199,7 +199,7 @@ namespace Ogre {
 					}
 					else if (character == UNICODE_SPACE) // space
 					{
-						len += mSpaceWidth;
+						len += mSpaceWidth * 2.0f * mViewportAspectCoef;
 					}
 					else 
 					{
@@ -244,7 +244,7 @@ namespace Ogre {
 			else if (character == UNICODE_SPACE) // space
 			{
 				// Just leave a gap, no tris
-				left += mSpaceWidth;
+				left += mSpaceWidth * 2.0f * mViewportAspectCoef;
 				// Also reduce tri count
 				mRenderOp.vertexData->vertexCount -= 6;
 				continue;
