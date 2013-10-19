@@ -1,3 +1,5 @@
+#version 120
+
 mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, mat2x4 dualQuaternions[24])
 {
 	mat2x4 blendDQ = blendWgt.x*dualQuaternions[int(blendIdx.x)];

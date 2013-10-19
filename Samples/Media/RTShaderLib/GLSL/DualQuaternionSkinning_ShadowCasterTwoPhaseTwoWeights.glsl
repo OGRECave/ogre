@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat2x4 dualQuaternions[24]);
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
