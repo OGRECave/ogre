@@ -42,60 +42,60 @@ namespace Ogre
 											size_t numElementsSize, uint16 depthLevel,
 											size_t hintMaxNodes, size_t cleanupThreshold,
 											size_t maxHardLimit, RebaseListener *rebaseListener ) :
-							m_elementsMemSizes( elementsMemSize ),
-							m_totalMemoryMultiplier( 0 ),
-							m_usedMemory( 0 ),
-							m_maxMemory( hintMaxNodes ),
-							m_maxHardLimit( maxHardLimit ),
-							m_cleanupThreshold( cleanupThreshold ),
-							m_rebaseListener( rebaseListener ),
-							m_level( depthLevel ),
-							m_managerType( managerType )
+							mElementsMemSizes( elementsMemSize ),
+							mTotalMemoryMultiplier( 0 ),
+							mUsedMemory( 0 ),
+							mMaxMemory( hintMaxNodes ),
+							mMaxHardLimit( maxHardLimit ),
+							mCleanupThreshold( cleanupThreshold ),
+							mRebaseListener( rebaseListener ),
+							mLevel( depthLevel ),
+							mManagerType( managerType )
 	{
 		//If the assert triggers, their values will overflow to 0 when
 		//trying to round to nearest multiple of ARRAY_PACKED_REALS
-		assert( m_maxHardLimit < (size_t)(-ARRAY_PACKED_REALS) &&
-				m_maxMemory < (size_t)(-ARRAY_PACKED_REALS) );
-		assert( m_maxMemory <= m_maxHardLimit );
+		assert( mMaxHardLimit < (size_t)(-ARRAY_PACKED_REALS) &&
+				mMaxMemory < (size_t)(-ARRAY_PACKED_REALS) );
+		assert( mMaxMemory <= mMaxHardLimit );
 
-		m_memoryPools.resize( numElementsSize, 0 );
+		mMemoryPools.resize( numElementsSize, 0 );
 		for( size_t i=0; i<numElementsSize; ++i )
-			m_totalMemoryMultiplier += m_elementsMemSizes[i];
+			mTotalMemoryMultiplier += mElementsMemSizes[i];
 
-		//If m_maxMemory == 1, it cannot grow because 1/2 truncates to 0
-		m_maxMemory		= std::max<size_t>( 2, m_maxMemory ) + OGRE_PREFETCH_SLOT_DISTANCE;
-		m_maxHardLimit	+= OGRE_PREFETCH_SLOT_DISTANCE;
+		//If mMaxMemory == 1, it cannot grow because 1/2 truncates to 0
+		mMaxMemory		= std::max<size_t>( 2, mMaxMemory ) + OGRE_PREFETCH_SLOT_DISTANCE;
+		mMaxHardLimit	+= OGRE_PREFETCH_SLOT_DISTANCE;
 
 		// Round up max memory & hard limit to the next multiple of ARRAY_PACKED_REALS
-		m_maxMemory    = ( (m_maxMemory + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+		mMaxMemory    = ( (mMaxMemory + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
 							ARRAY_PACKED_REALS;
-		m_maxHardLimit = ( (m_maxHardLimit + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+		mMaxHardLimit = ( (mMaxHardLimit + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
 							ARRAY_PACKED_REALS;
 
-		if( !m_rebaseListener )
+		if( !mRebaseListener )
 		{
 			//If there's no listener to rebase, we can't later grow the memory pool or perform cleanups.
-			m_maxHardLimit		= m_maxMemory;
-			m_cleanupThreshold	= -1;
+			mMaxHardLimit		= mMaxMemory;
+			mCleanupThreshold	= -1;
 		}
 	}
 	//-----------------------------------------------------------------------------------
 	void ArrayMemoryManager::initialize()
 	{
-		assert( m_usedMemory == 0 && "Calling initialize twice"
+		assert( mUsedMemory == 0 && "Calling initialize twice"
 				" with used slots will cause dangling ptrs" );
 		destroy();
 
 		size_t i=0;
-		MemoryPoolVec::iterator itor = m_memoryPools.begin();
-		MemoryPoolVec::iterator end  = m_memoryPools.end();
+		MemoryPoolVec::iterator itor = mMemoryPools.begin();
+		MemoryPoolVec::iterator end  = mMemoryPools.end();
 
 		while( itor != end )
 		{
-//			*itor = reinterpret_cast<char*>(_aligned_malloc(m_maxMemory * ElementsMemSize[i], 16));
-			*itor = (char*)OGRE_MALLOC_SIMD( m_maxMemory * m_elementsMemSizes[i],
+//			*itor = reinterpret_cast<char*>(_aligned_malloc(mMaxMemory * ElementsMemSize[i], 16));
+			*itor = (char*)OGRE_MALLOC_SIMD( mMaxMemory * mElementsMemSizes[i],
 											 MEMCATEGORY_SCENE_OBJECTS );
-			memset( *itor, 0, m_maxMemory * m_elementsMemSizes[i] );
+			memset( *itor, 0, mMaxMemory * mElementsMemSizes[i] );
 			++i;
 			++itor;
 		}
@@ -105,8 +105,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void ArrayMemoryManager::destroy()
 	{
-		MemoryPoolVec::iterator itor = m_memoryPools.begin();
-		MemoryPoolVec::iterator end  = m_memoryPools.end();
+		MemoryPoolVec::iterator itor = mMemoryPools.begin();
+		MemoryPoolVec::iterator end  = mMemoryPools.end();
 
 		while( itor != end )
 		{
@@ -117,41 +117,41 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getFreeMemory() const
 	{
-		return ( m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE - m_usedMemory + m_availableSlots.size() )
-				* m_totalMemoryMultiplier;
+		return ( mMaxMemory - OGRE_PREFETCH_SLOT_DISTANCE - mUsedMemory + mAvailableSlots.size() )
+				* mTotalMemoryMultiplier;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getUsedMemory() const
 	{
-		return ( m_usedMemory - m_availableSlots.size() ) * m_totalMemoryMultiplier;
+		return ( mUsedMemory - mAvailableSlots.size() ) * mTotalMemoryMultiplier;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getWastedMemory() const
 	{
-		return m_availableSlots.size() * m_totalMemoryMultiplier;
+		return mAvailableSlots.size() * mTotalMemoryMultiplier;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::getAllMemory() const
 	{
-		return m_maxMemory * m_totalMemoryMultiplier;
+		return mMaxMemory * mTotalMemoryMultiplier;
 	}
 	//-----------------------------------------------------------------------------------
 	size_t ArrayMemoryManager::createNewSlot()
 	{
-		size_t nextSlot = m_usedMemory;
-		++m_usedMemory;
+		size_t nextSlot = mUsedMemory;
+		++mUsedMemory;
 
 		//See if we can reuse a slot that was previously acquired and released
-		if( !m_availableSlots.empty() )
+		if( !mAvailableSlots.empty() )
 		{
-			nextSlot = m_availableSlots.back();
-			m_availableSlots.pop_back();
-			--m_usedMemory;
+			nextSlot = mAvailableSlots.back();
+			mAvailableSlots.pop_back();
+			--mUsedMemory;
 		}
 
-		if( m_usedMemory > m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE )
+		if( mUsedMemory > mMaxMemory - OGRE_PREFETCH_SLOT_DISTANCE )
 		{
-			if( m_maxMemory >= m_maxHardLimit )
+			if( mMaxMemory >= mMaxHardLimit )
 			{
 				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 							"Trying to allocate more memory than the limit allowed by user",
@@ -160,37 +160,37 @@ namespace Ogre
 
 			//Build the diff list for rebase later.
 			PtrdiffVec diffsList;
-			diffsList.reserve( m_usedMemory );
-			m_rebaseListener->buildDiffList( m_managerType, m_level, m_memoryPools, diffsList );
+			diffsList.reserve( mUsedMemory );
+			mRebaseListener->buildDiffList( mManagerType, mLevel, mMemoryPools, diffsList );
 
 			//Reallocate, grow by 50% increments, rounding up to next multiple of ARRAY_PACKED_REALS
-			size_t newMemory = std::min( m_maxMemory + (m_maxMemory >> 1), m_maxHardLimit );
+			size_t newMemory = std::min( mMaxMemory + (mMaxMemory >> 1), mMaxHardLimit );
 			newMemory+= (ARRAY_PACKED_REALS - newMemory % ARRAY_PACKED_REALS) % ARRAY_PACKED_REALS;
-			newMemory = std::min( newMemory, m_maxHardLimit );
+			newMemory = std::min( newMemory, mMaxHardLimit );
 
 			size_t i=0;
-			MemoryPoolVec::iterator itor = m_memoryPools.begin();
-			MemoryPoolVec::iterator end  = m_memoryPools.end();
+			MemoryPoolVec::iterator itor = mMemoryPools.begin();
+			MemoryPoolVec::iterator end  = mMemoryPools.end();
 
 			while( itor != end )
 			{
 				//Reallocate
-				char *tmp = (char*)OGRE_MALLOC_SIMD( newMemory * m_elementsMemSizes[i],
+				char *tmp = (char*)OGRE_MALLOC_SIMD( newMemory * mElementsMemSizes[i],
 													 MEMCATEGORY_SCENE_OBJECTS );
-				memcpy( tmp, *itor, m_maxMemory * m_elementsMemSizes[i] );
-				memset( tmp + m_maxMemory * m_elementsMemSizes[i], 0,
-						(newMemory - m_maxMemory) * m_elementsMemSizes[i] );
+				memcpy( tmp, *itor, mMaxMemory * mElementsMemSizes[i] );
+				memset( tmp + mMaxMemory * mElementsMemSizes[i], 0,
+						(newMemory - mMaxMemory) * mElementsMemSizes[i] );
 				OGRE_FREE_SIMD( *itor, MEMCATEGORY_SCENE_OBJECTS );
 				*itor = tmp;
 				++i;
 				++itor;
 			}
 
-			const size_t prevNumSlots = m_maxMemory;
-			m_maxMemory = newMemory;
+			const size_t prevNumSlots = mMaxMemory;
+			mMaxMemory = newMemory;
 
 			//Rebase all ptrs
-			m_rebaseListener->applyRebase( m_managerType, m_level, m_memoryPools, diffsList );
+			mRebaseListener->applyRebase( mManagerType, mLevel, mMemoryPools, diffsList );
 
 			slotsRecreated( prevNumSlots );
 		}
@@ -202,29 +202,29 @@ namespace Ogre
 	{
 		const char *basePtr	= ptrToFirstElement;
 
-		const size_t slot = ( basePtr - m_memoryPools[0] ) / m_elementsMemSizes[0] + index;
+		const size_t slot = ( basePtr - mMemoryPools[0] ) / mElementsMemSizes[0] + index;
 
-		assert( slot < m_maxMemory && "This slot does not belong to this ArrayMemoryManager" );
+		assert( slot < mMaxMemory && "This slot does not belong to this ArrayMemoryManager" );
 
-		if( slot + 1 == m_usedMemory )
+		if( slot + 1 == mUsedMemory )
 		{
 			//Lucky us, LIFO. We're done.
-			--m_usedMemory;
+			--mUsedMemory;
 		}
 		else
 		{
 			//Not so lucky, add to "reuse" pool
-			m_availableSlots.push_back( slot );
+			mAvailableSlots.push_back( slot );
 
 			//The pool is getting to big? Do some cleanup (depending
 			//on fragmentation, may take a performance hit)
-			if( m_availableSlots.size() > m_cleanupThreshold )
+			if( mAvailableSlots.size() > mCleanupThreshold )
 			{
 				//Sort, last values first. This may improve performance in some
 				//scenarios by reducing the amount of data to be shifted
-				std::sort( m_availableSlots.begin(), m_availableSlots.end(), std::greater<size_t>() );
-				SlotsVec::const_iterator itor = m_availableSlots.begin();
-				SlotsVec::const_iterator end  = m_availableSlots.end();
+				std::sort( mAvailableSlots.begin(), mAvailableSlots.end(), std::greater<size_t>() );
+				SlotsVec::const_iterator itor = mAvailableSlots.begin();
+				SlotsVec::const_iterator end  = mAvailableSlots.end();
 
 				while( itor != end )
 				{
@@ -239,35 +239,35 @@ namespace Ogre
 
 					size_t i=0;
 					const size_t newEnd = *itor + 1;
-					MemoryPoolVec::iterator itPools = m_memoryPools.begin();
-					MemoryPoolVec::iterator enPools = m_memoryPools.end();
+					MemoryPoolVec::iterator itPools = mMemoryPools.begin();
+					MemoryPoolVec::iterator enPools = mMemoryPools.end();
 
 					//Shift everything N slots (N = lastRange)
 					while( itPools != enPools )
 					{
-						memcpy( *itPools + ( newEnd - lastRange ) * m_elementsMemSizes[i],
-								*itPools + newEnd * m_elementsMemSizes[i],
-								( m_usedMemory - newEnd ) * m_elementsMemSizes[i] );
+						memcpy( *itPools + ( newEnd - lastRange ) * mElementsMemSizes[i],
+								*itPools + newEnd * mElementsMemSizes[i],
+								( mUsedMemory - newEnd ) * mElementsMemSizes[i] );
 
 						//We need to default-initialize the garbage left after.
-						memset( *itPools + (m_usedMemory - lastRange) * m_elementsMemSizes[i], 0,
-								lastRange * m_elementsMemSizes[i] );
+						memset( *itPools + (mUsedMemory - lastRange) * mElementsMemSizes[i], 0,
+								lastRange * mElementsMemSizes[i] );
 
 						++i;
 						++itPools;
 					}
 
-					m_usedMemory -= lastRange;
-					slotsRecreated( m_usedMemory );
+					mUsedMemory -= lastRange;
+					slotsRecreated( mUsedMemory );
 
-					m_rebaseListener->performCleanup( m_managerType, m_level, m_memoryPools,
-														m_elementsMemSizes, (newEnd - lastRange),
+					mRebaseListener->performCleanup( mManagerType, mLevel, mMemoryPools,
+														mElementsMemSizes, (newEnd - lastRange),
 														lastRange );
 					
 					itor += lastRange;
 				}
 
-				m_availableSlots.clear();
+				mAvailableSlots.clear();
 			}
 		}
 	}

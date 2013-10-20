@@ -58,26 +58,26 @@ namespace Ogre
     class _OgreExport ArraySphere
     {
     public:
-		ArrayReal			m_radius;
-		ArrayVector3		m_center;
+		ArrayReal			mRadius;
+		ArrayVector3		mCenter;
 
 		ArraySphere()
 		{
 		}
 
 		ArraySphere( const ArrayReal &radius, const ArrayVector3 &center ) :
-					m_radius( radius ),
-					m_center( center )
+					mRadius( radius ),
+					mCenter( center )
 		{
 		}
 
 		void getAsSphere( Sphere &out, size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedRadius = reinterpret_cast<const Real*>( &m_radius );
+			const Real *aliasedRadius = reinterpret_cast<const Real*>( &mRadius );
 
 			Vector3 center;
-			m_center.getAsVector3( center, index );
+			mCenter.getAsVector3( center, index );
 			out.setCenter( center );
 			out.setRadius( *aliasedRadius );
 		}
@@ -93,9 +93,9 @@ namespace Ogre
 
 		void setFromSphere( const Sphere &sphere, size_t index )
 		{
-			Real *aliasedRadius = reinterpret_cast<Real*>( &m_radius );
+			Real *aliasedRadius = reinterpret_cast<Real*>( &mRadius );
 			aliasedRadius[index] = sphere.getRadius();
-			m_center.setFromVector3( sphere.getCenter(), index );
+			mCenter.setFromVector3( sphere.getCenter(), index );
 		}
 
 		/// Sets all packed spheres to the same value as the scalar input sphere
@@ -103,10 +103,10 @@ namespace Ogre
 		{
 			const Real fRadius		= sphere.getRadius();
 			const Vector3 &center	= sphere.getCenter();
-			m_radius = fRadius;
-			m_center.m_chunkBase[0] = center.x;
-			m_center.m_chunkBase[1] = center.y;
-			m_center.m_chunkBase[2] = center.z;
+			mRadius = fRadius;
+			mCenter.mChunkBase[0] = center.x;
+			mCenter.mChunkBase[1] = center.y;
+			mCenter.mChunkBase[2] = center.z;
 		}
 
 		/// @copydoc Sphere::intersects()

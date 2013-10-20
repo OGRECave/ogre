@@ -147,7 +147,7 @@ namespace Ogre {
 						uint8 renderQueueId=RENDER_QUEUE_MAIN );
 
 		/** Don't use this constructor unless you know what you're doing.
-			@See ObjectMemoryManager::m_dummyNode
+			@See ObjectMemoryManager::mDummyNode
 		*/
 		MovableObject( ObjectData *objectDataPtrs );
 

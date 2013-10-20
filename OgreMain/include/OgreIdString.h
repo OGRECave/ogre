@@ -56,34 +56,34 @@ namespace Ogre
 	{
 		static const uint32_t Seed = 0x3A8EFA67; //It's a prime number :)
 
-		uint32		m_hash;
+		uint32		mHash;
 #ifndef NDEBUG
 		#define OGRE_DEBUG_STR_SIZE 32
-		char		m_debugString[OGRE_DEBUG_STR_SIZE];
+		char		mDebugString[OGRE_DEBUG_STR_SIZE];
 #endif
 
-		IdString() : m_hash( 0 )
+		IdString() : mHash( 0 )
 		{
 #ifndef NDEBUG
-			m_debugString[0] = '\0';
+			mDebugString[0] = '\0';
 #endif
 		}
 
-		IdString( const char *string ) : m_hash( 0 )
+		IdString( const char *string ) : mHash( 0 )
 		{
-			OGRE_HASH_FUNC( string, strlen( string ), Seed, &m_hash );
+			OGRE_HASH_FUNC( string, strlen( string ), Seed, &mHash );
 			OGRE_COPY_DEBUG_STRING( string );
 		}
 
-		IdString( const std::string &string ) : m_hash( 0 )
+		IdString( const std::string &string ) : mHash( 0 )
 		{
-			OGRE_HASH_FUNC( string.c_str(), string.size(), Seed, &m_hash );
+			OGRE_HASH_FUNC( string.c_str(), string.size(), Seed, &mHash );
 			OGRE_COPY_DEBUG_STRING( string );
 		}
 
-		IdString( uint32 value ) : m_hash( 0 )
+		IdString( uint32 value ) : mHash( 0 )
 		{
-			OGRE_HASH_FUNC( &value, sizeof( value ), Seed, &m_hash );
+			OGRE_HASH_FUNC( &value, sizeof( value ), Seed, &mHash );
 			OGRE_COPY_DEBUG_STRING( value );
 		}
 
@@ -99,14 +99,14 @@ namespace Ogre
 			if( strLength > OGRE_DEBUG_STR_SIZE-1 )
 			{
 				//Copy the last characters, not the first ones!
-				strncpy( m_debugString, string + strLength - (OGRE_DEBUG_STR_SIZE-1),
+				strncpy( mDebugString, string + strLength - (OGRE_DEBUG_STR_SIZE-1),
 						 OGRE_DEBUG_STR_SIZE );
 			}
 			else
 			{
-				strncpy( m_debugString, string, OGRE_DEBUG_STR_SIZE );
+				strncpy( mDebugString, string, OGRE_DEBUG_STR_SIZE );
 			}
-			m_debugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+			mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
 		}
 
 		void OGRE_COPY_DEBUG_STRING( const std::string &string )
@@ -115,20 +115,20 @@ namespace Ogre
 			if( strLength > OGRE_DEBUG_STR_SIZE-1 )
 			{
 				//Copy the last characters, not the first ones!
-				strncpy( m_debugString, string.c_str() + strLength - (OGRE_DEBUG_STR_SIZE-1),
+				strncpy( mDebugString, string.c_str() + strLength - (OGRE_DEBUG_STR_SIZE-1),
 						 OGRE_DEBUG_STR_SIZE );
 			}
 			else
 			{
-				strncpy( m_debugString, string.c_str(), OGRE_DEBUG_STR_SIZE );
+				strncpy( mDebugString, string.c_str(), OGRE_DEBUG_STR_SIZE );
 			}
-			m_debugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+			mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
 		}
 
 		void OGRE_COPY_DEBUG_STRING( uint32 value )
 		{
-			sprintf( m_debugString, "[Value 0x%.8x]", value );
-			m_debugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+			sprintf( mDebugString, "[Value 0x%.8x]", value );
+			mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
 		}
 
 		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -138,45 +138,45 @@ namespace Ogre
 
 		IdString operator + ( IdString idString ) const
 		{
-			return IdString( m_hash + idString.m_hash );
+			return IdString( mHash + idString.mHash );
 		}
 
 		bool operator < ( IdString idString ) const
 		{
 #ifdef _DEBUG
 			//On highly debug builds, check for collisions
-			assert( !(m_hash == idString.m_hash &&
-					strcmp( m_debugString, idString.m_debugString ) != 0) &&
+			assert( !(mHash == idString.mHash &&
+					strcmp( mDebugString, idString.mDebugString ) != 0) &&
 					"Collision detected!" );
 #endif
-			return m_hash < idString.m_hash;
+			return mHash < idString.mHash;
 		}
 
 		bool operator == ( IdString idString ) const
 		{
 #ifndef NDEBUG
-			assert( !(m_hash == idString.m_hash &&
-					strcmp( m_debugString, idString.m_debugString ) != 0) &&
+			assert( !(mHash == idString.mHash &&
+					strcmp( mDebugString, idString.mDebugString ) != 0) &&
 					"Collision detected!" );
 #endif
-			return m_hash == idString.m_hash;
+			return mHash == idString.mHash;
 		}
 
 		bool operator != ( IdString idString ) const
 		{
 #ifndef NDEBUG
-			assert( !(m_hash == idString.m_hash &&
-					strcmp( m_debugString, idString.m_debugString ) != 0) &&
+			assert( !(mHash == idString.mHash &&
+					strcmp( mDebugString, idString.mDebugString ) != 0) &&
 					"Collision detected!" );
 #endif
-			return m_hash != idString.m_hash;
+			return mHash != idString.mHash;
 		}
 
 		/// Returns "[Hash 0x0a0100ef]" strings in Release mode, readable string in debug
 		std::string getFriendlyText() const
 		{
 #ifndef NDEBUG
-			return std::string( m_debugString );
+			return std::string( mDebugString );
 #else
 		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 			#pragma warning( push )
@@ -184,7 +184,7 @@ namespace Ogre
 		#endif
 
 			char tmp[(OGRE_HASH_BITS >> 2)+10];
-			sprintf( tmp, "[Hash 0x%.8x]", m_hash );
+			sprintf( tmp, "[Hash 0x%.8x]", mHash );
 			tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
 			return std::string( tmp );
 

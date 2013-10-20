@@ -95,7 +95,7 @@ namespace Ogre {
 					SceneNode *parent );
 
 		/** Don't use this constructor unless you know what you're doing.
-			@See NodeMemoryManager::m_dummyNode
+			@See NodeMemoryManager::mDummyNode
 		*/
 		SceneNode( const Transform &transformPtrs );
 

@@ -825,10 +825,10 @@ namespace Ogre
         Real radius = sphere.getRadius();
 
 		// Arvo's algorithm
-		Vector3 cathetus = center - aabb.m_center;
-		cathetus.x = max( Abs( cathetus.x ) - aabb.m_halfSize.x, 0.0f );
-		cathetus.y = max( Abs( cathetus.y ) - aabb.m_halfSize.y, 0.0f );
-		cathetus.z = max( Abs( cathetus.z ) - aabb.m_halfSize.z, 0.0f );
+		Vector3 cathetus = center - aabb.mCenter;
+		cathetus.x = max( Abs( cathetus.x ) - aabb.mHalfSize.x, 0.0f );
+		cathetus.y = max( Abs( cathetus.y ) - aabb.mHalfSize.y, 0.0f );
+		cathetus.z = max( Abs( cathetus.z ) - aabb.mHalfSize.z, 0.0f );
 		return cathetus.dotProduct( cathetus ) < radius * radius;
 	}*/
     //-----------------------------------------------------------------------

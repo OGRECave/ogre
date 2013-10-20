@@ -55,20 +55,20 @@ namespace Ogre
 	{
 		typedef vector<NodeArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
-		ArrayMemoryManagerVec					m_memoryManagers;
+		ArrayMemoryManagerVec					mMemoryManagers;
 
 		/// Dummy node where to point Transform::mParents[i] when they're unused slots.
-		SceneNode								*m_dummyNode;
-		Transform								m_dummyTransformPtrs;
+		SceneNode								*mDummyNode;
+		Transform								mDummyTransformPtrs;
 
 		/** Memory managers can have a 'twin' (optional). A twin is used when there
 			static and dynamic scene managers, thus caching their pointers here is
 			very convenient.
 		*/
-		SceneMemoryMgrTypes						m_memoryManagerType;
-		NodeMemoryManager						*m_twinMemoryManager;
+		SceneMemoryMgrTypes						mMemoryManagerType;
+		NodeMemoryManager						*mTwinMemoryManager;
 
-		/** Makes m_memoryManagers big enough to be able to fulfill m_memoryManagers[newDepth]
+		/** Makes mMemoryManagers big enough to be able to fulfill mMemoryManagers[newDepth]
 		@param newDepth
 			Hierarchy level depth we wish to grow to.
 		*/
@@ -78,12 +78,12 @@ namespace Ogre
 		NodeMemoryManager();
 		~NodeMemoryManager();
 
-		/// @See m_memoryManagerType
+		/// @See mMemoryManagerType
 		void _setTwin( SceneMemoryMgrTypes memoryManagerType, NodeMemoryManager *twinMemoryManager );
 
 		/// Note the return value can be null
-		NodeMemoryManager* getTwin() const							{ return m_twinMemoryManager; }
-		SceneMemoryMgrTypes getMemoryManagerType() const			{ return m_memoryManagerType; }
+		NodeMemoryManager* getTwin() const							{ return mTwinMemoryManager; }
+		SceneMemoryMgrTypes getMemoryManagerType() const			{ return mMemoryManagerType; }
 
 		/** Requests memory for the given transform for the first, initializing values.
 		@param outTransform
@@ -153,7 +153,7 @@ namespace Ogre
 
 		/** Retrieves the number of depth levels that have been created.
 		@remarks
-			The return value is equal or below m_memoryManagers.size(), you should cache
+			The return value is equal or below mMemoryManagers.size(), you should cache
 			the result instead of calling this function too often.
 		*/
 		size_t getNumDepths() const;

@@ -54,7 +54,7 @@ namespace Ogre
 			time (the actual amount is defined by ARRAY_PACKED_REALS)
 			Assuming ARRAY_PACKED_REALS == 4, the memory layout will
 			be as following:
-               m_chunkBase			  m_chunkBase + 4
+               mChunkBase			  mChunkBase + 4
 			WWWW XXXX YYYY ZZZZ		WWWW XXXX YYYY ZZZZ
 			Extracting one quat (XYZW) needs 64 bytes, which is within
 			the 64 byte size of common cache lines.

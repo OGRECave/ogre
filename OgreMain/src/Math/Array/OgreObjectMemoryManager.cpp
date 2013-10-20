@@ -35,50 +35,50 @@ THE SOFTWARE.
 namespace Ogre
 {
 	ObjectMemoryManager::ObjectMemoryManager() :
-			m_totalObjects( 0 ),
-			m_dummyNode( 0 ),
-			m_dummyObject( 0 ),
-			m_memoryManagerType( SCENE_DYNAMIC ),
-			m_twinMemoryManager( 0 )
+			mTotalObjects( 0 ),
+			mDummyNode( 0 ),
+			mDummyObject( 0 ),
+			mMemoryManagerType( SCENE_DYNAMIC ),
+			mTwinMemoryManager( 0 )
 	{
 		//Manually allocate the memory for the dummy scene nodes (since we can't pass ourselves
 		//or yet another object) We only allocate what's needed to prevent access violations.
-		/*m_dummyTransformPtrs.mPosition = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+		/*mDummyTransformPtrs.mPosition = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
-		m_dummyTransformPtrs.mOrientation = reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mOrientation = reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayQuaternion ), MEMCATEGORY_SCENE_OBJECTS ) );
-		m_dummyTransformPtrs.mScale = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mScale = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );*/
 
-		m_dummyTransformPtrs.mDerivedPosition	= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mDerivedPosition	= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
-		m_dummyTransformPtrs.mDerivedOrientation= reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mDerivedOrientation= reinterpret_cast<ArrayQuaternion*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayQuaternion ), MEMCATEGORY_SCENE_OBJECTS ) );
-		m_dummyTransformPtrs.mDerivedScale		= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mDerivedScale		= reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
 												sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
 
-		m_dummyTransformPtrs.mDerivedTransform	= reinterpret_cast<Matrix4*>( OGRE_MALLOC_SIMD(
+		mDummyTransformPtrs.mDerivedTransform	= reinterpret_cast<Matrix4*>( OGRE_MALLOC_SIMD(
 												sizeof( Matrix4 ) * ARRAY_PACKED_REALS,
 												MEMCATEGORY_SCENE_OBJECTS ) );
-		/*m_dummyTransformPtrs.mInheritOrientation= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
+		/*mDummyTransformPtrs.mInheritOrientation= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
 																	MEMCATEGORY_SCENE_OBJECTS );
-		m_dummyTransformPtrs.mInheritScale		= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
+		mDummyTransformPtrs.mInheritScale		= OGRE_MALLOC_SIMD( sizeof( bool ) * ARRAY_PACKED_REALS,
 																	MEMCATEGORY_SCENE_OBJECTS );*/
 
-		*m_dummyTransformPtrs.mDerivedPosition		= ArrayVector3::ZERO;
-		*m_dummyTransformPtrs.mDerivedOrientation	= ArrayQuaternion::IDENTITY;
-		*m_dummyTransformPtrs.mDerivedScale			= ArrayVector3::UNIT_SCALE;
+		*mDummyTransformPtrs.mDerivedPosition		= ArrayVector3::ZERO;
+		*mDummyTransformPtrs.mDerivedOrientation	= ArrayQuaternion::IDENTITY;
+		*mDummyTransformPtrs.mDerivedScale			= ArrayVector3::UNIT_SCALE;
 		for( size_t i=0; i<ARRAY_PACKED_REALS; ++i )
-			m_dummyTransformPtrs.mDerivedTransform[i] = Matrix4::IDENTITY;
+			mDummyTransformPtrs.mDerivedTransform[i] = Matrix4::IDENTITY;
 
-		m_dummyNode = new SceneNode( m_dummyTransformPtrs );
-		m_dummyObject = new NullEntity();
+		mDummyNode = new SceneNode( mDummyTransformPtrs );
+		mDummyObject = new NullEntity();
 	}
 	//-----------------------------------------------------------------------------------
 	ObjectMemoryManager::~ObjectMemoryManager()
 	{
-		ArrayMemoryManagerVec::iterator itor = m_memoryManagers.begin();
-		ArrayMemoryManagerVec::iterator end  = m_memoryManagers.end();
+		ArrayMemoryManagerVec::iterator itor = mMemoryManagers.begin();
+		ArrayMemoryManagerVec::iterator end  = mMemoryManagers.end();
 
 		while( itor != end )
 		{
@@ -86,44 +86,44 @@ namespace Ogre
 			++itor;
 		}
 
-		m_memoryManagers.clear();
+		mMemoryManagers.clear();
 
-		delete m_dummyNode;
-		m_dummyNode = 0;
+		delete mDummyNode;
+		mDummyNode = 0;
 
-		delete m_dummyObject;
-		m_dummyObject = 0;
+		delete mDummyObject;
+		mDummyObject = 0;
 
-		/*OGRE_FREE_SIMD( m_dummyTransformPtrs.mPosition, MEMCATEGORY_SCENE_OBJECTS );
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mOrientation, MEMCATEGORY_SCENE_OBJECTS );
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mScale, MEMCATEGORY_SCENE_OBJECTS );*/
+		/*OGRE_FREE_SIMD( mDummyTransformPtrs.mPosition, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mScale, MEMCATEGORY_SCENE_OBJECTS );*/
 
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedPosition, MEMCATEGORY_SCENE_OBJECTS );
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedOrientation, MEMCATEGORY_SCENE_OBJECTS );
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedScale, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedPosition, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedScale, MEMCATEGORY_SCENE_OBJECTS );
 
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mDerivedTransform, MEMCATEGORY_SCENE_OBJECTS );
-		/*OGRE_FREE_SIMD( m_dummyTransformPtrs.mInheritOrientation, MEMCATEGORY_SCENE_OBJECTS );
-		OGRE_FREE_SIMD( m_dummyTransformPtrs.mInheritScale, MEMCATEGORY_SCENE_OBJECTS );*/
-		m_dummyTransformPtrs = Transform();
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mDerivedTransform, MEMCATEGORY_SCENE_OBJECTS );
+		/*OGRE_FREE_SIMD( mDummyTransformPtrs.mInheritOrientation, MEMCATEGORY_SCENE_OBJECTS );
+		OGRE_FREE_SIMD( mDummyTransformPtrs.mInheritScale, MEMCATEGORY_SCENE_OBJECTS );*/
+		mDummyTransformPtrs = Transform();
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::_setTwin( SceneMemoryMgrTypes memoryManagerType,
 										ObjectMemoryManager *twinMemoryManager )
 	{
-		m_memoryManagerType = memoryManagerType;
-		m_twinMemoryManager = twinMemoryManager;
+		mMemoryManagerType = memoryManagerType;
+		mTwinMemoryManager = twinMemoryManager;
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::growToDepth( size_t newDepth )
 	{
 		//TODO: (dark_sylinc) give a specialized hint for each depth
-		while( newDepth >= m_memoryManagers.size() )
+		while( newDepth >= mMemoryManagers.size() )
 		{
-			m_memoryManagers.push_back( ObjectDataArrayMemoryManager( m_memoryManagers.size(), 100,
-											m_dummyNode, m_dummyObject, 100,
+			mMemoryManagers.push_back( ObjectDataArrayMemoryManager( mMemoryManagers.size(), 100,
+											mDummyNode, mDummyObject, 100,
 											ArrayMemoryManager::MAX_MEMORY_SLOTS, this ) );
-			m_memoryManagers.back().initialize();
+			mMemoryManagers.back().initialize();
 		}
 	}
 	//-----------------------------------------------------------------------------------
@@ -131,10 +131,10 @@ namespace Ogre
 	{
 		growToDepth( renderQueue );
 
-		ObjectDataArrayMemoryManager& mgr = m_memoryManagers[renderQueue];
+		ObjectDataArrayMemoryManager& mgr = mMemoryManagers[renderQueue];
 		mgr.createNewNode( outObjectData );
 
-		++m_totalObjects;
+		++mTotalObjects;
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::objectMoved( ObjectData &inOutObjectData, size_t oldRenderQueue,
@@ -143,11 +143,11 @@ namespace Ogre
 		growToDepth( newRenderQueue );
 
 		ObjectData tmp;
-		m_memoryManagers[newRenderQueue].createNewNode( tmp );
+		mMemoryManagers[newRenderQueue].createNewNode( tmp );
 
 		tmp.copy( inOutObjectData );
 
-		ObjectDataArrayMemoryManager &mgr = m_memoryManagers[oldRenderQueue];
+		ObjectDataArrayMemoryManager &mgr = mMemoryManagers[oldRenderQueue];
 		mgr.destroyNode( inOutObjectData );
 
 		inOutObjectData = tmp;
@@ -155,10 +155,10 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::objectDestroyed( ObjectData &outObjectData, size_t renderQueue )
 	{
-		ObjectDataArrayMemoryManager &mgr = m_memoryManagers[renderQueue];
+		ObjectDataArrayMemoryManager &mgr = mMemoryManagers[renderQueue];
 		mgr.destroyNode( outObjectData );
 
-		--m_totalObjects;
+		--mTotalObjects;
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::migrateTo( ObjectData &inOutObjectData, size_t renderQueue,
@@ -174,9 +174,9 @@ namespace Ogre
 	size_t ObjectMemoryManager::getNumRenderQueues() const
 	{
 		size_t retVal = -1;
-		ArrayMemoryManagerVec::const_iterator begin= m_memoryManagers.begin();
-		ArrayMemoryManagerVec::const_iterator itor = m_memoryManagers.begin();
-		ArrayMemoryManagerVec::const_iterator end  = m_memoryManagers.end();
+		ArrayMemoryManagerVec::const_iterator begin= mMemoryManagers.begin();
+		ArrayMemoryManagerVec::const_iterator itor = mMemoryManagers.begin();
+		ArrayMemoryManagerVec::const_iterator end  = mMemoryManagers.end();
 
 		while( itor != end )
 		{
@@ -190,7 +190,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t ObjectMemoryManager::getFirstObjectData( ObjectData &outObjectData, size_t renderQueue )
 	{
-		return m_memoryManagers[renderQueue].getFirstNode( outObjectData );
+		return mMemoryManagers[renderQueue].getFirstNode( outObjectData );
 	}
 	//-----------------------------------------------------------------------------------
 	void ObjectMemoryManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,

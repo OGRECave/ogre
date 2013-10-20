@@ -57,24 +57,24 @@ namespace Ogre
 	{
 		typedef vector<ObjectDataArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
-		ArrayMemoryManagerVec					m_memoryManagers;
+		ArrayMemoryManagerVec					mMemoryManagers;
 
 		/// Tracks total number of objects in all render queues.
-		size_t									m_totalObjects;
+		size_t									mTotalObjects;
 
 		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
-		SceneNode								*m_dummyNode;
-		Transform								m_dummyTransformPtrs;
-		NullEntity								*m_dummyObject;
+		SceneNode								*mDummyNode;
+		Transform								mDummyTransformPtrs;
+		NullEntity								*mDummyObject;
 
 		/** Memory managers can have a 'twin' (optional). A twin is used when there
 			static and dynamic scene managers, thus caching their pointers here is
 			very convenient.
 		*/
-		SceneMemoryMgrTypes						m_memoryManagerType;
-		ObjectMemoryManager						*m_twinMemoryManager;
+		SceneMemoryMgrTypes						mMemoryManagerType;
+		ObjectMemoryManager						*mTwinMemoryManager;
 
-		/** Makes m_memoryManagers big enough to be able to fulfill m_memoryManagers[newDepth]
+		/** Makes mMemoryManagers big enough to be able to fulfill mMemoryManagers[newDepth]
 		@param newDepth
 			Hierarchy level depth we wish to grow to.
 		*/
@@ -84,12 +84,12 @@ namespace Ogre
 		ObjectMemoryManager();
 		~ObjectMemoryManager();
 
-		/// @See m_memoryManagerType
+		/// @See mMemoryManagerType
 		void _setTwin( SceneMemoryMgrTypes memoryManagerType, ObjectMemoryManager *twinMemoryManager );
 
 		/// Note the return value can be null
-		ObjectMemoryManager* getTwin() const						{ return m_twinMemoryManager; }
-		SceneMemoryMgrTypes getMemoryManagerType() const			{ return m_memoryManagerType; }
+		ObjectMemoryManager* getTwin() const						{ return mTwinMemoryManager; }
+		SceneMemoryMgrTypes getMemoryManagerType() const			{ return mMemoryManagerType; }
 
 		/** Requests memory for the given ObjectData, initializing values.
 		@param outObjectData
@@ -134,21 +134,21 @@ namespace Ogre
 
 		/** Retrieves the number of render queues that have been created.
 		@remarks
-			The return value is equal or below m_memoryManagers.size(), you should cache
+			The return value is equal or below mMemoryManagers.size(), you should cache
 			the result instead of calling this function too often.
 		*/
 		size_t getNumRenderQueues() const;
 
-		size_t _getTotalRenderQueues() const				{ return m_memoryManagers.size(); }
+		size_t _getTotalRenderQueues() const				{ return mMemoryManagers.size(); }
 
 		/** Retrieves the sum of the number of objects in all render queues.
 		@remarks
 			The value is cached to avoid iterating through all RQ levels.
 		*/
-		size_t getTotalNumObjects() const					{ return m_totalObjects; }
+		size_t getTotalNumObjects() const					{ return mTotalObjects; }
 
 		/// Returns the pointer to the dummy node (useful when detaching)
-		SceneNode* _getDummyNode() const					{ return m_dummyNode; }
+		SceneNode* _getDummyNode() const					{ return mDummyNode; }
 
 		/** Retrieves a ObjectData pointing to the first MovableObject in the given render queue
 		@param outObjectData

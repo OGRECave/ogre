@@ -64,8 +64,8 @@ namespace Ogre
 #define DEFINE_OPERATION( leftClass, rightClass, op )\
 	inline ArrayVector3 operator op ( const leftClass &lhs, const rightClass &rhs )\
 	{\
-		const ArrayReal * RESTRICT_ALIAS lhsChunkBase = lhs.m_chunkBase;\
-		const ArrayReal * RESTRICT_ALIAS rhsChunkBase = rhs.m_chunkBase;\
+		const ArrayReal * RESTRICT_ALIAS lhsChunkBase = lhs.mChunkBase;\
+		const ArrayReal * RESTRICT_ALIAS rhsChunkBase = rhs.mChunkBase;\
 		return ArrayVector3(\
 				lhsChunkBase[0] op rhsChunkBase[0],\
 				lhsChunkBase[1] op rhsChunkBase[1],\
@@ -75,26 +75,26 @@ namespace Ogre
 	inline ArrayVector3 operator op ( const leftType fScalar, const rightClass &rhs )\
 	{\
 		return ArrayVector3(\
-				fScalar op rhs.m_chunkBase[0],\
-				fScalar op rhs.m_chunkBase[1],\
-				fScalar op rhs.m_chunkBase[2] );\
+				fScalar op rhs.mChunkBase[0],\
+				fScalar op rhs.mChunkBase[1],\
+				fScalar op rhs.mChunkBase[2] );\
 	}
 #define DEFINE_R_OPERATION( leftClass, rightType, op )\
 	inline ArrayVector3 operator op ( const leftClass &lhs, const rightType fScalar )\
 	{\
 		return ArrayVector3(\
-				lhs.m_chunkBase[0] op fScalar,\
-				lhs.m_chunkBase[1] op fScalar,\
-				lhs.m_chunkBase[2] op fScalar );\
+				lhs.mChunkBase[0] op fScalar,\
+				lhs.mChunkBase[1] op fScalar,\
+				lhs.mChunkBase[2] op fScalar );\
 	}
 
 #define DEFINE_L_SCALAR_DIVISION( leftType, rightClass, op )\
 	inline ArrayVector3 operator op ( const leftType fScalar, const rightClass &rhs )\
 	{\
 		return ArrayVector3(\
-				fScalar op rhs.m_chunkBase[0],\
-				fScalar op rhs.m_chunkBase[1],\
-				fScalar op rhs.m_chunkBase[2] );\
+				fScalar op rhs.mChunkBase[0],\
+				fScalar op rhs.mChunkBase[1],\
+				fScalar op rhs.mChunkBase[2] );\
 	}
 #define DEFINE_R_SCALAR_DIVISION( leftClass, rightType, op, op_func )\
 	inline ArrayVector3 operator op ( const leftClass &lhs, const rightType fScalar )\
@@ -102,9 +102,9 @@ namespace Ogre
 		assert( fScalar != 0.0 );\
 		Real fInv = 1.0f / fScalar;\
 		return ArrayVector3(\
-				lhs.m_chunkBase[0] op_func fInv,\
-				lhs.m_chunkBase[1] op_func fInv,\
-				lhs.m_chunkBase[2] op_func fInv );\
+				lhs.mChunkBase[0] op_func fInv,\
+				lhs.mChunkBase[1] op_func fInv,\
+				lhs.mChunkBase[2] op_func fInv );\
 	}
 
 #ifdef NDEBUG
@@ -118,8 +118,8 @@ namespace Ogre
 #define DEFINE_UPDATE_OPERATION( leftClass, op )\
 	inline void ArrayVector3::operator op ( const leftClass &a )\
 	{\
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;\
-		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.m_chunkBase;\
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;\
+		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.mChunkBase;\
 		chunkBase[0] = chunkBase[0] op aChunkBase[0];\
 		chunkBase[1] = chunkBase[1] op aChunkBase[1];\
 		chunkBase[2] = chunkBase[2] op aChunkBase[2];\
@@ -127,15 +127,15 @@ namespace Ogre
 #define DEFINE_UPDATE_R_SCALAR_OPERATION( rightType, op )\
 	inline void ArrayVector3::operator op ( const rightType fScalar )\
 	{\
-		m_chunkBase[0] = m_chunkBase[0] op fScalar;\
-		m_chunkBase[1] = m_chunkBase[1] op fScalar;\
-		m_chunkBase[2] = m_chunkBase[2] op fScalar;\
+		mChunkBase[0] = mChunkBase[0] op fScalar;\
+		mChunkBase[1] = mChunkBase[1] op fScalar;\
+		mChunkBase[2] = mChunkBase[2] op fScalar;\
 	}
 #define DEFINE_UPDATE_DIVISION( leftClass, op )\
 	inline void ArrayVector3::operator op ( const leftClass &a )\
 	{\
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;\
-		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.m_chunkBase;\
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;\
+		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.mChunkBase;\
 		chunkBase[0] = chunkBase[0] op aChunkBase[0];\
 		chunkBase[1] = chunkBase[1] op aChunkBase[1];\
 		chunkBase[2] = chunkBase[2] op aChunkBase[2];\
@@ -145,9 +145,9 @@ namespace Ogre
 	{\
 		assert( fScalar != 0.0 );\
 		Real fInv = 1.0f / fScalar;\
-		m_chunkBase[0] = m_chunkBase[0] op_func fInv;\
-		m_chunkBase[1] = m_chunkBase[1] op_func fInv;\
-		m_chunkBase[2] = m_chunkBase[2] op_func fInv;\
+		mChunkBase[0] = mChunkBase[0] op_func fInv;\
+		mChunkBase[1] = mChunkBase[1] op_func fInv;\
+		mChunkBase[2] = mChunkBase[2] op_func fInv;\
 	}
 
 	inline const ArrayVector3& ArrayVector3::operator + () const
@@ -157,7 +157,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::operator - () const
 	{
-		return ArrayVector3( -m_chunkBase[0], -m_chunkBase[1], -m_chunkBase[2] );
+		return ArrayVector3( -mChunkBase[0], -mChunkBase[1], -mChunkBase[2] );
 	}
 	//-----------------------------------------------------------------------------------
 
@@ -184,9 +184,9 @@ namespace Ogre
 	inline ArrayVector3 ArrayVector3::Cmov4( const ArrayVector3 &arg1, const ArrayVector3 &arg2, ArrayMaskR mask )
 	{
 		return ArrayVector3(
-				MathlibC::Cmov4( arg1.m_chunkBase[0], arg2.m_chunkBase[0], mask ),
-				MathlibC::Cmov4( arg1.m_chunkBase[1], arg2.m_chunkBase[1], mask ),
-				MathlibC::Cmov4( arg1.m_chunkBase[2], arg2.m_chunkBase[2], mask ) );
+				MathlibC::Cmov4( arg1.mChunkBase[0], arg2.mChunkBase[0], mask ),
+				MathlibC::Cmov4( arg1.mChunkBase[1], arg2.mChunkBase[1], mask ),
+				MathlibC::Cmov4( arg1.mChunkBase[2], arg2.mChunkBase[2], mask ) );
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -213,16 +213,16 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::length() const
     {
-		return sqrt( (m_chunkBase[0] * m_chunkBase[0]) +
-						(m_chunkBase[1] * m_chunkBase[1]) +
-						(m_chunkBase[2] * m_chunkBase[2]) );
+		return sqrt( (mChunkBase[0] * mChunkBase[0]) +
+						(mChunkBase[1] * mChunkBase[1]) +
+						(mChunkBase[2] * mChunkBase[2]) );
     }
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::squaredLength() const
     {
-        return (m_chunkBase[0] * m_chunkBase[0]) +
-				(m_chunkBase[1] * m_chunkBase[1]) +
-				(m_chunkBase[2] * m_chunkBase[2]);
+        return (mChunkBase[0] * mChunkBase[0]) +
+				(mChunkBase[1] * mChunkBase[1]) +
+				(mChunkBase[2] * mChunkBase[2]);
     }
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::distance( const ArrayVector3& rhs ) const
@@ -237,23 +237,23 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::dotProduct( const ArrayVector3& vec ) const
 	{
-		return (m_chunkBase[0] * vec.m_chunkBase[0]) +
-				(m_chunkBase[1] * vec.m_chunkBase[1]) +
-				(m_chunkBase[2] * vec.m_chunkBase[2]);
+		return (mChunkBase[0] * vec.mChunkBase[0]) +
+				(mChunkBase[1] * vec.mChunkBase[1]) +
+				(mChunkBase[2] * vec.mChunkBase[2]);
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::absDotProduct( const ArrayVector3& vec ) const
 	{
-		return Math::Abs( (m_chunkBase[0] * vec.m_chunkBase[0]) ) +
-				Math::Abs( (m_chunkBase[1] * vec.m_chunkBase[1]) ) +
-				Math::Abs( (m_chunkBase[2] * vec.m_chunkBase[2]) );
+		return Math::Abs( (mChunkBase[0] * vec.mChunkBase[0]) ) +
+				Math::Abs( (mChunkBase[1] * vec.mChunkBase[1]) ) +
+				Math::Abs( (mChunkBase[2] * vec.mChunkBase[2]) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::normalise( void )
 	{
-		ArrayReal sqLength = (m_chunkBase[0] * m_chunkBase[0]) +
-								(m_chunkBase[1] * m_chunkBase[1]) +
-								(m_chunkBase[2] * m_chunkBase[2]);
+		ArrayReal sqLength = (mChunkBase[0] * mChunkBase[0]) +
+								(mChunkBase[1] * mChunkBase[1]) +
+								(mChunkBase[2] * mChunkBase[2]);
 
 		//Convert sqLength's 0s into 1, so that zero vectors remain as zero
 		//Denormals are treated as 0 during the check.
@@ -261,33 +261,33 @@ namespace Ogre
 		//generating the nans could impact performance in some architectures
 		sqLength = MathlibC::Cmov4( sqLength, 1.0f, sqLength > MathlibC::FLOAT_MIN );
 		ArrayReal invLength = MathlibC::InvSqrtNonZero4( sqLength );
-		m_chunkBase[0] = m_chunkBase[0] * invLength; //x * invLength
-		m_chunkBase[1] = m_chunkBase[1] * invLength; //y * invLength
-		m_chunkBase[2] = m_chunkBase[2] * invLength; //z * invLength
+		mChunkBase[0] = mChunkBase[0] * invLength; //x * invLength
+		mChunkBase[1] = mChunkBase[1] * invLength; //y * invLength
+		mChunkBase[2] = mChunkBase[2] * invLength; //z * invLength
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::crossProduct( const ArrayVector3& rkVec ) const
     {
 		return ArrayVector3(
-				(m_chunkBase[1] * rkVec.m_chunkBase[2]) -
-				(m_chunkBase[0] * rkVec.m_chunkBase[1]),
-				(m_chunkBase[2] * rkVec.m_chunkBase[0]) -
-				(m_chunkBase[0] * rkVec.m_chunkBase[2]),
-				(m_chunkBase[0] * rkVec.m_chunkBase[1]) -
-				(m_chunkBase[1] * rkVec.m_chunkBase[0]) );
+				(mChunkBase[1] * rkVec.mChunkBase[2]) -
+				(mChunkBase[0] * rkVec.mChunkBase[1]),
+				(mChunkBase[2] * rkVec.mChunkBase[0]) -
+				(mChunkBase[0] * rkVec.mChunkBase[2]),
+				(mChunkBase[0] * rkVec.mChunkBase[1]) -
+				(mChunkBase[1] * rkVec.mChunkBase[0]) );
     }
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::midPoint( const ArrayVector3& rkVec ) const
     {
-		return ArrayVector3( (m_chunkBase[0] + rkVec.m_chunkBase[0]) * 0.5f,
-							 (m_chunkBase[1] + rkVec.m_chunkBase[1]) * 0.5f,
-							 (m_chunkBase[2] + rkVec.m_chunkBase[2]) * 0.5f );
+		return ArrayVector3( (mChunkBase[0] + rkVec.mChunkBase[0]) * 0.5f,
+							 (mChunkBase[1] + rkVec.mChunkBase[1]) * 0.5f,
+							 (mChunkBase[2] + rkVec.mChunkBase[2]) * 0.5f );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::makeFloor( const ArrayVector3& cmp )
     {
-		ArrayReal * RESTRICT_ALIAS aChunkBase = &m_chunkBase[0];
-		const ArrayReal * RESTRICT_ALIAS bChunkBase = &cmp.m_chunkBase[0];
+		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = &cmp.mChunkBase[0];
 		aChunkBase[0] = Ogre::min( aChunkBase[0], bChunkBase[0] );
 		aChunkBase[1] = Ogre::min( aChunkBase[1], bChunkBase[1] );
 		aChunkBase[2] = Ogre::min( aChunkBase[2], bChunkBase[2] );
@@ -295,8 +295,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::makeCeil( const ArrayVector3& cmp )
     {
-		ArrayReal * RESTRICT_ALIAS aChunkBase = &m_chunkBase[0];
-		const ArrayReal * RESTRICT_ALIAS bChunkBase = &cmp.m_chunkBase[0];
+		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = &cmp.mChunkBase[0];
 		aChunkBase[0] = Ogre::max( aChunkBase[0], bChunkBase[0] );
 		aChunkBase[1] = Ogre::max( aChunkBase[1], bChunkBase[1] );
 		aChunkBase[2] = Ogre::max( aChunkBase[2], bChunkBase[2] );
@@ -304,19 +304,19 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::getMinComponent() const
 	{
-		return Ogre::min( m_chunkBase[0], Ogre::min( m_chunkBase[1], m_chunkBase[2] ) );
+		return Ogre::min( mChunkBase[0], Ogre::min( mChunkBase[1], mChunkBase[2] ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayVector3::getMaxComponent() const
 	{
-		return Ogre::max( m_chunkBase[0], Ogre::max( m_chunkBase[1], m_chunkBase[2] ) );
+		return Ogre::max( mChunkBase[0], Ogre::max( mChunkBase[1], mChunkBase[2] ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::setToSign()
 	{
-		m_chunkBase[0] = m_chunkBase[0] >= 0 ? 1.0f : -1.0f;
-		m_chunkBase[1] = m_chunkBase[1] >= 0 ? 1.0f : -1.0f;
-		m_chunkBase[2] = m_chunkBase[2] >= 0 ? 1.0f : -1.0f;
+		mChunkBase[0] = mChunkBase[0] >= 0 ? 1.0f : -1.0f;
+		mChunkBase[1] = mChunkBase[1] >= 0 ? 1.0f : -1.0f;
+		mChunkBase[2] = mChunkBase[2] >= 0 ? 1.0f : -1.0f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::perpendicular( void ) const
@@ -331,9 +331,9 @@ namespace Ogre
 			   so we have to use another axis for those.
             */
             ArrayVector3 perp1 = this->crossProduct( ArrayVector3::UNIT_Y );
-			perp.m_chunkBase[0] = MathlibC::Cmov4( perp1.m_chunkBase[0], perp.m_chunkBase[0], mask );
-			perp.m_chunkBase[1] = MathlibC::Cmov4( perp1.m_chunkBase[1], perp.m_chunkBase[1], mask );
-			perp.m_chunkBase[2] = MathlibC::Cmov4( perp1.m_chunkBase[2], perp.m_chunkBase[2], mask );
+			perp.mChunkBase[0] = MathlibC::Cmov4( perp1.mChunkBase[0], perp.mChunkBase[0], mask );
+			perp.mChunkBase[1] = MathlibC::Cmov4( perp1.mChunkBase[1], perp.mChunkBase[1], mask );
+			perp.mChunkBase[2] = MathlibC::Cmov4( perp1.mChunkBase[2], perp.mChunkBase[2], mask );
         }
 		perp.normalise();
 
@@ -342,9 +342,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::normalisedCopy( void ) const
 	{
-		ArrayReal sqLength = (m_chunkBase[0] * m_chunkBase[0]) +
-								(m_chunkBase[1] * m_chunkBase[1]) +
-								(m_chunkBase[2] * m_chunkBase[2]);
+		ArrayReal sqLength = (mChunkBase[0] * mChunkBase[0]) +
+								(mChunkBase[1] * mChunkBase[1]) +
+								(mChunkBase[2] * mChunkBase[2]);
 
 		//Convert sqLength's 0s into 1, so that zero vectors remain as zero
 		//Denormals are treated as 0 during the check.
@@ -353,9 +353,9 @@ namespace Ogre
 		sqLength = MathlibC::Cmov4( sqLength, MathlibC::ONE, sqLength > MathlibC::FLOAT_MIN );
 		ArrayReal invLength = MathlibC::InvSqrtNonZero4( sqLength );
 
-		return ArrayVector3( m_chunkBase[0] * invLength,	//x * invLength
-							 m_chunkBase[1] * invLength,	//y * invLength
-							 m_chunkBase[2] * invLength );	//z * invLength
+		return ArrayVector3( mChunkBase[0] * invLength,	//x * invLength
+							 mChunkBase[1] * invLength,	//y * invLength
+							 mChunkBase[2] * invLength );	//z * invLength
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::reflect( const ArrayVector3& normal ) const
@@ -365,7 +365,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline int ArrayVector3::isNaN( void ) const
 	{
-		return Math::isNaN( m_chunkBase[0] ) | Math::isNaN( m_chunkBase[1] ) | Math::isNaN( m_chunkBase[2] );
+		return Math::isNaN( mChunkBase[0] ) | Math::isNaN( mChunkBase[1] ) | Math::isNaN( mChunkBase[2] );
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayVector3::primaryAxis( void ) const
@@ -379,31 +379,31 @@ namespace Ogre
 		// way. Doing this the "human readable way" results in massive amounts of wasted
 		// instructions and stack memory abuse.
 		// See Vector3::primaryAxis() to understand what's actually going on.
-		ArrayReal absx = Math::Abs( m_chunkBase[0] );
-		ArrayReal absy = Math::Abs( m_chunkBase[1] );
-		ArrayReal absz = Math::Abs( m_chunkBase[2] );
+		ArrayReal absx = Math::Abs( mChunkBase[0] );
+		ArrayReal absy = Math::Abs( mChunkBase[1] );
+		ArrayReal absz = Math::Abs( mChunkBase[2] );
 
 		//xVec = x > 0 ? Vector3::UNIT_X : Vector3::NEGATIVE_UNIT_X;
-		ArrayReal sign = MathlibC::Cmov4( 1.0f, -1.0f, m_chunkBase[0] > 0 );
+		ArrayReal sign = MathlibC::Cmov4( 1.0f, -1.0f, mChunkBase[0] > 0 );
 		ArrayVector3 xVec( sign, 0, 0 );
 
 		//yVec = y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
-		sign = MathlibC::Cmov4( 1.0f, -1.0f, m_chunkBase[1] > 0 );
+		sign = MathlibC::Cmov4( 1.0f, -1.0f, mChunkBase[1] > 0 );
 		ArrayVector3 yVec( 0, sign, 0 );
 
 		//zVec = z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
-		sign = MathlibC::Cmov4( 1.0f, -1.0f, m_chunkBase[2] > 0 );
+		sign = MathlibC::Cmov4( 1.0f, -1.0f, mChunkBase[2] > 0 );
 		ArrayVector3 zVec( 0, 0, sign );
 
 		//xVec = absx > absz ? xVec : zVec
 		ArrayMaskR mask = absx > absz;
-		xVec.m_chunkBase[0] = MathlibC::Cmov4( xVec.m_chunkBase[0], zVec.m_chunkBase[0], mask );
-		xVec.m_chunkBase[2] = MathlibC::Cmov4( xVec.m_chunkBase[2], zVec.m_chunkBase[2], mask );
+		xVec.mChunkBase[0] = MathlibC::Cmov4( xVec.mChunkBase[0], zVec.mChunkBase[0], mask );
+		xVec.mChunkBase[2] = MathlibC::Cmov4( xVec.mChunkBase[2], zVec.mChunkBase[2], mask );
 
 		//yVec = absy > absz ? yVec : zVec
 		mask = absy > absz;
-		yVec.m_chunkBase[1] = MathlibC::Cmov4( yVec.m_chunkBase[1], zVec.m_chunkBase[1], mask );
-		yVec.m_chunkBase[2] = MathlibC::Cmov4( yVec.m_chunkBase[2], zVec.m_chunkBase[2], mask );
+		yVec.mChunkBase[1] = MathlibC::Cmov4( yVec.mChunkBase[1], zVec.mChunkBase[1], mask );
+		yVec.mChunkBase[2] = MathlibC::Cmov4( yVec.mChunkBase[2], zVec.mChunkBase[2], mask );
 
 		yVec.Cmov4( absx > absy, xVec );
 		return yVec;
@@ -411,18 +411,18 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline Vector3 ArrayVector3::collapseMin( void ) const
 	{
-		return Vector3( m_chunkBase[0], m_chunkBase[1], m_chunkBase[2] );
+		return Vector3( mChunkBase[0], mChunkBase[1], mChunkBase[2] );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Vector3 ArrayVector3::collapseMax( void ) const
 	{
-		return Vector3( m_chunkBase[0], m_chunkBase[1], m_chunkBase[2] );
+		return Vector3( mChunkBase[0], mChunkBase[1], mChunkBase[2] );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::Cmov4( ArrayMaskR mask, const ArrayVector3 &replacement )
 	{
-		ArrayReal * RESTRICT_ALIAS aChunkBase = &m_chunkBase[0];
-		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.m_chunkBase[0];
+		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.mChunkBase[0];
 		aChunkBase[0] = MathlibC::Cmov4( bChunkBase[0], aChunkBase[0], mask );
 		aChunkBase[1] = MathlibC::Cmov4( bChunkBase[1], aChunkBase[1], mask );
 		aChunkBase[2] = MathlibC::Cmov4( bChunkBase[2], aChunkBase[2], mask );
@@ -430,8 +430,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::CmovRobust( ArrayMaskR mask, const ArrayVector3 &replacement )
 	{
-		ArrayReal * RESTRICT_ALIAS aChunkBase = &m_chunkBase[0];
-		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.m_chunkBase[0];
+		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.mChunkBase[0];
 		aChunkBase[0] = MathlibC::CmovRobust( bChunkBase[0], aChunkBase[0], mask );
 		aChunkBase[1] = MathlibC::CmovRobust( bChunkBase[1], aChunkBase[1], mask );
 		aChunkBase[2] = MathlibC::CmovRobust( bChunkBase[2], aChunkBase[2], mask );

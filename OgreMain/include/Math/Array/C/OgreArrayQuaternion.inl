@@ -127,19 +127,19 @@ namespace Ogre
 
 		// uv = uv * (2.0f * w)
 		ArrayReal w2 = inQ.w + inQ.w;
-		uv.m_chunkBase[0] = uv.m_chunkBase[0] * w2;
-		uv.m_chunkBase[1] = uv.m_chunkBase[1] * w2;
-		uv.m_chunkBase[2] = uv.m_chunkBase[2] * w2;
+		uv.mChunkBase[0] = uv.mChunkBase[0] * w2;
+		uv.mChunkBase[1] = uv.mChunkBase[1] * w2;
+		uv.mChunkBase[2] = uv.mChunkBase[2] * w2;
 
 		// uuv = uuv * 2.0f
-		uuv.m_chunkBase[0] = uuv.m_chunkBase[0] + uuv.m_chunkBase[0];
-		uuv.m_chunkBase[1] = uuv.m_chunkBase[1] + uuv.m_chunkBase[1];
-		uuv.m_chunkBase[2] = uuv.m_chunkBase[2] + uuv.m_chunkBase[2];
+		uuv.mChunkBase[0] = uuv.mChunkBase[0] + uuv.mChunkBase[0];
+		uuv.mChunkBase[1] = uuv.mChunkBase[1] + uuv.mChunkBase[1];
+		uuv.mChunkBase[2] = uuv.mChunkBase[2] + uuv.mChunkBase[2];
 
 		//inOutVec = v + uv + uuv
-		inOutVec.m_chunkBase[0] = inOutVec.m_chunkBase[0] + uv.m_chunkBase[0] + uuv.m_chunkBase[0];
-		inOutVec.m_chunkBase[1] = inOutVec.m_chunkBase[1] + uv.m_chunkBase[1] + uuv.m_chunkBase[1];
-		inOutVec.m_chunkBase[2] = inOutVec.m_chunkBase[2] + uv.m_chunkBase[2] + uuv.m_chunkBase[2];
+		inOutVec.mChunkBase[0] = inOutVec.mChunkBase[0] + uv.mChunkBase[0] + uuv.mChunkBase[0];
+		inOutVec.mChunkBase[1] = inOutVec.mChunkBase[1] + uv.mChunkBase[1] + uuv.mChunkBase[1];
+		inOutVec.mChunkBase[2] = inOutVec.mChunkBase[2] + uv.mChunkBase[2] + uuv.mChunkBase[2];
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
@@ -155,7 +155,7 @@ namespace Ogre
 		MathlibC::SinCos4( fHalfAngle, fSin, w );
 
 		ArrayReal * RESTRICT_ALIAS chunkBase = &w;
-		const ArrayReal * RESTRICT_ALIAS rkAxisChunkBase = rkAxis.m_chunkBase;
+		const ArrayReal * RESTRICT_ALIAS rkAxisChunkBase = rkAxis.mChunkBase;
 
 		chunkBase[1] = fSin * rkAxisChunkBase[0]; //x = fSin*rkAxis.x;
 		chunkBase[2] = fSin * rkAxisChunkBase[1]; //y = fSin*rkAxis.y;
@@ -180,11 +180,11 @@ namespace Ogre
 					acosW + acosW,
 					0, mask );
 
-		rkAxis.m_chunkBase[0] = MathlibC::Cmov4(//sqLength > 0 ? (x * fInvLength) : 1
+		rkAxis.mChunkBase[0] = MathlibC::Cmov4(//sqLength > 0 ? (x * fInvLength) : 1
 												x * fInvLength, 1.0f, mask );
-		rkAxis.m_chunkBase[1] = MathlibC::Cmov4(//sqLength > 0 ? (y * fInvLength) : 0
+		rkAxis.mChunkBase[1] = MathlibC::Cmov4(//sqLength > 0 ? (y * fInvLength) : 0
 												y * fInvLength, 0, mask );
-		rkAxis.m_chunkBase[2] = MathlibC::Cmov4(//sqLength > 0 ? (y * fInvLength) : 0
+		rkAxis.mChunkBase[2] = MathlibC::Cmov4(//sqLength > 0 ? (y * fInvLength) : 0
 												z * fInvLength, 0, mask );
 	}
 	//-----------------------------------------------------------------------------------
@@ -323,19 +323,19 @@ namespace Ogre
 
 		// uv = uv * (2.0f * w)
 		ArrayReal w2 = w + w;
-		uv.m_chunkBase[0] = uv.m_chunkBase[0] * w2;
-		uv.m_chunkBase[1] = uv.m_chunkBase[1] * w2;
-		uv.m_chunkBase[2] = uv.m_chunkBase[2] * w2;
+		uv.mChunkBase[0] = uv.mChunkBase[0] * w2;
+		uv.mChunkBase[1] = uv.mChunkBase[1] * w2;
+		uv.mChunkBase[2] = uv.mChunkBase[2] * w2;
 
 		// uuv = uuv * 2.0f
-		uuv.m_chunkBase[0] = uuv.m_chunkBase[0] + uuv.m_chunkBase[0];
-		uuv.m_chunkBase[1] = uuv.m_chunkBase[1] + uuv.m_chunkBase[1];
-		uuv.m_chunkBase[2] = uuv.m_chunkBase[2] + uuv.m_chunkBase[2];
+		uuv.mChunkBase[0] = uuv.mChunkBase[0] + uuv.mChunkBase[0];
+		uuv.mChunkBase[1] = uuv.mChunkBase[1] + uuv.mChunkBase[1];
+		uuv.mChunkBase[2] = uuv.mChunkBase[2] + uuv.mChunkBase[2];
 
 		//uv = v + uv + uuv
-		uv.m_chunkBase[0] = v.m_chunkBase[0] + uv.m_chunkBase[0] + uuv.m_chunkBase[0];
-		uv.m_chunkBase[1] = v.m_chunkBase[1] + uv.m_chunkBase[1] + uuv.m_chunkBase[1];
-		uv.m_chunkBase[2] = v.m_chunkBase[2] + uv.m_chunkBase[2] + uuv.m_chunkBase[2];
+		uv.mChunkBase[0] = v.mChunkBase[0] + uv.mChunkBase[0] + uuv.mChunkBase[0];
+		uv.mChunkBase[1] = v.mChunkBase[1] + uv.mChunkBase[1] + uuv.mChunkBase[1];
+		uv.mChunkBase[2] = v.mChunkBase[2] + uv.mChunkBase[2] + uuv.mChunkBase[2];
 
 		return uv;
 	}

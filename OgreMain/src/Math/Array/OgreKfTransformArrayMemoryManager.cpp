@@ -58,8 +58,8 @@ namespace Ogre
 		const size_t nextSlotBase		= nextSlot - nextSlotIdx;
 
 		//Set memory ptrs
-		*outTransform = reinterpret_cast<KfTransform*>( m_memoryPools[KfTransformType] +
-													nextSlotBase * m_elementsMemSizes[KfTransformType] );
+		*outTransform = reinterpret_cast<KfTransform*>( mMemoryPools[KfTransformType] +
+													nextSlotBase * mElementsMemSizes[KfTransformType] );
 
 		//Set default values
 		(*outTransform)->mPosition		= ArrayVector3::ZERO;

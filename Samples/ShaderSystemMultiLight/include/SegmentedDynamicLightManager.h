@@ -115,7 +115,7 @@ private:
 	bool initTexture();
 	//Arrange the lights in the different lists
 	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightList& i_LightList);
-	//Repopulate the m_ActiveLights list which keeps track of all lights being rendered in the frame
+	//Repopulate the mActiveLights list which keeps track of all lights being rendered in the frame
 	void regenerateActiveLightList(const LightList& i_LightList);
 	//Calculate the bounds of a single light
 	void calculateLightBounds(const Light* i_Light, LightData &o_LightData);

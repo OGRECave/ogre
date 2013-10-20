@@ -54,7 +54,7 @@ namespace Ogre
 			time (the actual amount is defined by ARRAY_PACKED_REALS)
 			Assuming ARRAY_PACKED_REALS == 4, the memory layout will
 			be as following:
-               m_chunkBase			  m_chunkBase + 4
+               mChunkBase			  mChunkBase + 4
 			WWWW XXXX YYYY ZZZZ		WWWW XXXX YYYY ZZZZ
 			Extracting one quat (XYZW) needs 64 bytes, which is within
 			the 64 byte size of common cache lines.
@@ -65,22 +65,22 @@ namespace Ogre
     class _OgreExport ArrayQuaternion
     {
     public:
-		ArrayReal		m_chunkBase[4];
+		ArrayReal		mChunkBase[4];
 
 		ArrayQuaternion() {}
 		ArrayQuaternion( const ArrayReal &chunkW, const ArrayReal &chunkX,
 								const ArrayReal &chunkY, const ArrayReal &chunkZ )
 		{
-			m_chunkBase[0] = chunkW;
-			m_chunkBase[1] = chunkX;
-			m_chunkBase[2] = chunkY;
-			m_chunkBase[3] = chunkZ;
+			mChunkBase[0] = chunkW;
+			mChunkBase[1] = chunkX;
+			mChunkBase[2] = chunkY;
+			mChunkBase[3] = chunkZ;
 		}
 
 		void getAsQuaternion( Quaternion &out, size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedReal = reinterpret_cast<const Real*>( m_chunkBase );
+			const Real *aliasedReal = reinterpret_cast<const Real*>( mChunkBase );
 			out.w = aliasedReal[ARRAY_PACKED_REALS * 0 + index];		//W
 			out.x = aliasedReal[ARRAY_PACKED_REALS * 1 + index];		//X
 			out.y = aliasedReal[ARRAY_PACKED_REALS * 2 + index];		//Y
@@ -92,7 +92,7 @@ namespace Ogre
 		Quaternion getAsQuaternion( size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedReal = reinterpret_cast<const Real*>( m_chunkBase );
+			const Real *aliasedReal = reinterpret_cast<const Real*>( mChunkBase );
 			return Quaternion( aliasedReal[ARRAY_PACKED_REALS * 0 + index],	//W
 							aliasedReal[ARRAY_PACKED_REALS * 1 + index],		//X
 							aliasedReal[ARRAY_PACKED_REALS * 2 + index],		//Y
@@ -101,7 +101,7 @@ namespace Ogre
 
 		void setFromQuaternion( const Quaternion &v, size_t index )
 		{
-			Real *aliasedReal = reinterpret_cast<Real*>( m_chunkBase );
+			Real *aliasedReal = reinterpret_cast<Real*>( mChunkBase );
 			aliasedReal[ARRAY_PACKED_REALS * 0 + index] = v.w;
 			aliasedReal[ARRAY_PACKED_REALS * 1 + index] = v.x;
 			aliasedReal[ARRAY_PACKED_REALS * 2 + index] = v.y;

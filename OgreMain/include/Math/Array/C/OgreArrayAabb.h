@@ -69,24 +69,24 @@ namespace Ogre
     class _OgreExport ArrayAabb
     {
 	public:
-		ArrayVector3	m_center;
-		ArrayVector3	m_halfSize;
+		ArrayVector3	mCenter;
+		ArrayVector3	mHalfSize;
 
 		ArrayAabb( const ArrayVector3 &center, const ArrayVector3 &halfSize ) :
-				m_center( center ), m_halfSize( halfSize )
+				mCenter( center ), mHalfSize( halfSize )
 		{
 		}
 
 		void getAsAabb( Aabb &out, size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedReal = reinterpret_cast<const Real*>( &m_center );
-			out.m_center.x = aliasedReal[ARRAY_PACKED_REALS * 0 + index];		//X
-			out.m_center.y = aliasedReal[ARRAY_PACKED_REALS * 1 + index];		//Y
-			out.m_center.z = aliasedReal[ARRAY_PACKED_REALS * 2 + index];		//Z
-			out.m_halfSize.x = aliasedReal[ARRAY_PACKED_REALS * 3 + index];		//X
-			out.m_halfSize.y = aliasedReal[ARRAY_PACKED_REALS * 4 + index];		//Y
-			out.m_halfSize.z = aliasedReal[ARRAY_PACKED_REALS * 5 + index];		//Z
+			const Real *aliasedReal = reinterpret_cast<const Real*>( &mCenter );
+			out.mCenter.x = aliasedReal[ARRAY_PACKED_REALS * 0 + index];		//X
+			out.mCenter.y = aliasedReal[ARRAY_PACKED_REALS * 1 + index];		//Y
+			out.mCenter.z = aliasedReal[ARRAY_PACKED_REALS * 2 + index];		//Z
+			out.mHalfSize.x = aliasedReal[ARRAY_PACKED_REALS * 3 + index];		//X
+			out.mHalfSize.y = aliasedReal[ARRAY_PACKED_REALS * 4 + index];		//Y
+			out.mHalfSize.z = aliasedReal[ARRAY_PACKED_REALS * 5 + index];		//Z
 		}
 
 		/// Prefer using @see getAsAabb() because this function may have more
@@ -100,13 +100,13 @@ namespace Ogre
 
 		void setFromAabb( const Aabb &aabb, size_t index )
 		{
-			Real *aliasedReal = reinterpret_cast<Real*>( &m_center );
-			aliasedReal[ARRAY_PACKED_REALS * 0 + index] = aabb.m_center.x;		//X
-			aliasedReal[ARRAY_PACKED_REALS * 1 + index] = aabb.m_center.y;		//Y
-			aliasedReal[ARRAY_PACKED_REALS * 2 + index] = aabb.m_center.z;		//Z
-			aliasedReal[ARRAY_PACKED_REALS * 3 + index] = aabb.m_halfSize.x;		//X
-			aliasedReal[ARRAY_PACKED_REALS * 4 + index] = aabb.m_halfSize.y;		//Y
-			aliasedReal[ARRAY_PACKED_REALS * 5 + index] = aabb.m_halfSize.z;		//Z
+			Real *aliasedReal = reinterpret_cast<Real*>( &mCenter );
+			aliasedReal[ARRAY_PACKED_REALS * 0 + index] = aabb.mCenter.x;		//X
+			aliasedReal[ARRAY_PACKED_REALS * 1 + index] = aabb.mCenter.y;		//Y
+			aliasedReal[ARRAY_PACKED_REALS * 2 + index] = aabb.mCenter.z;		//Z
+			aliasedReal[ARRAY_PACKED_REALS * 3 + index] = aabb.mHalfSize.x;		//X
+			aliasedReal[ARRAY_PACKED_REALS * 4 + index] = aabb.mHalfSize.y;		//Y
+			aliasedReal[ARRAY_PACKED_REALS * 5 + index] = aabb.mHalfSize.z;		//Z
 		}
 
 		/// Gets the minimum corner of the box.

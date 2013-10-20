@@ -64,54 +64,54 @@ namespace Ogre
 	*/
 	template <typename T> class FastArray
 	{
-		T			*m_data;
-		size_t		m_size;
-		size_t		m_capacity;
+		T			*mData;
+		size_t		mSize;
+		size_t		mCapacity;
 
 		/** Checks whether we'll be at full capacity after adding N new elements, if so,
 			increase the array size by 50%
 		@remarks
 			Doesn't do anything if available capacity is enough to contain the new elements
-			Won't modify m_size, only m_capacity
+			Won't modify mSize, only mCapacity
 		@param newElements
 			Amount of new elements to push to the array
 		*/
 		void growToFit( size_t newElements )
 		{
-			if( m_size + newElements > m_capacity )
+			if( mSize + newElements > mCapacity )
 			{
-				m_capacity = std::max( m_size + newElements, m_capacity + (m_capacity >> 1) + 1 );
-				T *data = (T*)::operator new( m_capacity * sizeof(T) );
-				memcpy( data, m_data, m_size * sizeof(T) );
-				::operator delete( m_data );
-				m_data = data;
+				mCapacity = std::max( mSize + newElements, mCapacity + (mCapacity >> 1) + 1 );
+				T *data = (T*)::operator new( mCapacity * sizeof(T) );
+				memcpy( data, mData, mSize * sizeof(T) );
+				::operator delete( mData );
+				mData = data;
 			}
 		}
 
 	public:
 		FastArray() :
-			m_data( 0 ),
-			m_size( 0 ),
-			m_capacity( 0 )
+			mData( 0 ),
+			mSize( 0 ),
+			mCapacity( 0 )
 		{
 		}
 
 		void swap( FastArray<T> &other )
 		{
-			std::swap( this->m_data, other.m_data );
-			std::swap( this->m_size, other.m_size );
-			std::swap( this->m_capacity, other.m_capacity );
+			std::swap( this->mData, other.mData );
+			std::swap( this->mSize, other.mSize );
+			std::swap( this->mCapacity, other.mCapacity );
 		}
 
 		FastArray( const FastArray<T> &copy ) :
-				m_size( copy.m_size ),
-				m_capacity( copy.m_size )
+				mSize( copy.mSize ),
+				mCapacity( copy.mSize )
 		{
-			m_data = (T*)::operator new( m_size * sizeof(T) );
-			for( size_t i=0; i<m_size; ++i )
+			mData = (T*)::operator new( mSize * sizeof(T) );
+			for( size_t i=0; i<mSize; ++i )
 			{
-				new (&m_data[i]) T();
-				m_data[i] = copy.m_data[i];
+				new (&mData[i]) T();
+				mData[i] = copy.mData[i];
 			}
 		}
 
@@ -119,148 +119,148 @@ namespace Ogre
 		{
 			if( &copy != this )
 			{
-				for( size_t i=0; i<m_size; ++i )
-					m_data[i].~T();
-				::operator delete( m_data );
+				for( size_t i=0; i<mSize; ++i )
+					mData[i].~T();
+				::operator delete( mData );
 
-				m_size		= copy.m_size;
-				m_capacity	= copy.m_size;
+				mSize		= copy.mSize;
+				mCapacity	= copy.mSize;
 
-				m_data = (T*)::operator new( m_size * sizeof(T) );
-				for( size_t i=0; i<m_size; ++i )
+				mData = (T*)::operator new( mSize * sizeof(T) );
+				for( size_t i=0; i<mSize; ++i )
 				{
-					new (&m_data[i]) T();
-					m_data[i] = copy.m_data[i];
+					new (&mData[i]) T();
+					mData[i] = copy.mData[i];
 				}
 			}
 		}
 
 		/// Creates an array reserving the amount of elements (memory is not initialized)
 		FastArray( size_t reserveAmount ) :
-			m_size( 0 ),
-			m_capacity( reserveAmount )
+			mSize( 0 ),
+			mCapacity( reserveAmount )
 		{
-			m_data = (T*)::operator new( reserveAmount * sizeof(T) );
+			mData = (T*)::operator new( reserveAmount * sizeof(T) );
 		}
 
 		/// Creates an array pushing the value N times
 		FastArray( size_t count, const T &value ) :
-			m_size( count ),
-			m_capacity( count )
+			mSize( count ),
+			mCapacity( count )
 		{
-			m_data = (T*)::operator new( count * sizeof(T) );
+			mData = (T*)::operator new( count * sizeof(T) );
 			for( size_t i=0; i<count; ++i )
 			{
-				new (&m_data[i]) T();
-				m_data[i] = value;
+				new (&mData[i]) T();
+				mData[i] = value;
 			}
 		}
 
 		~FastArray()
 		{
-			for( size_t i=0; i<m_size; ++i )
-				m_data[i].~T();
-			::operator delete( m_data );
+			for( size_t i=0; i<mSize; ++i )
+				mData[i].~T();
+			::operator delete( mData );
 		}
 
-		size_t size() const						{ return m_size; }
-		size_t capacity() const					{ return m_capacity; }
+		size_t size() const						{ return mSize; }
+		size_t capacity() const					{ return mCapacity; }
 
 		void push_back( const T& val )
 		{
 			growToFit( 1 );
-			new (&m_data[m_size]) T();
-			m_data[m_size] = val;
-			++m_size;
+			new (&mData[mSize]) T();
+			mData[mSize] = val;
+			++mSize;
 		}
 
 		void pop_back()
 		{
-			assert( m_size > 0 && "Can't pop a zero-sized array" );
-			--m_size;
+			assert( mSize > 0 && "Can't pop a zero-sized array" );
+			--mSize;
 		}
 
 		void clear()
 		{
-			for( size_t i=0; i<m_size; ++i )
-				m_data[i].~T();
-			m_size = 0;
+			for( size_t i=0; i<mSize; ++i )
+				mData[i].~T();
+			mSize = 0;
 		}
 
-		bool empty() const						{ return m_size == 0; }
+		bool empty() const						{ return mSize == 0; }
 
 		void reserve( size_t reserveAmount )
 		{
-			if( reserveAmount > m_capacity )
+			if( reserveAmount > mCapacity )
 			{
 				//We don't use growToFit because it will try to increase capacity by 50%,
 				//which is not the desire when calling reserve() explicitly
-				m_capacity = reserveAmount;
-				T *data = (T*)::operator new( m_capacity * sizeof(T) );
-				memcpy( data, m_data, m_size * sizeof(T) );
-				::operator delete( m_data );
-				m_data = data;
+				mCapacity = reserveAmount;
+				T *data = (T*)::operator new( mCapacity * sizeof(T) );
+				memcpy( data, mData, mSize * sizeof(T) );
+				::operator delete( mData );
+				mData = data;
 			}
 		}
 
 		void resize( size_t newSize, const T &value=T() )
 		{
-			if( newSize > m_size )
+			if( newSize > mSize )
 			{
-				growToFit( newSize - m_size );
-				for( size_t i=m_size; i<newSize; ++i )
+				growToFit( newSize - mSize );
+				for( size_t i=mSize; i<newSize; ++i )
 				{
-					new (&m_data[i]) T();
-					m_data[i] = value;
+					new (&mData[i]) T();
+					mData[i] = value;
 				}
 			}
 
-			m_size = newSize;
+			mSize = newSize;
 		}
 
 		T& operator [] ( size_t idx )
         {
-			assert( idx < m_size && "Index out of bounds" );
-            return m_data[idx];
+			assert( idx < mSize && "Index out of bounds" );
+            return mData[idx];
         }
 
 		const T& operator [] ( size_t idx ) const
         {
-			assert( idx < m_size && "Index out of bounds" );
-            return m_data[idx];
+			assert( idx < mSize && "Index out of bounds" );
+            return mData[idx];
         }
 
 		T& back()
 		{
-			assert( m_size > 0 && "Can't call back with no elements" );
-			return m_data[m_size-1];
+			assert( mSize > 0 && "Can't call back with no elements" );
+			return mData[mSize-1];
 		}
 
 		const T& back() const
 		{
-			assert( m_size > 0 && "Can't call back with no elements" );
-			return m_data[m_size-1];
+			assert( mSize > 0 && "Can't call back with no elements" );
+			return mData[mSize-1];
 		}
 
 		T& front()
 		{
-			assert( m_size > 0 && "Can't call front with no elements" );
-			return m_data[0];
+			assert( mSize > 0 && "Can't call front with no elements" );
+			return mData[0];
 		}
 
 		const T& front() const
 		{
-			assert( m_size > 0 && "Can't call front with no elements" );
-			return m_data[0];
+			assert( mSize > 0 && "Can't call front with no elements" );
+			return mData[0];
 		}
 
 		typedef T* iterator;
 		typedef const T* const_iterator;
 
-		iterator begin()						{ return m_data; }
-		const_iterator begin() const			{ return m_data; }
-		iterator end()							{ return m_data + m_size; }
-		const_iterator end() const				{ return m_data + m_size; }
+		iterator begin()						{ return mData; }
+		const_iterator begin() const			{ return mData; }
+		iterator end()							{ return mData + mSize; }
+		const_iterator end() const				{ return mData + mSize; }
 	};
 }
 

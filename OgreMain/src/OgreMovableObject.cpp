@@ -472,32 +472,32 @@ namespace Ogre {
 			ArrayReal dotResult;
 			ArrayMaskR mask;
 			ArrayVector3 centerPlusFlippedHS;
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[0].signFlip;
 			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[1].signFlip;
 			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[2].signFlip;
 			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[3].signFlip;
 			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[4].signFlip;
 			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[5].signFlip;
 			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
@@ -505,9 +505,9 @@ namespace Ogre {
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
 			ArrayMaskR tmpMask = Mathlib::Or(
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
-			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
 			//isVisible = isVisible() && (isCaster || includeNonCasters)
@@ -530,11 +530,11 @@ namespace Ogre {
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
 			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
 			vMinBounds.CmovRobust( receiverMask, newVal );
 
 			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
 			vMaxBounds.CmovRobust( receiverMask, newVal );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
@@ -613,32 +613,32 @@ namespace Ogre {
 			ArrayReal dotResult;
 			ArrayMaskR mask;
 			ArrayVector3 centerPlusFlippedHS;
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[0].signFlip;
 			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[1].signFlip;
 			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[2].signFlip;
 			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[3].signFlip;
 			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[4].signFlip;
 			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
 
-			centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																 planes[5].signFlip;
 			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
 			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
@@ -646,9 +646,9 @@ namespace Ogre {
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
 			ArrayMaskR tmpMask = Mathlib::Or(
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) );
-			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
 			//No need to check for casters as in cullFrustum. See function documentation
@@ -668,11 +668,11 @@ namespace Ogre {
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
 			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
 			vMinBounds.CmovRobust( receiverMask, newVal );
 
 			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
 			vMaxBounds.CmovRobust( receiverMask, newVal );
 
 			objData.advanceFrustumPack();
@@ -743,36 +743,36 @@ namespace Ogre {
 				//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 				ArrayReal dotResult;
 				ArrayVector3 centerPlusFlippedHS;
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	planes[j].planes[0].signFlip;
 				dotResult = planes[j].planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::CompareGreater( dotResult, planes[j].planes[0].planeNegD );
 
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	 planes[j].planes[1].signFlip;
 				dotResult = planes[j].planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[1].planeNegD ) );
 
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	 planes[j].planes[2].signFlip;
 				dotResult = planes[j].planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[2].planeNegD ) );
 
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	 planes[j].planes[3].signFlip;
 				dotResult = planes[j].planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[3].planeNegD ) );
 
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	 planes[j].planes[4].signFlip;
 				dotResult = planes[j].planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[4].planeNegD ) );
 
-				centerPlusFlippedHS = objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize *
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
 																	 planes[j].planes[5].signFlip;
 				dotResult = planes[j].planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
@@ -785,9 +785,9 @@ namespace Ogre {
 			//Always pass the test if any of the components were
 			//Infinity (dot product above could've caused nans)
 			ArrayMaskR tmpMask = Mathlib::Or( Mathlib::Or(
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ) );
 			mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
 
 			//Use the light mask to discard null mOwner ptrs
@@ -806,7 +806,7 @@ namespace Ogre {
 					const size_t idx = outGlobalLightList.lights.size();
 					outGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
 					outGlobalLightList.boundingSphere[idx] = Sphere(
-														objData.mWorldAabb->m_center.getAsVector3( j ),
+														objData.mWorldAabb->mCenter.getAsVector3( j ),
 														objData.mWorldRadius[j] );
 					assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
 					outGlobalLightList.lights.push_back( static_cast<Light*>( objData.mOwner[j] ) );
@@ -830,7 +830,7 @@ namespace Ogre {
 		{
 			ArrayReal * RESTRICT_ALIAS arrayRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
 																		(objData.mWorldRadius);
-			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->m_center );
+			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->mCenter );
 
 			const ArrayInt * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																				(objData.mLightMask);
@@ -849,8 +849,8 @@ namespace Ogre {
 
 				//Check if it intersects
 				ArrayMaskI rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
-				ArrayReal distSimd = objSphere.m_center.distance( lightSphere.m_center ) -
-										lightSphere.m_radius;
+				ArrayReal distSimd = objSphere.mCenter.distance( lightSphere.mCenter ) -
+										lightSphere.mRadius;
 				CastArrayToReal( distance, distSimd );
 
 				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
@@ -901,13 +901,13 @@ namespace Ogre {
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 
-			objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize;
+			objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize;
 
 			//Ignore casters with infinite boxes
 			ArrayMaskR infMask = Mathlib::Or( Mathlib::Or(
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[0] ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[1] ) ),
-							Mathlib::isInfinity( objData.mWorldAabb->m_halfSize.m_chunkBase[2] ) );
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ) );
 
 			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
@@ -924,11 +924,11 @@ namespace Ogre {
 			//Merge with bounds only if they're visible. We first merge, then CMov its older
 			//value if the object isn't visible. Also do the same with the receiver-only aabb
 			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
 			vMinBounds.CmovRobust( casterMask, newVal );
 
 			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
 			vMaxBounds.CmovRobust( casterMask, newVal );
 
 			objData.advanceFrustumPack();
