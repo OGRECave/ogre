@@ -77,22 +77,22 @@ namespace Ogre
 
     struct _OgreExport Aabb
     {
-		Ogre::Vector3		m_center;
-		Ogre::Vector3		m_halfSize;
+		Ogre::Vector3		mCenter;
+		Ogre::Vector3		mHalfSize;
 
 		Aabb() :
-			m_center( Vector3::ZERO ),
-			m_halfSize( Vector3::ZERO )
+			mCenter( Vector3::ZERO ),
+			mHalfSize( Vector3::ZERO )
 		{
 		}
 		/*Aabb( const AxisAlignedBox &aab ) :
-					m_center( aab.getCenter() ),
+					mCenter( aab.getCenter() ),
 					m_index( aab.getHalfSize() )
 		{
 		}*/
 		Aabb( const Vector3 &center, const Vector3 &halfSize ) :
-					m_center( center ),
-					m_halfSize( halfSize )
+					mCenter( center ),
+					mHalfSize( halfSize )
 		{
 		}
 
@@ -150,7 +150,7 @@ namespace Ogre
 		/// Returns the minimum distance between a given point and any part of the box.
 		inline Real distance( const Vector3 &v ) const;
 
-		/// Returns the radius of a sphere enclosing the aabb from the outside at center m_center
+		/// Returns the radius of a sphere enclosing the aabb from the outside at center mCenter
 		inline Real getRadius() const;
 
 		/// Returns the radius of a sphere enclosing the aabb from origin as center

@@ -32,8 +32,8 @@ namespace Ogre
 	{
 		assert( (min.x <= max.x && min.y <= max.y && min.z <= max.z) &&
                 "The minimum corner of the box must be less than or equal to maximum corner" );
-		m_center	= (max + min) * 0.5f;
-		m_halfSize	= (max - min) * 0.5f;
+		mCenter	= (max + min) * 0.5f;
+		mHalfSize	= (max - min) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline Aabb Aabb::newFromExtents( const Vector3& min, const Vector3& max )
@@ -41,59 +41,59 @@ namespace Ogre
 		assert( (min.x <= max.x && min.y <= max.y && min.z <= max.z) &&
                 "The minimum corner of the box must be less than or equal to maximum corner" );
 		Aabb retVal;
-		retVal.m_center		= (max + min) * 0.5f;
-		retVal.m_halfSize	= (max - min) * 0.5f;
+		retVal.mCenter		= (max + min) * 0.5f;
+		retVal.mHalfSize	= (max - min) * 0.5f;
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
 	inline Vector3 Aabb::getMinimum() const
 	{
-		return m_center - m_halfSize;
+		return mCenter - mHalfSize;
 	}
 	//-----------------------------------------------------------------------------------
 	inline Vector3 Aabb::getMaximum() const
 	{
-		return m_center + m_halfSize;
+		return mCenter + mHalfSize;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void Aabb::merge( const Aabb& rhs )
 	{
-		Vector3 max( m_center + m_halfSize );
-		max.makeCeil( rhs.m_center + rhs.m_halfSize );
+		Vector3 max( mCenter + mHalfSize );
+		max.makeCeil( rhs.mCenter + rhs.mHalfSize );
 
-		Vector3 min( m_center - m_halfSize );
-		min.makeFloor( rhs.m_center - rhs.m_halfSize );
+		Vector3 min( mCenter - mHalfSize );
+		min.makeFloor( rhs.mCenter - rhs.mHalfSize );
 
 		if( max.x != std::numeric_limits<float>::infinity() &&
 			max.y != std::numeric_limits<float>::infinity() &&
 			max.z != std::numeric_limits<float>::infinity() )
 		{
-			m_center	= ( max + min ) * 0.5f;
+			mCenter	= ( max + min ) * 0.5f;
 		}
-		m_halfSize	= ( max - min ) * 0.5f;
+		mHalfSize	= ( max - min ) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void Aabb::merge( const Vector3& points )
 	{
-		Vector3 max( m_center + m_halfSize );
+		Vector3 max( mCenter + mHalfSize );
 		max.makeCeil( points );
 
-		Vector3 min( m_center - m_halfSize );
+		Vector3 min( mCenter - mHalfSize );
 		min.makeFloor( points );
 
 		if( max.x != std::numeric_limits<float>::infinity() &&
 			max.y != std::numeric_limits<float>::infinity() &&
 			max.z != std::numeric_limits<float>::infinity() )
 		{
-			m_center	= ( max + min ) * 0.5f;
+			mCenter	= ( max + min ) * 0.5f;
 		}
-		m_halfSize	= ( max - min ) * 0.5f;
+		mHalfSize	= ( max - min ) * 0.5f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::intersects( const Aabb& b2 ) const
 	{
-		Vector3 distance( m_center - b2.m_center );
-		Vector3 sumHalfSizes( m_halfSize + b2.m_halfSize );
+		Vector3 distance( mCenter - b2.mCenter );
+		Vector3 sumHalfSizes( mHalfSize + b2.mHalfSize );
 
 		// ( abs( center.x - center2.x ) <= halfSize.x + halfSize2.x &&
 		//   abs( center.y - center2.y ) <= halfSize.y + halfSize2.y &&
@@ -106,49 +106,49 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::volume(void) const
 	{
-		const Vector3 size = m_halfSize * 2.0f;
+		const Vector3 size = mHalfSize * 2.0f;
 		return size.x * size.y * size.z; // w * h * d
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::contains( const Aabb &other ) const
 	{
-		Vector3 distance( m_center - other.m_center );
+		Vector3 distance( mCenter - other.mCenter );
 
-		// In theory, "abs( distance.x ) < m_halfSize - other.m_halfSize" should be more pipeline-
+		// In theory, "abs( distance.x ) < mHalfSize - other.mHalfSize" should be more pipeline-
 		// friendly because the processor can do the subtraction while the abs() is being performed,
 		// however that variation won't handle the case where both boxes are infinite (will produce
 		// nan instead and return false, when it should return true)
 
 		//TODO: Profile whether '&&' or '&' is faster. Probably varies per architecture.
-		return ( Math::Abs( distance.x ) + other.m_halfSize.x <= m_halfSize.x ) &
-				( Math::Abs( distance.y ) + other.m_halfSize.y <= m_halfSize.y ) &
-				( Math::Abs( distance.z ) + other.m_halfSize.z <= m_halfSize.z );
+		return ( Math::Abs( distance.x ) + other.mHalfSize.x <= mHalfSize.x ) &
+				( Math::Abs( distance.y ) + other.mHalfSize.y <= mHalfSize.y ) &
+				( Math::Abs( distance.z ) + other.mHalfSize.z <= mHalfSize.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::contains( const Vector3 &v ) const
 	{
-		Vector3 distance( m_center - v );
+		Vector3 distance( mCenter - v );
 
-		// ( abs( distance.x ) <= m_halfSize.x &&
-		//   abs( distance.y ) <= m_halfSize.y &&
-		//   abs( distance.z ) <= m_halfSize.z )
-		return ( Math::Abs( distance.x ) <= m_halfSize.x ) &
-				( Math::Abs( distance.y ) <= m_halfSize.y ) &
-				( Math::Abs( distance.z ) <= m_halfSize.z );
+		// ( abs( distance.x ) <= mHalfSize.x &&
+		//   abs( distance.y ) <= mHalfSize.y &&
+		//   abs( distance.z ) <= mHalfSize.z )
+		return ( Math::Abs( distance.x ) <= mHalfSize.x ) &
+				( Math::Abs( distance.y ) <= mHalfSize.y ) &
+				( Math::Abs( distance.z ) <= mHalfSize.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::distance( const Vector3 &v ) const
 	{
-		Vector3 distance( m_center - v );
+		Vector3 distance( mCenter - v );
 
 		// x = abs( distance.x ) - halfSize.x
 		// y = abs( distance.y ) - halfSize.y
 		// z = abs( distance.z ) - halfSize.z
 		// return max( min( x, y, z ), 0 ); //Return minimum between xyz, clamp to zero
 
-		distance.x = Math::Abs( distance.x ) - m_halfSize.x;
-		distance.y = Math::Abs( distance.y ) - m_halfSize.y;
-		distance.z = Math::Abs( distance.z ) - m_halfSize.z;
+		distance.x = Math::Abs( distance.x ) - mHalfSize.x;
+		distance.y = Math::Abs( distance.y ) - mHalfSize.y;
+		distance.z = Math::Abs( distance.z ) - mHalfSize.z;
 
 		return std::max( std::min( std::min( distance.x, distance.y ), distance.z ), 1.0f );
 	}
@@ -157,24 +157,24 @@ namespace Ogre
 	{
 		assert( m.isAffine() );
 
-		m_center = m.transformAffine( m_center );
+		mCenter = m.transformAffine( mCenter );
 
-		m_halfSize = Vector3(
-				Math::Abs(m[0][0]) * m_halfSize.x + Math::Abs(m[0][1]) * m_halfSize.y + Math::Abs(m[0][2]) * m_halfSize.z, 
-				Math::Abs(m[1][0]) * m_halfSize.x + Math::Abs(m[1][1]) * m_halfSize.y + Math::Abs(m[1][2]) * m_halfSize.z,
-				Math::Abs(m[2][0]) * m_halfSize.x + Math::Abs(m[2][1]) * m_halfSize.y + Math::Abs(m[2][2]) * m_halfSize.z );
+		mHalfSize = Vector3(
+				Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z, 
+				Math::Abs(m[1][0]) * mHalfSize.x + Math::Abs(m[1][1]) * mHalfSize.y + Math::Abs(m[1][2]) * mHalfSize.z,
+				Math::Abs(m[2][0]) * mHalfSize.x + Math::Abs(m[2][1]) * mHalfSize.y + Math::Abs(m[2][2]) * mHalfSize.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::getRadius() const
 	{
-		return sqrtf( m_halfSize.dotProduct( m_halfSize ) );
+		return sqrtf( mHalfSize.dotProduct( mHalfSize ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::getRadiusOrigin() const
 	{
-		Vector3 v( m_center );
+		Vector3 v( mCenter );
 		v.makeAbs();
-		v += m_halfSize;			
+		v += mHalfSize;			
 		return v.length();
 	}
 }

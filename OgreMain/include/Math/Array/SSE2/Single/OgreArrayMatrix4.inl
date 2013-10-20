@@ -340,56 +340,56 @@ namespace Ogre
 	inline ArrayMatrix4 operator * ( const ArrayMatrix4 &lhs, const ArrayMatrix4 &rhs )
 	{
 		ArrayMatrix4 retVal;
-		concatArrayMat4( retVal.m_chunkBase, lhs.m_chunkBase, rhs.m_chunkBase );
+		concatArrayMat4( retVal.mChunkBase, lhs.mChunkBase, rhs.mChunkBase );
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayMatrix4::operator * ( const ArrayVector3 &rhs ) const
 	{
 		ArrayReal invW = _mm_add_ps( _mm_add_ps(
-								_mm_mul_ps( m_chunkBase[12], rhs.m_chunkBase[0] ),
-								_mm_mul_ps( m_chunkBase[13], rhs.m_chunkBase[1] ) ),
+								_mm_mul_ps( mChunkBase[12], rhs.mChunkBase[0] ),
+								_mm_mul_ps( mChunkBase[13], rhs.mChunkBase[1] ) ),
 							_mm_add_ps(
-								_mm_mul_ps( m_chunkBase[14], rhs.m_chunkBase[2] ),
-								m_chunkBase[15] ) );
+								_mm_mul_ps( mChunkBase[14], rhs.mChunkBase[2] ),
+								mChunkBase[15] ) );
 		invW = MathlibSSE2::Inv4( invW );
 
 		return ArrayVector3(
 			//X
 			_mm_mul_ps(
 			_mm_add_ps( _mm_add_ps(
-				_mm_mul_ps( m_chunkBase[0], rhs.m_chunkBase[0] ),	//( m00 * v.x   +
-				_mm_mul_ps( m_chunkBase[1], rhs.m_chunkBase[1] ) ),	//  m01 * v.y ) +
+				_mm_mul_ps( mChunkBase[0], rhs.mChunkBase[0] ),	//( m00 * v.x   +
+				_mm_mul_ps( mChunkBase[1], rhs.mChunkBase[1] ) ),	//  m01 * v.y ) +
 			_mm_add_ps(
-				_mm_mul_ps( m_chunkBase[2], rhs.m_chunkBase[2] ),	//( m02 * v.z   +
-				m_chunkBase[3] ) ) , invW ),						//  m03 ) * fInvW
+				_mm_mul_ps( mChunkBase[2], rhs.mChunkBase[2] ),	//( m02 * v.z   +
+				mChunkBase[3] ) ) , invW ),						//  m03 ) * fInvW
 			//Y
 			_mm_mul_ps(
 			_mm_add_ps( _mm_add_ps(
-				_mm_mul_ps( m_chunkBase[4], rhs.m_chunkBase[0] ),	//( m10 * v.x   +
-				_mm_mul_ps( m_chunkBase[5], rhs.m_chunkBase[1] ) ),	//  m11 * v.y ) +
+				_mm_mul_ps( mChunkBase[4], rhs.mChunkBase[0] ),	//( m10 * v.x   +
+				_mm_mul_ps( mChunkBase[5], rhs.mChunkBase[1] ) ),	//  m11 * v.y ) +
 			_mm_add_ps(
-				_mm_mul_ps( m_chunkBase[6], rhs.m_chunkBase[2] ),	//( m12 * v.z   +
-				m_chunkBase[7] ) ), invW ),							//  m13 ) * fInvW
+				_mm_mul_ps( mChunkBase[6], rhs.mChunkBase[2] ),	//( m12 * v.z   +
+				mChunkBase[7] ) ), invW ),							//  m13 ) * fInvW
 			//Z
 			_mm_mul_ps(
 			_mm_add_ps( _mm_add_ps(
-				_mm_mul_ps( m_chunkBase[8], rhs.m_chunkBase[0] ),	//( m20 * v.x   +
-				_mm_mul_ps( m_chunkBase[9], rhs.m_chunkBase[1] ) ),	//  m21 * v.y ) +
+				_mm_mul_ps( mChunkBase[8], rhs.mChunkBase[0] ),	//( m20 * v.x   +
+				_mm_mul_ps( mChunkBase[9], rhs.mChunkBase[1] ) ),	//  m21 * v.y ) +
 			_mm_add_ps(
-				_mm_mul_ps( m_chunkBase[10], rhs.m_chunkBase[2] ),	//( m22 * v.z   +
-				m_chunkBase[11] ) ), invW ) );						//  m23 ) * fInvW
+				_mm_mul_ps( mChunkBase[10], rhs.mChunkBase[2] ),	//( m22 * v.z   +
+				mChunkBase[11] ) ), invW ) );						//  m23 ) * fInvW
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::operator *= ( const ArrayMatrix4 &rhs )
 	{
-		concatArrayMat4( m_chunkBase, rhs.m_chunkBase );
+		concatArrayMat4( mChunkBase, rhs.mChunkBase );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::fromQuaternion( const ArrayQuaternion &q )
 	{
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS qChunkBase = q.m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS qChunkBase = q.mChunkBase;
 		ArrayReal fTx  = _mm_add_ps( qChunkBase[1], qChunkBase[1] );		// 2 * x
 		ArrayReal fTy  = _mm_add_ps( qChunkBase[2], qChunkBase[2] );		// 2 * y
 		ArrayReal fTz  = _mm_add_ps( qChunkBase[3], qChunkBase[3] );		// 2 * z
@@ -417,9 +417,9 @@ namespace Ogre
 	inline void ArrayMatrix4::makeTransform( const ArrayVector3 &position, const ArrayVector3 &scale,
 											 const ArrayQuaternion &orientation )
 	{
-		ArrayReal * RESTRICT_ALIAS chunkBase			= m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS posChunkBase	= position.m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS scaleChunkBase	= scale.m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS chunkBase			= mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS posChunkBase	= position.mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS scaleChunkBase	= scale.mChunkBase;
 		this->fromQuaternion( orientation );
 		chunkBase[0] = _mm_mul_ps( chunkBase[0], scaleChunkBase[0] );	//m00 * scale.x
 		chunkBase[1] = _mm_mul_ps( chunkBase[1], scaleChunkBase[1] );	//m01 * scale.y
@@ -437,7 +437,7 @@ namespace Ogre
 		chunkBase[11]=  posChunkBase[2];								//m23 * pos.z
 
 		// No projection term
-		chunkBase[12] = m_chunkBase[13] = m_chunkBase[14] = _mm_setzero_ps();
+		chunkBase[12] = mChunkBase[13] = mChunkBase[14] = _mm_setzero_ps();
 		chunkBase[15] = MathlibSSE2::ONE;
 	}
 	//-----------------------------------------------------------------------------------
@@ -445,10 +445,10 @@ namespace Ogre
 	{
 		ArrayReal mask = 
 			_mm_and_ps(
-				_mm_and_ps( _mm_cmpeq_ps( m_chunkBase[12], _mm_setzero_ps() ),
-					_mm_cmpeq_ps( m_chunkBase[13], _mm_setzero_ps() ) ),
-				_mm_and_ps( _mm_cmpeq_ps( m_chunkBase[14], _mm_setzero_ps() ),
-					_mm_cmpeq_ps( m_chunkBase[15], MathlibSSE2::ONE ) ) );
+				_mm_and_ps( _mm_cmpeq_ps( mChunkBase[12], _mm_setzero_ps() ),
+					_mm_cmpeq_ps( mChunkBase[13], _mm_setzero_ps() ) ),
+				_mm_and_ps( _mm_cmpeq_ps( mChunkBase[14], _mm_setzero_ps() ),
+					_mm_cmpeq_ps( mChunkBase[15], MathlibSSE2::ONE ) ) );
 
 		return _mm_movemask_ps( mask ) == 0x0f;
 	}
@@ -475,32 +475,32 @@ namespace Ogre
 		register ArrayReal m0, m1, m2, m3;
 
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							this->m_chunkBase[0], this->m_chunkBase[1],
-							this->m_chunkBase[2], this->m_chunkBase[3],
+							this->mChunkBase[0], this->mChunkBase[1],
+							this->mChunkBase[2], this->mChunkBase[3],
 							m0, m1, m2, m3 );
 		_mm_stream_ps( dst[0]._m, m0 );
 		_mm_stream_ps( dst[1]._m, m1 );
 		_mm_stream_ps( dst[2]._m, m2 );
 		_mm_stream_ps( dst[3]._m, m3 );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							this->m_chunkBase[4], this->m_chunkBase[5],
-							this->m_chunkBase[6], this->m_chunkBase[7],
+							this->mChunkBase[4], this->mChunkBase[5],
+							this->mChunkBase[6], this->mChunkBase[7],
 							m0, m1, m2, m3 );
 		_mm_stream_ps( dst[0]._m+4, m0 );
 		_mm_stream_ps( dst[1]._m+4, m1 );
 		_mm_stream_ps( dst[2]._m+4, m2 );
 		_mm_stream_ps( dst[3]._m+4, m3 );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							this->m_chunkBase[8], this->m_chunkBase[9],
-							this->m_chunkBase[10], this->m_chunkBase[11],
+							this->mChunkBase[8], this->mChunkBase[9],
+							this->mChunkBase[10], this->mChunkBase[11],
 							m0, m1, m2, m3 );
 		_mm_stream_ps( dst[0]._m+8, m0 );
 		_mm_stream_ps( dst[1]._m+8, m1 );
 		_mm_stream_ps( dst[2]._m+8, m2 );
 		_mm_stream_ps( dst[3]._m+8, m3 );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							this->m_chunkBase[12], this->m_chunkBase[13],
-							this->m_chunkBase[14], this->m_chunkBase[15],
+							this->mChunkBase[12], this->mChunkBase[13],
+							this->mChunkBase[14], this->mChunkBase[15],
 							m0, m1, m2, m3 );
 		_mm_stream_ps( dst[0]._m+12, m0 );
 		_mm_stream_ps( dst[1]._m+12, m1 );
@@ -513,47 +513,47 @@ namespace Ogre
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							_mm_load_ps( src[0]._m ), _mm_load_ps( src[1]._m ), 
 							_mm_load_ps( src[2]._m ), _mm_load_ps( src[3]._m ),
-							this->m_chunkBase[0], this->m_chunkBase[1],
-							this->m_chunkBase[2], this->m_chunkBase[3] );
+							this->mChunkBase[0], this->mChunkBase[1],
+							this->mChunkBase[2], this->mChunkBase[3] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							_mm_load_ps( src[0]._m+4 ), _mm_load_ps( src[1]._m+4 ), 
 							_mm_load_ps( src[2]._m+4 ), _mm_load_ps( src[3]._m+4 ),
-							this->m_chunkBase[4], this->m_chunkBase[5],
-							this->m_chunkBase[6], this->m_chunkBase[7] );
+							this->mChunkBase[4], this->mChunkBase[5],
+							this->mChunkBase[6], this->mChunkBase[7] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							_mm_load_ps( src[0]._m+8 ), _mm_load_ps( src[1]._m+8 ), 
 							_mm_load_ps( src[2]._m+8 ), _mm_load_ps( src[3]._m+8 ),
-							this->m_chunkBase[8], this->m_chunkBase[9],
-							this->m_chunkBase[10], this->m_chunkBase[11] );
+							this->mChunkBase[8], this->mChunkBase[9],
+							this->mChunkBase[10], this->mChunkBase[11] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							_mm_load_ps( src[0]._m+12 ), _mm_load_ps( src[1]._m+12 ), 
 							_mm_load_ps( src[2]._m+12 ), _mm_load_ps( src[3]._m+12 ),
-							this->m_chunkBase[12], this->m_chunkBase[13],
-							this->m_chunkBase[14], this->m_chunkBase[15] );
+							this->mChunkBase[12], this->mChunkBase[13],
+							this->mChunkBase[14], this->mChunkBase[15] );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::loadFromAoS( const SimpleMatrix4 * RESTRICT_ALIAS src )
 	{
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							src[0].m_chunkBase[0], src[1].m_chunkBase[0],
-							src[2].m_chunkBase[0], src[3].m_chunkBase[0],
-							this->m_chunkBase[0], this->m_chunkBase[1],
-							this->m_chunkBase[2], this->m_chunkBase[3] );
+							src[0].mChunkBase[0], src[1].mChunkBase[0],
+							src[2].mChunkBase[0], src[3].mChunkBase[0],
+							this->mChunkBase[0], this->mChunkBase[1],
+							this->mChunkBase[2], this->mChunkBase[3] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							src[0].m_chunkBase[1], src[1].m_chunkBase[1],
-							src[2].m_chunkBase[1], src[3].m_chunkBase[1],
-							this->m_chunkBase[4], this->m_chunkBase[5],
-							this->m_chunkBase[6], this->m_chunkBase[7] );
+							src[0].mChunkBase[1], src[1].mChunkBase[1],
+							src[2].mChunkBase[1], src[3].mChunkBase[1],
+							this->mChunkBase[4], this->mChunkBase[5],
+							this->mChunkBase[6], this->mChunkBase[7] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							src[0].m_chunkBase[2], src[1].m_chunkBase[2],
-							src[2].m_chunkBase[2], src[3].m_chunkBase[2],
-							this->m_chunkBase[8], this->m_chunkBase[9],
-							this->m_chunkBase[10], this->m_chunkBase[11] );
+							src[0].mChunkBase[2], src[1].mChunkBase[2],
+							src[2].mChunkBase[2], src[3].mChunkBase[2],
+							this->mChunkBase[8], this->mChunkBase[9],
+							this->mChunkBase[10], this->mChunkBase[11] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
-							src[0].m_chunkBase[3], src[1].m_chunkBase[3],
-							src[2].m_chunkBase[3], src[3].m_chunkBase[3],
-							this->m_chunkBase[12], this->m_chunkBase[13],
-							this->m_chunkBase[14], this->m_chunkBase[15] );
+							src[0].mChunkBase[3], src[1].mChunkBase[3],
+							src[2].mChunkBase[3], src[3].mChunkBase[3],
+							this->mChunkBase[12], this->mChunkBase[13],
+							this->mChunkBase[14], this->mChunkBase[15] );
 	}
 	//-----------------------------------------------------------------------------------
 }

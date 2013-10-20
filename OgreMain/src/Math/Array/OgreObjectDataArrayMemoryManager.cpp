@@ -58,8 +58,8 @@ namespace Ogre
 			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
-			m_dummyNode( dummyNode ),
-			m_dummyObject( dummyObject )
+			mDummyNode( dummyNode ),
+			mDummyObject( dummyObject )
 	{
 	}
 	//-----------------------------------------------------------------------------------
@@ -67,12 +67,12 @@ namespace Ogre
 	{
 		ArrayMemoryManager::slotsRecreated( prevNumSlots );
 
-		Node **nodesPtr = reinterpret_cast<Node**>( m_memoryPools[Parent] ) + prevNumSlots;
-		MovableObject **ownersPtr = reinterpret_cast<MovableObject**>(m_memoryPools[Owner])+prevNumSlots;
-		for( size_t i=prevNumSlots; i<m_maxMemory; ++i )
+		Node **nodesPtr = reinterpret_cast<Node**>( mMemoryPools[Parent] ) + prevNumSlots;
+		MovableObject **ownersPtr = reinterpret_cast<MovableObject**>(mMemoryPools[Owner])+prevNumSlots;
+		for( size_t i=prevNumSlots; i<mMaxMemory; ++i )
 		{
-			*nodesPtr++ = m_dummyNode;
-			*ownersPtr++ = m_dummyObject;
+			*nodesPtr++ = mDummyNode;
+			*ownersPtr++ = mDummyObject;
 		}
 	}
 	//-----------------------------------------------------------------------------------
@@ -84,29 +84,29 @@ namespace Ogre
 
 		//Set memory ptrs
 		outData.mIndex = nextSlotIdx;
-		outData.mParents				= reinterpret_cast<Node**>( m_memoryPools[Parent] +
-												nextSlotBase * m_elementsMemSizes[Parent] );
-		outData.mOwner					= reinterpret_cast<MovableObject**>( m_memoryPools[Owner] +
-												nextSlotBase * m_elementsMemSizes[Owner] );
-		outData.mLocalAabb				= reinterpret_cast<ArrayAabb*>( m_memoryPools[LocalAabb] +
-												nextSlotBase * m_elementsMemSizes[LocalAabb] );
-		outData.mWorldAabb				= reinterpret_cast<ArrayAabb*>( m_memoryPools[WorldAabb] +
-												nextSlotBase * m_elementsMemSizes[WorldAabb] );
-		outData.mLocalRadius			= reinterpret_cast<Real*>( m_memoryPools[LocalRadius] +
-												nextSlotBase * m_elementsMemSizes[LocalRadius] );
-		outData.mWorldRadius			= reinterpret_cast<Real*>( m_memoryPools[WorldRadius] +
-												nextSlotBase * m_elementsMemSizes[WorldRadius] );
-		outData.mSquaredUpperDistance	= reinterpret_cast<Real*>( m_memoryPools[SquaredUpperDistance] +
-												nextSlotBase * m_elementsMemSizes[SquaredUpperDistance] );
-		outData.mVisibilityFlags		= reinterpret_cast<uint32*>( m_memoryPools[VisibilityFlags] +
-												nextSlotBase * m_elementsMemSizes[VisibilityFlags] );
-		outData.mQueryFlags				= reinterpret_cast<uint32*>( m_memoryPools[QueryFlags] +
-												nextSlotBase * m_elementsMemSizes[QueryFlags] );
-		outData.mLightMask				= reinterpret_cast<uint32*>( m_memoryPools[LightMask] +
-												nextSlotBase * m_elementsMemSizes[LightMask] );
+		outData.mParents				= reinterpret_cast<Node**>( mMemoryPools[Parent] +
+												nextSlotBase * mElementsMemSizes[Parent] );
+		outData.mOwner					= reinterpret_cast<MovableObject**>( mMemoryPools[Owner] +
+												nextSlotBase * mElementsMemSizes[Owner] );
+		outData.mLocalAabb				= reinterpret_cast<ArrayAabb*>( mMemoryPools[LocalAabb] +
+												nextSlotBase * mElementsMemSizes[LocalAabb] );
+		outData.mWorldAabb				= reinterpret_cast<ArrayAabb*>( mMemoryPools[WorldAabb] +
+												nextSlotBase * mElementsMemSizes[WorldAabb] );
+		outData.mLocalRadius			= reinterpret_cast<Real*>( mMemoryPools[LocalRadius] +
+												nextSlotBase * mElementsMemSizes[LocalRadius] );
+		outData.mWorldRadius			= reinterpret_cast<Real*>( mMemoryPools[WorldRadius] +
+												nextSlotBase * mElementsMemSizes[WorldRadius] );
+		outData.mSquaredUpperDistance	= reinterpret_cast<Real*>( mMemoryPools[SquaredUpperDistance] +
+												nextSlotBase * mElementsMemSizes[SquaredUpperDistance] );
+		outData.mVisibilityFlags		= reinterpret_cast<uint32*>( mMemoryPools[VisibilityFlags] +
+												nextSlotBase * mElementsMemSizes[VisibilityFlags] );
+		outData.mQueryFlags				= reinterpret_cast<uint32*>( mMemoryPools[QueryFlags] +
+												nextSlotBase * mElementsMemSizes[QueryFlags] );
+		outData.mLightMask				= reinterpret_cast<uint32*>( mMemoryPools[LightMask] +
+												nextSlotBase * mElementsMemSizes[LightMask] );
 
 		//Set default values
-		outData.mParents[nextSlotIdx]	= m_dummyNode;
+		outData.mParents[nextSlotIdx]	= mDummyNode;
 		outData.mOwner[nextSlotIdx]		= 0; //Caller has to fill it. Otherwise a crash is a good warning
 		outData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
 		outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
@@ -121,8 +121,8 @@ namespace Ogre
 	{
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
-		inOutData.mParents[inOutData.mIndex]			= m_dummyNode;
-		inOutData.mOwner[inOutData.mIndex]				= m_dummyObject;
+		inOutData.mParents[inOutData.mIndex]			= mDummyNode;
+		inOutData.mOwner[inOutData.mIndex]				= mDummyObject;
 		inOutData.mVisibilityFlags[inOutData.mIndex]	= 0;
 		inOutData.mQueryFlags[inOutData.mIndex]			= 0;
 		inOutData.mLightMask[inOutData.mIndex]			= 0;
@@ -134,7 +134,7 @@ namespace Ogre
 	size_t ObjectDataArrayMemoryManager::getFirstNode( ObjectData &outData )
 	{
 		// Quick hack to fill all pointer variables (I'm lazy to type!)
-		memcpy( &outData.mParents, &m_memoryPools[0], sizeof(void*) * m_memoryPools.size() );
-		return m_usedMemory;
+		memcpy( &outData.mParents, &mMemoryPools[0], sizeof(void*) * mMemoryPools.size() );
+		return mUsedMemory;
 	}
 }

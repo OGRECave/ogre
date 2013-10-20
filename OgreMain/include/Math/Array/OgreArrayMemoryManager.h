@@ -82,10 +82,10 @@ namespace Ogre
 		//typedef vector<ptrdiff_t>::type PtrdiffVec; //TODO: Modify for Ogre
 		typedef std::vector<ptrdiff_t> PtrdiffVec;
 
-		/** When m_usedMemory >= m_maxMemory (that is, we've exhausted all our preallocated memory)
+		/** When mUsedMemory >= mMaxMemory (that is, we've exhausted all our preallocated memory)
 			ArrayMemoryManager will proceed to reallocate all memory. The resulting base pointer
 			address may have changed and hence each ArrayVector3, ArrayMatrix4, etc needs to be
-			rebased (alter it's m_chunkBase pointer).
+			rebased (alter it's mChunkBase pointer).
 
 			It consists in two steps: First build a list of relative differences before deallocation
 			and then apply the new base offseting based on that list. The list is needed because
@@ -120,7 +120,7 @@ namespace Ogre
 			/** Called when the manager already grew it's memory pool to honour more node requests.
 				@remarks
 					Will use the new base ptr and the list we built in @see buildDiffList() to know
-					what m_chunkPtr & m_index needs to be set for each ArrayVector3/etc we have.
+					what mChunkPtr & mIndex needs to be set for each ArrayVector3/etc we have.
 				@param managerType
 					The derived type of this manager, so listener knows whether this is an Node or
 					ObjectData manager
@@ -165,25 +165,25 @@ namespace Ogre
 
 	protected:
 		///One per memory type
-		MemoryPoolVec				m_memoryPools;
-		size_t const				*m_elementsMemSizes;
-		size_t						m_totalMemoryMultiplier;
+		MemoryPoolVec				mMemoryPools;
+		size_t const				*mElementsMemSizes;
+		size_t						mTotalMemoryMultiplier;
 
 		//The following three are measured in instances, not bytes
-		size_t				m_usedMemory;
-		size_t				m_maxMemory;
-		size_t				m_maxHardLimit;
-		size_t				m_cleanupThreshold;
+		size_t				mUsedMemory;
+		size_t				mMaxMemory;
+		size_t				mMaxHardLimit;
+		size_t				mCleanupThreshold;
 		typedef std::vector<size_t> SlotsVec; //TODO: Modify for Ogre
-		SlotsVec			m_availableSlots;
-		RebaseListener		*m_rebaseListener;
+		SlotsVec			mAvailableSlots;
+		RebaseListener		*mRebaseListener;
 
 		/// The hierarchy depth level. This value is not used by the manager,
 		/// just passed to the listeners so they can know to which level it
 		/// belongs
-		uint16				m_level;
+		uint16				mLevel;
 
-		ManagerType			m_managerType;
+		ManagerType			mManagerType;
 
 	public:
 		static const size_t MAX_MEMORY_SLOTS;
@@ -218,7 +218,7 @@ namespace Ogre
 							size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
 							RebaseListener *rebaseListener=0 );
 
-		/** Initializes m_memoryPools. Once it has been called, destroy() __must__ be called.
+		/** Initializes mMemoryPools. Once it has been called, destroy() __must__ be called.
 			@See destroy
 		@remarks
 			The destructor won't free the data, if you don't call destroy, memory will leak.
@@ -260,16 +260,16 @@ namespace Ogre
 			@remarks
 				For optimal results, try to respect LIFO order in the removals
 			@param ptrToFirstElement
-				Pointer to the first element, what's allocated with m_memoryPools[0]
+				Pointer to the first element, what's allocated with mMemoryPools[0]
 			@param index
 				The index, typically mIndex (range [0; ARRAY_PACKED_REALS) )
 		*/
 		void destroySlot( const char *ptrToFirstElement, uint8 index );
 
-		/** Called when m_memoryPools changes, to give a chance derived class to initialize memory
+		/** Called when mMemoryPools changes, to give a chance derived class to initialize memory
 			to default values
 		@param prevNumSlots
-			The previous value of m_maxMemory before changing m_memoryPools
+			The previous value of mMaxMemory before changing mMemoryPools
 		*/
 		virtual void slotsRecreated( size_t prevNumSlots ) {}
 	};
@@ -286,10 +286,10 @@ namespace Ogre
 	class _OgreExport NodeArrayMemoryManager : public ArrayMemoryManager
 	{
 		/// Dummy node where to point Transform::mParents[i] when they're unused slots.
-		Node	*m_dummyNode;
+		Node	*mDummyNode;
 
 	protected:
-		/// We overload to set all mParents to point to m_dummyNode
+		/// We overload to set all mParents to point to mDummyNode
 		virtual void slotsRecreated( size_t prevNumSlots );
 
 	public:
@@ -357,11 +357,11 @@ namespace Ogre
 	class _OgreExport ObjectDataArrayMemoryManager : public ArrayMemoryManager
 	{
 		/// Dummy node where to point ObjectData::mParents[i] when they're unused slots.
-		Node			*m_dummyNode;
-		MovableObject	*m_dummyObject;
+		Node			*mDummyNode;
+		MovableObject	*mDummyObject;
 
 	protected:
-		/// We overload to set all mParents to point to m_dummyNode
+		/// We overload to set all mParents to point to mDummyNode
 		virtual void slotsRecreated( size_t prevNumSlots );
 
 	public:

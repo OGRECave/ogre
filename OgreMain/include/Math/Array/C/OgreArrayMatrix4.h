@@ -55,7 +55,7 @@ namespace Ogre
 			time (the actual amount is defined by ARRAY_PACKED_REALS)
 			Assuming ARRAY_PACKED_REALS == 4, the memory layout will
 			be as following:
-             m_chunkBase	m_chunkBase + 3
+             mChunkBase	mChunkBase + 3
 			 a00b00c00d00	 a01b01c01d01
 			Extracting one Matrix4 needs 256 bytes, which needs 4 line
 			fetches for common cache lines of 64 bytes.
@@ -69,7 +69,7 @@ namespace Ogre
     class _OgreExport ArrayMatrix4
     {
     public:
-		ArrayReal		m_chunkBase[16];
+		ArrayReal		mChunkBase[16];
 
 		ArrayMatrix4() {}
 		ArrayMatrix4( const ArrayMatrix4 &copy )
@@ -80,17 +80,17 @@ namespace Ogre
 			//becomes unmaintainable (16 lines!?)
 			for( size_t i=0; i<16; i+=4 )
 			{
-				m_chunkBase[i  ] = copy.m_chunkBase[i  ];
-				m_chunkBase[i+1] = copy.m_chunkBase[i+1];
-				m_chunkBase[i+2] = copy.m_chunkBase[i+2];
-				m_chunkBase[i+3] = copy.m_chunkBase[i+3];
+				mChunkBase[i  ] = copy.mChunkBase[i  ];
+				mChunkBase[i+1] = copy.mChunkBase[i+1];
+				mChunkBase[i+2] = copy.mChunkBase[i+2];
+				mChunkBase[i+3] = copy.mChunkBase[i+3];
 			}
 		}
 
 		void getAsMatrix4( Matrix4 &out, size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real * RESTRICT_ALIAS aliasedReal = reinterpret_cast<const Real*>( m_chunkBase );
+			const Real * RESTRICT_ALIAS aliasedReal = reinterpret_cast<const Real*>( mChunkBase );
 			Real * RESTRICT_ALIAS matrix = reinterpret_cast<Real*>( out._m );
 			for( size_t i=0; i<16; i+=4 )
 			{
@@ -113,7 +113,7 @@ namespace Ogre
 
 		void setFromMatrix4( const Matrix4 &m, size_t index )
 		{
-			Real * RESTRICT_ALIAS aliasedReal = reinterpret_cast<Real*>( m_chunkBase );
+			Real * RESTRICT_ALIAS aliasedReal = reinterpret_cast<Real*>( mChunkBase );
 			const Real * RESTRICT_ALIAS matrix = reinterpret_cast<const Real*>( m._m );
 			for( size_t i=0; i<16; i+=4 )
 			{
@@ -127,22 +127,22 @@ namespace Ogre
 		static ArrayMatrix4 createAllFromMatrix4( const Matrix4 &m )
 		{
 			ArrayMatrix4 retVal;
-			retVal.m_chunkBase[0]  = m._m[0];
-			retVal.m_chunkBase[1]  = m._m[1];
-			retVal.m_chunkBase[2]  = m._m[2];
-			retVal.m_chunkBase[3]  = m._m[3];
-			retVal.m_chunkBase[4]  = m._m[4];
-			retVal.m_chunkBase[5]  = m._m[5];
-			retVal.m_chunkBase[6]  = m._m[6];
-			retVal.m_chunkBase[7]  = m._m[7];
-			retVal.m_chunkBase[8]  = m._m[8];
-			retVal.m_chunkBase[9]  = m._m[9];
-			retVal.m_chunkBase[10] = m._m[10];
-			retVal.m_chunkBase[11] = m._m[11];
-			retVal.m_chunkBase[12] = m._m[12];
-			retVal.m_chunkBase[13] = m._m[13];
-			retVal.m_chunkBase[14] = m._m[14];
-			retVal.m_chunkBase[15] = m._m[15];
+			retVal.mChunkBase[0]  = m._m[0];
+			retVal.mChunkBase[1]  = m._m[1];
+			retVal.mChunkBase[2]  = m._m[2];
+			retVal.mChunkBase[3]  = m._m[3];
+			retVal.mChunkBase[4]  = m._m[4];
+			retVal.mChunkBase[5]  = m._m[5];
+			retVal.mChunkBase[6]  = m._m[6];
+			retVal.mChunkBase[7]  = m._m[7];
+			retVal.mChunkBase[8]  = m._m[8];
+			retVal.mChunkBase[9]  = m._m[9];
+			retVal.mChunkBase[10] = m._m[10];
+			retVal.mChunkBase[11] = m._m[11];
+			retVal.mChunkBase[12] = m._m[12];
+			retVal.mChunkBase[13] = m._m[13];
+			retVal.mChunkBase[14] = m._m[14];
+			retVal.mChunkBase[15] = m._m[15];
 			return retVal;
 		}
 
@@ -155,10 +155,10 @@ namespace Ogre
         {
 			for( size_t i=0; i<16; i+=4 )
 			{
-				m_chunkBase[i  ] = rkMatrix.m_chunkBase[i  ];
-				m_chunkBase[i+1] = rkMatrix.m_chunkBase[i+1];
-				m_chunkBase[i+2] = rkMatrix.m_chunkBase[i+2];
-				m_chunkBase[i+3] = rkMatrix.m_chunkBase[i+3];
+				mChunkBase[i  ] = rkMatrix.mChunkBase[i  ];
+				mChunkBase[i+1] = rkMatrix.mChunkBase[i+1];
+				mChunkBase[i+2] = rkMatrix.mChunkBase[i+2];
+				mChunkBase[i+3] = rkMatrix.mChunkBase[i+3];
 			}
             return *this;
         }
@@ -215,27 +215,27 @@ namespace Ogre
 	class _OgreExport SimpleMatrix4
     {
     public:
-		ArrayReal		m_chunkBase[16];
+		ArrayReal		mChunkBase[16];
 
 		/// Assumes src is aligned
 		void load( const Matrix4 &src )
 		{
-			m_chunkBase[0]  = src._m[0];
-			m_chunkBase[1]  = src._m[1];
-			m_chunkBase[2]  = src._m[2];
-			m_chunkBase[3]  = src._m[3];
-			m_chunkBase[4]  = src._m[4];
-			m_chunkBase[5]  = src._m[5];
-			m_chunkBase[6]  = src._m[6];
-			m_chunkBase[7]  = src._m[7];
-			m_chunkBase[8]  = src._m[8];
-			m_chunkBase[9]  = src._m[9];
-			m_chunkBase[10] = src._m[10];
-			m_chunkBase[11] = src._m[11];
-			m_chunkBase[12] = src._m[12];
-			m_chunkBase[13] = src._m[13];
-			m_chunkBase[14] = src._m[14];
-			m_chunkBase[15] = src._m[15];
+			mChunkBase[0]  = src._m[0];
+			mChunkBase[1]  = src._m[1];
+			mChunkBase[2]  = src._m[2];
+			mChunkBase[3]  = src._m[3];
+			mChunkBase[4]  = src._m[4];
+			mChunkBase[5]  = src._m[5];
+			mChunkBase[6]  = src._m[6];
+			mChunkBase[7]  = src._m[7];
+			mChunkBase[8]  = src._m[8];
+			mChunkBase[9]  = src._m[9];
+			mChunkBase[10] = src._m[10];
+			mChunkBase[11] = src._m[11];
+			mChunkBase[12] = src._m[12];
+			mChunkBase[13] = src._m[13];
+			mChunkBase[14] = src._m[14];
+			mChunkBase[15] = src._m[15];
 		}
 	};
 

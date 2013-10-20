@@ -53,7 +53,7 @@ namespace Ogre
 			time (the actual amount is defined by ARRAY_PACKED_REALS)
 			Assuming ARRAY_PACKED_REALS == 4, the memory layout will
 			be as following:
-             m_chunkBase		m_chunkBase + 3
+             mChunkBase		mChunkBase + 3
 			XXXX YYYY ZZZZ		XXXX YYYY ZZZZ
 			Extracting one vector (XYZ) needs 48 bytes, which is within
 			the 64 byte size of common cache lines.
@@ -64,20 +64,20 @@ namespace Ogre
     class _OgreExport ArrayVector3
     {
     public:
-		ArrayReal		m_chunkBase[3];
+		ArrayReal		mChunkBase[3];
 
 		ArrayVector3() {}
 		ArrayVector3( ArrayReal chunkX, ArrayReal chunkY, ArrayReal chunkZ )
 		{
-			m_chunkBase[0] = chunkX;
-			m_chunkBase[1] = chunkY;
-			m_chunkBase[2] = chunkZ;
+			mChunkBase[0] = chunkX;
+			mChunkBase[1] = chunkY;
+			mChunkBase[2] = chunkZ;
 		}
 
 		void getAsVector3( Vector3 &out, size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedReal = reinterpret_cast<const Real*>( m_chunkBase );
+			const Real *aliasedReal = reinterpret_cast<const Real*>( mChunkBase );
 			out.x = aliasedReal[ARRAY_PACKED_REALS * 0 + index];		//X
 			out.y = aliasedReal[ARRAY_PACKED_REALS * 1 + index];		//Y
 			out.z = aliasedReal[ARRAY_PACKED_REALS * 2 + index];		//Z
@@ -88,7 +88,7 @@ namespace Ogre
 		Vector3 getAsVector3( size_t index ) const
 		{
 			//Be careful of not writing to these regions or else strict aliasing rule gets broken!!!
-			const Real *aliasedReal = reinterpret_cast<const Real*>( m_chunkBase );
+			const Real *aliasedReal = reinterpret_cast<const Real*>( mChunkBase );
 			return Vector3( aliasedReal[ARRAY_PACKED_REALS * 0 + index],		//X
 							aliasedReal[ARRAY_PACKED_REALS * 1 + index],		//Y
 							aliasedReal[ARRAY_PACKED_REALS * 2 + index] );	//Z
@@ -96,7 +96,7 @@ namespace Ogre
 
 		void setFromVector3( const Vector3 &v, size_t index )
 		{
-			Real *aliasedReal = reinterpret_cast<Real*>( m_chunkBase );
+			Real *aliasedReal = reinterpret_cast<Real*>( mChunkBase );
 			aliasedReal[ARRAY_PACKED_REALS * 0 + index] = v.x;
 			aliasedReal[ARRAY_PACKED_REALS * 1 + index] = v.y;
 			aliasedReal[ARRAY_PACKED_REALS * 2 + index] = v.z;
@@ -105,9 +105,9 @@ namespace Ogre
 		/// Sets all packed vectors to the same value as the scalar input vector
 		void setAll( const Vector3 &v )
 		{
-			m_chunkBase[0] = _mm_set_ps1( v.x );
-			m_chunkBase[1] = _mm_set_ps1( v.y );
-			m_chunkBase[2] = _mm_set_ps1( v.z );
+			mChunkBase[0] = _mm_set_ps1( v.x );
+			mChunkBase[1] = _mm_set_ps1( v.y );
+			mChunkBase[2] = _mm_set_ps1( v.z );
 		}
 
 		/// Copies only one vector, by looking at the indexes
@@ -122,12 +122,12 @@ namespace Ogre
         {
 			//set1_ps is a composite instrinsic using shuffling instructions.
 			//Store the actual result in a tmp variable and copy. We don't
-			//do m_chunkBase[1] = m_chunkBase[0]; because of a potential LHS
+			//do mChunkBase[1] = mChunkBase[0]; because of a potential LHS
 			//depending on how smart the compiler was
 			ArrayReal tmp = _mm_set1_ps( fScalar );
-            m_chunkBase[0] = tmp;
-			m_chunkBase[1] = tmp;
-			m_chunkBase[2] = tmp;
+            mChunkBase[0] = tmp;
+			mChunkBase[1] = tmp;
+			mChunkBase[2] = tmp;
 
             return *this;
         }

@@ -180,36 +180,36 @@ namespace Ogre
 	inline ArrayMatrix4 operator * ( const ArrayMatrix4 &lhs, const ArrayMatrix4 &rhs )
 	{
 		ArrayMatrix4 retVal;
-		concatArrayMat4( retVal.m_chunkBase, lhs.m_chunkBase, rhs.m_chunkBase );
+		concatArrayMat4( retVal.mChunkBase, lhs.mChunkBase, rhs.mChunkBase );
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayMatrix4::operator * ( const ArrayVector3 &rhs ) const
 	{
-		ArrayReal invW = ( m_chunkBase[12] * rhs.m_chunkBase[0] + m_chunkBase[13] * rhs.m_chunkBase[1] )
-							+ ( m_chunkBase[14] * rhs.m_chunkBase[2] + m_chunkBase[15] );
+		ArrayReal invW = ( mChunkBase[12] * rhs.mChunkBase[0] + mChunkBase[13] * rhs.mChunkBase[1] )
+							+ ( mChunkBase[14] * rhs.mChunkBase[2] + mChunkBase[15] );
 		invW = MathlibC::Inv4( invW );
 
 		return ArrayVector3(
 			//X = ( m00 * v.x + m01 * v.y + m02 * v.z + m03 ) * fInvW
-			( m_chunkBase[0] * rhs.m_chunkBase[0] + m_chunkBase[1] * rhs.m_chunkBase[1] +
-			  m_chunkBase[2] * rhs.m_chunkBase[2] + m_chunkBase[3] ) * invW,
+			( mChunkBase[0] * rhs.mChunkBase[0] + mChunkBase[1] * rhs.mChunkBase[1] +
+			  mChunkBase[2] * rhs.mChunkBase[2] + mChunkBase[3] ) * invW,
 			//Y = ( m10 * v.x + m11 * v.y + m12 * v.z + m13 ) * fInvW
-			( m_chunkBase[4] * rhs.m_chunkBase[0] + m_chunkBase[5] * rhs.m_chunkBase[1] +
-			  m_chunkBase[6] * rhs.m_chunkBase[2] + m_chunkBase[7] ) * invW,
+			( mChunkBase[4] * rhs.mChunkBase[0] + mChunkBase[5] * rhs.mChunkBase[1] +
+			  mChunkBase[6] * rhs.mChunkBase[2] + mChunkBase[7] ) * invW,
 			//Z = ( m20 * v.x + m21 * v.y + m22 * v.z + m23 ) * fInvW
-			( m_chunkBase[8] * rhs.m_chunkBase[0] + m_chunkBase[9] * rhs.m_chunkBase[1] +
-			  m_chunkBase[10] * rhs.m_chunkBase[2] + m_chunkBase[11] ) * invW );
+			( mChunkBase[8] * rhs.mChunkBase[0] + mChunkBase[9] * rhs.mChunkBase[1] +
+			  mChunkBase[10] * rhs.mChunkBase[2] + mChunkBase[11] ) * invW );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::operator *= ( const ArrayMatrix4 &rhs )
 	{
-		concatArrayMat4( m_chunkBase, rhs.m_chunkBase );
+		concatArrayMat4( mChunkBase, rhs.mChunkBase );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::fromQuaternion( const ArrayQuaternion &q )
 	{
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;
 		const ArrayReal * RESTRICT_ALIAS qChunkBase = &q.w;
 		ArrayReal fTx  = qChunkBase[1] + qChunkBase[1];			// 2 * x
 		ArrayReal fTy  = qChunkBase[2] + qChunkBase[2];			// 2 * y
@@ -238,9 +238,9 @@ namespace Ogre
 	inline void ArrayMatrix4::makeTransform( const ArrayVector3 &position, const ArrayVector3 &scale,
 											 const ArrayQuaternion &orientation )
 	{
-		ArrayReal * RESTRICT_ALIAS chunkBase			= m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS posChunkBase	= position.m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS scaleChunkBase	= scale.m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS chunkBase			= mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS posChunkBase	= position.mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS scaleChunkBase	= scale.mChunkBase;
 		this->fromQuaternion( orientation );
 		chunkBase[0] = chunkBase[0] * scaleChunkBase[0];	//m00 * scale.x
 		chunkBase[1] = chunkBase[1] * scaleChunkBase[1];	//m01 * scale.y
@@ -258,14 +258,14 @@ namespace Ogre
 		chunkBase[11]= posChunkBase[2];						//m23 * pos.z
 
 		// No projection term
-		chunkBase[12] = m_chunkBase[13] = m_chunkBase[14] = 0.0f;
+		chunkBase[12] = mChunkBase[13] = mChunkBase[14] = 0.0f;
 		chunkBase[15] = 1.0f;
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool ArrayMatrix4::isAffine() const
 	{
-		return (m_chunkBase[12] == 0) & (m_chunkBase[13] == 0) &
-				(m_chunkBase[14] == 0) & (m_chunkBase[15] == 1.0f);
+		return (mChunkBase[12] == 0) & (mChunkBase[13] == 0) &
+				(mChunkBase[14] == 0) & (mChunkBase[15] == 1.0f);
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::storeToAoS( Matrix4 * RESTRICT_ALIAS dst ) const
@@ -280,22 +280,22 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrix4::loadFromAoS( const SimpleMatrix4 * RESTRICT_ALIAS src )
 	{
-		m_chunkBase[0]  = src->m_chunkBase[0];
-		m_chunkBase[1]  = src->m_chunkBase[1];
-		m_chunkBase[2]  = src->m_chunkBase[2];
-		m_chunkBase[3]  = src->m_chunkBase[3];
-		m_chunkBase[4]  = src->m_chunkBase[4];
-		m_chunkBase[5]  = src->m_chunkBase[5];
-		m_chunkBase[6]  = src->m_chunkBase[6];
-		m_chunkBase[7]  = src->m_chunkBase[7];
-		m_chunkBase[8]  = src->m_chunkBase[8];
-		m_chunkBase[9]  = src->m_chunkBase[9];
-		m_chunkBase[10] = src->m_chunkBase[10];
-		m_chunkBase[11] = src->m_chunkBase[11];
-		m_chunkBase[12] = src->m_chunkBase[12];
-		m_chunkBase[13] = src->m_chunkBase[13];
-		m_chunkBase[14] = src->m_chunkBase[14];
-		m_chunkBase[15] = src->m_chunkBase[15];
+		mChunkBase[0]  = src->mChunkBase[0];
+		mChunkBase[1]  = src->mChunkBase[1];
+		mChunkBase[2]  = src->mChunkBase[2];
+		mChunkBase[3]  = src->mChunkBase[3];
+		mChunkBase[4]  = src->mChunkBase[4];
+		mChunkBase[5]  = src->mChunkBase[5];
+		mChunkBase[6]  = src->mChunkBase[6];
+		mChunkBase[7]  = src->mChunkBase[7];
+		mChunkBase[8]  = src->mChunkBase[8];
+		mChunkBase[9]  = src->mChunkBase[9];
+		mChunkBase[10] = src->mChunkBase[10];
+		mChunkBase[11] = src->mChunkBase[11];
+		mChunkBase[12] = src->mChunkBase[12];
+		mChunkBase[13] = src->mChunkBase[13];
+		mChunkBase[14] = src->mChunkBase[14];
+		mChunkBase[15] = src->mChunkBase[15];
 	}
 	//-----------------------------------------------------------------------------------
 }

@@ -4919,7 +4919,7 @@ void SceneManager::performCleanup( ArrayMemoryManager::ManagerType managerType, 
 									const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
 									size_t startInstance, size_t diffInstances )
 {
-	//If mSceneNodes were ordered by m_chunkBase & m_index, there would be a huge optimization to be made
+	//If mSceneNodes were ordered by mChunkBase & mIndex, there would be a huge optimization to be made
 	SceneNodeList::const_iterator itor = mSceneNodes.begin();
 	SceneNodeList::const_iterator end  = mSceneNodes.end();
 

@@ -203,7 +203,7 @@ namespace Ogre {
         Node( IdType id, NodeMemoryManager *nodeMemoryManager, Node *parent );
 
 		/** Don't use this constructor unless you know what you're doing.
-			@See NodeMemoryManager::m_dummyNode
+			@See NodeMemoryManager::mDummyNode
 		*/
 		Node( const Transform &transformPtrs );
 

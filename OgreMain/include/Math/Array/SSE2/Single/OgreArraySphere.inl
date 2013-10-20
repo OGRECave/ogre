@@ -31,17 +31,17 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArraySphere::intersects( const ArraySphere &s ) const
 	{
-		ArrayReal sqRadius	= _mm_add_ps( m_radius, s.m_radius );
+		ArrayReal sqRadius	= _mm_add_ps( mRadius, s.mRadius );
 		sqRadius			= _mm_mul_ps( sqRadius, sqRadius );
-		ArrayReal sqDist	= m_center.squaredDistance( s.m_center );
+		ArrayReal sqDist	= mCenter.squaredDistance( s.mCenter );
 
 		return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArraySphere::intersects( const ArrayVector3 &v ) const
 	{
-		ArrayReal sqRadius	= _mm_mul_ps( m_radius, m_radius );
-		ArrayReal sqDist	= m_center.squaredDistance( v );
+		ArrayReal sqRadius	= _mm_mul_ps( mRadius, mRadius );
+		ArrayReal sqDist	= mCenter.squaredDistance( v );
 
 		return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
 	}

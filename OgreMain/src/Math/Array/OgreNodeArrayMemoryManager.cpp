@@ -56,7 +56,7 @@ namespace Ogre
 			ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
-			m_dummyNode( dummyNode )
+			mDummyNode( dummyNode )
 	{
 	}
 	//-----------------------------------------------------------------------------------
@@ -64,9 +64,9 @@ namespace Ogre
 	{
 		ArrayMemoryManager::slotsRecreated( prevNumSlots );
 
-		Node **nodesPtr = reinterpret_cast<Node**>( m_memoryPools[Parent] ) + prevNumSlots;
-		for( size_t i=prevNumSlots; i<m_maxMemory; ++i )
-			*nodesPtr++ = m_dummyNode;
+		Node **nodesPtr = reinterpret_cast<Node**>( mMemoryPools[Parent] ) + prevNumSlots;
+		for( size_t i=prevNumSlots; i<mMaxMemory; ++i )
+			*nodesPtr++ = mDummyNode;
 	}
 	//-----------------------------------------------------------------------------------
 	void NodeArrayMemoryManager::createNewNode( Transform &outTransform )
@@ -77,34 +77,34 @@ namespace Ogre
 
 		//Set memory ptrs
 		outTransform.mIndex = nextSlotIdx;
-		outTransform.mParents			= reinterpret_cast<Node**>( m_memoryPools[Parent] +
-												nextSlotBase * m_elementsMemSizes[Parent] );
-		outTransform.mOwner				= reinterpret_cast<Node**>( m_memoryPools[Owner] +
-												nextSlotBase * m_elementsMemSizes[Owner] );
-		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( m_memoryPools[Position] +
-												nextSlotBase * m_elementsMemSizes[Position] );
+		outTransform.mParents			= reinterpret_cast<Node**>( mMemoryPools[Parent] +
+												nextSlotBase * mElementsMemSizes[Parent] );
+		outTransform.mOwner				= reinterpret_cast<Node**>( mMemoryPools[Owner] +
+												nextSlotBase * mElementsMemSizes[Owner] );
+		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( mMemoryPools[Position] +
+												nextSlotBase * mElementsMemSizes[Position] );
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(
-												m_memoryPools[Orientation] +
-												nextSlotBase * m_elementsMemSizes[Orientation] );
-		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( m_memoryPools[Scale] +
-												nextSlotBase * m_elementsMemSizes[Scale] );
+												mMemoryPools[Orientation] +
+												nextSlotBase * mElementsMemSizes[Orientation] );
+		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( mMemoryPools[Scale] +
+												nextSlotBase * mElementsMemSizes[Scale] );
 		outTransform.mDerivedPosition	= reinterpret_cast<ArrayVector3*>(
-												m_memoryPools[DerivedPosition] +
-												nextSlotBase * m_elementsMemSizes[DerivedPosition] );
+												mMemoryPools[DerivedPosition] +
+												nextSlotBase * mElementsMemSizes[DerivedPosition] );
 		outTransform.mDerivedOrientation=reinterpret_cast<ArrayQuaternion*>(
-												m_memoryPools[DerivedOrientation] +
-												nextSlotBase * m_elementsMemSizes[DerivedOrientation] );
-		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( m_memoryPools[DerivedScale] +
-												nextSlotBase * m_elementsMemSizes[DerivedScale] );
-		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( m_memoryPools[WorldMat] +
-												nextSlotBase * m_elementsMemSizes[WorldMat] );
-		outTransform.mInheritOrientation= reinterpret_cast<bool*>( m_memoryPools[InheritOrientation] +
-												nextSlotBase * m_elementsMemSizes[InheritOrientation] );
-		outTransform.mInheritScale		= reinterpret_cast<bool*>( m_memoryPools[InheritScale] +
-												nextSlotBase * m_elementsMemSizes[InheritScale] );
+												mMemoryPools[DerivedOrientation] +
+												nextSlotBase * mElementsMemSizes[DerivedOrientation] );
+		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( mMemoryPools[DerivedScale] +
+												nextSlotBase * mElementsMemSizes[DerivedScale] );
+		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( mMemoryPools[WorldMat] +
+												nextSlotBase * mElementsMemSizes[WorldMat] );
+		outTransform.mInheritOrientation= reinterpret_cast<bool*>( mMemoryPools[InheritOrientation] +
+												nextSlotBase * mElementsMemSizes[InheritOrientation] );
+		outTransform.mInheritScale		= reinterpret_cast<bool*>( mMemoryPools[InheritScale] +
+												nextSlotBase * mElementsMemSizes[InheritScale] );
 
 		//Set default values
-		outTransform.mParents[nextSlotIdx] = m_dummyNode;
+		outTransform.mParents[nextSlotIdx] = mDummyNode;
 		outTransform.mOwner[nextSlotIdx] = 0;
 		outTransform.mPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
@@ -122,7 +122,7 @@ namespace Ogre
 		//Zero out important data that would lead to bugs (Remember SIMD SoA means even if
 		//there's one object in scene, 4 objects are still parsed simultaneously)
 
-		inOutTransform.mParents[inOutTransform.mIndex]	= m_dummyNode;
+		inOutTransform.mParents[inOutTransform.mIndex]	= mDummyNode;
 		inOutTransform.mOwner[inOutTransform.mIndex]	= 0;
 		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
 		//Zero out all pointers
@@ -131,21 +131,21 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t NodeArrayMemoryManager::getFirstNode( Transform &outTransform )
 	{
-		outTransform.mParents			= reinterpret_cast<Node**>( m_memoryPools[Parent] );
-		outTransform.mOwner				= reinterpret_cast<Node**>( m_memoryPools[Owner] );
-		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( m_memoryPools[Position] );
+		outTransform.mParents			= reinterpret_cast<Node**>( mMemoryPools[Parent] );
+		outTransform.mOwner				= reinterpret_cast<Node**>( mMemoryPools[Owner] );
+		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( mMemoryPools[Position] );
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(
-														m_memoryPools[Orientation] );
-		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( m_memoryPools[Scale] );
+														mMemoryPools[Orientation] );
+		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( mMemoryPools[Scale] );
 		outTransform.mDerivedPosition	= reinterpret_cast<ArrayVector3*>(
-														m_memoryPools[DerivedPosition] );
+														mMemoryPools[DerivedPosition] );
 		outTransform.mDerivedOrientation= reinterpret_cast<ArrayQuaternion*>(
-														m_memoryPools[DerivedOrientation] );
-		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( m_memoryPools[DerivedScale] );
-		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( m_memoryPools[WorldMat] );
-		outTransform.mInheritOrientation= reinterpret_cast<bool*>( m_memoryPools[InheritOrientation] );
-		outTransform.mInheritScale		= reinterpret_cast<bool*>( m_memoryPools[InheritScale] );
+														mMemoryPools[DerivedOrientation] );
+		outTransform.mDerivedScale		= reinterpret_cast<ArrayVector3*>( mMemoryPools[DerivedScale] );
+		outTransform.mDerivedTransform	= reinterpret_cast<Matrix4*>( mMemoryPools[WorldMat] );
+		outTransform.mInheritOrientation= reinterpret_cast<bool*>( mMemoryPools[InheritOrientation] );
+		outTransform.mInheritScale		= reinterpret_cast<bool*>( mMemoryPools[InheritScale] );
 
-		return m_usedMemory;
+		return mUsedMemory;
 	}
 }

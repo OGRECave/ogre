@@ -188,11 +188,11 @@ namespace Ogre
 			//Merge with bounds only if they're in use (and not explicitly hidden,
 			//but may be invisible for some cameras or out of frustum)
 			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->m_center - objData.mWorldAabb->m_halfSize );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
 			vMinBounds.CmovRobust( inUse, newVal );
 
 			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->m_center + objData.mWorldAabb->m_halfSize );
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
 			vMaxBounds.CmovRobust( inUse, newVal );
 
 			//maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
@@ -209,8 +209,8 @@ namespace Ogre
 		//threaded, we might've processed a full chunk of non-visible objects.
 		//Aabb aabb = Aabb::newFromExtents( vMin - maxRadius, vMax + maxRadius );
 		Aabb aabb;
-		aabb.m_center	= (vMax + vMin) * 0.5f;
-		aabb.m_halfSize	= (vMax - vMin) * 0.5f;
+		aabb.mCenter	= (vMax + vMin) * 0.5f;
+		aabb.mHalfSize	= (vMax - vMin) * 0.5f;
 		mThreadAabbs[threadIdx] = aabb;
 	}
 	//-----------------------------------------------------------------------
@@ -397,7 +397,7 @@ namespace Ogre
 		CustomParamsVec::iterator firstParams = usedParams.end() - maxInstancesToCopy *
 																	mCreator->getNumCustomParams();
 
-		//Copy from the back to front, into m_instancedEntities
+		//Copy from the back to front, into mInstancedEntities
 		mInstancedEntities.insert( mInstancedEntities.begin(), first, usedEntities.end() );
 		//Remove them from the array
 		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
@@ -597,7 +597,7 @@ namespace Ogre
         Real lodValue = depth * cam->_getLodBiasInverse();
 
 		//Now calculate Material LOD
-        /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
+        /*const LodStrategy *materialStrategy = mMaterial->getLodStrategy();
         
         //Calculate lod value for given strategy
         Real lodValue = materialStrategy->getValue( this, cam );*/
@@ -611,7 +611,7 @@ namespace Ogre
         subEntEvt.subEntity = this;
         subEntEvt.camera = cam;
         subEntEvt.lodValue = lodValue;
-        subEntEvt.previousLodIndex = m_materialLodIndex;
+        subEntEvt.previousLodIndex = mMaterialLodIndex;
         subEntEvt.newLodIndex = idx;
 
         //Notify lod event listeners

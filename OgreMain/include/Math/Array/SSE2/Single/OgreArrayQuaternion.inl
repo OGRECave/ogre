@@ -32,8 +32,8 @@ namespace Ogre
 #define DEFINE_OPERATION( leftClass, rightClass, op, op_func )\
 	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightClass &rhs )\
 	{\
-		const ArrayReal * RESTRICT_ALIAS lhsChunkBase = lhs.m_chunkBase;\
-		const ArrayReal * RESTRICT_ALIAS rhsChunkBase = rhs.m_chunkBase;\
+		const ArrayReal * RESTRICT_ALIAS lhsChunkBase = lhs.mChunkBase;\
+		const ArrayReal * RESTRICT_ALIAS rhsChunkBase = rhs.mChunkBase;\
 		return ArrayQuaternion(\
 				op_func( lhsChunkBase[0], rhsChunkBase[0] ),\
 				op_func( lhsChunkBase[1], rhsChunkBase[1] ),\
@@ -44,27 +44,27 @@ namespace Ogre
 	inline ArrayQuaternion operator op ( const leftType lhs, const rightClass &rhs )\
 	{\
 		return ArrayQuaternion(\
-				op_func( lhs, rhs.m_chunkBase[0] ),\
-				op_func( lhs, rhs.m_chunkBase[1] ),\
-				op_func( lhs, rhs.m_chunkBase[2] ),\
-				op_func( lhs, rhs.m_chunkBase[3] ) );\
+				op_func( lhs, rhs.mChunkBase[0] ),\
+				op_func( lhs, rhs.mChunkBase[1] ),\
+				op_func( lhs, rhs.mChunkBase[2] ),\
+				op_func( lhs, rhs.mChunkBase[3] ) );\
 	}
 #define DEFINE_R_OPERATION( leftClass, rightType, op, op_func )\
 	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightType rhs )\
 	{\
 		return ArrayQuaternion(\
-				op_func( lhs.m_chunkBase[0], rhs ),\
-				op_func( lhs.m_chunkBase[1], rhs ),\
-				op_func( lhs.m_chunkBase[2], rhs ),\
-				op_func( lhs.m_chunkBase[3], rhs ) );\
+				op_func( lhs.mChunkBase[0], rhs ),\
+				op_func( lhs.mChunkBase[1], rhs ),\
+				op_func( lhs.mChunkBase[2], rhs ),\
+				op_func( lhs.mChunkBase[3], rhs ) );\
 	}
 
 	// Update operations
 #define DEFINE_UPDATE_OPERATION( leftClass, op, op_func )\
 	inline void ArrayQuaternion::operator op ( const leftClass &a )\
 	{\
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;\
-		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.m_chunkBase;\
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;\
+		const ArrayReal * RESTRICT_ALIAS aChunkBase = a.mChunkBase;\
 		chunkBase[0] = op_func( chunkBase[0], aChunkBase[0] );\
 		chunkBase[1] = op_func( chunkBase[1], aChunkBase[1] );\
 		chunkBase[2] = op_func( chunkBase[2], aChunkBase[2] );\
@@ -73,10 +73,10 @@ namespace Ogre
 #define DEFINE_UPDATE_R_OPERATION( rightType, op, op_func )\
 	inline void ArrayQuaternion::operator op ( const rightType a )\
 	{\
-		m_chunkBase[0] = op_func( m_chunkBase[0], a );\
-		m_chunkBase[1] = op_func( m_chunkBase[1], a );\
-		m_chunkBase[2] = op_func( m_chunkBase[2], a );\
-		m_chunkBase[3] = op_func( m_chunkBase[3], a );\
+		mChunkBase[0] = op_func( mChunkBase[0], a );\
+		mChunkBase[1] = op_func( mChunkBase[1], a );\
+		mChunkBase[2] = op_func( mChunkBase[2], a );\
+		mChunkBase[3] = op_func( mChunkBase[3], a );\
 	}
 
 	// + Addition
@@ -109,32 +109,32 @@ namespace Ogre
 		return ArrayQuaternion(
 			/* w = (w * rkQ.w - x * rkQ.x) - (y * rkQ.y + z * rkQ.z) */
 			_mm_sub_ps( _mm_sub_ps(
-					_mm_mul_ps( lhs.m_chunkBase[0], rhs.m_chunkBase[0] ),
-					_mm_mul_ps( lhs.m_chunkBase[1], rhs.m_chunkBase[1] ) ),
+					_mm_mul_ps( lhs.mChunkBase[0], rhs.mChunkBase[0] ),
+					_mm_mul_ps( lhs.mChunkBase[1], rhs.mChunkBase[1] ) ),
 			_mm_add_ps(
-					_mm_mul_ps( lhs.m_chunkBase[2], rhs.m_chunkBase[2] ),
-					_mm_mul_ps( lhs.m_chunkBase[3], rhs.m_chunkBase[3] ) ) ),
+					_mm_mul_ps( lhs.mChunkBase[2], rhs.mChunkBase[2] ),
+					_mm_mul_ps( lhs.mChunkBase[3], rhs.mChunkBase[3] ) ) ),
 			/* x = (w * rkQ.x + x * rkQ.w) + (y * rkQ.z - z * rkQ.y) */
 			_mm_add_ps( _mm_add_ps(
-					_mm_mul_ps( lhs.m_chunkBase[0], rhs.m_chunkBase[1] ),
-					_mm_mul_ps( lhs.m_chunkBase[1], rhs.m_chunkBase[0] ) ),
+					_mm_mul_ps( lhs.mChunkBase[0], rhs.mChunkBase[1] ),
+					_mm_mul_ps( lhs.mChunkBase[1], rhs.mChunkBase[0] ) ),
 			_mm_sub_ps(
-					_mm_mul_ps( lhs.m_chunkBase[2], rhs.m_chunkBase[3] ),
-					_mm_mul_ps( lhs.m_chunkBase[3], rhs.m_chunkBase[2] ) ) ),
+					_mm_mul_ps( lhs.mChunkBase[2], rhs.mChunkBase[3] ),
+					_mm_mul_ps( lhs.mChunkBase[3], rhs.mChunkBase[2] ) ) ),
 			/* y = (w * rkQ.y + y * rkQ.w) + (z * rkQ.x - x * rkQ.z) */
 			_mm_add_ps( _mm_add_ps(
-					_mm_mul_ps( lhs.m_chunkBase[0], rhs.m_chunkBase[2] ),
-					_mm_mul_ps( lhs.m_chunkBase[2], rhs.m_chunkBase[0] ) ),
+					_mm_mul_ps( lhs.mChunkBase[0], rhs.mChunkBase[2] ),
+					_mm_mul_ps( lhs.mChunkBase[2], rhs.mChunkBase[0] ) ),
 			_mm_sub_ps(
-					_mm_mul_ps( lhs.m_chunkBase[3], rhs.m_chunkBase[1] ),
-					_mm_mul_ps( lhs.m_chunkBase[1], rhs.m_chunkBase[3] ) ) ),
+					_mm_mul_ps( lhs.mChunkBase[3], rhs.mChunkBase[1] ),
+					_mm_mul_ps( lhs.mChunkBase[1], rhs.mChunkBase[3] ) ) ),
 			/* z = (w * rkQ.z + z * rkQ.w) + (x * rkQ.y - y * rkQ.x) */
 			_mm_add_ps( _mm_add_ps(
-					_mm_mul_ps( lhs.m_chunkBase[0], rhs.m_chunkBase[3] ),
-					_mm_mul_ps( lhs.m_chunkBase[3], rhs.m_chunkBase[0] ) ),
+					_mm_mul_ps( lhs.mChunkBase[0], rhs.mChunkBase[3] ),
+					_mm_mul_ps( lhs.mChunkBase[3], rhs.mChunkBase[0] ) ),
 			_mm_sub_ps(
-					_mm_mul_ps( lhs.m_chunkBase[1], rhs.m_chunkBase[2] ),
-					_mm_mul_ps( lhs.m_chunkBase[2], rhs.m_chunkBase[1] ) ) ) );
+					_mm_mul_ps( lhs.mChunkBase[1], rhs.mChunkBase[2] ),
+					_mm_mul_ps( lhs.mChunkBase[2], rhs.mChunkBase[1] ) ) ) );
     }
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Slerp( ArrayReal fT, const ArrayQuaternion &rkP,
@@ -149,10 +149,10 @@ namespace Ogre
 		ArrayReal m = MathlibSSE2::Cmov4( MathlibSSE2::NEG_ONE, MathlibSSE2::ONE,
 											_mm_cmplt_ps( fCos, _mm_setzero_ps() ) /*&& shortestPath*/ );
         ArrayQuaternion rkT(
-						_mm_mul_ps( rkQ.m_chunkBase[0], m ),
-						_mm_mul_ps( rkQ.m_chunkBase[1], m ),
-						_mm_mul_ps( rkQ.m_chunkBase[2], m ),
-						_mm_mul_ps( rkQ.m_chunkBase[3], m ) );
+						_mm_mul_ps( rkQ.mChunkBase[0], m ),
+						_mm_mul_ps( rkQ.mChunkBase[1], m ),
+						_mm_mul_ps( rkQ.mChunkBase[2], m ),
+						_mm_mul_ps( rkQ.mChunkBase[3], m ) );
 		
 		ArrayReal fSin = _mm_sqrt_ps( _mm_sub_ps( MathlibSSE2::ONE, _mm_mul_ps( fCos, fCos ) ) );
 		
@@ -176,14 +176,14 @@ namespace Ogre
 		fCoeff1 = MathlibSSE2::CmovRobust( fCoeff1, fT, mask );
 
 		// retVal = fCoeff0 * rkP + fCoeff1 * rkT;
-		rkT.m_chunkBase[0] = _mm_add_ps( _mm_mul_ps( rkP.m_chunkBase[0], fCoeff0 ),
-										 _mm_mul_ps( rkT.m_chunkBase[0], fCoeff1 ) ),
-		rkT.m_chunkBase[1] = _mm_add_ps( _mm_mul_ps( rkP.m_chunkBase[1], fCoeff0 ),
-										 _mm_mul_ps( rkT.m_chunkBase[1], fCoeff1 ) ),
-		rkT.m_chunkBase[2] = _mm_add_ps( _mm_mul_ps( rkP.m_chunkBase[2], fCoeff0 ),
-										 _mm_mul_ps( rkT.m_chunkBase[2], fCoeff1 ) ),
-		rkT.m_chunkBase[3] = _mm_add_ps( _mm_mul_ps( rkP.m_chunkBase[3], fCoeff0 ),
-										 _mm_mul_ps( rkT.m_chunkBase[3], fCoeff1 ) );
+		rkT.mChunkBase[0] = _mm_add_ps( _mm_mul_ps( rkP.mChunkBase[0], fCoeff0 ),
+										 _mm_mul_ps( rkT.mChunkBase[0], fCoeff1 ) ),
+		rkT.mChunkBase[1] = _mm_add_ps( _mm_mul_ps( rkP.mChunkBase[1], fCoeff0 ),
+										 _mm_mul_ps( rkT.mChunkBase[1], fCoeff1 ) ),
+		rkT.mChunkBase[2] = _mm_add_ps( _mm_mul_ps( rkP.mChunkBase[2], fCoeff0 ),
+										 _mm_mul_ps( rkT.mChunkBase[2], fCoeff1 ) ),
+		rkT.mChunkBase[3] = _mm_add_ps( _mm_mul_ps( rkP.mChunkBase[3], fCoeff0 ),
+										 _mm_mul_ps( rkT.mChunkBase[3], fCoeff1 ) );
 
 		rkT.normalise();
 
@@ -196,16 +196,16 @@ namespace Ogre
 		//Flip the sign of rkQ when p.dot( q ) < 0 to get the shortest path
 		ArrayReal signMask = _mm_set1_ps( -0.0f );
 		ArrayReal sign = _mm_and_ps( signMask, rkP.Dot( rkQ ) );
-		ArrayQuaternion tmpQ = ArrayQuaternion( _mm_xor_ps( rkQ.m_chunkBase[0], sign ),
-												_mm_xor_ps( rkQ.m_chunkBase[1], sign ),
-												_mm_xor_ps( rkQ.m_chunkBase[2], sign ),
-												_mm_xor_ps( rkQ.m_chunkBase[3], sign ) );
+		ArrayQuaternion tmpQ = ArrayQuaternion( _mm_xor_ps( rkQ.mChunkBase[0], sign ),
+												_mm_xor_ps( rkQ.mChunkBase[1], sign ),
+												_mm_xor_ps( rkQ.mChunkBase[2], sign ),
+												_mm_xor_ps( rkQ.mChunkBase[3], sign ) );
 
 		ArrayQuaternion retVal(
-				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[0], rkP.m_chunkBase[0] ), rkP.m_chunkBase[0] ),
-				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[1], rkP.m_chunkBase[1] ), rkP.m_chunkBase[1] ),
-				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[2], rkP.m_chunkBase[2] ), rkP.m_chunkBase[2] ),
-				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.m_chunkBase[3], rkP.m_chunkBase[3] ), rkP.m_chunkBase[3] ) );
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.mChunkBase[0], rkP.mChunkBase[0] ), rkP.mChunkBase[0] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.mChunkBase[1], rkP.mChunkBase[1] ), rkP.mChunkBase[1] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.mChunkBase[2], rkP.mChunkBase[2] ), rkP.mChunkBase[2] ),
+				_mm_madd_ps( fT, _mm_sub_ps( tmpQ.mChunkBase[3], rkP.mChunkBase[3] ), rkP.mChunkBase[3] ) );
 		retVal.normalise();
 
 		return retVal;
@@ -215,10 +215,10 @@ namespace Ogre
 														const ArrayQuaternion &rkQ )
 	{
 		ArrayQuaternion retVal(
-				_mm_madd_ps( fT, _mm_sub_ps( rkQ.m_chunkBase[0], rkP.m_chunkBase[0] ), rkP.m_chunkBase[0] ),
-				_mm_madd_ps( fT, _mm_sub_ps( rkQ.m_chunkBase[1], rkP.m_chunkBase[1] ), rkP.m_chunkBase[1] ),
-				_mm_madd_ps( fT, _mm_sub_ps( rkQ.m_chunkBase[2], rkP.m_chunkBase[2] ), rkP.m_chunkBase[2] ),
-				_mm_madd_ps( fT, _mm_sub_ps( rkQ.m_chunkBase[3], rkP.m_chunkBase[3] ), rkP.m_chunkBase[3] ) );
+				_mm_madd_ps( fT, _mm_sub_ps( rkQ.mChunkBase[0], rkP.mChunkBase[0] ), rkP.mChunkBase[0] ),
+				_mm_madd_ps( fT, _mm_sub_ps( rkQ.mChunkBase[1], rkP.mChunkBase[1] ), rkP.mChunkBase[1] ),
+				_mm_madd_ps( fT, _mm_sub_ps( rkQ.mChunkBase[2], rkP.mChunkBase[2] ), rkP.mChunkBase[2] ),
+				_mm_madd_ps( fT, _mm_sub_ps( rkQ.mChunkBase[3], rkP.mChunkBase[3] ), rkP.mChunkBase[3] ) );
 		retVal.normalise();
 
 		return retVal;
@@ -228,38 +228,38 @@ namespace Ogre
 													const ArrayQuaternion &arg2, ArrayReal mask )
 	{
 		return ArrayQuaternion(
-				MathlibSSE2::Cmov4( arg1.m_chunkBase[0], arg2.m_chunkBase[0], mask ),
-				MathlibSSE2::Cmov4( arg1.m_chunkBase[1], arg2.m_chunkBase[1], mask ),
-				MathlibSSE2::Cmov4( arg1.m_chunkBase[2], arg2.m_chunkBase[2], mask ),
-				MathlibSSE2::Cmov4( arg1.m_chunkBase[3], arg2.m_chunkBase[3], mask ) );
+				MathlibSSE2::Cmov4( arg1.mChunkBase[0], arg2.mChunkBase[0], mask ),
+				MathlibSSE2::Cmov4( arg1.mChunkBase[1], arg2.mChunkBase[1], mask ),
+				MathlibSSE2::Cmov4( arg1.mChunkBase[2], arg2.mChunkBase[2], mask ),
+				MathlibSSE2::Cmov4( arg1.mChunkBase[3], arg2.mChunkBase[3], mask ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayQuaternion::mul( const ArrayQuaternion &inQ, ArrayVector3 &inOutVec )
 	{
 		// nVidia SDK implementation
-		ArrayVector3 qVec( inQ.m_chunkBase[1], inQ.m_chunkBase[2], inQ.m_chunkBase[3] );
+		ArrayVector3 qVec( inQ.mChunkBase[1], inQ.mChunkBase[2], inQ.mChunkBase[3] );
 
 		ArrayVector3 uv	= qVec.crossProduct( inOutVec );
 		ArrayVector3 uuv	= qVec.crossProduct( uv );
 
 		// uv = uv * (2.0f * w)
-		ArrayReal w2 = _mm_add_ps( inQ.m_chunkBase[0], inQ.m_chunkBase[0] );
-		uv.m_chunkBase[0] = _mm_mul_ps( uv.m_chunkBase[0], w2 );
-		uv.m_chunkBase[1] = _mm_mul_ps( uv.m_chunkBase[1], w2 );
-		uv.m_chunkBase[2] = _mm_mul_ps( uv.m_chunkBase[2], w2 );
+		ArrayReal w2 = _mm_add_ps( inQ.mChunkBase[0], inQ.mChunkBase[0] );
+		uv.mChunkBase[0] = _mm_mul_ps( uv.mChunkBase[0], w2 );
+		uv.mChunkBase[1] = _mm_mul_ps( uv.mChunkBase[1], w2 );
+		uv.mChunkBase[2] = _mm_mul_ps( uv.mChunkBase[2], w2 );
 
 		// uuv = uuv * 2.0f
-		uuv.m_chunkBase[0] = _mm_add_ps( uuv.m_chunkBase[0], uuv.m_chunkBase[0] );
-		uuv.m_chunkBase[1] = _mm_add_ps( uuv.m_chunkBase[1], uuv.m_chunkBase[1] );
-		uuv.m_chunkBase[2] = _mm_add_ps( uuv.m_chunkBase[2], uuv.m_chunkBase[2] );
+		uuv.mChunkBase[0] = _mm_add_ps( uuv.mChunkBase[0], uuv.mChunkBase[0] );
+		uuv.mChunkBase[1] = _mm_add_ps( uuv.mChunkBase[1], uuv.mChunkBase[1] );
+		uuv.mChunkBase[2] = _mm_add_ps( uuv.mChunkBase[2], uuv.mChunkBase[2] );
 
 		//inOutVec = v + uv + uuv
-		inOutVec.m_chunkBase[0] = _mm_add_ps( inOutVec.m_chunkBase[0],
-									_mm_add_ps( uv.m_chunkBase[0], uuv.m_chunkBase[0] ) );
-		inOutVec.m_chunkBase[1] = _mm_add_ps( inOutVec.m_chunkBase[1],
-									_mm_add_ps( uv.m_chunkBase[1], uuv.m_chunkBase[1] ) );
-		inOutVec.m_chunkBase[2] = _mm_add_ps( inOutVec.m_chunkBase[2],
-									_mm_add_ps( uv.m_chunkBase[2], uuv.m_chunkBase[2] ) );
+		inOutVec.mChunkBase[0] = _mm_add_ps( inOutVec.mChunkBase[0],
+									_mm_add_ps( uv.mChunkBase[0], uuv.mChunkBase[0] ) );
+		inOutVec.mChunkBase[1] = _mm_add_ps( inOutVec.mChunkBase[1],
+									_mm_add_ps( uv.mChunkBase[1], uuv.mChunkBase[1] ) );
+		inOutVec.mChunkBase[2] = _mm_add_ps( inOutVec.mChunkBase[2],
+									_mm_add_ps( uv.mChunkBase[2], uuv.mChunkBase[2] ) );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
@@ -272,10 +272,10 @@ namespace Ogre
 		ArrayReal fHalfAngle( _mm_mul_ps( rfAngle.valueRadians(), MathlibSSE2::HALF ) );
 
 		ArrayReal fSin;
-		MathlibSSE2::SinCos4( fHalfAngle, fSin, m_chunkBase[0] );
+		MathlibSSE2::SinCos4( fHalfAngle, fSin, mChunkBase[0] );
 
-		ArrayReal * RESTRICT_ALIAS chunkBase = m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS rkAxisChunkBase = rkAxis.m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS chunkBase = mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS rkAxisChunkBase = rkAxis.mChunkBase;
 
 		chunkBase[1] = _mm_mul_ps( fSin, rkAxisChunkBase[0] ); //x = fSin*rkAxis.x;
 		chunkBase[2] = _mm_mul_ps( fSin, rkAxisChunkBase[1] ); //y = fSin*rkAxis.y;
@@ -287,9 +287,9 @@ namespace Ogre
 		// The quaternion representing the rotation is
         //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 		ArrayReal sqLength = _mm_add_ps( _mm_add_ps(
-								_mm_mul_ps( m_chunkBase[1], m_chunkBase[1] ),	//(x * x +
-								_mm_mul_ps( m_chunkBase[2], m_chunkBase[2] ) ),	//y * y) +
-								_mm_mul_ps( m_chunkBase[3], m_chunkBase[3] ) );	//z * z )
+								_mm_mul_ps( mChunkBase[1], mChunkBase[1] ),	//(x * x +
+								_mm_mul_ps( mChunkBase[2], mChunkBase[2] ) ),	//y * y) +
+								_mm_mul_ps( mChunkBase[3], mChunkBase[3] ) );	//z * z )
 
 		ArrayReal mask		= _mm_cmpgt_ps( sqLength, _mm_setzero_ps() ); //mask = sqLength > 0
 
@@ -299,29 +299,29 @@ namespace Ogre
 										_mm_cmpgt_ps( sqLength, MathlibSSE2::FLOAT_MIN ) );
 		ArrayReal fInvLength = MathlibSSE2::InvSqrtNonZero4( sqLength );
 
-		const ArrayReal acosW = MathlibSSE2::ACos4( m_chunkBase[0] );
+		const ArrayReal acosW = MathlibSSE2::ACos4( mChunkBase[0] );
 		rfAngle = MathlibSSE2::Cmov4( //sqLength > 0 ? (2 * ACos(w)) : 0
 					_mm_add_ps( acosW, acosW ),
 					_mm_setzero_ps(), mask );
 
-		rkAxis.m_chunkBase[0] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (x * fInvLength) : 1
-									_mm_mul_ps( m_chunkBase[1], fInvLength ), MathlibSSE2::ONE, mask );
-		rkAxis.m_chunkBase[1] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (y * fInvLength) : 0
-									_mm_mul_ps( m_chunkBase[2], fInvLength ), _mm_setzero_ps(), mask );
-		rkAxis.m_chunkBase[2] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (y * fInvLength) : 0
-									_mm_mul_ps( m_chunkBase[3], fInvLength ), _mm_setzero_ps(), mask );
+		rkAxis.mChunkBase[0] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (x * fInvLength) : 1
+									_mm_mul_ps( mChunkBase[1], fInvLength ), MathlibSSE2::ONE, mask );
+		rkAxis.mChunkBase[1] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (y * fInvLength) : 0
+									_mm_mul_ps( mChunkBase[2], fInvLength ), _mm_setzero_ps(), mask );
+		rkAxis.mChunkBase[2] = MathlibSSE2::Cmov4(	//sqLength > 0 ? (y * fInvLength) : 0
+									_mm_mul_ps( mChunkBase[3], fInvLength ), _mm_setzero_ps(), mask );
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayQuaternion::xAxis( void ) const
 	{
-		ArrayReal fTy  = _mm_add_ps( m_chunkBase[2], m_chunkBase[2] );		// 2 * y
-		ArrayReal fTz  = _mm_add_ps( m_chunkBase[3], m_chunkBase[3] );		// 2 * z
-		ArrayReal fTwy = _mm_mul_ps( fTy, m_chunkBase[0] );					// fTy*w;
-		ArrayReal fTwz = _mm_mul_ps( fTz, m_chunkBase[0] );					// fTz*w;
-		ArrayReal fTxy = _mm_mul_ps( fTy, m_chunkBase[1] );					// fTy*x;
-		ArrayReal fTxz = _mm_mul_ps( fTz, m_chunkBase[1] );					// fTz*x;
-		ArrayReal fTyy = _mm_mul_ps( fTy, m_chunkBase[2] );					// fTy*y;
-		ArrayReal fTzz = _mm_mul_ps( fTz, m_chunkBase[3] );					// fTz*z;
+		ArrayReal fTy  = _mm_add_ps( mChunkBase[2], mChunkBase[2] );		// 2 * y
+		ArrayReal fTz  = _mm_add_ps( mChunkBase[3], mChunkBase[3] );		// 2 * z
+		ArrayReal fTwy = _mm_mul_ps( fTy, mChunkBase[0] );					// fTy*w;
+		ArrayReal fTwz = _mm_mul_ps( fTz, mChunkBase[0] );					// fTz*w;
+		ArrayReal fTxy = _mm_mul_ps( fTy, mChunkBase[1] );					// fTy*x;
+		ArrayReal fTxz = _mm_mul_ps( fTz, mChunkBase[1] );					// fTz*x;
+		ArrayReal fTyy = _mm_mul_ps( fTy, mChunkBase[2] );					// fTy*y;
+		ArrayReal fTzz = _mm_mul_ps( fTz, mChunkBase[3] );					// fTz*z;
 
 		return ArrayVector3(
 				_mm_sub_ps( MathlibSSE2::ONE, _mm_add_ps( fTyy, fTzz ) ),
@@ -331,15 +331,15 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayQuaternion::yAxis( void ) const
 	{
-		ArrayReal fTx  = _mm_add_ps( m_chunkBase[1], m_chunkBase[1] );		// 2 * x
-		ArrayReal fTy  = _mm_add_ps( m_chunkBase[2], m_chunkBase[2] );		// 2 * y
-		ArrayReal fTz  = _mm_add_ps( m_chunkBase[3], m_chunkBase[3] );		// 2 * z
-		ArrayReal fTwx = _mm_mul_ps( fTx, m_chunkBase[0] );					// fTx*w;
-		ArrayReal fTwz = _mm_mul_ps( fTz, m_chunkBase[0] );					// fTz*w;
-		ArrayReal fTxx = _mm_mul_ps( fTx, m_chunkBase[1] );					// fTx*x;
-		ArrayReal fTxy = _mm_mul_ps( fTy, m_chunkBase[1] );					// fTy*x;
-		ArrayReal fTyz = _mm_mul_ps( fTz, m_chunkBase[2] );					// fTz*y;
-		ArrayReal fTzz = _mm_mul_ps( fTz, m_chunkBase[3] );					// fTz*z;
+		ArrayReal fTx  = _mm_add_ps( mChunkBase[1], mChunkBase[1] );		// 2 * x
+		ArrayReal fTy  = _mm_add_ps( mChunkBase[2], mChunkBase[2] );		// 2 * y
+		ArrayReal fTz  = _mm_add_ps( mChunkBase[3], mChunkBase[3] );		// 2 * z
+		ArrayReal fTwx = _mm_mul_ps( fTx, mChunkBase[0] );					// fTx*w;
+		ArrayReal fTwz = _mm_mul_ps( fTz, mChunkBase[0] );					// fTz*w;
+		ArrayReal fTxx = _mm_mul_ps( fTx, mChunkBase[1] );					// fTx*x;
+		ArrayReal fTxy = _mm_mul_ps( fTy, mChunkBase[1] );					// fTy*x;
+		ArrayReal fTyz = _mm_mul_ps( fTz, mChunkBase[2] );					// fTz*y;
+		ArrayReal fTzz = _mm_mul_ps( fTz, mChunkBase[3] );					// fTz*z;
 
 		return ArrayVector3(
 				_mm_sub_ps( fTxy, fTwz ),
@@ -349,15 +349,15 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayQuaternion::zAxis( void ) const
 	{
-		ArrayReal fTx  = _mm_add_ps( m_chunkBase[1], m_chunkBase[1] );		// 2 * x
-		ArrayReal fTy  = _mm_add_ps( m_chunkBase[2], m_chunkBase[2] );		// 2 * y
-		ArrayReal fTz  = _mm_add_ps( m_chunkBase[3], m_chunkBase[3] );		// 2 * z
-		ArrayReal fTwx = _mm_mul_ps( fTx, m_chunkBase[0] );					// fTx*w;
-		ArrayReal fTwy = _mm_mul_ps( fTy, m_chunkBase[0] );					// fTy*w;
-		ArrayReal fTxx = _mm_mul_ps( fTx, m_chunkBase[1] );					// fTx*x;
-		ArrayReal fTxz = _mm_mul_ps( fTz, m_chunkBase[1] );					// fTz*x;
-		ArrayReal fTyy = _mm_mul_ps( fTy, m_chunkBase[2] );					// fTy*y;
-		ArrayReal fTyz = _mm_mul_ps( fTz, m_chunkBase[2] );					// fTz*y;
+		ArrayReal fTx  = _mm_add_ps( mChunkBase[1], mChunkBase[1] );		// 2 * x
+		ArrayReal fTy  = _mm_add_ps( mChunkBase[2], mChunkBase[2] );		// 2 * y
+		ArrayReal fTz  = _mm_add_ps( mChunkBase[3], mChunkBase[3] );		// 2 * z
+		ArrayReal fTwx = _mm_mul_ps( fTx, mChunkBase[0] );					// fTx*w;
+		ArrayReal fTwy = _mm_mul_ps( fTy, mChunkBase[0] );					// fTy*w;
+		ArrayReal fTxx = _mm_mul_ps( fTx, mChunkBase[1] );					// fTx*x;
+		ArrayReal fTxz = _mm_mul_ps( fTz, mChunkBase[1] );					// fTz*x;
+		ArrayReal fTyy = _mm_mul_ps( fTy, mChunkBase[2] );					// fTy*y;
+		ArrayReal fTyz = _mm_mul_ps( fTz, mChunkBase[2] );					// fTz*y;
 
 		return ArrayVector3(
 				_mm_add_ps( fTxz, fTwy ),
@@ -369,29 +369,29 @@ namespace Ogre
 	{
 		return
 		_mm_add_ps( _mm_add_ps( _mm_add_ps(
-			_mm_mul_ps( m_chunkBase[0], rkQ.m_chunkBase[0] ) ,	//((w * vec.w   +
-			_mm_mul_ps( m_chunkBase[1], rkQ.m_chunkBase[1] ) ),	//  x * vec.x ) +
-			_mm_mul_ps( m_chunkBase[2], rkQ.m_chunkBase[2] ) ), //  y * vec.y ) +
-			_mm_mul_ps( m_chunkBase[3], rkQ.m_chunkBase[3] ) );	//  z * vec.z
+			_mm_mul_ps( mChunkBase[0], rkQ.mChunkBase[0] ) ,	//((w * vec.w   +
+			_mm_mul_ps( mChunkBase[1], rkQ.mChunkBase[1] ) ),	//  x * vec.x ) +
+			_mm_mul_ps( mChunkBase[2], rkQ.mChunkBase[2] ) ), //  y * vec.y ) +
+			_mm_mul_ps( mChunkBase[3], rkQ.mChunkBase[3] ) );	//  z * vec.z
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayReal ArrayQuaternion::Norm( void ) const
 	{
 		return
 		_mm_add_ps( _mm_add_ps( _mm_add_ps(
-			_mm_mul_ps( m_chunkBase[0], m_chunkBase[0] ) ,	//((w * w   +
-			_mm_mul_ps( m_chunkBase[1], m_chunkBase[1] ) ),	//  x * x ) +
-			_mm_mul_ps( m_chunkBase[2], m_chunkBase[2] ) ), //  y * y ) +
-			_mm_mul_ps( m_chunkBase[3], m_chunkBase[3] ) );	//  z * z
+			_mm_mul_ps( mChunkBase[0], mChunkBase[0] ) ,	//((w * w   +
+			_mm_mul_ps( mChunkBase[1], mChunkBase[1] ) ),	//  x * x ) +
+			_mm_mul_ps( mChunkBase[2], mChunkBase[2] ) ), //  y * y ) +
+			_mm_mul_ps( mChunkBase[3], mChunkBase[3] ) );	//  z * z
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayQuaternion::normalise( void )
 	{
 		ArrayReal sqLength = _mm_add_ps( _mm_add_ps( _mm_add_ps(
-			_mm_mul_ps( m_chunkBase[0], m_chunkBase[0] ) ,	//((w * w   +
-			_mm_mul_ps( m_chunkBase[1], m_chunkBase[1] ) ),	//  x * x ) +
-			_mm_mul_ps( m_chunkBase[2], m_chunkBase[2] ) ), //  y * y ) +
-			_mm_mul_ps( m_chunkBase[3], m_chunkBase[3] ) );	//  z * z
+			_mm_mul_ps( mChunkBase[0], mChunkBase[0] ) ,	//((w * w   +
+			_mm_mul_ps( mChunkBase[1], mChunkBase[1] ) ),	//  x * x ) +
+			_mm_mul_ps( mChunkBase[2], mChunkBase[2] ) ), //  y * y ) +
+			_mm_mul_ps( mChunkBase[3], mChunkBase[3] ) );	//  z * z
 
 		//Convert sqLength's 0s into 1, so that zero vectors remain as zero
 		//Denormals are treated as 0 during the check.
@@ -400,19 +400,19 @@ namespace Ogre
 		sqLength = MathlibSSE2::Cmov4( sqLength, MathlibSSE2::ONE,
 										_mm_cmpgt_ps( sqLength, MathlibSSE2::FLOAT_MIN ) );
 		ArrayReal invLength = MathlibSSE2::InvSqrtNonZero4( sqLength );
-		m_chunkBase[0] = _mm_mul_ps( m_chunkBase[0], invLength ); //w * invLength
-		m_chunkBase[1] = _mm_mul_ps( m_chunkBase[1], invLength ); //x * invLength
-		m_chunkBase[2] = _mm_mul_ps( m_chunkBase[2], invLength ); //y * invLength
-		m_chunkBase[3] = _mm_mul_ps( m_chunkBase[3], invLength ); //z * invLength
+		mChunkBase[0] = _mm_mul_ps( mChunkBase[0], invLength ); //w * invLength
+		mChunkBase[1] = _mm_mul_ps( mChunkBase[1], invLength ); //x * invLength
+		mChunkBase[2] = _mm_mul_ps( mChunkBase[2], invLength ); //y * invLength
+		mChunkBase[3] = _mm_mul_ps( mChunkBase[3], invLength ); //z * invLength
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Inverse( void ) const
 	{
 		ArrayReal fNorm = _mm_add_ps( _mm_add_ps( _mm_add_ps(
-			_mm_mul_ps( m_chunkBase[0], m_chunkBase[0] ) ,	//((w * w   +
-			_mm_mul_ps( m_chunkBase[1], m_chunkBase[1] ) ),	//  x * x ) +
-			_mm_mul_ps( m_chunkBase[2], m_chunkBase[2] ) ), //  y * y ) +
-			_mm_mul_ps( m_chunkBase[3], m_chunkBase[3] ) );	//  z * z;
+			_mm_mul_ps( mChunkBase[0], mChunkBase[0] ) ,	//((w * w   +
+			_mm_mul_ps( mChunkBase[1], mChunkBase[1] ) ),	//  x * x ) +
+			_mm_mul_ps( mChunkBase[2], mChunkBase[2] ) ), //  y * y ) +
+			_mm_mul_ps( mChunkBase[3], mChunkBase[3] ) );	//  z * z;
 
 		//Will return a zero Quaternion if original is zero length (Quaternion's behavior)
 		fNorm = MathlibSSE2::Cmov4( fNorm, MathlibSSE2::ONE,
@@ -421,19 +421,19 @@ namespace Ogre
 		ArrayReal negInvNorm = _mm_mul_ps( invNorm, MathlibSSE2::NEG_ONE );
 
 		return ArrayQuaternion(
-			_mm_mul_ps( m_chunkBase[0], invNorm ),		//w * invNorm
-			_mm_mul_ps( m_chunkBase[1], negInvNorm ),	//x * -invNorm
-			_mm_mul_ps( m_chunkBase[2], negInvNorm ),	//y * -invNorm
-			_mm_mul_ps( m_chunkBase[3], negInvNorm ) );	//z * -invNorm
+			_mm_mul_ps( mChunkBase[0], invNorm ),		//w * invNorm
+			_mm_mul_ps( mChunkBase[1], negInvNorm ),	//x * -invNorm
+			_mm_mul_ps( mChunkBase[2], negInvNorm ),	//y * -invNorm
+			_mm_mul_ps( mChunkBase[3], negInvNorm ) );	//z * -invNorm
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::UnitInverse( void ) const
 	{
 		return ArrayQuaternion(
-			m_chunkBase[0],											//w
-			_mm_mul_ps( m_chunkBase[1], MathlibSSE2::NEG_ONE ),		//-x
-			_mm_mul_ps( m_chunkBase[2], MathlibSSE2::NEG_ONE ),		//-y
-			_mm_mul_ps( m_chunkBase[3], MathlibSSE2::NEG_ONE ) );	//-z
+			mChunkBase[0],											//w
+			_mm_mul_ps( mChunkBase[1], MathlibSSE2::NEG_ONE ),		//-x
+			_mm_mul_ps( mChunkBase[2], MathlibSSE2::NEG_ONE ),		//-y
+			_mm_mul_ps( mChunkBase[3], MathlibSSE2::NEG_ONE ) );	//-z
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Exp( void ) const
@@ -443,9 +443,9 @@ namespace Ogre
         // use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
 
 		ArrayReal fAngle = _mm_sqrt_ps( _mm_add_ps( _mm_add_ps(						//sqrt(
-								_mm_mul_ps( m_chunkBase[1], m_chunkBase[1] ),		//(x * x +
-								_mm_mul_ps( m_chunkBase[2], m_chunkBase[2] ) ),		//y * y) +
-								_mm_mul_ps( m_chunkBase[3], m_chunkBase[3] ) ) );	//z * z )
+								_mm_mul_ps( mChunkBase[1], mChunkBase[1] ),		//(x * x +
+								_mm_mul_ps( mChunkBase[2], mChunkBase[2] ) ),		//y * y) +
+								_mm_mul_ps( mChunkBase[3], mChunkBase[3] ) ) );	//z * z )
 
 		ArrayReal w, fSin;
 		MathlibSSE2::SinCos4( fAngle, fSin, w );
@@ -455,9 +455,9 @@ namespace Ogre
 								_mm_cmpge_ps( MathlibSSE2::Abs4( fSin ), MathlibSSE2::fEpsilon ) );
 		return ArrayQuaternion(
 			w,											//cos( fAngle )
-			_mm_mul_ps( m_chunkBase[1], coeff ),		//x * coeff
-			_mm_mul_ps( m_chunkBase[2], coeff ),		//y * coeff
-			_mm_mul_ps( m_chunkBase[3], coeff ) );		//z * coeff
+			_mm_mul_ps( mChunkBase[1], coeff ),		//x * coeff
+			_mm_mul_ps( mChunkBase[2], coeff ),		//y * coeff
+			_mm_mul_ps( mChunkBase[3], coeff ) );		//z * coeff
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Log( void ) const
@@ -466,12 +466,12 @@ namespace Ogre
         // log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
         // sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
 
-		ArrayReal fAngle	= MathlibSSE2::ACos4( m_chunkBase[0] );
+		ArrayReal fAngle	= MathlibSSE2::ACos4( mChunkBase[0] );
 		ArrayReal fSin		= MathlibSSE2::Sin4( fAngle );
 
 		//mask = Math::Abs(w) < 1.0 && Math::Abs(fSin) >= msEpsilon
 		ArrayReal mask = _mm_and_ps(
-							_mm_cmplt_ps( MathlibSSE2::Abs4( m_chunkBase[0] ), MathlibSSE2::ONE ),
+							_mm_cmplt_ps( MathlibSSE2::Abs4( mChunkBase[0] ), MathlibSSE2::ONE ),
 							_mm_cmpge_ps( MathlibSSE2::Abs4( fSin ), MathlibSSE2::fEpsilon ) );
 
 		//coeff = mask ? (fAngle / fSin) : 1.0
@@ -483,45 +483,45 @@ namespace Ogre
 
 		return ArrayQuaternion(
 			_mm_setzero_ps(),							//w = 0
-			_mm_mul_ps( m_chunkBase[1], coeff ),		//x * coeff
-			_mm_mul_ps( m_chunkBase[2], coeff ),		//y * coeff
-			_mm_mul_ps( m_chunkBase[3], coeff ) );		//z * coeff
+			_mm_mul_ps( mChunkBase[1], coeff ),		//x * coeff
+			_mm_mul_ps( mChunkBase[2], coeff ),		//y * coeff
+			_mm_mul_ps( mChunkBase[3], coeff ) );		//z * coeff
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayVector3 ArrayQuaternion::operator * ( const ArrayVector3 &v ) const
 	{
 		// nVidia SDK implementation
-		ArrayVector3 qVec( m_chunkBase[1], m_chunkBase[2], m_chunkBase[3] );
+		ArrayVector3 qVec( mChunkBase[1], mChunkBase[2], mChunkBase[3] );
 
 		ArrayVector3 uv	= qVec.crossProduct( v );
 		ArrayVector3 uuv	= qVec.crossProduct( uv );
 
 		// uv = uv * (2.0f * w)
-		ArrayReal w2 = _mm_add_ps( m_chunkBase[0], m_chunkBase[0] );
-		uv.m_chunkBase[0] = _mm_mul_ps( uv.m_chunkBase[0], w2 );
-		uv.m_chunkBase[1] = _mm_mul_ps( uv.m_chunkBase[1], w2 );
-		uv.m_chunkBase[2] = _mm_mul_ps( uv.m_chunkBase[2], w2 );
+		ArrayReal w2 = _mm_add_ps( mChunkBase[0], mChunkBase[0] );
+		uv.mChunkBase[0] = _mm_mul_ps( uv.mChunkBase[0], w2 );
+		uv.mChunkBase[1] = _mm_mul_ps( uv.mChunkBase[1], w2 );
+		uv.mChunkBase[2] = _mm_mul_ps( uv.mChunkBase[2], w2 );
 
 		// uuv = uuv * 2.0f
-		uuv.m_chunkBase[0] = _mm_add_ps( uuv.m_chunkBase[0], uuv.m_chunkBase[0] );
-		uuv.m_chunkBase[1] = _mm_add_ps( uuv.m_chunkBase[1], uuv.m_chunkBase[1] );
-		uuv.m_chunkBase[2] = _mm_add_ps( uuv.m_chunkBase[2], uuv.m_chunkBase[2] );
+		uuv.mChunkBase[0] = _mm_add_ps( uuv.mChunkBase[0], uuv.mChunkBase[0] );
+		uuv.mChunkBase[1] = _mm_add_ps( uuv.mChunkBase[1], uuv.mChunkBase[1] );
+		uuv.mChunkBase[2] = _mm_add_ps( uuv.mChunkBase[2], uuv.mChunkBase[2] );
 
 		//uv = v + uv + uuv
-		uv.m_chunkBase[0] = _mm_add_ps( v.m_chunkBase[0],
-								_mm_add_ps( uv.m_chunkBase[0], uuv.m_chunkBase[0] ) );
-		uv.m_chunkBase[1] = _mm_add_ps( v.m_chunkBase[1],
-								_mm_add_ps( uv.m_chunkBase[1], uuv.m_chunkBase[1] ) );
-		uv.m_chunkBase[2] = _mm_add_ps( v.m_chunkBase[2],
-								_mm_add_ps( uv.m_chunkBase[2], uuv.m_chunkBase[2] ) );
+		uv.mChunkBase[0] = _mm_add_ps( v.mChunkBase[0],
+								_mm_add_ps( uv.mChunkBase[0], uuv.mChunkBase[0] ) );
+		uv.mChunkBase[1] = _mm_add_ps( v.mChunkBase[1],
+								_mm_add_ps( uv.mChunkBase[1], uuv.mChunkBase[1] ) );
+		uv.mChunkBase[2] = _mm_add_ps( v.mChunkBase[2],
+								_mm_add_ps( uv.mChunkBase[2], uuv.mChunkBase[2] ) );
 
 		return uv;
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayQuaternion::Cmov4( ArrayReal mask, const ArrayQuaternion &replacement )
 	{
-		ArrayReal * RESTRICT_ALIAS aChunkBase = m_chunkBase;
-		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.m_chunkBase;
+		ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
+		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
 		aChunkBase[0] = MathlibSSE2::Cmov4( aChunkBase[0], bChunkBase[0], mask );
 		aChunkBase[1] = MathlibSSE2::Cmov4( aChunkBase[1], bChunkBase[1], mask );
 		aChunkBase[2] = MathlibSSE2::Cmov4( aChunkBase[2], bChunkBase[2], mask );
