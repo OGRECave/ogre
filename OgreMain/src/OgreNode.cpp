@@ -143,13 +143,16 @@ namespace Ogre {
 
         mParent = parent;
 
-		// Call listener (note, only called if there's something to do)
-		if( mListener && different )
+		if( different )
 		{
-			if (mParent)
-				mListener->nodeAttached(this);
-			else
-				mListener->nodeDetached(this);
+			// Call listener
+			if( mListener )
+			{
+				if (mParent)
+					mListener->nodeAttached(this);
+				else
+					mListener->nodeDetached(this);
+			}
 
 			size_t oldDepthLevel = mDepthLevel;
 

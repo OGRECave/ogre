@@ -182,6 +182,8 @@ namespace Ogre
 
 		void clear()
 		{
+			for( size_t i=0; i<m_size; ++i )
+				m_data[i].~T();
 			m_size = 0;
 		}
 

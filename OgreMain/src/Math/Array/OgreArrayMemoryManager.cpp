@@ -67,9 +67,9 @@ namespace Ogre
 		m_maxHardLimit	+= OGRE_PREFETCH_SLOT_DISTANCE;
 
 		// Round up max memory & hard limit to the next multiple of ARRAY_PACKED_REALS
-		m_maxMemory   += ( (m_maxMemory + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+		m_maxMemory    = ( (m_maxMemory + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
 							ARRAY_PACKED_REALS;
-		m_maxHardLimit+= ( (m_maxHardLimit + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+		m_maxHardLimit = ( (m_maxHardLimit + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
 							ARRAY_PACKED_REALS;
 
 		if( !m_rebaseListener )
@@ -149,7 +149,7 @@ namespace Ogre
 			--m_usedMemory;
 		}
 
-		if( m_usedMemory >= m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE )
+		if( m_usedMemory > m_maxMemory - OGRE_PREFETCH_SLOT_DISTANCE )
 		{
 			if( m_maxMemory >= m_maxHardLimit )
 			{
