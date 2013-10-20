@@ -179,7 +179,7 @@ void Sample_Compositor::registerCompositors(void)
 			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
 		} catch (...) {
 			/// Warn user
-			LogManager::getSingleton().logMessage("Could not load compositor " + compositorName);
+			LogManager::getSingleton().logMessage("Could not load compositor " + compositorName, LML_CRITICAL);
 		}
     }
 

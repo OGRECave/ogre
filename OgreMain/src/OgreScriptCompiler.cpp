@@ -233,7 +233,7 @@ namespace Ogre
 			Ogre::StringConverter::toString(line) + ")";
 		if(!msg.empty())
 			str = str + ": " + msg;
-		Ogre::LogManager::getSingleton().logMessage(str);
+		Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
 	}
 
 	bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval)
@@ -465,7 +465,7 @@ namespace Ogre
 				Ogre::StringConverter::toString(line) + ")";
 			if(!msg.empty())
 				str = str + ": " + msg;
-			Ogre::LogManager::getSingleton().logMessage(str);
+			Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
 		}
 
 		mErrors.push_back(err);

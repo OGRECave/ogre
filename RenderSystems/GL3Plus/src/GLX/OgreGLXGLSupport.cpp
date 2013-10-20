@@ -859,7 +859,7 @@ namespace Ogre
         XSetErrorHandler( oldHandler );
 
         if ( ctxErrorOccurred || !glxContext )
-            LogManager::getSingleton().logMessage("Failed to create an OpenGL 3+ context");
+            LogManager::getSingleton().logMessage("Failed to create an OpenGL 3+ context", LML_CRITICAL);
 
 		return glxContext;
 	}
