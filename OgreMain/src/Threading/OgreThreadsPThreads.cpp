@@ -46,7 +46,6 @@ namespace Ogre
 
 	ThreadHandlePtr Threads::CreateThread( THREAD_ENTRY_POINT entryPoint, size_t threadIdx, void *param )
 	{
-		ThreadHandle *threadArg( new ThreadHandle( threadIdx, param ) );
 		ThreadHandlePtr retVal( new ThreadHandle( threadIdx, param ) );
 		pthread_t threadId;
 		pthread_create( &threadId, NULL, entryPoint, param );
