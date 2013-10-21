@@ -523,8 +523,7 @@ namespace Ogre {
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
 			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
-			finalMask				= Mathlib::And( finalMask, isVisible );
-			ArrayMaskR finalMskAsReal= CastIntToReal( finalMask );
+            finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,
@@ -661,8 +660,7 @@ namespace Ogre {
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
 			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
-			finalMask				= Mathlib::And( finalMask, isVisible );
-			ArrayMaskR finalMskAsReal= CastIntToReal( finalMask );
+            finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,

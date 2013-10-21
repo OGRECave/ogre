@@ -538,7 +538,7 @@ namespace Ogre
 				if( itor->light < mCurrentLightList.size() &&
 					mAffectedLights[mCurrentLightList[itor->light].globalIndex] )
 				{
-					const LightClosest &light = mCurrentLightList[itor->light];
+                    //const LightClosest &light = mCurrentLightList[itor->light];
 
 					//TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
 					//changes need to be done so that UV calculations land on the right place

@@ -270,7 +270,7 @@ namespace OgreBites
 			//See doxygen documentation regarding culling methods.
 			//In some cases you may still want to use single thread.
 			if( numThreads > 1 )
-				Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+                threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
 #endif
 			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 #ifdef USE_RTSHADER_SYSTEM
