@@ -392,7 +392,7 @@ namespace Ogre {
         float mRelLeft, mRelTop, mRelWidth, mRelHeight;
         /// Actual dimensions, based on target dimensions
         int mActLeft, mActTop, mActWidth, mActHeight;
-        /// ZOrder
+        /// Z-order
         int mZOrder;
         /// Background options
         ColourValue mBackColour;
