@@ -51,11 +51,11 @@ namespace Ogre {
         The defaults when a light is created is pure white diffuse light, with no
         attenuation (does not decrease with distance) and a range of 1000 world units.
     @par
-        Lights are created by using the SceneManager::createLight method. They can subsequently be
-        added to a SceneNode if required to allow them to move relative to a node in the scene. A light attached
-        to a SceneNode is assumed to have a base position of (0,0,0) and a direction of (0,0,1) before modification
-        by the SceneNode's own orientation. If not attached to a SceneNode,
-        the light's position and direction is as set using setPosition and setDirection.
+        Lights are created by using the SceneManager::createLight method. Starting Ogre 2.0
+		all Lights must be associated to a SceneNode in order to work; which holds the position
+		and direction.
+		Light::setDirection and Light::getDirection will redirect to the SceneNode and assert
+		or crash if not attached to one.
     @par
         Remember also that dynamic lights rely on modifying the colour of vertices based on the position of
         the light compared to an object's vertex normals. Dynamic lighting will only look good if the

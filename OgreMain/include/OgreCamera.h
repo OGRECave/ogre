@@ -77,10 +77,12 @@ namespace Ogre {
         co-ordinates. Obviously it is advisable that the viewport has the same
         aspect ratio as the camera to avoid distortion (unless you want it!).
     @par
-        Note that a Camera can be attached to a SceneNode, using the method
-        SceneNode::attachObject. If this is done the Camera will combine it's own
+        Starting Ogre 2.x, a Camera must be attached to a SceneNode, using the
+		method SceneNode::attachObject. By default the camera is attached to
+		the root scene node on creation.
+		When this is done the Camera will combine it's own
         position/orientation settings with it's parent SceneNode. 
-        This is useful for implementing more complex Camera / object
+        This is also useful for implementing more complex Camera / object
         relationships i.e. having a camera attached to a world object.
     */
     class _OgreExport Camera : public Frustum
