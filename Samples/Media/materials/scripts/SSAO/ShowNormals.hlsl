@@ -5,14 +5,19 @@ SamplerState g_samLinear
     AddressV = Wrap;
 };
 
-uniform Texture2D mrt1;
+uniform Texture2D mrt1 : register(s0);
+
+struct fragmentIn
+{
+	float4 position : SV_POSITION;
+    float2 iTexCoord : TEXCOORD0;
+};
 
 float4 ShowNormals_fp
 (
-	float4 position : SV_POSITION,
-    in float2 iTexCoord : TEXCOORD0
+	fragmentIn input
 ) : SV_Target
 {
-    float4 oColor0 = float4(mrt1.Sample(g_samLinear, iTexCoord).xyz / 2 + 0.5, 1.0);
+    float4 oColor0 = float4(mrt1.Sample(g_samLinear, input.iTexCoord).xyz / 2 + 0.5, 1.0);
 	return oColor0;
 }

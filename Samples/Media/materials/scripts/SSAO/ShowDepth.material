@@ -2,7 +2,7 @@ fragment_program SSAO/ShowDepth_fp_hlsl hlsl
 {
     source ShowDepth.hlsl
     entry_point ShowDepth_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/ShowDepth_fp_cg cg
@@ -25,9 +25,9 @@ fragment_program SSAO/ShowDepth_fp_glsl glsl
 
 fragment_program SSAO/ShowDepth_fp unified
 {
-	delegate SSAO/ShowDepth_fp_glsl 
+	//delegate SSAO/ShowDepth_fp_glsl 
 	delegate SSAO/ShowDepth_fp_hlsl 
-	delegate SSAO/ShowDepth_fp_cg
+	//delegate SSAO/ShowDepth_fp_cg
 }
 
 material SSAO/ShowDepth

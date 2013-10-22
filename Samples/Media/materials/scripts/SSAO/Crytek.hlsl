@@ -5,12 +5,17 @@ SamplerState g_samLinear
     AddressV = Wrap;
 };
 
+struct v2p
+{
+	float4 position : SV_POSITION;
+    float2 fragmentTC : TEXCOORD0;
+};
+
 uniform Texture2D sSceneDepthSampler; // depth = w component [0, 1]
 uniform Texture2D sRotSampler4x4;  // rotation sampler -> pseudo random spherical weighted sampling
 float4 Crytek_fp
 (
-	float4 position : SV_POSITION,
-    in float2 fragmentTC : TEXCOORD0,
+	v2p input,
     
     uniform float4 cViewportSize, // auto param width/height/inv. width/inv. height
     uniform float cFov, // vertical field of view in radians
@@ -31,10 +36,10 @@ float4 Crytek_fp
     const float clipDepth = farClipDistance - nearClipDistance;
 
     // get the depth of the current pixel and convert into world space unit [0, inf]
-    float fragmentWorldDepth = sSceneDepthSampler.Sample(g_samLinear, fragmentTC).w * clipDepth;
+    float fragmentWorldDepth = sSceneDepthSampler.Sample(g_samLinear, input.fragmentTC).w * clipDepth;
 
     // get rotation vector, rotation is tiled every 4 screen pixels
-    float2 rotationTC = fragmentTC * cViewportSize.xy / 4;
+    float2 rotationTC = input.fragmentTC * cViewportSize.xy / 4;
     float3 rotationVector = 2 * sRotSampler4x4.Sample(g_samLinear, rotationTC).xyz - 1; // [-1, 1]x[-1. 1]x[-1. 1]
     
     float rUV = 0; // radius of influence in screen space
@@ -70,7 +75,7 @@ float4 Crytek_fp
             // reflect offset vector by random rotation sample (i.e. rotating it) 
             float3 rotatedOffset = reflect(offset, rotationVector);
                     
-            float2 sampleTC = fragmentTC + rotatedOffset.xy * rUV;
+            float2 sampleTC = input.fragmentTC + rotatedOffset.xy * rUV;
                 
             // read scene depth at sampling point and convert into world space units (m or whatever)
             float sampleWorldDepth = sSceneDepthSampler.SampleLevel(g_samLinear, sampleTC, 0).w * clipDepth;

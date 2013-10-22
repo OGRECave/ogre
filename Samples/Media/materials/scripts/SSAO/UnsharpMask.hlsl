@@ -5,17 +5,22 @@ SamplerState g_samLinear
     AddressV = Wrap;
 };
 
+struct v2p
+{
+	float4 position : SV_POSITION;
+    float2 uv : TEXCOORD0; 
+};
+
 float4 UnsharpMask_fp
 (
-	float4 position : SV_POSITION,
-    in float2 iTexCoord : TEXCOORD0, 
+	v2p input,
     
-    uniform Texture2D blurred,
-    uniform Texture2D mrt0,
+    uniform Texture2D blurred : register(s0),
+    uniform Texture2D mrt0 : register(s1),
     uniform float cLambda
 ) : SV_Target
 {
-    float spacialImportance = blurred.Sample(g_samLinear, iTexCoord).w - mrt0.Sample(g_samLinear, iTexCoord).w;
+    float spacialImportance = blurred.Sample(g_samLinear, input.uv).w - mrt0.Sample(g_samLinear, input.uv).w;
     float4 color = float4(1,1,1,1);
 	float4 oColor0;
     if (spacialImportance < 0) // darkening only
@@ -30,10 +35,9 @@ float4 UnsharpMask_fp
 
 float4 GaussianBlurX_fp
 (
-	float4 position : SV_POSITION,
-    in float2 uv : TEXCOORD0,
+	v2p input,
 
-    uniform Texture2D mrt1,
+    uniform Texture2D mrt1 : register(s0),
     uniform float stepX,
     uniform const float cKernelWidthBias
 ) : SV_Target
@@ -48,20 +52,19 @@ float4 GaussianBlurX_fp
     {
         float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
         weights += geometricWeight;
-        blurredDepth += mrt1.SampleLevel(g_samLinear, float2(uv.x - i * stepX * cKernelWidthBias, uv.y), 0).w * geometricWeight;
+        blurredDepth += mrt1.SampleLevel(g_samLinear, float2(input.uv.x - i * stepX * cKernelWidthBias, input.uv.y), 0).w * geometricWeight;
     }
 
     blurredDepth /= weights;
-    float4 oColor0 = float4(mrt1.Sample(g_samLinear, uv).xyz, blurredDepth);
+    float4 oColor0 = float4(mrt1.Sample(g_samLinear, input.uv).xyz, blurredDepth);
 	return oColor0;
 }
 
 float4 GaussianBlurY_fp
 (
-	float4 position : SV_POSITION,
-    in float2 uv : TEXCOORD0,
+	v2p input,
 
-    uniform Texture2D mrt1,
+    uniform Texture2D mrt1 : register(s0),
     uniform const float stepY,
     uniform const float cKernelWidthBias
 ) : SV_Target
@@ -76,11 +79,11 @@ float4 GaussianBlurY_fp
     {
         float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
         weights += geometricWeight;
-        blurredDepth += mrt1.SampleLevel(g_samLinear, float2(uv.x, uv.y - i * stepY * cKernelWidthBias), 0).w * geometricWeight;
+        blurredDepth += mrt1.SampleLevel(g_samLinear, float2(input.uv.x, input.uv.y - i * stepY * cKernelWidthBias), 0).w * geometricWeight;
     }
 
     blurredDepth /= weights;
-    float4 oColor0 = float4(mrt1.Sample(g_samLinear, uv).xyz, blurredDepth);
+    float4 oColor0 = float4(mrt1.Sample(g_samLinear, input.uv).xyz, blurredDepth);
 	return oColor0;
 }
     

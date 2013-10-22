@@ -9,18 +9,22 @@ struct v2p
     float3 oNormal : TEXCOORD1;
 };
 
-v2p GBuffer_vp(
-        float4 iPosition : POSITION,
-        float3 iNormal   : NORMAL,
+struct vertexIn
+{
+    float4 iPosition : POSITION;
+    float3 iNormal   : NORMAL;
+};
 
-        uniform float4x4 cWorldViewProj,
-        uniform float4x4 cWorldView
+v2p GBuffer_vp(
+		vertexIn input,
+        uniform matrix cWorldViewProj,
+        uniform matrix cWorldView
         )
 {
 	v2p output;
-	output.oPosition = mul(cWorldViewProj, iPosition);         // transform the vertex position to the projection space
-	output.oViewPos = mul(cWorldView, iPosition).xyz;          // transform the vertex position to the view space
-	output.oNormal = mul(cWorldView, float4(iNormal,0)).xyz;   // transform the vertex normal to view space
+	output.oPosition = mul(cWorldViewProj, input.iPosition);         // transform the vertex position to the projection space
+	output.oViewPos = mul(cWorldView, input.iPosition).xyz;          // transform the vertex position to the view space
+	output.oNormal = mul(cWorldView, float4(input.iNormal,0)).xyz;   // transform the vertex normal to view space
 	return output;
 }
 
@@ -31,17 +35,14 @@ struct  NV // normal + view
 };
 
 NV GBuffer_fp(
-		float4 position : SV_POSITION,
-        float3 iViewPos : TEXCOORD0,
-        float3 iNormal  : TEXCOORD1,
-      
+		v2p input,
         uniform float cNearClipDistance,
         uniform float cFarClipDistance		// !!! might be 0 for infinite view projection.
         )
 {
     	float clipDistance = cFarClipDistance - cNearClipDistance;
 		NV output;
-		output.oNormalDepth = float4(normalize(iNormal).xyz, (length(iViewPos) - cNearClipDistance) / clipDistance);
-		output.oViewPos = float4(iViewPos, 0);
+		output.oNormalDepth = float4(normalize(input.oNormal).xyz, (length(input.oViewPos) - cNearClipDistance) / clipDistance);
+		output.oViewPos = float4(input.oViewPos, 0);
 		return output;
 }

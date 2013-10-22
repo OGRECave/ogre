@@ -2,7 +2,7 @@ fragment_program SSAO/HemisphereMC_fp_hlsl hlsl
 {
     source HemisphereMC.hlsl
     entry_point HemisphereMC_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/HemisphereMC_fp_cg cg
@@ -26,9 +26,9 @@ fragment_program SSAO/HemisphereMC_fp_glsl glsl
 
 fragment_program SSAO/HemisphereMC_fp unified
 {
-	delegate SSAO/HemisphereMC_fp_glsl 
+	//delegate SSAO/HemisphereMC_fp_glsl 
 	delegate SSAO/HemisphereMC_fp_hlsl 
-	delegate SSAO/HemisphereMC_fp_cg
+	//delegate SSAO/HemisphereMC_fp_cg
 }
 
 // Monte Carlo Integration of the hemisphere definded by the fragment normal

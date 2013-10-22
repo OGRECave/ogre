@@ -2,7 +2,7 @@ fragment_program SSAO/Crytek_fp_hlsl hlsl
 {
     source Crytek.hlsl
     entry_point Crytek_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/Crytek_fp_cg cg
@@ -25,9 +25,9 @@ fragment_program SSAO/Crytek_fp_glsl glsl
 
 fragment_program SSAO/Crytek_fp unified
 {
-	delegate SSAO/Crytek_fp_glsl 
+	//delegate SSAO/Crytek_fp_glsl 
 	delegate SSAO/Crytek_fp_hlsl 
-	delegate SSAO/Crytek_fp_cg
+	//delegate SSAO/Crytek_fp_cg
 }
 
 material SSAO/Crytek

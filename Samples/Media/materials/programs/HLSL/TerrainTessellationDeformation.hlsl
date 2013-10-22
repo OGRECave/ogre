@@ -24,8 +24,8 @@ struct DeformVertex
 };
 
 DeformVertex InitializationVS( NullVertex input,
-							   uniform float g_DeformMin,
-							   uniform float g_DeformMax)
+							   uniform float3 g_DeformMin,
+							   uniform float3 g_DeformMax)
 {
     DeformVertex output = (DeformVertex) 0;
     

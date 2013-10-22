@@ -7,14 +7,19 @@ SamplerState g_samLinear
     AddressV = Wrap;
 };
 
-uniform Texture2D sNormal;    // xyz normal + depth [0, 1]
-uniform Texture2D sPosition;  // view space position
-uniform Texture2D sRandom;    // random texture sampler
+uniform Texture2D sNormal : register(s0);    // xyz normal + depth [0, 1]
+uniform Texture2D sPosition : register(s1);  // view space position
+uniform Texture2D sRandom : register(s2);    // random texture sampler
+
+struct v2p
+{
+	float4 position : SV_POSITION;
+    float2 uv : TEXCOORD0;
+};
 
 float4 CreaseShading_fp
 (
-	float4 position : SV_POSITION,
-    float2 uv : TEXCOORD0,
+	v2p input,
     
     uniform const float cRange, // the three(four) artistic parameters
     uniform const float cBias,
@@ -25,8 +30,8 @@ float4 CreaseShading_fp
 ) : SV_Target
 {
 	// get the view space position and normal of the fragment
-    const float3 fragmentPosition = sPosition.Sample(g_samLinear, uv).xyz;
-    const float3 fragmentNormal = sNormal.Sample(g_samLinear, uv).xyz;
+    const float3 fragmentPosition = sPosition.Sample(g_samLinear, input.uv).xyz;
+    const float3 fragmentNormal = sNormal.Sample(g_samLinear, input.uv).xyz;
 
     float totalGI = 0.0f;
     
@@ -53,7 +58,7 @@ float4 CreaseShading_fp
         {
             float2 sampleOffset = diagonalStart + float2(j, -j);
 
-            float2 sampleUV = uv + (sampleOffset * cViewportSize.zw * cKernelSize);
+            float2 sampleUV = input.uv + (sampleOffset * cViewportSize.zw * cKernelSize);
             float3 samplePos = sPosition.SampleLevel(g_samLinear, sampleUV, 0).xyz;
 
             float3 toCenter = samplePos - fragmentPosition;

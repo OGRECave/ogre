@@ -2,21 +2,21 @@ fragment_program SSAO/UnsharpMask_fp_hlsl hlsl
 {
     source UnsharpMask.hlsl
     entry_point UnsharpMask_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurX_fp_hlsl hlsl
 {
     source UnsharpMask.hlsl
     entry_point GaussianBlurX_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_hlsl hlsl
 {
     source UnsharpMask.hlsl
     entry_point GaussianBlurY_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_4_0
 }
 
 fragment_program SSAO/UnsharpMask_fp_cg cg
@@ -73,23 +73,23 @@ fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_glsl glsl
 
 fragment_program SSAO/UnsharpMask_fp unified
 {
-	delegate SSAO/UnsharpMask_fp_glsl 
+	//delegate SSAO/UnsharpMask_fp_glsl 
 	delegate SSAO/UnsharpMask_fp_hlsl 
-	delegate SSAO/UnsharpMask_fp_cg
+	//delegate SSAO/UnsharpMask_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurX_fp unified
 {
-	delegate SSAO/UnsharpMask/GaussianBlurX_fp_glsl 
+	//delegate SSAO/UnsharpMask/GaussianBlurX_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurX_fp_hlsl 
-	delegate SSAO/UnsharpMask/GaussianBlurX_fp_cg
+	//delegate SSAO/UnsharpMask/GaussianBlurX_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurY_fp unified
 {
-	delegate SSAO/UnsharpMask/GaussianBlurY_fp_glsl 
+	//delegate SSAO/UnsharpMask/GaussianBlurY_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurY_fp_hlsl 
-	delegate SSAO/UnsharpMask/GaussianBlurY_fp_cg
+	//delegate SSAO/UnsharpMask/GaussianBlurY_fp_cg
 }
 
 material SSAO/UnsharpMask/GaussianBlurX
