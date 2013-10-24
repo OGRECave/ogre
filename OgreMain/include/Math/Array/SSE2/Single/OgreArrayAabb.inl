@@ -169,11 +169,11 @@ namespace Ogre
 		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
 		//(which is ok since we need them to say 'false' to intersection tests)
 		x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, x,
-									_mm_cmple_ps( mHalfSize.mChunkBase[0], MathlibSSE2::INFINITEA ) );
+									_mm_cmpeq_ps( mHalfSize.mChunkBase[0], MathlibSSE2::INFINITEA ) );
 		y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, y,
-									_mm_cmple_ps( mHalfSize.mChunkBase[1], MathlibSSE2::INFINITEA ) );
+									_mm_cmpeq_ps( mHalfSize.mChunkBase[1], MathlibSSE2::INFINITEA ) );
 		z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, z,
-									_mm_cmple_ps( mHalfSize.mChunkBase[2], MathlibSSE2::INFINITEA ) );
+									_mm_cmpeq_ps( mHalfSize.mChunkBase[2], MathlibSSE2::INFINITEA ) );
 
 		mHalfSize = ArrayVector3( x, y, z );
 	}

@@ -1109,6 +1109,8 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 		{
 			OgreProfileGroup("cullFrusum", OGREPROF_CULLING);
 
+			assert( !mEntitiesMemoryManagerCulledList.empty() );
+
 			// Quick way of reducing overhead/stress on VisibleObjectsBoundsInfo
 			// calculation (lastRq can be up to 255)
 			uint8 realFirstRq= firstRq;

@@ -1143,6 +1143,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Camera::_setRenderedRqs( size_t rqStart, size_t rqEnd )
 	{
+		assert( rqStart <= rqEnd );
 		for( size_t i=rqStart; i<rqEnd; ++i )
 			mRenderedRqs[i] = true;
 	}
