@@ -56,7 +56,7 @@ namespace Ogre
 		static const ArrayReal fRad2Deg;	//Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg, Math::fRad2Deg
 		static const ArrayReal FLOAT_MIN;	//FLT_MIN, FLT_MIN, FLT_MIN, FLT_MIN
 		static const ArrayReal SIGN_MASK;	//0x80000000, 0x80000000, 0x80000000, 0x80000000
-		static const ArrayReal INF;	//Inf, Inf, Inf, Inf
+		static const ArrayReal INFINITEA;	//Inf, Inf, Inf, Inf
 		static const ArrayReal MAX_NEG;		//Max negative number (x4)
 		static const ArrayReal MAX_POS;		//Max negative number (x4)
 
