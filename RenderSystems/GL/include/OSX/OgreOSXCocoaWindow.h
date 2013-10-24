@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <QuartzCore/CVDisplayLink.h>
 #include "OgreOSXCocoaView.h"
 #include "OgreOSXCocoaWindowDelegate.h"
+#include "OgrePixelBox.h"
 
 @class OSXCocoaWindowDelegate;
 

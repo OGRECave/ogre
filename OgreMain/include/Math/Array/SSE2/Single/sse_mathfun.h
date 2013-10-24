@@ -70,7 +70,7 @@ _PS_CONST_TYPE(min_norm_pos, int, 0x00800000);
 _PS_CONST_TYPE(mant_mask, int, 0x7f800000);
 _PS_CONST_TYPE(inv_mant_mask, int, ~0x7f800000);
 
-_PS_CONST_TYPE(sign_mask, int, 0x80000000);
+_PS_CONST_TYPE(sign_mask, int, static_cast<int>(0x80000000));
 _PS_CONST_TYPE(inv_sign_mask, int, ~0x80000000);
 
 _PI32_CONST(1, 1);

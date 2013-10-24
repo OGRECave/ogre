@@ -27,14 +27,8 @@ Description: Utility class to load plugins statically
 #ifdef ENABLE_PLUGIN_CgProgramManager
 #  include "OgreCgPlugin.h"
 #endif
-#ifdef ENABLE_PLUGIN_OctreeSceneManager
-#  include "OgreOctreePlugin.h"
-#endif
 #ifdef ENABLE_PLUGIN_ParticleFX
 #  include "OgreParticleFXPlugin.h"
-#endif
-#ifdef ENABLE_PLUGIN_BSPSceneManager
-#  include "OgreBspSceneManagerPlugin.h"
 #endif
 #ifdef ENABLE_PLUGIN_GL
 #  include "OgreGLPlugin.h"
@@ -63,14 +57,8 @@ namespace Ogre
 #ifdef ENABLE_PLUGIN_CgProgramManager
 		CgPlugin* mCgPlugin;
 #endif
-#ifdef ENABLE_PLUGIN_OctreeSceneManager
-		OctreePlugin* mOctreePlugin;
-#endif
 #ifdef ENABLE_PLUGIN_ParticleFX
 		ParticleFXPlugin* mParticleFXPlugin;
-#endif
-#ifdef ENABLE_PLUGIN_BSPSceneManager
-		BspSceneManagerPlugin* mBSPPlugin;
 #endif
 #ifdef ENABLE_PLUGIN_GL
 		GLPlugin* mGLPlugin;
@@ -103,31 +91,17 @@ namespace Ogre
 			mCgPlugin = new CgPlugin();
 			root.installPlugin(mCgPlugin);
 #endif
-#ifdef ENABLE_PLUGIN_OctreeSceneManager
-			mOctreePlugin = new OctreePlugin();
-			root.installPlugin(mOctreePlugin);
-#endif
 #ifdef ENABLE_PLUGIN_ParticleFX
 			mParticleFXPlugin = new ParticleFXPlugin();
 			root.installPlugin(mParticleFXPlugin);
-#endif
-#ifdef ENABLE_PLUGIN_BSPSceneManager
-			mBSPPlugin = new BspSceneManagerPlugin();
-			root.installPlugin(mBSPPlugin);
 #endif
 		}
 
 		void unload()
 		{
 			// don't unload plugins, since Root will have done that. Destroy here.
-#ifdef ENABLE_PLUGIN_BSPSceneManager
-			delete mBSPPlugin;
-#endif
 #ifdef ENABLE_PLUGIN_ParticleFX
 			delete mParticleFXPlugin;
-#endif
-#ifdef ENABLE_PLUGIN_OctreeSceneManager
-			delete mOctreePlugin;
 #endif
 #ifdef ENABLE_PLUGIN_CgProgramManager
 			delete mCgPlugin;

@@ -48,22 +48,11 @@ target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${O
 ogre_config_common(TestContext)
 
 # Make sure all plugins are built
-if (OGRE_BUILD_PLUGIN_OCTREE)
-    add_dependencies(TestContext Plugin_OctreeSceneManager)
-endif ()
-if (OGRE_BUILD_PLUGIN_BSP)
-    add_dependencies(TestContext Plugin_BSPSceneManager)
-endif ()
 if (OGRE_BUILD_PLUGIN_CG)
     add_dependencies(TestContext Plugin_CgProgramManager)
 endif (OGRE_BUILD_PLUGIN_CG)
 if (OGRE_BUILD_PLUGIN_PFX)
     add_dependencies(TestContext Plugin_ParticleFX)
-endif ()
-
-if (OGRE_BUILD_PLUGIN_PCZ)
-    add_dependencies(TestContext Plugin_PCZSceneManager)
-    add_dependencies(TestContext Plugin_OctreeZone)
 endif ()
 
 if (OGRE_BUILD_RENDERSYSTEM_D3D9)
@@ -130,8 +119,6 @@ if (APPLE)
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg
-		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/tests.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
@@ -153,31 +140,9 @@ if (APPLE)
 			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()
-	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_BSPSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
 	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_CgProgramManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_PCZSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/    
-			)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeZone.framework 
 			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 			)
 	endif()

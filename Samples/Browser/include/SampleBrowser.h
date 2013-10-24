@@ -52,16 +52,12 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-#       include "BSP.h"
-#   endif
 #   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #       ifdef USE_RTSHADER_SYSTEM
 #           include "ShaderSystem.h"
 #       endif
 #		include "DualQuaternion.h"
 #       include "DeferredShadingDemo.h"
-#       include "Instancing.h"
 #       include "NewInstancing.h"
 #       include "TextureArray.h"
 #       include "SSAO.h"
@@ -1074,7 +1070,6 @@ protected:
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
 #		if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
- 			mPluginNameMap["Sample_Instancing"]			= (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
@@ -1101,9 +1096,6 @@ protected:
 #if defined(USE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             if(hasProgrammableGPU)
             {
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-				mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
-#   endif
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();

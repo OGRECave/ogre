@@ -7,7 +7,7 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure BSP SceneManager build
+# Configure ParticleFX Plugin build
 
 set (HEADER_FILES
   include/OgreAreaEmitter.h

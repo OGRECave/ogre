@@ -1,6 +1,5 @@
 SampleFolder=@OGRE_SAMPLES_DIR_DBG@
 SamplePlugin=Sample_BezierPatch_d
-SamplePlugin=Sample_BSP_d
 SamplePlugin=Sample_CameraTrack_d
 SamplePlugin=Sample_CelShading_d
 SamplePlugin=Sample_Character_d
@@ -14,7 +13,6 @@ SamplePlugin=Sample_EndlessWorld_d
 SamplePlugin=Sample_FacialAnimation_d
 SamplePlugin=Sample_Fresnel_d
 SamplePlugin=Sample_Grass_d
-SamplePlugin=Sample_Instancing_d
 SamplePlugin=Sample_Isosurf_d
 SamplePlugin=Sample_Lighting_d
 SamplePlugin=Sample_MeshLod_d

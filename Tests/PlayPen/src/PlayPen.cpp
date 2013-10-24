@@ -124,7 +124,6 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //#    define ENABLE_PLUGIN_Direct3D9
 //#  endif
 //#  define ENABLE_PLUGIN_OctreeSceneManager
-//#  define ENABLE_PLUGIN_BSPSceneManager
 //#  define ENABLE_PLUGIN_ParticleFX
 //#  define ENABLE_PLUGIN_CgProgramManager
 //#endif
@@ -879,12 +878,6 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //		// DefaultSceneManager
 //		//mSceneMgr = mRoot->createSceneManager("DefaultSceneManager", "PlayPenSMInstance");
 //
-//		// BspSceneManager
-//		//mSceneMgr = mRoot->createSceneManager("BspSceneManager", "PlayPenSMInstance");
-//
-//		// OctreeSceneManager
-//		//mSceneMgr = mRoot->createSceneManager("OctreeSceneManager", "PlayPenSMInstance");
-//
 //		// TerrainSceneManager
 //		mSceneMgr = mRoot->createSceneManager("TerrainSceneManager", "PlayPenSMInstance");
 //	}
@@ -1618,36 +1611,6 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //        mRootNode->addChild(node);
 //
 //        mSceneMgr->showBoundingBoxes(true);
-//
-//    }
-//    void testBsp()
-//    {
-//        // Load Quake3 locations from a file
-//        ConfigFile cf;
-//
-//        cf.load("quake3settings.cfg");
-//
-//        String quakePk3 = cf.getSetting("Pak0Location");
-//        String quakeLevel = cf.getSetting("Map");
-//
-//		ResourceGroupManager::getSingleton().addResourceLocation(quakePk3, "Zip");
-//
-//
-//        // Load world geometry
-//        mSceneMgr->setWorldGeometry(quakeLevel);
-//
-//        // modify camera for close work
-//        mCamera->setNearClipDistance(4);
-//        mCamera->setFarClipDistance(4000);
-//
-//        // Also change position, and set Quake-type orientation
-//        // Get random player start point
-//        ViewPoint vp = mSceneMgr->getSuggestedViewpoint(true);
-//        mCamera->setPosition(vp.position);
-//        mCamera->pitch(Degree(90)); // Quake uses X/Y horizon, Z up
-//        mCamera->rotate(vp.orientation);
-//        // Don't yaw along variable axis, causes leaning
-//        mCamera->setFixedYawAxis(true, Vector3::UNIT_Z);
 //
 //    }
 //
@@ -3551,80 +3514,6 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //		ent->setMaterialName("testglsl");
 //	}
 //
-//	void testInfiniteAAB()
-//	{
-//		// When using the BspSceneManager
-//		//mSceneMgr->setWorldGeometry("ogretestmap.bsp");
-//
-//		// When using the TerrainSceneManager
-//		mSceneMgr->setWorldGeometry("terrain.cfg");
-//
-//		AxisAlignedBox b1; // null
-//		assert( b1.isNull() );
-//		
-//		AxisAlignedBox b2(Vector3::ZERO, 5.0 * Vector3::UNIT_SCALE); // finite
-//		assert( b2.isFinite() );
-//
-//		AxisAlignedBox b3;
-//		b3.setInfinite();
-//		assert( b3.isInfinite() );
-//
-//		{
-//			// Create background material
-//			MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
-//			material->getTechnique(0)->getPass(0)->createTextureUnitState("rockwall.tga");
-//			material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
-//			material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
-//			material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-//
-//			// Create left background rectangle
-//			// NOTE: Uses finite aab
-//			Rectangle2D* rect1 = new Rectangle2D(true);
-//			rect1->setCorners(-0.5, 0.1, -0.1, -0.1);
-//			// Hacky, set small bounding box, to show problem
-//			rect1->setBoundingBox(AxisAlignedBox(-10.0*Vector3::UNIT_SCALE, 10.0*Vector3::UNIT_SCALE));
-//			rect1->setMaterial("Background");
-//			rect1->setRenderQueueGroup(RENDER_QUEUE_OVERLAY - 1);
-//			SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Background1");
-//			node->attachObject(rect1);
-//
-//			// Create right background rectangle
-//			// NOTE: Uses infinite aab
-//			Rectangle2D* rect2 = new Rectangle2D(true);
-//			rect2->setCorners(0.1, 0.1, 0.5, -0.1);
-//			AxisAlignedBox aabInf; aabInf.setInfinite();
-//			rect2->setBoundingBox(aabInf);
-//			rect2->setMaterial("Background");
-//			rect2->setRenderQueueGroup(RENDER_QUEUE_OVERLAY - 1);
-//			node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Background2");
-//			node->attachObject(rect2);
-//
-//			// Create a manual object for 2D
-//			ManualObject* manual = mSceneMgr->createManualObject("manual");
-//			manual->setUseIdentityProjection(true);
-//			manual->setUseIdentityView(true);
-//			manual->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
-//			manual->position(-0.2, -0.2, 0.0);
-//			manual->position( 0.2, -0.2, 0.0);
-//			manual->position( 0.2,  0.2, 0.0);
-//			manual->position(-0.2,  0.2, 0.0);
-//			manual->index(0);
-//			manual->index(1);
-//			manual->index(2);
-//			manual->index(3);
-//			manual->index(0);
-//			manual->end();
-//			manual->setBoundingBox(aabInf); // Use infinite aab to always stay visible
-//			rect2->setRenderQueueGroup(RENDER_QUEUE_OVERLAY - 1);
-//			mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(manual);
-//		}
-//
-//		mSceneMgr->showBoundingBoxes(true);
-//
-//		Entity* ent = mSceneMgr->createEntity("test", "ogrehead.mesh");
-//		mSceneMgr->getRootSceneNode()->createChildSceneNode(
-//			"test", 50.0 * Vector3::UNIT_X)->attachObject(ent);
-//	}
 //
 //	void test2Windows(void)
 //	{
