@@ -176,9 +176,6 @@ namespace Ogre
 		/** Sets whether the entity is in use. */
 		void setInUse(bool used);
 
-		/// Incremented count for next name extension
-        static NameGenerator msNameGenerator;
-
 	public:
 		InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceBatch *batchOwner,
 						 uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL );

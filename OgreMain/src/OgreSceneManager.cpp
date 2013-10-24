@@ -118,7 +118,6 @@ mResetIdentityView(false),
 mResetIdentityProj(false),
 mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
-mMovableNameGenerator("Ogre/MO"),
 mShadowCasterPlainBlackPass(0),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
@@ -675,9 +674,6 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode( SceneMemoryMgrTypes sceneType )
 {
-    if(!sn)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
-
     return mSceneRoot[sceneType];
 }
 //-----------------------------------------------------------------------

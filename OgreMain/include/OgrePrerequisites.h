@@ -313,7 +313,6 @@ namespace Ogre {
 	class CompositorManager2;
 
     template<typename T> class SharedPtr;
-    typedef SharedPtr<Compositor> CompositorPtr;
     typedef SharedPtr<GpuProgram> GpuProgramPtr;
     typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
     typedef SharedPtr<Material> MaterialPtr;

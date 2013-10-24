@@ -142,9 +142,6 @@ namespace Ogre {
         /// Friendly name of this OldNode, can be automatically generated if you don't care
         String mName;
 
-        /// Incremented count for next name extension
-        static NameGenerator msNameGenerator;
-
         /// Stores the orientation of the OldNode relative to it's parent.
         Quaternion mOrientation;
 

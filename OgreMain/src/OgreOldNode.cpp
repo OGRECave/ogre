@@ -42,8 +42,6 @@ THE SOFTWARE.
 #include "OgreManualObject.h"
 
 namespace Ogre {
-
-    NameGenerator OldNode::msNameGenerator("Unnamed_");
 	OldNode::QueuedUpdates OldNode::msQueuedUpdates;
     //-----------------------------------------------------------------------
     OldNode::OldNode()
@@ -68,7 +66,7 @@ namespace Ogre {
 		mDebug(0)
     {
         // Generate a name
-        mName = msNameGenerator.generate();
+        mName = "";
 
         needUpdate();
 

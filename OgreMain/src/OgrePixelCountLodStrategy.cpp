@@ -169,7 +169,7 @@ namespace Ogre {
         Real absoluteValue = AbsolutePixelCountLodStrategy::getSingletonPtr()->getValueImpl(movableObject, camera);
 
         // Get viewport area
-        const Viewport *viewport = camera->getViewport();        
+        const Viewport *viewport = camera->getLastViewport();        
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
         
         // Return ratio of screen size to absolutely covered pixel count

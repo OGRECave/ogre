@@ -312,7 +312,6 @@ namespace Ogre
 		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
 		texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
 
-			const size_t maxPixelsPerLine = std::min<size_t>( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
 		float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
 		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );

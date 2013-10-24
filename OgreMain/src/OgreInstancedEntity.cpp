@@ -35,14 +35,11 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreCamera.h"
 #include "OgreException.h"
-#include "OgreNameGenerator.h"
 
 #include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre
 {
-	NameGenerator InstancedEntity::msNameGenerator("");
-
 	InstancedEntity::InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager,
 										InstanceBatch *batchOwner, uint32 instanceID,
 										InstancedEntity* sharedTransformEntity ) :

@@ -169,7 +169,7 @@ namespace Ogre {
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // LOD.
-        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+		return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getWorldRadius());
     }
     //-----------------------------------------------------------------------
 

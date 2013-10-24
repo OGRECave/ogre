@@ -58,7 +58,6 @@ Torus Knot Software Ltd.
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
-#include "OgreNameGenerator.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -604,7 +603,6 @@ namespace Ogre {
 		};
 		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
 		MovableObjectCollectionMap mMovableObjectCollectionMap;
-		NameGenerator mMovableNameGenerator;
 		/** Gets the movable object collection for the given type name.
 		@remarks
 			This method create new collection if the collection does not exist.

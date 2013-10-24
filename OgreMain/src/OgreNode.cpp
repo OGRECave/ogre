@@ -40,7 +40,6 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreManualObject.h"
-#include "OgreNameGenerator.h"
 
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"
