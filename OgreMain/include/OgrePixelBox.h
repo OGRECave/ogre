@@ -66,7 +66,7 @@ namespace Ogre {
     		@param pixelFormat	Format of this buffer
     		@param pixelData    Pointer to the actual data
     	*/
-    	PixelBox(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, void *pixelData=0):
+    	PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
     		Box(0, 0, 0, width, height, depth),
     		data(pixelData), format(pixelFormat)
     	{
@@ -128,6 +128,11 @@ namespace Ogre {
       		@throws	Exception(ERR_INVALIDPARAMS) if def is not fully contained
       	*/
       	PixelBox getSubVolume(const Box &def) const;
+        
+      	/** Return a data pointer pointing to top left front pixel of the pixel box.
+            @remarks Non consecutive pixel boxes are supported.
+         */
+        void* getTopLeftFrontPixelPtr() const;
         
         /**
          * Get colour value from a certain location in the PixelBox. The z coordinate

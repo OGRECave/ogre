@@ -108,7 +108,7 @@ namespace Ogre
 		*/
 		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 		virtual void setFsaaResolveDirty(void);
-		virtual void swapBuffers(bool waitForVSync = true);
+		virtual void swapBuffers(void);
 
 		/// Irrelevant implementation since cannot copy
 		PixelFormat suggestPixelFormat() const { return PF_UNKNOWN; }

@@ -54,10 +54,6 @@
 #ifdef OGRE_STATIC_LIB
 #   ifdef INCLUDE_RTSHADER_SYSTEM
 #       include "ShaderSystem.h"
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#       ifdef USE_RTSHADER_SYSTEM
-#           include "ShaderSystem.h"
-#       endif
 #		include "DualQuaternion.h"
 #       include "DeferredShadingDemo.h"
 #       include "NewInstancing.h"

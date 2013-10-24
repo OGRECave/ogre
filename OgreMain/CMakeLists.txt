@@ -32,7 +32,7 @@ list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreSIMDHelper.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad/*.cpp"

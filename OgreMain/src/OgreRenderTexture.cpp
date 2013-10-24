@@ -98,17 +98,14 @@ namespace Ogre
 		RenderTarget::setFsaaResolveDirty();
 	}
 	//-----------------------------------------------------------------------------
-	void MultiRenderTarget::swapBuffers(bool waitForVSync)
+	void MultiRenderTarget::swapBuffers(void)
 	{
 		BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
 		BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
 
-		bool bFirst = true & waitForVSync;
-
 		while( itor != end )
 		{
-			(*itor)->swapBuffers( bFirst );
-			bFirst = false;
+			(*itor)->swapBuffers();
 			++itor;
 		}
 	}

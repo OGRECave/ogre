@@ -123,8 +123,8 @@ namespace Ogre
 		*/
 		void revalidateAllNodes(void);
 
-		void _update( bool swapFinalTargets, bool waitForVSync );
-		void _swapFinalTarget( bool waitForVSync );
+		void _update( bool swapFinalTargets );
+		void _swapFinalTarget(void);
 
 		/** For compatibility with D3D9, forces a device lost check
 			on the RenderWindow, so that BeginScene doesn't fail.

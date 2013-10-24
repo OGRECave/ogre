@@ -135,8 +135,7 @@ namespace Ogre {
                 an off-screen version of the window) the buffers
                 are swapped to display the new frame.
         */
-        virtual void swapBuffers(bool waitForVSync = true)
-        { (void)waitForVSync; mFsaaResolveDirty = false; }
+        virtual void swapBuffers(void)										{ mFsaaResolveDirty = false; }
 
 		virtual void setFsaaResolveDirty(void)								{ mFsaaResolveDirty = true; }
 

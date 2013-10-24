@@ -1460,12 +1460,12 @@ namespace Ogre {
     {
         // update all targets but don't swap buffers
         //mActiveRenderer->_updateAllRenderTargets(false);
-		mCompositorManager2->_update( false, false );
+		mCompositorManager2->_update( false );
 
 		// give client app opportunity to use queued GPU time
 		bool ret = _fireFrameRenderingQueued();
 		// block for final swap
-		mCompositorManager2->_swapAllFinalTargets( mActiveRenderer->getWaitForVerticalBlank() );
+		mCompositorManager2->_swapAllFinalTargets();
 
         // This belongs here, as all render targets must be updated before events are
         // triggered, otherwise targets could be mismatched.  This could produce artifacts,
@@ -1479,11 +1479,11 @@ namespace Ogre {
 	bool Root::_updateAllRenderTargets(FrameEvent& evt)
 	{
 		// update all targets but don't swap buffers
-		mCompositorManager2->_update( false, false );
+		mCompositorManager2->_update( false );
 		// give client app opportunity to use queued GPU time
 		bool ret = _fireFrameRenderingQueued(evt);
 		// block for final swap
-		mCompositorManager2->_swapAllFinalTargets( mActiveRenderer->getWaitForVerticalBlank() );
+		mCompositorManager2->_swapAllFinalTargets();
 
 		// This belongs here, as all render targets must be updated before events are
 		// triggered, otherwise targets could be mismatched.  This could produce artifacts,

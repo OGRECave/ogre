@@ -356,7 +356,7 @@ namespace Ogre
 		return mDefinition->mCompositorManager->getFrameCount();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspace::_update( bool swapFinalTargets, bool waitForVSync )
+	void CompositorWorkspace::_update( bool swapFinalTargets )
 	{
 		if( mCurrentWidth != mRenderWindow->getWidth() || mCurrentHeight != mRenderWindow->getHeight() )
 		{
@@ -409,13 +409,13 @@ namespace Ogre
 		}
 
 		if( swapFinalTargets && mRenderWindow )
-			mRenderWindow->swapBuffers( waitForVSync );
+			mRenderWindow->swapBuffers();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspace::_swapFinalTarget( bool waitForVSync )
+	void CompositorWorkspace::_swapFinalTarget(void)
 	{
 		if( mRenderWindow )
-			mRenderWindow->swapBuffers( waitForVSync );
+			mRenderWindow->swapBuffers();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_validateFinalTarget(void)

@@ -220,8 +220,8 @@ namespace Ogre
 		/// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
 		void validateAllNodes();
 
-		void _update( bool swapFinalTargets, bool waitForVSync );
-		void _swapAllFinalTargets( bool waitForVSync );
+		void _update( bool swapFinalTargets );
+		void _swapAllFinalTargets(void);
 
 		/** Utility helper to create a basic workspace to get you out of the rush. Advanced users will
 			probably prefer to create the workspace definition using scripts or manipulating functions
