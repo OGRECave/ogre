@@ -47,7 +47,7 @@ namespace Ogre
 	const ArrayReal MathlibC::OneMinusEpsilon= 1.0f - 1e-6f;
 	const ArrayReal MathlibC::FLOAT_MIN	= std::numeric_limits<Real>::min();
 	const ArrayReal MathlibC::SIGN_MASK	= -0.0f;
-	const ArrayReal MathlibC::INFINITY	= std::numeric_limits<Real>::infinity();
+	const ArrayReal MathlibC::INF	= std::numeric_limits<Real>::infinity();
 	const ArrayReal MathlibC::MAX_NEG	= -std::numeric_limits<Real>::max();
 	const ArrayReal MathlibC::MAX_POS	= std::numeric_limits<Real>::max();
 
