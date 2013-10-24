@@ -35,6 +35,8 @@
 #error This header is for use with NaCl only
 #endif
 
+#include "SampleBrowser.h"
+
 #include <pthread.h>
 #include <map>
 #include <vector>

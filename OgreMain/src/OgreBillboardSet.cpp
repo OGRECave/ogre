@@ -601,7 +601,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 			
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+			mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
 			
             if (mMaterial.isNull())
             {

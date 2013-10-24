@@ -45,6 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    class NameGenerator;
 
     /** \addtogroup Core
     *  @{

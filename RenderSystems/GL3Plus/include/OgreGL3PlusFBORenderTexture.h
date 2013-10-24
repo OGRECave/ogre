@@ -46,7 +46,7 @@ namespace Ogre {
         virtual void getCustomAttribute(const String& name, void* pData);
 
 		/// Override needed to deal with multisample buffers
-		virtual void swapBuffers(bool waitForVSync = true);
+		virtual void swapBuffers();
 
 		/// Override so we can attach the depth buffer to the FBO
 		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
@@ -88,7 +88,7 @@ namespace Ogre {
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */
-        GL3PlusSurfaceDesc requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa);
+        GL3PlusSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
         /** Request the specify render buffer in case shared somewhere. Ignore
             silently if surface.buffer is 0.
         */
@@ -186,6 +186,7 @@ namespace Ogre {
         void detectFBOFormats();
         GLuint _tryFormat(GLenum depthFormat, GLenum stencilFormat);
         bool _tryPackedFormat(GLenum packedFormat);
+        void _createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid);
     };
 }
 

@@ -42,7 +42,7 @@ namespace Ogre
 	{
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 
-        mHomePath = std::string([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
+        mHomePath = Ogre::String([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
 	}
     //---------------------------------------------------------------------
     bool FileSystemLayer::fileExists(const Ogre::String& path) const

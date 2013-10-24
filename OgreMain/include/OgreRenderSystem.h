@@ -549,25 +549,6 @@ namespace Ogre
 		*/
 		virtual String getErrorDescription(long errorNumber) const = 0;
 
-		/** Defines whether or now fullscreen render windows wait for the vertical blank before flipping buffers.
-		@remarks
-		By default, all rendering windows wait for a vertical blank (when the CRT beam turns off briefly to move
-		from the bottom right of the screen back to the top left) before flipping the screen buffers. This ensures
-		that the image you see on the screen is steady. However it restricts the frame rate to the refresh rate of
-		the monitor, and can slow the frame rate down. You can speed this up by not waiting for the blank, but
-		this has the downside of introducing 'tearing' artefacts where part of the previous frame is still displayed
-		as the buffers are switched. Speed vs quality, you choose.
-		@note
-		Has NO effect on windowed mode render targets. Only affects fullscreen mode.
-		@param
-		enabled If true, the system waits for vertical blanks - quality over speed. If false it doesn't - speed over quality.
-		*/
-		void setWaitForVerticalBlank(bool enabled);
-
-		/** Returns true if the system is synchronising frames with the monitor vertical blank.
-		*/
-		bool getWaitForVerticalBlank(void) const;
-
 		/** Returns the global instance vertex buffer.
 		*/
         HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
@@ -587,7 +568,6 @@ namespace Ogre
 		*/
         void setGlobalNumberOfInstances(const size_t val);
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/** Sets if fixed pipeline rendering is enabled on the system.
 		*/
 		void setFixedPipelineEnabled(bool enabled);
@@ -595,7 +575,6 @@ namespace Ogre
 		/** Returns true if fixed pipeline rendering is enabled on the system.
 		*/
 		bool getFixedPipelineEnabled(void) const;
-#endif
 
 		/** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
 			and sets it.
@@ -820,7 +799,7 @@ namespace Ogre
 		virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.
@@ -832,7 +811,7 @@ namespace Ogre
 		virtual void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD) = 0;
 
 		/** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-		The result of the blending operation is:</p>
+		The result of the blending operation is:
 		<p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
 		Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
 		enumerated type.
@@ -1267,7 +1246,7 @@ namespace Ogre
 		*/
 		virtual bool getInvertVertexWinding(void) const;
 
-		/** Sets the 'scissor region' ie the region of the target in which rendering can take place.
+		/** Sets the 'scissor region' i.e. the region of the target in which rendering can take place.
 		@remarks
 		This method allows you to 'mask off' rendering in all but a given rectangular area
 		as identified by the parameters to this method.
@@ -1507,8 +1486,6 @@ namespace Ogre
 
 		CullingMode mCullingMode;
 
-		bool mVSync;
-		unsigned int mVSyncInterval;
 		bool mWBuffer;
 
 		size_t mBatchCount;
@@ -1539,10 +1516,8 @@ namespace Ogre
         /// the number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/// is fixed pipeline enabled
 		bool mEnableFixedPipeline;
-#endif
 
 		/** updates pass iteration rendering state including bound gpu program parameter
 		pass iteration auto constant entry

@@ -98,9 +98,9 @@ namespace Ogre {
         /// Retrieve information about the render target.
         virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth);
 
-        virtual unsigned int getWidth(void) const;
-        virtual unsigned int getHeight(void) const;
-        virtual unsigned int getColourDepth(void) const;
+        virtual uint32 getWidth(void) const;
+        virtual uint32 getHeight(void) const;
+        virtual uint32 getColourDepth(void) const;
 
 		/**
 		 * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
@@ -134,18 +134,6 @@ namespace Ogre {
                 during rendering. Once rendering has completed (to
                 an off-screen version of the window) the buffers
                 are swapped to display the new frame.
-
-            @param
-                waitForVSync If true, the system waits for the
-                next vertical blank period (when the CRT beam turns off
-                as it travels from bottom-right to top-left at the
-                end of the pass) before flipping. If false, flipping
-                occurs no matter what the beam position. Waiting for
-                a vertical blank can be slower (and limits the
-                framerate to the monitor refresh rate) but results
-                in a steadier image with no 'tearing' (a flicker
-                resulting from flipping buffers when the beam is
-                in the progress of drawing the last frame).
         */
         virtual void swapBuffers(bool waitForVSync = true)
         { (void)waitForVSync; mFsaaResolveDirty = false; }
@@ -324,7 +312,7 @@ namespace Ogre {
 			renderTarget->_updateViewport(2); // which is not auto updated
 			renderTarget->_updateAutoUpdatedViewports();
 			renderTarget->_endUpdate();
-			renderTarget->swapBuffers(true);
+			renderTarget->swapBuffers();
 		</pre>
 			Please note that in that case, the zorder may not work as you expect,
 			since you are responsible for calling _updateViewport in the correct order.
@@ -360,9 +348,9 @@ namespace Ogre {
 		/// The priority of the render target.
 		uchar mPriority;
 
-        unsigned int mWidth;
-        unsigned int mHeight;
-        unsigned int mColourDepth;
+        uint32 mWidth;
+        uint32 mHeight;
+        uint32 mColourDepth;
 		uint16		 mDepthBufferPoolId;
         DepthBuffer	*mDepthBuffer;
 

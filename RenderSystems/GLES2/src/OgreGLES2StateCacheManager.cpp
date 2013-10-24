@@ -32,7 +32,7 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-#if OGRE_NO_GLES2_STATE_CACHE_SUPPORT == 0
+#if OGRE_NO_GL_STATE_CACHE_SUPPORT == 0
 #   include "OgreGLES2StateCacheManagerImp.h"
 #else
 #   include "OgreGLES2NullStateCacheManagerImp.h"
@@ -48,6 +48,7 @@ namespace Ogre {
     GLES2StateCacheManager::~GLES2StateCacheManager()
     {
         delete mImp;
+        mImp = 0;
     }
 
     void GLES2StateCacheManager::initializeCache()
@@ -69,12 +70,27 @@ namespace Ogre {
     {
         mImp->deleteGLBuffer(target, buffer, force);
     }
-    
+
+    void GLES2StateCacheManager::invalidateStateForTexture(GLuint texture)
+    {
+        mImp->invalidateStateForTexture(texture);
+    }
+
     void GLES2StateCacheManager::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         mImp->setTexParameteri(target, pname, param);
     }
-    
+
+    void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
+    {
+        mImp->setTexParameterf(target, pname, param);
+    }
+
+    void GLES2StateCacheManager::getTexParameterfv(GLenum target, GLenum pname, GLfloat *param)
+    {
+        mImp->getTexParameterfv(target, pname, param);
+    }
+
     void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mImp->bindGLTexture(target, texture);
@@ -134,7 +150,17 @@ namespace Ogre {
     {
         mImp->setDisabled(flag);
     }
-    
+
+    void GLES2StateCacheManager::setVertexAttribEnabled(GLuint attrib)
+    {
+        mImp->setVertexAttribEnabled(attrib);
+    }
+
+    void GLES2StateCacheManager::setVertexAttribDisabled(GLuint attrib)
+    {
+        mImp->setVertexAttribDisabled(attrib);
+    }
+
     void GLES2StateCacheManager::setCullFace(GLenum face)
     {
         mImp->setCullFace(face);

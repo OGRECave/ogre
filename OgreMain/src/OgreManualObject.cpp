@@ -188,7 +188,7 @@ namespace Ogre {
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite");
+            material = MaterialManager::getSingleton().getByName("BaseWhite");
 
 			if (material.isNull())
 			{
@@ -981,7 +981,7 @@ namespace Ogre {
 		{
 			// Load from default group. If user wants to use alternate groups,
 			// they can define it and preload
-			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName);
+			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName).staticCast<Material>();
 		}
 		return mMaterial;
 	}

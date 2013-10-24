@@ -62,7 +62,7 @@ namespace OgreBites
     class AndroidMultiTouch : public OIS::MultiTouch
     {
     public:
-        AndroidMultiTouch():OIS::MultiTouch("DWM", false, 0, 0){}
+        AndroidMultiTouch():OIS::MultiTouch("Ogre", false, 0, 0){}
         
         /** @copydoc Object::setBuffered */
         virtual void setBuffered(bool buffered){}
@@ -94,7 +94,7 @@ namespace OgreBites
     class AndroidKeyboard : public OIS::Keyboard
     {
     public:
-        AndroidKeyboard():OIS::Keyboard("DWM", false, 1, 0){}
+        AndroidKeyboard():OIS::Keyboard("Ogre", false, 1, 0){}
         
         /** @copydoc Object::setBuffered */
         virtual void setBuffered(bool buffered){}

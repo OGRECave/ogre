@@ -58,8 +58,6 @@ namespace Ogre {
         // This means CULL clockwise vertices, i.e. front of poly is counter-clockwise
         // This makes it the same as OpenGL and other right-handed systems
         , mCullingMode(CULL_CLOCKWISE)
-        , mVSync(true)
-		, mVSyncInterval(1)
 		, mWBuffer(false)
         , mInvertVertexWinding(false)
         , mDisabledTexUnitsFrom(0)
@@ -71,9 +69,7 @@ namespace Ogre {
         , mDerivedDepthBiasSlopeScale(0.0f)
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		, mEnableFixedPipeline(true)
-#endif
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
 		, mTesselationHullProgramBound(false)
@@ -465,12 +461,6 @@ namespace Ogre {
         return mCullingMode;
     }
     //-----------------------------------------------------------------------
-    bool RenderSystem::getWaitForVerticalBlank(void) const
-    {
-        return mVSync;
-    }
-    //-----------------------------------------------------------------------
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     bool RenderSystem::getFixedPipelineEnabled(void) const
     {
         return mEnableFixedPipeline;
@@ -480,7 +470,6 @@ namespace Ogre {
     {
         mEnableFixedPipeline = enabled;
     }
-#endif
     //-----------------------------------------------------------------------
 	void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
 	{
@@ -516,11 +505,6 @@ namespace Ogre {
 													   "for RT: " + renderTarget->getName() );
 		}
 	}
-    //-----------------------------------------------------------------------
-    void RenderSystem::setWaitForVerticalBlank(bool enabled)
-    {
-        mVSync = enabled;
-    }
     bool RenderSystem::getWBufferEnabled(void) const
     {
         return mWBuffer;
@@ -603,7 +587,7 @@ namespace Ogre {
         else
             val = op.vertexData->vertexCount;
 
-		int trueInstanceNum = std::max<size_t>(op.numberOfInstances,1);
+		size_t trueInstanceNum = std::max<size_t>(op.numberOfInstances,1);
 		val *= trueInstanceNum;
 
         // account for a pass having multiple iterations

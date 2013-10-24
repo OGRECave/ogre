@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GL3PlusFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GL3PlusFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}
@@ -141,6 +141,42 @@ namespace Ogre {
         
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
 	}
+
+    void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
+    {
+        glGenFramebuffers(1, &fb);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
+        if (fmt != GL_NONE)
+        {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
+            // Create and attach texture
+            glGenTextures(1, &tid);
+            glBindTexture(GL_TEXTURE_2D, tid);
+
+            // Set some default parameters
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0);
+
+            if(ogreFormat == PF_DEPTH)
+                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0);
+            else
+                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0);
+        }
+        else
+        {
+            // Draw to nowhere -- stencil/depth only
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
+    }
 
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
@@ -240,9 +276,8 @@ namespace Ogre {
     {
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
-        GLenum target = GL_TEXTURE_2D;
 
-        for(size_t x=0; x<PF_COUNT; ++x)
+        for(int x = 0; x < PF_COUNT; ++x)
         {
             mProps[x].valid = false;
 
@@ -250,7 +285,7 @@ namespace Ogre {
 			GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
 			GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
 			GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
-            if(fmt == GL_NONE && x!=0)
+            if(fmt == GL_NONE && x != 0)
                 continue;
 
 			// No test for compressed formats
@@ -258,34 +293,8 @@ namespace Ogre {
 				continue;
 
             // Create and attach framebuffer
-            glGenFramebuffers(1, &fb);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
-            if (fmt!=GL_NONE)
-            {
-				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
-				
-                // Set some default parameters
-                glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
 
-				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt2, type, 0);
-                if(x == PF_DEPTH)
-                    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0);
-                else
-                    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0);
-            }
-			else
-			{
-				// Draw to nowhere -- stencil/depth only
-				glDrawBuffer(GL_NONE);
-				glReadBuffer(GL_NONE);
-			}
             // Check status
             GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 
@@ -323,6 +332,19 @@ namespace Ogre {
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
                             }
+                            else
+                            {
+                                // There is a small edge case that FBO is trashed during the test
+                                // on some drivers resulting in undefined behavior
+                                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                                glDeleteFramebuffers(1, &fb);
+
+                                // Workaround for NVIDIA / Linux 169.21 driver problem
+                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                glFinish();
+
+                                _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+                            }
                         }
                     }
                     else
@@ -348,8 +370,7 @@ namespace Ogre {
                             // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
                             glFinish();
 
-                            glGenFramebuffers(1, &fb);
-                            glBindFramebuffer(GL_FRAMEBUFFER, fb);
+                            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                         }
                     }
                 }
@@ -361,7 +382,10 @@ namespace Ogre {
             glDeleteFramebuffers(1, &fb);
 			
             if (fmt != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
 		String fmtstring = "";
@@ -436,7 +460,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
     
-    GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GL3PlusSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested

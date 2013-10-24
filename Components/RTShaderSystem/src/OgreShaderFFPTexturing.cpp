@@ -108,11 +108,12 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	case TEXCALC_ENVIRONMENT_MAP:
 	case TEXCALC_ENVIRONMENT_MAP_PLANAR:	
 	case TEXCALC_ENVIRONMENT_MAP_NORMAL:
-		
-		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
+		//TODO: change the following 'mWorldITMatrix' member to 'mWorldViewITMatrix'
+		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX, 0);
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
+		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
 		
-		hasError |= !(mWorldITMatrix.get()) || !(mViewMatrix.get());
+		hasError |= !(mWorldITMatrix.get())  || !(mViewMatrix.get()) || !(mWorldITMatrix.get());
 		break;
 
 	case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
@@ -187,8 +188,9 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_ENVIRONMENT_MAP_PLANAR:		
 		case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 			// Resolve vertex normal.
+			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-			hasError |= !(mVSInputNormal.get());
+			hasError |= !(mVSInputNormal.get()) || !(mVSInputPos.get());
 			break;	
 
 		case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
@@ -318,8 +320,11 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			//TODO: Add field member mWorldViewITMatrix 
+			texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);	
 			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);
 			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
 			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}
@@ -327,10 +332,12 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);	
 			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
-			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);
 			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
 			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
 		break;

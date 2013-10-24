@@ -126,10 +126,10 @@ namespace Ogre
         return mUp; 
     }
 	//-----------------------------------------------------------------------
-	void ParticleEmitter::setDirPositionReference( const Vector3& position, bool enable )
+    void ParticleEmitter::setDirPositionReference( const Vector3& nposition, bool enable )
     { 
-		mUseDirPositionRef	= enable;
-        mDirPositionRef		= position;
+	mUseDirPositionRef	= enable;
+        mDirPositionRef		= nposition;
     }
     //-----------------------------------------------------------------------
 	const Vector3& ParticleEmitter::getDirPositionReference() const

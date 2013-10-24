@@ -94,7 +94,7 @@ public:
         ,resolutionY(resy)
         ,mDirectory(directory)
     {
-        std::stringstream ver;
+        StringStream ver;
         ver<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
             OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX;
         version = ver.str();

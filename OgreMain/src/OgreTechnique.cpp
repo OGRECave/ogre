@@ -1314,7 +1314,7 @@ namespace Ogre {
 	void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
 	{ 
 		mShadowCasterMaterialName = name;
-		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name); 
+		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name);
 	}
 	//---------------------------------------------------------------------
 	void Technique::addGPUVendorRule(GPUVendor vendor, Technique::IncludeOrExclude includeOrExclude)

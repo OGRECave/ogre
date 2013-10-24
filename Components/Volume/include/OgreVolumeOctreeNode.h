@@ -50,7 +50,7 @@ namespace Volume {
         static const Real NEAR_FACTOR;
 
         /// To count some indices while creating the debug view and recursing through the instances.
-        static size_t mGridPositionCount;
+        static uint32 mGridPositionCount;
 
         /// To give the debug manual object an unique name.
         static size_t mNodeI;

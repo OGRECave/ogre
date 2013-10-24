@@ -70,7 +70,7 @@ namespace Ogre {
 		void destroy(void);
 		bool isClosed(void) const;
 
-        void swapBuffers(bool waitForVSync);
+        void swapBuffers();
 
 	    //Moved this from EGLWindow because it has some native calls.
         void create(const String& name, unsigned int width, unsigned int height,

@@ -85,7 +85,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipArchive::load()
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         if (!mZzipDir)
         {
             zzip_error_t zzipError;
@@ -113,7 +113,10 @@ namespace Ogre {
                     // the compressed size of a folder, and if he does, its useless anyway
                     info.compressedSize = size_t (-1);
                 }
-
+				else
+				{
+					info.filename = info.basename;
+				}
                 mFileList.push_back(info);
 
             }
@@ -123,7 +126,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipArchive::unload()
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         if (mZzipDir)
         {
             zzip_dir_close(mZzipDir);
@@ -136,7 +139,7 @@ namespace Ogre {
 	DataStreamPtr ZipArchive::open(const String& filename, bool readOnly) const
     {
 		// zziplib is not threadsafe
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         String lookUpFileName = filename;
 
         // Format not used here (always binary)
@@ -187,7 +190,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         FileInfoList::iterator i, iend;
@@ -202,7 +205,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
@@ -216,17 +219,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs)
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
-
+		bool wildCard = pattern.find("*") != String::npos;
+			
         FileInfoList::iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
-                (recursive || full_match || i->path.empty()))
+                (recursive || full_match || wildCard))
                 // Check basename matches pattern (zip is case insensitive)
                 if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
                     ret->push_back(i->filename);
@@ -237,17 +241,18 @@ namespace Ogre {
 	FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
         bool recursive, bool dirs) const
     {
-		OGRE_LOCK_AUTO_MUTEX
+		OGRE_LOCK_AUTO_MUTEX;
         FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
+		bool wildCard = pattern.find("*") != String::npos;
 
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
-                (recursive || full_match || i->path.empty()))
+                (recursive || full_match || wildCard))
                 // Check name matches pattern (zip is case insensitive)
                 if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
                     ret->push_back(*i);
@@ -255,15 +260,25 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-	bool ZipArchive::exists(const String& filename)
+	struct FileNameCompare : public std::binary_function<FileInfo, String, bool>
 	{
-		// zziplib is not threadsafe
-		OGRE_LOCK_AUTO_MUTEX
-		ZZIP_STAT zstat;
-		int res = zzip_dir_stat(mZzipDir, filename.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
+		bool operator()(const Ogre::FileInfo& lhs, const String& filename) const
+		{
+			return lhs.filename == filename;
+		}
+	};
+	//-----------------------------------------------------------------------
+	bool ZipArchive::exists(const String& filename)
+	{		
+		OGRE_LOCK_AUTO_MUTEX;
+		String cleanName = filename;
+		if(filename.rfind("/") != String::npos)
+		{
+			StringVector tokens = StringUtil::split(filename, "/");
+			cleanName = tokens[tokens.size() - 1];
+		}
 
-		return (res == ZZIP_NO_ERROR);
-
+		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
 	}
 	//---------------------------------------------------------------------
 	time_t ZipArchive::getModifiedTime(const String& filename)
@@ -368,7 +383,7 @@ namespace Ogre {
 		else
 		{
 			// everything is going all right, relative seek
-			skip(newPos - prevPos);
+			skip((long)(newPos - prevPos));
 		}
     }
     //-----------------------------------------------------------------------
@@ -548,13 +563,13 @@ namespace Ogre {
         switch(whence)
         {
             case SEEK_CUR:
-                newPos = curEmbeddedFileData.curPos + offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.curPos + offset);
                 break;
             case SEEK_END:
-                newPos = curEmbeddedFileData.fileSize - offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.fileSize - offset);
                 break;
             case SEEK_SET:
-                newPos = offset;
+                newPos = (zzip_size_t)offset;
                 break;
             default:
                 // bad whence - return an error - nonzero value.
@@ -645,7 +660,7 @@ namespace Ogre {
         newEmbeddedFileData.fileSize = fileSize;
         newEmbeddedFileData.decryptFunc = decryptFunc;
         EmbeddedZipArchiveFactory_mEmbbedFileDataList->push_back(newEmbeddedFileData);
-        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = EmbeddedZipArchiveFactory_mEmbbedFileDataList->size();
+        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = static_cast<int>(EmbeddedZipArchiveFactory_mEmbbedFileDataList->size());
     }
     //-----------------------------------------------------------------------
     void EmbeddedZipArchiveFactory::removeEmbbeddedFile( const String& name )

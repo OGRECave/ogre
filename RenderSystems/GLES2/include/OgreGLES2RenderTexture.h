@@ -40,7 +40,7 @@ namespace Ogre {
     {
         public:
             GLES2HardwarePixelBuffer *buffer;
-            size_t zoffset;
+            uint32 zoffset;
             uint numSamples;
 
             GLES2SurfaceDesc() :buffer(0), zoffset(0), numSamples(0) {}

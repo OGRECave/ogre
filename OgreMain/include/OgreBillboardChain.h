@@ -100,7 +100,7 @@ namespace Ogre {
 			Real texCoord;
 			ColourValue colour;
 
-			//Only used when mFaceCamera == false
+			/// Only used when mFaceCamera == false
 			Quaternion orientation;
 		};
 		typedef vector<Element>::type ElementList;
@@ -110,13 +110,13 @@ namespace Ogre {
 		@param maxElements The maximum number of elements per chain
 		@param numberOfChains The number of separate chain segments contained in this object
 		@param useTextureCoords If true, use texture coordinates from the chain elements
-		@param useVertexColours If true, use vertex colours from the chain elements
+		@param useColours If true, use vertex colours from the chain elements
 		@param dynamic If true, buffers are created with the intention of being updated
 		*/
 		BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements = 20,
 						size_t numberOfChains = 1,  bool useTextureCoords = true, bool useColours = true,
 						bool dynamic = true );
-		/// destructor
+		/// Destructor
 		virtual ~BillboardChain();
 
 		/** Set the maximum number of chain elements per chain 

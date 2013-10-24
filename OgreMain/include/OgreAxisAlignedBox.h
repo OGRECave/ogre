@@ -69,14 +69,14 @@ namespace Ogre {
 
 	public:
 		/*
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		*/
 		typedef enum {
 			FAR_LEFT_BOTTOM = 0,
@@ -288,14 +288,14 @@ namespace Ogre {
 		anticlockwise around this face (looking onto the face from
 		outside the box). Like this:
 		<pre>
-		1-----2
-		/|    /|
-		/ |   / |
-		5-----4  |
-		|  0--|--3
-		| /   | /
-		|/    |/
-		6-----7
+           1-------2
+          /|      /|
+         / |     / |
+        5-------4  |
+        |  0----|--3
+        | /     | /
+        |/      |/
+        6-------7
 		</pre>
 		*/
 		inline const Vector3* getAllCorners(void) const
@@ -759,32 +759,40 @@ namespace Ogre {
                    mMinimum.z <= v.z && v.z <= mMaximum.z;
         }
 		
-		/** Returns the minimum distance between a given point and any part of the box. */
-		Real distance(const Vector3& v) const
-		{
-			
+		/** Returns the squared minimum distance between a given point and any part of the box.
+		 *  This is faster than distance since avoiding a squareroot, so use if you can. */
+        Real squaredDistance(const Vector3& v) const
+        {
+
 			if (this->contains(v))
 				return 0;
 			else
 			{
-				Real maxDist = std::numeric_limits<Real>::min();
+				Vector3 maxDist(0,0,0);
 
 				if (v.x < mMinimum.x)
-					maxDist = std::max(maxDist, mMinimum.x - v.x);
+					maxDist.x = mMinimum.x - v.x;
+				else if (v.x > mMaximum.x)
+					maxDist.x = v.x - mMaximum.x;
+
 				if (v.y < mMinimum.y)
-					maxDist = std::max(maxDist, mMinimum.y - v.y);
+					maxDist.y = mMinimum.y - v.y;
+				else if (v.y > mMaximum.y)
+					maxDist.y = v.y - mMaximum.y;
+
 				if (v.z < mMinimum.z)
-					maxDist = std::max(maxDist, mMinimum.z - v.z);
-				
-				if (v.x > mMaximum.x)
-					maxDist = std::max(maxDist, v.x - mMaximum.x);
-				if (v.y > mMaximum.y)
-					maxDist = std::max(maxDist, v.y - mMaximum.y);
-				if (v.z > mMaximum.z)
-					maxDist = std::max(maxDist, v.z - mMaximum.z);
-				
-				return maxDist;
+					maxDist.z = mMinimum.z - v.z;
+				else if (v.z > mMaximum.z)
+					maxDist.z = v.z - mMaximum.z;
+
+				return maxDist.squaredLength();
 			}
+        }
+        
+        /** Returns the minimum distance between a given point and any part of the box. */
+        Real distance (const Vector3& v) const
+        {
+			return Ogre::Math::Sqrt(squaredDistance(v));
 		}
 
         /** Tests whether another box contained by this box.

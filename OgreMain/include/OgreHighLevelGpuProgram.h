@@ -130,64 +130,6 @@ namespace Ogre {
 
 
     };
-
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to HighLevelGpuProgramPtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport HighLevelGpuProgramPtr : public SharedPtr<HighLevelGpuProgram> 
-    {
-    public:
-        HighLevelGpuProgramPtr() : SharedPtr<HighLevelGpuProgram>() {}
-        explicit HighLevelGpuProgramPtr(HighLevelGpuProgram* rep) : SharedPtr<HighLevelGpuProgram>(rep) {}
-        HighLevelGpuProgramPtr(const HighLevelGpuProgramPtr& r) : SharedPtr<HighLevelGpuProgram>(r) {} 
-        HighLevelGpuProgramPtr(const ResourcePtr& r) : SharedPtr<HighLevelGpuProgram>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-			    OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<HighLevelGpuProgram*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a HighLevelGpuProgramPtr
-        HighLevelGpuProgramPtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<HighLevelGpuProgram*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME)
-			    OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-                pRep = static_cast<HighLevelGpuProgram*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
-		/// Operator used to convert a GpuProgramPtr to a HighLevelGpuProgramPtr
-		HighLevelGpuProgramPtr& operator=(const GpuProgramPtr& r);
-    };
 	/** @} */
 	/** @} */
 

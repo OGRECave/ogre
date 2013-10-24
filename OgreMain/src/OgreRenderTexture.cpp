@@ -37,12 +37,12 @@ namespace Ogre
 {
 
     //-----------------------------------------------------------------------------
-	RenderTexture::RenderTexture(HardwarePixelBuffer *buffer, size_t zoffset):
+	RenderTexture::RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset):
 		mBuffer(buffer), mZOffset(zoffset)
     {
         mPriority = OGRE_REND_TO_TEX_RT_GROUP;
-		mWidth = static_cast<unsigned int>(mBuffer->getWidth());
-		mHeight = static_cast<unsigned int>(mBuffer->getHeight());
+		mWidth = mBuffer->getWidth();
+		mHeight = mBuffer->getHeight();
         mColourDepth = static_cast<unsigned int>(
 			Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
     }

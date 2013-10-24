@@ -147,7 +147,7 @@ namespace Ogre {
 
   
 
-    void EGLWindow::swapBuffers(bool waitForVSync)
+    void EGLWindow::swapBuffers()
     {
         if (mClosed || mIsExternalGLControl)
         {
@@ -217,37 +217,27 @@ namespace Ogre {
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
+#if OGRE_NO_GLES3_SUPPORT == 0
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+#endif
 		// Must change the packing to ensure no overruns!
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 #endif
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-			(GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-			format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+#if OGRE_NO_GLES3_SUPPORT == 0
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+#endif
 
-		//vertical flip
-		{
-			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-			size_t height = dst.getHeight();
-			uchar *tmpData = new uchar[rowSpan * height];
-			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-
-			while (tmpRow >= tmpData)
-			{
-				memcpy(tmpRow, srcRow, rowSpan);
-				srcRow += rowSpan;
-				tmpRow -= rowSpan;
-			}
-			memcpy(dst.data, tmpData, rowSpan * height);
-
-			delete [] tmpData;
-		}
-
+        PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
 

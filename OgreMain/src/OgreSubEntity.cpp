@@ -52,6 +52,8 @@ namespace Ogre {
 		mSoftwareVertexAnimVertexData = 0;
 		mHardwareVertexAnimVertexData = 0;
 		mHardwarePoseCount = 0;
+		mIndexStart = 0;
+        mIndexEnd = 0;
     }
     //-----------------------------------------------------------------------
     SubEntity::~SubEntity()
@@ -113,7 +115,7 @@ namespace Ogre {
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
 			
-            mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
+			mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
 			
             if (mMaterialPtr.isNull())
             {
@@ -149,7 +151,41 @@ namespace Ogre {
 		// Deal with any vertex data overrides
 		op.vertexData = getVertexDataForBinding();
 
+		// If we use custom index position the client is responsible to set meaningful values 
+		if(mIndexStart != mIndexEnd)
+		{
+			op.indexData->indexStart = mIndexStart;
+			op.indexData->indexCount = mIndexEnd;
+		}
     }
+	//-----------------------------------------------------------------------
+    void SubEntity::setIndexDataStartIndex(size_t start_index)
+    {
+		if(start_index < mSubMesh->indexData->indexCount)
+	        mIndexStart = start_index;
+    }
+    //-----------------------------------------------------------------------
+    size_t SubEntity::getIndexDataStartIndex() const
+    {
+        return mIndexStart;
+    }
+    //-----------------------------------------------------------------------
+    void SubEntity::setIndexDataEndIndex(size_t end_index)
+    {
+		if(end_index > 0 && end_index <= mSubMesh->indexData->indexCount)
+	        mIndexEnd = end_index;
+    }
+    //-----------------------------------------------------------------------
+    size_t SubEntity::getIndexDataEndIndex() const
+    {
+        return mIndexEnd;
+    }
+    //-----------------------------------------------------------------------
+	void SubEntity::resetIndexDataStartEndIndex()
+	{
+		mIndexStart = 0;
+		mIndexEnd = 0;
+	}
 	//-----------------------------------------------------------------------
 	VertexData* SubEntity::getVertexDataForBinding(void)
 	{

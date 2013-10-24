@@ -31,9 +31,26 @@ fragment_program Ogre/Compositor/ASCIIFPGLSL glsl
 	}
 }
 
+fragment_program Ogre/Compositor/ASCIIFPGLSLES glsles
+{
+	source ASCIIFP.glsles
+	syntax glsles
+	
+	default_params
+	{
+	    param_named iNumTiles float2 0.010 0.02
+	    param_named iNumTiles2 float2 0.005 0.01
+	    param_named numTiles float2 100 50
+	    param_named lum float4 0.30 0.59 0.11 0.0
+	    param_named charBias float 0.734375
+   		param_named RT int 0
+   		param_named chars int 1
+	}
+}
 fragment_program Ogre/Compositor/ASCIIFP unified
 {
 	delegate Ogre/Compositor/ASCIIFPGLSL
+	delegate Ogre/Compositor/ASCIIFPGLSLES
 	delegate Ogre/Compositor/ASCIIFPCg
 }
 

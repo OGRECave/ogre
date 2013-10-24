@@ -167,7 +167,7 @@ protected:
 		Ogre::LodConfig lodConfig;
 		lodConfig.levels.clear();
 		lodConfig.mesh = mesh;
-		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
 		LodLevel lodLevel;
 		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 		lodLevel.distance = 1;

@@ -13,9 +13,9 @@ same license as the rest of the engine.
 */
 
 /**
-    \file 
+    @file 
         Shadows.cpp
-    \brief
+    @brief
         Shows a few ways to use Ogre's shadowing techniques
 */
 
@@ -392,7 +392,9 @@ protected:
 	{
 		ControllerManager::getSingleton().destroyController(mController);
 
-        MeshManager::getSingleton().remove("Myplane");
+		MeshManager::getSingleton().remove("Myplane");
+
+		pColumns.clear();
 	}
 
 	/// Change basic shadow technique 
@@ -726,12 +728,12 @@ protected:
 
 				break;
 			case MAT_DEPTH_FLOAT:
-				if (mIsOpenGL)
-				{
-					// GL performs much better if you pick half-float format
-					mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
-				}
-				else
+				//if (mIsOpenGL)
+				//{
+				//	// GL performs much better if you pick half-float format
+				//	mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
+				//}
+				//else
 				{
 					// D3D is the opposite - if you ask for PF_FLOAT16_R you
 					// get an integer format instead! You can ask for PF_FLOAT16_GR
@@ -763,12 +765,12 @@ protected:
 				setDefaultDepthShadowParams();
 				break;
 			case MAT_DEPTH_FLOAT_PCF:
-				if (mIsOpenGL)
-				{
-					// GL performs much better if you pick half-float format
-					mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
-				}
-				else
+				//if (mIsOpenGL)
+				//{
+				//	// GL performs much better if you pick half-float format
+				//	mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
+				//}
+				//else
 				{
 					// D3D is the opposite - if you ask for PF_FLOAT16_R you
 					// get an integer format instead! You can ask for PF_FLOAT16_GR

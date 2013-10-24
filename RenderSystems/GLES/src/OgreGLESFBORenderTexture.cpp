@@ -58,7 +58,7 @@ namespace Ogre {
         }
     }
 
-	void GLESFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLESFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}

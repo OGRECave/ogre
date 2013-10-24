@@ -105,6 +105,10 @@ namespace Ogre
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
+        if(dst.getWidth() != dst.rowPitch)
+        {
+            glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch));
+        }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
@@ -112,29 +116,14 @@ namespace Ogre
         }
         
         glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)dst.left, (GLint)dst.top,
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.data);
+                     format, type, dst.getTopLeftFrontPixelPtr());
         
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
         
-        //vertical flip
-        {
-            size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-            size_t height = dst.getHeight();
-            uchar *tmpData = (uchar *)OGRE_MALLOC_ALIGN(rowSpan * height, MEMCATEGORY_GENERAL, false);
-            uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-            
-            while (tmpRow >= tmpData)
-            {
-                memcpy(tmpRow, srcRow, rowSpan);
-                srcRow += rowSpan;
-                tmpRow -= rowSpan;
-            }
-            memcpy(dst.data, tmpData, rowSpan * height);
-            
-            OGRE_FREE_ALIGN(tmpData, MEMCATEGORY_GENERAL, false);
-        }
+        PixelUtil::bulkPixelVerticalFlip(dst);
     }
     
     //-------------------------------------------------------------------------------------------------//
@@ -142,7 +131,7 @@ namespace Ogre
     {
         // Find the best match to what was requested
         boolean_t exactMatch = 0;
-        unsigned int reqWidth = 0, reqHeight = 0, reqDepth = 0;
+        size_t reqWidth = 0, reqHeight = 0, reqDepth = 0;
         CGLError cglErr = kCGLNoError;
         CGError cgErr = kCGErrorSuccess;
         
@@ -354,9 +343,9 @@ namespace Ogre
         }
 
         // Set some other variables.  Just in case we got a different value from CGDisplayBestModeForParameters than we requested
-        mWidth = reqWidth;
-        mHeight = reqHeight;
-        mColourDepth = reqDepth;
+        mWidth = static_cast<uint32>(reqWidth);
+        mHeight = static_cast<uint32>(reqHeight);
+        mColourDepth = static_cast<uint32>(reqDepth);
 
         cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
                                                 &reservationToken);

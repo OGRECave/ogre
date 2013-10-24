@@ -90,47 +90,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("EXT:" + str);
             extensionList.insert(str);
         }
-
-    		// Get function pointers on platforms that don't have prototypes
-#if !defined(GL_GLEXT_PROTOTYPES) && OGRE_NO_GLES3_SUPPORT == 1
-
-		// define the GL types if they are not defined
-#	ifndef PFNGLMAPBUFFEROES
-        typedef void* (GL_APIENTRY *PFNGLMAPBUFFEROES)(GLenum target, GLenum access);
-        typedef GLboolean (GL_APIENTRY *PFNGLUNMAPBUFFEROES)(GLenum target);
-#	endif
-
-#   ifndef PFNGLDRAWBUFFERSARB
-        typedef void (GL_APIENTRY *PFNGLDRAWBUFFERSARB) (GLsizei n, const GLenum *bufs);
-#   endif
-        
-#   ifndef PFNGLREADBUFFERNV
-        typedef void (GL_APIENTRY *PFNGLREADBUFFERNV) (GLenum mode);
-#   endif
-        
-#   ifndef PFNGLGETTEXIMAGENV
-        typedef void (GL_APIENTRY *PFNGLGETTEXIMAGENV) (GLenum target, GLint level, GLenum format, GLenum type, GLvoid* img);
-        typedef void (GL_APIENTRY *PFNGLGETCOMPRESSEDTEXIMAGENV) (GLenum target, GLint level, GLvoid* img);
-        typedef void (GL_APIENTRY *PFNGLGETTEXLEVELPARAMETERFVNV) (GLenum target, GLint level, GLenum pname, GLfloat* params);
-        typedef void (GL_APIENTRY *PFNGLGETTEXLEVELPARAMETERiVNV) (GLenum target, GLint level, GLenum pname, GLint* params);
-#   endif
-        glMapBufferOES = (PFNGLMAPBUFFEROES)getProcAddress("glMapBufferOES");
-        glUnmapBufferOES = (PFNGLUNMAPBUFFEROES)getProcAddress("glUnmapBufferOES");
-#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-        glDrawBuffersARB = (PFNGLDRAWBUFFERSARB)getProcAddress("glDrawBuffersARB");
-        glReadBufferNV = (PFNGLREADBUFFERNV)getProcAddress("glReadBufferNV");
-        glGetTexImageNV = (PFNGLGETTEXIMAGENV)getProcAddress("glGetTexImageNV");
-        glGetCompressedTexImageNV = (PFNGLGETCOMPRESSEDTEXIMAGENV)getProcAddress("glGetCompressedTexImageNV");
-        glGetTexLevelParameterfvNV = (PFNGLGETTEXLEVELPARAMETERFVNV)getProcAddress("glGetTexLevelParameterfvNV");
-        glGetTexLevelParameterivNV = (PFNGLGETTEXLEVELPARAMETERiVNV)getProcAddress("glGetTexLevelParameterivNV");
-#		else
-		glBindVertexArrayOES = (PFNGLBINDVERTEXARRAYOES) getProcAddress("glBindVertexArrayOES");
-		glDeleteVertexArraysOES = (PFNGLDELETEVERTEXARRAYSOES) getProcAddress("glDeleteVertexArraysOES");
-		glGenVertexArraysOES = (PFNGLGENVERTEXARRAYSOES) getProcAddress("glGenVertexArraysOES");
-		glIsVertexArrayOES = (PFNGLISVERTEXARRAYOES) getProcAddress("glIsVertexArrayOES");
-#		endif
-#endif
-}
+    }
 
     bool GLES2Support::checkExtension(const String& ext) const
     {

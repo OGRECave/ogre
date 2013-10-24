@@ -125,6 +125,10 @@ if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
 
     set(OGRE_BIN_SEARCH_PATH ${dir}/bin ${OGRE_BIN_SEARCH_PATH})
     set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
+
+    if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+      set(OGRE_BIN_SEARCH_PATH ${dir}/bin/macosx ${OGRE_BIN_SEARCH_PATH})
+    endif()
   endforeach(dir)
   
   if (OGRE_PREFIX_DEPENDENCIES_DIR)
@@ -159,7 +163,7 @@ if(NOT OGRE_STATIC)
 	use_pkgconfig(OGRE_PKGC "OGRE${OGRE_LIB_SUFFIX}")
 
 	# try to find framework on OSX
-	findpkg_framework(OGRE)
+	findpkg_framework(Ogre)
 else()
 	set(OGRE_LIBRARY_FWK "")
 endif()
@@ -258,16 +262,8 @@ if (OGRE_STATIC)
       set(X11_FOUND FALSE)
     endif ()
   endif ()
-  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    find_package(Cocoa QUIET)
-    find_package(Carbon QUIET)
-    find_package(CoreVideo QUIET)
-    if (NOT Cocoa_FOUND OR NOT Carbon_FOUND OR NOT CoreVideo_FOUND)
-      set(OGRE_DEPS_FOUND FALSE)
-    endif ()
-  endif ()
 
-  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${ZZip_LIBRARIES} ${ZLIB_LIBRARIES} ${FreeImage_LIBRARIES} ${FREETYPE_LIBRARIES} )
+  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${ZZip_LIBRARIES} ${ZLIB_LIBRARIES} ${FreeImage_LIBRARIES} ${FREETYPE_LIBRARIES})
 
   if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${X11_LIBRARIES} ${X11_Xt_LIBRARIES} ${XAW_LIBRARY} ${X11_Xrandr_LIB} ${Carbon_LIBRARIES} ${Cocoa_LIBRARIES})
@@ -287,7 +283,7 @@ if (OGRE_STATIC)
       set(OGRE_DEPS_FOUND FALSE)
 	endif ()
   endif ()
-
+endif()
   if (OGRE_CONFIG_THREADS)
     if (OGRE_CONFIG_THREAD_PROVIDER EQUAL 1)
       if (OGRE_STATIC)
@@ -296,7 +292,18 @@ if (OGRE_STATIC)
           set(Boost_USE_MULTITHREADED OFF)
         endif()
       endif()
-      find_package(Boost COMPONENTS thread QUIET)
+      
+      set(OGRE_BOOST_COMPONENTS thread date_time)
+      find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+      if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+        if(Boost_VERSION GREATER 105300)
+            set(OGRE_BOOST_COMPONENTS thread date_time system atomic chrono)
+        else()
+            set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
+        endif()
+      endif()
+
+      find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
       if (NOT Boost_THREAD_FOUND)
         set(OGRE_DEPS_FOUND FALSE)
       else ()
@@ -321,7 +328,7 @@ if (OGRE_STATIC)
       endif ()
     endif ()
   endif ()
-  
+if (OGRE_STATIC)
   if (NOT OGRE_DEPS_FOUND)
     pkg_message(OGRE "Could not find all required dependencies for the Ogre package.")
     set(OGRE_FOUND FALSE)
@@ -552,6 +559,7 @@ set(OGRE_MEDIA_SEARCH_SUFFIX
   Media
   media
   share/OGRE/media
+  share/OGRE/Media
 )
 
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)

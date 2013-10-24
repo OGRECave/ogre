@@ -60,7 +60,7 @@ namespace Ogre
 		unsigned int		getVSyncInterval	() const;
 		void 				reposition			(int left, int top);
 		void 				resize				(unsigned int width, unsigned int height);
-		void 				swapBuffers			( bool waitForVSync = true );
+		void 				swapBuffers			();
 		HWND 				getWindowHandle		() const { return mHWnd; }				
 		IDirect3DDevice9*	getD3D9Device		();
 		D3D9Device*			getDevice			();

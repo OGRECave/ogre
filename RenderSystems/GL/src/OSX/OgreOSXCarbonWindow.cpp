@@ -600,7 +600,7 @@ namespace Ogre
     }
     
     //-------------------------------------------------------------------------------------------------//
-    void OSXCarbonWindow::swapBuffers( bool waitForVSync )
+    void OSXCarbonWindow::swapBuffers( )
     {
         if(!mIsFullScreen)
         {

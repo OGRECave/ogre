@@ -3,7 +3,7 @@
 
 #include "SdkSample.h"
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 #include "OgreShaderExHardwareSkinning.h"
 #endif
 
@@ -14,7 +14,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 {
 public:
 	Sample_DualQuaternion() : ent(0), entDQ(0), totalTime(0)
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		, mSrsHardwareSkinning(0)
 #endif
 	{
@@ -40,6 +40,13 @@ public:
 
 
 protected:
+	StringVector getRequiredPlugins()
+	{
+		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+            names.push_back("Cg Program Manager");
+		return names;
+	}
 
 	void setupContent()
 	{
@@ -52,7 +59,7 @@ protected:
 		}
 		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //Add the hardware skinning to the shader generator default render state
         mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -135,7 +142,7 @@ protected:
 		sn->attachObject(entDQ);
 		sn->scale(Vector3(0.2,0.2,0.2));
 		
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //In case the system uses the RTSS, the following line will ensure
         //that the entity is using hardware animation in RTSS as well.
         RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
@@ -184,7 +191,7 @@ protected:
 	{
 		MeshManager::getSingleton().remove("floor");
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
 #endif
@@ -195,7 +202,7 @@ protected:
 
 	Real totalTime;
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 	RTShader::SubRenderState* mSrsHardwareSkinning;
 #endif
 };

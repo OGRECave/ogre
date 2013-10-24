@@ -81,7 +81,7 @@ namespace Volume {
     bool Chunk::contributesToVolumeMesh(const Vector3 &from, const Vector3 &to) const
     {
         Real centralValue = mShared->parameters->src->getValue((to - from) / (Real)2.0 + from);
-        return Math::Abs(centralValue) <= (to - from).length() * (Real)1.5;
+        return Math::Abs(centralValue) <= (to - from).length() * mShared->parameters->src->getVolumeSpaceToWorldSpaceFactor();
     }
 
     //-----------------------------------------------------------------------
@@ -185,8 +185,7 @@ namespace Volume {
     void Chunk::prepareGeometry(size_t level, OctreeNode *root, DualGridGenerator *dualGridGenerator, MeshBuilder *meshBuilder, const Vector3 &totalFrom, const Vector3 &totalTo)
     {
         OctreeNodeSplitPolicy policy(mShared->parameters->src,
-            mShared->parameters->errorMultiplicator * mShared->parameters->baseError,
-            mShared->parameters->octreeNodeDistanceCheckDiagonalFactor);
+            mShared->parameters->errorMultiplicator * mShared->parameters->baseError);
         mError = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError;
         root->split(&policy, mShared->parameters->src, mError);
         Real maxMSDistance = (Real)level * mShared->parameters->errorMultiplicator * mShared->parameters->baseError * mShared->parameters->skirtFactor;
@@ -205,7 +204,7 @@ namespace Volume {
 
         if (mShared->parameters->lodCallback)
         {
-            meshBuilder->executeCallback(mShared->parameters->lodCallback, level, mShared->chunksBeingProcessed);
+            meshBuilder->executeCallback(mShared->parameters->lodCallback, this, level, mShared->chunksBeingProcessed);
         }
 
         mBox = meshBuilder->getBoundingBox();
@@ -486,7 +485,7 @@ namespace Volume {
             return true;
         }
 
-        if (!mCamera)
+        if (!mCamera || !mCamera->getViewport())
         {
             setChunkVisible(true, false);
             return true;

@@ -269,7 +269,7 @@ namespace Ogre {
             evt.movableObject = this;
             evt.camera = cam;
 
-            // Notify lod event listeners
+            // Notify LOD event listeners
             cam->getSceneManager()->_notifyMovableObjectLodChanged(evt);
 
 		}

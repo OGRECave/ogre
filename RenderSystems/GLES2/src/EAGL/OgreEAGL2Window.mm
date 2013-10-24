@@ -35,6 +35,9 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 
+#import <UIKit/UIWindow.h>
+#import <UIKit/UIGraphics.h>
+
 namespace Ogre {
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
         :   mClosed(false),
@@ -397,7 +400,7 @@ namespace Ogre {
 		mClosed = false;
     }
 
-    void EAGL2Window::swapBuffers(bool waitForVSync)
+    void EAGL2Window::swapBuffers()
     {
         if (mClosed)
         {
@@ -519,7 +522,7 @@ namespace Ogre {
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
         // Read pixel data from the framebuffer
-		OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                                          (GLsizei)width, (GLsizei)height,
                                          format, type, data));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
@@ -550,7 +553,7 @@ namespace Ogre {
         CGContextDrawImage(context, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
 
         // Retrieve the UIImage from the current context
-        memcpy(dst.data, CGBitmapContextGetData(context), CGBitmapContextGetBytesPerRow(context) * height);
+        memcpy(dst.data, CGBitmapContextGetData(context), CGBitmapContextGetBytesPerRow(context) * height); // TODO: support dst.rowPitch != dst.getWidth() case
         UIGraphicsEndImageContext();
 
         // Clean up

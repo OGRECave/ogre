@@ -656,7 +656,7 @@ namespace Ogre {
         KeyFrameTimeList::iterator it =
             std::lower_bound(mKeyFrameTimes.begin(), mKeyFrameTimes.end(), timePos);
 
-        return TimeIndex(timePos, std::distance(mKeyFrameTimes.begin(), it));
+        return TimeIndex(timePos, static_cast<uint>(std::distance(mKeyFrameTimes.begin(), it)));
     }
     //-----------------------------------------------------------------------
     void Animation::buildKeyFrameTimeList(void) const

@@ -176,14 +176,14 @@ namespace Ogre {
         mClosed = false;
 	}
 
-    void NaClWindow::swapBuffers(bool waitForVSync)
+    void NaClWindow::swapBuffers()
     {
         if (mClosed)
         {
             return;
         }
 
-        mContext->swapBuffers(waitForVSync);
+        mContext->swapBuffers();
 
     }
 

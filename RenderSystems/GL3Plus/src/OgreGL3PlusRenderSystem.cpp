@@ -57,6 +57,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 
+#if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                             GLenum type,
                             GLuint id,
@@ -104,6 +105,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
     Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
 }
+#endif
 
 namespace Ogre {
 
@@ -262,7 +264,7 @@ namespace Ogre {
         // Multitexturing support and set number of texture units
         GLint units;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
-        rsc->setNumTextureUnits(units);
+        rsc->setNumTextureUnits(std::min<ushort>(16, units));
 
         // Check for Anisotropy support
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
@@ -297,7 +299,13 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         }
-        
+
+        // Check for etc compression
+        if(mGLSupport->checkExtension("GL_ARB_ES3_compatibility") || gl3wIsSupported(4, 3))
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
+        }
+
         // Check for vtc compression
         if(mGLSupport->checkExtension("GL_NV_texture_compression_vtc"))
         {
@@ -387,8 +395,8 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-//        if(mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || gl3wIsSupported(4, 1))
-//            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+        if(mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || gl3wIsSupported(4, 1))
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
@@ -446,10 +454,11 @@ namespace Ogre {
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
-			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+            GLint formats;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
 
-            // Enable microcache
-            mGpuProgramManager->setSaveMicrocodesToCache(true);
+            if(formats > 0)
+                rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
@@ -517,6 +526,12 @@ namespace Ogre {
 
         // Create the texture manager        
         mTextureManager = new GL3PlusTextureManager(*mGLSupport);
+
+        if (caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
+		{
+            // Enable microcache
+            mGpuProgramManager->setSaveMicrocodesToCache(true);
+		}
 
         mGLInitialised = true;
     }
@@ -717,7 +732,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
-			if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilBuffer != GL_NONE )
+			if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat != GL_NONE )
 			{
 				stencilBuffer = new GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -893,7 +908,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-		GL3PlusTexturePtr tex = texPtr;
+		GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
 
 		if (!activateGLTextureUnit(stage))
 			return;
@@ -1820,12 +1835,10 @@ namespace Ogre {
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
                 OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
-//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
             else
             {
                 OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
-//                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
 		}
         else if (op.useIndexes)
@@ -1947,7 +1960,7 @@ namespace Ogre {
         //  GL measures from the bottom, not the top
         size_t targetHeight = mActiveRenderTarget->getHeight();
         // Calculate the "lower-left" corner of the viewport
-        GLsizei x = 0, y = 0, w = 0, h = 0;
+        uint64 x = 0, y = 0, w = 0, h = 0;
 
         if (enabled)
         {
@@ -1960,7 +1973,10 @@ namespace Ogre {
                 y = targetHeight - bottom;
             w = right - left;
             h = bottom - top;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
         else
         {
@@ -1973,7 +1989,10 @@ namespace Ogre {
                 y = mActiveViewport->getActualTop();
             else
                 y = targetHeight - mActiveViewport->getActualTop() - h;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
     }
 
@@ -2532,7 +2551,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::registerThread()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// This is only valid once we've created the main context
 		if (!mMainContext)
 		{
@@ -2565,7 +2584,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::preExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// free context, we'll need this to share lists
         if(mCurrentContext)
 		mCurrentContext->endCurrent();
@@ -2573,7 +2592,7 @@ namespace Ogre {
 
 	void GL3PlusRenderSystem::postExtraThreadsStarted()
 	{
-		OGRE_LOCK_MUTEX(mThreadInitMutex)
+		OGRE_LOCK_MUTEX(mThreadInitMutex);
 		// reacquire context
         if(mCurrentContext)
 		mCurrentContext->setCurrent();
@@ -2589,7 +2608,7 @@ namespace Ogre {
     {
         markProfileEvent("Begin Event: " + eventName);
         if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
-            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, eventName.length(), eventName.c_str()));
+            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
     //---------------------------------------------------------------------
@@ -2611,7 +2630,7 @@ namespace Ogre {
                                  GL_DEBUG_TYPE_PERFORMANCE,
                                  GL_DEBUG_SEVERITY_LOW,
                                  0,
-                                 eventName.length(),
+                                 static_cast<GLint>(eventName.length()),
                                  eventName.c_str());
     }
 
@@ -2621,8 +2640,8 @@ namespace Ogre {
 		{
 			if (unit < getCapabilities()->getNumTextureUnits())
 			{
-				OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
-				mActiveTextureUnit = unit;
+				OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<uint32>(GL_TEXTURE0 + unit)));
+				mActiveTextureUnit = static_cast<GLenum>(unit);
 				return true;
 			}
 			else if (!unit)

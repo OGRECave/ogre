@@ -259,12 +259,12 @@ namespace Ogre
 			// No specified top left -> Center the window in the middle of the monitor
 			if (left == INT_MAX || top == INT_MAX)
 			{				
-				int screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-				int screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+				uint32 screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+				uint32 screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 
 				// clamp window dimensions to screen size
-				int outerw = (winWidth < screenw)? winWidth : screenw;
-				int outerh = (winHeight < screenh)? winHeight : screenh;
+				uint32 outerw = (winWidth < screenw)? winWidth : screenw;
+				uint32 outerh = (winHeight < screenh)? winHeight : screenh;
 
 				if (left == INT_MAX)
 					left = monitorInfo.rcWork.left + (screenw - outerw) / 2;
@@ -724,13 +724,18 @@ namespace Ogre
 
 	void D3D9RenderWindow::resize(unsigned int width, unsigned int height)
 	{
-		if (mHWnd && !mIsFullScreen)
+		if (!mIsExternal)
 		{
-			unsigned int winWidth, winHeight;
-			adjustWindow(width, height, &winWidth, &winHeight);
-			SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
-				SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			if (mHWnd && !mIsFullScreen)
+			{
+				unsigned int winWidth, winHeight;
+				adjustWindow(width, height, &winWidth, &winHeight);
+				SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			}
 		}
+		else
+			updateWindowRect();
 	}
 
 	void D3D9RenderWindow::windowMovedOrResized()
@@ -741,7 +746,7 @@ namespace Ogre
 		updateWindowRect();
 	}
 
-	void D3D9RenderWindow::swapBuffers( bool waitForVSync )
+	void D3D9RenderWindow::swapBuffers( )
 	{
 		if (mDeviceValid)
 			mDevice->present(this);		

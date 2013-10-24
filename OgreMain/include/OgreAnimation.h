@@ -58,6 +58,8 @@ namespace Ogre {
     class _OgreExport AnimationContainer
     {
     public:
+        virtual ~AnimationContainer() {}
+
         /** Gets the number of animations in this container. */
         virtual unsigned short getNumAnimations(void) const = 0;
         
@@ -277,7 +279,6 @@ namespace Ogre {
           const AnimationState::BoneBlendMask* blendMask, Real scale);
 
         /** Applies all vertex tracks given a specific time point and weight to a given entity.
-        @remarks
         @param entity The Entity to which this animation should be applied
         @param timePos The time position in the animation to apply.
         @param weight The weight at which the animation should be applied 

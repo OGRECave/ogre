@@ -28,10 +28,11 @@ THE SOFTWARE.
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreGLHardwareVertexBuffer.h"
 #include "OgreGLHardwareIndexBuffer.h"
+#include "OgreGLRenderSystem.h"
 #include "OgreGLRenderToVertexBuffer.h"
+#include "OgreGLUtil.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre {
@@ -50,6 +51,8 @@ namespace Ogre {
     GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
 		: mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
+		mStateCacheManager = dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getGLSupportRef()->getStateCacheManager();
+
 		// Init scratch pool
 		// TODO make it a configurable size?
 		// 32-bit aligned buffer
@@ -89,7 +92,7 @@ namespace Ogre {
 		GLHardwareVertexBuffer* buf = 
 			new GLHardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
 		{
-			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 			mVertexBuffers.insert(buf);
 		}
 		return HardwareVertexBufferSharedPtr(buf);
@@ -103,7 +106,7 @@ namespace Ogre {
 		GLHardwareIndexBuffer* buf = 
 			new GLHardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
 		{
-			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 			mIndexBuffers.insert(buf);
 		}
 		return HardwareIndexBufferSharedPtr(buf);
@@ -180,7 +183,7 @@ namespace Ogre {
 		// simple forward link search based on alloc sizes
 		// not that fast but the list should never get that long since not many
 		// locks at once (hopefully)
-		OGRE_LOCK_MUTEX(mScratchMutex)
+            OGRE_LOCK_MUTEX(mScratchMutex);
 
 		assert( OGRE_SIMD_ALIGNMENT >= sizeof(GLScratchBufferAlloc) &&
 				"Control blocks are 32-bit, but SIMD alignment is smaller" );
@@ -224,7 +227,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GLHardwareBufferManagerBase::deallocateScratch(void* ptr)
 	{
-		OGRE_LOCK_MUTEX(mScratchMutex)
+            OGRE_LOCK_MUTEX(mScratchMutex);
 
 		// Simple linear search dealloc
 		uint32 bufferPos = 0;

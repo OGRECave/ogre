@@ -27,13 +27,13 @@ THE SOFTWARE.
 
 #include "OgreEAGL2View.h"
 
-#include "OgreGLES2Prerequisites.h"
-
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLES2RenderSystem.h"
 
 #import <QuartzCore/QuartzCore.h>
+#import <UIKit/UIWindow.h>
+#import <UIKit/UIDevice.h>
 
 using namespace Ogre;
 
@@ -70,13 +70,13 @@ using namespace Ogre;
 
     // Check if orientation is supported
     NSString *rotateToOrientation = @"";
-    if(deviceOrientation == UIInterfaceOrientationPortrait)
+    if(deviceOrientation == UIDeviceOrientationPortrait)
         rotateToOrientation = @"UIInterfaceOrientationPortrait";
-    else if(deviceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+    else if(deviceOrientation == UIDeviceOrientationPortraitUpsideDown)
         rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeLeft)
+    else if(deviceOrientation == UIDeviceOrientationLandscapeLeft)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
-    else if(deviceOrientation == UIInterfaceOrientationLandscapeRight)
+    else if(deviceOrientation == UIDeviceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
 
     NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];

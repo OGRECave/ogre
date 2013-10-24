@@ -69,8 +69,8 @@ namespace Ogre {
 		void detachDepthBuffer();
 
         /// Accessors
-        size_t getWidth();
-        size_t getHeight();
+        uint32 getWidth();
+        uint32 getHeight();
         PixelFormat getFormat();
 		GLsizei getFSAA();
 

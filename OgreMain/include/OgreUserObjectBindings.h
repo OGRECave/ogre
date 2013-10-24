@@ -41,7 +41,7 @@ namespace Ogre {
 	*  @{
 	*/
 
-	/** Class that provide convenient interface to establish a linkage between
+	/** Class that provides convenient interface to establish a linkage between
 	custom user application objects and Ogre core classes.
 	Any instance of Ogre class that will derive from this class could be associated with custom 
 	application object using this class interface.

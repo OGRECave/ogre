@@ -37,7 +37,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    
+
+class GLStateCacheManager;
+
 class _OgreGLExport GLSupport
 {
 public:
@@ -69,6 +71,16 @@ public:
 
     virtual bool supportsPBuffers();
     virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
+
+    GLStateCacheManager* getStateCacheManager() const
+    {
+        return mStateCacheManager;
+    }
+
+    void setStateCacheManager(GLStateCacheManager* stateCacheMgr)
+    {
+        mStateCacheManager = stateCacheMgr;
+    }
 
     /**
     * Start anything special
@@ -129,6 +141,8 @@ protected:
 private:
     String mVersion;
     String mVendor;
+
+    GLStateCacheManager* mStateCacheManager;
 
 }; // class GLSupport
 

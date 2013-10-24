@@ -50,7 +50,7 @@ namespace Ogre
 	{
 	public:
 		/** Creates a concrete platform-dependent implementation of FileSystemLayer.
-         @param
+         @param subdir
          A subdirectory inside the user's path to distinguish between
          different Ogre releases.
 		 */
@@ -66,7 +66,7 @@ namespace Ogre
          be found there, the function falls back to the system-wide install
          path for Ogre config files. (Usually the same place where the
          SampleBrowser resides, or a special config path above that path.)
-         @param
+         @param filename
          The config file name (without path)
          @return
          The full path to the config file.
@@ -102,7 +102,7 @@ namespace Ogre
 		/** Find a path where the given filename can be written to. This path 
          will usually be in the user's home directory. This function should
          be used for any output like logs and graphics settings.
-         @param
+         @param filename
          Name of the file.
          @return
          The full path to a writable location for the given filename.

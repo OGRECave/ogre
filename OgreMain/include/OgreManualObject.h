@@ -251,7 +251,7 @@ namespace Ogre
 		@note
 			32-bit indexes are not supported on all cards and will only be used
             when required, if an index is > 65535.
-		@param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face. 
+		@param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face.
 		*/
 		virtual void triangle(uint32 i1, uint32 i2, uint32 i3);
 		/** Add a set of 4 vertex indices to construct a quad (out of 2 

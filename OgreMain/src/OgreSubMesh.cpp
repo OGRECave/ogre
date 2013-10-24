@@ -361,7 +361,7 @@ namespace Ogre {
 			// just insert all indexes
 			for (size_t i = vertexData->vertexStart; i < vertexData->vertexCount; i++)
 			{
-				boxes [0].mIndices.insert (i);
+				boxes [0].mIndices.insert (static_cast<int>(i));
 			}
 
 		}
@@ -444,7 +444,7 @@ namespace Ogre {
 
         vbuf->unlock ();
     }
-	 //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
 	void SubMesh::setBuildEdgesEnabled(bool b)
 	{
 		mBuildEdgesEnabled = b;
@@ -454,6 +454,50 @@ namespace Ogre {
 			parent->setAutoBuildEdgeLists(true);
 		}
 	}
+    //---------------------------------------------------------------------
+    SubMesh * SubMesh::clone(const String& newName, Mesh *parentMesh)
+    {
+        // This is a bit like a copy constructor, but with the additional aspect of registering the clone with
+        //  the MeshManager
+
+        SubMesh* newSub;
+        if(!parentMesh)
+            newSub = parent->createSubMesh(newName);
+        else
+            newSub = parentMesh->createSubMesh(newName);
+
+        newSub->mMaterialName = this->mMaterialName;
+        newSub->mMatInitialised = this->mMatInitialised;
+        newSub->operationType = this->operationType;
+        newSub->useSharedVertices = this->useSharedVertices;
+        newSub->extremityPoints = this->extremityPoints;
+
+        if (!this->useSharedVertices)
+        {
+            // Copy unique vertex data
+            newSub->vertexData = this->vertexData->clone();
+            // Copy unique index map
+            newSub->blendIndexToBoneIndexMap = this->blendIndexToBoneIndexMap;
+        }
+
+        // Copy index data
+        OGRE_DELETE newSub->indexData;
+        newSub->indexData = this->indexData->clone();
+        // Copy any bone assignments
+        newSub->mBoneAssignments = this->mBoneAssignments;
+        newSub->mBoneAssignmentsOutOfDate = this->mBoneAssignmentsOutOfDate;
+        // Copy texture aliases
+        newSub->mTextureAliases = this->mTextureAliases;
+
+        // Copy lod face lists
+        newSub->mLodFaceList.reserve(this->mLodFaceList.size());
+        SubMesh::LODFaceList::const_iterator facei;
+        for (facei = this->mLodFaceList.begin(); facei != this->mLodFaceList.end(); ++facei) {
+            IndexData* newIndexData = (*facei)->clone();
+            newSub->mLodFaceList.push_back(newIndexData);
+        }
+        return newSub;
+    }
 }
 
 

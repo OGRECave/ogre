@@ -138,14 +138,14 @@ extern "C"
                 
         gInit = false;
                 
-        OGRE_DELETE gRoot;
-        gRoot = NULL;
-        gRenderWnd = NULL;
-            
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
 		OGRE_DELETE gOverlaySystem; 
 		gOverlaySystem = NULL;
 #endif
+
+        OGRE_DELETE gRoot;
+        gRoot = NULL;
+        gRenderWnd = NULL;
 
 #ifdef OGRE_BUILD_PLUGIN_PFX
 		OGRE_DELETE gParticleFXPlugin;

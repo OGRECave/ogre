@@ -39,12 +39,7 @@ namespace Ogre {
     {
         private:
             GLuint mBufferId;
-            // Scratch buffer handling
-            bool mLockedToScratch;
-            size_t mScratchOffset;
-            size_t mScratchSize;
-            void* mScratchPtr;
-            bool mScratchUploadOnUnlock;
+            GLsync mFence;
 
         protected:
             /** See HardwareBuffer. */
@@ -84,6 +79,7 @@ namespace Ogre {
             void _updateFromShadow(void);
 
             inline GLuint getGLBufferId(void) const { return mBufferId; }
+            void setFence(void);
     };
 }
 

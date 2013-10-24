@@ -131,7 +131,7 @@ namespace Ogre {
 				Mandatory on static buffers, i.e. those created without the HBU_DYNAMIC flag. 
 				*/ 
 			    HBL_READ_ONLY,
-                /** As HBL_NORMAL, except the application guarantees not to overwrite any 
+                /** As HBL_DISCARD, except the application guarantees not to overwrite any 
                 region of the buffer which has already been used in this frame, can allow
                 some optimisation on some APIs. */
                 HBL_NO_OVERWRITE,

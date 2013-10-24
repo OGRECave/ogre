@@ -54,7 +54,7 @@ namespace Ogre {
             virtual void endCurrent();
             GLES2Context* clone() const;
 
-            void swapBuffers(bool waitForVSync);
+            void swapBuffers();
 
             void resize();
 

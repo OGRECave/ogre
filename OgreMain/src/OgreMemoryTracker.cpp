@@ -57,7 +57,7 @@ namespace Ogre
 	{
 		if (mRecordEnable)
 		{
-			OGRE_LOCK_AUTO_MUTEX
+                    OGRE_LOCK_AUTO_MUTEX;
 
 				assert(mAllocations.find(ptr) == mAllocations.end() && "Double allocation with same address - "
 				"this probably means you have a mismatched allocation / deallocation style, "
@@ -80,7 +80,7 @@ namespace Ogre
 			if (!ptr)
 				return;
 
-			OGRE_LOCK_AUTO_MUTEX
+			OGRE_LOCK_AUTO_MUTEX;
 
 			AllocationMap::iterator i = mAllocations.find(ptr);
 			assert(i != mAllocations.end() && "Unable to locate allocation unit - "

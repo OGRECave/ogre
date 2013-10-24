@@ -20,6 +20,14 @@ public:
 			"It's cold though, so the frost will return after a while.";
 	}
 
+    StringVector getRequiredPlugins()
+	{
+		StringVector names;
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+            names.push_back("Cg Program Manager");
+		return names;
+	}
+
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
 		// shoot a ray from the cursor to the plane

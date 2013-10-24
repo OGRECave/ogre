@@ -313,7 +313,7 @@ namespace Ogre {
 			}
 
 			// Initalise the SizeOrPitch flags (power two textures for now)
-			ddsHeaderSizeOrPitch = ddsHeaderRgbBits * imgData->width;
+			ddsHeaderSizeOrPitch = static_cast<uint32>(ddsHeaderRgbBits * imgData->width);
 
 			// Initalise the caps flags
 			ddsHeaderCaps1 = (isVolume||isCubeMap) ? DDSCAPS_COMPLEX|DDSCAPS_TEXTURE : DDSCAPS_TEXTURE;
@@ -458,7 +458,7 @@ namespace Ogre {
 			PixelFormat pf = static_cast<PixelFormat>(i);
 			if (PixelUtil::getNumElemBits(pf) == rgbBits)
 			{
-				uint32 testMasks[4];
+				uint64 testMasks[4];
 				PixelUtil::getBitMasks(pf, testMasks);
 				int testBits[4];
 				PixelUtil::getBitDepths(pf, testBits);
@@ -557,66 +557,45 @@ namespace Ogre {
 	void DDSCodec::unpackDXTAlpha(
 		const DXTInterpolatedAlphaBlock& block, ColourValue* pCol) const
 	{
-		// 8 derived alpha values to be indexed
-		Real derivedAlphas[8];
+        // Adaptive 3-bit alpha part
+        float derivedAlphas[8];
 
 		// Explicit extremes
-		derivedAlphas[0] = block.alpha_0 / (Real)0xFF;
-		derivedAlphas[1] = block.alpha_1 / (Real)0xFF;
-		
-		
-		if (block.alpha_0 <= block.alpha_1)
-		{
-			// 4 interpolated alphas, plus zero and one			
-			// full range including extremes at [0] and [5]
-			// we want to fill in [1] through [4] at weights ranging
-			// from 1/5 to 4/5
-			Real denom = 1.0f / 5.0f;
-			for (size_t i = 0; i < 4; ++i) 
-			{
-				Real factor0 = (4 - i) * denom;
-				Real factor1 = (i + 1) * denom;
-				derivedAlphas[i + 2] = 
-					(factor0 * block.alpha_0) + (factor1 * block.alpha_1);
-			}
-			derivedAlphas[6] = 0.0f;
-			derivedAlphas[7] = 1.0f;
+        derivedAlphas[0] = ((float) block.alpha_0) * (1.0f / 255.0f);
+        derivedAlphas[1] = ((float) block.alpha_1) * (1.0f / 255.0f);
 
-		}
-		else
-		{
-			// 6 interpolated alphas
+        if(block.alpha_0 > block.alpha_1)
+        {
+            // 6 interpolated alpha values.
 			// full range including extremes at [0] and [7]
 			// we want to fill in [1] through [6] at weights ranging
 			// from 1/7 to 6/7
-			Real denom = 1.0f / 7.0f;
-			for (size_t i = 0; i < 6; ++i) 
-			{
-				Real factor0 = (6 - i) * denom;
-				Real factor1 = (i + 1) * denom;
-				derivedAlphas[i + 2] = 
-					(factor0 * block.alpha_0) + (factor1 * block.alpha_1);
-			}
-			
-		}
+            for(size_t i = 1; i < 7; ++i)
+                derivedAlphas[i + 1] = (derivedAlphas[0] * (7 - i) + derivedAlphas[1] * i) * (1.0f / 7.0f);
+        }
+        else
+        {
+            // 4 interpolated alpha values.
+			// full range including extremes at [0] and [5]
+			// we want to fill in [1] through [4] at weights ranging
+			// from 1/5 to 4/5
+            for(size_t i = 1; i < 5; ++i)
+                derivedAlphas[i + 1] = (derivedAlphas[0] * (5 - i) + derivedAlphas[1] * i) * (1.0f / 5.0f);
+
+            derivedAlphas[6] = 0.0f;
+            derivedAlphas[7] = 1.0f;
+        }
 
 		// Ok, now we've built the reference values, process the indexes
-		for (size_t i = 0; i < 16; ++i)
-		{
-			size_t baseByte = (i * 3) / 8;
-			size_t baseBit = (i * 3) % 8;
-			uint8 bits = static_cast<uint8>(block.indexes[baseByte] >> baseBit & 0x7);
-			// do we need to stitch in next byte too?
-			if (baseBit > 5)
-			{
-				uint8 extraBits = static_cast<uint8>(
-					(block.indexes[baseByte+1] << (8 - baseBit)) & 0xFF);
-				bits |= extraBits & 0x7;
-			}
-			pCol[i].a = derivedAlphas[bits];
+        uint32 dw = block.indexes[0] | (block.indexes[1] << 8) | (block.indexes[2] << 16);
 
-		}
+        for(size_t i = 0; i < 8; ++i, dw >>= 3)
+            pCol[i].a = derivedAlphas[dw & 0x7];
 
+        dw = block.indexes[3] | (block.indexes[4] << 8) | (block.indexes[5] << 16);
+
+        for(size_t i = 8; i < 16; ++i, dw >>= 3)
+            pCol[i].a = derivedAlphas[dw & 0x7];
 	}
     //---------------------------------------------------------------------
     Codec::DecodeResult DDSCodec::decode(DataStreamPtr& stream) const
@@ -661,7 +640,7 @@ namespace Ogre {
 
 		if (header.caps.caps1 & DDSCAPS_MIPMAP)
 		{
-	        imgData->num_mipmaps = static_cast<ushort>(header.mipMapCount - 1);
+	        imgData->num_mipmaps = static_cast<uint8>(header.mipMapCount - 1);
 		}
 		else
 		{
@@ -713,7 +692,9 @@ namespace Ogre {
 		if (PixelUtil::isCompressed(sourceFormat))
 		{
 			if (Root::getSingleton().getRenderSystem() == NULL ||
-				Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) == false)
+				!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
+                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP)
+                && !imgData->num_mipmaps))
 			{
 				// We'll need to decompress
 				decompressDXT = true;
@@ -785,9 +766,9 @@ namespace Ogre {
 		// all mips for a face, then each face
 		for(size_t i = 0; i < numFaces; ++i)
 		{   
-			size_t width = imgData->width;
-			size_t height = imgData->height;
-			size_t depth = imgData->depth;
+			uint32 width = imgData->width;
+			uint32 height = imgData->height;
+			uint32 depth = imgData->depth;
 
 			for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)
 			{
@@ -804,8 +785,8 @@ namespace Ogre {
 						// 4x4 block of decompressed colour
 						ColourValue tempColours[16];
 						size_t destBpp = PixelUtil::getNumElemBytes(imgData->format);
-						size_t sx = std::min(width, (size_t)4);
-						size_t sy = std::min(height, (size_t)4);
+						size_t sx = std::min((size_t)width, (size_t)4);
+						size_t sy = std::min((size_t)height, (size_t)4);
 						size_t destPitchMinus4 = dstPitch - destBpp * sx;
 						// slices are done individually
 						for(size_t z = 0; z < depth; ++z)

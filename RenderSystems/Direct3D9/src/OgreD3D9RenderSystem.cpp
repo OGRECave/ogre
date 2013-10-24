@@ -198,9 +198,7 @@ namespace Ogre
 		ConfigOption optSRGB;
 		ConfigOption optResourceCeationPolicy;
 		ConfigOption optMultiDeviceMemHint;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		ConfigOption optEnableFixedPipeline;
-#endif
 
 		driverList = this->getDirect3DDrivers();
 
@@ -304,13 +302,11 @@ namespace Ogre
 		optMultiDeviceMemHint.currentValue = "Use minimum system memory";
 		optMultiDeviceMemHint.immutable = false;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
 		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
 		optEnableFixedPipeline.possibleValues.push_back( "No" );
 		optEnableFixedPipeline.currentValue = "Yes";
 		optEnableFixedPipeline.immutable = false;
-#endif
 
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
@@ -325,9 +321,7 @@ namespace Ogre
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
 		mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
-#endif
 
 		refreshD3DSettings();
 
@@ -467,19 +461,6 @@ namespace Ogre
 
 		}
 
-		if( name == "VSync" )
-		{
-			if (value == "Yes")
-				mVSync = true;
-			else
-				mVSync = false;
-		}
-
-		if( name == "VSync Interval" )
-		{
-			mVSyncInterval = StringConverter::parseUnsignedInt(value);
-		}
-
 		if( name == "Allow NVPerfHUD" )
 		{
 			if (value == "Yes")
@@ -509,7 +490,6 @@ namespace Ogre
 				mResourceManager->setAutoHardwareBufferManagement(true);
 		}		
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if (name == "Fixed Pipeline Enabled")
 		{
 			if (value == "Yes")
@@ -519,7 +499,6 @@ namespace Ogre
 			else
 				mEnableFixedPipeline = false;
 		}
-#endif
 
 	}
 	//---------------------------------------------------------------------
@@ -602,12 +581,6 @@ namespace Ogre
 			return "Your DirectX driver name has changed since the last time you ran OGRE; "
 				"the 'Rendering Device' has been changed.";
 		}
-
-		it = mOptions.find( "VSync" );
-		if( it->second.currentValue == "Yes" )
-			mVSync = true;
-		else
-			mVSync = false;
 
 		return StringUtil::BLANK;
 	}
@@ -711,16 +684,24 @@ namespace Ogre
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
 			hwGamma = opt->second.currentValue == "Yes";
 
-			
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
 			miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
 			miscParams["FSAAHint"] = mFSAAHint;
-			miscParams["vsync"] = StringConverter::toString(mVSync);
-			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
 			miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
 			miscParams["gamma"] = StringConverter::toString(hwGamma);
 			miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
+
+            opt = mOptions.find("VSync");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
+            bool vsync = (opt->second.currentValue == "Yes");
+            miscParams["vsync"] = StringConverter::toString(vsync);
+
+            opt = mOptions.find("VSync Interval");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "D3D9RenderSystem::initialise");
+            miscParams["vsyncInterval"] = opt->second.currentValue;
 
 			autoWindow = _createRenderWindow( windowTitle, width, height, 
 				fullScreen, &miscParams );
@@ -801,10 +782,12 @@ namespace Ogre
 		StringStream ss;
 		ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
 			width << "x" << height << " ";
+
 		if(fullScreen)
 			ss << "fullscreen ";
 		else
 			ss << "windowed ";
+
 		if(miscParams)
 		{
 			ss << " miscParams: ";
@@ -895,9 +878,7 @@ namespace Ogre
 		rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
 		rsc->setRenderSystemName(getName());
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if(mEnableFixedPipeline)
-#endif
 		{
 			// Supports fixed-function
 			rsc->setCapability(RSC_FIXED_FUNCTION);
@@ -1945,7 +1926,7 @@ namespace Ogre
 	void D3D9RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
 	{
 		HRESULT hr;
-		D3D9TexturePtr dt = tex;
+		D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
 		if (enabled && !dt.isNull())
 		{
 			// note used
@@ -2024,7 +2005,7 @@ namespace Ogre
 		}
 		else
 		{
-			D3D9TexturePtr dt = tex;
+			D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
 			// note used
 			dt->touch();
 
@@ -3422,7 +3403,6 @@ namespace Ogre
 		RenderSystem::_render(op);
 
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
@@ -3435,7 +3415,6 @@ namespace Ogre
 				"Attempted to render using the fixed pipeline when it is disabled.",
 				"D3D9RenderSystem::_render");
 		}
-#endif
 
 		// To think about: possibly remove setVertexDeclaration and 
 		// setVertexBufferBinding from RenderSystem since the sequence is
@@ -3651,7 +3630,7 @@ namespace Ogre
 		case GPT_VERTEX_PROGRAM:
 			mActiveVertexGpuProgramParameters = params;
 			{
-				OGRE_LOCK_MUTEX(floatLogical->mutex)
+                            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 						i != floatLogical->map.end(); ++i)
@@ -3678,7 +3657,7 @@ namespace Ogre
 			}
 			// bind ints
 			{
-				OGRE_LOCK_MUTEX(intLogical->mutex)
+                            OGRE_LOCK_MUTEX(intLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 						i != intLogical->map.end(); ++i)
@@ -3707,7 +3686,7 @@ namespace Ogre
 		case GPT_FRAGMENT_PROGRAM:
 			mActiveFragmentGpuProgramParameters = params;
 			{
-				OGRE_LOCK_MUTEX(floatLogical->mutex)
+                            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 						i != floatLogical->map.end(); ++i)
@@ -3733,7 +3712,7 @@ namespace Ogre
 			}
 			// bind ints
 			{
-				OGRE_LOCK_MUTEX(intLogical->mutex)
+                            OGRE_LOCK_MUTEX(intLogical->mutex);
 
 					for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 						i != intLogical->map.end(); ++i)
@@ -4165,7 +4144,7 @@ namespace Ogre
 		IDirect3DSurface9* mSurface = activeDevice->getPrimaryWindow()->getRenderSurface();
 		D3DSURFACE_DESC srfDesc;
 
-		if(!FAILED(mSurface->GetDesc(&srfDesc)))
+		if(mSurface && SUCCEEDED(mSurface->GetDesc(&srfDesc)))
 		{
 			/// Probe all depth stencil formats
 			/// Break on first one that matches
@@ -4280,7 +4259,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::notifyOnDeviceLost(D3D9Device* device)
 	{	
-		std::stringstream ss;
+		StringStream ss;
 
 		ss << "D3D9 Device 0x[" << device->getD3D9Device() << "] entered lost state";
 		LogManager::getSingleton().logMessage(ss.str());
@@ -4302,7 +4281,7 @@ namespace Ogre
 		// Invalidate active view port.
 		mActiveViewport = NULL;
 
-		std::stringstream ss;
+		StringStream ss;
 
 		// Reset the texture stages, they will need to be rebound
 		for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)

@@ -62,7 +62,7 @@
 #    	include <unordered_map>
 #    	include <unordered_set>
 #   elif OGRE_THREAD_PROVIDER == 1
-#       include <boost/unordered_set.hpp>
+#       include <boost/unordered_map.hpp>
 #       include <boost/unordered_set.hpp>
 #   else
 #   	error "Your compiler doesn't support unordered_set and unordered_map. Try to compile Ogre with Boost or STLPort."
@@ -117,13 +117,6 @@ extern "C" {
 #   include <sys/param.h>
 #   include <CoreFoundation/CoreFoundation.h>
 }
-#endif
-
-#if OGRE_THREAD_SUPPORT
-#	if !defined(NOMINMAX) && defined(_MSC_VER)
-#		define NOMINMAX // required to stop windows.h messing up std::min
-#	endif
-#   include "Threading/OgreThreadHeaders.h"
 #endif
 
 #if defined ( OGRE_GCC_VISIBILITY ) && ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !__LP64__) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)

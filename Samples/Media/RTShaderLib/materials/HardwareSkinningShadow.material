@@ -203,8 +203,7 @@ vertex_program Ogre/RTShader/shadow_receiver_vs cg
 
 	default_params
 	{				
-		param_named_auto worldMatrix				world_matrix	
-		param_named_auto viewProjMatrix				viewproj_matrix			
+		param_named_auto worldViewProjMatrix worldviewproj_matrix
 	}
 }
 
@@ -216,7 +215,7 @@ fragment_program Ogre/RTShader/shadow_receiver_ps cg
 
 	default_params
 	{				
-		param_named_auto shadowColor		shadow_colour 					
+//		param_named_auto shadowColor		shadow_colour 					
 	}
 }
 

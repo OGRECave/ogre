@@ -127,7 +127,20 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
   endif ()
   if (MSVC_VERSION GREATER 1600 OR MSVC_VERSION EQUAL 1600)
+    option(OGRE_BUILD_MSVC_MP "Enable build with multiple processes in Visual Studio" TRUE)
+  else()
+    set(OGRE_BUILD_MSVC_MP FALSE CACHE BOOL "Forcing switch off /MP for older Visual Studio versions" FORCE)
+  endif()
+  if(OGRE_BUILD_MSVC_MP)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  endif ()
+  if(CMAKE_GENERATOR STREQUAL "Visual Studio 11 Win64" OR CMAKE_GENERATOR STREQUAL "Visual Studio 11")
+    option(OGRE_BUILD_MSVC_ZM "Add /Zm256 parameter to Visual Studio to fix PCH error" TRUE)
+  else()
+    set(OGRE_BUILD_MSVC_ZM FALSE CACHE BOOL "Forcing switch off /Zm256 for older Visual Studio versions" FORCE)
+  endif()
+  if(OGRE_BUILD_MSVC_ZM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm256")
   endif ()
 endif ()
 if (MINGW)
@@ -235,19 +248,17 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+  set(XCODE_ATTRIBUTE_LLVM_VECTORIZE_LOOPS "YES")
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
+  set(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT TRUE CACHE BOOL "Forcing libc++ support for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   add_definitions(-mno-thumb)
 
-  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-    set(CMAKE_OSX_ARCHITECTURES "${ARCHS_STANDARD_32_BIT}")
-  else()
-    set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)")
-  endif()
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_INCLUDING_64_BIT)")
   string (REPLACE "-msse" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 elseif (ANDROID)
   set(TargetPlatform "Android")
@@ -262,11 +273,11 @@ elseif (ANDROID)
    set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE CACHE BOOL "Disable OpenGL ES 2 RenderSystem for Android" FORCE)
    set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES 1 RenderSystem for Android" FORCE)
    set(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM FALSE CACHE BOOL "Disable RTSS component on Android ES1" FORCE)
+   set(OGRE_BUILD_COMPONENT_VOLUME FALSE CACHE BOOL "Disable volume component on Android ES1" FORCE)
+   set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on FlashCC" FORCE)
+   set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on FlashCC" FORCE)
   endif()
 
-  set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Android" FORCE)
-  set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Android" FORCE)
-  set(OGRE_BUILD_COMPONENT_VOLUME FALSE CACHE BOOL "Disable volume component on Android" FORCE)
   set(OGRE_BUILD_TESTS FALSE CACHE BOOL "Disable tests on Android" FORCE)
   set(OGRE_BUILD_TOOLS FALSE CACHE BOOL "Disable tools on Android" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Android" FORCE)
@@ -325,10 +336,19 @@ elseif (OGRE_BUILD_PLATFORM_WINRT)
   set(OGRE_BUILD_RENDERSYSTEM_D3D11 TRUE CACHE BOOL "Forcing Direct3D11 RenderSystem for WinRT" FORCE)
 endif ()
 
+if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+  set(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT TRUE CACHE BOOL "Forcing VAO support for OpenGL ES 3" FORCE)
+endif()
+
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
-  set(OGRE_CONFIG_ENABLE_ETC1 TRUE CACHE BOOL "Forcing ETC1 codec for OpenGL ES" FORCE)
+  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL ES" FORCE)
+endif()
+
+# Enable the ETC codec if OpenGL 3+ is being built
+if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
+  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
 
 ######################################################################
@@ -387,20 +407,20 @@ include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
-option(OGRE_CONFIG_ENABLE_ETC1 "Build ETC1 codec." FALSE)
+option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND OR OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT "Enable Cg support to ES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER "Enable GLSL optimiser use in GLES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT "Use VertexArrayObjects if possible." FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES_STATE_CACHE_SUPPORT "Enable GLES state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES" FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT "Enable GLES 2 state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT "Enable OpenGL state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2 OR OGRE_BUILD_RENDERSYSTEM_GL3PLUS" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES3_SUPPORT "Enable OpenGL ES 3.x Features" FALSE "OPENGLES3_FOUND;OGRE_BUILD_RENDERSYSTEM_GLES2;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT "Enable libc++ support for OS X" FALSE "APPLE" FALSE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
+option(OGRE_BUILD_DOCS "Generate documentation target for build if Doxygen is installed." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
@@ -410,6 +430,13 @@ option(OGRE_SIMD "Enable SIMD." TRUE)
 option(OGRE_RESTRICT_ALIASING "Restrict aliasing." TRUE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
+if (WIN32)
+	option(OGRE_INSTALL_VSPROPS "Install Visual Studio Property Page." FALSE)
+	if (OGRE_INSTALL_VSPROPS)
+		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${OGRE_BINARY_DIR}/OGRE.props)
+		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
+	endif ()
+endif ()
 
 # Unity build options
 # A Unity build includes all sources files in just a few actual compilation units
@@ -431,13 +458,13 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC
-  OGRE_CONFIG_ENABLE_ETC1
+  OGRE_CONFIG_ENABLE_ETC
   OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
   OGRE_CONFIG_ENABLE_ZIP
+  OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT
   OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT
   OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER
   OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT
-  OGRE_CONFIG_ENABLE_GLES_STATE_CACHE_SUPPORT
   OGRE_CONFIG_ENABLE_GLES3_SUPPORT
   OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT
   OGRE_USE_BOOST
@@ -506,7 +533,9 @@ if (OGRE_BUILD_XSIEXPORTER)
 endif ()
 
 # Install documentation
-add_subdirectory(Docs)
+if (OGRE_BUILD_DOCS)
+  add_subdirectory(Docs)
+endif ()
 
 # Install media files
 if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)

@@ -588,7 +588,7 @@ namespace Ogre {
 	String FreeImageCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
 	{
 		FIMEMORY* fiMem = 
-			FreeImage_OpenMemory((BYTE*)magicNumberPtr, static_cast<DWORD>(maxbytes));
+                    FreeImage_OpenMemory((BYTE*)const_cast<char*>(magicNumberPtr), static_cast<DWORD>(maxbytes));
 
 		FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(fiMem, (int)maxbytes);
 		FreeImage_CloseMemory(fiMem);

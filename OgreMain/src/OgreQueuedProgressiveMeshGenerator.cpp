@@ -246,8 +246,7 @@ void PMWorker::bakeLods()
 	// Create buffers.
 	for (unsigned short i = 0; i < submeshCount; i++) {
 		vector<PMGenRequest::IndexBuffer>::type& lods = mRequest->submesh[i].genIndexBuffers;
-		int indexCount = mIndexBufferInfoList[i].indexCount;
-		OgreAssert(indexCount >= 0, "");
+		size_t indexCount = mIndexBufferInfoList[i].indexCount;
 
 		lods.push_back(PMGenRequest::IndexBuffer());
 		if (indexCount == 0) {
@@ -355,8 +354,7 @@ void PMInjector::inject(PMGenRequest* request)
 		GenBuffers::iterator itEnd = buffers.end();
 		for (; it != itEnd; it++) {
 			PMGenRequest::IndexBuffer& buff = *it;
-			int indexCount = buff.indexCount;
-			OgreAssert(indexCount >= 0, "");
+			size_t indexCount = buff.indexCount;
 			lods.push_back(OGRE_NEW IndexData());
 			lods.back()->indexStart = 0;
 			lods.back()->indexCount = indexCount;
@@ -365,7 +363,7 @@ void PMInjector::inject(PMGenRequest* request)
 					buff.indexSize == 2 ?
 					HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
 					indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-				int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
+				size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
 				void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
 				memcpy(pOutBuff, buff.indexBuffer, sizeInBytes);
 				lods.back()->indexBuffer->unlock();
@@ -379,13 +377,13 @@ void PMInjector::inject(PMGenRequest* request)
 void QueuedProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 {
 #if OGRE_DEBUG_MODE
-	// Do not call this with empty Lod.
+	// Do not call this with empty LOD.
 	OgreAssert(!lodConfig.levels.empty(), "");
 
-	// Too many lod levels.
+	// Too many LOD levels.
 	OgreAssert(lodConfig.levels.size() <= 0xffff, "");
 
-	// Lod distances needs to be sorted.
+	// LOD distances needs to be sorted.
 	Mesh::LodValueList values;
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);
@@ -417,7 +415,7 @@ void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenReq
 		// Lock the buffer for reading.
 		unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 		unsigned char* vertex = vStart;
-		int vSize = vbuf->getVertexSize();
+		size_t vSize = vbuf->getVertexSize();
 
 		// Loop through all vertices and insert them to the Unordered Map.
 		Vector3* pOut = out.vertexBuffer;

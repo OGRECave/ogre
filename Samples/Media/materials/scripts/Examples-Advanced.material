@@ -731,58 +731,59 @@ material Examples/FresnelReflectionRefraction
 			
 	}
 
+        // Please test this code on OpenGL before reenabling it
 	// ATI 8500 +
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Examples/FresnelRefractReflectVPold
-			{
-				param_named_auto worldViewProjMatrix worldviewproj_matrix
-				param_named_auto eyePosition camera_position_object_space
-				param_named fresnelBias float -0.3
-				param_named fresnelScale float 1.4
-				param_named fresnelPower float 8
-				param_named_auto timeVal time_0_1 20
-				param_named scroll float 1 
-				param_named scale float 4 
-				param_named noise float 1
-				// scroll and noisePos will need updating per frame
-			}
+	// technique
+	// {
+	// 	pass
+	// 	{
+	// 		vertex_program_ref Examples/FresnelRefractReflectVPold
+	// 		{
+	// 			param_named_auto worldViewProjMatrix worldviewproj_matrix
+	// 			param_named_auto eyePosition camera_position_object_space
+	// 			param_named fresnelBias float -0.3
+	// 			param_named fresnelScale float 1.4
+	// 			param_named fresnelPower float 8
+	// 			param_named_auto timeVal time_0_1 20
+	// 			param_named scroll float 1 
+	// 			param_named scale float 4 
+	// 			param_named noise float 1
+	// 			// scroll and noisePos will need updating per frame
+	// 		}
 
-			// for ATI RADEON 8500 - 9200
-			fragment_program_ref Examples/FresnelRefractReflectPS
-			{
-				// distortionRange
-				param_indexed 0  float 0.025  
-				// tintColour
-				param_indexed 1  float4 0.05 0.12 0.15 1
-			}
+	// 		// for ATI RADEON 8500 - 9200
+	// 		fragment_program_ref Examples/FresnelRefractReflectPS
+	// 		{
+	// 			// distortionRange
+	// 			param_indexed 0  float 0.025  
+	// 			// tintColour
+	// 			param_indexed 1  float4 0.05 0.12 0.15 1
+	// 		}
 
-			// Noise
-			texture_unit
-			{
-				// Perlin noise volume
-				texture perlinvolume.dds 3d
-				// min / mag filtering, no mip
-				filtering linear linear none
-			}
-			// Reflection
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture Reflection
-				tex_address_mode clamp
-			}
-			// Refraction
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture Refraction
-				tex_address_mode clamp
-			}
-		}
-	}
+	// 		// Noise
+	// 		texture_unit
+	// 		{
+	// 			// Perlin noise volume
+	// 			texture perlinvolume.dds 3d
+	// 			// min / mag filtering, no mip
+	// 			filtering linear linear none
+	// 		}
+	// 		// Reflection
+	// 		texture_unit
+	// 		{
+	// 			// Will be filled in at runtime
+	// 			texture Reflection
+	// 			tex_address_mode clamp
+	// 		}
+	// 		// Refraction
+	// 		texture_unit
+	// 		{
+	// 			// Will be filled in at runtime
+	// 			texture Refraction
+	// 			tex_address_mode clamp
+	// 		}
+	// 	}
+	// }
 
 }
 

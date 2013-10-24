@@ -129,7 +129,8 @@ namespace Ogre {
         // Also add to name index
 		mAttachments.push_back( obj );
 		obj->mParentIndex = mAttachments.size() - 1;
-
+        (void)insresult;
+        
 		//Do this after attaching to allow proper cleanup in cases
 		//where object assumes it always has a scene node attached
 		if( obj->isStatic() != this->isStatic() )

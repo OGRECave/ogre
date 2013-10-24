@@ -144,7 +144,7 @@ protected:
 												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
 												SCENE_STATIC );
 		head->setMaterialName("Examples/OffsetMapping/Specular");
-#if defined(USE_RTSHADER_SYSTEM)
+#if defined(INCLUDE_RTSHADER_SYSTEM)
         MaterialPtr headMat = MaterialManager::getSingleton().getByName("Examples/OffsetMapping/Specular");
         headMat->getBestTechnique()->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
@@ -169,7 +169,7 @@ protected:
 		sm->vertexData->vertexCount = 12;
 		sm->indexData->indexCount = 18;
 
-#if defined(USE_RTSHADER_SYSTEM)
+#if defined(INCLUDE_RTSHADER_SYSTEM)
         MaterialPtr grassMat = MaterialManager::getSingleton().getByName("Examples/GrassBlades");
         grassMat->getTechnique(0)->setSchemeName(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif

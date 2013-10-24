@@ -61,7 +61,7 @@ namespace Ogre {
         
         public:
             /// Should be called by HardwareBufferManager
-            GLES2HardwarePixelBuffer(size_t mWidth, size_t mHeight, size_t mDepth,
+            GLES2HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
                                   PixelFormat mFormat,
                                   HardwareBuffer::Usage usage);
 

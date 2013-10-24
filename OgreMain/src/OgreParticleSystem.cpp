@@ -959,7 +959,7 @@ namespace Ogre {
         if (mIsRendererConfigured)
         {
             MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName);
+                mMaterialName, mResourceGroupName).staticCast<Material>();
             mRenderer->_setMaterial(mat);
         }
     }
@@ -1036,7 +1036,7 @@ namespace Ogre {
             mRenderer->_notifyDefaultDimensions(mDefaultWidth, mDefaultHeight);
             createVisualParticles(0, mParticlePool.size());
             MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName);
+                mMaterialName, mResourceGroupName).staticCast<Material>();
             mRenderer->_setMaterial(mat);
 			mRenderer->setRenderQueueGroup(mRenderQueueID);
 			mRenderer->setKeepParticlesInLocalSpace(mLocalSpace);

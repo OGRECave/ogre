@@ -85,71 +85,75 @@ if (OGRE_INSTALL_DEPENDENCIES)
   if (OGRE_STATIC)
     # for static builds, projects must link against all Ogre dependencies themselves, so copy full include and lib dir
     if (EXISTS ${OGRE_DEP_DIR}/include/)
-	  install(DIRECTORY ${OGRE_DEP_DIR}/include/ DESTINATION include)
-	endif ()
-	if (EXISTS ${OGRE_DEP_DIR}/lib/)
-      install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
-	endif ()
+      install(DIRECTORY ${OGRE_DEP_DIR}/include/ DESTINATION include)
+    endif ()
+    
+    if (EXISTS ${OGRE_DEP_DIR}/lib/)
+        install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
+    endif ()
   else ()
 	    # for non-static builds, we only need OIS for the samples
 	if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
-	      install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
-	endif ()
+    install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
+	endif () # OGRE_STATIC
+  
 	if(WIN32)
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
-	      install(FILES
-	        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
-	        DESTINATION lib/debug CONFIGURATIONS Debug
-	      )
+      install(FILES
+        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
+        DESTINATION lib/debug CONFIGURATIONS Debug
+      )
 	  endif ()
+    
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
-	      install(FILES
-	        ${OGRE_DEP_DIR}/lib/release/OIS.lib
-	        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-	      )
+      install(FILES
+        ${OGRE_DEP_DIR}/lib/release/OIS.lib
+        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+      )
 	  endif ()
+    
 	  if (MINGW)
-		install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
-		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
-		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
-	  endif ()
-	endif ()
-	  endif ()
+      install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
+      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
+      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
+	  endif () # MINGW
+	endif () # WIN32
+endif () # OGRE_INSTALL_DEPENDENCIES
     
   if(WIN32)
     # copy the dependency DLLs to the right places
     if(NOT OGRE_BUILD_PLATFORM_WINRT)
-        install_debug(OIS_d.dll)
-        install_release(OIS.dll)
+      install_debug(OIS_d.dll)
+      install_release(OIS.dll)
     endif ()
 
     if (OGRE_BUILD_PLUGIN_CG)
-	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
-	  if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+      # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+      if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
           install_debug(cg.dll)
-		else ()
-	      install_release(cg.dll)
-		endif ()
-	  else ()
+        else ()
+          install_release(cg.dll)
+        endif ()
+      else ()
         install_debug(cg.dll)
-	    install_release(cg.dll)
-	  endif ()
-    endif ()
+        install_release(cg.dll)
+      endif ()
+    endif () # OGRE_BUILD_PLUGIN_CG
 
     # install GLES dlls
     if (OGRE_BUILD_RENDERSYSTEM_GLES)
       install_debug(libgles_cm.dll)
-	  install_release(libgles_cm.dll)
+      install_release(libgles_cm.dll)
     endif ()
 
     # install GLES2 dlls
     if (OGRE_BUILD_RENDERSYSTEM_GLES2)
       install_debug(libGLESv2.dll)
-	  install_release(libEGL.dll)
+      install_release(libEGL.dll)
     endif ()
-  endif ()
+  endif () # WIN32
   
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
   if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND)
@@ -239,24 +243,30 @@ if (OGRE_COPY_DEPENDENCIES)
   if (WIN32)
     # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
     if(NOT OGRE_BUILD_PLATFORM_WINRT)
-        copy_debug(OIS_d.dll)
-        copy_release(OIS.dll)
+      install(FILES ${OIS_BINARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug None "")
+    	install(FILES ${OIS_BINARY_REL} DESTINATION lib/release CONFIGURATIONS Release None "")
+    	install(FILES ${OIS_BINARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+    	install(FILES ${OIS_BINARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)	
     endif ()
 
     if (OGRE_BUILD_PLUGIN_CG)
-	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
-	  if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+      # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+      if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-          copy_debug(cg.dll)
-		else ()
-	      copy_release(cg.dll)
-		endif ()
-	  else ()
-        copy_debug(cg.dll)
-	    copy_release(cg.dll)
-	  endif ()
-    endif ()
-
+          install(FILES ${Cg_BINARY_DBG} DESTINATION bin/debug CONFIGURATIONS Debug None "")
+        else ()
+          install(FILES ${Cg_BINARY_REL} DESTINATION bin/release CONFIGURATIONS Release None "")
+    			install(FILES ${Cg_BINARY_REL} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+    			install(FILES ${Cg_BINARY_REL} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
+        endif ()
+      else ()
+        install(FILES ${Cg_BINARY_DBG} DESTINATION bin/debug CONFIGURATIONS Debug None "")
+    		install(FILES ${Cg_BINARY_REL} DESTINATION bin/release CONFIGURATIONS Release None "")
+    		install(FILES ${Cg_BINARY_REL} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+    		install(FILES ${Cg_BINARY_REL} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)		
+      endif ()
+    endif()
+   
     if (OGRE_BUILD_RENDERSYSTEM_GLES)
       copy_debug(libgles_cm.dll)
       copy_release(libgles_cm.dll)

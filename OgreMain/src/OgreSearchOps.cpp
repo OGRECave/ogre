@@ -53,7 +53,7 @@ intptr_t _findfirst(const char *pattern, struct _finddata_t *data)
     const char *mask = strrchr (pattern, '/');
     if (mask)
     {
-        fs->dirlen = mask - pattern;
+        fs->dirlen = static_cast<int>(mask - pattern);
         mask++;
         fs->directory = (char *)malloc (fs->dirlen + 1);
         memcpy (fs->directory, pattern, fs->dirlen);

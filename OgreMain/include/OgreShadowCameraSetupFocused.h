@@ -221,7 +221,6 @@ namespace Ogre {
             Holds all potential occluders / receivers as one single bounding box
             of the currently active scene node.
         @param out_LVS
-		@param light: current light
             Intersection body LVS (world coordinates).
         */
         void calculateLVS(const SceneManager& sm, const Camera& cam, const Light& light,

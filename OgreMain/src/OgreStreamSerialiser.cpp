@@ -416,7 +416,7 @@ namespace Ogre
 		Chunk* c = OGRE_NEW Chunk();
 		c->id = id;
 		c->version = version;
-		c->offset = mStream->tell();
+		c->offset = static_cast<uint32>(mStream->tell());
 		c->length = 0;
 
 		mChunkStack.push_back(c);

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
@@ -90,7 +91,6 @@ namespace Ogre {
             void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
-#if OGRE_NO_GLES3_SUPPORT == 0
     /// Specialisation of HardwareUniformBuffer for emulation
     class _OgreGLES2Export GLES2DefaultHardwareUniformBuffer : public HardwareUniformBuffer
     {
@@ -118,7 +118,6 @@ namespace Ogre {
 
         void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
-#endif
 
     /** Specialisation of HardwareBufferManager to emulate hardware buffers.
     @remarks
@@ -143,18 +142,9 @@ namespace Ogre {
             /// Create a render to vertex buffer
             RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
         HardwareUniformBufferSharedPtr
             createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
-#else
-        HardwareUniformBufferSharedPtr
-            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "GLES2 does not support uniform buffer objects", 
-                "GLES2DefaultHardwareBufferManagerBase::createUniformBuffer");
-        }
-#endif
+
 		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "")
@@ -178,16 +168,6 @@ namespace Ogre {
 		{
 			OGRE_DELETE mImpl;
 		}
-        
-#if OGRE_NO_GLES3_SUPPORT == 1
-        HardwareUniformBufferSharedPtr
-            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "GLES2 does not support uniform buffer objects", 
-                "GLES2DefaultHardwareBufferManager::createUniformBuffer");
-        }
-#endif
     };
 }
 

@@ -87,6 +87,55 @@
 				</array>
 			</dict>
 		</dict>
+		<dict>
+			<key>Description</key>
+			<string>Use libc++ as the C++ Standard Library</string>
+			<key>Identifier</key>
+			<string>ogreUseLibcpp</string>
+			<key>Name</key>
+			<string>Use libc++</string>
+			<key>Type</key>
+			<string>checkbox</string>
+			<key>Default</key>
+			<string>false</string>
+			<key>Units</key>
+			<dict>
+				<key>false</key>
+				<array>
+					<dict>
+						<key>Targets</key>
+						<array>
+							<dict>
+								<key>SharedSettings</key>
+								<dict>
+									<key>CLANG_CXX_LIBRARY</key>
+									<string>libstdc++</string>
+									<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+									<string>gnu++98</string>
+								</dict>
+							</dict>
+						</array>
+					</dict>
+				</array>
+				<key>true</key>
+				<array>
+					<dict>
+						<key>Targets</key>
+						<array>
+							<dict>
+								<key>SharedSettings</key>
+								<dict>
+									<key>CLANG_CXX_LIBRARY</key>
+									<string>libc++</string>
+									<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+									<string>c++0x</string>
+								</dict>
+							</dict>
+						</array>
+					</dict>
+				</array>
+			</dict>
+		</dict>
 	</array>
 	<key>Definitions</key>
 	<dict>

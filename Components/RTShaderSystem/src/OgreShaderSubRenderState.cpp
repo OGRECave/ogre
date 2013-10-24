@@ -52,7 +52,7 @@ SubRenderState::~SubRenderState()
 //-----------------------------------------------------------------------
 SubRenderStateFactory::~SubRenderStateFactory()
 {
-	assert(mSubRenderStateList.size() == 0 &&
+	assert(mSubRenderStateList.empty() &&
 		"SubRenderStateFactory::~SubRenderStateFactory -> Sub render states still exists !!!");
 }
 

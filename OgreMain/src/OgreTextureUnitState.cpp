@@ -160,7 +160,7 @@ namespace Ogre {
         assert(mEffects.empty());
 
         // copy basic members (int's, real's)
-        memcpy( this, &oth, (uchar *)(&oth.mFrames) - (uchar *)(&oth) );
+        memcpy( this, &oth, (const uchar *)(&oth.mFrames) - (const uchar *)(&oth) );
         // copy complex members
         mFrames  = oth.mFrames;
 		mFramePtrs = oth.mFramePtrs;

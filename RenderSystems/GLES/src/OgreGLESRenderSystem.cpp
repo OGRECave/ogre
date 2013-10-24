@@ -242,7 +242,7 @@ namespace Ogre {
         // Multitexturing support and set number of texture units
         GLint units;
         glGetIntegerv(GL_MAX_TEXTURE_UNITS, &units);
-        rsc->setNumTextureUnits(units);
+        rsc->setNumTextureUnits(std::min<ushort>(16, units));
 
         // Check for hardware stencil support and set bit depth
         GLint stencil;
@@ -265,16 +265,27 @@ namespace Ogre {
         // For 1.1, http://www.khronos.org/registry/gles/api/1.1/glext.h
 
         if (mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_3DC_texture") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
+            mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") ||
+            mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc") ||
             mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
+            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
             mGLSupport->checkExtension("GL_OES_compressed_paletted_texture"))
         {
-            // TODO: Add support for compression types other than pvrtc
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
-
-            if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc"))
+			
+            if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
+               mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
+				
+            if(mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") && 
+               mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
+
+            if(mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC1);
+				
+			if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
 
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
@@ -586,7 +597,7 @@ namespace Ogre {
 #ifdef GL_DEPTH24_STENCIL8_OES
                depthFormat != GL_DEPTH24_STENCIL8_OES && 
 #endif
-               stencilBuffer )
+               stencilFormat )
 			{
 				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -889,8 +900,8 @@ namespace Ogre {
             // Equations are supposedly the same once you factor in vp height
             Real correction = 0.005;
             // scaling required
-            float val[4] = { constant, linear * correction,
-                             quadratic * correction, 1};
+            float val[4] = { static_cast<float>(constant), static_cast<float>(linear * correction),
+                             static_cast<float>(quadratic * correction), 1};
             glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, val);
             GL_CHECK_ERROR;
             glPointParameterf(GL_POINT_SIZE_MIN, adjMinSize);
@@ -952,7 +963,7 @@ namespace Ogre {
 
     void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLESTexturePtr tex = texPtr;
+		GLESTexturePtr tex = texPtr.staticCast<GLESTexture>();
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
 			return;
@@ -1271,7 +1282,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
         }
 
-        float blendValue[4] = {0, 0, 0, bm.factor};
+        float blendValue[4] = {0, 0, 0, static_cast<float>(bm.factor)};
         switch (bm.operation)
         {
             case LBX_BLEND_DIFFUSE_COLOUR:
@@ -2809,7 +2820,7 @@ namespace Ogre {
 
 #if OGRE_DOUBLE_PRECISION
 		// Must convert to float*
-		float tmp[4] = {vec.x, vec.y, vec.z, vec.w};
+		float tmp[4] = {static_cast<float>(vec.x), static_cast<float>(vec.y), static_cast<float>(vec.z), static_cast<float>(vec.w)};
 		glLightfv(lightindex, GL_POSITION, tmp);
 #else
 		glLightfv(lightindex, GL_POSITION, vec.ptr());
@@ -2821,7 +2832,7 @@ namespace Ogre {
 			vec.w = 0.0; 
 #if OGRE_DOUBLE_PRECISION
 			// Must convert to float*
-			float tmp2[4] = {vec.x, vec.y, vec.z, vec.w};
+            float tmp2[4] = {static_cast<float>(vec.x), static_cast<float>(vec.y), static_cast<float>(vec.z), static_cast<float>(vec.w)};
 			glLightfv(lightindex, GL_SPOT_DIRECTION, tmp2);
 #else
 			glLightfv(lightindex, GL_SPOT_DIRECTION, vec.ptr());

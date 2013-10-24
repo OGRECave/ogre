@@ -106,9 +106,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		SAFE_RELEASE(mlpD3DBuffer);
-#endif
 		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
 		SAFE_DELETE(mShadowBuffer);
 	}
@@ -120,6 +118,7 @@ namespace Ogre {
 		{
 			// need to realloc
 			mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
+			SAFE_RELEASE(mlpD3DBuffer);
 			HRESULT hr = mDevice->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -133,7 +132,7 @@ namespace Ogre {
 
 		if (mSystemMemory ||
 			(mUsage & HardwareBuffer::HBU_DYNAMIC && 
-			(options == HardwareBuffer::HBL_DISCARD)))
+			(options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)))
 		{
 			// Staging (system memory) buffers or dynamic, write-only buffers 
 			// are the only case where we can lock directly
@@ -146,46 +145,22 @@ namespace Ogre {
 			switch(options)
 			{
 			case HBL_DISCARD:
-				if (!mSystemMemory && (mUsage | HardwareBuffer::HBU_DYNAMIC))
-				{
-					// Map cannot be called with MAP_WRITE access, 
-					// because the Resource was created as D3D11_USAGE_DYNAMIC. 
-					// D3D11_USAGE_DYNAMIC Resources must use either MAP_WRITE_DISCARD 
-					// or MAP_WRITE_NO_OVERWRITE with Map.
-					mapType = D3D11_MAP_WRITE_DISCARD;
-				}
-				else
-				{
-					// Map cannot be called with MAP_WRITE_DISCARD access, 
-					// because the Resource was not created as D3D11_USAGE_DYNAMIC. 
-					// D3D11_USAGE_DYNAMIC Resources must use either MAP_WRITE_DISCARD 
-					// or MAP_WRITE_NO_OVERWRITE with Map.
-					mapType = D3D11_MAP_WRITE;
-				}
+				// To use D3D11_MAP_WRITE_DISCARD resource must have been created with write access and dynamic usage.
+				mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_DISCARD;
 				break;
 			case HBL_NO_OVERWRITE:
-				if (mSystemMemory)
-				{
-					// map cannot be called with MAP_WRITE_NO_OVERWRITE access, because the Resource was not created as D3D11_USAGE_DYNAMIC. D3D11_USAGE_DYNAMIC Resources must use either MAP_WRITE_DISCARD or MAP_WRITE_NO_OVERWRITE with Map.
-					mapType = D3D11_MAP_READ_WRITE;
-				}
-				else
-				{
-					mapType = D3D11_MAP_WRITE_NO_OVERWRITE;
-				}
+				// To use D3D11_MAP_WRITE_NO_OVERWRITE resource must have been created with write access.
+				// TODO: check (mSystemMemory aka D3D11_USAGE_STAGING => D3D11_MAP_WRITE_NO_OVERWRITE) combo - it`s not forbidden by MSDN
+				mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_NO_OVERWRITE; 
 				break;
 			case HBL_NORMAL:
-				if (mDesc.CPUAccessFlags & D3D11_CPU_ACCESS_READ)
-				{
-					mapType = D3D11_MAP_READ_WRITE;
-				}
-				else
-				{
-					mapType = D3D11_MAP_WRITE_DISCARD;
-				}
+				mapType = (mDesc.CPUAccessFlags & D3D11_CPU_ACCESS_READ) ? D3D11_MAP_READ_WRITE : D3D11_MAP_WRITE;
 				break;
 			case HBL_READ_ONLY:
 				mapType = D3D11_MAP_READ;
+				break;
+			case HBL_WRITE_ONLY:
+				mapType = D3D11_MAP_WRITE;
 				break;
 			}
 

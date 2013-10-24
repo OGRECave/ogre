@@ -464,7 +464,7 @@ namespace Ogre {
             Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
             Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
             Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
-            OGRE_MUTEX(mThreadInitMutex)
+            OGRE_MUTEX(mThreadInitMutex);
             void registerThread();
             void unregisterThread();
             void preExtraThreadsStarted();

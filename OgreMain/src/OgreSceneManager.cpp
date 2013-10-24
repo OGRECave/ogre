@@ -126,6 +126,7 @@ mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowMaterialInitDone(false),
+mShadowIndexBufferUsedSize(0),
 mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
 mIlluminationStage(IRS_NONE),
@@ -235,7 +236,7 @@ SceneManager::~SceneManager()
 
 	// clear down movable object collection map
 	{
-		OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+            OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 		for (MovableObjectCollectionMap::iterator i = mMovableObjectCollectionMap.begin();
 			i != mMovableObjectCollectionMap.end(); ++i)
 		{
@@ -349,6 +350,9 @@ Camera* SceneManager::findCamera( IdString name ) const
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
+    if(!cam)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null Camera.", "SceneManager::destroyCamera");
+
 	checkMovableObjectIntegrity( mCameras, cam );
 
 	// Find in list
@@ -671,6 +675,9 @@ void SceneManager::destroySceneNode( SceneNode* sn )
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode( SceneMemoryMgrTypes sceneType )
 {
+    if(!sn)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
+
     return mSceneRoot[sceneType];
 }
 //-----------------------------------------------------------------------
@@ -1097,7 +1104,7 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
-		OGRE_LOCK_MUTEX(sceneGraphMutex)
+            OGRE_LOCK_MUTEX(sceneGraphMutex);
 
 		// Prepare render queue for receiving new objects
 		/*{
@@ -3081,7 +3088,7 @@ void SceneManager::setDisplaySceneNodes(bool display)
 //-----------------------------------------------------------------------
 Animation* SceneManager::createAnimation(const String& name, Real length)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
     // Check name not used
     if (mAnimationsList.find(name) != mAnimationsList.end())
@@ -3099,7 +3106,7 @@ Animation* SceneManager::createAnimation(const String& name, Real length)
 //-----------------------------------------------------------------------
 Animation* SceneManager::getAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	AnimationList::const_iterator i = mAnimationsList.find(name);
     if (i == mAnimationsList.end())
@@ -3113,13 +3120,13 @@ Animation* SceneManager::getAnimation(const String& name) const
 //-----------------------------------------------------------------------
 bool SceneManager::hasAnimation(const String& name) const
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 	return (mAnimationsList.find(name) != mAnimationsList.end());
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAnimation(const String& name)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
 	// Also destroy any animation states referencing this animation
 	mAnimationStates.removeAnimationState(name);
@@ -3141,7 +3148,7 @@ void SceneManager::destroyAnimation(const String& name)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllAnimations(void)
 {
-	OGRE_LOCK_MUTEX(mAnimationsListMutex)
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
     // Destroy all states too, since they cannot reference destroyed animations
     destroyAllAnimationStates();
 
@@ -3188,7 +3195,7 @@ void SceneManager::destroyAllAnimationStates(void)
 void SceneManager::_applySceneAnimations(void)
 {
 	// manual lock over states (extended duration required)
-	OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME)
+    OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME);
 
 	// Iterate twice, once to reset, once to apply, to allow blending
     ConstEnabledAnimationStateIterator stateIt = mAnimationStates.getEnabledAnimationStateIterator();
@@ -4554,7 +4561,7 @@ void SceneManager::updateInstanceManagers(void)
 }
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery* 
-SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
+SceneManager::createAABBQuery(const AxisAlignedBox& box, uint32 mask)
 {
     DefaultAxisAlignedBoxSceneQuery* q = OGRE_NEW DefaultAxisAlignedBoxSceneQuery(this);
     q->setBox(box);
@@ -4563,7 +4570,7 @@ SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
 }
 //---------------------------------------------------------------------
 SphereSceneQuery* 
-SceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
+SceneManager::createSphereQuery(const Sphere& sphere, uint32 mask)
 {
     DefaultSphereSceneQuery* q = OGRE_NEW DefaultSphereSceneQuery(this);
     q->setSphere(sphere);
@@ -4573,7 +4580,7 @@ SceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
 //---------------------------------------------------------------------
 PlaneBoundedVolumeListSceneQuery* 
 SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, 
-                                            unsigned long mask)
+                                            uint32 mask)
 {
     DefaultPlaneBoundedVolumeListSceneQuery* q = OGRE_NEW DefaultPlaneBoundedVolumeListSceneQuery(this);
     q->setVolumes(volumes);
@@ -4583,7 +4590,7 @@ SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volume
 
 //---------------------------------------------------------------------
 RaySceneQuery* 
-SceneManager::createRayQuery(const Ray& ray, unsigned long mask)
+SceneManager::createRayQuery(const Ray& ray, uint32 mask)
 {
     DefaultRaySceneQuery* q = OGRE_NEW DefaultRaySceneQuery(this);
     q->setRay(ray);
@@ -4592,7 +4599,7 @@ SceneManager::createRayQuery(const Ray& ray, unsigned long mask)
 }
 //---------------------------------------------------------------------
 IntersectionSceneQuery* 
-SceneManager::createIntersectionQuery(unsigned long mask)
+SceneManager::createIntersectionQuery(uint32 mask)
 {
 
     DefaultIntersectionSceneQuery* q = OGRE_NEW DefaultIntersectionSceneQuery(this);
@@ -4609,7 +4616,7 @@ SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName)
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -4630,7 +4637,7 @@ const SceneManager::MovableObjectCollection*
 SceneManager::getMovableObjectCollection(const String& typeName) const
 {
 	// lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::const_iterator i = 
 		mMovableObjectCollectionMap.find(typeName);
@@ -4661,7 +4668,7 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		MovableObject* newObj = factory->createInstance( Id::generateNewId<MovableObject>(),
 														 objectMemMgr, this, params );
@@ -4686,7 +4693,7 @@ void SceneManager::destroyMovableObject( MovableObject *m, const String& typeNam
 		Root::getSingleton().getMovableObjectFactory(typeName);
 
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		checkMovableObjectIntegrity( objectMap->movableObjects, m );
 
@@ -4716,7 +4723,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 		Root::getSingleton().getMovableObjectFactory(typeName);
 	
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		MovableObjectVec::iterator itor = objectMap->movableObjects.begin();
 		MovableObjectVec::iterator end  = objectMap->movableObjects.end();
 		while( itor != end )
@@ -4744,7 +4751,7 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 void SceneManager::destroyAllMovableObjects(void)
 {
 	// Lock collection mutex
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex)
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
 
 	MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin();
 
@@ -4753,7 +4760,7 @@ void SceneManager::destroyAllMovableObjects(void)
 		MovableObjectCollection* coll = ci->second;
 
 		// lock map mutex
-		OGRE_LOCK_MUTEX(coll->mutex)
+		OGRE_LOCK_MUTEX(coll->mutex);
 
 		if (Root::getSingleton().hasMovableObjectFactory(ci->first))
 		{
@@ -4798,6 +4805,8 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
+    if(!m)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null MovableObject.", "SceneManager::destroyMovableObject");
 	destroyMovableObject(m, m->getMovableType());
 }
 //---------------------------------------------------------------------
@@ -4805,7 +4814,7 @@ void SceneManager::injectMovableObject(MovableObject* m)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		objectMap->movableObjects.push_back( m );
 		m->mGlobalIndex = objectMap->movableObjects.size() - 1;
@@ -4816,7 +4825,7 @@ void SceneManager::extractMovableObject(MovableObject* m)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		checkMovableObjectIntegrity( objectMap->movableObjects, m );
 		MovableObjectVec::iterator itor = objectMap->movableObjects.begin() + m->mGlobalIndex;
@@ -4833,7 +4842,7 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	{
-		OGRE_LOCK_MUTEX(objectMap->mutex)
+            OGRE_LOCK_MUTEX(objectMap->mutex);
 		// no deletion
 		objectMap->movableObjects.clear();
 	}

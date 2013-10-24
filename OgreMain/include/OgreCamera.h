@@ -495,7 +495,7 @@ namespace Ogre {
 
 
         /** Gets a world space ray as cast from the camera through a viewport position.
-        @param screenx, screeny The x and y position at which the ray should intersect the viewport, 
+        @param screenx, screeny The x and y position at which the ray should intersect the viewport,
             in normalised screen coordinates [0,1]
         */
         Ray getCameraToViewportRay(Real screenx, Real screeny) const;

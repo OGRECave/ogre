@@ -846,7 +846,7 @@ namespace Ogre {
         assert(mLodValues.size());
         mLodValues[0] = mLodStrategy->getBaseValue();
 
-        // Re-transform all user lod values (starting at index 1, no need to transform base value)
+        // Re-transform all user LOD values (starting at index 1, no need to transform base value)
         for (size_t i = 1; i < mUserLodValues.size(); ++i)
             mLodValues[i] = mLodStrategy->transformUserValue(mUserLodValues[i]);
     }

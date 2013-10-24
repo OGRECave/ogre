@@ -327,7 +327,7 @@ namespace Ogre {
         /** Creates a new billboard and adds it to this set.
         @remarks
             Behaviour once the billboard pool has been exhausted depends on the
-            BillboardSet::setAutoextendPool option.
+            BillboardSet::setAutoextend option.
         @param position
             The position of the new billboard realtive to the certer of the set
         @param colour
@@ -348,7 +348,7 @@ namespace Ogre {
         /** Creates a new billboard and adds it to this set.
         @remarks
             Behaviour once the billboard pool has been exhausted depends on the
-            BillboardSet::setAutoextendPool option.
+            BillboardSet::setAutoextend option.
         @param x
             The @c x position of the new billboard relative to the center of the set
         @param y

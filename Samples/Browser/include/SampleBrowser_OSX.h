@@ -42,6 +42,8 @@
 #import "OgreOSXCocoaWindow.h"
 #import <QuartzCore/CVDisplayLink.h>
 
+#include "SampleBrowser.h"
+
 using namespace Ogre;
 
 // All this does is suppress some messages in the run log.  NSApplication does not
@@ -71,7 +73,7 @@ using namespace Ogre;
 - (void)renderOneFrame:(id)sender;
 - (void)shutdown;
 
-@property (retain) NSTimer *mTimer;
+@property (retain, atomic) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
 @end

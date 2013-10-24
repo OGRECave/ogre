@@ -138,7 +138,7 @@ protected:
 
 	void loadResources()
 	{		
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
 		Ogre::StringVector::iterator itGroup = groupVector.begin();
 		Ogre::StringVector::iterator itGroupEnd = groupVector.end();
@@ -187,7 +187,7 @@ protected:
 		matNames.push_back("Examples/ShowNormals");
 		matNames.push_back("Examples/ShowTangents");
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		matNames.push_back("RTSS/NormalMapping_SinglePass");
 		matNames.push_back("RTSS/NormalMapping_MultiPass");
 #endif
@@ -203,7 +203,7 @@ protected:
 		matNames.push_back("Examples/ShowUV");
 		matNames.push_back("Examples/ShowNormals");
 		matNames.push_back("Examples/ShowTangents");
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		matNames.push_back("RTSS/Athene/NormalMapping_SinglePass");
 		matNames.push_back("RTSS/Athene/NormalMapping_MultiPass");
 #endif

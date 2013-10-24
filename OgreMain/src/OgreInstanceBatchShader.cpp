@@ -257,7 +257,7 @@ namespace Ogre
 				if( indexType == HardwareIndexBuffer::IT_16BIT )
 					*thisBuf16++ = static_cast<uint16>(originalVal) + vertexOffset;
 				else
-					*thisBuf32++ = originalVal + vertexOffset;
+					*thisBuf32++ = static_cast<uint32>(originalVal + vertexOffset);
 			}
 		}
 

@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "OgreGLXUtils.h"
 #include "OgreGLXWindow.h"
 
+#ifndef Status
+#define Status int
+#endif
+
+#include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
 static bool ctxErrorOccurred = false;
@@ -162,9 +167,7 @@ namespace Ogre
 		ConfigOption optFSAA;
 		ConfigOption optRTTMode;
 		ConfigOption optSRGB;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		ConfigOption optEnableFixedPipeline;
-#endif
 
 		optFullScreen.name = "Full Screen";
 		optFullScreen.immutable = false;
@@ -187,13 +190,11 @@ namespace Ogre
 		optSRGB.name = "sRGB Gamma Conversion";
 		optSRGB.immutable = false;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
 		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
 		optEnableFixedPipeline.possibleValues.push_back( "No" );
 		optEnableFixedPipeline.currentValue = "Yes";
 		optEnableFixedPipeline.immutable = false;
-#endif
 
 		optFullScreen.possibleValues.push_back("No");
 		optFullScreen.possibleValues.push_back("Yes");
@@ -247,9 +248,7 @@ namespace Ogre
 		mOptions[optRTTMode.name] = optRTTMode;
 		mOptions[optFSAA.name] = optFSAA;
 		mOptions[optSRGB.name] = optSRGB;
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
-#endif
 
 		refreshConfig();
 	}
@@ -364,13 +363,11 @@ namespace Ogre
 			if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
 				miscParams["gamma"] = opt->second.currentValue;
 
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 			opt = mOptions.find("Fixed Pipeline Enabled");
 			if (opt == mOptions.end())
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
 			bool enableFixedPipeline = (opt->second.currentValue == "Yes");
 			renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
-#endif
 
 			window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
 		}
@@ -425,7 +422,7 @@ namespace Ogre
 
 		LogManager::getSingleton().stream() << "Supported GLX extensions: " << extensionsString;
 
-		std::stringstream ext;
+		StringStream ext;
 		String instr;
 
 		ext << extensionsString;
@@ -666,7 +663,7 @@ namespace Ogre
 	}
 
 	//-------------------------------------------------------------------------------------------------//
-	bool GLXGLSupport::loadIcon(const std::string &name, Pixmap *pixmap, Pixmap *bitmap)
+	bool GLXGLSupport::loadIcon(const String &name, Pixmap *pixmap, Pixmap *bitmap)
 	{
 		Image image;
 		int width, height;
@@ -819,7 +816,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------------------------------//
 	::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
 	{
-		::GLXContext glxContext;
+		::GLXContext glxContext = NULL;
 		int context_attribs[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 5,

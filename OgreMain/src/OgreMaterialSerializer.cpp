@@ -2352,7 +2352,7 @@ namespace Ogre
         StringUtil::trim(vecparams[0]);
 
         context.material =
-			MaterialManager::getSingleton().create(vecparams[0], context.groupName);
+            MaterialManager::getSingleton().create(vecparams[0], context.groupName);
 
         if (!basematerial.isNull())
         {
@@ -2986,7 +2986,7 @@ namespace Ogre
         
         if (strategy == 0)
             logParseError(
-            "Bad lod_strategy attribute, available lod strategy name expected.",
+            "Bad lod_strategy attribute, available LOD strategy name expected.",
             context);
 
         context.material->setLodStrategy(strategy);
@@ -2997,7 +2997,7 @@ namespace Ogre
     bool parseLodDistances(String& params, MaterialScriptContext& context)
     {
         // Set to distance strategy
-        context.material->setLodStrategy(DistanceLodStrategy::getSingletonPtr());
+        context.material->setLodStrategy(DistanceLodSphereStrategy::getSingletonPtr());
 
         StringVector vecparams = StringUtil::split(params, " \t");
 
@@ -3688,7 +3688,7 @@ namespace Ogre
 			// Fire write begin event.
 			fireTechniqueEvent(MSE_WRITE_BEGIN, skipWriting, pTech);
 
-			// Lod index
+			// LOD index
 			if (mDefaults ||
 				pTech->getLodIndex() != 0)
 			{
@@ -5032,7 +5032,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
         if( !floatLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(floatLogical->mutex)
+                    OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
 				i != floatLogical->map.end(); ++i)
@@ -5060,7 +5060,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(floatLogical->mutex)
+                    OGRE_LOCK_MUTEX(floatLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
 				i != doubleLogical->map.end(); ++i)
@@ -5088,7 +5088,7 @@ namespace Ogre
 		GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
         if( !intLogical.isNull() )
 		{
-			OGRE_LOCK_MUTEX(intLogical->mutex)
+                    OGRE_LOCK_MUTEX(intLogical->mutex);
 
 			for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
 				i != intLogical->map.end(); ++i)

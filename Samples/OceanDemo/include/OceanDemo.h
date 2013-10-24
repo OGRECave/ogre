@@ -363,12 +363,12 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
                 size_t activeControlCount = mMaterialControlsContainer[mCurrentMaterial].getShaderControlCount();
 				
 				size_t startControlIndex = mCurrentPage * CONTROLS_PER_PAGE;
-				int numControls = activeControlCount - startControlIndex;
+				int numControls = static_cast<int>(activeControlCount - startControlIndex);
 				if (numControls <= 0)
 				{
 					mCurrentPage = 0;
 					startControlIndex = 0;
-					numControls = activeControlCount;
+					numControls = (int)activeControlCount;
 				}
 				
 				for (size_t i=0; i<CONTROLS_PER_PAGE; i++)

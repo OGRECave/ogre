@@ -100,6 +100,9 @@ namespace Ogre {
 		/** Returns whether a given high-level language is supported. */
 		bool isLanguageSupported(const String& lang);
 
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		HighLevelGpuProgramPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Create a new, unloaded HighLevelGpuProgram. 
 		@par

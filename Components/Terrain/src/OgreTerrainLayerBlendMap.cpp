@@ -155,17 +155,17 @@ namespace Ogre
 	{
 		if (mDirty)
 		{
-			mDirtyBox.left = std::min(mDirtyBox.left, (size_t)rect.left);
-			mDirtyBox.top = std::min(mDirtyBox.top, (size_t)rect.top);
-			mDirtyBox.right = std::max(mDirtyBox.right, (size_t)rect.right);
-			mDirtyBox.bottom = std::max(mDirtyBox.bottom, (size_t)rect.bottom);
+			mDirtyBox.left = std::min(mDirtyBox.left, static_cast<uint32>(rect.left));
+			mDirtyBox.top = std::min(mDirtyBox.top, static_cast<uint32>(rect.top));
+			mDirtyBox.right = std::max(mDirtyBox.right, static_cast<uint32>(rect.right));
+			mDirtyBox.bottom = std::max(mDirtyBox.bottom, static_cast<uint32>(rect.bottom));
 		}
 		else
 		{
-			mDirtyBox.left = rect.left;
-			mDirtyBox.right = rect.right;
-			mDirtyBox.top = rect.top;
-			mDirtyBox.bottom = rect.bottom;
+			mDirtyBox.left = static_cast<uint32>(rect.left);
+			mDirtyBox.right = static_cast<uint32>(rect.right);
+			mDirtyBox.top = static_cast<uint32>(rect.top);
+			mDirtyBox.bottom = static_cast<uint32>(rect.bottom);
 			mDirty = true;
 		}
 	}

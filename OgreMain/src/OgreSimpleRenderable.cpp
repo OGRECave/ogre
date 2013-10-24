@@ -40,7 +40,7 @@ namespace Ogre {
  	: MovableObject( id, objectMemoryManager )
  	, mWorldTransform(Matrix4::IDENTITY)
  	, mMatName("BaseWhite")
- 	, mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
+    , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
  	, mParentSceneManager(NULL)
     {
     }

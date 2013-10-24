@@ -451,9 +451,12 @@ namespace Ogre {
 				memset(CPUString, 0, sizeof(CPUString));
 				memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
-				*((int*)CPUString) = result._ebx;
-				*((int*)(CPUString+4)) = result._edx;
-				*((int*)(CPUString+8)) = result._ecx;
+				//*((int*)CPUString) = result._ebx;
+                                memcpy(CPUString, &result._ebx, sizeof(int));
+				//*((int*)(CPUString+4)) = result._edx;
+                                memcpy(CPUString+4, &result._edx, sizeof(int));
+                                //*((int*)(CPUString+8)) = result._ecx;
+                                memcpy(CPUString+8, &result._ecx, sizeof(int));
 
 				detailedIdentStr << CPUString;
 
@@ -582,7 +585,7 @@ namespace Ogre {
         // Get the size of the CPU subtype struct
         size_t size;
         sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
-        
+
         // Get the ARM CPU subtype
         cpu_subtype_t cpusubtype = 0;
         sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
@@ -597,6 +600,15 @@ namespace Ogre {
                 break;
             case CPU_SUBTYPE_ARM_V7F:
                 cpuID = "ARM Cortex-A9";
+                break;
+            case CPU_SUBTYPE_ARM_V7S:
+                cpuID = "ARM Swift";
+                break;
+            case CPU_SUBTYPE_ARM_V8:
+                cpuID = "ARMv8";
+                break;
+            case CPU_SUBTYPE_ARM64_V8:
+                cpuID = "ARM64v8";
                 break;
             default:
                 cpuID = "Unknown ARM";

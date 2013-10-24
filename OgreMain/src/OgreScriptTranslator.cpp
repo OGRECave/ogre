@@ -571,11 +571,13 @@ namespace Ogre{
 					break;
                 case ID_LOD_DISTANCES:
                     {
-                        // Set strategy to distance strategy
-                        LodStrategy *strategy = DistanceLodStrategy::getSingletonPtr();
+                        // Deprecated! Only for backwards compatibility.
+                        // Set strategy hard-coded to 'distance' strategy, since that was the only one available back then,
+                        // when using this material keyword was still current.
+                        LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
                         mMaterial->setLodStrategy(strategy);
 
-                        // Read in lod distances
+                        // Read in LOD distances
                         Material::LodValueList lods;
                         for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
                         {
@@ -605,6 +607,17 @@ namespace Ogre{
                         bool result = getString(prop->values.front(), &strategyName);
                         if (result)
                         {
+                            // In Ogre <= 1.8, the strategy names used to start with a capital letter.
+                            // Starting with Ogre 1.9, all fixed values and keywords in material scripts
+                            // are lower case only. For legacy support, we convert to lower case here to be safe.
+                            StringUtil::toLowerCase(strategyName);
+
+                            // In Ogre <= 1.8, there was no distinction between distance strategies based on
+                            // bounding BOX or bounding SPHERE. For backwards-capability, we fallback
+                            // to SPHERE (which was the only potion back then).
+                            if(StringUtil::endsWith(strategyName, "distance"))
+                                strategyName = "distance_sphere";
+
                             LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
 
                             result = (strategy != 0);
@@ -616,7 +629,7 @@ namespace Ogre{
                         if (!result)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                "lod_strategy argument must be a valid lod strategy");
+                                "lod_strategy argument must be a valid LOD strategy");
                         }
                     }
                     break;
@@ -4264,7 +4277,7 @@ namespace Ogre{
 			//Register the unsupported program so that materials that use it know that
 			//it exists but is unsupported
 			GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name, 
-					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax);
+					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax).staticCast<GpuProgram>();
 			return;
 		}
 

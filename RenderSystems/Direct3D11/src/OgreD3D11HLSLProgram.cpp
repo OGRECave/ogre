@@ -885,7 +885,7 @@ namespace Ogre {
     if(curItem.member != NULL)                       \
         length = strlen(curItem.member);             \
     newMicrocode->write(&length, sizeof(uint16));    \
-    if(length == 0) continue;                        \
+    if(length != 0)                                  \
     newMicrocode->write(curItem.member, length);     \
                 }
 
@@ -1209,7 +1209,7 @@ namespace Ogre {
             if (def.isFloat())
             {
                 def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
                     mFloatLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -1219,7 +1219,7 @@ namespace Ogre {
             else
             {
                 def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
                     mIntLogicalToPhysical->map.insert(
                     GpuLogicalIndexUseMap::value_type(paramIndex, 
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
@@ -1469,7 +1469,7 @@ namespace Ogre {
         // this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
         if ( !mAssemblerProgram.isNull() )
         {
-            *( mAssemblerProgram.useCountPointer() ) = 0;
+            mAssemblerProgram.setUseCount(0);
             mAssemblerProgram.setNull();
         }
 
@@ -1517,13 +1517,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        static const String compatibleVsTarget = "vs_4_0";
-        static const String compatiblePsTarget = "ps_4_0";
+        static const String
+			vs_4_0			 = "vs_4_0",
+			vs_4_0_level_9_3 = "vs_4_0_level_9_3",
+			vs_4_0_level_9_1 = "vs_4_0_level_9_1",
+			ps_4_0			 = "ps_4_0",
+			ps_4_0_level_9_3 = "ps_4_0_level_9_3",
+			ps_4_0_level_9_1 = "ps_4_0_level_9_1";
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0" || mTarget == "vs_2_x" || mTarget == "vs_3_0")	return compatibleVsTarget;
-            if(mTarget == "ps_2_0" || mTarget == "ps_2_x" || mTarget == "ps_3_0")	return compatiblePsTarget;
+            if(mTarget == "vs_2_0") return vs_4_0_level_9_1;
+            if(mTarget == "vs_2_a") return vs_4_0_level_9_3;
+            if(mTarget == "vs_2_x") return vs_4_0_level_9_3;
+            if(mTarget == "vs_3_0") return vs_4_0;
+
+            if(mTarget == "ps_2_0") return ps_4_0_level_9_1;
+            if(mTarget == "ps_2_a") return ps_4_0_level_9_3;
+            if(mTarget == "ps_2_b") return ps_4_0_level_9_3;
+            if(mTarget == "ps_2_x") return ps_4_0_level_9_3;
+            if(mTarget == "ps_3_0") return ps_4_0;
+            if(mTarget == "ps_3_x") return ps_4_0;
         }
 
         return mTarget;

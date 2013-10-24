@@ -253,7 +253,7 @@ namespace Ogre
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
 		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
-										 &mLocalObjectMemoryManager, this, num );
+										 &mLocalObjectMemoryManager, this, static_cast<uint32>(num) );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
@@ -599,7 +599,7 @@ namespace Ogre
 		//Now calculate Material LOD
         /*const LodStrategy *materialStrategy = mMaterial->getLodStrategy();
         
-        //Calculate lod value for given strategy
+        //Calculate LOD value for given strategy
         Real lodValue = materialStrategy->getValue( this, cam );*/
 
         //Get the index at this depth
@@ -614,10 +614,10 @@ namespace Ogre
         subEntEvt.previousLodIndex = mMaterialLodIndex;
         subEntEvt.newLodIndex = idx;
 
-        //Notify lod event listeners
+        //Notify LOD event listeners
         cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
 
-        //Change lod index
+        //Change LOD index
         mMaterialLodIndex = idx;
 	}
 	//-----------------------------------------------------------------------

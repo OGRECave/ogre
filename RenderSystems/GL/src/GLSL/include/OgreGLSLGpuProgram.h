@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLGpuProgram.h"
 
-
 namespace Ogre {
     namespace GLSL {
     /** GLSL low level compiled shader object - this class is used to get at the linked program object 
@@ -84,7 +83,6 @@ namespace Ogre {
 		
 		/// @copydoc GLGpuProgram::isAttributeValid
 		bool isAttributeValid(VertexElementSemantic semantic, uint index);
-		
 
     protected:
         /// Overridden from GpuProgram
@@ -93,8 +91,6 @@ namespace Ogre {
 		void unloadImpl(void);
 		/// @copydoc Resource::loadImpl
 		void loadImpl(void);
-
-
     };
 
     }

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __GLXUtils_H__
 
 #include "OgrePrerequisites.h"
-#include <X11/Xlib.h>
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 #include <GL/glxext.h>

@@ -41,6 +41,54 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    /** Template class describing a simple pool of items.
+     */
+	template <typename T>
+	class Pool
+	{
+	protected:
+		typedef typename list<T>::type ItemList;
+		ItemList mItems;
+		OGRE_AUTO_MUTEX;
+	public:
+		Pool() {}
+		virtual ~Pool() {}
+
+		/** Get the next item from the pool.
+         @return pair indicating whether there was a free item, and the item if so
+         */
+		virtual std::pair<bool, T> removeItem()
+		{
+            OGRE_LOCK_AUTO_MUTEX;
+			std::pair<bool, T> ret;
+			if (mItems.empty())
+			{
+				ret.first = false;
+			}
+			else
+			{
+				ret.first = true;
+				ret.second = mItems.front();
+				mItems.pop_front();
+			}
+			return ret;
+		}
+
+		/** Add a new item to the pool.
+         */
+		virtual void addItem(const T& i)
+		{
+            OGRE_LOCK_AUTO_MUTEX;
+			mItems.push_front(i);
+		}
+		/// Clear the pool
+		virtual void clear()
+		{
+            OGRE_LOCK_AUTO_MUTEX;
+			mItems.clear();
+		}
+	};
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -74,7 +122,7 @@ namespace Ogre {
 	class _OgreExport ResourceManager : public ScriptLoader, public ResourceAlloc
     {
     public:
-		OGRE_AUTO_MUTEX // public to allow external locking
+        OGRE_AUTO_MUTEX; // public to allow external locking
         ResourceManager();
         virtual ~ResourceManager();
 
@@ -97,7 +145,7 @@ namespace Ogre {
         @param createParams If any parameters are required to create an instance,
             they should be supplied here as name / value pairs
         */
-        virtual ResourcePtr create(const String& name, const String& group, 
+        virtual ResourcePtr createResource(const String& name, const String& group,
             bool isManual = false, ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
 
@@ -110,8 +158,8 @@ namespace Ogre {
 			in one call so there are no race conditions if using multiple
 			threads that could cause getByName() to return null, but create() to
 			fail because another thread created a resource in between.
-		@see ResourceManager::create
-		@see ResourceManager::getByName
+		@see ResourceManager::createResource
+		@see ResourceManager::getResourceByName
 		@return A pair, the first element being the pointer, and the second being 
 			an indicator specifying whether the resource was newly created.
 		*/
@@ -300,7 +348,7 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        virtual ResourcePtr getResourceByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
@@ -308,7 +356,7 @@ namespace Ogre {
 		/// Returns whether the named resource exists in this manager
 		virtual bool resourceExists(const String& name)
 		{
-			return !getByName(name).isNull();
+			return !getResourceByName(name).isNull();
 		}
 		/// Returns whether a resource with the given handle exists in this manager
 		virtual bool resourceExists(ResourceHandle handle)
@@ -526,11 +574,8 @@ namespace Ogre {
 	protected:
 		typedef map<String, ResourcePool*>::type ResourcePoolMap;
 		ResourcePoolMap mResourcePoolMap;
-
-
-    
-
     };
+
 	/** @} */
 	/** @} */
 

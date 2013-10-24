@@ -210,6 +210,7 @@ namespace Ogre
        class RandomValueProvider
        {
        public:
+            virtual ~RandomValueProvider() {}
             /** When called should return a random values in the range of [0,1] */
             virtual Real getRandomUnit() = 0;
        };

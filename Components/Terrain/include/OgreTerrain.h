@@ -704,6 +704,13 @@ namespace Ogre
 			It reads data from a native terrain data chunk. 
 		@return true if the preparation was successful
 		*/
+		bool prepare(DataStreamPtr& stream);
+		/** Prepare terrain data from saved data.
+		@remarks
+			This is safe to do in a background thread as it creates no GPU resources.
+			It reads data from a native terrain data chunk. 
+		@return true if the preparation was successful
+		*/
 		bool prepare(StreamSerialiser& stream);
 
 		/** Prepare the terrain from some import data rather than loading from 
@@ -1416,7 +1423,7 @@ namespace Ogre
 		/** Widen a rectangular area of terrain to take into account an extrusion vector.
 		@param vec A vector in world space
 		@param inRect Input rectangle
-		@param inRect Output rectangle
+		@param outRect Output rectangle
 		*/
 		void widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect);
 
@@ -1425,7 +1432,7 @@ namespace Ogre
 		@param vec A vector in world space
 		@param inRect Input rectangle
 		@param minHeight, maxHeight The extents of the height to extrude
-		@param inRect Output rectangle
+		@param outRect Output rectangle
 		*/
 		void widenRectByVector(const Vector3& vec, const Rect& inRect, 
 			Real minHeight, Real maxHeight, Rect& outRect);
@@ -1632,12 +1639,18 @@ namespace Ogre
 		static void writeLayerInstanceList(const Terrain::LayerInstanceList& lst, StreamSerialiser& ser);
 		/// Utility method to read a layer instance list from a stream
 		static bool readLayerInstanceList(StreamSerialiser& ser, size_t numSamplers, Terrain::LayerInstanceList& targetlst);
+
+		// This mutex is write-locked by neighbours if they are in the process of deleting themselves.
+		// It should be read-locked whenever using neighbours in calculations which are possibly running in a
+		// background thread.
+		OGRE_RW_MUTEX(mNeighbourMutex);
+
 	protected:
 		/** Gets the data size at a given LOD level.
 		*/
 		uint getGeoDataSizeAtLod(uint16 lodLevel);
         /** Get the real lod level
-         @para lodLevel LOD level which can be negative.
+         @param lodLevel LOD level which can be negative.
          @note After mapping, [-mNumLodLevels, -1] equals to [0,mNumLodLevels-1]
          So you can reference the lowest LOD with -1
          */
@@ -1702,7 +1715,8 @@ namespace Ogre
 		// overflow a point into a neighbour index and point
 		void getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy);
 
-		
+		/// Removes this terrain instance from neighbouring terrain's list of neighbours.
+		void removeFromNeighbours();
 
 		uint16 mWorkQueueChannel;
 		SceneManager* mSceneMgr;

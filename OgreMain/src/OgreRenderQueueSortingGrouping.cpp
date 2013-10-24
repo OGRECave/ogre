@@ -141,7 +141,7 @@ namespace Ogre {
         // the list and can cause problems with future clones
 		{
 			// Hmm, a bit hacky but least obtrusive for now
-			OGRE_LOCK_MUTEX(Pass::msPassGraveyardMutex)
+                    OGRE_LOCK_MUTEX(Pass::msPassGraveyardMutex);
 			const Pass::PassSet& graveyardList = Pass::getPassGraveyard();
 			Pass::PassSet::const_iterator gi, giend;
 			giend = graveyardList.end();
@@ -156,7 +156,7 @@ namespace Ogre {
         // If we don't do this, the std::map will become inconsistent for new insterts
 		{
 			// Hmm, a bit hacky but least obtrusive for now
-			OGRE_LOCK_MUTEX(Pass::msDirtyHashListMutex)
+                    OGRE_LOCK_MUTEX(Pass::msDirtyHashListMutex);
 			const Pass::PassSet& dirtyList = Pass::getDirtyHashList();
 			Pass::PassSet::const_iterator di, diend;
 			diend = dirtyList.end();

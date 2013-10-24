@@ -71,6 +71,11 @@ namespace Ogre {
 		destroyAllOverlayElements(true);
         destroyAll();
 
+		for(FactoryMap::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
+        {
+            OGRE_DELETE i->second;
+        }
+
         // Unregister with resource group manager
 		ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
     }
