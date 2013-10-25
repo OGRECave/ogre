@@ -151,8 +151,6 @@ namespace OgreBites
 				mSamplePaused = false;          // don't pause the next sample
 			}
 
-			mWindow->removeAllViewports();                  // wipe viewports
-
 			if (s)
 			{
 				// retrieve sample's required plugins and currently installed plugins

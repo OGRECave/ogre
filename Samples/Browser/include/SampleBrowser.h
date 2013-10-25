@@ -370,11 +370,12 @@ protected:
 
 				try
 				{
+					mWindow->removeAllViewports(); // wipe viewports
 #ifdef INCLUDE_RTSHADER_SYSTEM
-                    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
+                    /*if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                     {
                         createDummyScene();
-                    }
+                    }*/
 
 					s->setShaderGenerator(mShaderGenerator);
 #endif
