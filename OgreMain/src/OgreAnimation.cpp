@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreKeyFrame.h"
 #include "OgreException.h"
 #include "OgreSkeleton.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
 #include "OgreMesh.h"

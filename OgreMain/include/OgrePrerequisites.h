@@ -188,6 +188,7 @@ namespace Ogre {
     class IntersectionSceneQueryListener;
     class Image;
     class KeyFrame;
+	struct KfTransform;
     class Light;
     class Log;
     class LogManager;

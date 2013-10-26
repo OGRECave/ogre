@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreSkeletonInstance.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreTagPoint.h"
 
 

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreMatrix4.h"
 
 namespace Ogre	{

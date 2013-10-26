@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreLogManager.h"
 #include "OgreSkeleton.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreCamera.h"
 #include "OgreTagPoint.h"
 #include "OgreAxisAlignedBox.h"
