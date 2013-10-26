@@ -63,6 +63,8 @@ namespace Ogre {
 				SceneNode *parent, KfTransform const * RESTRICT_ALIAS reverseBind );
         virtual ~Bone();
 
+		void _setReverseBindPtr( const KfTransform *ptr	)			{ mReverseBind = ptr; }
+
 		/// Static bones are not supported.
 		virtual bool setStatic( bool bStatic );
 
