@@ -1159,7 +1159,7 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
-		OGRE_LOCK_MUTEX(sceneGraphMutex)
+		OGRE_LOCK_MUTEX(sceneGraphMutex);
 
 		// Invert vertex winding?
 		if (camera->isReflected())

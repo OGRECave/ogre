@@ -599,7 +599,7 @@ namespace Ogre {
 		struct MovableObjectCollection
 		{
 			MovableObjectVec movableObjects;
-			OGRE_MUTEX(mutex)
+			OGRE_MUTEX(mutex);
 		};
 		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
 		MovableObjectCollectionMap mMovableObjectCollectionMap;
