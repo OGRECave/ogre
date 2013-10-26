@@ -348,7 +348,7 @@ namespace Ogre {
         // texture aliases
         writeTextureAliases(subMeshNode, s);
 
-        // Bone assignments
+        // OldBone assignments
         if (mMesh->hasSkeleton())
         {
             SubMesh::BoneAssignmentIterator bi = const_cast<SubMesh*>(s)->getBoneAssignmentIterator();
@@ -864,7 +864,7 @@ namespace Ogre {
             if(textureAliasesNode)
                 readTextureAliases(textureAliasesNode, sm);
 
-            // Bone assignments
+            // OldBone assignments
             TiXmlElement* boneAssigns = smElem->FirstChildElement("boneassignments");
             if(boneAssigns)
                 readBoneAssignments(boneAssigns, sm);

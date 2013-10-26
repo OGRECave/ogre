@@ -63,6 +63,11 @@ namespace Ogre {
     */
 	class _OgreExport Node : public NodeAlloc, public IdObject
     {
+		/** Actually we just need Bone::updateAllTransforms and Bone::updateFromParentImpl
+			to be friends, but I don't see how to that without including OgreBone.h :(
+		*/
+		friend class Bone;
+
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -766,7 +771,6 @@ namespace Ogre {
 			hard copies but only the destructor must release the mTransform only slots once.
 		*/
 		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
-
     };
     /** @} */
     /** @} */

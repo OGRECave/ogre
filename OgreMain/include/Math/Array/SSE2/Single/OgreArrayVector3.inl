@@ -457,6 +457,17 @@ namespace Ogre
  		return ( *this - ( _mm_mul_ps( twoPointZero, this->dotProduct( normal ) ) * normal ) );
 	}
 	//-----------------------------------------------------------------------------------
+	inline void ArrayVector3::inverseLeaveZeroes( void )
+	{
+		//Use InvNonZero, we're gonna nuke the NaNs anyway.
+		mChunkBase[0] = MathlibSSE2::CmovRobust( mChunkBase[0], MathlibSSE2::InvNonZero4(mChunkBase[0]),
+												 _mm_cmpeq_ps( mChunkBase[0], _mm_setzero_ps() ) );
+		mChunkBase[1] = MathlibSSE2::CmovRobust( mChunkBase[1], MathlibSSE2::InvNonZero4(mChunkBase[1]),
+												 _mm_cmpeq_ps( mChunkBase[1], _mm_setzero_ps() ) );
+		mChunkBase[2] = MathlibSSE2::CmovRobust( mChunkBase[2], MathlibSSE2::InvNonZero4(mChunkBase[2]),
+												 _mm_cmpeq_ps( mChunkBase[2], _mm_setzero_ps() ) );
+	}
+	//-----------------------------------------------------------------------------------
 	inline int ArrayVector3::isNaN( void ) const
 	{
 		ArrayReal mask = _mm_and_ps( _mm_and_ps( 

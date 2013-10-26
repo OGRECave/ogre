@@ -230,6 +230,16 @@ namespace Ogre
 		/// @copydoc Vector3::reflect()
         inline ArrayVector3 reflect( const ArrayVector3& normal ) const;
 
+		/** Calculates the inverse of the vectors: 1.0f / v;
+			But if original is zero, the zero is left (0 / 0 = 0).
+			Example:
+			Bfore inverseLeaveZero:
+				x = 0; y = 2; z = 3;
+			After inverseLeaveZero
+				x = 0; y = 0.5; z = 0.3333;
+		*/
+		inline void inverseLeaveZeroes( void );
+
 		/// @see Vector3::isNaN()
 		///	@return
 		///		Return value differs from Vector3's counterpart. We return an int

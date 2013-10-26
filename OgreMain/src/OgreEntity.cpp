@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreLogManager.h"
 #include "OgreSkeleton.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreCamera.h"
 #include "OgreTagPoint.h"
 #include "OgreAxisAlignedBox.h"
@@ -551,7 +551,7 @@ namespace Ogre {
             int numBones = mSkeletonInstance->getNumBones();
             for (unsigned short b = 0; b < numBones; ++b)
             {
-                Bone* bone = mSkeletonInstance->getBone(b);
+                OldBone* bone = mSkeletonInstance->getBone(b);
 				queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
             }
         }
@@ -1290,7 +1290,7 @@ namespace Ogre {
         }
         if(pMovable->isAttached())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object already attached to a sceneNode or a Bone",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object already attached to a sceneNode or a OldBone",
                 "Entity::attachObjectToBone");
         }
         if (!hasSkeleton())
@@ -1298,7 +1298,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This entity's mesh has no skeleton to attach object to.",
                 "Entity::attachObjectToBone");
         }
-        Bone* bone = mSkeletonInstance->getBone(boneName);
+        OldBone* bone = mSkeletonInstance->getBone(boneName);
         if (!bone)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot locate bone named " + boneName,

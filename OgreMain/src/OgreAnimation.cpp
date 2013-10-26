@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreKeyFrame.h"
 #include "OgreException.h"
 #include "OgreSkeleton.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
 #include "OgreMesh.h"
@@ -360,7 +360,7 @@ namespace Ogre {
         for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
         {
             // get bone to apply to 
-            Bone* b = skel->getBone(i->first);
+            OldBone* b = skel->getBone(i->first);
             i->second->applyToNode(b, timeIndex, weight, scale);
         }
 
@@ -379,7 +379,7 @@ namespace Ogre {
       for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
       {
         // get bone to apply to 
-        Bone* b = skel->getBone(i->first);
+        OldBone* b = skel->getBone(i->first);
 		i->second->applyToNode(b, timeIndex, (*blendMask)[b->getHandle()] * weight, scale);
       }
     }

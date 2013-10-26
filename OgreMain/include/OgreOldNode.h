@@ -58,7 +58,7 @@ namespace Ogre {
         are combined with their parent's transformations.
     @par
         This is an abstract class - concrete classes are based on this for specific purposes,
-        e.g. SceneOldNode, Bone
+        e.g. OldBone
     */
     class _OgreExport OldNode : public NodeAlloc
     {

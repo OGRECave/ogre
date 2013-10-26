@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreAxisAlignedBox.h"
 #include "OgreBillboardChain.h"
 #include "OgreBillboardSet.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreCamera.h"
 #include "OgreConfigFile.h"
 #include "OgreControllerManager.h"

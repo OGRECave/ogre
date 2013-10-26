@@ -17,6 +17,7 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h"
@@ -32,6 +33,7 @@ list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreSIMDHelper.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Animation/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear/*.cpp"
