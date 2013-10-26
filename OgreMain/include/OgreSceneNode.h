@@ -65,7 +65,7 @@ namespace Ogre {
         SceneManager* mCreator;
 
         /** @copydoc Node::updateFromParentImpl. */
-        void updateFromParentImpl(void);
+        virtual void updateFromParentImpl(void);
 
         /** See Node. */
         Node* createChildImpl( SceneMemoryMgrTypes sceneType );
