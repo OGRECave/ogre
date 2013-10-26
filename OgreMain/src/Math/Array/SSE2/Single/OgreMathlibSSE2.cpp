@@ -120,20 +120,20 @@ namespace Ogre
 	const ArrayReal BooleanMask4::mMasks[NUM_MASKS] =
 	{
 		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0x00000000, 0x00000000 )),//MASK_NONE
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0x00000000, 0x00000000 )),//MASK_X
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0x00000000, 0x00000000 )),//MASK_Y
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 )),//MASK_XY
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0xffffffff, 0x00000000 )),//MASK_Z
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 )),//MASK_XZ
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0x00000000, 0xffffffff )),//MASK_X
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0xffffffff, 0x00000000 )),//MASK_Y
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0xffffffff, 0xffffffff )),//MASK_XY
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0x00000000, 0x00000000 )),//MASK_Z
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0x00000000, 0xffffffff )),//MASK_XZ
 		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0xffffffff, 0x00000000 )),//MASK_YZ
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 )),//MASK_XYZ
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0x00000000, 0xffffffff )),//MASK_W
+		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff )),//MASK_XYZ
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0x00000000, 0x00000000 )),//MASK_W
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0x00000000, 0xffffffff )),//MASK_XW
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0x00000000, 0xffffffff )),//MASK_YW
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff )),//MASK_XYW
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0x00000000, 0xffffffff, 0xffffffff )),//MASK_ZW
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff )),//MASK_XZW
-		_mm_castsi128_ps(_mm_set_epi32( 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff )),//MASK_YZW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 )),//MASK_YW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff )),//MASK_XYW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 )),//MASK_ZW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff )),//MASK_XZW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff. 0x00000000 )),//MASK_YZW
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff )) //MASK_XYZW
 	};
 }
