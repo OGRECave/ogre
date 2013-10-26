@@ -214,6 +214,7 @@ namespace Ogre {
 	struct ObjectData;
 	class ObjectMemoryManager;
 	class OldNode;
+	class OldBone;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;

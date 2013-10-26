@@ -108,9 +108,9 @@ namespace Ogre {
 		mSkeleton->_refreshAnimationState(animSet);
 	}
     //-------------------------------------------------------------------------
-    void SkeletonInstance::cloneBoneAndChildren(Bone* source, Bone* parent)
+    void SkeletonInstance::cloneBoneAndChildren(OldBone* source, OldBone* parent)
     {
-        Bone* newBone;
+        OldBone* newBone;
         if (source->getName().empty())
         {
             newBone = createBone(source->getHandle());
@@ -135,7 +135,7 @@ namespace Ogre {
 		OldNode::ChildOldNodeIterator it = source->getChildIterator();
         while (it.hasMoreElements())
         {
-            cloneBoneAndChildren(static_cast<Bone*>(it.getNext()), newBone);
+            cloneBoneAndChildren(static_cast<OldBone*>(it.getNext()), newBone);
         }
     }
     //-------------------------------------------------------------------------
@@ -149,7 +149,7 @@ namespace Ogre {
         BoneIterator i = mSkeleton->getRootBoneIterator();
         while (i.hasMoreElements())
         {
-            Bone* b = i.getNext();
+            OldBone* b = i.getNext();
             cloneBoneAndChildren(b, 0);
             b->_update(true, false);
         }
@@ -180,7 +180,7 @@ namespace Ogre {
     }
 
     //-------------------------------------------------------------------------
-    TagPoint* SkeletonInstance::createTagPointOnBone(Bone* bone,
+    TagPoint* SkeletonInstance::createTagPointOnBone(OldBone* bone,
         const Quaternion &offsetOrientation, 
         const Vector3 &offsetPosition)
     {

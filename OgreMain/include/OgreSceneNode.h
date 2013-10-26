@@ -99,7 +99,7 @@ namespace Ogre {
 		*/
 		SceneNode( const Transform &transformPtrs );
 
-        ~SceneNode();
+        virtual ~SceneNode();
 
 		/// @copydoc Node::setStatic
 		virtual bool setStatic( bool bStatic );

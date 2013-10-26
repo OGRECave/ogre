@@ -244,7 +244,7 @@ protected:
 			TransformKeyFrame* newKf = track->createNodeKeyFrame(ANIM_CHOP);
 			TransformKeyFrame* startKf = track->getNodeKeyFrame(0);
 
-			Bone* bone = skel->getBone(track->getHandle());
+			OldBone* bone = skel->getBone(track->getHandle());
 
 			if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
 			{

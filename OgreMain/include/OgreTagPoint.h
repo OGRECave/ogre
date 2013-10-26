@@ -57,7 +57,7 @@ namespace Ogre	{
         skeleton which has this tag point. Use the Entity::attachMovableObjectToBone method to attach
         the objects, which creates a new TagPoint on demand.
     */
-    class _OgreExport TagPoint : public Bone
+    class _OgreExport TagPoint : public OldBone
 	{
 
 	public:

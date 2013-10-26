@@ -33,41 +33,41 @@ THE SOFTWARE.
 namespace Ogre {
 
     //---------------------------------------------------------------------
-    Bone::Bone(unsigned short handle, Skeleton* creator) 
+    OldBone::OldBone(unsigned short handle, Skeleton* creator) 
         : OldNode(), mHandle(handle), mManuallyControlled(false), mCreator(creator)
     {
     }
     //---------------------------------------------------------------------
-    Bone::Bone(const String& name, unsigned short handle, Skeleton* creator) 
+    OldBone::OldBone(const String& name, unsigned short handle, Skeleton* creator) 
         : OldNode(name), mHandle(handle), mManuallyControlled(false), mCreator(creator)
     {
     }
     //---------------------------------------------------------------------
-    Bone::~Bone()
+    OldBone::~OldBone()
     {
     }
     //---------------------------------------------------------------------
-    Bone* Bone::createChild(unsigned short handle, const Vector3& inTranslate, 
+    OldBone* OldBone::createChild(unsigned short handle, const Vector3& inTranslate, 
         const Quaternion& inRotate)
     {
-        Bone* retBone = mCreator->createBone(handle);
+        OldBone* retBone = mCreator->createBone(handle);
         retBone->translate(inTranslate);
         retBone->rotate(inRotate);
         this->addChild(retBone);
         return retBone;
     }
     //---------------------------------------------------------------------
-    OldNode* Bone::createChildImpl(void)
+    OldNode* OldBone::createChildImpl(void)
     {
         return mCreator->createBone();
     }
     //---------------------------------------------------------------------
-    OldNode* Bone::createChildImpl(const String& name)
+    OldNode* OldBone::createChildImpl(const String& name)
     {
         return mCreator->createBone(name);
     }
     //---------------------------------------------------------------------
-    void Bone::setBindingPose(void)
+    void OldBone::setBindingPose(void)
     {
         setInitialState();
 
@@ -77,22 +77,22 @@ namespace Ogre {
         mBindDerivedInverseOrientation = _getDerivedOrientation().Inverse();
     }
     //---------------------------------------------------------------------
-    void Bone::reset(void)
+    void OldBone::reset(void)
     {
         resetToInitialState();
     }
     //---------------------------------------------------------------------
-    void Bone::setManuallyControlled(bool manuallyControlled) 
+    void OldBone::setManuallyControlled(bool manuallyControlled) 
 	{
         mManuallyControlled = manuallyControlled;
 		mCreator->_notifyManualBoneStateChange(this);
     }
     //---------------------------------------------------------------------
-    bool Bone::isManuallyControlled() const {
+    bool OldBone::isManuallyControlled() const {
         return mManuallyControlled;
     }
     //---------------------------------------------------------------------
-    void Bone::_getOffsetTransform(Matrix4& m) const
+    void OldBone::_getOffsetTransform(Matrix4& m) const
     {
         // Combine scale with binding pose inverse scale,
         // NB just combine as equivalent axes, no shearing
@@ -111,12 +111,12 @@ namespace Ogre {
         m.makeTransform(locTranslate, locScale, locRotate);
     }
     //---------------------------------------------------------------------
-    unsigned short Bone::getHandle(void) const
+    unsigned short OldBone::getHandle(void) const
     {
         return mHandle;
     }
 	//---------------------------------------------------------------------
-	void Bone::needUpdate(bool forceParentUpdate)
+	void OldBone::needUpdate(bool forceParentUpdate)
 	{
 		OldNode::needUpdate(forceParentUpdate);
 
