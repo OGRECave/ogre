@@ -409,11 +409,6 @@ namespace Ogre {
             // Has standard feature ?
             if (_performCpuid(0, result))
             {
-				// Check standard feature
-                _performCpuid(1, result);
-
-				numLogicalCores = (result._ebx >> 16) & 0xff;
-
                 // Check vendor strings
                 if (memcmp(&result._ebx, "GenuineIntel", 12) == 0)
                 {
@@ -426,6 +421,12 @@ namespace Ogre {
 					_performCpuid( 0x80000008, result );
 					numLogicalCores = (result._ecx & 0xff) + 1; // EAX[7:0] + 1
                 }
+				else
+				{
+					// Check standard feature
+					_performCpuid(1, result);
+					numLogicalCores = (result._ebx >> 16) & 0xff;
+				}
             }
 		}
 
