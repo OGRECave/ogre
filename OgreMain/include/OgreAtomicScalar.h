@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 #if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
-#if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+#if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473)) || ((OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__LIBCPP_VERSION))
     #define BUILTIN_FETCH_ADD(var, add) __atomic_fetch_add (var, add, __ATOMIC_SEQ_CST);
     #define BUILTIN_ADD_FETCH(var, add) __atomic_add_fetch (var, add, __ATOMIC_SEQ_CST);
     #define BUILTIN_SUB_FETCH(var, sub) __atomic_sub_fetch (var, sub, __ATOMIC_SEQ_CST);

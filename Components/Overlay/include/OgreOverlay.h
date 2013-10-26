@@ -112,12 +112,13 @@ namespace Ogre {
 
         /** Gets the name of this overlay. */
         const String& getName(void) const;
-        /** Alters the ZOrder of this overlay. 
+        
+        /** Alters the Z-order of this overlay. 
         @remarks
             Values between 0 and 650 are valid here.
         */
         void setZOrder(ushort zorder);
-        /** Gets the ZOrder of this overlay. */
+        /** Gets the Z-order of this overlay. */
         ushort getZOrder(void) const;
 
         /** Gets whether the overlay is displayed or not. */
