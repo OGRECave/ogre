@@ -87,35 +87,37 @@ namespace Ogre {
 
 /* Define whether or not Ogre compiled with SSE supports.
 */
-#if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
-    OGRE_PLATFORM != OGRE_PLATFORM_NACL
-#   define __OGRE_HAVE_SSE  1
-#elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
-      OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-#   define __OGRE_HAVE_SSE  1
+#if OGRE_USE_SIMD == 1
+	#if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
+		OGRE_PLATFORM != OGRE_PLATFORM_NACL
+	#   define __OGRE_HAVE_SSE  1
+	#elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
+		  OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+	#   define __OGRE_HAVE_SSE  1
+	#endif
+
+	/* Define whether or not Ogre compiled with VFP supports.
+	 */
+	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
+	#   define __OGRE_HAVE_VFP  1
+	#endif
+
+	/* Define whether or not Ogre compiled with NEON supports.
+	 */
+	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
+	#   define __OGRE_HAVE_NEON  1
+	#endif
 #endif
 
-/* Define whether or not Ogre compiled with VFP supports.
- */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
-#   define __OGRE_HAVE_VFP  1
-#endif
-
-/* Define whether or not Ogre compiled with NEON supports.
- */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
-#   define __OGRE_HAVE_NEON  1
-#endif
-
-#ifndef __OGRE_HAVE_SSE
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_SSE)
 #   define __OGRE_HAVE_SSE  0
 #endif
 
-#ifndef __OGRE_HAVE_VFP
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_VFP)
 #   define __OGRE_HAVE_VFP  0
 #endif
 
-#ifndef __OGRE_HAVE_NEON
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_NEON)
 #   define __OGRE_HAVE_NEON  0
 #endif
     
@@ -188,6 +190,12 @@ namespace Ogre {
 			and then all future calls with return internal cached value.
 		*/
 		static bool hasCpuFeature(CpuFeatures feature);
+
+		/** Returns the number of logical cores. Hyper Threaded cores do not count
+		@note
+			Returns 0 if couldn't detect.
+		*/
+		static uint32 getNumLogicalCores(void);
 
 
 		/** Write the CPU information to the passed in Log */

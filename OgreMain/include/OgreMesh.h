@@ -105,7 +105,7 @@ namespace Ogre {
         typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
         typedef vector<SubMesh*>::type SubMeshList;
-        typedef vector<unsigned short>::type IndexMap;
+        typedef FastArray<unsigned short> IndexMap;
 
     protected:
         /** A list of submeshes which make up this mesh.

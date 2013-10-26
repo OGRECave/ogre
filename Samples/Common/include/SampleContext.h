@@ -59,9 +59,6 @@
 #    endif
 #  endif
 
-#  ifdef OGRE_BUILD_PLUGIN_BSP
-#  define OGRE_STATIC_BSPSceneManager
-#  endif
 #  ifdef OGRE_BUILD_PLUGIN_PFX
 #  define OGRE_STATIC_ParticleFX
 #  endif
@@ -69,16 +66,6 @@
 #  define OGRE_STATIC_CgProgramManager
 #  endif
 
-#  ifdef OGRE_USE_PCZ
-#    ifdef OGRE_BUILD_PLUGIN_PCZ
-#    define OGRE_STATIC_PCZSceneManager
-#    define OGRE_STATIC_OctreeZone
-#    endif
-#  else
-#    ifdef OGRE_BUILD_PLUGIN_OCTREE
-#    define OGRE_STATIC_OctreeSceneManager
-#  endif
-#     endif
 #  include "OgreStaticPluginLoader.h"
 #endif
 
@@ -163,8 +150,6 @@ namespace OgreBites
 				mCurrentSample->_shutdown();    // quit current sample
 				mSamplePaused = false;          // don't pause the next sample
 			}
-
-			mWindow->removeAllViewports();                  // wipe viewports
 
 			if (s)
 			{
@@ -583,6 +568,7 @@ namespace OgreBites
 		virtual void setup()
 		{
 			mWindow = createWindow();
+			mRoot->initialiseCompositor();
 			setupInput();
 			locateResources();
 			loadResources();

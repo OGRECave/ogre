@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "Android/OgreAndroidEGLWindow.h"
 #include "Android/OgreAPKFileSystemArchive.h"
 #include "Android/OgreAPKZipArchive.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 #ifdef OGRE_BUILD_PLUGIN_OCTREE
 #	include "OgreOctreePlugin.h"
@@ -82,6 +83,7 @@ static Ogre::OverlaySystem* gOverlaySystem = NULL;
 
 static Ogre::GLESRS* gGLESPlugin = NULL;
 
+static Ogre::CompositorManager2* gCompositorManager = NULL;
 static Ogre::SceneManager* pSceneMgr = NULL;
 static Ogre::Camera* pCamera = NULL;
 static JavaVM* gVM = NULL;
@@ -154,9 +156,14 @@ extern "C"
 		OGRE_DELETE gOctreePlugin;
 		gOctreePlugin = NULL;
 #endif
-
+        
 		OGRE_DELETE gGLESPlugin;
 		gGLESPlugin = NULL;
+        
+        gCompositorManager->removeAllWorkspaces();
+        gCompositorManager->removeAllWorkspaceDefinitions();
+        gCompositorManager->removeAllNodeDefinitions();
+        gCompositorManager->removeAllShadowNodeDefinitions();
 	}
 	
 
@@ -174,13 +181,20 @@ extern "C"
 					gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
 					
 					
-					if(pSceneMgr == NULL)
+					if(gCompositorManager == NULL)
 					{
 						pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
 						pCamera = pSceneMgr->createCamera("MyCam");
 		
-						Ogre::Viewport* vp = gRenderWnd->addViewport(pCamera);
-						vp->setBackgroundColour(Ogre::ColourValue(1,0,0));
+                        gCompositorManager = mRoot->getCompositorManager2();
+                        if( !gCompositorManager->hasWorkspaceDefinition( "SampleBrowserWorkspace" ) )
+                        {
+                            gCompositorManager->createBasicWorkspaceDef( "SampleBrowserWorkspace",
+                                                                       Ogre::ColourValue( 1.0f, 0.0f, 0.0f ),
+                                                                       Ogre::IdString() );
+                        }
+                        compositorManager->addWorkspace( pSceneMgr, gRenderWnd, pCamera,
+                                                        "SampleBrowserWorkspace", true );
 					}						
 				}
 				else

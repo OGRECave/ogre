@@ -79,6 +79,15 @@ protected:
 
     void setupContent(void)
     {
+		CompositorManager2 *VolumeTex = mRoot->getCompositorManager2();
+		const IdString workspaceName( "ParticleGS Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
         // Create dynamic texture
 		ptex = TextureManager::getSingleton().createManual(
 			"DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);

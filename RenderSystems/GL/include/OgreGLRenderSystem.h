@@ -58,7 +58,7 @@ namespace Ogre {
             Note that a null value indicates a free slot
           */ 
         #define MAX_LIGHTS 8
-        Light* mLights[MAX_LIGHTS];
+        Light const * mLights[MAX_LIGHTS];
 
         /// View matrix to set world against
         Matrix4 mViewMatrix;
@@ -82,7 +82,7 @@ namespace Ogre {
         void initInputDevices(void);
         void processInputDevices(void);
 
-        void setGLLight(size_t index, Light* lt);
+        void setGLLight(size_t index, const Light* lt);
         void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
  
         GLint getBlendMode(SceneBlendFactor ogreBlend) const;
@@ -111,7 +111,7 @@ namespace Ogre {
         GLSupport* mGLSupport;
         
         /// Internal method to set pos / direction of a light
-        void setGLLightPositionDirection(Light* lt, GLenum lightindex);
+        void setGLLightPositionDirection(const Light* lt, GLenum lightindex);
 
         bool mUseAutoTextureMatrix;
         GLfloat mAutoTextureMatrix[16];

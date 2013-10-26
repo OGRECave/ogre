@@ -55,7 +55,7 @@ namespace Ogre {
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
     public:
-        BillboardParticleRenderer();
+		BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
         ~BillboardParticleRenderer();
 
         /** Command object for billboard type (see ParamCommand).*/
@@ -201,7 +201,7 @@ namespace Ogre {
         /// @copydoc ParticleSystemRenderer::getType
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
-        void _updateRenderQueue(RenderQueue* queue, 
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera,
             list<Particle*>::type& currentParticles, bool cullIndividually);
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
@@ -217,7 +217,7 @@ namespace Ogre {
         /// @copydoc ParticleSystemRenderer::_notifyParticleQuota
         void _notifyParticleQuota(size_t quota);
         /// @copydoc ParticleSystemRenderer::_notifyAttached
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached(Node* parent);
         /// @copydoc ParticleSystemRenderer::_notifyDefaultDimensions
         void _notifyDefaultDimensions(Real width, Real height);
 		/// @copydoc ParticleSystemRenderer::setRenderQueueGroup
@@ -247,11 +247,16 @@ namespace Ogre {
     /** Factory class for BillboardParticleRenderer */
     class _OgreExport BillboardParticleRendererFactory : public ParticleSystemRendererFactory
     {
+		ObjectMemoryManager *mDummyObjectMemoryManager;
+		
     public:
+		BillboardParticleRendererFactory();
+		~BillboardParticleRendererFactory();
+
         /// @copydoc FactoryObj::getType
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
-        ParticleSystemRenderer* createInstance( const String& name );
+		ParticleSystemRenderer* createInstance( const String &name );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };

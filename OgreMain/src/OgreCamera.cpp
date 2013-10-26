@@ -44,8 +44,8 @@ namespace Ogre {
 
     String Camera::msMovableType = "Camera";
     //-----------------------------------------------------------------------
-    Camera::Camera( const String& name, SceneManager* sm)
-        : Frustum(name),
+    Camera::Camera( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* sm )
+        : Frustum( id, objectMemoryManager ),
 		mSceneMgr(sm),
 		mOrientation(Quaternion::IDENTITY),
 		mPosition(Vector3::ZERO),
@@ -84,8 +84,7 @@ namespace Ogre {
         // no reflection
         mReflect = false;
 
-        mVisible = false;
-
+		setVisible( false );
     }
 
     //-----------------------------------------------------------------------
@@ -211,15 +210,7 @@ namespace Ogre {
         }
 
         // transform to parent space
-        if (mParentNode)
-        {
-            mOrientation =
-                mParentNode->_getDerivedOrientation().Inverse() * targetWorldOrientation;
-        }
-		else
-		{
-			mOrientation = targetWorldOrientation;
-		}
+		mOrientation = mParentNode->_getDerivedOrientationUpdated().Inverse() * targetWorldOrientation;
 
         // TODO If we have a fixed yaw axis, we mustn't break it by using the
         // shortest arc because this will sometimes cause a relative yaw
@@ -252,7 +243,7 @@ namespace Ogre {
     void Camera::lookAt(const Vector3& targetPoint)
     {
         updateView();
-        this->setDirection(targetPoint - mRealPosition);
+		this->setDirection( targetPoint - mRealPosition );
     }
 
     //-----------------------------------------------------------------------
@@ -329,28 +320,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Camera::isViewOutOfDate(void) const
     {
+		const Quaternion derivedOrient( mParentNode->_getDerivedOrientationUpdated() );
+		const Vector3 derivedPos( mParentNode->_getDerivedPosition() );
+
         // Overridden from Frustum to use local orientation / position offsets
-        // Attached to node?
-        if (mParentNode != 0)
+        if (mRecalcView ||
+			derivedOrient != mLastParentOrientation ||
+			derivedPos != mLastParentPosition)
         {
-            if (mRecalcView ||
-                mParentNode->_getDerivedOrientation() != mLastParentOrientation ||
-                mParentNode->_getDerivedPosition() != mLastParentPosition)
-            {
-                // Ok, we're out of date with SceneNode we're attached to
-                mLastParentOrientation = mParentNode->_getDerivedOrientation();
-                mLastParentPosition = mParentNode->_getDerivedPosition();
-                mRealOrientation = mLastParentOrientation * mOrientation;
-                mRealPosition = (mLastParentOrientation * mPosition) + mLastParentPosition;
-                mRecalcView = true;
-                mRecalcWindow = true;
-            }
-        }
-        else
-        {
-            // Rely on own updates
-            mRealOrientation = mOrientation;
-            mRealPosition = mPosition;
+            // Ok, we're out of date with SceneNode we're attached to
+            mLastParentOrientation = derivedOrient;
+            mLastParentPosition = derivedPos;
+            mRealOrientation = mLastParentOrientation * mOrientation;
+            mRealPosition = (mLastParentOrientation * mPosition) + mLastParentPosition;
+            mRecalcView = true;
+            mRecalcWindow = true;
         }
 
         // Deriving reflection from linked plane?
@@ -402,7 +386,7 @@ namespace Ogre {
         Frustum::invalidateFrustum();
     }
     //-----------------------------------------------------------------------
-    void Camera::_renderScene(Viewport *vp, bool includeOverlays)
+    void Camera::_cullScenePhase01( Viewport *vp, uint8 firstRq, uint8 lastRq )
     {
         OgreProfileBeginGPUEvent("Camera: " + getName());
 
@@ -424,10 +408,16 @@ namespace Ogre {
 		}
 
 		//render scene
-		mSceneMgr->_renderScene(this, vp, includeOverlays);
+		mSceneMgr->_cullPhase01( this, vp, firstRq, lastRq );
+	}
+	//-----------------------------------------------------------------------
+    void Camera::_renderScenePhase02(Viewport *vp, uint8 firstRq, uint8 lastRq, bool includeOverlays)
+    {
+		//render scene
+		mSceneMgr->_renderPhase02( this, vp, firstRq, lastRq, includeOverlays );
 
-		// Listener list may have change
-		listenersCopy = mListeners;
+		// Listener list may have changed
+		ListenerList listenersCopy = mListeners;
 
 		//notify postrender scene
 		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
@@ -579,13 +569,9 @@ namespace Ogre {
     {
         updateView();
 
-        Vector3 scale(1.0, 1.0, 1.0);
-        if (mParentNode)
-          scale = mParentNode->_getDerivedScale();
-
         mat->makeTransform(
                 mDerivedPosition,
-                scale,
+                mParentNode->_getDerivedScale(),
                 mDerivedOrientation);
     }
     //-----------------------------------------------------------------------
@@ -841,6 +827,7 @@ namespace Ogre {
         return mWindowClipPlanes;
     }
     // -------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     Real Camera::getBoundingRadius(void) const
     {
         // return a little bigger than the near distance
@@ -848,6 +835,7 @@ namespace Ogre {
         return mNearDist * 1.5f;
 
     }
+#endif
     //-----------------------------------------------------------------------
     const Vector3& Camera::getPositionForViewUpdate(void) const
     {
@@ -1145,6 +1133,19 @@ namespace Ogre {
 		//this->setLodCamera(cam->getLodCamera());
 		//this->setCullingFrustum(cam->getCullingFrustum());
 
+	}
+	//-----------------------------------------------------------------------
+	void Camera::_resetRenderedRqs( size_t numRqs )
+	{
+		mRenderedRqs.clear();
+		mRenderedRqs.resize( numRqs, false );
+	}
+	//-----------------------------------------------------------------------
+	void Camera::_setRenderedRqs( size_t rqStart, size_t rqEnd )
+	{
+		assert( rqStart <= rqEnd );
+		for( size_t i=rqStart; i<rqEnd; ++i )
+			mRenderedRqs[i] = true;
 	}
 
 

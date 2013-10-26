@@ -67,13 +67,21 @@ namespace Ogre {
     */
 	class _OgreExport ShadowCameraSetup : public ShadowDataAlloc
 	{
+	protected:
+		/// Defines the min & max frustum distance. TODO: put as output from getShadowCamera
+		mutable Real mMinDistance;
+		mutable Real mMaxDistance;
+
 	public:
 		/// Function to implement -- must set the shadow camera properties
 		virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-									  const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const = 0;
+									  const Light *light, Camera *texCam, size_t iteration) const = 0;
+		ShadowCameraSetup() : mMinDistance( 0.0f ), mMaxDistance( 1000000.0f ) {}
 		/// Need virtual destructor in case subclasses use it
 		virtual ~ShadowCameraSetup() {}
 
+		Real getMinDistance() const			{ return mMinDistance; }
+		Real getMaxDistance() const			{ return mMaxDistance; }
 	};
 
 
@@ -93,10 +101,8 @@ namespace Ogre {
 
 		/// Default shadow camera setup
 		virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-									  const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
+									  const Light *light, Camera *texCam, size_t iteration) const;
 	};
-
-
 
 	typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
 	/** @} */

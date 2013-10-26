@@ -37,12 +37,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatchHW::InstanceBatchHW( InstanceManager *creator, MeshPtr &meshReference,
+	InstanceBatchHW::InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
-				InstanceBatch( creator, meshReference, material, instancesPerBatch,
-								indexToBoneMap, batchName ),
-				mKeepStatic( false )
+										const Mesh::IndexMap *indexToBoneMap ) :
+				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
+								instancesPerBatch, indexToBoneMap )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance
 		mTechnSupportsSkeletal = false;
@@ -82,7 +82,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(lastSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 		thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -114,7 +114,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(newSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -180,78 +180,71 @@ namespace Ogre
 		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
 	}
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchHW::updateVertexBuffer( Camera *currentCamera )
+	size_t InstanceBatchHW::updateVertexBuffer( Camera *camera )
 	{
-		size_t retVal = 0;
+		MovableObjectArray *visibleObjects = 0;
+		if( mManager->getInstancingThreadedCullingMethod() == INSTANCING_CULLING_SINGLETHREAD )
+		{
+			//Perform the culling now
+			ObjectData objData;
+			const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
+
+			visibleObjects = &mManager->_getTmpVisibleObjectsList()[0];
+			visibleObjects->clear();
+
+			//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
+			MovableObject::cullFrustum( numObjs, objData, camera,
+						camera->getLastViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
+						*visibleObjects, (AxisAlignedBox*)0 );
+		}
+		else
+		{
+			//Get the results from the time the threaded version ran.
+			visibleObjects = &mCulledInstances;
+		}
 
 		//Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
 		const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
 		float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
 											getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
 
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
 		unsigned char numCustomParams			= mCreator->getNumCustomParams();
 		size_t customParamIdx					= 0;
 
+		MovableObjectArray::const_iterator itor = visibleObjects->begin();
+		MovableObjectArray::const_iterator end  = visibleObjects->end();
+
 		while( itor != end )
 		{
-			//Cull on an individual basis, the less entities are visible, the less instances we draw.
-			//No need to use null matrices at all!
-			if( (*itor)->findVisible( currentCamera ) )
+			assert( dynamic_cast<InstancedEntity*>(*itor) );
+			InstancedEntity *instancedEntity = static_cast<InstancedEntity*>(*itor);
+
+			//Write transform matrix
+			instancedEntity->writeSingleTransform3x4( pDest );
+			pDest += 12;
+
+			//Write custom parameters, if any
+			for( unsigned char i=0; i<numCustomParams; ++i )
 			{
-				const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
-
-				if( mManager->getCameraRelativeRendering() )
-					makeMatrixCameraRelative3x4( pDest, floatsWritten );
-
-				pDest += floatsWritten;
-
-				//Write custom parameters, if any
-				for( unsigned char i=0; i<numCustomParams; ++i )
-				{
-					*pDest++ = mCustomParams[customParamIdx+i].x;
-					*pDest++ = mCustomParams[customParamIdx+i].y;
-					*pDest++ = mCustomParams[customParamIdx+i].z;
-					*pDest++ = mCustomParams[customParamIdx+i].w;
-				}
-
-				++retVal;
+				*pDest++ = mCustomParams[customParamIdx+i].x;
+				*pDest++ = mCustomParams[customParamIdx+i].y;
+				*pDest++ = mCustomParams[customParamIdx+i].z;
+				*pDest++ = mCustomParams[customParamIdx+i].w;
 			}
-			++itor;
 
+			++itor;
 			customParamIdx += numCustomParams;
 		}
 
 		mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
 
-		return retVal;
+		return visibleObjects->size();
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW::_boundsDirty(void)
+	void InstanceBatchHW::createAllInstancedEntities(void)
 	{
-		//Don't update if we're static, but still mark we're dirty
-		if( !mBoundsDirty && !mKeepStatic )
-			mCreator->_addDirtyBatch( this );
-		mBoundsDirty = true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatchHW::setStaticAndUpdate( bool bStatic )
-	{
-		//We were dirty but didn't update bounds. Do it now.
-		if( mKeepStatic && mBoundsDirty )
-			mCreator->_addDirtyBatch( this );
-
-		mKeepStatic = bStatic;
-		if( mKeepStatic )
-		{
-			//One final update, since there will be none from now on
-			//(except further calls to this function). Pass NULL because
-			//we want to include only those who were added to the scene
-			//but we don't want to perform culling
-			mRenderOperation.numberOfInstances = updateVertexBuffer( 0 );
-		}
+		mCulledInstances.reserve( mInstancesPerBatch );
+		InstanceBatch::createAllInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::getWorldTransforms( Matrix4* xform ) const
@@ -264,16 +257,16 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue )
+	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue, Camera *camera )
 	{
-		if( !mKeepStatic )
+		//if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
-			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )
+			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
-		else
+		/*else
 		{
 			if( mManager->getCameraRelativeRendering() )
 			{
@@ -285,6 +278,6 @@ namespace Ogre
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-		}
+		}*/
 	}
 }

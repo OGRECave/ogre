@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePixelFormatDescriptions.h"
 
+#include "OgrePixelBox.h"
+
 namespace {
 #include "OgrePixelConversions.h"
 }

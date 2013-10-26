@@ -62,22 +62,22 @@ namespace Ogre {
         static String msMovableType;
     public:
 
-        MovablePlane(const String& name);
-        MovablePlane (const Plane& rhs);
+        MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager, const Plane& rhs );
         /** Construct a plane through a normal, and a distance to move the plane along the normal.*/
-        MovablePlane (const Vector3& rkNormal, Real fConstant);
-        MovablePlane (const Vector3& rkNormal, const Vector3& rkPoint);
-        MovablePlane (const Vector3& rkPoint0, const Vector3& rkPoint1,
-            const Vector3& rkPoint2);
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkNormal, Real fConstant );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkNormal, const Vector3& rkPoint );
+        MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
+						const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2 );
         ~MovablePlane() {}
         /// Overridden from MovableObject
         void _notifyCurrentCamera(Camera*) { /* don't care */ }
         /// Overridden from MovableObject
         const AxisAlignedBox& getBoundingBox(void) const { return mNullBB; }
         /// Overridden from MovableObject
-        Real getBoundingRadius(void) const { return 0.0f; }
-        /// Overridden from MovableObject
-        void _updateRenderQueue(RenderQueue*) { /* do nothing */}
+        void _updateRenderQueue(RenderQueue*, Camera *camera) { /* do nothing */}
         /// Overridden from MovableObject
         const String& getMovableType(void) const;
         /// Get the derived plane as transformed by its parent node. 

@@ -34,6 +34,8 @@
 
 #include "InputContext.h"
 #include "OgreFileSystemLayer.h"
+#include "OgreSceneManager.h"
+#include "Compositor/OgreCompositorManager2.h"
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
@@ -178,8 +180,13 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
+				Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+				compositorManager->removeAllWorkspaces();
+				compositorManager->removeAllWorkspaceDefinitions();
+				compositorManager->removeAllNodeDefinitions();
+				compositorManager->removeAllShadowNodeDefinitions();
 				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
-				mRoot->destroySceneManager(mSceneMgr);				
+				mRoot->destroySceneManager(mSceneMgr);
 			}
 			mSceneMgr = 0;
 
@@ -250,7 +257,22 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void createSceneManager()
 		{
-			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+#ifdef _DEBUG
+			//Debugging multithreaded code is a PITA, disable it.
+			const size_t numThreads = 1;
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+#else
+			//getNumLogicalCores() may return 0 if couldn't detect
+			const size_t numThreads = std::max<size_t>( 1, Ogre::PlatformInformation::getNumLogicalCores() );
+
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+			//See doxygen documentation regarding culling methods.
+			//In some cases you may still want to use single thread.
+			if( numThreads > 1 )
+                threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+#endif
+			mSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 #ifdef INCLUDE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif

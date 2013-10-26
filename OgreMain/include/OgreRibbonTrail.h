@@ -80,8 +80,9 @@ namespace Ogre {
 		@param useVertexColours If true, use vertex colours from the chain elements (must
 			be true if you intend to use fading)
 		*/
-		RibbonTrail(const String& name, size_t maxElements = 20, size_t numberOfChains = 1, 
-			bool useTextureCoords = true, bool useVertexColours = true);
+		RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements = 20,
+					size_t numberOfChains = 1, bool useTextureCoords = true,
+					bool useVertexColours = true );
 		/// destructor
 		virtual ~RibbonTrail();
 
@@ -216,7 +217,7 @@ namespace Ogre {
 		/// Node has changed position, update
 		virtual void updateTrail(size_t index, const Node* node);
         /// Reset the tracked chain to initial state
-        virtual void resetTrail(size_t index, const Node* node);
+        virtual void resetTrail(size_t index, Node* node);
         /// Reset all tracked chains to initial state
         virtual void resetAllTrails(void);
 
@@ -227,7 +228,8 @@ namespace Ogre {
 	class _OgreExport RibbonTrailFactory : public MovableObjectFactory
 	{
 	protected:
-		MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
 	public:
 		RibbonTrailFactory() {}
 		~RibbonTrailFactory() {}

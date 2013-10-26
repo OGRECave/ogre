@@ -16,13 +16,31 @@ PROJECT(OgreMain)
 include(PrecompiledHeader)
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassQuad/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassScene/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassStencil/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Array/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/*.h")
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
 
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassScene/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassStencil/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Array/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Simple/C/*.cpp")
 
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
@@ -43,6 +61,23 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
 )
 
+if (OGRE_SIMD)
+	set (SOURCE_FILES ${SOURCE_FILES}
+	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
+	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
+else()
+	set (SOURCE_FILES ${SOURCE_FILES}
+	  src/Math/Array/C/OgreArrayAabb.cpp
+	  src/Math/Array/C/OgreArrayMatrix4.cpp
+	  src/Math/Array/C/OgreArrayQuaternion.cpp
+	  src/Math/Array/C/OgreArrayVector3.cpp
+	  src/Math/Array/C/OgreMathlibC.cpp)
+endif ()
+
+
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
   include_directories("include/NaCl")
@@ -53,6 +88,12 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
+  set(THREAD_SOURCE_FILES
+      src/Threading/OgreBarrierWin.cpp
+	  src/Threading/OgreLightweightMutexWin.cpp
+      src/Threading/OgreThreadsWin.cpp
+  )
+  list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
   if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
@@ -176,15 +217,31 @@ elseif (UNIX)
   endif ()
 endif()
 
-# Configure threading files
-file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
+if (NOT WIN32)
+  set(THREAD_SOURCE_FILES
+      src/Threading/OgreBarrierPThreads.cpp
+	  src/Threading/OgreLightweightMutexPThreads.cpp
+      src/Threading/OgreThreadsPThreads.cpp
+  )
+endif()
 
+
+# Configure threading files
+set(THREAD_HEADER_FILES
+	include/Threading/OgreBarrier.h
+	include/Threading/OgreLightweightMutex.h
+	include/Threading/OgreThreadDefines.h
+	include/Threading/OgreThreadHeaders.h
+	include/Threading/OgreThreads.h
+	include/Threading/OgreDefaultWorkQueue.h
+	include/Threading/OgreUniformScalableTask.h
+)
 if (OGRE_THREAD_PROVIDER EQUAL 0)
 	list(APPEND THREAD_HEADER_FILES
 		include/Threading/OgreThreadDefinesNone.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 1)
@@ -193,7 +250,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 1)
 		include/Threading/OgreThreadHeadersBoost.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 2)
@@ -202,7 +259,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 2)
 		include/Threading/OgreThreadHeadersPoco.h
 		include/Threading/OgreDefaultWorkQueueStandard.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 3)
@@ -211,7 +268,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 3)
 		include/Threading/OgreThreadHeadersTBB.h
 		include/Threading/OgreDefaultWorkQueueTBB.h
 	)
-	set(THREAD_SOURCE_FILES
+	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueTBB.cpp
 	)
 endif ()

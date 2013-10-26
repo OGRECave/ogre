@@ -38,12 +38,12 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(__MINGW32__)) || OGRE_PLATFORM == OGRE_PLATFORM_WINRT || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "OgreCommon.h"
 #include "OgreArchive.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreBitwise.h"
 #include "OgreCamera.h"
 #include "OgreColourValue.h"
-#include "OgreCommon.h"
 #include "OgreDataStream.h"
 #include "OgreException.h"
 #include "OgreFileSystem.h"

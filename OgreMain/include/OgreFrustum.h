@@ -195,7 +195,7 @@ namespace Ogre
     public:
 
         /// Named constructor
-        Frustum(const String& name = StringUtil::BLANK);
+        Frustum( IdType id, ObjectMemoryManager *objectMemoryManager );
 
         virtual ~Frustum();
         /** Sets the Y-dimension Field Of View (FOV) of the frustum.
@@ -476,10 +476,7 @@ namespace Ogre
         const AxisAlignedBox& getBoundingBox(void) const;
 
         /** Overridden from MovableObject */
-        Real getBoundingRadius(void) const;
-
-        /** Overridden from MovableObject */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
         /** Overridden from MovableObject */
         const String& getMovableType(void) const;

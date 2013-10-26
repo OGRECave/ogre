@@ -499,6 +499,13 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
+		if( GLEW_VERSION_3_2 )
+		{
+			// GL_TEXTURE_2D_MULTISAMPLE and GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+			// http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml
+			rsc->setCapability(RSC_EXPLICIT_FSAA_RESOLVE);
+		}
+
 		if (GLEW_VERSION_3_3 || GLEW_ARB_instanced_arrays)
 		{
 			// states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml
@@ -658,6 +665,8 @@ namespace Ogre {
 		{
 			rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 		}
+
+		bool what = mGLSupport->checkExtension("GL_ARB_map_buffer_alignment");
 
 		// Alpha to coverage?
 		if (mGLSupport->checkExtension("GL_ARB_multisample"))
@@ -1289,8 +1298,8 @@ namespace Ogre {
 		unsigned short num = 0;
 		for (i = lights.begin(); i != iend && num < limit; ++i, ++num)
 		{
-			setGLLight(num, *i);
-			mLights[num] = *i;
+			setGLLight(num, i->light);
+			mLights[num] = i->light;
 		}
 		// Disable extra lights
 		for (; num < mCurrentLights; ++num)
@@ -1306,7 +1315,7 @@ namespace Ogre {
 		glPopMatrix();
 	}
 
-	void GLRenderSystem::setGLLight(size_t index, Light* lt)
+	void GLRenderSystem::setGLLight(size_t index, const Light* lt)
 	{
 		GLenum gl_index = GL_LIGHT0 + index;
 
@@ -2043,7 +2052,7 @@ namespace Ogre {
 		{
 			if (mLights[i] != NULL)
 			{
-				Light* lt = mLights[i];
+				const Light* lt = mLights[i];
 				setGLLightPositionDirection(lt, GL_LIGHT0 + i);
 			}
 		}
@@ -2052,11 +2061,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_beginFrame(void)
 	{
-		if (!mActiveViewport)
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-			"Cannot begin frame - no viewport selected.",
-			"GLRenderSystem::_beginFrame");
-
 		// Activate the viewport clipping
 		mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
 	}
@@ -2812,12 +2816,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		mStateCacheManager->activateGLTextureUnit(0);
 	}
 	//---------------------------------------------------------------------
-	void GLRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
+	void GLRenderSystem::setGLLightPositionDirection(const Light* lt, GLenum lightindex)
 	{
 		// Set position / direction
 		Vector4 vec;
 		// Use general 4D vector which is the same as GL's approach
-		vec = lt->getAs4DVector(true);
+		vec = lt->getAs4DVector();
 
 #if OGRE_DOUBLE_PRECISION
 		// Must convert to float*

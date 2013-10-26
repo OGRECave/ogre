@@ -79,7 +79,7 @@ namespace Ogre {
     @note
         No functions were declared virtual to improve performance.
     */
-    class _OgreExport Entity: public MovableObject, public Resource::Listener
+    class _OgreExport Entity : public MovableObject, public Resource::Listener
     {
         // Allow EntityFactory full access
         friend class EntityFactory;
@@ -93,10 +93,10 @@ namespace Ogre {
 
         /** Private constructor (instances cannot be created directly).
         */
-        Entity();
-        /** Private constructor - specify name (the usual constructor used).
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager );
+        /** Private constructor.
         */
-        Entity( const String& name, const MeshPtr& mesh);
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh );
 
         /** The Mesh that this Entity is based on.
         */
@@ -276,9 +276,6 @@ namespace Ogre {
         /// Internal implementation of detaching a 'child' object of this entity and clear the parent node of the child entity.
         void detachObjectImpl(MovableObject* pObject);
 
-        /// Internal implementation of detaching all 'child' objects of this entity.
-        void detachAllObjectsImpl(void);
-
         /// Ensures reevaluation of the vertex processing usage.
         void reevaluateVertexProcessing(void);
 
@@ -291,7 +288,7 @@ namespace Ogre {
         bool calcVertexProcessing(void);
     
         /// Apply vertex animation.
-        void applyVertexAnimation(bool hardwareAnimation, bool stencilShadows);
+        void applyVertexAnimation(bool hardwareAnimation);
         /// Initialise the hardware animation elements for given vertex data.
         ushort initHardwareAnimationElements(VertexData* vdata, ushort numberOfElements, bool animateNormals);
         /// Are software vertex animation temp buffers bound?
@@ -299,54 +296,6 @@ namespace Ogre {
         /// Are software skeleton animation temp buffers bound?
         bool tempSkelAnimBuffersBound(bool requestNormals) const;
 
-    public:
-        /// Contains the child objects (attached to bones) indexed by name.
-        typedef map<String, MovableObject*>::type ChildObjectList;
-    protected:
-        ChildObjectList mChildObjectList;
-
-
-        /// Bounding box that 'contains' all the mesh of each child entity.
-        mutable AxisAlignedBox mFullBoundingBox;
-
-        ShadowRenderableList mShadowRenderables;
-
-        /** Nested class to allow entity shadows. */
-        class _OgreExport EntityShadowRenderable : public ShadowRenderable
-        {
-        protected:
-            Entity* mParent;
-            /// Shared link to position buffer.
-            HardwareVertexBufferSharedPtr mPositionBuffer;
-            /// Shared link to w-coord buffer (optional).
-            HardwareVertexBufferSharedPtr mWBuffer;
-            /// Link to current vertex data used to bind (maybe changes).
-            const VertexData* mCurrentVertexData;
-            /// Original position buffer source binding.
-            unsigned short mOriginalPosBufferBinding;
-            /// Link to SubEntity, only present if SubEntity has it's own geometry.
-            SubEntity* mSubEntity;
-
-
-        public:
-            EntityShadowRenderable(Entity* parent,
-                HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
-                bool createSeparateLightCap, SubEntity* subent, bool isLightCap = false);
-            ~EntityShadowRenderable();
-            
-            /// Create the separate light cap if it doesn't already exists.
-            void _createSeparateLightCap();
-            /// @copydoc ShadowRenderable::getWorldTransforms.
-            void getWorldTransforms(Matrix4* xform) const;
-            HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-            /// Rebind the source positions (for temp buffer users).
-            void rebindPositionBuffer(const VertexData* vertexData, bool force);
-            /// @copydoc ShadowRenderable::isVisible.
-            bool isVisible(void) const;
-            /// @copydoc ShadowRenderable::rebindIndexBuffer.
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
-        };
     public:
         /** Default destructor.
         */
@@ -412,16 +361,9 @@ namespace Ogre {
         /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
-        /** @copydoc MovableObject::getBoundingBox.
-        */
-        const AxisAlignedBox& getBoundingBox(void) const;
-
-        /// Merge all the child object Bounds a return it.
-        AxisAlignedBox getChildObjectsBoundingBox(void) const;
-
         /** @copydoc MovableObject::_updateRenderQueue.
         */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
@@ -581,26 +523,17 @@ namespace Ogre {
         /// Detach all MovableObjects previously attached using attachObjectToBone
         void detachAllObjectsFromBone(void);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+		/// Contains the child objects (attached to bones) indexed by name.
+        typedef map<String, MovableObject*>::type ChildObjectList;
         typedef MapIterator<ChildObjectList> ChildObjectListIterator;
         /** Gets an iterator to the list of objects attached to bones on this entity. */
         ChildObjectListIterator getAttachedObjectIterator(void);
-        /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const;
-
-        /** @copydoc MovableObject::getWorldBoundingBox */
-        const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
-        /** @copydoc MovableObject::getWorldBoundingSphere */
-        const Sphere& getWorldBoundingSphere(bool derive = false) const;
-
+#endif
         /** @copydoc ShadowCaster::getEdgeList. */
         EdgeData* getEdgeList(void);
         /** @copydoc ShadowCaster::hasEdgeList. */
         bool hasEdgeList(void);
-        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light,
-            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
 
         /** Internal method for retrieving bone matrix information. */
         const Matrix4* _getBoneMatrices(void) const { return mBoneMatrices;}
@@ -628,7 +561,7 @@ namespace Ogre {
         bool isHardwareAnimationEnabled(void);
 
         /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached( Node* parent );
         /** Returns the number of requests that have been made for software animation
         @remarks
             If non-zero then software animation will be performed in updateAnimation
@@ -860,7 +793,8 @@ namespace Ogre {
     class _OgreExport EntityFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
     public:
         EntityFactory() {}
         ~EntityFactory() {}

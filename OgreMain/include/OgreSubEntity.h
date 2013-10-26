@@ -92,15 +92,6 @@ namespace Ogre {
         /// Is this SubEntity visible?
         bool mVisible;
 
-        /// The render queue to use when rendering this renderable
-        uint8 mRenderQueueID;
-        /// Flags whether the RenderQueue's default should be used.
-        bool mRenderQueueIDSet;
-        /// The render queue priority to use when rendering this renderable
-        ushort mRenderQueuePriority;
-        /// Flags whether the RenderQueue's default should be used.
-        bool mRenderQueuePrioritySet;
-
 		/// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
 		unsigned short mMaterialLodIndex;
 
@@ -154,46 +145,6 @@ namespace Ogre {
 
         /** Returns whether or not this SubEntity is supposed to be visible. */
         virtual bool isVisible(void) const;
-
-        /** Sets the render queue group this SubEntity will be rendered through.
-        @remarks
-            Render queues are grouped to allow you to more tightly control the ordering
-            of rendered objects. If you do not call this method, the SubEntity will use
-            either the Entity's queue or it will use the default
-            (RenderQueue::getDefaultQueueGroup).
-        @par
-            See Entity::setRenderQueueGroup for more details.
-        @param queueID Enumerated value of the queue group to use. See the
-            enum RenderQueueGroupID for what kind of values can be used here.
-        */
-        virtual void setRenderQueueGroup(uint8 queueID);
-
-        /** Sets the render queue group and group priority this SubEntity will be rendered through.
-        @remarks
-            Render queues are grouped to allow you to more tightly control the ordering
-            of rendered objects. Within a single render group there another type of grouping
-            called priority which allows further control.  If you do not call this method, 
-            all Entity objects default to the default queue and priority 
-            (RenderQueue::getDefaultQueueGroup, RenderQueue::getDefaultRenderablePriority).
-        @par
-            See Entity::setRenderQueueGroupAndPriority for more details.
-        @param queueID Enumerated value of the queue group to use. See the
-            enum RenderQueueGroupID for what kind of values can be used here.
-        @param priority The priority within a group to use.
-        */
-        virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
-
-        /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual uint8 getRenderQueueGroup(void) const;
-
-        /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual ushort getRenderQueuePriority(void) const;
-
-        /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual bool isRenderQueueGroupSet(void) const;
-
-        /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        virtual bool isRenderQueuePrioritySet(void) const;
 
         /** Accessor method to read mesh data.
         */

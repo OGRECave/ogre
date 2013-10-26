@@ -37,6 +37,8 @@
 #include <queue>
 #include <bitset>
 
+#include "OgreFastArray.h"
+
 // Note - not in the original STL, but exists in SGI STL and STLport
 // For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
 #if (OGRE_COMPILER == OGRE_COMPILER_GNUC) && !defined(STLPORT)

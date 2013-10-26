@@ -31,6 +31,8 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
+//#include "Math/Array/OgreArrayConfig.h"
+
 #include "OgreVector3.h"
 #include "OgreMatrix3.h"
 #include "OgreVector4.h"
@@ -78,9 +80,13 @@ namespace Ogre
     class _OgreExport Matrix4
     {
     protected:
+		friend class ArrayMatrix4;
+		friend class SimpleMatrix4;
         /// The matrix entries, indexed by [row][col].
         union {
-            Real m[4][4];
+            /*OGRE_ALIGNED_DECL( Real, m[4][4], OGRE_SIMD_ALIGNMENT );
+            OGRE_ALIGNED_DECL( Real, _m[16], OGRE_SIMD_ALIGNMENT );*/
+			Real m[4][4];
             Real _m[16];
         };
     public:
@@ -171,6 +177,43 @@ namespace Ogre
             return m[iRow];
         }
 
+/*#if OGRE_CPU == OGRE_CPU_X86
+		inline Matrix4 concatenate(const Matrix4 &_m2) const
+        {
+			Matrix4 r;
+			ArrayReal m2[4];
+			m2[0] = _mm_load_ps( &_m2[0][0] );
+			m2[1] = _mm_load_ps( &_m2[1][0] );
+			m2[2] = _mm_load_ps( &_m2[2][0] );
+			m2[3] = _mm_load_ps( &_m2[3][0] );
+
+			ArrayReal t = _mm_mul_ps( _mm_load_ps1( &m[0][0] ), m2[0] );
+			t = _mm_madd_ps( _mm_load_ps1( &m[0][1] ), m2[1], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[0][2] ), m2[2], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[0][3] ), m2[3], t );
+			_mm_store_ps( r._m+0, t );
+
+			t = _mm_mul_ps( _mm_load_ps1( &m[1][0] ), m2[0] );
+			t = _mm_madd_ps( _mm_load_ps1( &m[1][1] ), m2[1], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[1][2] ), m2[2], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[1][3] ), m2[3], t );
+			_mm_store_ps( r._m+4, t );
+
+			t = _mm_mul_ps( _mm_load_ps1( &m[2][0] ), m2[0] );
+			t = _mm_madd_ps( _mm_load_ps1( &m[2][1] ), m2[1], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[2][2] ), m2[2], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[2][3] ), m2[3], t );
+			_mm_store_ps( r._m+8, t );
+
+			t = _mm_mul_ps( _mm_load_ps1( &m[3][0] ), m2[0] );
+			t = _mm_madd_ps( _mm_load_ps1( &m[3][1] ), m2[1], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[3][2] ), m2[2], t );
+			t = _mm_madd_ps( _mm_load_ps1( &m[3][3] ), m2[3], t );
+			_mm_store_ps( r._m+12, t );
+
+            return r;
+        }
+#else*/
         inline Matrix4 concatenate(const Matrix4 &m2) const
         {
             Matrix4 r;
@@ -196,6 +239,7 @@ namespace Ogre
 
             return r;
         }
+//#endif
 
         /** Matrix concatenation using '*'.
         */

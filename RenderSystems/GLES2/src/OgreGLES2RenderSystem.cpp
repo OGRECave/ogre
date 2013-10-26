@@ -1068,11 +1068,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::_beginFrame(void)
     {
-        if (!mActiveViewport)
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "Cannot begin frame - no viewport selected.",
-                        "GLES2RenderSystem::_beginFrame");
-
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
     }
 

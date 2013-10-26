@@ -51,7 +51,7 @@ namespace Ogre {
             assert(camera->getProjectionType() == PT_PERSPECTIVE && "Camera projection type must be perspective!");
 
             // Get camera viewport
-            Viewport *viewport = camera->getViewport();
+            Viewport *viewport = camera->getLastViewport();
 
             // Get viewport area
             Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
@@ -67,7 +67,7 @@ namespace Ogre {
         }
 
         // Squared depth should never be below 0, so clamp
-        squaredDepth = std::max(squaredDepth, Real(0));
+        squaredDepth = max(squaredDepth, Real(0));
 
         // Now adjust it by the camera bias and return the computed value
         return squaredDepth * camera->_getLodBiasInverse();
@@ -169,7 +169,7 @@ namespace Ogre {
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // LOD.
-        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius());
+		return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getWorldRadius());
     }
     //-----------------------------------------------------------------------
 
@@ -194,7 +194,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real DistanceLodBoxStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
-        return Math::Sqr(movableObject->getBoundingBox().distance(camera->getPosition()));
+        return Math::Sqr(movableObject->getWorldAabb().distance(camera->getPosition()));
     }
     //-----------------------------------------------------------------------
 

@@ -16,7 +16,6 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures/nvidia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/models
 FileSystem=@OGRE_MEDIA_DIR_DBG@/particle
 FileSystem=@OGRE_MEDIA_DIR_DBG@/DeferredShadingMedia
-FileSystem=@OGRE_MEDIA_DIR_DBG@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib
 FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib/materials
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/scripts/SSAO

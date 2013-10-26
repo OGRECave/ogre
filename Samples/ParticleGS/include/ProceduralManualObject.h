@@ -24,7 +24,8 @@ namespace Ogre
 	class ProceduralManualObject : public SimpleRenderable
 	{
 	public:
-		ProceduralManualObject() {}
+		ProceduralManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
+			: SimpleRenderable( id, objectMemoryManager ) {}
 		virtual ~ProceduralManualObject() {}
 
 		void setRenderToVertexBuffer(RenderToVertexBufferSharedPtr r2vbObject)
@@ -36,7 +37,7 @@ namespace Ogre
 		ManualObject* getManualObject() const { return mManualObject; }
 
 		/** @copydoc SimpleRenderable::_updateRenderQueue. */
-		void _updateRenderQueue(RenderQueue* queue);
+		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 		/** @copydoc SimpleRenderable::getMovableType. */
 		const String& getMovableType(void) const;
 		/** @copydoc SimpleRenderable::getRenderOperation. */
@@ -55,7 +56,9 @@ namespace Ogre
 	class ProceduralManualObjectFactory : public MovableObjectFactory
 	{
 	protected:
-			MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+			MovableObject* createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params );
 		public:
 			ProceduralManualObjectFactory() {}
 			~ProceduralManualObjectFactory() {}

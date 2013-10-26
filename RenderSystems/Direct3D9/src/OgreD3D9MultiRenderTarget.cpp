@@ -98,32 +98,6 @@ namespace Ogre
 		checkAndUpdate();
 	}
 
-    void D3D9MultiRenderTarget::update(bool swapBuffers)
-    {     
-		D3D9DeviceManager* deviceManager = D3D9RenderSystem::getDeviceManager();       	
-		D3D9Device* currRenderWindowDevice = deviceManager->getActiveRenderTargetDevice();
-
-		if (currRenderWindowDevice != NULL)
-		{
-			if (currRenderWindowDevice->isDeviceLost() == false)
-				MultiRenderTarget::update(swapBuffers);
-		}
-		else
-		{
-			for (UINT i=0; i < deviceManager->getDeviceCount(); ++i)
-			{
-				D3D9Device* device = deviceManager->getDevice(i);
-
-				if (device->isDeviceLost() == false)
-				{
-					deviceManager->setActiveRenderTargetDevice(device);
-					MultiRenderTarget::update(swapBuffers);
-					deviceManager->setActiveRenderTargetDevice(NULL);
-				}								
-			}
-		}		
-    }
-
 	void D3D9MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
     {
 		if(name == "DDBACKBUFFER")

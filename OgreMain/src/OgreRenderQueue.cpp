@@ -44,20 +44,13 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     RenderQueue::RenderQueue()
-        : mSplitPassesByLightingType(false)
-		, mSplitNoShadowPasses(false)
-        , mShadowCastersCannotBeReceivers(false)
-		, mRenderableListener(0)
+		: mRenderableListener(0)
     {
         // Create the 'main' queue up-front since we'll always need that
         mGroups.insert(
             RenderQueueGroupMap::value_type(
                 RENDER_QUEUE_MAIN, 
-                OGRE_NEW RenderQueueGroup(this,
-                    mSplitPassesByLightingType,
-                    mSplitNoShadowPasses,
-                    mShadowCastersCannotBeReceivers)
-                )
+                OGRE_NEW RenderQueueGroup(this) )
             );
 
         // set default queue
@@ -209,10 +202,7 @@ namespace Ogre {
 		if (groupIt == mGroups.end())
 		{
 			// Insert new
-			pGroup = OGRE_NEW RenderQueueGroup(this,
-                mSplitPassesByLightingType,
-                mSplitNoShadowPasses,
-                mShadowCastersCannotBeReceivers);
+			pGroup = OGRE_NEW RenderQueueGroup(this);
 			mGroups.insert(RenderQueueGroupMap::value_type(groupID, pGroup));
 		}
 		else
@@ -222,60 +212,6 @@ namespace Ogre {
 
 		return pGroup;
 
-	}
-    //-----------------------------------------------------------------------
-    void RenderQueue::setSplitPassesByLightingType(bool split)
-    {
-        mSplitPassesByLightingType = split;
-
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
-        {
-            i->second->setSplitPassesByLightingType(split);
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool RenderQueue::getSplitPassesByLightingType(void) const
-    {
-        return mSplitPassesByLightingType;
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::setSplitNoShadowPasses(bool split)
-    {
-        mSplitNoShadowPasses = split;
-
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
-        {
-            i->second->setSplitNoShadowPasses(split);
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool RenderQueue::getSplitNoShadowPasses(void) const
-    {
-        return mSplitNoShadowPasses;
-    }
-	//-----------------------------------------------------------------------
-	void RenderQueue::setShadowCastersCannotBeReceivers(bool ind)
-	{
-		mShadowCastersCannotBeReceivers = ind;
-
-		RenderQueueGroupMap::iterator i, iend;
-		i = mGroups.begin();
-		iend = mGroups.end();
-		for (; i != iend; ++i)
-		{
-			i->second->setShadowCastersCannotBeReceivers(ind);
-		}
-	}
-	//-----------------------------------------------------------------------
-	bool RenderQueue::getShadowCastersCannotBeReceivers(void) const
-	{
-		return mShadowCastersCannotBeReceivers;
 	}
 	//-----------------------------------------------------------------------
 	void RenderQueue::merge( const RenderQueue* rhs )
@@ -291,39 +227,5 @@ namespace Ogre {
 			pDstGroup->merge( pSrcGroup );
 		}
 	}
-
-	//---------------------------------------------------------------------
-	void RenderQueue::processVisibleObject(MovableObject* mo, 
-		Camera* cam, 
-		bool onlyShadowCasters, 
-		VisibleObjectsBoundsInfo* visibleBounds)
-	{
-		mo->_notifyCurrentCamera(cam);
-		if (mo->isVisible())
-		{
-			bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
-				&& mo->getReceivesShadows();
-
-			if (!onlyShadowCasters || mo->getCastShadows())
-			{
-				mo -> _updateRenderQueue( this );
-				if (visibleBounds)
-				{
-					visibleBounds->merge(mo->getWorldBoundingBox(true), 
-						mo->getWorldBoundingSphere(true), cam, 
-						receiveShadows);
-				}
-			}
-			// not shadow caster, receiver only?
-			else if (onlyShadowCasters && !mo->getCastShadows() && 
-				receiveShadows)
-			{
-				visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
-					mo->getWorldBoundingSphere(true), cam);
-			}
-		}
-
-	}
-
 }
 

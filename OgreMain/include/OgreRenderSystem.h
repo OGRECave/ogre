@@ -60,7 +60,6 @@ namespace Ogre
 	typedef vector<DepthBuffer*>::type DepthBufferVec;
 	typedef map< uint16, DepthBufferVec >::type DepthBufferMap;
 	typedef map< String, RenderTarget * >::type RenderTargetMap;
-	typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
 
 	class TextureManager;
 	/// Enum describing the ways to generate texture coordinates
@@ -76,26 +75,6 @@ namespace Ogre
 		TEXCALC_ENVIRONMENT_MAP_NORMAL,
 		/// Projective texture
 		TEXCALC_PROJECTIVE_TEXTURE
-	};
-	/// Enum describing the various actions which can be taken on the stencil buffer
-	enum StencilOperation
-	{
-		/// Leave the stencil buffer unchanged
-		SOP_KEEP,
-		/// Set the stencil value to zero
-		SOP_ZERO,
-		/// Set the stencil value to the reference value
-		SOP_REPLACE,
-		/// Increase the stencil value by 1, clamping at the maximum value
-		SOP_INCREMENT,
-		/// Decrease the stencil value by 1, clamping at 0
-		SOP_DECREMENT,
-		/// Increase the stencil value by 1, wrapping back to 0 when incrementing the maximum value
-		SOP_INCREMENT_WRAP,
-		/// Decrease the stencil value by 1, wrapping when decrementing 0
-		SOP_DECREMENT_WRAP,
-		/// Invert the bits of the stencil buffer
-		SOP_INVERT
 	};
 
 
@@ -1258,17 +1237,6 @@ namespace Ogre
 		/** Utility method for initialising all render targets attached to this rendering system. */
 		virtual void _initRenderTargets(void);
 
-		/** Utility method to notify all render targets that a camera has been removed, 
-		in case they were referring to it as their viewer. 
-		*/
-		virtual void _notifyCameraRemoved(const Camera* cam);
-
-		/** Internal method for updating all render targets attached to this rendering system. */
-		virtual void _updateAllRenderTargets(bool swapBuffers = true);
-		/** Internal method for swapping all the buffers on all render targets,
-		if _updateAllRenderTargets was called with a 'false' parameter. */
-		virtual void _swapAllRenderTargetBuffers();
-
 		/** Sets whether or not vertex windings set should be inverted; this can be important
 		for rendering reflections. */
 		virtual void setInvertVertexWinding(bool invert);
@@ -1496,8 +1464,6 @@ namespace Ogre
 
 		/** The render targets. */
 		RenderTargetMap mRenderTargets;
-		/** The render targets, ordered by priority. */
-		RenderTargetPriorityMap mPrioritisedRenderTargets;
 		/** The Active render target. */
 		RenderTarget * mActiveRenderTarget;
 

@@ -35,12 +35,11 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Light::Light()
-		: mLightType(LT_POINT),
-          mPosition(Vector3::ZERO),
+    Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager )
+		: MovableObject( id, objectMemoryManager, 0 ),
+		  mLightType(LT_POINT),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),
-          mDirection(Vector3::UNIT_Z),
 		  mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
@@ -50,54 +49,17 @@ namespace Ogre {
 		  mAttenuationLinear(0.0f),
           mAttenuationQuad(0.0f),
 		  mPowerScale(1.0f),
-		  mIndexInFrame(0),
 		  mOwnShadowFarDist(false),
 		  mShadowFarDist(0),
 		  mShadowFarDistSquared(0),
 		  mShadowNearClipDist(-1),
-		  mShadowFarClipDist(-1),
-          mDerivedPosition(Vector3::ZERO),
-          mDerivedDirection(Vector3::UNIT_Z),
-		  mDerivedCamRelativePosition(Vector3::ZERO),
-		  mDerivedCamRelativeDirty(false),
-		  mCameraToBeRelativeTo(0),
-          mDerivedTransformDirty(false),
-		  mCustomShadowCameraSetup()
+		  mShadowFarClipDist(-1)
     {
 		//mMinPixelSize should always be zero for lights otherwise lights will disapear
     	mMinPixelSize = 0;
-    }
-    //-----------------------------------------------------------------------
-	Light::Light(const String& name) : MovableObject(name),
-        mLightType(LT_POINT),
-        mPosition(Vector3::ZERO),
-        mDiffuse(ColourValue::White),
-        mSpecular(ColourValue::Black),
-        mDirection(Vector3::UNIT_Z),
-		mSpotOuter(Degree(40.0f)),
-        mSpotInner(Degree(30.0f)),
-        mSpotFalloff(1.0f),
-        mSpotNearClip(0.0f),
-		mRange(100000),
-		mAttenuationConst(1.0f),
-		mAttenuationLinear(0.0f),
-        mAttenuationQuad(0.0f),
-		mPowerScale(1.0f),
-		mIndexInFrame(0),
-		mOwnShadowFarDist(false),
-		mShadowFarDist(0),
-		mShadowFarDistSquared(0),
-		mShadowNearClipDist(-1),
-		mShadowFarClipDist(-1),
-        mDerivedPosition(Vector3::ZERO),
-        mDerivedDirection(Vector3::UNIT_Z),
-		mDerivedCamRelativeDirty(false),
-		mCameraToBeRelativeTo(0),
-        mDerivedTransformDirty(false),
-		mCustomShadowCameraSetup()
-    {
-		//mMinPixelSize should always be zero for lights otherwise lights will disapear
-    	mMinPixelSize = 0;
+
+		mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
+		mObjectData.mWorldRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
     }
     //-----------------------------------------------------------------------
     Light::~Light()
@@ -107,56 +69,60 @@ namespace Ogre {
     void Light::setType(LightTypes type)
     {
         mLightType = type;
+
+		switch( mLightType )
+		{
+		case LT_POINT:
+			mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+			mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+												 mObjectData.mIndex );
+			break;
+		case LT_DIRECTIONAL:
+			mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
+			break;
+		case LT_SPOTLIGHT:
+			setSpotAabb();
+			break;
+		}
     }
-    //-----------------------------------------------------------------------
-    Light::LightTypes Light::getType(void) const
-    {
-        return mLightType;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setPosition(Real x, Real y, Real z)
-    {
-        mPosition.x = x;
-        mPosition.y = y;
-        mPosition.z = z;
-        mDerivedTransformDirty = true;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setPosition(const Vector3& vec)
-    {
-        mPosition = vec;
-        mDerivedTransformDirty = true;
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Light::getPosition(void) const
-    {
-        return mPosition;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDirection(Real x, Real y, Real z)
-    {
-        mDirection.x = x;
-        mDirection.y = y;
-        mDirection.z = z;
-        mDerivedTransformDirty = true;
-    }
+	//-----------------------------------------------------------------------
+	void Light::setSpotAabb(void)
+	{
+		assert( mLightType == LT_SPOTLIGHT );
+
+		//In local space, lights are centered at origin, facing towards +Z
+		Aabb aabb;
+		Real lenOpposite = Math::Tan( mSpotOuter ) * mRange;
+		aabb.mCenter	= Vector3::ZERO;
+		aabb.mHalfSize	= Vector3( lenOpposite, mRange, lenOpposite );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+		mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ), mObjectData.mIndex );
+	}
     //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)
     {
-        mDirection = vec;
-        mDerivedTransformDirty = true;
+		assert( dynamic_cast<SceneNode*>( mParentNode ) );
+		assert( !static_cast<SceneNode*>( mParentNode )->isYawFixed() && "Attach Lights to a "
+				"SceneNode without a fixed yaw! (SceneNode::setFixedYawAxis(false))" );
+		static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT, Vector3::UNIT_Z );
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDirection(void) const
+    Vector3 Light::getDirection(void) const
     {
-        return mDirection;
+        return mParentNode->getOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
     {
+		bool boundsChanged = mSpotOuter != outerAngle;
+
         mSpotInner = innerAngle;
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
+
+		if( boundsChanged && mLightType == LT_SPOTLIGHT )
+			setSpotAabb();
     }
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightInnerAngle(const Radian& val)
@@ -166,90 +132,35 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Light::setSpotlightOuterAngle(const Radian& val)
 	{
+		bool boundsChanged = mSpotOuter != val;
 		mSpotOuter = val;
+		if( boundsChanged && mLightType == LT_SPOTLIGHT )
+			setSpotAabb();
 	}
-	//-----------------------------------------------------------------------
-	void Light::setSpotlightFalloff(Real val)
-	{
-		mSpotFalloff = val;
-	}
-    //-----------------------------------------------------------------------
-    const Radian& Light::getSpotlightInnerAngle(void) const
-    {
-        return mSpotInner;
-    }
-    //-----------------------------------------------------------------------
-    const Radian& Light::getSpotlightOuterAngle(void) const
-    {
-        return mSpotOuter;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getSpotlightFalloff(void) const
-    {
-        return mSpotFalloff;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDiffuseColour(Real red, Real green, Real blue)
-    {
-        mDiffuse.r = red;
-        mDiffuse.b = blue;
-        mDiffuse.g = green;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setDiffuseColour(const ColourValue& colour)
-    {
-        mDiffuse = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Light::getDiffuseColour(void) const
-    {
-        return mDiffuse;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setSpecularColour(Real red, Real green, Real blue)
-    {
-        mSpecular.r = red;
-        mSpecular.b = blue;
-        mSpecular.g = green;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setSpecularColour(const ColourValue& colour)
-    {
-        mSpecular = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Light::getSpecularColour(void) const
-    {
-        return mSpecular;
-    }
     //-----------------------------------------------------------------------
     void Light::setAttenuation(Real range, Real constant,
                         Real linear, Real quadratic)
     {
+		bool boundsChanged = mRange != range;
+
         mRange = range;
         mAttenuationConst = constant;
         mAttenuationLinear = linear;
         mAttenuationQuad = quadratic;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationRange(void) const
-    {
-        return mRange;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationConstant(void) const
-    {
-        return mAttenuationConst;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationLinear(void) const
-    {
-        return mAttenuationLinear;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationQuadric(void) const
-    {
-        return mAttenuationQuad;
+
+		if( boundsChanged )
+		{
+			if( mLightType == LT_POINT )
+			{
+				mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
+				mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+													 mObjectData.mIndex );
+			}
+			else if( mLightType == LT_SPOTLIGHT )
+			{
+				setSpotAabb();
+			}
+		}
     }
     //-----------------------------------------------------------------------
 	void Light::setPowerScale(Real power)
@@ -257,102 +168,22 @@ namespace Ogre {
 		mPowerScale = power;
 	}
     //-----------------------------------------------------------------------
-	Real Light::getPowerScale(void) const
-	{
-		return mPowerScale;
-	}
-    //-----------------------------------------------------------------------
-    void Light::update(void) const
-    {
-        if (mDerivedTransformDirty)
-        {
-            if (mParentNode)
-            {
-                // Ok, update with SceneNode we're attached to
-                const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-                const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-                mDerivedDirection = parentOrientation * mDirection;
-                mDerivedPosition = (parentOrientation * mPosition) + parentPosition;
-            }
-            else
-            {
-                mDerivedPosition = mPosition;
-                mDerivedDirection = mDirection;
-            }
-
-            mDerivedTransformDirty = false;
-            //if the position has been updated we must update also the relative position
-            mDerivedCamRelativeDirty = true;
-        }
-		if (mCameraToBeRelativeTo && mDerivedCamRelativeDirty)
-		{
-			mDerivedCamRelativePosition = mDerivedPosition - mCameraToBeRelativeTo->getDerivedPosition();
-			mDerivedCamRelativeDirty = false;
-		}
-    }
-    //-----------------------------------------------------------------------
-    void Light::_notifyAttached(Node* parent, bool isTagPoint)
-    {
-        mDerivedTransformDirty = true;
-
-        MovableObject::_notifyAttached(parent, isTagPoint);
-    }
-    //-----------------------------------------------------------------------
-    void Light::_notifyMoved(void)
-    {
-        mDerivedTransformDirty = true;
-
-        MovableObject::_notifyMoved();
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& Light::getBoundingBox(void) const
-    {
-        // Null, lights are not visible
-        static AxisAlignedBox box;
-        return box;
-    }
-    //-----------------------------------------------------------------------
-    void Light::_updateRenderQueue(RenderQueue* queue)
-    {
-        // Do nothing
-    }
-	//-----------------------------------------------------------------------
-	void Light::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		// nothing to render
-	}
-    //-----------------------------------------------------------------------
     const String& Light::getMovableType(void) const
     {
 		return LightFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDerivedPosition(bool cameraRelative) const
+    Vector3 Light::getDerivedDirection(void) const
     {
-        update();
-		if (cameraRelative && mCameraToBeRelativeTo)
-		{
-			return mDerivedCamRelativePosition;
-		}
-		else
-		{
-			return mDerivedPosition;
-		}
+        return mParentNode->_getDerivedOrientation().zAxis();
+    }
+	//-----------------------------------------------------------------------
+    Vector3 Light::getDerivedDirectionUpdated(void) const
+    {
+        return mParentNode->_getDerivedOrientationUpdated().zAxis();
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDerivedDirection(void) const
-    {
-        update();
-        return mDerivedDirection;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setVisible(bool visible)
-    {
-        MovableObject::setVisible(visible);
-    }
-    //-----------------------------------------------------------------------
-	Vector4 Light::getAs4DVector(bool cameraRelativeIfSet) const
+	Vector4 Light::getAs4DVector(void) const
 	{
 		Vector4 ret;
         if (mLightType == Light::LT_DIRECTIONAL)
@@ -362,202 +193,11 @@ namespace Ogre {
         }	
 		else
         {
-            ret = getDerivedPosition(cameraRelativeIfSet);
+            ret = mParentNode->_getDerivedPosition();
             ret.w = 1.0;
         }
 		return ret;
 	}
-    //-----------------------------------------------------------------------
-    const PlaneBoundedVolume& Light::_getNearClipVolume(const Camera* const cam) const
-    {
-        // First check if the light is close to the near plane, since
-        // in this case we have to build a degenerate clip volume
-        mNearClipVolume.planes.clear();
-        mNearClipVolume.outside = Plane::NEGATIVE_SIDE;
-
-        Real n = cam->getNearClipDistance();
-        // Homogenous position
-        Vector4 lightPos = getAs4DVector();
-        // 3D version (not the same as _getDerivedPosition, is -direction for
-        // directional lights)
-        Vector3 lightPos3 = Vector3(lightPos.x, lightPos.y, lightPos.z);
-
-        // Get eye-space light position
-        // use 4D vector so directional lights still work
-        Vector4 eyeSpaceLight = cam->getViewMatrix() * lightPos;
-        // Find distance to light, project onto -Z axis
-        Real d = eyeSpaceLight.dotProduct(
-            Vector4(0, 0, -1, -n) );
-        #define THRESHOLD 1e-6
-        if (d > THRESHOLD || d < -THRESHOLD)
-        {
-            // light is not too close to the near plane
-            // First find the worldspace positions of the corners of the viewport
-            const Vector3 *corner = cam->getWorldSpaceCorners();
-            int winding = (d < 0) ^ cam->isReflected() ? +1 : -1;
-            // Iterate over world points and form side planes
-            Vector3 normal;
-            Vector3 lightDir;
-            for (unsigned int i = 0; i < 4; ++i)
-            {
-                // Figure out light dir
-                lightDir = lightPos3 - (corner[i] * lightPos.w);
-                // Cross with anticlockwise corner, therefore normal points in
-                normal = (corner[i] - corner[(i+winding)%4])
-                    .crossProduct(lightDir);
-                normal.normalise();
-                mNearClipVolume.planes.push_back(Plane(normal, corner[i]));
-            }
-
-            // Now do the near plane plane
-            normal = cam->getFrustumPlane(FRUSTUM_PLANE_NEAR).normal;
-            if (d < 0)
-            {
-                // Behind near plane
-                normal = -normal;
-            }
-            const Vector3& cameraPos = cam->getDerivedPosition();
-            mNearClipVolume.planes.push_back(Plane(normal, cameraPos));
-
-            // Finally, for a point/spot light we can add a sixth plane
-            // This prevents false positives from behind the light
-            if (mLightType != LT_DIRECTIONAL)
-            {
-                // Direction from light perpendicular to near plane
-                mNearClipVolume.planes.push_back(Plane(-normal, lightPos3));
-            }
-        }
-        else
-        {
-            // light is close to being on the near plane
-            // degenerate volume including the entire scene 
-            // we will always require light / dark caps
-            mNearClipVolume.planes.push_back(Plane(Vector3::UNIT_Z, -n));
-            mNearClipVolume.planes.push_back(Plane(-Vector3::UNIT_Z, n));
-        }
-
-        return mNearClipVolume;
-    }
-    //-----------------------------------------------------------------------
-    const PlaneBoundedVolumeList& Light::_getFrustumClipVolumes(const Camera* const cam) const
-    {
-
-        // Homogenous light position
-        Vector4 lightPos = getAs4DVector();
-        // 3D version (not the same as _getDerivedPosition, is -direction for
-        // directional lights)
-        Vector3 lightPos3 = Vector3(lightPos.x, lightPos.y, lightPos.z);
-
-        const Vector3 *clockwiseVerts[4];
-
-        // Get worldspace frustum corners
-        const Vector3* corners = cam->getWorldSpaceCorners();
-        int windingPt0 = cam->isReflected() ? 1 : 0;
-        int windingPt1 = cam->isReflected() ? 0 : 1;
-
-        bool infiniteViewDistance = (cam->getFarClipDistance() == 0);
-
-		Vector3 notSoFarCorners[4];
-		if(infiniteViewDistance)
-		{
-			Vector3 camPosition = cam->getRealPosition();
-			notSoFarCorners[0] = corners[0] + corners[0] - camPosition;
-			notSoFarCorners[1] = corners[1] + corners[1] - camPosition;
-			notSoFarCorners[2] = corners[2] + corners[2] - camPosition;
-			notSoFarCorners[3] = corners[3] + corners[3] - camPosition;
-		}
-
-        mFrustumClipVolumes.clear();
-        for (unsigned short n = 0; n < 6; ++n)
-        {
-            // Skip far plane if infinite view frustum
-            if (infiniteViewDistance && n == FRUSTUM_PLANE_FAR)
-                continue;
-
-            const Plane& plane = cam->getFrustumPlane(n);
-            Vector4 planeVec(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
-            // planes face inwards, we need to know if light is on negative side
-            Real d = planeVec.dotProduct(lightPos);
-            if (d < -1e-06)
-            {
-                // Ok, this is a valid one
-                // clockwise verts mean we can cross-product and always get normals
-                // facing into the volume we create
-
-                mFrustumClipVolumes.push_back(PlaneBoundedVolume());
-                PlaneBoundedVolume& vol = mFrustumClipVolumes.back();
-                switch(n)
-                {
-                case(FRUSTUM_PLANE_NEAR):
-                    clockwiseVerts[0] = corners + 3;
-                    clockwiseVerts[1] = corners + 2;
-                    clockwiseVerts[2] = corners + 1;
-                    clockwiseVerts[3] = corners + 0;
-                    break;
-                case(FRUSTUM_PLANE_FAR):
-                    clockwiseVerts[0] = corners + 7;
-                    clockwiseVerts[1] = corners + 6;
-                    clockwiseVerts[2] = corners + 5;
-                    clockwiseVerts[3] = corners + 4;
-                    break;
-                case(FRUSTUM_PLANE_LEFT):
-                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 1 : corners + 5;
-                    clockwiseVerts[1] = corners + 1;
-                    clockwiseVerts[2] = corners + 2;
-                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 2 : corners + 6;
-                    break;
-                case(FRUSTUM_PLANE_RIGHT):
-                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 3 : corners + 7;
-                    clockwiseVerts[1] = corners + 3;
-                    clockwiseVerts[2] = corners + 0;
-                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 0 : corners + 4;
-                    break;
-                case(FRUSTUM_PLANE_TOP):
-                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 0 : corners + 4;
-                    clockwiseVerts[1] = corners + 0;
-                    clockwiseVerts[2] = corners + 1;
-                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 1 : corners + 5;
-                    break;
-                case(FRUSTUM_PLANE_BOTTOM):
-                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 2 : corners + 6;
-                    clockwiseVerts[1] = corners + 2;
-                    clockwiseVerts[2] = corners + 3;
-                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 3 : corners + 7;
-                    break;
-                };
-
-                // Build a volume
-                // Iterate over world points and form side planes
-                Vector3 normal;
-                Vector3 lightDir;
-				unsigned int infiniteViewDistanceInt = infiniteViewDistance ? 1 : 0;
-                for (unsigned int i = 0; i < 4 - infiniteViewDistanceInt; ++i)
-                {
-                    // Figure out light dir
-                    lightDir = lightPos3 - (*(clockwiseVerts[i]) * lightPos.w);
-                    Vector3 edgeDir = *(clockwiseVerts[(i+windingPt1)%4]) - *(clockwiseVerts[(i+windingPt0)%4]);
-                    // Cross with anticlockwise corner, therefore normal points in
-                    normal = edgeDir.crossProduct(lightDir);
-                    normal.normalise();
-                    vol.planes.push_back(Plane(normal, *(clockwiseVerts[i])));
-                }
-
-                // Now do the near plane (this is the plane of the side we're 
-                // talking about, with the normal inverted (d is already interpreted as -ve)
-                vol.planes.push_back( Plane(-plane.normal, plane.d) );
-
-                // Finally, for a point/spot light we can add a sixth plane
-                // This prevents false positives from behind the light
-                if (mLightType != LT_DIRECTIONAL)
-                {
-                    // re-use our own plane normal
-                    vol.planes.push_back(Plane(plane.normal, lightPos3));
-                }
-            }
-        }
-
-        return mFrustumClipVolumes;
-    }
 	//-----------------------------------------------------------------------
 	uint32 Light::getTypeFlags(void) const
 	{
@@ -573,7 +213,7 @@ namespace Ogre {
 		else
 		{
 			tempSquareDist = 
-				(worldPos - getDerivedPosition()).squaredLength();
+				(worldPos - mParentNode->_getDerivedPosition()).squaredLength();
 		}
 
 	}
@@ -591,7 +231,6 @@ namespace Ogre {
 		vec.push_back("spotlightInner");
 		vec.push_back("spotlightOuter");
 		vec.push_back("spotlightFalloff");
-
 	}
 	//-----------------------------------------------------------------------
 	class LightDiffuseColourValue : public AnimableValue
@@ -764,21 +403,6 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void Light::setCustomShadowCameraSetup(const ShadowCameraSetupPtr& customShadowSetup)
-	{
-		mCustomShadowCameraSetup = customShadowSetup;
-	}
-	//-----------------------------------------------------------------------
-	void Light::resetCustomShadowCameraSetup()
-	{
-		mCustomShadowCameraSetup.setNull();
-	}
-	//-----------------------------------------------------------------------
-	const ShadowCameraSetupPtr& Light::getCustomShadowCameraSetup() const
-	{
-		return mCustomShadowCameraSetup;
-	}
-	//-----------------------------------------------------------------------
 	void Light::setShadowFarDistance(Real distance)
 	{
 		mOwnShadowFarDist = true;
@@ -805,12 +429,6 @@ namespace Ogre {
 			return mShadowFarDistSquared;
 		else
 			return mManager->getShadowFarDistanceSquared ();
-	}
-	//---------------------------------------------------------------------
-	void Light::_setCameraRelative(Camera* cam)
-	{
-		mCameraToBeRelativeTo = cam;
-		mDerivedCamRelativeDirty = true;
 	}
 	//---------------------------------------------------------------------
 	Real Light::_deriveShadowNearClipDistance(const Camera* maincam) const
@@ -864,75 +482,6 @@ namespace Ogre {
         }
 	}
 	//-----------------------------------------------------------------------
-	bool Light::isInLightRange(const Ogre::Sphere& container) const
-	{
-		bool isIntersect = true;
-		//directional light always intersects (check only spotlight and point)
-		if (mLightType != LT_DIRECTIONAL)
-		{
-			//Check that the sphere is within the sphere of the light
-			isIntersect = container.intersects(Sphere(mDerivedPosition, mRange));
-			//If this is a spotlight, check that the sphere is within the cone of the spot light
-			if ((isIntersect) && (mLightType == LT_SPOTLIGHT))
-			{
-				//check first check of the sphere surrounds the position of the light
-				//(this covers the case where the center of the sphere is behind the position of the light
-				// something which is not covered in the next test).
-				isIntersect = container.intersects(mDerivedPosition);
-				//if not test cones
-				if (!isIntersect)
-				{
-					//Calculate the cone that exists between the sphere and the center position of the light
-					Ogre::Vector3 lightSphereConeDirection = container.getCenter() - mDerivedPosition;
-					Ogre::Radian halfLightSphereConeAngle = Math::ASin(container.getRadius() / lightSphereConeDirection.length());
-
-					//Check that the light cone and the light-position-to-sphere cone intersect)
-					Radian angleBetweenConeDirections = lightSphereConeDirection.angleBetween(mDerivedDirection);
-					isIntersect = angleBetweenConeDirections <=  halfLightSphereConeAngle + mSpotOuter * 0.5;
-				}
-			}
-		}
-		return isIntersect;
-	}
-
-	//-----------------------------------------------------------------------
-	bool Light::isInLightRange(const Ogre::AxisAlignedBox& container) const
-	{
-		bool isIntersect = true;
-		//Check the 2 simple / obvious situations. Light is directional or light source is inside the container
-		if ((mLightType != LT_DIRECTIONAL) && (container.intersects(mDerivedPosition) == false))
-		{
-			//Check that the container is within the sphere of the light
-			isIntersect = Math::intersects(Sphere(mDerivedPosition, mRange),container);
-			//If this is a spotlight, do a more specific check
-			if ((isIntersect) && (mLightType == LT_SPOTLIGHT) && (mSpotOuter.valueRadians() <= Math::PI))
-			{
-				//Create a rough bounding box around the light and check if
-				Quaternion localToWorld = Vector3::NEGATIVE_UNIT_Z.getRotationTo(mDerivedDirection);
-
-				Real boxOffset = Math::Sin(mSpotOuter * 0.5) * mRange;
-				AxisAlignedBox lightBoxBound;
-				lightBoxBound.merge(Vector3::ZERO);
-				lightBoxBound.merge(localToWorld * Vector3(boxOffset, boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, -boxOffset, -mRange));
-				lightBoxBound.merge(localToWorld * Vector3(boxOffset, -boxOffset, -mRange));
-				lightBoxBound.setMaximum(lightBoxBound.getMaximum() + mDerivedPosition);
-				lightBoxBound.setMinimum(lightBoxBound.getMinimum() + mDerivedPosition);
-				isIntersect = lightBoxBound.intersects(container);
-				
-				//If the bounding box check succeeded do one more test
-				if (isIntersect)
-				{
-					//Check intersection again with the bounding sphere of the container
-					//Helpful for when the light is at an angle near one of the vertexes of the bounding box
-					isIntersect = isInLightRange(Sphere(container.getCenter(), 
-						container.getHalfSize().length()));
-				}
-			}
-		}
-		return isIntersect;
-	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	String LightFactory::FACTORY_TYPE_NAME = "Light";
@@ -942,11 +491,12 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* LightFactory::createInstanceImpl( const String& name, 
-		const NameValuePairList* params)
+	MovableObject* LightFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 
-		Light* light = OGRE_NEW Light(name);
+		Light* light = OGRE_NEW Light( id, objectMemoryManager );
  
 		if(params)
 		{
@@ -966,14 +516,6 @@ namespace Ogre {
 						"Invalid light type '" + ni->second + "'.",
 						"LightFactory::createInstance");
 			}
-
-			// Common properties
-			if ((ni = params->find("position")) != params->end())
-				light->setPosition(StringConverter::parseVector3(ni->second));
-
-			if ((ni = params->find("direction")) != params->end())
-				light->setDirection(StringConverter::parseVector3(ni->second));
-
 			if ((ni = params->find("diffuseColour")) != params->end())
 				light->setDiffuseColour(StringConverter::parseColourValue(ni->second));
 

@@ -110,7 +110,7 @@ namespace Ogre
 		void refreshD3DSettings();
         void refreshFSAAOptions();
 		
-		void setD3D9Light( size_t index, Light* light );
+		void setD3D9Light( size_t index, const Light* light );
 		
 		// state management methods, very primitive !!!
 		HRESULT __SetRenderState(D3DRENDERSTATETYPE state, DWORD value);

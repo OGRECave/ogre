@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreScriptLoader.h"
 #include "OgreResourceGroupManager.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -103,6 +104,8 @@ namespace Ogre {
 		// Factory instance
 		ParticleSystemFactory* mFactory;
 
+		ObjectMemoryManager mTemplatesObjectMemMgr;
+
         /** Internal script parsing method. */
         void parseNewEmitter(const String& type, DataStreamPtr& chunk, ParticleSystem* sys);
         /** Internal script parsing method. */
@@ -119,10 +122,11 @@ namespace Ogre {
         void skipToNextOpenBrace(DataStreamPtr& chunk);
 
 		/// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl(const String& name, size_t quota, 
-			const String& resourceGroup);
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+											size_t quota, const String& resourceGroup);
 		/// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl(const String& name, const String& templateName);
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+											const String& templateName);
 		/// Internal implementation of destroySystem
         void destroySystemImpl(ParticleSystem* sys);
 		
@@ -387,7 +391,8 @@ namespace Ogre {
 	class _OgreExport ParticleSystemFactory : public MovableObjectFactory
 	{
 	protected:
-		MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
 	public:
 		ParticleSystemFactory() {}
 		~ParticleSystemFactory() {}

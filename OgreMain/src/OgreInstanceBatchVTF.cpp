@@ -45,11 +45,12 @@ namespace Ogre
 	static const uint16 c_maxTexWidth	= 4096;
 	static const uint16 c_maxTexHeight	= 4096;
 
-	BaseInstanceBatchVTF::BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference,
+	BaseInstanceBatchVTF::BaseInstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
-				InstanceBatch( creator, meshReference, material, instancesPerBatch,
-								indexToBoneMap, batchName ),
+										const Mesh::IndexMap *indexToBoneMap ) :
+				InstanceBatch( id, objectMemoryManager, creator, meshReference, material,
+								instancesPerBatch, indexToBoneMap ),
 				mNumWorldMatrices( instancesPerBatch ),
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
@@ -371,9 +372,6 @@ namespace Ogre
 		{
 			size_t floatsWritten = (*itor)->getTransforms3x4( transforms );
 
-			if( mManager->getCameraRelativeRendering() )
-				makeMatrixCameraRelative3x4( transforms, floatsWritten );
-
 			if(mUseBoneDualQuaternions)
 			{
 				floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
@@ -446,7 +444,10 @@ namespace Ogre
 			}
 		}
 
-		return OGRE_NEW InstancedEntity(this, static_cast<uint32>(num), sharedTransformEntity);
+		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
+										 &mLocalObjectMemoryManager,
+										 this, static_cast<uint32>(num),
+										 sharedTransformEntity );
 	}
 
 
@@ -461,24 +462,20 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue)
+	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
-		InstanceBatch::_updateRenderQueue( queue );
-
-		if( mBoundsUpdated || mDirtyAnimation || mManager->getCameraRelativeRendering() )
-			updateVertexTexture();
-
-		mBoundsUpdated = false;
+		InstanceBatch::_updateRenderQueue( queue, camera );
 	}
 	//-----------------------------------------------------------------------
 	// InstanceBatchVTF
 	//-----------------------------------------------------------------------
 	InstanceBatchVTF::InstanceBatchVTF( 
+		IdType id, ObjectMemoryManager *objectMemoryManager,
 		InstanceManager *creator, MeshPtr &meshReference, 
 		const MaterialPtr &material, size_t instancesPerBatch, 
-		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
-			: BaseInstanceBatchVTF (creator, meshReference, material, 
-									instancesPerBatch, indexToBoneMap, batchName)
+		const Mesh::IndexMap *indexToBoneMap )
+			: BaseInstanceBatchVTF (id, objectMemoryManager, creator, meshReference, material,
+									instancesPerBatch, indexToBoneMap)
 	{
 
 	}

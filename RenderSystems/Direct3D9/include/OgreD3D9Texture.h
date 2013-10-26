@@ -225,7 +225,7 @@ namespace Ogre {
 		D3D9RenderTexture(const String &name, D3D9HardwarePixelBuffer *buffer, bool writeGamma, uint fsaa);
         ~D3D9RenderTexture() {}
 
-		virtual void update(bool swap);
+		//virtual void update(bool swap);
 
 		virtual void getCustomAttribute( const String& name, void *pData );
 

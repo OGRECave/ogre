@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgrePixelBox.h"
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
@@ -94,7 +95,7 @@ namespace Ogre {
             // Notify viewports of resize
             ViewportList::iterator it = mViewportList.begin();
             while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
+                (*it++)->_updateDimensions();
         }
 	}
 	

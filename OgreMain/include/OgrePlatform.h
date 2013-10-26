@@ -94,6 +94,8 @@ namespace Ogre {
 #   if !defined(FORCEINLINE)
 #       define FORCEINLINE __inline
 #   endif
+#elif !defined(ANDROID) && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
+#   define FORCEINLINE inline __attribute__((always_inline))
 #else
 #   define FORCEINLINE __inline
 #endif
@@ -164,16 +166,6 @@ namespace Ogre {
 #define OGRE_QUOTE_INPLACE(x) # x
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
-
-// For marking functions as deprecated
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_DEPRECATED(func) __declspec(deprecated) func
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   define OGRE_DEPRECATED(func) func __attribute__ ((deprecated))
-#else
-#   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
-#   define OGRE_DEPRECATED(func) func
-#endif
 
 //----------------------------------------------------------------------------
 // Windows Settings
@@ -252,6 +244,14 @@ namespace Ogre {
 #   else
 #       define OGRE_DEBUG_MODE 0
 #   endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+    #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #define OGRE_PLATFORM_LIB "OgrePlatform.a"
+#else //OGRE_PLATFORM_LINUX
+    #define OGRE_PLATFORM_LIB "libOgrePlatform.so"
+#endif
 
 // Always enable unicode support for the moment
 // Perhaps disable in old versions of gcc if necessary
@@ -337,6 +337,28 @@ namespace Ogre {
 #   define OGRE_BUILD_SUFFIX ""
 #endif
 
+#if OGRE_FLEXIBILITY_LEVEL >= 0
+	#define virtual_l0 virtual
+#else
+	#define virtual_l0
+#endif
+#if OGRE_FLEXIBILITY_LEVEL >= 1
+	#define virtual_l1 virtual
+#else
+	#define virtual_l1
+#endif
+#if OGRE_FLEXIBILITY_LEVEL >= 2
+	#define virtual_l2 virtual
+#else
+	#define virtual_l2
+#endif
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+	#define DECL_MALLOC __declspec(restrict) __declspec(noalias)
+#else
+	#define DECL_MALLOC __attribute__ ((malloc))
+#endif
+
 // Integer formats of fixed bit width
 typedef unsigned int uint32;
 typedef unsigned short uint16;
@@ -351,6 +373,20 @@ typedef signed char int8;
 #else
 	typedef unsigned long long uint64;
 	typedef long long int64;
+#endif
+
+#ifndef OGRE_RESTRICT_ALIASING
+	#define OGRE_RESTRICT_ALIASING 0
+#endif
+
+#if OGRE_RESTRICT_ALIASING != 0
+	#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+		#define RESTRICT_ALIAS __restrict	//MSVC
+	#else
+		#define RESTRICT_ALIAS __restrict__ //GCC... and others?
+	#endif
+#else
+	#define RESTRICT_ALIAS
 #endif
 
 // Disable these warnings (too much noise)

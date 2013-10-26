@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreParticle.h"
 #include "OgreStringConverter.h"
 
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 namespace Ogre {
     String rendererTypeName = "billboard";
 
@@ -43,7 +45,8 @@ namespace Ogre {
     BillboardParticleRenderer::CmdPointRendering BillboardParticleRenderer::msPointRenderingCmd;
 	BillboardParticleRenderer::CmdAccurateFacing BillboardParticleRenderer::msAccurateFacingCmd;
     //-----------------------------------------------------------------------
-    BillboardParticleRenderer::BillboardParticleRenderer()
+    BillboardParticleRenderer::BillboardParticleRenderer( IdType id,
+															ObjectMemoryManager *objectMemoryManager )
     {
         if (createParamDictionary("BillboardParticleRenderer"))
         {
@@ -104,7 +107,7 @@ namespace Ogre {
         }
 
         // Create billboard set
-        mBillboardSet = OGRE_NEW BillboardSet("", 0, true);
+        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, 0, true, 0 );
         // World-relative axes
         mBillboardSet->setBillboardsInWorldSpace(true);
     }
@@ -123,7 +126,7 @@ namespace Ogre {
         return rendererTypeName;
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, 
+    void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, Camera *camera,
         list<Particle*>::type& currentParticles, bool cullIndividually)
     {
         mBillboardSet->setCullIndividually(cullIndividually);
@@ -151,14 +154,14 @@ namespace Ogre {
                 bb.mWidth = p->mWidth;
                 bb.mHeight = p->mHeight;
             }
-            mBillboardSet->injectBillboard(bb);
+            mBillboardSet->injectBillboard(bb, camera);
 
         }
         
         mBillboardSet->endBillboards();
 
         // Update the queue
-        mBillboardSet->_updateRenderQueue(queue);
+        mBillboardSet->_updateRenderQueue(queue, camera);
     }
 	//---------------------------------------------------------------------
 	void BillboardParticleRenderer::visitRenderables(Renderable::Visitor* visitor, 
@@ -247,9 +250,9 @@ namespace Ogre {
         mBillboardSet->setPoolSize(quota);
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyAttached(Node* parent, bool isTagPoint)
+    void BillboardParticleRenderer::_notifyAttached(Node* parent)
     {
-        mBillboardSet->_notifyAttached(parent, isTagPoint);
+        mBillboardSet->_notifyAttached(parent);
     }
 	//-----------------------------------------------------------------------
 	void BillboardParticleRenderer::setRenderQueueGroup(uint8 queueID)
@@ -286,15 +289,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
+	BillboardParticleRendererFactory::BillboardParticleRendererFactory()
+	{
+		mDummyObjectMemoryManager = new ObjectMemoryManager();
+	}
+	//-----------------------------------------------------------------------
+	BillboardParticleRendererFactory::~BillboardParticleRendererFactory()
+	{
+		delete mDummyObjectMemoryManager;
+		mDummyObjectMemoryManager = 0;
+	}
+	//-----------------------------------------------------------------------
     const String& BillboardParticleRendererFactory::getType() const
     {
         return rendererTypeName;
     }
     //-----------------------------------------------------------------------
-    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
-        const String& name )
+    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( const String &name )
     {
-        return OGRE_NEW BillboardParticleRenderer();
+		return OGRE_NEW BillboardParticleRenderer( Id::generateNewId<ParticleSystemRenderer>(),
+													mDummyObjectMemoryManager );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRendererFactory::destroyInstance( 

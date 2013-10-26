@@ -78,12 +78,6 @@ namespace Ogre {
 
         struct FrameStats
         {
-            float lastFPS;
-            float avgFPS;
-            float bestFPS;
-            float worstFPS;
-            unsigned long bestFrameTime;
-            unsigned long worstFrameTime;
             size_t triangleCount;
             size_t batchCount;
         };
@@ -133,29 +127,6 @@ namespace Ogre {
 		*/
 		virtual void _detachDepthBuffer();
 
-        /** Tells the target to update it's contents.
-            @remarks
-                If OGRE is not running in an automatic rendering loop
-                (started using Root::startRendering),
-                the user of the library is responsible for asking each render
-                target to refresh. This is the method used to do this. It automatically
-                re-renders the contents of the target using whatever cameras have been
-                pointed at it (using Camera::setRenderTarget).
-            @par
-                This allows OGRE to be used in multi-windowed utilities
-                and for contents to be refreshed only when required, rather than
-                constantly as with the automatic rendering loop.
-			@param swapBuffers For targets that support double-buffering, if set 
-				to true, the target will immediately
-				swap it's buffers after update. Otherwise, the buffers are
-				not swapped, and you have to call swapBuffers yourself sometime
-				later. You might want to do this on some rendersystems which 
-				pause for queued rendering commands to complete before accepting
-				swap buffers calls - so you could do other CPU tasks whilst the 
-				queued commands complete. Or, you might do this if you want custom
-				control over your windows, such as for externally created windows.
-        */
-        virtual void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
             @remarks
                 For targets that are double-buffered so that no
@@ -164,7 +135,9 @@ namespace Ogre {
                 an off-screen version of the window) the buffers
                 are swapped to display the new frame.
         */
-        virtual void swapBuffers() {}
+        virtual void swapBuffers(void)										{ mFsaaResolveDirty = false; }
+
+		virtual void setFsaaResolveDirty(void)								{ mFsaaResolveDirty = true; }
 
         /** Adds a viewport to the rendering target.
             @remarks
@@ -189,8 +162,8 @@ namespace Ogre {
             @param
                 height The relative height of the viewport on the target, as a value between 0 and 1.
         */
-        virtual Viewport* addViewport(Camera* cam, int ZOrder = 0, float left = 0.0f, float top = 0.0f ,
-            float width = 1.0f, float height = 1.0f);
+        virtual Viewport* addViewport( float left = 0.0f, float top = 0.0f,
+										float width = 1.0f, float height = 1.0f );
 
         /** Returns the number of viewports attached to this target.*/
         virtual unsigned short getNumViewports(void) const;
@@ -198,68 +171,15 @@ namespace Ogre {
         /** Retrieves a pointer to the viewport with the given index. */
         virtual Viewport* getViewport(unsigned short index);
 
-		/** Retrieves a pointer to the viewport with the given Z-order. 
-			@remarks throws if not found.
-		*/
-        virtual Viewport* getViewportByZOrder(int ZOrder);
-
-		/** Returns true if and only if a viewport exists at the given Z-order. */
-		virtual bool hasViewportWithZOrder(int ZOrder);
-
         /** Removes a viewport at a given Z-order.
         */
-        virtual void removeViewport(int ZOrder);
+        virtual void removeViewport( Viewport *vp );
 
         /** Removes all viewports on this target.
         */
         virtual void removeAllViewports(void);
 
-        /** Retieves details of current rendering performance.
-            @remarks
-                If the user application wishes to do it's own performance
-                display, or use performance for some other means, this
-                method allows it to retrieve the statistics.
-                @param
-                    lastFPS Pointer to a float to receive the number of frames per second (FPS)
-                    based on the last frame rendered.
-                @param
-                    avgFPS Pointer to a float to receive the FPS rating based on an average of all
-                    the frames rendered since rendering began (the call to
-                    Root::startRendering).
-                @param
-                    bestFPS Pointer to a float to receive the best FPS rating that has been achieved
-                    since rendering began.
-                @param
-                    worstFPS Pointer to a float to receive the worst FPS rating seen so far.
-        */
-        virtual void getStatistics(float& lastFPS, float& avgFPS,
-            float& bestFPS, float& worstFPS) const;  // Access to stats
-
         virtual const FrameStats& getStatistics(void) const;
-
-        /** Individual stats access - gets the number of frames per second (FPS) based on the last frame rendered.
-        */
-        virtual float getLastFPS() const;
-
-        /** Individual stats access - gets the average frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getAverageFPS() const;
-
-        /** Individual stats access - gets the best frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getBestFPS() const;
-
-        /** Individual stats access - gets the worst frames per second (FPS) since call to Root::startRendering.
-        */
-        virtual float getWorstFPS() const;
-
-        /** Individual stats access - gets the best frame time
-        */
-        virtual float getBestFrameTime() const;
-
-        /** Individual stats access - gets the worst frame time
-        */
-        virtual float getWorstFrameTime() const;
 
         /** Resets saved frame-rate statistices.
         */
@@ -309,23 +229,6 @@ namespace Ogre {
         */
         virtual void setActive( bool state );
 
-        /** Sets whether this target should be automatically updated if Ogre's rendering
-            loop or Root::_updateAllRenderTargets is being used.
-        @remarks
-            By default, if you use Ogre's own rendering loop (Root::startRendering)
-            or call Root::_updateAllRenderTargets, all render targets are updated 
-            automatically. This method allows you to control that behaviour, if 
-            for example you have a render target which you only want to update periodically.
-        @param autoupdate If true, the render target is updated during the automatic render
-            loop or when Root::_updateAllRenderTargets is called. If false, the 
-            target is only updated when its update() method is called explicitly.
-        */
-        virtual void setAutoUpdated(bool autoupdate);
-        /** Gets whether this target is automatically updated if Ogre's rendering
-            loop or Root::_updateAllRenderTargets is being used.
-        */
-        virtual bool isAutoUpdated(void) const;
-
 		/** Copies the current contents of the render target to a pixelbox. 
 		@remarks See suggestPixelFormat for a tip as to the best pixel format to
 			extract into, although you can use whatever format you like and the 
@@ -351,10 +254,6 @@ namespace Ogre {
 		virtual size_t getTriangleCount(void) const;
         /** Gets the number of batches rendered in the last update() call. */
 		virtual size_t getBatchCount(void) const;
-        /** Utility method to notify a render target that a camera has been removed,
-        incase it was referring to it as a viewer.
-        */
-        virtual void _notifyCameraRemoved(const Camera* cam);
 
         /** Indicates whether this target is the primary window. The
             primary window is special in that it is destroyed when
@@ -380,6 +279,8 @@ namespace Ogre {
 		/** Gets the FSAA hint (@see Root::createRenderWindow)
 		*/
 		virtual const String& getFSAAHint() const { return mFSAAHint; }
+
+		bool isFsaaResolveDirty(void) const			{ return mFsaaResolveDirty; }
 
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
@@ -421,36 +322,20 @@ namespace Ogre {
         */
 		virtual void _beginUpdate();
 
-		/** Method for manual management of rendering - renders the given 
-		viewport (even if it is not autoupdated)
-		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
-		You should call it between _beginUpdate() and _endUpdate().
-		@see _beginUpdate for more details.
-		@param zorder The zorder of the viewport to update.
-		@param updateStatistics Whether you want to update statistics or not.
-		*/
-		virtual void _updateViewport(int zorder, bool updateStatistics = true);
+		void _updateViewportCullPhase01( Viewport* viewport, Camera *camera, uint8 firstRq, uint8 lastRq );
 
 		/** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
 		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics
-		if needed. You should call it between _beginUpdate() and _endUpdate().
-		@see _beginUpdate for more details.
-		@param viewport The viewport you want to update, it must be bound to the rendertarget.
-		@param updateStatistics Whether you want to update statistics or not.
+			This also fires preViewportUpdate and postViewportUpdate, and manages statistics
+			if needed. You should call it between _beginUpdate() and _endUpdate().
+			@see _beginUpdate for more details.
+		@param viewport
+			The viewport you want to update, it must be bound to the rendertarget.
+		@param updateStatistics
+			Whether you want to update statistics or not.
 		*/
-		virtual void _updateViewport(Viewport* viewport, bool updateStatistics = true);
-
-		/** Method for manual management of rendering - renders only viewports that are auto updated
-		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
-		You should call it between _beginUpdate() and _endUpdate().
-		See _beginUpdate for more details.
-		@param updateStatistics Whether you want to update statistics or not.
-		@see _beginUpdate()
-		*/
-		virtual void _updateAutoUpdatedViewports(bool updateStatistics = true);
+		virtual void _updateViewportRenderPhase02( Viewport* viewport, Camera *camera, uint8 firstRq,
+													uint8 lastRq, bool updateStatistics );
 		
 		/** Method for manual management of rendering - finishes statistics calculation 
 			and fires 'postRenderTargetUpdate'.
@@ -474,23 +359,16 @@ namespace Ogre {
 
         // Stats
 		FrameStats mStats;
-        
-        Timer* mTimer ;
-        unsigned long mLastSecond;
-        unsigned long mLastTime;
-        size_t mFrameCount;
 
         bool mActive;
-        bool mAutoUpdate;
 		// Hardware sRGB gamma conversion done on write?
 		bool mHwGamma;
 		// FSAA performed?
 		uint mFSAA;
 		String mFSAAHint;
+		bool mFsaaResolveDirty;
 
-        void updateStats(void);
-
-		typedef map<int, Viewport*>::type ViewportList;
+		typedef vector<Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order
         ViewportList mViewportList;
 
@@ -510,9 +388,6 @@ namespace Ogre {
 		virtual void fireViewportAdded(Viewport* vp);
 		/// internal method for firing events
 		virtual void fireViewportRemoved(Viewport* vp);
-		
-		/// Internal implementation of update()
-		virtual void updateImpl();
     };
 	/** @} */
 	/** @} */

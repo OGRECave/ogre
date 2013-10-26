@@ -206,7 +206,9 @@ namespace Ogre {
 #endif
 		}
 
-        ParticleSystem* tpl = OGRE_NEW ParticleSystem(name, resourceGroup);
+		ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(),
+														&mTemplatesObjectMemMgr, resourceGroup );
+		tpl->setName( name );
         addTemplate(name, tpl);
         return tpl;
 
@@ -226,26 +228,29 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-    ParticleSystem* ParticleSystemManager::createSystemImpl(const String& name,
-		size_t quota, const String& resourceGroup)
+    ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
+												ObjectMemoryManager *objectMemoryManager,
+												size_t quota, const String& resourceGroup)
     {
-        ParticleSystem* sys = OGRE_NEW ParticleSystem(name, resourceGroup);
+		ParticleSystem* sys = OGRE_NEW ParticleSystem( id, objectMemoryManager, resourceGroup );
         sys->setParticleQuota(quota);
         return sys;
     }
     //-----------------------------------------------------------------------
-    ParticleSystem* ParticleSystemManager::createSystemImpl(const String& name, 
-		const String& templateName)
+    ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
+												ObjectMemoryManager *objectMemoryManager,
+												const String& templateName)
     {
         // Look up template
         ParticleSystem* pTemplate = getTemplate(templateName);
         if (!pTemplate)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find required template '" + templateName + "'", "ParticleSystemManager::createSystem");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find required template '" + templateName + "'",
+						"ParticleSystemManager::createSystem");
         }
 
-        ParticleSystem* sys = createSystemImpl(name, pTemplate->getParticleQuota(), 
-            pTemplate->getResourceGroupName());
+        ParticleSystem* sys = createSystemImpl( id, objectMemoryManager, pTemplate->getParticleQuota(), 
+												pTemplate->getResourceGroupName() );
         // Copy template settings
         *sys = *pTemplate;
         return sys;
@@ -527,8 +532,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
     //-----------------------------------------------------------------------
-	MovableObject* ParticleSystemFactory::createInstanceImpl( const String& name, 
-			const NameValuePairList* params)
+	MovableObject* ParticleSystemFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		if (params != 0)
 		{
@@ -538,7 +544,7 @@ namespace Ogre {
 				String templateName = ni->second;
 				// create using manager
 				return ParticleSystemManager::getSingleton().createSystemImpl(
-						name, templateName);
+						id, objectMemoryManager, templateName);
 			}
 		}
 		// Not template based, look for quota & resource name
@@ -559,7 +565,7 @@ namespace Ogre {
 		}
 		// create using manager
 		return ParticleSystemManager::getSingleton().createSystemImpl(
-				name, quota, resourceGroup);
+								id, objectMemoryManager, quota, resourceGroup);
 				
 
 	}

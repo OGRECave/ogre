@@ -533,9 +533,9 @@ namespace Ogre
         */
         inline void makeFloor( const Vector3& cmp )
         {
-            if( cmp.x < x ) x = cmp.x;
-            if( cmp.y < y ) y = cmp.y;
-            if( cmp.z < z ) z = cmp.z;
+			x = Ogre::min( x, cmp.x );
+			y = Ogre::min( y, cmp.y );
+			z = Ogre::min( z, cmp.z );
         }
 
         /** Sets this vector's components to the maximum of its own and the
@@ -547,10 +547,18 @@ namespace Ogre
         */
         inline void makeCeil( const Vector3& cmp )
         {
-            if( cmp.x > x ) x = cmp.x;
-            if( cmp.y > y ) y = cmp.y;
-            if( cmp.z > z ) z = cmp.z;
+			x = Ogre::max( x, cmp.x );
+			y = Ogre::max( y, cmp.y );
+			z = Ogre::max( z, cmp.z );
         }
+
+		/// Causes negative members to become positive
+		inline void makeAbs()
+		{
+			x = Math::Abs( x );
+			y = Math::Abs( y );
+			z = Math::Abs( z );
+		}
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).
             @remarks

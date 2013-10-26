@@ -1,0 +1,14 @@
+Create static objects first.
+Sort your creation order of Entities by frequency of creation & destruction: Entities that will be created & destroyed often should be done last. Entities that will never be destroyed should be created first, followed by Entities that will rarely be removed/destroyed.
+Names are no longer unique (ie. two SceneNodes can have the same name). To identify uniqueness, use getId()
+Detaching an Entity from a Node will set its visibility to false. Attaching it to a Node will turn it on. Any user-defined value passed to setVisible() will not be preserved after attaching/detaching. Setting visibility to true for an Entity that is not attached is not allowed and will crash the engine. Previously an Entity would be "a part of the scene" when attached to a node whose parent ultimately was the Root SceneNode. Now all entities are part of the scene; however visibility is turned off when they're not attached, to avoid rendering & using a non-existent node.
+
+Behavior changes:
+ Shadows. The calculation of lispSM's shadow & receiver bounding box is very different. It's more stable and robust for directional lights, but might impact quality negatively on spot & point lights
+ The list of close lights passed to shaders is much more accurate when shadows are on. Ogre 1.x always passed shadow mapped lights first, even if they were too far from the object. Ogre 2.x prioritizes close lights. If any of them is shadow mapped, it is put first to match the texture unit bindings.
+ Compositor: When declaring texture, In 1.x HW gamma would be on by default if the global gamma settings were on; with no way to turn it off. But it could be forced always on using the keyword 'gamma'. In Ogre 2.x, leaving the option blank uses the system's settings, writing the keyword 'gamma' forces it on, using the keyword 'no_gamma' turns it off
+ PSSM Shadows: The auto constant pssm_splits has been added for use in pixel shaders. Traditionally Ogre examples passed the first & last points (which are the near & far), while we skip those to make room for more splits per constant (see OGRE_REMOVE_PSSM_SPLIT_LIMIT macro comments). As a result, when porting:
+	if (camDepth <= pssmSplitPoints[1].y) becomes if (camDepth <= pssmSplitPoints[1].x)
+	if (camDepth <= pssmSplitPoints[1].z) becomes if (camDepth <= pssmSplitPoints[1].y)
+ and so forth.
+ Camera relative rendering was removed, changed in favour of SceneManager::setRelativeOrigin which modifies the Root scene node. Also, all lights & cameras have to be attached to a node because of this (typically the root node). This can cause some porting bugs if the system relied on _getDerivedPosition comming from nodes & cameras if the relative origin is inconsistent with other systems in your engine (i.e. physics)

@@ -67,8 +67,8 @@ namespace Ogre {
 		virtual ~OverlaySystem();
 
 		/// @see RenderQueueListener
-		virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation);
+		virtual void renderQueueStarted( RenderQueue *rq, uint8 queueGroupId, const String& invocation,
+										 bool& skipThisInvocation);
 	private:
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;

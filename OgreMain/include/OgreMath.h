@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
+#include "OgreCommon.h"
+
 namespace Ogre
 {
 	/** \addtogroup Core
@@ -362,14 +364,30 @@ namespace Ogre
         }
 
         //Simulate the shader function saturate that clamps a parameter value between 0 and 1
-        static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
-        static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
+		static inline float saturate(float t)
+		{
+			float tmp = Ogre::max( t, 0.0f );
+			tmp = Ogre::min( tmp, 1.0f );
+			return tmp;
+		}
+        static inline double saturate(double t)
+		{
+			double tmp = Ogre::max( t, 0.0 );
+			tmp = Ogre::min( tmp, 1.0 );
+			return tmp;
+		}
         
-        //Simulate the shader function lerp which performers linear interpolation
-        //given 3 parameters v0, v1 and t the function returns the value of (1 – t)* v0 + t * v1. 
-        //where v0 and v1 are matching vector or scalar types and t can be either a scalar or a vector of the same type as a and b.
-        template<typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t) { 
-            return v0 * (1 - t) + v1 * t; }
+        /** Linear interpolation. Given 3 parameters a, b and wthe function returns the value
+			of (1 – w)* a + w * b. Where a and b are matching vector or scalar types and w can
+			be either a scalar or a vector of the same type as a and b.
+		@remarks
+			lerp( a, b, 0 ) = a
+			lerp( a, b, 1 ) = b
+		*/
+        template<typename T, typename S> static FORCEINLINE T lerp( const T& a, const T& b, const S& w )
+		{ 
+            return a + w * (b - a);
+		}
 
         /** Sine function.
             @param fValue
@@ -631,6 +649,10 @@ namespace Ogre
             const Vector3& b, const Vector3& c,
             bool positiveSide = true, bool negativeSide = true);
 
+		/** Sphere / box intersection test. */
+		//TODO: Enable (dark_sylinc)
+        //static bool intersects(const Sphere& sphere, const Aabb& aabb);
+
         /** Sphere / box intersection test. */
         static bool intersects(const Sphere& sphere, const AxisAlignedBox& box);
 
@@ -687,7 +709,7 @@ namespace Ogre
 
 		/** Clamp a value within an inclusive range. */
 		template <typename T>
-		static T Clamp(T val, T minval, T maxval)
+		inline static T Clamp(T val, T minval, T maxval)
 		{
 			assert (minval <= maxval && "Invalid clamp range");
 			return std::max(std::min(val, maxval), minval);
@@ -710,6 +732,19 @@ namespace Ogre
 		static const Real fRad2Deg;
 
     };
+
+	template <>
+	inline float Math::Clamp<float>(float val, float minval, float maxval)
+	{
+		assert (minval <= maxval && "Invalid clamp range");
+		return Ogre::max( Ogre::min(val, maxval), minval );
+	}
+	template <>
+	inline double Math::Clamp<double>(double val, double minval, double maxval)
+	{
+		assert (minval <= maxval && "Invalid clamp range");
+		return Ogre::max( Ogre::min(val, maxval), minval );
+	}
 
 	// these functions must be defined down here, because they rely on the
 	// angle unit conversion functions in class Math:

@@ -186,8 +186,6 @@ endif(NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
 include_directories(
   ${OGRE_INCLUDE_DIRS}
-  ${OGRE_Plugin_PCZSceneManager_INCLUDE_DIRS}
-  ${OGRE_Plugin_OctreeZone_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
 )
@@ -245,7 +243,6 @@ if (UNIX AND NOT APPLE)
   configure_file(${OGRE_SOURCE_DIR}/plugins.cfg ${OGRE_BINARY_DIR}/bin/plugins.cfg COPYONLY)
   configure_file(${OGRE_SOURCE_DIR}/resources.cfg ${OGRE_BINARY_DIR}/bin/resources.cfg COPYONLY)
   configure_file(${OGRE_SOURCE_DIR}/samples.cfg ${OGRE_BINARY_DIR}/bin/samples.cfg COPYONLY)
-  configure_file(${OGRE_SOURCE_DIR}/quakemap.cfg ${OGRE_BINARY_DIR}/bin/quakemap.cfg COPYONLY)
 endif ()
 
 if (MINGW)
@@ -264,17 +261,9 @@ endif ()
 
 if (OGRE_STATIC)
   # need to link against all plugins
-  if (OGRE_Plugin_BSPSceneManager_FOUND)
-    include_directories(${OGRE_Plugin_BSPSceneManager_INCLUDE_DIRS})
-    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_BSPSceneManager_LIBRARIES})
-  endif ()
   if (OGRE_Plugin_CgProgramManager_FOUND)
     include_directories(${OGRE_Plugin_CgProgramManager_INCLUDE_DIRS})
     set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_CgProgramManager_LIBRARIES})
-  endif ()
-  if (OGRE_Plugin_OctreeSceneManager_FOUND)
-    include_directories(${OGRE_Plugin_OctreeSceneManager_INCLUDE_DIRS})
-    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_OctreeSceneManager_LIBRARIES})
   endif ()
   if (OGRE_Plugin_ParticleFX_FOUND)
     include_directories(${OGRE_Plugin_ParticleFX_INCLUDE_DIRS})

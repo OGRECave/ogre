@@ -58,7 +58,7 @@ namespace Ogre {
 		// 32-bit aligned buffer
 		mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_ALIGN(SCRATCH_POOL_SIZE, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT));
 		GLScratchBufferAlloc* ptrAlloc = (GLScratchBufferAlloc*)mScratchBufferPool;
-		ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLScratchBufferAlloc);
+		ptrAlloc->size = SCRATCH_POOL_SIZE;
 		ptrAlloc->free = 1;
 
 		// non-Win32 machines are having issues glBufferSubData, looks like buffer corruption
@@ -185,13 +185,12 @@ namespace Ogre {
 		// locks at once (hopefully)
             OGRE_LOCK_MUTEX(mScratchMutex);
 
+		assert( OGRE_SIMD_ALIGNMENT >= sizeof(GLScratchBufferAlloc) &&
+				"Control blocks are 32-bit, but SIMD alignment is smaller" );
 
-		// Alignment - round up the size to 32 bits
-		// control blocks are 32 bits too so this packs nicely
-		if (size % 4 != 0)
-		{
-			size += 4 - (size % 4);
-		}
+		// Alignment - round up the size to OGRE_SIMD_ALIGNMENT bits
+		// control blocks are 32 bits which should give enough space.
+		size += 2*OGRE_SIMD_ALIGNMENT - (size % OGRE_SIMD_ALIGNMENT);
 
 		uint32 bufferPos = 0;
 		while (bufferPos < SCRATCH_POOL_SIZE)
@@ -200,29 +199,24 @@ namespace Ogre {
 			// Big enough?
 			if (pNext->free && pNext->size >= size)
 			{
-				// split? And enough space for control block
-				if(pNext->size > size + sizeof(GLScratchBufferAlloc))
-				{
-					uint32 offset = (uint32)sizeof(GLScratchBufferAlloc) + size;
+				uint32 offset = size;
 
-					GLScratchBufferAlloc* pSplitAlloc = (GLScratchBufferAlloc*)
-						(mScratchBufferPool + bufferPos + offset);
-					pSplitAlloc->free = 1;
-					// split size is remainder minus new control block
-					pSplitAlloc->size = pNext->size - size - sizeof(GLScratchBufferAlloc);
+				GLScratchBufferAlloc* pSplitAlloc = (GLScratchBufferAlloc*)
+					(mScratchBufferPool + bufferPos + offset);
+				pSplitAlloc->free = 1;
+				// split size is remainder minus new control block
+				pSplitAlloc->size = pNext->size - size;
 
-					// New size of current
-					pNext->size = size;
-				}
+				// New size of current
+				pNext->size = size;
 				// allocate and return
 				pNext->free = 0;
 
-				// return pointer just after this control block (++ will do that for us)
-				return ++pNext;
-
+				// return pointer just after this control block that is also multiple of alignment
+				return (char*)(pNext) + OGRE_SIMD_ALIGNMENT;
 			}
 
-			bufferPos += (uint32)sizeof(GLScratchBufferAlloc) + pNext->size;
+			bufferPos += pNext->size;
 
 		}
 
@@ -241,9 +235,9 @@ namespace Ogre {
 		while (bufferPos < SCRATCH_POOL_SIZE)
 		{
 			GLScratchBufferAlloc* pCurrent = (GLScratchBufferAlloc*)(mScratchBufferPool + bufferPos);
-			
+
 			// Pointers match?
-			if ((mScratchBufferPool + bufferPos + sizeof(GLScratchBufferAlloc))
+			if ((mScratchBufferPool + bufferPos + OGRE_SIMD_ALIGNMENT)
 				== ptr)
 			{
 				// dealloc
@@ -253,21 +247,21 @@ namespace Ogre {
 				if (pLast && pLast->free)
 				{
 					// adjust buffer pos
-					bufferPos -= (pLast->size + (uint32)sizeof(GLScratchBufferAlloc));
+					bufferPos -= pLast->size;
 					// merge free space
-					pLast->size += pCurrent->size + sizeof(GLScratchBufferAlloc);
+					pLast->size += pCurrent->size;
 					pCurrent = pLast;
 				}
 
 				// merge with next
-				uint32 offset = bufferPos + pCurrent->size + (uint32)sizeof(GLScratchBufferAlloc);
+				uint32 offset = bufferPos + pCurrent->size;
 				if (offset < SCRATCH_POOL_SIZE)
 				{
 					GLScratchBufferAlloc* pNext = (GLScratchBufferAlloc*)(
 						mScratchBufferPool + offset);
 					if (pNext->free)
 					{
-						pCurrent->size += pNext->size + sizeof(GLScratchBufferAlloc);
+						pCurrent->size += pNext->size;
 					}
 				}
 
@@ -275,7 +269,7 @@ namespace Ogre {
 				return;
 			}
 
-			bufferPos += (uint32)sizeof(GLScratchBufferAlloc) + pCurrent->size;
+			bufferPos += pCurrent->size;
 			pLast = pCurrent;
 
 		}

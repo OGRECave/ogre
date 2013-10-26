@@ -29,25 +29,39 @@ public:
 protected:
 
 	void setupContent()
-	{     
+	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+		const IdString workspaceName( "Smoke Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
 		mSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");
 
 		// dim orange ambient and two bright orange lights to match the skybox
 		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.2, 0));
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		Light* light = mSceneMgr->createLight();
-		light->setPosition(2000, 1000, -1000);
+		lightNode->setPosition(2000, 1000, -1000);
 		light->setDiffuseColour(1, 0.5, 0);
+		lightNode->attachObject( light );
+
+		lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		light = mSceneMgr->createLight();
-        light->setPosition(-2000, 1000, 1000);
+		lightNode->setPosition(-2000, 1000, 1000);
 		light->setDiffuseColour(1, 0.5, 0);
+		lightNode->attachObject( light );
 
 		mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
 
 		// create a child node and attach an ogre head and some smoke to it
-		SceneNode* headNode = mPivot->createChildSceneNode(Vector3(100, 0, 0));
-		headNode->attachObject(mSceneMgr->createEntity("Head", "ogrehead.mesh"));
-        headNode->attachObject(mSceneMgr->createParticleSystem("Smoke", "Examples/Smoke"));
+		SceneNode* headNode = mPivot->createChildSceneNode(SCENE_DYNAMIC, Vector3(100, 0, 0));
+		headNode->attachObject(mSceneMgr->createEntity("ogrehead.mesh"));
+        headNode->attachObject(mSceneMgr->createParticleSystem("Examples/Smoke"));
 
 		mCamera->setPosition(0, 30, 350);
 	}

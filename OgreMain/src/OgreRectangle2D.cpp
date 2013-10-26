@@ -28,207 +28,236 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRectangle2D.h"
 
-#include "OgreSimpleRenderable.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreCamera.h"
+#include "OgreMaterialManager.h"
 
-namespace Ogre {
-#define POSITION_BINDING 0
-#define NORMAL_BINDING 1
-#define TEXCOORD_BINDING 2
-
-	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable()
+namespace Ogre
+{
+	Rectangle2D::Rectangle2D( bool bQuad ) :
+			mPosition( Vector3::ZERO ),
+			mOrientation( Quaternion::IDENTITY ),
+			mScale( Vector3::ZERO ),
+			mQuad( bQuad )
 	{
-		_initRectangle2D(includeTextureCoords, vBufUsage);
-	}
+		initRectangle2D();
 
-	Rectangle2D::Rectangle2D(const String& name, bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable(name)
-	{
-		_initRectangle2D(includeTextureCoords, vBufUsage);
+		//By default we want Rectangle2Ds to still work in wireframe mode
+		setPolygonModeOverrideable( false );
 	}
-
-	void Rectangle2D::_initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
+	//-----------------------------------------------------------------------------------
+	void Rectangle2D::initRectangle2D(void)
     {
         // use identity projection and view matrices
-        mUseIdentityProjection = true;
-        mUseIdentityView = true;
+        mUseIdentityProjection	= true;
+        mUseIdentityView		= true;
 
         mRenderOp.vertexData = OGRE_NEW VertexData();
 
-        mRenderOp.indexData = 0;
-        mRenderOp.vertexData->vertexCount = 4; 
-        mRenderOp.vertexData->vertexStart = 0; 
-        mRenderOp.operationType = RenderOperation::OT_TRIANGLE_STRIP; 
-        mRenderOp.useIndexes = false; 
-        mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;
+        mRenderOp.indexData					= 0;
+		mRenderOp.vertexData->vertexCount	= mQuad ? 4 : 3;
+        mRenderOp.vertexData->vertexStart	= 0;
+		//Strip or list is fine for triangle, but using lists avoids tiny unnecessary state
+		//switches (assuming most of normal render is indexed list).
+		mRenderOp.operationType				= mQuad ? RenderOperation::OT_TRIANGLE_STRIP :
+														RenderOperation::OT_TRIANGLE_LIST;
+        mRenderOp.useIndexes									= false; 
+        mRenderOp.useGlobalInstancingVertexBufferIsAvailable	= false;
 
-        VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
-        VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
+        VertexDeclaration* decl		= mRenderOp.vertexData->vertexDeclaration;
+        VertexBufferBinding* bind	= mRenderOp.vertexData->vertexBufferBinding;
 
-        decl->addElement(POSITION_BINDING, 0, VET_FLOAT3, VES_POSITION);
+		size_t offset = 0;
+        decl->addElement( 0, 0, VET_FLOAT3, VES_POSITION );
+		offset += VertexElement::getTypeSize( VET_FLOAT3 );
+		decl->addElement( 0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES );
 
-
-        HardwareVertexBufferSharedPtr vbuf = 
+		HardwareVertexBufferSharedPtr vbuf = 
             HardwareBufferManager::getSingleton().createVertexBuffer(
-            decl->getVertexSize(POSITION_BINDING),
-            mRenderOp.vertexData->vertexCount,
-            vBufUsage);
+            decl->getVertexSize( 0 ), mRenderOp.vertexData->vertexCount,
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 
         // Bind buffer
-        bind->setBinding(POSITION_BINDING, vbuf);
+        bind->setBinding( 0, vbuf );
 
-		decl->addElement(NORMAL_BINDING, 0, VET_FLOAT3, VES_NORMAL);
+		float *pVerts = static_cast<float*>( vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+		if( mQuad )
+		{
+			//1st Top-left
+			*pVerts++ = -1.0f;
+			*pVerts++ =  1.0f;
+			*pVerts++ = -1.0f;
 
-		vbuf = 
-			HardwareBufferManager::getSingleton().createVertexBuffer(
-            decl->getVertexSize(NORMAL_BINDING),
-            mRenderOp.vertexData->vertexCount,
-            vBufUsage);
+			*pVerts++ =  0.0f;
+			*pVerts++ =  0.0f;
 
-		bind->setBinding(NORMAL_BINDING, vbuf);
+			//2nd Bottom-left
+			*pVerts++ = -1.0f;
+			*pVerts++ = -1.0f;
+			*pVerts++ = -1.0f;
 
-		float *pNorm = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+			*pVerts++ =  0.0f;
+			*pVerts++ =  1.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+			//3rd Top-right
+			*pVerts++ =  1.0f;
+			*pVerts++ =  1.0f;
+			*pVerts++ = -1.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+			*pVerts++ =  1.0f;
+			*pVerts++ =  0.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+			//4th Bottom-right
+			*pVerts++ =  1.0f;
+			*pVerts++ = -1.0f;
+			*pVerts++ = -1.0f;
+
+			*pVerts++ =  1.0f;
+			*pVerts++ =  1.0f;
+		}
+		else
+		{
+			//1st Top-left
+			*pVerts++ = -1.0f;
+			*pVerts++ =  1.0f;
+			*pVerts++ = -1.0f;
+
+			*pVerts++ =  0.0f;
+			*pVerts++ =  0.0f;
+
+			//2nd Bottom-left
+			*pVerts++ = -1.0f;
+			*pVerts++ = -3.0f; //3 = lerp( -1, 1, 2 );
+			*pVerts++ = -1.0f;
+
+			*pVerts++ =  0.0f;
+			*pVerts++ =  2.0f;
+
+			//3rd Top-right
+			*pVerts++ =  3.0f;
+			*pVerts++ =  1.0f;
+			*pVerts++ = -1.0f;
+
+			*pVerts++ =  2.0f;
+			*pVerts++ =  0.0f;
+		}
 
 		vbuf->unlock();
 
-        if (includeTextureCoords)
-        {
-            decl->addElement(TEXCOORD_BINDING, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES);
+		//Add the normals.
+		decl->addElement( 1, 0, VET_FLOAT3, VES_NORMAL );
 
+		vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+				decl->getVertexSize( 1 ), mRenderOp.vertexData->vertexCount,
+				HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 
-            HardwareVertexBufferSharedPtr tvbuf = 
-                HardwareBufferManager::getSingleton().createVertexBuffer(
-                decl->getVertexSize(TEXCOORD_BINDING),
-                mRenderOp.vertexData->vertexCount,
-                vBufUsage);
+		bind->setBinding( 1, vbuf );
 
-            // Bind buffer
-            bind->setBinding(TEXCOORD_BINDING, tvbuf);
+		float *pNorm = static_cast<float*>( vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
 
-            // Set up basic tex coordinates
-            setDefaultUVs();
-        }
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		if( mQuad )
+		{
+			*pNorm++ = 0.0f;
+			*pNorm++ = 0.0f;
+			*pNorm++ = 1.0f;
+		}
+
+		vbuf->unlock();
 
         // set basic white material
-        this->setMaterial("BaseWhiteNoLighting");
+        this->setMaterial( "BaseWhiteNoLighting" );
     }
-
-    Rectangle2D::~Rectangle2D() 
+	//-----------------------------------------------------------------------------------
+    Rectangle2D::~Rectangle2D()
     {
         OGRE_DELETE mRenderOp.vertexData;
     }
-
-    void Rectangle2D::setCorners(Real left, Real top, Real right, Real bottom, bool updateAABB) 
+	//-----------------------------------------------------------------------------------
+	void Rectangle2D::setMaterial( const String& matName )
     {
-        HardwareVertexBufferSharedPtr vbuf = 
-            mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-
-        *pFloat++ = left;
-        *pFloat++ = top;
-        *pFloat++ = -1;
-
-        *pFloat++ = left;
-        *pFloat++ = bottom;
-        *pFloat++ = -1;
-
-        *pFloat++ = right;
-        *pFloat++ = top;
-        *pFloat++ = -1;
-
-        *pFloat++ = right;
-        *pFloat++ = bottom;
-        *pFloat++ = -1;
-
-        vbuf->unlock();
-
-		if(updateAABB)
+        mMaterial = MaterialManager::getSingleton().getByName( matName );
+		if( mMaterial.isNull() )
 		{
-			mBox.setExtents(
-				std::min(left, right), std::min(top, bottom), 0,
-				std::max(left, right), std::max(top, bottom), 0);
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
+						"Rectangle2D::setMaterial" );
 		}
+    
+        // Won't load twice anyway
+        mMaterial->load();
     }
-
-	void Rectangle2D::setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
+	//-----------------------------------------------------------------------------------
+    const MaterialPtr& Rectangle2D::getMaterial(void) const
+    {
+        return mMaterial;
+    }
+	//-----------------------------------------------------------------------------------
+    void Rectangle2D::setCorners( Real left, Real top, Real width, Real height )
+    {
+		mPosition	= Vector3( left, top, 0.0f );
+		mScale		= Vector3( width, height, 0.0f );
+    }
+	//-----------------------------------------------------------------------------------
+	void Rectangle2D::setNormals( const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft,
+									const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
 	{
-		HardwareVertexBufferSharedPtr vbuf = 
-            mRenderOp.vertexData->vertexBufferBinding->getBuffer(NORMAL_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+		HardwareVertexBufferSharedPtr vbuf = mRenderOp.vertexData->vertexBufferBinding->getBuffer( 1 );
+        float* pFloat = static_cast<float*>( vbuf->lock(HardwareBuffer::HBL_DISCARD) );
 
         *pFloat++ = topLeft.x;
         *pFloat++ = topLeft.y;
         *pFloat++ = topLeft.z;
 
-        *pFloat++ = bottomLeft.x;
-        *pFloat++ = bottomLeft.y;
-        *pFloat++ = bottomLeft.z;
+		if( mQuad )
+		{
+			*pFloat++ = bottomLeft.x;
+			*pFloat++ = bottomLeft.y;
+			*pFloat++ = bottomLeft.z;
 
-        *pFloat++ = topRight.x;
-        *pFloat++ = topRight.y;
-        *pFloat++ = topRight.z;
+			*pFloat++ = topRight.x;
+			*pFloat++ = topRight.y;
+			*pFloat++ = topRight.z;
 
-        *pFloat++ = bottomRight.x;
-        *pFloat++ = bottomRight.y;
-        *pFloat++ = bottomRight.z;
+			*pFloat++ = bottomRight.x;
+			*pFloat++ = bottomRight.y;
+			*pFloat++ = bottomRight.z;
+		}
+		else
+		{
+			*pFloat++ = bottomLeft.x;
+			*pFloat++ = Math::lerp( topLeft.y, bottomLeft.y, 2.0f );
+			*pFloat++ = bottomLeft.z;
 
-        vbuf->unlock();
-	}
-
-	void Rectangle2D::setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
-								const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight)
-	{
-		if( mRenderOp.vertexData->vertexDeclaration->getElementCount() <= TEXCOORD_BINDING )
-			return; //Vertex data wasn't built with UV buffer
-
-		HardwareVertexBufferSharedPtr vbuf = 
-            mRenderOp.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-
-        *pFloat++ = topLeft.x;
-        *pFloat++ = topLeft.y;
-
-        *pFloat++ = bottomLeft.x;
-        *pFloat++ = bottomLeft.y;
-
-        *pFloat++ = topRight.x;
-        *pFloat++ = topRight.y;
-
-        *pFloat++ = bottomRight.x;
-        *pFloat++ = bottomRight.y;
+			*pFloat++ = Math::lerp( topLeft.x, topRight.x, 2.0f );
+			*pFloat++ = topRight.y;
+			*pFloat++ = topRight.z;
+		}
 
         vbuf->unlock();
 	}
-
-	void Rectangle2D::setDefaultUVs()
-	{
-		setUVs( Vector2::ZERO, Vector2::UNIT_Y, Vector2::UNIT_X, Vector2::UNIT_SCALE );
-	}
-
-    // Override this method to prevent parent transforms (rotation,translation,scale)
+	//-----------------------------------------------------------------------------------
     void Rectangle2D::getWorldTransforms( Matrix4* xform ) const
     {
-        // return identity matrix to prevent parent transforms
-        *xform = Matrix4::IDENTITY;
+		xform->makeTransform( mPosition, mScale, mOrientation );
     }
-
-
+	//-----------------------------------------------------------------------------------
+	void Rectangle2D::getRenderOperation(RenderOperation& op)
+    {
+		op = mRenderOp;
+    }
+	//-----------------------------------------------------------------------------------
+	const LightList& Rectangle2D::getLights(void) const
+	{
+		static const LightList l;
+		return l;
+	}
 }
-

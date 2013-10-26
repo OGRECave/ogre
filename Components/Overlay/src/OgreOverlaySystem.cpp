@@ -65,18 +65,17 @@ namespace Ogre {
 		OGRE_DELETE mFontManager;
 	}
 	//---------------------------------------------------------------------
-	void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation)
+	void OverlaySystem::renderQueueStarted( RenderQueue *rq, uint8 queueGroupId,
+											const String& invocation, bool& skipThisInvocation )
 	{
 		if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
 		{
 			Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
 			if(vp != NULL)
 			{
-				Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
-				if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
+				if (vp->getOverlaysEnabled())
 				{
-					OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
+					OverlayManager::getSingleton()._queueOverlaysForRendering( rq, vp );
 				}
 			}
 		}

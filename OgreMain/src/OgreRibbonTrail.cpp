@@ -51,9 +51,9 @@ namespace Ogre
     }
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	RibbonTrail::RibbonTrail(const String& name, size_t maxElements, 
+	RibbonTrail::RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements, 
 		size_t numberOfChains, bool useTextureCoords, bool useColours)
-		:BillboardChain(name, maxElements, 0, useTextureCoords, useColours, true),
+		:BillboardChain( id, objectMemoryManager, maxElements, 0, useTextureCoords, useColours, true),
 		mFadeController(0)
 	{
 		setTrailLength(100);
@@ -431,14 +431,6 @@ namespace Ogre
 
 
 		mBoundsDirty = true;
-		// Need to dirty the parent node, but can't do it using needUpdate() here 
-		// since we're in the middle of the scene graph update (node listener), 
-		// so re-entrant calls don't work. Queue.
-		if (mParentNode)
-		{
-			Node::queueNeedUpdate(getParentSceneNode());
-		}
-
 	}
 	//-----------------------------------------------------------------------
 	void RibbonTrail::_timeUpdate(Real time)
@@ -468,7 +460,7 @@ namespace Ogre
 		mVertexContentDirty = true;
 	}
     //-----------------------------------------------------------------------
-    void RibbonTrail::resetTrail(size_t index, const Node* node)
+    void RibbonTrail::resetTrail(size_t index, Node* node)
     {
         assert(index < mChainCount);
 
@@ -477,7 +469,7 @@ namespace Ogre
         seg.head = seg.tail = SEGMENT_EMPTY;
         // Create new element, v coord is always 0.0f
 		// need to convert to take parent node's position into account
-		Vector3 position = node->_getDerivedPosition();
+		Vector3 position = node->_getDerivedPositionUpdated();
 		if (mParentNode)
 		{
 			position = mParentNode->_getDerivedOrientation().Inverse() 
@@ -513,8 +505,9 @@ namespace Ogre
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* RibbonTrailFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* RibbonTrailFactory::createInstanceImpl(  IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		size_t maxElements = 20;
 		size_t numberOfChains = 1;
@@ -546,7 +539,8 @@ namespace Ogre
 
 		}
 
-		return OGRE_NEW RibbonTrail(name, maxElements, numberOfChains, useTex, useCol);
+		return OGRE_NEW RibbonTrail( id, objectMemoryManager, maxElements,
+									 numberOfChains, useTex, useCol);
 
 	}
 	//-----------------------------------------------------------------------

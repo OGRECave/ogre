@@ -78,8 +78,6 @@ if (OGRE_BUILD_TESTS)
             ${OGRE_TEST_CONTENTS_PATH}/Resources/
             COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg 
             ${OGRE_TEST_CONTENTS_PATH}/Resources/
-            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
-            ${OGRE_TEST_CONTENTS_PATH}/Resources/
             COMMAND ditto 
             ${OGRE_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
             COMMAND ditto 
@@ -109,31 +107,9 @@ if (OGRE_BUILD_TESTS)
                 ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
                 )
         endif ()
-        if (OGRE_BUILD_PLUGIN_BSP)
-            add_custom_command(TARGET Test_Ogre POST_BUILD
-                COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_BSPSceneManager.framework
-                ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-                )
-        endif()
         if (OGRE_BUILD_PLUGIN_CG)
             add_custom_command(TARGET Test_Ogre POST_BUILD
                 COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_CgProgramManager.framework
-                ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-                )
-        endif()
-        if (OGRE_BUILD_PLUGIN_OCTREE)
-            add_custom_command(TARGET Test_Ogre POST_BUILD
-                COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_OctreeSceneManager.framework
-                ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-                )
-        endif()
-        if (OGRE_BUILD_PLUGIN_PCZ)
-            add_custom_command(TARGET Test_Ogre POST_BUILD
-                COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_PCZSceneManager.framework
-                ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-                )
-            add_custom_command(TARGET Test_Ogre POST_BUILD
-                COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Plugin_OctreeZone.framework
                 ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
                 )
         endif()
@@ -190,22 +166,11 @@ if (OGRE_BUILD_TESTS)
 	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
 	  # Make sure all plugins are built
-	  if (OGRE_BUILD_PLUGIN_OCTREE)
-		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_OctreeSceneManager)
-	  endif ()
-	  if (OGRE_BUILD_PLUGIN_BSP)
-		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_BSPSceneManager)
-	  endif ()
 	  if (OGRE_BUILD_PLUGIN_CG)
 		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_CgProgramManager)
 	  endif (OGRE_BUILD_PLUGIN_CG)
 	  if (OGRE_BUILD_PLUGIN_PFX)
 		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_ParticleFX)
-	  endif ()
-	  
-	  if (OGRE_BUILD_PLUGIN_PCZ)
-		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_PCZSceneManager)
-		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_OctreeZone)
 	  endif ()
 	  
 	  if (OGRE_BUILD_RENDERSYSTEM_D3D9)
@@ -229,12 +194,8 @@ if (OGRE_BUILD_TESTS)
 
 	  if (OGRE_STATIC)
 		# Static linking means we need to directly use plugins
-		include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
 		include_directories(${OGRE_SOURCE_DIR}/PlugIns/CgProgramManager/include)
-		include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeSceneManager/include)
-		include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeZone/include)
 		include_directories(${OGRE_SOURCE_DIR}/PlugIns/ParticleFX/include)
-		include_directories(${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
 		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
 		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
 		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)

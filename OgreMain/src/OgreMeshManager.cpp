@@ -548,7 +548,7 @@ namespace Ogre
                 {
                     min.makeFloor(vec);
                     max.makeCeil(vec);
-                    maxSquaredLength = std::max(maxSquaredLength, vec.squaredLength());
+					maxSquaredLength = Ogre::max(maxSquaredLength, vec.squaredLength());
                 }
 
                 if (params.normals)
@@ -702,7 +702,7 @@ namespace Ogre
                 {
                     min.makeFloor(vec);
                     max.makeCeil(vec);
-                    maxSqLen = std::max(maxSqLen, vec.squaredLength());
+					maxSqLen = Ogre::max(maxSqLen, vec.squaredLength());
                 }
 
                 if (params.normals)
@@ -874,7 +874,7 @@ namespace Ogre
                 {
                     min.makeFloor(vec);
                     max.makeCeil(vec);
-                    maxSquaredLength = std::max(maxSquaredLength, vec.squaredLength());
+					maxSquaredLength = Ogre::max(maxSquaredLength, vec.squaredLength());
                 }
 
                 if (params.normals)

@@ -48,42 +48,9 @@ namespace Ogre {
     RadixSort<BillboardSet::ActiveBillboardList, Billboard*, float> BillboardSet::mRadixSorter;
 
     //-----------------------------------------------------------------------
-    BillboardSet::BillboardSet() :
-		mBoundingRadius(0.0f), 
-        mOriginType( BBO_CENTER ),
-        mRotationType( BBR_TEXCOORD ),
-        mAllDefaultSize( true ),
-        mAutoExtendPool( true ),
-        mSortingEnabled(false),
-        mAccurateFacing(false),
-        mAllDefaultRotation(true),
-        mWorldSpace(false),
-        mVertexData(0),
-        mIndexData(0),
-        mCullIndividual( false ),
-        mBillboardType(BBT_POINT),
-        mCommonDirection(Ogre::Vector3::UNIT_Z),
-        mCommonUpVector(Vector3::UNIT_Y),
-        mPointRendering(false),
-        mBuffersCreated(false),
-        mPoolSize(0),
-		mExternalData(false),
-		mAutoUpdate(true),
-		mBillboardDataChanged(true)
-    {
-        setDefaultDimensions( 100, 100 );
-        setMaterialName( "BaseWhite" );
-        mCastShadows = false;
-        setTextureStacksAndSlices( 1, 1 );
-    }
-
-    //-----------------------------------------------------------------------
-    BillboardSet::BillboardSet(
-        const String& name,
-        unsigned int poolSize,
-        bool externalData) :
-        MovableObject(name),
-		mBoundingRadius(0.0f), 
+    BillboardSet::BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
+								unsigned int poolSize, bool externalData, uint8 renderQueueId ) :
+        MovableObject( id, objectMemoryManager, renderQueueId ),
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
         mAllDefaultSize( true ),
@@ -108,8 +75,10 @@ namespace Ogre {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );
         setPoolSize( poolSize );
-        mCastShadows = false;
+		setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
+
+		mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------
     BillboardSet::~BillboardSet()
@@ -154,15 +123,17 @@ namespace Ogre {
         newBill->_notifyOwner(this);
 
 		// Merge into bounds
-		Real adjust = std::max(mDefaultWidth, mDefaultHeight);
+		Real adjust = Ogre::max(mDefaultWidth, mDefaultHeight);
         Vector3 vecAdjust(adjust, adjust, adjust);
 		Vector3 newMin = position - vecAdjust;
 		Vector3 newMax = position + vecAdjust;
 
-        mAABB.merge(newMin);
-        mAABB.merge(newMax);
-
-		mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
+		Aabb aabb;
+		mObjectData.mLocalAabb->getAsAabb( aabb, mObjectData.mIndex );
+		aabb.merge(newMin);
+		aabb.merge(newMax);
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
         return newBill;
     }
@@ -371,13 +342,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_notifyCurrentCamera( Camera* cam )
     {
-		MovableObject::_notifyCurrentCamera(cam);
-
-        mCurrentCamera = cam;
-
         // Calculate camera orientation and position
-        mCamQ = mCurrentCamera->getDerivedOrientation();
-        mCamPos = mCurrentCamera->getDerivedPosition();
+        mCamQ = cam->getDerivedOrientation();
+        mCamPos = cam->getDerivedPosition();
         if (!mWorldSpace)
         {
             // Default behaviour is that billboards are in local node space
@@ -476,13 +443,13 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::injectBillboard(const Billboard& bb)
+    void BillboardSet::injectBillboard(const Billboard& bb, const Camera *camera)
     {
 		// Don't accept injections beyond pool size
 		if (mNumVisibleBillboards == mPoolSize) return;
 
 		// Skip if not visible (NB always true if not bounds checking individual billboards)
-        if (!billboardVisible(mCurrentCamera, bb)) return;
+        if (!billboardVisible(camera, bb)) return;
 
         if (!mPointRendering &&
 			(mBillboardType == BBT_ORIENTED_SELF ||
@@ -540,10 +507,10 @@ namespace Ogre {
         mMainBuf->unlock();
     }
 	//-----------------------------------------------------------------------
-	void BillboardSet::setBounds(const AxisAlignedBox& box, Real radius)
+	void BillboardSet::setBounds(const Aabb& aabb, Real radius)
 	{
-		mAABB = box;
-		mBoundingRadius = radius;
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = radius;
 	}
     //-----------------------------------------------------------------------
     void BillboardSet::_updateBounds(void)
@@ -551,8 +518,8 @@ namespace Ogre {
         if (mActiveBillboards.empty())
         {
             // No billboards, null bbox
-            mAABB.setNull();
-			mBoundingRadius = 0.0f;
+			mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = 0.0f;
         }
         else
         {
@@ -564,50 +531,42 @@ namespace Ogre {
 
             iend = mActiveBillboards.end();
 			Matrix4 invWorld;
-			if (mWorldSpace && getParentSceneNode())
-				invWorld = getParentSceneNode()->_getFullTransform().inverse();
+			if (mWorldSpace && getParentNode())
+				invWorld = getParentNode()->_getFullTransform().inverse();
 
             for (i = mActiveBillboards.begin(); i != iend; ++i)
             {
                 Vector3 pos = (*i)->getPosition();
 				// transform from world space to local space
-				if (mWorldSpace && getParentSceneNode())
+				if (mWorldSpace && getParentNode())
 					pos = invWorld * pos;
                 min.makeFloor(pos);
                 max.makeCeil(pos);
 
-				maxSqLen = std::max(maxSqLen, pos.squaredLength());
+				maxSqLen = Ogre::max(maxSqLen, pos.squaredLength());
             }
             // Adjust for billboard size
-            Real adjust = std::max(mDefaultWidth, mDefaultHeight);
+			Real adjust = Ogre::max(mDefaultWidth, mDefaultHeight);
             Vector3 vecAdjust(adjust, adjust, adjust);
             min -= vecAdjust;
             max += vecAdjust;
 
-            mAABB.setExtents(min, max);
-			mBoundingRadius = Math::Sqrt(maxSqLen);
+			mObjectData.mLocalAabb->setFromAabb( Aabb::newFromExtents( min, max ), mObjectData.mIndex );
+			mObjectData.mLocalRadius[mObjectData.mIndex] = Math::Sqrt(maxSqLen);
 
         }
-
-        if (mParentNode)
-            mParentNode->needUpdate();
-
     }
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& BillboardSet::getBoundingBox(void) const
+    void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
-        return mAABB;
-    }
+		_notifyCurrentCamera( camera );
 
-    //-----------------------------------------------------------------------
-    void BillboardSet::_updateRenderQueue(RenderQueue* queue)
-    {
         // If we're driving this from our own data, update geometry if need to.
         if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))
         {
             if (mSortingEnabled)
             {
-                _sortBillboards(mCurrentCamera);
+                _sortBillboards(camera);
             }
 
             beginBillboards(mActiveBillboards.size());
@@ -616,25 +575,13 @@ namespace Ogre {
                 it != mActiveBillboards.end();
                 ++it )
             {
-                injectBillboard(*(*it));
+                injectBillboard(*(*it), camera);
             }
             endBillboards();
 			mBillboardDataChanged = false;
         }
 
-        //only set the render queue group if it has been explicitly set.
-		if (mRenderQueuePrioritySet)
-		{
-			assert(mRenderQueueIDSet == true);
-			queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
-		}
-        else if( mRenderQueueIDSet )
-        {
-           queue->addRenderable(this, mRenderQueueID);
-        } else {
-           queue->addRenderable(this);
-        }
-
+		queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
     }
 
     //-----------------------------------------------------------------------
@@ -986,7 +933,7 @@ namespace Ogre {
         mCullIndividual = cullIndividual;
     }
     //-----------------------------------------------------------------------
-    bool BillboardSet::billboardVisible(Camera* cam, const Billboard& bill)
+    bool BillboardSet::billboardVisible(const Camera* cam, const Billboard& bill)
     {
         // Return always visible if not culling individually
         if (!mCullIndividual) return true;
@@ -1001,11 +948,11 @@ namespace Ogre {
 
         if (bill.mOwnDimensions)
         {
-            sph.setRadius(std::max(bill.mWidth, bill.mHeight));
+            sph.setRadius(max(bill.mWidth, bill.mHeight));
         }
         else
         {
-            sph.setRadius(std::max(mDefaultWidth, mDefaultHeight));
+            sph.setRadius(max(mDefaultWidth, mDefaultHeight));
         }
 
         return cam->isVisible(sph);
@@ -1404,11 +1351,6 @@ namespace Ogre {
         return mParentNode->getSquaredViewDepth(cam);
     }
     //-----------------------------------------------------------------------
-	Real BillboardSet::getBoundingRadius(void) const
-	{
-		return mBoundingRadius;
-	}
-    //-----------------------------------------------------------------------
     const LightList& BillboardSet::getLights(void) const
     {
         // It's actually quite unlikely that this will be called,
@@ -1509,8 +1451,9 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* BillboardSetFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* BillboardSetFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		// may have parameters
 		bool externalData = false;
@@ -1533,11 +1476,11 @@ namespace Ogre {
 
 		if (poolSize > 0)
 		{
-			return OGRE_NEW BillboardSet(name, poolSize, externalData);
+			return OGRE_NEW BillboardSet(id, objectMemoryManager, poolSize, externalData);
 		}
 		else
 		{
-			return OGRE_NEW BillboardSet(name);
+			return OGRE_NEW BillboardSet(id, objectMemoryManager);
 		}
 
 	}

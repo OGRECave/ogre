@@ -60,7 +60,85 @@ namespace Ogre
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
 	protected:
-		bool	mKeepStatic;
+		struct TransformsToTexture
+		{
+			float * RESTRICT_ALIAS mDest; //Pointer to VTF texture
+			size_t	mFloatsPerEntity;
+			size_t	mEntitiesPerPadding;
+			size_t	mWidthFloatsPadding;
+			TransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+								 size_t floatsPerEntity,
+								 size_t entitiesPerPadding,
+								 size_t widthFloatsPadding ) :
+					mDest( dstPtr ),
+					mFloatsPerEntity( floatsPerEntity ),
+					mEntitiesPerPadding( entitiesPerPadding ),
+					mWidthFloatsPadding( widthFloatsPadding ) {}
+		};
+		struct SendAllSingleTransformsToTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			SendAllSingleTransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+												size_t floatsPerEntity,
+												size_t entitiesPerPadding,
+												size_t widthFloatsPadding ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
+		struct SendAllAnimatedTransformsToTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllAnimatedTransformsToTexture( float * RESTRICT_ALIAS dstPtr,
+												size_t floatsPerEntity,
+												size_t entitiesPerPadding,
+												size_t widthFloatsPadding,
+												const Mesh::IndexMap *indexMap ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
+		struct SendAllLUTToTexture : public TransformsToTexture
+		{
+			vector<bool>::type mWrittenPositions;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllLUTToTexture( float * RESTRICT_ALIAS dstPtr,
+									size_t floatsPerEntity,
+									size_t entitiesPerPadding,
+									size_t widthFloatsPadding,
+									const Mesh::IndexMap *indexMap,
+									size_t numLutEntries ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ),
+					mWrittenPositions( numLutEntries, false ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
+		struct SendAllDualQuatTexture : public TransformsToTexture
+		{
+			size_t	mInstancesWritten;
+			Mesh::IndexMap::const_iterator boneIdxStart;
+			Mesh::IndexMap::const_iterator boneIdxEnd;
+			SendAllDualQuatTexture( float * RESTRICT_ALIAS dstPtr,
+									size_t floatsPerEntity,
+									size_t entitiesPerPadding,
+									size_t widthFloatsPadding,
+									const Mesh::IndexMap *indexMap ) :
+					TransformsToTexture( dstPtr, floatsPerEntity,
+										 entitiesPerPadding, widthFloatsPadding ),
+					mInstancesWritten( 0 ),
+					boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ) {}
+			FORCEINLINE void operator () ( const MovableObject *mo );
+		};
 
 		//Pointer to the buffer containing the per instance vertex data
 		HardwareVertexBufferSharedPtr mInstanceVertexBuffer;
@@ -73,12 +151,10 @@ namespace Ogre
 			const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec& hwBoneWgt );
 
 		/** updates the vertex buffer containing the per instance data 
-		@param[in] isFirstTime Tells if this is the first time the buffer is being updated
-		@param[in] currentCamera The camera being used for render (valid when using bone matrix lookup)
-		@return The number of instances to be rendered
 		*/
-		virtual size_t updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera);
+		void fillVertexBufferOffsets(void);
 
+		void fillVertexBufferLUT( const MovableObjectArray *culledInstances );
 
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
@@ -87,11 +163,15 @@ namespace Ogre
 		*/
 		size_t updateVertexTexture( Camera *currentCamera );
 
+		/// Overloaded to reserve enough space in mCulledInstances
+		virtual void createAllInstancedEntities(void);
+
 		virtual bool matricesTogetherPerRow() const { return true; }
 	public:
-		InstanceBatchHW_VTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName );
+		InstanceBatchHW_VTF( IdType id, ObjectMemoryManager *objectMemoryManager,
+							InstanceManager *creator, MeshPtr &meshReference,
+							const MaterialPtr &material, size_t instancesPerBatch,
+							const Mesh::IndexMap *indexToBoneMap );
 		virtual ~InstanceBatchHW_VTF();
 		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
@@ -99,13 +179,14 @@ namespace Ogre
 		/** @copydoc InstanceBatchHW::_boundsDirty */
 		void _boundsDirty(void);
 
-		/** @copydoc InstanceBatchHW::setStaticAndUpdate */
-		void setStaticAndUpdate( bool bStatic );
-
-		bool isStatic() const { return mKeepStatic; }
-
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
-		virtual void _updateRenderQueue( RenderQueue* queue );
+		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+														uint32 combinedVisibilityFlags )
+		{
+			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+		}
 	};
 
 }

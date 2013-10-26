@@ -54,6 +54,15 @@ protected:
 
 	void setupContent()
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "TextureArray Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
 		// set our camera to orbit around the origin and show cursor
@@ -113,7 +122,7 @@ protected:
         pState->setTextureName(tex->getName(), TEX_TYPE_2D_ARRAY);
 
         // create a plane with float3 tex coord - the third value will be the texture index in our case
-	    ManualObject* textureArrayObject = mSceneMgr->createManualObject("TextureAtlasObject");
+	    ManualObject* textureArrayObject = mSceneMgr->createManualObject();
         
         // create a quad that uses our material 
         int quadSize = 100;

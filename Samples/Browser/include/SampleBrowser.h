@@ -30,6 +30,7 @@
 
 #include "SampleContext.h"
 #include "SamplePlugin.h"
+#include "Compositor/OgreCompositorManager2.h"
 #include "SdkTrays.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -51,11 +52,22 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-#       include "BSP.h"
-#   endif
 #   ifdef INCLUDE_RTSHADER_SYSTEM
 #       include "ShaderSystem.h"
+#		include "DualQuaternion.h"
+#       include "DeferredShadingDemo.h"
+#       include "NewInstancing.h"
+#       include "TextureArray.h"
+#       include "SSAO.h"
+#       include "OceanDemo.h"
+#		ifdef OGRE_BUILD_COMPONENT_VOLUME
+#			include "VolumeCSG.h"
+#			include "VolumeTerrain.h"
+#		endif
+#       ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#           include "EndlessWorld.h"
+#           include "Terrain.h"
+#       endif
 #   endif
 #	include "DualQuaternion.h"
 #   include "DeferredShadingDemo.h"
@@ -358,11 +370,12 @@ protected:
 
 				try
 				{
+					mWindow->removeAllViewports(); // wipe viewports
 #ifdef INCLUDE_RTSHADER_SYSTEM
-                    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
+                    /*if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                     {
                         createDummyScene();
-                    }
+                    }*/
 
 					s->setShaderGenerator(mShaderGenerator);
 #endif
@@ -1059,7 +1072,10 @@ protected:
 		virtual void setup()
 		{
             if(mWindow == NULL)
+			{
                 mWindow = createWindow();
+				mRoot->initialiseCompositor();
+			}
             
 			setupInput(mNoGrabInput);
 			locateResources();
@@ -1083,7 +1099,6 @@ protected:
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
 			
 			mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
- 			mPluginNameMap["Sample_Instancing"]			= (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
@@ -1110,9 +1125,6 @@ protected:
 #if defined(INCLUDE_RTSHADER_SYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
             if(hasProgrammableGPU)
             {
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-				mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
-#   endif
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
@@ -1295,11 +1307,36 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void createDummyScene()
 		{
-			mWindow->removeAllViewports();
-			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+#ifdef _DEBUG
+			//Debugging multithreaded code is a PITA, disable it.
+			const size_t numThreads = 1;
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+#else
+			//getNumLogicalCores() may return 0 if couldn't detect
+            const size_t numThreads = std::max<Ogre::uint32>
+                                           ( 1, Ogre::PlatformInformation::getNumLogicalCores() );
+
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+			//See doxygen documentation regarding culling methods.
+			//In some cases you may still want to use single thread.
+			if( numThreads > 1 )
+                threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+#endif
+			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads,
+																threadedCullingMethod, "DummyScene");
 			sm->addRenderQueueListener(mOverlaySystem);
 			Ogre::Camera* cam = sm->createCamera("DummyCamera");
-			mWindow->addViewport(cam);
+
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+			if( !compositorManager->hasWorkspaceDefinition( "SampleBrowserWorkspace" ) )
+			{
+				compositorManager->createBasicWorkspaceDef( "SampleBrowserWorkspace",
+															Ogre::ColourValue( 0.6f, 0.0f, 0.6f ),
+															Ogre::IdString() );
+			}
+			compositorManager->addWorkspace( sm, mWindow, cam,
+											"SampleBrowserWorkspace", true );
 #ifdef INCLUDE_RTSHADER_SYSTEM
 			// Initialize shader generator.
 			// Must be before resource loading in order to allow parsing extended material attributes.
@@ -1787,8 +1824,13 @@ protected:
 #ifdef INCLUDE_RTSHADER_SYSTEM
 			mShaderGenerator->removeSceneManager(dummyScene);
 #endif
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+			compositorManager->removeAllWorkspaces();
+			compositorManager->removeAllWorkspaceDefinitions();
+			compositorManager->removeAllNodeDefinitions();
+			compositorManager->removeAllShadowNodeDefinitions();
+
 			dummyScene->removeRenderQueueListener(mOverlaySystem);
-			mWindow->removeAllViewports();
 			mRoot->destroySceneManager(dummyScene);
 		}	
 

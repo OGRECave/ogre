@@ -38,14 +38,8 @@ namespace Ogre {
 
 
 	//-----------------------------------------------------------------------
-	RenderPriorityGroup::RenderPriorityGroup(RenderQueueGroup* parent, 
-            bool splitPassesByLightingType,
-            bool splitNoShadowPasses, 
-			bool shadowCastersNotReceivers)
+	RenderPriorityGroup::RenderPriorityGroup(RenderQueueGroup* parent)
 	 	: mParent(parent)
-        , mSplitPassesByLightingType(splitPassesByLightingType)
-        , mSplitNoShadowPasses(splitNoShadowPasses)
-        , mShadowCastersNotReceivers(shadowCastersNotReceivers)
 	{
 		// Initialise collection sorting options
 		// this can become dynamic according to invocation later
@@ -60,18 +54,12 @@ namespace Ogre {
 	void RenderPriorityGroup::resetOrganisationModes(void)
 	{
 		mSolidsBasic.resetOrganisationModes();
-		mSolidsDiffuseSpecular.resetOrganisationModes();
-		mSolidsDecal.resetOrganisationModes();
-		mSolidsNoShadowReceive.resetOrganisationModes();
 		mTransparentsUnsorted.resetOrganisationModes();
 	}
 	//-----------------------------------------------------------------------
 	void RenderPriorityGroup::addOrganisationMode(QueuedRenderableCollection::OrganisationMode om)
 	{
 		mSolidsBasic.addOrganisationMode(om);
-		mSolidsDiffuseSpecular.addOrganisationMode(om);
-		mSolidsDecal.addOrganisationMode(om);
-		mSolidsNoShadowReceive.addOrganisationMode(om);
 		mTransparentsUnsorted.addOrganisationMode(om);
 	}
 	//-----------------------------------------------------------------------
@@ -99,81 +87,21 @@ namespace Ogre {
         }
         else
         {
-            if (mSplitNoShadowPasses &&
-                mParent->getShadowsEnabled() &&
-                (!pTech->getParent()->getReceiveShadows() ||
-                 (rend->getCastsShadows() && mShadowCastersNotReceivers)))
-            {
-                // Add solid renderable and add passes to no-shadow group
-                addSolidRenderable(pTech, rend, true);
-            }
-            else
-            {
-                if (mSplitPassesByLightingType && mParent->getShadowsEnabled())
-                {
-                    addSolidRenderableSplitByLightType(pTech, rend);
-                }
-                else
-                {
-                    addSolidRenderable(pTech, rend, false);
-                }
-            }
+            // Add solid renderable
+            addSolidRenderable( pTech, rend );
         }
 
     }
     //-----------------------------------------------------------------------
-    void RenderPriorityGroup::addSolidRenderable(Technique* pTech, 
-        Renderable* rend, bool addToNoShadow)
+    void RenderPriorityGroup::addSolidRenderable(Technique* pTech, Renderable* rend)
     {
         Technique::PassIterator pi = pTech->getPassIterator();
-
-		QueuedRenderableCollection* collection;
-        if (addToNoShadow)
-        {
-            collection = &mSolidsNoShadowReceive;
-        }
-        else
-        {
-            collection = &mSolidsBasic;
-        }
-
 
         while (pi.hasMoreElements())
         {
             // Insert into solid list
             Pass* p = pi.getNext();
-			collection->addRenderable(p, rend);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderPriorityGroup::addSolidRenderableSplitByLightType(Technique* pTech,
-        Renderable* rend)
-    {
-        // Divide the passes into the 3 categories
-        Technique::IlluminationPassIterator pi = 
-            pTech->getIlluminationPassIterator();
-
-        while (pi.hasMoreElements())
-        {
-            // Insert into solid list
-            IlluminationPass* p = pi.getNext();
-            QueuedRenderableCollection* collection = NULL;
-            switch(p->stage)
-            {
-            case IS_AMBIENT:
-                collection = &mSolidsBasic;
-                break;
-            case IS_PER_LIGHT:
-                collection = &mSolidsDiffuseSpecular;
-                break;
-            case IS_DECAL:
-                collection = &mSolidsDecal;
-                break;
-            default:
-                assert(false); // should never happen
-            };
-
-			collection->addRenderable(p->pass, rend);
+			mSolidsBasic.addRenderable(p, rend);
         }
     }
     //-----------------------------------------------------------------------
@@ -202,9 +130,6 @@ namespace Ogre {
 	void RenderPriorityGroup::removePassEntry(Pass* p)
 	{
 		mSolidsBasic.removePassGroup(p);
-		mSolidsDiffuseSpecular.removePassGroup(p);
-		mSolidsNoShadowReceive.removePassGroup(p);
-		mSolidsDecal.removePassGroup(p);
 		mTransparentsUnsorted.removePassGroup(p);
 		mTransparents.removePassGroup(p); // shouldn't be any, but for completeness
 	}	
@@ -249,9 +174,6 @@ namespace Ogre {
 		// between the pass groups which are removed above, and clearing done
 		// here
 		mSolidsBasic.clear();
-        mSolidsDecal.clear();
-        mSolidsDiffuseSpecular.clear();
-        mSolidsNoShadowReceive.clear();
 		mTransparentsUnsorted.clear();
         mTransparents.clear();
 
@@ -260,9 +182,6 @@ namespace Ogre {
 	void RenderPriorityGroup::sort(const Camera* cam)
 	{
 		mSolidsBasic.sort(cam);
-		mSolidsDecal.sort(cam);
-		mSolidsDiffuseSpecular.sort(cam);
-		mSolidsNoShadowReceive.sort(cam);
 		mTransparentsUnsorted.sort(cam);
 		mTransparents.sort(cam);
 	}
@@ -270,9 +189,6 @@ namespace Ogre {
 	void RenderPriorityGroup::merge( const RenderPriorityGroup* rhs )
 	{
 		mSolidsBasic.merge( rhs->mSolidsBasic );
-		mSolidsDecal.merge( rhs->mSolidsDecal );
-		mSolidsDiffuseSpecular.merge( rhs->mSolidsDiffuseSpecular );
-		mSolidsNoShadowReceive.merge( rhs->mSolidsNoShadowReceive );
 		mTransparentsUnsorted.merge( rhs->mTransparentsUnsorted );
 		mTransparents.merge( rhs->mTransparents );
 	}

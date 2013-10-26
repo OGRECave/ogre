@@ -177,8 +177,10 @@ namespace Ogre {
 			usage options on this texture, or if the hardware does not support it. 
 		@param fsaa The number of samples
 		@param fsaaHint Any hinting text (@see Root::createRenderWindow)
+		@param explicitResolve @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
 		*/
-		virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; }
+		virtual void setFSAA(uint fsaa, const String& fsaaHint, bool explicitResolve)
+					{ mFSAA = fsaa; mFSAAHint = fsaaHint; mFsaaExplicitResolve = explicitResolve; }
 
 		/** Get the level of multisample AA to be used if this texture is a 
 		rendertarget.
@@ -398,6 +400,7 @@ namespace Ogre {
 		bool mHwGamma;
 		uint mFSAA;
 		String mFSAAHint;
+		bool mFsaaExplicitResolve;
 
         TextureType mTextureType;
 		PixelFormat mFormat;

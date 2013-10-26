@@ -56,7 +56,6 @@ namespace OgreBites
 			mTrayMgr = 0;
 			mCameraMan = 0;
 			mCamera = 0;
-			mViewport = 0;
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
 			mDragLook = false;
@@ -127,7 +126,8 @@ namespace OgreBites
 
 		virtual void windowResized(Ogre::RenderWindow* rw)
 		{
-			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+			//Commented, Camera has auto AR
+			//mCamera->setAspectRatio((Ogre::Real)rw->getWidth() / (Ogre::Real)rw->getHeight());
 		}
 
 		virtual bool keyPressed(const OIS::KeyEvent& evt)
@@ -228,7 +228,7 @@ namespace OgreBites
 			{	
 				if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
 				{
-					Ogre::Viewport* mainVP = mCamera->getViewport();
+					Ogre::Viewport* mainVP = mCamera->getLastViewport();
 					const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
 					if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
@@ -473,7 +473,7 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
 			mDetailsPanel->setParamValue(11, "Off");
 
-            Ogre::Viewport* mainVP = mCamera->getViewport();
+            Ogre::Viewport* mainVP = mCamera->getLastViewport();
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
@@ -510,8 +510,6 @@ namespace OgreBites
 		{
 			// setup default viewport layout and camera
 			mCamera = mSceneMgr->createCamera("MainCamera");
-			mViewport = mWindow->addViewport(mCamera);
-			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
 			mCamera->setNearClipDistance(5);
 
@@ -534,7 +532,6 @@ namespace OgreBites
 			}
 		}
 
-		Ogre::Viewport* mViewport;    		// main viewport
 		Ogre::Camera* mCamera;        		// main camera
 		SdkTrayManager* mTrayMgr;     		// tray interface manager
 		SdkCameraMan* mCameraMan;     		// basic camera controller

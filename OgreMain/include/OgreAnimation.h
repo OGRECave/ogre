@@ -133,7 +133,7 @@ namespace Ogre {
         */
         void setLength(Real len);
 
-        /** Creates a NodeAnimationTrack for animating a Node.
+        /** Creates a NodeAnimationTrack for animating a OldNode.
         @param handle Handle to give the track, used for accessing the track later. 
             Must be unique within this Animation.
         */
@@ -154,15 +154,15 @@ namespace Ogre {
         */
         VertexAnimationTrack* createVertexTrack(unsigned short handle, VertexAnimationType animType);
 
-        /** Creates a new AnimationTrack automatically associated with a Node. 
+        /** Creates a new AnimationTrack automatically associated with a OldNode. 
         @remarks
             This method creates a standard AnimationTrack, but also associates it with a
-            target Node which will receive all keyframe effects.
+            target OldNode which will receive all keyframe effects.
         @param handle Numeric handle to give the track, used for accessing the track later. 
             Must be unique within this Animation.
-        @param node A pointer to the Node object which will be affected by this track
+        @param node A pointer to the OldNode object which will be affected by this track
         */
-        NodeAnimationTrack* createNodeTrack(unsigned short handle, Node* node);
+        NodeAnimationTrack* createNodeTrack(unsigned short handle, OldNode* node);
 
         /** Creates a NumericAnimationTrack and associates it with an animable. 
         @param handle Handle to give the track, used for accessing the track later. 
@@ -249,11 +249,11 @@ namespace Ogre {
         @param scale The scale to apply to translations and scalings, useful for 
             adapting an animation to a different size target.
         */
-        void applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+        void applyToNode(OldNode* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
         /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
-            Where you have associated animation tracks with Node objects, you can easily apply
+            Where you have associated animation tracks with OldNode objects, you can easily apply
             an animation to those nodes by calling this method.
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
@@ -265,7 +265,7 @@ namespace Ogre {
 
         /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
-            Where you have associated animation tracks with Node objects, you can easily apply
+            Where you have associated animation tracks with OldNode objects, you can easily apply
             an animation to those nodes by calling this method.
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
@@ -503,7 +503,7 @@ namespace Ogre {
         AnimationContainer* getContainer();
         
     protected:
-        /// Node tracks, indexed by handle
+        /// OldNode tracks, indexed by handle
         NodeTrackList mNodeTrackList;
         /// Numeric tracks, indexed by handle
         NumericTrackList mNumericTrackList;

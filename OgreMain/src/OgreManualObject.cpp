@@ -45,14 +45,14 @@ namespace Ogre {
 #define TEMP_INITIAL_VERTEX_SIZE TEMP_VERTEXSIZE_GUESS * TEMP_INITIAL_SIZE
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
 	//-----------------------------------------------------------------------------
-	ManualObject::ManualObject(const String& name)
-		: MovableObject(name),
+	ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
+		: MovableObject( id, objectMemoryManager ),
 		  mDynamic(false), mCurrentSection(0), mFirstVertex(true),
 		  mTempVertexPending(false),
 		  mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
 		  mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),
 		  mDeclSize(0), mEstVertexCount(0), mEstIndexCount(0), mTexCoordIndex(0), 
-		  mRadius(0), mAnyIndexed(false), mEdgeList(0), 
+		  mAnyIndexed(false), mEdgeList(0), 
 		  mUseIdentityProjection(false), mUseIdentityView(false), mKeepDeclarationOrder(false)
 	{
 	}
@@ -70,19 +70,13 @@ namespace Ogre {
 			OGRE_DELETE *i;
 		}
 		mSectionList.clear();
-		mRadius = 0;
-		mAABB.setNull();
+		mObjectData.mLocalRadius[mObjectData.mIndex] = 0.0f;
+
+		mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
+
 		OGRE_DELETE mEdgeList;
 		mEdgeList = 0;
 		mAnyIndexed = false;
-		for (ShadowRenderableList::iterator s = mShadowRenderables.begin();
-			s != mShadowRenderables.end(); ++s)
-		{
-			OGRE_DELETE *s;
-		}
-		mShadowRenderables.clear();
-
-
 	}
 	//-----------------------------------------------------------------------------
 	void ManualObject::resetTempAreas(void)
@@ -275,8 +269,13 @@ namespace Ogre {
 		mTempVertex.position.z = z;
 
 		// update bounds
-		mAABB.merge(mTempVertex.position);
-		mRadius = std::max(mRadius, mTempVertex.position.length());
+		Aabb aabb;
+		mObjectData.mLocalAabb->getAsAabb( aabb, mObjectData.mIndex );
+		aabb.merge( mTempVertex.position );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = Ogre::max(
+															mObjectData.mLocalRadius[mObjectData.mIndex],
+															mTempVertex.position.length());
 
 		// reset current texture coord
 		mTexCoordIndex = 0;
@@ -778,12 +777,6 @@ namespace Ogre {
 		mCurrentSection = 0;
 		resetTempAreas();
 
-		// Tell parent if present
-		if (mParentNode)
-		{
-			mParentNode->needUpdate();
-		}
-
 		// will return the finished section or NULL if
 		// the section was empty (i.e. zero vertices/indices)
 		return result;
@@ -840,8 +833,9 @@ namespace Ogre {
 			}
 		}
         // update bounds
-		m->_setBounds(mAABB);
-		m->_setBoundingSphereRadius(mRadius);
+		Aabb aabb = mObjectData.mLocalAabb->getAsAabb(mObjectData.mIndex);
+		m->_setBounds( AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() ) );
+		m->_setBoundingSphereRadius( mObjectData.mLocalRadius[mObjectData.mIndex] );
 
 		m->load();
 
@@ -893,17 +887,7 @@ namespace Ogre {
 		return ManualObjectFactory::FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	const AxisAlignedBox& ManualObject::getBoundingBox(void) const
-	{
-		return mAABB;
-	}
-	//-----------------------------------------------------------------------------
-	Real ManualObject::getBoundingRadius(void) const
-	{
-		return mRadius;
-	}
-	//-----------------------------------------------------------------------------
-	void ManualObject::_updateRenderQueue(RenderQueue* queue)
+	void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
 		// To be used when order of creation must be kept while rendering
 		unsigned short priority = queue->getDefaultRenderablePriority();
@@ -916,15 +900,7 @@ namespace Ogre {
 				(rop->useIndexes && rop->indexData->indexCount == 0))
 				continue;
 			
-			if (mRenderQueuePrioritySet)
-			{
-				assert(mRenderQueueIDSet == true);
-				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
-			}
-			else if (mRenderQueueIDSet)
-				queue->addRenderable(*i, mRenderQueueID, mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
-			else
-				queue->addRenderable(*i, queue->getDefaultQueueGroup(), mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
+			queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
 		}
 	}
 	//-----------------------------------------------------------------------------
@@ -971,101 +947,6 @@ namespace Ogre {
 	bool ManualObject::hasEdgeList()
 	{
 		return getEdgeList() != 0;
-	}
-	//-----------------------------------------------------------------------------
-	ShadowCaster::ShadowRenderableListIterator
-	ManualObject::getShadowVolumeRenderableIterator(
-		ShadowTechnique shadowTechnique, const Light* light,
-		HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-		bool extrude, Real extrusionDistance, unsigned long flags)
-	{
-		assert(indexBuffer && "Only external index buffers are supported right now");		
-
-        EdgeData* edgeList = getEdgeList();
-        if (!edgeList)
-        {
-            return ShadowRenderableListIterator(
-                mShadowRenderables.begin(), mShadowRenderables.end());
-        }
-
-		// Calculate the object space light details
-		Vector4 lightPos = light->getAs4DVector();
-		Matrix4 world2Obj = mParentNode->_getFullTransform().inverseAffine();
-		lightPos = world2Obj.transformAffine(lightPos);
-		Matrix3 world2Obj3x3;
-		world2Obj.extract3x3Matrix(world2Obj3x3);
-		extrusionDistance *= Math::Sqrt(std::min(std::min(world2Obj3x3.GetColumn(0).squaredLength(), world2Obj3x3.GetColumn(1).squaredLength()), world2Obj3x3.GetColumn(2).squaredLength()));
-
-		// Init shadow renderable list if required (only allow indexed)
-		bool init = mShadowRenderables.empty() && mAnyIndexed;
-
-		EdgeData::EdgeGroupList::iterator egi;
-		ShadowRenderableList::iterator si, siend;
-		ManualObjectSectionShadowRenderable* esr = 0;
-		SectionList::iterator seci;
-		if (init)
-			mShadowRenderables.resize(edgeList->edgeGroups.size());
-
-		siend = mShadowRenderables.end();
-		egi = edgeList->edgeGroups.begin();
-		seci = mSectionList.begin();
-		for (si = mShadowRenderables.begin(); si != siend; ++seci)
-		{
-            // Skip non-indexed geometry
-            if (!(*seci)->getRenderOperation()->useIndexes)
-            {
-                continue;
-            }
-
-			if (init)
-			{
-				// Create a new renderable, create a separate light cap if
-				// we're using a vertex program (either for this model, or
-				// for extruding the shadow volume) since otherwise we can
-				// get depth-fighting on the light cap
-				MaterialPtr mat = (*seci)->getMaterial();
-				mat->load();
-				bool vertexProgram = false;
-				Technique* t = mat->getBestTechnique(0, *seci);
-				for (unsigned short p = 0; p < t->getNumPasses(); ++p)
-				{
-					Pass* pass = t->getPass(p);
-					if (pass->hasVertexProgram())
-					{
-						vertexProgram = true;
-						break;
-					}
-				}
-				*si = OGRE_NEW ManualObjectSectionShadowRenderable(this, indexBuffer,
-					egi->vertexData, vertexProgram || !extrude);
-			}
-			// Get shadow renderable
-			esr = static_cast<ManualObjectSectionShadowRenderable*>(*si);
-			HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
-			// Extrude vertices in software if required
-			if (extrude)
-			{
-				extrudeVertices(esrPositionBuffer,
-					egi->vertexData->vertexCount,
-					lightPos, extrusionDistance);
-
-			}
-
-            ++si;
-            ++egi;
-		}
-		// Calc triangle light facing
-		updateEdgeListLightFacing(edgeList, lightPos);
-
-		// Generate indexes and update renderables
-		generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
-			light, mShadowRenderables, flags);
-
-
-		return ShadowRenderableListIterator(
-			mShadowRenderables.begin(), mShadowRenderables.end());
-
-
 	}
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
@@ -1138,77 +1019,6 @@ namespace Ogre {
 		return mParent->queryLights();
 	}
 	//-----------------------------------------------------------------------------
-	//--------------------------------------------------------------------------
-	ManualObject::ManualObjectSectionShadowRenderable::ManualObjectSectionShadowRenderable(
-		ManualObject* parent, HardwareIndexBufferSharedPtr* indexBuffer,
-		const VertexData* vertexData, bool createSeparateLightCap,
-		bool isLightCap)
-		: mParent(parent)
-	{
-		// Initialise render op
-		mRenderOp.indexData = OGRE_NEW IndexData();
-		mRenderOp.indexData->indexBuffer = *indexBuffer;
-		mRenderOp.indexData->indexStart = 0;
-		// index start and count are sorted out later
-
-		// Create vertex data which just references position component (and 2 component)
-		mRenderOp.vertexData = OGRE_NEW VertexData();
-		// Map in position data
-		mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
-		ushort origPosBind =
-			vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-		mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
-		mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-		// Map in w-coord buffer (if present)
-		if(!vertexData->hardwareShadowVolWBuffer.isNull())
-		{
-			mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-			mWBuffer = vertexData->hardwareShadowVolWBuffer;
-			mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-		}
-		// Use same vertex start as input
-		mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-		if (isLightCap)
-		{
-			// Use original vertex count, no extrusion
-			mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-		}
-		else
-		{
-			// Vertex count must take into account the doubling of the buffer,
-			// because second half of the buffer is the extruded copy
-			mRenderOp.vertexData->vertexCount =
-				vertexData->vertexCount * 2;
-			if (createSeparateLightCap)
-			{
-				// Create child light cap
-				mLightCap = OGRE_NEW ManualObjectSectionShadowRenderable(parent,
-					indexBuffer, vertexData, false, true);
-			}
-		}
-	}
-	//--------------------------------------------------------------------------
-	ManualObject::ManualObjectSectionShadowRenderable::~ManualObjectSectionShadowRenderable()
-	{
-		OGRE_DELETE mRenderOp.indexData;
-		OGRE_DELETE mRenderOp.vertexData;
-	}
-	//--------------------------------------------------------------------------
-	void ManualObject::ManualObjectSectionShadowRenderable::getWorldTransforms(
-		Matrix4* xform) const
-	{
-		// pretransformed
-		*xform = mParent->_getParentNodeFullTransform();
-	}
-	//-----------------------------------------------------------------------
-	void ManualObject::ManualObjectSectionShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-	{
-		mRenderOp.indexData->indexBuffer = indexBuffer;
-		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
-	}
-	//-----------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------
 	String ManualObjectFactory::FACTORY_TYPE_NAME = "ManualObject";
 	//-----------------------------------------------------------------------------
 	const String& ManualObjectFactory::getType(void) const
@@ -1216,10 +1026,11 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	MovableObject* ManualObjectFactory::createInstanceImpl(
-		const String& name, const NameValuePairList* params)
+	MovableObject* ManualObjectFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
-		return OGRE_NEW ManualObject(name);
+		return OGRE_NEW ManualObject( id, objectMemoryManager );
 	}
 	//-----------------------------------------------------------------------------
 	void ManualObjectFactory::destroyInstance( MovableObject* obj)

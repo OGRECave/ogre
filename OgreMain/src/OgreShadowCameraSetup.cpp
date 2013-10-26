@@ -45,15 +45,17 @@ namespace Ogre
 	
 	/// Default shadow camera setup implementation
 	void DefaultShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-		const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
+									const Light *light, Camera *texCam, size_t iteration) const
 	{
 		Vector3 pos, dir;
 
 		// reset custom view / projection matrix in case already set
 		texCam->setCustomViewMatrix(false);
 		texCam->setCustomProjectionMatrix(false);
-		texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
-		texCam->setFarClipDistance(light->_deriveShadowFarClipDistance(cam));
+		mMinDistance = light->_deriveShadowNearClipDistance(cam);
+		mMaxDistance = light->_deriveShadowFarClipDistance(cam);
+		texCam->setNearClipDistance( mMinDistance );
+		texCam->setFarClipDistance( mMaxDistance );
 
 		// get the shadow frustum's far distance
 		Real shadowDist = light->getShadowFarDistance();
@@ -67,6 +69,9 @@ namespace Ogre
 		// Directional lights 
 		if (light->getType() == Light::LT_DIRECTIONAL)
 		{
+			const AxisAlignedBox &casterBox = sm->getCurrentCastersBox();
+			mMaxDistance = casterBox.getMinimum().distance( casterBox.getMaximum() );
+
 			// set up the shadow texture
 			// Set ortho projection
 			texCam->setProjectionType(PT_ORTHOGRAPHIC);
@@ -95,7 +100,7 @@ namespace Ogre
 			//~ pos.x -= fmod(pos.x, worldTexelSize);
 			//~ pos.y -= fmod(pos.y, worldTexelSize);
 			//~ pos.z -= fmod(pos.z, worldTexelSize);
-			Real worldTexelSize = (shadowDist * 2) / texCam->getViewport()->getActualWidth();
+			Real worldTexelSize = (shadowDist * 2) / texCam->getLastViewport()->getActualWidth();
 
 			 //get texCam orientation
 
@@ -139,7 +144,7 @@ namespace Ogre
 			texCam->setFOVy(fovy);
 
 			// Calculate position, which same as spotlight position
-			pos = light->getDerivedPosition();
+			pos = light->getParentNode()->_getDerivedPosition();
 
 			// Calculate direction, which same as spotlight direction
 			dir = - light->getDerivedDirection(); // backwards since point down -z
@@ -160,7 +165,7 @@ namespace Ogre
 				(cam->getDerivedDirection() * shadowOffset);
 
 			// Calculate position, which same as point light position
-			pos = light->getDerivedPosition();
+			pos = light->getParentNode()->_getDerivedPosition();
 
 			dir = (pos - target); // backwards since point down -z
 			dir.normalise();

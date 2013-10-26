@@ -40,37 +40,21 @@ THE SOFTWARE.
 namespace Ogre {
     OrientationMode Viewport::mDefaultOrientationMode = OR_DEGREE_0;
     //---------------------------------------------------------------------
-    Viewport::Viewport(Camera* cam, RenderTarget* target, Real left, Real top, Real width, Real height, int ZOrder)
-        : mCamera(cam)
-        , mTarget(target)
+    Viewport::Viewport(RenderTarget* target, Real left, Real top, Real width, Real height)
+        : mGlobalIndex( -1 )
+		, mTarget(target)
         , mRelLeft(left)
         , mRelTop(top)
         , mRelWidth(width)
         , mRelHeight(height)
         // Actual dimensions will update later
-        , mZOrder(ZOrder)
-        , mBackColour(ColourValue::Black)
-		, mDepthClearValue(1)
-        , mClearEveryFrame(true)
-		, mClearBuffers(FBT_COLOUR | FBT_DEPTH)
         , mUpdated(false)
         , mShowOverlays(true)
         , mShowSkies(true)
-		, mShowShadows(true)
-		, mVisibilityMask(0xFFFFFFFF)
+		, mVisibilityMask(0)
 		, mRQSequence(0)
 		, mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
-		, mIsAutoUpdated(true)
     {			
-#if OGRE_COMPILER != OGRE_COMPILER_GCCE && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-		LogManager::getSingleton().stream(LML_TRIVIAL)
-			<< "Creating viewport on target '" << target->getName() << "'"
-			<< ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
-			<< ", relative dimensions "	<< std::ios::fixed << std::setprecision(2) 
-			<< "L: " << left << " T: " << top << " W: " << width << " H: " << height
-			<< " Z-order: " << ZOrder;
-#endif
-
         // Set the default orientation mode
         mOrientationMode = mDefaultOrientationMode;
 			
@@ -80,20 +64,10 @@ namespace Ogre {
         
         // Calculate actual dimensions
         _updateDimensions();
-
-        // notify camera
-        if(cam) cam->_notifyViewport(this);
     }
     //---------------------------------------------------------------------
     Viewport::~Viewport()
     {
-		ListenerList listenersCopy;
-		std::swap(mListeners, listenersCopy);
-		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
-		{
-			(*i)->viewportDestroyed(this);
-		}
-
 		RenderSystem* rs = Root::getSingleton().getRenderSystem();
 		if ((rs) && (rs->_getViewport() == this))
 		{
@@ -121,50 +95,12 @@ namespace Ogre {
         mActWidth = (int) (mRelWidth * width);
         mActHeight = (int) (mRelHeight * height);
 
-        // This will check if the cameras getAutoAspectRatio() property is set.
-        // If it's true its aspect ratio is fit to the current viewport
-        // If it's false the camera remains unchanged.
-        // This allows cameras to be used to render to many viewports,
-        // which can have their own dimensions and aspect ratios.
-
-        if (mCamera) 
-        {
-            if (mCamera->getAutoAspectRatio())
-                mCamera->setAspectRatio((Real) mActWidth / (Real) mActHeight);
-
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            mCamera->setOrientationMode(mOrientationMode);
-#endif
-        }
-
-#if OGRE_COMPILER != OGRE_COMPILER_GCCE
-		LogManager::getSingleton().stream(LML_TRIVIAL)
-			<< "Viewport for camera '" << (mCamera != 0 ? mCamera->getName() : "NULL") << "'"
-			<< ", actual dimensions "	<< std::ios::fixed << std::setprecision(2) 
-			<< "L: " << mActLeft << " T: " << mActTop << " W: " << mActWidth << " H: " << mActHeight;
-#endif
-
-		 mUpdated = true;
-
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-		{
-			(*i)->viewportDimensionsChanged(this);
-		}
-	}
-	//---------------------------------------------------------------------
-	int Viewport::getZOrder(void) const
-	{
-		return mZOrder;
+		mUpdated = true;
 	}
 	//---------------------------------------------------------------------
     RenderTarget* Viewport::getTarget(void) const
     {
         return mTarget;
-    }
-    //---------------------------------------------------------------------
-    Camera* Viewport::getCamera(void) const
-    {
-        return mCamera;
     }
     //---------------------------------------------------------------------
     Real Viewport::getLeft(void) const
@@ -215,14 +151,27 @@ namespace Ogre {
         mRelHeight = height;
         _updateDimensions();
     }
-    //---------------------------------------------------------------------
-    void Viewport::update(void)
+	//---------------------------------------------------------------------
+    void Viewport::_updateCullPhase01( Camera* camera, uint8 firstRq, uint8 lastRq )
     {
-        if (mCamera)
-        {
-            // Tell Camera to render into me
-            mCamera->_renderScene(this, mShowOverlays);
-        }
+		// Automatic AR cameras are useful for cameras that draw into multiple viewports
+		const Real aspectRatio = (Real) mActWidth / (Real) mActHeight;
+		if( camera->getAutoAspectRatio() && camera->getAspectRatio() != aspectRatio )
+		{
+			camera->setAspectRatio( aspectRatio );
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            camera->setOrientationMode(mOrientationMode);
+#endif
+		}
+        // Tell Camera to render into me
+		camera->_notifyViewport(this);
+
+        camera->_cullScenePhase01( this, firstRq, lastRq );
+    }
+    //---------------------------------------------------------------------
+    void Viewport::_updateRenderPhase02( Camera* camera, uint8 firstRq, uint8 lastRq )
+    {
+        camera->_renderScenePhase02( this, firstRq, lastRq, mShowOverlays );
     }
     //---------------------------------------------------------------------
     void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)
@@ -237,11 +186,6 @@ namespace Ogre {
         if (setDefault)
         {
             setDefaultOrientationMode(orientationMode);
-        }
-
-        if (mCamera)
-        {
-            mCamera->setOrientationMode(mOrientationMode);
         }
 
 	// Update the render system config
@@ -286,42 +230,6 @@ namespace Ogre {
         return mDefaultOrientationMode;
     }
     //---------------------------------------------------------------------
-    void Viewport::setBackgroundColour(const ColourValue& colour)
-    {
-        mBackColour = colour;
-    }
-    //---------------------------------------------------------------------
-    const ColourValue& Viewport::getBackgroundColour(void) const
-    {
-        return mBackColour;
-    }
-    //---------------------------------------------------------------------
-	void Viewport::setDepthClear( Real depth )
-    {
-        mDepthClearValue = depth;
-    }
-    //---------------------------------------------------------------------
-    Real Viewport::getDepthClear(void) const
-    {
-        return mDepthClearValue;
-    }
-	//---------------------------------------------------------------------
-    void Viewport::setClearEveryFrame(bool inClear, unsigned int inBuffers)
-    {
-        mClearEveryFrame = inClear;
-		mClearBuffers = inBuffers;
-    }
-    //---------------------------------------------------------------------
-    bool Viewport::getClearEveryFrame(void) const
-    {
-        return mClearEveryFrame;
-    }
-    //---------------------------------------------------------------------
-    unsigned int Viewport::getClearBuffers(void) const
-    {
-        return mClearBuffers;
-    }
-    //---------------------------------------------------------------------
 	void Viewport::clear(unsigned int buffers, const ColourValue& col,  
 						 Real depth, unsigned short stencil)
 	{
@@ -348,56 +256,6 @@ namespace Ogre {
         height = mActHeight;
 
     }
-    //---------------------------------------------------------------------
-    unsigned int Viewport::_getNumRenderedFaces(void) const
-    {
-		return mCamera ? mCamera->_getNumRenderedFaces() : 0;
-    }
-    //---------------------------------------------------------------------
-    unsigned int Viewport::_getNumRenderedBatches(void) const
-    {
-		return mCamera ? mCamera->_getNumRenderedBatches() : 0;
-    }
-	//---------------------------------------------------------------------
-	void Viewport::setCamera(Camera* cam)
-	{
-		if(mCamera)
-		{
-			if(mCamera->getViewport() == this)
-			{
-				mCamera->_notifyViewport(0);
-			}
-		}
-
-		mCamera = cam;
-		if (cam)
-		{
-			// update aspect ratio of new camera if needed.
-			if (cam->getAutoAspectRatio())
-			{
-				cam->setAspectRatio((Real) mActWidth / (Real) mActHeight);
-			}
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-			cam->setOrientationMode(mOrientationMode);
-#endif
-			cam->_notifyViewport(this);
-		}
-
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-		{
-			(*i)->viewportCameraChanged(this);
-		}
-    }
-    //---------------------------------------------------------------------
-	void Viewport::setAutoUpdated(bool inAutoUpdated)
-	{
-		mIsAutoUpdated = inAutoUpdated;
-	}
-	//---------------------------------------------------------------------
-	bool Viewport::isAutoUpdated() const
-	{
-		return mIsAutoUpdated;
-	}
 	//---------------------------------------------------------------------
     void Viewport::setOverlaysEnabled(bool enabled)
     {
@@ -417,16 +275,6 @@ namespace Ogre {
     bool Viewport::getSkiesEnabled(void) const
     {
         return mShowSkies;
-    }
-    //---------------------------------------------------------------------
-    void Viewport::setShadowsEnabled(bool enabled)
-    {
-        mShowShadows = enabled;
-    }
-    //---------------------------------------------------------------------
-    bool Viewport::getShadowsEnabled(void) const
-    {
-        return mShowShadows;
     }
 	//-----------------------------------------------------------------------
 	void Viewport::setRenderQueueInvocationSequenceName(const String& sequenceName)
@@ -483,18 +331,5 @@ namespace Ogre {
             break;
         }
     }
-	//-----------------------------------------------------------------------
-	void Viewport::addListener(Listener* l)
-	{
-		if (std::find(mListeners.begin(), mListeners.end(), l) == mListeners.end())
-			mListeners.push_back(l);
-	}
-	//-----------------------------------------------------------------------
-	void Viewport::removeListener(Listener* l)
-	{
-		ListenerList::iterator i = std::find(mListeners.begin(), mListeners.end(), l);
-		if (i != mListeners.end())
-			mListeners.erase(i);
-	}
 
 }

@@ -32,13 +32,9 @@ THE SOFTWARE.
 
 #include "OgreNode.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreAxisAlignedBox.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
-	// forward decl
-	struct VisibleObjectsBoundsInfo;
 
 	/** \addtogroup Core
 	*  @{
@@ -58,164 +54,91 @@ namespace Ogre {
     class _OgreExport SceneNode : public Node
     {
     public:
-        typedef HashMap<String, MovableObject*> ObjectMap;
-        typedef MapIterator<ObjectMap> ObjectIterator;
-		typedef ConstMapIterator<ObjectMap> ConstObjectIterator;
+		typedef vector<MovableObject*>::type ObjectVec;
+        typedef VectorIterator<ObjectVec> ObjectIterator;
+		typedef ConstVectorIterator<ObjectVec> ConstObjectIterator;
 
     protected:
-        ObjectMap mObjectsByName;
-
-		/// Pointer to a Wire Bounding Box for this Node
-		WireBoundingBox *mWireBoundingBox;
-		/// Flag that determines if the bounding box of the node should be displayed
-		bool mShowBoundingBox;
-        bool mHideBoundingBox;
+        ObjectVec mAttachments;
 
         /// SceneManager which created this node
         SceneManager* mCreator;
 
-        /// World-Axis aligned bounding box, updated only through _update
-        AxisAlignedBox mWorldAABB;
-
         /** @copydoc Node::updateFromParentImpl. */
-        void updateFromParentImpl(void) const;
+        virtual void updateFromParentImpl(void);
 
         /** See Node. */
-        Node* createChildImpl(void);
-
-        /** See Node. */
-        Node* createChildImpl(const String& name);
-
-		/** See Node */
-		void setParent(Node* parent);
-
-		/** Internal method for setting whether the node is in the scene 
-			graph.
-		*/
-		virtual void setInSceneGraph(bool inGraph);
+        Node* createChildImpl( SceneMemoryMgrTypes sceneType );
 
         /// Whether to yaw around a fixed axis.
         bool mYawFixed;
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
 
+		//TODO: Move auto tracking out of here. dark_sylinc
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;
         /// Local 'normal' direction vector
         Vector3 mAutoTrackLocalDirection;
-		/// Is this node a current part of the scene graph?
-		bool mIsInSceneGraph;
+
+		/** Retrieves a the iterator to an attached object.
+        @remarks Retrieves by object name, see alternate version to retrieve by index.
+		Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
+        */
+		ObjectVec::iterator getAttachedObjectIt( const String& name );
+		ObjectVec::const_iterator getAttachedObjectIt( const String& name ) const;
     public:
-        /** Constructor, only to be called by the creator SceneManager.
-        @remarks
-            Creates a node with a generated name.
-        */
-        SceneNode(SceneManager* creator);
-        /** Constructor, only to be called by the creator SceneManager.
-        @remarks
-            Creates a node with a specified name.
-        */
-        SceneNode(SceneManager* creator, const String& name);
+        /** Constructor, only to be called by the creator SceneManager. */
+		SceneNode( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
+					SceneNode *parent );
+
+		/** Don't use this constructor unless you know what you're doing.
+			@See NodeMemoryManager::mDummyNode
+		*/
+		SceneNode( const Transform &transformPtrs );
+
         ~SceneNode();
+
+		/// @copydoc Node::setStatic
+		virtual bool setStatic( bool bStatic );
+
+		/// @copydoc Node::_notifyStaticDirty
+		virtual void _notifyStaticDirty(void) const;
 
         /** Adds an instance of a scene object to this node.
         @remarks
             Scene objects can include Entity objects, Camera objects, Light objects, 
             ParticleSystem objects etc. Anything that subclasses from MovableObject.
         */
-        virtual void attachObject(MovableObject* obj);
+        virtual_l2 void attachObject(MovableObject* obj);
 
         /** Reports the number of objects attached to this node.
         */
-        virtual unsigned short numAttachedObjects(void) const;
+		size_t numAttachedObjects(void) const						{ return mAttachments.size(); }
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by index, see alternate version to retrieve by name. The index
         of an object may change as other objects are added / removed.
         */
-        virtual MovableObject* getAttachedObject(unsigned short index);
+		MovableObject* getAttachedObject( size_t index )			{ return mAttachments[index]; }
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by object name, see alternate version to retrieve by index.
+		Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
         */
-        virtual MovableObject* getAttachedObject(const String& name);
+        MovableObject* getAttachedObject( const String& name );
 
-        /** Detaches the indexed object from this scene node.
-        @remarks
-            Detaches by index, see the alternate version to detach by name. Object indexes
-            may change as other objects are added / removed.
-        */
-        virtual MovableObject* detachObject(unsigned short index);
-        /** Detaches an object by pointer. */
-        virtual void detachObject(MovableObject* obj);
-
-        /** Detaches the named object from this node and returns a pointer to it. */
-        virtual MovableObject* detachObject(const String& name);
+        /** Detaches an object by pointer.
+		@remarks
+			It's fast, takes only O(1)
+		*/
+        virtual_l2 void detachObject(MovableObject* obj);
 
         /** Detaches all objects attached to this node.
         */
         virtual void detachAllObjects(void);
-
-		/** Determines whether this node is in the scene graph, i.e.
-			whether it's ultimate ancestor is the root scene node.
-		*/
-		virtual bool isInSceneGraph(void) const { return mIsInSceneGraph; }
-
-		/** Notifies this SceneNode that it is the root scene node. 
-		@remarks
-			Only SceneManager should call this!
-		*/
-		virtual void _notifyRootNode(void) { mIsInSceneGraph = true; }
-			
-
-        /** Internal method to update the Node.
-            @note
-                Updates this scene node and any relevant children to incorporate transforms etc.
-                Don't call this yourself unless you are writing a SceneManager implementation.
-            @param
-                updateChildren If true, the update cascades down to all children. Specify false if you wish to
-                update children separately, e.g. because of a more selective SceneManager implementation.
-            @param
-                parentHasChanged This flag indicates that the parent transform has changed,
-                    so the child should retrieve the parent's transform and combine it with its own
-                    even if it hasn't changed itself.
-        */
-        virtual void _update(bool updateChildren, bool parentHasChanged);
-
-		/** Tells the SceneNode to update the world bound info it stores.
-		*/
-		virtual void _updateBounds(void);
-
-        /** Internal method which locates any visible objects attached to this node and adds them to the passed in queue.
-            @remarks
-                Should only be called by a SceneManager implementation, and only after the _updat method has been called to
-                ensure transforms and world bounds are up to date.
-                SceneManager implementations can choose to let the search cascade automatically, or choose to prevent this
-                and select nodes themselves based on some other criteria.
-            @param
-                cam The active camera
-            @param
-                queue The SceneManager's rendering queue
-			@param
-				visibleBounds bounding information created on the fly containing all visible objects by the camera
-            @param
-                includeChildren If true, the call is cascaded down to all child nodes automatically.
-            @param
-                displayNodes If true, the nodes themselves are rendered as a set of 3 axes as well
-                    as the objects being rendered. For debugging purposes.
-        */
-		virtual void _findVisibleObjects(Camera* cam, RenderQueue* queue, 
-			VisibleObjectsBoundsInfo* visibleBounds, 
-            bool includeChildren = true, bool displayNodes = false, bool onlyShadowCasters = false);
-
-        /** Gets the axis-aligned bounding box of this node (and hence all subnodes).
-        @remarks
-            Recommended only if you are extending a SceneManager, because the bounding box returned
-            from this method is only up to date after the SceneManager has called _update.
-        */
-        virtual const AxisAlignedBox& _getWorldAABB(void) const;
 
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
@@ -247,29 +170,19 @@ namespace Ogre {
         */
         SceneManager* getCreator(void) const { return mCreator; }
 
-        /** This method removes and destroys the named child and all of its children.
+		/** This method removes and destroys the child and all of its children.
         @remarks
-            Unlike removeChild, which removes a single named child from this
+            Unlike removeChild, which removes a single child from this
             node but does not destroy it, this method destroys the child
             and all of it's children. 
         @par
             Use this if you wish to recursively destroy a node as well as 
             detaching it from it's parent. Note that any objects attached to
             the nodes will be detached but will not themselves be destroyed.
+		@param
+			SceneNode, must be a child of ours
         */
-        virtual void removeAndDestroyChild(const String& name);
-
-        /** This method removes and destroys the child and all of its children.
-        @remarks
-            Unlike removeChild, which removes a single named child from this
-            node but does not destroy it, this method destroys the child
-            and all of it's children. 
-        @par
-            Use this if you wish to recursively destroy a node as well as 
-            detaching it from it's parent. Note that any objects attached to
-            the nodes will be detached but will not themselves be destroyed.
-        */
-        virtual void removeAndDestroyChild(unsigned short index);
+        virtual void removeAndDestroyChild( SceneNode *sceneNode );
 
         /** Removes and destroys all children of this node.
         @remarks
@@ -279,32 +192,6 @@ namespace Ogre {
         */
         virtual void removeAndDestroyAllChildren(void);
 
-        /** Allows the showing of the node's bounding box.
-        @remarks
-            Use this to show or hide the bounding box of the node.
-        */
-		virtual void showBoundingBox(bool bShow);
-
-        /** Allows the overriding of the node's bounding box
-            over the SceneManager's bounding box setting.
-        @remarks
-            Use this to override the bounding box setting of the node.
-        */
-		virtual void hideBoundingBox(bool bHide);
-
-        /** Add the bounding box to the rendering queue.
-        */
-		virtual void _addBoundingBoxToQueue(RenderQueue* queue);
-
-        /** This allows scene managers to determine if the node's bounding box
-			should be added to the rendering queue.
-        @remarks
-            Scene Managers that implement their own _findVisibleObjects will have to 
-			check this flag and then use _addBoundingBoxToQueue to add the bounding box
-			wireframe.
-        */
-		virtual bool getShowBoundingBox() const;
-
         /** Creates an unnamed new SceneNode as a child of this node.
         @param
             translate Initial translation offset of child relative to parent
@@ -312,37 +199,11 @@ namespace Ogre {
             rotate Initial rotation relative to parent
         */
         virtual SceneNode* createChildSceneNode(
-            const Vector3& translate = Vector3::ZERO, 
-            const Quaternion& rotate = Quaternion::IDENTITY );
+				SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
+				const Vector3& translate = Vector3::ZERO, 
+				const Quaternion& rotate = Quaternion::IDENTITY );
 
-        /** Creates a new named SceneNode as a child of this node.
-        @remarks
-            This creates a child node with a given name, which allows you to look the node up from 
-            the parent which holds this collection of nodes.
-            @param
-                translate Initial translation offset of child relative to parent
-            @param
-                rotate Initial rotation relative to parent
-        */
-        virtual SceneNode* createChildSceneNode(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
-
-        /** Allows retrieval of the nearest lights to the centre of this SceneNode.
-        @remarks
-            This method allows a list of lights, ordered by proximity to the centre
-            of this SceneNode, to be retrieved. Can be useful when implementing
-            MovableObject::queryLights and Renderable::getLights.
-        @par
-            Note that only lights could be affecting the frustum will take into
-            account, which cached in scene manager.
-        @see SceneManager::_getLightsAffectingFrustum
-        @see SceneManager::_populateLightList
-        @param destList List to be populated with ordered set of lights; will be
-            cleared by this method before population.
-        @param radius Parameter to specify lights intersecting a given radius of
-            this SceneNode's centre.
-		@param lightMask The mask with which to include / exclude lights
-        */
-        virtual void findLights(LightList& destList, Real radius, uint32 lightMask = 0xFFFFFFFF) const;
+		virtual void setListener( Listener* listener );
 
         /** Tells the node whether to yaw around it's own local Y axis or a fixed axis of choice.
         @remarks
@@ -358,11 +219,13 @@ namespace Ogre {
         @param
         fixedAxis The axis to use if the first parameter is true.
         */
-        virtual void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
+        void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
+
+		bool isYawFixed(void) const										{ return mYawFixed; }
 
 		/** Rotate the node around the Y-axis.
 		*/
-		virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+		void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
         /** Sets the node's direction vector ie it's local -z.
         @remarks
         Note that the 'up' vector for the orientation will automatically be 
@@ -458,7 +321,7 @@ namespace Ogre {
         virtual void setDebugDisplayEnabled(bool enabled, bool cascade = true);
 
 		/// As Node::getDebugRenderable, except scaling is automatically determined
-		virtual DebugRenderable* getDebugRenderable();
+		//virtual DebugRenderable* getDebugRenderable();
 
 
 

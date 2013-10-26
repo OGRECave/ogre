@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreConfigDialog.h"
 #include "OgreException.h"
 #include "OgreImage.h"
+#include "OgrePixelBox.h"
 #include "OgreLogManager.h"
 
 #include <cstdlib>

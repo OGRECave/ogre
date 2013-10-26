@@ -42,7 +42,7 @@ namespace Ogre {
 		D3D9MultiRenderTarget(const String &name);
 		~D3D9MultiRenderTarget();
 
-        virtual void update(bool swapBuffers);
+        //virtual void update(bool swapBuffers);
 
 		virtual void getCustomAttribute( const String& name, void *pData );
 

@@ -44,8 +44,6 @@ namespace RTShader {
 /************************************************************************/
 String NormalMapLighting::Type						= "SGX_NormalMapLighting";
 
-Light NormalMapLighting::msBlankLight;
-
 //-----------------------------------------------------------------------
 NormalMapLighting::NormalMapLighting()
 {
@@ -59,10 +57,6 @@ NormalMapLighting::NormalMapLighting()
 	mNormalMapMipFilter				= FO_POINT;
 	mNormalMapAnisotropy			= 1;
 	mNormalMapMipBias				= -1.0;
-
-	msBlankLight.setDiffuseColour(ColourValue::Black);
-	msBlankLight.setSpecularColour(ColourValue::Black);
-	msBlankLight.setAttenuation(0,1,0,0);
 }
 
 //-----------------------------------------------------------------------
@@ -123,9 +117,9 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		// Search a matching light from the current sorted lights of the given renderable.
 		for (unsigned int j = curSearchLightIndex; j < pLightList->size(); ++j)
 		{
-			if (pLightList->at(j)->getType() == curLightType)
+			if (pLightList->at(j).light->getType() == curLightType)
 			{				
-				srcLight = pLightList->at(j);
+				srcLight = const_cast<Light*>(pLightList->at(j).light);
 				curSearchLightIndex = j + 1;
 				break;
 			}			
@@ -133,8 +127,9 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 		// No matching light found -> use a blank dummy light for parameter update.
 		if (srcLight == NULL)
-		{						
-			srcLight = &msBlankLight;
+		{			
+			assert("No matching light found!");
+			return;
 		}
 
 
@@ -159,7 +154,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		case Light::LT_POINT:
 
 			// Update light position. (World space).				
-			vParameter = srcLight->getAs4DVector(true);
+			vParameter = srcLight->getAs4DVector();
 			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
@@ -175,7 +170,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				Vector3 vec3;				
 											
 				// Update light position. (World space).				
-				vParameter = srcLight->getAs4DVector(true);
+				vParameter = srcLight->getAs4DVector();
 				curParams.mPosition->setGpuParameter(vParameter);
 
 							

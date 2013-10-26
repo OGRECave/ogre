@@ -35,10 +35,6 @@
 #    endif
 #  endif
 #  define OGRE_STATIC_CgProgramManager
-#  ifdef OGRE_USE_PCZ
-#    define OGRE_STATIC_PCZSceneManager
-#    define OGRE_STATIC_OctreeZone
-#  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL

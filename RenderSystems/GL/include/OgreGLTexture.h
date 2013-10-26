@@ -58,6 +58,17 @@ namespace Ogre {
 
         GLuint getGLID() const
         {
+			if( mFSAA > 0 )
+			{
+				//Before GL 3.3, only implicit resolves are supported.
+				for( size_t face=0; face<getNumFaces(); ++face )
+				{
+					RenderTarget *renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
+					if( renderTarget->isFsaaResolveDirty() )
+						renderTarget->swapBuffers();
+				}
+			}
+
             return mTextureID;
         }
 		

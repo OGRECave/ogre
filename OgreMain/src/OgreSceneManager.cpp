@@ -57,7 +57,6 @@ THE SOFTWARE.
 #include "OgreSpotShadowFadePng.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGpuProgram.h"
-#include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreDataStream.h"
 #include "OgreStaticGeometry.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -67,10 +66,13 @@ THE SOFTWARE.
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreProfiler.h"
-#include "OgreCompositorManager.h"
-#include "OgreCompositorChain.h"
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
+#include "OgreOldNode.h"
+#include "Compositor/OgreCompositorShadowNode.h"
+#include "Threading/OgreBarrier.h"
+#include "Threading/OgreUniformScalableTask.h"
+
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -86,13 +88,16 @@ uint32 SceneManager::LIGHT_TYPE_MASK			= 0x08000000;
 uint32 SceneManager::FRUSTUM_TYPE_MASK			= 0x04000000;
 uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
-SceneManager::SceneManager(const String& name) :
+SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
+						   InstancingTheadedCullingMethod threadedCullingMethod) :
 mName(name),
+mStaticMinDepthLevelDirty( 0 ),
+mStaticEntitiesDirty( true ),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
-mSceneRoot(0),
+mCurrentShadowNode(0),
 mSkyPlaneEntity(0),
 mSkyBoxObj(0),
 mSkyPlaneNode(0),
@@ -113,59 +118,58 @@ mResetIdentityView(false),
 mResetIdentityProj(false),
 mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
-mLightsDirtyCounter(0),
-mMovableNameGenerator("Ogre/MO"),
 mShadowCasterPlainBlackPass(0),
-mShadowReceiverPass(0),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
-mShadowTechnique(SHADOWTYPE_NONE),
-mDebugShadows(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
-mShadowDebugPass(0),
-mShadowStencilPass(0),
-mShadowModulativePass(0),
 mShadowMaterialInitDone(false),
-mShadowIndexBufferSize(51200),
 mShadowIndexBufferUsedSize(0),
 mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
 mIlluminationStage(IRS_NONE),
-mShadowTextureConfigDirty(true),
-mShadowUseInfiniteFarPlane(true),
 mShadowCasterRenderBackFaces(true),
-mShadowAdditiveLightClip(false),
 mLightClippingInfoMapFrameNumber(999),
-mShadowCasterSphereQuery(0),
-mShadowCasterAABBQuery(0),
 mDefaultShadowFarDist(0),
 mDefaultShadowFarDistSquared(0),
 mShadowTextureOffset(0.6), 
 mShadowTextureFadeStart(0.7), 
 mShadowTextureFadeEnd(0.9),
-mShadowTextureSelfShadow(false),
 mShadowTextureCustomCasterPass(0),
-mShadowTextureCustomReceiverPass(0),
-mVisibilityMask(0xFFFFFFFF),
+mVisibilityMask(0xFFFFFFFF & VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
+mNumWorkerThreads( numWorkerThreads ),
+mExitWorkerThreads( false ),
+mUpdateBoundsRequest( 0 ),
+mInstancingThreadedCullingMethod( threadedCullingMethod ),
+mUserTask( 0 ),
+mRequestType( NUM_REQUESTS ),
+mWorkerThreadsBarrier( 0 ),
 mSuppressRenderStateChanges(false),
-mSuppressShadows(false),
-mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
+	assert( numWorkerThreads >= 1 );
+
+	if( numWorkerThreads <= 1 )
+		mInstancingThreadedCullingMethod = INSTANCING_CULLING_SINGLETHREAD;
+
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		mSceneRoot[i] = 0;
+
+	mNodeMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mNodeMemoryManager[SCENE_DYNAMIC] );
+	mNodeMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mNodeMemoryManager[SCENE_STATIC] );
+	mEntityMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mEntityMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mEntityMemoryManager[SCENE_STATIC] );
 
     // init sky
     for (size_t i = 0; i < 5; ++i)
     {
         mSkyDomeEntity[i] = 0;
     }
-
-	mShadowCasterQueryListener = OGRE_NEW ShadowCasterSceneQueryListener(this);
 
     Root *root = Root::getSingletonPtr();
     if (root)
@@ -174,26 +178,58 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	// Setup default queued renderable visitor
 	mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
 
-	// set up default shadow camera setup
-	mDefaultShadowCameraSetup.bind(OGRE_NEW DefaultShadowCameraSetup());
-
-	// init shadow texture config
-	setShadowTextureCount(1);
-
-	// init shadow texture count per type.
-	mShadowTextureCountPerType[Light::LT_POINT] = 1;
-	mShadowTextureCountPerType[Light::LT_DIRECTIONAL] = 1;
-	mShadowTextureCountPerType[Light::LT_SPOTLIGHT] = 1;
-
 	// create the auto param data source instance
 	mAutoParamDataSource = createAutoParamDataSource();
 
+	mVisibleObjects.resize( mNumWorkerThreads );
+	mVisibleObjectsBackup.resize( mNumWorkerThreads );
+	mTmpVisibleObjects.resize( mNumWorkerThreads );
+	mReceiversBoxPerThread.resize( mNumWorkerThreads );
+
+	startWorkerThreads();
+
+	// Init shadow caster material for texture shadows
+    if (!mShadowCasterPlainBlackPass)
+    {
+        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
+            "Ogre/TextureShadowCaster");
+        if (matPlainBlack.isNull())
+        {
+            matPlainBlack = MaterialManager::getSingleton().create(
+                "Ogre/TextureShadowCaster",
+                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
+            // Lighting has to be on, because we need shadow coloured objects
+            // Note that because we can't predict vertex programs, we'll have to
+            // bind light values to those, and so we bind White to ambient
+            // reflectance, and we'll set the ambient colour to the shadow colour
+            mShadowCasterPlainBlackPass->setAmbient(ColourValue::White);
+            mShadowCasterPlainBlackPass->setDiffuse(ColourValue::Black);
+            mShadowCasterPlainBlackPass->setSelfIllumination(ColourValue::Black);
+            mShadowCasterPlainBlackPass->setSpecular(ColourValue::Black);
+			// Override fog
+			mShadowCasterPlainBlackPass->setFog(true, FOG_NONE);
+            // no textures or anything else, we will bind vertex programs
+            // every so often though
+        }
+        else
+        {
+            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
+        }
+    }
+
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+	{
+		// Create root scene node
+		mSceneRoot[i] = createSceneNodeImpl( (SceneNode*)0, static_cast<SceneMemoryMgrTypes>( i ) );
+		mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
+		mSceneRoot[i]->_getDerivedPositionUpdated();
+	}
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
 {
 	fireSceneManagerDestroyed();
-	destroyShadowTextures();
     clearScene();
     destroyAllCameras();
 
@@ -210,13 +246,13 @@ SceneManager::~SceneManager()
 
 	OGRE_DELETE mSkyBoxObj;
 
-	OGRE_DELETE mShadowCasterQueryListener;
-    OGRE_DELETE mSceneRoot;
+	for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		OGRE_DELETE mSceneRoot[i];
     OGRE_DELETE mFullScreenQuad;
-    OGRE_DELETE mShadowCasterSphereQuery;
-    OGRE_DELETE mShadowCasterAABBQuery;
     OGRE_DELETE mRenderQueue;
 	OGRE_DELETE mAutoParamDataSource;
+
+	stopWorkerThreads();
 }
 //-----------------------------------------------------------------------
 RenderQueue* SceneManager::getRenderQueue(void)
@@ -231,11 +267,7 @@ RenderQueue* SceneManager::getRenderQueue(void)
 void SceneManager::initRenderQueue(void)
 {
     mRenderQueue = OGRE_NEW RenderQueue();
-    // init render queues that do not need shadows
-    mRenderQueue->getQueueGroup(RENDER_QUEUE_BACKGROUND)->setShadowsEnabled(false);
-    mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY)->setShadowsEnabled(false);
-    mRenderQueue->getQueueGroup(RENDER_QUEUE_SKIES_EARLY)->setShadowsEnabled(false);
-    mRenderQueue->getQueueGroup(RENDER_QUEUE_SKIES_LATE)->setShadowsEnabled(false);
+	mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY); //TODO: This feels hacky to get Overlays working
 }
 //-----------------------------------------------------------------------
 void SceneManager::addSpecialCaseRenderQueue(uint8 qid)
@@ -280,131 +312,114 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 	return mWorldGeometryRenderQueue;
 }
 //-----------------------------------------------------------------------
-Camera* SceneManager::createCamera(const String& name)
+Camera* SceneManager::createCamera( const String &name, bool isVisible )
 {
-    // Check name not used
-    if (mCameras.find(name) != mCameras.end())
-    {
-        OGRE_EXCEPT(
-            Exception::ERR_DUPLICATE_ITEM,
-            "A camera with the name " + name + " already exists",
-            "SceneManager::createCamera" );
-    }
+	if( mCamerasByName.find( name ) != mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
+					 "Camera with name '" + name + "' already exists", "SceneManager::createCamera" );
+	}
 
-    Camera *c = OGRE_NEW Camera(name, this);
-    mCameras.insert(CameraList::value_type(name, c));
+	Camera *c = OGRE_NEW Camera( Id::generateNewId<MovableObject>(),
+								 &mEntityMemoryManager[SCENE_DYNAMIC], this );
+    mCameras.push_back( c );
+	c->mGlobalIndex = mCameras.size() - 1;
+	c->setName( name );
+	mCamerasByName[name] = c;
 
-	// create visible bounds aab map entry
-	mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
+	if( isVisible )
+		mVisibleCameras.push_back( c );
 
+	mSceneRoot[SCENE_DYNAMIC]->attachObject( c );
     return c;
 }
-
 //-----------------------------------------------------------------------
-Camera* SceneManager::getCamera(const String& name) const
+Camera* SceneManager::findCamera( IdString name ) const
 {
-    CameraList::const_iterator i = mCameras.find(name);
-    if (i == mCameras.end())
-    {
-        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-            "Cannot find Camera with name " + name,
-            "SceneManager::getCamera");
-    }
-    else
-    {
-        return i->second;
-    }
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasCamera(const String& name) const
-{
-	return (mCameras.find(name) != mCameras.end());
-}
+	CameraMap::const_iterator itor = mCamerasByName.find( name );
+	if( itor == mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+					 "Camera with name '" + name.getFriendlyText() + "' not found",
+					 "SceneManager::getCamera" );
+	}
 
+    return itor->second;
+}
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
     if(!cam)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null Camera.", "SceneManager::destroyCamera");
 
-	destroyCamera(cam->getName());
-}
+	checkMovableObjectIntegrity( mCameras, cam );
 
-//-----------------------------------------------------------------------
-void SceneManager::destroyCamera(const String& name)
-{
-    // Find in list
-    CameraList::iterator i = mCameras.find(name);
-    if (i != mCameras.end())
-    {
-		// Remove visible boundary AAB entry
-		CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( i->second );
-		if ( camVisObjIt != mCamVisibleObjectsMap.end() )
-			mCamVisibleObjectsMap.erase( camVisObjIt );
+	// Find in list
+	CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
 
-		// Remove light-shadow cam mapping entry
-		ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( i->second );
-		if ( camLightIt != mShadowCamLightMapping.end() )
-			mShadowCamLightMapping.erase( camLightIt );
+	IdString camName( cam->getName() );
 
-		// Notify render system
-        mDestRenderSystem->_notifyCameraRemoved(i->second);
-        OGRE_DELETE i->second;
-        mCameras.erase(i);
-    }
+	itor = efficientVectorRemove( mCameras, itor );
+    OGRE_DELETE cam;
+	cam = 0;
 
+	{
+		FrustumVec::iterator it = std::find( mVisibleCameras.begin(), mVisibleCameras.end(), cam );
+		if( it != mVisibleCameras.end() )
+			efficientVectorRemove( mVisibleCameras, it );
+	}
+
+	//The node that was at the end got swapped and has now a different index
+	if( itor != mCameras.end() )
+		(*itor)->mGlobalIndex = itor - mCameras.begin();
+
+	CameraMap::iterator itorMap = mCamerasByName.find( camName );
+	if( itorMap == mCamerasByName.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+					 "Camera with name '" + camName.getFriendlyText() + "' not found!",
+					 "SceneManager::destroyCamera" );
+	}
+	else
+	{
+		mCamerasByName.erase( itorMap );
+	}
 }
 
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllCameras(void)
 {
-	CameraList::iterator camIt = mCameras.begin();
-	while( camIt != mCameras.end() )
+	CameraList::iterator camIt  = mCameras.begin();
+	CameraList::iterator camEnd = mCameras.end();
+
+	while( camIt != camEnd )
 	{
-		bool dontDelete = false;
-		 // dont destroy shadow texture cameras here. destroyAllCameras is public
-		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
-		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
-		{
-			if( (*camShadowTexIt) == camIt->second )
-			{
-				dontDelete = true;
-				break;
-			}
-		}
-
-		if( dontDelete )	// skip this camera
-			camIt++;
-		else 
-		{
-			destroyCamera(camIt->second);
-			camIt = mCameras.begin(); // recreate iterator
-		}
+		const size_t oldIdx = camIt - mCameras.begin();
+		destroyCamera( *camIt );
+		camIt  = mCameras.begin() + oldIdx;
+		camEnd = mCameras.end();
 	}
-
-}
-//-----------------------------------------------------------------------
-Light* SceneManager::createLight(const String& name)
-{
-	return static_cast<Light*>(
-		createMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
 {
-	String name = mMovableNameGenerator.generate();
-	return createLight(name);
-}
-//-----------------------------------------------------------------------
-Light* SceneManager::getLight(const String& name) const
-{
-	return static_cast<Light*>(
-		getMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasLight(const String& name) const
-{
-	return hasMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
+	const size_t totalNumObjects = mLightMemoryManager.getTotalNumObjects() + 1;
+	if( mGlobalLightList.lights.capacity() < totalNumObjects )
+	{
+		assert( mGlobalLightList.lights.empty() &&
+				"Don't create objects in the middle of a scene update!" );
+		mGlobalLightList.lights.reserve( totalNumObjects );
+		OGRE_FREE_SIMD( mGlobalLightList.visibilityMask, MEMCATEGORY_SCENE_CONTROL );
+		OGRE_FREE_SIMD( mGlobalLightList.boundingSphere, MEMCATEGORY_SCENE_CONTROL );
+		mGlobalLightList.visibilityMask = OGRE_ALLOC_T_SIMD( uint32, totalNumObjects,
+															MEMCATEGORY_SCENE_CONTROL );
+		mGlobalLightList.boundingSphere = OGRE_ALLOC_T_SIMD( Sphere, totalNumObjects,
+															MEMCATEGORY_SCENE_CONTROL );
+	}
+
+	Light *newLight = static_cast<Light*>(
+							createMovableObject(LightFactory::FACTORY_TYPE_NAME, &mLightMemoryManager));
+	return newLight;
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyLight(Light *l)
@@ -412,183 +427,53 @@ void SceneManager::destroyLight(Light *l)
 	destroyMovableObject(l);
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyLight(const String& name)
-{
-	destroyMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
 void SceneManager::destroyAllLights(void)
 {
 	destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-const LightList& SceneManager::_getLightsAffectingFrustum(void) const
-{
-    return mLightsAffectingFrustum;
-}
-//-----------------------------------------------------------------------
-bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
-{
-    return a->tempSquareDist < b->tempSquareDist;
-}
-//-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const Vector3& position, Real radius, 
-									  LightList& destList, uint32 lightMask)
-{
-    // Really basic trawl of the lights, then sort
-    // Subclasses could do something smarter
-
-    // Pick up the lights that affecting frustum only, which should has been
-    // cached, so better than take all lights in the scene into account.
-    const LightList& candidateLights = _getLightsAffectingFrustum();
-
-    // Pre-allocate memory
-    destList.clear();
-    destList.reserve(candidateLights.size());
-
-    LightList::const_iterator it;
-    for (it = candidateLights.begin(); it != candidateLights.end(); ++it)
-    {
-        Light* lt = *it;
-		// check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
-		if(!(lt->getLightMask() & lightMask))
-			continue; //skip this light
-
-		// Calc squared distance
-		lt->_calcTempSquareDist(position);
-
-        if (lt->getType() == Light::LT_DIRECTIONAL)
-        {
-            // Always included
-            destList.push_back(lt);
-        }
-        else
-        {
-            // only add in-range lights
-			if (lt->isInLightRange(Sphere(position,radius)))
-            {
-                destList.push_back(lt);
-            }
-        }
-    }
-
-    // Sort (stable to guarantee ordering on directional lights)
-	if (isShadowTechniqueTextureBased())
-	{
-		// Note that if we're using texture shadows, we actually want to use
-		// the first few lights unchanged from the frustum list, matching the
-		// texture shadows that were generated
-		// Thus we only allow object-relative sorting on the remainder of the list
-		if (destList.size() > getShadowTextureCount())
-		{
-			LightList::iterator start = destList.begin();
-			std::advance(start, getShadowTextureCount());
-			std::stable_sort(start, destList.end(), lightLess());
-		}
-	}
-	else
-	{
-		std::stable_sort(destList.begin(), destList.end(), lightLess());
-	}
-
-	// Now assign indexes in the list so they can be examined if needed
-	size_t lightIndex = 0;
-	for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
-	{
-		(*li)->_notifyIndexInFrame(lightIndex);
-	}
-
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
-{
-    _populateLightList(sn->_getDerivedPosition(), radius, destList, lightMask);
-}
-//-----------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
+Entity* SceneManager::createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType )
 {
     switch (ptype)
     {
     case PT_PLANE:
-        return createEntity(entityName, "Prefab_Plane");
+        return createEntity( "Prefab_Plane", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 	case PT_CUBE:
-		return createEntity(entityName, "Prefab_Cube");
+		return createEntity( "Prefab_Cube", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 	case PT_SPHERE:
-		return createEntity(entityName, "Prefab_Sphere");
+		return createEntity( "Prefab_Sphere", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+							 sceneType );
 
         break;
     }
 
-    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-        "Unknown prefab type for entity " + entityName,
-        "SceneManager::createEntity");
+    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Unknown prefab type", "SceneManager::createEntity" );
 }
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(PrefabType ptype)
-{
-	String name = mMovableNameGenerator.generate();
-	return createEntity(name, ptype);
-}
-
 //-----------------------------------------------------------------------
-Entity* SceneManager::createEntity(
-                                   const String& entityName,
-                                   const String& meshName,
-								   const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+Entity* SceneManager::createEntity(const String& meshName,
+								   const String& groupName, /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */
+								   SceneMemoryMgrTypes sceneType /*= SCENE_DYNAMIC */ )
 {
 	// delegate to factory implementation
 	NameValuePairList params;
 	params["mesh"] = meshName;
 	params["resourceGroup"] = groupName;
-	return static_cast<Entity*>(
-		createMovableObject(entityName, EntityFactory::FACTORY_TYPE_NAME, 
-			&params));
+	return static_cast<Entity*>( createMovableObject( EntityFactory::FACTORY_TYPE_NAME,
+														&mEntityMemoryManager[sceneType], &params) );
 
 }
 //---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& entityName, const MeshPtr& pMesh)
+Entity* SceneManager::createEntity(const MeshPtr& pMesh, SceneMemoryMgrTypes sceneType)
 {
-    return createEntity(entityName, pMesh->getName(), pMesh->getGroup());
+    return createEntity(pMesh->getName(), pMesh->getGroup(), sceneType);
 }
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& meshName)
-{
-	String name = mMovableNameGenerator.generate();
-	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
-	return createEntity(name, meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-}
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(const MeshPtr& pMesh)
-{
-    String name = mMovableNameGenerator.generate();
-    return createEntity(name, pMesh);
-}
-//-----------------------------------------------------------------------
-Entity* SceneManager::getEntity(const String& name) const
-{
-	return static_cast<Entity*>(
-		getMovableObject(name, EntityFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasEntity(const String& name) const
-{
-	return hasMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyEntity(Entity *e)
 {
 	destroyMovableObject(e);
 }
-
-//-----------------------------------------------------------------------
-void SceneManager::destroyEntity(const String& name)
-{
-	destroyMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllEntities(void)
 {
@@ -602,29 +487,10 @@ void SceneManager::destroyAllBillboardSets(void)
 	destroyAllMovableObjectsByType(BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-ManualObject* SceneManager::createManualObject(const String& name)
+ManualObject* SceneManager::createManualObject( SceneMemoryMgrTypes sceneType )
 {
 	return static_cast<ManualObject*>(
-		createMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-ManualObject* SceneManager::createManualObject()
-{
-	String name = mMovableNameGenerator.generate();
-	return createManualObject(name);
-}
-//-----------------------------------------------------------------------
-ManualObject* SceneManager::getManualObject(const String& name) const
-{
-	return static_cast<ManualObject*>(
-		getMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasManualObject(const String& name) const
-{
-	return hasMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-
+		createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager[sceneType]) );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyManualObject(ManualObject* obj)
@@ -632,49 +498,20 @@ void SceneManager::destroyManualObject(ManualObject* obj)
 	destroyMovableObject(obj);
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyManualObject(const String& name)
-{
-	destroyMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
 void SceneManager::destroyAllManualObjects(void)
 {
 	destroyAllMovableObjectsByType(ManualObjectFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-BillboardChain* SceneManager::createBillboardChain(const String& name)
-{
-	return static_cast<BillboardChain*>(
-		createMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain()
 {
-	String name = mMovableNameGenerator.generate();
-	return createBillboardChain(name);
+	return static_cast<BillboardChain*>( createMovableObject(BillboardChainFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC]) );
 }
-//-----------------------------------------------------------------------
-BillboardChain* SceneManager::getBillboardChain(const String& name) const
-{
-	return static_cast<BillboardChain*>(
-		getMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardChain(const String& name) const
-{
-	return hasMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardChain(BillboardChain* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardChain(const String& name)
-{
-	destroyMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllBillboardChains(void)
@@ -682,39 +519,15 @@ void SceneManager::destroyAllBillboardChains(void)
 	destroyAllMovableObjectsByType(BillboardChainFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-RibbonTrail* SceneManager::createRibbonTrail(const String& name)
-{
-	return static_cast<RibbonTrail*>(
-		createMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
 RibbonTrail* SceneManager::createRibbonTrail()
 {
-	String name = mMovableNameGenerator.generate();
-	return createRibbonTrail(name);
+	return static_cast<RibbonTrail*>( createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME,
+															&mEntityMemoryManager[SCENE_DYNAMIC]) );
 }
-//-----------------------------------------------------------------------
-RibbonTrail* SceneManager::getRibbonTrail(const String& name) const
-{
-	return static_cast<RibbonTrail*>(
-		getMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasRibbonTrail(const String& name) const
-{
-	return hasMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyRibbonTrail(RibbonTrail* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyRibbonTrail(const String& name)
-{
-	destroyMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllRibbonTrails(void)
@@ -722,57 +535,30 @@ void SceneManager::destroyAllRibbonTrails(void)
 	destroyAllMovableObjectsByType(RibbonTrailFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-	const String& templateName)
+ParticleSystem* SceneManager::createParticleSystem(const String& templateName)
 {
 	NameValuePairList params;
 	params["templateName"] = templateName;
 	
-	return static_cast<ParticleSystem*>(
-		createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-			&params));
+	return static_cast<ParticleSystem*>( createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC],
+															 &params) );
 }
 //-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-	size_t quota, const String& group)
+ParticleSystem* SceneManager::createParticleSystem( size_t quota, const String& group )
 {
 	NameValuePairList params;
 	params["quota"] = StringConverter::toString(quota);
 	params["resourceGroup"] = group;
 	
-	return static_cast<ParticleSystem*>(
-		createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-			&params));
+	return static_cast<ParticleSystem*>( createMovableObject(ParticleSystemFactory::FACTORY_TYPE_NAME,
+															 &mEntityMemoryManager[SCENE_DYNAMIC],
+															 &params) );
 }
-//-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(size_t quota, const String& group)
-{
-	String name = mMovableNameGenerator.generate();
-	return createParticleSystem(name, quota, group);
-}
-
-//-----------------------------------------------------------------------
-ParticleSystem* SceneManager::getParticleSystem(const String& name) const
-{
-	return static_cast<ParticleSystem*>(
-		getMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasParticleSystem(const String& name) const
-{
-	return hasMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyParticleSystem(ParticleSystem* obj)
 {
 	destroyMovableObject(obj);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyParticleSystem(const String& name)
-{
-	destroyMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllParticleSystems(void)
@@ -794,12 +580,10 @@ void SceneManager::clearScene(void)
 	for (SceneNodeList::iterator i = mSceneNodes.begin();
 		i != mSceneNodes.end(); ++i)
 	{
-		OGRE_DELETE i->second;
+		OGRE_DELETE *i;
 	}
 	mSceneNodes.clear();
 	mAutoTrackingSceneNodes.clear();
-
-
 	
 	// Clear animations
     destroyAllAnimations();
@@ -814,48 +598,42 @@ void SceneManager::clearScene(void)
 
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl(void)
+SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType )
 {
-    return OGRE_NEW SceneNode(this);
+	SceneNode *retVal = OGRE_NEW SceneNode( Id::generateNewId<Node>(), this,
+											&mNodeMemoryManager[sceneType], parent );
+	if( sceneType == SCENE_STATIC )
+		notifyStaticDirty( retVal );
+	return retVal;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl(const String& name)
+SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType )
 {
-    return OGRE_NEW SceneNode(this, name);
-}//-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNode(void)
-{
-    SceneNode* sn = createSceneNodeImpl();
-    assert(mSceneNodes.find(sn->getName()) == mSceneNodes.end());
-    mSceneNodes[sn->getName()] = sn;
+	SceneNode* sn = createSceneNodeImpl( parent, sceneType );
+	mSceneNodes.push_back( sn );
+	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNode(const String& name)
+SceneNode* SceneManager::createSceneNode( SceneMemoryMgrTypes sceneType )
 {
-    // Check name not used
-    if (mSceneNodes.find(name) != mSceneNodes.end())
-    {
-        OGRE_EXCEPT(
-            Exception::ERR_DUPLICATE_ITEM,
-            "A scene node with the name " + name + " already exists",
-            "SceneManager::createSceneNode" );
-    }
-
-    SceneNode* sn = createSceneNodeImpl(name);
-    mSceneNodes[sn->getName()] = sn;
+    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0, sceneType );
+	mSceneNodes.push_back( sn );
+	sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroySceneNode(const String& name)
+void SceneManager::destroySceneNode( SceneNode* sn )
 {
-    SceneNodeList::iterator i = mSceneNodes.find(name);
-
-    if (i == mSceneNodes.end())
+	if( sn->mGlobalIndex >= mSceneNodes.size() || sn != *(mSceneNodes.begin() + sn->mGlobalIndex) )
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
-            "SceneManager::destroySceneNode");
+		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "SceneNode ID: " +
+			StringConverter::toString( sn->getId() ) + ", named '" + sn->getName() +
+			"' had it's mGlobalIndex out of date!!! (or the SceneNode wasn't "
+			"created with this SceneManager)", "SceneManager::destroySceneNode");
     }
+
+	SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
 
     // Find any scene nodes which are tracking this node, and turn them off
     AutoTrackingSceneNodes::iterator ai, aiend;
@@ -866,13 +644,13 @@ void SceneManager::destroySceneNode(const String& name)
 		AutoTrackingSceneNodes::iterator curri = ai++;
         SceneNode* n = *curri;
         // Tracking this node
-        if (n->getAutoTrackTarget() == i->second)
+        if (n->getAutoTrackTarget() == sn)
         {
             // turn off, this will notify SceneManager to remove
             n->setAutoTracking(false);
         }
         // node is itself a tracker
-        else if (n == i->second)
+        else if (n == sn)
         {
             mAutoTrackingSceneNodes.erase(curri);
         }
@@ -880,54 +658,74 @@ void SceneManager::destroySceneNode(const String& name)
 
 	// detach from parent (don't do this in destructor since bulk destruction
 	// behaves differently)
-	Node* parentNode = i->second->getParent();
-	if (parentNode)
+	Node *parentNode = sn->getParent();
+	if( parentNode )
 	{
-		parentNode->removeChild(i->second);
+		parentNode->removeChild( sn );
 	}
-    OGRE_DELETE i->second;
-    mSceneNodes.erase(i);
-}
-//---------------------------------------------------------------------
-void SceneManager::destroySceneNode(SceneNode* sn)
-{
-    if(!sn)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
+	itor = efficientVectorRemove( mSceneNodes, itor );
+    OGRE_DELETE sn;
+	sn = 0;
 
-	destroySceneNode(sn->getName());
+	//The node that was at the end got swapped and has now a different index
+	if( itor != mSceneNodes.end() )
+		(*itor)->mGlobalIndex = itor - mSceneNodes.begin();
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getRootSceneNode(void)
+SceneNode* SceneManager::getRootSceneNode( SceneMemoryMgrTypes sceneType )
 {
-	if (!mSceneRoot)
-	{
-		// Create root scene node
-		mSceneRoot = createSceneNodeImpl("Ogre/SceneRoot");
-		mSceneRoot->_notifyRootNode();
-	}
-
-    return mSceneRoot;
+    return mSceneRoot[sceneType];
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getSceneNode(const String& name) const
+SceneNode* SceneManager::getSceneNode( IdType id )
 {
-    SceneNodeList::const_iterator i = mSceneNodes.find(name);
+	// Use reverse iterators, as we assume the most used nodes are the last ones created.
+	SceneNode *retVal = 0;
+	SceneNodeList::reverse_iterator ritor = mSceneNodes.rbegin();
+	SceneNodeList::reverse_iterator rend  = mSceneNodes.rend();
 
-    if (i == mSceneNodes.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
-            "SceneManager::getSceneNode");
-    }
+	IdCmp idCmp;
+	while( ritor != rend && !idCmp( *ritor, id ) )
+		++ritor;
 
-    return i->second;
+	if( ritor != mSceneNodes.rend() )
+        retVal = *ritor;
 
+    return retVal;
 }
 //-----------------------------------------------------------------------
-bool SceneManager::hasSceneNode(const String& name) const
+const SceneNode* SceneManager::getSceneNode( IdType id ) const
 {
-	return (mSceneNodes.find(name) != mSceneNodes.end());
-}
+	// Use reverse iterators, as we assume the most used nodes are the last ones created.
+	SceneNode const *retVal = 0;
+	SceneNodeList::const_reverse_iterator ritor = mSceneNodes.rbegin();
+	SceneNodeList::const_reverse_iterator rend  = mSceneNodes.rend();
 
+	IdCmp idCmp;
+	while( ritor != rend && !idCmp( *ritor, id ) )
+		++ritor;
+
+	if( ritor != mSceneNodes.rend() )
+        retVal = *ritor;
+
+    return retVal;
+}
+//-----------------------------------------------------------------------
+void SceneManager::registerSceneNodeListener( SceneNode *sceneNode )
+{
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodesWithListeners.begin(),
+													 mSceneNodesWithListeners.end(), sceneNode );
+	mSceneNodesWithListeners.insert( itor, sceneNode );
+}
+//-----------------------------------------------------------------------
+void SceneManager::unregisterSceneNodeListener( SceneNode *sceneNode )
+{
+	SceneNodeList::iterator itor = std::lower_bound( mSceneNodesWithListeners.begin(),
+													 mSceneNodesWithListeners.end(), sceneNode );
+	assert( itor != mSceneNodesWithListeners.end() && *itor == sceneNode );
+	if( itor != mSceneNodesWithListeners.end() && *itor == sceneNode )
+		mSceneNodesWithListeners.erase( itor );
+}
 //-----------------------------------------------------------------------
 const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 
 								   bool shadowDerivation)
@@ -953,10 +751,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			// Derive a special shadow caster pass from this one
 			pass = deriveShadowCasterPass(pass);
-		}
-		else if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && shadowDerivation)
-		{
-			pass = deriveShadowReceiverPass(pass);
 		}
 
         // Tell params about current pass
@@ -1146,56 +940,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
 		Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
 		size_t unit = 0;
-		// Reset the shadow texture index for each pass
-		size_t startLightIndex = pass->getStartLight();
-		size_t shadowTexUnitIndex = 0;
-		size_t shadowTexIndex = mShadowTextures.size();
-		if (mShadowTextureIndexLightList.size() > startLightIndex)
-			shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
 		while(texIter.hasMoreElements())
 		{
 			TextureUnitState* pTex = texIter.getNext();
-			if (!pass->getIteratePerLight() && 
-				isShadowTechniqueTextureBased() && 
-				pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
-			{
-				// Need to bind the correct shadow texture, based on the start light
-				// Even though the light list can change per object, our restrictions
-				// say that when texture shadows are enabled, the lights up to the
-				// number of texture shadows will be fixed for all objects
-				// to match the shadow textures that have been generated
-				// see Listener::sortLightsAffectingFrustum and
-				// MovableObject::Listener::objectQueryLights
-				// Note that light iteration throws the indexes out so we don't bind here
-				// if that's the case, we have to bind when lights are iterated
-				// in renderSingleObject
-
-				TexturePtr shadowTex;
-				if (shadowTexIndex < mShadowTextures.size())
-				{
-					shadowTex = getShadowTexture(shadowTexIndex);
-					// Hook up projection frustum
-					Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-					// Enable projective texturing if fixed-function, but also need to
-					// disable it explicitly for program pipeline.
-					pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-					mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
-				}
-				else
-				{
-					// Use fallback 'null' shadow texture
-					// no projection since all uniform colour anyway
-					shadowTex = mNullShadowTexture;
-					pTex->setProjectiveTexturing(false);
-					mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
-
-				}
-				pTex->_setTexturePtr(shadowTex);
-
-				++shadowTexIndex;
-				++shadowTexUnitIndex;
-			}
-			else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
+			if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram() &&
+				pTex->getContentType() != TextureUnitState::CONTENT_SHADOW )
 			{
 				// Manually set texture projector for shaders if present
 				// This won't get set any other way if using manual projection
@@ -1208,30 +957,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
 			{
-				CompositorChain* currentChain = _getActiveCompositorChain();
-				if (!currentChain)
-				{
-					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-						"A pass that wishes to reference a compositor texture "
-						"attempted to render in a pipeline without a compositor",
-						"SceneManager::_setPass");
-				}
-				CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
-				if (refComp == 0)
-				{
-					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-						"Invalid compositor content_type compositor name",
-						"SceneManager::_setPass");
-				}
-				Ogre::TexturePtr refTex = refComp->getTextureInstance(
-					pTex->getReferencedTextureName(), pTex->getReferencedMRTIndex());
-				if (refTex.isNull())
-				{
-					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-						"Invalid compositor content_type texture name",
-						"SceneManager::_setPass");
-				}
-				pTex->_setTexturePtr(refTex);
+				//TODO: (dark_sylinc) Add CONTENT_COMPOSITOR back!
+				//(should be able to read from global tex. or local to current node)
+				//pTex->_setTexturePtr( compoTex );
 			}
 			mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
 			++unit;
@@ -1254,8 +982,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		bool colWrite = pass->getColourWriteEnabled();
 		mDestRenderSystem->_setColourBufferWriteEnabled(colWrite, colWrite, colWrite, colWrite);
 		// Culling mode
-		if (isShadowTechniqueTextureBased() 
-			&& mIlluminationStage == IRS_RENDER_TO_TEXTURE
+		if ( mIlluminationStage == IRS_RENDER_TO_TEXTURE
 			&& mShadowCasterRenderBackFaces
 			&& pass->getCullingMode() == CULL_CLOCKWISE)
 		{
@@ -1314,9 +1041,6 @@ void SceneManager::prepareRenderQueue(void)
 			RenderQueueGroup* group = 
 				q->getQueueGroup(invocation->getRenderQueueGroupID());
 			group->addOrganisationMode(invocation->getSolidsOrganisation());
-			// also set splitting options
-			updateRenderQueueGroupSplitOptions(group, invocation->getSuppressShadows(), 
-				invocation->getSuppressRenderStateChanges());
 		}
 
 		mLastRenderQueueInvocationCustom = true;
@@ -1340,21 +1064,88 @@ void SceneManager::prepareRenderQueue(void)
 			}
 		}
 
-		// Global split options
-		updateRenderQueueSplitOptions();
-
 		mLastRenderQueueInvocationCustom = false;
 	}
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)
+void SceneManager::_swapVisibleObjectsForShadowMapping()
 {
-	OgreProfileGroup("_renderScene", OGREPROF_GENERAL);
+	mVisibleObjects.swap( mVisibleObjectsBackup );
+}
+//-----------------------------------------------------------------------
+void SceneManager::_cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq )
+{
+	camera->_setRenderedRqs( firstRq, lastRq );
+
+	CullFrustumRequest cullRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList, camera );
+	fireCullReceiversBoxThreads( cullRequest );
+
+	//Now merge the bounds from all threads into one
+	collectVisibleBoundsInfoFromThreads( camera, firstRq, lastRq );
+}
+//-----------------------------------------------------------------------
+void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq )
+{
+	OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
 
     Root::getSingleton()._pushCurrentSceneManager(this);
 	mActiveQueuedRenderableVisitor->targetSceneMgr = this;
 	mAutoParamDataSource->setCurrentSceneManager(this);
+
+	// Also set the internal viewport pointer at this point, for calls that need it
+	// However don't call setViewport just yet (see below)
+	mCurrentViewport = vp;
+    mCameraInProgress = camera;
+
+	{
+		// Lock scene graph mutex, no more changes until we're ready to render
+            OGRE_LOCK_MUTEX(sceneGraphMutex);
+
+		// Prepare render queue for receiving new objects
+		/*{
+			OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
+			prepareRenderQueue();
+		}*/
+
+		if (mFindVisibleObjects)
+		{
+			OgreProfileGroup("cullFrusum", OGREPROF_CULLING);
+
+			assert( !mEntitiesMemoryManagerCulledList.empty() );
+
+			// Quick way of reducing overhead/stress on VisibleObjectsBoundsInfo
+			// calculation (lastRq can be up to 255)
+			uint8 realFirstRq= firstRq;
+			uint8 realLastRq = 0;
+			{
+				ObjectMemoryManagerVec::const_iterator itor = mEntitiesMemoryManagerCulledList.begin();
+				ObjectMemoryManagerVec::const_iterator end  = mEntitiesMemoryManagerCulledList.end();
+				while( itor != end )
+				{
+					realFirstRq = std::min<uint8>( realFirstRq, (*itor)->_getTotalRenderQueues() );
+					realLastRq	= std::max<uint8>( realLastRq, (*itor)->_getTotalRenderQueues() );
+					++itor;
+				}
+				realLastRq = std::min( realLastRq, lastRq );
+			}
+
+			camera->_setRenderedRqs( realFirstRq, realLastRq );
+
+			CullFrustumRequest cullRequest( realFirstRq, realLastRq,
+											&mEntitiesMemoryManagerCulledList, camera );
+			fireCullFrustumThreads( cullRequest );
+
+			//Now merge the bounds from all threads into one
+			collectVisibleBoundsInfoFromThreads( camera, realFirstRq, realLastRq );
+		}
+	} // end lock on scene graph mutex
+}
+//-----------------------------------------------------------------------
+void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
+									bool includeOverlays )
+{
+	OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
 
 	// Also set the internal viewport pointer at this point, for calls that need it
 	// However don't call setViewport just yet (see below)
@@ -1364,90 +1155,11 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	LightList emptyLightList;
 	useLights(emptyLightList, 0);
 
-    if (isShadowTechniqueInUse())
-    {
-        // Prepare shadow materials
-        initShadowVolumeMaterials();
-    }
-
-    // Perform a quick pre-check to see whether we should override far distance
-    // When using stencil volumes we have to use infinite far distance
-    // to prevent dark caps getting clipped
-    if (isShadowTechniqueStencilBased() && 
-        camera->getProjectionType() == PT_PERSPECTIVE &&
-        camera->getFarClipDistance() != 0 && 
-        mDestRenderSystem->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE) && 
-        mShadowUseInfiniteFarPlane)
-    {
-        // infinite far distance
-        camera->setFarClipDistance(0);
-    }
-
     mCameraInProgress = camera;
-
-
-    // Update controllers 
-    ControllerManager::getSingleton().updateAllControllers();
-
-    // Update the scene, only do this once per frame
-    unsigned long thisFrameNumber = Root::getSingleton().getNextFrameNumber();
-    if (thisFrameNumber != mLastFrameNumber)
-    {
-        // Update animations
-        _applySceneAnimations();
-		updateDirtyInstanceManagers();
-        mLastFrameNumber = thisFrameNumber;
-    }
 
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
-            OGRE_LOCK_MUTEX(sceneGraphMutex);
-
-		// Update scene graph for this camera (can happen multiple times per frame)
-		{
-			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
-			_updateSceneGraph(camera);
-
-			// Auto-track nodes
-			AutoTrackingSceneNodes::iterator atsni, atsniend;
-			atsniend = mAutoTrackingSceneNodes.end();
-			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
-			{
-				(*atsni)->_autoTrack();
-			}
-			// Auto-track camera if required
-			camera->_autoTrack();
-		}
-
-		if (mIlluminationStage != IRS_RENDER_TO_TEXTURE && mFindVisibleObjects)
-		{
-			// Locate any lights which could be affecting the frustum
-			findLightsAffectingFrustum(camera);
-
-			// Are we using any shadows at all?
-			if (isShadowTechniqueInUse() && vp->getShadowsEnabled())
-			{
-				// Prepare shadow textures if texture shadow based shadowing
-				// technique in use
-				if (isShadowTechniqueTextureBased())
-				{
-					OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
-
-					// *******
-					// WARNING
-					// *******
-					// This call will result in re-entrant calls to this method
-					// therefore anything which comes before this is NOT 
-					// guaranteed persistent. Make sure that anything which 
-					// MUST be specific to this camera / target is done 
-					// AFTER THIS POINT
-					prepareShadowTextures(camera, vp);
-					// reset the cameras & viewport because of the re-entrant call
-					mCameraInProgress = camera;
-					mCurrentViewport = vp;
-				}
-			}
-		}
+		OGRE_LOCK_MUTEX(sceneGraphMutex);
 
 		// Invert vertex winding?
 		if (camera->isReflected())
@@ -1465,7 +1177,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		setViewport(vp);
 
 		// Tell params about camera
-		mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+		mAutoParamDataSource->setCurrentCamera(camera);
 		// Set autoparams for finite dir light extrusion
 		mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -1496,26 +1208,33 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 		if (mFindVisibleObjects)
 		{
-			OgreProfileGroup("_findVisibleObjects", OGREPROF_CULLING);
+			OgreProfileGroup("_updateRenderQueue", OGREPROF_CULLING);
 
-			// Assemble an AAB on the fly which contains the scene elements visible
-			// by the camera.
-			CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
+			if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
+			{
+				fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera,
+													 vp->getVisibilityMask()|getVisibilityMask() ) );
+			}
 
-			assert (camVisObjIt != mCamVisibleObjectsMap.end() &&
-				"Should never fail to find a visible object bound for a camera, "
-				"did you override SceneManager::createCamera or something?");
+			//mVisibleObjects should be filled in phase 01
+			VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
+			VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
 
-			// reset the bounds
-			camVisObjIt->second.reset();
-
-			// Parse the scene and tag visibles
+			//TODO: _updateRenderQueue MIGHT be called in parallel
 			firePreFindVisibleObjects(vp);
-			_findVisibleObjects(camera, &(camVisObjIt->second),
-				mIlluminationStage == IRS_RENDER_TO_TEXTURE? true : false);
-			firePostFindVisibleObjects(vp);
+			while( it != en )
+			{
+				MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+				MovableObject::MovableObjectArray::const_iterator end  = it->end();
 
-			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
+				while( itor != end )
+				{
+					(*itor)->_updateRenderQueue( getRenderQueue(), camera );
+					++itor;
+				}
+				++it;
+			}
+			firePostFindVisibleObjects(vp);
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
@@ -1525,16 +1244,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	} // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
-	// Clear the viewport if required
-	if (mCurrentViewport->getClearEveryFrame())
-	{
-		mDestRenderSystem->clearFrameBuffer(
-			mCurrentViewport->getClearBuffers(), 
-			mCurrentViewport->getBackgroundColour(),
-			mCurrentViewport->getDepthClear() );
-	}        
-    // Begin the frame
-    mDestRenderSystem->_beginFrame();
 
     // Set rasterisation mode
     mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
@@ -1543,14 +1252,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
 	
 	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
-
-	if (mCameraRelativeRendering)
-	{
-		mCachedViewMatrix.setTrans(Vector3::ZERO);
-		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
-	}
-	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
-
 	
 	setViewMatrix(mCachedViewMatrix);
 
@@ -1560,9 +1261,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		_renderVisibleObjects();
 	}
 
-    // End frame
-    mDestRenderSystem->_endFrame();
-
     // Notify camera of vis faces
     camera->_notifyRenderedFaces(mDestRenderSystem->_getFaceCount());
 
@@ -1570,7 +1268,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
 	Root::getSingleton()._popCurrentSceneManager(this);
-
 }
 
 
@@ -1617,29 +1314,6 @@ void SceneManager::setWorldGeometry(DataStreamPtr& stream,
         "World geometry is not supported by the generic SceneManager.",
         "SceneManager::setWorldGeometry");
 }
-
-//-----------------------------------------------------------------------
-bool SceneManager::materialLess::operator() (const Material* x, const Material* y) const
-{
-    // If x transparent and y not, x > y (since x has to overlap y)
-    if (x->isTransparent() && !y->isTransparent())
-    {
-        return false;
-    }
-    // If y is transparent and x not, x < y
-    else if (!x->isTransparent() && y->isTransparent())
-    {
-        return true;
-    }
-    else
-    {
-        // Otherwise don't care (both transparent or both solid)
-        // Just arbitrarily use pointer
-        return x < y;
-    }
-
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::_setSkyPlane(
                                bool enable,
@@ -1702,8 +1376,8 @@ void SceneManager::_setSkyPlane(
         // Create entity 
         if (mSkyPlaneEntity)
         {
-            // destroy old one, do it by name for speed
-            destroyEntity(meshName);
+            // destroy old one
+            destroyEntity( mSkyPlaneEntity );
             mSkyPlaneEntity = 0;
         }
         // Create, use the same name for mesh and entity
@@ -1712,17 +1386,21 @@ void SceneManager::_setSkyPlane(
 			Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
 		NameValuePairList params;
 		params["mesh"] = meshName;
-        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, this, &params));
+		mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(
+											Id::generateNewId<MovableObject>(),
+											&mEntityMemoryManager[SCENE_DYNAMIC], this, &params ));
+		mSkyPlaneEntity->setName( meshName );
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
 
         MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
-        objectMap->map[meshName] = mSkyPlaneEntity;
+		objectMap->movableObjects.push_back( mSkyPlaneEntity );
+		mSkyPlaneEntity->mGlobalIndex = objectMap->movableObjects.size() - 1;
 
         // Create node and attach
         if (!mSkyPlaneNode)
         {
-            mSkyPlaneNode = createSceneNode(meshName + "Node");
+            mSkyPlaneNode = createSceneNode();
         }
         else
         {
@@ -1792,13 +1470,15 @@ void SceneManager::_setSkyBox(
         // Create node 
         if (!mSkyBoxNode)
         {
-            mSkyBoxNode = createSceneNode("SkyBoxNode");
+			mSkyBoxNode = createSceneNode( SCENE_DYNAMIC );
+			mSkyBoxNode->setName( "SkyBoxNode" );
         }
 
 		// Create object
 		if (!mSkyBoxObj)
 		{
-			mSkyBoxObj = OGRE_NEW ManualObject("SkyBox");
+			mSkyBoxObj = OGRE_NEW ManualObject( Id::generateNewId<MovableObject>(),
+												&mEntityMemoryManager[SCENE_DYNAMIC] );
 			mSkyBoxObj->setCastShadows(false);
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}
@@ -2009,7 +1689,8 @@ void SceneManager::_setSkyDome(
         // Create node 
         if (!mSkyDomeNode)
         {
-            mSkyDomeNode = createSceneNode("SkyDomeNode");
+			mSkyDomeNode = createSceneNode( SCENE_DYNAMIC );
+			mSkyDomeNode->setName( "SkyDomeNode" );
         }
         else
         {
@@ -2029,7 +1710,7 @@ void SceneManager::_setSkyDome(
             if (mSkyDomeEntity[i])
             {
                 // destroy old one, do it by name for speed
-                destroyEntity(entName);
+                destroyEntity(mSkyDomeEntity[i]);
                 mSkyDomeEntity[i] = 0;
             }
 			// construct manually so we don't have problems if destroyAllMovableObjects called
@@ -2038,12 +1719,16 @@ void SceneManager::_setSkyDome(
 
 			NameValuePairList params;
 			params["mesh"] = planeMesh->getName();
-			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, this, &params));
+			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(
+												Id::generateNewId<MovableObject>(),
+												&mEntityMemoryManager[SCENE_DYNAMIC], this, &params ));
+			mSkyDomeEntity[i]->setName( entName );
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
 
             MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
-            objectMap->map[entName] = mSkyDomeEntity[i];
+			objectMap->movableObjects.push_back( mSkyDomeEntity[i] );
+			mSkyDomeEntity[i]->mGlobalIndex = objectMap->movableObjects.size() - 1;
 
             // Attach to node
             mSkyDomeNode->attachObject(mSkyDomeEntity[i]);
@@ -2219,32 +1904,382 @@ MeshPtr SceneManager::createSkydomePlane(
     return planeMesh;
 
 }
-
-
 //-----------------------------------------------------------------------
-void SceneManager::_updateSceneGraph(Camera* cam)
+void SceneManager::notifyStaticDirty( MovableObject *movableObject )
 {
-	firePreUpdateSceneGraph(cam);
-
-	// Process queued needUpdate calls 
-	Node::processQueuedUpdates();
-
-    // Cascade down the graph updating transforms & world bounds
-    // In this implementation, just update from the root
-    // Smarter SceneManager subclasses may choose to update only
-    //   certain scene graph branches
-    getRootSceneNode()->_update(true, false);
-
-	firePostUpdateSceneGraph(cam);
+	mStaticEntitiesDirty = true;
+	movableObject->_notifyStaticDirty();
 }
 //-----------------------------------------------------------------------
-void SceneManager::_findVisibleObjects(
-	Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters)
+void SceneManager::notifyStaticDirty( Node *node )
 {
-    // Tell nodes to find, cascade down all nodes
-    getRootSceneNode()->_findVisibleObjects(cam, getRenderQueue(), visibleBounds, true, 
-        mDisplayNodes, onlyShadowCasters);
+	assert( node->isStatic() );
 
+	mStaticMinDepthLevelDirty = std::min<uint16>( mStaticMinDepthLevelDirty, node->getDepthLevel() );
+	node->_notifyStaticDirty();
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx )
+{
+	Transform t( request.t );
+	const size_t toAdvance = std::min( threadIdx * request.numNodesPerThread,
+										request.numTotalNodes );
+
+	//Prevent going out of bounds (usually in the last threadIdx, or
+	//when there are less nodes than ARRAY_PACKED_REALS
+	const size_t numNodes = std::min( request.numNodesPerThread, request.numTotalNodes - toAdvance );
+	t.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+	Node::updateAllTransforms( numNodes, t );
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllTransforms()
+{
+	mRequestType = UPDATE_ALL_TRANSFORMS;
+	NodeMemoryManagerVec::const_iterator it = mNodeMemoryManagerUpdateList.begin();
+	NodeMemoryManagerVec::const_iterator en = mNodeMemoryManagerUpdateList.end();
+
+	while( it != en )
+	{
+		NodeMemoryManager *nodeMemoryManager = *it;
+		const size_t numDepths = nodeMemoryManager->getNumDepths();
+
+		size_t start = nodeMemoryManager->getMemoryManagerType() == SCENE_STATIC ?
+													mStaticMinDepthLevelDirty : 1;
+
+		//Start from the first level (not root) unless static (start from first dirty)
+		for( size_t i=start; i<numDepths; ++i )
+		{
+			Transform t;
+			const size_t numNodes = nodeMemoryManager->getFirstNode( t, i );
+
+			//nodesPerThread must be multiple of ARRAY_PACKED_REALS
+			size_t nodesPerThread = ( numNodes + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			nodesPerThread		  = ( (nodesPerThread + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+									ARRAY_PACKED_REALS;
+
+			//Send them to worker threads (dark_sylinc). We need to go depth by depth because
+			//we may depend on parents which could be processed by different threads.
+			mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
+			mWorkerThreadsBarrier->sync(); //Fire threads
+			mWorkerThreadsBarrier->sync(); //Wait them to complete
+			//Node::updateAllTransforms( numNodes, t );
+		}
+
+		++it;
+	}
+
+	//Call all listeners
+	SceneNodeList::const_iterator itor = mSceneNodesWithListeners.begin();
+	SceneNodeList::const_iterator end  = mSceneNodesWithListeners.end();
+
+	while( itor != end )
+	{
+		(*itor)->getListener()->nodeUpdated( *itor );
+		++itor;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx )
+{
+	ObjectMemoryManagerVec::const_iterator it = objectMemManager.begin();
+	ObjectMemoryManagerVec::const_iterator en = objectMemManager.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+			MovableObject::updateAllBounds( numObjs, objData );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManager )
+{
+	mUpdateBoundsRequest	= &objectMemManager;
+	mRequestType			= UPDATE_ALL_BOUNDS;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
+void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
+													size_t threadIdx )
+{
+	MovableObject::MovableObjectArray::const_iterator itor = mVisibleObjects[threadIdx].begin();
+	MovableObject::MovableObjectArray::const_iterator end  = mVisibleObjects[threadIdx].end();
+
+	while( itor != end )
+	{
+		(*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.combinedVisibilityFlags );
+		++itor;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t threadIdx )
+{
+	MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + threadIdx);
+	outVisibleObjects.clear();
+
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
+	{
+		if( aabbInfo.size() < mCurrentCullFrustumRequest.lastRq )
+			aabbInfo.resize( mCurrentCullFrustumRequest.lastRq );
+
+		//Reset the aabb infos.
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
+
+		while( itor != end )
+		{
+			itor->setNull();
+			++itor;
+		}
+	}
+
+	const Camera *camera = request.camera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			ObjectData objData;
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+			MovableObject::cullFrustum( numObjs, objData, camera,
+					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
+					outVisibleObjects, &aabbInfo[i] );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t threadIdx )
+{
+	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
+	{
+		if( aabbInfo.size() < request.lastRq )
+			aabbInfo.resize( request.lastRq );
+
+		//Reset the aabb infos.
+		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
+		AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
+
+		while( itor != end )
+		{
+			itor->setNull();
+			++itor;
+		}
+	}
+
+	const Camera *camera = request.camera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			ObjectData objData;
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+			MovableObject::cullReceiversBox( numObjs, objData, camera,
+					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::buildLightList()
+{
+	mGlobalLightList.lights.clear();
+
+	ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		//Cull the lights against all cameras to build the list of visible lights.
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			Light::cullLights( numObjs, objData, mGlobalLightList, mVisibleCameras );
+		}
+
+		++it;
+	}
+
+	//Global light list built. Now build a per-movable object light list
+	it = mEntitiesMemoryManagerCulledList.begin();
+	en = mEntitiesMemoryManagerCulledList.end();
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		for( size_t i=0; i<numRenderQueues; ++i )
+		{
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::buildLightList( numObjs, objData, mGlobalLightList );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::highLevelCull()
+{
+	mNodeMemoryManagerUpdateList.clear();
+	mEntitiesMemoryManagerCulledList.clear();
+	mEntitiesMemoryManagerUpdateList.clear();
+	mLightsMemoryManagerCulledList.clear();
+
+	mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
+	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_STATIC] );
+	mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
+	mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
+
+	if( mStaticEntitiesDirty )
+	{
+		//Entities have changed
+		mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_STATIC] );
+	}
+
+	if( mStaticMinDepthLevelDirty < mNodeMemoryManager[SCENE_STATIC].getNumDepths() )
+	{
+		//Nodes have changed
+		mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_STATIC] );
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateSceneGraph()
+{
+	//TODO: Enable auto tracking again, first manually update the tracked scene nodes for correct math. (dark_sylinc)
+	// Update scene graph for this camera (can happen multiple times per frame)
+	/*{
+		// Auto-track nodes
+		AutoTrackingSceneNodes::iterator atsni, atsniend;
+		atsniend = mAutoTrackingSceneNodes.end();
+		for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+		{
+			(*atsni)->_autoTrack();
+		}
+		// Auto-track camera if required
+		camera->_autoTrack();
+	}*/
+
+	OgreProfileGroup("updateSceneGraph", OGREPROF_GENERAL);
+
+	// Update controllers 
+    ControllerManager::getSingleton().updateAllControllers();
+
+	highLevelCull();
+	_applySceneAnimations();
+	updateAllTransforms();
+	updateInstanceManagerAnimations();
+	updateInstanceManagers();
+	updateAllBounds( mEntitiesMemoryManagerUpdateList );
+	updateAllBounds( mLightsMemoryManagerCulledList );
+	buildLightList();
+
+	//Reset the list of render RQs for all cameras that are in a PASS_SCENE (except shadow passes)
+	uint8 numRqs = 0;
+	{
+		ObjectMemoryManagerVec::const_iterator itor = mEntitiesMemoryManagerCulledList.begin();
+		ObjectMemoryManagerVec::const_iterator end  = mEntitiesMemoryManagerCulledList.end();
+		while( itor != end )
+		{
+			numRqs = std::max<uint8>( numRqs, (*itor)->_getTotalRenderQueues() );
+			++itor;
+		}
+	}
+
+	CameraList::const_iterator itor = mCameras.begin();
+	CameraList::const_iterator end  = mCameras.end();
+	while( itor != end )
+	{
+		(*itor)->_resetRenderedRqs( numRqs );
+		++itor;
+	}
+
+	// Reset these
+	mStaticMinDepthLevelDirty = std::numeric_limits<uint16>::max();
+	mStaticEntitiesDirty = false;
+
+	for( size_t i=0; i<OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i )
+		mAutoParamDataSource->setTextureProjector( 0, i );
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderVisibleObjects(void)
@@ -2367,185 +2402,6 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderAdditiveStencilShadowedQueueGroupObjects(
-	RenderQueueGroup* pGroup, 
-	QueuedRenderableCollection::OrganisationMode om)
-{
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-    LightList lightList;
-
-    while (groupIt.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
-
-        // Sort the queue first
-        pPriorityGrp->sort(mCameraInProgress);
-
-        // Clear light list
-        lightList.clear();
-
-        // Render all the ambient passes first, no light iteration, no lights
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
-        // Also render any objects which have receive shadows disabled
-        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
-
-
-        // Now iterate per light
-        // Iterate over lights, render all volumes to stencil
-        LightList::const_iterator li, liend;
-        liend = mLightsAffectingFrustum.end();
-
-        for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
-        {
-            Light* l = *li;
-            // Set light state
-			if (lightList.empty())
-				lightList.push_back(l);
-			else
-				lightList[0] = l;
-
-			// set up scissor, will cover shadow vol and regular light rendering
-			ClipResult scissored = buildAndSetScissor(lightList, mCameraInProgress);
-			ClipResult clipped = CLIPPED_NONE;
-			if (mShadowAdditiveLightClip)
-				clipped = buildAndSetLightClip(lightList);
-
-			// skip light if scissored / clipped entirely
-			if (scissored == CLIPPED_ALL || clipped == CLIPPED_ALL)
-				continue;
-
-            if (l->getCastShadows())
-            {
-                // Clear stencil
-                mDestRenderSystem->clearFrameBuffer(FBT_STENCIL);
-                renderShadowVolumesToStencil(l, mCameraInProgress, false);
-                // turn stencil check on
-                mDestRenderSystem->setStencilCheckEnabled(true);
-                // NB we render where the stencil is equal to zero to render lit areas
-                mDestRenderSystem->setStencilBufferParams(CMPF_EQUAL, 0);
-            }
-
-            // render lighting passes for this light
-            renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
-
-            // Reset stencil params
-            mDestRenderSystem->setStencilBufferParams();
-            mDestRenderSystem->setStencilCheckEnabled(false);
-            mDestRenderSystem->_setDepthBufferParams();
-
-			if (scissored == CLIPPED_SOME)
-				resetScissor();
-			if (clipped == CLIPPED_SOME)
-				resetLightClip();
-
-        }// for each light
-
-
-        // Now render decal passes, no need to set lights as lighting will be disabled
-        renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
-
-
-    }// for each priority
-
-    // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-    while (groupIt2.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
-
-        // Do unsorted transparents
-        renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending sort)
-        renderObjects(pPriorityGrp->getTransparents(), 
-			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
-	RenderQueueGroup* pGroup, 
-	QueuedRenderableCollection::OrganisationMode om)
-{
-    /* For each light, we need to render all the solids from each group, 
-    then do the modulative shadows, then render the transparents from
-    each group.
-    Now, this means we are going to reorder things more, but that it required
-    if the shadows are to look correct. The overall order is preserved anyway,
-    it's just that all the transparents are at the end instead of them being
-    interleaved as in the normal rendering loop. 
-    */
-    // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-
-    while (groupIt.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
-
-        // Sort the queue first
-        pPriorityGrp->sort(mCameraInProgress);
-
-        // Do (shadowable) solids
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
-    }
-
-
-    // Iterate over lights, render all volumes to stencil
-    LightList::const_iterator li, liend;
-    liend = mLightsAffectingFrustum.end();
-
-    for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
-    {
-        Light* l = *li;
-        if (l->getCastShadows())
-        {
-            // Clear stencil
-            mDestRenderSystem->clearFrameBuffer(FBT_STENCIL);
-            renderShadowVolumesToStencil(l, mCameraInProgress, true);
-            // render full-screen shadow modulator for all lights
-            _setPass(mShadowModulativePass);
-            // turn stencil check on
-            mDestRenderSystem->setStencilCheckEnabled(true);
-            // NB we render where the stencil is not equal to zero to render shadows, not lit areas
-            mDestRenderSystem->setStencilBufferParams(CMPF_NOT_EQUAL, 0);
-            renderSingleObject(mFullScreenQuad, mShadowModulativePass, false, false);
-            // Reset stencil params
-            mDestRenderSystem->setStencilBufferParams();
-            mDestRenderSystem->setStencilCheckEnabled(false);
-            mDestRenderSystem->_setDepthBufferParams();
-        }
-
-    }// for each light
-
-    // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-    while (groupIt2.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
-
-        // Do non-shadowable solids
-        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
-
-    }// for each priority
-
-
-    // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt3 = pGroup->getIterator();
-    while (groupIt3.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt3.getNext();
-
-        // Do unsorted transparents
-        renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending sort)
-        renderObjects(pPriorityGrp->getTransparents(), 
-			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
-}
-//-----------------------------------------------------------------------
 void SceneManager::renderTextureShadowCasterQueueGroupObjects(
 	RenderQueueGroup* pGroup, 
 	QueuedRenderableCollection::OrganisationMode om)
@@ -2553,24 +2409,15 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     // This is like the basic group render, except we skip all transparents
     // and we also render any non-shadowed objects
     // Note that non-shadow casters will have already been eliminated during
-    // _findVisibleObjects
+    // _cullPhase01
 
     // Iterate through priorities
     RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs and fixed function to 
-	if (isShadowTechniqueAdditive())
-	{
-		// Use simple black / white mask if additive
-		mAutoParamDataSource->setAmbientLightColour(ColourValue::Black);
-		mDestRenderSystem->setAmbientLight(0, 0, 0);
-	}
-	else
-	{
-		// Use shadow colour as caster colour if modulative
-		mAutoParamDataSource->setAmbientLightColour(mShadowColour);
-		mDestRenderSystem->setAmbientLight(mShadowColour.r, mShadowColour.g, mShadowColour.b);
-	}
+	// Use shadow colour as caster colour if modulative
+	mAutoParamDataSource->setAmbientLightColour(mShadowColour);
+	mDestRenderSystem->setAmbientLight(mShadowColour.r, mShadowColour.g, mShadowColour.b);
 
     while (groupIt.hasMoreElements())
     {
@@ -2580,15 +2427,14 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
         pPriorityGrp->sort(mCameraInProgress);
 
         // Do solids, override light list incase any vertex programs use them
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &mShadowTextureCurrentCasterLightList);
-        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        renderObjects( pPriorityGrp->getSolidsBasic(), om, false, false );
 		// Do unsorted transparents that cast shadows
-		renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
+		renderObjects( pPriorityGrp->getTransparentsUnsorted(), om, false, false );
 		// Do transparents that cast shadows
 		renderTransparentShadowCasterObjects(
 				pPriorityGrp->getTransparents(), 
 				QueuedRenderableCollection::OM_SORT_DESCENDING, 
-				false, false, &mShadowTextureCurrentCasterLightList);
+				false, false );
 
 
     }// for each priority
@@ -2598,315 +2444,12 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderModulativeTextureShadowedQueueGroupObjects(
-	RenderQueueGroup* pGroup, 
-	QueuedRenderableCollection::OrganisationMode om)
-{
-    /* For each light, we need to render all the solids from each group, 
-    then do the modulative shadows, then render the transparents from
-    each group.
-    Now, this means we are going to reorder things more, but that it required
-    if the shadows are to look correct. The overall order is preserved anyway,
-    it's just that all the transparents are at the end instead of them being
-    interleaved as in the normal rendering loop. 
-    */
-    // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-
-    while (groupIt.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
-
-        // Sort the queue first
-        pPriorityGrp->sort(mCameraInProgress);
-
-        // Do solids
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
-        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
-    }
-
-
-    // Iterate over lights, render received shadows
-    // only perform this if we're in the 'normal' render stage, to avoid
-    // doing it during the render to texture
-    if (mIlluminationStage == IRS_NONE)
-    {
-        mIlluminationStage = IRS_RENDER_RECEIVER_PASS;
-
-        LightList::iterator i, iend;
-        ShadowTextureList::iterator si, siend;
-        iend = mLightsAffectingFrustum.end();
-        siend = mShadowTextures.end();
-        for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
-            i != iend && si != siend; ++i)
-        {
-            Light* l = *i;
-
-            if (!l->getCastShadows())
-                continue;
-
-			// Store current shadow texture
-            mCurrentShadowTexture = si->getPointer();
-			// Get camera for current shadow texture
-            Camera *cam = mCurrentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-            // Hook up receiver texture
-			Pass* targetPass = mShadowTextureCustomReceiverPass ?
-				mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-			targetPass->getTextureUnitState(0)->setTextureName(
-				mCurrentShadowTexture->getName());
-			// Hook up projection frustum if fixed-function, but also need to
-			// disable it explicitly for program pipeline.
-			TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
-			texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-			// clamp to border colour in case this is a custom material
-			texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-			texUnit->setTextureBorderColour(ColourValue::White);
-
-            mAutoParamDataSource->setTextureProjector(cam, 0);
-            // if this light is a spotlight, we need to add the spot fader layer
-			// BUT not if using a custom projection matrix, since then it will be
-			// inappropriately shaped most likely
-            if (l->getType() == Light::LT_SPOTLIGHT && !cam->isCustomProjectionMatrixEnabled())
-            {
-				// remove all TUs except 0 & 1 
-				// (only an issue if additive shadows have been used)
-				while(targetPass->getNumTextureUnitStates() > 2)
-					targetPass->removeTextureUnitState(2);
-
-                // Add spot fader if not present already
-                if (targetPass->getNumTextureUnitStates() == 2 && 
-					targetPass->getTextureUnitState(1)->getTextureName() == 
-						"spot_shadow_fade.png")
-				{
-					// Just set 
-					TextureUnitState* t = 
-						targetPass->getTextureUnitState(1);
-					t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-				}
-                else
-				{
-					// Remove any non-conforming spot layers
-					while(targetPass->getNumTextureUnitStates() > 1)
-						targetPass->removeTextureUnitState(1);
-
-                    TextureUnitState* t = 
-                        targetPass->createTextureUnitState("spot_shadow_fade.png");
-                    t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-                    t->setColourOperation(LBO_ADD);
-                    t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-                }
-            }
-            else 
-            {
-				// remove all TUs except 0 including spot
-				while(targetPass->getNumTextureUnitStates() > 1)
-	                targetPass->removeTextureUnitState(1);
-
-            }
-			// Set lighting / blending modes
-			targetPass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
-			targetPass->setLightingEnabled(false);
-
-            targetPass->_load();
-
-			// Fire pre-receiver event
-			fireShadowTexturesPreReceiver(l, cam);
-
-            renderTextureShadowReceiverQueueGroupObjects(pGroup, om);
-
-            ++si;
-
-        }// for each light
-
-        mIlluminationStage = IRS_NONE;
-
-    }
-
-    // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt3 = pGroup->getIterator();
-    while (groupIt3.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt3.getNext();
-
-        // Do unsorted transparents
-        renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending)
-        renderObjects(pPriorityGrp->getTransparents(), 
-			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::renderAdditiveTextureShadowedQueueGroupObjects(
-	RenderQueueGroup* pGroup, 
-	QueuedRenderableCollection::OrganisationMode om)
-{
-	RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-	LightList lightList;
-
-	while (groupIt.hasMoreElements())
-	{
-		RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
-
-		// Sort the queue first
-		pPriorityGrp->sort(mCameraInProgress);
-
-		// Clear light list
-		lightList.clear();
-
-		// Render all the ambient passes first, no light iteration, no lights
-		renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
-		// Also render any objects which have receive shadows disabled
-		renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
-
-
-		// only perform this next part if we're in the 'normal' render stage, to avoid
-		// doing it during the render to texture
-		if (mIlluminationStage == IRS_NONE)
-		{
-			// Iterate over lights, render masked
-			LightList::const_iterator li, liend;
-			ShadowTextureList::iterator si, siend;
-			liend = mLightsAffectingFrustum.end();
-			siend = mShadowTextures.end();
-            si = mShadowTextures.begin();
-
-			for (li = mLightsAffectingFrustum.begin(); li != liend; ++li)
-			{
-				Light* l = *li;
-
-				if (l->getCastShadows() && si != siend)
-				{
-					// Store current shadow texture
-					mCurrentShadowTexture = si->getPointer();
-					// Get camera for current shadow texture
-					Camera *cam = mCurrentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-					// Hook up receiver texture
-					Pass* targetPass = mShadowTextureCustomReceiverPass ?
-						mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-					targetPass->getTextureUnitState(0)->setTextureName(
-						mCurrentShadowTexture->getName());
-					// Hook up projection frustum if fixed-function, but also need to
-					// disable it explicitly for program pipeline.
-					TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
-					texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-					// clamp to border colour in case this is a custom material
-					texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-					texUnit->setTextureBorderColour(ColourValue::White);
-					mAutoParamDataSource->setTextureProjector(cam, 0);
-					// Remove any spot fader layer
-					if (targetPass->getNumTextureUnitStates() > 1 && 
-						targetPass->getTextureUnitState(1)->getTextureName() 
-							== "spot_shadow_fade.png")
-					{
-						// remove spot fader layer (should only be there if
-						// we previously used modulative shadows)
-						targetPass->removeTextureUnitState(1);
-					}
-					// Set lighting / blending modes
-					targetPass->setSceneBlending(SBF_ONE, SBF_ONE);
-					targetPass->setLightingEnabled(true);
-					targetPass->_load();
-
-					// increment shadow texture since used
-					++si;
-
-					mIlluminationStage = IRS_RENDER_RECEIVER_PASS;
-
-				}
-				else
-				{
-					mIlluminationStage = IRS_NONE;
-
-				}
-
-                // render lighting passes for this light
-                if (lightList.empty())
-                    lightList.push_back(l);
-                else
-                    lightList[0] = l;
-
-				// set up light scissoring, always useful in additive modes
-				ClipResult scissored = buildAndSetScissor(lightList, mCameraInProgress);
-				ClipResult clipped = CLIPPED_NONE;
-				if(mShadowAdditiveLightClip)
-					clipped = buildAndSetLightClip(lightList);
-				// skip if entirely clipped
-				if(scissored == CLIPPED_ALL || clipped == CLIPPED_ALL)
-					continue;
-
-				renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
-				if (scissored == CLIPPED_SOME)
-					resetScissor();
-				if (clipped == CLIPPED_SOME)
-					resetLightClip();
-
-			}// for each light
-
-			mIlluminationStage = IRS_NONE;
-
-			// Now render decal passes, no need to set lights as lighting will be disabled
-			renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
-
-		}
-
-
-	}// for each priority
-
-	// Iterate again - variable name changed to appease gcc.
-	RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-	while (groupIt2.hasMoreElements())
-	{
-		RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
-
-        // Do unsorted transparents
-        renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-		// Do transparents (always descending sort)
-		renderObjects(pPriorityGrp->getTransparents(), 
-			QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-	}// for each priority
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
-	RenderQueueGroup* pGroup, 
-	QueuedRenderableCollection::OrganisationMode om)
-{
-    static LightList nullLightList;
-
-    // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-
-    // Override auto param ambient to force vertex programs to go full-bright
-    mAutoParamDataSource->setAmbientLightColour(ColourValue::White);
-    mDestRenderSystem->setAmbientLight(1, 1, 1);
-
-    while (groupIt.hasMoreElements())
-    {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
-
-        // Do solids, override light list incase any vertex programs use them
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
-
-        // Don't render transparents or passes which have shadow receipt disabled
-
-    }// for each priority
-
-    // reset ambient
-    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
-    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
-
-}
-//-----------------------------------------------------------------------
 void SceneManager::SceneMgrQueuedRenderableVisitor::visit(Renderable* r)
 {
-	// Give SM a chance to eliminate
-	if (targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
+	if( targetSceneMgr->_getCurrentRenderStage() != IRS_RENDER_TO_TEXTURE || mUsedPass->getIndex() == 0 )
 	{
 		// Render a single object, this will set up auto params if required
-		targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights, manualLightList);
+		targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights);
 	}
 }
 //-----------------------------------------------------------------------
@@ -2933,11 +2476,10 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
 		return;
 
 	// Give SM a chance to eliminate
-	if (targetSceneMgr->validateRenderableForRendering(rp->pass, rp->renderable))
+	if( targetSceneMgr->_getCurrentRenderStage() != IRS_RENDER_TO_TEXTURE || rp->pass->getIndex() == 0 )
 	{
 		mUsedPass = targetSceneMgr->_setPass(rp->pass);
-		targetSceneMgr->renderSingleObject(rp->renderable, mUsedPass, scissoring, 
-			autoLights, manualLightList);
+		targetSceneMgr->renderSingleObject(rp->renderable, mUsedPass, scissoring, autoLights);
 	}
 }
 //-----------------------------------------------------------------------
@@ -2948,10 +2490,8 @@ bool SceneManager::validatePassForRendering(const Pass* pass)
 	// one pass for shadow texture receive for modulative technique)
 	// Also bypass if passes above the first if render state changes are
 	// suppressed since we're not actually using this pass data anyway
-    if (!mSuppressShadows && mCurrentViewport->getShadowsEnabled() &&
-		((isShadowTechniqueModulative() && mIlluminationStage == IRS_RENDER_RECEIVER_PASS)
-		 || mIlluminationStage == IRS_RENDER_TO_TEXTURE || mSuppressRenderStateChanges) && 
-        pass->getIndex() > 0)
+    if( (mIlluminationStage == IRS_RENDER_TO_TEXTURE || mSuppressRenderStateChanges) && 
+        pass->getIndex() > 0 )
     {
         return false;
     }
@@ -2970,40 +2510,12 @@ bool SceneManager::validatePassForRendering(const Pass* pass)
     return true;
 }
 //-----------------------------------------------------------------------
-bool SceneManager::validateRenderableForRendering(const Pass* pass, const Renderable* rend)
-{
-    // Skip this renderable if we're doing modulative texture shadows, it casts shadows
-    // and we're doing the render receivers pass and we're not self-shadowing
-	// also if pass number > 0
-    if (!mSuppressShadows && mCurrentViewport->getShadowsEnabled() &&
-		isShadowTechniqueTextureBased())
-	{
-		if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && 
-			rend->getCastsShadows() && !mShadowTextureSelfShadow)
-		{
-			return false;
-		}
-		// Some duplication here with validatePassForRendering, for transparents
-		if (((isShadowTechniqueModulative() && mIlluminationStage == IRS_RENDER_RECEIVER_PASS)
-			|| mIlluminationStage == IRS_RENDER_TO_TEXTURE || mSuppressRenderStateChanges) && 
-			pass->getIndex() > 0)
-		{
-			return false;
-		}
-    }
-
-    return true;
-
-}
-//-----------------------------------------------------------------------
 void SceneManager::renderObjects(const QueuedRenderableCollection& objs, 
 								 QueuedRenderableCollection::OrganisationMode om, 
 								 bool lightScissoringClipping,
-								 bool doLightIteration, 
-                                 const LightList* manualLightList)
+								 bool doLightIteration)
 {
 	mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
-	mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
 	mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
 	mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
 	// Use visitor
@@ -3013,61 +2525,20 @@ void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
 void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup, 
 										   QueuedRenderableCollection::OrganisationMode om)
 {
-	bool doShadows = 
-		pGroup->getShadowsEnabled() && 
-		mCurrentViewport->getShadowsEnabled() && 
-		!mSuppressShadows && !mSuppressRenderStateChanges;
-	
-    if (doShadows && mShadowTechnique == SHADOWTYPE_STENCIL_ADDITIVE)
+	// Modulative texture shadows in use
+    if (mIlluminationStage == IRS_RENDER_TO_TEXTURE)
     {
-        // Additive stencil shadows in use
-        renderAdditiveStencilShadowedQueueGroupObjects(pGroup, om);
-    }
-    else if (doShadows && mShadowTechnique == SHADOWTYPE_STENCIL_MODULATIVE)
-    {
-        // Modulative stencil shadows in use
-        renderModulativeStencilShadowedQueueGroupObjects(pGroup, om);
-    }
-    else if (isShadowTechniqueTextureBased())
-    {
-        // Modulative texture shadows in use
-        if (mIlluminationStage == IRS_RENDER_TO_TEXTURE)
+        // Shadow caster pass
+        if (!mSuppressRenderStateChanges)
         {
-            // Shadow caster pass
-            if (mCurrentViewport->getShadowsEnabled() &&
-                !mSuppressShadows && !mSuppressRenderStateChanges)
-            {
-                renderTextureShadowCasterQueueGroupObjects(pGroup, om);
-            }
-        }
-        else
-        {
-            // Ordinary + receiver pass
-            if (doShadows && !isShadowTechniqueIntegrated())
-			{
-				// Receiver pass(es)
-				if (isShadowTechniqueAdditive())
-				{
-					// Auto-additive
-					renderAdditiveTextureShadowedQueueGroupObjects(pGroup, om);
-				}
-				else
-				{
-					// Modulative
-            		renderModulativeTextureShadowedQueueGroupObjects(pGroup, om);
-				}
-			}
-			else
-				renderBasicQueueGroupObjects(pGroup, om);
+            renderTextureShadowCasterQueueGroupObjects(pGroup, om);
         }
     }
     else
     {
-        // No shadows, ordinary pass
-        renderBasicQueueGroupObjects(pGroup, om);
+		// Either no shadows or rendering the receiver's pass
+		renderBasicQueueGroupObjects(pGroup, om);
     }
-
-
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
@@ -3099,12 +2570,10 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 void SceneManager::renderTransparentShadowCasterObjects(
 	const QueuedRenderableCollection& objs, 
 	QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping, 
-	bool doLightIteration,
-	const LightList* manualLightList)
+	bool doLightIteration)
 {
 	mActiveQueuedRenderableVisitor->transparentShadowCastersMode = true;
 	mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
-	mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
 	mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
 	
 	// Sort descending (transparency)
@@ -3115,8 +2584,7 @@ void SceneManager::renderTransparentShadowCasterObjects(
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass, 
-                                      bool lightScissoringClipping, bool doLightIteration, 
-									  const LightList* manualLightList)
+                                      bool lightScissoringClipping, bool doLightIteration )
 {
     unsigned short numMatrices;
     RenderOperation ro;
@@ -3139,14 +2607,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	if (numMatrices > 0)
 	{
 	    rend->getWorldTransforms(mTempXform);
-
-		if (mCameraRelativeRendering && !rend->getUseIdentityView())
-		{
-			for (unsigned short i = 0; i < numMatrices; ++i)
-			{
-				mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
-			}
-		}
 
 		if (passTransformState)
 		{
@@ -3252,7 +2712,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             // Create local light list for faster light iteration setup
             static LightList localLightList;
 
-
 			// Here's where we issue the rendering operation to the render system
 			// Note that we may do this once per light, therefore it's in a loop
 			// and the light parameters are updated once per traversal through the
@@ -3274,7 +2733,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				}
 			}
 
-
 			const LightList* pLightListToUse;
 			// Start counting from the start light
 			size_t lightIndex = pass->getStartLight();
@@ -3285,11 +2743,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Determine light list to use
 				if (iteratePerLight)
 				{
-					// Starting shadow texture index.
-					size_t shadowTexIndex = mShadowTextures.size();
-					if (mShadowTextureIndexLightList.size() > lightIndex)
-						shadowTexIndex = mShadowTextureIndexLightList[lightIndex];
-
 					localLightList.resize(pass->getLightCountPerIteration());
 
 					LightList::iterator destit = localLightList.begin();
@@ -3298,7 +2751,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							&& lightIndex < rendLightList.size(); 
 						++lightIndex, --lightsLeft)
 					{
-						Light* currLight = rendLightList[lightIndex];
+						Light const * currLight = rendLightList[lightIndex].light;
 
 						// Check whether we need to filter this one out
 						if ((pass->getRunOnlyForOneLightType() && 
@@ -3306,48 +2759,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							(pass->getLightMask() & currLight->getLightMask()) == 0)
 						{
 							// Skip
-							// Also skip shadow texture(s)
-							if (isShadowTechniqueTextureBased())
-							{
-								shadowTexIndex += mShadowTextureCountPerType[currLight->getType()];
-							}
 							continue;
 						}
 
-						*destit++ = currLight;
-
-						// potentially need to update content_type shadow texunit
-						// corresponding to this light
-						if (isShadowTechniqueTextureBased())
-						{
-							size_t textureCountPerLight = mShadowTextureCountPerType[currLight->getType()];
-							for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mShadowTextures.size(); ++j)
-							{
-								// link the numShadowTextureLights'th shadow texture unit
-								unsigned short tuindex = 
-									pass->_getTextureUnitWithContentTypeIndex(
-									TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
-								if (tuindex > pass->getNumTextureUnitStates()) break;
-
-								// I know, nasty const_cast
-								TextureUnitState* tu = 
-									const_cast<TextureUnitState*>(
-										pass->getTextureUnitState(tuindex));
-								const TexturePtr& shadowTex = mShadowTextures[shadowTexIndex];
-								tu->_setTexturePtr(shadowTex);
-								Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-								tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-								mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
-								++numShadowTextureLights;
-								++shadowTexIndex;
-								// Have to set TU on rendersystem right now, although
-								// autoparams will be set later
-								mDestRenderSystem->_setTextureUnitSettings(tuindex, *tu);
-							}
-						}
-
-
-
+						*destit = rendLightList[lightIndex];
+						++destit;
 					}
 					// Did we run out of lights before slots? e.g. 5 lights, 2 per iteration
 					if (destit != localLightList.end())
@@ -3361,7 +2777,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// since this is light iteration, we shouldn't render at all
 					if (pLightListToUse->empty())
 						return;
-
 				}
 				else // !iterate per light
 				{
@@ -3392,7 +2807,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							// Copy lights over
 							for(LightList::const_iterator iter = copyStart; iter != rendLightList.end() && lightsCopied < lightsToCopy; ++iter)
 							{
-								if((pass->getLightMask() & (*iter)->getLightMask()) != 0)
+								if((pass->getLightMask() & iter->light->getLightMask()) != 0)
 								{
 									localLightList.push_back(*iter);
 									lightsCopied++;
@@ -3414,6 +2829,12 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Do we need to update GPU program parameters?
 				if (pass->isProgrammable())
 				{
+					if( mCurrentShadowNode )
+					{
+						mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
+																 pass->getStartLight() );
+					}
+
 					useLightsGpuProgram(pass, pLightListToUse);
 				}
 				// Do we need to update light states? 
@@ -3494,9 +2915,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 			bool skipBecauseOfLightType = false;
 			if (pass->getRunOnlyForOneLightType())
 			{
-				if (!manualLightList ||
-					(manualLightList->size() == 1 && 
-					manualLightList->at(0)->getType() != pass->getOnlyLightType())) 
+				if( rend->getLights().size() == 1 && 
+					rend->getLights().at(0).light->getType() != pass->getOnlyLightType() )
 				{
 					skipBecauseOfLightType = true;
 				}
@@ -3504,35 +2924,37 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
 			if (!skipBecauseOfLightType)
 			{
-				fireRenderSingleObject(rend, pass, mAutoParamDataSource, manualLightList, mSuppressRenderStateChanges);
+				const LightList *lightList = &rend->getLights();
+				fireRenderSingleObject( rend, pass, mAutoParamDataSource,
+										lightList, mSuppressRenderStateChanges );
+
 				// Do we need to update GPU program parameters?
-				if (pass->isProgrammable())
+				if( pass->isProgrammable() )
 				{
-					// Do we have a manual light list?
-					if (manualLightList)
+					if( mCurrentShadowNode )
 					{
-						useLightsGpuProgram(pass, manualLightList);
+						mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
+																 pass->getStartLight() );
 					}
 
+					useLightsGpuProgram( pass, lightList );
 				}
-
-				// Use manual lights if present, and not using vertex programs that don't use fixed pipeline
-				if (manualLightList && 
-					pass->getLightingEnabled() && passSurfaceAndLightParams)
+				else if( pass->getLightingEnabled() && passSurfaceAndLightParams )
 				{
-					useLights(*manualLightList, pass->getMaxSimultaneousLights());
+					// Use manual lights if present, and not using vertex programs that don't use fixed pipeline
+					useLights( *lightList, pass->getMaxSimultaneousLights() );
 				}
 
 				// optional light scissoring
 				ClipResult scissored = CLIPPED_NONE;
 				ClipResult clipped = CLIPPED_NONE;
-				if (lightScissoringClipping && manualLightList && pass->getLightScissoringEnabled())
+				if (lightScissoringClipping && pass->getLightScissoringEnabled())
 				{
-					scissored = buildAndSetScissor(*manualLightList, mCameraInProgress);
+					scissored = buildAndSetScissor( *lightList, mCameraInProgress );
 				}
-				if (lightScissoringClipping && manualLightList && pass->getLightClipPlanesEnabled())
+				if (lightScissoringClipping && pass->getLightClipPlanesEnabled())
 				{
-					clipped = buildAndSetLightClip(*manualLightList);
+					clipped = buildAndSetLightClip( *lightList );
 				}
 	
 				// don't bother rendering if clipped / scissored entirely
@@ -3641,40 +3063,18 @@ Real SceneManager::getFogDensity(void) const
     return mFogDensity;
 }
 //-----------------------------------------------------------------------
-BillboardSet* SceneManager::createBillboardSet(const String& name, unsigned int poolSize)
+BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
 {
 	NameValuePairList params;
 	params["poolSize"] = StringConverter::toString(poolSize);
-	return static_cast<BillboardSet*>(
-		createMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME, &params));
+	return static_cast<BillboardSet*>( createMovableObject(BillboardSetFactory::FACTORY_TYPE_NAME,
+															&mEntityMemoryManager[SCENE_DYNAMIC],
+															&params) );
 }
-//-----------------------------------------------------------------------
-BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
-{
-	String name = mMovableNameGenerator.generate();
-	return createBillboardSet(name, poolSize);
-}
-//-----------------------------------------------------------------------
-BillboardSet* SceneManager::getBillboardSet(const String& name) const
-{
-	return static_cast<BillboardSet*>(
-		getMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardSet(const String& name) const
-{
-	return hasMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
-}
-
 //-----------------------------------------------------------------------
 void SceneManager::destroyBillboardSet(BillboardSet* set)
 {
 	destroyMovableObject(set);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardSet(const String& name)
-{
-	destroyMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::setDisplaySceneNodes(bool display)
@@ -3805,7 +3205,7 @@ void SceneManager::_applySceneAnimations(void)
         Animation::NodeTrackIterator nodeTrackIt = anim->getNodeTrackIterator();
         while(nodeTrackIt.hasMoreElements())
         {
-            Node* nd = nodeTrackIt.getNext()->getAssociatedNode();
+            OldNode* nd = nodeTrackIt.getNext()->getAssociatedNode();
 			if (nd)
 				nd->resetToInitialState();
         }
@@ -3856,10 +3256,10 @@ void SceneManager::manualRender(RenderOperation* rend,
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
-		Camera dummyCam(StringUtil::BLANK, 0);
+		Camera dummyCam( 0, &mEntityMemoryManager[SCENE_DYNAMIC], 0 );
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
-		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam);
 		updateGpuProgramParameters(pass);
 	}
     mDestRenderSystem->_render(*rend);
@@ -3872,7 +3272,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp,
 	const Matrix4& viewMatrix, 
 	const Matrix4& projMatrix,bool doBeginEndFrame,
-	bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList)
+	bool lightScissoringClipping, bool doLightIteration)
 {
 	if (vp)
 		mDestRenderSystem->_setViewport(vp);
@@ -3884,7 +3284,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 	mDestRenderSystem->_setProjectionMatrix(projMatrix);
 
 	_setPass(pass);
-	Camera dummyCam(StringUtil::BLANK, 0);
+	Camera dummyCam( 0, &mEntityMemoryManager[SCENE_DYNAMIC], 0 );
 	dummyCam.setCustomViewMatrix(true, viewMatrix);
 	dummyCam.setCustomProjectionMatrix(true, projMatrix);
 	// Do we need to update GPU program parameters?
@@ -3896,12 +3296,12 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
-		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam);
 		updateGpuProgramParameters(pass);
 	}
 	if (vp)
 		mCurrentViewport = vp;
-	renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
+	renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration);
 
 
 	if (doBeginEndFrame)
@@ -3973,16 +3373,19 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	{
 		// The plane position relative to the camera has already been set up
 		mSkyPlaneNode->setPosition(cam->getDerivedPosition());
+		mSkyPlaneNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyBoxNode)
 	{
 		mSkyBoxNode->setPosition(cam->getDerivedPosition());
+		mSkyBoxNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyDomeNode)
 	{
 		mSkyDomeNode->setPosition(cam->getDerivedPosition());
+		mSkyDomeNode->_getDerivedPositionUpdated();
 	}
 
 	if (mSkyPlaneEnabled
@@ -3995,7 +3398,7 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	if (mSkyBoxEnabled
 		&& mSkyBoxObj && mSkyBoxObj->isVisible())
 	{
-		mSkyBoxObj->_updateRenderQueue(getRenderQueue());
+		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam);
 	}
 
 	if (mSkyDomeEnabled)
@@ -4050,6 +3453,13 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
 		}
 	}
 }
+//---------------------------------------------------------------------
+void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode )
+{
+	mCurrentShadowNode = shadowNode;
+	mAutoParamDataSource->setCurrentShadowNode( shadowNode );
+}
+//---------------------------------------------------------------------
 void SceneManager::addListener(Listener* newListener)
 {
     mListeners.push_back(newListener);
@@ -4085,10 +3495,12 @@ bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)
     RenderQueueListenerList::iterator i, iend;
     bool skip = false;
 
+	RenderQueue *rq = getRenderQueue();
+
     iend = mRenderQueueListeners.end();
     for (i = mRenderQueueListeners.begin(); i != iend; ++i)
     {
-        (*i)->renderQueueStarted(id, invocation, skip);
+		(*i)->renderQueueStarted( rq, id, invocation, skip );
     }
     return skip;
 }
@@ -4131,7 +3543,7 @@ void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+void SceneManager::fireShadowTexturesPreCaster(const Light* light, Camera* camera, size_t iteration)
 {
     ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
@@ -4142,43 +3554,6 @@ void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, siz
         (*i)->shadowTextureCasterPreViewProj(light, camera, iteration);
     }
 }
-//---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
-{
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
-    {
-        (*i)->shadowTextureReceiverPreViewProj(light, f);
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::firePreUpdateSceneGraph(Camera* camera)
-{
-    ListenerList listenersCopy = mListeners;
-	ListenerList::iterator i, iend;
-
-	iend = listenersCopy.end();
-	for (i = listenersCopy.begin(); i != iend; ++i)
-	{
-		(*i)->preUpdateSceneGraph(this, camera);
-	}
-}
-//---------------------------------------------------------------------
-void SceneManager::firePostUpdateSceneGraph(Camera* camera)
-{
-    ListenerList listenersCopy = mListeners;
-	ListenerList::iterator i, iend;
-
-	iend = listenersCopy.end();
-	for (i = listenersCopy.begin(); i != iend; ++i)
-	{
-		(*i)->postUpdateSceneGraph(this, camera);
-	}
-}
-
 //---------------------------------------------------------------------
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
@@ -4250,972 +3625,171 @@ void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTechnique(ShadowTechnique technique)
-{
-    mShadowTechnique = technique;
-    if (isShadowTechniqueStencilBased())
-    {
-        // Firstly check that we  have a stencil
-        // Otherwise forget it
-        if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
-        {
-            LogManager::getSingleton().logMessage(
-                "WARNING: Stencil shadows were requested, but this device does not "
-                "have a hardware stencil. Shadows disabled.");
-            mShadowTechnique = SHADOWTYPE_NONE;
-        }
-        else if (mShadowIndexBuffer.isNull())
-        {
-            // Create an estimated sized shadow index buffer
-            mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-                createIndexBuffer(HardwareIndexBuffer::IT_16BIT, 
-                mShadowIndexBufferSize, 
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                false);
-            // tell all meshes to prepare shadow volumes
-            MeshManager::getSingleton().setPrepareAllMeshesForShadowVolumes(true);
-        }
-	}
-
-    if (!isShadowTechniqueTextureBased())
-    {
-        // Destroy shadow textures to optimise resource usage
-        destroyShadowTextures();
-    }
-	else
-	{
-		// assure no custom shadow matrix is used accidentally in case we switch
-		// from a custom shadow mapping type to a non-custom (uniform shadow mapping)
-		for ( size_t i = 0; i < mShadowTextureCameras.size(); ++i )
-		{
-			Camera* texCam = mShadowTextureCameras[i];
-
-			texCam->setCustomViewMatrix(false);
-			texCam->setCustomProjectionMatrix(false);
-		}
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::_suppressShadows(bool suppress)
-{
-	mSuppressShadows = suppress;
-}
-//---------------------------------------------------------------------
 void SceneManager::_suppressRenderStateChanges(bool suppress)
 {
 	mSuppressRenderStateChanges = suppress;
 }
 //---------------------------------------------------------------------
-void SceneManager::updateRenderQueueSplitOptions(void)
-{
-	if (isShadowTechniqueStencilBased())
-	{
-		// Casters can always be receivers
-		getRenderQueue()->setShadowCastersCannotBeReceivers(false);
-	}
-	else // texture based
-	{
-		getRenderQueue()->setShadowCastersCannotBeReceivers(!mShadowTextureSelfShadow);
-	}
-
-	if (isShadowTechniqueAdditive() && !isShadowTechniqueIntegrated()
-		&& mCurrentViewport->getShadowsEnabled())
-	{
-		// Additive lighting, we need to split everything by illumination stage
-		getRenderQueue()->setSplitPassesByLightingType(true);
-	}
-	else
-	{
-		getRenderQueue()->setSplitPassesByLightingType(false);
-	}
-
-	if (isShadowTechniqueInUse() && mCurrentViewport->getShadowsEnabled()
-		&& !isShadowTechniqueIntegrated())
-	{
-		// Tell render queue to split off non-shadowable materials
-		getRenderQueue()->setSplitNoShadowPasses(true);
-	}
-	else
-	{
-		getRenderQueue()->setSplitNoShadowPasses(false);
-	}
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::updateRenderQueueGroupSplitOptions(RenderQueueGroup* group, 
-	bool suppressShadows, bool suppressRenderState)
-{
-	if (isShadowTechniqueStencilBased())
-	{
-		// Casters can always be receivers
-		group->setShadowCastersCannotBeReceivers(false);
-	}
-	else if (isShadowTechniqueTextureBased()) 
-	{
-		group->setShadowCastersCannotBeReceivers(!mShadowTextureSelfShadow);
-	}
-
-	if (!suppressShadows && mCurrentViewport->getShadowsEnabled() &&
-		isShadowTechniqueAdditive() && !isShadowTechniqueIntegrated())
-	{
-		// Additive lighting, we need to split everything by illumination stage
-		group->setSplitPassesByLightingType(true);
-	}
-	else
-	{
-		group->setSplitPassesByLightingType(false);
-	}
-
-	if (!suppressShadows && mCurrentViewport->getShadowsEnabled() 
-		&& isShadowTechniqueInUse())
-	{
-		// Tell render queue to split off non-shadowable materials
-		group->setSplitNoShadowPasses(true);
-	}
-	else
-	{
-		group->setSplitNoShadowPasses(false);
-	}
-
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::_notifyLightsDirty(void)
-{
-    ++mLightsDirtyCounter;
-}
-//---------------------------------------------------------------------
-bool SceneManager::lightsForShadowTextureLess::operator ()(
-	const Ogre::Light *l1, const Ogre::Light *l2) const
-{
-	if (l1 == l2)
-		return false;
-
-	// sort shadow casting lights ahead of non-shadow casting
-	if (l1->getCastShadows() != l2->getCastShadows())
-	{
-		return l1->getCastShadows();
-	}
-
-	// otherwise sort by distance (directional lights will have 0 here)
-	return l1->tempSquareDist < l2->tempSquareDist;
-
-}
-//---------------------------------------------------------------------
-void SceneManager::findLightsAffectingFrustum(const Camera* camera)
-{
-    // Basic iteration for this SM
-
-    MovableObjectCollection* lights =
-        getMovableObjectCollection(LightFactory::FACTORY_TYPE_NAME);
-
-
-	{
-            OGRE_LOCK_MUTEX(lights->mutex);
-
-		// Pre-allocate memory
-		mTestLightInfos.clear();
-		mTestLightInfos.reserve(lights->map.size());
-
-		MovableObjectIterator it(lights->map.begin(), lights->map.end());
-
-		while(it.hasMoreElements())
-		{
-			Light* l = static_cast<Light*>(it.getNext());
-
-			if (mCameraRelativeRendering)
-				l->_setCameraRelative(mCameraInProgress);
-			else
-				l->_setCameraRelative(0);
-
-			if (l->isVisible())
-			{
-				LightInfo lightInfo;
-				lightInfo.light = l;
-				lightInfo.type = l->getType();
-				lightInfo.lightMask = l->getLightMask();
-				if (lightInfo.type == Light::LT_DIRECTIONAL)
-				{
-					// Always visible
-					lightInfo.position = Vector3::ZERO;
-					lightInfo.range = 0;
-					mTestLightInfos.push_back(lightInfo);
-				}
-				else
-				{
-					// NB treating spotlight as point for simplicity
-					// Just see if the lights attenuation range is within the frustum
-					lightInfo.range = l->getAttenuationRange();
-					lightInfo.position = l->getDerivedPosition();
-					Sphere sphere(lightInfo.position, lightInfo.range);
-					if (camera->isVisible(sphere))
-					{
-						mTestLightInfos.push_back(lightInfo);
-					}
-				}
-			}
-		}
-	} // release lock on lights collection
-
-    // Update lights affecting frustum if changed
-    if (mCachedLightInfos != mTestLightInfos)
-    {
-        mLightsAffectingFrustum.resize(mTestLightInfos.size());
-        LightInfoList::const_iterator i;
-        LightList::iterator j = mLightsAffectingFrustum.begin();
-        for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
-        {
-            *j = i->light;
-			// add cam distance for sorting if texture shadows
-			if (isShadowTechniqueTextureBased())
-			{
-				(*j)->_calcTempSquareDist(camera->getDerivedPosition());
-			}
-        }
-
-		// Sort the lights if using texture shadows, since the first 'n' will be
-		// used to generate shadow textures and we should pick the most appropriate
-		if (isShadowTechniqueTextureBased())
-		{
-			// Allow a Listener to override light sorting
-			// Reverse iterate so last takes precedence
-			bool overridden = false;
-			ListenerList listenersCopy = mListeners;
-			for (ListenerList::reverse_iterator ri = listenersCopy.rbegin();
-				ri != listenersCopy.rend(); ++ri)
-			{
-				overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
-				if (overridden)
-					break;
-			}
-			if (!overridden)
-			{
-				// default sort (stable to preserve directional light ordering
-				std::stable_sort(
-					mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end(), 
-					lightsForShadowTextureLess());
-			}
-			
-		}
-
-        // Use swap instead of copy operator for efficiently
-        mCachedLightInfos.swap(mTestLightInfos);
-
-        // notify light dirty, so all movable objects will re-populate
-        // their light list next time
-        _notifyLightsDirty();
-    }
-
-}
-//---------------------------------------------------------------------
-bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
-    MovableObject* object)
-{
-    if (object->getCastShadows() && object->isVisible() && 
-		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
-		// objects need an edge list to cast shadows (shadow volumes only)
-		((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
-        ((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList())
-		)
-	   )
-    {
-        if (mFarDistSquared)
-        {
-            // Check object is within the shadow far distance
-            Vector3 toObj = object->getParentNode()->_getDerivedPosition() 
-                - mCamera->getDerivedPosition();
-            Real radius = object->getWorldBoundingSphere().getRadius();
-            Real dist =  toObj.squaredLength();               
-            if (dist - (radius * radius) > mFarDistSquared)
-            {
-                // skip, beyond max range
-                return true;
-            }
-        }
-
-        // If the object is in the frustum, we can always see the shadow
-        if (mCamera->isVisible(object->getWorldBoundingBox()))
-        {
-            mCasterList->push_back(object);
-            return true;
-        }
-
-        // Otherwise, object can only be casting a shadow into our view if
-        // the light is outside the frustum (or it's a directional light, 
-        // which are always outside), and the object is intersecting
-        // on of the volumes formed between the edges of the frustum and the
-        // light
-        if (!mIsLightInFrustum || mLight->getType() == Light::LT_DIRECTIONAL)
-        {
-            // Iterate over volumes
-            PlaneBoundedVolumeList::const_iterator i, iend;
-            iend = mLightClipVolumeList->end();
-            for (i = mLightClipVolumeList->begin(); i != iend; ++i)
-            {
-                if (i->intersects(object->getWorldBoundingBox()))
-                {
-                    mCasterList->push_back(object);
-                    return true;
-                }
-
-            }
-
-        }
-    }
-    return true;
-}
-//---------------------------------------------------------------------
-bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
-    SceneQuery::WorldFragment* fragment)
-{
-    // don't deal with world geometry
-    return true;
-}
-//---------------------------------------------------------------------
-const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
-    const Light* light, const Camera* camera)
-{
-    mShadowCasterList.clear();
-
-    if (light->getType() == Light::LT_DIRECTIONAL)
-    {
-        // Basic AABB query encompassing the frustum and the extrusion of it
-        AxisAlignedBox aabb;
-        const Vector3* corners = camera->getWorldSpaceCorners();
-        Vector3 min, max;
-        Vector3 extrude = light->getDerivedDirection() * -mShadowDirLightExtrudeDist;
-        // do first corner
-        min = max = corners[0];
-        min.makeFloor(corners[0] + extrude);
-        max.makeCeil(corners[0] + extrude);
-        for (size_t c = 1; c < 8; ++c)
-        {
-            min.makeFloor(corners[c]);
-            max.makeCeil(corners[c]);
-            min.makeFloor(corners[c] + extrude);
-            max.makeCeil(corners[c] + extrude);
-        }
-        aabb.setExtents(min, max);
-
-        if (!mShadowCasterAABBQuery)
-            mShadowCasterAABBQuery = createAABBQuery(aabb);
-        else
-            mShadowCasterAABBQuery->setBox(aabb);
-        // Execute, use callback
-        mShadowCasterQueryListener->prepare(false, 
-            &(light->_getFrustumClipVolumes(camera)), 
-            light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
-        mShadowCasterAABBQuery->execute(mShadowCasterQueryListener);
-
-
-    }
-    else
-    {
-        Sphere s(light->getDerivedPosition(), light->getAttenuationRange());
-        // eliminate early if camera cannot see light sphere
-        if (camera->isVisible(s))
-        {
-            if (!mShadowCasterSphereQuery)
-                mShadowCasterSphereQuery = createSphereQuery(s);
-            else
-                mShadowCasterSphereQuery->setSphere(s);
-
-            // Determine if light is inside or outside the frustum
-            bool lightInFrustum = camera->isVisible(light->getDerivedPosition());
-            const PlaneBoundedVolumeList* volList = 0;
-            if (!lightInFrustum)
-            {
-                // Only worth building an external volume list if
-                // light is outside the frustum
-                volList = &(light->_getFrustumClipVolumes(camera));
-            }
-
-            // Execute, use callback
-            mShadowCasterQueryListener->prepare(lightInFrustum, 
-                volList, light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
-            mShadowCasterSphereQuery->execute(mShadowCasterQueryListener);
-
-        }
-
-    }
-
-
-    return mShadowCasterList;
-}
-//---------------------------------------------------------------------
-void SceneManager::initShadowVolumeMaterials(void)
-{
-    /* This should have been set in the SceneManager constructor, but if you
-       created the SceneManager BEFORE the Root object, you will need to call
-       SceneManager::_setDestinationRenderSystem manually.
-     */
-    assert( mDestRenderSystem );
-
-    if (mShadowMaterialInitDone)
-        return;
-
-    if (!mShadowDebugPass)
-    {
-        MaterialPtr matDebug = 
-            MaterialManager::getSingleton().getByName("Ogre/Debug/ShadowVolumes");
-        if (matDebug.isNull())
-        {
-            // Create
-            matDebug = MaterialManager::getSingleton().create(
-                "Ogre/Debug/ShadowVolumes", 
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
-            mShadowDebugPass->setSceneBlending(SBT_ADD); 
-            mShadowDebugPass->setLightingEnabled(false);
-            mShadowDebugPass->setDepthWriteEnabled(false);
-            TextureUnitState* t = mShadowDebugPass->createTextureUnitState();
-            t->setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, 
-                ColourValue(0.7, 0.0, 0.2));
-            mShadowDebugPass->setCullingMode(CULL_NONE);
-
-            if (mDestRenderSystem->getCapabilities()->hasCapability(
-                RSC_VERTEX_PROGRAM))
-            {
-                ShadowVolumeExtrudeProgram::initialise();
-
-                // Enable the (infinite) point light extruder for now, just to get some params
-                mShadowDebugPass->setVertexProgram(
-                    ShadowVolumeExtrudeProgram::programNames[ShadowVolumeExtrudeProgram::POINT_LIGHT]);
-				mShadowDebugPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);				
-                mInfiniteExtrusionParams = 
-                    mShadowDebugPass->getVertexProgramParameters();
-                mInfiniteExtrusionParams->setAutoConstant(0, 
-                    GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                mInfiniteExtrusionParams->setAutoConstant(4, 
-                    GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                // Note ignored extra parameter - for compatibility with finite extrusion vertex program
-                mInfiniteExtrusionParams->setAutoConstant(5, 
-					GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-            }	
-            matDebug->compile();
-
-        }
-        else
-        {
-            mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
-
-            if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
-            {
-                mInfiniteExtrusionParams = mShadowDebugPass->getVertexProgramParameters();
-            }
-        }
-    }
-
-    if (!mShadowStencilPass)
-    {
-
-        MaterialPtr matStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowVolumes");
-        if (matStencil.isNull())
-        {
-            // Init
-            matStencil = MaterialManager::getSingleton().create(
-                "Ogre/StencilShadowVolumes",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
-
-            if (mDestRenderSystem->getCapabilities()->hasCapability(
-                RSC_VERTEX_PROGRAM))
-            {
-
-                // Enable the finite point light extruder for now, just to get some params
-                mShadowStencilPass->setVertexProgram(
-                    ShadowVolumeExtrudeProgram::programNames[ShadowVolumeExtrudeProgram::POINT_LIGHT_FINITE]);
-				mShadowStencilPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);				
-                mFiniteExtrusionParams = 
-                    mShadowStencilPass->getVertexProgramParameters();
-                mFiniteExtrusionParams->setAutoConstant(0, 
-                    GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                mFiniteExtrusionParams->setAutoConstant(4, 
-                    GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                // Note extra parameter
-                mFiniteExtrusionParams->setAutoConstant(5, 
-                    GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-            }
-            matStencil->compile();
-            // Nothing else, we don't use this like a 'real' pass anyway,
-            // it's more of a placeholder
-        }
-        else
-        {
-            mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
-
-            if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
-            {
-                mFiniteExtrusionParams = mShadowStencilPass->getVertexProgramParameters();
-            }
-        }
-    }
-
-
-
-
-    if (!mShadowModulativePass)
-    {
-
-        MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowModulationPass");
-        if (matModStencil.isNull())
-        {
-            // Init
-            matModStencil = MaterialManager::getSingleton().create(
-                "Ogre/StencilShadowModulationPass",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-            mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO); 
-            mShadowModulativePass->setLightingEnabled(false);
-            mShadowModulativePass->setDepthWriteEnabled(false);
-            mShadowModulativePass->setDepthCheckEnabled(false);
-            TextureUnitState* t = mShadowModulativePass->createTextureUnitState();
-            t->setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, 
-                mShadowColour);
-            mShadowModulativePass->setCullingMode(CULL_NONE);
-        }
-        else
-        {
-            mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-        }
-    }
-
-    // Also init full screen quad while we're at it
-    if (!mFullScreenQuad)
-    {
-        mFullScreenQuad = OGRE_NEW Rectangle2D();
-        mFullScreenQuad->setCorners(-1,1,1,-1);
-    }
-
-    // Also init shadow caster material for texture shadows
-    if (!mShadowCasterPlainBlackPass)
-    {
-        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowCaster");
-        if (matPlainBlack.isNull())
-        {
-            matPlainBlack = MaterialManager::getSingleton().create(
-                "Ogre/TextureShadowCaster",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
-            // Lighting has to be on, because we need shadow coloured objects
-            // Note that because we can't predict vertex programs, we'll have to
-            // bind light values to those, and so we bind White to ambient
-            // reflectance, and we'll set the ambient colour to the shadow colour
-            mShadowCasterPlainBlackPass->setAmbient(ColourValue::White);
-            mShadowCasterPlainBlackPass->setDiffuse(ColourValue::Black);
-            mShadowCasterPlainBlackPass->setSelfIllumination(ColourValue::Black);
-            mShadowCasterPlainBlackPass->setSpecular(ColourValue::Black);
-			// Override fog
-			mShadowCasterPlainBlackPass->setFog(true, FOG_NONE);
-            // no textures or anything else, we will bind vertex programs
-            // every so often though
-        }
-        else
-        {
-            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
-        }
-    }
-
-    if (!mShadowReceiverPass)
-    {
-        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowReceiver");
-        if (matShadRec.isNull())			
-        {
-            matShadRec = MaterialManager::getSingleton().create(
-                "Ogre/TextureShadowReceiver",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-			// Don't set lighting and blending modes here, depends on additive / modulative
-            TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
-            t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-        }
-        else
-        {
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-        }
-    }
-
-    // Set up spot shadow fade texture (loaded from code data block)
-    TexturePtr spotShadowFadeTex = 
-        TextureManager::getSingleton().getByName("spot_shadow_fade.png");
-    if (spotShadowFadeTex.isNull())
-    {
-        // Load the manual buffer into an image (don't destroy memory!
-        DataStreamPtr stream(
-			OGRE_NEW MemoryDataStream(SPOT_SHADOW_FADE_PNG, SPOT_SHADOW_FADE_PNG_SIZE, false));
-        Image img;
-        img.load(stream, "png");
-        spotShadowFadeTex = 
-            TextureManager::getSingleton().loadImage(
-			"spot_shadow_fade.png", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
-			img, TEX_TYPE_2D);
-    }
-
-    mShadowMaterialInitDone = true;
-}
-//---------------------------------------------------------------------
 const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 {
-	if (isShadowTechniqueTextureBased())
+	Pass* retPass;	
+	if (!pass->getParent()->getShadowCasterMaterial().isNull())
 	{
-		Pass* retPass;	
-		if (!pass->getParent()->getShadowCasterMaterial().isNull())
-		{
-			return pass->getParent()->getShadowCasterMaterial()->getBestTechnique()->getPass(0); 
-		}
-		else 
-		{
-			retPass = mShadowTextureCustomCasterPass ? 
-				mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
-		}
+		return pass->getParent()->getShadowCasterMaterial()->getBestTechnique()->getPass(0); 
+	}
+	else 
+	{
+		retPass = mShadowTextureCustomCasterPass ? 
+			mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
+	}
 
-		
-		// Special case alpha-blended passes
-		if ((pass->getSourceBlendFactor() == SBF_SOURCE_ALPHA && 
-			pass->getDestBlendFactor() == SBF_ONE_MINUS_SOURCE_ALPHA) 
-			|| pass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
-		{
-			// Alpha blended passes must retain their transparency
-			retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(), 
-				pass->getAlphaRejectValue());
-			retPass->setSceneBlending(pass->getSourceBlendFactor(), pass->getDestBlendFactor());
-			retPass->getParent()->getParent()->setTransparencyCastsShadows(true);
+	
+	// Special case alpha-blended passes
+	if ((pass->getSourceBlendFactor() == SBF_SOURCE_ALPHA && 
+		pass->getDestBlendFactor() == SBF_ONE_MINUS_SOURCE_ALPHA) 
+		|| pass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
+	{
+		// Alpha blended passes must retain their transparency
+		retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(), 
+			pass->getAlphaRejectValue());
+		retPass->setSceneBlending(pass->getSourceBlendFactor(), pass->getDestBlendFactor());
+		retPass->getParent()->getParent()->setTransparencyCastsShadows(true);
 
-			// So we allow the texture units, but override the colour functions
-			// Copy texture state, shift up one since 0 is shadow texture
-			unsigned short origPassTUCount = pass->getNumTextureUnitStates();
-			for (unsigned short t = 0; t < origPassTUCount; ++t)
+		// So we allow the texture units, but override the colour functions
+		// Copy texture state, shift up one since 0 is shadow texture
+		unsigned short origPassTUCount = pass->getNumTextureUnitStates();
+		for (unsigned short t = 0; t < origPassTUCount; ++t)
+		{
+			TextureUnitState* tex;
+			if (retPass->getNumTextureUnitStates() <= t)
 			{
-				TextureUnitState* tex;
-				if (retPass->getNumTextureUnitStates() <= t)
-				{
-					tex = retPass->createTextureUnitState();
-				}
-				else
-				{
-					tex = retPass->getTextureUnitState(t);
-				}
-				// copy base state
-				(*tex) = *(pass->getTextureUnitState(t));
-				// override colour function
-				tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT,
-					isShadowTechniqueAdditive()? ColourValue::Black : mShadowColour);
-
+				tex = retPass->createTextureUnitState();
 			}
-			// Remove any extras
-			while (retPass->getNumTextureUnitStates() > origPassTUCount)
+			else
 			{
-				retPass->removeTextureUnitState(origPassTUCount);
+				tex = retPass->getTextureUnitState(t);
+			}
+			// copy base state
+			(*tex) = *(pass->getTextureUnitState(t));
+			// override colour function
+			tex->setColourOperationEx( LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, mShadowColour );
+
+		}
+		// Remove any extras
+		while (retPass->getNumTextureUnitStates() > origPassTUCount)
+		{
+			retPass->removeTextureUnitState(origPassTUCount);
+		}
+
+	}
+	else
+	{
+		// reset
+		retPass->setSceneBlending(SBT_REPLACE);
+		retPass->setAlphaRejectFunction(CMPF_ALWAYS_PASS);
+		while (retPass->getNumTextureUnitStates() > 0)
+		{
+			retPass->removeTextureUnitState(0);
+		}
+	}
+
+	// Propagate culling modes
+	retPass->setCullingMode(pass->getCullingMode());
+	retPass->setManualCullingMode(pass->getManualCullingMode());
+	
+
+	// Does incoming pass have a custom shadow caster program?
+	if (!pass->getShadowCasterVertexProgramName().empty())
+	{
+		// Have to merge the shadow caster vertex program in
+		retPass->setVertexProgram(
+			pass->getShadowCasterVertexProgramName(), false);
+		const GpuProgramPtr& prg = retPass->getVertexProgram();
+		// Load this program if not done already
+		if (!prg->isLoaded())
+			prg->load();
+		// Copy params
+		retPass->setVertexProgramParameters(
+			pass->getShadowCasterVertexProgramParameters());
+		// Also have to hack the light autoparams, that is done later
+	}
+	else 
+	{
+		if (retPass == mShadowTextureCustomCasterPass)
+		{
+			// reset vp?
+			if (mShadowTextureCustomCasterPass->getVertexProgramName() !=
+				mShadowTextureCustomCasterVertexProgram)
+			{
+				mShadowTextureCustomCasterPass->setVertexProgram(
+					mShadowTextureCustomCasterVertexProgram, false);
+				if(mShadowTextureCustomCasterPass->hasVertexProgram())
+				{
+					mShadowTextureCustomCasterPass->setVertexProgramParameters(
+						mShadowTextureCustomCasterVPParams);
+
+				}
+
 			}
 
 		}
 		else
 		{
-			// reset
-			retPass->setSceneBlending(SBT_REPLACE);
-			retPass->setAlphaRejectFunction(CMPF_ALWAYS_PASS);
-			while (retPass->getNumTextureUnitStates() > 0)
-			{
-				retPass->removeTextureUnitState(0);
-			}
+			// Standard shadow caster pass, reset to no vp
+			retPass->setVertexProgram(StringUtil::BLANK);
 		}
-
-		// Propagate culling modes
-		retPass->setCullingMode(pass->getCullingMode());
-		retPass->setManualCullingMode(pass->getManualCullingMode());
-		
-
-		// Does incoming pass have a custom shadow caster program?
-		if (!pass->getShadowCasterVertexProgramName().empty())
-		{
-			// Have to merge the shadow caster vertex program in
-			retPass->setVertexProgram(
-				pass->getShadowCasterVertexProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getVertexProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setVertexProgramParameters(
-				pass->getShadowCasterVertexProgramParameters());
-			// Also have to hack the light autoparams, that is done later
-		}
-		else 
-		{
-			if (retPass == mShadowTextureCustomCasterPass)
-			{
-				// reset vp?
-				if (mShadowTextureCustomCasterPass->getVertexProgramName() !=
-					mShadowTextureCustomCasterVertexProgram)
-				{
-					mShadowTextureCustomCasterPass->setVertexProgram(
-						mShadowTextureCustomCasterVertexProgram, false);
-					if(mShadowTextureCustomCasterPass->hasVertexProgram())
-					{
-						mShadowTextureCustomCasterPass->setVertexProgramParameters(
-							mShadowTextureCustomCasterVPParams);
-
-					}
-
-				}
-
-			}
-			else
-			{
-				// Standard shadow caster pass, reset to no vp
-				retPass->setVertexProgram(StringUtil::BLANK);
-			}
-		}
-
-        if (!pass->getShadowCasterFragmentProgramName().empty())
-		{
-			// Have to merge the shadow caster fragment program in
-			retPass->setFragmentProgram(
-                                      pass->getShadowCasterFragmentProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getFragmentProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setFragmentProgramParameters(
-                                                pass->getShadowCasterFragmentProgramParameters());
-			// Also have to hack the light autoparams, that is done later
-		}
-		else 
-		{
-			if (retPass == mShadowTextureCustomCasterPass)
-			{
-				// reset fp?
-				if (mShadowTextureCustomCasterPass->getFragmentProgramName() !=
-					mShadowTextureCustomCasterFragmentProgram)
-				{
-					mShadowTextureCustomCasterPass->setFragmentProgram(
-                                                                     mShadowTextureCustomCasterFragmentProgram, false);
-					if(mShadowTextureCustomCasterPass->hasFragmentProgram())
-					{
-						mShadowTextureCustomCasterPass->setFragmentProgramParameters(
-                                                                                   mShadowTextureCustomCasterFPParams);
-					}
-				}
-			}
-			else
-			{
-				// Standard shadow caster pass, reset to no fp
-				retPass->setFragmentProgram(StringUtil::BLANK);
-			}
-		}
-        
-		// handle the case where there is no fixed pipeline support
-		retPass->getParent()->getParent()->compile();
-        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
-        if( btech )
-        {
-		    retPass = btech->getPass(0);
-        }
-
-		return retPass;
 	}
-	else
+
+    if (!pass->getShadowCasterFragmentProgramName().empty())
 	{
-        return pass;
-    }
-
-}
-//---------------------------------------------------------------------
-const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
-{
-
-    if (isShadowTechniqueTextureBased())
+		// Have to merge the shadow caster fragment program in
+		retPass->setFragmentProgram(
+                                  pass->getShadowCasterFragmentProgramName(), false);
+		const GpuProgramPtr& prg = retPass->getFragmentProgram();
+		// Load this program if not done already
+		if (!prg->isLoaded())
+			prg->load();
+		// Copy params
+		retPass->setFragmentProgramParameters(
+                                            pass->getShadowCasterFragmentProgramParameters());
+		// Also have to hack the light autoparams, that is done later
+	}
+	else 
+	{
+		if (retPass == mShadowTextureCustomCasterPass)
+		{
+			// reset fp?
+			if (mShadowTextureCustomCasterPass->getFragmentProgramName() !=
+				mShadowTextureCustomCasterFragmentProgram)
+			{
+				mShadowTextureCustomCasterPass->setFragmentProgram(
+                                                                 mShadowTextureCustomCasterFragmentProgram, false);
+				if(mShadowTextureCustomCasterPass->hasFragmentProgram())
+				{
+					mShadowTextureCustomCasterPass->setFragmentProgramParameters(
+                                                                               mShadowTextureCustomCasterFPParams);
+				}
+			}
+		}
+		else
+		{
+			// Standard shadow caster pass, reset to no fp
+			retPass->setFragmentProgram(StringUtil::BLANK);
+		}
+	}
+    
+	// handle the case where there is no fixed pipeline support
+	retPass->getParent()->getParent()->compile();
+    Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
+    if( btech )
     {
-		Pass* retPass = NULL;
-		if (!pass->getParent()->getShadowReceiverMaterial().isNull())
-		{
-			return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0); 
-		}
-		else
-		{
-			retPass = mShadowTextureCustomReceiverPass ? 
-				mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-		}
-
-		// Does incoming pass have a custom shadow receiver program?
-		if (!pass->getShadowReceiverVertexProgramName().empty())
-		{
-			// Have to merge the shadow receiver vertex program in
-			retPass->setVertexProgram(
-				pass->getShadowReceiverVertexProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getVertexProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setVertexProgramParameters(
-				pass->getShadowReceiverVertexProgramParameters());
-			// Also have to hack the light autoparams, that is done later
-		}
-		else 
-		{
-			if (retPass == mShadowTextureCustomReceiverPass)
-			{
-				// reset vp?
-				if (mShadowTextureCustomReceiverPass->getVertexProgramName() !=
-					mShadowTextureCustomReceiverVertexProgram)
-				{
-					mShadowTextureCustomReceiverPass->setVertexProgram(
-						mShadowTextureCustomReceiverVertexProgram, false);
-					if(mShadowTextureCustomReceiverPass->hasVertexProgram())
-					{
-						mShadowTextureCustomReceiverPass->setVertexProgramParameters(
-							mShadowTextureCustomReceiverVPParams);
-
-					}
-
-				}
-
-			}
-			else
-			{
-				// Standard shadow receiver pass, reset to no vp
-				retPass->setVertexProgram(StringUtil::BLANK);
-			}
-		}
-
-        unsigned short keepTUCount;
-		// If additive, need lighting parameters & standard programs
-		if (isShadowTechniqueAdditive())
-		{
-			retPass->setLightingEnabled(true);
-			retPass->setAmbient(pass->getAmbient());
-			retPass->setSelfIllumination(pass->getSelfIllumination());
-			retPass->setDiffuse(pass->getDiffuse());
-			retPass->setSpecular(pass->getSpecular());
-			retPass->setShininess(pass->getShininess());
-			retPass->setIteratePerLight(pass->getIteratePerLight(), 
-				pass->getRunOnlyForOneLightType(), pass->getOnlyLightType());
-			retPass->setLightMask(pass->getLightMask());
-
-            // We need to keep alpha rejection settings
-            retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
-                pass->getAlphaRejectValue());
-            // Copy texture state, shift up one since 0 is shadow texture
-            unsigned short origPassTUCount = pass->getNumTextureUnitStates();
-            for (unsigned short t = 0; t < origPassTUCount; ++t)
-            {
-                unsigned short targetIndex = t+1;
-                TextureUnitState* tex;
-                if (retPass->getNumTextureUnitStates() <= targetIndex)
-                {
-                    tex = retPass->createTextureUnitState();
-                }
-                else
-                {
-                    tex = retPass->getTextureUnitState(targetIndex);
-                }
-                (*tex) = *(pass->getTextureUnitState(t));
-				// If programmable, have to adjust the texcoord sets too
-				// D3D insists that texcoordsets match tex unit in programmable mode
-				if (retPass->hasVertexProgram())
-					tex->setTextureCoordSet(targetIndex);
-            }
-            keepTUCount = origPassTUCount + 1;
-		}// additive lighting
-		else
-		{
-			// need to keep spotlight fade etc
-			keepTUCount = retPass->getNumTextureUnitStates();
-		}
-
-
-		// Will also need fragment programs since this is a complex light setup
-		if (!pass->getShadowReceiverFragmentProgramName().empty())
-		{
-			// Have to merge the shadow receiver vertex program in
-			retPass->setFragmentProgram(
-				pass->getShadowReceiverFragmentProgramName(), false);
-			const GpuProgramPtr& prg = retPass->getFragmentProgram();
-			// Load this program if not done already
-			if (!prg->isLoaded())
-				prg->load();
-			// Copy params
-			retPass->setFragmentProgramParameters(
-				pass->getShadowReceiverFragmentProgramParameters());
-
-			// Did we bind a shadow vertex program?
-			if (pass->hasVertexProgram() && !retPass->hasVertexProgram())
-			{
-				// We didn't bind a receiver-specific program, so bind the original
-				retPass->setVertexProgram(pass->getVertexProgramName(), false);
-				const GpuProgramPtr& prog = retPass->getVertexProgram();
-				// Load this program if required
-				if (!prog->isLoaded())
-					prog->load();
-				// Copy params
-				retPass->setVertexProgramParameters(
-					pass->getVertexProgramParameters());
-
-			}
-		}
-		else 
-		{
-			// Reset any merged fragment programs from last time
-			if (retPass == mShadowTextureCustomReceiverPass)
-			{
-				// reset fp?
-				if (mShadowTextureCustomReceiverPass->getFragmentProgramName() !=
-					mShadowTextureCustomReceiverFragmentProgram)
-				{
-					mShadowTextureCustomReceiverPass->setFragmentProgram(
-						mShadowTextureCustomReceiverFragmentProgram, false);
-					if(mShadowTextureCustomReceiverPass->hasFragmentProgram())
-					{
-						mShadowTextureCustomReceiverPass->setFragmentProgramParameters(
-							mShadowTextureCustomReceiverFPParams);
-
-					}
-
-				}
-
-			}
-			else
-			{
-				// Standard shadow receiver pass, reset to no fp
-				retPass->setFragmentProgram(StringUtil::BLANK);
-			}
-
-		}
-
-        // Remove any extra texture units
-        while (retPass->getNumTextureUnitStates() > keepTUCount)
-        {
-            retPass->removeTextureUnitState(keepTUCount);
-        }
-
-		retPass->_load();
-
-		// handle the case where there is no fixed pipeline support
-		retPass->getParent()->getParent()->compile();
-        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
-        if( btech )
-        {
-		    retPass = btech->getPass(0);
-        }
-
-		return retPass;
-	}
-	else
-	{
-        return pass;
+	    retPass = btech->getPass(0);
     }
 
+	return retPass;
 }
 //---------------------------------------------------------------------
-const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
+const RealRect& SceneManager::getLightScissorRect( const Light* l, const Camera* cam )
 {
 	checkCachedLightClippingInfo();
 
@@ -5249,7 +3823,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
 
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
-		Light* l = *i;
+		Light const * l = i->light;
 		// a directional light is being used, no scissoring can be done, period.
 		if (l->getType() == Light::LT_DIRECTIONAL)
 			return CLIPPED_NONE;
@@ -5298,7 +3872,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
 void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect& rect)
 {
 	// Project the sphere onto the camera
-	Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
+	Sphere sphere(light->getParentNode()->_getDerivedPosition(), light->getAttenuationRange());
 	cam->projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
 }
 //---------------------------------------------------------------------
@@ -5308,6 +3882,170 @@ void SceneManager::resetScissor()
 		return;
 
 	mDestRenderSystem->setScissorTest(false);
+}
+//---------------------------------------------------------------------
+void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq )
+{
+	AxisAlignedBoxVec &boxes = camera->_getReceiversBoxPerRenderQueue();
+	if( boxes.size() < lastRq )
+		boxes.resize( lastRq );
+	for( size_t i=firstRq; i<lastRq; ++i )
+		boxes[i].setNull();
+
+	ReceiversBoxPerThread::const_iterator it = mReceiversBoxPerThread.begin();
+	ReceiversBoxPerThread::const_iterator en = mReceiversBoxPerThread.end();
+	while( it != en )
+	{
+		const AxisAlignedBoxVec &threadInfo = *it;
+		for( size_t i=firstRq; i<lastRq; ++i )
+			boxes[i].merge( threadInfo[i] );
+
+		++it;
+	}
+}
+//---------------------------------------------------------------------
+const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
+{
+	if( !mCurrentShadowNode )
+		return AxisAlignedBox::BOX_NULL;
+	else
+		return mCurrentShadowNode->getReceiversBox();
+}
+//---------------------------------------------------------------------
+const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const
+{
+	if( !mCurrentShadowNode )
+		return AxisAlignedBox::BOX_NULL;
+	else
+		return mCurrentShadowNode->getCastersBox();
+}
+//---------------------------------------------------------------------
+void SceneManager::getMinMaxDepthRange( const Frustum *shadowMapCamera,
+										Real &outMin, Real &outMax ) const
+{
+	if( !mCurrentShadowNode )
+	{
+		outMin = 0.0f;
+		outMax = 100000.0f;
+	}
+	else
+	{
+		mCurrentShadowNode->getMinMaxDepthRange( shadowMapCamera, outMin, outMax );
+	}
+}
+//---------------------------------------------------------------------
+AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibilityMask,
+															uint8 _firstRq, uint8 _lastRq ) const
+{
+	AxisAlignedBox retVal;
+
+	ObjectMemoryManagerVec::const_iterator it = mEntitiesMemoryManagerCulledList.begin();
+	ObjectMemoryManagerVec::const_iterator en = mEntitiesMemoryManagerCulledList.end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *objMemoryManager = *it;
+		const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+		//TODO: Send this to worker threads (dark_sylinc)
+
+		size_t firstRq = std::min<size_t>( _firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( _lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			AxisAlignedBox tmpBox;
+
+			ObjectData objData;
+			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+			MovableObject::calculateCastersBox( numObjs, objData,
+												viewportVisibilityMask|getVisibilityMask(),
+												&tmpBox );
+			retVal.merge( tmpBox );
+		}
+
+		++it;
+	}
+
+	return retVal;
+}
+//---------------------------------------------------------------------
+void SceneManager::propagateRelativeOrigin( SceneNode *sceneNode, const Vector3 &relativeOrigin )
+{
+	if( sceneNode->numAttachedObjects() > 0 )
+	{
+		size_t numAttachedCameras = 0;
+		for( size_t i=0; i<sceneNode->numAttachedObjects(); ++i )
+		{
+			MovableObject *attachedObj = sceneNode->getAttachedObject( i );
+
+			CameraMap::const_iterator itor = mCamerasByName.find( attachedObj->getName() ); 
+			if( itor != mCamerasByName.end() && attachedObj == itor->second )
+				++numAttachedCameras;
+		}
+
+		if( numAttachedCameras == sceneNode->numAttachedObjects() )
+		{
+			//All of the attached objects are actually cameras. We can propagate
+			//the change to them and continue with this node's children.
+			for( size_t i=0; i<sceneNode->numAttachedObjects(); ++i )
+			{
+				MovableObject *attachedObj = sceneNode->getAttachedObject( i );
+				assert( dynamic_cast<Camera*>( attachedObj ) );
+				Camera *camera = static_cast<Camera*>( attachedObj );
+				camera->setPosition( camera->getPosition() - relativeOrigin );
+			}
+
+			for( size_t i=0; i<sceneNode->numChildren(); ++i )
+			{
+				propagateRelativeOrigin( static_cast<SceneNode*>(sceneNode->getChild( i )),
+										 relativeOrigin );
+			}
+		}
+		else
+		{
+			//There are attachments here. We can't keep propagating. Change here.
+			sceneNode->setPosition( sceneNode->getPosition() - relativeOrigin );
+		}
+	}
+	else if( sceneNode->numChildren() == 0 )
+	{
+		sceneNode->setPosition( sceneNode->getPosition() - relativeOrigin );
+	}
+	else
+	{
+		for( size_t i=0; i<sceneNode->numChildren(); ++i )
+			propagateRelativeOrigin( static_cast<SceneNode*>(sceneNode->getChild( i )), relativeOrigin );
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::setRelativeOrigin( const Vector3 &relativeOrigin, bool bPermanent )
+{
+	if( !bPermanent )
+	{
+		for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+			mSceneRoot[i]->setPosition( -relativeOrigin );
+	}
+	else
+	{
+		for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+		{
+			mSceneRoot[i]->setPosition( Vector3::ZERO );
+			propagateRelativeOrigin( mSceneRoot[i], relativeOrigin );
+		}
+
+		propagateRelativeOrigin( mSkyBoxNode, relativeOrigin );
+		propagateRelativeOrigin( mSkyDomeNode, relativeOrigin );
+		propagateRelativeOrigin( mSkyBoxNode, relativeOrigin );
+	}
+
+	notifyStaticDirty( mSceneRoot[SCENE_STATIC] );
+}
+//---------------------------------------------------------------------
+Vector3 SceneManager::getRelativeOrigin(void) const
+{
+	return mSceneRoot[SCENE_DYNAMIC]->getPosition();
 }
 //---------------------------------------------------------------------
 void SceneManager::checkCachedLightClippingInfo()
@@ -5321,7 +4059,7 @@ void SceneManager::checkCachedLightClippingInfo()
 	}
 }
 //---------------------------------------------------------------------
-const PlaneList& SceneManager::getLightClippingPlanes(Light* l)
+const PlaneList& SceneManager::getLightClippingPlanes( const Light* l )
 {
 	checkCachedLightClippingInfo();
 
@@ -5346,11 +4084,11 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
 	if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
 		return CLIPPED_NONE;
 
-	Light* clipBase = 0;
+	Light const * clipBase = 0;
 	for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
 	{
 		// a directional light is being used, no clipping can be done, period.
-		if ((*i)->getType() == Light::LT_DIRECTIONAL)
+		if (i->light->getType() == Light::LT_DIRECTIONAL)
 			return CLIPPED_NONE;
 
 		if (clipBase)
@@ -5359,7 +4097,7 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
 			// in this list we could clip by, so clip none
 			return CLIPPED_NONE;
 		}
-		clipBase = *i;
+		clipBase = i->light;
 	}
 
 	if (clipBase)
@@ -5386,7 +4124,7 @@ void SceneManager::buildLightClip(const Light* l, PlaneList& planes)
 
 	planes.clear();
 
-	Vector3 pos = l->getDerivedPosition();
+	Vector3 pos = l->getParentNode()->_getDerivedPosition();
 	Real r = l->getAttenuationRange();
 	switch(l->getType())
 	{
@@ -5458,382 +4196,9 @@ void SceneManager::resetLightClip()
 	mDestRenderSystem->resetClipPlanes();
 }
 //---------------------------------------------------------------------
-void SceneManager::renderShadowVolumesToStencil(const Light* light, 
-	const Camera* camera, bool calcScissor)
-{
-    // Get the shadow caster list
-    const ShadowCasterList& casters = findShadowCastersForLight(light, camera);
-    // Check there are some shadow casters to render
-    if (casters.empty())
-    {
-        // No casters, just do nothing
-        return;
-    }
-
-	// Add light to internal list for use in render call
-	LightList lightList;
-	// const_cast is forgiveable here since we pass this const
-	lightList.push_back(const_cast<Light*>(light));
-
-    // Set up scissor test (point & spot lights only)
-    ClipResult scissored = CLIPPED_NONE;
-	if (calcScissor)
-	{
-		scissored = buildAndSetScissor(lightList, camera);
-		if (scissored == CLIPPED_ALL)
-			return; // nothing to do
-	}
-
-    mDestRenderSystem->unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
-
-    // Can we do a 2-sided stencil?
-    bool stencil2sided = false;
-    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_TWO_SIDED_STENCIL) && 
-        mDestRenderSystem->getCapabilities()->hasCapability(RSC_STENCIL_WRAP))
-    {
-        // enable
-        stencil2sided = true;
-    }
-
-    // Do we have access to vertex programs?
-    bool extrudeInSoftware = true;
-    bool finiteExtrude = !mShadowUseInfiniteFarPlane || 
-        !mDestRenderSystem->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE);
-    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
-    {
-        extrudeInSoftware = false;
-        // attach the appropriate extrusion vertex program
-        // Note we never unset it because support for vertex programs is constant
-        mShadowStencilPass->setVertexProgram(
-            ShadowVolumeExtrudeProgram::getProgramName(light->getType(), finiteExtrude, false)
-            , false);
-		mShadowStencilPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);				
-        // Set params
-        if (finiteExtrude)
-        {
-            mShadowStencilPass->setVertexProgramParameters(mFiniteExtrusionParams);
-        }
-        else
-        {
-            mShadowStencilPass->setVertexProgramParameters(mInfiniteExtrusionParams);
-        }
-        if (mDebugShadows)
-        {
-            mShadowDebugPass->setVertexProgram(
-                ShadowVolumeExtrudeProgram::getProgramName(light->getType(), finiteExtrude, true)
-				 , false);
-			mShadowDebugPass->setFragmentProgram(ShadowVolumeExtrudeProgram::frgProgramName);				
-
-               
-            // Set params
-            if (finiteExtrude)
-            {
-                mShadowDebugPass->setVertexProgramParameters(mFiniteExtrusionParams);
-            }
-            else
-            {
-                mShadowDebugPass->setVertexProgramParameters(mInfiniteExtrusionParams);
-            }
-        }
-
-        bindGpuProgram(mShadowStencilPass->getVertexProgram()->_getBindingDelegate());
-		if (!ShadowVolumeExtrudeProgram::frgProgramName.empty())
-		{
-			bindGpuProgram(mShadowStencilPass->getFragmentProgram()->_getBindingDelegate());
-		}
-
-    }
-    else
-    {
-        mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
-    }
-
-    // Turn off colour writing and depth writing
-    mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
-	mDestRenderSystem->_disableTextureUnitsFrom(0);
-    mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
-    mDestRenderSystem->setStencilCheckEnabled(true);
-
-    // Calculate extrusion distance
-    // Use direction light extrusion distance now, just form optimize code
-    // generate a little, point/spot light will up to date later
-    Real extrudeDist = mShadowDirLightExtrudeDist;
-
-    // Figure out the near clip volume
-    const PlaneBoundedVolume& nearClipVol = 
-        light->_getNearClipVolume(camera);
-
-    // Now iterate over the casters and render
-    ShadowCasterList::const_iterator si, siend;
-    siend = casters.end();
-
-
-	// Now iterate over the casters and render
-	for (si = casters.begin(); si != siend; ++si)
-	{
-        ShadowCaster* caster = *si;
-		bool zfailAlgo = camera->isCustomNearClipPlaneEnabled();
-		unsigned long flags = 0;
-
-        if (light->getType() != Light::LT_DIRECTIONAL)
-        {
-            extrudeDist = caster->getPointExtrusionDistance(light); 
-        }
-
-        Real darkCapExtrudeDist = extrudeDist;
-        if (!extrudeInSoftware && !finiteExtrude)
-        {
-            // hardware extrusion, to infinity (and beyond!)
-            flags |= SRF_EXTRUDE_TO_INFINITY;
-            darkCapExtrudeDist = mShadowDirLightExtrudeDist;
-        }
-
-		// Determine whether zfail is required
-        if (zfailAlgo || nearClipVol.intersects(caster->getWorldBoundingBox()))
-        {
-            // We use zfail for this object only because zfail
-	        // compatible with zpass algorithm
-			zfailAlgo = true;
-            // We need to include the light and / or dark cap
-            // But only if they will be visible
-            if(camera->isVisible(caster->getLightCapBounds()))
-            {
-                flags |= SRF_INCLUDE_LIGHT_CAP;
-            }
-			// zfail needs dark cap 
-			// UNLESS directional lights using hardware extrusion to infinity
-			// since that extrudes to a single point
-			if(!((flags & SRF_EXTRUDE_TO_INFINITY) && 
-				light->getType() == Light::LT_DIRECTIONAL) &&
-				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
-			{
-				flags |= SRF_INCLUDE_DARK_CAP;
-			}
-        }
-		else
-		{
-			// In zpass we need a dark cap if
-			// 1: infinite extrusion on point/spotlight sources in modulative shadows
-			//    mode, since otherwise in areas where there is no depth (skybox)
-			//    the infinitely projected volume will leave a dark band
-			// 2: finite extrusion on any light source since glancing angles
-			//    can peek through the end and shadow objects behind incorrectly
-			if ((flags & SRF_EXTRUDE_TO_INFINITY) && 
-				light->getType() != Light::LT_DIRECTIONAL && 
-				isShadowTechniqueModulative() && 
-				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
-			{
-				flags |= SRF_INCLUDE_DARK_CAP;
-			}
-			else if (!(flags & SRF_EXTRUDE_TO_INFINITY) && 
-				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
-			{
-				flags |= SRF_INCLUDE_DARK_CAP;
-			}
-
-		}
-
-        // Get shadow renderables			
-        ShadowCaster::ShadowRenderableListIterator iShadowRenderables =
-            caster->getShadowVolumeRenderableIterator(mShadowTechnique,
-            light, &mShadowIndexBuffer, &mShadowIndexBufferUsedSize,
-            extrudeInSoftware, extrudeDist, flags);
-
-        // Render a shadow volume here
-        //  - if we have 2-sided stencil, one render with no culling
-        //  - otherwise, 2 renders, one with each culling method and invert the ops
-        setShadowVolumeStencilState(false, zfailAlgo, stencil2sided);
-        renderShadowVolumeObjects(iShadowRenderables, mShadowStencilPass, &lightList, flags,
-            false, zfailAlgo, stencil2sided);
-        if (!stencil2sided)
-        {
-            // Second pass
-            setShadowVolumeStencilState(true, zfailAlgo, false);
-            renderShadowVolumeObjects(iShadowRenderables, mShadowStencilPass, &lightList, flags,
-                true, zfailAlgo, false);
-        }
-
-        // Do we need to render a debug shadow marker?
-        if (mDebugShadows)
-        {
-            // reset stencil & colour ops
-            mDestRenderSystem->setStencilBufferParams();
-            mShadowDebugPass->getTextureUnitState(0)->
-                setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT,
-                zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
-            _setPass(mShadowDebugPass);
-            renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
-                true, false, false);
-            mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
-            mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
-        }
-    }
-
-    // revert colour write state
-    mDestRenderSystem->_setColourBufferWriteEnabled(true, true, true, true);
-    // revert depth state
-    mDestRenderSystem->_setDepthBufferParams();
-
-    mDestRenderSystem->setStencilCheckEnabled(false);
-
-    mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
-
-    if (scissored == CLIPPED_SOME)
-    {
-        // disable scissor test
-        resetScissor();
-    }
-
-}
-//---------------------------------------------------------------------
-void SceneManager::renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
-                                             Pass* pass,
-                                             const LightList *manualLightList,
-                                             unsigned long flags,
-                                             bool secondpass, bool zfail, bool twosided)
-{
-    // ----- SHADOW VOLUME LOOP -----
-    // Render all shadow renderables with same stencil operations
-    while (iShadowRenderables.hasMoreElements())
-    {
-        ShadowRenderable* sr = iShadowRenderables.getNext();
-
-        // omit hidden renderables
-        if (sr->isVisible())
-        {
-            // render volume, including dark and (maybe) light caps
-            renderSingleObject(sr, pass, false, false, manualLightList);
-
-            // optionally render separate light cap
-            if (sr->isLightCapSeparate() && (flags & SRF_INCLUDE_LIGHT_CAP))
-            {
-                ShadowRenderable* lightCap = sr->getLightCapRenderable();
-                assert(lightCap && "Shadow renderable is missing a separate light cap renderable!");
-
-                // We must take care with light caps when we could 'see' the back facing
-                // triangles directly:
-                //   1. The front facing light caps must render as always fail depth
-                //      check to avoid 'depth fighting'.
-                //   2. The back facing light caps must use normal depth function to
-                //      avoid break the standard depth check
-                //
-                // TODO:
-                //   1. Separate light caps rendering doesn't need for the 'closed'
-                //      mesh that never touch the near plane, because in this instance,
-                //      we couldn't 'see' any back facing triangles directly. The
-                //      'closed' mesh must determinate by edge list builder.
-                //   2. There still exists 'depth fighting' bug with coplane triangles
-                //      that has opposite facing. This usually occur when use two side
-                //      material in the modeling tools and the model exporting tools
-                //      exporting double triangles to represent this model. This bug
-                //      can't fixed in GPU only, there must has extra work on edge list
-                //      builder and shadow volume generater to fix it.
-                //
-                if (twosided)
-                {
-                    // select back facing light caps to render
-                    mDestRenderSystem->_setCullingMode(CULL_ANTICLOCKWISE);
-					mPassCullingMode = CULL_ANTICLOCKWISE;
-                    // use normal depth function for back facing light caps
-                    renderSingleObject(lightCap, pass, false, false, manualLightList);
-
-                    // select front facing light caps to render
-                    mDestRenderSystem->_setCullingMode(CULL_CLOCKWISE);
-					mPassCullingMode = CULL_CLOCKWISE;
-                    // must always fail depth check for front facing light caps
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_ALWAYS_FAIL);
-                    renderSingleObject(lightCap, pass, false, false, manualLightList);
-
-                    // reset depth function
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
-                    // reset culling mode
-                    mDestRenderSystem->_setCullingMode(CULL_NONE);
-					mPassCullingMode = CULL_NONE;
-                }
-                else if ((secondpass || zfail) && !(secondpass && zfail))
-                {
-                    // use normal depth function for back facing light caps
-                    renderSingleObject(lightCap, pass, false, false, manualLightList);
-                }
-                else
-                {
-                    // must always fail depth check for front facing light caps
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_ALWAYS_FAIL);
-                    renderSingleObject(lightCap, pass, false, false, manualLightList);
-
-                    // reset depth function
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
-                }
-            }
-        }
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool twosided)
-{
-    // Determinate the best stencil operation
-    StencilOperation incrOp, decrOp;
-    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_STENCIL_WRAP))
-    {
-        incrOp = SOP_INCREMENT_WRAP;
-        decrOp = SOP_DECREMENT_WRAP;
-    }
-    else
-    {
-        incrOp = SOP_INCREMENT;
-        decrOp = SOP_DECREMENT;
-    }
-
-    // First pass, do front faces if zpass
-    // Second pass, do back faces if zpass
-    // Invert if zfail
-    // this is to ensure we always increment before decrement
-    // When two-sided stencil, always pass front face stencil
-    // operation parameters and the inverse of them will happen
-    // for back faces
-    if ( !twosided && ((secondpass || zfail) && !(secondpass && zfail)) )
-    {
-		mPassCullingMode = twosided? CULL_NONE : CULL_ANTICLOCKWISE;
-        mDestRenderSystem->setStencilBufferParams(
-            CMPF_ALWAYS_PASS, // always pass stencil check
-            0, // no ref value (no compare)
-            0xFFFFFFFF, // no compare mask
-            0xFFFFFFFF, // no write mask
-            SOP_KEEP, // stencil test will never fail
-            zfail ? incrOp : SOP_KEEP, // back face depth fail
-            zfail ? SOP_KEEP : decrOp, // back face pass
-            twosided
-            );
-    }
-    else
-    {
-		mPassCullingMode = twosided? CULL_NONE : CULL_CLOCKWISE;
-        mDestRenderSystem->setStencilBufferParams(
-            CMPF_ALWAYS_PASS, // always pass stencil check
-            0, // no ref value (no compare)
-			0xFFFFFFFF, // no compare mask
-            0xFFFFFFFF, // no write mask
-            SOP_KEEP, // stencil test will never fail
-            zfail ? decrOp : SOP_KEEP, // front face depth fail
-            zfail ? SOP_KEEP : incrOp, // front face pass
-            twosided
-            );
-    }
-	mDestRenderSystem->_setCullingMode(mPassCullingMode);
-
-}
-//---------------------------------------------------------------------
 void SceneManager::setShadowColour(const ColourValue& colour)
 {
     mShadowColour = colour;
-
-    // Change shadow material setting only when it's prepared,
-    // otherwise, it'll set up while preparing shadow materials.
-    if (mShadowModulativePass)
-    {
-        mShadowModulativePass->getTextureUnitState(0)->setColourOperationEx(
-            LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, colour);
-    }
 }
 //---------------------------------------------------------------------
 const ColourValue& SceneManager::getShadowColour(void) const
@@ -5855,156 +4220,6 @@ void SceneManager::setShadowDirectionalLightExtrusionDistance(Real dist)
 Real SceneManager::getShadowDirectionalLightExtrusionDistance(void) const
 {
     return mShadowDirLightExtrudeDist;
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowIndexBufferSize(size_t size)
-{
-    if (!mShadowIndexBuffer.isNull() && size != mShadowIndexBufferSize)
-    {
-        // re-create shadow buffer with new size
-        mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-            createIndexBuffer(HardwareIndexBuffer::IT_16BIT, 
-            size, 
-            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-            false);
-    }
-    mShadowIndexBufferSize = size;
-	mShadowIndexBufferUsedSize = 0;
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-	unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
-{
-	ShadowTextureConfig conf;
-	conf.width = width;
-	conf.height = height;
-	conf.format = format;
-    conf.fsaa = fsaa;
-	conf.depthBufferPoolId = depthBufferPoolId;
-
-	setShadowTextureConfig(shadowIndex, conf);
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, 
-	const ShadowTextureConfig& config)
-{
-	if (shadowIndex >= mShadowTextureConfigList.size())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"shadowIndex out of bounds",
-			"SceneManager::setShadowTextureConfig");
-	}
-	mShadowTextureConfigList[shadowIndex] = config;
-
-	mShadowTextureConfigDirty = true;
-}
-//---------------------------------------------------------------------
-ConstShadowTextureConfigIterator SceneManager::getShadowTextureConfigIterator() const
-{
-	return ConstShadowTextureConfigIterator(
-		mShadowTextureConfigList.begin(), mShadowTextureConfigList.end());
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSize(unsigned short size)
-{
-	// default all current
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->width != size || i->height != size)
-		{
-			i->width = i->height = size;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureCount(size_t count)
-{
-    // Change size, any new items will need defaults
-	if (count != mShadowTextureConfigList.size())
-	{
-		// if no entries yet, use the defaults
-		if (mShadowTextureConfigList.empty())
-		{
-			mShadowTextureConfigList.resize(count);
-		}
-		else 
-		{
-			// create new instances with the same settings as the last item in the list
-			mShadowTextureConfigList.resize(count, *mShadowTextureConfigList.rbegin());
-		}
-		mShadowTextureConfigDirty = true;
-	}
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
-{
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->format != fmt)
-		{
-			i->format = fmt;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-}
-void SceneManager::setShadowTextureFSAA(unsigned short fsaa)
-{
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-                i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->fsaa != fsaa)
-        {
-            i->fsaa = fsaa;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSettings(unsigned short size, 
-	unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
-{
-	setShadowTextureCount(count);
-	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-		i != mShadowTextureConfigList.end(); ++i)
-	{
-		if (i->width != size || i->height != size || i->format != fmt || i->fsaa != fsaa)
-		{
-			i->width = i->height = size;
-			i->format = fmt;
-            i->fsaa = fsaa;
-			i->depthBufferPoolId = depthBufferPoolId;
-			mShadowTextureConfigDirty = true;
-		}
-	}
-}
-//---------------------------------------------------------------------
-const TexturePtr& SceneManager::getShadowTexture(size_t shadowIndex)
-{
-	if (shadowIndex >= mShadowTextureConfigList.size())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"shadowIndex out of bounds",
-			"SceneManager::getShadowTexture");
-	}
-	ensureShadowTexturesCreated();
-
-	return mShadowTextures[shadowIndex];
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSelfShadow(bool selfShadow) 
-{ 
-	mShadowTextureSelfShadow = selfShadow;
-	if (isShadowTechniqueTextureBased())
-		getRenderQueue()->setShadowCastersCannotBeReceivers(!selfShadow);
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureCasterMaterial(const String& name)
@@ -6052,336 +4267,18 @@ void SceneManager::setShadowTextureCasterMaterial(const String& name)
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTextureReceiverMaterial(const String& name)
+template<typename T>
+void SceneManager::checkMovableObjectIntegrity( const typename vector<T*>::type &container,
+												const T *mo ) const
 {
-	if (name.empty())
+	if( mo->mGlobalIndex >= container.size() || mo != *(container.begin() + mo->mGlobalIndex) )
 	{
-		mShadowTextureCustomReceiverPass = 0;
+		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "MovableObject ID: " +
+			StringConverter::toString( mo->getId() ) + ", named '" + mo->getName() +
+			"' of type '" + mo->getMovableType() + "'\nHad it's mGlobalIndex out of "
+			"date!!! (or the MovableObject wasn't created with this SceneManager)",
+			"SceneManager::checkMovableObjectIntegrity" );
 	}
-	else
-	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(name);
-		if (mat.isNull())
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-				"Cannot locate material called '" + name + "'", 
-				"SceneManager::setShadowTextureReceiverMaterial");
-		}
-		mat->load();
-		if (!mat->getBestTechnique())
-		{
-			// unsupported
-			mShadowTextureCustomReceiverPass = 0;
-		}
-		else
-		{
-
-			mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
-			if (mShadowTextureCustomReceiverPass->hasVertexProgram())
-			{
-				// Save vertex program and params in case we have to swap them out
-				mShadowTextureCustomReceiverVertexProgram = 
-					mShadowTextureCustomReceiverPass->getVertexProgramName();
-				mShadowTextureCustomReceiverVPParams = 
-					mShadowTextureCustomReceiverPass->getVertexProgramParameters();
-			}
-			else
-			{
-				mShadowTextureCustomReceiverVertexProgram = StringUtil::BLANK;
-			}
-			if (mShadowTextureCustomReceiverPass->hasFragmentProgram())
-			{
-				// Save fragment program and params in case we have to swap them out
-				mShadowTextureCustomReceiverFragmentProgram = 
-					mShadowTextureCustomReceiverPass->getFragmentProgramName();
-				mShadowTextureCustomReceiverFPParams = 
-					mShadowTextureCustomReceiverPass->getFragmentProgramParameters();
-			}
-			else
-			{
-				mShadowTextureCustomReceiverFragmentProgram = StringUtil::BLANK;
-			}
-		}
-	}
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup)
-{
-	mDefaultShadowCameraSetup = shadowSetup;
-
-}
-//---------------------------------------------------------------------
-const ShadowCameraSetupPtr& SceneManager::getShadowCameraSetup() const
-{
-	return mDefaultShadowCameraSetup;
-}
-//---------------------------------------------------------------------
-void SceneManager::ensureShadowTexturesCreated()
-{
-	if (mShadowTextureConfigDirty)
-	{
-		destroyShadowTextures();
-		ShadowTextureManager::getSingleton().getShadowTextures(
-			mShadowTextureConfigList, mShadowTextures);
-
-		// clear shadow cam - light mapping
-		mShadowCamLightMapping.clear();
-
-		//Used to get the depth buffer ID setting for each RTT
-		size_t __i = 0;
-
-		// Recreate shadow textures
-		for (ShadowTextureList::iterator i = mShadowTextures.begin(); 
-			i != mShadowTextures.end(); ++i, ++__i) 
-		{
-			const TexturePtr& shadowTex = *i;
-
-			// Camera names are local to SM 
-			String camName = shadowTex->getName() + "Cam";
-			// Material names are global to SM, make specific
-			String matName = shadowTex->getName() + "Mat" + getName();
-
-			RenderTexture *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-
-			//Set appropriate depth buffer
-			shadowRTT->setDepthBufferPool( mShadowTextureConfigList[__i].depthBufferPoolId );
-
-			// Create camera for this texture, but note that we have to rebind
-			// in prepareShadowTextures to coexist with multiple SMs
-			Camera* cam = createCamera(camName);
-			cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
-			mShadowTextureCameras.push_back(cam);
-
-			// Create a viewport, if not there already
-			if (shadowRTT->getNumViewports() == 0)
-			{
-				// Note camera assignment is transient when multiple SMs
-				Viewport *v = shadowRTT->addViewport(cam);
-				v->setClearEveryFrame(true);
-				// remove overlays
-				v->setOverlaysEnabled(false);
-			}
-
-			// Don't update automatically - we'll do it when required
-			shadowRTT->setAutoUpdated(false);
-
-			// Also create corresponding Material used for rendering this shadow
-			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-			if (mat.isNull())
-			{
-				mat = MaterialManager::getSingleton().create(
-					matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			}
-			Pass* p = mat->getTechnique(0)->getPass(0);
-			if (p->getNumTextureUnitStates() != 1 ||
-				p->getTextureUnitState(0)->_getTexturePtr(0) != shadowTex)
-			{
-				mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-				// create texture unit referring to render target texture
-				TextureUnitState* texUnit = 
-					p->createTextureUnitState(shadowTex->getName());
-				// set projective based on camera
-				texUnit->setProjectiveTexturing(!p->hasVertexProgram(), cam);
-				// clamp to border colour
-				texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-				texUnit->setTextureBorderColour(ColourValue::White);
-				mat->touch();
-
-			}
-
-			// insert dummy camera-light combination
-			mShadowCamLightMapping[cam] = 0;
-
-			// Get null shadow texture
-			if (mShadowTextureConfigList.empty())
-			{
-				mNullShadowTexture.setNull();
-			}
-			else
-			{
-				mNullShadowTexture = 
-					ShadowTextureManager::getSingleton().getNullShadowTexture(
-						mShadowTextureConfigList[0].format);
-			}
-
-
-		}
-		mShadowTextureConfigDirty = false;
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyShadowTextures(void)
-{
-	
-	ShadowTextureList::iterator i, iend;
-	iend = mShadowTextures.end();
-	for (i = mShadowTextures.begin(); i != iend; ++i)
-	{
-		TexturePtr &shadowTex = *i;
-
-		// Cleanup material that references this texture
-		String matName = shadowTex->getName() + "Mat" + getName();
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-		if (!mat.isNull())
-		{
-			// manually clear TUS to ensure texture ref released
-			mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-			MaterialManager::getSingleton().remove(mat->getHandle());
-		}
-
-	}
-
-	ShadowTextureCameraList::iterator ci, ciend;
-	ciend = mShadowTextureCameras.end();
-	for (ci = mShadowTextureCameras.begin(); ci != ciend; ++ci)
-	{
-		// Always destroy camera since they are local to this SM
-   		destroyCamera(*ci);
-    }
-    mShadowTextures.clear();
-	mShadowTextureCameras.clear();
-
-	// Will destroy if no other scene managers referencing
-	ShadowTextureManager::getSingleton().clearUnused();
-
-	mShadowTextureConfigDirty = true;
-        
-}
-//---------------------------------------------------------------------
-void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
-{
-	// create shadow textures if needed
-	ensureShadowTexturesCreated();
-
-    // Set the illumination stage, prevents recursive calls
-    IlluminationRenderStage savedStage = mIlluminationStage;
-    mIlluminationStage = IRS_RENDER_TO_TEXTURE;
-
-	if (lightList == 0)
-		lightList = &mLightsAffectingFrustum;
-
-	try
-	{
-		
-		// Determine far shadow distance
-		Real shadowDist = mDefaultShadowFarDist;
-		if (!shadowDist)
-		{
-			// need a shadow distance, make one up
-			shadowDist = cam->getNearClipDistance() * 300;
-		}
-		Real shadowOffset = shadowDist * mShadowTextureOffset;
-		// Precalculate fading info
-		Real shadowEnd = shadowDist + shadowOffset;
-		Real fadeStart = shadowEnd * mShadowTextureFadeStart;
-		Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
-		// Additive lighting should not use fogging, since it will overbrighten; use border clamp
-		if (!isShadowTechniqueAdditive())
-		{
-			// set fogging to hide the shadow edge 
-			mShadowReceiverPass->setFog(true, FOG_LINEAR, ColourValue::White, 
-				0, fadeStart, fadeEnd);
-		}
-		else
-		{
-			// disable fogging explicitly
-			mShadowReceiverPass->setFog(true, FOG_NONE);
-		}
-
-		// Iterate over the lights we've found, max out at the limit of light textures
-		// Note that the light sorting must now place shadow casting lights at the
-		// start of the light list, therefore we do not need to deal with potential
-		// mismatches in the light<->shadow texture list any more
-
-		LightList::const_iterator i, iend;
-		ShadowTextureList::iterator si, siend;
-		ShadowTextureCameraList::iterator ci;
-		iend = lightList->end();
-		siend = mShadowTextures.end();
-		ci = mShadowTextureCameras.begin();
-		mShadowTextureIndexLightList.clear();
-		size_t shadowTextureIndex = 0;
-		for (i = lightList->begin(), si = mShadowTextures.begin();
-			i != iend && si != siend; ++i)
-		{
-			Light* light = *i;
-
-			// skip light if shadows are disabled
-			if (!light->getCastShadows())
-				continue;
-
-			if (mShadowTextureCurrentCasterLightList.empty())
-				mShadowTextureCurrentCasterLightList.push_back(light);
-			else
-				mShadowTextureCurrentCasterLightList[0] = light;
-
-
-			// texture iteration per light.
-			size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];
-			for (size_t j = 0; j < textureCountPerLight && si != siend; ++j)
-			{
-				TexturePtr &shadowTex = *si;
-				RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-				Viewport *shadowView = shadowRTT->getViewport(0);
-				Camera *texCam = *ci;
-				// rebind camera, incase another SM in use which has switched to its cam
-				shadowView->setCamera(texCam);
-
-				// Associate main view camera as LOD camera
-				texCam->setLodCamera(cam);
-				// set base
-				if (light->getType() != Light::LT_POINT)
-					texCam->setDirection(light->getDerivedDirection());
-				if (light->getType() != Light::LT_DIRECTIONAL)
-					texCam->setPosition(light->getDerivedPosition());
-
-				// Use the material scheme of the main viewport 
-				// This is required to pick up the correct shadow_caster_material and similar properties.
-				shadowView->setMaterialScheme(vp->getMaterialScheme());
-
-				// update shadow cam - light mapping
-				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
-				assert(camLightIt != mShadowCamLightMapping.end());
-				camLightIt->second = light;
-
-				if (light->getCustomShadowCameraSetup().isNull())
-					mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam, j);
-				else
-					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam, j);
-
-				// Setup background colour
-				shadowView->setBackgroundColour(ColourValue::White);
-
-				// Fire shadow caster update, callee can alter camera settings
-				fireShadowTexturesPreCaster(light, texCam, j);
-
-				// Update target
-				shadowRTT->update();
-
-				++si; // next shadow texture
-				++ci; // next camera
-			}
-
-			// set the first shadow texture index for this light.
-			mShadowTextureIndexLightList.push_back(shadowTextureIndex);
-			shadowTextureIndex += textureCountPerLight;
-		}
-	}
-	catch (Exception&) 
-	{
-		// we must reset the illumination stage if an exception occurs
-		mIlluminationStage = savedStage;
-		throw;
-	}
-    // Set the illumination stage, prevents recursive calls
-    mIlluminationStage = savedStage;
-
-	fireShadowTexturesUpdated(
-		std::min(lightList->size(), mShadowTextures.size()));
-
-	ShadowTextureManager::getSingleton().clearUnused();
-
 }
 //---------------------------------------------------------------------
 SceneManager::RenderContext* SceneManager::_pauseRendering()
@@ -6414,7 +4311,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	setViewport(vp);
 
 	// Tell params about camera
-	mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+	mAutoParamDataSource->setCurrentCamera(camera);
 	// Set autoparams for finite dir light extrusion
 	mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -6447,14 +4344,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	
 	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
 
-	if (mCameraRelativeRendering)
-	{
-		mCachedViewMatrix.setTrans(Vector3::ZERO);
-		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
-	}
-	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
-
-	
 	setViewMatrix(mCachedViewMatrix);
 	delete context;
 }
@@ -6518,66 +4407,16 @@ void SceneManager::destroyAllStaticGeometry(void)
 	mStaticGeometryList.clear();
 }
 //---------------------------------------------------------------------
-InstancedGeometry* SceneManager::createInstancedGeometry(const String& name)
-{
-	// Check not existing
-	if (mInstancedGeometryList.find(name) != mInstancedGeometryList.end())
-	{
-		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-			"InstancedGeometry with name '" + name + "' already exists!", 
-			"SceneManager::createInstancedGeometry");
-	}
-	InstancedGeometry* ret = OGRE_NEW InstancedGeometry(this, name);
-	mInstancedGeometryList[name] = ret;
-	return ret;
-}
-//---------------------------------------------------------------------
-InstancedGeometry* SceneManager::getInstancedGeometry(const String& name) const
-{
-	InstancedGeometryList::const_iterator i = mInstancedGeometryList.find(name);
-	if (i == mInstancedGeometryList.end())
-	{
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"InstancedGeometry with name '" + name + "' not found", 
-			"SceneManager::createInstancedGeometry");
-	}
-	return i->second;
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(InstancedGeometry* geom)
-{
-	destroyInstancedGeometry(geom->getName());
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyInstancedGeometry(const String& name)
-{
-	InstancedGeometryList::iterator i = mInstancedGeometryList.find(name);
-	if (i != mInstancedGeometryList.end())
-	{
-		OGRE_DELETE i->second;
-		mInstancedGeometryList.erase(i);
-	}
-
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyAllInstancedGeometry(void)
-{
-	InstancedGeometryList::iterator i, iend;
-	iend = mInstancedGeometryList.end();
-	for (i = mInstancedGeometryList.begin(); i != iend; ++i)
-	{
-		OGRE_DELETE i->second;
-	}
-	mInstancedGeometryList.clear();
-}
-//---------------------------------------------------------------------
 InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,
 													  const String &groupName,
 													  InstanceManager::InstancingTechnique technique,
 													  size_t numInstancesPerBatch, uint16 flags,
 													  unsigned short subMeshIdx )
 {
-	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
+	InstanceManagerVec::iterator itor = std::lower_bound( mInstanceManagers.begin(),
+															mInstanceManagers.end(),
+															customName, InstanceManagerCmp() );
+	if (itor != mInstanceManagers.end() && (*itor)->getName() == customName )
 	{
 		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
 			"InstancedManager with name '" + customName + "' already exists!", 
@@ -6587,41 +4426,42 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
 													flags, numInstancesPerBatch, subMeshIdx );
 
-	mInstanceManagerMap[customName] = retVal;
+	mInstanceManagers.insert( itor, retVal );
 	return retVal;
 }
 //---------------------------------------------------------------------
-InstanceManager* SceneManager::getInstanceManager( const String &managerName ) const
+InstanceManager* SceneManager::getInstanceManager( IdString managerName ) const
 {
-	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
-
-	if (itor == mInstanceManagerMap.end())
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
+	if (itor == mInstanceManagers.end() || (*itor)->getName() != managerName )
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"InstancedManager with name '" + managerName + "' not found", 
+				"InstancedManager with name '" + managerName.getFriendlyText() + "' not found",
 				"SceneManager::getInstanceManager");
 	}
 
-	return itor->second;
+	return *itor;
 }
 //---------------------------------------------------------------------
-bool SceneManager::hasInstanceManager( const String &managerName ) const
+bool SceneManager::hasInstanceManager( IdString managerName ) const
 {
-    InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
-    return itor != mInstanceManagerMap.end();
+    InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
+    return itor != mInstanceManagers.end() && (*itor)->getName() == managerName;
 }
 //---------------------------------------------------------------------
-void SceneManager::destroyInstanceManager( const String &name )
+void SceneManager::destroyInstanceManager( IdString name )
 {
-	//The manager we're trying to destroy might have been scheduled for updating
-	//while we haven't yet rendered a frame. Update now to avoid a dangling ptr
-	updateDirtyInstanceManagers();
-
-	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
-	if (i != mInstanceManagerMap.end())
+	InstanceManagerVec::iterator itor = std::lower_bound( mInstanceManagers.begin(),
+															mInstanceManagers.end(),
+															name, InstanceManagerCmp() );
+	if (itor != mInstanceManagers.end() && (*itor)->getName() == name )
 	{
-		OGRE_DELETE i->second;
-		mInstanceManagerMap.erase(i);
+		OGRE_DELETE *itor;
+		mInstanceManagers.erase( itor );
 	}
 }
 //---------------------------------------------------------------------
@@ -6632,17 +4472,13 @@ void SceneManager::destroyInstanceManager( InstanceManager *instanceManager )
 //---------------------------------------------------------------------
 void SceneManager::destroyAllInstanceManagers(void)
 {
-	InstanceManagerMap::iterator itor = mInstanceManagerMap.begin();
-	InstanceManagerMap::iterator end  = mInstanceManagerMap.end();
+	InstanceManagerVec::iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::iterator end  = mInstanceManagers.end();
 
 	while( itor != end )
-	{
-		OGRE_DELETE itor->second;
-		++itor;
-	}
+		OGRE_DELETE *itor++;
 
-	mInstanceManagerMap.clear();
-	mDirtyInstanceManagers.clear();
+	mInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,
@@ -6659,16 +4495,18 @@ size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const Stri
 //---------------------------------------------------------------------
 InstancedEntity* SceneManager::createInstancedEntity( const String &materialName, const String &managerName )
 {
-	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+	InstanceManagerVec::const_iterator itor = std::lower_bound( mInstanceManagers.begin(),
+																mInstanceManagers.end(),
+																managerName, InstanceManagerCmp() );
 
-	if (itor == mInstanceManagerMap.end())
+	if (itor == mInstanceManagers.end() || (*itor)->getName() != managerName )
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 				"InstancedManager with name '" + managerName + "' not found", 
 				"SceneManager::createInstanceEntity");
 	}
 
-	return itor->second->createInstancedEntity( materialName );
+	return (*itor)->createInstancedEntity( materialName );
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
@@ -6676,41 +4514,45 @@ void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }
 //---------------------------------------------------------------------
-void SceneManager::_addDirtyInstanceManager( InstanceManager *dirtyManager )
+void SceneManager::updateInstanceManagerAnimations(void)
 {
-	mDirtyInstanceManagers.push_back( dirtyManager );
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
+
+	while( itor != end )
+	{
+		(*itor)->_updateAnimations();
+		++itor;
+	}
 }
 //---------------------------------------------------------------------
-void SceneManager::updateDirtyInstanceManagers(void)
+void SceneManager::updateInstanceManagersThread( size_t threadIdx )
 {
-	//Copy all dirty mgrs to a temporary buffer to iterate through them. We need this because
-	//if two InstancedEntities from different managers belong to the same SceneNode, one of the
-	//managers may have been tagged as dirty while the other wasn't, and _addDirtyInstanceManager
-	//will get called while iterating through them. The "while" loop will update all mgrs until
-	//no one is dirty anymore (i.e. A makes B aware it's dirty, B makes C aware it's dirty)
-	//mDirtyInstanceMgrsTmp isn't a local variable to prevent allocs & deallocs every frame.
-	mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
-									mDirtyInstanceManagers.end() );
-	mDirtyInstanceManagers.clear();
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
 
-	while( !mDirtyInstanceMgrsTmp.empty() )
+	while( itor != end )
 	{
-		InstanceManagerVec::const_iterator itor = mDirtyInstanceMgrsTmp.begin();
-		InstanceManagerVec::const_iterator end  = mDirtyInstanceMgrsTmp.end();
+		(*itor)->_updateDirtyBatchesThread( threadIdx );
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::updateInstanceManagers(void)
+{
+	// First update the individual instances from multiple threads
+	mRequestType = UPDATE_INSTANCE_MANAGERS;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
 
-		while( itor != end )
-		{
-			(*itor)->_updateDirtyBatches();
-			++itor;
-		}
+	// Now perform the final pass from a single thread
+	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mInstanceManagers.end();
 
-		//Clear temp buffer
-		mDirtyInstanceMgrsTmp.clear();
-
-		//Do it again?
-		mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
-									mDirtyInstanceManagers.end() );
-		mDirtyInstanceManagers.clear();
+	while( itor != end )
+	{
+		(*itor)->_updateDirtyBatches();
+		++itor;
 	}
 }
 //---------------------------------------------------------------------
@@ -6807,13 +4649,14 @@ SceneManager::getMovableObjectCollection(const String& typeName) const
 	}
 }
 //---------------------------------------------------------------------
-MovableObject* SceneManager::createMovableObject(const String& name, 
-	const String& typeName, const NameValuePairList* params)
+MovableObject* SceneManager::createMovableObject( const String& typeName,
+													ObjectMemoryManager *objectMemMgr,
+													const NameValuePairList* params )
 {
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
 	{
-		return createCamera(name);
+		return createCamera( "", true );
 	}
 	MovableObjectFactory* factory = 
 		Root::getSingleton().getMovableObjectFactory(typeName);
@@ -6823,33 +4666,22 @@ MovableObject* SceneManager::createMovableObject(const String& name,
 	{
             OGRE_LOCK_MUTEX(objectMap->mutex);
 
-		if (objectMap->map.find(name) != objectMap->map.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"An object of type '" + typeName + "' with name '" + name
-				+ "' already exists.", 
-				"SceneManager::createMovableObject");
-		}
-
-		MovableObject* newObj = factory->createInstance(name, this, params);
-		objectMap->map[name] = newObj;
+		MovableObject* newObj = factory->createInstance( Id::generateNewId<MovableObject>(),
+														 objectMemMgr, this, params );
+		objectMap->movableObjects.push_back( newObj );
+		newObj->mGlobalIndex = objectMap->movableObjects.size() - 1;
 		return newObj;
 	}
 
 }
 //---------------------------------------------------------------------
-MovableObject* SceneManager::createMovableObject(const String& typeName, const NameValuePairList* params /* = 0 */)
-{
-	String name = mMovableNameGenerator.generate();
-	return createMovableObject(name, typeName, params);
-}
-//---------------------------------------------------------------------
-void SceneManager::destroyMovableObject(const String& name, const String& typeName)
+void SceneManager::destroyMovableObject( MovableObject *m, const String& typeName )
 {
 	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
 	if (typeName == "Camera")
 	{
-		destroyCamera(name);
+		assert( dynamic_cast<Camera*>(m) );
+		destroyCamera( static_cast<Camera*>(m) );
 		return;
 	}
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
@@ -6859,12 +4691,18 @@ void SceneManager::destroyMovableObject(const String& name, const String& typeNa
 	{
             OGRE_LOCK_MUTEX(objectMap->mutex);
 
-		MovableObjectMap::iterator mi = objectMap->map.find(name);
-		if (mi != objectMap->map.end())
-		{
-			factory->destroyInstance(mi->second);
-			objectMap->map.erase(mi);
-		}
+		checkMovableObjectIntegrity( objectMap->movableObjects, m );
+
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin() + m->mGlobalIndex;
+
+		//If itor is invalid then something is terribly wrong (deleting a ptr twice may be?)
+		itor = efficientVectorRemove( objectMap->movableObjects, itor );
+		factory->destroyInstance( m );
+		m = 0;
+
+		//The MovableObject that was at the end got swapped and has now a different index
+		if( itor != objectMap->movableObjects.end() )
+			(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
 	}
 }
 //---------------------------------------------------------------------
@@ -6882,16 +4720,27 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 	
 	{
             OGRE_LOCK_MUTEX(objectMap->mutex);
-		MovableObjectMap::iterator i = objectMap->map.begin();
-		for (; i != objectMap->map.end(); ++i)
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin();
+		MovableObjectVec::iterator end  = objectMap->movableObjects.end();
+		while( itor != end )
 		{
-			// Only destroy our own
-			if (i->second->_getManager() == this)
+			if( (*itor)->_getManager() == this )
 			{
-				factory->destroyInstance(i->second);
+				// Only destroy our own
+				MovableObject *mo = *itor;
+				itor = efficientVectorRemove( objectMap->movableObjects, itor );
+				end  = objectMap->movableObjects.end();
+				factory->destroyInstance( mo );
+
+				//The node that was at the end got swapped and has now a different index
+				if( itor != end )
+					(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
+			}
+			else
+			{
+				++itor;
 			}
 		}
-		objectMap->map.clear();
 	}
 }
 //---------------------------------------------------------------------
@@ -6914,62 +4763,31 @@ void SceneManager::destroyAllMovableObjects(void)
 			// Only destroy if we have a factory instance; otherwise must be injected
 			MovableObjectFactory* factory = 
 				Root::getSingleton().getMovableObjectFactory(ci->first);
-			MovableObjectMap::iterator i = coll->map.begin();
-			for (; i != coll->map.end(); ++i)
+
+			MovableObjectVec::iterator itor = coll->movableObjects.begin();
+			MovableObjectVec::iterator end  = coll->movableObjects.end();
+			while( itor != end )
 			{
-				if (i->second->_getManager() == this)
+				if( (*itor)->_getManager() == this )
 				{
-					factory->destroyInstance(i->second);
+					// Only destroy our own
+					MovableObject *mo = *itor;
+					itor = efficientVectorRemove( coll->movableObjects, itor );
+					end  = coll->movableObjects.end();
+					factory->destroyInstance( mo );
+
+					//The node that was at the end got swapped and has now a different index
+					if( itor != end )
+						(*itor)->mGlobalIndex = itor - coll->movableObjects.begin();
+				}
+				else
+				{
+					++itor;
 				}
 			}
 		}
-		coll->map.clear();
 	}
 
-}
-//---------------------------------------------------------------------
-MovableObject* SceneManager::getMovableObject(const String& name, const String& typeName) const
-{
-	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
-	if (typeName == "Camera")
-	{
-		return getCamera(name);
-	}
-
-	const MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
-	
-	{
-            OGRE_LOCK_MUTEX(objectMap->mutex);
-		MovableObjectMap::const_iterator mi = objectMap->map.find(name);
-		if (mi == objectMap->map.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Object named '" + name + "' does not exist.", 
-				"SceneManager::getMovableObject");
-		}
-		return mi->second;
-	}
-	
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasMovableObject(const String& name, const String& typeName) const
-{
-	// Nasty hack to make generalised Camera functions work without breaking add-on SMs
-	if (typeName == "Camera")
-	{
-		return hasCamera(name);
-	}
-	OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
-
-	MovableObjectCollectionMap::const_iterator i = 
-		mMovableObjectCollectionMap.find(typeName);
-	if (i == mMovableObjectCollectionMap.end())
-		return false;
-	
-	{
-            OGRE_LOCK_MUTEX(i->second->mutex);
-		return (i->second->map.find(name) != i->second->map.end());
-	}
 }
 
 //---------------------------------------------------------------------
@@ -6978,15 +4796,14 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 {
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 	// Iterator not thread safe! Warned in header.
-	return MovableObjectIterator(objectMap->map.begin(), objectMap->map.end());
+	return MovableObjectIterator(objectMap->movableObjects.begin(), objectMap->movableObjects.end());
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
     if(!m)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null MovableObject.", "SceneManager::destroyMovableObject");
-
-	destroyMovableObject(m->getName(), m->getMovableType());
+	destroyMovableObject(m, m->getMovableType());
 }
 //---------------------------------------------------------------------
 void SceneManager::injectMovableObject(MovableObject* m)
@@ -6995,28 +4812,26 @@ void SceneManager::injectMovableObject(MovableObject* m)
 	{
             OGRE_LOCK_MUTEX(objectMap->mutex);
 
-		objectMap->map[m->getName()] = m;
+		objectMap->movableObjects.push_back( m );
+		m->mGlobalIndex = objectMap->movableObjects.size() - 1;
 	}
-}
-//---------------------------------------------------------------------
-void SceneManager::extractMovableObject(const String& name, const String& typeName)
-{
-	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
-	{
-            OGRE_LOCK_MUTEX(objectMap->mutex);
-		MovableObjectMap::iterator mi = objectMap->map.find(name);
-		if (mi != objectMap->map.end())
-		{
-			// no delete
-			objectMap->map.erase(mi);
-		}
-	}
-
 }
 //---------------------------------------------------------------------
 void SceneManager::extractMovableObject(MovableObject* m)
 {
-	extractMovableObject(m->getName(), m->getMovableType());
+	MovableObjectCollection* objectMap = getMovableObjectCollection(m->getMovableType());
+	{
+            OGRE_LOCK_MUTEX(objectMap->mutex);
+
+		checkMovableObjectIntegrity( objectMap->movableObjects, m );
+		MovableObjectVec::iterator itor = objectMap->movableObjects.begin() + m->mGlobalIndex;
+
+		// no delete
+		itor = efficientVectorRemove( objectMap->movableObjects, itor );
+		//The node that was at the end got swapped and has now a different index
+		if( itor != objectMap->movableObjects.end() )
+			(*itor)->mGlobalIndex = itor - objectMap->movableObjects.begin();
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::extractAllMovableObjectsByType(const String& typeName)
@@ -7025,16 +4840,22 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 	{
             OGRE_LOCK_MUTEX(objectMap->mutex);
 		// no deletion
-		objectMap->map.clear();
+		objectMap->movableObjects.clear();
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::_injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation,
-	bool doLightIteration, const LightList* manualLightList)
+void SceneManager::_injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera,
+										  bool shadowDerivation, bool doLightIteration )
 {
+	if( activeCamera )
+	{
+		mCameraInProgress	= activeCamera;
+		mCurrentViewport	= activeCamera->getLastViewport();
+	}
+
 	// render something as if it came from the current queue
     const Pass *usedPass = _setPass(pass, false, shadowDerivation);
-    renderSingleObject(rend, usedPass, false, doLightIteration, manualLightList);
+    renderSingleObject( rend, usedPass, false, doLightIteration );
 }
 //---------------------------------------------------------------------
 RenderSystem *SceneManager::getDestinationRenderSystem()
@@ -7049,57 +4870,6 @@ uint32 SceneManager::_getCombinedVisibilityMask(void) const
 
 }
 //---------------------------------------------------------------------
-const VisibleObjectsBoundsInfo& 
-SceneManager::getVisibleObjectsBoundsInfo(const Camera* cam) const
-{
-	static VisibleObjectsBoundsInfo nullBox;
-
-	CamVisibleObjectsMap::const_iterator camVisObjIt = mCamVisibleObjectsMap.find( cam );
-
-	if ( camVisObjIt == mCamVisibleObjectsMap.end() )
-		return nullBox;
-	else
-		return camVisObjIt->second;
-}
-//---------------------------------------------------------------------
-const VisibleObjectsBoundsInfo& 
-SceneManager::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
-{
-	static VisibleObjectsBoundsInfo nullBox;
-
-	// find light
-	unsigned int foundCount = 0;
-	ShadowCamLightMapping::const_iterator it; 
-	for ( it = mShadowCamLightMapping.begin() ; it != mShadowCamLightMapping.end(); ++it )
-	{
-		if ( it->second == light )
-		{
-			if (foundCount == iteration)
-			{
-				// search the camera-aab list for the texture cam
-				CamVisibleObjectsMap::const_iterator camIt = mCamVisibleObjectsMap.find( it->first );
-
-				if ( camIt == mCamVisibleObjectsMap.end() )
-				{
-					return nullBox;
-				}
-				else
-				{
-					return camIt->second;
-				}
-			}
-			else
-			{
-				// multiple shadow textures per light, keep searching
-				++foundCount;
-			}
-		}
-	}
-
-	// AAB not available
-	return nullBox;
-}
-//---------------------------------------------------------------------
 void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRenderableVisitor* visitor)
 {
 	if (visitor)
@@ -7112,6 +4882,70 @@ SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderable
 {
 	return mActiveQueuedRenderableVisitor;
 }
+//-----------------------------------------------------------------------------------
+/*void SceneManager::buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs,
+									ArrayMemoryManager::PtrdiffVec &outDiffsList )
+{
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			outDiffsList.push_back( (transform.mParents + transform.mIndex) -
+									(Ogre::Node**)basePtrs[NodeArrayMemoryManager::Parent] );
+		}
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+								const MemoryPoolVec &newBasePtrs,
+								const ArrayMemoryManager::PtrdiffVec &diffsList )
+{
+	ArrayMemoryManager::PtrdiffVec::const_iterator it = diffsList.begin();
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			transform.rebasePtrs( newBasePtrs, *it++ );
+		}
+
+		++itor;
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+									const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+									size_t startInstance, size_t diffInstances )
+{
+	//If mSceneNodes were ordered by mChunkBase & mIndex, there would be a huge optimization to be made
+	SceneNodeList::const_iterator itor = mSceneNodes.begin();
+	SceneNodeList::const_iterator end  = mSceneNodes.end();
+
+	const Ogre::Node **minBasePtr = (const Ogre::Node**)( basePtrs[NodeArrayMemoryManager::Parent] +
+									startInstance * elementsMemSizes[NodeArrayMemoryManager::Parent] );
+
+	while( itor != end )
+	{
+		if( (*itor)->getDepthLevel() == level )
+		{
+			Transform &transform = (*itor)->_getTransform();
+			if( transform.mParents + transform.mIndex > minBasePtr )
+			{
+				transform.rebasePtrs( diffInstances );
+				++itor;
+			}
+		}
+	}
+}*/
 //---------------------------------------------------------------------
 void SceneManager::addLodListener(LodListener *listener)
 {
@@ -7289,46 +5123,118 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 }
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
+void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
 {
-	reset();
+	mCurrentCullFrustumRequest = request;
+	mRequestType = CULL_FRUSTUM;
+	//This is where I figuratively kill whoever made mutable variables inside a
+	//const function, silencing a race condition: Update the frustum planes now
+	//in case they weren't up to date.
+	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::reset()
+void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &request )
 {
-	aabb.setNull();
-	receiverAabb.setNull();
-	minDistance = minDistanceInFrustum = std::numeric_limits<Real>::infinity();
-	maxDistance = maxDistanceInFrustum = 0;
+	mCurrentCullFrustumRequest = request;
+	mRequestType = CALCULATE_RECEIVER_BOX;
+	//This is where I figuratively kill whoever made mutable variables inside a
+	//const function, silencing a race condition: Update the frustum planes now
+	//in case they weren't up to date.
+	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
-		   const Camera* cam, bool receiver)
+void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request )
 {
-	aabb.merge(boxBounds);
-	if (receiver)
-		receiverAabb.merge(boxBounds);
-	// use view matrix to determine distance, works with custom view matrices
-	Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
-	Real camDistToCenter = vsSpherePos.length();
-	minDistance = std::min(minDistance, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
-	maxDistance = std::max(maxDistance, camDistToCenter + sphereBounds.getRadius());
-	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
-	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
+	mInstanceBatchCullRequest = request;
+	mRequestType = CULL_FRUSTUM_INSTANCEDENTS;
+	mInstanceBatchCullRequest.frustum->getFrustumPlanes(); // Ensure they're up to date.
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-								  const Sphere& sphereBounds, const Camera* cam)
+void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlock )
 {
-	(void)boxBounds;
-	// use view matrix to determine distance, works with custom view matrices
-	Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
-	Real camDistToCenter = vsSpherePos.length();
-	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
-	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
-
+	mRequestType = USER_UNIFORM_SCALABLE_TASK;
+	mUserTask = task;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	if( bBlock )
+		mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
+//---------------------------------------------------------------------
+void SceneManager::waitForPendingUserScalableTask()
+{
+	assert( mRequestType == USER_UNIFORM_SCALABLE_TASK );
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//---------------------------------------------------------------------
+unsigned long updateWorkerThread( ThreadHandle *threadHandle )
+{
+	SceneManager *sceneManager = reinterpret_cast<SceneManager*>( threadHandle->getUserParam() );
+	return sceneManager->_updateWorkerThread( threadHandle );
+}
+THREAD_DECLARE( updateWorkerThread );
+//---------------------------------------------------------------------
+void SceneManager::startWorkerThreads()
+{
+	mWorkerThreadsBarrier = new Barrier( mNumWorkerThreads+1 );
+	mWorkerThreads.reserve( mNumWorkerThreads );
+	for( size_t i=0; i<mNumWorkerThreads; ++i )
+	{
+		ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateWorkerThread ), i, this );
+		mWorkerThreads.push_back( th );
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::stopWorkerThreads()
+{
+	mExitWorkerThreads = true;
+	mWorkerThreadsBarrier->sync(); // Wake up worker threads so they stop
+	Threads::WaitForThreads( mWorkerThreads );
 
+	delete mWorkerThreadsBarrier;
+	mWorkerThreadsBarrier = 0;
+}
+//---------------------------------------------------------------------
+unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
+{
+	size_t threadIdx = threadHandle->getThreadIdx();
+	while( !mExitWorkerThreads )
+	{
+		mWorkerThreadsBarrier->sync();
+		if( !mExitWorkerThreads )
+		{
+			switch( mRequestType )
+			{
+			case CULL_FRUSTUM:
+				cullFrustum( mCurrentCullFrustumRequest, threadIdx );
+				break;
+			case CALCULATE_RECEIVER_BOX:
+				cullReceiversBox( mCurrentCullFrustumRequest, threadIdx );
+				break;
+			case UPDATE_ALL_TRANSFORMS:
+				updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
+				break;
+			case UPDATE_ALL_BOUNDS:
+				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+				break;
+			case UPDATE_INSTANCE_MANAGERS:
+				updateInstanceManagersThread( threadIdx );
+				break;
+			case CULL_FRUSTUM_INSTANCEDENTS:
+				instanceBatchCullFrustumThread( mInstanceBatchCullRequest, threadIdx );
+				break;
+			case USER_UNIFORM_SCALABLE_TASK:
+				mUserTask->execute( threadIdx, mNumWorkerThreads );
+				break;
+			}
+			mWorkerThreadsBarrier->sync();
+		}
+	}
 
-
+	return 0;
+}
 }

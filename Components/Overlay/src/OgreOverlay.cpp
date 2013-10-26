@@ -48,15 +48,18 @@ namespace Ogre {
         mZOrder(100), mVisible(false), mInitialised(false)
 
     {
-        mRootNode = OGRE_NEW SceneNode(NULL);
-
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+        mRootNode = OGRE_NEW SceneNode( 0, 0, 0, 0 );
+#endif
     }
     //---------------------------------------------------------------------
     Overlay::~Overlay()
     {
 		// remove children
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         OGRE_DELETE mRootNode;
+#endif
 		
 		for (OverlayContainerList::iterator i = m2DElements.begin(); 
 			 i != m2DElements.end(); ++i)
@@ -151,17 +154,23 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Overlay::add3D(SceneNode* node)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         mRootNode->addChild(node);
+#endif
     }
     //---------------------------------------------------------------------
     void Overlay::remove3D(SceneNode* node)
     {
-        mRootNode->removeChild(node->getName());
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+        mRootNode->removeChild(node);
+#endif
     }
     //---------------------------------------------------------------------
     void Overlay::clear(void)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         mRootNode->removeAllChildren();
+#endif
         m2DElements.clear();
         // Note no deallocation, memory handled by OverlayManager & SceneManager
     }
@@ -278,16 +287,21 @@ namespace Ogre {
 
         if (mVisible)
         {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
             // Add 3D elements
             mRootNode->setPosition(cam->getDerivedPosition());
             mRootNode->setOrientation(cam->getDerivedOrientation());
+			//TODO: (dark_sylinc)
             mRootNode->_update(true, false);
+#endif
             // Set up the default queue group for the objects about to be added
             uint8 oldgrp = queue->getDefaultQueueGroup();
             ushort oldPriority = queue-> getDefaultRenderablePriority();
             queue->setDefaultQueueGroup(RENDER_QUEUE_OVERLAY);
             queue->setDefaultRenderablePriority(static_cast<ushort>((mZOrder*100)-1));
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
             mRootNode->_findVisibleObjects(cam, queue, NULL, true, false);
+#endif
             // Reset the group
             queue->setDefaultQueueGroup(oldgrp);
             queue->setDefaultRenderablePriority(oldPriority);
@@ -297,7 +311,7 @@ namespace Ogre {
             {
                 (*i)->_update();
 
-                (*i)->_updateRenderQueue(queue);
+                (*i)->_updateRenderQueue(queue, cam);
             }
         }
 

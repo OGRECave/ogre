@@ -1884,12 +1884,6 @@ namespace Ogre
 		context.technique->setShadowCasterMaterial(params);
 		return false;
 	}
-	//-----------------------------------------------------------------------
-	bool parseShadowReceiverMaterial(String& params, MaterialScriptContext& context)
-	{
-		context.technique->setShadowReceiverMaterial(params);
-		return false;
-	}
     //-----------------------------------------------------------------------
     bool parseSetTextureAlias(String& params, MaterialScriptContext& context)
     {
@@ -2567,8 +2561,6 @@ namespace Ogre
 
         context.isVertexProgramShadowCaster = false;
         context.isFragmentProgramShadowCaster = false;
-        context.isVertexProgramShadowReceiver = false;
-        context.isFragmentProgramShadowReceiver = false;
 
         // Create params? Skip this if program is not supported
         if (context.program->isSupported())
@@ -2616,8 +2608,6 @@ namespace Ogre
 
         context.isVertexProgramShadowCaster = false;
         context.isFragmentProgramShadowCaster = false;
-        context.isVertexProgramShadowReceiver = false;
-        context.isFragmentProgramShadowReceiver = false;
 
         // Create params? Skip this if program is not supported
         if (context.program->isSupported())
@@ -2646,8 +2636,6 @@ namespace Ogre
 
         context.isVertexProgramShadowCaster = true;
         context.isFragmentProgramShadowCaster = false;
-        context.isVertexProgramShadowReceiver = false;
-		context.isFragmentProgramShadowReceiver = false;
 
         // Set the vertex program for this pass
         context.pass->setShadowCasterVertexProgram(params);
@@ -2679,8 +2667,6 @@ namespace Ogre
 
         context.isVertexProgramShadowCaster = false;
         context.isFragmentProgramShadowCaster = true;
-        context.isVertexProgramShadowReceiver = false;
-		context.isFragmentProgramShadowReceiver = false;
 
         // Set the vertex program for this pass
         context.pass->setShadowCasterFragmentProgram(params);
@@ -2695,74 +2681,6 @@ namespace Ogre
         // Return TRUE because this must be followed by a {
         return true;
     }
-    //-----------------------------------------------------------------------
-    bool parseShadowReceiverVertexProgramRef(String& params, MaterialScriptContext& context)
-    {
-        // update section
-        context.section = MSS_PROGRAM_REF;
-
-        context.program = GpuProgramManager::getSingleton().getByName(params);
-        if (context.program.isNull())
-        {
-            // Unknown program
-            logParseError("Invalid shadow_receiver_vertex_program_ref entry - vertex program "
-                + params + " has not been defined.", context);
-            return true;
-        }
-
-
-        context.isVertexProgramShadowCaster = false;
-        context.isFragmentProgramShadowCaster = false;
-        context.isVertexProgramShadowReceiver = true;
-		context.isFragmentProgramShadowReceiver = false;
-
-        // Set the vertex program for this pass
-        context.pass->setShadowReceiverVertexProgram(params);
-
-        // Create params? Skip this if program is not supported
-        if (context.program->isSupported())
-        {
-            context.programParams = context.pass->getShadowReceiverVertexProgramParameters();
-			context.numAnimationParametrics = 0;
-        }
-
-        // Return TRUE because this must be followed by a {
-        return true;
-    }
-	//-----------------------------------------------------------------------
-	bool parseShadowReceiverFragmentProgramRef(String& params, MaterialScriptContext& context)
-	{
-		// update section
-		context.section = MSS_PROGRAM_REF;
-
-		context.program = GpuProgramManager::getSingleton().getByName(params);
-		if (context.program.isNull())
-		{
-			// Unknown program
-			logParseError("Invalid shadow_receiver_fragment_program_ref entry - fragment program "
-				+ params + " has not been defined.", context);
-			return true;
-		}
-
-
-        context.isVertexProgramShadowCaster = false;
-        context.isFragmentProgramShadowCaster = false;
-		context.isVertexProgramShadowReceiver = false;
-		context.isFragmentProgramShadowReceiver = true;
-
-		// Set the vertex program for this pass
-		context.pass->setShadowReceiverFragmentProgram(params);
-
-		// Create params? Skip this if program is not supported
-		if (context.program->isSupported())
-		{
-			context.programParams = context.pass->getShadowReceiverFragmentProgramParameters();
-			context.numAnimationParametrics = 0;
-		}
-
-		// Return TRUE because this must be followed by a {
-		return true;
-	}
     //-----------------------------------------------------------------------
     bool parseFragmentProgramRef(String& params, MaterialScriptContext& context)
     {
@@ -3118,7 +3036,6 @@ namespace Ogre
         // Set up technique attribute parsers
         mTechniqueAttribParsers.insert(AttribParserList::value_type("lod_index", (ATTRIBUTE_PARSER)parseLodIndex));
 		mTechniqueAttribParsers.insert(AttribParserList::value_type("shadow_caster_material", (ATTRIBUTE_PARSER)parseShadowCasterMaterial));
-		mTechniqueAttribParsers.insert(AttribParserList::value_type("shadow_receiver_material", (ATTRIBUTE_PARSER)parseShadowReceiverMaterial));
 		mTechniqueAttribParsers.insert(AttribParserList::value_type("scheme", (ATTRIBUTE_PARSER)parseScheme));
 		mTechniqueAttribParsers.insert(AttribParserList::value_type("gpu_vendor_rule", (ATTRIBUTE_PARSER)parseGPUVendorRule));
 		mTechniqueAttribParsers.insert(AttribParserList::value_type("gpu_device_rule", (ATTRIBUTE_PARSER)parseGPUDeviceRule));
@@ -3155,8 +3072,6 @@ namespace Ogre
 		mPassAttribParsers.insert(AttribParserList::value_type("geometry_program_ref", (ATTRIBUTE_PARSER)parseGeometryProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("shadow_caster_vertex_program_ref", (ATTRIBUTE_PARSER)parseShadowCasterVertexProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("shadow_caster_fragment_program_ref", (ATTRIBUTE_PARSER)parseShadowCasterFragmentProgramRef));
-        mPassAttribParsers.insert(AttribParserList::value_type("shadow_receiver_vertex_program_ref", (ATTRIBUTE_PARSER)parseShadowReceiverVertexProgramRef));
-		mPassAttribParsers.insert(AttribParserList::value_type("shadow_receiver_fragment_program_ref", (ATTRIBUTE_PARSER)parseShadowReceiverFragmentProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("fragment_program_ref", (ATTRIBUTE_PARSER)parseFragmentProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("max_lights", (ATTRIBUTE_PARSER)parseMaxLights));
 		mPassAttribParsers.insert(AttribParserList::value_type("start_light", (ATTRIBUTE_PARSER)parseStartLight));
@@ -3795,12 +3710,6 @@ namespace Ogre
 				writeAttribute(2, "shadow_caster_material");
 				writeValue(quoteWord(pTech->getShadowCasterMaterial()->getName()));
 			}
-			// ShadowReceiverMaterial name
-			if (!pTech->getShadowReceiverMaterial().isNull())
-			{
-				writeAttribute(2, "shadow_receiver_material");
-				writeValue(quoteWord(pTech->getShadowReceiverMaterial()->getName()));
-			}
 			// GPU vendor rules
 			Technique::GPUVendorRuleIterator vrit = pTech->getGPUVendorRuleIterator();
 			while (vrit.hasMoreElements())
@@ -4327,16 +4236,6 @@ namespace Ogre
             if (pPass->hasShadowCasterVertexProgram())
             {
                 writeShadowCasterVertexProgramRef(pPass);
-            }
-
-            if (pPass->hasShadowReceiverVertexProgram())
-            {
-                writeShadowReceiverVertexProgramRef(pPass);
-            }
-
-            if (pPass->hasShadowReceiverFragmentProgram())
-            {
-                writeShadowReceiverFragmentProgramRef(pPass);
             }
 
             // Nested texture layers
@@ -5028,18 +4927,6 @@ namespace Ogre
     {
         writeGpuProgramRef("shadow_caster_fragment_program_ref",
             pPass->getShadowCasterFragmentProgram(), pPass->getShadowCasterFragmentProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverVertexProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_vertex_program_ref",
-            pPass->getShadowReceiverVertexProgram(), pPass->getShadowReceiverVertexProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverFragmentProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_fragment_program_ref",
-            pPass->getShadowReceiverFragmentProgram(), pPass->getShadowReceiverFragmentProgramParameters());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeFragmentProgramRef(const Pass* pPass)

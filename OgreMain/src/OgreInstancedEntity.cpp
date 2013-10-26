@@ -35,14 +35,15 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreCamera.h"
 #include "OgreException.h"
-#include "OgreNameGenerator.h"
+
+#include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre
 {
-	NameGenerator InstancedEntity::msNameGenerator("");
-
-	InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity ) :
-				MovableObject(),
+	InstancedEntity::InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager,
+										InstanceBatch *batchOwner, uint32 instanceID,
+										InstancedEntity* sharedTransformEntity ) :
+				MovableObject( id, objectMemoryManager, 0 ),
 				mInstanceId( instanceID ),
                 mInUse( false ),
 				mBatchOwner( batchOwner ),
@@ -52,22 +53,16 @@ namespace Ogre
 				mBoneWorldMatrices(0),
 				mFrameAnimationLastUpdated(std::numeric_limits<unsigned long>::max() - 1),
 				mSharedTransformEntity( 0 ),
-				mTransformLookupNumber(instanceID),
-				mPosition(Vector3::ZERO),
-				mDerivedLocalPosition(Vector3::ZERO),
-				mOrientation(Quaternion::IDENTITY),
-				mScale(Vector3::UNIT_SCALE),
-				mMaxScaleLocal(1),
-				mNeedTransformUpdate(true),
-				mNeedAnimTransformUpdate(true),
-				mUseLocalTransform(false)
-
-	
+				mTransformLookupNumber(instanceID)
 	{
-		//Use a static name generator to ensure this name stays unique (which may not happen
-		//otherwise due to reparenting when defragmenting)
-		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(mInstanceId) + "/"+
-				msNameGenerator.generate();
+		setInUse( false );
+
+		mName = batchOwner->getName() + "/IE_" + StringConverter::toString(mInstanceId);
+
+		const AxisAlignedBox &bounds = batchOwner->_getMeshReference()->getBounds();
+		Aabb aabb( bounds.getCenter(), bounds.getHalfSize() );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
 		if (sharedTransformEntity)
 		{
@@ -77,7 +72,6 @@ namespace Ogre
 		{
 			createSkeletonInstance();
 		}
-		updateTransforms();
 	}
 
 	InstancedEntity::~InstancedEntity()
@@ -220,7 +214,7 @@ namespace Ogre
 				const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
 				Mesh::IndexMap::const_iterator itor = indexMap->begin();
 				Mesh::IndexMap::const_iterator end  = indexMap->end();
-				
+
 				while( itor != end )
 				{
 					const Matrix4 &mat = matrices[*itor++];
@@ -256,10 +250,6 @@ namespace Ogre
 		{
 			//check object is explicitly visible
 			retVal = isVisible();
-
-			//Object's bounding box is viewed by the camera
-			if( retVal && camera )
-				retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
 		}
 
 		return retVal;
@@ -287,6 +277,9 @@ namespace Ogre
 
 			mAnimationState = OGRE_NEW AnimationStateSet();
 			mBatchOwner->_getMeshRef()->_initAnimationState( mAnimationState );
+
+			if( mParentNode )
+				mBatchOwner->_addAnimatedInstance( this );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -360,31 +353,45 @@ namespace Ogre
 		//TODO: Add attached objects (TagPoints) to the bbox
 		return mBatchOwner->_getMeshReference()->getBounds();
     }
-
-	//-----------------------------------------------------------------------
-    Real InstancedEntity::getBoundingRadius(void) const
-	{
-		return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * getMaxScaleCoef();
-	}
 	//-----------------------------------------------------------------------
 	Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
 	{
-		return _getDerivedPosition().squaredDistance(cam->getDerivedPosition());
+		return mParentNode->_getDerivedPosition().squaredDistance(cam->getDerivedPosition());
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyStaticDirty(void) const
+	{
+		assert( mBatchOwner->isStatic() );
+		mBatchOwner->_notifyStaticDirty();
 	}
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyMoved(void)
 	{
-		markTransformDirty();
 		MovableObject::_notifyMoved();
-		updateTransforms();
 	}
-
 	//-----------------------------------------------------------------------
-	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
+	void InstancedEntity::_notifyAttached( Node* parent )
 	{
-		markTransformDirty();
-		MovableObject::_notifyAttached( parent, isTagPoint );
-		updateTransforms();
+		bool different = (parent != mParentNode);
+
+		if( different )
+		{
+			if( parent )
+			{
+				//Check we're skeletally animated and actual owners of our transform
+				if( !mSharedTransformEntity && mSkeletonInstance )
+					mBatchOwner->_addAnimatedInstance( this );
+			}
+			else
+			{
+				mBatchOwner->_removeAnimatedInstance( this );
+			}
+
+			if( isStatic() )
+				_notifyStaticDirty();
+		}
+
+		MovableObject::_notifyAttached( parent );
 	}
 	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const
@@ -405,17 +412,19 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	bool InstancedEntity::_updateAnimation(void)
 	{
-		if (mSharedTransformEntity)
+		//Probably this is triggered by a missing call to mBatchOwner->_removeAnimatedInstance
+		assert( !mSharedTransformEntity && "Updating the animation of an entity with shared animation" );
+		/*if (mSharedTransformEntity)
 		{
 			return mSharedTransformEntity->_updateAnimation();
 		}
 		else
-		{
+		{*/
 			const bool animationDirty =
 				(mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
 				(mSkeletonInstance->getManualBonesDirty());
 
-			if( animationDirty || (mNeedAnimTransformUpdate &&  mBatchOwner->useBoneWorldMatrices()))
+			if( animationDirty || mBatchOwner->useBoneWorldMatrices())
 			{
 				mSkeletonInstance->setAnimationState( *mAnimationState );
 				mSkeletonInstance->_getBoneMatrices( mBoneMatrices );
@@ -424,103 +433,26 @@ namespace Ogre
 				if (mBatchOwner->useBoneWorldMatrices())
 				{
 					OptimisedUtil::getImplementation()->concatenateAffineMatrices(
-													_getParentNodeFullTransform(),
+													mParentNode->_getFullTransform(),
 													mBoneMatrices,
 													mBoneWorldMatrices,
 													mSkeletonInstance->getNumBones() );
-					mNeedAnimTransformUpdate = false;
 				}
 				
 				mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
 
 				return true;
 			}
-		}
+		//}
 
 		return false;
 	}
-
-	//-----------------------------------------------------------------------
-	void InstancedEntity::markTransformDirty()
-	{
-		mNeedTransformUpdate = true;
-		mNeedAnimTransformUpdate = true; 
-		mBatchOwner->_boundsDirty();
-	}
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setPosition(const Vector3& position, bool doUpdate) 
-	{ 
-		mPosition = position; 
-		mDerivedLocalPosition = position;
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setOrientation(const Quaternion& orientation, bool doUpdate) 
-	{ 
-		mOrientation = orientation;  
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::setScale(const Vector3& scale, bool doUpdate) 
-	{ 
-		mScale = scale; 
-		mMaxScaleLocal = std::max<Real>(std::max<Real>(
-			Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
-		mUseLocalTransform = true;
-		markTransformDirty();
-		if (doUpdate) updateTransforms();
-	} 
-
-	//---------------------------------------------------------------------------
-	Real InstancedEntity::getMaxScaleCoef() const 
-	{ 
-		if (mParentNode)
-		{
-			const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
-			return mMaxScaleLocal * std::max<Real>(std::max<Real>(
-				Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
-		}
-		return mMaxScaleLocal; 
-	}
-
-	//---------------------------------------------------------------------------
-	void InstancedEntity::updateTransforms()
-	{
-		if (mUseLocalTransform && mNeedTransformUpdate)
-		{
-			if (mParentNode)
-			{
-				const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-				const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-				const Vector3& parentScale = mParentNode->_getDerivedScale();
-				
-				Quaternion derivedOrientation = parentOrientation * mOrientation;
-				Vector3 derivedScale = parentScale * mScale;
-				mDerivedLocalPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
-			
-				mFullLocalTransform.makeTransform(mDerivedLocalPosition, derivedScale, derivedOrientation);
-			}
-			else
-			{
-				mFullLocalTransform.makeTransform(mPosition,mScale,mOrientation);
-			}
-			mNeedTransformUpdate = false;
-		}
-	}
-
 	//---------------------------------------------------------------------------
 	void InstancedEntity::setInUse( bool used )
 	{
 		mInUse = used;
-		//Remove the use of local transform if the object is deleted
-		mUseLocalTransform &= used;
+		if( !used )
+			setVisible( false );
 	}
 	//---------------------------------------------------------------------------
 	void InstancedEntity::setCustomParam( unsigned char idx, const Vector4 &newParam )

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreSimpleRenderable.h"
+#include "OgreRenderable.h"
 
 namespace Ogre {
 
@@ -42,53 +42,53 @@ namespace Ogre {
 	*/
 	/** Allows the rendering of a simple 2D rectangle
     This class renders a simple 2D rectangle; this rectangle has no depth and
-    therefore is best used with specific render queue and depth settings,
-    like RENDER_QUEUE_BACKGROUND and 'depth_write off' for backdrops, and 
-    RENDER_QUEUE_OVERLAY and 'depth_check off' for fullscreen quads.
+    therefore is best used with 'depth_write off' materials.
+	@par
+	Beginning Ogre 2.0, it supports building a full screen triangle instead
+	of rectangle. Position & UVs are in the first source. Normals are in the second one
     */
-    class _OgreExport Rectangle2D : public SimpleRenderable
+    class _OgreExport Rectangle2D : public Renderable, public MovableAlloc
     {
     protected:
-        /** Override this method to prevent parent transforms (rotation,translation,scale)
-        */
-        void getWorldTransforms( Matrix4* xform ) const;
+		Vector3		mPosition;
+		Quaternion	mOrientation;
+		Vector3		mScale;
 
-        void _initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage);
+		bool		mQuad;
+
+		MaterialPtr	mMaterial;
+		RenderOperation	mRenderOp;
+
+        void initRectangle2D(void);
 
     public:
-
-        Rectangle2D(bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
-        Rectangle2D(const String& name, bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        Rectangle2D( bool bQuad );
         ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.
         @param
-        left Left position in screen relative coordinates, -1 = left edge, 1.0 = right edge
-        @param top Top position in screen relative coordinates, 1 = top edge, -1 = bottom edge
-        @param right Right position in screen relative coordinates
-        @param bottom Bottom position in screen relative coordinates
-		@param updateAABB Tells if you want to recalculate the AABB according to 
-		the new corners. If false, the axis aligned bounding box will remain identical.
+        left Left position in screen normalized coordinates, 0 = left edge, 1 = right edge
+        @param top Top position in screen normalized coordinates, 0 = top edge, 1 = bottom edge
+        @param width Width in screen normalized coordinates
+        @param height Height in screen normalized coordinates
         */
-        void setCorners(Real left, Real top, Real right, Real bottom, bool updateAABB = true);
+        void setCorners( Real left, Real top, Real width, Real height );
 
 		/** Sets the normals of the rectangle
-		*/
-		void setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight);
-
-		/** Sets the UVs of the rectangle
 		@remarks
-		Doesn't do anything if the rectangle wasn't built with texture coordinates
+			Be careful the normals can be bilinearly interpolated correctly, otherwise the
+			results between Fullscreen Triangles & Fullscreen Quads will be different
 		*/
-		void setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
-					 const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight);
+		void setNormals( const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft,
+						const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight );
 
-		void setDefaultUVs();
+        Real getSquaredViewDepth(const Camera* cam) const	{ (void)cam; return 0; }
 
-        Real getSquaredViewDepth(const Camera* cam) const
-        { (void)cam; return 0; }
-
-        Real getBoundingRadius(void) const { return 0; }
+		void setMaterial( const String& matName );
+        virtual const MaterialPtr& getMaterial(void) const;
+		virtual void getWorldTransforms( Matrix4* xform ) const;
+		virtual void getRenderOperation( RenderOperation& op );
+		virtual const LightList& getLights(void) const;
 
     };
 	/** @} */
@@ -97,5 +97,3 @@ namespace Ogre {
 }// namespace
 
 #endif
-
-

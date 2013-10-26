@@ -204,12 +204,8 @@ namespace Ogre {
         GpuProgramUsage *mShadowCasterVertexProgramUsage;
         /// Fragment program details
         GpuProgramUsage *mShadowCasterFragmentProgramUsage;
-        /// Vertex program details
-        GpuProgramUsage *mShadowReceiverVertexProgramUsage;
 		/// Fragment program details
 		GpuProgramUsage *mFragmentProgramUsage;
-		/// Fragment program details
-		GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
 		/// Geometry program details
 		GpuProgramUsage *mGeometryProgramUsage;
 		/// Tesselation hull program details
@@ -231,9 +227,8 @@ namespace Ogre {
 		/// Constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
-		typedef vector<unsigned short>::type ContentTypeLookup;
-		mutable ContentTypeLookup mShadowContentTypeLookup;
-		mutable bool mContentTypeLookupBuilt;
+		typedef vector<size_t>::type ContentTypeLookup;
+		ContentTypeLookup mShadowContentTypeLookup;
 		/// Scissoring for the light?
 		bool mLightScissoring;
 		/// User clip planes for light?
@@ -289,10 +284,6 @@ namespace Ogre {
 	    bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster fragment program
         bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow receiver vertex program
-        bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow receiver fragment program
-        bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
 
         size_t calculateSize(void) const;
 
@@ -573,14 +564,14 @@ namespace Ogre {
 		void addTextureUnitState(TextureUnitState* state);
         /** Retrieves a pointer to a texture unit state so it may be modified.
         */
-        TextureUnitState* getTextureUnitState(unsigned short index);
+        TextureUnitState* getTextureUnitState( size_t index );
         /** Retrieves the Texture Unit State matching name.
             Returns 0 if name match is not found.
         */
         TextureUnitState* getTextureUnitState(const String& name);
 		/** Retrieves a const pointer to a texture unit state.
 		*/
-		const TextureUnitState* getTextureUnitState(unsigned short index) const;
+		const TextureUnitState* getTextureUnitState( size_t index ) const;
 		/** Retrieves the Texture Unit State matching name.
 		Returns 0 if name match is not found.
 		*/
@@ -618,6 +609,22 @@ namespace Ogre {
         {
             return static_cast<unsigned short>(mTextureUnitStates.size());
         }
+
+		size_t getNumShadowContentTextures(void) const		{ return mShadowContentTypeLookup.size(); }
+
+		/// Recreates the contents of mShadowContentTypeLookup from scratch
+		void recreateShadowContentTypeLookup(void);
+
+		/** Call this function when a texture unit changed to type CONTENT_SHADOW
+		@param textureUnitIndex
+			Texture Unit index of the TU being changed
+		*/
+		void insertShadowContentTypeLookup( size_t textureUnitIndex );
+
+		/** Call this function when a texture unit is removed (any type), or when a tex unit
+			that used to be of type CONTENT_SHADOW, no longer is.
+		*/
+		void removeShadowContentTypeLookup( size_t textureUnitIndex );
 
         /** Sets the kind of blending this pass has with the existing contents of the scene.
         @remarks
@@ -1327,85 +1334,6 @@ namespace Ogre {
             only available after _load(). */
         const GpuProgramPtr& getShadowCasterFragmentProgram(void) const;
 
-        /** Sets the details of the vertex program to use when rendering as a
-            shadow receiver.
-        @remarks
-            Texture-based shadows require that the shadow receiver is rendered using
-            a projective texture. Whilst Ogre can arrange this for the fixed function
-            pipeline, passes which use vertex programs might need the vertex
-            programs still to run in order to preserve any deformation etc
-            that it does. So in this case, we need a vertex program which does the
-            appropriate vertex transformation, but generates projective texture
-            coordinates.
-        @par
-            Therefore, it is up to implementors of vertex programs to provide an
-            alternative vertex program which can be used to render the object
-            as a shadow receiver. Do all the same vertex transforms, but generate
-            <strong>2 sets</strong> of texture coordinates using the auto parameter
-            ACT_TEXTURE_VIEWPROJ_MATRIX, which Ogre will bind to the parameter name /
-            index you supply as the second parameter to this method. 2 texture
-            sets are needed because Ogre needs to use 2 texture units for some
-            shadow effects.
-        @note
-            This is only applicable to programmable passes.
-        @par
-            The default behaviour is for Ogre to switch to fixed-function
-            rendering if an explict vertex program alternative is not set.
-        */
-        void setShadowReceiverVertexProgram(const String& name);
-        /** Sets the vertex program parameters for rendering as a shadow receiver.
-        @remarks
-        Only applicable to programmable passes, and this particular call is
-        designed for low-level programs; use the named parameter methods
-        for setting high-level program parameters.
-        */
-        void setShadowReceiverVertexProgramParameters(GpuProgramParametersSharedPtr params);
-
-		/** This method allows you to specify a fragment program for use when
-			rendering a texture shadow receiver.
-		@remarks
-			Texture shadows are applied by rendering the receiver. Modulative texture
-			shadows are performed as a post-render darkening pass, and as such
-			fragment programs are generally not required per-object. Additive
-			texture shadows, however, are applied by accumulating light masked
-			out using a texture shadow (black & white by default, unless you
-			customise this using SceneManager::setCustomShadowCasterMaterial).
-			OGRE can do this for you for most materials, but if you use a custom
-			lighting program (e.g. per pixel lighting) then you'll need to provide
-			a custom version for receiving shadows. You don't need to provide
-			this for shadow casters if you don't use self-shadowing since they
-			will never be shadow receivers too.
-		@par
-			The shadow texture is always bound to texture unit 0 when rendering
-			texture shadow passes. Therefore your custom shadow receiver program
-			may well just need to shift it's texture unit usage up by one unit,
-			and take the shadow texture into account in its calculations.
-		*/
-		void setShadowReceiverFragmentProgram(const String& name);
-        /** Sets the fragment program parameters for rendering as a shadow receiver.
-        @remarks
-        Only applicable to programmable passes, and this particular call is
-        designed for low-level programs; use the named parameter methods
-        for setting high-level program parameters.
-        */
-        void setShadowReceiverFragmentProgramParameters(GpuProgramParametersSharedPtr params);
-
-        /** Gets the name of the vertex program used by this pass when rendering shadow receivers. */
-        const String& getShadowReceiverVertexProgramName(void) const;
-        /** Gets the vertex program parameters used by this pass when rendering shadow receivers. */
-        GpuProgramParametersSharedPtr getShadowReceiverVertexProgramParameters(void) const;
-        /** Gets the vertex program used by this pass when rendering shadow receivers,
-        only available after _load(). */
-        const GpuProgramPtr& getShadowReceiverVertexProgram(void) const;
-
-		/** Gets the name of the fragment program used by this pass when rendering shadow receivers. */
-		const String& getShadowReceiverFragmentProgramName(void) const;
-		/** Gets the fragment program parameters used by this pass when rendering shadow receivers. */
-		GpuProgramParametersSharedPtr getShadowReceiverFragmentProgramParameters(void) const;
-		/** Gets the fragment program used by this pass when rendering shadow receivers,
-		only available after _load(). */
-		const GpuProgramPtr& getShadowReceiverFragmentProgram(void) const;
-
 		/** Sets the details of the fragment program to use.
 		@remarks
 			Only applicable to programmable passes, this sets the details of
@@ -1522,8 +1450,8 @@ namespace Ogre {
 			exist, then this method returns an arbitrary high-value outside the
 			valid range to index texture units.
 		*/
-		unsigned short _getTextureUnitWithContentTypeIndex(
-			TextureUnitState::ContentType contentType, unsigned short index) const;
+		size_t _getTextureUnitWithContentTypeIndex( TextureUnitState::ContentType contentType,
+													size_t index) const;
 
         /** Set texture filtering for every texture unit 
         @note

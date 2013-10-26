@@ -88,6 +88,14 @@ protected:
 
 	void setupContent()
 	{
+		const IdString workspaceName( "LightingWorkspace" );
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		// Set our camera to orbit around the origin at a suitable distance
 		mCameraMan->setStyle(CS_ORBIT);
 		mCameraMan->setYawPitchDist(Radian(0), Radian(0), 400);
@@ -95,7 +103,7 @@ protected:
 		mTrayMgr->showCursor();
 
 		// Create an ogre head and place it at the origin
-		Entity* head = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		Entity* head = mSceneMgr->createEntity( "ogrehead.mesh" );
 		head->setRenderQueueGroup(cPriorityMain);
 		mSceneMgr->getRootSceneNode()->attachObject(head);
 
@@ -108,10 +116,9 @@ protected:
 		mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));  // Dim ambient lighting
 
 		// Create a ribbon trail that our lights will leave behind
-		NameValuePairList params;
-		params["numberOfChains"] = "2";
-		params["maxElements"] = "80";
-		mTrail = (RibbonTrail*)mSceneMgr->createMovableObject("RibbonTrail", &params);
+		mTrail = mSceneMgr->createRibbonTrail();
+		mTrail->setNumberOfChains( 2 );
+		mTrail->setMaxChainElements( 80 );
 		mSceneMgr->getRootSceneNode()->attachObject(mTrail);
 		mTrail->setMaterialName("Examples/LightRibbonTrail");
 		mTrail->setTrailLength(400);
@@ -158,12 +165,14 @@ protected:
 		BillboardSet* bbs;
 		
 		// Create a light node
-		node = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(50, 30, 0));
+		node = mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_DYNAMIC, Vector3(50, 30, 0) );
 
 		// Create a 14 second animation with spline interpolation
 		anim = mSceneMgr->createAnimation("Path1", 14);
 		anim->setInterpolationMode(Animation::IM_SPLINE);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+		// >> TODO: This needs to be back <<
 		track = anim->createNodeTrack(1, node);  // Create a node track for our animation
 
 		// Enter keyframes for our track to define a path for the light to follow
@@ -175,6 +184,7 @@ protected:
 		track->createNodeKeyFrame(10)->setTranslate(Vector3(-150, -20, -100));
 		track->createNodeKeyFrame(12)->setTranslate(Vector3(-50, -30, 0));
 		track->createNodeKeyFrame(14)->setTranslate(Vector3(50, 30, 0));
+#endif
 
 		// Create an animation state from the animation and enable it
 		mYellowLightAnimState = mSceneMgr->createAnimationState("Path1");
@@ -219,12 +229,14 @@ protected:
 		}
 
 		// Create a second light node
-		node = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-50, 100, 0));
+		node = mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_DYNAMIC, Vector3(-50, 100, 0) );
 
 		// Create a 10 second animation with spline interpolation
 		anim = mSceneMgr->createAnimation("Path2", 10);
 		anim->setInterpolationMode(Animation::IM_SPLINE);
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+		// >> TODO: This needs to be back <<
 		track = anim->createNodeTrack(1, node);  // Create a node track for our animation
 
 		// Enter keyframes for our track to define a path for the light to follow
@@ -234,6 +246,7 @@ protected:
 		track->createNodeKeyFrame(6)->setTranslate(Vector3(0, -150, 70));
 		track->createNodeKeyFrame(8)->setTranslate(Vector3(50, 0, 30));
 		track->createNodeKeyFrame(10)->setTranslate(Vector3(-50, 100, 0));
+#endif
 
 		// Create an animation state from the animation and enable it
 		mGreenLightAnimState = mSceneMgr->createAnimationState("Path2");

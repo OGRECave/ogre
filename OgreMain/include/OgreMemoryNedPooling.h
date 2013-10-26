@@ -47,10 +47,10 @@ namespace Ogre
 	class _OgreExport NedPoolingImpl
 	{
 	public:
-		static void* allocBytes(size_t count, 
+		static DECL_MALLOC void* allocBytes(size_t count, 
 			const char* file, int line, const char* func);
 		static void deallocBytes(void* ptr);
-		static void* allocBytesAligned(size_t align, size_t count, 
+		static DECL_MALLOC void* allocBytesAligned(size_t align, size_t count, 
 			const char* file, int line, const char* func);
 		static void deallocBytesAligned(size_t align, void* ptr);
 
@@ -67,7 +67,7 @@ namespace Ogre
 	class _OgreExport NedPoolingPolicy
 	{
 	public:
-		static inline void* allocateBytes(size_t count, 
+		static inline DECL_MALLOC void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
 			return NedPoolingImpl::allocBytes(count, file, line, func);
@@ -109,7 +109,7 @@ namespace Ogre
 		typedef int IsValidAlignment
 			[Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];
 
-		static inline void* allocateBytes(size_t count, 
+		static inline DECL_MALLOC void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
 			return NedPoolingImpl::allocBytesAligned(Alignment, count, file, line, func);

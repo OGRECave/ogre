@@ -209,11 +209,12 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
 				mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1));
 		}
 
-		if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
-		{
-			dstPass->getParent()->setShadowReceiverMaterial(
-				mCreator->getCustomShadowReceiverMaterial(mSkinningType, weightCount - 1));
-		}
+		// TODO fix it 
+		//if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
+		//{
+		//	dstPass->getParent()->setShadowReceiverMaterial(
+		//		mCreator->getCustomShadowReceiverMaterial(mSkinningType, weightCount - 1));
+		//}
 	}
 
 	return true;

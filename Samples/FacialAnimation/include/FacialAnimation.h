@@ -31,10 +31,26 @@ protected:
 
 	void setupContent(void)
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+		const IdString workspaceName( "FacialAnimationWorkspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.3f, 0.3f, 0.3f ),
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-		mSceneMgr->createLight()->setPosition(40, 60, 50);
-		mSceneMgr->createLight()->setPosition(-120, -80, -50);
+
+
+		SceneNode *light0 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		SceneNode *light1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		light0->setPosition(40, 60, 50);
+		light1->setPosition(-120, -80, -50);
+		light0->attachObject( mSceneMgr->createLight() );
+		light1->attachObject( mSceneMgr->createLight() );
 
 		// pre-load the mesh so that we can tweak it with a manual animation
 		mHeadMesh = MeshManager::getSingleton().load("facial.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -46,8 +62,11 @@ protected:
 		for (unsigned int i = 0; i < 15; i++) mManualKeyFrame->addPoseReference(i, 0);
 
 		// create a head entity from the mesh and attach it to a node with a vertical offset to center it
-		Entity* head = mSceneMgr->createEntity("Head", "facial.mesh");
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, -30, 0))->attachObject(head);
+		Entity* head = mSceneMgr->createEntity( "facial.mesh",
+												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC );
+		mSceneMgr->getRootSceneNode( SCENE_STATIC )->createChildSceneNode(
+												SCENE_STATIC, Vector3(0, -30, 0) )->attachObject(head);
 
 		// get the animation states
 		mSpeakAnimState = head->getAnimationState("Speak");

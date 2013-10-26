@@ -1,0 +1,135 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+#ifndef __CompositorWorkspaceDef_H__
+#define __CompositorWorkspaceDef_H__
+
+#include "OgreHeaderPrefix.h"
+#include "Compositor/OgreTextureDefinition.h"
+
+namespace Ogre
+{
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	/** Workspaces assume all other definitions are already parsed as we perform
+		validation checks.
+		TODO: Describe!!!
+	@author
+		Matias N. Goldberg
+    @version
+        1.0
+    */
+	class _OgreExport CompositorWorkspaceDef : public TextureDefinitionBase
+	{
+		friend class CompositorWorkspace;
+	protected:
+		struct ChannelRoute
+		{
+			uint32		outChannel;
+			IdString	outNode;		/// Name of the alias
+			uint32		inChannel;
+			IdString	inNode;			/// Name of the alias
+			ChannelRoute( uint32 _outChannel, IdString _outNode, uint32 _inChannel, IdString _inNode ) :
+						outChannel( _outChannel ), outNode( _outNode ),
+						inChannel( _inChannel ), inNode( _inNode ) {}
+		};
+
+		IdString			mName;
+
+		typedef map<IdString, IdString>::type	NodeAliasMap;
+		typedef list<ChannelRoute>::type		ChannelRouteList;
+
+		NodeAliasMap		mAliasedNodes;
+		ChannelRouteList	mChannelRoutes;
+
+		
+		uint32				mFinalInChannel;/// Input Channel # to send the RenderWindow to
+		IdString			mFinalNode;		/// Alias of the final node to send the RenderWindow to
+
+		CompositorManager2	*mCompositorManager;
+
+		/** Checks if nodeName is already aliased (whether explicitly or implicitly). If not,
+			checks whether the name of the node corresponds to an actual Node definition.
+			If so, creates the implicit alias; otherwise throws
+		@remarks
+			This means it's only safe to pass names that aren't Nodes if it's already
+			 been explicitly aliased.
+		@param
+			Name of the node definition.
+		*/
+		void createImplicitAlias( IdString nodeName );
+
+	public:
+		CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
+
+		/** Connects outNode's output channel to inNode's input channel.
+		@remarks
+			This mapping will later be used to know how connections should be done.
+			@See CompositorNode::connectTo
+			If outNode & inNode are not in mAliasedNodes and they match the name of an
+			existing node definition, an implicit alias is created automatically.
+			Else it throws.
+		*/
+		void connect( uint32 outChannel, IdString outNode, uint32 inChannel, IdString inNode );
+
+		/** Connects the (probably "final") node by passing the RenderWindow in the given input channel
+		@remarks
+			@See connect
+			Only passing the RenderTarget to one node is supported. If the user wants to use it
+			in more nodes, he can use a dummy node as splitter (gotta love Nodes' flexibility! :)).
+			An implicit alias may be created.
+		*/
+		void connectOutput( uint32 inChannel, IdString inNode );
+
+		/** An alias is explicitly used when the user wants to use multiple, independent
+			instances of the same node. Each alias equals one instance.
+			An implicit alias is when the name of the alias and it's node name match.
+		@remarks
+			This function will throw if trying the alias is already taken by a node
+			definition (unless the node name and the alias match)
+			This function will throw if the alias was already used.
+		@param alias
+			Name of the alias (instance)
+		@param nodeName
+			Name of the node definition
+		*/
+		void addNodeAlias( IdString alias, IdString nodeName );
+	};
+
+	/** @} */
+	/** @} */
+}
+
+#include "OgreHeaderSuffix.h"
+
+#endif

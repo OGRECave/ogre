@@ -122,6 +122,15 @@ protected:
     
 	void setupContent(void)
     {
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "ParticleGS Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
         demoTime = 0;
 
         mProceduralManualObjectFactory = OGRE_NEW ProceduralManualObjectFactory();

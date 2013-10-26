@@ -199,7 +199,7 @@ namespace Ogre
 		virtual void destroy(void);
 
 		virtual void resize(unsigned int width, unsigned int height);
-		virtual void update(bool swapBuffers = true);
+		virtual void update();
 		virtual void swapBuffers();
 
 		virtual bool isVisible() const							{ return mImageSourceNative != NULL; }

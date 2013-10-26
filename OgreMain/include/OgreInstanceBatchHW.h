@@ -60,8 +60,7 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW : public InstanceBatch
 	{
-		bool	mKeepStatic;
-
+	protected:
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
@@ -70,10 +69,13 @@ namespace Ogre
 
 		size_t updateVertexBuffer( Camera *currentCamera );
 
+		/// Overloaded to reserve enough space in mCulledInstances
+		virtual void createAllInstancedEntities(void);
+
 	public:
-		InstanceBatchHW( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName );
+		InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
+							MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
 		virtual ~InstanceBatchHW();
 
 		/** @see InstanceBatch::calculateMaxNumInstances */
@@ -82,28 +84,19 @@ namespace Ogre
 		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
-		/** Overloaded so that we don't perform needless updates when in static mode. Also doing that
-			could cause glitches with shadow mapping (since Ogre thinks we're small/bigger than we
-			really are when displaying, or that we're somewhere else)
-        */
-		void _boundsDirty(void);
-
-		/** @see InstanceBatch::setStaticAndUpdate. While this flag is true, no individual per-entity
-			cull check is made. This means if the camera is looking at only one instance, all instances
-			are sent to the vertex shader (unlike when this flag is false). This saves a lot of CPU
-			power and a bit of bus bandwidth.
-		*/
-		void setStaticAndUpdate( bool bStatic );
-
-		bool isStatic() const						{ return mKeepStatic; }
-
 		//Renderable overloads
 		void getWorldTransforms( Matrix4* xform ) const;
 		unsigned short getNumWorldTransforms(void) const;
 
 		/** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
 			per unit basis and finally updated the vertex buffer */
-		virtual void _updateRenderQueue( RenderQueue* queue );
+		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+														uint32 combinedVisibilityFlags )
+		{
+			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+		}
 	};
 }
 

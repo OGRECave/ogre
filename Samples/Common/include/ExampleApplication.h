@@ -36,15 +36,8 @@ Description: Base class for all the OGRE examples
 #      define OGRE_STATIC_Direct3D11
 #    endif
 #  endif
-#  define OGRE_STATIC_BSPSceneManager
 #  define OGRE_STATIC_ParticleFX
 #  define OGRE_STATIC_CgProgramManager
-#  ifdef OGRE_USE_PCZ
-#    define OGRE_STATIC_PCZSceneManager
-#    define OGRE_STATIC_OctreeZone
-#  else
-#    define OGRE_STATIC_OctreeSceneManager
-#  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL

@@ -95,16 +95,6 @@ namespace Ogre {
 		* shadow caster behavior.There only material name is stored so that it can be loaded once all file parsed in a resource group.
 		*/
 		String mShadowCasterMaterialName;
-		/** When receiving shadow, if not using default Ogre shadow receiving material, or 
-		* nor using fixed function texture projection receiving, mShadowReceiverMaterial let you customize per material
-		* shadow caster behavior
-		*/
-		MaterialPtr mShadowReceiverMaterial;
-		/** When receiving shadow, if not using default Ogre shadow receiving material, or 
-		* nor using fixed function texture projection receiving, mShadowReceiverMaterial let you customize per material
-		* shadow caster behavior. There only material name is stored so that it can be loaded once all file parsed in a resource group.
-		*/
-		String mShadowReceiverMaterialName;	
 
 		// User objects binding.
 		UserObjectBindings	mUserObjectBindings;
@@ -260,15 +250,6 @@ namespace Ogre {
 		/** set this material specific  shadow casting specific material
 		*/
 		void setShadowCasterMaterial(const Ogre::String &name);
-		/** return this material specific shadow receiving specific material
-		*/
-		Ogre::MaterialPtr getShadowReceiverMaterial() const;
-		/** set this material specific  shadow receiving specific material
-		*/
-		void setShadowReceiverMaterial(Ogre::MaterialPtr val);
-		/** set this material specific  shadow receiving specific material
-		*/
-		void setShadowReceiverMaterial(const Ogre::String &name);
 
         // -------------------------------------------------------------------------------
         // The following methods are to make migration from previous versions simpler

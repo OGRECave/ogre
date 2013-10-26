@@ -402,6 +402,42 @@ namespace Ogre {
 
         return features;
     }
+	//---------------------------------------------------------------------
+	static uint32 _detectNumLogicalCores(void)
+	{
+		uint numLogicalCores = 0;
+
+        // Supports CPUID instruction ?
+        if (_isSupportCpuid())
+        {
+			CpuidResult result;
+
+            // Has standard feature ?
+            if (_performCpuid(0, result))
+            {
+                // Check vendor strings
+                if (memcmp(&result._ebx, "GenuineIntel", 12) == 0)
+                {
+					_performCpuid(4, result);
+					numLogicalCores = ((result._eax >> 26) & 0x3f) + 1; // EAX[31:26] + 1
+                }
+                else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0)
+                {
+					//Number of CPU cores - 1
+					_performCpuid( 0x80000008, result );
+					numLogicalCores = (result._ecx & 0xff) + 1; // EAX[7:0] + 1
+                }
+				else
+				{
+					// Check standard feature
+					_performCpuid(1, result);
+					numLogicalCores = (result._ebx >> 16) & 0xff;
+				}
+            }
+		}
+
+		return numLogicalCores;
+	}
     //---------------------------------------------------------------------
     static String _detectCpuIdentifier(void)
     {
@@ -520,6 +556,12 @@ namespace Ogre {
         }
         return cpuID;
     }
+	//---------------------------------------------------------------------
+	static uint32 _detectNumLogicalCores(void)
+	{
+		//TODO
+		return 0;
+	}
     
 #elif OGRE_CPU == OGRE_CPU_ARM  // OGRE_CPU == OGRE_CPU_ARM
 
@@ -582,6 +624,12 @@ namespace Ogre {
 #endif
         return cpuID;
     }
+	//---------------------------------------------------------------------
+	static uint32 _detectNumLogicalCores(void)
+	{
+		//TODO
+		return 0;
+	}
     
 #else   // OGRE_CPU == OGRE_CPU_ARM
 
@@ -595,6 +643,11 @@ namespace Ogre {
     {
         return "Unknown";
     }
+	//---------------------------------------------------------------------
+	static uint32 _detectNumLogicalCores(void)
+	{
+		return 0;
+	}
 
 #endif  // OGRE_CPU
 
@@ -619,12 +672,21 @@ namespace Ogre {
 		return (getCpuFeatures() & feature) != 0;
 	}
 	//---------------------------------------------------------------------
+	uint32 PlatformInformation::getNumLogicalCores(void)
+	{
+		static const uint32 sNumCores = _detectNumLogicalCores();
+		return sNumCores;
+	}
+	//---------------------------------------------------------------------
 	void PlatformInformation::log(Log* pLog)
 	{
 		pLog->logMessage("CPU Identifier & Features");
 		pLog->logMessage("-------------------------");
 		pLog->logMessage(
 			" *   CPU ID: " + getCpuIdentifier());
+		pLog->logMessage(
+			" *   Number of logical cores (excluding hyperthreaded): " +
+						StringConverter::toString( getNumLogicalCores() ) );
 #if OGRE_CPU == OGRE_CPU_X86
 		if(_isSupportCpuid())
 		{

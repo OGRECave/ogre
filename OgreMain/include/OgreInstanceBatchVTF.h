@@ -76,7 +76,6 @@ namespace Ogre
 	protected:
 		typedef vector<uint8>::type HWBoneIdxVec;
 		typedef vector<float>::type HWBoneWgtVec;
-		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					mMatricesPerInstance; //number of bone matrices per instance
 		size_t					mNumWorldMatrices;	//Num bones * num instances
@@ -143,9 +142,9 @@ namespace Ogre
 		virtual InstancedEntity* generateInstancedEntity(size_t num);
 
 	public:
-		BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName);
+		BaseInstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager,
+							InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
 		virtual ~BaseInstanceBatchVTF();
 
 		/** @see InstanceBatch::buildFrom */
@@ -156,7 +155,7 @@ namespace Ogre
 		unsigned short getNumWorldTransforms(void) const;
 
 		/** Overloaded to be able to updated the vertex texture */
-		void _updateRenderQueue(RenderQueue* queue);
+		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
 		/** Sets the state of the usage of bone matrix lookup
 		
@@ -213,9 +212,9 @@ namespace Ogre
 
 		virtual bool matricesTogetherPerRow() const { return false; }
 	public:
-		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName);
+		InstanceBatchVTF( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
+							MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
 		virtual ~InstanceBatchVTF();
 
 		/** @see InstanceBatch::calculateMaxNumInstances */

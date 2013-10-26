@@ -69,7 +69,6 @@ set (VISUAL_TEST_LIST
   PlayPen_BillboardTextureCoords
   PlayPen_BlendDiffuseColour
   PlayPen_BlitSubTextures
-  PlayPen_Bsp
   PlayPen_BuildTangentOnAnimatedMesh
   PlayPen_CameraSetDirection
   PlayPen_ClearScene

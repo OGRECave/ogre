@@ -36,63 +36,61 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreLodListener.h"
+#include "OgreLight.h"
+#include "Math/Array/OgreArraySphere.h"
+#include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre {
+	using namespace VisibilityFlags;
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
+	const String NullEntity::msMovableType = "NullEntity";
+	const uint32 VisibilityFlags::LAYER_SHADOW_RECEIVER		= 1 << 31;
+	const uint32 VisibilityFlags::LAYER_SHADOW_CASTER		= 1 << 30;
+	const uint32 VisibilityFlags::LAYER_VISIBILITY			= 1 << 29;
+	const uint32 VisibilityFlags::RESERVED_VISIBILITY_FLAGS	= ~(LAYER_SHADOW_RECEIVER|LAYER_SHADOW_CASTER|
+																LAYER_VISIBILITY);
 	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
-	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
+	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
-    MovableObject::MovableObject()
-        : mCreator(0)
+    MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
+									uint8 renderQueueId )
+        : IdObject( id )
+		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
-        , mParentIsTagPoint(false)
-        , mVisible(true)
-		, mDebugDisplay(false)
-        , mUpperDistance(0)
-        , mSquaredUpperDistance(0)
+		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mBeyondFarDistance(false)
-        , mRenderQueueID(RENDER_QUEUE_MAIN)
-        , mRenderQueueIDSet(false)
+        , mRenderQueueID(renderQueueId)
 		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
-        , mVisibilityFlags(msDefaultVisibilityFlags)
-        , mCastShadows(true)
-        , mRenderingDisabled(false)
         , mListener(0)
-        , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
+		, mDebugDisplay(false)
+		, mObjectMemoryManager( objectMemoryManager )
+		, mGlobalIndex( -1 )
+		, mParentIndex( -1 )
     {
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
+
+		//Will initialize mObjectData
+		mObjectMemoryManager->objectCreated( mObjectData, mRenderQueueID );
+		mObjectData.mOwner[mObjectData.mIndex] = this;
     }
-    //-----------------------------------------------------------------------
-    MovableObject::MovableObject(const String& name)
-        : mName(name)
-        , mCreator(0)
+	//-----------------------------------------------------------------------
+    MovableObject::MovableObject( ObjectData *objectDataPtrs )
+        : IdObject( 0 )
+		, mCreator(0)
         , mManager(0)
         , mParentNode(0)
-        , mParentIsTagPoint(false)
-        , mVisible(true)
-		, mDebugDisplay(false)
-        , mUpperDistance(0)
-        , mSquaredUpperDistance(0)
+		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
-        , mRenderQueueIDSet(false)
 		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
-        , mVisibilityFlags(msDefaultVisibilityFlags)
-        , mCastShadows(true)
-        , mRenderingDisabled(false)
         , mListener(0)
-        , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
+		, mDebugDisplay(false)
+		, mObjectMemoryManager( 0 )
+		, mGlobalIndex( -1 )
+		, mParentIndex( -1 )
     {
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
@@ -108,112 +106,59 @@ namespace Ogre {
 
         if (mParentNode)
         {
-            // detach from parent
-            if (mParentIsTagPoint)
-            {
-                // May be we are a LOD entity which not in the parent entity child object list,
-                // call this method could safely ignore this case.
-                static_cast<TagPoint*>(mParentNode)->getParentEntity()->detachObjectFromBone(this);
-            }
-            else
-            {
-                // May be we are a LOD entity which not in the parent node child object list,
-                // call this method could safely ignore this case.
-                static_cast<SceneNode*>(mParentNode)->detachObject(this);
-            }
+			// May be we are a lod entity which not in the parent node child object list,
+			// call this method could safely ignore this case.
+			static_cast<SceneNode*>(mParentNode)->detachObject( this );
         }
+
+		if( mObjectMemoryManager )
+			mObjectMemoryManager->objectDestroyed( mObjectData, mRenderQueueID );
     }
     //-----------------------------------------------------------------------
-    void MovableObject::_notifyAttached(Node* parent, bool isTagPoint)
+    void MovableObject::_notifyAttached( Node* parent )
     {
         assert(!mParentNode || !parent);
 
         bool different = (parent != mParentNode);
 
-        mParentNode = parent;
-        mParentIsTagPoint = isTagPoint;
+		if( different )
+		{
+			mParentNode = parent;
+			if( parent )
+				mObjectData.mParents[mObjectData.mIndex] = parent;
+			else
+				mObjectData.mParents[mObjectData.mIndex] = mObjectMemoryManager->_getDummyNode();
 
-        // Mark light list being dirty, simply decrease
-        // counter by one for minimise overhead
-        --mLightListUpdated;
+			setVisible( parent != 0 );
 
-        // Call listener (note, only called if there's something to do)
-        if (mListener && different)
-        {
-            if (mParentNode)
-                mListener->objectAttached(this);
-            else
-                mListener->objectDetached(this);
-        }
-    }
-    //-----------------------------------------------------------------------
-    Node* MovableObject::getParentNode(void) const
-    {
-        return mParentNode;
-    }
-    //-----------------------------------------------------------------------
-    SceneNode* MovableObject::getParentSceneNode(void) const
-    {
-        if (mParentIsTagPoint)
-        {
-            TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-            return tp->getParentEntity()->getParentSceneNode();
-        }
-        else
-        {
-            return static_cast<SceneNode*>(mParentNode);
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::isAttached(void) const
-    {
-        return (mParentNode != 0);
+			// Call listener (note, only called if there's something to do)
+			if (mListener)
+			{
+				if (mParentNode)
+					mListener->objectAttached(this);
+				else
+					mListener->objectDetached(this);
+			}
 
+			if( mManager && isStatic() )
+				mManager->notifyStaticDirty( this );
+		}
     }
 	//---------------------------------------------------------------------
 	void MovableObject::detachFromParent(void)
 	{
 		if (isAttached())
 		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				tp->getParentEntity()->detachObjectFromBone(this);
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				sn->detachObject(this);
-			}
-		}
-	}
-    //-----------------------------------------------------------------------
-	bool MovableObject::isInScene(void) const
-	{
-		if (mParentNode != 0)
-		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				return tp->getParentEntity()->isInScene();
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				return sn->isInSceneGraph();
-			}
-		}
-		else
-		{
-			return false;
+			SceneNode* sn = static_cast<SceneNode*>(mParentNode);
+			sn->detachObject(this);
 		}
 	}
     //-----------------------------------------------------------------------
     void MovableObject::_notifyMoved(void)
     {
-        // Mark light list being dirty, simply decrease
-        // counter by one for minimise overhead
-        --mLightListUpdated;
+#ifndef NDEBUG
+		mCachedAabbOutOfDate = true;
+#endif
 
         // Notify listener if exists
         if (mListener)
@@ -221,20 +166,37 @@ namespace Ogre {
             mListener->objectMoved(this);
         }
     }
-    //-----------------------------------------------------------------------
-    void MovableObject::setVisible(bool visible)
-    {
-        mVisible = visible;
-    }
-    //-----------------------------------------------------------------------
-    bool MovableObject::getVisible(void) const
-    {
-        return mVisible;
-    }
+	//-----------------------------------------------------------------------
+	bool MovableObject::isStatic() const
+	{
+		return mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC;
+	}
+	//-----------------------------------------------------------------------
+	bool MovableObject::setStatic( bool bStatic )
+	{
+		bool retVal = false;
+		if( mObjectMemoryManager->getTwin() &&
+			mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
+			mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+		{
+			mObjectMemoryManager->migrateTo( mObjectData, mRenderQueueID,
+											 mObjectMemoryManager->getTwin() );
+
+			if( mParentNode && mParentNode->isStatic() != bStatic )
+				mParentNode->setStatic( bStatic );
+
+			if( mManager && bStatic )
+				mManager->notifyStaticDirty( this );
+
+			retVal = true;
+		}
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
     bool MovableObject::isVisible(void) const
     {
-        if (!mVisible || mBeyondFarDistance || mRenderingDisabled)
+        if( !getVisible() )
             return false;
 
         SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
@@ -243,7 +205,7 @@ namespace Ogre {
 
         return true;
     }
-	//-----------------------------------------------------------------------
+	/*//-----------------------------------------------------------------------
 	void MovableObject::_notifyCurrentCamera(Camera* cam)
 	{
 		if (mParentNode)
@@ -256,7 +218,7 @@ namespace Ogre {
 				Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
 				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+				Real factor = max(max(scl.x, scl.y), scl.z);
 
 				// Max distance to still render
 				Real maxDist = mUpperDistance + rad * factor;
@@ -285,10 +247,10 @@ namespace Ogre {
 				objBound.x = Math::Sqr(objBound.x);
 				objBound.y = Math::Sqr(objBound.y);
 				objBound.z = Math::Sqr(objBound.z);
-				float sqrObjMedianSize = std::max(std::max(
-									std::min(objBound.x,objBound.y),
-									std::min(objBound.x,objBound.z)),
-									std::min(objBound.y,objBound.z));
+				float sqrObjMedianSize = max(max(
+									min(objBound.x,objBound.y),
+									min(objBound.x,objBound.z)),
+									min(objBound.y,objBound.z));
 
 				//If we have a perspective camera calculations are done relative to distance
 				Real sqrDistance = 1;
@@ -313,24 +275,21 @@ namespace Ogre {
 		}
 
         mRenderingDisabled = mListener && !mListener->objectRendering(this, cam);
-	}
+	}*/
     //-----------------------------------------------------------------------
     void MovableObject::setRenderQueueGroup(uint8 queueID)
     {
-		assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
-        mRenderQueueID = queueID;
-        mRenderQueueIDSet = true;
-    }
+		if( mRenderQueueID != queueID )
+			mObjectMemoryManager->objectMoved( mObjectData, mRenderQueueID, queueID );
 
+        mRenderQueueID = queueID;
+    }
 	//-----------------------------------------------------------------------
 	void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
 	{
 		setRenderQueueGroup(queueID);
 		mRenderQueuePriority = priority;
-		mRenderQueuePrioritySet = true;
-
 	}
-
     //-----------------------------------------------------------------------
     uint8 MovableObject::getRenderQueueGroup(void) const
     {
@@ -339,29 +298,60 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
 	{
-		
-		if(mParentNode)
-		{
-			// object attached to a sceneNode
-			return mParentNode->_getFullTransform();
-		}
-        // fallback
-        return Matrix4::IDENTITY;
+		return mParentNode->_getFullTransform();
+	}
+	//-----------------------------------------------------------------------
+	const Aabb MovableObject::getWorldAabb() const
+	{
+		assert( !mCachedAabbOutOfDate );
+		return mObjectData.mWorldAabb->getAsAabb( mObjectData.mIndex );
+	}
+	//-----------------------------------------------------------------------
+	const Aabb MovableObject::getWorldAabbUpdated()
+	{
+		return updateSingleWorldAabb();
+	}
+	//-----------------------------------------------------------------------
+	float MovableObject::getWorldRadius() const
+	{
+		assert( !mCachedAabbOutOfDate );
+		return mObjectData.mWorldRadius[mObjectData.mIndex];
+	}
+	//-----------------------------------------------------------------------
+	float MovableObject::getWorldRadiusUpdated()
+	{
+		return updateSingleWorldRadius();
 	}
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
-    {
-        if (derive)
-        {
-            mWorldAABB = this->getBoundingBox();
-            mWorldAABB.transformAffine(_getParentNodeFullTransform());
-        }
+	Aabb MovableObject::updateSingleWorldAabb()
+	{
+		Matrix4 derivedTransform = mParentNode->_getFullTransformUpdated();
 
-        return mWorldAABB;
+		Aabb retVal;
+		mObjectData.mLocalAabb->getAsAabb( retVal, mObjectData.mIndex );
+		retVal.transformAffine( derivedTransform );
 
-    }
+		mObjectData.mWorldAabb->setFromAabb( retVal, mObjectData.mIndex );
+
+#ifndef NDEBUG
+		mCachedAabbOutOfDate = false;
+#endif
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------
+	float MovableObject::updateSingleWorldRadius()
+	{
+		const Vector3 derivedScale = mParentNode->_getDerivedScaleUpdated();
+
+		float retVal = mObjectData.mLocalRadius[mObjectData.mIndex] *
+						max( max( derivedScale.x, derivedScale.y ), derivedScale.z );
+		mObjectData.mWorldRadius[mObjectData.mIndex] = retVal;
+
+		return retVal;
+	}
     //-----------------------------------------------------------------------
-	const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
+	/*const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
 	{
 		if (derive)
 		{
@@ -371,88 +361,585 @@ namespace Ogre {
 			mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
 		}
 		return mWorldBoundingSphere;
+	}*/
+    //-----------------------------------------------------------------------
+	void MovableObject::updateAllBounds( const size_t numNodes, ObjectData objData )
+	{
+		SimpleMatrix4 mats[ARRAY_PACKED_REALS];
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+			ArrayMatrix4 parentMat;
+			ArrayVector3 parentScale;
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				//Profiling shows these prefetches do make a difference. Perhaps playing with them could
+				//achieve even greater speed ups. This function is terribly bounded by memory latency
+				//Last tested on:
+				//	* Intel Quad Core Extreme QX9650 3Ghz
+				OGRE_PREFETCH_NTA( (const char*)(objData.mParents[i+OGRE_PREFETCH_SLOT_DISTANCE]) );
+
+				Vector3 scale;
+				const Transform &parentTransform = objData.mParents[j]->_getTransform();
+				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
+				mats[j].load( parentTransform.mDerivedTransform[parentTransform.mIndex] );
+				parentScale.setFromVector3( scale, j );
+
+				// j + OGRE_PREFETCH_SLOT_DISTANCE won't go out of bounds because
+				// the memory manager allocates enough extra space
+				OGRE_PREFETCH_NTA( (const char*)objData.mParents[j+(OGRE_PREFETCH_SLOT_DISTANCE>>1)]->
+									_getTransform().mDerivedScale );
+				OGRE_PREFETCH_NTA( (const char*)(objData.mParents[j+(OGRE_PREFETCH_SLOT_DISTANCE>>1)]->
+									_getTransform().mDerivedTransform+parentTransform.mIndex) );
+			}
+
+			parentMat.loadFromAoS( mats );
+
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS localRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mLocalRadius);
+
+			*objData.mWorldAabb = *objData.mLocalAabb;
+			objData.mWorldAabb->transformAffine( parentMat );
+			*worldRadius = (*localRadius) * parentScale.getMaxComponent();
+
+#ifndef NDEBUG
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				if( objData.mOwner[j] )
+					objData.mOwner[j]->mCachedAabbOutOfDate = false;
+			}
+#endif
+
+			objData.advanceBoundsPack();
+		}
 	}
-    //-----------------------------------------------------------------------
-    const LightList& MovableObject::queryLights(void) const
-    {
-        // Try listener first
-        if (mListener)
-        {
-            const LightList* lightList =
-                mListener->objectQueryLights(this);
-            if (lightList)
-            {
-                return *lightList;
-            }
-        }
+	//-----------------------------------------------------------------------
+	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
+									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
+									 AxisAlignedBox *outReceiversBox )
+	{
+		//On threaded environments, the internal variables from outCulledObjects cause
+		//a false cache sharing because they're too close to each other. Perfoming
+		//a swap places those internal vars in the local stack, increasing scalability
+		MovableObjectArray culledObjects;
+		culledObjects.swap( outCulledObjects );
 
-        // Query from parent entity if exists
-        if (mParentIsTagPoint)
-        {
-            TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-            return tp->getParentEntity()->queryLights();
-        }
+		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
+		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
+		// (we use method Method 5: "If you really don’t care whether a box is
+		// partially or fully inside"):
+		// vector4 signFlip = componentwise_and(plane, 0x80000000);
+		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
 
-        if (mParentNode)
-        {
-            SceneNode* sn = static_cast<SceneNode*>(mParentNode);
+		// Flip the bit from shadow caster, and leave only that in "includeNonCasters"
+		ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
+														& LAYER_SHADOW_CASTER );
+		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
 
-            // Make sure we only update this only if need.
-            ulong frame = sn->getCreator()->_getLightsDirtyCounter();
-            if (mLightListUpdated != frame)
-            {
-                mLightListUpdated = frame;
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+		ArrayPlane planes[6];
+		const Plane *frustumPlanes = frustum->getFrustumPlanes();
 
-				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+		for( size_t i=0; i<6; ++i )
+		{
+			planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setToSign();
+			planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+		}
 
-                sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
-            }
-        }
-        else
-        {
-            mLightList.clear();
-        }
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
 
-        return mLightList;
-    }
-    //-----------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
-        ShadowTechnique shadowTechnique, const Light* light, 
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
-    {
-        static ShadowRenderableList dummyList;
-        return ShadowRenderableListIterator(dummyList.begin(), dummyList.end());
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getLightCapBounds(void) const
-    {
-        // Same as original bounds
-        return getWorldBoundingBox();
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getDarkCapBounds(const Light& light, Real extrusionDist) const
-    {
-        // Extrude own light cap bounds
-        mWorldDarkCapBounds = getLightCapBounds();
-        this->extrudeBounds(mWorldDarkCapBounds, light.getAs4DVector(), 
-            extrusionDist);
-        return mWorldDarkCapBounds;
+		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
+		//In theory xor is faster, but some archs have a penalty for switching between integer
+		//& floating point, even if it's simd sse
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
 
-    }
-    //-----------------------------------------------------------------------
-    Real MovableObject::getPointExtrusionDistance(const Light* l) const
-    {
-        if (mParentNode)
-        {
-            return getExtrusionDistance(mParentNode->_getDerivedPosition(), l);
-        }
-        else
-        {
-            return 0;
-        }
-    }
+			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
+			ArrayReal dotResult;
+			ArrayMaskR mask;
+			ArrayVector3 centerPlusFlippedHS;
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[0].signFlip;
+			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[1].signFlip;
+			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[2].signFlip;
+			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[3].signFlip;
+			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[4].signFlip;
+			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[5].signFlip;
+			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
+
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayMaskR tmpMask = Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
+								mask );
+
+			//isVisible = isVisible() && (isCaster || includeNonCasters)
+			ArrayMaskI isVisible = Mathlib::And(
+								Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) ),
+								Mathlib::TestFlags4( Mathlib::Or( *visibilityFlags, includeNonCasters ),
+														Mathlib::SetAll( LAYER_SHADOW_CASTER ) ) );
+			ArrayMaskI isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
+
+			//Fuse result with visibility flag
+			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+														Mathlib::And( sceneFlags, *visibilityFlags ) );
+            finalMask				= Mathlib::And( finalMask, isVisible );
+			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+
+			//Merge with bounds only if they're visible & are receivers. We first merge,
+			//then CMov its older value if the object isn't visible/receiver.
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( receiverMask, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( receiverMask, newVal );
+
+			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				//Decompose the result for analyzing each MovableObject's
+				//There's no need to check objData.mOwner[j] is null because
+				//we set mVisibilityFlags to 0 on slot removals
+				if( IS_BIT_SET( j, scalarMask ) )
+				{
+					culledObjects.push_back( objData.mOwner[j] );
+				}
+			}
+
+			objData.advanceFrustumPack();
+		}
+
+		//Merge the individual values and return the result.
+		if( outReceiversBox )
+		{
+			Vector3 vMin = vMinBounds.collapseMin();
+			Vector3 vMax = vMaxBounds.collapseMax();
+			if( vMin > vMax )
+				outReceiversBox->setNull();
+			else
+				outReceiversBox->setExtents( vMin, vMax );
+		}
+
+		culledObjects.swap( outCulledObjects );
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::cullReceiversBox( const size_t numNodes, ObjectData objData,
+											const Frustum *frustum, uint32 sceneVisibilityFlags,
+											AxisAlignedBox *outReceiversBox )
+	{
+		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
+		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
+		// (we use method Method 5: "If you really don’t care whether a box is
+		// partially or fully inside"):
+		// vector4 signFlip = componentwise_and(plane, 0x80000000);
+		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
+
+		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
+
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+		ArrayPlane planes[6];
+		const Plane *frustumPlanes = frustum->getFrustumPlanes();
+
+		for( size_t i=0; i<6; ++i )
+		{
+			planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setAll( frustumPlanes[i].normal );
+			planes[i].signFlip.setToSign();
+			planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+		}
+
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
+
+		//TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
+		//In theory xor is faster, but some archs have a penalty for switching between integer
+		//& floating point, even if it's simd sse
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+
+			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
+			ArrayReal dotResult;
+			ArrayMaskR mask;
+			ArrayVector3 centerPlusFlippedHS;
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[0].signFlip;
+			dotResult = planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::CompareGreater( dotResult, planes[0].planeNegD );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[1].signFlip;
+			dotResult = planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[1].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[2].signFlip;
+			dotResult = planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[2].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[3].signFlip;
+			dotResult = planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[3].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[4].signFlip;
+			dotResult = planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[4].planeNegD ) );
+
+			centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																 planes[5].signFlip;
+			dotResult = planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+			mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult, planes[5].planeNegD ) );
+
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayMaskR tmpMask = Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) );
+			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
+								mask );
+
+			//No need to check for casters as in cullFrustum. See function documentation
+			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			ArrayMaskI isReceiver= Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_RECEIVER ) );
+
+			//Fuse result with visibility flag
+			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+														Mathlib::And( sceneFlags, *visibilityFlags ) );
+            finalMask				= Mathlib::And( finalMask, isVisible );
+			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+
+			//Merge with bounds only if they're visible & are receivers. We first merge,
+			//then CMov its older value if the object isn't visible/receiver.
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( receiverMask, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( receiverMask, newVal );
+
+			objData.advanceFrustumPack();
+		}
+
+		//Merge the individual values and return the result.
+		Vector3 vMin = vMinBounds.collapseMin();
+		Vector3 vMax = vMaxBounds.collapseMax();
+		if( vMin > vMax )
+			outReceiversBox->setNull();
+		else
+			outReceiversBox->setExtents( vMin, vMax );
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
+									LightListInfo &outGlobalLightList, const FrustumVec &frustums )
+	{
+		struct ArrayPlane
+		{
+			ArrayVector3	planeNormal;
+			ArrayVector3	signFlip;
+			ArrayReal		planeNegD;
+		};
+		struct ArraySixPlanes
+		{
+			ArrayPlane planes[6];
+		};
+		const size_t numFrustums = frustums.size();
+		ArraySixPlanes *planes = OGRE_ALLOC_T_SIMD( ArraySixPlanes, numFrustums,
+													MEMCATEGORY_SCENE_CONTROL );
+
+		FrustumVec::const_iterator itor = frustums.begin();
+		FrustumVec::const_iterator end  = frustums.end();
+		ArraySixPlanes *planesIt = planes;
+
+		while( itor != end )
+		{
+			const Plane *frustumPlanes = (*itor)->getFrustumPlanes();
+
+			for( size_t i=0; i<6; ++i )
+			{
+				planesIt->planes[i].planeNormal.setAll( frustumPlanes[i].normal );
+				planesIt->planes[i].signFlip.setAll( frustumPlanes[i].normal );
+				planesIt->planes[i].signFlip.setToSign();
+				planesIt->planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
+			}
+
+			++planesIt;
+			++itor;
+		}
+
+		//Implementation detail: Ogre 1.9 treated spotlights as a point (Sphere vs Plane collision test)
+		//for simplicity (and presumably performance). We use aabbs for all lights in Ogre 2.0, which
+		//plays better with area lights when we implemented (and spotlights too) degrading performance
+		//for point lights
+
+		//TODO: Profile whether we should use XOR to flip signs
+		//instead of multiplication (see cullFrustum)
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			//Initialize mask to 0
+			ArrayMaskI mask = ARRAY_INT_ZERO;
+
+			for( size_t j=0; j<numFrustums; ++j )
+			{
+				ArrayMaskR tmpMask;
+
+				//Test all 6 planes and AND the dot product. If one is false, then we're not visible
+				ArrayReal dotResult;
+				ArrayVector3 centerPlusFlippedHS;
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	planes[j].planes[0].signFlip;
+				dotResult = planes[j].planes[0].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::CompareGreater( dotResult, planes[j].planes[0].planeNegD );
+
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	 planes[j].planes[1].signFlip;
+				dotResult = planes[j].planes[1].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
+																planes[j].planes[1].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	 planes[j].planes[2].signFlip;
+				dotResult = planes[j].planes[2].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
+																planes[j].planes[2].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	 planes[j].planes[3].signFlip;
+				dotResult = planes[j].planes[3].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
+																planes[j].planes[3].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	 planes[j].planes[4].signFlip;
+				dotResult = planes[j].planes[4].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
+																planes[j].planes[4].planeNegD ) );
+
+				centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
+																	 planes[j].planes[5].signFlip;
+				dotResult = planes[j].planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
+				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
+																planes[j].planes[5].planeNegD ) );
+
+				//Accumulate into mask. If one Frustum can see, then we need to include it.
+				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
+			}
+
+			//Always pass the test if any of the components were
+			//Infinity (dot product above could've caused nans)
+			ArrayMaskR tmpMask = Mathlib::Or( Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ) );
+			mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
+
+			//Use the light mask to discard null mOwner ptrs
+			mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+												(objData.mLightMask) );
+
+			const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				//Decompose the result for analyzing each MovableObject's
+				//There's no need to check objData.mOwner[j] is null because
+				//we set mVisibilityFlags to 0 on slot removals
+				if( IS_BIT_SET( j, scalarMask ) )
+				{
+					const size_t idx = outGlobalLightList.lights.size();
+					outGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
+					outGlobalLightList.boundingSphere[idx] = Sphere(
+														objData.mWorldAabb->mCenter.getAsVector3( j ),
+														objData.mWorldRadius[j] );
+					assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
+					outGlobalLightList.lights.push_back( static_cast<Light*>( objData.mOwner[j] ) );
+				}
+			}
+
+			objData.advanceCullLightPack();
+		}
+
+		OGRE_FREE_SIMD( planes, MEMCATEGORY_SCENE_CONTROL );
+		planes = 0;
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::buildLightList( const size_t numNodes, ObjectData objData,
+										const LightListInfo &globalLightList )
+	{
+		const size_t numGlobalLights = globalLightList.lights.size();
+		ArraySphere lightSphere;
+		OGRE_ALIGNED_DECL( Real, distance[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayReal * RESTRICT_ALIAS arrayRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->mCenter );
+
+			const ArrayInt * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																				(objData.mLightMask);
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+				objData.mOwner[j]->mLightList.clear();
+
+			//Now iterate through all lights to find the influence on these 4 Objects at once
+			LightArray::const_iterator lightsIt				= globalLightList.lights.begin();
+			const uint32 * RESTRICT_ALIAS	visibilityMask	= globalLightList.visibilityMask;
+			const Sphere * RESTRICT_ALIAS 	boundingSphere	= globalLightList.boundingSphere;
+			for( size_t j=0; j<numGlobalLights; ++j )
+			{
+				//We check 1 light against 4 MovableObjects at a time.
+				lightSphere.setAll( *boundingSphere );
+
+				//Check if it intersects
+				ArrayMaskI rMask = CastRealToInt( lightSphere.intersects( objSphere ) );
+				ArrayReal distSimd = objSphere.mCenter.distance( lightSphere.mCenter ) -
+										lightSphere.mRadius;
+				CastArrayToReal( distance, distSimd );
+
+				//Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
+				//rMask = ( intersects() && lightMask & visibilityMask )
+				rMask = Mathlib::TestFlags4( rMask, Mathlib::And( *objLightMask, *visibilityMask ) );
+
+				//Convert rMask into something smaller we can work with.
+				uint32 r = BooleanMask4::getScalarMask( rMask );
+
+				for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+				{
+					//Decompose the result for analyzing each MovableObject's
+					//There's no need to check objData.mOwner[k] is null because
+					//we set lightMask to 0 on slot removals
+					if( IS_BIT_SET( k, r ) )
+					{
+						LightList &lightList = objData.mOwner[k]->mLightList;
+						lightList.push_back( LightClosest( *lightsIt, j, distance[k],
+															lightList.size() ) );
+					}
+				}
+
+				++lightsIt;
+				++visibilityMask;
+				++boundingSphere;
+			}
+
+			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
+				std::stable_sort( objData.mOwner[j]->mLightList.begin(),
+									objData.mOwner[j]->mLightList.end() );
+			}
+
+			objData.advanceLightPack();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::calculateCastersBox( const size_t numNodes, ObjectData objData,
+											 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox )
+	{
+		ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
+
+		ArrayVector3 vMinBounds( Mathlib::MAX_POS, Mathlib::MAX_POS, Mathlib::MAX_POS );
+		ArrayVector3 vMaxBounds( Mathlib::MAX_NEG, Mathlib::MAX_NEG, Mathlib::MAX_NEG );
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+																		(objData.mVisibilityFlags);
+
+			objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize;
+
+			//Ignore casters with infinite boxes
+			ArrayMaskR infMask = Mathlib::Or( Mathlib::Or(
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[0] ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[1] ) ),
+							Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ) );
+
+			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_VISIBILITY ) );
+			ArrayMaskI isCaster  = Mathlib::TestFlags4( *visibilityFlags,
+														Mathlib::SetAll( LAYER_SHADOW_CASTER ) );
+
+			//Fuse result with visibility flag
+			// finalMask = ( visible&!infiniteAabb & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
+			ArrayMaskI finalMask = Mathlib::TestFlags4( Mathlib::And( sceneFlags, *visibilityFlags ),
+												Mathlib::AndNot( isVisible, CastRealToInt( infMask ) ) );
+			finalMask				= Mathlib::And( finalMask, isCaster );
+			ArrayMaskR casterMask	= CastIntToReal( finalMask );
+
+			//Merge with bounds only if they're visible. We first merge, then CMov its older
+			//value if the object isn't visible. Also do the same with the receiver-only aabb
+			ArrayVector3 newVal( vMinBounds );
+			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( casterMask, newVal );
+
+			newVal = vMaxBounds;
+			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( casterMask, newVal );
+
+			objData.advanceFrustumPack();
+		}
+
+		//Merge the individual values and return the result.
+		Vector3 vMin = vMinBounds.collapseMin();
+		Vector3 vMax = vMaxBounds.collapseMax();
+		if( vMin > vMax )
+			outBox->setNull();
+		else
+			outBox->setExtents( vMin, vMax );
+	}
 	//-----------------------------------------------------------------------
 	uint32 MovableObject::getTypeFlags(void) const
 	{
@@ -464,13 +951,6 @@ namespace Ogre {
 		{
 			return 0xFFFFFFFF;
 		}
-	}
-	//---------------------------------------------------------------------
-	void MovableObject::setLightMask(uint32 lightMask)
-	{
-		this->mLightMask = lightMask;
-		//make sure to request a new light list from the scene manager if mask changed
-		mLightListUpdated = 0;
 	}
 	//---------------------------------------------------------------------
 	class MORecvShadVisitor : public Renderable::Visitor
@@ -500,16 +980,33 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	MovableObject* MovableObjectFactory::createInstance(
-		const String& name, SceneManager* manager, 
-		const NameValuePairList* params)
+	MovableObject* MovableObjectFactory::createInstance( IdType id,
+								ObjectMemoryManager *objectMemoryManager, SceneManager* manager,
+								const NameValuePairList* params )
 	{
-		MovableObject* m = createInstanceImpl(name, params);
+		MovableObject* m = createInstanceImpl( id, objectMemoryManager, params );
 		m->_notifyCreator(this);
 		m->_notifyManager(manager);
 		return m;
 	}
 
 
+	inline bool LightClosest::operator < (const LightClosest &right) const
+	{
+		/*
+		Shouldn't be necessary. distance is insanely low (big negative number)
+		if( light->getType() == Light::LT_DIRECTIONAL &&
+			right.light->getType() != Light::LT_DIRECTIONAL )
+		{
+			return true;
+		}
+		else if( light->getType() != Light::LT_DIRECTIONAL &&
+				 right.light->getType() == Light::LT_DIRECTIONAL )
+		{
+			return false;
+		}*/
+
+		return distance < right.distance;
+	}
 }
 

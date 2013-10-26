@@ -147,6 +147,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY, "spotlight_viewproj_matrix_array", 16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,  "spotlight_worldviewproj_matrix",16, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY,  "spotlight_worldviewproj_matrix_array",16, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_PSSM_SPLITS,                   "pssm_splits",                  1, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_CUSTOM,                        "custom",                       4, ET_REAL, ACDT_INT),  // *** needs to be tested
 		AutoConstantDefinition(ACT_TIME,                               "time",                               1, ET_REAL, ACDT_REAL),
 		AutoConstantDefinition(ACT_TIME_0_X,                      "time_0_x",                     4, ET_REAL, ACDT_REAL),
@@ -1259,6 +1260,7 @@ namespace Ogre
 		case ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY:
 		case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
 		case ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
+		case ACT_PSSM_SPLITS:
 		case ACT_LIGHT_CUSTOM:
 
 			return (uint16)GPV_LIGHTS;
@@ -2174,6 +2176,12 @@ namespace Ogre
                     for (size_t l = 0; l < i->data; ++l)
                         _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(i->data), i->elementCount);
                     break;
+				case ACT_PSSM_SPLITS:
+					{
+						const vector<Real>::type &pssmSplitPoints = source->getPssmSplits( i->data );
+						_writeRawConstants(i->physicalIndex, &pssmSplitPoints[1], pssmSplitPoints.size()-1);
+					}
+					break;
 				case ACT_LIGHT_POSITION_OBJECT_SPACE:
 					_writeRawConstant(i->physicalIndex, 
 						source->getInverseWorldMatrix().transformAffine(
@@ -2378,7 +2386,7 @@ namespace Ogre
 					// of the world scaling to deal with scaled objects
 					source->getWorldMatrix().extract3x3Matrix(m3);
 					_writeRawConstant(i->physicalIndex, source->getShadowExtrusionDistance() / 
-						Math::Sqrt(std::max(std::max(m3.GetColumn(0).squaredLength(), m3.GetColumn(1).squaredLength()), m3.GetColumn(2).squaredLength())));
+						Math::Sqrt( max( max( m3.GetColumn(0).squaredLength(), m3.GetColumn(1).squaredLength()), m3.GetColumn(2).squaredLength())));
 					break;
 				case ACT_SHADOW_SCENE_DEPTH_RANGE:
 					_writeRawConstant(i->physicalIndex, source->getShadowSceneDepthRange(i->data));

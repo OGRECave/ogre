@@ -16,7 +16,6 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/nvidia
 FileSystem=@OGRE_MEDIA_DIR_REL@/models
 FileSystem=@OGRE_MEDIA_DIR_REL@/particle
 FileSystem=@OGRE_MEDIA_DIR_REL@/DeferredShadingMedia
-FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_REL@/RTShaderLib
 FileSystem=@OGRE_MEDIA_DIR_REL@/RTShaderLib/materials
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts/SSAO

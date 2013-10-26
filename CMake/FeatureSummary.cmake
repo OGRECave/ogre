@@ -48,17 +48,8 @@ if (DEFINED _components)
 endif ()
 
 # summarise plugins
-if (OGRE_BUILD_PLUGIN_BSP)
-	set(_plugins "${_plugins}  + BSP scene manager\n")
-endif ()
 if (OGRE_BUILD_PLUGIN_CG)
 	set(_plugins "${_plugins}  + Cg program manager\n")
-endif ()
-if (OGRE_BUILD_PLUGIN_OCTREE)
-	set(_plugins "${_plugins}  + Octree scene manager\n")
-endif ()
-if (OGRE_BUILD_PLUGIN_PCZ)
-	set(_plugins "${_plugins}  + Portal connected zone scene manager\n")
 endif ()
 if (OGRE_BUILD_PLUGIN_PFX)
 	set(_plugins "${_plugins}  + Particle FX\n")
@@ -178,6 +169,7 @@ var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
 var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
 var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
 var_to_string(OGRE_USE_BOOST _boost)
+var_to_string(OGRE_USE_SIMD _simd)
 # threading settings
 if (OGRE_CONFIG_THREADS EQUAL 0)
 	set(_threads "none")
@@ -203,6 +195,7 @@ set(_features "${_features}Memory tracker (debug):          ${_memtrack_debug}\n
 set(_features "${_features}Memory tracker (release):        ${_memtrack_release}\n")
 set(_features "${_features}Use new script compilers:        ${_compilers}\n")
 set(_features "${_features}Use Boost:                       ${_boost}\n")
+set(_features "${_features}Use SIMD:                        ${_simd}\n")
 
 
 set(_features "${_features}\n----------------------------------------------------------------------------\n")

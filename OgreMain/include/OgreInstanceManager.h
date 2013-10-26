@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreMesh.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreIdString.h"
 
 namespace Ogre
 {
@@ -96,17 +97,18 @@ namespace Ogre
             }
         };
 
-        typedef vector<InstanceBatch*>::type        InstanceBatchVec;   //vec[batchN] = Batch
-        typedef map<String, InstanceBatchVec>::type InstanceBatchMap;   //map[materialName] = Vec
+        typedef vector<InstanceBatch*>::type		InstanceBatchVec;   //vec[batchN] = Batch
+        typedef map<IdString, InstanceBatchVec>::type InstanceBatchMap; //map[materialName] = Vec
 
-        typedef map<String, BatchSettings>::type    BatchSettingsMap;
+        typedef map<IdString, BatchSettings>::type  BatchSettingsMap;
 
-        const String            mName;                  //Not the name of the mesh
+        const IdString          mName;                  //Not the name of the mesh
         MeshPtr                 mMeshReference;
         InstanceBatchMap        mInstanceBatches;
         size_t                  mIdCount;
 
-        InstanceBatchVec        mDirtyBatches;
+        InstanceBatchVec        mDynamicBatches;
+		InstanceBatchVec        mDirtyStaticBatches;
 
         RenderOperation         mSharedRenderOperation;
 
@@ -124,7 +126,7 @@ namespace Ogre
         /** Finds a batch with at least one free instanced entity we can use.
             If none found, creates one.
         */
-        inline InstanceBatch* getFreeBatch( const String &materialName );
+        inline InstanceBatch* getFreeBatch( const String &materialName, SceneMemoryMgrTypes sceneType );
 
         /** Called when batches are fully exhausted (can't return more instances) so a new batch
             is created.
@@ -135,7 +137,8 @@ namespace Ogre
         @param firstTime True if this is the first time it is called
         @return The created InstancedManager for convenience
         */
-        InstanceBatch* buildNewBatch( const String &materialName, bool firstTime );
+        InstanceBatch* buildNewBatch( const String &materialName, SceneMemoryMgrTypes sceneType,
+										bool firstTime );
 
         /** @see defragmentBatches overload, this takes care of an array of batches
             for a specific material */
@@ -154,13 +157,13 @@ namespace Ogre
 		void unshareVertices(const Ogre::MeshPtr &mesh);
 
     public:
-        InstanceManager( const String &customName, SceneManager *sceneManager,
+        InstanceManager( IdString customName, SceneManager *sceneManager,
                          const String &meshName, const String &groupName,
                          InstancingTechnique instancingTechnique, uint16 instancingFlags,
                          size_t instancesPerBatch, unsigned short subMeshIdx, bool useBoneMatrixLookup = false);
         virtual ~InstanceManager();
 
-        const String& getName() const { return mName; }
+        const IdString getName() const { return mName; }
 
         SceneManager* getSceneManager() const { return mSceneManager; }
 
@@ -219,10 +222,12 @@ namespace Ogre
         @param flags @see InstanceManagerFlags
         @return The max/best amount of instances per batch given the suggested size and flags
         */
-        size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
+        size_t getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize,
+												 uint16 flags );
 
         /** @copydoc SceneManager::createInstancedEntity */
-        InstancedEntity* createInstancedEntity( const String &materialName );
+		InstancedEntity* createInstancedEntity( const String &materialName,
+												SceneMemoryMgrTypes sceneType=SCENE_DYNAMIC );
 
         /** This function can be useful to improve CPU speed after having too many instances
             created, which where now removed, thus freeing many batches with zero used Instanced Entities
@@ -272,26 +277,46 @@ namespace Ogre
         @param enabled Boolean value. It's meaning depends on the id.
         @param materialName When Blank, the setting is applied to all existing materials
         */
-        void setSetting( BatchSettingId id, bool enabled, const String &materialName = StringUtil::BLANK );
+        void setSetting( BatchSettingId id, bool enabled, IdString materialName=IdString() );
 
         /// If settings for the given material didn't exist, default value is returned
-        bool getSetting( BatchSettingId id, const String &materialName ) const;
+        bool getSetting( BatchSettingId id, IdString materialName ) const;
 
         /** Returns true if settings were already created for the given material name.
             If false is returned, it means getSetting will return default settings.
         */
-        bool hasSettings( const String &materialName ) const
+        bool hasSettings( IdString materialName ) const
         { return mBatchSettings.find( materialName ) != mBatchSettings.end(); }
 
-        /** @copydoc InstanceBatch::setStaticAndUpdate */
-        void setBatchesAsStaticAndUpdate( bool bStatic );
+        /** @copydoc InstanceBatch::setStatic */
+        void setBatchesAsStatic( bool bStatic );
+
+		/** Kees the batch in the dynamic batch list so that it gets updated every frame.
+			@See _removeFromDynamicBatchList
+        @param dynamicBatch
+			The batch which is now static or unused, usually same as caller.
+        */
+		void _addToDynamicBatchList( InstanceBatch *dynamicBatch );
+
+		/** Called when a previously dynamic InstanceBatch went static (@see InstanceBatch::setStatic)
+			or a dynamic batch has no InstancedEntity in use
+        @param batch
+			The batch which is now static or unused, usually same as caller.
+        */
+		void _removeFromDynamicBatchList( InstanceBatch *batch );
 
         /** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
         @param dirtyBatch The batch which is dirty, usually same as caller.
         */
-        void _addDirtyBatch( InstanceBatch *dirtyBatch );
+        void _addDirtyStaticBatch( InstanceBatch *dirtyBatch );
 
-        /** Called by SceneManager when we told it we have at least one dirty batch */
+		/// Called by SceneManager every frame
+		void _updateAnimations(void);
+
+		/** Called by SceneManager every frame from multiple threads */
+        void _updateDirtyBatchesThread( size_t threadIdx );
+
+        /** Called by SceneManager every frame */
         void _updateDirtyBatches(void);
 
         typedef ConstMapIterator<InstanceBatchMap> InstanceBatchMapIterator;
@@ -307,16 +332,26 @@ namespace Ogre
             setCustomParameter), but there's no synchronization mechanism when
             multithreading or creating more instances, that's up to the user.
         */
-        InstanceBatchIterator getInstanceBatchIterator( const String &materialName ) const
-        {
-            InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialName );
-            if(it != mInstanceBatches.end())
-                return InstanceBatchIterator( it->second.begin(), it->second.end() );
-            else
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot create instance batch iterator. "
-                            "Material " + materialName + " cannot be found.", "InstanceManager::getInstanceBatchIterator");
-        }
+        InstanceBatchIterator getInstanceBatchIterator( const String &materialName,
+														SceneMemoryMgrTypes sceneType ) const;
     };
+
+	struct InstanceManagerCmp
+	{
+		bool operator () ( const InstanceManager *a, const InstanceManager *b ) const
+		{
+			return a->getName() < b->getName();
+		}
+		bool operator () ( const InstanceManager *a, IdString name ) const
+		{
+			return a->getName() < name;
+		}
+		bool operator () ( IdString name, const InstanceManager *a ) const
+		{
+			return name < a->getName();
+		}
+	};
+
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

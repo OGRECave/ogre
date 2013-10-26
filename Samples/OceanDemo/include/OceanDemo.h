@@ -195,6 +195,12 @@ void Sample_Ocean::setupContent(void)
 
 void Sample_Ocean::setupScene()
 {
+	const IdString workspaceName( "OceanDemoWorkspace" );
+	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+	if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ) );
+	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 	// Set ambient light
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
 	mSceneMgr->setSkyBox(true, "SkyBox", 1000);
@@ -204,19 +210,21 @@ void Sample_Ocean::setupScene()
 
     for (unsigned int i = 0; i < NUM_LIGHTS; ++i)
     {
-        mLightPivots[i] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mLightPivots[i] = lightNode->createChildSceneNode();
         mLightPivots[i]->rotate(mLightRotationAxes[i], Ogre::Angle(mLightRotationAngles[i]));
         // Create a light, use default parameters
-        mLights[i] = mSceneMgr->createLight("Light" + Ogre::StringConverter::toString(i));
-		mLights[i]->setPosition(mLightPositions[i]);
+        mLights[i] = mSceneMgr->createLight();
+		// Attach light
+		lightNode->attachObject(mLights[i]);
+		lightNode->setPosition(mLightPositions[i]);
 		mLights[i]->setDiffuseColour(mDiffuseLightColours[i]);
 		mLights[i]->setSpecularColour(mSpecularLightColours[i]);
 		mLights[i]->setVisible(mLightState[i]);
 		//mLights[i]->setAttenuation(400, 0.1 , 1 , 0);
-        // Attach light
-        mLightPivots[i]->attachObject(mLights[i]);
+
 		// Create billboard for light
-        mLightFlareSets[i] = mSceneMgr->createBillboardSet("Flare" + Ogre::StringConverter::toString(i));
+        mLightFlareSets[i] = mSceneMgr->createBillboardSet();
 		mLightFlareSets[i]->setMaterialName("LightFlare");
 		mLightPivots[i]->attachObject(mLightFlareSets[i]);
 		mLightFlares[i] = mLightFlareSets[i]->createBillboard(mLightPositions[i]);
@@ -237,8 +245,10 @@ void Sample_Ocean::setupScene()
         oceanSurface,
         1000, 1000, 50, 50, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
 
-    mOceanSurfaceEnt = mSceneMgr->createEntity( "OceanSurface", "OceanSurface" );
-    mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mOceanSurfaceEnt);
+    mOceanSurfaceEnt = mSceneMgr->createEntity( "OceanSurface",
+												ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC );
+    mSceneMgr->getRootSceneNode( SCENE_STATIC )->createChildSceneNode( SCENE_STATIC )->attachObject(mOceanSurfaceEnt);
 }
 
 

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreImageCodec.h"
+#include "OgrePixelBox.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreWin32GLSupport.h"
@@ -802,9 +803,9 @@ namespace Ogre {
 			mHeight = rc.bottom - rc.top;
 
 			// Notify viewports of resize
-			ViewportList::iterator it = mViewportList.begin();
+			ViewportList::const_iterator it = mViewportList.begin();
 			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();			
+				(*it++)->_updateDimensions();
 		}
 	}
 

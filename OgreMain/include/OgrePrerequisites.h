@@ -122,17 +122,23 @@ namespace Ogre {
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
+	struct Aabb;
     class Angle;
     class Animation;
     class AnimationState;
     class AnimationStateSet;
     class AnimationTrack;
+	class ArrayMatrix4;
+	class ArrayQuaternion;
+	class ArrayVector3;
+	class ArrayMemoryManager;
     class Archive;
     class ArchiveFactory;
     class ArchiveManager;
     class AutoParamDataSource;
     class AxisAlignedBox;
     class AxisAlignedBoxSceneQuery;
+	class Barrier;
     class Billboard;
     class BillboardChain;
     class BillboardSet;
@@ -202,9 +208,12 @@ namespace Ogre {
     class MovablePlane;
     class Node;
 	class NodeAnimationTrack;
-	class NodeKeyFrame;
+	class NodeMemoryManager;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
+	struct ObjectData;
+	class ObjectMemoryManager;
+	class OldNode;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
@@ -265,8 +274,6 @@ namespace Ogre {
 	class ScriptCompilerManager;
 	class ScriptLoader;
     class Serializer;
-    class ShadowCaster;
-    class ShadowRenderable;
 	class ShadowTextureManager;
     class SimpleRenderable;
     class SimpleSpline;
@@ -288,6 +295,7 @@ namespace Ogre {
     class TextureUnitState;
     class Texture;
     class TextureManager;
+	struct Transform;
     class TransformKeyFrame;
 	class Timer;
 	class UserObjectBindings;
@@ -302,18 +310,9 @@ namespace Ogre {
 	class VertexMorphKeyFrame;
     class WireBoundingBox;
 	class WorkQueue;
-    class Compositor;
-    class CompositorManager;
-    class CompositorChain;
-    class CompositorInstance;
-	class CompositorLogic;
-    class CompositionTechnique;
-    class CompositionPass;
-    class CompositionTargetPass;
-	class CustomCompositionPass;
+	class CompositorManager2;
 
     template<typename T> class SharedPtr;
-    typedef SharedPtr<Compositor> CompositorPtr;
     typedef SharedPtr<GpuProgram> GpuProgramPtr;
     typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
     typedef SharedPtr<Material> MaterialPtr;

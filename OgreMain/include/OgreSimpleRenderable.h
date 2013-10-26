@@ -61,18 +61,12 @@ namespace Ogre {
         /// The scene manager for the current frame.
         SceneManager *mParentSceneManager;
 
-        /// The camera for the current frame.
-        Camera *mCamera;
-
         /// Static member used to automatically generate names for SimpleRendaerable objects.
         static uint msGenNameCount;
 
     public:
         /// Constructor
-        SimpleRenderable();
-
-        /// Named constructor
-        SimpleRenderable(const String& name);
+        SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager );
 
         virtual void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;
@@ -83,13 +77,10 @@ namespace Ogre {
         void setWorldTransform( const Matrix4& xform );
         virtual void getWorldTransforms( Matrix4* xform ) const;
 
-
-        virtual void _notifyCurrentCamera(Camera* cam);
-
         void setBoundingBox( const AxisAlignedBox& box );
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 
-        virtual void _updateRenderQueue(RenderQueue* queue);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 		/// @copydoc MovableObject::visitRenderables
 		void visitRenderables(Renderable::Visitor* visitor, 
 			bool debugRenderables = false);

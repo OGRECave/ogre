@@ -41,10 +41,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceManager::InstanceManager( const String &customName, SceneManager *sceneManager,
+	InstanceManager::InstanceManager( IdString customName, SceneManager *sceneManager,
 										const String &meshName, const String &groupName,
 										InstancingTechnique instancingTechnique, uint16 instancingFlags,
-										size_t instancesPerBatch, unsigned short subMeshIdx, bool useBoneMatrixLookup ) :
+										size_t instancesPerBatch, unsigned short subMeshIdx,
+										bool useBoneMatrixLookup ) :
 				mName( customName ),
 				mIdCount( 0 ),
 				mInstancesPerBatch( instancesPerBatch ),
@@ -117,8 +118,8 @@ namespace Ogre
 		mNumCustomParams = numCustomParams;
 	}
 	//----------------------------------------------------------------------
-	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize,
-																uint16 flags )
+	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( const String &materialName,
+																size_t suggestedSize, uint16 flags )
 	{
 		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
@@ -132,23 +133,23 @@ namespace Ogre
 		switch( mInstancingTechnique )
 		{
 		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( this, mMeshReference, mat, suggestedSize,
-													0, mName + "/TempBatch" );
+			batch = OGRE_NEW InstanceBatchShader( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ),
+													this, mMeshReference, mat, suggestedSize, 0 );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( this, mMeshReference, mat, suggestedSize,
-													0, mName + "/TempBatch" );
+			batch = OGRE_NEW InstanceBatchVTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+												mMeshReference, mat, suggestedSize, 0 );
 			static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
 			static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
 			static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
 			break;
 		case HWInstancingBasic:
-			batch = OGRE_NEW InstanceBatchHW( this, mMeshReference, mat, suggestedSize,
-													0, mName + "/TempBatch" );
+			batch = OGRE_NEW InstanceBatchHW( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+												mMeshReference, mat, suggestedSize, 0 );
 			break;
 		case HWInstancingVTF:
-			batch = OGRE_NEW InstanceBatchHW_VTF( this, mMeshReference, mat, suggestedSize,
-													0, mName + "/TempBatch" );
+			batch = OGRE_NEW InstanceBatchHW_VTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+													mMeshReference, mat, suggestedSize, 0 );
 			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
 			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
 			static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
@@ -169,21 +170,24 @@ namespace Ogre
 		return retVal;
 	}
 	//----------------------------------------------------------------------
-	InstancedEntity* InstanceManager::createInstancedEntity( const String &materialName )
+	InstancedEntity* InstanceManager::createInstancedEntity( const String &materialName,
+															 SceneMemoryMgrTypes sceneType )
 	{
 		InstanceBatch *instanceBatch;
 
 		if( mInstanceBatches.empty() )
-			instanceBatch = buildNewBatch( materialName, true );
+			instanceBatch = buildNewBatch( materialName, sceneType, true );
 		else
-			instanceBatch = getFreeBatch( materialName );
+			instanceBatch = getFreeBatch( materialName, sceneType );
 
 		return instanceBatch->createInstancedEntity();
 	}
 	//-----------------------------------------------------------------------
-	inline InstanceBatch* InstanceManager::getFreeBatch( const String &materialName )
+	inline InstanceBatch* InstanceManager::getFreeBatch( const String &materialName,
+														 SceneMemoryMgrTypes sceneType )
 	{
-		InstanceBatchVec &batchVec = mInstanceBatches[materialName];
+		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+		InstanceBatchVec &batchVec = mInstanceBatches[materialHash];
 
 		InstanceBatchVec::const_reverse_iterator itor = batchVec.rbegin();
 		InstanceBatchVec::const_reverse_iterator end  = batchVec.rend();
@@ -196,11 +200,15 @@ namespace Ogre
 		}
 
 		//None found, or they're all full
-		return buildNewBatch( materialName, false );
+		return buildNewBatch( materialName, sceneType, false );
 	}
 	//-----------------------------------------------------------------------
-	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName, bool firstTime )
+	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName,
+													SceneMemoryMgrTypes sceneType, bool firstTime )
 	{
+		IdString materialHashGeneric( materialName );
+		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+
 		//Get the bone to index map for the batches
 		Mesh::IndexMap &idxMap = mMeshReference->getSubMesh(mSubMeshIdx)->blendIndexToBoneIndexMap;
 		idxMap = idxMap.empty() ? mMeshReference->sharedBlendIndexToBoneIndexMap : idxMap;
@@ -210,34 +218,38 @@ namespace Ogre
 																	mMeshReference->getGroup() );
 
 		//Get the array of batches grouped by this material
-		InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialName];
+		InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialHash];
 
 		InstanceBatch *batch = 0;
 
 		switch( mInstancingTechnique )
 		{
 		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap, mName + "/InstanceBatch_" +
-													StringConverter::toString(mIdCount++) );
+			batch = OGRE_NEW InstanceBatchShader( Id::generateNewId<InstanceBatch>(),
+													&mSceneManager->_getEntityMemoryManager(sceneType),
+													this, mMeshReference, mat, mInstancesPerBatch,
+													&idxMap );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap, mName + "/InstanceBatch_" +
-													StringConverter::toString(mIdCount++) );
+			batch = OGRE_NEW InstanceBatchVTF( Id::generateNewId<InstanceBatch>(),
+													&mSceneManager->_getEntityMemoryManager(sceneType),
+													this, mMeshReference, mat, mInstancesPerBatch,
+													&idxMap );
 			static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
 			static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
 			static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
 			break;
 		case HWInstancingBasic:
-			batch = OGRE_NEW InstanceBatchHW( this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap, mName + "/InstanceBatch_" +
-													StringConverter::toString(mIdCount++) );
+			batch = OGRE_NEW InstanceBatchHW( Id::generateNewId<InstanceBatch>(),
+													&mSceneManager->_getEntityMemoryManager(sceneType), 
+													this, mMeshReference, mat, mInstancesPerBatch,
+													&idxMap );
 			break;
 		case HWInstancingVTF:
-			batch = OGRE_NEW InstanceBatchHW_VTF( this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap, mName + "/InstanceBatch_" +
-													StringConverter::toString(mIdCount++) );
+			batch = OGRE_NEW InstanceBatchHW_VTF( Id::generateNewId<InstanceBatch>(),
+													&mSceneManager->_getEntityMemoryManager(sceneType),
+													this, mMeshReference, mat, mInstancesPerBatch,
+													&idxMap );
 			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
 			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
 			static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
@@ -250,8 +262,12 @@ namespace Ogre
 					"InstanceBatch::buildNewBatch()");
 		}
 
-		batch->_notifyManager( mSceneManager );
+#ifndef NDEBUG
+		batch->setName( mName.getFriendlyText() + "/InstanceBatch_" +
+							StringConverter::toString(mIdCount++) );
+#endif
 
+		batch->_notifyManager( mSceneManager );
 
 		if( !firstTime )
 		{
@@ -274,13 +290,10 @@ namespace Ogre
 			mSharedRenderOperation = batch->build( mMeshReference->getSubMesh(mSubMeshIdx) );
 		}
 
-		const BatchSettings &batchSettings = mBatchSettings[materialName];
+		const BatchSettings &batchSettings = mBatchSettings[materialHashGeneric];
 		batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
 
-		//Batches need to be part of a scene node so that their renderable can be rendered
-		SceneNode *sceneNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
-		sceneNode->attachObject( batch );
-		sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
+		batch->setStatic( sceneType == SCENE_STATIC );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -403,11 +416,11 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::setSetting( BatchSettingId id, bool value, const String &materialName )
+	void InstanceManager::setSetting( BatchSettingId id, bool value, IdString materialName )
 	{
 		assert( id < NUM_SETTINGS );
 
-		if( materialName == StringUtil::BLANK )
+		if( materialName == IdString() )
 		{
 			//Setup all existing materials
 			InstanceBatchMap::iterator itor = mInstanceBatches.begin();
@@ -433,7 +446,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	bool InstanceManager::getSetting( BatchSettingId id, const String &materialName ) const
+	bool InstanceManager::getSetting( BatchSettingId id, IdString materialName ) const
 	{
 		assert( id < NUM_SETTINGS );
 
@@ -459,7 +472,7 @@ namespace Ogre
 				(*itor)->setCastShadows( value );
 				break;
 			case SHOW_BOUNDINGBOX:
-				(*itor)->getParentSceneNode()->showBoundingBox( value );
+				//(*itor)->getParentSceneNode()->showBoundingBox( value );
 				break;
 			default:
 				break;
@@ -468,7 +481,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::setBatchesAsStaticAndUpdate( bool bStatic )
+	void InstanceManager::setBatchesAsStatic( bool bStatic )
 	{
 		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
 		InstanceBatchMap::iterator end  = mInstanceBatches.end();
@@ -480,7 +493,7 @@ namespace Ogre
 
 			while( it != en )
 			{
-				(*it)->setStaticAndUpdate( bStatic );
+				(*it)->setStatic( bStatic );
 				++it;
 			}
 
@@ -488,18 +501,82 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::_addDirtyBatch( InstanceBatch *dirtyBatch )
+	void InstanceManager::_addToDynamicBatchList( InstanceBatch *dynamicBatch )
 	{
-		if( mDirtyBatches.empty() )
-			mSceneManager->_addDirtyInstanceManager( this );
+		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+													 dynamicBatch );
+		if( itor == mDynamicBatches.end() )
+			mDynamicBatches.push_back( dynamicBatch );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_removeFromDynamicBatchList( InstanceBatch *batch )
+	{
+		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+													 batch );
+		if( itor != mDynamicBatches.end() )
+			efficientVectorRemove( mDynamicBatches, itor );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_addDirtyStaticBatch( InstanceBatch *dirtyBatch )
+	{
+		//If he needs to this very often, they're probably not static...
+		//Note: Calling this more often will only affect performance for the next frame.
+		//It won't crash and can be ignored
+		assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
+				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
 
-		mDirtyBatches.push_back( dirtyBatch );
+		mDirtyStaticBatches.push_back( dirtyBatch );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_updateAnimations(void)
+	{
+		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateAnimations();
+			++itor;
+		}
+
+		itor = mDirtyStaticBatches.begin();
+		end  = mDirtyStaticBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateAnimations();
+			++itor;
+		}
+
+		//_updateDirtyBatches will be called after us, and will do that job.
+		//mDirtyStaticBatches.clear();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_updateDirtyBatchesThread( size_t threadIdx )
+	{
+		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateEntitiesBoundsThread( threadIdx );
+			++itor;
+		}
+
+		itor = mDirtyStaticBatches.begin();
+		end  = mDirtyStaticBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateEntitiesBoundsThread( threadIdx );
+			++itor;
+		}
 	}
 	//-----------------------------------------------------------------------
 	void InstanceManager::_updateDirtyBatches(void)
 	{
-		InstanceBatchVec::const_iterator itor = mDirtyBatches.begin();
-		InstanceBatchVec::const_iterator end  = mDirtyBatches.end();
+		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
 
 		while( itor != end )
 		{
@@ -507,8 +584,31 @@ namespace Ogre
 			++itor;
 		}
 
-		mDirtyBatches.clear();
+		itor = mDirtyStaticBatches.begin();
+		end  = mDirtyStaticBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateBounds();
+			++itor;
+		}
+
+		mDirtyStaticBatches.clear();
 	}
+	//-----------------------------------------------------------------------
+	InstanceManager::InstanceBatchIterator InstanceManager::getInstanceBatchIterator(
+										const String &materialName, SceneMemoryMgrTypes sceneType ) const
+    {
+		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+        InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialHash );
+		if( it == mInstanceBatches.end() )
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+						"Can't find instance batches with material '" + materialName + "'",
+						"InstanceManager::getInstanceBatchIterator");
+		}
+        return InstanceBatchIterator( it->second.begin(), it->second.end() );
+    }
 	//-----------------------------------------------------------------------
 	// Helper functions to unshare the vertices
 	//-----------------------------------------------------------------------

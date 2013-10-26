@@ -50,6 +50,15 @@ protected:
 
 	void setupContent()
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "DualQuaternion Workspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //Add the hardware skinning to the shader generator default render state
         mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
@@ -70,12 +79,6 @@ protected:
 
         Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_LINEAR, pCast1l, pCast2l, pCast3l, pCast4l);
 #endif
-		// set shadow properties
-		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-		mSceneMgr->setShadowTextureSize(2048);
-		mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
-		mSceneMgr->setShadowTextureCount(1);
-
 		// add a little ambient lighting
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
@@ -87,22 +90,24 @@ protected:
 		bbs->setMaterialName("Examples/Flare");
 		lightsBbsNode->attachObject(bbs);
 
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
  		Light* l = mSceneMgr->createLight();
+		lightNode->attachObject( l );
 		Vector3 dir;
  		l->setType(Light::LT_POINT);
- 		l->setPosition(30, 70, 40);
- 		dir = -l->getPosition();
+ 		lightNode->setPosition(30, 70, 40);
+ 		dir = -lightNode->getPosition();
  		dir.normalise();
  		l->setDirection(dir);
  		l->setDiffuseColour(1, 1, 1);
- 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+ 		bbs->createBillboard(lightNode->getPosition())->setColour(l->getDiffuseColour());
 
 		// create a floor mesh resource
 		MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 			Plane(Vector3::UNIT_Y, -1), 250, 250, 25, 25, true, 1, 15, 15, Vector3::UNIT_Z);
 
 		// add a floor to our scene using the floor mesh we created
-		Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+		Entity* floor = mSceneMgr->createEntity("floor");
 		floor->setMaterialName("Examples/Rockwall");
 		floor->setCastShadows(false);
 		mSceneMgr->getRootSceneNode()->attachObject(floor);
@@ -121,7 +126,7 @@ protected:
 		sn->translate(0, 0, 20, Node::TS_LOCAL);
 
 		//Create and attach a spine entity with standard skinning
-		ent = mSceneMgr->createEntity("Spine", "spine.mesh");
+		ent = mSceneMgr->createEntity("spine.mesh");
 		ent->setMaterialName("spine");
 		ent->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
 		sn->attachObject(ent);
@@ -131,7 +136,7 @@ protected:
 		sn->translate(0, 0, -20, Node::TS_LOCAL);
 
 		//Create and attach a spine entity with dual quaternion skinning
-		entDQ = mSceneMgr->createEntity("SpineDQ", "spine.mesh");
+		entDQ = mSceneMgr->createEntity("spine.mesh");
 		entDQ->setMaterialName("spineDualQuat");
 		entDQ->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
 		sn->attachObject(entDQ);

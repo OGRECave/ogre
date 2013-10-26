@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreImageCodec.h"
 #include "OgreColourValue.h"
 #include "OgreMath.h"
+#include "OgrePixelBox.h"
 #include "OgreImageResampler.h"
 
 namespace Ogre {

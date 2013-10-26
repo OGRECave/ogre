@@ -148,7 +148,8 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	SceneManager* SceneManagerEnumerator::createSceneManager(
-		const String& typeName, const String& instanceName)
+		const String& typeName, size_t numWorkerThreads,
+		InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
 	{
 		if (mInstances.find(instanceName) != mInstances.end())
 		{
@@ -167,11 +168,11 @@ namespace Ogre {
 					// generate a name
 					StringUtil::StrStreamType s;
 					s << "SceneManagerInstance" << ++mInstanceCreateCount;
-					inst = (*i)->createInstance(s.str());
+					inst = (*i)->createInstance(s.str(), numWorkerThreads, threadedCullingMethod);
 				}
 				else
 				{
-					inst = (*i)->createInstance(instanceName);
+					inst = (*i)->createInstance(instanceName, numWorkerThreads, threadedCullingMethod);
 				}
 				break;
 			}
@@ -197,7 +198,8 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	SceneManager* SceneManagerEnumerator::createSceneManager(
-		SceneTypeMask typeMask, const String& instanceName)
+		SceneTypeMask typeMask, size_t numWorkerThreads,
+		InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
 	{
 		if (mInstances.find(instanceName) != mInstances.end())
 		{
@@ -221,14 +223,14 @@ namespace Ogre {
 		{
 			if ((*i)->getMetaData().sceneTypeMask & typeMask)
 			{
-				inst = (*i)->createInstance(name);
+				inst = (*i)->createInstance(name, numWorkerThreads,threadedCullingMethod);
 				break;
 			}
 		}
 
 		// use default factory if none
 		if (!inst)
-			inst = mDefaultFactory.createInstance(name);
+			inst = mDefaultFactory.createInstance(name, numWorkerThreads, threadedCullingMethod);
 
 		/// assign rs if already configured
 		if (mCurrentRenderSystem)
@@ -320,9 +322,10 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
 	SceneManager* DefaultSceneManagerFactory::createInstance(
-		const String& instanceName)
+		const String& instanceName, size_t numWorkerThreads,
+		InstancingTheadedCullingMethod threadedCullingMethod)
 	{
-		return OGRE_NEW DefaultSceneManager(instanceName);
+		return OGRE_NEW DefaultSceneManager(instanceName, numWorkerThreads, threadedCullingMethod);
 	}
     //-----------------------------------------------------------------------
 	void DefaultSceneManagerFactory::destroyInstance(SceneManager* instance)
@@ -331,8 +334,9 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-	DefaultSceneManager::DefaultSceneManager(const String& name)
-		: SceneManager(name)
+	DefaultSceneManager::DefaultSceneManager(const String& name, size_t numWorkerThreads,
+											 InstancingTheadedCullingMethod threadedCullingMethod)
+		: SceneManager(name, numWorkerThreads, threadedCullingMethod)
 	{
 	}
     //-----------------------------------------------------------------------

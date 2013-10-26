@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgrePixelBox.h"
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"

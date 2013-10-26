@@ -36,7 +36,6 @@ namespace Ogre {
 
 	class Camera;
 	class MovableObject;
-	struct VisibleObjectsBoundsInfo;
 
 	/** \addtogroup Core
 	*  @{
@@ -138,9 +137,7 @@ namespace Ogre {
         /// The default priority
         ushort mDefaultRenderablePriority;
 
-        bool mSplitPassesByLightingType;
         bool mSplitNoShadowPasses;
-		bool mShadowCastersCannotBeReceivers;
 
 		RenderableListener* mRenderableListener;
     public:
@@ -243,16 +240,6 @@ namespace Ogre {
         QueueGroupIterator _getQueueGroupIterator(void);
         ConstQueueGroupIterator _getQueueGroupIterator(void) const;
 
-        /** Sets whether or not the queue will split passes by their lighting type,
-            ie ambient, per-light and decal. 
-        */
-        void setSplitPassesByLightingType(bool split);
-
-        /** Gets whether or not the queue will split passes by their lighting type,
-            ie ambient, per-light and decal. 
-        */
-        bool getSplitPassesByLightingType(void) const;
-
         /** Sets whether or not the queue will split passes which have shadow receive
         turned off (in their parent material), which is needed when certain shadow
         techniques are used.
@@ -264,16 +251,6 @@ namespace Ogre {
         techniques are used.
         */
         bool getSplitNoShadowPasses(void) const;
-
-		/** Sets whether or not objects which cast shadows should be treated as
-		never receiving shadows. 
-		*/
-		void setShadowCastersCannotBeReceivers(bool ind);
-
-		/** Gets whether or not objects which cast shadows should be treated as
-		never receiving shadows. 
-		*/
-		bool getShadowCastersCannotBeReceivers(void) const;
 
 		/** Set a renderable listener on the queue.
 		@remarks
@@ -289,16 +266,6 @@ namespace Ogre {
 		/** Merge render queue.
 		*/
 		void merge( const RenderQueue* rhs );
-		/** Utility method to perform the standard actions associated with 
-			getting a visible object to add itself to the queue. This is 
-			a replacement for SceneManager implementations of the associated
-			tasks related to calling MovableObject::_updateRenderQueue.
-		*/
-		void processVisibleObject(MovableObject* mo, 
-			Camera* cam, 
-			bool onlyShadowCasters, 
-			VisibleObjectsBoundsInfo* visibleBounds);
-
     };
 
 	/** @} */

@@ -53,8 +53,9 @@ namespace Ogre
 	*  @{
 	*/
 
+	class FrameStats;
     typedef vector<RenderSystem*>::type RenderSystemList;
-	
+
     /** The root class of the Ogre system.
         @remarks
             The Ogre::Root class represents a starting point for the client
@@ -112,12 +113,13 @@ namespace Ogre
         PMWorker* mPMWorker;
         PMInjector* mPMInjector;
 
+		FrameStats*	mFrameStats;
         Timer* mTimer;
         RenderWindow* mAutoWindow;
         Profiler* mProfiler;
         HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
 		ExternalTextureSourceManager* mExternalTextureSourceManager;
-        CompositorManager* mCompositorManager;      
+		CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
 		Real mFrameSmoothingTime;
 		bool mRemoveQueueStructuresOnClear;
@@ -315,6 +317,8 @@ namespace Ogre
         */
         RenderSystem* getRenderSystem(void);
 
+		CompositorManager2* getCompositorManager2() const			{ return mCompositorManager2; }
+
         /** Initialises the renderer.
             @remarks
                 This method can only be called after a renderer has been
@@ -332,6 +336,9 @@ namespace Ogre
         */
 	    RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
                                     const String& customCapabilitiesConfig = StringUtil::BLANK);
+
+		/// Call this function after Root::initialise and having set at least one RenderWindow
+		void initialiseCompositor(void);
 
 		/** Returns whether the system is initialised or not. */
 		bool isInitialised(void) const { return mIsInitialised; }
@@ -390,9 +397,20 @@ namespace Ogre
 		@param typeName String identifying a unique SceneManager type
 		@param instanceName Optional name to given the new instance that is
 			created. If you leave this blank, an auto name will be assigned.
+		@param numWorkerThreads
+			Number of worker threads. Must be greater than 0; you should not
+			oversubscribe the system. I.e. if the system has 4 cores (excluding
+			HyperThreading) and you intend to run your logic 100% in one of the cores,
+			set this value to 3. If you intend to fully use 2 cores for your own stuff,
+			set this value to 2.
+		@param threadedCullingMethod
+			@See InstancingTheadedCullingMethod. Note: When numWorkerThreads is 1,
+			this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
+			it would only degrade performance).
 		*/
-		SceneManager* createSceneManager(const String& typeName, 
-			const String& instanceName = StringUtil::BLANK);
+		SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
+										InstancingTheadedCullingMethod threadedCullingMethod,
+										const String& instanceName = StringUtil::BLANK);
 
 		/** Create a SceneManager instance based on scene type support.
 		@remarks
@@ -405,9 +423,20 @@ namespace Ogre
 		@param typeMask A mask containing one or more SceneType flags
 		@param instanceName Optional name to given the new instance that is
 			created. If you leave this blank, an auto name will be assigned.
+		@param numWorkerThreads
+			Number of worker threads. Must be greater than 0; you should not
+			oversubscribe the system. I.e. if the system has 4 cores (excluding
+			HyperThreading) and you intend to run your logic 100% in one of the cores,
+			set this value to 3. If you intend to fully use 2 cores for your own stuff,
+			set this value to 2.
+		@param threadedCullingMethod
+			@See InstancingTheadedCullingMethod. Note: When numWorkerThreads is 1,
+			this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
+			it would only degrade performance).
 		*/
-		SceneManager* createSceneManager(SceneTypeMask typeMask, 
-			const String& instanceName = StringUtil::BLANK);
+		SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
+										InstancingTheadedCullingMethod threadedCullingMethod,
+										const String& instanceName = StringUtil::BLANK);
 
 		/** Destroy an instance of a SceneManager. */
 		void destroySceneManager(SceneManager* sm);
@@ -495,6 +524,8 @@ namespace Ogre
                 Root, Root::queueEndRendering, Root::startRendering
         */
         bool endRenderingQueued(void);
+
+		const FrameStats* getFrameStats(void) const				{ return mFrameStats; }
 
         /** Starts / restarts the automatic rendering cycle.
             @remarks

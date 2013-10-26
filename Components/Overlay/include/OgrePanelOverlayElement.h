@@ -101,7 +101,7 @@ namespace Ogre {
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
         /** Overridden from OverlayContainer */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
 
         /** Command object for specifying tiling (see ParamCommand).*/

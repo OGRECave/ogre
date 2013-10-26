@@ -23,6 +23,12 @@ protected:
 
 	void setupContent()
 	{
+		const IdString workspaceName( "TextureFX Workspace" );
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White );
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
 		// set our camera to orbit around the origin and show cursor
@@ -35,7 +41,7 @@ protected:
 		for (unsigned int i = 0; i < 4; i++)
 		{
 			// create a standard plane entity
-			Entity* ent = mSceneMgr->createEntity("Plane" + StringConverter::toString(i + 1), SceneManager::PT_PLANE);
+			Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE);
 
 			// attach it to a node, scale it, and position appropriately
 			SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();

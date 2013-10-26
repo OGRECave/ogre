@@ -350,7 +350,7 @@ namespace Ogre {
         virtual void _notifyViewport();
 
         /** Internal method to put the contents onto the render queue. */
-        virtual void _updateRenderQueue(RenderQueue* queue);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 
 		/// @copydoc MovableObject::visitRenderables
 		void visitRenderables(Renderable::Visitor* visitor, 

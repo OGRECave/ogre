@@ -29,16 +29,27 @@ public:
 	void checkBoxToggled(CheckBox* box)
 	{
 		// show or hide the particle system with the same name as the check box
-		mSceneMgr->getParticleSystem(box->getName())->setVisible(box->isChecked());
+		mParticleSystems[box->getName()]->setVisible(box->isChecked());
 	}
 
 protected:
 
 	void setupContent()
 	{
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		const IdString workspaceName( "ParticleFXWorkspace" );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
+														IdString() );
+		}
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		// setup some basic lighting for our scene
 		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-		mSceneMgr->createLight()->setPosition(20, 80, 50);
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->attachObject( mSceneMgr->createLight() );
+		lightNode->setPosition(20, 80, 50);
 
 		// set our camera to orbit around the origin and show cursor
 		mCameraMan->setStyle(CS_ORBIT);
@@ -46,8 +57,10 @@ protected:
 		mTrayMgr->showCursor();
 
 		// create an ogre head entity and place it at the origin
-        Entity* ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-        mSceneMgr->getRootSceneNode()->attachObject(ent);
+        Entity* ent = mSceneMgr->createEntity( "ogrehead.mesh",
+												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC );
+        mSceneMgr->getRootSceneNode( SCENE_STATIC )->attachObject(ent);
 		
 		setupParticles();   // setup particles
 		setupTogglers();    // setup particle togglers
@@ -60,31 +73,37 @@ protected:
 		ParticleSystem* ps;
 
         // create some nice fireworks and place it at the origin
-        ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
+        ps = mSceneMgr->createParticleSystem("Examples/Fireworks");
 		mSceneMgr->getRootSceneNode()->attachObject(ps);
+		mParticleSystems["Fireworks"] = ps;
 
         // create a green nimbus around the ogre head
-        ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
+        ps = mSceneMgr->createParticleSystem("Examples/GreenyNimbus");
 		mSceneMgr->getRootSceneNode()->attachObject(ps);
+		mParticleSystems["Nimbus"] = ps;
        
-        ps = mSceneMgr->createParticleSystem("Rain", "Examples/Rain");  // create a rainstorm
+        ps = mSceneMgr->createParticleSystem("Examples/Rain");  // create a rainstorm
         ps->fastForward(5);   // fast-forward the rain so it looks more natural
-        mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 1000, 0))->attachObject(ps);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_DYNAMIC, Vector3(0, 1000, 0))->attachObject(ps);
+		mParticleSystems["Rain"] = ps;
 
         // create aureola around ogre head perpendicular to the ground
-        ps = mSceneMgr->createParticleSystem("Aureola", "Examples/Aureola");
+        ps = mSceneMgr->createParticleSystem("Examples/Aureola");
         mSceneMgr->getRootSceneNode()->attachObject(ps);
+		mParticleSystems["Aureola"] = ps;
 
         // create shared pivot node for spinning the fountains
         mFountainPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
-        ps = mSceneMgr->createParticleSystem("Fountain1", "Examples/PurpleFountain");  // create fountain 1
+        ps = mSceneMgr->createParticleSystem("Examples/PurpleFountain");  // create fountain 1
         // attach the fountain to a child node of the pivot at a distance and angle
-		mFountainPivot->createChildSceneNode(Vector3(200, -100, 0), Quaternion(Degree(20), Vector3::UNIT_Z))->attachObject(ps);
+		mFountainPivot->createChildSceneNode(SCENE_DYNAMIC, Vector3(200, -100, 0), Quaternion(Degree(20), Vector3::UNIT_Z))->attachObject(ps);
+		mParticleSystems["Fountain1"] = ps;
         
-        ps = mSceneMgr->createParticleSystem("Fountain2", "Examples/PurpleFountain");  // create fountain 2
+        ps = mSceneMgr->createParticleSystem("Examples/PurpleFountain");  // create fountain 2
         // attach the fountain to a child node of the pivot at a distance and angle
-		mFountainPivot->createChildSceneNode(Vector3(-200, -100, 0), Quaternion(Degree(-20), Vector3::UNIT_Z))->attachObject(ps);
+		mFountainPivot->createChildSceneNode(SCENE_DYNAMIC, Vector3(-200, -100, 0), Quaternion(Degree(-20), Vector3::UNIT_Z))->attachObject(ps);
+		mParticleSystems["Fountain2"] = ps;
 	}
 
 	void setupTogglers()
@@ -100,6 +119,7 @@ protected:
 	}
 
 	SceneNode* mFountainPivot;
+	map<IdString, ParticleSystem*>::type mParticleSystems;
 };
 
 #endif

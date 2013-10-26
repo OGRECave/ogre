@@ -1930,7 +1930,7 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 
 	if (sceneManager != NULL && curRenderState->getLightCountAutoUpdate())
 	{
-		const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
+		LightArray lightList =  sceneManager->getGlobalLightList().lights;
 		
 		int sceneLightCount[3] = {0};
 		int currLightCount[3] = {0};

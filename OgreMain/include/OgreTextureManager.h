@@ -295,11 +295,15 @@ namespace Ogre {
 			@param fsaa The level of multisampling to use if this is a render target. Ignored
 				if usage does not include TU_RENDERTARGET or if the device does
 				not support it.
+			@param explicitResolve Whether FSAA resolves are done implicitly when used as
+				texture, or must be done explicitly.
+				@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
 			int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK);
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
+			bool explicitResolve = false);
 			
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
@@ -344,14 +348,18 @@ namespace Ogre {
 			@param fsaa The level of multisampling to use if this is a render target. Ignored
 				if usage does not include TU_RENDERTARGET or if the device does
 				not support it.
+			@param explicitResolve Whether FSAA resolves are done implicitly when used as
+				texture, or must be done explicitly.
+				@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
         */
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int numMipmaps,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK)
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
+			bool explicitResolve = false)
 		{
 			return createManual(name, group, texType, width, height, 1, 
-				numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint);
+				numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint, explicitResolve);
 		}
 
         /** Sets preferred bit depth for integer pixel format textures.

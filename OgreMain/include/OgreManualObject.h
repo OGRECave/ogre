@@ -106,7 +106,7 @@ namespace Ogre
 	class _OgreExport ManualObject : public MovableObject
 	{
 	public:
-		ManualObject(const String& name);
+		ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager );
 		virtual ~ManualObject();
 
 		//pre-declare ManualObjectSection
@@ -345,15 +345,6 @@ namespace Ogre
 		*/
 		bool getUseIdentityView(void) const { return mUseIdentityView; }
 
-		/** Sets the bounding box.
-			@remarks Call this after having finished creating sections to modify the
-				bounding box. E.g. if you're using ManualObject to create 2D overlays
-				you can call things function to set an infinite bounding box so that
-				the object always stays visible when attached.
-			@see ManualObject::setUseIdentityProjection, ManualObject::setUseIdentityView,
-				AxisAlignedBox::setInfinite */
-		void setBoundingBox(const AxisAlignedBox& box) { mAABB = box; }
-
 		/** Gets a pointer to a ManualObjectSection, i.e. a part of a ManualObject.
 		*/
 		ManualObjectSection* getSection(unsigned int index) const;
@@ -381,22 +372,12 @@ namespace Ogre
 
 		/** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
-		/** @copydoc MovableObject::getBoundingBox. */
-		const AxisAlignedBox& getBoundingBox(void) const;
-		/** @copydoc MovableObject::getBoundingRadius. */
-		Real getBoundingRadius(void) const;
 		/** @copydoc MovableObject::_updateRenderQueue. */
-		void _updateRenderQueue(RenderQueue* queue);
+		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
 		/** Implement this method to enable stencil shadows. */
 		EdgeData* getEdgeList(void);
 		/** Overridden member from ShadowCaster. */
 		bool hasEdgeList(void);
-		/** Implement this method to enable stencil shadows. */
-		ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-			ShadowTechnique shadowTechnique, const Light* light, 
-			HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-			bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
-
 
 		/// Built, renderable section of geometry
 		class _OgreExport ManualObjectSection : public Renderable, public MovableAlloc
@@ -442,31 +423,6 @@ namespace Ogre
 
 
 					
-		};
-		/** Nested class to allow shadows. */
-		class _OgreExport ManualObjectSectionShadowRenderable : public ShadowRenderable
-		{
-		protected:
-			ManualObject* mParent;
-			// Shared link to position buffer
-			HardwareVertexBufferSharedPtr mPositionBuffer;
-			// Shared link to w-coord buffer (optional)
-			HardwareVertexBufferSharedPtr mWBuffer;
-
-		public:
-			ManualObjectSectionShadowRenderable(ManualObject* parent, 
-				HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-				bool createSeparateLightCap, bool isLightCap = false);
-			~ManualObjectSectionShadowRenderable();
-			/// Overridden from ShadowRenderable
-			void getWorldTransforms(Matrix4* xform) const;
-			HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-			HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-			/// Overridden from ShadowRenderable
-			virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
-
-			
-
 		};
 
 		typedef vector<ManualObjectSection*>::type SectionList;
@@ -517,16 +473,10 @@ namespace Ogre
 		size_t mEstIndexCount;
 		/// Current texture coordinate
 		ushort mTexCoordIndex;
-		/// Bounding box
-		AxisAlignedBox mAABB;
-		/// Bounding sphere
-		Real mRadius;
 		/// Any indexed geometry on any sections?
 		bool mAnyIndexed;
 		/// Edge list, used if stencil shadow casting is enabled 
 		EdgeData* mEdgeList;
-		/// List of shadow renderables
-		ShadowRenderableList mShadowRenderables;
 		/// Whether to use identity projection for sections
 		bool mUseIdentityProjection;
 		/// Whether to use identity view for sections
@@ -552,7 +502,8 @@ namespace Ogre
 	class _OgreExport ManualObjectFactory : public MovableObjectFactory
 	{
 	protected:
-		MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+		virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+													const NameValuePairList* params = 0 );
 	public:
 		ManualObjectFactory() {}
 		~ManualObjectFactory() {}

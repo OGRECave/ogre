@@ -28,9 +28,17 @@ protected:
 
 	void setupContent()
 	{
+		const IdString workspaceName( "SkyDome Workspace" );
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White );
+		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
+        SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->setPosition(20, 80, 50);
+		lightNode->attachObject( mSceneMgr->createLight() );
 
 		// set our camera to orbit around the origin and show cursor
 		mCameraMan->setStyle(CS_ORBIT);
@@ -42,12 +50,12 @@ protected:
 			Plane(Vector3::UNIT_Y, -30), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
 		// create a floor entity, give it a material, and place it at the origin
-        Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+        Entity* floor = mSceneMgr->createEntity("floor");
         floor->setMaterialName("Examples/BumpyMetal");
         mSceneMgr->getRootSceneNode()->attachObject(floor);
 
 		// create an ogre head entity and place it at the origin
-        mSceneMgr->getRootSceneNode()->attachObject(mSceneMgr->createEntity("Head", "ogrehead.mesh"));
+        mSceneMgr->getRootSceneNode()->attachObject(mSceneMgr->createEntity("ogrehead.mesh"));
 
 		// create slider bars to control the dome curvature and texture tiling
 		mCurvatureSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "Curvature", "Dome Curvature", 200, 60, 0, 50, 11);

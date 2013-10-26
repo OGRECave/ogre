@@ -27,14 +27,8 @@ Description: Utility class to load plugins statically
 #ifdef OGRE_STATIC_CgProgramManager
 #  include "OgreCgPlugin.h"
 #endif
-#ifdef OGRE_STATIC_OctreeSceneManager
-#  include "OgreOctreePlugin.h"
-#endif
 #ifdef OGRE_STATIC_ParticleFX
 #  include "OgreParticleFXPlugin.h"
-#endif
-#ifdef OGRE_STATIC_BSPSceneManager
-#  include "OgreBspSceneManagerPlugin.h"
 #endif
 #ifdef OGRE_STATIC_GL
 #  include "OgreGLPlugin.h"
@@ -54,12 +48,6 @@ Description: Utility class to load plugins statically
 #ifdef OGRE_STATIC_Direct3D11
 #  include "OgreD3D11Plugin.h"
 #endif
-#ifdef OGRE_STATIC_PCZSceneManager
-#  include "OgrePCZPlugin.h"
-#endif
-#ifdef OGRE_STATIC_OctreeZone
-#  include "OgreOctreeZonePlugin.h"
-#endif
 
 namespace Ogre
 {
@@ -78,20 +66,8 @@ namespace Ogre
 #ifdef OGRE_STATIC_CgProgramManager
 		CgPlugin* mCgPlugin;
 #endif
-#ifdef OGRE_STATIC_OctreeSceneManager
-		OctreePlugin* mOctreePlugin;
-#endif
 #ifdef OGRE_STATIC_ParticleFX
 		ParticleFXPlugin* mParticleFXPlugin;
-#endif
-#ifdef OGRE_STATIC_BSPSceneManager
-		BspSceneManagerPlugin* mBSPPlugin;
-#endif
-#ifdef OGRE_STATIC_PCZSceneManager
-		PCZPlugin* mPCZPlugin;
-#endif
-#ifdef OGRE_STATIC_OctreeZone
-		OctreeZonePlugin* mOctreeZonePlugin;
 #endif
 #ifdef OGRE_STATIC_GL
 		GLPlugin* mGLPlugin;
@@ -147,45 +123,17 @@ namespace Ogre
 			mCgPlugin = OGRE_NEW CgPlugin();
 			root.installPlugin(mCgPlugin);
 #endif
-#ifdef OGRE_STATIC_OctreeSceneManager
-			mOctreePlugin = OGRE_NEW OctreePlugin();
-			root.installPlugin(mOctreePlugin);
-#endif
 #ifdef OGRE_STATIC_ParticleFX
 			mParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
 			root.installPlugin(mParticleFXPlugin);
-#endif
-#ifdef OGRE_STATIC_BSPSceneManager
-			mBSPPlugin = OGRE_NEW BspSceneManagerPlugin();
-			root.installPlugin(mBSPPlugin);
-#endif
-#ifdef OGRE_STATIC_PCZSceneManager
-			mPCZPlugin = OGRE_NEW PCZPlugin();
-			root.installPlugin(mPCZPlugin);
-#endif
-#ifdef OGRE_STATIC_OctreeZone
-			mOctreeZonePlugin = OGRE_NEW OctreeZonePlugin();
-			root.installPlugin(mOctreeZonePlugin);
 #endif
 		}
 
 		void unload()
 		{
 			// don't unload plugins, since Root will have done that. Destroy here.
-#ifdef OGRE_STATIC_OctreeZone
-			OGRE_DELETE mOctreeZonePlugin;
-#endif
-#ifdef OGRE_STATIC_PCZSceneManager
-			OGRE_DELETE mPCZPlugin;
-#endif
-#ifdef OGRE_STATIC_BSPSceneManager
-			OGRE_DELETE mBSPPlugin;
-#endif
 #ifdef OGRE_STATIC_ParticleFX
 			OGRE_DELETE mParticleFXPlugin;
-#endif
-#ifdef OGRE_STATIC_OctreeSceneManager
-			OGRE_DELETE mOctreePlugin;
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
 			OGRE_DELETE mCgPlugin;

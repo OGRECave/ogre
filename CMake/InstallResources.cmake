@@ -80,15 +80,6 @@ endif ()
 if (NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
   set(OGRE_COMMENT_RENDERSYSTEM_GLES2 "#")
 endif ()
-if (NOT OGRE_BUILD_PLUGIN_BSP)
-  set(OGRE_COMMENT_PLUGIN_BSP "#")
-endif ()
-if (NOT OGRE_BUILD_PLUGIN_OCTREE)
-  set(OGRE_COMMENT_PLUGIN_OCTREE "#")
-endif ()
-if (NOT OGRE_BUILD_PLUGIN_PCZ)
-  set(OGRE_COMMENT_PLUGIN_PCZ "#")
-endif ()
 if (NOT OGRE_BUILD_PLUGIN_PFX)
   set(OGRE_COMMENT_PLUGIN_PARTICLEFX "#")
 endif ()
@@ -116,9 +107,6 @@ configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bi
 # create plugins.cfg
 configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg)
-# create quakemap.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/quakemap_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg)
 # create samples.cfg
 configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg)
@@ -133,7 +121,6 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
 	${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
 	${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
     DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
   )
   install(FILES 
@@ -141,7 +128,6 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
     DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
   )
   install(FILES 
@@ -149,7 +135,6 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
 	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
   )
   install(FILES 
@@ -157,7 +142,6 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-    ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
 	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
   )
 
@@ -168,7 +152,6 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
       ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
-      ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
       DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}"
     )
   endif()
@@ -219,11 +202,6 @@ if (MSVC AND NOT NMAKE)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/plugins.cfg)
-  # create quakemap.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/quakemap_d.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/release/quakemap.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/quakemap.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/quakemap.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/samples_d.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/release/samples.cfg)
@@ -243,8 +221,6 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/resources${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/resources${OGRE_CFG_SUFFIX}.cfg)
   # create plugins.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/plugins${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/plugins${OGRE_CFG_SUFFIX}.cfg)
-  # create quakemap.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/quakemap${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/quakemap${OGRE_CFG_SUFFIX}.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/samples${OGRE_CFG_SUFFIX}.cfg)
   # create tests.cfg

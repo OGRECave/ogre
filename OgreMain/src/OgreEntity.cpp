@@ -56,8 +56,9 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Entity::Entity ()
-		: mAnimationState(NULL),
+    Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
+		: MovableObject( id, objectMemoryManager ),
+		  mAnimationState(NULL),
           mSkelAnimVertexData(0),
 		  mSoftwareVertexAnimVertexData(0),
 		  mHardwareVertexAnimVertexData(0),
@@ -87,13 +88,12 @@ namespace Ogre {
           mSkeletonInstance(0),
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
-		  mMeshStateCount(0),
-          mFullBoundingBox()
+		  mMeshStateCount(0)
     {
     }
     //-----------------------------------------------------------------------
-    Entity::Entity( const String& name, const MeshPtr& mesh) :
-		MovableObject(name),
+    Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
+		MovableObject(id, objectMemoryManager),
         mMesh(mesh),
         mAnimationState(NULL),
 		mSkelAnimVertexData(0),
@@ -124,8 +124,7 @@ namespace Ogre {
 		mSkeletonInstance(0),
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
-		mMeshStateCount(0),
-        mFullBoundingBox()
+		mMeshStateCount(0)
 	{
 		_initialise();
     }
@@ -182,8 +181,9 @@ namespace Ogre {
 			{
 				const MeshLodUsage& usage = mMesh->getLodLevel(i);
 				// Manually create entity
-				Entity* lodEnt = OGRE_NEW Entity(mName + "Lod" + StringConverter::toString(i),
-					usage.manualMesh);
+				Entity* lodEnt = OGRE_NEW Entity( Id::generateNewId<MovableObject>(),
+													mObjectMemoryManager, usage.manualMesh );
+				lodEnt->setName( mName + "Lod" + StringConverter::toString(i) );
 				mLodEntityList.push_back(lodEnt);
 			}
 		}
@@ -204,17 +204,15 @@ namespace Ogre {
 		}
 
 		reevaluateVertexProcessing();
-		
-		// Update of bounds of the parent SceneNode, if Entity already attached
-		// this can happen if Mesh is loaded in background or after reinitialisation
-		if( mParentNode )
-		{
-			getParentSceneNode()->needUpdate();
-		}
+
+		Aabb aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
+		mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+		mObjectData.mWorldRadius[mObjectData.mIndex] = aabb.getRadius();
 
 		mInitialised = true;
 		mMeshStateCount = mMesh->getStateCount();
-
 	}
 	//-----------------------------------------------------------------------
 	void Entity::_deinitialise(void)
@@ -244,19 +242,11 @@ namespace Ogre {
 		}
         mLodEntityList.clear();
         
-		// Delete shadow renderables
-		ShadowRenderableList::iterator si, siend;
-		siend = mShadowRenderables.end();
-		for (si = mShadowRenderables.begin(); si != siend; ++si)
-		{
-			OGRE_DELETE *si;
-            *si = 0;
-		}
-        mShadowRenderables.clear();
-        
 		// Detach all child objects, do this manually to avoid needUpdate() call
 		// which can fail because of deleted items
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
 		detachAllObjectsImpl();
+#endif
 
 		if (mSkeletonInstance) {
 			OGRE_FREE_SIMD(mBoneWorldMatrices, MEMCATEGORY_ANIMATION);
@@ -390,7 +380,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
-		MovableObject::_notifyCurrentCamera(cam);
+		//TODO (dark_sylinc): This whole state tracking thing feels wrong.
 
         // Calculate the LOD
         if (mParentNode)
@@ -473,6 +463,8 @@ namespace Ogre {
 
 
         }
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Notify any child objects
         ChildObjectList::iterator child_itr = mChildObjectList.begin();
         ChildObjectList::iterator child_itr_end = mChildObjectList.end();
@@ -480,77 +472,10 @@ namespace Ogre {
         {
             (*child_itr).second->_notifyCurrentCamera(cam);
         }
+#endif
     }
     //-----------------------------------------------------------------------
-    const AxisAlignedBox& Entity::getBoundingBox(void) const
-    {
-		// Get from Mesh
-		if (mMesh->isLoaded())
-		{
-			mFullBoundingBox = mMesh->getBounds();
-			mFullBoundingBox.merge(getChildObjectsBoundingBox());
-
-			// Don't scale here, this is taken into account when world BBox calculation is done
-		}
-		else
-			mFullBoundingBox.setNull();
-
-        return mFullBoundingBox;
-    }
-    //-----------------------------------------------------------------------
-    AxisAlignedBox Entity::getChildObjectsBoundingBox(void) const
-    {
-        AxisAlignedBox aa_box;
-        AxisAlignedBox full_aa_box;
-        full_aa_box.setNull();
-
-        ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-        ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-        for( ; child_itr != child_itr_end; child_itr++)
-        {
-            aa_box = child_itr->second->getBoundingBox();
-            TagPoint* tp = (TagPoint*)child_itr->second->getParentNode();
-            // Use transform local to skeleton since world xform comes later
-            aa_box.transformAffine(tp->_getFullLocalTransform());
-
-            full_aa_box.merge(aa_box);
-        }
-
-        return full_aa_box;
-    }
-	//-----------------------------------------------------------------------
-	const AxisAlignedBox& Entity::getWorldBoundingBox(bool derive) const
-	{
-		if (derive)
-		{
-			// derive child bounding boxes
-			ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-			ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-			for( ; child_itr != child_itr_end; child_itr++)
-			{
-				child_itr->second->getWorldBoundingBox(true);
-			}
-		}
-		return MovableObject::getWorldBoundingBox(derive);
-	}
-	//-----------------------------------------------------------------------
-	const Sphere& Entity::getWorldBoundingSphere(bool derive) const
-	{
-		if (derive)
-		{
-			// derive child bounding boxes
-			ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-			ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-			for( ; child_itr != child_itr_end; child_itr++)
-			{
-				child_itr->second->getWorldBoundingSphere(true);
-			}
-		}
-		return MovableObject::getWorldBoundingSphere(derive);
-
-	}
-    //-----------------------------------------------------------------------
-    void Entity::_updateRenderQueue(RenderQueue* queue)
+    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera)
     {
 		// Do nothing if not initialised yet
 		if (!mInitialised)
@@ -592,31 +517,9 @@ namespace Ogre {
         {
             if((*i)->isVisible())
             {
-                // Order: first use subentity queue settings, if available
-                //        if not then use entity queue settings, if available
-                //        finally fall back on default queue settings
-                if((*i)->isRenderQueuePrioritySet())
-                {
-					assert((*i)->isRenderQueueGroupSet() == true);
-                    queue->addRenderable(*i, (*i)->getRenderQueueGroup(), (*i)->getRenderQueuePriority());
-                }
-                else if((*i)->isRenderQueueGroupSet())
-                {
-                    queue->addRenderable(*i, (*i)->getRenderQueueGroup());
-                }
-				else if (mRenderQueuePrioritySet)
-				{
-					assert(mRenderQueueIDSet == true);
-					queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
-				}
-                else if(mRenderQueueIDSet)
-                {
-                    queue->addRenderable(*i, mRenderQueueID);
-				}
-                else
-                {
-                    queue->addRenderable(*i);
-                }
+				//TODO: (dark_sylinc) send our mLightList in this function,
+				//instead of overloading getLights
+				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
             }
         }
 
@@ -638,32 +541,6 @@ namespace Ogre {
         if (displayEntity->hasSkeleton() || displayEntity->hasVertexAnimation())
         {
             displayEntity->updateAnimation();
-
-            //--- pass this point,  we are sure that the transformation matrix of each bone and tagPoint have been updated
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; child_itr++)
-            {
-                MovableObject* child = child_itr->second;
-                bool visible = child->isVisible();
-                if (visible && (displayEntity != this))
-                {
-                    //Check if the bone exists in the current LOD
-
-                    //The child is connected to a tagpoint which is connected to a bone
-                    Bone* bone = static_cast<Bone*>(child->getParentNode()->getParent());
-                    if (!displayEntity->getSkeleton()->hasBone(bone->getName()))
-                    {
-                        //Current LOD entity does not have the bone that the
-                        //child is connected to. Do not display.
-                        visible = false;
-                    }
-                }
-                if (visible)
-                {
-                    child->_updateRenderQueue(queue);
-                }   
-            }
         }
 
         // HACK to display bones
@@ -675,19 +552,7 @@ namespace Ogre {
             for (unsigned short b = 0; b < numBones; ++b)
             {
                 Bone* bone = mSkeletonInstance->getBone(b);
-				if (mRenderQueuePrioritySet)
-				{
-					assert(mRenderQueueIDSet == true);
-					queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
-				}
-				else if(mRenderQueueIDSet)
-                {
-                     queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
-                } 
-				else 
-				{
-                     queue->addRenderable(bone->getDebugRenderable(1));
-                }
+				queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
             }
         }
     }
@@ -772,10 +637,7 @@ namespace Ogre {
 		bool isNeedUpdateHardwareAnim = hwAnimation && !mCurrentHWAnimationState;
 		bool forcedSwAnimation = getSoftwareAnimationRequests()>0;
 		bool forcedNormals = getSoftwareAnimationNormalsRequests()>0;
-		bool stencilShadows = false;
-		if (getCastShadows() && hasEdgeList() && root._getCurrentSceneManager())
-			stencilShadows =  root._getCurrentSceneManager()->isShadowTechniqueStencilBased();
-		bool softwareAnimation = !hwAnimation || stencilShadows || forcedSwAnimation;
+		bool softwareAnimation = !hwAnimation || forcedSwAnimation;
 		// Blend normals in s/w only if we're not using h/w animation,
 		// since shadows only require positions
 		bool blendNormals = !hwAnimation || forcedNormals;
@@ -827,7 +689,7 @@ namespace Ogre {
 
 					}
 				}
-				applyVertexAnimation(hwAnimation, stencilShadows);
+				applyVertexAnimation(hwAnimation);
 			}
 
 			if (hasSkeleton())
@@ -889,10 +751,6 @@ namespace Ogre {
 				}
 			}
 
-            // Trigger update of bounding box if necessary
-            if (!mChildObjectList.empty())
-                mParentNode->needUpdate();
-
 			mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
         }
 
@@ -904,14 +762,6 @@ namespace Ogre {
         {
             // Cache last parent transform for next frame use too.
             mLastParentXform = _getParentNodeFullTransform();
-
-            //--- Update the child object's transforms
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; child_itr++)
-            {
-                (*child_itr).second->getParentNode()->_update(true, true);
-            }
 
             // Also calculate bone world matrices, since are used as replacement world matrices,
             // but only if it's used (when using hardware animation and skeleton animated).
@@ -955,10 +805,10 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
-	void Entity::applyVertexAnimation(bool hardwareAnimation, bool stencilShadows)
+	void Entity::applyVertexAnimation(bool hardwareAnimation)
 	{
 		const MeshPtr& msh = getMesh();
-		bool swAnim = !hardwareAnimation || stencilShadows || (mSoftwareAnimationRequests>0);
+		bool swAnim = !hardwareAnimation || (mSoftwareAnimationRequests>0);
 
 		// make sure we have enough hardware animation elements to play with
 		if (hardwareAnimation)
@@ -1431,6 +1281,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TagPoint* Entity::attachObjectToBone(const String &boneName, MovableObject *pMovable, const Quaternion &offsetOrientation, const Vector3 &offsetPosition)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         if (mChildObjectList.find(pMovable->getName()) != mChildObjectList.end())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
@@ -1461,24 +1312,25 @@ namespace Ogre {
 
         attachObjectImpl(pMovable, tp);
 
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
-
 		return tp;
+#endif
+		return 0;
     }
 
     //-----------------------------------------------------------------------
     void Entity::attachObjectImpl(MovableObject *pObject, TagPoint *pAttachingPoint)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         assert(mChildObjectList.find(pObject->getName()) == mChildObjectList.end());
         mChildObjectList[pObject->getName()] = pObject;
         pObject->_notifyAttached(pAttachingPoint, true);
+#endif
     }
 
     //-----------------------------------------------------------------------
     MovableObject* Entity::detachObjectFromBone(const String &name)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         ChildObjectList::iterator i = mChildObjectList.find(name);
 
         if (i == mChildObjectList.end())
@@ -1490,15 +1342,14 @@ namespace Ogre {
         detachObjectImpl(obj);
         mChildObjectList.erase(i);
 
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
-
-        return obj;
+		return obj;
+#endif
+		return 0;
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         ChildObjectList::iterator i, iend;
         iend = mChildObjectList.end();
         for (i = mChildObjectList.begin(); i != iend; ++i)
@@ -1507,55 +1358,52 @@ namespace Ogre {
             {
                 detachObjectImpl(obj);
                 mChildObjectList.erase(i);
-
-                // Trigger update of bounding box if necessary
-                if (mParentNode)
-                    mParentNode->needUpdate();
                 break;
             }
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsFromBone(void)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         detachAllObjectsImpl();
-
-        // Trigger update of bounding box if necessary
-        if (mParentNode)
-            mParentNode->needUpdate();
+#endif
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectImpl(MovableObject* pObject)
     {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         TagPoint* tp = static_cast<TagPoint*>(pObject->getParentNode());
 
         // free the TagPoint so we can reuse it later
         mSkeletonInstance->freeTagPoint(tp);
 
         pObject->_notifyAttached((TagPoint*)0);
+#endif
     }
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsImpl(void)
     {
+
         ChildObjectList::const_iterator i, iend;
         iend = mChildObjectList.end();
         for (i = mChildObjectList.begin(); i != iend; ++i)
         {
             detachObjectImpl(i->second);
         }
-        mChildObjectList.clear();
+        mChildObjectList.clear()
     }
+#endif
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     //-----------------------------------------------------------------------
     Entity::ChildObjectListIterator Entity::getAttachedObjectIterator()
     {
         return ChildObjectListIterator(mChildObjectList.begin(), mChildObjectList.end());
     }
-    //-----------------------------------------------------------------------
-    Real Entity::getBoundingRadius(void) const
-    {
-        return mMesh->getBoundingSphereRadius();
-    }
+#endif
     //-----------------------------------------------------------------------
     void Entity::prepareTempBlendBuffers(void)
     {
@@ -1742,14 +1590,6 @@ namespace Ogre {
 					// If one material uses a vertex program, set this flag
 					// Causes some special processing like forcing a separate light cap
 					mVertexProgramInUse = true;
-					
-					// If shadow renderables already created create their light caps
-					ShadowRenderableList::iterator si = mShadowRenderables.begin();
-					ShadowRenderableList::iterator siend = mShadowRenderables.end();
-					for (si = mShadowRenderables.begin(); si != siend; ++si)
-					{
-						static_cast<EntityShadowRenderable*>(*si)->_createSeparateLightCap();
-					}
 				}
 
 				if (hasSkeleton())
@@ -1838,177 +1678,6 @@ namespace Ogre {
         return mMeshLodFactorTransformed;
     }
     //-----------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator
-        Entity::getShadowVolumeRenderableIterator(
-        ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool extrude, Real extrusionDistance, unsigned long flags)
-    {
-        assert(indexBuffer && "Only external index buffers are supported right now");
-        assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-            "Only 16-bit indexes supported for now");
-
-        // Potentially delegate to LOD entity
-        if (mMesh->isLodManual() && mMeshLodIndex > 0)
-        {
-            // Use alternate entity
-            assert( static_cast< size_t >( mMeshLodIndex - 1 ) < mLodEntityList.size() &&
-                "No LOD EntityList - did you build the manual LODs after creating the entity?");
-            // delegate, we're using manual LOD and not the top LOD index
-            if (hasSkeleton() && mLodEntityList[mMeshLodIndex - 1]->hasSkeleton())
-            {
-                // Copy the animation state set to LOD entity, we assume the lod
-                // entity only has a subset animation states
-                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
-				if (mAnimationState != targetState) // only copy if lods have different skeleton instances
-				{
-					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
-						mAnimationState->copyMatchingState(targetState);
-				}
-            }
-            return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
-                shadowTechnique, light, indexBuffer, indexBufferUsedSize,
-                extrude, extrusionDistance, flags);
-        }
-
-
-        // Prepare temp buffers if required
-        if (!mPreparedForShadowVolumes)
-        {
-            mMesh->prepareForShadowVolume();
-            // reset frame last updated to force update of animations if they exist
-            if (mAnimationState)
-                mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber() - 1;
-            // re-prepare buffers
-            prepareTempBlendBuffers();
-        }
-
-
-        bool hasAnimation = (hasSkeleton() || hasVertexAnimation());
-
-        // Update any animation
-        if (hasAnimation)
-        {
-            updateAnimation();
-        }
-
-        // Calculate the object space light details
-        Vector4 lightPos = light->getAs4DVector();
-        Matrix4 world2Obj = mParentNode->_getFullTransform().inverseAffine();
-        lightPos = world2Obj.transformAffine(lightPos);
-        Matrix3 world2Obj3x3;
-        world2Obj.extract3x3Matrix(world2Obj3x3);
-        extrusionDistance *= Math::Sqrt(std::min(std::min(world2Obj3x3.GetColumn(0).squaredLength(), world2Obj3x3.GetColumn(1).squaredLength()), world2Obj3x3.GetColumn(2).squaredLength()));
-
-        // We need to search the edge list for silhouette edges
-        EdgeData* edgeList = getEdgeList();
-
-		if (!edgeList)
-		{
-			// we can't get an edge list for some reason, return blank
-			// really we shouldn't be able to get here, but this is a safeguard
-			return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
-		}
-
-        // Init shadow renderable list if required
-        bool init = mShadowRenderables.empty();
-
-        EdgeData::EdgeGroupList::iterator egi;
-        ShadowRenderableList::iterator si, siend;
-        EntityShadowRenderable* esr = 0;
-        if (init)
-            mShadowRenderables.resize(edgeList->edgeGroups.size());
-
-        bool isAnimated = hasAnimation;
-        bool updatedSharedGeomNormals = false;
-        siend = mShadowRenderables.end();
-        egi = edgeList->edgeGroups.begin();
-        for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
-        {
-            const VertexData *pVertData;
-            if (isAnimated)
-            {
-                // Use temp buffers
-                pVertData = findBlendedVertexData(egi->vertexData);
-            }
-            else
-            {
-                pVertData = egi->vertexData;
-            }
-            if (init)
-            {
-                // Try to find corresponding SubEntity; this allows the
-                // linkage of visibility between ShadowRenderable and SubEntity
-                SubEntity* subent = findSubEntityForVertexData(egi->vertexData);
-                // Create a new renderable, create a separate light cap if
-                // we're using a vertex program (either for this model, or
-                // for extruding the shadow volume) since otherwise we can
-                // get depth-fighting on the light cap
-
-                *si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
-                    mVertexProgramInUse || !extrude, subent);
-            }
-            else
-            {
-                // If we have animation, we have no guarantee that the position
-                // buffer we used last frame is the same one we used last frame
-                // since a temporary buffer is requested each frame
-                // therefore, we need to update the EntityShadowRenderable
-                // with the current position buffer
-                static_cast<EntityShadowRenderable*>(*si)->rebindPositionBuffer(pVertData, hasAnimation);
-
-            }
-            // Get shadow renderable
-            esr = static_cast<EntityShadowRenderable*>(*si);
-            HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
-            // For animated entities we need to recalculate the face normals
-            if (hasAnimation)
-            {
-                if (egi->vertexData != mMesh->sharedVertexData || !updatedSharedGeomNormals)
-                {
-                    // recalculate face normals
-                    edgeList->updateFaceNormals(egi->vertexSet, esrPositionBuffer);
-                    // If we're not extruding in software we still need to update
-                    // the latter part of the buffer (the hardware extruded part)
-                    // with the latest animated positions
-                    if (!extrude)
-                    {
-                        // Lock, we'll be locking the (suppressed hardware update) shadow buffer
-                        float* pSrc = static_cast<float*>(
-                            esrPositionBuffer->lock(HardwareBuffer::HBL_NORMAL));
-                        float* pDest = pSrc + (egi->vertexData->vertexCount * 3);
-                        memcpy(pDest, pSrc, sizeof(float) * 3 * egi->vertexData->vertexCount);
-                        esrPositionBuffer->unlock();
-                    }
-                    if (egi->vertexData == mMesh->sharedVertexData)
-                    {
-                        updatedSharedGeomNormals = true;
-                    }
-                }
-            }
-            // Extrude vertices in software if required
-            if (extrude)
-            {
-                extrudeVertices(esrPositionBuffer,
-                    egi->vertexData->vertexCount,
-                    lightPos, extrusionDistance);
-
-            }
-            // Stop suppressing hardware update now, if we were
-            esrPositionBuffer->suppressHardwareUpdate(false);
-
-        }
-        // Calc triangle light facing
-        updateEdgeListLightFacing(edgeList, lightPos);
-
-        // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
-            light, mShadowRenderables, flags);
-
-
-        return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
-    }
-    //-----------------------------------------------------------------------
     const VertexData* Entity::findBlendedVertexData(const VertexData* orig)
     {
 		bool skel = hasSkeleton();
@@ -2078,125 +1747,17 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Entity::_notifyAttached(Node* parent, bool isTagPoint)
+    void Entity::_notifyAttached( Node* parent )
     {
-        MovableObject::_notifyAttached(parent, isTagPoint);
+        MovableObject::_notifyAttached(parent);
         // Also notify LOD entities
         LODEntityList::iterator i, iend;
         iend = mLodEntityList.end();
         for (i = mLodEntityList.begin(); i != iend; ++i)
         {
-            (*i)->_notifyAttached(parent, isTagPoint);
-        }
-
-    }
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::EntityShadowRenderable(Entity* parent,
-        HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
-        bool createSeparateLightCap, SubEntity* subent, bool isLightCap)
-        : mParent(parent), mSubEntity(subent)
-    {
-        // Save link to vertex data
-        mCurrentVertexData = vertexData;
-
-        // Initialise render op
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexBuffer = *indexBuffer;
-        mRenderOp.indexData->indexStart = 0;
-        // index start and count are sorted out later
-
-        // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = OGRE_NEW VertexData();
-        // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
-        mOriginalPosBufferBinding =
-            vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(mOriginalPosBufferBinding);
-        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(!vertexData->hardwareShadowVolWBuffer.isNull())
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
-        // Use same vertex start as input
-        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-        if (isLightCap)
-        {
-            // Use original vertex count, no extrusion
-            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-        }
-        else
-        {
-            // Vertex count must take into account the doubling of the buffer,
-            // because second half of the buffer is the extruded copy
-            mRenderOp.vertexData->vertexCount =
-                vertexData->vertexCount * 2;
-            if (createSeparateLightCap)
-            {
-				_createSeparateLightCap();
-            }
+            (*i)->_notifyAttached(parent);
         }
     }
-
-	//-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::_createSeparateLightCap()
-	{
-		if (mLightCap == NULL)
-		{
-			// Create child light cap
-			mLightCap = OGRE_NEW EntityShadowRenderable(mParent,
-				&mRenderOp.indexData->indexBuffer, mCurrentVertexData, false, mSubEntity, true);
-		}   
-	}
-    //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::~EntityShadowRenderable()
-    {
-        OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-    }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::getWorldTransforms(Matrix4* xform) const
-    {
-        *xform = mParent->_getParentNodeFullTransform();
-    }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::rebindPositionBuffer(const VertexData* vertexData, bool force)
-    {
-        if (force || mCurrentVertexData != vertexData)
-        {
-            mCurrentVertexData = vertexData;
-            mPositionBuffer = mCurrentVertexData->vertexBufferBinding->getBuffer(
-                mOriginalPosBufferBinding);
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-            if (mLightCap)
-            {
-                static_cast<EntityShadowRenderable*>(mLightCap)->rebindPositionBuffer(vertexData, force);
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
-    bool Entity::EntityShadowRenderable::isVisible(void) const
-    {
-        if (mSubEntity)
-        {
-            return mSubEntity->isVisible();
-        }
-        else
-        {
-            return ShadowRenderable::isVisible();
-        }
-    }
-	//-----------------------------------------------------------------------
-	void Entity::EntityShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-	{
-		mRenderOp.indexData->indexBuffer = indexBuffer;
-		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
-	}
-
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroup(uint8 queueID)
     {
@@ -2414,8 +1975,9 @@ namespace Ogre {
 		return FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	MovableObject* EntityFactory::createInstanceImpl( const String& name,
-		const NameValuePairList* params)
+	MovableObject* EntityFactory::createInstanceImpl( IdType id,
+											ObjectMemoryManager *objectMemoryManager,
+											const NameValuePairList* params )
 	{
 		// must have mesh parameter
 		MeshPtr pMesh;
@@ -2449,8 +2011,7 @@ namespace Ogre {
 				"EntityFactory::createInstance");
 		}
 
-		return OGRE_NEW Entity(name, pMesh);
-
+		return OGRE_NEW Entity( id, objectMemoryManager, pMesh );
 	}
 	//-----------------------------------------------------------------------
 	void EntityFactory::destroyInstance( MovableObject* obj)
