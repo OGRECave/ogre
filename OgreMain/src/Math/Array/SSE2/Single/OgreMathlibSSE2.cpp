@@ -133,7 +133,7 @@ namespace Ogre
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff )),//MASK_XYW
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 )),//MASK_ZW
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff )),//MASK_XZW
-		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff. 0x00000000 )),//MASK_YZW
+		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 )),//MASK_YZW
 		_mm_castsi128_ps(_mm_set_epi32( 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff )) //MASK_XYZW
 	};
 }
