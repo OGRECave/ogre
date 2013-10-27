@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreInstancedEntity.h"
 #include "OgreInstanceBatch.h"
-#include "OgreSkeletonInstance.h"
+#include "OgreOldSkeletonInstance.h"
 #include "OgreAnimationState.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSceneNode.h"

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreSubEntity.h"
 
 #include "OgreEntity.h"
-#include "OgreSkeletonInstance.h"
+#include "OgreOldSkeletonInstance.h"
 #include "OgreSceneManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreSubMesh.h"

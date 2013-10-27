@@ -44,7 +44,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreTechnique.h"
 #include "OgrePass.h"
-#include "OgreSkeletonInstance.h"
+#include "OgreOldSkeletonInstance.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreStringConverter.h"
 #include "OgreAnimation.h"
