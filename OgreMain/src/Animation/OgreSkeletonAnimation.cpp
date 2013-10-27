@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreStableHeaders.h"
+
 #include "Animation/OgreSkeletonAnimation.h"
 #include "Animation/OgreSkeletonAnimationDef.h"
 #include "Animation/OgreSkeletonInstance.h"
