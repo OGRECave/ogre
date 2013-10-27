@@ -13,36 +13,51 @@
 
 PROJECT(OgreMain)
 
+function( add_filtered_h filterName fileString )
+	file(GLOB TMP_FILES ${fileString})
+	set(HEADER_FILES ${HEADER_FILES} ${TMP_FILES} PARENT_SCOPE)
+	source_group(${filterName} FILES ${TMP_FILES})
+endfunction( add_filtered_h )
+
+function( add_filtered_src filterName fileString )
+	file(GLOB TMP_FILES ${fileString})
+	set(SOURCE_FILES ${SOURCE_FILES} ${TMP_FILES} PARENT_SCOPE)
+	source_group(${filterName} FILES ${TMP_FILES})
+endfunction( add_filtered_src )
+
 include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassQuad/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassScene/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassStencil/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Array/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/*.h")
+
+add_filtered_h( "Header Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.h" )
+add_filtered_h( "Header Files\\Compositor" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h" )
+add_filtered_h( "Header Files\\Compositor\\Pass" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h" )
+add_filtered_h( "Header Files\\Compositor\\PassClear" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h" )
+add_filtered_h( "Header Files\\Compositor\\PassQuad" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassQuad/*.h" )
+add_filtered_h( "Header Files\\Compositor\\PassScene" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassScene/*.h" )
+add_filtered_h( "Header Files\\Compositor\\PassStencil" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassStencil/*.h" )
+
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Animation/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassScene/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassStencil/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Array/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Simple/C/*.cpp")
+	
+add_filtered_src( "Source Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/src/Animation/*.cpp" )
+add_filtered_src( "Source Files\\Compositor" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp" )
+add_filtered_src( "Source Files\\Compositor\\Pass" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp" )
+add_filtered_src( "Source Files\\Compositor\\Pass\\PassClear" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear*.cpp" )
+add_filtered_src( "Source Files\\Compositor\\Pass\\PassQuad" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad*.cpp" )
+add_filtered_src( "Source Files\\Compositor\\Pass\\PassScene" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassScene*.cpp" )
+add_filtered_src( "Source Files\\Compositor\\Pass\\PassStencil" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassStencil*.cpp" )
 
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
