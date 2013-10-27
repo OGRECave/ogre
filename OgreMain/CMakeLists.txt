@@ -28,7 +28,7 @@ endfunction( add_filtered_src )
 function( add_filter_only filterName fileString )
 	file(GLOB TMP_FILES ${fileString})
 	source_group(${filterName} FILES ${TMP_FILES})
-endfunction( add_filtered_src )
+endfunction( add_filter_only )
 
 include(PrecompiledHeader)
 
