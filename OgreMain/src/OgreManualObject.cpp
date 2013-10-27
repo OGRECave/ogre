@@ -192,7 +192,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getByName("BaseWhite");
 

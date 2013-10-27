@@ -289,7 +289,7 @@ namespace Ogre {
 		{
 			LogManager::getSingleton().logMessage(
 				"WARNING (StaticGeometry): Manual LOD is not supported. "
-				"Using only highest LOD level for mesh " + msh->getName());
+				"Using only highest LOD level for mesh " + msh->getName(), LML_CRITICAL);
 		}
 
 		AxisAlignedBox sharedWorldBounds;

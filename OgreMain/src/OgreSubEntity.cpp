@@ -90,7 +90,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material " + name +
 				" to SubEntity of " + mParentEntity->getName() + " because this "
 				"Material does not exist. Have you forgotten to define it in a "
-				".material script?");
+				".material script?", LML_CRITICAL);
 
 			material = MaterialManager::getSingleton().getByName("BaseWhite");
 
@@ -115,7 +115,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material "  
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
-                ".material script?");
+                ".material script?", LML_CRITICAL);
 			
 			mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
 			

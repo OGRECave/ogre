@@ -38,7 +38,7 @@ void MaterialControls::addControl(const Ogre::String& params)
     if (vecparams.size() != 6)
     {
         Ogre::LogManager::getSingleton().logMessage(
-            "Incorrect number of parameters passed in params string for MaterialControls::addControl()" );
+            "Incorrect number of parameters passed in params string for MaterialControls::addControl()", Ogre::LML_CRITICAL);
 
         return;
     }

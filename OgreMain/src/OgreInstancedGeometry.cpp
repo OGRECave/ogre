@@ -323,7 +323,7 @@ namespace Ogre {
 		{
 			LogManager::getSingleton().logMessage(
 				"WARNING (InstancedGeometry): Manual LOD is not supported. "
-				"Using only highest LOD level for mesh " + msh->getName());
+				"Using only highest LOD level for mesh " + msh->getName(), LML_CRITICAL);
 		}
 
 		//get the skeleton of the entity, if that's not already done

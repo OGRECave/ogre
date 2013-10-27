@@ -125,7 +125,7 @@ namespace Ogre {
         char msgBuf[4096]; \
         StringVector tokens = StringUtil::split(#glFunc, "("); \
         sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
-        LogManager::getSingleton().logMessage(msgBuf); \
+        LogManager::getSingleton().logMessage(msgBuf, LML_CRITICAL); \
     } \
 }
 #else

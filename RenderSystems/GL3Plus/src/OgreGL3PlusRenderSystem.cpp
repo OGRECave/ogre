@@ -2205,7 +2205,7 @@ namespace Ogre {
 
         // Initialise GL3W
         if (gl3wInit())
-            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
 
         // Make sure that OpenGL 3.0+ is supported in this context
         if (!gl3wIsSupported(3, 0))

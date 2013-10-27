@@ -542,7 +542,7 @@ namespace Ogre {
 			}
 			else
 				LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"
-													   "for RT: " + renderTarget->getName() );
+													   "for RT: " + renderTarget->getName() , LML_CRITICAL);
 		}
 	}
     bool RenderSystem::getWBufferEnabled(void) const
