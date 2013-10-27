@@ -1,0 +1,146 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+#ifndef _SkeletonInstance2_H__
+#define _SkeletonInstance2_H__
+
+#include "OgreSkeletonAnimation.h"
+#include "Animation/OgreBone.h"
+
+namespace Ogre
+{
+	class SkeletonDef;
+	typedef vector<SkeletonAnimation>::type SkeletonAnimationVec;
+	typedef vector<SkeletonAnimation*>::type ActiveAnimationsVec;
+
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
+
+	/** Instance of a Skeleton, main external interface for retrieving bone positions and applying
+		animations.
+    @remarks
+		The new SkeletonInstance uses SIMD to animate up to 4 bones at the same time, though
+		this depends on the number of bones on each parent level depth in the hierachy.
+	@par
+		I.e. if there is 1 root bone with 6 child bones; the root node will be animated solo,
+		the first 4 child bones will be animated at the same time, and the 2 last bones
+		will be animated together in the next loop iteration.
+	@par
+		Note however, when updating bones in the hierarchy to obtain the derived transforms
+		(rather than animating), the root bone will be updated together using SIMD with the
+		root bones from 3 other SkeletonInstances that share the same SkeletonDef.
+		Only animating them has this restriction.
+		The animation system won't be able to "share" though, if the SkeletonDef had 3 root
+		nodes instead of 1; because we need to put them in a SIMD block in a repeating
+		pattern And repeating 3 bones at least twice gives 6 bones, which doesn't fit in
+		SSE2 (though it should in AVX, where ARRAY_PACKED_REALS = 8)
+
+		To those interested in the original repository of OgreAnimation to obtain full
+		history, go to:
+			https://bitbucket.org/dark_sylinc/ogreanimation
+    */
+	class SkeletonInstance : public MovableAlloc
+	{
+	public:
+		typedef vector<Bone>::type BoneVec;
+
+	protected:
+		BoneVec				mBones;
+		TransformArray		mBoneStartTransforms; /// The start of Transform at each depth level
+
+		RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION> mManualBones;
+
+		FastArray<size_t>		mSlotStarts;
+
+		SkeletonAnimationVec	mAnimations;
+		ActiveAnimationsVec		mActiveAnimations;
+
+		SkeletonDef const		*mDefinition;
+
+		/** Unused slots for each parent depth level that had more bones
+			than >= ARRAY_PACKED_REALS /2 but less than < ARRAY_PACKED_REALS (or a multiple of it)
+		*/
+		BoneVec					mUnusedNodes;
+
+	public:
+		SkeletonInstance( const SkeletonDef *skeletonDef, NodeMemoryManager *nodeMemoryManager );
+		~SkeletonInstance();
+
+		void update(void);
+
+		/// Resets the transform of all bones to the binding pose. Manual bones are not reset
+		void resetToPose(void);
+
+		/** Sets the given node to manual. Manual bones won't be reset to binding pose
+			(@see resetToPose) and thus are suitable for manual control. However if the
+			bone is animated, you're responsible for resetting the position/rotation/scale
+			before each call to @see update
+		@remarks
+			You can prevent the bone from receiving animation by setting the bone weight
+			to zero. @See SkeletonAnimation::setBoneWeight
+		@param bone
+			Bone to set/unset to manual. Must belong to this SkeletonInstance (an assert
+			is triggered on non-release builds). Behavior is undefined if node doesn't
+			belong to this instance.
+		@param isManual
+			True to set to manual, false to restore it.
+		*/
+		void setManualBone( SceneNode *bone, bool isManual );
+
+		/** Returns true if the bone is manually controlled. @See setManualBone
+		@param bone
+			Bone to query if manual. Must belong to this SkeletonInstance.
+		*/
+		bool isManualBone( SceneNode *bone );
+
+		/// Gets the bone with given name. Throws if not found.
+		SceneNode* getBone( IdString boneName );
+
+		bool hasAnimation( IdString name ) const;
+		/// Returns the requested animations. Throws if not found. O(N) Linear search
+		SkeletonAnimation* getAnimation( IdString name );
+
+		/// Internal use. Enables given animation. Input should belong to us and not already animated.
+		void _enableAnimation( SkeletonAnimation *animation );
+
+		/// Internal use. Disables given animation. Input should belong to us and already being animated.
+		void _disableAnimation( SkeletonAnimation *animation );
+
+		void getTransforms( Matrix4 * RESTRICT_ALIAS outTransform,
+							const FastArray<unsigned short> &usedBones ) const;
+	};
+
+	/** @} */
+	/** @} */
+}
+
+#endif
