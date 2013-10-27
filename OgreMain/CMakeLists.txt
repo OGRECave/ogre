@@ -25,6 +25,11 @@ function( add_filtered_src filterName fileString )
 	source_group(${filterName} FILES ${TMP_FILES})
 endfunction( add_filtered_src )
 
+function( add_filter_only filterName fileString )
+	file(GLOB TMP_FILES ${fileString})
+	source_group(${filterName} FILES ${TMP_FILES})
+endfunction( add_filtered_src )
+
 include(PrecompiledHeader)
 
 # define header and source files for the library
@@ -58,6 +63,9 @@ add_filtered_src( "Source Files\\Compositor\\Pass\\PassClear" "${CMAKE_CURRENT_S
 add_filtered_src( "Source Files\\Compositor\\Pass\\PassQuad" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad*.cpp" )
 add_filtered_src( "Source Files\\Compositor\\Pass\\PassScene" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassScene*.cpp" )
 add_filtered_src( "Source Files\\Compositor\\Pass\\PassStencil" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassStencil*.cpp" )
+
+add_filter_only( "Header Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h" )
+add_filter_only( "Source Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/*.cpp" )
 
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
