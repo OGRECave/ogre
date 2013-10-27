@@ -90,7 +90,7 @@ namespace Ogre
 								mDefinition->getNumberOfBoneBlocks( depthLevelInfo.size() ) );
 			Real *manualBones = reinterpret_cast<Real*>( mManualBones.get() );
 
-			mUnusedNodes.reserve( mDefinition->mNumUnusedSlots );
+			mUnusedNodes.resize( mDefinition->mNumUnusedSlots, Bone( Transform() ) );
 
 			KfTransform const *reverseBindPose = mDefinition->mReverseBindPose.get();
 
@@ -120,14 +120,21 @@ namespace Ogre
 					{
 						for( size_t i=0; i<unusedSlots; ++i )
 						{
-							//Even dummy nodes need the right parent so that
-							//they consume memory from the right depth level
-							Bone unused( Id::generateNewId<Node>(), (SceneManager*)0,
-												nodeMemoryManager, 0, 0 );
+							//Dummy bones need the right parent so they
+							//consume memory from the right depth level
+							Bone *parent = 0;
+							if( itor != depthLevelInfo.begin() )
+								parent = &mBones[itor->firstBoneIndex];
+
+							mUnusedNodes[i].~Bone();
+							new (&mUnusedNodes[i]) Bone( Id::generateNewId<Node>(), (SceneManager*)0,
+														nodeMemoryManager, parent, 0 );
+							Bone &unused = mUnusedNodes[i];
 							unused.setName( "Unused" );
-							mUnusedNodes.push_back( unused );
-							mBones[itor->firstBoneIndex].addChild( &mUnusedNodes.back() );
-							unused._setNullNodeMemoryManager();	// Rule of 3
+							unused.mGlobalIndex = i;
+
+							if( parent )
+								parent->_notifyOfChild( &unused );
 						}
 					}
 				}
