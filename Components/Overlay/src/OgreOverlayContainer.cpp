@@ -296,7 +296,7 @@ namespace Ogre {
             while (it.hasMoreElements())
             {
                 // Give children Z-order 1 higher than this
-                it.getNext()->_updateRenderQueue(queue);
+                it.getNext()->_updateRenderQueue(queue, camera);
             }
         }
 
