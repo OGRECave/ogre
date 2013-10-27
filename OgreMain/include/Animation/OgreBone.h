@@ -61,6 +61,12 @@ namespace Ogre {
         /** Constructor, only to be called by the creator SceneManager. */
 		Bone( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
 				SceneNode *parent, KfTransform const * RESTRICT_ALIAS reverseBind );
+
+		/** Don't use this constructor unless you know what you're doing.
+			@See NodeMemoryManager::mDummyNode
+		*/
+		Bone( const Transform &transformPtrs );
+
         virtual ~Bone();
 
 		void _setReverseBindPtr( const KfTransform *ptr	)			{ mReverseBind = ptr; }
@@ -76,6 +82,13 @@ namespace Ogre {
         virtual void removeAndDestroyChild( SceneNode *sceneNode );
 		/// Bones can't remove children so easily.
         virtual void removeAndDestroyAllChildren(void);
+
+		/** Notifies the given node is a child of us, we just add it to mChildren
+			and set node->mParentIndex. <b>Internal Use.</b>
+		@param node
+			The bone/node that is a child of us.
+		*/
+		void _notifyOfChild( Bone *node );
 
         /** TODO
         */

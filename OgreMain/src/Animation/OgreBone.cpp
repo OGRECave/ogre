@@ -40,6 +40,10 @@ namespace Ogre {
 	{
 	}
 	//-----------------------------------------------------------------------
+	Bone::Bone( const Transform &transformPtrs ) : SceneNode( transformPtrs )
+	{
+	}
+	//-----------------------------------------------------------------------
 	Bone::~Bone()
 	{
 	}
@@ -235,6 +239,12 @@ namespace Ogre {
 		//TODO
 		OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Bones can't remove their children.",
 					"Bone::removeAndDestroyChild" );
+	}
+	//-----------------------------------------------------------------------
+	void Bone::_notifyOfChild( Bone *node )
+	{
+		mChildren.push_back( node );
+		node->mParentIndex = mChildren.size() - 1;
 	}
 }
 
