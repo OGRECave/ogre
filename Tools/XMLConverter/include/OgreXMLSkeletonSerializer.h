@@ -67,7 +67,7 @@ namespace Ogre {
         TiXmlDocument* mXMLDoc;
 
         void writeSkeleton(const Skeleton* pSkel);
-        void writeBone(TiXmlElement* bonesElement, const Bone* pBone);
+        void writeBone(TiXmlElement* bonesElement, const OldBone* pBone);
         void writeBoneParent(TiXmlElement* boneHierarchyNode, String boneName , String parentName);
         void writeAnimation(TiXmlElement* animsNode, const Animation* anim);
         void writeAnimationTrack(TiXmlElement* tracksNode, 

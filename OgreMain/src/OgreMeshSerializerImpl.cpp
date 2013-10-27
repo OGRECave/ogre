@@ -281,7 +281,7 @@ namespace Ogre {
         // Operation type
         writeSubMeshOperation(s);
 
-        // Bone assignments
+        // OldBone assignments
         if (!s->mBoneAssignments.empty())
         {
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
@@ -565,7 +565,7 @@ namespace Ogre {
         size += calcSubMeshTextureAliasesSize(pSub);
         size += calcSubMeshOperationSize(pSub);
 
-        // Bone assignments
+        // OldBone assignments
         if (!pSub->mBoneAssignments.empty())
         {
             SubMesh::VertexBoneAssignmentList::const_iterator vi;
@@ -1157,7 +1157,7 @@ namespace Ogre {
 
         // Vert index
         size += sizeof(unsigned int);
-        // Bone index
+        // OldBone index
         size += sizeof(unsigned short);
         // weight
         size += sizeof(float);

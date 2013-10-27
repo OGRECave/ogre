@@ -169,7 +169,7 @@ var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
 var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
 var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
 var_to_string(OGRE_USE_BOOST _boost)
-var_to_string(OGRE_USE_SIMD _simd)
+var_to_string(OGRE_SIMD _simd)
 # threading settings
 if (OGRE_CONFIG_THREADS EQUAL 0)
 	set(_threads "none")

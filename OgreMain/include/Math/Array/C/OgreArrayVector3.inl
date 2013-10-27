@@ -363,6 +363,16 @@ namespace Ogre
  		return ( *this - ( 2.0f * this->dotProduct( normal ) ) * normal );
 	}
 	//-----------------------------------------------------------------------------------
+	inline void ArrayVector3::inverseLeaveZeroes( void )
+	{
+		mChunkBase[0] = MathlibC::CmovRobust( mChunkBase[0], MathlibC::InvNonZero4(mChunkBase[0]),
+												mChunkBase[0] == 0.0f );
+		mChunkBase[1] = MathlibC::CmovRobust( mChunkBase[1], MathlibC::InvNonZero4(mChunkBase[1]),
+												mChunkBase[1] == 0.0f );
+		mChunkBase[2] = MathlibC::CmovRobust( mChunkBase[2], MathlibC::InvNonZero4(mChunkBase[2]),
+												mChunkBase[2] == 0.0f );
+	}
+	//-----------------------------------------------------------------------------------
 	inline int ArrayVector3::isNaN( void ) const
 	{
 		return Math::isNaN( mChunkBase[0] ) | Math::isNaN( mChunkBase[1] ) | Math::isNaN( mChunkBase[2] );

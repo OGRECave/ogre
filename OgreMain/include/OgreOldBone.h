@@ -48,16 +48,16 @@ namespace Ogre
         This class is a node in the joint hierarchy. Mesh vertices also have assignments
         to bones to define how they move in relation to the skeleton.
     */
-    class _OgreExport Bone : public OldNode
+    class _OgreExport OldBone : public OldNode
     {
     public:
-        /** Constructor, not to be used directly (use Bone::createChild or Skeleton::createBone) */
-        Bone(unsigned short handle, Skeleton* creator);
-        /** Constructor, not to be used directly (use Bone::createChild or Skeleton::createBone) */
-        Bone(const String& name, unsigned short handle, Skeleton* creator);
-        ~Bone();
+        /** Constructor, not to be used directly (use OldBone::createChild or Skeleton::createBone) */
+        OldBone(unsigned short handle, Skeleton* creator);
+        /** Constructor, not to be used directly (use OldBone::createChild or Skeleton::createBone) */
+        OldBone(const String& name, unsigned short handle, Skeleton* creator);
+        ~OldBone();
 
-        /** Creates a new Bone as a child of this bone.
+        /** Creates a new OldBone as a child of this bone.
         @remarks
             This method creates a new bone which will inherit the transforms of this
             bone, with the handle specified.
@@ -68,7 +68,7 @@ namespace Ogre
             @param
                 rotate Initial rotation relative to parent
         */
-        Bone* createChild(unsigned short handle, 
+        OldBone* createChild(unsigned short handle, 
             const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
 
@@ -80,7 +80,7 @@ namespace Ogre
         */
         void setBindingPose(void);
 
-        /** Resets the position and orientation of this Bone to the original binding position.
+        /** Resets the position and orientation of this OldBone to the original binding position.
         @remarks
             Bones are bound to the mesh in a binding pose. They are then modified from this
             position during animation. This method returns the bone to it's original position and

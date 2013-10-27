@@ -88,7 +88,7 @@ namespace Ogre {
 
 
         /** Creates a TagPoint ready to be attached to a bone */
-        TagPoint* createTagPointOnBone(Bone* bone, 
+        TagPoint* createTagPointOnBone(OldBone* bone, 
             const Quaternion &offsetOrientation = Quaternion::IDENTITY, 
             const Vector3 &offsetPosition = Vector3::ZERO);
 
@@ -145,7 +145,7 @@ namespace Ogre {
         /// TagPoint automatic handles
         unsigned short mNextTagPointAutoHandle;
 
-        void cloneBoneAndChildren(Bone* source, Bone* parent);
+        void cloneBoneAndChildren(OldBone* source, OldBone* parent);
         /** Overridden from Skeleton
         */
         void loadImpl(void);

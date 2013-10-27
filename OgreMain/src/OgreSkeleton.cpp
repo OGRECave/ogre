@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreSkeleton.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreAnimationState.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
@@ -119,18 +119,18 @@ namespace Ogre {
         mLinkedSkeletonAnimSourceList.clear();
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::createBone(void)
+    OldBone* Skeleton::createBone(void)
     {
         // use autohandle
         return createBone(mNextAutoHandle++);
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::createBone(const String& name)
+    OldBone* Skeleton::createBone(const String& name)
     {
         return createBone(name, mNextAutoHandle++);
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::createBone(unsigned short handle)
+    OldBone* Skeleton::createBone(unsigned short handle)
     {
         if (handle >= OGRE_MAX_NUM_BONES)
         {
@@ -145,7 +145,7 @@ namespace Ogre {
                 "A bone with the handle " + StringConverter::toString(handle) + " already exists",
                 "Skeleton::createBone" );
         }
-        Bone* ret = OGRE_NEW Bone(handle, this);
+        OldBone* ret = OGRE_NEW OldBone(handle, this);
         assert(mBoneListByName.find(ret->getName()) == mBoneListByName.end());
         if (mBoneList.size() <= handle)
         {
@@ -157,7 +157,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::createBone(const String& name, unsigned short handle)
+    OldBone* Skeleton::createBone(const String& name, unsigned short handle)
     {
         if (handle >= OGRE_MAX_NUM_BONES)
         {
@@ -180,7 +180,7 @@ namespace Ogre {
                 "A bone with the name " + name + " already exists",
                 "Skeleton::createBone" );
         }
-        Bone* ret = OGRE_NEW Bone(name, handle, this);
+        OldBone* ret = OGRE_NEW OldBone(name, handle, this);
         if (mBoneList.size() <= handle)
         {
             mBoneList.resize(handle+1);
@@ -193,7 +193,7 @@ namespace Ogre {
 
 
     //---------------------------------------------------------------------
-    Bone* Skeleton::getRootBone(void) const
+    OldBone* Skeleton::getRootBone(void) const
     {
         if (mRootBones.empty())
         {
@@ -448,7 +448,7 @@ namespace Ogre {
 		mManualBonesDirty = true;
 	}
 	//-----------------------------------------------------------------------
-	void Skeleton::_notifyManualBoneStateChange(Bone* bone)
+	void Skeleton::_notifyManualBoneStateChange(OldBone* bone)
 	{
 		if (bone->isManuallyControlled())
 			mManualBones.insert(bone);
@@ -470,9 +470,9 @@ namespace Ogre {
             Calculating the bone matrices
             -----------------------------
             Now that we have the derived scaling factors, orientations & positions in the
-            Bone nodes, we have to compute the Matrix4 to apply to the vertices of a mesh.
+            OldBone nodes, we have to compute the Matrix4 to apply to the vertices of a mesh.
             Because any modification of a vertex has to be relative to the bone, we must
-            first reverse transform by the Bone's original derived position/orientation/scale,
+            first reverse transform by the OldBone's original derived position/orientation/scale,
             then transform by the new derived position/orientation/scale.
             Also note we combine scale as equivalent axes, no shearing.
         */
@@ -481,7 +481,7 @@ namespace Ogre {
         boneend = mBoneList.end();
         for (i = mBoneList.begin();i != boneend; ++i)
         {
-            Bone* pBone = *i;
+            OldBone* pBone = *i;
             pBone->_getOffsetTransform(*pMatrices);
             pMatrices++;
         }
@@ -505,19 +505,19 @@ namespace Ogre {
         return i->second;
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::getBone(unsigned short handle) const
+    OldBone* Skeleton::getBone(unsigned short handle) const
     {
         assert(handle < mBoneList.size() && "Index out of bounds");
         return mBoneList[handle];
     }
     //---------------------------------------------------------------------
-    Bone* Skeleton::getBone(const String& name) const
+    OldBone* Skeleton::getBone(const String& name) const
     {
         BoneListByName::const_iterator i = mBoneListByName.find(name);
 
         if (i == mBoneListByName.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Bone named '" + name + "' not found.", 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "OldBone named '" + name + "' not found.", 
                 "Skeleton::getBone");
         }
 
@@ -541,7 +541,7 @@ namespace Ogre {
 
         mRootBones.clear();
 
-        Bone* currentBone;
+        OldBone* currentBone;
         BoneList::const_iterator i;
         BoneList::const_iterator iend = mBoneList.end();
         for (i = mBoneList.begin(); i != iend; ++i)
@@ -571,9 +571,9 @@ namespace Ogre {
         BoneList::iterator bi;
         for (bi = mBoneList.begin(); bi != mBoneList.end(); ++bi)
         {
-            Bone* bone = *bi;
+            OldBone* bone = *bi;
 
-            of << "-- Bone " << bone->getHandle() << " --" << std::endl;
+            of << "-- OldBone " << bone->getHandle() << " --" << std::endl;
             of << "Position: " << bone->getPosition();
             q = bone->getOrientation();
             of << "Rotation: " << q;
@@ -596,7 +596,7 @@ namespace Ogre {
             {
                 NodeAnimationTrack* track = anim->getNodeTrack(ti);
                 of << "  -- AnimationTrack " << ti << " --" << std::endl;
-                of << "  Affects bone: " << ((Bone*)track->getAssociatedNode())->getHandle() << std::endl;
+                of << "  Affects bone: " << ((OldBone*)track->getAssociatedNode())->getHandle() << std::endl;
                 of << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
 
                 for (unsigned short ki = 0; ki < track->getNumKeyFrames(); ++ki)
@@ -769,17 +769,17 @@ namespace Ogre {
         // not necessary to have same number of bones and bone names).
         for (handle = 0; handle < numSrcBones; ++handle)
         {
-            const Bone* srcBone = src->getBone(handle);
+            const OldBone* srcBone = src->getBone(handle);
             ushort dstHandle = boneHandleMap[handle];
 
             // Does it exists in target skeleton?
             if (dstHandle < numDstBones)
             {
-                Bone* destBone = this->getBone(dstHandle);
+                OldBone* destBone = this->getBone(dstHandle);
 
                 // Check both bones have identical parent, or both are root bone.
-                const Bone* srcParent = static_cast<Bone*>(srcBone->getParent());
-                Bone* destParent = static_cast<Bone*>(destBone->getParent());
+                const OldBone* srcParent = static_cast<OldBone*>(srcBone->getParent());
+                OldBone* destParent = static_cast<OldBone*>(destBone->getParent());
                 if ((srcParent || destParent) &&
                     (!srcParent || !destParent ||
                      boneHandleMap[srcParent->getHandle()] != destParent->getHandle()))
@@ -803,13 +803,13 @@ namespace Ogre {
             // Create missing bones
             for (handle = 0; handle < numSrcBones; ++handle)
             {
-                const Bone* srcBone = src->getBone(handle);
+                const OldBone* srcBone = src->getBone(handle);
                 ushort dstHandle = boneHandleMap[handle];
 
                 // The bone is missing in target skeleton?
                 if (dstHandle >= numDstBones)
                 {
-                    Bone* dstBone = this->createBone(srcBone->getName(), dstHandle);
+                    OldBone* dstBone = this->createBone(srcBone->getName(), dstHandle);
                     // Sets initial transform
                     dstBone->setPosition(srcBone->getInitialPosition());
                     dstBone->setOrientation(srcBone->getInitialOrientation());
@@ -821,17 +821,17 @@ namespace Ogre {
             // Link new bones to parent
             for (handle = 0; handle < numSrcBones; ++handle)
             {
-                const Bone* srcBone = src->getBone(handle);
+                const OldBone* srcBone = src->getBone(handle);
                 ushort dstHandle = boneHandleMap[handle];
 
                 // Is new bone?
                 if (dstHandle >= numDstBones)
                 {
-                    const Bone* srcParent = static_cast<Bone*>(srcBone->getParent());
+                    const OldBone* srcParent = static_cast<OldBone*>(srcBone->getParent());
                     if (srcParent)
                     {
-                        Bone* destParent = this->getBone(boneHandleMap[srcParent->getHandle()]);
-                        Bone* dstBone = this->getBone(dstHandle);
+                        OldBone* destParent = this->getBone(boneHandleMap[srcParent->getHandle()]);
+                        OldBone* dstBone = this->getBone(dstHandle);
                         destParent->addChild(dstBone);
                     }
                 }
@@ -874,7 +874,7 @@ namespace Ogre {
         vector<DeltaTransform>::type deltaTransforms(numSrcBones);
         for (handle = 0; handle < numSrcBones; ++handle)
         {
-            const Bone* srcBone = src->getBone(handle);
+            const OldBone* srcBone = src->getBone(handle);
             DeltaTransform& deltaTransform = deltaTransforms[handle];
             ushort dstHandle = boneHandleMap[handle];
 
@@ -882,7 +882,7 @@ namespace Ogre {
             {
                 // Common bone, calculate delta-transform
 
-                Bone* dstBone = this->getBone(dstHandle);
+                OldBone* dstBone = this->getBone(dstHandle);
 
                 deltaTransform.translate = srcBone->getInitialPosition() - dstBone->getInitialPosition();
                 deltaTransform.rotate = dstBone->getInitialOrientation().Inverse() * srcBone->getInitialOrientation();
@@ -1021,7 +1021,7 @@ namespace Ogre {
         ushort newBoneHandle = this->getNumBones();
         for (ushort handle = 0; handle < numSrcBones; ++handle)
         {
-            const Bone* srcBone = src->getBone(handle);
+            const OldBone* srcBone = src->getBone(handle);
             BoneListByName::const_iterator i = this->mBoneListByName.find(srcBone->getName());
             if (i == mBoneListByName.end())
                 boneHandleMap[handle] = newBoneHandle++;
@@ -1034,11 +1034,11 @@ namespace Ogre {
     {
         size_t memSize = 0;
         memSize += sizeof(SkeletonAnimationBlendMode);
-        memSize += mBoneList.size() * sizeof(Bone);
-        memSize += mRootBones.size() * sizeof(Bone);
-        memSize += mBoneListByName.size() * (sizeof(String) + sizeof(Bone*));
+        memSize += mBoneList.size() * sizeof(OldBone);
+        memSize += mRootBones.size() * sizeof(OldBone);
+        memSize += mBoneListByName.size() * (sizeof(String) + sizeof(OldBone*));
         memSize += mAnimationsList.size() * (sizeof(String) + sizeof(Animation*));
-        memSize += mManualBones.size() * sizeof(Bone*);
+        memSize += mManualBones.size() * sizeof(OldBone*);
         memSize += mLinkedSkeletonAnimSourceList.size() * sizeof(LinkedSkeletonAnimationSource);
         memSize += sizeof(bool);
 

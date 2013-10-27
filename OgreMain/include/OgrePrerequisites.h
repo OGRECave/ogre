@@ -188,6 +188,7 @@ namespace Ogre {
     class IntersectionSceneQueryListener;
     class Image;
     class KeyFrame;
+	struct KfTransform;
     class Light;
     class Log;
     class LogManager;
@@ -214,6 +215,7 @@ namespace Ogre {
 	struct ObjectData;
 	class ObjectMemoryManager;
 	class OldNode;
+	class OldBone;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
