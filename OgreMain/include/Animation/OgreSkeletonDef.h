@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreRawPtr.h"
 
-#include "Math/Array/OgreNodeMemoryManager.h"
-
 namespace Ogre
 {
 	class SkeletonDef : public MovableAlloc
@@ -89,8 +87,6 @@ namespace Ogre
 		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> mReverseBindPose;
 
 		DepthLevelInfoVec		mDepthLevelInfoVec;
-
-		NodeMemoryManager		mNodeMemoryManager;
 
 		/// Cached for SkeletonInstance::mUnusedNodes
 		size_t					mNumUnusedSlots;

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonAnimationDef.h"
 #include "Animation/OgreBone.h"
+#include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreKfTransformArrayMemoryManager.h"
 
 #include "OgreId.h"
