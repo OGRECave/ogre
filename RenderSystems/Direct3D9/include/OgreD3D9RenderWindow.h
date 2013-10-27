@@ -40,9 +40,8 @@ namespace Ogre
 		/** Constructor.
 		@param instance The application instance
 		*/
-		D3D9RenderWindow					(HINSTANCE instance);
-		~D3D9RenderWindow					();
-		
+		D3D9RenderWindow					    (HINSTANCE instance);
+		~D3D9RenderWindow					    ();	
 		
 		void				create				(const String& name, unsigned int width, unsigned int height,
 												 bool fullScreen, const NameValuePairList *miscParams);
@@ -102,7 +101,7 @@ namespace Ogre
 		/// Returns true if this window use depth buffer.
 		bool isDepthBuffered() const;
 
-		/// Returns true if this window should use NV perf hud adapter.
+		/// Returns true if this window should use NV Perf HUD adapter.
 		bool isNvPerfHUDEnable() const;
 
 		/** Validate the device for this window. */

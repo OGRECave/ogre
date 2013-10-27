@@ -266,13 +266,15 @@ namespace Ogre {
 #       undef OGRE_UNICODE_SUPPORT
 #   endif
 #	define OGRE_UNICODE_SUPPORT 1
-#	define CLOCKS_PER_SEC  1000
     // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 #   ifdef DEBUG
 #       define OGRE_DEBUG_MODE 1
 #   else
 #       define OGRE_DEBUG_MODE 0
+#   endif
+#   ifndef CLOCKS_PER_SEC
+#	    define CLOCKS_PER_SEC  1000
 #   endif
 #endif
     

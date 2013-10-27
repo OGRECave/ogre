@@ -46,6 +46,12 @@ THE SOFTWARE.
         #include <sys/sysctl.h>
         #if __MACH__
             #include <mach/machine.h>
+            #ifndef CPU_SUBTYPE_ARM64_V8
+                #define CPU_SUBTYPE_ARM64_V8 ((cpu_subtype_t) 1)
+            #endif
+            #ifndef CPU_SUBTYPE_ARM_V8
+                #define CPU_SUBTYPE_ARM_V8 ((cpu_subtype_t) 13)
+            #endif
         #endif
     #endif
 #endif

@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "Animation/OgreBone.h"
+#include "OgreLogManager.h"
 
 #include "Math/Array/OgreKfTransform.h"
 #include "Math/Array/OgreBooleanMask.h"

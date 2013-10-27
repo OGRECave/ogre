@@ -280,7 +280,7 @@ namespace Ogre
 		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
 		texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
 
-		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), static_cast<uint32>(mMaxFloatsPerLine >> 2) );
 
 		Vector2 *thisVec = static_cast<Vector2*>(
 								mInstanceVertexBuffer->lock( HardwareBuffer::HBL_DISCARD ) );
@@ -314,7 +314,7 @@ namespace Ogre
 
 		float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
-		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+		const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), static_cast<uint32>(mMaxFloatsPerLine >> 2) );
 
 		MovableObjectArray::const_iterator itor = culledInstances->begin();
 		MovableObjectArray::const_iterator end  = culledInstances->end();
