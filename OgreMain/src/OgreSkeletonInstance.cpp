@@ -33,82 +33,82 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-------------------------------------------------------------------------
-    SkeletonInstance::SkeletonInstance(const SkeletonPtr& masterCopy) 
+    OldSkeletonInstance::OldSkeletonInstance(const SkeletonPtr& masterCopy) 
         : Skeleton()
         , mSkeleton(masterCopy)
         , mNextTagPointAutoHandle(0)
     {
     }
     //-------------------------------------------------------------------------
-    SkeletonInstance::~SkeletonInstance()
+    OldSkeletonInstance::~OldSkeletonInstance()
     {
         // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         // ...and calling it in Skeleton destructor does not unload
-        // SkeletonInstance since it has seized to be by then.
+        // OldSkeletonInstance since it has seized to be by then.
         unload();
     }
     //-------------------------------------------------------------------------
-    unsigned short SkeletonInstance::getNumAnimations(void) const
+    unsigned short OldSkeletonInstance::getNumAnimations(void) const
     {
         return mSkeleton->getNumAnimations();
     }
     //-------------------------------------------------------------------------
-    Animation* SkeletonInstance::getAnimation(unsigned short index) const
+    Animation* OldSkeletonInstance::getAnimation(unsigned short index) const
     {
         return mSkeleton->getAnimation(index);
     }
     //-------------------------------------------------------------------------
-    Animation* SkeletonInstance::createAnimation(const String& name, Real length)
+    Animation* OldSkeletonInstance::createAnimation(const String& name, Real length)
     {
         return mSkeleton->createAnimation(name, length);
     }
     //-------------------------------------------------------------------------
-    Animation* SkeletonInstance::getAnimation(const String& name, 
+    Animation* OldSkeletonInstance::getAnimation(const String& name, 
 		const LinkedSkeletonAnimationSource** linker) const
     {
         return mSkeleton->getAnimation(name, linker);
     }
 	//-------------------------------------------------------------------------
-	Animation* SkeletonInstance::_getAnimationImpl(const String& name, 
+	Animation* OldSkeletonInstance::_getAnimationImpl(const String& name, 
 		const LinkedSkeletonAnimationSource** linker) const
 	{
 		return mSkeleton->_getAnimationImpl(name, linker);
 	}
     //-------------------------------------------------------------------------
-    void SkeletonInstance::removeAnimation(const String& name)
+    void OldSkeletonInstance::removeAnimation(const String& name)
     {
         mSkeleton->removeAnimation(name);
     }
 	//-------------------------------------------------------------------------
-	void SkeletonInstance::addLinkedSkeletonAnimationSource(const String& skelName, 
+	void OldSkeletonInstance::addLinkedSkeletonAnimationSource(const String& skelName, 
 		Real scale)
 	{
 		mSkeleton->addLinkedSkeletonAnimationSource(skelName, scale);
 	}
 	//-------------------------------------------------------------------------
-	void SkeletonInstance::removeAllLinkedSkeletonAnimationSources(void)
+	void OldSkeletonInstance::removeAllLinkedSkeletonAnimationSources(void)
 	{
 		mSkeleton->removeAllLinkedSkeletonAnimationSources();
 	}
 	//-------------------------------------------------------------------------
 	Skeleton::LinkedSkeletonAnimSourceIterator 
-	SkeletonInstance::getLinkedSkeletonAnimationSourceIterator(void) const
+	OldSkeletonInstance::getLinkedSkeletonAnimationSourceIterator(void) const
 	{
 		return mSkeleton->getLinkedSkeletonAnimationSourceIterator();
 	}
 	//-------------------------------------------------------------------------
-	void SkeletonInstance::_initAnimationState(AnimationStateSet* animSet)
+	void OldSkeletonInstance::_initAnimationState(AnimationStateSet* animSet)
 	{
 		mSkeleton->_initAnimationState(animSet);
 	}
 	//-------------------------------------------------------------------------
-	void SkeletonInstance::_refreshAnimationState(AnimationStateSet* animSet)
+	void OldSkeletonInstance::_refreshAnimationState(AnimationStateSet* animSet)
 	{
 		mSkeleton->_refreshAnimationState(animSet);
 	}
     //-------------------------------------------------------------------------
-    void SkeletonInstance::cloneBoneAndChildren(OldBone* source, OldBone* parent)
+    void OldSkeletonInstance::cloneBoneAndChildren(OldBone* source, OldBone* parent)
     {
         OldBone* newBone;
         if (source->getName().empty())
@@ -139,7 +139,7 @@ namespace Ogre {
         }
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::loadImpl(void)
+    void OldSkeletonInstance::loadImpl(void)
     {
         mNextAutoHandle = mSkeleton->mNextAutoHandle;
         mNextTagPointAutoHandle = 0;
@@ -156,7 +156,7 @@ namespace Ogre {
         setBindingPose();
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::unloadImpl(void)
+    void OldSkeletonInstance::unloadImpl(void)
     {
         Skeleton::unloadImpl();
 
@@ -180,7 +180,7 @@ namespace Ogre {
     }
 
     //-------------------------------------------------------------------------
-    TagPoint* SkeletonInstance::createTagPointOnBone(OldBone* bone,
+    TagPoint* OldSkeletonInstance::createTagPointOnBone(OldBone* bone,
         const Quaternion &offsetOrientation, 
         const Vector3 &offsetPosition)
     {
@@ -210,7 +210,7 @@ namespace Ogre {
         return ret;
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::freeTagPoint(TagPoint* tagPoint)
+    void OldSkeletonInstance::freeTagPoint(TagPoint* tagPoint)
     {
         TagPointList::iterator it =
             std::find(mActiveTagPoints.begin(), mActiveTagPoints.end(), tagPoint);
@@ -224,19 +224,19 @@ namespace Ogre {
         }
     }
 	//-------------------------------------------------------------------------
-	const String& SkeletonInstance::getName(void) const
+	const String& OldSkeletonInstance::getName(void) const
 	{
 		// delegate
 		return mSkeleton->getName();
 	}
 	//-------------------------------------------------------------------------
-	ResourceHandle SkeletonInstance::getHandle(void) const
+	ResourceHandle OldSkeletonInstance::getHandle(void) const
 	{
 		// delegate
 		return mSkeleton->getHandle();
 	}
 	//-------------------------------------------------------------------------
-	const String& SkeletonInstance::getGroup(void)
+	const String& OldSkeletonInstance::getGroup(void)
 	{
 		// delegate
 		return mSkeleton->getGroup();

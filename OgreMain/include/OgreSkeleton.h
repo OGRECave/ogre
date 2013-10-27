@@ -86,9 +86,9 @@ namespace Ogre {
     */
     class _OgreExport Skeleton : public Resource, public AnimationContainer
     {
-		friend class SkeletonInstance;
+		friend class OldSkeletonInstance;
 	protected:
-		/// Internal constructor for use by SkeletonInstance only
+		/// Internal constructor for use by OldSkeletonInstance only
 		Skeleton();
 
     public:

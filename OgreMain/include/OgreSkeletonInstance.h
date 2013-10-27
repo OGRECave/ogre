@@ -41,23 +41,23 @@ namespace Ogre {
 	/** \addtogroup Scene
 	*  @{
 	*/
-	/** A SkeletonInstance is a single instance of a Skeleton used by a world object.
+	/** A OldSkeletonInstance is a single instance of a Skeleton used by a world object.
     @remarks
-        The difference between a Skeleton and a SkeletonInstance is that the
+        The difference between a Skeleton and a OldSkeletonInstance is that the
         Skeleton is the 'master' version much like Mesh is a 'master' version of
-        Entity. Many SkeletonInstance objects can be based on a single Skeleton, 
+        Entity. Many OldSkeletonInstance objects can be based on a single Skeleton, 
         and are copies of it when created. Any changes made to this are not
         reflected in the master copy. The exception is animations; these are
         shared on the Skeleton itself and may not be modified here.
     */
-    class _OgreExport SkeletonInstance : public Skeleton
+    class _OgreExport OldSkeletonInstance : public Skeleton
     {
     public:
         /** Constructor, don't call directly, this will be created automatically
         when you create an Entity based on a skeletally animated Mesh.
         */
-        SkeletonInstance(const SkeletonPtr& masterCopy);
-        ~SkeletonInstance();
+        OldSkeletonInstance(const SkeletonPtr& masterCopy);
+        ~OldSkeletonInstance();
 
         /** Gets the number of animations on this skeleton. */
         unsigned short getNumAnimations(void) const;

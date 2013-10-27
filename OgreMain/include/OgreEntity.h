@@ -191,8 +191,8 @@ namespace Ogre {
         /// a shared skeleton.
         unsigned long *mFrameBonesLastUpdated;
 
-        /** A set of all the entities which shares a single SkeletonInstance.
-            This is only created if the entity is in fact sharing it's SkeletonInstance with
+        /** A set of all the entities which shares a single OldSkeletonInstance.
+            This is only created if the entity is in fact sharing it's OldSkeletonInstance with
             other Entities.
         */
         EntitySet* mSharedSkeletonEntities;
@@ -256,7 +256,7 @@ namespace Ogre {
 
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
-        SkeletonInstance* mSkeletonInstance;
+        OldSkeletonInstance* mSkeletonInstance;
 
         /// Has this entity been initialised yet?
         bool mInitialised;
@@ -542,7 +542,7 @@ namespace Ogre {
         /** Returns whether or not this entity is skeletally animated. */
         bool hasSkeleton(void) const { return mSkeletonInstance != 0; }
         /** Get this Entity's personal skeleton instance. */
-        SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
+        OldSkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
         /** Returns whether or not hardware animation is enabled.
         @remarks
             Because fixed-function indexed vertex blending is rarely supported
@@ -608,7 +608,7 @@ namespace Ogre {
         */
         void removeSoftwareAnimationRequest(bool normalsAlso);
 
-        /** Shares the SkeletonInstance with the supplied entity.
+        /** Shares the OldSkeletonInstance with the supplied entity.
             Note that in order for this to work, both entities must have the same
             Skeleton.
         */
@@ -619,7 +619,7 @@ namespace Ogre {
         bool hasVertexAnimation(void) const;
 
 
-        /** Stops sharing the SkeletonInstance with other entities.
+        /** Stops sharing the OldSkeletonInstance with other entities.
         */
         void stopSharingSkeletonInstance();
 
@@ -628,8 +628,8 @@ namespace Ogre {
         */
         inline bool sharesSkeletonInstance() const { return mSharedSkeletonEntities != NULL; }
 
-        /** Returns a pointer to the set of entities which share a SkeletonInstance.
-            If this instance does not share it's SkeletonInstance with other instances @c NULL will be returned
+        /** Returns a pointer to the set of entities which share a OldSkeletonInstance.
+            If this instance does not share it's OldSkeletonInstance with other instances @c NULL will be returned
         */
         inline const EntitySet* getSkeletonInstanceSharingSet() const { return mSharedSkeletonEntities; }
 

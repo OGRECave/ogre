@@ -164,7 +164,7 @@ namespace Ogre {
 		// Is mesh skeletally animated?
 		if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull())
 		{
-			mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
 			mSkeletonInstance->load();
 		}
 
@@ -1857,7 +1857,7 @@ namespace Ogre {
         }
         else
         {
-            mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
+            mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
             mSkeletonInstance->load();
             mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);

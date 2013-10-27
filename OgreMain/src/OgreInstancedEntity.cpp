@@ -262,7 +262,7 @@ namespace Ogre
 			!mBatchOwner->_getMeshRef()->getSkeleton().isNull() &&
 			mBatchOwner->_supportsSkeletalAnimation() )
 		{
-			mSkeletonInstance = OGRE_NEW SkeletonInstance( mBatchOwner->_getMeshRef()->getSkeleton() );
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance( mBatchOwner->_getMeshRef()->getSkeleton() );
 			mSkeletonInstance->load();
 
 			mBoneMatrices		= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *

@@ -88,7 +88,7 @@ namespace Ogre
 		InstanceBatch *mBatchOwner;
 
 		AnimationStateSet *mAnimationState;
-		SkeletonInstance *mSkeletonInstance;
+		OldSkeletonInstance *mSkeletonInstance;
 		Matrix4 *mBoneMatrices;	 //Local space
 		Matrix4 *mBoneWorldMatrices; //World space
 		unsigned long mFrameAnimationLastUpdated;
@@ -235,7 +235,7 @@ namespace Ogre
 		/** @see Entity::hasSkeleton */
 		bool hasSkeleton(void) const { return mSkeletonInstance != 0; }
 		/** @see Entity::getSkeleton */
-		SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
+		OldSkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
 
 		/** @see Entity::getAnimationState */
 		AnimationState* getAnimationState(const String& name) const;

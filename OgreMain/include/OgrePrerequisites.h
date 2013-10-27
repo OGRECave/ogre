@@ -216,6 +216,7 @@ namespace Ogre {
 	class ObjectMemoryManager;
 	class OldNode;
 	class OldBone;
+	class OldSkeletonInstance;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
@@ -280,7 +281,6 @@ namespace Ogre {
     class SimpleRenderable;
     class SimpleSpline;
     class Skeleton;
-    class SkeletonInstance;
     class SkeletonManager;
     class Sphere;
     class SphereSceneQuery;
