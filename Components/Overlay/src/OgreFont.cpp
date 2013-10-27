@@ -362,7 +362,7 @@ namespace Ogre
 				{
 					// problem loading this glyph, continue
 					LogManager::getSingleton().logMessage("Info: cannot load character " +
-						StringConverter::toString(cp) + " in font " + mName);
+						StringConverter::toString(cp) + " in font " + mName, LML_CRITICAL);
 					continue;
 				}
 

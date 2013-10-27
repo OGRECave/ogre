@@ -1778,7 +1778,7 @@ void SceneManager::_setSkyBox(
 			!m->getBestTechnique()->getNumPasses())
 		{
 			LogManager::getSingleton().logMessage(
-				"Warning, skybox material " + materialName + " is not supported, defaulting.");
+				"Warning, skybox material " + materialName + " is not supported, defaulting.", LML_CRITICAL);
 			m = MaterialManager::getSingleton().getDefaultSettings();
 		}
 
@@ -4261,7 +4261,7 @@ void SceneManager::setShadowTechnique(ShadowTechnique technique)
         {
             LogManager::getSingleton().logMessage(
                 "WARNING: Stencil shadows were requested, but this device does not "
-                "have a hardware stencil. Shadows disabled.");
+                "have a hardware stencil. Shadows disabled.", LML_CRITICAL);
             mShadowTechnique = SHADOWTYPE_NONE;
         }
         else if (mShadowIndexBuffer.isNull())

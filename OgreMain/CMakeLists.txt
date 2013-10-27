@@ -289,7 +289,7 @@ else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
-if(OGRE_GCC_VERSION GREATER 470)
+if(OGRE_GCC_VERSION VERSION_GREATER 4.7)
   list(APPEND LIBRARIES "-latomic")
 endif()
 
