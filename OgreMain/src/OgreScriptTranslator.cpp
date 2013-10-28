@@ -5414,7 +5414,7 @@ namespace Ogre{
 		size_t width = 0, height = 0;
 		float widthFactor = 1.0f, heightFactor = 1.0f;
 		bool widthSet = false, heightSet = false, formatSet = false;
-        TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::Undefined;
+        TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
 		bool fsaa = true;
 		bool fsaaExplicitResolve = false;
 		uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
@@ -5479,10 +5479,10 @@ namespace Ogre{
 				}
 				break;
 			case ID_GAMMA:
-				hwGammaWrite = TextureDefinitionBase::True;
+				hwGammaWrite = TextureDefinitionBase::BoolTrue;
 				break;
 			case ID_NO_GAMMA:
-				hwGammaWrite = TextureDefinitionBase::False;
+				hwGammaWrite = TextureDefinitionBase::BoolFalse;
 				break;
 			case ID_NO_FSAA:
 				fsaa = false;

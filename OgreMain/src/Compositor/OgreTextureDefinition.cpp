@@ -182,8 +182,8 @@ namespace Ogre
 		}
 
 		//If undefined, use main target's hw gamma settings, else use explicit setting
-		bool hwGamma	= textureDef.hwGammaWrite == Undefined ? defaultHwGamma :
-															(textureDef.hwGammaWrite == True);
+		bool hwGamma	= textureDef.hwGammaWrite == BoolUndefined ?
+								defaultHwGamma : (textureDef.hwGammaWrite == BoolTrue);
 		//If true, use main target's fsaa settings, else disable
 		uint fsaa		= textureDef.fsaa ? defaultFsaa : 0;
 		const String &fsaaHint = textureDef.fsaa ? defaultFsaaHint : StringUtil::BLANK;

@@ -64,9 +64,9 @@ namespace Ogre
 
 		enum BoolSetting
 		{
-            Undefined = 0,
-			False,
-			True,
+			BoolFalse,
+			BoolTrue,
+			BoolUndefined,
 		};
 
 		/// Local texture definition
@@ -103,7 +103,7 @@ namespace Ogre
 			bool	fsaaExplicitResolve;
 
 			TextureDefinition( IdString _name ) : name(_name), width(0), height(0), widthFactor(1.0f),
-                    heightFactor(1.0f), fsaa(true), hwGammaWrite(Undefined), depthBufferId(1),
+                    heightFactor(1.0f), fsaa(true), hwGammaWrite(BoolUndefined), depthBufferId(1),
 					fsaaExplicitResolve(false) {}
         };
 

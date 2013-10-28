@@ -71,7 +71,7 @@ namespace Ogre
 			prevKeyFrame.mInvNextFrameDistance = 1.0f / (keyFrame.mFrame - prevKeyFrame.mFrame);
 		}
 
-        mLocalMemoryManager->createNewNode( reinterpret_cast<KfTransform**>(&keyFrame.mBoneTransform) );
+        mLocalMemoryManager->createNewNode( (KfTransform**)(&keyFrame.mBoneTransform) );
 	}
 	//-----------------------------------------------------------------------------------
 	void SkeletonTrack::setKeyFrameTransform( Real frame, uint32 slot, const Vector3 &vPos,
