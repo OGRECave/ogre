@@ -601,7 +601,7 @@ namespace Ogre {
 		{
 			// Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			// Only Copy does, but Copy means only one depth buffer...
-			GLES2Context *windowContext;
+			GLES2Context *windowContext = 0;
 			win->getCustomAttribute( "GLCONTEXT", &windowContext );
 			GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 															windowContext, 0, 0,
@@ -690,7 +690,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
     {
-        GLES2Context *windowContext;
+        GLES2Context *windowContext = 0;
         pWin->getCustomAttribute("GLCONTEXT", &windowContext);
         
         // 1 Window <-> 1 Context, should be always true

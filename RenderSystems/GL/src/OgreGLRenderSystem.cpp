@@ -1124,7 +1124,7 @@ namespace Ogre {
 		{
 			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			//Only Copy does, but Copy means only one depth buffer...
-			GLContext *windowContext;
+			GLContext *windowContext = 0;
 			win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 
  			GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
@@ -1228,7 +1228,7 @@ namespace Ogre {
 		{
 			if (i->second == pWin)
 			{
-				GLContext *windowContext;
+				GLContext *windowContext = 0;
 				pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
 				//1 Window <-> 1 Context, should be always true
