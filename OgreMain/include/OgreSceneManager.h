@@ -423,12 +423,34 @@ namespace Ogre {
 		friend class SceneMgrQueuedRenderableVisitor;
 
     protected:
+		struct SkeletonAnimManager
+		{
+			struct BySkeletonDef
+			{
+				NodeMemoryManager				nodeMemoryManager;
+
+				/** MUST be sorted by location in its NodeMemoryManager's slot
+					(in order to update in parallel without causing race conditions)
+					@See threadStarts
+				*/
+				FastArray<SkeletonInstance*>	skeletons;
+
+				/** One per thread (plus one), tells where we should start from in each
+					thread. It's not exactly skeletons.size() / mNumWorkerThreads because
+					we need to account that instances that share the same memory block.
+				*/
+				FastArray<size_t>				threadStarts;
+			};
+			typedef list<BySkeletonDef>::type BySkeletonDefList;
+			BySkeletonDefList bySkeletonDefs;
+		};
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
         virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
 		typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
 		typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
+		typedef vector<SkeletonAnimManager*>::type SkeletonAnimManagerVec;
 
 		/** These are the main memory managers. Note that some Scene Managers may have more than one
 			memory manager (eg. one per Octant in an Octree implementation, one per Portal, etc)
@@ -441,11 +463,13 @@ namespace Ogre {
 		NodeMemoryManager		mNodeMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
 		ObjectMemoryManager		mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
 		ObjectMemoryManager		mLightMemoryManager;
+		SkeletonAnimManager		mSkeletonAnimationManager;
 		/// Filled and cleared every frame in HighLevelCull()
 		NodeMemoryManagerVec	mNodeMemoryManagerUpdateList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerCulledList;
 		ObjectMemoryManagerVec	mEntitiesMemoryManagerUpdateList;
 		ObjectMemoryManagerVec	mLightsMemoryManagerCulledList;
+		SkeletonAnimManagerVec	mSkeletonAnimManagerCulledList;
 
 		/** Minimum depth level at which mNodeMemoryManager[SCENE_STATIC] is dirty.
 		@remarks
@@ -873,6 +897,7 @@ namespace Ogre {
 		{
 			CULL_FRUSTUM,
 			CALCULATE_RECEIVER_BOX,
+			UPDATE_ALL_ANIMATIONS,
 			UPDATE_ALL_TRANSFORMS,
 			UPDATE_ALL_BOUNDS,
 			UPDATE_INSTANCE_MANAGERS,
@@ -996,6 +1021,13 @@ namespace Ogre {
         /// List of entity material LOD changed events
         typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
+
+		/** Updates the Animations from the given request inside a thread. @See updateAllAnimations
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void updateAllAnimationsThread( size_t threadIdx );
 
 		/** Updates the Nodes from the given request inside a thread. @See updateAllTransforms
 		@param request
@@ -1597,11 +1629,19 @@ namespace Ogre {
 
 		void notifyStaticDirty( Node *node );
 
+		/** Updates all skeletal animations in the scene. This is typically called once
+			per frame during render, but the user might want to manually call this function.
+		@remarks
+			mSkeletonAnimManagerCulledList must be set. @See updateAllTransforms remarks
+		*/
+		void updateAllAnimations();
+
 		/** Updates the derived transforms of all nodes in the scene. This is typically called once
 			per frame during render, but the user may want to manually call this function.
-		@param objectMemManager
-			Memory manager containing all objects to be updated (i.e. Entities & Lights are both
-			MovableObjects but are kept separate)
+		@remarks
+			mEntitiesMemoryManagerUpdateList must be set. It contains multiple memory manager
+			containing all objects to be updated (i.e. Entities & Lights are both MovableObjects
+			but are kept separate)
 			Don't call this function from another thread other than Ogre's main one (we use worker
 			threads that may be in use for something else, and touching the sync barrier
 			could deadlock in the best of cases).

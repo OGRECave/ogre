@@ -281,6 +281,7 @@ namespace Ogre {
     class SimpleRenderable;
     class SimpleSpline;
     class Skeleton;
+	class SkeletonInstance;
     class SkeletonManager;
     class Sphere;
     class SphereSceneQuery;

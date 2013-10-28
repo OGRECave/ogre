@@ -69,6 +69,7 @@ THE SOFTWARE.
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
+#include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Threading/OgreBarrier.h"
 #include "Threading/OgreUniformScalableTask.h"
@@ -1919,6 +1920,42 @@ void SceneManager::notifyStaticDirty( Node *node )
 	node->_notifyStaticDirty();
 }
 //-----------------------------------------------------------------------
+void SceneManager::updateAllAnimationsThread( size_t threadIdx )
+{
+	SkeletonAnimManagerVec::const_iterator it = mSkeletonAnimManagerCulledList.begin();
+	SkeletonAnimManagerVec::const_iterator en = mSkeletonAnimManagerCulledList.end();
+
+	while( it != en )
+	{
+		SkeletonAnimManager::BySkeletonDefList::const_iterator itDef = (*it)->bySkeletonDefs.begin();
+		SkeletonAnimManager::BySkeletonDefList::const_iterator enDef = (*it)->bySkeletonDefs.end();
+
+		while( itDef != enDef )
+		{
+			FastArray<SkeletonInstance*>::const_iterator itor = itDef->skeletons.begin() +
+																	itDef->threadStarts[threadIdx];
+			FastArray<SkeletonInstance*>::const_iterator end  = itDef->skeletons.begin() +
+																	itDef->threadStarts[threadIdx+1];
+			while( itor != end )
+			{
+				(*itor)->update();
+				++itor;
+			}
+
+			++itDef;
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllAnimations()
+{
+	mRequestType = UPDATE_ALL_ANIMATIONS;
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
 void SceneManager::updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx )
 {
 	Transform t( request.t );
@@ -2204,12 +2241,14 @@ void SceneManager::highLevelCull()
 	mEntitiesMemoryManagerCulledList.clear();
 	mEntitiesMemoryManagerUpdateList.clear();
 	mLightsMemoryManagerCulledList.clear();
+	mSkeletonAnimManagerCulledList.clear();
 
 	mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
 	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
 	mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_STATIC] );
 	mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
 	mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
+	mSkeletonAnimManagerCulledList.push_back( &mSkeletonAnimationManager );
 
 	if( mStaticEntitiesDirty )
 	{
@@ -2247,6 +2286,7 @@ void SceneManager::updateSceneGraph()
 
 	highLevelCull();
 	_applySceneAnimations();
+	updateAllAnimationsThread();
 	updateAllTransforms();
 	updateInstanceManagerAnimations();
 	updateInstanceManagers();
@@ -5215,6 +5255,8 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 			case CALCULATE_RECEIVER_BOX:
 				cullReceiversBox( mCurrentCullFrustumRequest, threadIdx );
 				break;
+			case UPDATE_ALL_ANIMATIONS:
+				updateAllAnimationsThread( threadIdx );
 			case UPDATE_ALL_TRANSFORMS:
 				updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
 				break;
