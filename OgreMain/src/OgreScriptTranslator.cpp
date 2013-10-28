@@ -5414,8 +5414,7 @@ namespace Ogre{
 		size_t width = 0, height = 0;
 		float widthFactor = 1.0f, heightFactor = 1.0f;
 		bool widthSet = false, heightSet = false, formatSet = false;
-		TextureDefinitionBase::BoolSetting hwGammaWrite =
-													TextureDefinitionBase::Undefined;
+        TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::Undefined;
 		bool fsaa = true;
 		bool fsaaExplicitResolve = false;
 		uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;

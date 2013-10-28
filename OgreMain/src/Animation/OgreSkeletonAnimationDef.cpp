@@ -101,8 +101,8 @@ namespace Ogre
 				++depthLevel;
 
 			size_t offset = 0;
-			vector<size_t>::type::const_iterator itor = boneToSlot.begin();
-			vector<size_t>::type::const_iterator end  = boneToSlot.end();
+            vector<uint32>::type::const_iterator itor = boneToSlot.begin();
+            vector<uint32>::type::const_iterator end  = boneToSlot.end();
 			while( itor != end )
 			{
 				if( (*itor >> 24) == depthLevel )
@@ -185,7 +185,7 @@ namespace Ogre
 			{
 				Real fTime = itKeys->mFrame * frameRate;
 
-				for( size_t i=0; i<ARRAY_PACKED_REALS; ++i )
+                for( uint32 i=0; i<ARRAY_PACKED_REALS; ++i )
 				{
 					uint32 slotIdx = blockIdx + i;
 
@@ -206,7 +206,7 @@ namespace Ogre
 						itKeys->mBoneTransform->mOrientation.setFromQuaternion( originalKF.getRotation(),
 																				i );
 						itKeys->mBoneTransform->mScale.setFromVector3( originalKF.getScale(), i );
-						itTrack->_setMaxUsedSlot( i );
+                        itTrack->_setMaxUsedSlot( i );
 					}
 					else
 					{

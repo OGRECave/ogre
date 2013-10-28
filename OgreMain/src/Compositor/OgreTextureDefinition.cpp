@@ -69,8 +69,8 @@ namespace Ogre
 		return (index & 0x3FFFFFFF)|(textureSource<<30);
 	}
 	//-----------------------------------------------------------------------------------
-	inline void TextureDefinitionBase::decodeTexSource( uint32 encodedVal, size_t &outIdx,
-														TextureSource &outTexSource )
+    void TextureDefinitionBase::decodeTexSource( uint32 encodedVal, size_t &outIdx,
+                                                 TextureSource &outTexSource )
 	{
 		uint32 texSource = (encodedVal & 0xC0000000) >> 30;
 		assert( texSource < NUM_TEXTURES_SOURCES );

@@ -2286,7 +2286,7 @@ void SceneManager::updateSceneGraph()
 
 	highLevelCull();
 	_applySceneAnimations();
-	updateAllAnimationsThread();
+    updateAllAnimations();
 	updateAllTransforms();
 	updateInstanceManagerAnimations();
 	updateInstanceManagers();

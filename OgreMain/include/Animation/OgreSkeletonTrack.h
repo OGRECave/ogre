@@ -74,7 +74,7 @@ namespace Ogre
 			mBoneTransform[2] = mBoneTransform[0]
 			mBoneTransform[3] = mBoneTransform[0]
 		*/
-		size_t				mUsedSlots;
+        uint32				mUsedSlots;
 
 		KfTransformArrayMemoryManager *mLocalMemoryManager;
 
@@ -90,7 +90,7 @@ namespace Ogre
 
 		uint32 getBoneBlockIdx(void) const						{ return mBoneBlockIdx; }
 		size_t getUsedSlots(void) const							{ return mUsedSlots; }
-		void _setMaxUsedSlot( size_t slot )
+        void _setMaxUsedSlot( uint32 slot )
 										{ mUsedSlots = std::max( slot+1, mUsedSlots ); }
 
 		const KeyFrameRigVec& getKeyFrames(void) const			{ return mKeyFrameRigs; }
