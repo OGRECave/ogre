@@ -158,6 +158,9 @@ namespace Ogre
 
 		static const Aabb BOX_INFINITE;
 		static const Aabb BOX_NULL;
+
+		//Contains all zeroes. Used for inactive objects to avoid causing unnecessary NaNs
+		static const Aabb BOX_ZERO;
     };
 	/** @} */
 	/** @} */

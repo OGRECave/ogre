@@ -39,10 +39,12 @@ namespace Ogre
 															- OGRE_PREFETCH_SLOT_DISTANCE;
 
 	ArrayMemoryManager::ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
+											CleanupRoutines const *cleanupRoutines,
 											size_t numElementsSize, uint16 depthLevel,
 											size_t hintMaxNodes, size_t cleanupThreshold,
 											size_t maxHardLimit, RebaseListener *rebaseListener ) :
 							mElementsMemSizes( elementsMemSize ),
+							mCleanupRoutines( cleanupRoutines ),
 							mTotalMemoryMultiplier( 0 ),
 							mUsedMemory( 0 ),
 							mMaxMemory( hintMaxNodes ),
@@ -245,14 +247,12 @@ namespace Ogre
 					//Shift everything N slots (N = lastRange)
 					while( itPools != enPools )
 					{
-						memcpy( *itPools + ( newEnd - lastRange ) * mElementsMemSizes[i],
-								*itPools + newEnd * mElementsMemSizes[i],
-								( mUsedMemory - newEnd ) * mElementsMemSizes[i] );
-
-						//We need to default-initialize the garbage left after.
-						memset( *itPools + (mUsedMemory - lastRange) * mElementsMemSizes[i], 0,
-								lastRange * mElementsMemSizes[i] );
-
+						mCleanupRoutines[i]( *itPools + ( newEnd - lastRange ) * mElementsMemSizes[i],
+											( newEnd - lastRange ) % ARRAY_PACKED_REALS,
+											 *itPools + newEnd * mElementsMemSizes[i],
+											 newEnd % ARRAY_PACKED_REALS,
+											( mUsedMemory - newEnd ), mUsedMemory,
+											mElementsMemSizes[i] );
 						++i;
 						++itPools;
 					}
@@ -270,5 +270,148 @@ namespace Ogre
 				mAvailableSlots.clear();
 			}
 		}
+	}
+	//-----------------------------------------------------------------------------------
+	void cleanerFlat( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+						size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+	{
+		memcpy( dstPtr, srcPtr, numSlots * elementsMemSize );
+
+		//We need to default-initialize the garbage left after.
+		memset( dstPtr + numSlots * elementsMemSize, 0, (numTotalSlots - numSlots) * elementsMemSize );
+	}
+	//-----------------------------------------------------------------------------------
+	void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+								size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+	{
+		assert( numTotalSlots >= numSlots );
+
+		ArrayVector3 *dst = reinterpret_cast<ArrayVector3*>( dstPtr - indexDst * elementsMemSize );
+		ArrayVector3 *src = reinterpret_cast<ArrayVector3*>( srcPtr - indexSrc * elementsMemSize );
+
+		for( size_t i=0; i<numSlots; ++i )
+		{
+			Vector3 tmp;
+			src->getAsVector3( tmp, indexSrc );
+			dst->setFromVector3( tmp, indexDst );
+
+			++indexDst;
+			++indexSrc;
+
+			if( indexDst >= ARRAY_PACKED_REALS )
+			{
+				++dst;
+				indexDst = 0;
+			}
+			if( indexSrc >= ARRAY_PACKED_REALS )
+			{
+				++src;
+				indexSrc = 0;
+			}
+		}
+
+		//We need to default-initialize the garbage left after.
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		for( size_t i=0; i<scalarRemainder; ++i )
+		{
+			dst->setFromVector3( Vector3::ZERO, indexDst );
+			++indexDst;
+		}
+
+		++dst;
+		indexDst = 0;
+
+		//Keep default initializing, but now on bulk (faster)
+		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
+			*dst++ = ArrayVector3::ZERO;
+	}
+	//-----------------------------------------------------------------------------------
+	void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+								 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+	{
+		ArrayQuaternion *dst = reinterpret_cast<ArrayQuaternion*>( dstPtr - indexDst * elementsMemSize );
+		ArrayQuaternion *src = reinterpret_cast<ArrayQuaternion*>( srcPtr - indexSrc * elementsMemSize );
+
+		for( size_t i=0; i<numSlots; ++i )
+		{
+			Quaternion tmp;
+			src->getAsQuaternion( tmp, indexSrc );
+			dst->setFromQuaternion( tmp, indexDst );
+
+			++indexDst;
+			++indexSrc;
+
+			if( indexDst >= ARRAY_PACKED_REALS )
+			{
+				++dst;
+				indexDst = 0;
+			}
+			if( indexSrc >= ARRAY_PACKED_REALS )
+			{
+				++src;
+				indexSrc = 0;
+			}
+		}
+
+		//We need to default-initialize the garbage left after.
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		for( size_t i=0; i<scalarRemainder; ++i )
+		{
+			dst->setFromQuaternion( Quaternion::IDENTITY, indexDst );
+			++indexDst;
+		}
+
+		++dst;
+		indexDst = 0;
+
+		//Keep default initializing, but now on bulk (faster)
+		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
+			*dst++ = ArrayQuaternion::IDENTITY;
+	}
+	//-----------------------------------------------------------------------------------
+	void cleanerArrayAabb( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+							size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+	{
+		ArrayAabb *dst = reinterpret_cast<ArrayAabb*>( dstPtr - indexDst * elementsMemSize );
+		ArrayAabb *src = reinterpret_cast<ArrayAabb*>( srcPtr - indexSrc * elementsMemSize );
+
+		for( size_t i=0; i<numSlots; ++i )
+		{
+			Aabb tmp;
+			src->getAsAabb( tmp, indexSrc );
+			dst->setFromAabb( tmp, indexDst );
+
+			++indexDst;
+			++indexSrc;
+
+			if( indexDst >= ARRAY_PACKED_REALS )
+			{
+				++dst;
+				indexDst = 0;
+			}
+			if( indexSrc >= ARRAY_PACKED_REALS )
+			{
+				++src;
+				indexSrc = 0;
+			}
+		}
+
+		//We need to default-initialize the garbage left after.
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		for( size_t i=0; i<scalarRemainder; ++i )
+		{
+			dst->setFromAabb( Aabb::BOX_ZERO, indexDst );
+			++indexDst;
+		}
+
+		++dst;
+		indexDst = 0;
+
+		//Keep default initializing, but now on bulk (faster)
+		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
+			*dst++ = ArrayAabb::BOX_ZERO;
 	}
 }

@@ -143,7 +143,14 @@ namespace Ogre
 
 		/** Retrieves the sum of the number of objects in all render queues.
 		@remarks
-			The value is cached to avoid iterating through all RQ levels.
+			The value is cached to avoid iterating through all RQ levels, however
+			be **very careful** with this value it may not be equal to the sum of
+			all getFirstObjectData() from all render queues.
+		@par
+			When ARRAY_PACKED_REALS = 4, and 4 objects have been created but
+			the 2nd one has been deleted, getFirstObjectData will still return
+			4 until the 4th object is removed or a cleanup is performed; whereas
+			getTotalNumObjects will return the actual number of objects.
 		*/
 		size_t getTotalNumObjects() const					{ return mTotalObjects; }
 

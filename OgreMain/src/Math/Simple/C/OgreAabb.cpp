@@ -40,4 +40,5 @@ namespace Ogre
 									Vector3( -std::numeric_limits<float>::infinity(),
 											-std::numeric_limits<float>::infinity(),
 											-std::numeric_limits<float>::infinity() ) );
+	const Aabb Aabb::BOX_ZERO( Vector3( 0.0f, 0.0f, 0.0f ), Vector3( 0.0f, 0.0f, 0.0f ) );
 }

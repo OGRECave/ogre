@@ -131,6 +131,7 @@ namespace Ogre {
 			mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
 		{
 			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
+			mNodeMemoryManager = mNodeMemoryManager->getTwin();
 			retVal = true;
 		}
 

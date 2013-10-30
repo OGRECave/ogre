@@ -48,12 +48,26 @@ namespace Ogre
 		sizeof( bool ),					//ArrayMemoryManager::InheritOrientation
 		sizeof( bool )					//ArrayMemoryManager::InheritScale
 	};
+	const CleanupRoutines NodeArrayMemoryManager::NodeCleanupRoutines[NumMemoryTypes] =
+	{
+		cleanerFlat,					//ArrayMemoryManager::Parent
+		cleanerFlat,					//ArrayMemoryManager::Owner
+		cleanerArrayVector3,			//ArrayMemoryManager::Position
+		cleanerArrayQuaternion,			//ArrayMemoryManager::Orientation
+		cleanerArrayVector3,			//ArrayMemoryManager::Scale
+		cleanerArrayVector3,			//ArrayMemoryManager::DerivedPosition
+		cleanerArrayQuaternion,			//ArrayMemoryManager::DerivedOrientation
+		cleanerArrayVector3,			//ArrayMemoryManager::DerivedScale
+		cleanerFlat,					//ArrayMemoryManager::WorldMat
+		cleanerFlat,					//ArrayMemoryManager::InheritOrientation
+		cleanerFlat						//ArrayMemoryManager::InheritScale
+	};
 	//-----------------------------------------------------------------------------------
 	NodeArrayMemoryManager::NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
 													Node *dummyNode, size_t cleanupThreshold,
 													size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
-			ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize,
+			ArrayMemoryManager( ArrayMemoryManager::NodeType, ElementsMemSize, NodeCleanupRoutines,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
 			mDummyNode( dummyNode )

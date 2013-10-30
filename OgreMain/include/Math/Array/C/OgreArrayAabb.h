@@ -155,6 +155,9 @@ namespace Ogre
 		inline ArrayReal distance( const ArrayVector3 &v ) const;
 
 		static const ArrayAabb BOX_INFINITE;
+
+		//Contains all zeroes. Used for inactive objects to avoid causing unnecessary NaNs
+		static const ArrayAabb BOX_ZERO;
     };
 	/** @} */
 	/** @} */

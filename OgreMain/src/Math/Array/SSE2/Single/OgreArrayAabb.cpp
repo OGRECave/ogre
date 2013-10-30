@@ -40,6 +40,12 @@ namespace Ogre
 								ArrayVector3( _mm_set_ps1( std::numeric_limits<float>::infinity() ),
 													_mm_set_ps1( std::numeric_limits<float>::infinity() ),
 													_mm_set_ps1( std::numeric_limits<float>::infinity() ) ) );
+	const ArrayAabb ArrayAabb::BOX_ZERO( ArrayVector3( _mm_setzero_ps(),
+															_mm_setzero_ps(),
+															_mm_setzero_ps() ),
+										 ArrayVector3( _mm_setzero_ps(),
+															_mm_setzero_ps(),
+															_mm_setzero_ps() ) );
 }
 
 #endif

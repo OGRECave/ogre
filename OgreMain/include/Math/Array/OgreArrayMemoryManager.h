@@ -43,6 +43,9 @@ namespace Ogre
 	*  @{
 	*/
 
+	typedef void (*CleanupRoutines)( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+									 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+
 	/** Abstract memory manager for managing large chunks of contiguous memory, optimized for SoA
 		(Structure of Arrays) implementations.
 	@remarks
@@ -167,6 +170,7 @@ namespace Ogre
 		///One per memory type
 		MemoryPoolVec				mMemoryPools;
 		size_t const				*mElementsMemSizes;
+		CleanupRoutines const		*mCleanupRoutines;
 		size_t						mTotalMemoryMultiplier;
 
 		//The following three are measured in instances, not bytes
@@ -191,6 +195,11 @@ namespace Ogre
 		/** Constructor. @See intialize. @See destroy.
 			@param elementsMemSize
 				Array containing the size in bytes of each element type (i.e. NodeElementsMemSize)
+			@param cleanupRoutines
+				Array containing the cleanup function that will be called when performing cleanups.
+				Many pointers can use the flatCleaner and is the fastest. However Array variables
+				(i.e. ArrayVector3) have a layout where flatCleaner won't work correctly because
+				the data is interleaved (rather than flat).
 			@param numElementsSize
 				Number of entries in elementsMemSize
 			@param depthLevel
@@ -214,7 +223,8 @@ namespace Ogre
 				cleanupThreshold is set to -1 & maxHardLimit will be set to hintMaxNodes
 		*/
 		ArrayMemoryManager( ManagerType managerType, size_t const *elementsMemSize,
-							size_t numElementsSize, uint16 depthLevel, size_t hintMaxNodes,
+							CleanupRoutines const *cleanupRoutines, size_t numElementsSize,
+							uint16 depthLevel, size_t hintMaxNodes,
 							size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
 							RebaseListener *rebaseListener=0 );
 
@@ -310,6 +320,7 @@ namespace Ogre
 		};
 
 		static const size_t ElementsMemSize[NumMemoryTypes];
+		static const CleanupRoutines NodeCleanupRoutines[NumMemoryTypes];
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
 		NodeArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
@@ -381,6 +392,7 @@ namespace Ogre
 		};
 
 		static const size_t ElementsMemSize[NumMemoryTypes];
+		static const CleanupRoutines ObjCleanupRoutines[NumMemoryTypes];
 
 		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
 		ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes, Node *dummyNode,
@@ -397,6 +409,15 @@ namespace Ogre
 		/// @copydoc NodeArrayMemoryManager::getFirstNode
 		size_t getFirstNode( ObjectData &outData );
 	};
+
+	extern void cleanerFlat( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+							 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+	extern void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+									 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+	extern void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+										size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+	extern void cleanerArrayAabb( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
+									size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
 
 	/** @} */
 	/** @} */

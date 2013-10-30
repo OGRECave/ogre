@@ -50,12 +50,25 @@ namespace Ogre
 		1 * sizeof( Ogre::uint32 ),		//ArrayMemoryManager::QueryFlags
 		1 * sizeof( Ogre::uint32 ),		//ArrayMemoryManager::LightMask
 	};
+	const CleanupRoutines ObjectDataArrayMemoryManager::ObjCleanupRoutines[NumMemoryTypes] =
+	{
+		cleanerFlat,					//ArrayMemoryManager::Parent
+		cleanerFlat,					//ArrayMemoryManager::Owner
+		cleanerArrayAabb,				//ArrayMemoryManager::LocalAabb
+		cleanerArrayAabb,				//ArrayMemoryManager::WorldAabb
+		cleanerFlat,					//ArrayMemoryManager::LocalRadius
+		cleanerFlat,					//ArrayMemoryManager::WorldRadius
+		cleanerFlat,					//ArrayMemoryManager::SquaredUpperDistance
+		cleanerFlat,					//ArrayMemoryManager::VisibilityFlags
+		cleanerFlat,					//ArrayMemoryManager::QueryFlags
+		cleanerFlat,					//ArrayMemoryManager::LightMask
+	};
 	//-----------------------------------------------------------------------------------
 	ObjectDataArrayMemoryManager::ObjectDataArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
 													Node *dummyNode, MovableObject *dummyObject,
 													size_t cleanupThreshold, size_t maxHardLimit,
 													RebaseListener *rebaseListener ) :
-			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize,
+			ArrayMemoryManager( ArrayMemoryManager::ObjectDataType, ElementsMemSize, ObjCleanupRoutines,
 								sizeof( ElementsMemSize ) / sizeof( size_t ), depthLevel,
 								hintMaxNodes, cleanupThreshold, maxHardLimit, rebaseListener ),
 			mDummyNode( dummyNode ),

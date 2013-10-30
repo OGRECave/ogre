@@ -181,6 +181,7 @@ namespace Ogre {
 		{
 			mObjectMemoryManager->migrateTo( mObjectData, mRenderQueueID,
 											 mObjectMemoryManager->getTwin() );
+			mObjectMemoryManager = mObjectMemoryManager->getTwin();
 
 			if( mParentNode && mParentNode->isStatic() != bStatic )
 				mParentNode->setStatic( bStatic );
