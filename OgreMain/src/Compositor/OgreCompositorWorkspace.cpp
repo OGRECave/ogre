@@ -358,6 +358,13 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_update( bool swapFinalTargets )
 	{
+		//We need to do this so that D3D9 (and D3D11?) knows which device
+		//is active now, so that _beginFrame calls go to the right device.
+		mRenderSys->_setRenderTarget( mRenderWindow );
+
+		// Begin the frame
+		mRenderSys->_beginFrame();
+
 		if( mCurrentWidth != mRenderWindow->getWidth() || mCurrentHeight != mRenderWindow->getHeight() )
 		{
 			//Main RenderTarget reference changed resolution. Some nodes may need to rebuild
@@ -407,6 +414,9 @@ namespace Ogre
 			node->_update();
 			++itor;
 		}
+
+		// End frame
+		mRenderSys->_endFrame();
 
 		if( swapFinalTargets && mRenderWindow )
 			mRenderWindow->swapBuffers();

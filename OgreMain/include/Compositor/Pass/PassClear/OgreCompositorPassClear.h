@@ -55,8 +55,12 @@ namespace Ogre
     */
 	class _OgreExport CompositorPassClear : public CompositorPass
 	{
+	protected:
+		SceneManager	*mSceneManager;
+
 	public:
-		CompositorPassClear( const CompositorPassClearDef *definition, RenderTarget *target );
+		CompositorPassClear( const CompositorPassClearDef *definition, SceneManager *sceneManager,
+							 RenderTarget *target );
 
 		virtual void execute();
 

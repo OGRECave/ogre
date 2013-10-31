@@ -322,7 +322,7 @@ namespace Ogre
 				case PASS_CLEAR:
 					newPass = OGRE_NEW CompositorPassClear(
 											static_cast<CompositorPassClearDef*>(*itPass),
-											channel->target );
+											mWorkspace->getSceneManager(), channel->target );
 					break;
 				case PASS_QUAD:
 					newPass = OGRE_NEW CompositorPassQuad(

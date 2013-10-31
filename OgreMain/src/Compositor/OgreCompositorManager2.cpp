@@ -454,9 +454,6 @@ namespace Ogre
 
 		itor = mWorkspaces.begin();
 
-		// Begin the frame
-		mRenderSystem->_beginFrame();
-
 		while( itor != end )
 		{
 			CompositorWorkspace *workspace = (*itor);
@@ -476,9 +473,6 @@ namespace Ogre
 			}
 			++itor;
 		}
-
-		// End frame
-		mRenderSystem->_endFrame();
 
 		++mFrameCount;
 	}

@@ -35,8 +35,9 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
-												RenderTarget *target ) :
+												SceneManager *sceneManager, RenderTarget *target ) :
 				CompositorPass( definition, target ),
+				mSceneManager( sceneManager ),
 				mDefinition( definition )
 	{
 	}
@@ -52,6 +53,7 @@ namespace Ogre
 		}
 
 		//TODO: Implement mDiscardOnly
+		mSceneManager->_setViewport( mViewport );
 		mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
 							mDefinition->mDepthValue, mDefinition->mStencilValue );
 	}
