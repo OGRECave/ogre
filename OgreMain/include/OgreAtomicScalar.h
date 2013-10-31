@@ -125,6 +125,13 @@ namespace Ogre {
 #   elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
         volatile T mField __attribute__((__aligned__(16)));
 #   endif
+#elif OGRE_CPU == OGRE_CPU_X86 && OGRE_PLATFORM == OGRE_PLATFORM_APPLE && ((OGRE_COMPILER == OGRE_COMPILER_CLANG) && (OGRE_COMP_VER < 500))
+/* https://ogre3d.atlassian.net/browse/OGRE-324
+ * but see http://stackoverflow.com/questions/19387043/how-can-i-reliably-detect-the-version-of-clang-at-preprocessing-time
+ * the version in OGRE_COMP_VER is exactly the version reported with 'gcc -v' (Apple LLVM version 5.0 would produce OGRE_COMP_VER==500)
+ * but if the system built clang from sources that same compiler would be LLVM version 3.3 with OGRE_COMP_VER==330
+ */
+        volatile T mField __attribute__((__aligned__(16)));
 #else
         volatile T mField;
 #endif
