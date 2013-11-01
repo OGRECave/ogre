@@ -63,12 +63,6 @@ namespace Ogre
 		return numInputChannels;
 	}
 	//-----------------------------------------------------------------------------------
-	inline uint32 TextureDefinitionBase::encodeTexSource( size_t index, TextureSource textureSource )
-	{
-		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
-		return (index & 0x3FFFFFFF)|(textureSource<<30);
-	}
-	//-----------------------------------------------------------------------------------
     void TextureDefinitionBase::decodeTexSource( uint32 encodedVal, size_t &outIdx,
                                                  TextureSource &outTexSource )
 	{

@@ -70,7 +70,7 @@ namespace Ogre
 		};
 
 		/// Local texture definition
-        class TextureDefinition : public CompositorInstAlloc
+        class _OgreExport TextureDefinition : public CompositorInstAlloc
         {
         public:
             IdString name;
@@ -122,7 +122,12 @@ namespace Ogre
 		*/
 		NameToChannelMap		mNameToChannelMap;
 
-		static uint32 encodeTexSource( size_t index, TextureSource textureSource );
+        static inline uint32 encodeTexSource( size_t index, TextureSource textureSource )
+        {
+            assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
+            return (index & 0x3FFFFFFF)|(textureSource<<30);
+        }
+
 		static void decodeTexSource( uint32 encodedVal, size_t &outIdx, TextureSource &outTexSource );
 
 	public:

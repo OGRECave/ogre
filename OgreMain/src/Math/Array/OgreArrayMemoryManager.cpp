@@ -30,7 +30,9 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreArrayConfig.h"
 #include "Math/Array/OgreArrayMemoryManager.h"
-
+#include "Math/Array/OgreArrayQuaternion.h"
+#include "Math/Array/OgreArrayAabb.h"
+#include "Math/Simple/OgreAabb.h"
 #include "OgreException.h"
 
 namespace Ogre
