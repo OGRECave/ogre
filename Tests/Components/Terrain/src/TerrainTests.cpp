@@ -57,7 +57,11 @@ void TerrainTests::setUp()
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	cf.load("bin/release/resources.cfg");
+#if OGRE_DEBUG_MODE
+	cf.load("resources_d.cfg");
+#else
+	cf.load("resources.cfg");
+#endif
 #else
 	#ifdef OGRE_STATIC_LIB
 	cf.load("bin/resources.cfg");
