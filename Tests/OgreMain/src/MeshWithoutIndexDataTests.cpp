@@ -27,7 +27,9 @@ THE SOFTWARE.
 */
 #include <stdio.h>
 #include "Ogre.h"
-#include "OgreProgressiveMeshGenerator.h"
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreMeshLodGenerator.h"
+#endif
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
@@ -455,6 +457,7 @@ void MeshWithoutIndexDataTests::testBuildTangentVectors()
 
 void MeshWithoutIndexDataTests::testGenerateLodLevels()
 {
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName);
@@ -468,9 +471,9 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     lodLevel.distance = 600.0;
     lodLevel.reductionValue = 2;
     lodConfig.levels.push_back(lodLevel);
-    ProgressiveMeshGenerator pm;
+    MeshLodGenerator pm(false);
     pm.generateLodLevels(lodConfig);
-    // FAIL: Levels == 1
+    // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
@@ -479,6 +482,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
         {
             if (subMesh->indexData->indexCount > 0)
             {
+				// This may not be true for all meshes, but in this test we don't have reduced to 0.
                 CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount > 0);
             }
             else
@@ -495,4 +499,5 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     remove(fileName.c_str());
 
     mMeshMgr->remove( fileName );
+#endif
 }
