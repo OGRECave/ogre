@@ -79,10 +79,11 @@ namespace Ogre
 			LodData::Vertex v;
 			v.position = it->src;
 			LodData::UniqueVertexSet::iterator src = data->mUniqueVertexSet.find(&v);
-			assert(src != data->mUniqueVertexSet.end());
+			OgreAssert(src != data->mUniqueVertexSet.end(), "Invalid vertex position in Lod profile");
 			mHasProfile[LodData::getVectorIDFromPointer(data->mVertexList, *src)] = true;
 			v.position = it->dst;
 			LodData::UniqueVertexSet::iterator dst = data->mUniqueVertexSet.find(&v);
+			OgreAssert(dst != data->mUniqueVertexSet.end(), "Invalid vertex position in Lod profile");
 			ProfiledEdge e;
 			e.dst = *dst;
 			e.cost = it->cost;
