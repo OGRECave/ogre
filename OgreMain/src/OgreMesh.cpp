@@ -263,7 +263,7 @@ namespace Ogre {
         // transformation of user values must occur after loading is complete.
 
         // Transform user lod values (starting at index 1, no need to transform base value)
-		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin() + 1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 #endif
 	}
