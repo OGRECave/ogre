@@ -359,6 +359,22 @@ namespace Ogre {
         */
         void _setBoundingSphereRadius(Real radius);
 
+		/** Automatically update the bounding radius and bounding box for this Mesh.
+		@remarks
+		Calling this method is required when building manual meshes. However it is recommended to
+		use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+		a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+		@param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
+		*/
+		void _updateBoundsFromVertexBuffers(bool pad = false);
+
+		/** Calculates 
+		@remarks
+		Calling this method is required when building manual meshes. However it is recommended to
+		use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+		a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+		*/
+		void _calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool updateOnly = false);
         /** Sets the name of the skeleton this Mesh uses for animation.
         @remarks
             Meshes can optionally be assigned a skeleton which can be used to animate

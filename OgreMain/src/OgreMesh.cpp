@@ -501,6 +501,67 @@ namespace Ogre {
         mBoundRadius = radius;
     }
     //-----------------------------------------------------------------------
+	void Mesh::_updateBoundsFromVertexBuffers(bool pad)
+	{
+		bool extendOnly = false; // First time we need full AABB of the given submesh, but on the second call just extend that one.
+		if (sharedVertexData){
+			_calcBoundsFromVertexBuffer(sharedVertexData, mAABB, mBoundRadius, extendOnly);
+			extendOnly = true;
+		}
+		for (size_t i = 0; i < mSubMeshList.size(); i++){
+			if (mSubMeshList[i]->vertexData){
+				_calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData, mAABB, mBoundRadius, extendOnly);
+				extendOnly = true;
+			}
+		}
+		if (pad)
+		{
+			Vector3 max = mAABB.getMaximum();
+			Vector3 min = mAABB.getMinimum();
+			// Pad out the AABB a little, helps with most bounds tests
+			Vector3 scaler = (max - min) * MeshManager::getSingleton().getBoundsPaddingFactor();
+			mAABB.setExtents(min - scaler, max + scaler);
+			// Pad out the sphere a little too
+			mBoundRadius = mBoundRadius + (mBoundRadius * MeshManager::getSingleton().getBoundsPaddingFactor());
+		}
+	}
+	void Mesh::_calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool extendOnly /*= false*/)
+	{
+		if (vertexData->vertexCount == 0) {
+			if (!extendOnly) {
+				outAABB = AxisAlignedBox(Vector3::ZERO, Vector3::ZERO);
+				outRadius = 0;
+			}
+			return;
+		}
+		const VertexElement* elemPos = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+		HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elemPos->getSource());
+		
+		unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+
+		if (!extendOnly){
+			// init values
+			outRadius = 0;
+			float* pFloat;
+			elemPos->baseVertexPointerToElement(vertex, &pFloat);
+			Vector3 basePos(pFloat[0], pFloat[1], pFloat[2]);
+			outAABB.setExtents(basePos, basePos);
+		}
+		int vSize = vbuf->getVertexSize();
+		unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
+		Real radiusSqr = outRadius * outRadius;
+		// Loop through all vertices.
+		for (; vertex < vEnd; vertex += vSize) {
+			float* pFloat;
+			elemPos->baseVertexPointerToElement(vertex, &pFloat);
+			Vector3 pos(pFloat[0], pFloat[1], pFloat[2]);
+			outAABB.getMinimum().makeFloor(pos);
+			outAABB.getMaximum().makeCeil(pos);
+			radiusSqr = std::max<Real>(radiusSqr, pos.squaredLength());
+		}
+		outRadius = std::sqrt(radiusSqr);
+	}
+    //-----------------------------------------------------------------------
     void Mesh::setSkeletonName(const String& skelName)
     {
 		if (skelName != mSkeletonName)
