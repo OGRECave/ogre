@@ -195,7 +195,7 @@ namespace Ogre
 				Real beforeDot = neighbor->normal.dotProduct(src->normal);
 				Real afterDot = neighbor->normal.dotProduct(dst->normal);
 				normalCost = std::max<Real>(normalCost, std::max<Real>(diff, std::abs(beforeDot - afterDot)) *
-					std::max<Real>(afterDist/8.0, std::max<Real>(dist, std::abs(beforeDist - afterDist))));
+					std::max<Real>(afterDist/8.0f, std::max<Real>(dist, std::abs(beforeDist - afterDist))));
 			}
 			cost = std::max<Real>(normalCost * 0.25f, cost);
 		}
