@@ -54,7 +54,13 @@ void ZipArchiveTests::tearDown()
 void ZipArchiveTests::testListNonRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	} catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     StringVectorPtr vec = arch.list(false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
@@ -65,7 +71,14 @@ void ZipArchiveTests::testListNonRecursive()
 void ZipArchiveTests::testListRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     StringVectorPtr vec = arch.list(true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size());
@@ -79,7 +92,14 @@ void ZipArchiveTests::testListRecursive()
 void ZipArchiveTests::testListFileInfoNonRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     FileInfoListPtr vec = arch.listFileInfo(false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
@@ -98,7 +118,14 @@ void ZipArchiveTests::testListFileInfoNonRecursive()
 void ZipArchiveTests::testListFileInfoRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     FileInfoListPtr vec = arch.listFileInfo(true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size());
@@ -143,7 +170,14 @@ void ZipArchiveTests::testListFileInfoRecursive()
 void ZipArchiveTests::testFindNonRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     StringVectorPtr vec = arch.find("*.txt", false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
@@ -153,7 +187,14 @@ void ZipArchiveTests::testFindNonRecursive()
 void ZipArchiveTests::testFindRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     StringVectorPtr vec = arch.find("*.material", true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)4, vec->size());
@@ -165,7 +206,14 @@ void ZipArchiveTests::testFindRecursive()
 void ZipArchiveTests::testFindFileInfoNonRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
@@ -184,7 +232,14 @@ void ZipArchiveTests::testFindFileInfoNonRecursive()
 void ZipArchiveTests::testFindFileInfoRecursive()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
     FileInfoListPtr vec = arch.findFileInfo("*.material", true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)4, vec->size());
@@ -217,7 +272,14 @@ void ZipArchiveTests::testFindFileInfoRecursive()
 void ZipArchiveTests::testFileRead()
 {
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
 
     DataStreamPtr stream = arch.open("rootfile.txt");
     CPPUNIT_ASSERT_EQUAL(String("this is line 1 in file 1"), stream->getLine());
@@ -233,7 +295,14 @@ void ZipArchiveTests::testReadInterleave()
     // Test overlapping reads from same archive
 
     ZipArchive arch(testPath, "Zip");
+	try {
     arch.load();
+	}
+	catch (Ogre::Exception e) {
+		// If it starts in build/bin/debug
+		arch = ZipArchive("../../../" + testPath, "Zip");
+		arch.load();
+	}
 
     // File 1
     DataStreamPtr stream1 = arch.open("rootfile.txt");
