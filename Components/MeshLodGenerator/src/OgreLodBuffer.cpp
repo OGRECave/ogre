@@ -38,10 +38,10 @@ namespace Ogre
 
 	void LodIndexBuffer::fillBuffer( Ogre::IndexData* data )
 	{
-		const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
-		indexSize = hwIndexBuffer->getIndexSize();
 		indexCount = data->indexCount;
 		if (indexCount > 0) {
+			const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
+			indexSize = hwIndexBuffer->getIndexSize();
 			unsigned char* pBuffer = (unsigned char*) hwIndexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
 			size_t offset = data->indexStart * indexSize;
 			indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[indexCount * indexSize]);
@@ -54,17 +54,15 @@ namespace Ogre
 
 	void LodVertexBuffer::fillBuffer( Ogre::VertexData* data )
 	{
-		// Locate position element and the buffer to go with it.
-		const VertexElement* elemPos = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
-
-		// Only float supported.
-		OgreAssert(elemPos->getSize() == 12, "");
-
-		HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elemPos->getSource());
-
 		vertexCount = data->vertexCount;
-
 		if (vertexCount > 0) {
+			// Locate position element and the buffer to go with it.
+			const VertexElement* elemPos = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
+
+			// Only float supported.
+			OgreAssert(elemPos->getSize() == 12, "");
+
+			HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elemPos->getSource());
 			vertexBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
 
 			// Lock the buffer for reading.
