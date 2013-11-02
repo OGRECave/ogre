@@ -129,8 +129,10 @@ struct _OgreLodExport LodConfig {
 
 	struct Advanced {
 		/// Whether you want to process it immediatelly on main thread or you want to use Ogre::WorkQueue.
-		/// If you use workqueue the generator will return immediately, after processed in background,
-		/// the LodWorkQueueInjector will inject it in frameEnd event when rendering next frame. (enabled by default)
+		/// If you use workqueue the generator will return immediately. After processed in background,
+		/// the LodWorkQueueInjector will inject it in frameEnd event when rendering next frame.
+		/// Ready LODs can also be injected by calling Root::getSingleton().getWorkQueue()->processResponses().
+		/// (disabled by default)
 		bool useBackgroundQueue;
 		/// If enabled, it allows up to 50% smaller index buffers by storing once shared faces with frame shifting.
 		/// There is no performance disadvantage! (enabled by default)
@@ -148,7 +150,7 @@ struct _OgreLodExport LodConfig {
 		/// If the algorithm makes errors, you can fix it, by adding the edge to the profile.
 		LodProfile profile;
 		Advanced() :
-			useBackgroundQueue(true),
+			useBackgroundQueue(false),
 			useCompression(true),
 			useVertexNormals(true),
 			outsideWeight(0.0),
