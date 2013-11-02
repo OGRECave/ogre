@@ -86,6 +86,10 @@ public:
 	void _resolveComponents( LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);
 	void _process( LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser);
 
+	/// If you only use manual Lod levels, then you don't need to build LodData mesh representation.
+	/// This function will generate manual Lod levels without overhead, but every Lod level needs to be a manual Lod level.
+	void _generateManualLodLevels(LodConfig& lodConfig);
+
 protected:
 	void computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser);
 	void calcLodVertexCount(const LodLevel& lodLevel, size_t uniqueVertexCount, size_t& outVertexCountLimit, Real& outCollapseCostLimit);
