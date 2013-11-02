@@ -45,6 +45,8 @@
 #include "OgreLodCollapseCostOutside.h"
 #include "OgreLodData.h"
 #include "OgreLodCollapser.h"
+#include "OgreRoot.h"
+
 
 namespace Ogre
 {
@@ -122,17 +124,17 @@ void MeshLodGenerator::_configureMeshLodUsage( const LodConfig& lodConfig )
 	lodConfig.mesh->_setLodInfo(n + 1);
 }
 
-MeshLodGenerator::MeshLodGenerator()
+MeshLodGenerator::MeshLodGenerator(bool initWorkQueue) :
+	mWQWorker(NULL),
+	mWQInjector(NULL)
 {
+	if (initWorkQueue){
 	if(!LodWorkQueueWorker::getSingletonPtr()){
 		mWQWorker = new LodWorkQueueWorker();
-	} else {
-		mWQWorker = NULL;
 	}
 	if(!LodWorkQueueInjector::getSingletonPtr()){
 		mWQInjector = new LodWorkQueueInjector();
-	} else {
-		mWQWorker = NULL;
+		}
 	}
 }
 

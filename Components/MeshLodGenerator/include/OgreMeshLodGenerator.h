@@ -51,7 +51,13 @@ public:
 	static MeshLodGenerator* getSingletonPtr();
 	static MeshLodGenerator& getSingleton();
 
-	MeshLodGenerator();
+	/**
+	* @brief Generates the Lod levels for a mesh.
+	*
+	* @param initWorkQueue Set to false if you don't have initialized Ogre::Root and/or you don't
+	*        want to use threading. Threading requires Root::getWorkQueue() to work properly.
+	*/
+	MeshLodGenerator(bool initWorkQueue = true);
 	virtual ~MeshLodGenerator();
 
 	/**
