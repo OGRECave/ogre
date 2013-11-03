@@ -126,6 +126,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeMesh(const Mesh* pMesh)
     {
+		exportedLodCount = 1; // generate edge data for original mesh
+
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh));
 
@@ -1171,12 +1173,12 @@ namespace Ogre {
 	void MeshSerializerImpl::writeLodInfo(const Mesh* pMesh)
 	{
 		const LodStrategy *strategy = pMesh->getLodStrategy();
-		ushort numLods = pMesh->getNumLodLevels();
+		exportedLodCount = pMesh->getNumLodLevels();
 		bool manual = pMesh->hasManualLodLevel();
-		writeLodSummary(numLods, manual, strategy);
+		writeLodSummary(exportedLodCount, manual, strategy);
 
 		// Loop from LOD 1 (not 0, this is full detail)
-		for (ushort i = 1; i < numLods; ++i)
+		for (ushort i = 1; i < exportedLodCount; ++i)
 		{
 			const MeshLodUsage& usage = pMesh->getLodLevel(i);
 			if (pMesh->_isManualLodLevel(i))
@@ -1693,7 +1695,7 @@ namespace Ogre {
 	{
         writeChunkHeader(M_EDGE_LISTS, calcEdgeListSize(pMesh));
 
-        for (ushort i = 0; i < pMesh->getNumLodLevels(); ++i)
+		for (ushort i = 0; i < exportedLodCount; ++i)
         {
             const EdgeData* edgeData = pMesh->getEdgeList(i);
             bool isManual = pMesh->mMeshLodUsageList[i].manualName.empty();
@@ -3643,7 +3645,7 @@ namespace Ogre {
 	{
         writeChunkHeader(M_EDGE_LISTS, calcEdgeListSize(pMesh));
 		
-        for (ushort i = 0; i < pMesh->getNumLodLevels(); ++i)
+		for (ushort i = 0; i < exportedLodCount; ++i)
         {
             const EdgeData* edgeData = pMesh->getEdgeList(i);
             bool isManual = pMesh->mMeshLodUsageList[i].manualName.empty();

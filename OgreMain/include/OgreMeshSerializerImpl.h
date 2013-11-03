@@ -182,7 +182,7 @@ namespace Ogre {
         /// pointer to locked or temporary memory 
         virtual void flipEndian(void* pData, size_t vertexCount, size_t vertexSize, const VertexDeclaration::VertexElementList& elems);
 		
-		
+		ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
 	};
 
 
