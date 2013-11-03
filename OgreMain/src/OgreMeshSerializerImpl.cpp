@@ -1356,7 +1356,65 @@ namespace Ogre {
 	void MeshSerializerImpl::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
 	{
 #if OGRE_NO_MESHLOD
+
+		/*
+		//Since the chunk sizes in old versions are messed up, we can't use this clean solution.
+		// We need to walk through the data to not rely on the chunk size!
 		stream->skip(mCurrentstreamLen);
+
+		// Since we got here, we have already read the chunk header.
+		backpedalChunkHeader(stream);
+		*/
+		uint16 numSubs = pMesh->getNumSubMeshes();
+		String strategyName = readString(stream);
+		uint16 numLods;
+		readShorts(stream, &numLods, 1);
+		pushInnerChunk(stream);
+		for (int lodID = 1; lodID < numLods; lodID++){
+			unsigned short streamID = readChunk(stream);
+			Real usageValue;
+			readFloats(stream, &usageValue, 1);
+			switch (streamID){
+			case M_MESH_LOD_MANUAL:
+			{
+									  String manualName = readString(stream);
+									  break;
+			}
+			case M_MESH_LOD_GENERATED:
+				for (int i = 0; i < numSubs; ++i)
+				{
+					unsigned int numIndexes;
+					readInts(stream, &numIndexes, 1);
+
+					unsigned int offset;
+					readInts(stream, &offset, 1);
+
+					// For merged buffers, you can pass the index of previous Lod.
+					// To create buffer it should be -1.
+					unsigned int bufferIndex;
+					readInts(stream, &bufferIndex, 1);
+					if (bufferIndex == (unsigned int)-1) {
+						// generate buffers
+
+						// bool indexes32Bit
+						bool idx32Bit;
+						readBools(stream, &idx32Bit, 1);
+
+						unsigned int buffIndexCount;
+						readInts(stream, &buffIndexCount, 1);
+
+						size_t buffSize = buffIndexCount * (idx32Bit ? 4 : 2);
+						stream->skip(buffSize);
+					}
+				}
+				break;
+			default:
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"Invalid Lod Usage type in " + pMesh->getName(),
+					"MeshSerializerImpl::readMeshLodInfo");
+			}
+		}
+		popInnerChunk(stream);
 #else
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
@@ -2709,6 +2767,67 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void MeshSerializerImpl_v1_8::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
 	{
+#if OGRE_NO_MESHLOD
+
+		/*
+		//Since the chunk sizes in old versions are messed up, we can't use this clean solution.
+		// We need to walk through the data to not rely on the chunk size!
+		stream->skip(mCurrentstreamLen);
+
+		// Since we got here, we have already read the chunk header.
+		backpedalChunkHeader(stream);
+		*/
+		uint16 numSubs = pMesh->getNumSubMeshes();
+		String strategyName = readString(stream);
+		uint16 numLods;
+		readShorts(stream, &numLods, 1);
+		pushInnerChunk(stream);
+		for (int lodID = 1; lodID < numLods; lodID++){
+			unsigned short streamID = readChunk(stream);
+			Real usageValue;
+			readFloats(stream, &usageValue, 1);
+			switch (streamID){
+			case M_MESH_LOD_MANUAL:
+			{
+									  String manualName = readString(stream);
+									  break;
+			}
+			case M_MESH_LOD_GENERATED:
+				for (int i = 0; i < numSubs; ++i)
+				{
+					unsigned int numIndexes;
+					readInts(stream, &numIndexes, 1);
+
+					unsigned int offset;
+					readInts(stream, &offset, 1);
+
+					// For merged buffers, you can pass the index of previous Lod.
+					// To create buffer it should be -1.
+					unsigned int bufferIndex;
+					readInts(stream, &bufferIndex, 1);
+					if (bufferIndex == (unsigned int)-1) {
+						// generate buffers
+
+						// bool indexes32Bit
+						bool idx32Bit;
+						readBools(stream, &idx32Bit, 1);
+
+						unsigned int buffIndexCount;
+						readInts(stream, &buffIndexCount, 1);
+
+						size_t buffSize = buffIndexCount * (idx32Bit ? 4 : 2);
+						stream->skip(buffSize);
+					}
+				}
+				break;
+			default:
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"Invalid Lod Usage type in " + pMesh->getName(),
+					"MeshSerializerImpl::readMeshLodInfo");
+			}
+		}
+		popInnerChunk(stream);
+#else
 		unsigned short streamID, i;
 
 		// Read the strategy to be used for this mesh
@@ -2766,6 +2885,7 @@ namespace Ogre {
 			// Save usage
 			pMesh->mMeshLodUsageList.push_back(usage);
 		}
+#endif
 	}
 	//---------------------------------------------------------------------
 	void MeshSerializerImpl_v1_8::readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage )
@@ -3156,6 +3276,75 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_4::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
     {
+#if OGRE_NO_MESHLOD
+
+		/*
+		//Since the chunk sizes in old versions are messed up, we can't use this clean solution.
+		// We need to walk through the data to not rely on the chunk size!
+		stream->skip(mCurrentstreamLen);
+
+		// Since we got here, we have already read the chunk header.
+		backpedalChunkHeader(stream);
+		*/
+		uint16 numSubs = pMesh->getNumSubMeshes();
+		// String strategyName = readString(stream); // missing in v1_4
+		uint16 numLods;
+		readShorts(stream, &numLods, 1);
+		bool manual;
+		readBools(stream, &manual, 1); // missing in v1_9
+		pushInnerChunk(stream);
+		for (uint16 i = 1; i < numLods; ++i)
+		{
+			uint16 streamID = readChunk(stream);
+			if (streamID != M_MESH_LOD_USAGE)
+			{
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+					"Missing M_MESH_LOD_USAGE stream in " + pMesh->getName(),
+					"MeshSerializerImpl::readMeshLodInfo");
+			}
+			float usageValue;
+			readFloats(stream, &usageValue, 1);
+
+			if (manual)
+			{
+				// Read detail stream
+				uint16  streamID = readChunk(stream);
+				if (streamID != M_MESH_LOD_MANUAL)
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+						"Missing M_MESH_LOD_MANUAL stream in " + pMesh->getName(),
+						"MeshSerializerImpl::readMeshLodUsageManual");
+				}
+
+				String manualName = readString(stream);
+			}
+			else
+			{
+				pushInnerChunk(stream);
+				for (uint16 n = 0; n < numSubs; ++n)
+				{
+					unsigned long streamID = readChunk(stream);
+					if (streamID != M_MESH_LOD_GENERATED)
+					{
+						OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+							"Missing M_MESH_LOD_GENERATED stream in " + pMesh->getName(),
+							"MeshSerializerImpl::readMeshLodUsageGenerated");
+					}
+
+					unsigned int numIndexes;
+					readInts(stream, &numIndexes, 1);
+
+					bool idx32Bit;
+					readBools(stream, &idx32Bit, 1);
+
+					size_t buffSize = numIndexes * (idx32Bit ? 4 : 2);
+					stream->skip(buffSize);
+				}
+				popInnerChunk(stream);
+			}
+		}
+		popInnerChunk(stream);
+#else
         unsigned short streamID, i;
 
         // Use the old strategy for this mesh
@@ -3213,10 +3402,8 @@ namespace Ogre {
             // Save usage
             pMesh->mMeshLodUsageList.push_back(usage);
         }
-
-
-	}
 #endif
+	}
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
