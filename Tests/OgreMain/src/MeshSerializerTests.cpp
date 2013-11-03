@@ -54,11 +54,6 @@ THE SOFTWARE.
 #include "OgreXMLMeshSerializer.h"
 #endif
 
-namespace Ogre
-{
-_OgreExport extern bool VAR_ENABLE_DEBUGGING;
-};
-
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #include "OgreMeshLodGenerator.h"
 #include "OgreLodConfig.h"
@@ -188,11 +183,9 @@ void MeshSerializerTests::testMesh_clone()
 
 void MeshSerializerTests::testMesh(MeshVersion version)
 {
-	VAR_ENABLE_DEBUGGING = true;
 	MeshSerializer serializer;
 	serializer.exportMesh(mOrigMesh.get(), mMeshFullPath, version);
 	mMesh->reload();
-	VAR_ENABLE_DEBUGGING = false;
 	assertMeshClone(mOrigMesh.get(), mMesh.get(), version);
 }
 
@@ -267,7 +260,6 @@ void MeshSerializerTests::testMesh_Version_1_2()
 				// If there is no backup, create one.
 				copyFile(mMeshFullPath, mMeshFullPath + ".bak");
 			}
-			VAR_ENABLE_DEBUGGING = true;
 			mOrigMesh = mMesh->clone(mMesh->getName() + ".orig.mesh", mMesh->getGroup());
 			testMesh_XML();
 			testMesh(MESH_VERSION_1_9);
@@ -275,7 +267,6 @@ void MeshSerializerTests::testMesh_Version_1_2()
 			testMesh(MESH_VERSION_1_7);
 			testMesh(MESH_VERSION_1_4);
 			testMesh(MESH_VERSION_1_0);
-			VAR_ENABLE_DEBUGGING = false;
 		}
 		meshes = ResourceGroupManager::getSingleton().findResourceNames(groups[i], "*.skeleton");
 		it = meshes->begin();
@@ -287,13 +278,11 @@ void MeshSerializerTests::testMesh_Version_1_2()
 				// If there is no backup, create one.
 				copyFile(mSkeletonFullPath, mSkeletonFullPath + ".bak");
 			}
-			VAR_ENABLE_DEBUGGING = true;
 			SkeletonSerializer skeletonSerializer;
 			skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_8);
 			mSkeleton->reload();
 			skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_0);
 			mSkeleton->reload();
-			VAR_ENABLE_DEBUGGING = false;
 		}
 	}
 #endif /* ifdef I_HAVE_LOT_OF_FREE_TIME */

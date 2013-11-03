@@ -106,7 +106,7 @@ namespace Ogre {
                 // unsigned int vertexIndex;
                 // unsigned short boneIndex;
                 // float weight;
-            M_MESH_LOD = 0x8000,
+            M_MESH_LOD_LEVEL = 0x8000,
                 // Optional LOD information
                 // string strategyName;
                 // unsigned short numLevels;
