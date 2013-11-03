@@ -48,7 +48,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
     {
-        if(mVAO)
+        if (mVAO)
         {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
             mVAO = 0;
@@ -58,7 +58,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GL3PlusVertexArrayObject::bind(void)
     {
-        if(mVAO)
+        if (mVAO)
         {
             OGRE_CHECK_GL_ERROR(glBindVertexArray(mVAO));
         }

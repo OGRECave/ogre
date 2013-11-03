@@ -30,16 +30,16 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-#define LOG_GENERATED_BUFFER
+// #define LOG_GENERATED_BUFFER
 const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
 struct FireworkParticle
 {
-    float pos[4];
-    // float timer;
-    // float type;
-    // float vel[3];
+    float pos[3];
+    float timer;
+    float type;
+    float vel[3];
 };
 #endif
 
@@ -67,9 +67,9 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         // This needs to be the initial launcher particle.
         particleSystemSeed->begin("Ogre/ParticleGS/Display", RenderOperation::OT_POINT_LIST);
         particleSystemSeed->position(0,0,0); // Position
-        // particleSystemSeed->textureCoord(1); // Timer
-        // particleSystemSeed->textureCoord(0); // Type
-        // particleSystemSeed->textureCoord(0,0,0); // Velocity
+        particleSystemSeed->textureCoord(1); // Timer
+        particleSystemSeed->textureCoord(0); // Type
+        particleSystemSeed->textureCoord(0,0,0); // Velocity
         particleSystemSeed->end();
 
         // Generate the RenderToBufferObject.
@@ -83,23 +83,31 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         VertexDeclaration* vertexDecl = r2vbObject->getVertexDeclaration();
         size_t offset = 0;
         // Position
-        offset += vertexDecl->addElement(0, offset, VET_FLOAT4, VES_POSITION).getSize();
-        // // Timer
-        // offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
-        // // Type
-        // offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 1).getSize();
-        // // Velocity
-        // vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize(); 
+        offset += vertexDecl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+        // Timer
+        offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
+        // Type
+        offset += vertexDecl->addElement(0, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 1).getSize();
+        // Velocity
+        vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize();
 
         // Apply the random texture.
-        // TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        // r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
-        //     getTextureUnitState("RandomTexture")->setTextureName(
-        //         randomTexture->getName(), randomTexture->getTextureType());
+        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
+        r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
+            getTextureUnitState("randomTexture")->setTextureName(
+                randomTexture->getName(), randomTexture->getTextureType());
 
         // Bind the two together.
         mParticleSystem->setRenderToVertexBuffer(r2vbObject);
         mParticleSystem->setManualObject(particleSystemSeed);
+
+        // GpuProgramParametersSharedPtr geomParams = mParticleSystem->
+        //     getRenderToVertexBuffer()->getRenderToBufferMaterial()->
+        //     getBestTechnique()->getPass(0)->getGeometryProgramParameters();
+        // if (geomParams->_findNamedConstantDefinition("randomTexture"))
+        // {
+        //     geomParams->setNamedConstant("randomTexture", 0);
+        // }
 
         // Set bounds.
         AxisAlignedBox aabb;
@@ -172,22 +180,22 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     bool frameStarted(const FrameEvent& evt)
     {
         // Set shader parameters.
-        // GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-        //     getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-        //     getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        // if (geomParams->_findNamedConstantDefinition("elapsedTime"))
-        // {
-        //     geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-        // }
-        // demoTime += evt.timeSinceLastFrame;
-        // if (geomParams->_findNamedConstantDefinition("globalTime"))
-        // {
-        //     geomParams->setNamedConstant("globalTime", demoTime);
-        // }
-        // if (geomParams->_findNamedConstantDefinition("frameGravity"))
-        // {
-        //     geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-        // }
+        GpuProgramParametersSharedPtr geomParams = mParticleSystem->
+            getRenderToVertexBuffer()->getRenderToBufferMaterial()->
+            getBestTechnique()->getPass(0)->getGeometryProgramParameters();
+        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
+        {
+            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
+        }
+        demoTime += evt.timeSinceLastFrame;
+        if (geomParams->_findNamedConstantDefinition("globalTime"))
+        {
+            geomParams->setNamedConstant("globalTime", demoTime);
+        }
+        if (geomParams->_findNamedConstantDefinition("frameGravity"))
+        {
+            geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
+        }
         return SdkSample::frameStarted(evt);
     }
 
@@ -213,11 +221,10 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
             FireworkParticle& p = particles[i];
             LogManager::getSingleton().getDefaultLog()->stream() <<
                 "FireworkParticle " << i + 1 << " : " <<
-                "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2];
-                // "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
-                // "Timer : " << p.timer << " , " <<
-                // "Type : " << p.type << " , " <<
-                // "Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
+                "Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
+                "Timer : " << p.timer << " , " <<
+                "Type : " << p.type << " , " <<
+                "Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
         }
         
         vertexBuffer->unlock();

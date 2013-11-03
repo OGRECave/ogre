@@ -156,20 +156,20 @@ namespace Ogre {
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attString));
 
-            // sadly position is a special case
+            // Sadly position is a special case.
             if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
             {
                 OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
             }
 
-            // for uv and other case the index is a part of the name
+            // For uv and other case the index is a part of the name.
             if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
             {
                 String attStringWithSemantic = String(attString) + StringConverter::toString(index);
                 OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
             }
 
-            // update mCustomAttributesIndexes with the index we found (or didn't find)
+            // Update mCustomAttributesIndexes with the index we found (or didn't find).
             mCustomAttributesIndexes[semantic-1][index] = attrib;
             res = attrib;
         }

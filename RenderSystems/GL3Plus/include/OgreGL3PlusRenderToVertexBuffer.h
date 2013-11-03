@@ -47,25 +47,25 @@ namespace Ogre {
         virtual ~GL3PlusRenderToVertexBuffer();
 
         /** Get the render operation for this buffer
-        */
+         */
         virtual void getRenderOperation(RenderOperation& op);
 
         /** Update the contents of this vertex buffer by rendering
-        */
+         */
         virtual void update(SceneManager* sceneMgr);
     protected:
-        void reallocateBuffer(size_t index);
-        void bindVerticesOutput(Pass* pass);
-        String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
         HardwareVertexBufferSharedPtr mVertexBuffers[2];
-        size_t mFrontBufferIndex;
+        /* size_t mSourceBufferIndex; */
+        size_t mTargetBufferIndex;
         GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
         bool mFirstUpdate;
         // GL4+
-        /* GLuint mFeedbackObject; */
-        GLuint VertexArray[2];
-        GLuint VertexBuffer[2];
+        // GLuint mFeedbackObject;
+
+        void bindVerticesOutput(Pass* pass);
+        void reallocateBuffer(size_t index);
+        String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
     };
 }
 

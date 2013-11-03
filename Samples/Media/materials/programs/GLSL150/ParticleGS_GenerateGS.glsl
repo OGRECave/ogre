@@ -12,7 +12,7 @@
 // After it's emitted, it explodes again into many PT_EMBER1's.
 #define PT_EMBER2   3 
 // Just a different colored ember1.
-#define PT_EMBER3   4 
+#define PT_EMBER3   4
 #define P_SHELLLIFE 3.0
 #define P_EMBER1LIFE 2.5
 #define P_EMBER2LIFE 1.5
@@ -25,25 +25,26 @@
 // This one was originally a variant, but also causes runtime errors.
 //#define MAX_EMBER_2S 15.0
 
+layout(points) in;
+layout(points, max_vertices = 60) out;
+
 in block {
-    vec4        Pos;
-    // float       Timer;
-    // float       Type;
-    // vec3        Vel;
+    vec3 Pos;
+    float Timer;
+    float Type;
+    vec3 Vel;
 } FireworkData[];
 
-layout(points) in;
-layout(points, max_vertices = 1) out;
+out vec3 outputPos;
+out float outputTimer;
+out float outputType;
+out vec3 outputVel;
 
-uniform sampler1D randomTex;
+uniform sampler1D randomTexture;
 uniform vec3 frameGravity;
 uniform float globalTime;
 uniform float elapsedTime;
 uniform float secondsPerFirework;
-out vec4 colour;
-// out float outputTimer;
-// out float outputType;
-// out vec3 outputVel;
 
 //
 // Generic particle motion handler
@@ -52,12 +53,16 @@ void GSGenericHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
                        float elapsedTime,
                        vec3 frameGravity)
 {
-    gl_Position.xyz = Pos + (Vel * elapsedTime);
     Vel += frameGravity;
     Timer -= elapsedTime;
+
     if (Pos.y > -100)
     {
-        EmitVertex();//Pos : POSITION, Vel : TEXCOORD2, Timer : TEXCOORD0, Type : TEXCOORD1);
+        outputPos = Pos + (Vel * elapsedTime);
+        outputTimer = Timer;
+        outputType = Type;
+        outputVel = Vel;
+        EmitVertex();
     }
 }
 
@@ -81,19 +86,19 @@ void GSLauncherHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
 {
     if (Timer <= 0)
     {
-        vec3 vRandom = normalize( RandomDir( Type, globalTime, randomTex) );
-        //Give it more of an up bias
-        vRandom = normalize(vRandom + vec3(0,2.5,0));
+        vec3 vRandom = normalize(RandomDir(Type, globalTime, randomTex));
+        // Give it more of an up bias.
+        vRandom = normalize(vRandom + vec3(0, 2.5, 0));
 
         // Time to emit a new SHELL.
-        gl_Position.xyz = Pos + Vel*elapsedTime;
-        // outputVel = Vel + vRandom*35.0;
-        // outputTimer = P_SHELLLIFE + vRandom.y*0.5;
-        // outputType = PT_SHELL;
-        EmitVertex();//(outputPos : POSITION, outputVel : TEXCOORD2, outputTimer : TEXCOORD0, outputType : TEXCOORD1);
+        outputPos = Pos + Vel * elapsedTime;
+        outputVel = Vel + vRandom * 35.0;
+        outputTimer = P_SHELLLIFE + vRandom.y * 0.5;
+        outputType = PT_SHELL;
+        EmitVertex();
 
         // Reset our timer.
-        Timer = secondsPerFirework + vRandom.x*0.4;
+        Timer = secondsPerFirework + vRandom.x * 0.4;
     }
     else
     {
@@ -101,7 +106,11 @@ void GSLauncherHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
     }
 
     // Emit ourselves to keep us alive.
-    EmitVertex();//( Pos : POSITION, Vel : TEXCOORD2, Timer : TEXCOORD0, Type : TEXCOORD1);
+    outputPos = Pos;
+    outputVel = Vel;
+    outputTimer = Timer;
+    outputType = Type;
+    EmitVertex();
 }
 
 //
@@ -120,12 +129,12 @@ void GSShellHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
         // Time to emit a series of new Ember1s.
         for (int i = 0; i < NUM_EMBER_1S; i++)
         {
-            vRandom = normalize( RandomDir( Type+i, globalTime, randomTex ) );
-            gl_Position.xyz = Pos + Vel*elapsedTime;
-            // outputVel = Vel + vRandom*15.0;
-            // outputTimer = P_EMBER1LIFE;
-            // outputType = PT_EMBER1;
-            EmitVertex();//(outputPos : POSITION, outputTimer : TEXCOORD0, outputType : TEXCOORD1, outputVel : TEXCOORD2);
+            vRandom = normalize(RandomDir(Type + i, globalTime, randomTex));
+            outputPos = Pos + Vel * elapsedTime;
+            outputVel = Vel + vRandom * 15.0;
+            outputTimer = P_EMBER1LIFE;
+            outputType = PT_EMBER1;
+            EmitVertex();
         }
 
         // Find out how many Ember2s to emit.
@@ -133,18 +142,18 @@ void GSShellHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
         //int numEmber2s = abs(vRandom.x)*MAX_EMBER_2S;
         for (int i = 0; i < NUM_EMBER_2S; i++)
         {
-            vRandom = normalize( RandomDir( Type, globalTime, randomTex) );
-            gl_Position.xyz = Pos + Vel*elapsedTime;
-            // outputVel = Vel + vRandom*10.0;
-            // outputTimer = P_EMBER2LIFE + 0.4*vRandom.x;
-            // outputType = PT_EMBER2;
-            EmitVertex();//(outputPos : POSITION, outputVel : TEXCOORD2, outputTimer : TEXCOORD0, outputType : TEXCOORD1);
+            vRandom = normalize(RandomDir(Type, globalTime, randomTex));
+            outputPos = Pos + Vel * elapsedTime;
+            outputVel = Vel + vRandom * 10.0;
+            outputTimer = P_EMBER2LIFE + 0.4 * vRandom.x;
+            outputType = PT_EMBER2;
+            EmitVertex();
         }
 
     }
     else
     {
-        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity );
+        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity);
     }
 }
 
@@ -157,7 +166,7 @@ void GSEmber1Handler( vec3 Pos, vec3 Vel, float Timer, float Type,
 {
     if (Timer > 0)
     {
-        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity );
+        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity);
     }
 }
 
@@ -175,42 +184,56 @@ void GSEmber2Handler( vec3 Pos, vec3 Vel, float Timer, float Type,
         // Time to emit a series of new Ember3's.
         for (int i = 0; i < NUM_EMBER_3S; i++)
         {
-            gl_Position.xyz = Pos + Vel*elapsedTime;
-            // outputVel = Vel + normalize( RandomDir( Type + i, globalTime, randomTex ) )*10.0;
-            // outputTimer = P_EMBER3LIFE;
-            // outputType = PT_EMBER3;
+            outputPos = Pos + Vel * elapsedTime;
+            outputVel = Vel + normalize(RandomDir(Type + i, globalTime, randomTex)) * 10.0;
+            outputTimer = P_EMBER3LIFE;
+            outputType = PT_EMBER3;
             EmitVertex();
         }
     }
     else
     {
-        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity );
+        GSGenericHandler(Pos, Vel, Timer, Type, elapsedTime, frameGravity);
     }
 }
 
 void main()
 {
-    // if (FireworkData[0].Type == PT_LAUNCHER)
-    //     GSLauncherHandler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
-    //                        elapsedTime, globalTime, randomTex, secondsPerFirework);
-    // else if (FireworkData[0].Type == PT_SHELL)
-    //     GSShellHandler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
-    //                     elapsedTime, globalTime, randomTex, frameGravity);
-    // else if (FireworkData[0].Type == PT_EMBER1 ||
-    //          FireworkData[0].Type == PT_EMBER3)
-    //     GSEmber1Handler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
-    //                      elapsedTime, frameGravity);
-    // else if (FireworkData[0].Type == PT_EMBER2)
-    //     GSEmber2Handler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
-    //                      elapsedTime, globalTime, randomTex, frameGravity);
-    colour = vec4(1.0,1.0,0.0,1.0);
-
-    // gl_Position.xyz = FireworkData[0].Pos.xyz; // + FireworkData[0].Vel * elapsedTime;
-    gl_Position = vec4(10,10,10,1);
-    // outputVel = FireworkData[0].Vel + 35.0;
-    // outputTimer = P_SHELLLIFE + 0.5;
-    // outputType = PT_SHELL;
-    EmitVertex();
-
+    if (FireworkData[0].Type == PT_LAUNCHER)
+        GSLauncherHandler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
+                           elapsedTime, globalTime, randomTexture, secondsPerFirework);
+    else if (FireworkData[0].Type == PT_SHELL)
+        GSShellHandler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
+                        elapsedTime, globalTime, randomTexture, frameGravity);
+    else if (FireworkData[0].Type == PT_EMBER1 ||
+             FireworkData[0].Type == PT_EMBER3)
+        GSEmber1Handler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
+                         elapsedTime, frameGravity);
+    else if (FireworkData[0].Type == PT_EMBER2)
+        GSEmber2Handler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
+                         elapsedTime, globalTime, randomTexture, frameGravity);
     EndPrimitive();
+
+    // // gl_Position.xyz = FireworkData[0].Pos;// + FireworkData[0].Vel * elapsedTime;
+    // // gl_Position.w = 1;
+    // outputPos = FireworkData[0].Pos + 1;// + FireworkData[0].Vel * elapsedTime;
+    // // outputPos = Pos[0];// + FireworkData[0].Vel * elapsedTime;
+    // //gl_Position = vec4(10, 10, 10, 1);
+    // // outputTimer = P_SHELLLIFE + 0.5;
+    // outputTimer = FireworkData[0].Timer;
+    // // outputTimer = Timer[0];
+    // outputType = FireworkData[0].Type;
+    // // outputType = Type[0];
+    // outputVel = FireworkData[0].Vel;
+    // // outputVel = Vel[0];
+    // //outputVel = vec3(4, 5, 35.0);
+    // EmitVertex();
+    // EndPrimitive();
+    // // // gl_Position = vec4(10, 20, 30, 1);
+    // outputPos = vec3(10, 20, 30);
+    // outputTimer = P_EMBER3LIFE;
+    // outputType = PT_SHELL;
+    // outputVel = vec3(40, 50, 60);
+    // EmitVertex();
+    // EndPrimitive();
 }

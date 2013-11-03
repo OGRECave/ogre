@@ -84,7 +84,7 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 
         mPixelBuffer = mImage->getBuffer(0,0);
 
-        // Lock the buffer so we can write to it
+        // Lock the buffer so we can write to it.
         mPixelBuffer->lock(HardwareBuffer::HBL_DISCARD);
         const PixelBox &pb = mPixelBuffer->getCurrentLock();
 

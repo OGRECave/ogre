@@ -103,7 +103,7 @@ fragment_program Ogre/ParticleGS/DisplayPSglsl glsl
 	syntax glsl150
 }
 
-//The material used to generate the particle system geometry
+// The material used to generate the particle system geometry.
 material Ogre/ParticleGS/Generate
 {
 	technique cg
@@ -154,7 +154,7 @@ material Ogre/ParticleGS/Generate
 				tex_address_mode wrap
 				filtering none
 			}
-			// This is needed if you render to a stream out buffer, otherwise, atleast DX 11 complains
+			// This is needed if you render to a stream out buffer, otherwise DX 11 complains
 			depth_write off
 			depth_check off
 		}
@@ -173,19 +173,19 @@ material Ogre/ParticleGS/Generate
 				
 			}
 			
-			// geometry_program_ref Ogre/ParticleGS/GenerateGSglsl
-			// {
-			// 	param_named frameGravity float3 0 -0.1 0
-			// 	param_named globalTime float 0.0
-			// 	param_named elapsedTime float 0.1
-			// 	param_named secondsPerFirework float 0.3
-			// }
-			
-			//This texture unit will be filled at runtime
-			texture_unit RandomTexture
+			geometry_program_ref Ogre/ParticleGS/GenerateGSglsl
 			{
-				tex_address_mode wrap
-				filtering none
+			    param_named frameGravity float3 0 -0.1 0
+			    param_named globalTime float 0.0
+			    param_named elapsedTime float 0.1
+			    param_named secondsPerFirework float 0.3
+			}
+			
+			// This texture unit will be filled at runtime.
+			texture_unit randomTexture
+			{
+		            tex_address_mode wrap
+			    filtering none
 			}
 		}
 	}
@@ -260,31 +260,31 @@ material Ogre/ParticleGS/Display
 	{
 		pass
 		{
-			// depth_write off
+			depth_write off
 			
 			vertex_program_ref Ogre/ParticleGS/DisplayVSglsl
 			{
 				
 			}
 			
-			// geometry_program_ref Ogre/ParticleGS/DisplayGSglsl
-			// {
-			// 	param_named_auto inverseView inverse_view_matrix
-			// 	param_named_auto worldViewProj worldviewproj_matrix
-			// }
+			geometry_program_ref Ogre/ParticleGS/DisplayGSglsl
+			{
+			    param_named_auto inverseView inverse_view_matrix
+			    param_named_auto worldViewProj worldviewproj_matrix
+			}
 			
 			fragment_program_ref Ogre/ParticleGS/DisplayPSglsl
 			{
 				
 			}
 			
-			// texture_unit
-			// {
-			// 	tex_coord_set 0
-			// 	texture particle.dds
-			// }
+			texture_unit
+			{
+			    tex_coord_set 0
+			    texture particle.dds
+			}
 			
-			// scene_blend alpha_blend
+			scene_blend alpha_blend
 		}
 	}
 }

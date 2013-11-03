@@ -38,7 +38,10 @@ THE SOFTWARE.
 namespace Ogre
 {
     GLSLProgramPipeline::GLSLProgramPipeline(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram) :
-        GLSLProgramCommon(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram) { }
+        GLSLProgramCommon(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram) 
+    {
+        mVertexArrayObject = new GL3PlusVertexArrayObject();
+    }
 
     GLSLProgramPipeline::~GLSLProgramPipeline()
     {
@@ -53,7 +56,6 @@ namespace Ogre
         OGRE_CHECK_GL_ERROR(glGenProgramPipelines(1, &mGLProgramPipelineHandle));
         //OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
 
-        mVertexArrayObject = new GL3PlusVertexArrayObject();
         mVertexArrayObject->bind();
 
         loadIndividualProgram(mVertexProgram);

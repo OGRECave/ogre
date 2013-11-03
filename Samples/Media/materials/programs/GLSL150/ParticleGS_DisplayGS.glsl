@@ -1,15 +1,15 @@
 #version 150
 
 in block {
-    vec3        pos;
-    vec4        color;
-    float       radius;
+    vec3 pos;
+    vec4 color;
+    float radius;
 } ColoredFirework[];
 
 out block {
-    vec4        pos;
-    vec4        color;
-    vec2        texcoord;
+    vec4 pos;
+    vec4 color;
+    vec2 texcoord;
 } Firework;
 
 uniform mat4 inverseView;

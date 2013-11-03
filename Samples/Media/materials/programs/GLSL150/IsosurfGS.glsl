@@ -21,7 +21,7 @@ out vec3 oNormal;
 
 uniform float IsoValue;
 
-uniform sampler2D edge_table;
+// uniform sampler2D edge_table;
 
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 4) out;

@@ -40,6 +40,25 @@
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
+    GL3PlusRenderToVertexBuffer::GL3PlusRenderToVertexBuffer()
+        : mTargetBufferIndex(0)
+        , mFirstUpdate(true)
+    {
+        mVertexBuffers[0].setNull();
+        mVertexBuffers[1].setNull();
+
+        // Create query objects.
+        OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
+
+        // GL4+
+        // glGenTransformFeedbacks(1, mFeedbackObject);
+    }
+    //-----------------------------------------------------------------------------
+    GL3PlusRenderToVertexBuffer::~GL3PlusRenderToVertexBuffer()
+    {
+        OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mPrimitivesDrawnQuery));
+    }
+    //-----------------------------------------------------------------------------
     static GLint getR2VBPrimitiveType(RenderOperation::OperationType operationType)
     {
         switch (operationType)
@@ -74,25 +93,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------------
-    GL3PlusRenderToVertexBuffer::GL3PlusRenderToVertexBuffer()
-        : mFrontBufferIndex(-1)
-        , mFirstUpdate(true)
-    {
-        mVertexBuffers[0].setNull();
-        mVertexBuffers[1].setNull();
-
-        // Create query objects.
-        OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
-
-        // GL4+
-        // glGenTransformFeedbacks(1, mFeedbackObject);
-    }
-    //-----------------------------------------------------------------------------
-    GL3PlusRenderToVertexBuffer::~GL3PlusRenderToVertexBuffer()
-    {
-        OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mPrimitivesDrawnQuery));
-    }
-    //-----------------------------------------------------------------------------
     void GL3PlusRenderToVertexBuffer::getRenderOperation(RenderOperation& op)
     {
         op.operationType = mOperationType;
@@ -100,140 +100,34 @@ namespace Ogre {
         op.vertexData = mVertexData;
     }
     //-----------------------------------------------------------------------------
-    // void GL3PlusRenderToVertexBuffer::update(SceneManager* sceneMgr)
-    // {
-    //     size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
-    //     if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
-    //     {
-    //         // Buffers don't match. Need to reallocate.
-    //         mResetRequested = true;
-    //     }
-
-    //     // Single pass only for now.
-    //     Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
-
-    //     // Set pass before binding buffers to activate the GPU programs.
-    //     sceneMgr->_setPass(r2vbPass);
-    //     if (mFirstUpdate)
-    //     {
-    //         bindVerticesOutput(r2vbPass);
-    //         mFirstUpdate = false;
-    //     }
-
-    //     RenderOperation renderOp;
-    //     size_t targetBufferIndex;
-    //     if (mResetRequested || mResetsEveryUpdate)
-    //     {
-    //         // Use source data to render to first buffer.
-    //         mSourceRenderable->getRenderOperation(renderOp);
-    //         targetBufferIndex = 0;
-    //     }
-    //     else
-    //     {
-    //         // Use current front buffer to render to back buffer.
-    //         this->getRenderOperation(renderOp);
-    //         targetBufferIndex = 1 - mFrontBufferIndex;
-    //     }
-
-    //     if (mVertexBuffers[targetBufferIndex].isNull() ||
-    //         mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
-    //     {
-    //         reallocateBuffer(targetBufferIndex);
-    //     }
-
-    //     // Disable rasterization.
-    //     OGRE_CHECK_GL_ERROR(glEnable(GL_RASTERIZER_DISCARD));
-
-    //     // Bind vertex array object.
-    //     if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-    //     {
-    //         GLSLProgramPipeline* programPipeline =
-    //             GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-    //         programPipeline->getVertexArrayObject()->bind();
-    //     }
-    //     else
-    //     {
-    //         GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-    //         linkProgram->getVertexArrayObject()->bind();
-    //     }
-    //     //TODO now bind vertex buffer 
-    //     GL3PlusHardwareVertexBuffer* vertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
-    //     OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->getGLBufferId()));
-    //     float buffer[3] = {0, 1, 2};
-    //     GLvoid* pBuffer = buffer;
-    //     OGRE_CHECK_GL_ERROR(glVertexAttribPointer(0, 3, GL_FLOAT, 0, 0, pBuffer));
-    //     OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(0));
-
-    //     // // Disable rasterization.
-    //     // //TODO is this second disabling of rasterization needed?
-    //     // OGRE_CHECK_GL_ERROR(glEnable(GL_RASTERIZER_DISCARD));
-
-
-
-    //     // Bind shader parameters.
-    //     RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
-    //     targetRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
-    //     targetRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
-    //     targetRenderSystem->_setProjectionMatrix(Matrix4::IDENTITY);
-    //     if (r2vbPass->hasVertexProgram())
-    //     {
-    //         targetRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM,
-    //                                                      r2vbPass->getVertexProgramParameters(), GPV_ALL);
-    //     }
-    //     if (r2vbPass->hasFragmentProgram())
-    //     {
-    //         targetRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM,
-    //                                                      r2vbPass->getFragmentProgramParameters(), GPV_ALL);
-    //     }
-    //     if (r2vbPass->hasGeometryProgram())
-    //     {
-    //         targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-    //                                                      r2vbPass->getGeometryProgramParameters(), GPV_ALL);
-    //     }
-    //     //TODO add tessellation stages
-
-    //     // Bind the target buffer.
-    //     OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer->getGLBufferId()));
-
-    //     // 'Render' data to the transform buffer.
-    //     OGRE_CHECK_GL_ERROR(glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery));
-    //     OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(getR2VBPrimitiveType(mOperationType)));
-    //     // OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(GL_LINES));
-    //     // OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(GL_TRIANGLES));
-
-    //     // targetRenderSystem->_render(renderOp);
-    //     OGRE_CHECK_GL_ERROR(glDrawArrays(GL_POINTS, 0, 1));
-        
-    //     //TODO GL 4+
-    //     //glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mFeedbackObject);
-    //     //glDrawTransformFeedback(getR2VBPrimitiveType(mOperationType), mFeedbackObject);
-
-    //     OGRE_CHECK_GL_ERROR(glEndTransformFeedback());
-
-    //     // Finish the query.
-    //     OGRE_CHECK_GL_ERROR(glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN));
-
-    //     // Read back query results.
-    //     GLuint primitivesWritten;
-    //     OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten));
-    //     mVertexData->vertexCount = primitivesWritten * getVertexCountPerPrimitive(mOperationType);
-
-    //     // Switch the vertex binding if necessary.
-    //     if (targetBufferIndex != mFrontBufferIndex)
-    //     {
-    //         mVertexData->vertexBufferBinding->unsetAllBindings();
-    //         mVertexData->vertexBufferBinding->setBinding(0, mVertexBuffers[targetBufferIndex]);
-    //         mFrontBufferIndex = targetBufferIndex;
-    //     }
-
-    //     // Enable rasterization.
-    //     OGRE_CHECK_GL_ERROR(glDisable(GL_RASTERIZER_DISCARD));
-
-    //     // Clear the reset flag.
-    //     mResetRequested = false;
-    // }
     void GL3PlusRenderToVertexBuffer::update(SceneManager* sceneMgr)
     {
+        //     size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
+        //     if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
+        //     {
+        //         // Buffers don't match. Need to reallocate.
+        //         mResetRequested = true;
+        //     }
+
+        //     if (mResetRequested || mResetsEveryUpdate)
+        //     {
+        //         // Use source data to render to first buffer.
+        //         mSourceRenderable->getRenderOperation(renderOp);
+        //         targetBufferIndex = 0;
+        //     }
+        //     else
+        //     {
+        //         // Use current front buffer to render to back buffer.
+        //         this->getRenderOperation(renderOp);
+        //         targetBufferIndex = 1 - mSourceBufferIndex;
+        //     }
+
+        //     if (mVertexBuffers[targetBufferIndex].isNull() ||
+        //         mVertexBuffers[targetBufferIndex]->getSizeInBytes() != bufSize)
+        //     {
+        //         reallocateBuffer(targetBufferIndex);
+        //     }
+
         // Single pass only for now.
         Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
 
@@ -245,8 +139,7 @@ namespace Ogre {
             mFirstUpdate = false;
         }
 
-        size_t sourceBufferIndex = 0;
-        size_t targetBufferIndex = 1;
+        // size_t targetBufferIndex = mSourceBufferIndex == 0 ? 0 : 1;
 
         // Disable rasterization.
         OGRE_CHECK_GL_ERROR(glEnable(GL_RASTERIZER_DISCARD));
@@ -271,14 +164,28 @@ namespace Ogre {
             targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
                                                          r2vbPass->getGeometryProgramParameters(), GPV_ALL);
         }
+        //TODO add tessellation stages
 
-        // Bind vertex array.
-        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[targetBufferIndex]));
-        OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[sourceBufferIndex]));
+        // Bind source vertex array + target tranform feedback buffer.
+        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
+        // OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[mTargetBufferIndex]));
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, targetVertexBuffer->getGLBufferId()));
+        // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLProgramPipeline* programPipeline =
+                GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+            programPipeline->getVertexArrayObject()->bind();
+        }
+        else
+        {
+            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            linkProgram->getVertexArrayObject()->bind();
+        }
 
         // 'Render' data to the transform buffer.
         OGRE_CHECK_GL_ERROR(glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery));
-        OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(GL_POINTS));
+        OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(getR2VBPrimitiveType(mOperationType)));
 
         RenderOperation renderOp;
         if (mResetRequested || mResetsEveryUpdate)
@@ -299,8 +206,6 @@ namespace Ogre {
         //glDrawTransformFeedback(getR2VBPrimitiveType(mOperationType), mFeedbackObject);
 
         OGRE_CHECK_GL_ERROR(glEndTransformFeedback());
-
-        // Finish the query.
         OGRE_CHECK_GL_ERROR(glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN));
 
         // Read back query results.
@@ -308,8 +213,126 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten));
         mVertexData->vertexCount = primitivesWritten * getVertexCountPerPrimitive(mOperationType);
 
+        // Switch the vertex binding.
+        mVertexData->vertexBufferBinding->unsetAllBindings();
+        mVertexData->vertexBufferBinding->setBinding(0, mVertexBuffers[mTargetBufferIndex]);
+        mTargetBufferIndex = mTargetBufferIndex == 0 ? 1 : 0;
+
         // Enable rasterization.
         OGRE_CHECK_GL_ERROR(glDisable(GL_RASTERIZER_DISCARD));
+
+        // Clear the reset flag.
+        mResetRequested = false;
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusRenderToVertexBuffer::bindVerticesOutput(Pass* pass)
+    {
+        // VertexDeclaratinon* declaration = mVertexData->vertexDeclaration;
+        // size_t elemCount = declaration->getElementCount();
+
+        // if (elemCount == 0)
+        //     return;
+
+        // Get program object ID.
+        GLuint linkProgramId = 0;
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLProgramPipeline* programPipeline =
+                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
+            GLSLGpuProgram* glslGpuProgram = 0;
+            if (glslGpuProgram = programPipeline->getGeometryProgram())
+                linkProgramId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
+            //TODO include tessellation stages
+            else // vertex program
+                linkProgramId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+        }
+        else
+        {
+            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            linkProgramId = linkProgram->getGLProgramHandle();
+        }
+
+        size_t sourceBufferIndex = mTargetBufferIndex == 0 ? 1 : 0;
+
+        // Bind and fill vertex arrays + buffers.
+        reallocateBuffer(sourceBufferIndex);
+        reallocateBuffer(mTargetBufferIndex);
+        // GL3PlusHardwareVertexBuffer* sourceVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mSourceBufferIndex].getPointer());
+        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
+
+        //TODO GL4+ glBindTransformFeedback
+
+        // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[0]));
+        // OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(0));
+        // OGRE_CHECK_GL_ERROR(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(buffer), 0));
+        // OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
+
+        // Store the output in a buffer.  The buffer has the same
+        // structure as the shader output vertex data.
+        // Note: 64 is the minimum number of interleaved
+        // attributes allowed by GL_EXT_transform_feedback so we
+        // are using it. Otherwise we could query during
+        // rendersystem initialisation and use a dynamic sized
+        // array.  But that would require C99.
+        const size_t elemCount = 4;
+        const GLchar* names[elemCount] = {
+            //"gl_Position",
+            "outputPos",
+            "outputTimer",
+            "outputType",
+            "outputVel"
+        };
+        
+        //FIXME Shader variable names should be dynamically determined like below.
+        // vector<const GLchar*>::type names;
+        // std::vector<const GLchar*> names;
+        // for (unsigned short e = 0; e < elemCount; e++)
+        // {
+        //     const VertexElement* element = declaration->getElement(e);
+        //     String varyingName = getSemanticVaryingName(element->getSemantic(), element->getIndex());
+        //     names.push_back(varyingName.c_str());
+        // }
+
+        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
+
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLProgramPipeline* programPipeline =
+                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
+            programPipeline->activate();
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
+        }
+
+#if OGRE_DEBUG_MODE
+        // Check if program linking was successful.
+        GLint didLink = 0;
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(linkProgramId, GL_LINK_STATUS, &didLink));
+        logObjectInfo(String("RVB GLSL link result : "), linkProgramId);
+        if (glIsProgram(linkProgramId))
+        {
+            glValidateProgram(linkProgramId);
+        }
+        logObjectInfo(String("RVB GLSL validation result : "), linkProgramId);
+
+        // Check if varyings were successfully set.
+        GLchar Name[64];
+        GLsizei Length(0);
+        GLsizei Size(0);
+        GLenum Type(0);
+        // bool Validated = false;
+        for (size_t i = 0; i < elemCount; i++) 
+        {
+            OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
+                linkProgramId, i, 64, &Length, &Size, &Type, Name
+            ));
+            std::cout << "Varying " << i << ": " << Name <<" "<< Length <<" "<< Size <<" "<< Type << std::endl;
+            // Validated = (Size == 1) && (Type == GL_FLOAT_VEC3);
+            // std::cout << Validated << " " << GL_FLOAT_VEC3 << std::endl;
+        }
+#endif
     }
     //-----------------------------------------------------------------------------
     void GL3PlusRenderToVertexBuffer::reallocateBuffer(size_t index)
@@ -320,15 +343,17 @@ namespace Ogre {
             mVertexBuffers[index].setNull();
         }
 
+        // Transform feedback buffer must be at least as large as the
+        // number of output primitives. AMD drivers seem to prefer
+        // that the array be at least one primitive larger than this.
         mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
-            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount,
+            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount + 1,
+#if OGRE_DEBUG_MODE
+            // Allow reading the contents of the buffer in debug mode.
             HardwareBuffer::HBU_DYNAMIC
-// #if OGRE_DEBUG_MODE
-//             // Allow reading the contents of the buffer in debug mode.
-//             HardwareBuffer::HBU_DYNAMIC
-// #else
-//             HardwareBuffer::HBU_STATIC_WRITE_ONLY
-// #endif
+#else
+            HardwareBuffer::HBU_STATIC_WRITE_ONLY
+#endif
         );
     }
     //-----------------------------------------------------------------------------
@@ -350,189 +375,5 @@ namespace Ogre {
                         "Unsupported vertex element sematic in render to vertex buffer",
                         "OgreGL3PlusRenderToVertexBuffer::getSemanticVaryingName");
         }
-    }
-    //-----------------------------------------------------------------------------
-    // void GL3PlusRenderToVertexBuffer::bindVerticesOutput(Pass* pass)
-    // {
-    //     VertexDeclaration* declaration = mVertexData->vertexDeclaration;
-    //     size_t elemCount = declaration->getElementCount();
-
-    //     if (elemCount > 0)
-    //     {
-    //         GLuint linkProgramId = 0;
-    //         // Have GLSL shaders, using varying attributes.
-    //         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-    //         {
-    //             GLSLProgramPipeline* programPipeline =
-    //                 GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-    //             // Linkprogramid = programPipeline->getGLProgramPipelineHandle();
-    //             GLSLGpuProgram* glslGpuProgram = 0;
-    //             if (glslGpuProgram = programPipeline->getGeometryProgram())
-    //                 linkProgramId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
-    //             //TODO include tessellation stages
-    //             else // vertex program
-    //                 linkProgramId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
-    //         }
-    //         else
-    //         {
-    //             GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-    //             linkProgramId = linkProgram->getGLProgramHandle();
-    //         }
-
-    //         // Note: 64 is the minimum number of interleaved
-    //         // attributes allowed by GL_EXT_transform_feedback So we
-    //         // are using it. Otherwise we could query during
-    //         // rendersystem initialisation and use a dynamic sized
-    //         // array.  But that would require C99. 
-    //         // const GLchar *names[64];
-    //         // const GLchar* names[1] = {"gl_Position"};//, "oUv0", "oUv1", "oUv2" };
-    //         // elemCount = 1;
-    //         const GLchar* names[1] = {
-    //             "Position0"
-    //             // "FireworkData.Pos"
-    //             // "gl_Position" 
-    //             // "outputTimer",
-    //             // "outputType",
-    //             // "outputVel"
-    //         };
-    //         elemCount = 1;
-    //         //FIXME Shader variable names should be dynamically determined like below.
-    //         //vector<const GLchar*>::type names;
-    //         // std::vector<const GLchar*> names;
-    //         // for (unsigned short e = 0; e < elemCount; e++)
-    //         // {
-    //         //     const VertexElement* element = declaration->getElement(e);
-    //         //     String varyingName = getSemanticVaryingName(element->getSemantic(), element->getIndex());
-    //         //     names.push_back(varyingName.c_str());
-    //         // }
-
-    //         // Store the output in a buffer.  The buffer has the same
-    //         // structure as the shader output vertex data.
-    //         // OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
-    //         OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, &names[0], GL_INTERLEAVED_ATTRIBS));
-
-    //         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-    //         {
-    //             GLSLProgramPipeline* programPipeline =
-    //                 GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-    //             programPipeline->activate();
-    //         }
-    //         else
-    //         {
-    //             OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
-    //         }
-
-    //         // Check if program linking was successful.
-    //         GLint didLink = 0;
-    //         OGRE_CHECK_GL_ERROR(glGetProgramiv(linkProgramId, GL_LINK_STATUS, &didLink));
-    //         logObjectInfo(String("RVB GLSL link result : "), linkProgramId);
-    //         if (glIsProgram(linkProgramId))
-    //         {
-    //             glValidateProgram(linkProgramId);
-    //         }
-    //         logObjectInfo(String("RVB GLSL validation result : "), linkProgramId);
-
-    //         // glGetTranformFeedbackVarying seems broken in AMD drivers,
-    //         // returning a type value 0 no matter the actual type.
-    //         // Not sure about Nvidia.
-    //         GLchar Name[64];
-    //         GLsizei Length(0);
-    //         GLsizei Size(0);
-    //         GLenum Type(0);
-    //         OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
-    //             linkProgramId, 0, 64, &Length, &Size, &Type, Name
-    //         ));
-    //         std::cout << "Varying: " << Name <<" "<< Length <<" "<< Size <<" "<< Type << std::endl;
-    //         bool Validated(false);
-    //         Validated = (Size == 1) && (Type == GL_FLOAT_VEC4);
-    //         std::cout << Validated << " " << GL_FLOAT_VEC4 << std::endl;
-    //     }
-    // }
-    void GL3PlusRenderToVertexBuffer::bindVerticesOutput(Pass* pass)
-    {
-        // VertexDeclaration* declaration = mVertexData->vertexDeclaration;
-        // size_t elemCount = declaration->getElementCount();
-
-        // if (elemCount == 0)
-        //     return;
-
-        // Get program object ID.
-        GLuint linkProgramId = 0;
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
-            GLSLGpuProgram* glslGpuProgram = 0;
-            if (glslGpuProgram = programPipeline->getGeometryProgram())
-                linkProgramId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
-            else // vertex program
-                linkProgramId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
-        }
-        else
-        {
-            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-            linkProgramId = linkProgram->getGLProgramHandle();
-        }
-
-        size_t sourceBufferIndex = 0;
-        size_t targetBufferIndex = 1;
-        // Bind vertex array object.
-        OGRE_CHECK_GL_ERROR(glGenVertexArrays(2, &VertexArray[0]));
-        // Bind and fill vertex buffers.
-        float bufferData[3] = {0.0, 1.0, 2.0};
-        float * buffer = bufferData;
-        OGRE_CHECK_GL_ERROR(glGenBuffers(2, &VertexBuffer[0]));
-        for (int i = 0; i < 2; i++)
-        {
-            OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[i]));
-            //glBindTransformFeedback
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer[i]));
-            OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, sizeof(buffer)*(i+1), buffer, GL_DYNAMIC_DRAW));
-            OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(0));
-            OGRE_CHECK_GL_ERROR(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(buffer)*(i+1), 0));
-            OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[i]));
-        }
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
-
-        // Store the output in a buffer.  The buffer has the same
-        // structure as the shader output vertex data.
-        const GLchar* names[1] = {
-            "Position0"
-        };
-        size_t elemCount = 1;
-        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
-
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
-            programPipeline->activate();
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
-        }
-
-        // Check if program linking was successful.
-        GLint didLink = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(linkProgramId, GL_LINK_STATUS, &didLink));
-        logObjectInfo(String("RVB GLSL link result : "), linkProgramId);
-        if (glIsProgram(linkProgramId))
-        {
-            glValidateProgram(linkProgramId);
-        }
-        logObjectInfo(String("RVB GLSL validation result : "), linkProgramId);
-
-        GLchar Name[64];
-        GLsizei Length(0);
-        GLsizei Size(0);
-        GLenum Type(0);
-        OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
-            linkProgramId, 0, 64, &Length, &Size, &Type, Name
-        ));
-        std::cout << "Varying: " << Name <<" "<< Length <<" "<< Size <<" "<< Type << std::endl;
-        bool Validated(false);
-        Validated = (Size == 1) && (Type == GL_FLOAT_VEC4);
-        std::cout << Validated << " " << GL_FLOAT_VEC4 << std::endl;
     }
 }

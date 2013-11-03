@@ -52,6 +52,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
         mFence = 0;
         //        std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }

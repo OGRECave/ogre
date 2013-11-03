@@ -98,10 +98,10 @@ namespace Ogre {
     // Creation / loading methods
     void GL3PlusTexture::createInternalResourcesImpl(void)
     {
-        // Adjust format if required
+        // Adjust format if required.
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
-        // Check requested number of mipmaps
+        // Check requested number of mipmaps.
         size_t maxMips = GL3PlusPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
 
         if (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
@@ -111,25 +111,26 @@ namespace Ogre {
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
 
-        // Generate texture name
+        // Create a texture object and identify its GL type.
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
         GLenum texTarget = getGL3PlusTextureTarget();
 
-        // Calculate size for all mip levels of the texture
+        // Calculate size for all mip levels of the texture.
         size_t width, height, depth;
 
         if ((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
-            // Standard alignment of 4 is not right for some formats
+            // Standard alignment of 4 is not right for some formats.
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         }
 
-        // Set texture type
+        // Bind texture object to its type, making it the active texture object
+        // for that type.
         OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL,
                                             (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps ));
-        // Set some misc default parameters, these can of course be changed later
+        // Set some misc default parameters, these can of course be changed later.
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST));
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
@@ -139,7 +140,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-        // Set up texture swizzling
+        // Set up texture swizzling.
         if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
@@ -163,7 +164,7 @@ namespace Ogre {
             }
         }
 
-        // Allocate internal buffer so that glTexSubImageXD can be used
+        // Allocate internal buffer so that glTexSubImageXD can be used.
         // Internal format
         GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         GLenum datatype = GL3PlusPixelUtil::getGLOriginDataType(mFormat);
