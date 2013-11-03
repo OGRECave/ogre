@@ -135,6 +135,7 @@ namespace Ogre {
 
 }
 
+
  #elif OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1400 && OGRE_THREAD_SUPPORT
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -145,14 +146,68 @@ namespace Ogre {
 #endif
 #include <windows.h>
 #include <intrin.h>
+#include "Threading/OgreThreadHeaders.h"
 
 // Save warnings state
 #   pragma warning (push)
 #   pragma warning (disable : 4244)
 
+
+
 namespace Ogre {
 
-	/** \addtogroup Core
+    // a hack so we can support windows xp.
+#define NEED_TO_INIT_INTERLOCKEDCOMPAREEXCHANGE64WRAPPER
+    struct _OgreExport InterlockedCompareExchange64Wrapper
+    {
+        InterlockedCompareExchange64Wrapper();
+
+        typedef 
+            LONGLONG
+            (WINAPI *func_InterlockedCompareExchange64)( 
+            __inout LONGLONG volatile *Destination,
+            __in    LONGLONG Exchange,
+            __in    LONGLONG Comperand) ;
+
+        static func_InterlockedCompareExchange64 Ogre_InterlockedCompareExchange64;
+
+        static FORCEINLINE
+            LONGLONG
+            Ogre_InterlockedIncrement64 (
+            __inout LONGLONG volatile *Addend
+            )
+        {
+            LONGLONG Old;
+
+            do {
+                Old = *Addend;
+            } while (Ogre_InterlockedCompareExchange64(Addend,
+                Old + 1,
+                Old) != Old);
+
+            return Old + 1;
+        }
+
+        static FORCEINLINE
+            LONGLONG
+            Ogre_InterlockedDecrement64 (
+            __inout LONGLONG volatile *Addend
+            )
+        {
+            LONGLONG Old;
+
+            do {
+                Old = *Addend;
+            } while (Ogre_InterlockedCompareExchange64(Addend,
+                Old - 1,
+                Old) != Old);
+
+            return Old - 1;
+        }
+
+    };
+
+    /** \addtogroup Core
 	*  @{
 	*/
 	/** \addtogroup General
@@ -198,11 +253,14 @@ namespace Ogre {
 			{
                 return _InterlockedCompareExchange((LONG*)&mField, static_cast<LONG>(nu), static_cast<LONG>(old)) == static_cast<LONG>(old);
 			} 
-			else if (sizeof(T)==8) {
-                return _InterlockedCompareExchange64((LONGLONG*)&mField, static_cast<LONGLONG>(nu), static_cast<LONGLONG>(old)) == static_cast<LONGLONG>(old);
+			else if (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL) {
+                return InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64((LONGLONG*)&mField, static_cast<LONGLONG>(nu), static_cast<LONGLONG>(old)) == static_cast<LONGLONG>(old);
             } 
 			else {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::cas");
+                OGRE_LOCK_AUTO_MUTEX;
+                if (mField != old) return false;
+                mField = nu;
+                return true;
             }
         }
             
@@ -212,10 +270,11 @@ namespace Ogre {
                 return _InterlockedIncrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField);
-            } else if (sizeof(T)==8) {
-                return InterlockedIncrement64((LONGLONG*)&mField);
+            } else if (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL) {
+                return InterlockedCompareExchange64Wrapper::Ogre_InterlockedIncrement64((LONGLONG*)&mField);
             } else {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator++(prefix)");
+                OGRE_LOCK_AUTO_MUTEX;
+                return ++mField;
             }
         }
             
@@ -225,10 +284,11 @@ namespace Ogre {
                 return _InterlockedDecrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField);
-            } else if (sizeof(T)==8) {
-                return InterlockedDecrement64((LONGLONG*)&mField);
+            } else if (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL) {
+                return InterlockedCompareExchange64Wrapper::Ogre_InterlockedDecrement64((LONGLONG*)&mField);
             } else {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator--(prefix)");
+                OGRE_LOCK_AUTO_MUTEX;
+                return --mField;
             }
         }
 
@@ -238,10 +298,11 @@ namespace Ogre {
                 return _InterlockedIncrement16((SHORT*)&mField)-1;
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField)-1;
-            } else if (sizeof(T)==8) {
-                return InterlockedIncrement64((LONGLONG*)&mField)-1;
+            } else if (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL) {
+                return InterlockedCompareExchange64Wrapper::Ogre_InterlockedIncrement64((LONGLONG*)&mField)-1;
             } else {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator++(postfix)");
+                OGRE_LOCK_AUTO_MUTEX;
+                return mField++;
             }
         }
             
@@ -251,42 +312,63 @@ namespace Ogre {
                 return _InterlockedDecrement16((SHORT*)&mField)+1;
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField)+1;
-            } else if (sizeof(T)==8) {
-                return InterlockedDecrement64((LONGLONG*)&mField)+1;
+            } else if (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL) {
+                return InterlockedCompareExchange64Wrapper::Ogre_InterlockedDecrement64((LONGLONG*)&mField)+1;
             } else {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator--(postfix)");
+                OGRE_LOCK_AUTO_MUTEX;
+                return mField--;
             }
         }
 
 		T operator+=(const T &add)
 		{
-			//The function InterlockedExchangeAdd is not available for 64 and 16 bit version
-			//We will use the cas operation instead. 
-			T newVal;
-			do {
-				//Create a value of the current field plus the added value
-				newVal = mField + add;
-				//Replace the current field value with the new value. Ensure that the value 
-				//of the field hasn't changed in the mean time by comparing it to the new value
-				//minus the added value. 
-			} while (!cas(newVal - add, newVal)); //repeat until successful
-			return newVal;
+            if ((sizeof(T)==2) || (sizeof(T)==4) || (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL)) {
+                //The function InterlockedExchangeAdd is not available for 64 and 16 bit version
+                //We will use the cas operation instead. 
+                T newVal;
+                do {
+                    //Create a value of the current field plus the added value
+                    newVal = mField + add;
+                    //Replace the current field value with the new value. Ensure that the value 
+                    //of the field hasn't changed in the mean time by comparing it to the new value
+                    //minus the added value. 
+                } while (!cas(newVal - add, newVal)); //repeat until successful
+                return newVal;
+            }
+            else
+            {
+                OGRE_LOCK_AUTO_MUTEX;
+                mField += add;
+                return mField;
+            }
 		}
 
 		T operator-=(const T &sub)
 		{
-			//The function InterlockedExchangeAdd is not available for 64 and 16 bit version
-			//We will use the cas operation instead. 
-			T newVal;
-			do {
-				//Create a value of the current field plus the added value
-				newVal = mField - sub;
-				//Replace the current field value with the new value. Ensure that the value 
-				//of the field hasn't changed in the mean time by comparing it to the new value
-				//minus the added value. 
-			} while (!cas(newVal + sub, newVal)); //repeat until successful
-			return newVal;
+            if ((sizeof(T)==2) || (sizeof(T)==4) || (sizeof(T)==8 && InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64 != NULL)) {
+                //The function InterlockedExchangeAdd is not available for 64 and 16 bit version
+                //We will use the cas operation instead. 
+                T newVal;
+                do {
+                    //Create a value of the current field plus the added value
+                    newVal = mField - sub;
+                    //Replace the current field value with the new value. Ensure that the value 
+                    //of the field hasn't changed in the mean time by comparing it to the new value
+                    //minus the added value. 
+                } while (!cas(newVal + sub, newVal)); //repeat until successful
+                return newVal;
+            }
+            else
+            {
+                OGRE_LOCK_AUTO_MUTEX;
+                mField -= sub;
+                return mField;
+            }
 		}
+
+        protected:
+
+        OGRE_AUTO_MUTEX;
 
         volatile T mField;
 
@@ -327,7 +409,6 @@ namespace Ogre {
 
         void operator= (const AtomicScalar<T> &cousin)
         {
-            OGRE_LOCK_AUTO_MUTEX;
             mField = cousin.mField;
         }
 
@@ -341,7 +422,6 @@ namespace Ogre {
 
         void set (const T &v)
         {
-            OGRE_LOCK_AUTO_MUTEX;
             mField = v;
         }
 
