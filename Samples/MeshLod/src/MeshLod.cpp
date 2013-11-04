@@ -415,22 +415,28 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 {
 	ResourceGroupManager& resourceGroupMgr = ResourceGroupManager::getSingleton();
 	String group = mesh->getGroup();
-	// If we don't add * to the name, the pattern matcher will not find it.
-	String name = "*" + mLodConfig.mesh->getName();
-	FileInfoListPtr locPtr = resourceGroupMgr.findResourceFileInfo(group, name);
-	assert(locPtr->size() == 1);
+	String name = mesh->getName();
+	FileInfo* info;
+	FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
+	FileInfoList::iterator it, itEnd;
+	it = locPtr->begin();
+	itEnd = locPtr->end();
+	for (; it != itEnd; it++) {
+		if (name == it->filename) {
+			info = &*it;
+			break;
+		}
+	}
 
-	FileInfo& info = locPtr->at(0);
-
-	outPath = info.archive->getName();
+	outPath = info->archive->getName();
 	if(outPath.back() != '/' && outPath.back() != '\\')
 		outPath += '/';
-	outPath += info.path;
+	outPath += info->path;
 	if(outPath.back() != '/' && outPath.back() != '\\')
 		outPath += '/';
-	outPath += info.filename;
+	outPath += info->filename;
 
-	return (info.archive->getType() == "FileSystem");
+	return (info->archive->getType() == "FileSystem");
 }
 
 void Sample_MeshLod::addToProfile( Real cost )
