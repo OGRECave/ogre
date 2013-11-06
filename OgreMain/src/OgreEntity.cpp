@@ -77,6 +77,7 @@ namespace Ogre {
 		  mSoftwareAnimationNormalsRequests(0),
           mSkipAnimStateUpdates(false),
 		  mAlwaysUpdateMainSkeleton(false),
+          mUpdateBoundingBoxFromSkeleton(false),
 		  mMeshLodIndex(0),
 		  mMeshLodFactorTransformed(1.0f),
 		  mMinMeshLodIndex(99),
@@ -115,6 +116,7 @@ namespace Ogre {
 		mSoftwareAnimationNormalsRequests(0),
         mSkipAnimStateUpdates(false),
 		mAlwaysUpdateMainSkeleton(false),
+        mUpdateBoundingBoxFromSkeleton(false),
 		mMeshLodIndex(0),
 		mMeshLodFactorTransformed(1.0f),
 		mMinMeshLodIndex(99),
@@ -505,16 +507,46 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const AxisAlignedBox& Entity::getBoundingBox(void) const
     {
-		// Get from Mesh
 		if (mMesh->isLoaded())
 		{
-			mFullBoundingBox = mMesh->getBounds();
-			mFullBoundingBox.merge(getChildObjectsBoundingBox());
+            if ( mUpdateBoundingBoxFromSkeleton && hasSkeleton() )
+            {
+                // get from skeleton
+                // self bounding box without children
+                AxisAlignedBox bbox;
+                bbox.setNull();
+                //Matrix4 parentXform = mParentNode->_getFullTransform();
+                // for each bone that has vertices weighted to it,
+                for (size_t iBlend = 0; iBlend < mMesh->sharedBlendIndexToBoneIndexMap.size(); ++iBlend)
+                {
+                    size_t boneHandle = mMesh->sharedBlendIndexToBoneIndexMap[ iBlend ];
+                    const Bone* bone = mSkeletonInstance->getBone( boneHandle );
+                    bbox.merge( bone->_getDerivedPosition() );
+                }
+                float r = mMesh->getBoneBoundingRadius();
+                Vector3 expansion(r, r, r);
+                bbox.setExtents( bbox.getMinimum() - expansion, bbox.getMaximum() + expansion );
+                bbox.merge(getChildObjectsBoundingBox());
+                // if bounding box has changed,
+                if (bbox != mFullBoundingBox)
+                {
+                    mFullBoundingBox = bbox;
+                    Node::queueNeedUpdate( mParentNode );  // inform the parent node to update its AABB (without this, changes to the bbox won't propagate to the scene node)
+                }
+            }
+            else
+            {
+                // Get from Mesh
+                mFullBoundingBox = mMesh->getBounds();
+                mFullBoundingBox.merge(getChildObjectsBoundingBox());
+            }
 
 			// Don't scale here, this is taken into account when world BBox calculation is done
 		}
 		else
+        {
 			mFullBoundingBox.setNull();
+        }
 
         return mFullBoundingBox;
     }

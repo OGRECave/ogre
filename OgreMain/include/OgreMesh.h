@@ -139,6 +139,8 @@ namespace Ogre {
         AxisAlignedBox mAABB;
         /// Local bounding sphere radius (centered on object).
         Real mBoundRadius;
+        /// Largest bounding radius of any bone in the skeleton (centered on each bone, only considering verts weighted to the bone)
+        Real mBoneBoundingRadius;
 
         /// Optional linked skeleton.
         String mSkeletonName;
@@ -214,6 +216,7 @@ namespace Ogre {
 
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
 									 unsigned short texCoordSetToDestroy, VertexData *vertexData );
+        void computeBoneBoundingRadius();
 
 
     public:
@@ -340,6 +343,9 @@ namespace Ogre {
         /** Gets the radius of the bounding sphere surrounding this mesh. */
         Real getBoundingSphereRadius(void) const;
 
+        /** Gets the radius used to inflate the bounding box around the bones. */
+        Real getBoneBoundingRadius() const;
+
         /** Manually set the bounding box for this Mesh.
         @remarks
             Calling this method is required when building manual meshes now, because OGRE can no longer 
@@ -358,6 +364,13 @@ namespace Ogre {
             if they are not, reading data from a hardware buffer is a bottleneck).
         */
         void _setBoundingSphereRadius(Real radius);
+
+        /** Manually set the bone bounding radius. 
+        @remarks
+            This value is computed automatically when the mesh is loaded, however it can
+            be overriden with this method.
+        */
+        void _setBoneBoundingRadius(Real radius);
 
 		/** Automatically update the bounding radius and bounding box for this Mesh.
 		@remarks

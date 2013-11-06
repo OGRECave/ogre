@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreAnimationTrack.h"
+#include "OgreBone.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
@@ -51,6 +52,7 @@ namespace Ogre {
         const String& group, bool isManual, ManualResourceLoader* loader)
         : Resource(creator, name, handle, group, isManual, loader),
         mBoundRadius(0.0f),
+        mBoneBoundingRadius(0.0f),
         mBoneAssignmentsOutOfDate(false),
         mLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy()),
         mHasManualLodLevel(false),
@@ -334,6 +336,7 @@ namespace Ogre {
         // Copy bounds
         newMesh->mAABB = mAABB;
         newMesh->mBoundRadius = mBoundRadius;
+        newMesh->mBoneBoundingRadius = mBoneBoundingRadius;
         newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
 		newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
 
@@ -420,6 +423,11 @@ namespace Ogre {
     void Mesh::_setBoundingSphereRadius(Real radius)
     {
         mBoundRadius = radius;
+    }
+    //-----------------------------------------------------------------------
+    void Mesh::_setBoneBoundingRadius(Real radius)
+    {
+        mBoneBoundingRadius = radius;
     }
     //-----------------------------------------------------------------------
 	void Mesh::_updateBoundsFromVertexBuffers(bool pad)
@@ -552,7 +560,9 @@ namespace Ogre {
 
 			// Take the opportunity to update the compiled bone assignments
             _updateCompiledBoneAssignments();
-		}
+
+            computeBoneBoundingRadius();
+        }
 
 		// Animation states for vertex animation
 		for (AnimationList::iterator i = mAnimationsList.begin();
@@ -886,6 +896,129 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+    Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )
+    {
+        Vector3 v01 = line1 - line0;
+        Real tt = v01.dotProduct( pt - line0 ) / std::max( v01.dotProduct(v01), Real(1e-6f) );
+        tt = Math::Clamp( tt, Real(0.0f), Real(1.0f) );
+        Vector3 onLine = line0 + tt * v01;
+        return pt.distance( onLine );
+    }
+    //---------------------------------------------------------------------
+    Real _computeBoneBoundingRadius( VertexData* vertexData,
+        const Mesh::VertexBoneAssignmentList& boneAssignments,
+        const vector<Vector3>::type& bonePositions,
+        const vector< vector<ushort>::type >::type& boneChildren
+        )
+    {
+        vector<Vector3>::type vertexPositions;
+        {
+            // extract vertex positions
+            vertexPositions.resize( vertexData->vertexCount );
+            const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+            HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+            unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+            float* pFloat;
+
+            for(size_t i = 0; i < vertexData->vertexCount; ++i)
+            {
+                posElem->baseVertexPointerToElement(vertex, &pFloat);
+                vertexPositions[ i ] = Vector3( pFloat[0], pFloat[1], pFloat[2] );
+                vertex += vbuf->getVertexSize();
+            }
+            vbuf->unlock();
+        }
+        Real maxRadius = Real(0);
+        Real minWeight = Real(0.01);
+        // for each vertex-bone assignment,
+        for (Mesh::VertexBoneAssignmentList::const_iterator i = boneAssignments.begin(); i != boneAssignments.end(); ++i)
+        {
+            // if weight is close to zero, ignore
+            if (i->second.weight > minWeight)
+            {
+                // if we have a bounding box around all bone origins, we consider how far outside this box the
+                // current vertex could ever get (assuming it is only attached to the given bone, and the bones all have unity scale)
+                size_t iBone = i->second.boneIndex;
+                const Vector3& v = vertexPositions[ i->second.vertexIndex ];
+                Vector3 diff = v - bonePositions[ iBone ];
+                Real dist = diff.length();  // max distance of vertex v outside of bounding box
+                // if this bone has children, we can reduce the dist under the assumption that the children may rotate wrt their parent, but don't translate
+                for (size_t iChild = 0; iChild < boneChildren[iBone].size(); ++iChild)
+                {
+                    // given this assumption, we know that the bounding box will enclose both the bone origin as well as the origin of the child bone,
+                    // and therefore everything on a line segment between the bone origin and the child bone will be inside the bounding box as well
+                    size_t iChildBone = boneChildren[ iBone ][ iChild ];
+                    // compute distance from vertex to line segment between bones
+                    float distChild = distLineSegToPoint( bonePositions[ iBone ], bonePositions[ iChildBone ], v );
+                    dist = std::min( dist, distChild );
+                }
+                // scale the distance by the weight, this prevents the radius from being over-inflated because of a vertex that is lightly influenced by a faraway bone
+                dist *= i->second.weight;
+                maxRadius = std::max( maxRadius, dist );
+            }
+        }
+        return maxRadius;
+    }
+    //---------------------------------------------------------------------
+    void Mesh::computeBoneBoundingRadius()
+    {
+        if (mBoneBoundingRadius == Real(0))
+        {
+            Real radius = Real(0);
+            vector<Vector3>::type bonePositions;
+            vector< vector<ushort>::type >::type boneChildren;  // for each bone, a list of children
+            {
+                // extract binding pose bone positions, and also indices for child bones
+                size_t numBones = mSkeleton->getNumBones();
+                mSkeleton->setBindingPose();
+                mSkeleton->_updateTransforms();
+                bonePositions.resize( numBones );
+                boneChildren.resize( numBones );
+                // for each bone,
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    Bone* bone = mSkeleton->getBone( iBone );
+                    bonePositions[ iBone ] = bone->_getDerivedPosition();
+                    boneChildren[ iBone ].reserve( bone->numChildren() );
+                    for (size_t iChild = 0; iChild < bone->numChildren(); ++iChild)
+                    {
+                        Bone* child = static_cast<Bone*>( bone->getChild( iChild ) );
+                        boneChildren[ iBone ].push_back( child->getHandle() );
+                    }
+                }
+            }
+            if (sharedVertexData)
+            {
+                // check shared vertices
+                radius = _computeBoneBoundingRadius(sharedVertexData, mBoneAssignments, bonePositions, boneChildren);
+            }
+
+            // check submesh vertices
+            SubMeshList::const_iterator itor = mSubMeshList.begin();
+            SubMeshList::const_iterator end  = mSubMeshList.end();
+
+            while( itor != end )
+            {
+                SubMesh* submesh = *itor;
+                if (!submesh->useSharedVertices && submesh->vertexData)
+                {
+                    Real r = _computeBoneBoundingRadius(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
+                    radius = std::max( radius, r );
+                }
+                ++itor;
+            }
+            if (radius > Real(0))
+            {
+                mBoneBoundingRadius = radius;
+            }
+            else
+            {
+                // fallback if we failed to find the vertices
+                mBoneBoundingRadius = mBoundRadius;
+            }
+        }
+    }
+    //---------------------------------------------------------------------
     void Mesh::_notifySkeleton(SkeletonPtr& pSkel)
     {
         mSkeleton = pSkel;
@@ -1060,6 +1193,11 @@ namespace Ogre {
     Real Mesh::getBoundingSphereRadius(void) const
     {
         return mBoundRadius;
+    }
+    //---------------------------------------------------------------------
+    Real Mesh::getBoneBoundingRadius(void) const
+    {
+        return mBoneBoundingRadius;
     }
     //---------------------------------------------------------------------
 	void Mesh::setVertexBufferPolicy(HardwareBuffer::Usage vbUsage, bool shadowBuffer)

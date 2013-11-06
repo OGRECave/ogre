@@ -225,6 +225,8 @@ namespace Ogre {
         bool mSkipAnimStateUpdates;
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
+        /// Flag indicating whether to update the bounding box from the bones of the skeleton.
+        bool mUpdateBoundingBoxFromSkeleton;
 
 #if !OGRE_NO_MESHLOD
         /// The LOD number of the mesh to use, calculated by _notifyCurrentCamera.
@@ -316,7 +318,7 @@ namespace Ogre {
 
 
         /// Bounding box that 'contains' all the mesh of each child entity.
-        mutable AxisAlignedBox mFullBoundingBox;
+        mutable AxisAlignedBox mFullBoundingBox;  // note: this exists only so that getBoundingBox() can return an AAB by reference
 
         ShadowRenderableList mShadowRenderables;
 
@@ -860,6 +862,26 @@ namespace Ogre {
         */
         bool getAlwaysUpdateMainSkeleton() const {
             return mAlwaysUpdateMainSkeleton;
+        }
+
+        /** If true, the skeleton of the entity will be used to update the bounding box for culling.
+            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
+            bounding box of the mesh in the binding pose will be used.
+        @remarks
+            When true, the bounding box will be generated to only enclose the bones that are used for skinning.
+            Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoundingSphereRadius().
+            The expansion amount can be changed on the mesh to achieve a better fitting bounding box.
+        */
+        void setUpdateBoundingBoxFromSkeleton(bool update) {
+             mUpdateBoundingBoxFromSkeleton = update;
+        }
+
+        /** If true, the skeleton of the entity will be used to update the bounding box for culling.
+            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
+            bounding box of the mesh in the binding pose will be used.
+        */
+        bool getUpdateBoundingBoxFromSkeleton() const {
+            return mUpdateBoundingBoxFromSkeleton;
         }
 
         
