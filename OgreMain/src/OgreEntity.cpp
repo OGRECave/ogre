@@ -515,15 +515,23 @@ namespace Ogre {
                 // self bounding box without children
                 AxisAlignedBox bbox;
                 bbox.setNull();
+                Real maxScale = Real(0);
                 //Matrix4 parentXform = mParentNode->_getFullTransform();
                 // for each bone that has vertices weighted to it,
                 for (size_t iBlend = 0; iBlend < mMesh->sharedBlendIndexToBoneIndexMap.size(); ++iBlend)
                 {
                     size_t boneHandle = mMesh->sharedBlendIndexToBoneIndexMap[ iBlend ];
                     const Bone* bone = mSkeletonInstance->getBone( boneHandle );
-                    bbox.merge( bone->_getDerivedPosition() );
+                    Vector3 scaleVec = bone->_getDerivedScale();
+                    Real scale = std::max( std::max( Math::Abs(scaleVec.x), Math::Abs(scaleVec.y)), Math::Abs(scaleVec.z) );
+                    maxScale = std::max( maxScale, scale );
+                    // only include bones that aren't scaled to zero
+                    if (scale > Real(0))
+                    {
+                        bbox.merge( bone->_getDerivedPosition() );
+                    }
                 }
-                float r = mMesh->getBoneBoundingRadius();
+                float r = mMesh->getBoneBoundingRadius() * maxScale;  // adjust bone bounding radius by max scale of any bone
                 Vector3 expansion(r, r, r);
                 bbox.setExtents( bbox.getMinimum() - expansion, bbox.getMaximum() + expansion );
                 bbox.merge(getChildObjectsBoundingBox());
