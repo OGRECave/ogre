@@ -99,11 +99,11 @@ geometry_program Ogre/ParticleGS/DisplayGSglsl glsl
 
 fragment_program Ogre/ParticleGS/DisplayPSglsl glsl
 {
-	source ParticleGS_DisplayPS.glsl
+	source ParticleGS_DisplayFS.glsl
 	syntax glsl150
 }
 
-// The material used to generate the particle system geometry.
+// Generate the particle system geometry.
 material Ogre/ParticleGS/Generate
 {
 	technique cg
@@ -191,7 +191,7 @@ material Ogre/ParticleGS/Generate
 	}
 }
 
-//The material used to display the generated particle system geometry
+// Display the generated particle system geometry.
 material Ogre/ParticleGS/Display
 {
 	technique cg

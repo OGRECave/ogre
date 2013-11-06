@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -31,38 +31,38 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
-	//-----------------------------------------------------------------------
-	RenderToVertexBuffer::RenderToVertexBuffer() :
-		mOperationType(RenderOperation::OT_TRIANGLE_LIST),
-		mResetsEveryUpdate(false),
-		mResetRequested(true),
+    //-----------------------------------------------------------------------
+    RenderToVertexBuffer::RenderToVertexBuffer() :
+        mOperationType(RenderOperation::OT_TRIANGLE_LIST),
+        mResetsEveryUpdate(false),
+        mResetRequested(true),
         mMaxVertexCount(1000)
-	{
-		mVertexData = OGRE_NEW VertexData;
-	}
-	//-----------------------------------------------------------------------
-	RenderToVertexBuffer::~RenderToVertexBuffer()
-	{
-		OGRE_DELETE mVertexData;
-	}
-	//-----------------------------------------------------------------------
-	VertexDeclaration* RenderToVertexBuffer::getVertexDeclaration()
-	{
-		//TODO : Mark dirty?
-		return mVertexData->vertexDeclaration;
-	}
-	//-----------------------------------------------------------------------
-	void RenderToVertexBuffer::setRenderToBufferMaterialName(const String& materialName)
-	{
-		mMaterial = MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
+    {
+        mVertexData = OGRE_NEW VertexData;
+    }
+    //-----------------------------------------------------------------------
+    RenderToVertexBuffer::~RenderToVertexBuffer()
+    {
+        OGRE_DELETE mVertexData;
+    }
+    //-----------------------------------------------------------------------
+    VertexDeclaration* RenderToVertexBuffer::getVertexDeclaration()
+    {
+        //TODO : Mark dirty?
+        return mVertexData->vertexDeclaration;
+    }
+    //-----------------------------------------------------------------------
+    void RenderToVertexBuffer::setRenderToBufferMaterialName(const String& materialName)
+    {
+        mMaterial = MaterialManager::getSingleton().getByName(materialName).staticCast<Material>();
 
-		if (mMaterial.isNull())
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + materialName,
-				"RenderToVertexBuffer::setRenderToBufferMaterialName" );
+        if (mMaterial.isNull())
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + materialName,
+                         "RenderToVertexBuffer::setRenderToBufferMaterialName" );
 
         /* Ensure that the new material was loaded (will not load again if
            already loaded anyway)
         */
         mMaterial->load();
-	}
+    }
 }

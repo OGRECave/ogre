@@ -10,7 +10,7 @@ out vec4 fragColour;
 
 uniform sampler2D diffuseTex;
 
-// The fragment shaders that colors the fireworks.
+// Colors the fireworks.
 void main()
 {
     fragColour = texture(diffuseTex, Firework.texcoord) * Firework.color;

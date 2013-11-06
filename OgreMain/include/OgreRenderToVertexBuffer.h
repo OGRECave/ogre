@@ -133,6 +133,7 @@ namespace Ogre {
            the vertex buffer
         */
         void setRenderToBufferMaterialName(const String& materialName);
+
     protected:
         RenderOperation::OperationType mOperationType;
         bool mResetsEveryUpdate;

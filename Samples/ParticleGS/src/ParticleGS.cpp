@@ -73,14 +73,15 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
         particleSystemSeed->end();
 
         // Generate the RenderToBufferObject.
-        RenderToVertexBufferSharedPtr r2vbObject =
+        RenderToVertexBufferSharedPtr r2vb =
             HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
-        r2vbObject->setRenderToBufferMaterialName("Ogre/ParticleGS/Generate");
+        r2vb->setRenderToBufferMaterialName("Ogre/ParticleGS/Generate");
 
-        r2vbObject->setOperationType(RenderOperation::OT_POINT_LIST);
-        r2vbObject->setMaxVertexCount(16000);
-        r2vbObject->setResetsEveryUpdate(false);
-        VertexDeclaration* vertexDecl = r2vbObject->getVertexDeclaration();
+        r2vb->setOperationType(RenderOperation::OT_POINT_LIST);
+        r2vb->setMaxVertexCount(16000);
+        r2vb->setResetsEveryUpdate(false);
+        VertexDeclaration* vertexDecl = r2vb->getVertexDeclaration();
+        // Define input / feedback variables.
         size_t offset = 0;
         // Position
         offset += vertexDecl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
@@ -93,12 +94,12 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 
         // Apply the random texture.
         TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
+        r2vb->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
             getTextureUnitState("randomTexture")->setTextureName(
                 randomTexture->getName(), randomTexture->getTextureType());
 
         // Bind the two together.
-        mParticleSystem->setRenderToVertexBuffer(r2vbObject);
+        mParticleSystem->setRenderToVertexBuffer(r2vb);
         mParticleSystem->setManualObject(particleSystemSeed);
 
         // GpuProgramParametersSharedPtr geomParams = mParticleSystem->

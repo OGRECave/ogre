@@ -52,7 +52,7 @@ namespace Ogre {
         // Create query objects.
         OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
 
-        // GL4+
+        //TODO GL4+
         // glGenTransformFeedbacks(1, mFeedbackObject);
     }
     //-----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ namespace Ogre {
         // OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[mTargetBufferIndex]));
         OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, targetVertexBuffer->getGLBufferId()));
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLProgramPipeline* programPipeline =
                 GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
@@ -203,7 +203,7 @@ namespace Ogre {
         targetRenderSystem->_render(renderOp);
         // OGRE_CHECK_GL_ERROR(glDrawArrays(GL_POINTS, 0, 1));
         
-        //TODO GL 4+
+        //TODO GL4+
         //glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mFeedbackObject);
         //glDrawTransformFeedback(getR2VBPrimitiveType(mOperationType), mFeedbackObject);
 
@@ -229,31 +229,38 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GL3PlusRenderToVertexBuffer::bindVerticesOutput(Pass* pass)
     {
-        // VertexDeclaratinon* declaration = mVertexData->vertexDeclaration;
-        // size_t elemCount = declaration->getElementCount();
+        VertexDeclaration* declaration = mVertexData->vertexDeclaration;
+        size_t elemCount = declaration->getElementCount();
 
-        // if (elemCount == 0)
-        //     return;
+        if (elemCount == 0)
+            return;
 
         // Get program object ID.
-        GLuint linkProgramId = 0;
+        GLuint programId = 0;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLProgramPipeline* programPipeline =
                 GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
             GLSLGpuProgram* glslGpuProgram = 0;
             if (glslGpuProgram = programPipeline->getGeometryProgram())
-                linkProgramId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
+                programId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
             //TODO include tessellation stages
             else // vertex program
-                linkProgramId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+                programId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
         }
         else
         {
             GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-            linkProgramId = linkProgram->getGLProgramHandle();
+            programId = linkProgram->getGLProgramHandle();
         }
 
+        // Store the output in a buffer.  The buffer has the same
+        // structure as the shader output vertex data.
+        // Note: 64 is the minimum number of interleaved
+        // attributes allowed by GL_EXT_transform_feedback so we
+        // are using it. Otherwise we could query during
+        // rendersystem initialisation and use a dynamic sized
+        // array.  But that would require C99.
         size_t sourceBufferIndex = mTargetBufferIndex == 0 ? 1 : 0;
 
         // Bind and fill vertex arrays + buffers.
@@ -264,38 +271,21 @@ namespace Ogre {
 
         //TODO GL4+ glBindTransformFeedback
 
-        // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[0]));
-        // OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(0));
-        // OGRE_CHECK_GL_ERROR(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(buffer), 0));
-        // OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
+        // Dynamically deteremine shader output variable names.
+        std::vector<String> nameStrings;
+        std::vector<const GLchar*> names;
+        for (int e = 0; e < elemCount; e++)
+        {
+            const VertexElement* element = declaration->getElement(e);
+            String name = getSemanticVaryingName(element->getSemantic(), element->getIndex());
+            nameStrings.push_back(name);
+            names.push_back(nameStrings[e].c_str());
+        }
 
-        // Store the output in a buffer.  The buffer has the same
-        // structure as the shader output vertex data.
-        // Note: 64 is the minimum number of interleaved
-        // attributes allowed by GL_EXT_transform_feedback so we
-        // are using it. Otherwise we could query during
-        // rendersystem initialisation and use a dynamic sized
-        // array.  But that would require C99.
-        const size_t elemCount = 4;
-        const GLchar* names[elemCount] = {
-            //"gl_Position",
-            "outputPos",
-            "outputTimer",
-            "outputType",
-            "outputVel"
-        };
-        
-        //FIXME Shader variable names should be dynamically determined like below.
-        // vector<const GLchar*>::type names;
-        // std::vector<const GLchar*> names;
-        // for (unsigned short e = 0; e < elemCount; e++)
-        // {
-        //     const VertexElement* element = declaration->getElement(e);
-        //     String varyingName = getSemanticVaryingName(element->getSemantic(), element->getIndex());
-        //     names.push_back(varyingName.c_str());
-        // }
+        //TODO replace glTransformFeedbackVaryings with in-shader specification (GL 4.4)
+        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(programId, elemCount, &names[0], GL_INTERLEAVED_ATTRIBS));
 
-        OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
+        printf("Transform Feedback complete!\n");
 
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -305,19 +295,21 @@ namespace Ogre {
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
+            OGRE_CHECK_GL_ERROR(glLinkProgram(programId));
         }
+
+        printf("Made it this far!\n");
 
 #if OGRE_DEBUG_MODE
         // Check if program linking was successful.
         GLint didLink = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(linkProgramId, GL_LINK_STATUS, &didLink));
-        logObjectInfo(String("RVB GLSL link result : "), linkProgramId);
-        if (glIsProgram(linkProgramId))
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programId, GL_LINK_STATUS, &didLink));
+        logObjectInfo(String("RVB GLSL link result : "), programId);
+        if (glIsProgram(programId))
         {
-            glValidateProgram(linkProgramId);
+            glValidateProgram(programId);
         }
-        logObjectInfo(String("RVB GLSL validation result : "), linkProgramId);
+        logObjectInfo(String("RVB GLSL validation result : "), programId);
 
         // Check if varyings were successfully set.
         GLchar Name[64];
@@ -328,7 +320,7 @@ namespace Ogre {
         for (size_t i = 0; i < elemCount; i++) 
         {
             OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
-                linkProgramId, i, 64, &Length, &Size, &Type, Name
+                programId, i, 64, &Length, &Size, &Type, Name
             ));
             std::cout << "Varying " << i << ": " << Name <<" "<< Length <<" "<< Size <<" "<< Type << std::endl;
             // Validated = (Size == 1) && (Type == GL_FLOAT_VEC3);
@@ -364,7 +356,10 @@ namespace Ogre {
         switch (semantic)
         {
         case VES_POSITION:
-            return "gl_Position";
+            // Since type of gl_Position cannot be redefined, it is
+            // better to use a custom variable name.
+            // return "gl_Position";
+            return "oPos";
         case VES_TEXTURE_COORDINATES:
             return String("oUv") + StringConverter::toString(index);
         case VES_DIFFUSE:

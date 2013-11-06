@@ -56,6 +56,7 @@ namespace Ogre {
     protected:
         HardwareVertexBufferSharedPtr mVertexBuffers[2];
         /* size_t mSourceBufferIndex; */
+        std::vector<String> feedbackVariableNames;
         size_t mTargetBufferIndex;
         GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
