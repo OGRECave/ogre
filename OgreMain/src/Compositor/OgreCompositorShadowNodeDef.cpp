@@ -170,7 +170,6 @@ namespace Ogre
 
 		//See which shadow maps can share the camera setup
 		ShadowMapTexDefVec::iterator it1 = mShadowMapTexDefinitions.begin();
-		ShadowMapTexDefVec::iterator en1 = mShadowMapTexDefinitions.end();
 
 		while( itor != end )
 		{

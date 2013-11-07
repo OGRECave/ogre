@@ -42,8 +42,8 @@ namespace Ogre
 {
 	SkeletonAnimationDef::SkeletonAnimationDef() :
 		mNumFrames( 0 ),
-		mKfTransformMemoryManager( 0 ),
-		mOriginalFrameRate( 25.0f )
+		mOriginalFrameRate( 25.0f ),
+        mKfTransformMemoryManager( 0 )
 	{
 	}
 	//-----------------------------------------------------------------------------------
@@ -112,8 +112,8 @@ namespace Ogre
 
 			//Build the map that lets us know the final slot bone index that will be
 			//assigned to this bone (to get the block we still need to divide by ARRAY_PACKED_REALS)
-			boneToSlot.push_back( (depthLevel << 24) | (offset & 0x00FFFFFF) );
-			slotToBone[boneToSlot.back()] = i;
+			boneToSlot.push_back( static_cast<uint>((depthLevel << 24) | (offset & 0x00FFFFFF)) );
+			slotToBone[boneToSlot.back()] = static_cast<uint>(i);
 		}
 
 		//1st Pass: Count the number of keyframes, so we know how
@@ -161,7 +161,7 @@ namespace Ogre
 					size_t trackDiff = std::distance( timestampsByBlock.begin(), itKeyframes );
 					mBoneToWeights[skeleton->getBone( boneIdx )->getName()] =
 										(boneToSlot[boneIdx] & 0xFF000000) |
-										(trackDiff * ARRAY_PACKED_REALS + slotIdx) & 0x00FFFFFF;
+										((trackDiff * ARRAY_PACKED_REALS + slotIdx) & 0x00FFFFFF);
 				}
 			}
 
@@ -254,7 +254,7 @@ namespace Ogre
 		while( itor != end )
 		{
 			size_t blockIdx = itor->first;
-			mTracks.push_back( SkeletonTrack( blockIdx, mKfTransformMemoryManager ) );
+			mTracks.push_back( SkeletonTrack( static_cast<uint32>(blockIdx), mKfTransformMemoryManager ) );
 
 			mTracks.back().addKeyFrame( *itor->second.begin(), frameRate );
 			++itor;

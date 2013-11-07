@@ -1307,7 +1307,7 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void createDummyScene()
 		{
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
 			//Debugging multithreaded code is a PITA, disable it.
 			const size_t numThreads = 1;
 			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;

@@ -295,7 +295,7 @@ namespace Ogre
 		@return
 			r[0] = min( a[0], a[1], a[2], a[3] )
 		*/
-		static inline Real ColapseMin( ArrayReal a )
+		static inline Real CollapseMin( ArrayReal a )
 		{
 			float r;
 			ArrayReal t0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 2, 3, 2, 3 ) );
@@ -310,7 +310,7 @@ namespace Ogre
 		@return
 			r[0] = max( a[0], a[1], a[2], a[3] )
 		*/
-		static inline Real ColapseMax( ArrayReal a )
+		static inline Real CollapseMax( ArrayReal a )
 		{
 			float r;
 			ArrayReal t0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 2, 3, 2, 3 ) );

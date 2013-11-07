@@ -111,7 +111,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &mBackingHeight));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mViewRenderbuffer));
 
-#if GL_APPLE_framebuffer_multisample
+#if defined(GL_APPLE_framebuffer_multisample) || (OGRE_NO_GLES3_SUPPORT == 0)
         if(mIsMultiSampleSupported && mNumSamples > 0)
         {
             // Determine how many MSAS samples to use

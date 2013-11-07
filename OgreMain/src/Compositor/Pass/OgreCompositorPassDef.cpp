@@ -67,6 +67,8 @@ namespace Ogre
 		case PASS_STENCIL:
 			retVal = OGRE_NEW CompositorPassStencilDef();
 			break;
+        default:
+            break;
 		}
 
 		mCompositorPasses.push_back( retVal );

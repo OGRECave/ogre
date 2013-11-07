@@ -40,7 +40,7 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
         
         mNumSamples = 0;
@@ -63,7 +63,7 @@ namespace Ogre {
 			OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
 		}
         
-        /// Initialise state
+        // Initialise state
         mDepth.buffer=0;
         mStencil.buffer=0;
         for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
@@ -77,7 +77,7 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
 		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        /// Delete framebuffer object
+        // Delete framebuffer object
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
         
 		if (mMultisampleFB)
@@ -99,7 +99,7 @@ namespace Ogre {
     
     void GLES2FrameBufferObject::notifyOnContextReset(const GLES2SurfaceDesc &target)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
@@ -133,7 +133,7 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
 		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        /// First buffer must be bound
+        // First buffer must be bound
         if(!mColour[0].buffer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -148,16 +148,16 @@ namespace Ogre {
 
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
-        /// Store basic stats
-        size_t width = mColour[0].buffer->getWidth();
-        size_t height = mColour[0].buffer->getHeight();
+        // Store basic stats
+        uint32 width = mColour[0].buffer->getWidth();
+        uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
 
 		// Bind simple buffer to add colour attachments
 		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
-        /// Bind all attachment points to frame buffer
-        for(size_t x=0; x<maxSupportedMRTs; ++x)
+        // Bind all attachment points to frame buffer
+        for(uint32 x=0; x<maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
@@ -205,12 +205,12 @@ namespace Ogre {
 			// depth & stencil will be dealt with below
 		}
 
-        /// Depth buffer is not handled here anymore.
-		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
+        // Depth buffer is not handled here anymore.
+		// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		for(uint32 x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
@@ -240,11 +240,11 @@ namespace Ogre {
 			OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
 		}
 #endif
-        /// Check status
+        // Check status
         GLuint status;
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
-        /// Bind main buffer
+        // Bind main buffer
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // The screen buffer is 1 on iOS
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
@@ -271,7 +271,7 @@ namespace Ogre {
     
     void GLES2FrameBufferObject::bind()
     {
-        /// Bind it to FBO
+        // Bind it to FBO
 		const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
 		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
     }

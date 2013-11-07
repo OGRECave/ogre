@@ -56,16 +56,16 @@ namespace Ogre {
     MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
 									uint8 renderQueueId )
         : IdObject( id )
-		, mCreator(0)
-        , mManager(0)
         , mParentNode(0)
+        , mRenderQueueID(renderQueueId)
+        , mRenderQueuePriority(100)
+        , mManager(0)
 		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mRenderQueueID(renderQueueId)
-		, mRenderQueuePriority(100)
         , mListener(0)
 		, mDebugDisplay(false)
 		, mObjectMemoryManager( objectMemoryManager )
+        , mCreator(0)
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
@@ -79,16 +79,16 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     MovableObject::MovableObject( ObjectData *objectDataPtrs )
         : IdObject( 0 )
-		, mCreator(0)
-        , mManager(0)
         , mParentNode(0)
+        , mRenderQueueID(RENDER_QUEUE_MAIN)
+        , mRenderQueuePriority(100)
+        , mManager(0)
 		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
-        , mRenderQueueID(RENDER_QUEUE_MAIN)
-		, mRenderQueuePriority(100)
         , mListener(0)
 		, mDebugDisplay(false)
 		, mObjectMemoryManager( 0 )
+        , mCreator(0)
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
@@ -176,8 +176,8 @@ namespace Ogre {
 	{
 		bool retVal = false;
 		if( mObjectMemoryManager->getTwin() &&
-			mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
-			mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+			((mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic) ||
+			 (mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic)))
 		{
 			mObjectMemoryManager->migrateTo( mObjectData, mRenderQueueID,
 											 mObjectMemoryManager->getTwin() );

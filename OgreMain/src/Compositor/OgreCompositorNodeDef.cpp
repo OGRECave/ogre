@@ -61,7 +61,7 @@ namespace Ogre
 
 		if( textureSource != TEXTURE_GLOBAL )
 		{
-			mOutChannelMapping[outChannel] = encodeTexSource( index, textureSource );
+			mOutChannelMapping[outChannel] = encodeTexSource( (uint32)index, textureSource );
 		}
 		else
 		{

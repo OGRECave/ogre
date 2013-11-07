@@ -92,7 +92,34 @@ if (OGRE_SIMD)
 	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
-	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
+	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp
+	  src/Math/Array/NEON/Single/OgreArrayAabb.cpp
+      src/Math/Array/NEON/Single/OgreArrayMatrix4.cpp
+      src/Math/Array/NEON/Single/OgreArrayQuaternion.cpp
+	  src/Math/Array/NEON/Single/OgreArrayVector3.cpp
+	  src/Math/Array/NEON/Single/OgreMathlibNEON.cpp)
+
+	set (HEADER_FILES ${HEADER_FILES}
+	  include/Math/Array/SSE2/Single/OgreArrayAabb.h
+	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.h
+	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.h
+	  include/Math/Array/SSE2/Single/OgreArrayVector3.h
+	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.h
+	  include/Math/Array/NEON/Single/OgreArrayAabb.h
+      include/Math/Array/NEON/Single/OgreArrayMatrix4.h
+      include/Math/Array/NEON/Single/OgreArrayQuaternion.h
+	  include/Math/Array/NEON/Single/OgreArrayVector3.h
+	  include/Math/Array/NEON/Single/OgreMathlibNEON.h
+	  include/Math/Array/SSE2/Single/OgreArrayAabb.inl
+	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.inl
+	  include/Math/Array/SSE2/Single/OgreArrayVector3.inl
+	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.inl
+	  include/Math/Array/NEON/Single/OgreArrayAabb.inl
+      include/Math/Array/NEON/Single/OgreArrayMatrix4.inl
+      include/Math/Array/NEON/Single/OgreArrayQuaternion.inl
+	  include/Math/Array/NEON/Single/OgreArrayVector3.inl
+	  include/Math/Array/NEON/Single/OgreMathlibNEON.inl)
 else()
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/C/OgreArrayAabb.cpp
@@ -100,6 +127,18 @@ else()
 	  src/Math/Array/C/OgreArrayQuaternion.cpp
 	  src/Math/Array/C/OgreArrayVector3.cpp
 	  src/Math/Array/C/OgreMathlibC.cpp)
+
+	set (HEADER_FILES ${HEADER_FILES}
+	  include/Math/Array/C/Single/OgreArrayAabb.h
+	  include/Math/Array/C/Single/OgreArrayMatrix4.h
+	  include/Math/Array/C/Single/OgreArrayQuaternion.h
+	  include/Math/Array/C/Single/OgreArrayVector3.h
+	  include/Math/Array/C/Single/OgreMathlibC.h
+	  include/Math/Array/C/Single/OgreArrayAabb.inl
+	  include/Math/Array/C/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/C/Single/OgreArrayQuaternion.inl
+	  include/Math/Array/C/Single/OgreArrayVector3.inl
+	  include/Math/Array/C/Single/OgreMathlibC.inl)
 endif ()
 
 

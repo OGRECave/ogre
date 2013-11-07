@@ -998,7 +998,6 @@ namespace Ogre {
 	{
 
 		EdgeListBuilder eb;
-		size_t vertexSet = 0;
 
 		// Just pass this on to child buckets
 		for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
@@ -1008,11 +1007,6 @@ namespace Ogre {
 
 			mat->build();
 		}
-
-		/*if (stencilShadows)
-		{
-			mEdgeList = eb.build();
-		}*/
 	}
 	//--------------------------------------------------------------------------
 	void StaticGeometry::LODBucket::addRenderables(RenderQueue* queue,
@@ -1426,7 +1420,6 @@ namespace Ogre {
 		}
 		// create all vertex buffers, and lock
 		ushort b;
-		ushort posBufferIdx = dcl->findElementBySemantic(VES_POSITION)->getSource();
 
 		vector<uchar*>::type destBufferLocks;
 		vector<VertexDeclaration::VertexElementList>::type bufferElements;

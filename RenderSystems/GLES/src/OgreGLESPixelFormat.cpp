@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
+#include "OgrePixelBox.h"
 
 /* GL_AMD_compressed_ATC_texture */
 #if OGRE_NO_ETC_CODEC == 0 

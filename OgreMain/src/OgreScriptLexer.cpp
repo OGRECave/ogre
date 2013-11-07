@@ -282,7 +282,7 @@ namespace Ogre{
 
 	bool ScriptLexer::isWhitespace(Ogre::String::value_type c) const
 	{
-#ifdef OGRE_WCHAR_T_STRINGS
+#if OGRE_WCHAR_T_STRINGS
 		return c == L' ' || c == L'\r' || c == L'\t';
 #else
 		return c == ' ' || c == '\r' || c == '\t';
@@ -291,7 +291,7 @@ namespace Ogre{
 
 	bool ScriptLexer::isNewline(Ogre::String::value_type c) const
 	{
-#ifdef OGRE_WCHAR_T_STRINGS
+#if OGRE_WCHAR_T_STRINGS
 		return c == L'\n' || c == L'\r';
 #else
 		return c == '\n' || c == '\r';

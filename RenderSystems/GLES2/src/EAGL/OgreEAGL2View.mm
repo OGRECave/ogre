@@ -114,11 +114,11 @@ using namespace Ogre;
         window->resize(width, height);
         
         // After rotation the aspect ratio of the viewport has changed, update that as well.
-        if(window->getNumViewports() > 0)
-        {
-            Ogre::Viewport *viewPort = window->getViewport(0);
-            viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
-        }
+//        if(window->getNumViewports() > 0)
+//        {
+//            Ogre::Viewport *viewPort = window->getViewport(0);
+//            viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
+//        }
     }
 }
 

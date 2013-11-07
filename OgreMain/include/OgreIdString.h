@@ -71,13 +71,13 @@ namespace Ogre
 
 		IdString( const char *string ) : mHash( 0 )
 		{
-			OGRE_HASH_FUNC( string, strlen( string ), Seed, &mHash );
+			OGRE_HASH_FUNC( string, static_cast<int>(strlen( string )), Seed, &mHash );
 			OGRE_COPY_DEBUG_STRING( string );
 		}
 
 		IdString( const std::string &string ) : mHash( 0 )
 		{
-			OGRE_HASH_FUNC( string.c_str(), string.size(), Seed, &mHash );
+			OGRE_HASH_FUNC( string.c_str(), static_cast<int>(string.size()), Seed, &mHash );
 			OGRE_COPY_DEBUG_STRING( string );
 		}
 
@@ -143,7 +143,7 @@ namespace Ogre
 
 		bool operator < ( IdString idString ) const
 		{
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
 			//On highly debug builds, check for collisions
 			assert( !(mHash == idString.mHash &&
 					strcmp( mDebugString, idString.mDebugString ) != 0) &&

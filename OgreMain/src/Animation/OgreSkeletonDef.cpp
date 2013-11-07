@@ -109,34 +109,34 @@ namespace Ogre
 
 		while( itDepth != enDepth )
 		{
-			list<size_t>::type::const_iterator itor = itDepth->begin();
-			list<size_t>::type::const_iterator end  = itDepth->end();
+			list<size_t>::type::const_iterator bonesItor = itDepth->begin();
+			list<size_t>::type::const_iterator bonesItorEnd  = itDepth->end();
 
-			while( itor != end )
+			while( bonesItor != bonesItorEnd )
 			{
 				Bone *parent = 0;
-				size_t parentIdx = mBones[*itor].parent;
-				const BoneData &boneData = mBones[*itor];
+				size_t parentIdx = mBones[*bonesItor].parent;
+				const BoneData &boneData = mBones[*bonesItor];
 
 				if( parentIdx != std::numeric_limits<size_t>::max() )
 					parent = &boneNodes[parentIdx];
 
-				boneNodes[*itor].~Bone();
-				new (&boneNodes[*itor]) Bone( Id::generateNewId<Node>(), (SceneManager*)0,
+				boneNodes[*bonesItor].~Bone();
+				new (&boneNodes[*bonesItor]) Bone( Id::generateNewId<Node>(), (SceneManager*)0,
 												&nodeMemoryManager, parent, 0 );
-				Bone &newBone = boneNodes[*itor];
+				Bone &newBone = boneNodes[*bonesItor];
 				newBone.setPosition( boneData.vPos );
 				newBone.setOrientation( boneData.qRot );
 				newBone.setScale( boneData.vScale );
 				newBone.setInheritOrientation( boneData.bInheritOrientation );
 				newBone.setInheritScale( boneData.bInheritScale );
 				newBone.setName( boneData.name );
-				newBone.mGlobalIndex = *itor;
+				newBone.mGlobalIndex = *bonesItor;
 				
 				if( parent )
 					parent->_notifyOfChild( &newBone );
 
-				++itor;
+				++bonesItor;
 			}
 
 			++itDepth;
@@ -164,10 +164,10 @@ namespace Ogre
 			KfTransform *derivedPose = derivedPosesPtr.get();
 
 			size_t currentDepthLevel = 0;
-			DepthLevelInfoVec::const_iterator itor = mDepthLevelInfoVec.begin();
-			DepthLevelInfoVec::const_iterator end  = mDepthLevelInfoVec.end();
+			DepthLevelInfoVec::const_iterator bonesItor = mDepthLevelInfoVec.begin();
+			DepthLevelInfoVec::const_iterator bonesItorEnd  = mDepthLevelInfoVec.end();
 
-			while( itor != end )
+			while( bonesItor != bonesItorEnd )
 			{
 				list<size_t>::type::const_iterator itBoneIdx = mBonesPerDepth[currentDepthLevel].begin();
 				list<size_t>::type::const_iterator enBoneIdx = mBonesPerDepth[currentDepthLevel].end();
@@ -197,12 +197,12 @@ namespace Ogre
 					++itBoneIdx;
 				}
 
-				if( itor->numBonesInLevel <= (ARRAY_PACKED_REALS >> 1) )
+				if( bonesItor->numBonesInLevel <= (ARRAY_PACKED_REALS >> 1) )
 				{
 					//Repeat the slots in patterns to save memory when instances get created
 					//Do the same in SkeletonTrack::_bakeUnusedSlots
 					size_t k=0;
-					for( size_t j=itor->numBonesInLevel; j<ARRAY_PACKED_REALS; ++j )
+					for( size_t j=bonesItor->numBonesInLevel; j<ARRAY_PACKED_REALS; ++j )
 					{
 						Vector3 vTmp;
 						Quaternion qTmp;
@@ -220,7 +220,7 @@ namespace Ogre
 						derivedPose->mScale.getAsVector3( vTmp, k );
 						derivedPose->mScale.setFromVector3( vTmp, j );
 
-						k = (k+1) % itor->numBonesInLevel;
+						k = (k+1) % bonesItor->numBonesInLevel;
 					}
 
 					bindPoseIndex = 0;
@@ -250,7 +250,7 @@ namespace Ogre
 				}
 
 				++currentDepthLevel;
-				++itor;
+				++bonesItor;
 			}
 
 			//Now set the reverse of the binding pose (so we can pass the
@@ -270,18 +270,17 @@ namespace Ogre
 		{
 			//Cache the amount of unused slots for the SkeletonInstance
 			mNumUnusedSlots = 0;
-			SkeletonDef::DepthLevelInfoVec::const_iterator itor = mDepthLevelInfoVec.begin();
-			SkeletonDef::DepthLevelInfoVec::const_iterator end  = mDepthLevelInfoVec.end();
-			while( itor != end )
+			SkeletonDef::DepthLevelInfoVec::const_iterator depthLevelItor = mDepthLevelInfoVec.begin();
+			while( depthLevelItor != mDepthLevelInfoVec.end() )
 			{
-				if( itor->numBonesInLevel > (ARRAY_PACKED_REALS >> 1) )
+				if( depthLevelItor->numBonesInLevel > (ARRAY_PACKED_REALS >> 1) )
 				{
 					size_t unusedSlots = ARRAY_PACKED_REALS -
-											(itor->numBonesInLevel % ARRAY_PACKED_REALS);
+											(depthLevelItor->numBonesInLevel % ARRAY_PACKED_REALS);
 					if( unusedSlots != ARRAY_PACKED_REALS )
 						mNumUnusedSlots += unusedSlots;
 				}
-				++itor;
+				++depthLevelItor;
 			}
 		}
 	}

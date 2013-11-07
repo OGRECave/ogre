@@ -120,7 +120,7 @@ namespace Ogre
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
         
         /// See GLESStateCacheManager.activateGLTextureUnit.
-        bool activateGLTextureUnit(unsigned char unit);
+        bool activateGLTextureUnit(size_t unit);
         
         /// See GLESStateCacheManager.getBlendEquation.
         GLenum getBlendEquation(void) const { return mBlendEquation; }

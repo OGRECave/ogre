@@ -321,7 +321,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
@@ -365,7 +364,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
@@ -409,7 +407,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;

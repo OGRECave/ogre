@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLPixelFormat.h"
-#include "OgrePixelBox.h"
+#import "OgrePixelBox.h"
 
 #include <OpenGL/gl.h>
 #define GL_EXT_texture_env_combine 1

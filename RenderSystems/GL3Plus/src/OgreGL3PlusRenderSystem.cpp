@@ -930,10 +930,7 @@ namespace Ogre {
 
 			if(!tex.isNull())
             {
-				bool isFsaa;
-				GLuint id = tex->getGLID( isFsaa );
-				OGRE_CHECK_GL_ERROR(glBindTexture( isFsaa ?
-											GL_TEXTURE_2D_MULTISAMPLE : mTextureTypes[stage], id ));
+				OGRE_CHECK_GL_ERROR(glBindTexture( mTextureTypes[stage], tex->getGLID() ));
             }
 			else
             {
@@ -1200,6 +1197,11 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_beginFrame(void)
     {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Cannot begin frame - no viewport selected.",
+                        "GL3PlusRenderSystem::_beginFrame");
+
         OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
     }
 

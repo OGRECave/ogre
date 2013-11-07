@@ -31,13 +31,18 @@ THE SOFTWARE.
 
 #include "OgreSharedPtr.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	#define OGRE_THREAD_CALL_CONVENTION __stdcall
+#if OGRE_CPU == OGRE_CPU_ARM
+    // Don't need calling conventions for ARM CPU's
+    #define OGRE_THREAD_CALL_CONVENTION
 #else
-	#if OGRE_COMPILER == OGRE_COMPILER_GNUC
-		#define __cdecl __attribute__((__cdecl__))
-	#endif
-	#define OGRE_THREAD_CALL_CONVENTION __cdecl
+    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        #define OGRE_THREAD_CALL_CONVENTION __stdcall
+    #else
+        #if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+            #define __cdecl __attribute__((__cdecl__))
+        #endif
+        #define OGRE_THREAD_CALL_CONVENTION __cdecl
+    #endif
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

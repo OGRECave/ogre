@@ -117,8 +117,8 @@ namespace Ogre {
       : mQueuedEnd(false)
       , mLogManager(0)
 	  , mRenderSystemCapabilitiesManager(0)
-	  , mCompositorManager2(0)
 	  , mFrameStats(0)
+      , mCompositorManager2(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
@@ -1039,7 +1039,7 @@ namespace Ogre {
 		if(!_fireFrameStarted(evt))
 			return false;
 
-		SceneManagerEnumerator::SceneManagerIterator itor = mSceneManagerEnum->getSceneManagerIterator();
+        SceneManagerEnumerator::SceneManagerIterator itor = mSceneManagerEnum->getSceneManagerIterator();
 		while( itor.hasMoreElements() )
 		{
 			SceneManager *sceneManager = itor.getNext();

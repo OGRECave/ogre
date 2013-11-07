@@ -889,9 +889,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera)
 	{
-		// To be used when order of creation must be kept while rendering
-		unsigned short priority = queue->getDefaultRenderablePriority();
-
 		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
 		{
 			// Skip empty sections (only happens if non-empty first, then updated)

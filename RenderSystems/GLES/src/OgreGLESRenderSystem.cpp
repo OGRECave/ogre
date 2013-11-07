@@ -723,8 +723,8 @@ namespace Ogre {
         unsigned short num = 0;
         for (i = lights.begin(); i != iend && num < limit; ++i, ++num)
         {
-            setGLLight(num, *i);
-            mLights[num] = *i;
+            setGLLight(num, i->light);
+            mLights[num] = i->light;
         }
         // Disable extra lights
         for (; num < mCurrentLights; ++num)
@@ -1703,6 +1703,11 @@ namespace Ogre {
 
     void GLESRenderSystem::_beginFrame(void)
     {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Cannot begin frame - no viewport selected.",
+                        "GLESRenderSystem::_beginFrame");
+
         if(mCurrentCapabilities->hasCapability(RSC_SCISSOR_TEST)) {
             glEnable(GL_SCISSOR_TEST);
             GL_CHECK_ERROR;
@@ -2805,13 +2810,13 @@ namespace Ogre {
         {
             if (mLights[i] != NULL)
             {
-                Light* lt = mLights[i];
+                const Light* lt = mLights[i];
                 setGLLightPositionDirection(lt, GL_LIGHT0 + i);
             }
         }
     }
 
-    void GLESRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
+    void GLESRenderSystem::setGLLightPositionDirection(const Light* lt, GLenum lightindex)
     {
         // Set position / direction
         Vector4 vec;
@@ -2840,7 +2845,7 @@ namespace Ogre {
         }
     }
 
-    void GLESRenderSystem::setGLLight(size_t index, Light* lt)
+    void GLESRenderSystem::setGLLight(size_t index, const Light* lt)
     {
         GLenum gl_index = GL_LIGHT0 + index;
 

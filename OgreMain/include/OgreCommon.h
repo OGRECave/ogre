@@ -29,12 +29,15 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
+#include "OgrePlatformInformation.h"
 #include "OgreString.h"
 #include "OgrePlatformInformation.h"
 
 #if OGRE_CPU == OGRE_CPU_X86
-	#include <xmmintrin.h>
-	#include <emmintrin.h>
+    #include <xmmintrin.h>
+    #include <emmintrin.h>
+#elif OGRE_CPU == OGRE_CPU_ARM
+    #include <arm_neon.h>
 #endif
 
 #if defined ( OGRE_GCC_VISIBILITY )
@@ -809,25 +812,25 @@ namespace Ogre {
 #if OGRE_CPU == OGRE_CPU_X86
 	//VS 2012 translates this to a single maxss/maxpd instruction! :)
 	//(plus some memory loading if arguments weren't loaded)
-	inline const float min( const float &left, const float &right )
+	inline float min( const float &left, const float &right )
 	{
 		float retVal;
 		_mm_store_ss( &retVal, _mm_min_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
 		return retVal;
 	}
-	inline const float max( const float &left, const float &right )
+	inline float max( const float &left, const float &right )
 	{
 		float retVal;
 		_mm_store_ss( &retVal, _mm_max_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
 		return retVal;
 	}
-	inline const double min( const double &left, const double &right )
+	inline double min( const double &left, const double &right )
 	{
 		double retVal;
 		_mm_store_sd( &retVal, _mm_min_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
 		return retVal;
 	}
-	inline const double max( const double &left, const double &right )
+	inline double max( const double &left, const double &right )
 	{
 		double retVal;
 		_mm_store_sd( &retVal, _mm_max_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );

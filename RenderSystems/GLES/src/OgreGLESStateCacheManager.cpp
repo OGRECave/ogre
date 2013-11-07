@@ -80,7 +80,7 @@ namespace Ogre {
         mImp->bindGLTexture(target, texture);
     }
     
-    bool GLESStateCacheManager::activateGLTextureUnit(unsigned char unit)
+    bool GLESStateCacheManager::activateGLTextureUnit(size_t unit)
 	{
         return mImp->activateGLTextureUnit(unit);
 	}

@@ -205,7 +205,7 @@ namespace Ogre{
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
 
 		char *end;
-		*result = strtoul( atom->value.c_str(), &end, 16 );
+		*result = static_cast<uint32>(strtoul( atom->value.c_str(), &end, 16 ));
 		
 		return !(*end);
 	}
@@ -5411,7 +5411,7 @@ namespace Ogre{
 		// Save the first atom, should be name
 		AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-		size_t width = 0, height = 0;
+		uint width = 0, height = 0;
 		float widthFactor = 1.0f, heightFactor = 1.0f;
 		bool widthSet = false, heightSet = false, formatSet = false;
         TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
@@ -5444,7 +5444,7 @@ namespace Ogre{
 			case ID_TARGET_HEIGHT_SCALED:
 				{
 					bool *pSetFlag;
-					size_t *pSize;
+					uint *pSize;
 					float *pFactor;
 
 					if (atom->id == ID_TARGET_WIDTH_SCALED)
@@ -5817,8 +5817,8 @@ namespace Ogre{
 			}
 			else if((*i)->type == ANT_OBJECT)
 			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-				if( !obj->abstract && obj->id == ID_TARGET )
+				ObjectAbstractNode *objNode = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !objNode->abstract && objNode->id == ID_TARGET )
 					++numTargetPasses;
 			}
 		}
@@ -5938,14 +5938,14 @@ namespace Ogre{
 		// Save the first atom, should be shadow map name.
 		AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-		size_t width = 0, height = 0;
+		uint width = 0, height = 0;
 		float widthFactor = 1.0f, heightFactor = 1.0f;
 		bool widthSet = false, heightSet = false, formatSet = false;
 		bool hwGammaWrite = false;
 		uint fsaa = 0;
 		uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
 		Ogre::PixelFormatList formats;
-		size_t lightIdx = ~0;
+		int lightIdx = ~0;
 		size_t splitIdx = 0;
 
 		while (atomIndex < prop->values.size())
@@ -5972,7 +5972,7 @@ namespace Ogre{
 			case ID_TARGET_HEIGHT_SCALED:
 				{
 					bool *pSetFlag;
-					size_t *pSize;
+					uint *pSize;
 					float *pFactor;
 
 					if (atom->id == ID_TARGET_WIDTH_SCALED)
@@ -6190,14 +6190,14 @@ namespace Ogre{
 			}
 			else if((*i)->type == ANT_OBJECT)
 			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-				if( !obj->abstract )
+				ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !nodeObj->abstract )
 				{
-					if( obj->id == ID_TARGET )
+					if( nodeObj->id == ID_TARGET )
 						++numTargetPasses;
-					else if( obj->id == ID_SHADOW_MAP )
+					else if( nodeObj->id == ID_SHADOW_MAP )
 					{
-						numTargetPasses += obj->values.size() + 1;
+						numTargetPasses += nodeObj->values.size() + 1;
 					}
 				}
 			}
@@ -6468,8 +6468,8 @@ namespace Ogre{
 		{
 			if((*i)->type == ANT_OBJECT)
 			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-				if( !obj->abstract && obj->id == ID_PASS )
+				ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !nodeObj->abstract && nodeObj->id == ID_PASS )
 					++numPasses;
 			}
 		}
@@ -6503,8 +6503,6 @@ namespace Ogre{
 
 		mTargetDef = 0;
 		CompositorNodeDef *nodeDef = 0;
-		
-		ObjectAbstractNode *parent = reinterpret_cast<ObjectAbstractNode*>(obj->parent);
 
 		nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
 		if( obj->name.empty())
@@ -6518,8 +6516,8 @@ namespace Ogre{
 		{
 			if((*i)->type == ANT_OBJECT)
 			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-				if( !obj->abstract && obj->id == ID_PASS )
+				ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+				if( !nodeObj->abstract && nodeObj->id == ID_PASS )
 					++numPasses;
 			}
 		}
@@ -6566,7 +6564,7 @@ namespace Ogre{
 
 			while( itor != end )
 			{
-				(*itor)->mShadowMapIdx		= shadowMapIdx;
+				(*itor)->mShadowMapIdx		= static_cast<uint32>(shadowMapIdx);
 				(*itor)->mIncludeOverlays	= false;
 				++itor;
 			}

@@ -86,7 +86,11 @@ namespace Ogre {
 #endif
         
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
-        mGLSLOptimiserContext = glslopt_initialize(true);
+#if OGRE_NO_GLES3_SUPPORT == 0
+        mGLSLOptimiserContext = glslopt_initialize(kGlslTargetOpenGLES30);
+#else
+        mGLSLOptimiserContext = glslopt_initialize(kGlslTargetOpenGLES20);
+#endif
 #endif
 	}
 
