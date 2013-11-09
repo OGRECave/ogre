@@ -31,8 +31,11 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_USE_BOOST
-#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
 #       pragma GCC diagnostic push
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC
+#   pragma GCC diagnostic ignored "-Wpragmas"
+#endif
 #       pragma GCC diagnostic ignored "-Wshadow"
 #       pragma GCC diagnostic ignored "-Wpadded"
 #       pragma GCC diagnostic ignored "-Wweak-vtables"
@@ -41,7 +44,7 @@ THE SOFTWARE.
 
 #   include <boost/range.hpp>
 
-#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
 #       pragma GCC diagnostic pop
 #   endif
 #endif
