@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#include "OgreStableHeaders.h"
 #include "OgreAtomicScalar.h"
 
 #ifdef NEED_TO_INIT_INTERLOCKEDCOMPAREEXCHANGE64WRAPPER
