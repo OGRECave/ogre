@@ -132,7 +132,7 @@ protected:
 // Attributes.
 protected:
 	// All factories needed by the FFP.
-	SubRenderStateFactoryList mFFPSubRenderStateFactoyList;
+	SubRenderStateFactoryList mFFPSubRenderStateFactoryList;
 	
 };
 
