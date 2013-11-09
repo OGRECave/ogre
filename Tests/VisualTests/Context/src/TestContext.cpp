@@ -747,7 +747,7 @@ bool TestContext::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 }
 
 /*-----------------------------------------------------------------------------
-  | Finalize the RT Shader system.
+  | Destroy the RT Shader system.
   -----------------------------------------------------------------------------*/
 void TestContext::finaliseRTShaderSystem()
 {
@@ -762,10 +762,10 @@ void TestContext::finaliseRTShaderSystem()
         mMaterialMgrListener = NULL;
     }
 
-    // Finalize RTShader system.
+    // Destroy RTShader system.
     if (mShaderGenerator != NULL)
     {
-        Ogre::RTShader::ShaderGenerator::finalize();
+        Ogre::RTShader::ShaderGenerator::destroy();
         mShaderGenerator = NULL;
     }
 }
