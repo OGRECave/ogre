@@ -28,7 +28,9 @@ THE SOFTWARE
 
 #if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
 #   pragma GCC diagnostic push
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC
 #   pragma GCC diagnostic ignored "-Wpragmas"
+#endif
 #   pragma GCC diagnostic ignored "-Wshadow"
 #   pragma GCC diagnostic ignored "-Wpadded"
 #   pragma GCC diagnostic ignored "-Wweak-vtables"
