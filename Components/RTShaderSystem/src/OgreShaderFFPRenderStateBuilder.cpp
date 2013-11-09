@@ -103,7 +103,7 @@ bool FFPRenderStateBuilder::initialize()
 }
 
 //-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::finalize()
+void FFPRenderStateBuilder::destroy()
 {
 	SubRenderStateFactoryIterator it;
 
