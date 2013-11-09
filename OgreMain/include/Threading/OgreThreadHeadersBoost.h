@@ -33,6 +33,7 @@ THE SOFTWARE
 #   pragma GCC diagnostic ignored "-Wweak-vtables"
 #   pragma GCC diagnostic ignored "-Wall"
 #   pragma GCC diagnostic ignored "-Wshorten-64-to-32"
+#   pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 
 #include <boost/thread/tss.hpp>
