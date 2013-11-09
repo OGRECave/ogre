@@ -315,7 +315,7 @@ namespace Ogre
 		
 		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-		if (it != mMapRenderWindowToResources.end())
+		while (it != mMapRenderWindowToResources.end())
 		{	
 			if (it->first->getWindowHandle() == msSharedFocusWindow)
 				setSharedWindowHandle(NULL);
