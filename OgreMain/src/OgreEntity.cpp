@@ -516,7 +516,6 @@ namespace Ogre {
                 AxisAlignedBox bbox;
                 bbox.setNull();
                 Real maxScale = Real(0);
-                //Matrix4 parentXform = mParentNode->_getFullTransform();
                 // for each bone that has vertices weighted to it,
                 for (size_t iBlend = 0; iBlend < mMesh->sharedBlendIndexToBoneIndexMap.size(); ++iBlend)
                 {
@@ -531,9 +530,14 @@ namespace Ogre {
                         bbox.merge( bone->_getDerivedPosition() );
                     }
                 }
-                float r = mMesh->getBoneBoundingRadius() * maxScale;  // adjust bone bounding radius by max scale of any bone
-                Vector3 expansion(r, r, r);
-                bbox.setExtents( bbox.getMinimum() - expansion, bbox.getMaximum() + expansion );
+                // unless all bones were scaled to zero,
+                if (! bbox.isNull())
+                {
+                    // inflate the bounding box
+                    float r = mMesh->getBoneBoundingRadius() * maxScale;  // adjust bone bounding radius by max scale of any bone
+                    Vector3 expansion(r, r, r);
+                    bbox.setExtents( bbox.getMinimum() - expansion, bbox.getMaximum() + expansion );
+                }
                 bbox.merge(getChildObjectsBoundingBox());
                 // if bounding box has changed,
                 if (bbox != mFullBoundingBox)

@@ -869,7 +869,7 @@ namespace Ogre {
             bounding box of the mesh in the binding pose will be used.
         @remarks
             When true, the bounding box will be generated to only enclose the bones that are used for skinning.
-            Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoundingSphereRadius().
+            Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoneBoundingRadius().
             The expansion amount can be changed on the mesh to achieve a better fitting bounding box.
         */
         void setUpdateBoundingBoxFromSkeleton(bool update) {

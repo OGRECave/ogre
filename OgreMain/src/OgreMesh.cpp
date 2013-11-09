@@ -899,7 +899,7 @@ namespace Ogre {
     Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )
     {
         Vector3 v01 = line1 - line0;
-        Real tt = v01.dotProduct( pt - line0 ) / std::max( v01.dotProduct(v01), Real(1e-6f) );
+        Real tt = v01.dotProduct( pt - line0 ) / std::max( v01.dotProduct(v01), std::numeric_limits<Real>::epsilon() );
         tt = Math::Clamp( tt, Real(0.0f), Real(1.0f) );
         Vector3 onLine = line0 + tt * v01;
         return pt.distance( onLine );
@@ -914,9 +914,15 @@ namespace Ogre {
         vector<Vector3>::type vertexPositions;
         {
             // extract vertex positions
-            vertexPositions.resize( vertexData->vertexCount );
             const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
             HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+            // if usage is write only,
+            if ( vbuf->getUsage() & HardwareBuffer::HBU_WRITE_ONLY )
+            {
+                // can't do it
+                return Real(0.0f);
+            }
+            vertexPositions.resize( vertexData->vertexCount );
             unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
             float* pFloat;
 
