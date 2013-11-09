@@ -337,7 +337,7 @@ protected:
                 if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                 {
                     destroyDummyScene();
-                    finaliseRTShaderSystem();
+                    destroyRTShaderSystem();
                 }
 #endif
 
