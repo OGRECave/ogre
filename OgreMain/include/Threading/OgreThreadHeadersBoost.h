@@ -30,6 +30,8 @@ THE SOFTWARE
 #   pragma GCC diagnostic push
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC
 #   pragma GCC diagnostic ignored "-Wpragmas"
+#elif OGRE_COMPILER == OGRE_COMPILER_CLANG
+#   pragma GCC diagnostic ignored "-Wdocumentation"
 #endif
 #   pragma GCC diagnostic ignored "-Wshadow"
 #   pragma GCC diagnostic ignored "-Wpadded"

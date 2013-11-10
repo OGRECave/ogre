@@ -216,7 +216,7 @@ namespace Ogre
             per batch
         @param materialName Name of the material to base on
         @param suggestedSize Suggested amount of instances per batch
-        @param flags @see InstanceManagerFlags
+        @param flags Flags to pass to the InstanceManager. @see InstanceManagerFlags
         @return The max/best amount of instances per batch given the suggested size and flags
         */
         size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
