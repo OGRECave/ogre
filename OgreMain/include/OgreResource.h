@@ -90,13 +90,13 @@ namespace Ogre {
 			@deprecated
 				Use loadingComplete instead.
 			*/
-			virtual void backgroundLoadingComplete(Resource*) OGRE_DEPRECATED {}
+			OGRE_DEPRECATED virtual void backgroundLoadingComplete(Resource*) {}
 
 			/** Callback to indicate that background preparing has completed.
 			@deprecated
 				Use preparingComplete instead.
 			*/
-			virtual void backgroundPreparingComplete(Resource*) OGRE_DEPRECATED {}
+			OGRE_DEPRECATED virtual void backgroundPreparingComplete(Resource*) {}
 
 			/** Called whenever the resource finishes loading. 
 			@remarks
