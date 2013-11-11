@@ -55,7 +55,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
 
-    // prepopulate expected options
+    // Prepopulate expected options.
     unOpt["-r"] = false;        // generate reference set
     unOpt["--no-html"] = false; // whether or not to generate html
     unOpt["-d"] = false;        // force config dialogue
@@ -69,7 +69,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     binOpt["-rs"] = "SAVED";    // rendersystem to use (default: use name from the config file/dialog)
     binOpt["-o"] = "NONE";      // path to output a summary file to (default: don't output a file)
 
-    // parse
+    // Parse.
     Ogre::findCommandLineOpts(argc, argv, unOpt, binOpt);
 
     mReferenceSet = unOpt["-r"];
@@ -95,7 +95,7 @@ TestContext::~TestContext()
 
 void TestContext::setup()
 {
-    // standard setup
+    // Standard setup.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
     uint w = modeSize.width / [UIScreen mainScreen].scale;
@@ -116,7 +116,7 @@ void TestContext::setup()
 
     mWindow->setDeactivateOnFocusChange(false);
 
-    // grab input, since moving the window seemed to change the results (in Linux anyways)
+    // Grab input, since moving the window seemed to change the results (in Linux anyways).
     setupInput(mNoGrabMouse);
 
     locateResources();
@@ -136,14 +136,14 @@ void TestContext::setup()
     Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 #endif
 
-    // get the path and list of test plugins from the config file
+    // Get the path and list of test plugins from the config file.
     Ogre::ConfigFile testConfig;
     testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
-    // parse for the test sets and plugins that they're made up of
+    // Parse for the test sets and plugins that they're made up of.
     for (; sections.hasMoreElements(); sections.moveNext())
     {
         Ogre::String setName = sections.peekNextKey();
@@ -161,15 +161,15 @@ void TestContext::setup()
     mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
 #endif
 
-    // timestamp for the filename
+    // Timestamp for the filename.
     char temp[25];
     time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     Ogre::String filestamp = Ogre::String(temp);
-    // name for this batch (used for naming the directory, and uniquely identifying this batch)
+    // Name for this batch (used for naming the directory, and uniquely identifying this batch).
     Ogre::String batchName = mTestSetName + "_" + filestamp;
 
-    // a nicer formatted version for display
+    // A nicer formatted version for display.
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp);
 
@@ -178,10 +178,10 @@ void TestContext::setup()
     else if (mBatchName != "AUTO")
         batchName = mBatchName;
 
-    // set up output directories
+    // Set up output directories.
     setupDirectories(batchName);
 
-    // an object storing info about this set
+    // An object storing info about this set.
     mBatch = new TestBatch(batchName, mTestSetName, timestamp,
                            mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
     mBatch->comment = mComment;
