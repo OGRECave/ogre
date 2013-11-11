@@ -130,8 +130,8 @@ THE SOFTWARE.
         #define _mm_nmsub_ps( a, b, c )		vsubq_f32( c, vmulq_f32( a, b ) )
 
         /// Does not convert, just cast ArrayReal to ArrayInt
-        #define CastRealToInt( x )			(ArrayInt)( x )
-        #define CastIntToReal( x )			(ArrayReal)( x )
+        #define CastRealToInt( x )			vreinterpretq_s32_f32( x )
+        #define CastIntToReal( x )			vreinterpretq_f32_s32( x )
         /// Input must be 16-byte aligned
         #define CastArrayToReal( outFloatPtr, arraySimd )		vst1q_f32( outFloatPtr, arraySimd )
 
