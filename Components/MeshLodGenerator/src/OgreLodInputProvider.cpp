@@ -83,7 +83,7 @@ void LodInputProvider::addTriangleToEdges(LodData* data, LodData::Triangle* tria
 			str << "Triangle " << LodData::getVectorIDFromPointer(data->mTriangleList, duplicate) << " positions:" << std::endl;
 			printTriangle(duplicate, str);
 			str << "Triangle " << LodData::getVectorIDFromPointer(data->mTriangleList, triangle) << " will be excluded from Lod level calculations.";
-			LogManager::getSingleton().stream() << str;
+			LogManager::getSingleton().stream() << str.str();
 #endif
 			triangle->isRemoved = true;
 			data->mIndexBufferInfoList[triangle->submeshID].indexCount -= 3;
