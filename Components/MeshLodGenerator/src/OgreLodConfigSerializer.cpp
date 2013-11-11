@@ -41,7 +41,7 @@ namespace Ogre
 
 	LodConfigSerializer::LodConfigSerializer()
 	{
-		mVersion = "[LodConfigSerializer_v0.1]";
+		mVersion = "[LodConfigSerializer_v1.0]";
 	}
 
 	void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, const Ogre::String& filename)
@@ -59,39 +59,37 @@ namespace Ogre
 
 	void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, DataStreamPtr& stream)
 	{
-		// Determine endianness (must be the first thing we do!)
-		determineEndianness(stream);
-
-		// Check header
-		readFileHeader(stream);
-
 		mStream = stream;
 		mLodConfig = config;
 
-		// Reset config file
-		cleanup();
+		// Determine endianness (must be the first thing we do!)
+		determineEndianness(mStream);
 
+		// Check header
+		readFileHeader(mStream);
 
+		pushInnerChunk(mStream);
 		unsigned short streamID;
-		while(!stream->eof())
+		while (!mStream->eof())
 		{
-			streamID = readChunk(stream);
+			streamID = readChunk(mStream);
 			switch (streamID)
 			{
 			case LCCID_LOD_CONFIG:
 				readLodConfig();
 				break;
+			default:
+				backpedalChunkHeader(mStream);
+				popInnerChunk(mStream);
+				return;
 			}
 		}
-	}
-
-	void LodConfigSerializer::cleanup(){
-		mLodConfig->levels.clear();
-		mLodConfig->advanced.profile.clear();
+		popInnerChunk(mStream);
 	}
 
 	void LodConfigSerializer::readLodConfig()
 	{
+		pushInnerChunk(mStream);
 		while(!mStream->eof())
 		{
 			unsigned short streamID = readChunk(mStream);
@@ -111,10 +109,12 @@ namespace Ogre
 				break;
 			default:
 				// Backpedal back to start of stream
-				mStream->skip(-(int)calcChunkHeaderSize());
+				backpedalChunkHeader(mStream);
+				popInnerChunk(mStream);
 				return;
 			}
 		}
+		popInnerChunk(mStream);
 	}
 
 	void LodConfigSerializer::readLodBasicInfo()
@@ -131,7 +131,7 @@ namespace Ogre
 	{
 		uint32 size = 0;
 		readInts(mStream, &size, 1);
-
+		mLodConfig->levels.clear();
 		while(size--){
 			LodLevel level;
 			readFloats(mStream, &level.distance, 1);
@@ -146,6 +146,9 @@ namespace Ogre
 	{
 		readBools(mStream, &mLodConfig->advanced.useCompression, 1);
 		readBools(mStream, &mLodConfig->advanced.useVertexNormals, 1);
+		readBools(mStream, &mLodConfig->advanced.useBackgroundQueue, 1);
+		readFloats(mStream, &mLodConfig->advanced.outsideWeight, 1);
+		readFloats(mStream, &mLodConfig->advanced.outsideWalkAngle, 1);
 	}
 
 	void LodConfigSerializer::readLodProfile()
@@ -193,19 +196,21 @@ namespace Ogre
 
 
 		LogManager::getSingleton().logMessage("Writing Lod Config...");
-
+		pushInnerChunk(mStream);
 		writeLodConfig();
-
+		popInnerChunk(mStream);
 		LogManager::getSingleton().logMessage("LodConfigSerializer export successful.");
 	}
 
 	void LodConfigSerializer::writeLodConfig()
 	{
 		writeChunkHeader(LCCID_LOD_CONFIG, calcLodConfigSize());
+		pushInnerChunk(mStream);
 		writeLodBasicInfo();
 		writeLodLevels();
 		writeLodAdvancedInfo();
 		writeLodProfile();
+		popInnerChunk(mStream);
 	}
 
 	size_t LodConfigSerializer::calcLodConfigSize()
@@ -288,6 +293,9 @@ namespace Ogre
 		writeChunkHeader(LCCID_ADVANCED_INFO, calcLodAdvancedInfoSize());
 		writeBools(&mLodConfig->advanced.useCompression, 1);
 		writeBools(&mLodConfig->advanced.useVertexNormals, 1);
+		writeBools(&mLodConfig->advanced.useBackgroundQueue, 1);
+		writeFloats(&mLodConfig->advanced.outsideWeight, 1);
+		writeFloats(&mLodConfig->advanced.outsideWalkAngle, 1);
 	}
 
 	size_t LodConfigSerializer::calcLodAdvancedInfoSize()
@@ -298,6 +306,12 @@ namespace Ogre
 		size += sizeof(bool);
 		// mLodConfig->advanced.useVertexNormals
 		size += sizeof(bool);
+		// mLodConfig->advanced.useBackgroundQueue
+		size += sizeof(bool);
+		// mLodConfig->advanced.outsideWeight
+		size += sizeof(float);
+		// mLodConfig->advanced.outsideWalkAngle
+		size += sizeof(float);
 
 		return size;
 	}
@@ -324,9 +338,12 @@ namespace Ogre
 		if(mLodConfig->advanced.profile.empty()){
 			return 0;
 		}
-		// Vector3, LodProfile::ProfiledVertex::position
+		// Vector3, LodProfile::ProfiledVertex::src
 		size_t profiledVertexSize = sizeof(float) * 3;
 		
+		// Vector3, LodProfile::ProfiledVertex::dst
+		profiledVertexSize += sizeof(float) * 3;
+
 		// LodProfile::ProfiledVertex::cost
 		profiledVertexSize += sizeof(float);
 

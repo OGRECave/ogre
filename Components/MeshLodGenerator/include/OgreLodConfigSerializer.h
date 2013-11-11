@@ -65,8 +65,6 @@ protected:
 		LCCID_PROFILE = 0x800,
 	};
 
-	void cleanup();
-
 	void readLodConfig();
 	void readLodBasicInfo();
 	void readLodLevels();
