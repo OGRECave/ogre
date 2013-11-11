@@ -26,7 +26,7 @@ THE SOFTWARE.
 */
 
 //-----------------------------------------------------------------------------
-// Program Name: FFPLib_TextureStage
+// Program Name: FFPLib_Texturing
 // Program Desc: Texture functions of the FFP.
 // Program Type: Vertex/Pixel shader
 // Language: GLSL
@@ -55,8 +55,6 @@ void FFP_TransformTexCoord(in mat4 m, in vec3 v, out vec3 vOut)
 {
 	vOut = (m * vec4(v, 1.0)).xyz;
 }
-
-
 
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT, 
