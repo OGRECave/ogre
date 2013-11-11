@@ -29,6 +29,14 @@ THE SOFTWARE.
 #ifndef __VisualTest_H__
 #define __VisualTest_H__
 
+#include "OgreBuildSettings.h"
+
+#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
+#  define USE_RTSHADER_SYSTEM
+#endif
+
+//#define _RTSS_WRITE_SHADERS_TO_DISK
+
 #include "SdkSample.h"
 
 // resource group that will be automatically unloaded after the close of the sample

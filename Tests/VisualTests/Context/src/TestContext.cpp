@@ -26,14 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreBuildSettings.h"
-
-#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
-#  define USE_RTSHADER_SYSTEM
-#endif
-
-//#define _RTSS_WRITE_SHADERS_TO_DISK
-
 #include "TestContext.h"
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
