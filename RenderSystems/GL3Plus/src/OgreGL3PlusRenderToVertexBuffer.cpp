@@ -35,6 +35,8 @@
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLSLLinkProgramManager.h"
+#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLProgram.h"
 #include "OgreGLSLProgramPipelineManager.h"
 #include "OgreStringConverter.h"
 

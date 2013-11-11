@@ -32,9 +32,9 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreGLSLProgram.h"
 #include "OgreGpuProgramManager.h"
-//#include "OgreHardwareBufferManager.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreRoot.h"
+#include "OgreGL3PlusUtil.h"
 
 namespace Ogre {
 
@@ -759,95 +759,100 @@ namespace Ogre {
         
         // Now deal with shader storage blocks
 
-        OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
-
-        //TODO error if GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS > # shader_storage_blocks
-        // do same for other buffers
-
-        for (int index = 0; index < blockCount; index++)
+        if(getGLSupport()->checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
         {
-            //OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformName, ));
-            // OGRE_CHECK_GL_ERROR(glGetIntegeri_v(GL_SHADER_STORAGE_BUFFER_BINDING, index, uniformName));
-            OGRE_CHECK_GL_ERROR(glGetProgramResourceName(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformLength, NULL, uniformName));
+            OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
-            // Map uniform block to binding point of GL buffer of
-            // shared param bearing the same name.
+            //TODO error if GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS > # shader_storage_blocks
+            // do same for other buffers
 
-            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-            //TODO error handling for when buffer has no associated shared parameter?
-            //if (bufferi == mSharedParamGLBufferMap.end()) continue;
-
-            // No more shader storage blocks.
-            // if (uniformName == 0) break;
-            GL3PlusHardwareShaderStorageBuffer* hwGlBuffer;
-            SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
-            if (bufferMapi != sharedParamsBufferMap.end())
+            for (int index = 0; index < blockCount; index++)
             {
-                hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(bufferMapi->second.get());
-            }
-            else
-            {
-                // Create buffer and add entry to buffer map.
-                // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                // HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-                // bufferMapi->second() = newUniformBuffer;
-                // hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
-                // GLint bufferBinding = sharedParamsBufferMap.size();
-                // hwGlBuffer->setGLBufferBinding(bufferBinding);
-                // std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
-                // sharedParamsBufferMap.insert(newPair);
+                //OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformName, ));
+                // OGRE_CHECK_GL_ERROR(glGetIntegeri_v(GL_SHADER_STORAGE_BUFFER_BINDING, index, uniformName));
+                OGRE_CHECK_GL_ERROR(glGetProgramResourceName(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformLength, NULL, uniformName));
 
-                GLint blockSize;
-                //GLint parameters [2];
-                // const GLenum properties [2] = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
-                const GLenum properties [1] = {GL_BUFFER_DATA_SIZE};
-                OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
-                //blockSize = properties[0];
-                //TODO Implement shared param access param in materials (R, W, R+W)
-                // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
+                // Map uniform block to binding point of GL buffer of
+                // shared param bearing the same name.
+
+                GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+                //TODO error handling for when buffer has no associated shared parameter?
+                //if (bufferi == mSharedParamGLBufferMap.end()) continue;
+
+                // No more shader storage blocks.
+                // if (uniformName == 0) break;
+                GL3PlusHardwareShaderStorageBuffer* hwGlBuffer;
+                SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
+                if (bufferMapi != sharedParamsBufferMap.end())
+                {
+                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(bufferMapi->second.get());
+                }
+                else
+                {
+                    // Create buffer and add entry to buffer map.
+                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
+                    // HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
+                    // bufferMapi->second() = newUniformBuffer;
+                    // hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
+                    // GLint bufferBinding = sharedParamsBufferMap.size();
+                    // hwGlBuffer->setGLBufferBinding(bufferBinding);
+                    // std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
+                    // sharedParamsBufferMap.insert(newPair);
+
+                    GLint blockSize;
+                    //GLint parameters [2];
+                    // const GLenum properties [2] = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
+                    const GLenum properties [1] = {GL_BUFFER_DATA_SIZE};
+                    OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
+                    //blockSize = properties[0];
+                    //TODO Implement shared param access param in materials (R, W, R+W)
+                    // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
+                    HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
+                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
+                    
+                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
+                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
+                    //FIXME check parameters
+                    
+                    GLint bufferBinding = sharedParamsBufferMap.size();
+                    hwGlBuffer->setGLBufferBinding(bufferBinding);
+
+                    std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
+                    //sharedParamsBufferMap.insert(newPair);
+
+                    // Get active block parameter properties.
+                }
+
+                GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
                 
-                // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
-                //FIXME check parameters
-                
-                GLint bufferBinding = sharedParamsBufferMap.size();
-                hwGlBuffer->setGLBufferBinding(bufferBinding);
-
-                std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
-                //sharedParamsBufferMap.insert(newPair);
-
-                // Get active block parameter properties.
+                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
             }
-
-            GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
-            
-            OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
         }
-
-        // Now deal with atomic counters buffers
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
-
-        for (int index = 0; index < blockCount; index++)
+        if(getGLSupport()->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
         {
-            //TODO Is this necessary?
-            //GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+            // Now deal with atomic counters buffers
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
 
-            //TODO We could build list of atomic counters here or above, 
-            // whichever is most efficient.
-            // GLint * active_indices;
-            // OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES, active_indices));
-            
-            GLint bufferSize, bufferBinding;
-            OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
-            OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
-            //TODO check parameters of this GL call
-            HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+            for (int index = 0; index < blockCount; index++)
+            {
+                //TODO Is this necessary?
+                //GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
 
-            GL3PlusHardwareCounterBuffer* hwGlBuffer = static_cast<GL3PlusHardwareCounterBuffer*>(newCounterBuffer.get());
-            hwGlBuffer->setGLBufferBinding(bufferBinding);
-            counterBufferList.push_back(newCounterBuffer);
+                //TODO We could build list of atomic counters here or above, 
+                // whichever is most efficient.
+                // GLint * active_indices;
+                // OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES, active_indices));
+                
+                GLint bufferSize, bufferBinding;
+                OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
+                OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
+                //TODO check parameters of this GL call
+                HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+
+                GL3PlusHardwareCounterBuffer* hwGlBuffer = static_cast<GL3PlusHardwareCounterBuffer*>(newCounterBuffer.get());
+                hwGlBuffer->setGLBufferBinding(bufferBinding);
+                counterBufferList.push_back(newCounterBuffer);
+            }
         }
     }
     //---------------------------------------------------------------------
