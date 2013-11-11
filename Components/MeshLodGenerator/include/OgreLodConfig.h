@@ -32,6 +32,7 @@
 #include "OgreLodPrerequisites.h"
 #include "OgreMesh.h"
 #include "OgreLodStrategy.h"
+#include "OgreDistanceLodStrategy.h"
 
 namespace Ogre
 {
@@ -127,7 +128,16 @@ struct _OgreLodExport LodConfig {
 	typedef vector<LodLevel>::type LodLevelList;
 	LodLevelList levels; /// Info about Lod levels
 
-	struct Advanced {
+    LodConfig(MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodStrategy::getSingletonPtr());
+    LodConfig();
+
+    // Helper functions:
+    void createManualLodLevel(Ogre::Real distance, const String& manualMeshName);
+    void createGeneratedLodLevel(Ogre::Real distance,
+                                 Real reductionValue,
+                                 LodLevel::VertexReductionMethod reductionMethod = LodLevel::VRM_PROPORTIONAL);
+
+    struct _OgreLodExport Advanced {
 		/// Whether you want to process it immediatelly on main thread or you want to use Ogre::WorkQueue.
 		/// If you use workqueue the generator will return immediately. After processed in background,
 		/// the LodWorkQueueInjector will inject it in frameEnd event when rendering next frame.
@@ -149,15 +159,8 @@ struct _OgreLodExport LodConfig {
 		Ogre::Real outsideWalkAngle;
 		/// If the algorithm makes errors, you can fix it, by adding the edge to the profile.
 		LodProfile profile;
-		Advanced() :
-			useBackgroundQueue(false),
-			useCompression(true),
-			useVertexNormals(true),
-			outsideWeight(0.0),
-			outsideWalkAngle(0.0)
-		{ }
+        Advanced();
 	} advanced;
-
 };
 }
 #endif

@@ -26,123 +26,46 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef __LogConfig_H_
-#define __LogConfig_H_
-
-#include "OgreLodPrerequisites.h"
-
-#include "OgreMesh.h"
-#include "OgreLodStrategy.h"
+#include "OgreLodConfig.h"
 
 namespace Ogre
 {
 
-struct _OgreLodExport ProfiledEdge {
-	Vector3 src; // Vertex identifier
-	Vector3 dst; // Direction of collapse
-	Real cost; // Requested collapse cost
-};
-
-typedef vector<ProfiledEdge>::type LodProfile;
-
-/**
- * @brief Structure for automatic Lod configuration.
- */
-struct _OgreLodExport LodLevel {
-	/**
-	 * @brief Type of the reduction.
-	 *
-	 * Note: The vertex count is determined by unique vertices per submesh.
-	 * A mesh may have duplicate vertices with same position.
-	 */
-	enum VertexReductionMethod {
-		/**
-		 * @brief Percentage of vertexes to be removed from each submesh.
-		 *
-		 * Valid range is a number between 0.0 and 1.0
-		 */
-		VRM_PROPORTIONAL,
-
-		/**
-		 * @brief Exact vertex count to be removed from each submesh.
-		 *
-		 * Pass only integers or it will be rounded.
-		 */
-		VRM_CONSTANT,
-
-		/**
-		 * @brief Reduces the vertices, until the cost is bigger then the given value.
-		 *
-		 * Collapse cost is equal to the amount of artifact the reduction causes.
-		 * This generates the best Lod output, but the collapse cost depends on implementation.
-		 */
-		VRM_COLLAPSE_COST
-	};
-
-	/**
-	 * @brief Distance to swap the Lod.
-	 *
-	 * This depends on LodStrategy.
-	 */
-	Real distance;
-
-	/**
-	 * @brief Reduction method to use.
-	 *
-	 * @see ProgressiveMeshGenerator::VertexReductionMethod
-	 */
-	VertexReductionMethod reductionMethod;
-
-	/**
-	 * @brief The value, which depends on reductionMethod.
-	 */
-	Real reductionValue;
-
-	/**
-	 * @brief Set's a mesh as the Lod Level for given distance.
-	 * 
-	 * This allows to generate the Lod levels in third party editors.
-	 * The mesh should have the same submeshes, same bones and animations, like the original mesh.
-	 * If you use this parameter, the reduction value and method will be ignored.
-	 * Using manual mesh is less efficient, because it needs separated vertex buffers.
-	 */
-	String manualMeshName;
-
-	/**
-	 * @brief This is set by ProgressiveMeshGenerator::build() function.
-	 *
-	 * Use Mesh::getNumLodLevels() for generated Lod count.
-	 */
-	size_t outUniqueVertexCount;
-
-	/**
-	 * @brief Whether the Lod level generation was skipped, because it has same vertex count as the previous Lod level.
-	 */
-	bool outSkipped;
-};
-
-struct _OgreLodExport LodConfig {
-	MeshPtr mesh;
-	LodStrategy* strategy;
-
-	typedef vector<LodLevel>::type LodLevelList;
-	LodLevelList levels;
-
-	struct Advanced {
-		bool useBackgroundQueue;
-		bool useCompression;
-		bool useVertexNormals;
-		Ogre::Real outsideWeight;
-		Ogre::Real outsideWalkAngle;
-		LodProfile profile;
-		Advanced() :
+LodConfig::Advanced::Advanced() :
+    useBackgroundQueue(false),
 			useCompression(true),
 			useVertexNormals(true),
 			outsideWeight(0.0),
 			outsideWalkAngle(0.0)
-		{ }
-	} advanced;
-
-};
+{
 }
-#endif
+
+LodConfig::LodConfig(MeshPtr& _mesh, LodStrategy* _strategy /*= DistanceLodStrategy::getSingletonPtr()*/) :
+    mesh(_mesh), strategy(_strategy)
+{
+}
+
+LodConfig::LodConfig()
+{
+}
+
+void LodConfig::createManualLodLevel(Ogre::Real distance, const String& manualMeshName)
+{
+    LodLevel lodLevel;
+    lodLevel.distance = distance;
+    lodLevel.manualMeshName = manualMeshName;
+    levels.push_back(lodLevel);
+}
+
+void LodConfig::createGeneratedLodLevel(Ogre::Real distance,
+                                        Real reductionValue,
+                                        LodLevel::VertexReductionMethod reductionMethod /*= LodLevel::VRM_PROPORTIONAL*/)
+{
+    LodLevel lodLevel;
+    lodLevel.distance = distance;
+    lodLevel.reductionValue = reductionValue;
+    lodLevel.reductionMethod = reductionMethod;
+    levels.push_back(lodLevel);
+}
+
+}
