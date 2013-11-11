@@ -337,17 +337,17 @@ namespace Ogre {
 #   define OGRE_BUILD_SUFFIX ""
 #endif
 
-#if OGRE_FLEXIBILITY_LEVEL >= 0
+#if OGRE_FLEXIBILITY_LEVEL > 0
 	#define virtual_l0 virtual
 #else
 	#define virtual_l0
 #endif
-#if OGRE_FLEXIBILITY_LEVEL >= 1
+#if OGRE_FLEXIBILITY_LEVEL > 1
 	#define virtual_l1 virtual
 #else
 	#define virtual_l1
 #endif
-#if OGRE_FLEXIBILITY_LEVEL >= 2
+#if OGRE_FLEXIBILITY_LEVEL > 2
 	#define virtual_l2 virtual
 #else
 	#define virtual_l2

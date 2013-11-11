@@ -257,6 +257,15 @@ namespace Ogre
 			return _mm_cmplt_ps( a, b );
 		}
 
+		/** Returns the result of "a <= b"
+		@return
+			r[i] = a[i] <= b[i] ? 0xffffffff : 0;
+		*/
+		static inline __m128 CompareLessEqual( __m128 a, __m128 b )
+		{
+			return _mm_cmplt_ps( a, b );
+		}
+
 		/** Returns the result of "a > b"
 		@return
 			r[i] = a[i] > b[i] ? 0xffffffff : 0;
@@ -488,7 +497,7 @@ namespace Ogre
 //	inline ArrayReal operator - ( ArrayReal l )					{ return _mm_xor_ps( l, MathlibSSE2::SIGN_MASK ); }
 //	inline ArrayReal operator + ( ArrayReal l, Real r )			{ return _mm_add_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator + ( Real l, ArrayReal r )			{ return _mm_add_ps( _mm_set1_ps( l ), r ); }
-//	inline ArrayReal operator + ( ArrayReal l, ArrayReal r )	{ return _mm_add_ps( l, r ); }
+	inline ArrayReal operator + ( ArrayReal l, ArrayReal r )	{ return _mm_add_ps( l, r ); }
 //	inline ArrayReal operator - ( ArrayReal l, Real r )			{ return _mm_sub_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator - ( Real l, ArrayReal r )			{ return _mm_sub_ps( _mm_set1_ps( l ), r ); }
 	inline ArrayReal operator - ( ArrayReal l, ArrayReal r )	{ return _mm_sub_ps( l, r ); }
@@ -497,7 +506,7 @@ namespace Ogre
 	inline ArrayReal operator * ( ArrayReal l, ArrayReal r )	{ return _mm_mul_ps( l, r ); }
 //	inline ArrayReal operator / ( ArrayReal l, Real r )			{ return _mm_div_ps( l, _mm_set1_ps( r ) ); }
 //	inline ArrayReal operator / ( Real l, ArrayReal r )			{ return _mm_div_ps( _mm_set1_ps( l ), r ); }
-//	inline ArrayReal operator / ( ArrayReal l, ArrayReal r )	{ return _mm_div_ps( l, r ); }
+	inline ArrayReal operator / ( ArrayReal l, ArrayReal r )	{ return _mm_div_ps( l, r ); }
 #endif
 }
 

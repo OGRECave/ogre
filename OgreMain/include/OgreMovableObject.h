@@ -56,6 +56,17 @@ namespace Ogre {
 	/** \addtogroup Scene
 	*  @{
 	*/
+
+	struct LodMerged
+	{
+		Real			lodValue;
+		unsigned char	meshLodIndex;
+		unsigned char	materialLodIndex;
+	};
+	bool operator < ( Real _left, const LodMerged &_right ) { return _left < _right.lodValue; }
+	bool operator < ( const LodMerged &_left, Real _right ) { return _left.lodValue < _right; }
+	bool operator < ( const LodMerged &_l, const LodMerged &_r ) { return _l.lodValue < _r.lodValue; }
+
 	/** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
@@ -92,8 +103,11 @@ namespace Ogre {
 		ObjectData mObjectData;
 		/// SceneManager holding this object (if applicable)
 		SceneManager* mManager;
-		/// Upper distance to still render. @See ObjectData::mSquaredUpperDistance
-		Real mUpperDistance;
+
+		//One for each submesh/material/Renderable
+		FastArray<FastArray<LodMerged>>	*mLodMerged;
+		FastArray<unsigned char>		mCurrentLod;
+
 		// Minimum pixel size to still render
 		Real mMinPixelSize;
 		/// User objects binding.
@@ -249,11 +263,15 @@ namespace Ogre {
 			should be rendered
 		@param outReceiversBox [out]
 			Bounds information from culled objects that are shadow receivers. Pointer can be null
+		@param lodCamera
+			Camera in which lod levels calculations are based (i.e. during shadow pass renders)
+			Note however, we only use this camera to calulate if should be visible according to
+			mUpperDistance
 		*/
 		typedef FastArray<MovableObject*> MovableObjectArray;
 		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
 								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-								 AxisAlignedBox *outReceiversBox );
+								 AxisAlignedBox *outReceiversBox, const Camera *lodCamera );
 
 		/// @See InstancingTheadedCullingMethod, @see InstanceBatch::instanceBatchCullFrustumThreaded
 		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
@@ -272,7 +290,8 @@ namespace Ogre {
 			always included, since it's not meant to be called for casters-only (unlike cullFrustum).
 		*/
 		static void cullReceiversBox( const size_t numNodes, ObjectData t, const Frustum *frustum,
-										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox );
+										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox,
+										const Camera *lodCamera );
 
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList
@@ -300,6 +319,36 @@ namespace Ogre {
 
 		static void calculateCastersBox( const size_t numNodes, ObjectData t,
 										 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox );
+
+	protected:
+		inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
+	public:
+
+		/** @See SceneManager::lodDistance
+		@remarks
+			Uses the distance to camera method to calculate the Lod value
+			(will be cached in ObjectData::mOwner::mCurrentLod). @See mCurrentLod
+		@param numNodes
+			Total number of MovableObjects in ObjectData
+		@param t
+			SoA pointers to MovableObjects.
+		@param camera
+			Camera used for our Lod calculations.
+		*/
+		static void lodDistance( const size_t numNodes, ObjectData t, const Camera *camera );
+
+		/** @See lodDistance
+		@remarks
+			Uses the visible pixel count method to calculate the Lod Value
+		*/
+		static void lodPixelCount( const size_t numNodes, ObjectData t, const Camera *camera );
+
+	protected:
+		static void lodPixelCountPerspective( const size_t numNodes, ObjectData t,
+												const Camera *camera );
+		static void lodPixelCountOrthographic( const size_t numNodes, ObjectData t,
+												const Camera *camera );
+	public:
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it
@@ -338,7 +387,7 @@ namespace Ogre {
 		inline void setRenderingDistance(Real dist);
 
 		/** Gets the distance at which batches are no longer rendered. */
-		Real getRenderingDistance(void) const								{ return mUpperDistance; }
+		inline Real getRenderingDistance(void) const;
 
 		/** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
 		@note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.

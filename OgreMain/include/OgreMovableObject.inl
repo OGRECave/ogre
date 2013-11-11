@@ -93,10 +93,12 @@ namespace Ogre
 	{
 		assert( dist > 0.0f );
 		if( dist > 0.0f )
-		{
-			mUpperDistance = dist; 
-			mObjectData.mSquaredUpperDistance[mObjectData.mIndex] = mUpperDistance * mUpperDistance;
-		}
+			mObjectData.mUpperDistance[mObjectData.mIndex] = dist;
+	}
+	//-----------------------------------------------------------------------------------
+	inline Real MovableObject::getRenderingDistance(void) const
+	{
+		return mObjectData.mUpperDistance[mObjectData.mIndex];
 	}
 	//-----------------------------------------------------------------------------------
 	inline void MovableObject::setVisible( bool visible )

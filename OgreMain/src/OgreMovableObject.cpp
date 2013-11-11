@@ -58,8 +58,9 @@ namespace Ogre {
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)
+		, mLodMerged( 0 )
+		, mCurrentLod( 0 )
         , mParentNode(0)
-		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
         , mRenderQueueID(renderQueueId)
 		, mRenderQueuePriority(100)
@@ -81,8 +82,9 @@ namespace Ogre {
         : IdObject( 0 )
 		, mCreator(0)
         , mManager(0)
+		, mLodMerged( 0 )
+		, mCurrentLod( 0 )
         , mParentNode(0)
-		, mUpperDistance( std::numeric_limits<float>::max() )
 		, mMinPixelSize(0)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
 		, mRenderQueuePriority(100)
@@ -420,7 +422,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
 									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-									 AxisAlignedBox *outReceiversBox )
+									 AxisAlignedBox *outReceiversBox, const Camera *lodCamera )
 	{
 		//On threaded environments, the internal variables from outCulledObjects cause
 		//a false cache sharing because they're too close to each other. Perfoming
@@ -440,6 +442,9 @@ namespace Ogre {
 			ArrayVector3	signFlip;
 			ArrayReal		planeNegD;
 		};
+
+		ArrayVector3 lodCameraPos;
+		lodCameraPos.setAll( lodCamera->getDerivedPosition() );
 
 		// Flip the bit from shadow caster, and leave only that in "includeNonCasters"
 		ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
@@ -468,6 +473,10 @@ namespace Ogre {
 		{
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mUpperDistance);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 			ArrayReal dotResult;
@@ -511,6 +520,10 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
+			ArrayReal distance = lodCameraPos.distance( objData.mWorldAabb->mCenter );
+			mask = Mathlib::And( Mathlib::Or( mask, tmpMask ),
+								 Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance ) );
+
 			//isVisible = isVisible() && (isCaster || includeNonCasters)
 			ArrayMaskI isVisible = Mathlib::And(
 								Mathlib::TestFlags4( *visibilityFlags,
@@ -522,7 +535,7 @@ namespace Ogre {
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
             finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
@@ -569,7 +582,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void MovableObject::cullReceiversBox( const size_t numNodes, ObjectData objData,
 											const Frustum *frustum, uint32 sceneVisibilityFlags,
-											AxisAlignedBox *outReceiversBox )
+											AxisAlignedBox *outReceiversBox, const Camera *lodCamera )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
@@ -583,6 +596,9 @@ namespace Ogre {
 			ArrayVector3	signFlip;
 			ArrayReal		planeNegD;
 		};
+
+		ArrayVector3 lodCameraPos;
+		lodCameraPos.setAll( lodCamera->getDerivedPosition() );
 
 		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
 
@@ -608,6 +624,10 @@ namespace Ogre {
 		{
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mUpperDistance);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 			ArrayReal dotResult;
@@ -651,6 +671,10 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
+			ArrayReal distance = lodCameraPos.distance( objData.mWorldAabb->mCenter );
+			mask = Mathlib::And( Mathlib::Or( mask, tmpMask ),
+								 Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance ) );
+
 			//No need to check for casters as in cullFrustum. See function documentation
 			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
@@ -659,7 +683,7 @@ namespace Ogre {
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
             finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
@@ -940,6 +964,139 @@ namespace Ogre {
 			outBox->setNull();
 		else
 			outBox->setExtents( vMin, vMax );
+	}
+	//-----------------------------------------------------------------------
+	inline void MovableObject::lodSet( ObjectData &objData, Real lodValues[ARRAY_PACKED_REALS] )
+	{
+		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+		{
+			MovableObject *owner = objData.mOwner[j];
+
+			//This may look like a lot of ugly indirections, but mLodMerged is a pointer that allows
+			//sharing with many MovableObjects (it should perfectly fit even in small caches).
+			FastArray<FastArray<LodMerged>>::const_iterator itor = owner->mLodMerged->begin();
+			FastArray<FastArray<LodMerged>>::const_iterator end  = owner->mLodMerged->end();
+
+			FastArray<unsigned char>::iterator itLodLevel = owner->mCurrentLod.begin();
+
+			while( itor != end )
+			{
+				FastArray<LodMerged>::const_iterator it = std::lower_bound( itor->begin(),
+																			itor->end(),
+																			lodValues[j] );
+				*itLodLevel++ = (unsigned char)std::min<size_t>( (it - itor->begin()),
+																 itor->size() );
+				++itor;
+			}
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::lodDistance( const size_t numNodes, ObjectData objData, const Camera *camera )
+	{
+		ArrayVector3 cameraPos;
+		cameraPos.setAll( camera->getDerivedPosition() );
+
+		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() ) );
+		Real lodValues[ARRAY_PACKED_REALS];
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal arrayLodValue = objData.mWorldAabb->mCenter.distance( cameraPos ) - (*worldRadius);
+			arrayLodValue = arrayLodValue * lodInvBias;
+			CastArrayToReal( lodValues, arrayLodValue );
+
+			lodSet( objData, lodValues );
+
+			objData.advanceLodPack();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::lodPixelCount( const size_t numNodes, ObjectData objData, const Camera *camera )
+	{
+		if( camera->getProjectionType() == PT_PERSPECTIVE )
+		{
+			lodPixelCountPerspective( numNodes, objData, camera );
+		}
+		else
+		{
+			lodPixelCountOrthographic( numNodes, objData, camera );
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::lodPixelCountPerspective( const size_t numNodes, ObjectData objData,
+													const Camera *camera )
+	{
+		const Viewport *viewport = camera->getLastViewport();
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+
+		ArrayVector3 cameraPos;
+		cameraPos.setAll( camera->getDerivedPosition() );
+
+		//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+		//order and use lower_bound (which wouldn't be the same as using upper_bound)
+		const Matrix4 &projMat = camera->getProjectionMatrix();
+		ArrayReal PiDotVpAreaDotProjMat00dot11(
+						Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] ) );
+
+		Real lodValues[ARRAY_PACKED_REALS];
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal sqDistance = objData.mWorldAabb->mCenter.squaredDistance( cameraPos );
+
+			//Avoid division by zero
+			sqDistance = Mathlib::Max( sqDistance, Mathlib::fEpsilon );
+
+			// Get area of unprojected circle with object bounding radius
+			//ArrayReal boundingArea = Mathlib::PI * (*worldRadius * *worldRadius);
+			//ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
+
+			ArrayReal sqRadius = (*worldRadius * *worldRadius);
+			ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
+
+			CastArrayToReal( lodValues, arrayLodValue );
+
+			lodSet( objData, lodValues );
+
+			objData.advanceLodPack();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::lodPixelCountOrthographic( const size_t numNodes, ObjectData objData,
+													const Camera *camera )
+	{
+		const Viewport *viewport = camera->getLastViewport();
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+		Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
+
+		//Avoid division by zero
+		orthoArea = Ogre::max( orthoArea, 1e-6f );
+
+		ArrayVector3 cameraPos;
+		cameraPos.setAll( camera->getDerivedPosition() );
+
+		//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+		//order and use lower_bound (which wouldn't be the same as using upper_bound)
+		const Matrix4 &projMat = camera->getProjectionMatrix();
+		ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
+
+		Real lodValues[ARRAY_PACKED_REALS];
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal arrayLodValue = (*worldRadius * *worldRadius) * PiDotVpAreaDivOrhtoArea;
+			CastArrayToReal( lodValues, arrayLodValue );
+
+			lodSet( objData, lodValues );
+
+			objData.advanceLodPack();
+		}
 	}
 	//-----------------------------------------------------------------------
 	uint32 MovableObject::getTypeFlags(void) const

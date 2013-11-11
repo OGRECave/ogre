@@ -124,25 +124,31 @@ namespace Ogre
 			}
 		}
 
+		/// Sets all packed matrices to the same value as the scalar input matrix
+		void setAll( const Matrix4 &m )
+		{
+			mChunkBase[0]  = m._m[0];
+			mChunkBase[1]  = m._m[1];
+			mChunkBase[2]  = m._m[2];
+			mChunkBase[3]  = m._m[3];
+			mChunkBase[4]  = m._m[4];
+			mChunkBase[5]  = m._m[5];
+			mChunkBase[6]  = m._m[6];
+			mChunkBase[7]  = m._m[7];
+			mChunkBase[8]  = m._m[8];
+			mChunkBase[9]  = m._m[9];
+			mChunkBase[10] = m._m[10];
+			mChunkBase[11] = m._m[11];
+			mChunkBase[12] = m._m[12];
+			mChunkBase[13] = m._m[13];
+			mChunkBase[14] = m._m[14];
+			mChunkBase[15] = m._m[15];
+		}
+
 		static ArrayMatrix4 createAllFromMatrix4( const Matrix4 &m )
 		{
 			ArrayMatrix4 retVal;
-			retVal.mChunkBase[0]  = m._m[0];
-			retVal.mChunkBase[1]  = m._m[1];
-			retVal.mChunkBase[2]  = m._m[2];
-			retVal.mChunkBase[3]  = m._m[3];
-			retVal.mChunkBase[4]  = m._m[4];
-			retVal.mChunkBase[5]  = m._m[5];
-			retVal.mChunkBase[6]  = m._m[6];
-			retVal.mChunkBase[7]  = m._m[7];
-			retVal.mChunkBase[8]  = m._m[8];
-			retVal.mChunkBase[9]  = m._m[9];
-			retVal.mChunkBase[10] = m._m[10];
-			retVal.mChunkBase[11] = m._m[11];
-			retVal.mChunkBase[12] = m._m[12];
-			retVal.mChunkBase[13] = m._m[13];
-			retVal.mChunkBase[14] = m._m[14];
-			retVal.mChunkBase[15] = m._m[15];
+			retVal.setAll( m );
 			return retVal;
 		}
 
