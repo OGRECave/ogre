@@ -56,7 +56,7 @@ public:
 
 	void clearPendingLodRequests();
 
-private:
+protected:
 	ushort mChannelID;
 	WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 };
