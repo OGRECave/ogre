@@ -116,6 +116,14 @@ namespace Ogre
 
 		inline friend ArrayQuaternion operator * ( const ArrayQuaternion &lhs, const ArrayQuaternion &rhs );
 
+		inline friend ArrayQuaternion operator + ( const ArrayQuaternion &lhs, const ArrayQuaternion &rhs );
+		inline friend ArrayQuaternion operator - ( const ArrayQuaternion &lhs, const ArrayQuaternion &rhs );
+		inline friend ArrayQuaternion operator * ( const ArrayQuaternion &lhs, ArrayReal scalar );
+		inline friend ArrayQuaternion operator * ( ArrayReal scalar, const ArrayQuaternion &lhs );
+		inline void operator += ( const ArrayQuaternion &a );
+		inline void operator -= ( const ArrayQuaternion &a );
+		inline void operator *= ( const ArrayReal fScalar );
+
 		/// @copydoc Quaternion::xAxis
 		inline ArrayVector3 xAxis( void ) const;
 		/// @copydoc Quaternion::yAxis

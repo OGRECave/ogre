@@ -170,8 +170,9 @@ namespace Ogre
 
 		//See which shadow maps can share the camera setup
 		ShadowMapTexDefVec::iterator it1 = mShadowMapTexDefinitions.begin();
+		ShadowMapTexDefVec::iterator en1 = mShadowMapTexDefinitions.end();
 
-		while( itor != end )
+		while( it1 != en1 )
 		{
 			if( it1->split != 0 && it1->shadowMapTechnique != SHADOWMAP_PSSM )
 			{

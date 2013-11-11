@@ -151,8 +151,10 @@ THE SOFTWARE.
 		typedef bool ArrayMaskR;
 		typedef bool ArrayMaskI;
 
-		#define CastIntToReal( x ) static_cast<Ogre::Real>(x)
-		#define CastRealToInt( x ) static_cast<ArrayInt>(x)
+		//Do NOT I REPEAT DO NOT change these to static_cast<Ogre::Real>(x) and static_cast<int>(x)
+		//These are not conversions. They're reinterpretations!
+		#define CastIntToReal( x ) (x)
+		#define CastRealToInt( x ) (x)
 
 		#define ogre_madd( a, b, c )		( (c) + ( (a) * (b) ) )
 

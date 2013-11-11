@@ -151,12 +151,12 @@ namespace Ogre
 
 		static inline ArrayMaskI And( ArrayMaskI a, ArrayInt b )
 		{
-			return (a ? 0xffffffff : 0) & b;
+			return ((a ? 0xffffffff : 0) & b) != 0;
 		}
 
 		static inline ArrayMaskI And( ArrayInt a, ArrayMaskI b )
 		{
-			return a & (b ? 0xffffffff : 0);
+			return (a & (b ? 0xffffffff : 0)) != 0;
 		}
 
 		static inline ArrayMaskI And( ArrayMaskI a, ArrayMaskI b )
@@ -194,12 +194,17 @@ namespace Ogre
 
 		static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayInt b )
 		{
-			return (a ? 0xffffffff : 0) & ~b;
+			return ((a ? 0xffffffff : 0) & ~b) != 0;
 		}
 
 		static inline ArrayMaskI AndNot( ArrayInt a, ArrayMaskI b )
 		{
-			return a & (b ? 0 : 0xffffffff);
+			return (a & (b ? 0 : 0xffffffff)) != 0;
+		}
+
+		static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayMaskI b )
+		{
+			return a & (!b);
 		}
 
 		/** Returns the result of "a | b"

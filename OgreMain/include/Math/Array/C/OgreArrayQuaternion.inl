@@ -28,6 +28,73 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	// Arithmetic operations
+#define DEFINE_OPERATION( leftClass, rightClass, op )\
+	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightClass &rhs )\
+	{\
+		return ArrayQuaternion(\
+				lhs.w op rhs.w,\
+				lhs.x op rhs.x,\
+				lhs.y op rhs.y,\
+				lhs.z op rhs.z );\
+	}
+#define DEFINE_L_OPERATION( leftType, rightClass, op )\
+	inline ArrayQuaternion operator op ( const leftType lhs, const rightClass &rhs )\
+	{\
+		return ArrayQuaternion(\
+				lhs op rhs.w,\
+				lhs op rhs.x,\
+				lhs op rhs.y,\
+				lhs op rhs.z );\
+	}
+#define DEFINE_R_OPERATION( leftClass, rightType, op )\
+	inline ArrayQuaternion operator op ( const leftClass &lhs, const rightType rhs )\
+	{\
+		return ArrayQuaternion(\
+				lhs.w op rhs,\
+				lhs.x op rhs,\
+				lhs.y op rhs,\
+				lhs.z op rhs );\
+	}
+
+	// Update operations
+#define DEFINE_UPDATE_OPERATION( leftClass, op )\
+	inline void ArrayQuaternion::operator op ( const leftClass &a )\
+	{\
+		w = w op a.w;\
+		x = x op a.x;\
+		y = y op a.y;\
+		z = z op a.z;\
+	}
+#define DEFINE_UPDATE_R_OPERATION( rightType, op )\
+	inline void ArrayQuaternion::operator op ( const rightType a )\
+	{\
+		w = w op a;\
+		x = x op a;\
+		y = y op a;\
+		z = z op a;\
+	}
+
+	// + Addition
+	DEFINE_OPERATION( ArrayQuaternion, ArrayQuaternion, + );
+
+	// - Subtraction
+	DEFINE_OPERATION( ArrayQuaternion, ArrayQuaternion, - );
+
+	// * Multiplication (scalar only)
+	DEFINE_L_OPERATION( ArrayReal, ArrayQuaternion, * );
+	DEFINE_R_OPERATION( ArrayQuaternion, ArrayReal, * );
+
+	// Update operations
+	// +=
+	DEFINE_UPDATE_OPERATION(			ArrayQuaternion,		+= );
+
+	// -=
+	DEFINE_UPDATE_OPERATION(			ArrayQuaternion,		-= );
+
+	// *=
+	DEFINE_UPDATE_R_OPERATION(			ArrayReal,			*= );
+
 	// Notes: This operator doesn't get inlined. The generated instruction count is actually high so
 	// the compiler seems to be clever in not inlining. There is no gain in doing a "mul()" equivalent
 	// like we did with mul( const ArrayQuaternion&, ArrayVector3& ) because we would still need

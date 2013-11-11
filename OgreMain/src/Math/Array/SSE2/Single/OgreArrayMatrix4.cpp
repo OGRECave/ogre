@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreArrayMatrix4.h"
 
+#if __OGRE_HAVE_SSE
+
 namespace Ogre
 {
 	const ArrayMatrix4 ArrayMatrix4::IDENTITY( ArrayMatrix4::createAllFromMatrix4(
@@ -38,3 +40,5 @@ namespace Ogre
 							0, 0, 1, 0,
 							0, 0, 0, 1 ) ) );
 }
+
+#endif
