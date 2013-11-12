@@ -26,7 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "PlayPenSamples.h"
-
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreMeshLodGenerator.h"
+#endif
 
 //---------------------------------------------------------------------
 PlayPen_testManualBlend::PlayPen_testManualBlend()
@@ -205,6 +207,7 @@ void PlayPen_testCameraSetDirection::checkBoxToggled(OgreBites::CheckBox* box)
 
 	}
 }
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 //---------------------------------------------------------------------
 PlayPen_testManualLOD::PlayPen_testManualLOD()
 {
@@ -216,12 +219,12 @@ String PlayPen_testManualLOD::getLODMesh()
 {
 	MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-	msh1->createManualLodLevel(200, "razor.mesh");
-	msh1->createManualLodLevel(500, "sphere.mesh");
+	LodConfig lodConfig(msh1);
+	lodConfig.createManualLodLevel(5, "razor.mesh");
+	lodConfig.createManualLodLevel(10, "sphere.mesh");
+	MeshLodGenerator(false).generateLodLevels(lodConfig);
 
 	return msh1->getName();
-
 }
 //---------------------------------------------------------------------
 void PlayPen_testManualLOD::setupContent()
@@ -270,8 +273,10 @@ String PlayPen_testManualLODFromFile::getLODMesh()
 	MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-	msh1->createManualLodLevel(200, "razor.mesh");
-	msh1->createManualLodLevel(500, "sphere.mesh");
+	LodConfig lodConfig(msh1);
+	lodConfig.createManualLodLevel(5, "razor.mesh");
+	lodConfig.createManualLodLevel(10, "sphere.mesh");
+	MeshLodGenerator(false).generateLodLevels(lodConfig);
 
 	// this time, we save this data to a file and re-load it
 
@@ -289,10 +294,10 @@ String PlayPen_testManualLODFromFile::getLODMesh()
 	ser.exportMesh(msh1.get(), prefix + "/testlod.mesh");
 
 	MeshManager::getSingleton().removeAll();
-
 	return "testlod.mesh";
 
 }
+#endif
 //---------------------------------------------------------------------
 PlayPen_testFullScreenSwitch::PlayPen_testFullScreenSwitch()
 {
