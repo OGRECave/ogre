@@ -104,6 +104,7 @@ namespace Ogre {
         mBoneAssignmentsOutOfDate(false),
 		mHasManualLodLevel(false),
         mNumLods(1),
+        mLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy()),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mVertexBufferShadowBuffer(true),
@@ -117,18 +118,13 @@ namespace Ogre {
 		mPosesIncludeNormals(false),
 		sharedVertexData(0)
     {
-#if !OGRE_NO_MESHLOD
-        // Initialise to default strategy
-        mLodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-
 		// Init first (manual) lod
 		MeshLodUsage lod;
         lod.userValue = 0; // User value not used for base lod level
-		lod.value = mLodStrategy->getBaseValue();
+		lod.value = getLodStrategy()->getBaseValue();
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
-#endif
     }
     //-----------------------------------------------------------------------
     Mesh::~Mesh()
@@ -2397,11 +2393,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     const LodStrategy *Mesh::getLodStrategy() const
     {
-#if !OGRE_NO_MESHLOD
 		return mLodStrategy;
-#else
-        return LodStrategyManager::getSingleton().getDefaultStrategy();
-#endif
     }
 #if !OGRE_NO_MESHLOD
     //---------------------------------------------------------------------
