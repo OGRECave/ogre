@@ -48,6 +48,7 @@ namespace Ogre {
 	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
 		: EGLWindow(glsupport),
 		  mMaxBufferSize(32),
+		  mMinBufferSize(16),
 		  mMaxDepthSize(16),
 		  mMaxStencilSize(0)
 	{
@@ -167,6 +168,12 @@ namespace Ogre {
             {
                 mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
             }
+
+			if((opt = miscParams->find("minColourBufferSize")) != end)
+            {
+                mMinBufferSize = Ogre::StringConverter::parseInt(opt->second);
+                if (mMinBufferSize > mMaxBufferSize) mMinBufferSize = mMaxBufferSize;
+            }
         }
         
         initNativeCreatedWindow(miscParams);
@@ -234,7 +241,7 @@ namespace Ogre {
         
         int minAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-            EGL_BUFFER_SIZE, 16,
+            EGL_BUFFER_SIZE, mMinBufferSize,
             EGL_DEPTH_SIZE, 16,
             EGL_NONE
         };

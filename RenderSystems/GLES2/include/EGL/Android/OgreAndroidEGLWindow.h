@@ -38,6 +38,7 @@ namespace Ogre {
     {
 	private:
 		uint mMaxBufferSize;
+		uint mMinBufferSize;
 		uint mMaxDepthSize;
 		uint mMaxStencilSize;
 		

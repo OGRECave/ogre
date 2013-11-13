@@ -309,6 +309,7 @@ namespace OgreBites
                             Ogre::NameValuePairList opt;
                             opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
                             opt["androidConfig"] = Ogre::StringConverter::toString((int)config);
+                            opt["minColourBufferSize"] = Ogre::StringConverter::toString(32);
                             
                             mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                             
