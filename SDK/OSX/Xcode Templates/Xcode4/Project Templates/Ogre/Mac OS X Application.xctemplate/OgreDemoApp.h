@@ -93,7 +93,7 @@ private:
     void setupDemoScene();
 	void runDemo();
     bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr);
-    void finaliseRTShaderSystem();
+    void destroyRTShaderSystem();
 
 	Ogre::SceneNode*			m_pCubeNode;
 	Ogre::Entity*				m_pCubeEntity;
