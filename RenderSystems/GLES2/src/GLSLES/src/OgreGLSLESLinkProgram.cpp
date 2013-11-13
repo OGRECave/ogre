@@ -71,6 +71,7 @@ namespace Ogre {
         mLinked = false;
         mTriedToLinkAndFailed = false;
         mUniformRefsBuilt = false;
+        mUniformCache->clearCache();
     }
     
     void GLSLESLinkProgram::notifyOnContextReset()
