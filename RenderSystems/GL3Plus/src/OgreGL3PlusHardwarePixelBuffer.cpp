@@ -215,7 +215,7 @@ namespace Ogre {
 
         // Get face identifier
         mFaceTarget = mTarget;
-        if(mTarget == GL_TEXTURE_CUBE_MAP)
+        if (mTarget == GL_TEXTURE_CUBE_MAP)
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
         
         // Get width
@@ -555,7 +555,7 @@ namespace Ogre {
     void GL3PlusTextureBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
     {
         assert(zoffset < mDepth);
-        OGRE_CHECK_GL_ERROR(glBindTexture(mFaceTarget, mTextureID));
+        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
         switch(mTarget)
         {
             case GL_TEXTURE_1D:

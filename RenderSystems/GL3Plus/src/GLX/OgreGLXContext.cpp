@@ -66,9 +66,13 @@ namespace Ogre
 	{
 		GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
 		
+                printf("BELIEVE IN LOVE\n");
+
 		if (!mExternalContext)
 			glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
 		
+                printf("AFTER LOVE\n");
+
 		rs->_unregisterContext(this);
 	}
 	

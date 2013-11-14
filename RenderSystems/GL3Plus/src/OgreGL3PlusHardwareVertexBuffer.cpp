@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -32,11 +32,12 @@ THE SOFTWARE.
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
-    GL3PlusHardwareVertexBuffer::GL3PlusHardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
-													   size_t vertexSize,
-                                                       size_t numVertices,
-                                                       HardwareBuffer::Usage usage,
-                                                       bool useShadowBuffer)
+
+    GL3PlusHardwareVertexBuffer::GL3PlusHardwareVertexBuffer(HardwareBufferManagerBase* mgr,
+                                                             size_t vertexSize,
+                                                             size_t numVertices,
+                                                             HardwareBuffer::Usage usage,
+                                                             bool useShadowBuffer)
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -51,8 +52,10 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
         mFence = 0;
-//        std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
+        //        std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }
 
     GL3PlusHardwareVertexBuffer::~GL3PlusHardwareVertexBuffer()
@@ -69,8 +72,8 @@ namespace Ogre {
     }
 
     void* GL3PlusHardwareVertexBuffer::lockImpl(size_t offset,
-                                           size_t length,
-                                           LockOptions options)
+                                                size_t length,
+                                                LockOptions options)
     {
         if (mIsLocked)
         {
@@ -82,56 +85,59 @@ namespace Ogre {
         GLenum access = 0;
         void* retPtr = 0;
 
-        if (!retPtr)
-		{
-			// Use glMapBuffer
-            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
+        // Use glMapBuffer
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 
-			if (mUsage & HBU_WRITE_ONLY)
+        if (mUsage & HBU_WRITE_ONLY)
+        {
+            access |= GL_MAP_WRITE_BIT;
+            access |= GL_MAP_FLUSH_EXPLICIT_BIT;
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
-				access |= GL_MAP_WRITE_BIT;
-                access |= GL_MAP_FLUSH_EXPLICIT_BIT;
-                if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
-                {
-                    // Discard the buffer
-                    access |= GL_MAP_INVALIDATE_RANGE_BIT;
-                }
-                access |= GL_MAP_UNSYNCHRONIZED_BIT;
+                // Discard the buffer
+                access |= GL_MAP_INVALIDATE_RANGE_BIT;
             }
-			else if (options == HBL_READ_ONLY)
-				access |= GL_MAP_READ_BIT;
-			else
-				access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+            access |= GL_MAP_UNSYNCHRONIZED_BIT;
+        }
+        else if (options == HBL_READ_ONLY)
+            access |= GL_MAP_READ_BIT;
+        else
+            access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
-            // FIXME: Big stall here
-            void* pBuffer;
-            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
+        // FIXME: Big stall here
+        void* pBuffer;
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
+        //OGRE_CHECK_GL_ERROR(pBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
 
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Vertex Buffer: Out of memory",
-                    "GL3PlusHardwareVertexBuffer::lock");
-			}
+        if(pBuffer == 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Vertex Buffer: Out of memory",
+                        "GL3PlusHardwareVertexBuffer::lock");
+        }
 
-            if(mFence)
+        if(mFence)
+        {
+            GLenum result;
+            OGRE_CHECK_GL_ERROR(result = glClientWaitSync(mFence, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED));
+            if(result == GL_WAIT_FAILED)
             {
-                GLenum result;
-                OGRE_CHECK_GL_ERROR(result = glClientWaitSync(mFence, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED));
-                if(result == GL_WAIT_FAILED)
-                {
-                    // Some error
-                }
-                OGRE_CHECK_GL_ERROR(glDeleteSync(mFence));
-                mFence = 0;
+                // Some error
+                //FIXME
+                printf("FAILED TO WAIT WHILE FENCED\n");
+                printf("OgreGL3PlusHardwareVertexBuffer\n");
             }
+            OGRE_CHECK_GL_ERROR(glDeleteSync(mFence));
+            mFence = 0;
+        }
 
-			// return offsetted
-			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+        // return offsetted
+        retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-			mLockedToScratch = false;
-		}
-		mIsLocked = true;
+        mLockedToScratch = false;
+
+
+        mIsLocked = true;
         return retPtr;
     }
 
@@ -146,7 +152,7 @@ namespace Ogre {
                           mScratchOffset == 0 && mScratchSize == getSizeInBytes());
             }
 
-			// deallocate from scratch buffer
+            // deallocate from scratch buffer
             static_cast<GL3PlusHardwareBufferManager*>(
                 HardwareBufferManager::getSingletonPtr())->deallocateScratch(mScratchPtr);
 
@@ -156,19 +162,19 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 
-			if (mUsage & HBU_WRITE_ONLY)
+            if (mUsage & HBU_WRITE_ONLY)
             {
                 OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
             }
 
             GLboolean mapped;
             OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ARRAY_BUFFER));
-			if(!mapped)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Buffer data corrupted, please reload", 
-					"GL3PlusHardwareVertexBuffer::unlock");
-			}
+            if(!mapped)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                            "Buffer data corrupted, please reload",
+                            "GL3PlusHardwareVertexBuffer::unlock");
+            }
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
         }
 
@@ -193,9 +199,9 @@ namespace Ogre {
     }
 
     void GL3PlusHardwareVertexBuffer::writeData(size_t offset,
-                                           size_t length,
-                                           const void* pSource,
-                                           bool discardWholeBuffer)
+                                                size_t length,
+                                                const void* pSource,
+                                                bool discardWholeBuffer)
     {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 
@@ -203,7 +209,7 @@ namespace Ogre {
         if(mUseShadowBuffer)
         {
             void* destData = mShadowBuffer->lock(offset, length,
-                                                  discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL);
+                                                 discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL);
             memcpy(destData, pSource, length);
             mShadowBuffer->unlock();
         }
@@ -217,7 +223,7 @@ namespace Ogre {
         {
             if(discardWholeBuffer)
             {
-                OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
+                OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                                  GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
             }
 
@@ -225,13 +231,13 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusHardwareVertexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-                  size_t dstOffset, size_t length, bool discardWholeBuffer)
+    void GL3PlusHardwareVertexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
+                                               size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {
@@ -259,8 +265,8 @@ namespace Ogre {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
             const void *srcData = mShadowBuffer->lock(mLockStart,
-                                                       mLockSize,
-                                                       HBL_READ_ONLY);
+                                                      mLockSize,
+                                                      HBL_READ_ONLY);
 
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 

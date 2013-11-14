@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -36,75 +36,75 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    /** GLSL low level compiled shader object - this class is used to get at the linked program object 
-		and provide an interface for GL3PlusRenderSystem calls.  GLSL does not provide access to the
-		low level code of the shader so this class is really just a dummy place holder.
-		GLSL uses a program object to represent the active vertex and fragment programs used
-		but Ogre materials maintain separate instances of the active vertex and fragment programs
-		which creates a small problem for GLSL integration.  The GLSLGpuProgram class provides the
-		interface between the GLSLLinkProgramManager , GL3PlusRenderSystem, and the active GLSLProgram
-		instances.
-	*/
+    /** GLSL low level compiled shader object - this class is used to get at the linked program object
+        and provide an interface for GL3PlusRenderSystem calls.  GLSL does not provide access to the
+        low level code of the shader so this class is really just a dummy place holder.
+        GLSL uses a program object to represent the active vertex and fragment programs used
+        but Ogre materials maintain separate instances of the active vertex and fragment programs
+        which creates a small problem for GLSL integration.  The GLSLGpuProgram class provides the
+        interface between the GLSLLinkProgramManager , GL3PlusRenderSystem, and the active GLSLProgram
+        instances.
+    */
     class _OgreGL3PlusExport GLSLGpuProgram : public GL3PlusGpuProgram
     {
     private:
-		/// GL Handle for the shader object
-		GLSLProgram* mGLSLProgram;
+        /// GL Handle for the shader object
+        GLSLProgram* mGLSLProgram;
 
-		/// Keep track of the number of vertex shaders created
-		static GLuint mVertexShaderCount;
-		/// Keep track of the number of fragment shaders created
-		static GLuint mFragmentShaderCount;
-		/// Keep track of the number of geometry shaders created
-		static GLuint mGeometryShaderCount;
-		/// Keep track of the number of tesselation hull(control) shaders created
-		static GLuint mHullShaderCount;
-		/// Keep track of the number of tesselation domain(evaluation) shaders created
-		static GLuint mDomainShaderCount;
-		/// Keep track of the number of compute shaders created
-		static GLuint mComputeShaderCount;
+        /// Keep track of the number of vertex shaders created
+        static GLuint mVertexShaderCount;
+        /// Keep track of the number of fragment shaders created
+        static GLuint mFragmentShaderCount;
+        /// Keep track of the number of geometry shaders created
+        static GLuint mGeometryShaderCount;
+        /// Keep track of the number of tesselation hull(control) shaders created
+        static GLuint mHullShaderCount;
+        /// Keep track of the number of tesselation domain(evaluation) shaders created
+        static GLuint mDomainShaderCount;
+        /// Keep track of the number of compute shaders created
+        static GLuint mComputeShaderCount;
 
         /** Flag indicating that the program object has been successfully linked.
-         Only used when programs are linked separately with GL_ARB_separate_shader_objects.
-         */
-		GLint mLinked;
+            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
+        */
+        GLint mLinked;
 
-	public:
+    public:
         GLSLGpuProgram(GLSLProgram* parent);
-		~GLSLGpuProgram();
+        ~GLSLGpuProgram();
 
 
-		/// Execute the binding functions for this program
-		void bindProgram(void);
-		/// Execute the unbinding functions for this program
-		void unbindProgram(void);
-		/// Execute the param binding functions for this program
-		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/// Execute the pass iteration param binding functions for this program
-		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
-		/// Execute the shared param binding functions for this program
-		void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the binding functions for this program
+        void bindProgram(void);
+        /// Execute the unbinding functions for this program
+        void unbindProgram(void);
+        /// Execute the param binding functions for this program
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the pass iteration param binding functions for this program
+        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
+        /// Execute the shared param binding functions for this program
+        void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
-		/// Get the GLSLProgram for the shader object
-		GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }		
+        /// Get the GLSLProgram for the shader object
+        GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }
 
         /** Return the programs link status
-         Only used when programs are linked separately with GL_ARB_separate_shader_objects.
-         */
+            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
+        */
         GLint isLinked(void) { return mLinked; }
 
         /** Set the programs link status
-         Only used when programs are linked separately with GL_ARB_separate_shader_objects.
-         */
+            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
+        */
         void setLinked(GLint flag) { mLinked = flag; }
 
     protected:
         /// Overridden from GpuProgram
         void loadFromSource(void);
-		/// @copydoc Resource::unloadImpl
-		void unloadImpl(void);
-		/// @copydoc Resource::loadImpl
-		void loadImpl(void);
+        /// @copydoc Resource::unloadImpl
+        void unloadImpl(void);
+        /// @copydoc Resource::loadImpl
+        void loadImpl(void);
     };
 }
 

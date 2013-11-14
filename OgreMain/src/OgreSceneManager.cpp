@@ -1026,6 +1026,20 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			// Set fixed-function tesselation evaluation parameters
 		}
 
+                if (pass->hasComputeProgram())
+		{
+                    bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
+                    // bind parameters later
+		}
+		else
+		{
+                    // Unbind program?
+                    if (mDestRenderSystem->isGpuProgramBound(GPT_COMPUTE_PROGRAM))
+                    {
+                        mDestRenderSystem->unbindGpuProgram(GPT_COMPUTE_PROGRAM);
+                    }
+                    // Set fixed-function compute parameters
+		}
 
 		if (passSurfaceAndLightParams)
 		{
@@ -7282,6 +7296,12 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 			mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
 				pass->getTesselationDomainProgramParameters(), mGpuParamsDirty);
 		}
+
+                // if (pass->hasComputeProgram())
+		// {
+                //     mDestRenderSystem->bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, 
+                //                                                 pass->getComputeProgramParameters(), mGpuParamsDirty);
+		// }
 
 		mGpuParamsDirty = 0;
 	}

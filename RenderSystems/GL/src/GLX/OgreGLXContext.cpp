@@ -65,9 +65,13 @@ namespace Ogre
 	GLXContext::~GLXContext() 	
 	{
 		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+
+                printf("BELIEVE IN LOVE\n");
 		
 		if (!mExternalContext)
-			glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
+                    glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
+
+                printf("AFTER LOVE\n");
 		
 		rs->_unregisterContext(this);
 	}

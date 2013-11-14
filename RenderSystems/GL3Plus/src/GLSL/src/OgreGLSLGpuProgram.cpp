@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -34,104 +34,104 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	GLuint GLSLGpuProgram::mVertexShaderCount = 0;
-	GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
-	GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
-	GLuint GLSLGpuProgram::mHullShaderCount = 0;
-	GLuint GLSLGpuProgram::mDomainShaderCount = 0;
-	GLuint GLSLGpuProgram::mComputeShaderCount = 0;
+    GLuint GLSLGpuProgram::mVertexShaderCount = 0;
+    GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
+    GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
+    GLuint GLSLGpuProgram::mHullShaderCount = 0;
+    GLuint GLSLGpuProgram::mDomainShaderCount = 0;
+    GLuint GLSLGpuProgram::mComputeShaderCount = 0;
     //-----------------------------------------------------------------------------
-	GLSLGpuProgram::GLSLGpuProgram(GLSLProgram* parent) : 
-        GL3PlusGpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(), 
-            parent->getGroup(), false, 0), mGLSLProgram(parent)
+    GLSLGpuProgram::GLSLGpuProgram(GLSLProgram* parent) :
+        GL3PlusGpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(),
+                          parent->getGroup(), false, 0), mGLSLProgram(parent)
     {
         mType = parent->getType();
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
 
         mLinked = 0;
 
-		if (parent->getType() == GPT_VERTEX_PROGRAM)
-		{
-			mProgramID = ++mVertexShaderCount;
-		}
-		else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
-		{
-			mProgramID = ++mFragmentShaderCount;
-		}
-		else if (parent->getType() == GPT_GEOMETRY_PROGRAM)
-		{
-			mProgramID = ++mGeometryShaderCount;
-		}
-		else if (parent->getType() == GPT_HULL_PROGRAM)
-		{
-			mProgramID = ++mHullShaderCount;
-		}
+        if (parent->getType() == GPT_VERTEX_PROGRAM)
+        {
+            mProgramID = ++mVertexShaderCount;
+        }
+        else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
+        {
+            mProgramID = ++mFragmentShaderCount;
+        }
+        else if (parent->getType() == GPT_GEOMETRY_PROGRAM)
+        {
+            mProgramID = ++mGeometryShaderCount;
+        }
+        else if (parent->getType() == GPT_HULL_PROGRAM)
+        {
+            mProgramID = ++mHullShaderCount;
+        }
         else if (parent->getType() == GPT_COMPUTE_PROGRAM)
-		{
-			mProgramID = ++mComputeShaderCount;
-		}
-		else
-		{
-			mProgramID = ++mDomainShaderCount;
-		}
+        {
+            mProgramID = ++mComputeShaderCount;
+        }
+        else
+        {
+            mProgramID = ++mDomainShaderCount;
+        }
 
         // Transfer skeletal animation status from parent
         mSkeletalAnimation = mGLSLProgram->isSkeletalAnimationIncluded();
-		// There is nothing to load
-		mLoadFromFile = false;
+        // There is nothing to load
+        mLoadFromFile = false;
     }
     //-----------------------------------------------------------------------
     GLSLGpuProgram::~GLSLGpuProgram()
     {
         // Have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
-        unload(); 
+        unload();
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     void GLSLGpuProgram::loadImpl(void)
     {
-		// nothing to load
+        // nothing to load
     }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::unloadImpl(void)
-	{
-		// nothing to unload
-	}
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::unloadImpl(void)
+    {
+        // nothing to unload
+    }
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     void GLSLGpuProgram::loadFromSource(void)
     {
-		// nothing to load
-	}
+        // nothing to load
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgram(void)
-	{
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgram(void)
+    {
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Tell the Program Pipeline Manager what pipeline is to become active
             switch (mType)
             {
-                case GPT_VERTEX_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveVertexLinkProgram( this );
-                    break;
-                case GPT_FRAGMENT_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( this );
-                    break;
-                case GPT_GEOMETRY_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveGeometryLinkProgram( this );
-                    break;
-                case GPT_HULL_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveTessHullLinkProgram( this );
-                    break;
-                case GPT_DOMAIN_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveTessDomainLinkProgram( this );
-                    break;
-                case GPT_COMPUTE_PROGRAM:
-                    GLSLProgramPipelineManager::getSingleton().setActiveComputeLinkProgram( this );
-                default:
-                    break;
+            case GPT_VERTEX_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveVertexLinkProgram( this );
+                break;
+            case GPT_FRAGMENT_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( this );
+                break;
+            case GPT_GEOMETRY_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveGeometryLinkProgram( this );
+                break;
+            case GPT_HULL_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveTessHullLinkProgram( this );
+                break;
+            case GPT_DOMAIN_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveTessDomainLinkProgram( this );
+                break;
+            case GPT_COMPUTE_PROGRAM:
+                GLSLProgramPipelineManager::getSingleton().setActiveComputeLinkProgram( this );
+            default:
+                break;
             }
         }
         else
@@ -139,32 +139,35 @@ namespace Ogre {
             // Tell the Link Program Manager what shader is to become active
             switch (mType)
             {
-                case GPT_VERTEX_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveVertexShader( this );
-                    break;
-                case GPT_FRAGMENT_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( this );
-                    break;
-                case GPT_GEOMETRY_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( this );
-                    break;
-                case GPT_HULL_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveHullShader( this );
-                    break;
-                case GPT_DOMAIN_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveDomainShader( this );
-                    break;
-                case GPT_COMPUTE_PROGRAM:
-                    GLSLLinkProgramManager::getSingleton().setActiveComputeShader( this );
-                default:
-                    break;
+            case GPT_VERTEX_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveVertexShader( this );
+                break;
+            case GPT_FRAGMENT_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( this );
+                break;
+            case GPT_GEOMETRY_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( this );
+                break;
+            case GPT_HULL_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveHullShader( this );
+                break;
+            case GPT_DOMAIN_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveDomainShader( this );
+                break;
+            case GPT_COMPUTE_PROGRAM:
+                GLSLLinkProgramManager::getSingleton().setActiveComputeShader( this );
+            default:
+                break;
             }
         }
-	}
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::unbindProgram(void)
-	{
+        
+        
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::unbindProgram(void)
+    {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Tell the Program Pipeline Manager what pipeline is to become inactive
@@ -188,7 +191,7 @@ namespace Ogre {
             {
                 GLSLProgramPipelineManager::getSingleton().setActiveComputeLinkProgram( NULL );
             }
-            else // Its a fragment shader
+            else // It's a fragment shader
             {
                 GLSLProgramPipelineManager::getSingleton().setActiveFragmentLinkProgram( NULL );
             }
@@ -216,25 +219,26 @@ namespace Ogre {
             {
                 GLSLLinkProgramManager::getSingleton().setActiveComputeShader( NULL );
             }
-            else // Its a fragment shader
+            else // It's a fragment shader
             {
                 GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( NULL );
             }
         }
-	}
+    }
 
     //-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
-	{
-		// Link can throw exceptions, ignore them at this point
-		try
-		{
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+    void GLSLGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
                 // Pass on parameters from params to program object uniforms
                 programPipeline->updateUniformBlocks(params, mask, mType);
+                // programPipeline->updateShaderStorageBlock(params, mask, mType);
             }
             else
             {
@@ -243,22 +247,23 @@ namespace Ogre {
                 // Pass on parameters from params to program object uniforms
                 linkProgram->updateUniformBlocks(params, mask, mType);
             }
-		}
-		catch (Exception& e) {}
-	}
+        }
+        catch (Exception& e) {}
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
-	{
-		// Link can throw exceptions, ignore them at this point
-		try
-		{
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
                 // Pass on parameters from params to program object uniforms
                 programPipeline->updateUniforms(params, mask, mType);
+                programPipeline->updateAtomicCounters(params, mask, mType);
             }
             else
             {
@@ -266,15 +271,17 @@ namespace Ogre {
                 GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
                 // Pass on parameters from params to program object uniforms
                 linkProgram->updateUniforms(params, mask, mType);
+                //TODO add atomic counter support
+                //linkProgram->updateAtomicCounters(params, mask, mType);
             }
-		}
-		catch (Exception& e) {}
-	}
+        }
+        catch (Exception& e) {}
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
-	{
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
+    {
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Activate the program pipeline object
             GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
@@ -287,7 +294,6 @@ namespace Ogre {
             GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
             // Pass on parameters from params to program object uniforms
             linkProgram->updatePassIterationUniforms( params );
-		}
-	}
+        }
+    }
 }
-
