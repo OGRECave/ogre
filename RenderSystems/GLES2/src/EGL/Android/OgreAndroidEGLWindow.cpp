@@ -276,7 +276,7 @@ namespace Ogre {
 					EGL_BUFFER_SIZE, mMinBufferSize,
 					EGL_DEPTH_SIZE, 16,
 					EGL_COVERAGE_BUFFERS_NV, 1,
-					EGL_COVERAGE_SAMPLES_NV, mMSAA,
+					EGL_COVERAGE_SAMPLES_NV, mCSAA,
 					EGL_NONE
 				};
 				int CSAAmaxAttribs[] = {
@@ -285,7 +285,7 @@ namespace Ogre {
 					EGL_DEPTH_SIZE, mMaxDepthSize,
 					EGL_STENCIL_SIZE, mMaxStencilSize,
 					EGL_COVERAGE_BUFFERS_NV, 1,
-					EGL_COVERAGE_SAMPLES_NV, mMSAA,
+					EGL_COVERAGE_SAMPLES_NV, mCSAA,
 					EGL_NONE
 				};
 				mEglConfig = mGLSupport->selectGLConfig(CSAAminAttribs, CSAAmaxAttribs);
