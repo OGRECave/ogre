@@ -2,7 +2,7 @@
 
 in vec4 vertex;
 
-//Just a pass-through shader
+// Just a pass-through vertex shader.
 void main()
 {
     gl_Position = vertex;
