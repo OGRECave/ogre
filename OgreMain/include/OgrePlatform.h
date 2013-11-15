@@ -56,7 +56,10 @@ namespace Ogre {
 
 /* Finds the compiler type and version.
 */
-#if defined( __GCCE__ )
+#if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra
+#   define OGRE_COMPILER OGRE_COMPILER_GNUC
+#   define OGRE_COMP_VER 470
+#elif defined( __GCCE__ )
 #   define OGRE_COMPILER OGRE_COMPILER_GCCE
 #   define OGRE_COMP_VER _MSC_VER
 //#	include <staticlibinit_gcce.h> // This is a GCCE toolchain workaround needed when compiling with GCCE 
@@ -99,7 +102,7 @@ namespace Ogre {
 #endif
 
 /* Finds the current platform */
-#if defined( __WIN32__ ) || defined( _WIN32 )
+#if (defined( __WIN32__ ) || defined( _WIN32 )) && !defined(__ANDROID__)
 #	if defined(WINAPI_FAMILY)
 #		define __OGRE_HAVE_DIRECTXMATH 1
 #		include <winapifamily.h>

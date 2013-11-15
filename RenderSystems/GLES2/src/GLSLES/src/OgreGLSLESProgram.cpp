@@ -217,27 +217,23 @@ namespace Ogre {
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
 		{
-            // Add preprocessor extras and main source
-            if (!mSource.empty())
+            // Fix up the source in case someone forgot to redeclare gl_Position
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                mType == GPT_VERTEX_PROGRAM)
             {
-                // Fix up the source in case someone forgot to redeclare gl_Position
-                if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
-                   mType == GPT_VERTEX_PROGRAM)
-                {
-                    size_t versionPos = mSource.find("#version");
-                    int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
+                size_t versionPos = mSource.find("#version");
+                int shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
 
-                    // Check that it's missing and that this shader has a main function, ie. not a child shader.
-                    if(mSource.find("out highp vec4 gl_Position") == String::npos)
-                    {
-                        if(shaderVersion >= 300)
-                            mSource.insert(versionPos+16, "out highp vec4 gl_Position;\nout highp float gl_PointSize;\n");
-                    }
-                    if(mSource.find("#extension GL_EXT_separate_shader_objects : require") == String::npos)
-                    {
-                        if(shaderVersion >= 300)
-                            mSource.insert(versionPos+16, "#extension GL_EXT_separate_shader_objects : require\n");
-                    }
+                // Check that it's missing and that this shader has a main function, ie. not a child shader.
+                if(mSource.find("out highp vec4 gl_Position") == String::npos)
+                {
+                    if(shaderVersion >= 300)
+                        mSource.insert(versionPos+16, "out highp vec4 gl_Position;\nout highp float gl_PointSize;\n");
+                }
+                if(mSource.find("#extension GL_EXT_separate_shader_objects : require") == String::npos)
+                {
+                    if(shaderVersion >= 300)
+                        mSource.insert(versionPos+16, "#extension GL_EXT_separate_shader_objects : require\n");
                 }
             }
     
