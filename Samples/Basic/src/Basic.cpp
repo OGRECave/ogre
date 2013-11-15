@@ -41,13 +41,33 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
+        if (!caps->hasCapability(RSC_ATOMIC_COUNTERS))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support atomic counters, "
+                        "so you cannot run this sample. Sorry!",
+                        "Sample_Basic::testCapabilities");
+        }
+
+        if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support compute programs, "
+                        "so you cannot run this sample. Sorry!",
+                        "Sample_Basic::testCapabilities");
+        }
+
+        if (!caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support tesselation programs, "
+                        "so you cannot run this sample. Sorry!",
+                        "Sample_Basic::testCapabilities");
+        }
+
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
                         "so you cannot run this sample. Sorry!", 
                         "Sample_Basic::testCapabilities");
         }
-        //TODO check for tessellation shaders and compute shaders too
     }
 
     // Just override the mandatory create scene method
