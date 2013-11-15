@@ -601,9 +601,11 @@ namespace Ogre {
         //         mMipmapLevel, 
         //         mLayered.find('all') != str::npos ? GL_TRUE : GL_FALSE, mLayer,
         //         mImageAccess (READ, WRITE, READ_WRITE), 
-        //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE 
-        OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
-        // }
+        //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE
+        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || gl3wIsSupported(4, 2))
+        {
+            OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
+        }
     }
 
 }
