@@ -56,6 +56,8 @@ void FFP_TransformTexCoord(in mat4 m, in vec3 v, out vec3 vOut)
 	vOut = (m * vec4(v, 1.0)).xyz;
 }
 
+
+
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT, 
 						   in mat4 mView,
@@ -80,36 +82,36 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT,
 	
 	vOut = (mTexture * vec4(vViewNormal, 1.0)).xyz;
 }
-
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld, 
-						   in mat4 mView,
-						   in vec3 vNormal,
-						   out vec2 vOut)
-{	
-	vec3 vWorldNormal = (mWorld * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
-
-	vOut.x = vViewNormal.x/2.0 + 0.5;
-	vOut.y = -vViewNormal.y/2.0 + 0.5;
+void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
+										in 	mat4 mView,
+										in 	mat4 mWorldIT,
+										in 	vec4 vPos,
+										in 	vec3 vNormal,
+										out vec2 vOut)
+{
+	mat4 worldview = mView * mWorld;
+	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
+	vec3 eyedir =  normalize(worldview * vPos).xyz;
+	vec3 r = reflect(eyedir, normal);
+	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = vec2(0.5 + r.x / two_p,0.5 - r.y / two_p);
 }
-
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld, 
-						   in mat4 mView,
-						   in mat4 mTexture,
-						   in vec3 vNormal,
-						   out vec2 vOut)
+void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
+										in 	mat4 mView,
+										in 	mat4 mWorldIT,
+										in 	vec4 vPos,
+										in 	vec3 vNormal,
+										in 	mat4 mTexture,
+										out vec2 vOut)
 {	
-	vec3 vWorldNormal = (mWorld* vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
-
-	vec2 vSphereCoords;
-
-	vSphereCoords.x = vViewNormal.x/2.0 + 0.5;
-	vSphereCoords.y = -vViewNormal.y/2.0 + 0.5;
-	
-	vOut = (mTexture * vec4(vSphereCoords, 0.0, 0.0)).xy;
+	mat4 worldview = mView * mWorld;
+	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
+	vec3 eyedir =  normalize(worldview * vPos).xyz;
+	vec3 r = reflect(eyedir, normal);
+	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = (mTexture * vec4(0.5 + r.x / two_p,0.5 - r.y / two_p,0,0)).xy;
 }
 
 //-----------------------------------------------------------------------------
