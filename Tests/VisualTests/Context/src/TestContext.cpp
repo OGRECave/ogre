@@ -84,6 +84,11 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mRenderSystemName = binOpt["-rs"];
     mSummaryOutputDir = binOpt["-o"];
     mHelp = unOpt["-h"] || unOpt["--help"];
+
+#ifdef INCLUDE_RTSHADER_SYSTEM
+    mShaderGenerator     = NULL;
+    mMaterialMgrListener = NULL;
+#endif // INCLUDE_RTSHADER_SYSTEM
 }
 //-----------------------------------------------------------------------
 
