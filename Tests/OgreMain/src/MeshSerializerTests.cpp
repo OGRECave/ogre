@@ -208,7 +208,7 @@ void MeshSerializerTests::testSkeleton_Version_1_0()
 }
 
 
-void MeshSerializerTests::testMesh_Version_1_9()
+void MeshSerializerTests::testMesh_Version_1_10()
 {
 	testMesh(MESH_VERSION_LATEST);
 }
@@ -262,7 +262,7 @@ void MeshSerializerTests::testMesh_Version_1_2()
 			}
 			mOrigMesh = mMesh->clone(mMesh->getName() + ".orig.mesh", mMesh->getGroup());
 			testMesh_XML();
-			testMesh(MESH_VERSION_1_9);
+			testMesh(MESH_VERSION_1_10);
 			testMesh(MESH_VERSION_1_8);
 			testMesh(MESH_VERSION_1_7);
 			testMesh(MESH_VERSION_1_4);
@@ -358,7 +358,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
 #endif // !OGRE_TEST_XMLSERIALIZER
 
 	if ((a->getNumLodLevels() > 1 || b->getNumLodLevels() > 1) &&
-	    ((version < MESH_VERSION_1_8 || (!isLodMixed(a) && !isLodMixed(b))) && // mixed lod only supported in v1.9+
+	    ((version < MESH_VERSION_1_8 || (!isLodMixed(a) && !isLodMixed(b))) && // mixed lod only supported in v1.10+
 	     (version < MESH_VERSION_1_4 || (a->getLodStrategy() == DistanceLodStrategy::getSingletonPtr() &&
 	                                     b->getLodStrategy() == DistanceLodStrategy::getSingletonPtr())))) { // Lod Strategy only supported in v1.41+
 		CPPUNIT_ASSERT(a->getNumLodLevels() == b->getNumLodLevels());

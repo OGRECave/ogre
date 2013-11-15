@@ -48,7 +48,7 @@ namespace Ogre {
 		
 		// Note MUST be added in reverse order so latest is first in the list
 		mVersionData.push_back(OGRE_NEW MeshVersionData(
-			MESH_VERSION_1_9, "[MeshSerializer_v1.9]", 
+			MESH_VERSION_1_10, "[MeshSerializer_v1.10]", 
 			OGRE_NEW MeshSerializerImpl()));
 
 		mVersionData.push_back(OGRE_NEW MeshVersionData(

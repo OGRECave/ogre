@@ -55,7 +55,7 @@ namespace Ogre {
     will remain to load the latest version.
 
 	 @note
-		This mesh format was used from Ogre v1.9.
+		This mesh format was used from Ogre v1.10.
 
     */
     class _OgrePrivate MeshSerializerImpl : public Serializer
