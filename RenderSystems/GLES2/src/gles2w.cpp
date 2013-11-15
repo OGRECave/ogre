@@ -55,6 +55,8 @@ static void open_libgl(void)
 {
     CFStringRef frameworkPath = CFSTR("/System/Library/Frameworks/OpenGLES.framework");
     NSString *sysVersion = [UIDevice currentDevice].systemVersion;
+    NSArray *sysVersionComponents = [sysVersion componentsSeparatedByString:@"."];
+
     BOOL isSimulator = ([[UIDevice currentDevice].model rangeOfString:@"Simulator"].location != NSNotFound);
     if(isSimulator)
     {
@@ -67,9 +69,10 @@ static void open_libgl(void)
 
         char tempPath[PATH_MAX];
         sprintf(tempPath,
-                "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.sdk/System/Library/Frameworks/OpenGLES.framework",
+                "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.%s.sdk/System/Library/Frameworks/OpenGLES.framework",
                 xcodePath.c_str(),
-                [sysVersion cStringUsingEncoding:NSUTF8StringEncoding]);
+                [[sysVersionComponents objectAtIndex:0] cStringUsingEncoding:NSUTF8StringEncoding],
+                [[sysVersionComponents objectAtIndex:1] cStringUsingEncoding:NSUTF8StringEncoding]);
         frameworkPath = CFStringCreateWithCString(kCFAllocatorDefault, tempPath, kCFStringEncodingUTF8);
     }
 

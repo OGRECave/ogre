@@ -33,6 +33,14 @@ THE SOFTWARE.
 #include "OgreAndroidEGLSupport.h"
 #include "android/configuration.h"
 
+#ifndef EGL_COVERAGE_BUFFERS_NV
+#define EGL_COVERAGE_BUFFERS_NV 0x30E0
+#endif
+
+#ifndef EGL_COVERAGE_SAMPLES_NV
+#define EGL_COVERAGE_SAMPLES_NV 0x30E1
+#endif
+
 namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
@@ -41,6 +49,8 @@ namespace Ogre {
 		uint mMinBufferSize;
 		uint mMaxDepthSize;
 		uint mMaxStencilSize;
+		uint mMSAA;
+		uint mCSAA;
 		
 	protected:
 		virtual EGLContext * createEGLContext() const;
