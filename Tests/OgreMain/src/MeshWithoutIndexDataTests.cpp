@@ -462,17 +462,9 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName);
 
-	LodConfig lodConfig;
-    lodConfig.levels.clear();
-    lodConfig.mesh = MeshPtr(mesh);
-    lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
-    LodLevel lodLevel;
-    lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-    lodLevel.distance = 600.0;
-    lodLevel.reductionValue = 2;
-    lodConfig.levels.push_back(lodLevel);
-    MeshLodGenerator pm(false);
-    pm.generateLodLevels(lodConfig);
+	LodConfig lodConfig(mesh);
+	lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
+    MeshLodGenerator().generateLodLevels(lodConfig);
     // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)

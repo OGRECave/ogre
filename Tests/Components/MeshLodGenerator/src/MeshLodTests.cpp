@@ -216,18 +216,11 @@ void MeshLodTests::testQuadricError()
 void MeshLodTests::setTestLodConfig(LodConfig& config)
 {
 	config.mesh = mMesh;
-	LodLevel level;
-	level.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-	level.distance = 10;
-	level.reductionValue = 0.1; // 10%
-	config.levels.push_back(level);
-	level.distance = 9;
-	level.reductionValue = 0.2; // 20%
-	config.levels.push_back(level);
-	level.distance = 8;
-	level.reductionValue = 0.3; // 30%
-	config.levels.push_back(level);
 	config.strategy = PixelCountLodStrategy::getSingletonPtr();
+	config.levels.clear();
+	config.createGeneratedLodLevel(10, 0.1);
+	config.createGeneratedLodLevel(9, 0.2);
+	config.createGeneratedLodLevel(8, 0.3);
 	config.advanced.outsideWeight = 1.0;
 	config.advanced.useCompression = true;
 	config.advanced.useVertexNormals = true;

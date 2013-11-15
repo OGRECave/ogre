@@ -307,15 +307,9 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 	// The vertex buffer contains the same vertex position multiple times.
 	// To get the count of the vertices, which has unique positions, we can use progressive mesh.
 	// It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
-	LodConfig lodConfig;
-	lodConfig.mesh = mesh;
-	lodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
+	LodConfig lodConfig(mesh, PixelCountLodStrategy::getSingletonPtr());
 	lodConfig.advanced.useBackgroundQueue = false; // Non-threaded
-	LodLevel lodLevel;
-	lodLevel.distance = 0;
-	lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-	lodLevel.reductionValue = 0.0;
-	lodConfig.levels.push_back(lodLevel);
+	lodConfig.createGeneratedLodLevel(0, 0);
 	MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
 	gen.generateLodLevels(lodConfig);
 	//ProgressiveMeshGenerator pm;
