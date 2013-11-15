@@ -43,7 +43,7 @@ THE SOFTWARE.
 #include "OgreSkeletonSerializer.h"
 #include "OgreDistanceLodStrategy.h"
 
-#define I_HAVE_LOT_OF_FREE_TIME
+//#define I_HAVE_LOT_OF_FREE_TIME
 
 // To run XML test, you need to symlink all files (except main.cpp) from XMLConverter tool to the Test_Ogre component!
 // You also need to set TIXML_USE_STL macro globally.
@@ -513,7 +513,7 @@ bool MeshSerializerTests::isHashMapClone(const HashMap<K, V>& a, const HashMap<K
 	if (a.size() != b.size()) {
 		return false;
 	}
-	HashMap<K, V>::const_iterator it, itFind, itEnd;
+	typename HashMap<K, V>::const_iterator it, itFind, itEnd;
 	it = a.begin();
 	itEnd = a.end();
 	for (; it != itEnd; it++) {
@@ -580,17 +580,21 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
 	it = locPtr->begin();
 	itEnd = locPtr->end();
 	for (; it != itEnd; it++) {
-		if (name == it->filename) {
+		if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
 			info = &*it;
+			break;
 		}
 	}
-
+	if(!info) {
+		outPath = name;
+		return;
+	}
 	outPath = info->archive->getName();
-	if (outPath.back() != '/' && outPath.back() != '\\') {
+	if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
 		outPath += '/';
 	}
 	outPath += info->path;
-	if (outPath.back() != '/' && outPath.back() != '\\') {
+	if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
 		outPath += '/';
 	}
 	outPath += info->filename;
@@ -600,11 +604,11 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
 
 bool MeshSerializerTests::copyFile(const String& srcPath, const String& dstPath)
 {
-	std::ifstream src(srcPath, std::ios::binary);
+	std::ifstream src(srcPath.c_str(), std::ios::binary);
 	if (!src.is_open()) {
 		return false;
 	}
-	std::ofstream dst(dstPath, std::ios::binary);
+	std::ofstream dst(dstPath.c_str(), std::ios::binary);
 	if (!dst.is_open()) {
 		return false;
 	}

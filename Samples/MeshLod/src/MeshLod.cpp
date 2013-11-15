@@ -427,11 +427,13 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 		return false;
 	}
 	outPath = info->archive->getName();
-	if(outPath.back() != '/' && outPath.back() != '\\')
+	if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
 		outPath += '/';
+	}
 	outPath += info->path;
-	if(outPath.back() != '/' && outPath.back() != '\\')
+	if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
 		outPath += '/';
+	}
 	outPath += info->filename;
 
 	return (info->archive->getType() == "FileSystem");

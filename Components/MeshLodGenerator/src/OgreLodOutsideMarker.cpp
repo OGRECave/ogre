@@ -82,7 +82,7 @@ void LodOutsideMarker::initHull()
 		itOut->isInsideHull = false;
 	}
 	// We need to find 4 vertices, which are on the convex hull to start the algorithm.
-	CHVertex* vertex[4] = { nullptr, nullptr, nullptr, nullptr };
+	CHVertex* vertex[4] = { NULL, NULL, NULL, NULL };
 
 	{
 		// Get 1. vertex: minimum y vertex
@@ -200,7 +200,7 @@ Real LodOutsideMarker::getTetrahedronVolume(CHVertex* a, CHVertex* b, CHVertex* 
 LodOutsideMarker::CHVertex* LodOutsideMarker::getFurthestVertex(CHTriangle* tri)
 {
 	// Find the furthest vertex from triangle plane towards the facing direction.
-	CHVertex* furthestVertex = nullptr;
+	CHVertex* furthestVertex = NULL;
 	Real furthestDistance = 0;
 	Plane plane(tri->normal, -tri->normal.dotProduct(tri->vertex[0]->position));
 	plane.normalise();
