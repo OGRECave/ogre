@@ -41,7 +41,7 @@ namespace Ogre
 
 	void LodOutputProviderBuffer::prepare( LodData* data )
 	{
-		
+
 		mBuffer.submesh.resize(data->mIndexBufferInfoList.size());
 	}
 
@@ -122,15 +122,15 @@ void LodOutputProviderBuffer::inject()
 		GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 
 		int buffCount = buffers.size();
-		for (int i=0; i<buffCount;i++) {
-			LodIndexBuffer& buff = buffers[i];
+		for (int n=0; n<buffCount;n++) {
+			LodIndexBuffer& buff = buffers[n];
 			int indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
-			OgreAssert(buff.indexCount >= 0, "");
+			OgreAssert((int)buff.indexCount >= 0, "");
 			lods.push_back(OGRE_NEW IndexData());
 			lods.back()->indexStart = buff.indexStart;
 			lods.back()->indexCount = buff.indexCount;
 			if(indexCount != 0) {
-				if(i > 0 && buffers[i-1].indexBuffer == buff.indexBuffer){
+				if(n > 0 && buffers[n-1].indexBuffer == buff.indexBuffer){
 					lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
 				} else {
 					lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(

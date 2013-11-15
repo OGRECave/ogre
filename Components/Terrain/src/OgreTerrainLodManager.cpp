@@ -195,7 +195,7 @@ namespace Ogre
 					{
 						mLodInfoTable[level].treeStart = depth;
 						mLodInfoTable[level].treeEnd = prevdepth;
-						mLodInfoTable[level].isLast = level == last+prevdepth-depth-1;
+						mLodInfoTable[level].isLast = level == (uint)(last+prevdepth-depth-1);
 						mLodInfoTable[level].resolution = bakedresolution;
 						mLodInfoTable[level].size = ((bakedresolution-1) / splits) + 1;
 						// this lod info has been filled

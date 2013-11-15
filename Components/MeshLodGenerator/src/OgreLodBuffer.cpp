@@ -73,7 +73,7 @@ namespace Ogre
 			const VertexElement* elemNormal = 0;
 			HardwareVertexBufferSharedPtr vNormalBuf;
 			unsigned char* vNormal;
-			Vector3* pNormalOut;
+			Vector3* pNormalOut = NULL;
 			int vNormalSize;
 			bool useVertexNormals = true;
 			elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
@@ -103,7 +103,7 @@ namespace Ogre
 				pOut->y = *(++pFloat);
 				pOut->z = *(++pFloat);
 				vertex += vSize;
-				if(elemNormal){
+				if(useVertexNormals){
 					elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
 					pNormalOut->x = *pFloat;
 					pNormalOut->y = *(++pFloat);

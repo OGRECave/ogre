@@ -1565,11 +1565,10 @@ namespace Ogre {
 	void XMLMeshSerializer::writeExtremes(TiXmlElement* mMeshNode, const Mesh* m)
 	{
 		TiXmlElement* extremesNode = NULL;
-		int idx = 0;
-		for (Mesh::SubMeshIterator i = ((Mesh &)*m).getSubMeshIterator ();
-			 i.hasMoreElements (); i.moveNext (), ++idx)
+		ushort submeshCount = m->getNumSubMeshes();
+		for (int idx = 0; idx < submeshCount; ++idx)
 		{
-			SubMesh *sm = i.peekNext ();
+			SubMesh *sm = m->getSubMesh(idx);
 			if (sm->extremityPoints.empty())
 				continue; // do nothing
 
@@ -1612,7 +1611,7 @@ namespace Ogre {
 			StringConverter::parseUnsignedInt(val));
 
 		val = lodNode->Attribute("manual");
-		bool manual = StringConverter::parseBool(val);
+		StringConverter::parseBool(val);
 
 		// Set up the basic structures
 		mMesh->_setLodInfo(numLevels);

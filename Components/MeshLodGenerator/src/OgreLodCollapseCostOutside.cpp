@@ -33,10 +33,10 @@
 namespace Ogre
 {
 	LodCollapseCostOutside::LodCollapseCostOutside( LodCollapseCostPtr costCalculator, Real outsideWeight, Real outsideWalkAngle ) :
-		mCostCalculator(costCalculator), 
-		mOutsideMarker(NULL),
 		mOutsideWeight(outsideWeight),
-		mOutsideWalkAngle(outsideWalkAngle)
+		mOutsideWalkAngle(outsideWalkAngle),
+		mCostCalculator(costCalculator),
+		mOutsideMarker(NULL)
 	{
 	}
 

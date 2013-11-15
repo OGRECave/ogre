@@ -35,9 +35,9 @@ namespace Ogre
 {
 
 LodOutsideMarker::LodOutsideMarker(LodData::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle) :
-	mVertexListOrig(vertexList),
-	mWalkAngle(walkAngle),
-	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0) // How much floating point math error you have for equal values. This may depend on compiler flags.
+	mEpsilon(boundingSphereRadius * std::numeric_limits<Real>::epsilon() * (Real)4.0), // How much floating point math error you have for equal values. This may depend on compiler flags.
+    mVertexListOrig(vertexList),
+	mWalkAngle(walkAngle)
 {
 	assert(!vertexList.empty());
 	assert(mWalkAngle >= -1.0001f && mWalkAngle <= 1.0001f); // dot product range

@@ -574,7 +574,7 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
 	ResourceGroupManager& resourceGroupMgr = ResourceGroupManager::getSingleton();
 	String group = resource->getGroup();
 	String name = resource->getName();
-	FileInfo* info;
+	FileInfo* info = NULL;
 	FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
 	FileInfoList::iterator it, itEnd;
 	it = locPtr->begin();
