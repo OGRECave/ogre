@@ -411,18 +411,21 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 	ResourceGroupManager& resourceGroupMgr = ResourceGroupManager::getSingleton();
 	String group = mesh->getGroup();
 	String name = mesh->getName();
-	FileInfo* info;
+	FileInfo* info = NULL;
 	FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
 	FileInfoList::iterator it, itEnd;
 	it = locPtr->begin();
 	itEnd = locPtr->end();
 	for (; it != itEnd; it++) {
-		if (name == it->filename) {
+		if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
 			info = &*it;
 			break;
 		}
 	}
-
+	if(!info) {
+		outPath = name;
+		return false;
+	}
 	outPath = info->archive->getName();
 	if(outPath.back() != '/' && outPath.back() != '\\')
 		outPath += '/';
