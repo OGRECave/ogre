@@ -146,7 +146,7 @@ namespace Ogre
 		// fCoeff1 = Sin( fT * fAngle ) * fInvSin
 		ArrayReal fCoeff0 = MathlibC::Sin4( oneSubT * fAngle ) * fInvSin;
 		ArrayReal fCoeff1 = MathlibC::Sin4( fT * fAngle ) * fInvSin;
-		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180°)
+		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180Â°)
 		fCoeff0 = MathlibC::CmovRobust( fCoeff0, oneSubT, mask );
 		fCoeff1 = MathlibC::CmovRobust( fCoeff1, fT, mask );
 

@@ -380,7 +380,7 @@ void help( char *filename )
 		<< "Converts a Lightwave object to an Ogre mesh." << nl
 		<< "Please send any feedback to: dennis.verbeek@chello.nl" << nl << nl
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-		<< "Linux Port (2004.10.16) by Magnus Møller Petersen." << nl
+		<< "Linux Port (2004.10.16) by Magnus MÃ¸ller Petersen." << nl
 		<< "Please send feedback concerning Linux to: magnus@moaner.dk" << nl << nl
 #endif
 		<< "Usage: " << filename << " [options] source [dest]" << nl

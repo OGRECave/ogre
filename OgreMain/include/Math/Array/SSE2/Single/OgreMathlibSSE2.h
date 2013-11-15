@@ -155,7 +155,7 @@ namespace Ogre
 				floating point to integer and back has a latency delay
 
 				For more information refer to Chapter 3.5.2.3
-				Bypass between Execution Domains, Intel® 64 and IA-32
+				Bypass between Execution Domains, IntelÂ® 64 and IA-32
 				Architectures Optimization Reference Manual Order
 				Number: 248966-026 April (and also Table 2-12)
 			@param
@@ -331,7 +331,7 @@ namespace Ogre
 				12 bits of accuracy that _mm_rcp_ps gives us 
 				In short, one Newton-Raphson Iteration:
 				 f( i+1 ) = 2 * rcp( f ) - f * rcp( f ) * rcp( f )
-				See Intel AP-803 (Application note), Order N° 243637-002 (if you can get it!)
+				See Intel AP-803 (Application note), Order NÂ° 243637-002 (if you can get it!)
 				 "x0 = RCPSS(d)
 				x1 = x0 * (2 - d * x0) = 2 * x0 - d * x0 * x0
 				where x0 is the first approximation to the reciprocal of the divisor d, and x1 is a
@@ -363,7 +363,7 @@ namespace Ogre
 				12 bits of accuracy that _mm_rcp_ps gives us 
 				In short, one Newton-Raphson Iteration:
 				 f( i+1 ) = 2 * rcp( f ) - f * rcp( f ) * rcp( f )
-				See Intel AP-803 (Application note), Order N° 243637-002 (if you can get it!)
+				See Intel AP-803 (Application note), Order NÂ° 243637-002 (if you can get it!)
 				 "x0 = RCPSS(d)
 				x1 = x0 * (2 - d * x0) = 2 * x0 - d * x0 * x0
 				where x0 is the first approximation to the reciprocal of the divisor d, and x1 is a
@@ -388,7 +388,7 @@ namespace Ogre
 				12 bits of accuracy that _mm_rcp_ps gives us 
 				In short, one Newton-Raphson Iteration:
 					 f( i+1 ) = 0.5 * rsqrt( f ) * ( 3 - f * rsqrt( f ) * rsqrt( f ) )
-				See Intel AP-803 (Application note), Order N° 243637-002 (if you can get it!)
+				See Intel AP-803 (Application note), Order NÂ° 243637-002 (if you can get it!)
 				"x0 = RSQRTSS(a)
 				x1 = 0.5 * x0 * ( 3 - ( a * x0 ) * x0 )
 				where x0 is the first approximation to the reciprocal square root of a, and x1 is a
@@ -416,7 +416,7 @@ namespace Ogre
 				12 bits of accuracy that _mm_rcp_ps gives us 
 				In short, one Newton-Raphson Iteration:
 					 f( i+1 ) = 0.5 * rsqrt( f ) * ( 3 - f * rsqrt( f ) * rsqrt( f ) )
-				See Intel AP-803 (Application note), Order N° 243637-002 (if you can get it!)
+				See Intel AP-803 (Application note), Order NÂ° 243637-002 (if you can get it!)
 				"x0 = RSQRTSS(a)
 				x1 = 0.5 * x0 * ( 3 - ( a * x0 ) * x0 )
 				where x0 is the first approximation to the reciprocal square root of a, and x1 is a
