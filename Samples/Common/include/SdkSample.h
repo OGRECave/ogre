@@ -59,6 +59,7 @@ namespace OgreBites
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
 			mDragLook = false;
+			mBackgroundColor = Ogre::ColourValue::Black;
 		}
 
 		virtual ~SdkSample() {}
@@ -486,6 +487,16 @@ namespace OgreBites
 			mDetailsPanel->setParamValue(15, "0");															
 #endif
 
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+			const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
+			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+			{
+				compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
+															Ogre::IdString() );
+			}
+			compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
 			setupContent();
 			mContentSetup = true;
 
@@ -538,6 +549,7 @@ namespace OgreBites
 		ParamsPanel* mDetailsPanel;   		// sample details panel
 		bool mCursorWasVisible;				// was cursor visible before dialog appeared
 		bool mDragLook;                     // click and drag to free-look
+		Ogre::ColourValue mBackgroundColor;	// color value passed to createBasicWorkspaceDef
     };
 }
 

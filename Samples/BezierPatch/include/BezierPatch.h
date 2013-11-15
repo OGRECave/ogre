@@ -51,16 +51,6 @@ protected:
 
 	void setupContent()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-
-		const IdString workspaceName( "BezierPatch Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// setup some basic lighting for our scene
 		mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

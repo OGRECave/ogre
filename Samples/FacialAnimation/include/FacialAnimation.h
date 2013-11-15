@@ -19,6 +19,7 @@ public:
 		mInfo["Category"] = "Animation";
 		mInfo["Help"] = "Use the checkbox to enable/disable manual animation. "
 			"When manual animation is enabled, use the sliders to adjust each pose's influence.";
+		mBackgroundColor = ColourValue( 0.3f, 0.3f, 0.3f );
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
@@ -31,16 +32,6 @@ protected:
 
 	void setupContent(void)
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-
-		const IdString workspaceName( "FacialAnimationWorkspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.3f, 0.3f, 0.3f ),
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 

@@ -16,6 +16,7 @@ public:
 		mInfo["Description"] = "A demo of cel-shaded graphics using vertex & fragment programs.";
 		mInfo["Thumbnail"] = "thumb_cel.png";
 		mInfo["Category"] = "Lighting";
+		mBackgroundColor = ColourValue::White;
 	}
 
 	StringVector getRequiredPlugins()
@@ -47,15 +48,6 @@ protected:
 
 	void setupContent()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		const IdString workspaceName( "CellShadingWorkspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White,
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// set our camera to orbit around the origin and show cursor
 		mCameraMan->setStyle(CS_ORBIT);
 		mTrayMgr->showCursor();
