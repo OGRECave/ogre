@@ -24,6 +24,7 @@ public:
 		mInfo["Thumbnail"] = "thumb_tesselation.png";
 		mInfo["Category"] = "Unsorted";
 		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
+		mBackgroundColor = ColourValue(0.41f, 0.41f, 0.41f);
 	}
 
 	void testCapabilities(const RenderSystemCapabilities* caps)
@@ -195,15 +196,6 @@ protected:
 
 	void setupLights()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		const IdString workspaceName( "PNTrianglesTessellation Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue(0.41f, 0.41f, 0.41f),
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		mSceneMgr->setAmbientLight(ColourValue::Black); 
 
 		// create pivot nodes

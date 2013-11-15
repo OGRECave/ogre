@@ -22,12 +22,6 @@ protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "SkyPlane Workspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
         SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

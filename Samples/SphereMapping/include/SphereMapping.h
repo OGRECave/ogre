@@ -21,18 +21,13 @@ public:
 			"Sphere maps are not wrapped, and look the same from all directions.";
 		mInfo["Thumbnail"] = "thumb_spheremap.png";
 		mInfo["Category"] = "Unsorted";
+		mBackgroundColor = ColourValue::White;
 	}
 
 protected:
 
 	void setupContent()
 	{     
-		const IdString workspaceName( "SphereMappingWorkspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// setup some basic lighting for our scene
 		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
 		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
