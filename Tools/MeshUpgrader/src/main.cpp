@@ -636,7 +636,7 @@ size_t getUniqueVertexCount(MeshPtr mesh)
 	lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 	lodLevel.reductionValue = 0.0;
 	lodConfig.levels.push_back(lodLevel);
-	MeshLodGenerator gen(false);
+	MeshLodGenerator gen();
 	gen.generateLodLevels(lodConfig);
 	return lodConfig.levels[0].outUniqueVertexCount;
 }
@@ -862,7 +862,7 @@ void buildLod(MeshPtr& mesh)
 	// ensure we use correct bounds
 	recalcBounds(mesh.get());
 
-	MeshLodGenerator gen(false);
+	MeshLodGenerator gen();
 	if (opts.lodAutoconfigure) {
 		// In this case we ignore other settings
 		gen.getAutoconfig(mesh, lodConfig);

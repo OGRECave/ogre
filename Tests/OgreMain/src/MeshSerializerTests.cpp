@@ -132,7 +132,7 @@ void MeshSerializerTests::setUp()
 
 	mMesh->reload();
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
-	MeshLodGenerator gen(false); // assuming singleton is not initialized yet
+	MeshLodGenerator gen; // assuming singleton is not initialized yet
 	LodConfig lodConfig;
 	gen.getAutoconfig(mMesh, lodConfig);
 	LodLevel manual;

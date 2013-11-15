@@ -53,6 +53,7 @@ public:
 	void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
 	void setInjectorListener(LodWorkQueueInjectorListener* injectorListener) {mInjectorListener = injectorListener;}
+	LodWorkQueueInjectorListener* getInjectorListener() {return mInjectorListener;}
 	void removeInjectorListener() {mInjectorListener = 0;}
 protected:
 	LodWorkQueueInjectorListener* mInjectorListener;

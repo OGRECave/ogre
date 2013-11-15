@@ -51,23 +51,24 @@
 namespace Ogre
 {
 
-	template<> MeshLodGenerator* Singleton<MeshLodGenerator>::msSingleton = 0;
-	MeshLodGenerator* MeshLodGenerator::getSingletonPtr()
-	{
-		return msSingleton;
-	}
-	MeshLodGenerator& MeshLodGenerator::getSingleton()
-	{  
-		assert( msSingleton );  return ( *msSingleton );  
-	}
-void MeshLodGenerator::getAutoconfig( MeshPtr& inMesh, LodConfig& outLodConfig )
+template<> MeshLodGenerator* Singleton<MeshLodGenerator>::msSingleton = 0;
+MeshLodGenerator* MeshLodGenerator::getSingletonPtr()
+{
+	return msSingleton;
+}
+MeshLodGenerator& MeshLodGenerator::getSingleton()
+{
+	assert(msSingleton);
+	return (*msSingleton);
+}
+void MeshLodGenerator::getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig)
 {
 	outLodConfig.mesh = inMesh;
 	outLodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
 	LodLevel lodLevel;
 	lodLevel.reductionMethod = LodLevel::VRM_COLLAPSE_COST;
 	Real radius = inMesh->getBoundingSphereRadius();
-	for (int i = 2; i < 6; i++) {
+	for(int i = 2; i < 6; i++) {
 		Real i4 = (Real) (i * i * i * i);
 		Real i5 = i4 * (Real) i;
 		// Distance = pixel count
@@ -92,25 +93,25 @@ void MeshLodGenerator::getAutoconfig( MeshPtr& inMesh, LodConfig& outLodConfig )
 	}
 }
 
-void MeshLodGenerator::generateAutoconfiguredLodLevels( MeshPtr& mesh )
+void MeshLodGenerator::generateAutoconfiguredLodLevels(MeshPtr& mesh)
 {
 	LodConfig lodConfig;
 	getAutoconfig(mesh, lodConfig);
 	generateLodLevels(lodConfig);
 }
 
-void MeshLodGenerator::_configureMeshLodUsage( const LodConfig& lodConfig )
+void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
 {
 	lodConfig.mesh->freeEdgeList();
 	lodConfig.mesh->setLodStrategy(lodConfig.strategy);
 	MeshLodUsage usage;
 	size_t n = 0;
 	lodConfig.mesh->_setLodInfo(lodConfig.levels.size() + 1); // add Lod levels
-	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
+	for(size_t i = 0; i < lodConfig.levels.size(); i++) {
 		// Record usages. First Lod usage is the mesh itself.
 
 		// Skip lods, which have the same amount of vertices. No buffer generated for them.
-		if (!lodConfig.levels[i].outSkipped) {
+		if(!lodConfig.levels[i].outSkipped) {
 
 			usage.userValue = lodConfig.levels[i].distance;
 			usage.value = lodConfig.mesh->getLodStrategy()->transformUserValue(usage.userValue);
@@ -124,18 +125,11 @@ void MeshLodGenerator::_configureMeshLodUsage( const LodConfig& lodConfig )
 	lodConfig.mesh->_setLodInfo(n + 1);
 }
 
-MeshLodGenerator::MeshLodGenerator(bool initWorkQueue) :
+MeshLodGenerator::MeshLodGenerator() :
 	mWQWorker(NULL),
 	mWQInjector(NULL)
 {
-	if (initWorkQueue){
-	if(!LodWorkQueueWorker::getSingletonPtr()){
-		mWQWorker = new LodWorkQueueWorker();
-	}
-	if(!LodWorkQueueInjector::getSingletonPtr()){
-		mWQInjector = new LodWorkQueueInjector();
-		}
-	}
+
 }
 
 MeshLodGenerator::~MeshLodGenerator()
@@ -143,14 +137,21 @@ MeshLodGenerator::~MeshLodGenerator()
 	delete mWQWorker;
 	delete mWQInjector;
 }
-void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser )
+void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
+                                          LodCollapseCostPtr& cost,
+                                          LodDataPtr& data,
+                                          LodInputProviderPtr& input,
+                                          LodOutputProviderPtr& output,
+                                          LodCollapserPtr& collapser)
 {
 	if(cost.isNull()) {
 		cost = LodCollapseCostPtr(new LodCollapseCostCurvature);
-		if(lodConfig.advanced.outsideWeight != 0){
-			cost = LodCollapseCostPtr(new LodCollapseCostOutside(cost, lodConfig.advanced.outsideWeight, lodConfig.advanced.outsideWalkAngle));
+		if(lodConfig.advanced.outsideWeight != 0) {
+			cost =
+			    LodCollapseCostPtr(new LodCollapseCostOutside(cost, lodConfig.advanced.outsideWeight,
+			                                                  lodConfig.advanced.outsideWalkAngle));
 		}
-		if(!lodConfig.advanced.profile.empty()){
+		if(!lodConfig.advanced.profile.empty()) {
 			cost = LodCollapseCostPtr(new LodCollapseCostProfiler(lodConfig.advanced.profile, cost));
 		}
 
@@ -161,12 +162,12 @@ void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCost
 	if(collapser.isNull()) {
 		collapser = LodCollapserPtr(new LodCollapser());
 	}
-	if(lodConfig.advanced.useBackgroundQueue){
+	if(lodConfig.advanced.useBackgroundQueue) {
 		if(input.isNull()) {
 			input = LodInputProviderPtr(new LodInputProviderBuffer(lodConfig.mesh));
 		}
 		if(output.isNull()) {
-			if(lodConfig.advanced.useCompression){
+			if(lodConfig.advanced.useCompression) {
 				output = LodOutputProviderPtr(new LodOutputProviderCompressedBuffer(lodConfig.mesh));
 			} else {
 				output = LodOutputProviderPtr(new LodOutputProviderBuffer(lodConfig.mesh));
@@ -177,7 +178,7 @@ void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCost
 			input = LodInputProviderPtr(new LodInputProviderMesh(lodConfig.mesh));
 		}
 		if(output.isNull()) {
-			if(lodConfig.advanced.useCompression){
+			if(lodConfig.advanced.useCompression) {
 				output = LodOutputProviderPtr(new LodOutputProviderCompressedMesh(lodConfig.mesh));
 			} else {
 				output = LodOutputProviderPtr(new LodOutputProviderMesh(lodConfig.mesh));
@@ -185,7 +186,12 @@ void MeshLodGenerator::_resolveComponents( LodConfig& lodConfig, LodCollapseCost
 		}
 	}
 }
-void MeshLodGenerator::_process( LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser )
+void MeshLodGenerator::_process(LodConfig& lodConfig,
+                                LodCollapseCost* cost,
+                                LodData* data,
+                                LodInputProvider* input,
+                                LodOutputProvider* output,
+                                LodCollapser* collapser)
 {
 	input->initData(data);
 	data->mUseVertexNormals = data->mUseVertexNormals && lodConfig.advanced.useVertexNormals;
@@ -193,48 +199,57 @@ void MeshLodGenerator::_process( LodConfig& lodConfig, LodCollapseCost* cost, Lo
 	output->prepare(data);
 	computeLods(lodConfig, data, cost, output, collapser);
 	output->finalize(data);
-	if(!lodConfig.advanced.useBackgroundQueue){
+	if(!lodConfig.advanced.useBackgroundQueue) {
 		// This will be processed in LodWorkQueueInjector if we use background queue.
 		output->inject();
 		_configureMeshLodUsage(lodConfig);
 		//lodConfig.mesh->buildEdgeList();
 	}
 }
-void MeshLodGenerator::generateLodLevels( LodConfig& lodConfig, LodCollapseCostPtr cost, LodDataPtr data, LodInputProviderPtr input, LodOutputProviderPtr output, LodCollapserPtr collapser)
+void MeshLodGenerator::generateLodLevels(LodConfig& lodConfig,
+                                         LodCollapseCostPtr cost,
+                                         LodDataPtr data,
+                                         LodInputProviderPtr input,
+                                         LodOutputProviderPtr output,
+                                         LodCollapserPtr collapser)
 {
 	// If we don't have generated Lod levels, we can use _generateManualLodLevels.
 	bool hasGeneratedLevels = false;
-	for (size_t i = 0; i < lodConfig.levels.size(); i++){
-		if (lodConfig.levels[i].manualMeshName.empty()){
+	for(size_t i = 0; i < lodConfig.levels.size(); i++) {
+		if(lodConfig.levels[i].manualMeshName.empty()) {
 			hasGeneratedLevels = true;
 			break;
 		}
 	}
-	if (hasGeneratedLevels){
-	_resolveComponents(lodConfig, cost, data, input, output, collapser);
-	if(lodConfig.advanced.useBackgroundQueue){
-		LodWorkQueueWorker::getSingleton().addRequestToQueue(lodConfig, cost, data, input, output, collapser);
-		}
-		else {
+	if(hasGeneratedLevels || (LodWorkQueueInjector::getSingletonPtr() && LodWorkQueueInjector::getSingletonPtr()->getInjectorListener())) {
+		_resolveComponents(lodConfig, cost, data, input, output, collapser);
+		if(lodConfig.advanced.useBackgroundQueue) {
+			_initWorkQueue();
+			LodWorkQueueWorker::getSingleton().addRequestToQueue(lodConfig, cost, data, input, output, collapser);
+		} else {
 			_process(lodConfig, cost.get(), data.get(), input.get(), output.get(), collapser.get());
 		}
 	} else {
 		_generateManualLodLevels(lodConfig);
 	}
-
 }
 
-void MeshLodGenerator::computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser)
+void MeshLodGenerator::computeLods(LodConfig& lodConfig,
+                                   LodData* data,
+                                   LodCollapseCost* cost,
+                                   LodOutputProvider* output,
+                                   LodCollapser* collapser)
 {
 	int lodID = 0;
 	size_t lastBakeVertexCount = data->mVertexList.size();
-	for (unsigned short curLod = 0; curLod < lodConfig.levels.size(); curLod++) {
-		if(!lodConfig.levels[curLod].manualMeshName.empty()){
+	for(unsigned short curLod = 0; curLod < lodConfig.levels.size(); curLod++) {
+		if(!lodConfig.levels[curLod].manualMeshName.empty()) {
 			// Manual Lod level
-			lodConfig.levels[curLod].outSkipped = (curLod != 0 && lodConfig.levels[curLod].manualMeshName == lodConfig.levels[curLod - 1].manualMeshName);
+			lodConfig.levels[curLod].outSkipped =
+			    (curLod != 0 && lodConfig.levels[curLod].manualMeshName == lodConfig.levels[curLod - 1].manualMeshName);
 			lodConfig.levels[curLod].outUniqueVertexCount = 0;
 			lastBakeVertexCount = -1;
-			if (!lodConfig.levels[curLod].outSkipped) {
+			if(!lodConfig.levels[curLod].outSkipped) {
 				output->bakeManualLodLevel(data, lodConfig.levels[curLod].manualMeshName, lodID++);
 			}
 		} else {
@@ -245,33 +260,39 @@ void MeshLodGenerator::computeLods(LodConfig& lodConfig, LodData* data, LodColla
 			size_t vertexCount = data->mCollapseCostHeap.size();
 			lodConfig.levels[curLod].outUniqueVertexCount = vertexCount;
 			lodConfig.levels[curLod].outSkipped = (vertexCount == lastBakeVertexCount);
-			if (!lodConfig.levels[curLod].outSkipped) {
+			if(!lodConfig.levels[curLod].outSkipped) {
 				lastBakeVertexCount = vertexCount;
 				output->bakeLodLevel(data, lodID++);
 			}
 		}
 	}
 }
-void MeshLodGenerator::calcLodVertexCount(const LodLevel& lodLevel, size_t uniqueVertexCount, size_t& outVertexCountLimit,Real& outCollapseCostLimit)
+void MeshLodGenerator::calcLodVertexCount(const LodLevel& lodLevel,
+                                          size_t uniqueVertexCount,
+                                          size_t& outVertexCountLimit,
+                                          Real& outCollapseCostLimit)
 {
-	switch (lodLevel.reductionMethod) {
+	switch(lodLevel.reductionMethod) {
 	case LodLevel::VRM_PROPORTIONAL:
 		outCollapseCostLimit = LodData::NEVER_COLLAPSE_COST;
-		outVertexCountLimit = uniqueVertexCount - (size_t)((Real)uniqueVertexCount * lodLevel.reductionValue);
+		outVertexCountLimit = uniqueVertexCount - (size_t) ((Real) uniqueVertexCount * lodLevel.reductionValue);
 		break;
+
 	case LodLevel::VRM_CONSTANT:
 		outCollapseCostLimit = LodData::NEVER_COLLAPSE_COST;
 		outVertexCountLimit = (size_t) lodLevel.reductionValue;
-		if (outVertexCountLimit < uniqueVertexCount) {
+		if(outVertexCountLimit < uniqueVertexCount) {
 			outVertexCountLimit = uniqueVertexCount - outVertexCountLimit;
 		} else {
 			outVertexCountLimit = 0;
 		}
 		break;
+
 	case LodLevel::VRM_COLLAPSE_COST:
 		outCollapseCostLimit = lodLevel.reductionValue;
 		outVertexCountLimit = 0;
 		break;
+
 	default:
 		OgreAssert(0, "");
 		outCollapseCostLimit = LodData::NEVER_COLLAPSE_COST;
@@ -284,8 +305,10 @@ void MeshLodGenerator::_generateManualLodLevels(LodConfig& lodConfig)
 {
 	LodOutputProviderMesh output(lodConfig.mesh);
 	output.prepare(NULL);
-	for (unsigned short curLod = 0; curLod < lodConfig.levels.size(); curLod++) {
-		OgreAssert(!lodConfig.levels[curLod].manualMeshName.empty(), "Only manual Lod levels are supported! Call generateLodLevels() instead!");
+	for(unsigned short curLod = 0; curLod < lodConfig.levels.size(); curLod++) {
+		OgreAssert(
+		    !lodConfig.levels[curLod].manualMeshName.empty(),
+		    "Only manual Lod levels are supported! Call generateLodLevels() instead!");
 		lodConfig.levels[curLod].outSkipped = false;
 		lodConfig.levels[curLod].outUniqueVertexCount = 0;
 		output.bakeManualLodLevel(NULL, lodConfig.levels[curLod].manualMeshName, curLod);
@@ -295,7 +318,15 @@ void MeshLodGenerator::_generateManualLodLevels(LodConfig& lodConfig)
 	_configureMeshLodUsage(lodConfig);
 }
 
+void MeshLodGenerator::_initWorkQueue()
+{
+	if (!LodWorkQueueWorker::getSingletonPtr()) {
+		mWQWorker = new LodWorkQueueWorker();
+	}
+	if (!LodWorkQueueInjector::getSingletonPtr()) {
+		mWQInjector = new LodWorkQueueInjector();
+	}
+}
 
 
 }
-

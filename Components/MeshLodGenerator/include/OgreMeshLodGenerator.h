@@ -44,7 +44,7 @@ namespace Ogre
 {
 
 class _OgreLodExport MeshLodGenerator :
-	public Singleton<MeshLodGenerator>
+public Singleton<MeshLodGenerator>
 {
 public:
 
@@ -52,20 +52,17 @@ public:
 	static MeshLodGenerator& getSingleton();
 
 	/**
-	* @brief Generates the Lod levels for a mesh.
-	*
-	* @param initWorkQueue Set to false if you don't have initialized Ogre::Root and/or you don't
-	*        want to use threading. Threading requires Root::getWorkQueue() to work properly.
-	*/
-	MeshLodGenerator(bool initWorkQueue = true);
+	 * @brief Generates the Lod levels for a mesh.
+	 */
+	MeshLodGenerator();
 	virtual ~MeshLodGenerator();
 
 	/**
 	 * @brief Generates the Lod levels for a mesh.
-	 * 
+	 *
 	 * @param lodConfig Specification of the requested Lod levels.
 	 */
-	virtual void generateLodLevels( LodConfig& lodConfig, LodCollapseCostPtr cost = LodCollapseCostPtr(), LodDataPtr data = LodDataPtr(), LodInputProviderPtr input = LodInputProviderPtr(), LodOutputProviderPtr output = LodOutputProviderPtr(), LodCollapserPtr collapser = LodCollapserPtr());
+	virtual void generateLodLevels(LodConfig& lodConfig, LodCollapseCostPtr cost = LodCollapseCostPtr(), LodDataPtr data = LodDataPtr(), LodInputProviderPtr input = LodInputProviderPtr(), LodOutputProviderPtr output = LodOutputProviderPtr(), LodCollapserPtr collapser = LodCollapserPtr());
 
 	/**
 	 * @brief Generates the Lod levels for a mesh without configuring it.
@@ -82,18 +79,19 @@ public:
 	 */
 	void getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig);
 
-	static void _configureMeshLodUsage( const LodConfig& lodConfig );
-	void _resolveComponents( LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);
-	void _process( LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser);
+	static void _configureMeshLodUsage(const LodConfig& lodConfig);
+	void _resolveComponents(LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);
+	void _process(LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser);
 
 	/// If you only use manual Lod levels, then you don't need to build LodData mesh representation.
 	/// This function will generate manual Lod levels without overhead, but every Lod level needs to be a manual Lod level.
 	void _generateManualLodLevels(LodConfig& lodConfig);
 
+	void _initWorkQueue();
 protected:
 	void computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser);
 	void calcLodVertexCount(const LodLevel& lodLevel, size_t uniqueVertexCount, size_t& outVertexCountLimit, Real& outCollapseCostLimit);
-	
+
 	LodWorkQueueWorker* mWQWorker;
 	LodWorkQueueInjector* mWQInjector;
 };

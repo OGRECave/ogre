@@ -222,7 +222,7 @@ String PlayPen_testManualLOD::getLODMesh()
 	LodConfig lodConfig(msh1);
 	lodConfig.createManualLodLevel(5, "razor.mesh");
 	lodConfig.createManualLodLevel(10, "sphere.mesh");
-	MeshLodGenerator(false).generateLodLevels(lodConfig);
+	MeshLodGenerator().generateLodLevels(lodConfig);
 
 	return msh1->getName();
 }
@@ -276,7 +276,7 @@ String PlayPen_testManualLODFromFile::getLODMesh()
 	LodConfig lodConfig(msh1);
 	lodConfig.createManualLodLevel(5, "razor.mesh");
 	lodConfig.createManualLodLevel(10, "sphere.mesh");
-	MeshLodGenerator(false).generateLodLevels(lodConfig);
+	MeshLodGenerator().generateLodLevels(lodConfig);
 
 	// this time, we save this data to a file and re-load it
 

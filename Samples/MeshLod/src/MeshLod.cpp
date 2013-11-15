@@ -45,7 +45,8 @@ void Sample_MeshLod::setupContent()
 	if(!MeshLodGenerator::getSingletonPtr()) {
 		new MeshLodGenerator();
 	}
-	Ogre::LodWorkQueueInjector::getSingleton().setInjectorListener(this);
+	MeshLodGenerator::getSingleton()._initWorkQueue(); // needed only for LodWorkQueueInjector::setInjectorListener
+	LodWorkQueueInjector::getSingleton().setInjectorListener(this);
 
 	// setup gui
 	setupControls();
