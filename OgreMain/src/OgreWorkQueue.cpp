@@ -562,11 +562,14 @@ namespace Ogre {
 		}
 		else
 		{
+			if (!r->getAborted())
+			{
 			// no response, delete request
 			LogManager::getSingleton().stream() << 
 				"DefaultWorkQueueBase('" << mName << "') warning: no handler processed request "
 				<< r->getID() << ", channel " << r->getChannel()
 				<< ", type " << r->getType();
+			}
 			OGRE_DELETE r;
 		}
 
