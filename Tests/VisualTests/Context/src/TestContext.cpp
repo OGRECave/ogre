@@ -119,8 +119,9 @@ void TestContext::setup()
 
     // Grab input, since moving the window seemed to change the results (in Linux anyways).
     setupInput(mNoGrabMouse);
-
+    
     locateResources();
+
     createDummyScene();
 #ifdef INCLUDE_RTSHADER_SYSTEM
     if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
@@ -637,7 +638,7 @@ void TestContext::createDummyScene()
         //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         // creates shaders for base material BaseWhite using the RTSS
-        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
+        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         baseWhite->setLightingEnabled(false);
         mShaderGenerator->createShaderBasedTechnique(
             "BaseWhite",
@@ -660,7 +661,7 @@ void TestContext::createDummyScene()
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                                            "BaseWhiteNoLighting");
-        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
+        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         if(baseWhite->getNumTechniques() > 1)
         {
             baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
