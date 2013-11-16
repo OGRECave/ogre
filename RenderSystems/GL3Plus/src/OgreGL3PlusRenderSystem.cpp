@@ -1197,11 +1197,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_beginFrame(void)
     {
-        if (!mActiveViewport)
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "Cannot begin frame - no viewport selected.",
-                        "GL3PlusRenderSystem::_beginFrame");
-
         OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
     }
 
