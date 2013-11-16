@@ -227,3 +227,9 @@ if (APPLE)
 	endif()
 	endif()
 endif()
+
+# In Windows TestContext cannot be run from the build directory
+# and thus must be installed to be useful.
+if (WIN32)
+    ogre_install_target(TestContext "" FALSE)
+endif()
