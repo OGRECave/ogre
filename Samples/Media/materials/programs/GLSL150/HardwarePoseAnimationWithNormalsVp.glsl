@@ -23,7 +23,6 @@ void main()
     vec4 posinterp = vec4(vertex.xyz + anim_t.x * uv1.xyz + anim_t.y * uv3.xyz, 1.0);
 
     // nlerp normal
-    // nlerp normal
     // First apply the pose normals (these are actual normals, not offsets)
     vec3 ninterp = anim_t.x * uv2.xyz + anim_t.y * uv4.xyz;
 
