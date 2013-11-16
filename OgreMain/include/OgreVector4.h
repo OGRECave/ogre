@@ -49,11 +49,12 @@ namespace Ogre
 
     public:
         inline Vector4()
+            : x( 0 ), y( 0 ), z( 0 ), w( 0 )
         {
         }
 
         inline Vector4( const Real fX, const Real fY, const Real fZ, const Real fW )
-            : x( fX ), y( fY ), z( fZ ), w( fW)
+            : x( fX ), y( fY ), z( fZ ), w( fW )
         {
         }
 

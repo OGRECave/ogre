@@ -97,7 +97,7 @@ namespace Volume {
         ChunkParameters(void) :
             sceneManager(0), src(0), baseError((Real)0.0), errorMultiplicator((Real)1.0), createOctreeVisualization(false),
             createDualGridVisualization(false), lodCallback(0), scale((Real)1.0), createGeometryFromLevel(0),
-            updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO), async(false)
+            updateFrom(Vector3::ZERO), updateTo(Vector3::ZERO), async(false), skirtFactor(0), maxScreenSpaceError(0)
         {
         }
     } ChunkParameters;

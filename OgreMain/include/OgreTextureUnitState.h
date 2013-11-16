@@ -132,7 +132,9 @@ namespace Ogre {
             /// Texture clamps at 1.0.
             TAM_CLAMP,
             /// Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-            TAM_BORDER
+            TAM_BORDER,
+            /// Unknown
+            TAM_UNKNOWN = 99
         };
 
         /** Texture addressing mode for each texture coordinate. */

@@ -99,6 +99,7 @@ void Program::removeParameter(UniformParameterPtr parameter)
 		{
 			(*it).setNull();
 			mParameters.erase(it);
+            break;
 		}
 	}
 }

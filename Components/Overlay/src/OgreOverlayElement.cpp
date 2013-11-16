@@ -73,6 +73,8 @@ namespace Ogre {
       , mParent(0)
       , mOverlay(0)
       , mDerivedOutOfDate(true)
+      , mDerivedLeft(0)
+      , mDerivedTop(0)
       , mGeomPositionsOutOfDate(true)
       , mGeomUVsOutOfDate(true)
       , mZOrder(0)

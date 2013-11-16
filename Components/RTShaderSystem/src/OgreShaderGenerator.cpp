@@ -90,10 +90,9 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
 	mCreateShaderOverProgrammablePass = false;
-    mIsFinalizing = false;
-
-
-	mShaderLanguage = "";
+    mIsFinalizing               = false;
+    mFSLayer                    = 0;
+	mShaderLanguage             = "";
 	
 	HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 

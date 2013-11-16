@@ -66,6 +66,7 @@ TextureAtlasSampler::TextureAtlasSampler() :
 	mIsTableDataUpdated(false),
 	mAutoAdjustPollPosition(true)
 {
+    mTextureAddressings->u = mTextureAddressings->v = mTextureAddressings->w = TextureUnitState::TAM_UNKNOWN;
 	memset(mIsAtlasTextureUnits, 0, sizeof(bool) * TAS_MAX_TEXTURES);
 }
 

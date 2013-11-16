@@ -149,7 +149,7 @@ namespace Ogre
 			Real lastCFactor;
 
 			LodLevel() : gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
-				lastTransitionDist(0), lastCFactor(0) {}
+				lastTransitionDist(0), lastCFactor(0), batchSize(0) {}
 		};
 		typedef vector<LodLevel*>::type LodLevelList;
 
@@ -306,7 +306,8 @@ namespace Ogre
 
 			VertexDataRecord(uint16 res, uint16 sz, uint16 lvls) 
 				: cpuVertexData(0), gpuVertexData(0), resolution(res), size(sz),
-				treeLevels(lvls), gpuVertexDataDirty(false) {}
+				treeLevels(lvls), gpuVertexDataDirty(false), numSkirtRowsCols(0),
+                skirtRowColSkip(0) {}
 		};
 		
 		TerrainQuadTreeNode* mNodeWithVertexData;
