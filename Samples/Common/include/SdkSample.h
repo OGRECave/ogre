@@ -487,16 +487,7 @@ namespace OgreBites
 			mDetailsPanel->setParamValue(15, "0");															
 #endif
 
-			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-
-			const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
-			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			{
-				compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
-															Ogre::IdString() );
-			}
-			compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
+			setupCompositor();
 			setupContent();
 			mContentSetup = true;
 
@@ -516,6 +507,22 @@ namespace OgreBites
 		}
 
     protected:
+
+		/** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
+		 *  if setupCompositor() is overridden, be aware @mBackgroundColor will be ignored
+		 */
+		virtual void setupCompositor()
+		{
+			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+			const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
+			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+			{
+				compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
+															Ogre::IdString() );
+			}
+			compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+		}
 
 		virtual void setupView()
 		{
