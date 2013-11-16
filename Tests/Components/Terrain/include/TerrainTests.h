@@ -43,6 +43,7 @@ class TerrainTests : public CppUnit::TestFixture
 	Root* mRoot;
 	SceneManager* mSceneMgr;
 	TerrainGlobalOptions* mTerrainOpts;
+	LogManager *mLogManager;
 
 public:
 	void setUp();

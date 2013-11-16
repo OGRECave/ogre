@@ -28,6 +28,7 @@ String mMeshFullPath;
 String mSkeletonFullPath;
 SkeletonPtr mSkeleton;
 Real errorFactor;
+LogManager* mLogManager;
 public:
 void setUp();
 void tearDown();

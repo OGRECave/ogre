@@ -48,6 +48,7 @@ class PageCoreTests : public CppUnit::TestFixture
 	Root* mRoot;
 	PageManager* mPageManager;
 	SceneManager* mSceneMgr;
+	LogManager* mLogManager;
 #ifdef OGRE_STATIC_LIB
 	StaticPluginLoader mStaticPluginLoader;
 #endif

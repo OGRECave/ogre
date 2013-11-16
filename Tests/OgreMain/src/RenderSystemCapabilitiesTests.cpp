@@ -46,11 +46,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( RenderSystemCapabilitiesTests );
 void RenderSystemCapabilitiesTests::setUp()
 {
     using namespace Ogre;
-    if(!LogManager::getSingletonPtr()) {
-        OGRE_NEW LogManager();
-    }
-    LogManager::getSingleton().createLog("RenderSystemCapabilitiesTests.log", true);
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("RenderSystemCapabilitiesTests.log", true);
+	mLogManager->setLogDetail(LL_LOW);
 
     // we need to be able to create FileSystem archives to load .rendercaps
     mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();

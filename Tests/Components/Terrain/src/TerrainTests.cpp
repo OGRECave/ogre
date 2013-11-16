@@ -38,16 +38,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 
 void TerrainTests::setUp()
 {
-    // set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testTerrain.log", true, false);
-	}
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+	// set up silent logging to not pollute output
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("testTerrain.log", true, false);
+	mLogManager->setLogDetail(LL_LOW);
 
 	mRoot = OGRE_NEW Root();
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
@@ -93,6 +88,7 @@ void TerrainTests::tearDown()
 {
 	OGRE_DELETE mTerrainOpts;
 	OGRE_DELETE mRoot;
+	OGRE_DELETE mLogManager;
 }
 
 void TerrainTests::testCreate()

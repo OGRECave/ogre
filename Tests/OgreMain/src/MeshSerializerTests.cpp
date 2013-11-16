@@ -65,8 +65,12 @@ CPPUNIT_TEST_SUITE_REGISTRATION(MeshSerializerTests);
 void MeshSerializerTests::setUp()
 {
 	errorFactor = 0.05;
-	LogManager::getSingleton().setLogDetail(LL_LOW);
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
+
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
+	mLogManager->setLogDetail(LL_LOW);
+
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
 	OGRE_NEW DefaultHardwareBufferManager();
@@ -123,7 +127,7 @@ void MeshSerializerTests::setUp()
 		copyFile(mMeshFullPath, mMeshFullPath + ".bak");
 	}
 	mSkeletonFullPath = "";
-	mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "Popular");
+	mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "Popular").staticCast<Skeleton>();
 	getResourceFullPath(mSkeleton, mSkeletonFullPath);
 	if (!copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath)) {
 		// If there is no backup, create one.
@@ -132,16 +136,9 @@ void MeshSerializerTests::setUp()
 
 	mMesh->reload();
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
-	MeshLodGenerator gen; // assuming singleton is not initialized yet
-	LodConfig lodConfig;
-	gen.getAutoconfig(mMesh, lodConfig);
-	LodLevel manual;
-	manual.manualMeshName = "OgreHead.mesh";
-	// lodConfig.levels.clear();
-	// lodConfig.levels.insert(lodConfig.levels.begin(), manual);
-	// lodConfig.levels.insert(lodConfig.levels.begin() + 2, manual);
-	// lodConfig.levels.push_back(manual);
-	gen.generateLodLevels(lodConfig);
+	{
+		MeshLodGenerator().generateAutoconfiguredLodLevels(mMesh);
+	}
 #endif /* ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR */
 	mOrigMesh = mMesh->clone(mMesh->getName() + ".orig.mesh", mMesh->getGroup());
 }
@@ -174,6 +171,7 @@ void MeshSerializerTests::tearDown()
 	OGRE_DELETE MaterialManager::getSingletonPtr();
 	OGRE_DELETE LodStrategyManager::getSingletonPtr();
 	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+	OGRE_DELETE mLogManager;
 }
 void MeshSerializerTests::testMesh_clone()
 {

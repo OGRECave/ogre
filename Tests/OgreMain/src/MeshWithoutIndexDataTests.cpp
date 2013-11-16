@@ -35,18 +35,18 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
-
+#include "OgreLogManager.h"
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
-    if(LogManager::getSingletonPtr() == 0)
-        mLogManager = OGRE_NEW LogManager();
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("MeshWithoutIndexDataTests.log", true);
+	mLogManager->setLogDetail(LL_LOW);
 
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
-    LogManager::getSingleton().setLogDetail(LL_LOW);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();

@@ -47,36 +47,25 @@ void UseCustomCapabilitiesTests::setUp()
     using namespace Ogre;
 
 	// write cleanup to log
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
-	}
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
+	mLogManager->setLogDetail(LL_LOW);
 
-	
-	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
-		OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
-	if(Ogre::GpuProgramManager::getSingletonPtr())
-		OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
-	if(Ogre::MaterialManager::getSingletonPtr())
-		OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
+	OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
+	OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
+	OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
+	OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
+	OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
 #if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
+	mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
 #endif
 }
 
 void UseCustomCapabilitiesTests::tearDown()
 {
-	using namespace Ogre;
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+	OGRE_DELETE mLogManager;
 
 #if OGRE_STATIC
         OGRE_DELETE mStaticPluginLoader;

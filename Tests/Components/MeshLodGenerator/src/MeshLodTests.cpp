@@ -22,8 +22,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
 
 void MeshLodTests::setUp()
 {
-	LogManager::getSingleton().setLogDetail(LL_LOW);
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
+	mLogManager->setLogDetail(LL_LOW);
+
 	Root* root = OGRE_NEW Root;
 	root->setRenderSystem(root->getAvailableRenderers().back());
 	root->initialise(false); // Needed for setting up HardwareBufferManager
@@ -80,6 +83,7 @@ void MeshLodTests::tearDown()
 	}
 	OGRE_DELETE MeshLodGenerator::getSingletonPtr();
 	OGRE_DELETE Root::getSingletonPtr();
+	OGRE_DELETE mLogManager;
 }
 
 void MeshLodTests::addProfile(LodConfig& config)

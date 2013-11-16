@@ -49,6 +49,7 @@ CPPUNIT_TEST_SUITE_END();
 StaticPluginLoader mStaticPluginLoader;
 #endif
 MeshPtr mMesh;
+LogManager* mLogManager;
 public:
 void setUp();
 void tearDown();
