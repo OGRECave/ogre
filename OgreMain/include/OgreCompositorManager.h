@@ -71,6 +71,19 @@ namespace Ogre {
             parse all available .compositor scripts. */
         void initialise(void);
 
+		/**
+		 * Create a new compositor
+		 * @see ResourceManager::createResource
+		 */
+		CompositorPtr create (const String& name, const String& group,
+							bool isManual = false, ManualResourceLoader* loader = 0,
+							const NameValuePairList* createParams = 0);
+
+		/// Get a resource by name
+		/// @see ResourceManager::getResourceByName
+		CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+
         /** @see ScriptLoader::parseScript
         */
         void parseScript(DataStreamPtr& stream, const String& groupName);

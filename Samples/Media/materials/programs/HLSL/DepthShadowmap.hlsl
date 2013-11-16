@@ -11,22 +11,12 @@ void casterVP(
 	out float2 outDepth		: TEXCOORD0,
 
 	uniform float4x4 worldViewProj,
-	uniform float4 texelOffsets,
-	uniform float4 depthRange
-	)
+	uniform float4 texelOffsets)
 {
 	outPos = mul(worldViewProj, position);
-
 	// fix pixel / texel alignment
 	outPos.xy += texelOffsets.zw * outPos.w;
-	// linear depth storage
-	// offset / scale range output
-#if LINEAR_RANGE
-	outDepth.x = (outPos.z - depthRange.x) * depthRange.w;
-#else
-	outDepth.x = outPos.z;
-#endif
-	outDepth.y = outPos.w;
+	outDepth = outPos.zw;
 }
 
 
@@ -34,16 +24,9 @@ void casterVP(
 void casterFP(
 	float2 depth			: TEXCOORD0,
 	out float4 result		: COLOR)
-	
 {
-#if LINEAR_RANGE
-	float finalDepth = depth.x;
-#else
-	float finalDepth = depth.x / depth.y;
-#endif
-	// just smear across all components 
-	// therefore this one needs high individual channel precision
-	result = float4(finalDepth, finalDepth, finalDepth, 1);
+    float finalDepth = depth.x / depth.y;
+    result = float4(finalDepth, finalDepth, finalDepth, 1);
 }
 
 
@@ -61,8 +44,7 @@ void receiverVP(
 	uniform float4x4 worldViewProj,
 	uniform float4x4 texViewProj,
 	uniform float4 lightPosition,
-	uniform float4 lightColour,
-	uniform float4 shadowDepthRange
+	uniform float4 lightColour
 	)
 {
 	float4 worldPos = mul(world, position);
@@ -78,14 +60,6 @@ void receiverVP(
 
 	// calculate shadow map coords
 	outShadowUV = mul(texViewProj, worldPos);
-#if LINEAR_RANGE
-	// adjust by fixed depth bias, rescale into range
-	outShadowUV.z = (outShadowUV.z - shadowDepthRange.x) * shadowDepthRange.w;
-#endif
-	
-
-
-	
 }
 
 void receiverFP(
@@ -98,16 +72,10 @@ void receiverFP(
 	uniform float fixedDepthBias,
 	uniform float gradientClamp,
 	uniform float gradientScaleBias,
-	uniform float shadowFuzzyWidth,
 	
 	out float4 result		: COLOR)
 {
-	// point on shadowmap
-#if LINEAR_RANGE
 	shadowUV.xy = shadowUV.xy / shadowUV.w;
-#else
-	shadowUV = shadowUV / shadowUV.w;
-#endif
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -127,15 +95,6 @@ void receiverFP(
 	float finalCenterDepth = centerdepth + depthAdjust;
 
 	// shadowUV.z contains lightspace position of current object
-
-#if FUZZY_TEST
-	// fuzzy test - introduces some ghosting in result and doesn't appear to be needed?
-	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
-	float visibility = saturate(1 + (finalCenterDepth - shadowUV.z) * shadowFuzzyWidth * shadowUV.w);
-
-	result = vertexColour * visibility;
-#else
-	// hard test
 #if PCF
 	// use depths from prev, calculate diff
 	depths += depthAdjust.xxxx;
@@ -152,11 +111,6 @@ void receiverFP(
 #else
 	result = (finalCenterDepth > shadowUV.z) ? vertexColour : float4(0,0,0,1);
 #endif
-
-#endif
-   
-
-	
 }
 
 
@@ -232,8 +186,7 @@ void normalMapShadowReceiverFp(
 			  uniform float inverseShadowmapSize,
 			  uniform float fixedDepthBias,
 			  uniform float gradientClamp,
-			  uniform float gradientScaleBias,
-			  uniform float shadowFuzzyWidth,
+			  uniform float gradientScaleBias
 			  
 			  uniform sampler2D   shadowMap : register(s0),
 			  uniform sampler2D   normalMap : register(s1),
@@ -249,13 +202,8 @@ void normalMapShadowReceiverFp(
 	// Calculate dot product
 	float4 vertexColour = lightColour * dot(bumpVec, lightVec);
 
-
 	// point on shadowmap
-#if LINEAR_RANGE
 	shadowUV.xy = shadowUV.xy / shadowUV.w;
-#else
-	shadowUV = shadowUV / shadowUV.w;
-#endif
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -275,15 +223,6 @@ void normalMapShadowReceiverFp(
 	float finalCenterDepth = centerdepth + depthAdjust;
 
 	// shadowUV.z contains lightspace position of current object
-
-#if FUZZY_TEST
-	// fuzzy test - introduces some ghosting in result and doesn't appear to be needed?
-	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
-	float visibility = saturate(1 + (finalCenterDepth - shadowUV.z) * shadowFuzzyWidth * shadowUV.w);
-
-	result = vertexColour * visibility;
-#else
-	// hard test
 #if PCF
 	// use depths from prev, calculate diff
 	depths += depthAdjust.xxxx;
@@ -300,10 +239,5 @@ void normalMapShadowReceiverFp(
 #else
 	result = (finalCenterDepth > shadowUV.z) ? vertexColour : float4(0,0,0,1);
 #endif
-
-#endif
-
-
-	
 }
 

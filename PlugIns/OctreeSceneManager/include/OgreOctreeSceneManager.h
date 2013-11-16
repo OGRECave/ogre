@@ -60,14 +60,10 @@ class OctreeSphereSceneQuery;
 class OctreeAxisAlignedBoxSceneQuery;
 class OctreePlaneBoundedVolumeListSceneQuery;
 
-
 typedef list< WireBoundingBox * >::type BoxList;
 typedef list< unsigned long >::type ColorList;
-//typedef list< SceneNode * >::type SceneNodeList;
-
 
 /** Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial queries.
-@remarks
 */
 
 class _OgreOctreePluginExport OctreeSceneManager : public SceneManager
@@ -192,11 +188,11 @@ public:
     /** Overridden from SceneManager */
     void clearScene(void);
 
-    AxisAlignedBoxSceneQuery* createAABBQuery(const AxisAlignedBox& box, unsigned long mask);
-    SphereSceneQuery* createSphereQuery(const Sphere& sphere, unsigned long mask);
-    PlaneBoundedVolumeListSceneQuery* createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, unsigned long mask);
-    RaySceneQuery* createRayQuery(const Ray& ray, unsigned long mask);
-    IntersectionSceneQuery* createIntersectionQuery(unsigned long mask);
+    AxisAlignedBoxSceneQuery* createAABBQuery(const AxisAlignedBox& box, uint32 mask);
+    SphereSceneQuery* createSphereQuery(const Sphere& sphere, uint32 mask);
+    PlaneBoundedVolumeListSceneQuery* createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, uint32 mask);
+    RaySceneQuery* createRayQuery(const Ray& ray, uint32 mask);
+    IntersectionSceneQuery* createIntersectionQuery(uint32 mask);
 
 protected:
 

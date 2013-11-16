@@ -129,7 +129,7 @@ namespace Ogre {
 		{*/
 			uni = new D3D11HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, mlpD3DDevice);
 			{
-				OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+				OGRE_LOCK_MUTEX(mUniformBuffersMutex);
 				mUniformBuffers.insert(uni);
 			}
 		//}
@@ -190,8 +190,8 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
-				UniformBufferList::iterator i, iend;
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex);
+			UniformBufferList::iterator i, iend;
 			iend = mUniformBuffers.end();
 			for (i = mUniformBuffers.begin(); i != iend; ++i)
 			{
@@ -246,8 +246,8 @@ namespace Ogre {
 		}
 
 		{
-			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
-				UniformBufferList::iterator i, iend;
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex);
+			UniformBufferList::iterator i, iend;
 			iend = mUniformBuffers.end();
 			for (i = mUniformBuffers.begin(); i != iend; ++i)
 			{

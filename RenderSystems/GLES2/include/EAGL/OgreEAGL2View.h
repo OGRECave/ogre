@@ -35,8 +35,7 @@ using namespace Ogre;
 
 #ifdef __OBJC__
 
-#import <UIKit/UIKit.h>
-
+#import <UIKit/UIView.h>
 
 @interface EAGL2View : UIView {
     String mWindowName;

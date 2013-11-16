@@ -60,9 +60,9 @@ namespace Volume {
             // Don't use Math::RealEqual here as it isn't inlined and this function is performance critical.
             if (fabs(val0.w - ISO_LEVEL) <= FLT_EPSILON)
             {
-                normal.x = val1.x;
-                normal.y = val1.y;
-                normal.z = val1.z;
+                normal.x = val0.x;
+                normal.y = val0.y;
+                normal.z = val0.z;
                 return v0;
             }
             if (fabs(val1.w - ISO_LEVEL) <= FLT_EPSILON)

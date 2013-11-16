@@ -54,10 +54,10 @@ THE SOFTWARE
 namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 1
-    #define OGRE_VERSION_MINOR 9
+    #define OGRE_VERSION_MINOR 10
     #define OGRE_VERSION_PATCH 0
 	#define OGRE_VERSION_SUFFIX "unstable"
-    #define OGRE_VERSION_NAME "Ghadamon"
+    #define OGRE_VERSION_NAME "Xalafu"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 
@@ -135,9 +135,6 @@ namespace Ogre {
     typedef unsigned int uint;
 	typedef unsigned long ulong;
 
-	// Useful threading defines
-#include "Threading/OgreThreadDefines.h"
-
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
@@ -179,7 +176,6 @@ namespace Ogre {
     class FrameListener;
     class Frustum;
     class GpuProgram;
-    class GpuProgramPtr;
     class GpuProgramManager;
 	class GpuProgramUsage;
     class HardwareIndexBuffer;
@@ -188,7 +184,6 @@ namespace Ogre {
 	class HardwarePixelBuffer;
     class HardwarePixelBufferSharedPtr;
 	class HighLevelGpuProgram;
-    class HighLevelGpuProgramPtr;
 	class HighLevelGpuProgramManager;
 	class HighLevelGpuProgramFactory;
     class IndexData;
@@ -210,14 +205,12 @@ namespace Ogre {
 	class ManualResourceLoader;
 	class ManualObject;
     class Material;
-    class MaterialPtr;
     class MaterialManager;
     class Math;
     class Matrix3;
     class Matrix4;
     class MemoryManager;
     class Mesh;
-    class MeshPtr;
     class MeshSerializer;
     class MeshSerializerImpl;
     class MeshManager;
@@ -291,7 +284,6 @@ namespace Ogre {
     class SimpleRenderable;
     class SimpleSpline;
     class Skeleton;
-    class SkeletonPtr;
     class SkeletonInstance;
     class SkeletonManager;
     class Sphere;
@@ -308,7 +300,6 @@ namespace Ogre {
 	class ExternalTextureSource;
     class TextureUnitState;
     class Texture;
-    class TexturePtr;
     class TextureManager;
     class TransformKeyFrame;
 	class Timer;
@@ -333,6 +324,17 @@ namespace Ogre {
     class CompositionPass;
     class CompositionTargetPass;
 	class CustomCompositionPass;
+
+    template<typename T> class SharedPtr;
+    typedef SharedPtr<Compositor> CompositorPtr;
+    typedef SharedPtr<GpuProgram> GpuProgramPtr;
+    typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
+    typedef SharedPtr<Material> MaterialPtr;
+    typedef SharedPtr<Mesh> MeshPtr;
+    typedef SharedPtr<PatchMesh> PatchMeshPtr;
+    typedef SharedPtr<Resource> ResourcePtr;
+    typedef SharedPtr<Skeleton> SkeletonPtr;
+    typedef SharedPtr<Texture> TexturePtr;
 }
 
 /* Include all the standard header *after* all the configuration
@@ -475,6 +477,34 @@ namespace Ogre
 	typedef StringStream stringstream;
 
 }
+
+#if OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR 
+namespace std 
+{
+#if (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430) || OGRE_COMPILER == OGRE_COMPILER_CLANG && !defined(STLPORT) && __cplusplus < 201103L
+	namespace tr1
+	{
+#endif
+    template <> struct hash<Ogre::String>
+	{
+    public :
+        size_t operator()(const Ogre::String &str ) const
+        {
+			size_t _Val = 2166136261U;
+			size_t _First = 0;
+			size_t _Last = str.size();
+			size_t _Stride = 1 + _Last / 10;
+
+			for(; _First < _Last; _First += _Stride)
+				_Val = 16777619U * _Val ^ (size_t)str[_First];
+			return (_Val);
+        }
+    };
+#if (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430) || OGRE_COMPILER == OGRE_COMPILER_CLANG && !defined(STLPORT) && __cplusplus < 201103L
+	}
+#endif
+}
+#endif
 
 //for stl container
 namespace Ogre

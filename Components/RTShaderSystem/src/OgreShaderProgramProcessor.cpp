@@ -290,7 +290,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 {
 
 	// Make sure the merge combinations are ready.
-	if (mParamMergeCombinations.size() == 0)
+	if (mParamMergeCombinations.empty())
 	{
 		buildMergeCombinations();
 	}
@@ -302,7 +302,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 
 		// Case all parameters have been merged.
 		if (paramsTable[0].size() + paramsTable[1].size() + 
-			paramsTable[2].size() + paramsTable[3].size() == 0)		
+			paramsTable[2].size() + paramsTable[3].empty())		
 			return;		
 
 		MergeParameter curMergeParam;
@@ -318,10 +318,10 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 	if (ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy() == VSOCP_LOW ||
 		ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy() == VSOCP_MEDIUM)
 	{
-		const int curUsedSlots = mergedParams.size();
-		const int float1ParamCount = paramsTable[0].size();
-		const int float2ParamCount = paramsTable[1].size();
-		const int float3ParamCount = paramsTable[2].size();
+		const int curUsedSlots = static_cast<int>(mergedParams.size());
+		const int float1ParamCount = static_cast<int>(paramsTable[0].size());
+		const int float2ParamCount = static_cast<int>(paramsTable[1].size());
+		const int float3ParamCount = static_cast<int>(paramsTable[2].size());
 		int       reqSlots = 0;
 
 		// Compute the required slots.
@@ -421,7 +421,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 			const MergeCombination& curCombination = simpleCombinations[i];
 
 			// Case all parameters have been merged.
-			if (paramsTable[0].size() + paramsTable[1].size() + paramsTable[2].size() + paramsTable[3].size() == 0)		
+			if (paramsTable[0].size() + paramsTable[1].size() + paramsTable[2].size() + paramsTable[3].empty())		
 				break;		
 
 			MergeParameter curMergeParam;
@@ -453,7 +453,7 @@ bool ProgramProcessor::mergeParametersByCombination(const MergeCombination& comb
 	for (int i=0; i < 4; ++i)
 	{
 		ShaderParameterList& curParamList = paramsTable[i];		
-		int srcParameterTypeCount = combination.srcParameterTypeCount[i];
+		int srcParameterTypeCount = static_cast<int>(combination.srcParameterTypeCount[i]);
 		int srcParameterCount = 0;
 
 		while (srcParameterTypeCount > 0)
@@ -618,7 +618,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
 												   ShaderParameterList& splitParams, LocalParameterMap& localParamsMap)
 {
 	// No split params created.
-	if (splitParams.size() == 0)	
+	if (splitParams.empty())	
 		return;	
 
 	// Create the local parameters + map from source to local.

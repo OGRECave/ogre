@@ -39,8 +39,8 @@
 #include "OgreGLSLProgramPipeline.h"
 
 namespace Ogre {
-    GL3PlusHardwarePixelBuffer::GL3PlusHardwarePixelBuffer(size_t inWidth, size_t inHeight,
-                                                   size_t inDepth, PixelFormat inFormat,
+    GL3PlusHardwarePixelBuffer::GL3PlusHardwarePixelBuffer(uint32 inWidth, uint32 inHeight,
+                                                   uint32 inDepth, PixelFormat inFormat,
                                                    HardwareBuffer::Usage usage)
     : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
     mBuffer(inWidth, inHeight, inDepth, inFormat),
@@ -194,7 +194,7 @@ namespace Ogre {
                     "GL3PlusHardwarePixelBuffer::download");
     }
     
-    void GL3PlusHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+    void GL3PlusHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "Framebuffer bind not possible for this pixelbuffer type",
@@ -268,7 +268,7 @@ namespace Ogre {
         {
             // Create render target for each slice
             mSliceTRT.reserve(mDepth);
-            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
@@ -509,9 +509,9 @@ namespace Ogre {
         }
 
         GLint offsetInBytes = 0;
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        uint32 width = mWidth;
+        uint32 height = mHeight;
+        uint32 depth = mDepth;
         for(GLint i = 0; i < mLevel; i++)
         {
             offsetInBytes += PixelUtil::getMemorySize(width, height, depth, data.format);
@@ -552,7 +552,7 @@ namespace Ogre {
         mBufferId = 0;
     }
     //-----------------------------------------------------------------------------  
-    void GL3PlusTextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+    void GL3PlusTextureBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
     {
         assert(zoffset < mDepth);
         OGRE_CHECK_GL_ERROR(glBindTexture(mFaceTarget, mTextureID));
@@ -576,7 +576,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------------
-    void GL3PlusTextureBuffer::copyFromFramebuffer(size_t zoffset)
+    void GL3PlusTextureBuffer::copyFromFramebuffer(uint32 zoffset)
     {
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
         switch(mTarget)
@@ -709,8 +709,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                                      tempTex, 0));
 
-            GLuint status = 0;
-            OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
             // Set viewport to size of destination slice
             OGRE_CHECK_GL_ERROR(glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight()));
@@ -722,7 +721,7 @@ namespace Ogre {
         }
         
         // Process each destination slice
-        for(size_t slice=dstBox.front; slice<dstBox.back; ++slice)
+        for(uint32 slice = dstBox.front; slice < dstBox.back; ++slice)
         {
             if(!tempTex)
             {
@@ -941,7 +940,7 @@ namespace Ogre {
 
     //********* GL3PlusRenderBuffer
     //----------------------------------------------------------------------------- 
-    GL3PlusRenderBuffer::GL3PlusRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
+    GL3PlusRenderBuffer::GL3PlusRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
     GL3PlusHardwarePixelBuffer(width, height, 1, GL3PlusPixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY),
     mRenderbufferID(0)
     
@@ -972,7 +971,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &mRenderbufferID));
     }
     //-----------------------------------------------------------------------------  
-    void GL3PlusRenderBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
+    void GL3PlusRenderBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
     {
         assert(zoffset < mDepth);
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment,

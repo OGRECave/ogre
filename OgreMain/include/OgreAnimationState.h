@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include "OgreController.h"
 #include "OgreIteratorWrappers.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

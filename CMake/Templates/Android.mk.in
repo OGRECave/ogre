@@ -5,12 +5,12 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_LDLIBS	:= -landroid -lc -lm -ldl -llog -lEGL -lGLESv2
     LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib/@ANDROID_ABI@
 	@SAMPLE_LDLIBS@
-    LOCAL_LDLIBS	+= -lPlugin_ParticleFXStatic -lPlugin_OctreeSceneManagerStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lOgreOverlayStatic -lOgreMainStatic
+    LOCAL_LDLIBS	+= -lPlugin_ParticleFXStatic -lPlugin_OctreeSceneManagerStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lOgreOverlayStatic -lOgreTerrainStatic -lOgrePagingStatic -lOgreVolumeStatic -lOgreMainStatic
     LOCAL_LDLIBS	+= -lzzip -lz -lFreeImage -lfreetype -lOIS @GLES_OPTIMISER@ @OGRE_BINARY_DIR@/systemlibs/@ANDROID_ABI@/libsupc++.a @OGRE_BINARY_DIR@/systemlibs/@ANDROID_ABI@/libstdc++.a @NDKOUT@/obj/local/@ANDROID_ABI@/libcpufeatures.a
     LOCAL_STATIC_LIBRARIES := android_native_app_glue cpufeatures
     
     LOCAL_CFLAGS := -DGL_GLEXT_PROTOTYPES=1 -I@OGRE_BINARY_DIR@/include -I@CMAKE_SOURCE_DIR@/OgreMain/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include/EGL
-    LOCAL_CFLAGS += -I@ANDROID_NDK@/sources/cpufeatures -I@CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include -I@CMAKE_SOURCE_DIR@/Components/Overlay/include 
+    LOCAL_CFLAGS += -I@ANDROID_NDK@/sources/cpufeatures -I@CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include -I@CMAKE_SOURCE_DIR@/Components/Overlay/include -I@CMAKE_SOURCE_DIR@/Components/Volume/include -I@CMAKE_SOURCE_DIR@/Components/Terrain/include -I@CMAKE_SOURCE_DIR@/Components/Paging/include
     LOCAL_CFLAGS += -I@CMAKE_SOURCE_DIR@/PlugIns/ParticleFX/include -I@CMAKE_SOURCE_DIR@/PlugIns/OctreeSceneManager/include 
     LOCAL_CFLAGS += -I@OGRE_DEPENDENCIES_DIR@/include -I@OGRE_DEPENDENCIES_DIR@/include/OIS -I@OGRE_BINARY_DIR@/Samples/include
     LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1 

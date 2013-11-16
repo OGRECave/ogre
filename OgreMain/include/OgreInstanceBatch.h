@@ -258,7 +258,7 @@ namespace Ogre
         @param optimizeCulling true will call the DoCull version, false the NoCull
         @param usedEntities Array of InstancedEntities to parent with this batch. Those reparented
             are removed from this input vector
-			@param Array of Custom parameters correlated with the InstancedEntities in usedEntities.
+        @param usedParams Array of Custom parameters correlated with the InstancedEntities in usedEntities.
 			They follow the fate of the entities in that vector.
 		@remarks:
 			This function assumes caller holds data to mInstancedEntities! Otherwise

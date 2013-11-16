@@ -111,13 +111,13 @@ namespace Ogre {
             // detach from parent
             if (mParentIsTagPoint)
             {
-                // May be we are a lod entity which not in the parent entity child object list,
+                // May be we are a LOD entity which not in the parent entity child object list,
                 // call this method could safely ignore this case.
                 static_cast<TagPoint*>(mParentNode)->getParentEntity()->detachObjectFromBone(this);
             }
             else
             {
-                // May be we are a lod entity which not in the parent node child object list,
+                // May be we are a LOD entity which not in the parent node child object list,
                 // call this method could safely ignore this case.
                 static_cast<SceneNode*>(mParentNode)->detachObject(this);
             }
@@ -307,7 +307,7 @@ namespace Ogre {
             evt.movableObject = this;
             evt.camera = cam;
 
-            // Notify lod event listeners
+            // Notify LOD event listeners
             cam->getSceneManager()->_notifyMovableObjectLodChanged(evt);
 
 		}
@@ -419,7 +419,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ShadowCaster::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light, 
-        HardwareIndexBufferSharedPtr* indexBuffer, 
+        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
     {
         static ShadowRenderableList dummyList;

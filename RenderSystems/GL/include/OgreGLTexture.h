@@ -94,96 +94,11 @@ namespace Ogre {
 
     private:
         GLuint mTextureID;
+        GLSupport& mGLSupport;
 		
 		/// Vector of pointers to subsurfaces
 		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
 		SurfaceList	mSurfaceList;
-    };
-
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to GLTexturePtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreGLExport GLTexturePtr : public SharedPtr<GLTexture> 
-    {
-    public:
-        GLTexturePtr() : SharedPtr<GLTexture>() {}
-        explicit GLTexturePtr(GLTexture* rep) : SharedPtr<GLTexture>(rep) {}
-        GLTexturePtr(const GLTexturePtr& r) : SharedPtr<GLTexture>(r) {} 
-        GLTexturePtr(const ResourcePtr& r) : SharedPtr<GLTexture>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<GLTexture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-		GLTexturePtr(const TexturePtr& r) : SharedPtr<GLTexture>()
-		{
-			*this = r;
-		}
-
-        /// Operator used to convert a ResourcePtr to a GLTexturePtr
-        GLTexturePtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<GLTexture*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<GLTexture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
-        /// Operator used to convert a TexturePtr to a GLTexturePtr
-        GLTexturePtr& operator=(const TexturePtr& r)
-        {
-            if (pRep == static_cast<GLTexture*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<GLTexture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
     };
 }
 

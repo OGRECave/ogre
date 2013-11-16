@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreGLHardwareIndexBuffer.h"
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreException.h"
+#include "OgreGLStateCacheManager.h"
 
 namespace Ogre {
 
@@ -45,7 +46,7 @@ namespace Ogre {
                 "GLHardwareIndexBuffer::GLHardwareIndexBuffer");
         }
 
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
+		static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
         // Initialise buffer and set usage
         glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
@@ -56,7 +57,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     GLHardwareIndexBuffer::~GLHardwareIndexBuffer()
     {
-        glDeleteBuffersARB(1, &mBufferId);
+        static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
     }
 	//---------------------------------------------------------------------
     void* GLHardwareIndexBuffer::lockImpl(size_t offset, 
@@ -86,7 +87,7 @@ namespace Ogre {
 				mScratchPtr = retPtr;
 				mScratchUploadOnUnlock = (options != HBL_READ_ONLY);
 
-				if (options != HBL_DISCARD)
+				if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
 				{
 					// have to read back the data before returning the pointer
 					readData(offset, length, retPtr);
@@ -97,9 +98,9 @@ namespace Ogre {
 		if (!retPtr)
 		{
             GLenum access = 0;
-			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId );
+            static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 			// Use glMapBuffer
-			if(options == HBL_DISCARD)
+			if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
 			{
 				// Discard the buffer
 				glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
@@ -152,7 +153,7 @@ namespace Ogre {
 		else
 		{
 
-			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId );
+            static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
 			if(!glUnmapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB ))
 			{
@@ -177,7 +178,7 @@ namespace Ogre {
         }
         else
         {
-            glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId );
+            static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
             glGetBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, offset, length, pDest);
         }
     }
@@ -185,7 +186,7 @@ namespace Ogre {
     void GLHardwareIndexBuffer::writeData(size_t offset, size_t length, 
             const void* pSource, bool discardWholeBuffer)
     {
-        glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId );
+        static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
         // Update the shadow buffer
         if(mUseShadowBuffer)
@@ -221,7 +222,7 @@ namespace Ogre {
             const void *srcData = mShadowBuffer->lock(
                 mLockStart, mLockSize, HBL_READ_ONLY);
 
-            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
+            static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)

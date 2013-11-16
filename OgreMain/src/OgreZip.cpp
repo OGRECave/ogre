@@ -161,7 +161,7 @@ namespace Ogre {
             int zerr = zzip_error(mZzipDir);
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
             LogManager::getSingleton().logMessage(
-                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'");
+                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'", LML_CRITICAL);
                 
 			// return null pointer
 			return DataStreamPtr();
@@ -271,7 +271,14 @@ namespace Ogre {
 	bool ZipArchive::exists(const String& filename)
 	{		
 		OGRE_LOCK_AUTO_MUTEX;
-		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), filename)) != mFileList.end();
+		String cleanName = filename;
+		if(filename.rfind("/") != String::npos)
+		{
+			StringVector tokens = StringUtil::split(filename, "/");
+			cleanName = tokens[tokens.size() - 1];
+		}
+
+		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
 	}
 	//---------------------------------------------------------------------
 	time_t ZipArchive::getModifiedTime(const String& filename)
@@ -376,7 +383,7 @@ namespace Ogre {
 		else
 		{
 			// everything is going all right, relative seek
-			skip(newPos - prevPos);
+			skip((long)(newPos - prevPos));
 		}
     }
     //-----------------------------------------------------------------------
@@ -556,13 +563,13 @@ namespace Ogre {
         switch(whence)
         {
             case SEEK_CUR:
-                newPos = curEmbeddedFileData.curPos + offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.curPos + offset);
                 break;
             case SEEK_END:
-                newPos = curEmbeddedFileData.fileSize - offset;
+                newPos = (zzip_size_t)(curEmbeddedFileData.fileSize - offset);
                 break;
             case SEEK_SET:
-                newPos = offset;
+                newPos = (zzip_size_t)offset;
                 break;
             default:
                 // bad whence - return an error - nonzero value.
@@ -653,7 +660,7 @@ namespace Ogre {
         newEmbeddedFileData.fileSize = fileSize;
         newEmbeddedFileData.decryptFunc = decryptFunc;
         EmbeddedZipArchiveFactory_mEmbbedFileDataList->push_back(newEmbeddedFileData);
-        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = EmbeddedZipArchiveFactory_mEmbbedFileDataList->size();
+        (*EmbeddedZipArchiveFactory_mFileNameToIndexMap)[name] = static_cast<int>(EmbeddedZipArchiveFactory_mEmbbedFileDataList->size());
     }
     //-----------------------------------------------------------------------
     void EmbeddedZipArchiveFactory::removeEmbbeddedFile( const String& name )

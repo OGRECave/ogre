@@ -106,7 +106,7 @@ namespace Ogre {
         return res;
     }
 
-    void NaClGLContext::swapBuffers( bool waitForVSync )
+    void NaClGLContext::swapBuffers( )
     {
         mContext.SwapBuffers(*mSwapCallback);
     }

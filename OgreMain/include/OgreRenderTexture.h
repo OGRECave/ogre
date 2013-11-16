@@ -48,7 +48,7 @@ namespace Ogre
     class _OgreExport RenderTexture: public RenderTarget
     {
     public:
-        RenderTexture(HardwarePixelBuffer *buffer, size_t zoffset);
+        RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset);
         virtual ~RenderTexture();
 
 		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
@@ -56,7 +56,7 @@ namespace Ogre
 
 	protected:
 		HardwarePixelBuffer *mBuffer;
-		size_t mZOffset;
+		uint32 mZOffset;
     };
 
 	/** This class represents a render target that renders to multiple RenderTextures

@@ -37,6 +37,7 @@ Program::Program(GpuProgramType type)
 	mType				= type;
 	mEntryPointFunction = NULL;
 	mSkeletalAnimation	= false;
+	mColumnMajorMatrices = true;
 }
 
 //-----------------------------------------------------------------------------

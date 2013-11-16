@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreManualObject.h"
+#include "OgreNameGenerator.h"
 
 namespace Ogre {
 
@@ -537,13 +538,15 @@ namespace Ogre {
 	void Node::_setDerivedPosition( const Vector3& pos )
 	{
 		//find where the node would end up in parent's local space
-		setPosition( mParent->convertWorldToLocalPosition( pos ) );
+        if(mParent)
+            setPosition( mParent->convertWorldToLocalPosition( pos ) );
 	}
 	//-----------------------------------------------------------------------
 	void Node::_setDerivedOrientation( const Quaternion& q )
 	{
 		//find where the node would end up in parent's local space
-		setOrientation( mParent->convertWorldToLocalOrientation( q ) );
+        if(mParent)
+            setOrientation( mParent->convertWorldToLocalOrientation( q ) );
 	}
 
     //-----------------------------------------------------------------------
@@ -928,9 +931,9 @@ namespace Ogre {
 
 			// indices
 			// 6 arrows
-			for (size_t i = 0; i < 6; ++i)
+			for (uint32 i = 0; i < 6; ++i)
 			{
-				size_t base = i * 7; 
+				uint32 base = i * 7;
 				mo.triangle(base + 0, base + 1, base + 2);
 				mo.triangle(base + 0, base + 2, base + 3);
 				mo.triangle(base + 4, base + 5, base + 6);

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
+#define KTX_ENDIAN_REF      (0x04030201)
+#define KTX_ENDIAN_REF_REV  (0x01020304)
 
 // In a PKM-file, the codecs are stored using the following identifiers
 //
@@ -152,17 +154,15 @@ namespace Ogre {
     Codec::DecodeResult ETCCodec::decode(DataStreamPtr& stream) const
     {
         DecodeResult ret;
-		if (!decodePKM(stream, ret))
-		{
-			stream->seek(0);
-			if (!decodeKTX(stream, ret))
-			{
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "This is not a ETC file!", "ETCCodec::decode");
-			}
-		}
+		if (decodeKTX(stream, ret))
+			return ret;
 
-		return ret;
+		stream->seek(0);
+		if (decodePKM(stream, ret))
+			return ret;
+
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                    "This is not a valid ETC file!", "ETCCodec::decode");
     }
     //---------------------------------------------------------------------    
     String ETCCodec::getType() const 
@@ -202,18 +202,14 @@ namespace Ogre {
 			flipEndian(&fileType, sizeof(uint32), 1);
 
 			if (PKM_MAGIC == fileType)
-			{
 				return String("pkm");
-			}
-			else if (KTX_MAGIC == fileType)
-            {
+		
+			if (KTX_MAGIC == fileType)
                 return String("ktx");
-            }
 		}
 
 		return StringUtil::BLANK;
 	}
-
     //---------------------------------------------------------------------
 	bool ETCCodec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const
 	{
@@ -223,10 +219,7 @@ namespace Ogre {
         stream->read(&header, sizeof(PKMHeader));
 
         if (PKM_MAGIC != FOURCC(header.name[0], header.name[1], header.name[2], header.name[3]) ) // "PKM 10"
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This is not a ETC file!", "ETCCodec::decodePKM");
-        }
+            return false;
 
         uint16 width = (header.iWidthMSB << 8) | header.iWidthLSB;
         uint16 height = (header.iHeightMSB << 8) | header.iHeightLSB;
@@ -296,7 +289,6 @@ namespace Ogre {
 
         return true;
     }
-
     //---------------------------------------------------------------------
 	bool ETCCodec::decodeKTX(DataStreamPtr& stream, DecodeResult& result) const
 	{
@@ -308,15 +300,52 @@ namespace Ogre {
 		if (memcmp(KTXFileIdentifier, &header.identifier, sizeof(KTXFileIdentifier)) != 0 )
 			return false;
 
+		if (header.endianness == KTX_ENDIAN_REF_REV)
+			flipEndian(&header.glType, sizeof(uint32), 1);
+
         ImageData *imgData = OGRE_NEW ImageData();
         imgData->depth = 1;
         imgData->width = header.pixelWidth;
         imgData->height = header.pixelHeight;
-        imgData->format = PF_ETC1_RGB8;
 		imgData->num_mipmaps = static_cast<ushort>(header.numberOfMipmapLevels - 1);
 
-		// ETC1 is a compressed format
-        imgData->flags |= IF_COMPRESSED;
+		switch(header.glInternalFormat)
+		{
+		case 37492: // GL_COMPRESSED_RGB8_ETC2
+            imgData->format = PF_ETC2_RGB8;
+			break;
+        case 37496:// GL_COMPRESSED_RGBA8_ETC2_EAC
+			imgData->format = PF_ETC2_RGBA8;
+            break;
+		case 37494: // GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2
+            imgData->format = PF_ETC2_RGB8A1;
+			break;
+		case 35986: // ATC_RGB
+			imgData->format = PF_ATC_RGB;
+			break;
+		case 35987: // ATC_RGB_Explicit
+			imgData->format = PF_ATC_RGBA_EXPLICIT_ALPHA;
+			break;
+		case 34798: // ATC_RGB_Interpolated
+			imgData->format = PF_ATC_RGBA_INTERPOLATED_ALPHA;
+			break;
+		case 33777: // DXT 1
+	        imgData->format = PF_DXT1;
+			break;
+		case 33778: // DXT 3
+	        imgData->format = PF_DXT3;
+			break;
+		case 33779: // DXT 5
+	        imgData->format = PF_DXT5;
+			break;
+		default:		
+	        imgData->format = PF_ETC1_RGB8;
+			break;
+		}
+		
+		imgData->flags = 0;
+		if (header.glType == 0 || header.glFormat == 0)
+	        imgData->flags |= IF_COMPRESSED;
 
 		size_t numFaces = 1; // Assume one face until we know otherwise
                              // Calculate total size from number of mipmaps, faces and size

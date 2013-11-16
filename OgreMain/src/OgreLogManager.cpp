@@ -124,7 +124,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void LogManager::destroyLog(Log* log)
 	{
-		destroyLog(log->getName());
+        if(!log)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null log.", "LogManager::destroyLog");
+
+        destroyLog(log->getName());
 	}
     //-----------------------------------------------------------------------
     void LogManager::logMessage( const String& message, LogMessageLevel lml, bool maskDebug)

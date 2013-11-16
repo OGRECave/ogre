@@ -404,7 +404,7 @@ protected:
 	{
 		// If when you finish the application is still raining there
  		// are water circles that are still being processed
- 		unsigned int activeCircles = this->circles.size ();
+ 		unsigned int activeCircles = (unsigned int)this->circles.size ();
         
  		// Kill the active water circles
  		for (unsigned int i = 0; i < activeCircles; i++)

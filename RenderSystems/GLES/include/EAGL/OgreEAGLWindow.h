@@ -96,7 +96,7 @@ namespace Ogre {
 
             void setVisible(bool visible) { mVisible = visible; }
             void setClosed(bool closed) { mClosed = closed; }
-            void swapBuffers(bool waitForVSync);
+            void swapBuffers(void);
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 
             /**

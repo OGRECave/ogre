@@ -283,7 +283,7 @@ namespace Ogre
 			};
 
 			int maxAttribs[] = {
-				GLX_SAMPLES,		samples,
+				GLX_SAMPLES,		static_cast<int>(samples),
 				GLX_DOUBLEBUFFER,   1,
 				GLX_STENCIL_SIZE,   INT_MAX,
 				GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, 1,
@@ -291,6 +291,11 @@ namespace Ogre
 			};
 
 			fbConfig = mGLSupport->selectFBConfig(minAttribs, maxAttribs);
+
+			// Now check the actual supported fsaa value
+			GLint maxSamples;
+			mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &maxSamples);
+			mFSAA = maxSamples;
 
 			if (gamma != 0)
 			{
@@ -655,7 +660,7 @@ namespace Ogre
 	}
 
 	//-------------------------------------------------------------------------------------------------//
-	void GLXWindow::swapBuffers(bool waitForVSync)
+	void GLXWindow::swapBuffers()
 	{
 		if (mClosed || mIsExternalGLControl)
 			return;
@@ -704,8 +709,8 @@ namespace Ogre
 		if (mClosed)
 			return;
 
-		if ((dst.left < 0) || (dst.right > mWidth) ||
-			(dst.top < 0) || (dst.bottom > mHeight) ||
+		if ((dst.right > mWidth) ||
+			(dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory" );
@@ -728,34 +733,21 @@ namespace Ogre
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 		
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
 		// Must change the packing to ensure no overruns!
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-					 format, type, dst.data);
+        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
 		
 		// restore default alignment
 		glPixelStorei(GL_PACK_ALIGNMENT, 4);
-
-		//vertical flip
-		{
-			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-			size_t height = dst.getHeight();
-			uchar *tmpData = new uchar[rowSpan * height];
-			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-
-			while (tmpRow >= tmpData)
-			{
-				memcpy(tmpRow, srcRow, rowSpan);
-				srcRow += rowSpan;
-				tmpRow -= rowSpan;
-			}
-			memcpy(dst.data, tmpData, rowSpan * height);
-
-			delete [] tmpData;
-		}
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+        
+        PixelUtil::bulkPixelVerticalFlip(dst);
 	}
 
 	//-------------------------------------------------------------------------------------------------//

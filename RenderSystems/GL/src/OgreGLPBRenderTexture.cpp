@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
-    GLPBuffer::GLPBuffer(PixelComponentType format, size_t width, size_t height):
+    GLPBuffer::GLPBuffer(PixelComponentType format, uint32 width, uint32 height):
         mFormat(format),
         mWidth(width),
         mHeight(height)
@@ -118,7 +118,7 @@ namespace Ogre {
             static_cast<GLTextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
     }
     
-    void GLPBRTTManager::requestPBuffer(PixelComponentType ctype, size_t width, size_t height)
+    void GLPBRTTManager::requestPBuffer(PixelComponentType ctype, uint32 width, uint32 height)
     {
         //Check size
         if(mPBuffers[ctype].pb)
@@ -149,7 +149,7 @@ namespace Ogre {
         }
     }
     
-    GLContext *GLPBRTTManager::getContextFor(PixelComponentType ctype, size_t width, size_t height)
+    GLContext *GLPBRTTManager::getContextFor(PixelComponentType ctype, uint32 width, uint32 height)
     {
         // Faster to return main context if the RTT is smaller than the window size
         // and ctype is PCT_BYTE. This must be checked every time because the window might have been resized

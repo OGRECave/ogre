@@ -147,7 +147,7 @@ namespace Ogre {
             @param destVertexBuffer The destination vertex buffer in which to build the patch.
             @param vertexStart The offset at which to start writing vertices for this patch
             @param destIndexBuffer The destination index buffer in which to build the patch.
-            @param vertexStart The offset at which to start writing indexes for this patch
+            @param indexStart The offset at which to start writing indexes for this patch
 
         */
         void build(HardwareVertexBufferSharedPtr destVertexBuffer, size_t vertexStart,

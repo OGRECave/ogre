@@ -255,8 +255,6 @@ if (OGRE_CONFIG_ENABLE_ZIP)
 
   if(ANDROID)
     ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
-    list(APPEND PLATFORM_HEADERS include/Android/OgreAPKZipArchive.h)
-    list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
 
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
@@ -289,6 +287,10 @@ if(WIN32 AND MSVC10 AND CMAKE_CL_64)
                       )
 else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
+endif()
+
+if(OGRE_GCC_VERSION VERSION_GREATER 4.7)
+  list(APPEND LIBRARIES "-latomic")
 endif()
 
 if (APPLE)

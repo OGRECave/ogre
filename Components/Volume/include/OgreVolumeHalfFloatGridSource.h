@@ -53,7 +53,7 @@ namespace Volume {
         
         /** Overridden from GridSource.
         */
-        virtual float getVolumeGridValue(int x, int y, int z) const;
+        virtual float getVolumeGridValue(size_t x, size_t y, size_t z) const;
 
         /** Overridden from GridSource.
         */
@@ -62,7 +62,7 @@ namespace Volume {
     public:
 
         /** Constructur.
-        @param volumeSerializationName
+        @param serializedVolumeFile
             Which volume serialization to get the data from.
         @param trilinearValue
             Whether to use trilinear filtering (true) or nearest neighbour (false) for the value.

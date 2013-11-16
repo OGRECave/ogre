@@ -65,7 +65,7 @@ namespace Ogre {
 		}
     }
 
-	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
+	void GLFBORenderTexture::swapBuffers()
 	{
 		mFB.swapBuffers();
 	}
@@ -135,7 +135,7 @@ static const size_t depthBits[] =
 	{
 		if(!mRenderBufferMap.empty())
 		{
-			LogManager::getSingleton().logMessage("GL: Warning! GLFBOManager destructor called, but not all renderbuffers were released.");
+			LogManager::getSingleton().logMessage("GL: Warning! GLFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
 		}
         
         glDeleteFramebuffersEXT(1, &mTempFBO);      
@@ -143,10 +143,16 @@ static const size_t depthBits[] =
 
     void GLFBOManager::_createTempFramebuffer(GLuint fmt, GLuint &fb, GLuint &tid)
     {
+        // NB we bypass state cache, this method is only called on startup and not after
+        // GLStateCacheManager::initializeCache
+
         glGenFramebuffersEXT(1, &fb);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-        if (fmt!=GL_NONE)
+        if (fmt != GL_NONE)
         {
+            if (tid)
+                glDeleteTextures(1, &tid);
+
             // Create and attach texture
             glGenTextures(1, &tid);
             glBindTexture(GL_TEXTURE_2D, tid);
@@ -289,7 +295,7 @@ static const size_t depthBits[] =
 
 			// Fetch GL format token
 			GLenum fmt = GLPixelUtil::getGLInternalFormat((PixelFormat)x);
-            if(fmt == GL_NONE && x!=0)
+            if(fmt == GL_NONE && x != 0)
                 continue;
 
 			// No test for compressed formats
@@ -410,8 +416,11 @@ static const size_t depthBits[] =
 			// see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
 			glFinish();
 			
-            if (fmt!=GL_NONE)
+            if (fmt != GL_NONE)
+            {
                 glDeleteTextures(1, &tid);
+                tid = 0;
+            }
         }
 
         // It seems a bug in nVidia driver: glBindFramebufferEXT should restore
@@ -495,7 +504,7 @@ static const size_t depthBits[] =
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
     
-    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLSurfaceDesc GLFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested

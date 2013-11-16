@@ -168,6 +168,8 @@ namespace Ogre  {
                 return GL_COMPRESSED_SIGNED_RED_RGTC1;
             case PF_BC5_UNORM:
                 return GL_COMPRESSED_RG_RGTC2;
+            case PF_BC5_SNORM:
+                return GL_COMPRESSED_SIGNED_RG_RGTC2;
             case PF_BC6H_SF16:
                 return GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB;
             case PF_BC6H_UF16:

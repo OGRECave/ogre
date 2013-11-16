@@ -102,7 +102,7 @@ namespace Ogre {
             Note the use of the material handle rather than the material
             name - this is for efficiency since there will be many of these.
         */
-        int materialHandle;
+        ResourceHandle materialHandle;
 
         Plane plane;
 

@@ -34,14 +34,16 @@ namespace Ogre
     OSXCocoaContext::OSXCocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
       : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
 	{
-		[mNSGLPixelFormat retain];
+        if(mNSGLPixelFormat)
+            [mNSGLPixelFormat retain];
 	}
 	    
 	OSXCocoaContext::~OSXCocoaContext()
 	{
 		_unregisterContext();
 		
-		[mNSGLPixelFormat release];
+        if(mNSGLPixelFormat)
+            [mNSGLPixelFormat release];
     }
 
     void OSXCocoaContext::setCurrent()

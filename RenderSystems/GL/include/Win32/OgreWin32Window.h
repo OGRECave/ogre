@@ -54,7 +54,7 @@ namespace Ogre {
         bool isClosed(void) const;
         void reposition(int left, int top);
         void resize(unsigned int width, unsigned int height);
-        void swapBuffers(bool waitForVSync);
+        void swapBuffers();
 
 		/** Overridden - see RenderTarget. */
 		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);

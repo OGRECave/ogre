@@ -7,9 +7,6 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class ShaderSystemListener;
-class ShaderSystemApplication;
-
 // Lighting models.
 enum ShaderSystemLightingModel
 {
@@ -155,7 +152,7 @@ protected:
 	void generateShaders(Entity* entity);
 
 	/** @see Sample::setupView. */
-	virtual void setupView();
+//	virtual void setupView();
 
 	/** @see Sample::setupContent. */
 	virtual void setupContent();

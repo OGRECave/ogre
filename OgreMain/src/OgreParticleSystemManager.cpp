@@ -275,6 +275,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyEmitter(ParticleEmitter* emitter)
     {
+        if(!emitter)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleEmitter.", "ParticleSystemManager::_destroyEmitter");
+
         OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleEmitterFactoryMap::iterator pFact = mEmitterFactories.find(emitter->getType());
@@ -307,6 +310,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyAffector(ParticleAffector* affector)
     {
+        if(!affector)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleAffector.", "ParticleSystemManager::_destroyAffector");
+
         OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleAffectorFactoryMap::iterator pFact = mAffectorFactories.find(affector->getType());
@@ -322,7 +328,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystemRenderer* ParticleSystemManager::_createRenderer(const String& rendererType)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
         // Locate affector type
         ParticleSystemRendererFactoryMap::iterator pFact = mRendererFactories.find(rendererType);
 
@@ -337,7 +343,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyRenderer(ParticleSystemRenderer* renderer)
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        if(!renderer)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleSystemRenderer.", "ParticleSystemManager::_destroyRenderer");
+
+        OGRE_LOCK_AUTO_MUTEX;
         // Destroy using the factory which created it
         ParticleSystemRendererFactoryMap::iterator pFact = mRendererFactories.find(renderer->getType());
 
@@ -433,14 +442,14 @@ namespace Ogre {
                 if (!renderer->setParameter(vecparams[0], vecparams[1]))
                 {
                     LogManager::getSingleton().logMessage("Bad particle system attribute line: '"
-                        + line + "' in " + sys->getName() + " (tried renderer)");
+                        + line + "' in " + sys->getName() + " (tried renderer)", LML_CRITICAL);
                 }
             }
             else
             {
                 // BAD command. BAD!
                 LogManager::getSingleton().logMessage("Bad particle system attribute line: '"
-                    + line + "' in " + sys->getName() + " (no renderer)");
+                    + line + "' in " + sys->getName() + " (no renderer)", LML_CRITICAL);
             }
         }
     }
@@ -455,7 +464,7 @@ namespace Ogre {
         {
             // BAD command. BAD!
             LogManager::getSingleton().logMessage("Bad particle emitter attribute line: '"
-                + line + "' for emitter " + emit->getType());
+                + line + "' for emitter " + emit->getType(), LML_CRITICAL);
         }
     }
     //-----------------------------------------------------------------------
@@ -469,7 +478,7 @@ namespace Ogre {
         {
             // BAD command. BAD!
             LogManager::getSingleton().logMessage("Bad particle affector attribute line: '"
-                + line + "' for affector " + aff->getType());
+                + line + "' for affector " + aff->getType(), LML_CRITICAL);
         }
     }
     //-----------------------------------------------------------------------

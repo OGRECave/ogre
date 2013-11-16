@@ -366,10 +366,11 @@ namespace Ogre {
 	{
 		String name = String("CG_") + mName;
 		size_t programStringSize = mProgramString.size();
-        size_t sizeOfMicrocode = sizeof(size_t) +   // size of mProgramString
-							     programStringSize + // microcode - mProgramString
-							     sizeof(size_t) + // size of param map
-							     mParametersMapSizeAsBuffer;
+        uint32 sizeOfMicrocode = static_cast<uint32>(
+                                                     sizeof(size_t) +   // size of mProgramString
+                                                     programStringSize + // microcode - mProgramString
+                                                     sizeof(size_t) + // size of param map
+                                                     mParametersMapSizeAsBuffer);
 
 		// create microcode
 		GpuProgramManager::Microcode newMicrocode = 
@@ -1094,6 +1095,8 @@ namespace Ogre {
                 case CG_TEXUNIT30: pos = 30; break;
                 case CG_TEXUNIT31: pos = 31; break;
 #endif
+                default:
+                    break;
                 }
                 if (pos != -1)
                 {

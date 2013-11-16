@@ -48,7 +48,7 @@ protected:
 
     virtual Ogre::String getOutput()
     {
-        std::stringstream out;
+        StringStream out;
 
         for(size_t i = 0; i < mResults->size(); ++i)
         {

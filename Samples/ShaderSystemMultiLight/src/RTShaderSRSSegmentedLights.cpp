@@ -32,7 +32,7 @@ RTShaderSRSSegmentedLights::RTShaderSRSSegmentedLights()
 	mTrackVertexColourType			= TVC_NONE;	
 	mSpecularEnable					= false;
 	mUseSegmentedLightTexture		= false;
-	m_LightSamplerIndex = -1;
+	mLightSamplerIndex = 0;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
 	msBlankLight.setSpecularColour(ColourValue::Black);
@@ -56,7 +56,7 @@ int	RTShaderSRSSegmentedLights::getExecutionOrder() const
 void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {
-	if ((mLightParamsList.size() == 0) && (!mUseSegmentedLightTexture))
+	if ((mLightParamsList.empty()) && (!mUseSegmentedLightTexture))
 		return;
 
 	const Matrix4& matWorld = source->getWorldMatrix();
@@ -188,15 +188,12 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
 		mPSLightTextureIndexLimit->setGpuParameter(Ogre::Vector2((Ogre::Real)indexStart, (Ogre::Real)indexEnd));
 		mPSLightTextureLightBounds->setGpuParameter(lightBounds);
 
-		if (m_LightSamplerIndex != -1)
-		{
-			Ogre::TextureUnitState* pLightTexture = pass->getTextureUnitState(m_LightSamplerIndex);
-			const Ogre::String& textureName = SegmentedDynamicLightManager::getSingleton().getSDLTextureName();
-			if (textureName != pLightTexture->getTextureName())
-			{
-				pLightTexture->setTextureName(textureName, Ogre::TEX_TYPE_2D);
-			}
-		}
+        Ogre::TextureUnitState* pLightTexture = pass->getTextureUnitState(mLightSamplerIndex);
+        const Ogre::String& textureName = SegmentedDynamicLightManager::getSingleton().getSDLTextureName();
+        if (textureName != pLightTexture->getTextureName())
+        {
+            pLightTexture->setTextureName(textureName, Ogre::TEX_TYPE_2D);
+        }
 	}
 }
 
@@ -376,7 +373,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
 	{
 		mPSLightTextureIndexLimit = psProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_PER_OBJECT, "LightTextureIndexLimits");
 		mPSLightTextureLightBounds = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_PER_OBJECT, "LightTextureBounds");
-		mPSSegmentedLightTexture = psProgram->resolveParameter(Ogre::GCT_SAMPLER2D, m_LightSamplerIndex, (Ogre::uint16)Ogre::GPV_GLOBAL, "segmentedLightTexture");
+		mPSSegmentedLightTexture = psProgram->resolveParameter(Ogre::GCT_SAMPLER2D, mLightSamplerIndex, (Ogre::uint16)Ogre::GPV_GLOBAL, "segmentedLightTexture");
 	}
 
 	return true;
@@ -853,7 +850,7 @@ bool RTShaderSRSSegmentedLights::preAddToRenderState(const RenderState* renderSt
 		Ogre::TextureUnitState* pLightTexture = dstPass->createTextureUnitState();
 		pLightTexture->setTextureName(SegmentedDynamicLightManager::getSingleton().getSDLTextureName(), Ogre::TEX_TYPE_2D);
 		pLightTexture->setTextureFiltering(Ogre::TFO_NONE);
-		m_LightSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
+		mLightSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 	}
 
 

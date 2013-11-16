@@ -63,11 +63,7 @@ void TerrainTests::setUp()
 	cf.load("resources.cfg");
 #endif
 #else
-	#ifdef OGRE_STATIC_LIB
 	cf.load("bin/resources.cfg");
-	#else
-	cf.load("resources.cfg");
-	#endif
 #endif
 
 	// Go through all sections & settings in the file

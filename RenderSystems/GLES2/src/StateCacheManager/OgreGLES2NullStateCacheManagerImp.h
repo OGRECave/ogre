@@ -82,10 +82,19 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.bindGLTexture.
         void bindGLTexture(GLenum target, GLuint texture);
-        
+
+        /// See GLES2StateCacheManager.invalidateStateForTexture.
+        void invalidateStateForTexture(GLuint texture);
+
         /// See GLES2StateCacheManager.setTexParameteri.
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
-        
+
+        /// See GLES2StateCacheManager.setTexParameterf.
+        void setTexParameterf(GLenum target, GLenum pname, GLfloat params);
+
+        /// See GLES2StateCacheManager.getTexParameterfv.
+        void getTexParameterfv(GLenum target, GLenum pname, GLfloat *params);
+
         /// See GLES2StateCacheManager.activateGLTextureUnit.
         bool activateGLTextureUnit(unsigned char unit);
         
@@ -136,7 +145,13 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.setDisabled.
         void setDisabled(GLenum flag);
-        
+
+        /// See GLES2StateCacheManager.setVertexAttribEnabled.
+        void setVertexAttribEnabled(GLuint attrib);
+
+        /// See GLES2StateCacheManager.setVertexAttribDisabled.
+        void setVertexAttribDisabled(GLuint attrib);
+
         /// See GLES2StateCacheManager.getDiscardBuffers.
         unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
         

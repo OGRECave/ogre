@@ -41,7 +41,7 @@ namespace Ogre {
     {
         public:
             GLESHardwarePixelBuffer *buffer;
-            size_t zoffset;
+            uint zoffset;
             uint numSamples;
 
             GLESSurfaceDesc() :buffer(0), zoffset(0), numSamples(0) {}

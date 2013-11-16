@@ -192,9 +192,9 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
 
-			material = MaterialManager::getSingleton().getByName("BaseWhite");
+            material = MaterialManager::getSingleton().getByName("BaseWhite");
 
 			if (material.isNull())
 			{
@@ -976,7 +976,7 @@ namespace Ogre {
 	ShadowCaster::ShadowRenderableListIterator
 	ManualObject::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
-		HardwareIndexBufferSharedPtr* indexBuffer,
+		HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
 		assert(indexBuffer && "Only external index buffers are supported right now");		
@@ -1058,8 +1058,8 @@ namespace Ogre {
 		updateEdgeListLightFacing(edgeList, lightPos);
 
 		// Generate indexes and update renderables
-		generateShadowVolume(edgeList, *indexBuffer, light,
-			mShadowRenderables, flags);
+		generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
+			light, mShadowRenderables, flags);
 
 
 		return ShadowRenderableListIterator(
@@ -1100,7 +1100,7 @@ namespace Ogre {
 		{
 			// Load from default group. If user wants to use alternate groups,
 			// they can define it and preload
-			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName);
+			mMaterial = MaterialManager::getSingleton().load(mMaterialName, mGroupName).staticCast<Material>();
 		}
 		return mMaterial;
 	}

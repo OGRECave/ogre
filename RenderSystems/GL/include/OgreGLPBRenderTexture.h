@@ -75,7 +75,7 @@ namespace Ogre {
         
         /** Create PBuffer for a certain pixel format and size
         */
-        void requestPBuffer(PixelComponentType ctype, size_t width, size_t height);
+        void requestPBuffer(PixelComponentType ctype, uint32 width, uint32 height);
         
         /** Release PBuffer for a certain pixel format
         */
@@ -83,7 +83,7 @@ namespace Ogre {
         
         /** Get GL rendering context for a certain component type and size.
         */
-        GLContext *getContextFor(PixelComponentType ctype, size_t width, size_t height);
+        GLContext *getContextFor(PixelComponentType ctype, uint32 width, uint32 height);
     protected:
         /** GLSupport reference, used to create PBuffers */
         GLSupport *mSupport;

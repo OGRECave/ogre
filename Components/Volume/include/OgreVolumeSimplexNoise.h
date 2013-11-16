@@ -100,10 +100,10 @@ namespace Volume {
         /** 3D noise function.
         @param xIn
             The first dimension parameter.
-        @param xIn
-            The first dimension parameter.
-        @param xIn
-            The first dimension parameter.
+        @param yIn
+            The second dimension parameter.
+        @param zIn
+            The third dimension parameter.
         @return
             The noise value.
         */

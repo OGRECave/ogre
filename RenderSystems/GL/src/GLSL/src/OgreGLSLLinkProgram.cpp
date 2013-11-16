@@ -118,6 +118,8 @@ namespace Ogre {
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
 	{
+        // Initialise uniform cache
+		mUniformCache = new GLUniformCache();
 	}
 
 	//-----------------------------------------------------------------------
@@ -125,6 +127,8 @@ namespace Ogre {
 	{
 		glDeleteObjectARB(mGLHandle);
 
+        delete mUniformCache;
+        mUniformCache = 0;
 	}
 
 	//-----------------------------------------------------------------------
@@ -186,12 +190,11 @@ namespace Ogre {
 		glProgramBinary(mGLHandle, 
 						binaryFormat, 
 						programBuffer,
-						sizeOfBuffer
+						static_cast<GLsizei>(sizeOfBuffer)
 						);
 
-		GLint   success = 0;
-        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &success);
-        if (!success)
+        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &mLinked);
+        if (!mLinked)
         {
             //
             // Something must have changed since the program binaries
@@ -284,6 +287,35 @@ namespace Ogre {
 				{
 
 					GLsizei glArraySize = (GLsizei)def->arraySize;
+
+                    bool shouldUpdate = true;
+
+                    switch (def->constType)
+                    {
+                        case GCT_INT1:
+                        case GCT_INT2:
+                        case GCT_INT3:
+                        case GCT_INT4:
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getIntPointer(def->physicalIndex),
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
+                            break;
+                        default:
+                            shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
+                                                                        params->getFloatPointer(def->physicalIndex),
+                                                                        static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
+                            break;
+
+                    }
+
+                    if(!shouldUpdate)
+                        continue;
 
 					// get the index in the parameter real list
 					switch (def->constType)
@@ -386,6 +418,7 @@ namespace Ogre {
 							(GLint*)params->getIntPointer(def->physicalIndex));
 						break;
                     case GCT_UNKNOWN:
+                    default:
                         break;
 
 					} // end switch
@@ -417,9 +450,12 @@ namespace Ogre {
 				// get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-					glUniform1fvARB( currentUniform->mLocation, 1, params->getFloatPointer(index));
-					// there will only be one multipass entry
-					return;
+                    if(!mUniformCache->updateUniform(currentUniform->mLocation,
+                                                     params->getFloatPointer(index),
+                                                     static_cast<GLsizei>(currentUniform->mConstantDef->elementSize *
+                                                     currentUniform->mConstantDef->arraySize *
+                                                     sizeof(float))))
+                        return;
 				}
 			}
 		}
@@ -518,25 +554,15 @@ namespace Ogre {
 			//Don't set adjacency flag. We handle it internally and expose "false"
 
 			RenderOperation::OperationType inputOperationType = mGeometryProgram->getGLSLProgram()->getInputOperationType();
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_INPUT_TYPE_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
 				getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
 
 			RenderOperation::OperationType outputOperationType = mGeometryProgram->getGLSLProgram()->getOutputOperationType();
-			switch (outputOperationType)
-			{
-			case RenderOperation::OT_POINT_LIST:
-			case RenderOperation::OT_LINE_STRIP:
-			case RenderOperation::OT_TRIANGLE_STRIP:
-			case RenderOperation::OT_LINE_LIST:
-			case RenderOperation::OT_TRIANGLE_LIST:
-			case RenderOperation::OT_TRIANGLE_FAN:
-				break;
 
-			}
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_OUTPUT_TYPE_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
 				getGLGeometryOutputPrimitiveType(outputOperationType));
 
-			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_VERTICES_OUT_EXT,
+			glProgramParameteriEXT(mGLHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
 				mGeometryProgram->getGLSLProgram()->getMaxOutputVertices());
 		}
 
@@ -558,8 +584,19 @@ namespace Ogre {
 		glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
 		mTriedToLinkAndFailed = !mLinked;
 
+		if(mTriedToLinkAndFailed == true)
+		{
+			GLchar *msg = NULL;
+			GLint length;
+			glGetProgramiv(mGLHandle, GL_INFO_LOG_LENGTH, &length);
+			msg = new GLchar[length];
+			glGetProgramInfoLog(mGLHandle, length, NULL, msg);
+			logObjectInfo( getCombinedName() + String(", Error linking program: ") + msg, mGLHandle );
+			delete msg;
+		}
+		
 		// force logging and raise exception if not linked
-        GLenum glErr = glGetError();
+		GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)
         {
 		    reportGLSLError( glErr, "GLSLLinkProgram::compileAndLink",

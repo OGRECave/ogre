@@ -43,6 +43,9 @@ namespace Ogre {
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
 	class GL3PlusDepthBuffer;
+
+    typedef SharedPtr<GL3PlusGpuProgram> GL3PlusGpuProgramPtr;
+    typedef SharedPtr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -120,8 +123,9 @@ namespace Ogre {
             default:                                                            break; \
         } \
         char msgBuf[4096]; \
-        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, #glFunc); \
-        LogManager::getSingleton().logMessage(msgBuf); \
+        StringVector tokens = StringUtil::split(#glFunc, "("); \
+        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
+        LogManager::getSingleton().logMessage(msgBuf, LML_CRITICAL); \
     } \
 }
 #else

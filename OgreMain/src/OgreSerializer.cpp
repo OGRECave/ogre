@@ -366,7 +366,12 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Serializer::writeObject(const Quaternion& q)
     {
-        float tmp[4] = { q.x, q.y, q.z, q.w };
+        float tmp[4] = {
+            static_cast<float>(q.x),
+            static_cast<float>(q.y),
+            static_cast<float>(q.z),
+            static_cast<float>(q.w)
+        };
         writeFloats(tmp, 4);
     }
     //---------------------------------------------------------------------

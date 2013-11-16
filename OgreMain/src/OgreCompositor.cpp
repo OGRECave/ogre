@@ -240,7 +240,7 @@ void Compositor::createGlobalTextures()
 			if (def->pooled) 
 			{
 				LogManager::getSingleton().logMessage(
-					"Pooling global compositor textures has no effect");
+					"Pooling global compositor textures has no effect", LML_CRITICAL);
 			}
 			globalTextureNames.insert(def->name);
 

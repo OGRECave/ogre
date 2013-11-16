@@ -120,7 +120,7 @@ bool CPreprocessor::Token::GetValue (long &oValue) const
 
     for (; i < Length; i++)
     {
-        long c = long (String [i]);
+        int c = int (String [i]);
         if (isspace (c))
             // Possible end of number
             break;
@@ -179,7 +179,7 @@ int CPreprocessor::Token::CountNL ()
         return 0;
 
     const char *s = String;
-    int l = Length;
+    size_t l = Length;
     int c = 0;
     while (l > 0)
     {
@@ -238,7 +238,7 @@ static void DefaultError (void *iData, int iLine, const char *iError,
                   iLine, iError, int (iTokenLen), iToken);
     else
         snprintf (line, sizeof (line), "line %d: %s\n", iLine, iError);
-    LogManager::getSingleton ().logMessage (line);
+    LogManager::getSingleton ().logMessage (line, LML_CRITICAL);
 }
 
 //---------------------------------------------------------------------------//
@@ -766,7 +766,7 @@ CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand)
         }
     }
 
-    uint len = oArg.Length;
+    size_t len = oArg.Length;
     while (true)
     {
         Token t = GetToken (iExpand);

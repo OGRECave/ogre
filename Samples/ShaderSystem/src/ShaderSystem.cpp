@@ -269,16 +269,16 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::setupView()
-{	
-	// setup default viewport layout and camera
-	mCamera = mSceneMgr->createCamera("MainCamera");
-	mViewport = mWindow->addViewport(mCamera);
-	mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
-	mCamera->setNearClipDistance(5);
-
-	mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
-}
+//void Sample_ShaderSystem::setupView()
+//{	
+//	// setup default viewport layout and camera
+//	mCamera = mSceneMgr->createCamera("MainCamera");
+//	mViewport = mWindow->addViewport(mCamera);
+//	mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+//	mCamera->setNearClipDistance(5);
+//
+//	mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
+//}
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
@@ -920,7 +920,7 @@ void Sample_ShaderSystem::addModelToScene(const String &  modelName)
 	    mLotsOfModelsNodes.push_back(childNode);
 	    childNode->setPosition(mNumberOfModelsAdded * scaleFactor, 15,  i * scaleFactor);
 	    childNode->attachObject(entity);
-        MeshPtr modelMesh = MeshManager::getSingleton().getByName(modelName);
+		MeshPtr modelMesh = MeshManager::getSingleton().getByName(modelName);
         Vector3 modelSize = modelMesh->getBounds().getSize();
         childNode->scale(1 / modelSize.x * scaleFactor, 
                          1 / modelSize.y * scaleFactor, 

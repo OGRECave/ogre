@@ -116,7 +116,7 @@ namespace Ogre {
 				"Image::flipAroundY" );
 		}
         
-         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
+        mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
 		uchar	*pTempBuffer1 = NULL;
 		ushort	*pTempBuffer2 = NULL;
@@ -232,10 +232,10 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	Image& Image::loadDynamicImage( uchar* pData, size_t uWidth, size_t uHeight, 
-		size_t depth,
+	Image& Image::loadDynamicImage( uchar* pData, uint32 uWidth, uint32 uHeight,
+		uint32 depth,
 		PixelFormat eFormat, bool autoDelete, 
-		size_t numFaces, size_t numMipMaps)
+		size_t numFaces, uint8 numMipMaps)
 	{
 
 		freeMemory();
@@ -270,7 +270,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Image & Image::loadRawData(
 		DataStreamPtr& stream, 
-		size_t uWidth, size_t uHeight, size_t uDepth,
+		uint32 uWidth, uint32 uHeight, uint32 uDepth,
 		PixelFormat eFormat,
 		size_t numFaces, size_t numMipMaps)
 	{
@@ -466,7 +466,7 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	size_t Image::getNumMipmaps() const
+	uint8 Image::getNumMipmaps() const
 	{
 		return mNumMipmaps;
 	}
@@ -485,18 +485,18 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	size_t Image::getDepth() const
+	uint32 Image::getDepth() const
 	{
 		return mDepth;
 	}
 	//-----------------------------------------------------------------------------
-	size_t Image::getWidth() const
+	uint32 Image::getWidth() const
 	{
 		return mWidth;
 	}
 
 	//-----------------------------------------------------------------------------
-	size_t Image::getHeight() const
+	uint32 Image::getHeight() const
 	{
 		return mHeight;
 	}
@@ -544,7 +544,7 @@ namespace Ogre {
 		uchar gammaramp[256];
 		const Real exponent = 1.0f / gamma;
 		for(int i = 0; i < 256; i++) {
-			gammaramp[i] = Math::Pow(i/255.0f, exponent)*255+0.5f;
+			gammaramp[i] = static_cast<uchar>(Math::Pow(i/255.0f, exponent)*255+0.5f);
 		}
 
 		for( size_t i = 0, j = size / stride; i < j; i++, buffer += stride )
@@ -715,13 +715,13 @@ namespace Ogre {
         // Calculate mipmap offset and size
         uint8 *offset = const_cast<uint8*>(getData());
 		// Base offset is number of full faces
-        size_t width = getWidth(), height=getHeight(), depth=getDepth();
+        uint32 width = getWidth(), height=getHeight(), depth=getDepth();
 		size_t numMips = getNumMipmaps();
 
 		// Figure out the offsets 
 		size_t fullFaceSize = 0;
 		size_t finalFaceSize = 0;
-		size_t finalWidth = 0, finalHeight = 0, finalDepth = 0;
+		uint32 finalWidth = 0, finalHeight = 0, finalDepth = 0;
 		for(size_t mip=0; mip <= numMips; ++mip)
         {
 			if (mip == mipmap)
@@ -746,7 +746,7 @@ namespace Ogre {
 		return src;
 	}
     //-----------------------------------------------------------------------------    
-    size_t Image::calculateSize(size_t mipmaps, size_t faces, size_t width, size_t height, size_t depth, 
+    size_t Image::calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, 
         PixelFormat format)
     {
         size_t size = 0;
@@ -844,7 +844,7 @@ namespace Ogre {
 
 		for (size_t face = 0; face < numFaces; ++face)
 		{
-			for (size_t mip = 0; mip <= mNumMipmaps; ++mip)
+			for (uint8 mip = 0; mip <= mNumMipmaps; ++mip)
 			{
 				// convert the RGB first
 				PixelBox srcRGB = rgb.getPixelBox(face, mip);

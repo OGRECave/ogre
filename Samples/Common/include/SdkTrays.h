@@ -42,7 +42,11 @@
 #endif
 
 #if OGRE_UNICODE_SUPPORT
-	#define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#	if	OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
+#		define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8_c_str())
+#	else
+#		define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#	endif
 #else
 	#define DISPLAY_STRING_TO_STRING(DS) (DS)
 #endif
@@ -205,8 +209,8 @@ namespace OgreBites
 			Ogre::Font* f = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
 			Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
-			int nl = s.find('\n');
-			if (nl != -1) s = s.substr(0, nl);
+			size_t nl = s.find('\n');
+			if (nl != Ogre::String::npos) s = s.substr(0, nl);
 
 			Ogre::Real width = 0;
 
@@ -744,7 +748,7 @@ namespace OgreBites
 			return mItems;
 		}
 
-		unsigned int getNumItems()
+		size_t getNumItems()
 		{
 			return mItems.size();
 		}
@@ -760,7 +764,7 @@ namespace OgreBites
 			}
 			mItemElements.clear();
 
-			mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, mItems.size()));
+			mItemsShown = std::max<int>(2, std::min<int>(mMaxItemsShown, (int)mItems.size()));
 
 			for (unsigned int i = 0; i < mItemsShown; i++)   // create all the item elements
 			{
@@ -1041,7 +1045,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void setDisplayIndex(unsigned int index)
 		{
-			index = std::min<int>(index, mItems.size() - mItemElements.size());
+			index = std::min<int>(index, (int)(mItems.size() - mItemElements.size()));
 			mDisplayIndex = index;
 			Ogre::BorderPanelOverlayElement* ie;
 			Ogre::TextAreaOverlayElement* ta;
@@ -2167,7 +2171,7 @@ namespace OgreBites
 		ParamsPanel* createParamsPanel(TrayLocation trayLoc, const Ogre::String& name, Ogre::Real width,
 			const Ogre::StringVector& paramNames)
 		{
-			ParamsPanel* pp = new ParamsPanel(name, width, paramNames.size());
+			ParamsPanel* pp = new ParamsPanel(name, width, (Ogre::uint)paramNames.size());
 			pp->setAllParamNames(paramNames);
 			moveWidgetToTray(pp, trayLoc);
 			return pp;
@@ -2554,7 +2558,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Gets the number of widgets in a tray.
 		-----------------------------------------------------------------------------*/
-		unsigned int getNumWidgets(TrayLocation trayLoc)
+		size_t getNumWidgets(TrayLocation trayLoc)
 		{
 			return mWidgets[trayLoc].size();
 		}
@@ -2655,7 +2659,7 @@ namespace OgreBites
 			}
 
 			// insert widget into new tray at given position, or at the end if unspecified or invalid
-			if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = mWidgets[trayLoc].size();
+			if (place == -1 || place > (int)mWidgets[trayLoc].size()) place = (int)mWidgets[trayLoc].size();
 			mWidgets[trayLoc].insert(mWidgets[trayLoc].begin() + place, widget);
 			mTrays[trayLoc]->addChild(widget->getOverlayElement());
 
@@ -2754,38 +2758,32 @@ namespace OgreBites
 				Ogre::String s("FPS: ");
 				s += Ogre::StringConverter::toString((int)stats.lastFPS);
 				
-				for (int i = s.length() - 5; i > 5; i -= 3) { s.insert(i, 1, ','); }
 				mFpsLabel->setCaption(s);
 
 				if (mStatsPanel->getOverlayElement()->isVisible())
 				{
 					Ogre::StringVector values;
-					std::ostringstream oss;
+					Ogre::StringStream oss;
 					
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.avgFPS;
 					Ogre::String str = oss.str();
-					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.bestFPS;
 					str = oss.str();
-					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.worstFPS;
 					str = oss.str();
-					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					str = Ogre::StringConverter::toString(stats.triangleCount);
-					for (int i = str.length() - 3; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					str = Ogre::StringConverter::toString(stats.batchCount);
-					for (int i = str.length() - 3; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(str);
 
 					mStatsPanel->setAllParamValues(values);

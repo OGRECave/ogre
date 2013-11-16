@@ -446,7 +446,7 @@ namespace Ogre
 			}
 		}
 
-		return OGRE_NEW InstancedEntity( this, num, sharedTransformEntity);
+		return OGRE_NEW InstancedEntity(this, static_cast<uint32>(num), sharedTransformEntity);
 	}
 
 
@@ -614,7 +614,7 @@ namespace Ogre
 				if( indexType == HardwareIndexBuffer::IT_16BIT )
 					*thisBuf16++ = static_cast<uint16>(originalVal) + vertexOffset;
 				else
-					*thisBuf32++ = originalVal + vertexOffset;
+					*thisBuf32++ = static_cast<uint32>(originalVal + vertexOffset);
 			}
 		}
 

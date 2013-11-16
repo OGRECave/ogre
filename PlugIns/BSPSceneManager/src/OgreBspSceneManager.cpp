@@ -116,7 +116,7 @@ namespace Ogre {
 
         // Load using resource manager
         mLevel = BspResourceManager::getSingleton().load(filename, 
-            ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+            ResourceGroupManager::getSingleton().getWorldResourceGroupName()).staticCast<BspLevel>();
 
 		if (mLevel->isSkyEnabled())
 		{
@@ -158,7 +158,7 @@ namespace Ogre {
 
         // Load using resource manager
         mLevel = BspResourceManager::getSingleton().load(stream, 
-			ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+			ResourceGroupManager::getSingleton().getWorldResourceGroupName()).staticCast<BspLevel>();
 
 		if (mLevel->isSkyEnabled())
 		{
@@ -387,7 +387,7 @@ namespace Ogre {
                     continue;
                 StaticFaceGroup* faceGroup = mLevel->mFaceGroups + realIndex;
                 // Get Material pointer by handle
-                pMat = MaterialManager::getSingleton().getByHandle(faceGroup->materialHandle);
+                pMat = MaterialManager::getSingleton().getByHandle(faceGroup->materialHandle).staticCast<Material>();
                 assert (!pMat.isNull());
                 // Check normal (manual culling)
                 ManualCullingMode cullMode = pMat->getTechnique(0)->getPass(0)->getManualCullingMode();
@@ -474,7 +474,7 @@ namespace Ogre {
         // indexes are sometimes reused to address different vertex chunks
         for (size_t elem = 0; elem < numIdx; ++elem)
         {
-            *pIndexes++ = *pSrc++ + vertexStart;
+            *pIndexes++ = *pSrc++ + static_cast<unsigned int>(vertexStart);
         }
         mLevel->mIndexes->unlock();
 
@@ -571,7 +571,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ViewPoint BspSceneManager::getSuggestedViewpoint(bool random)
     {
-        if (mLevel.isNull() || mLevel->mPlayerStarts.size() == 0)
+        if (mLevel.isNull() || mLevel->mPlayerStarts.empty())
         {
             // No level, use default
             return SceneManager::getSuggestedViewpoint(random);
@@ -645,7 +645,7 @@ namespace Ogre {
     */
     //-----------------------------------------------------------------------
     RaySceneQuery* BspSceneManager::
-    createRayQuery(const Ray& ray, unsigned long mask)
+    createRayQuery(const Ray& ray, uint32 mask)
     {
         BspRaySceneQuery* q = OGRE_NEW BspRaySceneQuery(this);
         q->setRay(ray);
@@ -654,7 +654,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     IntersectionSceneQuery* BspSceneManager::
-    createIntersectionQuery(unsigned long mask)
+    createIntersectionQuery(uint32 mask)
     {
         BspIntersectionSceneQuery* q = OGRE_NEW BspIntersectionSceneQuery(this);
         q->setQueryMask(mask);

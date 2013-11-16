@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreSerializer.h"
 #include "OgreRenderOperation.h"
 #include "OgreAny.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -565,6 +566,8 @@ namespace Ogre {
 		void setNamedConstant(const String& name, const Vector4& vec);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector3& vec) */
 		void setNamedConstant(const String& name, const Vector3& vec);
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector2& vec) */
+		void setNamedConstant(const String& name, const Vector2& vec);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
 		void setNamedConstant(const String& name, const Matrix4& m);
 		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
@@ -1348,6 +1351,14 @@ namespace Ogre {
 		@param vec The value to set
 		*/
 		void setConstant(size_t index, const Vector3& vec);
+		/** Sets a 4-element floating-point parameter to the program via Vector2.
+         @param index The logical constant index at which to place the parameter (each constant is
+         a 4D float).
+         Note that since you're passing a Vector2, the last 2 elements of the 4-element
+         value will be set to 1 (a homogeneous vector)
+         @param vec The value to set
+         */
+		void setConstant(size_t index, const Vector2& vec);
 		/** Sets a Matrix4 parameter to the program.
 		@param index The logical constant index at which to place the parameter (each constant is
 		a 4D float).
@@ -1480,6 +1491,14 @@ namespace Ogre {
 		@param vec The value to set
 		*/
 		void _writeRawConstant(size_t physicalIndex, const Vector3& vec);
+		/** Write a 2-element floating-point parameter to the program via Vector2.
+         @note You can use these methods if you have already derived the physical
+         constant buffer location, for a slight speed improvement over using
+         the named / logical index versions.
+         @param physicalIndex The physical buffer index at which to place the parameter
+         @param vec The value to set
+         */
+		void _writeRawConstant(size_t physicalIndex, const Vector2& vec);
 		/** Write a Matrix4 parameter to the program.
 		@note You can use these methods if you have already derived the physical
 		constant buffer location, for a slight speed improvement over using
@@ -1752,15 +1771,15 @@ namespace Ogre {
 		@note
 		This named option will only work if you are using a parameters object created
 		from a high-level program (HighLevelGpuProgram).
-		@param index The index at which to place the parameter
-		NB this index refers to the number of floats, so a Vector3 is 3. Note that many 
-		rendersystems & programs assume that every floating point parameter is passed in
-		as a vector of 4 items, so you are strongly advised to check with 
-		RenderSystemCapabilities before using this version - if in doubt use Vector4
-		or ColourValue instead (both are 4D).
+        @param name The name of the parameter
 		@param vec The value to set
 		*/
 		void setNamedConstant(const String& name, const Vector3& vec);
+		/** Sets a Vector2 parameter to the program.
+         @param name The name of the parameter
+         @param vec The value to set
+         */
+		void setNamedConstant(const String& name, const Vector2& vec);
 		/** Sets a Matrix4 parameter to the program.
 		@param name The name of the parameter
 		@param m The value to set

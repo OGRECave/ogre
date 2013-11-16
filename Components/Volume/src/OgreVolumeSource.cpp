@@ -147,7 +147,7 @@ namespace Volume {
         Vector3 dir = scaledRay.getDirection().normalisedCopy();
 
         size_t count = 0;
-        Vector3 prev, prevPrev;
+        Vector3 prev = Vector3::ZERO, prevPrev = Vector3::ZERO;
         bool atEnd = false;
         Real totalLength = (start - end).length();
         while (Math::Abs(densityCur) > (Real)0.01 && !atEnd)
@@ -184,6 +184,12 @@ namespace Volume {
         }
         return false;
     }
+    
+    //-----------------------------------------------------------------------
 
+    Real Source::getVolumeSpaceToWorldSpaceFactor(void) const
+    {
+        return (Real)1.0;
+    }
 }
 }

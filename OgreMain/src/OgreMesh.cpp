@@ -47,56 +47,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    MeshPtr::MeshPtr(const ResourcePtr& r) : SharedPtr<Mesh>()
-    {
-		// lock & copy other mutex pointer
-        OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-        {
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<Mesh*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
-    MeshPtr& MeshPtr::operator=(const ResourcePtr& r)
-    {
-        if (pRep == static_cast<Mesh*>(r.getPointer()))
-            return *this;
-        release();
-		// lock & copy other mutex pointer
-        OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-        {
-            OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-            OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-            pRep = static_cast<Mesh*>(r.getPointer());
-            pUseCount = r.useCountPointer();
-            if (pUseCount)
-            {
-                ++(*pUseCount);
-            }
-        }
-		else
-		{
-			// RHS must be a null pointer
-			assert(r.isNull() && "RHS must be null if it has no mutex!");
-			setNull();
-		}
-        return *this;
-    }
-    //-----------------------------------------------------------------------
-    void MeshPtr::destroy(void)
-    {
-        // We're only overriding so that we can destroy after full definition of Mesh
-        SharedPtr<Mesh>::destroy();
-    }
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
     Mesh::Mesh(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : Resource(creator, name, handle, group, isManual, loader),
@@ -120,7 +70,7 @@ namespace Ogre {
     {
 		// Init first (manual) lod
 		MeshLodUsage lod;
-        lod.userValue = 0; // User value not used for base lod level
+        lod.userValue = 0; // User value not used for base LOD level
 		lod.value = getLodStrategy()->getBaseValue();
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
@@ -255,10 +205,10 @@ namespace Ogre {
 			}
 		}
 #if !OGRE_NO_MESHLOD
-        // The loading process accesses lod usages directly, so
+        // The loading process accesses LOD usages directly, so
         // transformation of user values must occur after loading is complete.
 
-        // Transform user lod values (starting at index 1, no need to transform base value)
+        // Transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin() + 1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 #endif
@@ -363,41 +313,10 @@ namespace Ogre {
 
         // Copy submeshes first
         vector<SubMesh*>::type::iterator subi;
-        SubMesh* newSub;
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
-            newSub = newMesh->createSubMesh();
-            newSub->mMaterialName = (*subi)->mMaterialName;
-            newSub->mMatInitialised = (*subi)->mMatInitialised;
-            newSub->operationType = (*subi)->operationType;
-            newSub->useSharedVertices = (*subi)->useSharedVertices;
-            newSub->extremityPoints = (*subi)->extremityPoints;
+            (*subi)->clone("", newMesh.get());
 
-            if (!(*subi)->useSharedVertices)
-            {
-                // Copy unique vertex data
-				newSub->vertexData = (*subi)->vertexData->clone();
-                // Copy unique index map
-                newSub->blendIndexToBoneIndexMap = (*subi)->blendIndexToBoneIndexMap;
-            }
-
-            // Copy index data
-            OGRE_DELETE newSub->indexData;
-			newSub->indexData = (*subi)->indexData->clone();
-            // Copy any bone assignments
-            newSub->mBoneAssignments = (*subi)->mBoneAssignments;
-            newSub->mBoneAssignmentsOutOfDate = (*subi)->mBoneAssignmentsOutOfDate;
-            // Copy texture aliases
-            newSub->mTextureAliases = (*subi)->mTextureAliases;
-#if !OGRE_NO_MESHLOD
-            // Copy lod face lists
-            newSub->mLodFaceList.reserve((*subi)->mLodFaceList.size());
-            SubMesh::LODFaceList::const_iterator facei;
-            for (facei = (*subi)->mLodFaceList.begin(); facei != (*subi)->mLodFaceList.end(); ++facei) {
-                IndexData* newIndexData = (*facei)->clone();
-                newSub->mLodFaceList.push_back(newIndexData);
-            }
-#endif
         }
 
         // Copy shared geometry and index map, if any
@@ -579,7 +498,7 @@ namespace Ogre {
 			{
 				// Load skeleton
 				try {
-					mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup);
+					mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 				}
 				catch (...)
 				{
@@ -775,7 +694,7 @@ namespace Ogre {
                 "The lowest weighted assignments beyond this limit have been removed, so "
                 "your animation may look slightly different. To eliminate this, reduce "
                 "the number of bone assignments per vertex on your mesh to " +
-                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".");
+                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".", LML_CRITICAL);
             // we've adjusted them down to the max
             maxBones = OGRE_MAX_BLEND_WEIGHTS;
 
@@ -788,7 +707,7 @@ namespace Ogre {
                 "includes vertices without bone assignments. Those vertices will "
 				"transform to wrong position when skeletal animation enabled. "
 				"To eliminate this, assign at least one bone assignment per vertex "
-				"on your mesh.");
+				"on your mesh.", LML_CRITICAL);
 		}
 
         return maxBones;
@@ -1039,8 +958,8 @@ namespace Ogre {
 	{
 
 		// Basic prerequisites
-		assert(index != 0 && "Can't modify first lod level (full detail)");
-		assert(index < mMeshLodUsageList.size() && "Index out of bounds");
+		assert(index != 0 && "Can't modify first LOD level (full detail)");
+		assert(index < mMeshLodUsageList.size() && "Idndex out of bounds");
 		// get lod
 		MeshLodUsage* lod = &(mMeshLodUsageList[index]);
 
@@ -1071,7 +990,7 @@ namespace Ogre {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
 		// Basic prerequisites
-		assert(level != 0 && "Can't modify first lod level (full detail)");
+		assert(level != 0 && "Can't modify first LOD level (full detail)");
 		assert(level < mMeshLodUsageList.size() && "Index out of bounds");
 
 		mMeshLodUsageList[level] = usage;
@@ -1089,7 +1008,7 @@ namespace Ogre {
 		// Basic prerequisites
 		assert(mMeshLodUsageList[level].manualName.empty() && "Not using generated LODs!");
 		assert(subIdx < mSubMeshList.size() && "Index out of bounds");
-		assert(level != 0 && "Can't modify first lod level (full detail)");
+		assert(level != 0 && "Can't modify first LOD level (full detail)");
 		assert(level-1 < (unsigned short)mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
 
 		SubMesh* sm = mSubMeshList[subIdx];
@@ -2404,7 +2323,7 @@ namespace Ogre {
         assert(mMeshLodUsageList.size());
         mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 
-        // Re-transform user lod values (starting at index 1, no need to transform base value)
+        // Re-transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin()+1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 

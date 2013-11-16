@@ -72,7 +72,7 @@ void RenderSystemCapabilitiesTests::tearDown()
     OGRE_DELETE mRenderSystemCapabilitiesManager;
     OGRE_DELETE mArchiveManager;
     OGRE_DELETE mFileSystemArchiveFactory;
-
+    OGRE_DELETE mLogManager;
 }
 
 void RenderSystemCapabilitiesTests::testIsShaderProfileSupported(void)

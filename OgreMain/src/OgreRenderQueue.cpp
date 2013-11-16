@@ -104,7 +104,7 @@ namespace Ogre {
         if(pRend->getMaterial().isNull() || !pRend->getTechnique())
         {
             // Use default base white
-			MaterialPtr baseWhite = MaterialManager::getSingleton().getByName("BaseWhite");
+            MaterialPtr baseWhite = MaterialManager::getSingleton().getByName("BaseWhite");
             pTech = baseWhite->getTechnique(0);
         }
 		else

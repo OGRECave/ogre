@@ -40,7 +40,6 @@ THE SOFTWARE.
 namespace Ogre {
 
 	// Forward declaration
-	class MaterialPtr;
     class LodStrategy;
 
 	/** \addtogroup Core
@@ -70,7 +69,7 @@ namespace Ogre {
     for distant geometry.
     @par
     Each technique can be made up of multiple passes. A fixed-function pass
-    may combine multiple texture layers using multitexrtuing, but Ogre can 
+    may combine multiple texture layers using multitexturing, but Ogre can 
     break that into multiple passes automatically if the active card cannot
     handle that many simultaneous textures. Programmable passes, however, cannot
     be split down automatically, so if the active graphics card cannot handle the
@@ -264,7 +263,7 @@ namespace Ogre {
             The best supported technique is only available after this material has been compiled,
             which typically happens on loading the material. Therefore, if this method returns
             NULL, try calling Material::load.
-		@param lodIndex The material lod index to use
+		@param lodIndex The material LOD index to use
 		@param rend Optional parameter specifying the Renderable that is requesting
 			this technique. Only used if no valid technique for the active material 
 			scheme is found, at which point it is passed to 
@@ -606,7 +605,7 @@ namespace Ogre {
             method to determine the distance at which the lowe levels of detail kick in.
             The decision about what distance is actually used is a combination of this
             and the LOD bias applied to both the current Camera and the current Entity.
-        @param lodValues A vector of Reals which indicate the lod value at which to 
+        @param lodValues A vector of Reals which indicate the LOD value at which to 
             switch to lower details. They are listed in LOD index order, starting at index
             1 (ie the first level down from the highest level 0, which automatically applies
             from a value of 0). These are 'user values', before being potentially 
@@ -640,9 +639,9 @@ namespace Ogre {
 		*/
         ushort getLodIndex(Real value) const;
 
-        /** Get lod strategy used by this material. */
+        /** Get LOD strategy used by this material. */
         const LodStrategy *getLodStrategy() const;
-        /** Set the lod strategy used by this material. */
+        /** Set the LOD strategy used by this material. */
         void setLodStrategy(LodStrategy *lodStrategy);
 
         /** @copydoc Resource::touch
@@ -678,62 +677,6 @@ namespace Ogre {
 
 
     };
-
-	/** Specialisation of SharedPtr to allow SharedPtr to be assigned to MaterialPtr 
-	@note Has to be a subclass since we need operator=.
-	We could templatise this instead of repeating per Resource subclass, 
-	except to do so requires a form VC6 does not support i.e.
-	ResourceSubclassPtr<T> : public SharedPtr<T>
-	*/
-	class _OgreExport MaterialPtr : public SharedPtr<Material> 
-	{
-	public:
-		MaterialPtr() : SharedPtr<Material>() {}
-		explicit MaterialPtr(Material* rep) : SharedPtr<Material>(rep) {}
-		MaterialPtr(const MaterialPtr& r) : SharedPtr<Material>(r) {} 
-		MaterialPtr(const ResourcePtr& r) : SharedPtr<Material>()
-		{
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-			    pRep = static_cast<Material*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-		}
-
-		/// Operator used to convert a ResourcePtr to a MaterialPtr
-		MaterialPtr& operator=(const ResourcePtr& r)
-		{
-			if (pRep == static_cast<Material*>(r.getPointer()))
-				return *this;
-			release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-			    pRep = static_cast<Material*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-			return *this;
-		}
-	};
 	/** @} */
 	/** @} */
 

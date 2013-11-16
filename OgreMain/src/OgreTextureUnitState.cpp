@@ -1167,7 +1167,7 @@ namespace Ogre {
 						". Texture layer will be blank. Loading the texture "
 						"failed with the following exception: " 
 						+ e.getFullDescription();
-					LogManager::getSingleton().logMessage(msg);
+					LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
 					mTextureLoadFailed = true;
 				}	
 			}
@@ -1199,7 +1199,7 @@ namespace Ogre {
 						". Texture layer will be blank. Loading the texture "
 						"failed with the following exception: " 
 						+ e.getFullDescription();
-					LogManager::getSingleton().logMessage(msg);
+					LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
 					mTextureLoadFailed = true;
 				}
 			}

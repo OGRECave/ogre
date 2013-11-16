@@ -460,7 +460,7 @@ namespace Ogre {
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
-        /** Retrieves the level of detail index for the given lod value. 
+        /** Retrieves the level of detail index for the given LOD value. 
         @note
             The value passed in is the 'transformed' value. If you are dealing with
             an original source value (e.g. distance), use LodStrategy::transformUserValue
@@ -941,7 +941,7 @@ namespace Ogre {
         /** Get pose list. */
         const PoseList& getPoseList(void) const;
 
-        /** Get lod strategy used by this mesh. */
+        /** Get LOD strategy used by this mesh. */
         const LodStrategy *getLodStrategy() const;
 #if !OGRE_NO_MESHLOD
         /** Set the lod strategy used by this mesh. */
@@ -949,36 +949,16 @@ namespace Ogre {
 #endif
     };
 
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to MeshPtr 
-    @note Has to be a subclass since we need operator=.
-        We could templatise this instead of repeating per Resource subclass, 
-        except to do so requires a form VC6 does not support i.e.
-        ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport MeshPtr : public SharedPtr<Mesh> 
-    {
-    public:
-        MeshPtr() : SharedPtr<Mesh>() {}
-        explicit MeshPtr(Mesh* rep) : SharedPtr<Mesh>(rep) {}
-        MeshPtr(const MeshPtr& r) : SharedPtr<Mesh>(r) {} 
-        MeshPtr(const ResourcePtr& r);
-        /// Operator used to convert a ResourcePtr to a MeshPtr.
-        MeshPtr& operator=(const ResourcePtr& r);
-    protected:
-        /// Override destroy since we need to delete Mesh after fully defined.
-        void destroy(void);
-    };
-
     /** A way of recording the way each LODs is recorded this Mesh. */
     struct MeshLodUsage
     {
         /** User-supplied values used to determine on which distance the lod is applies.
         @remarks
-            This is required in case the lod strategy changes.
+            This is required in case the LOD strategy changes.
         */
         Real userValue;
 
-        /** Value used by to determine when this lod applies.
+        /** Value used by to determine when this LOD applies.
         @remarks
             May be interpretted differently by different strategies.
             Transformed from user-supplied values with LodStrategy::transformUserValue.

@@ -59,7 +59,7 @@ namespace Ogre
                 }
 
                 // Invalid option
-                LogManager::getSingleton().logMessage("Invalid option " + tmp);
+                LogManager::getSingleton().logMessage("Invalid option " + tmp, LML_CRITICAL);
 
             }
         }

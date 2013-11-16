@@ -619,7 +619,7 @@ namespace Ogre
 					break;
 
 				VertexBoneAssignment boneAssignment = (*it).second;
-				boneAssignment.vertexIndex = boneAssignment.vertexIndex - curVertexOffset;
+				boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
 				subMesh->addBoneAssignment(boneAssignment);
 			}
 			curVertexOffset = newVertexData->vertexCount + 1;

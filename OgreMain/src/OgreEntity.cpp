@@ -415,9 +415,9 @@ namespace Ogre {
 #if !OGRE_NO_MESHLOD
             // Get mesh lod strategy
             const LodStrategy *meshStrategy = mMesh->getLodStrategy();
-            // Get the appropriate lod value
+            // Get the appropriate LOD value
             Real lodValue = meshStrategy->getValue(this, cam);
-            // Bias the lod value
+            // Bias the LOD value
             Real biasedMeshLodValue = lodValue * mMeshLodFactorTransformed;
 
 
@@ -436,10 +436,10 @@ namespace Ogre {
             evt.previousLodIndex = mMeshLodIndex;
             evt.newLodIndex = newMeshLodIndex;
 
-            // Notify lod event listeners
+            // Notify LOD event listeners
             cam->getSceneManager()->_notifyEntityMeshLodChanged(evt);
 
-            // Change lod index
+            // Change LOD index
             mMeshLodIndex = evt.newLodIndex;
 
             // Now do material LOD
@@ -455,10 +455,10 @@ namespace Ogre {
                 // Get sub-entity material
                 const MaterialPtr& material = (*i)->getMaterial();
                 
-                // Get material lod strategy
+                // Get material LOD strategy
                 const LodStrategy *materialStrategy = material->getLodStrategy();
                 
-                // Recalculate lod value if strategies do not match
+                // Recalculate LOD value if strategies do not match
                 Real biasedMaterialLodValue;
                 if (meshStrategy == materialStrategy)
                     biasedMaterialLodValue = lodValue;
@@ -480,10 +480,10 @@ namespace Ogre {
                 subEntEvt.previousLodIndex = (*i)->mMaterialLodIndex;
                 subEntEvt.newLodIndex = idx;
 
-                // Notify lod event listeners
+                // Notify LOD event listeners
                 cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);
 
-                // Change lod index
+                // Change LOD index
                 (*i)->mMaterialLodIndex = subEntEvt.newLodIndex;
 #endif
 				// Also invalidate any camera distance cache
@@ -590,7 +590,7 @@ namespace Ogre {
             // Use alternate entity
             assert( static_cast< size_t >( mMeshLodIndex - 1 ) < mLodEntityList.size() &&
                 "No LOD EntityList - did you build the manual LODs after creating the entity?");
-            // index - 1 as we skip index 0 (original lod)
+            // index - 1 as we skip index 0 (original LOD)
 			displayEntity = mLodEntityList[mMeshLodIndex-1];
 
 			if (displayEntity != this && hasSkeleton() && displayEntity->hasSkeleton())
@@ -598,7 +598,7 @@ namespace Ogre {
 				// Copy the animation state set to lod entity, we assume the lod
 				// entity only has a subset animation states
 				AnimationStateSet* targetState = displayEntity->mAnimationState;
-				if (mAnimationState != targetState) // only copy if lods use different skeleton instances
+				if (mAnimationState != targetState) // only copy if LODs use different skeleton instances
 				{
 					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
 						mAnimationState->copyMatchingState(targetState);
@@ -712,10 +712,6 @@ namespace Ogre {
                 }
             }
         }
-
-
-
-
     }
     //-----------------------------------------------------------------------
     AnimationState* Entity::getAnimationState(const String& name) const
@@ -1884,7 +1880,7 @@ namespace Ogre {
     ShadowCaster::ShadowRenderableListIterator
         Entity::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer,
+        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool extrude, Real extrusionDistance, unsigned long flags)
     {
         assert(indexBuffer && "Only external index buffers are supported right now");
@@ -1913,7 +1909,7 @@ namespace Ogre {
 					}
 				}
 				return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
-					shadowTechnique, light, indexBuffer, extrude,
+					shadowTechnique, light, indexBuffer, indexBufferUsedSize,
 					extrusionDistance, flags);
 			}
         }
@@ -2049,8 +2045,8 @@ namespace Ogre {
         updateEdgeListLightFacing(edgeList, lightPos);
 
         // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, light,
-            mShadowRenderables, flags);
+        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
+            light, mShadowRenderables, flags);
 
 
         return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());

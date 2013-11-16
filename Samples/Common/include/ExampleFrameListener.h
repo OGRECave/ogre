@@ -53,7 +53,7 @@ D:        Step right
 
 using namespace Ogre;
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
 #endif
 
@@ -138,7 +138,7 @@ public:
 		WindowEventUtilities::addWindowEventListener(mWindow, this);		
 	}
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 	virtual void processShaderGeneratorInput()
 	{		
 		// Switch to default scheme.
@@ -439,7 +439,7 @@ public:
 			if( processUnbufferedKeyInput(evt) == false )
 				return false;
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 		processShaderGeneratorInput();
 #endif
 

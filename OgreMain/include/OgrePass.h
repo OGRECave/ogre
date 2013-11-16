@@ -486,8 +486,9 @@ namespace Ogre {
 			The resulting size is clamped to the minimum and maximum point
 			size.
 		@param enabled Whether point attenuation is enabled
-		@param constant, linear, quadratic Parameters to the attenuation
-			function defined above
+		@param constant Parameters to the attenuation function defined above
+        @param linear Parameters to the attenuation function defined above
+        @param quadratic Parameters to the attenuation function defined above
 		*/
 		void setPointAttenuation(bool enabled,
 			Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);

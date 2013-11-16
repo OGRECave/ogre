@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __SCRIPTPARSER_H_
 
 #include "OgrePrerequisites.h"
-#include "OgreSharedPtr.h"
 #include "OgreScriptCompiler.h"
 #include "OgreScriptLexer.h"
 #include "OgreHeaderPrefix.h"

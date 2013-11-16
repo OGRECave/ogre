@@ -14,6 +14,8 @@ file(GLOB SOURCE_FILES "src/*.cpp")
 
 file(GLOB GLSLES_FILES "src/GLSLES/include/*.h" "src/GLSLES/src/*.cpp")
 
+list(REMOVE_ITEM GLSLES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgram.cpp")
+list(REMOVE_ITEM GLSLES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp")
 
 if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
   list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gles2w.cpp")
@@ -29,7 +31,7 @@ else()
 endif()
 
 include_directories(src/StateCacheManager)
-if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
   list(APPEND HEADER_FILES
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
       src/StateCacheManager/OgreGLES2UniformCacheImp.h

@@ -68,14 +68,20 @@ THE SOFTWARE.
 
 // If we are going to use the PVRTC_CODEC make sure we
 // setup the needed constants
-#if (OGRE_NO_PVRTC_CODEC == 0)
+#if OGRE_NO_PVRTC_CODEC == 0
 #	ifndef GL_IMG_texture_compression_pvrtc
 #		define GL_IMG_texture_compression_pvrtc 1
-#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      0x8C00
-#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      0x8C01
-#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     0x8C02
-#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
+#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      	0x8C00
+#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      	0x8C01
+#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     	0x8C02
+#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     	0x8C03
 #	endif
+#endif
+
+/* GL_EXT_texture_compression_dxt1 */
+#ifndef GL_EXT_texture_compression_dxt1
+#	define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                         		0x83F0
+#	define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                        		0x83F1
 #endif
 
 // Function pointers for FBO extension methods
@@ -117,6 +123,11 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
 #ifndef GL_FILL
 #   define GL_FILL    0x1B02
 #endif
+
+namespace Ogre {
+    class GLESTexture;
+    typedef SharedPtr<GLESTexture> GLESTexturePtr;
+};
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLESPLUGIN_EXPORTS

@@ -1327,7 +1327,7 @@ namespace Ogre {
 	void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
 	{ 
 		mShadowCasterMaterialName = name;
-		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name); 
+		mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name);
 	}
 	//-----------------------------------------------------------------------
 	Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const 
@@ -1352,7 +1352,7 @@ namespace Ogre {
 	void  Technique::setShadowReceiverMaterial(const Ogre::String &name)  
 	{ 
 		mShadowReceiverMaterialName = name;
-		mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name); 
+		mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name);
 	}
 	//---------------------------------------------------------------------
 	void Technique::addGPUVendorRule(GPUVendor vendor, Technique::IncludeOrExclude includeOrExclude)

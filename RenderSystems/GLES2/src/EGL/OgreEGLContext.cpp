@@ -77,6 +77,12 @@ namespace Ogre {
                         "Unable to create a suitable EGLContext",
                         "EGLContext::EGLContext");
         }
+
+        setCurrent();
+
+        // Initialise GL3W
+        if (gleswInit())
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
     }
     
     void EGLContext::_destroyInternalResources()

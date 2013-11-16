@@ -125,8 +125,8 @@ namespace Ogre {
 #	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
     // Device                                                     Simulator
-    // Both requiring OS version 4.0 or greater
-#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 40000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000
+    // Both requiring OS version 6.0 or greater
+#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE_IOS
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
@@ -266,13 +266,15 @@ namespace Ogre {
 #       undef OGRE_UNICODE_SUPPORT
 #   endif
 #	define OGRE_UNICODE_SUPPORT 1
-#	define CLOCKS_PER_SEC  1000
     // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 #   ifdef DEBUG
 #       define OGRE_DEBUG_MODE 1
 #   else
 #       define OGRE_DEBUG_MODE 0
+#   endif
+#   ifndef CLOCKS_PER_SEC
+#	    define CLOCKS_PER_SEC  1000
 #   endif
 #endif
     
@@ -297,6 +299,33 @@ namespace Ogre {
 #    define OGRE_ENDIAN OGRE_ENDIAN_BIG
 #else
 #    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
+#endif
+
+//----------------------------------------------------------------------------
+// Set the default locale for strings
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+//	Locales are not supported by the C lib you have to go through JNI.
+#	define OGRE_DEFAULT_LOCALE ""
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#	define OGRE_DEFAULT_LOCALE "C"
+#else
+#	if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#		if _MSC_VER >= 1700
+#			define OGRE_DEFAULT_LOCALE "en-GB"
+#		else
+// 			http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
+#			define OGRE_DEFAULT_LOCALE "uk"
+#		endif
+#	elif OGRE_COMPILER == OGRE_COMPILER_GCCE
+//		http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
+#   	define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
+#	else
+#       if OGRE_NO_LIBCPP_SUPPORT == 0
+#           define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
+#       else
+#   	    define OGRE_DEFAULT_LOCALE "C"
+#       endif
+#	endif
 #endif
 
 //----------------------------------------------------------------------------

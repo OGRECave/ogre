@@ -62,7 +62,6 @@ namespace Ogre {
         mSkeletalAnimation = mGLSLProgram->isSkeletalAnimationIncluded();
 		// there is nothing to load
 		mLoadFromFile = false;
-
     }
     //-----------------------------------------------------------------------
     GLSLGpuProgram::~GLSLGpuProgram()

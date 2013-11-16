@@ -39,7 +39,8 @@ namespace Ogre {
         SDL_Surface* mScreen;
         bool mActive;
         bool mClosed;
-            
+        bool mVSync;
+
         // Process pending events
         void processEvents(void);
 
@@ -63,11 +64,16 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         void resize(unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
-        void swapBuffers(bool waitForVSync);
+        void swapBuffers();
 
         /** Overridden - see RenderTarget. */
         void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-        
+
+        /** @copydoc see RenderWindow::setVSyncEnabled */
+        void setVSyncEnabled(bool vsync);
+        /** @copydoc see RenderWindow::isVSyncEnabled */
+        bool isVSyncEnabled() const;
+
         /** Overridden - see RenderTarget.
         */
         void getCustomAttribute( const String& name, void* pData )

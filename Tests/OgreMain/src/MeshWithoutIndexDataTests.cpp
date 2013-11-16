@@ -42,8 +42,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
+    if(LogManager::getSingletonPtr() == 0)
+        mLogManager = OGRE_NEW LogManager();
+
+	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
     LogManager::getSingleton().setLogDetail(LL_LOW);
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", false);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
@@ -62,6 +65,7 @@ void MeshWithoutIndexDataTests::tearDown()
 	OGRE_DELETE MaterialManager::getSingletonPtr();
 	OGRE_DELETE LodStrategyManager::getSingletonPtr();
 	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+    OGRE_DELETE mLogManager;
 }
 
 void MeshWithoutIndexDataTests::testCreateSimpleLine()
@@ -223,7 +227,7 @@ void MeshWithoutIndexDataTests::testCreatePointList()
 void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
 {
     String matName = "lineMat";
-    MaterialPtr matPtr = MaterialManager::getSingleton().create(matName, "General");
+    MaterialPtr matPtr = MaterialManager::getSingleton().create(matName, "General").staticCast<Material>();
     Pass* pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(1.0, 0.1, 0.1, 0);
 
@@ -247,9 +251,8 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
     meshWriter.exportMesh(lineMesh.get(), fileName);
     MaterialSerializer matWriter;
     matWriter.exportMaterial(
-        MaterialManager::getSingleton().getByName(matName), 
-        matName + ".material"
-        );
+        MaterialManager::getSingleton().getByName(matName).staticCast<Material>(),
+        matName + ".material");
 
     mMeshMgr->remove( fileName );
 
@@ -273,25 +276,25 @@ void createMeshWithMaterial(String fileName)
     String matFileNameSuffix = ".material";
     String matName1 = "red";
     String matFileName1 = matName1 + matFileNameSuffix;
-    MaterialPtr matPtr = MaterialManager::getSingleton().create(matName1, "General");
+    MaterialPtr matPtr = MaterialManager::getSingleton().create(matName1, "General").staticCast<Material>();
     Pass* pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(1.0, 0.1, 0.1, 0);
 
     String matName2 = "green";
     String matFileName2 = matName2 + matFileNameSuffix;
-    matPtr = MaterialManager::getSingleton().create(matName2, "General");
+    matPtr = MaterialManager::getSingleton().create(matName2, "General").staticCast<Material>();
     pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(0.1, 1.0, 0.1, 0);
 
     String matName3 = "blue";
     String matFileName3 = matName3 + matFileNameSuffix;
-    matPtr = MaterialManager::getSingleton().create(matName3, "General");
+    matPtr = MaterialManager::getSingleton().create(matName3, "General").staticCast<Material>();
     pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(0.1, 0.1, 1.0, 0);
 
     String matName4 = "yellow";
     String matFileName4 = matName4 + matFileNameSuffix;
-    matPtr = MaterialManager::getSingleton().create(matName4, "General");
+    matPtr = MaterialManager::getSingleton().create(matName4, "General").staticCast<Material>();
     pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(1.0, 1.0, 0.1, 0);
 
@@ -333,7 +336,7 @@ void MeshWithoutIndexDataTests::testCreateMesh()
 {
     String fileName = "indexMix.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName);
+    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
     CPPUNIT_ASSERT(mesh->getNumSubMeshes() == 4);
     RenderOperation rop;
@@ -363,7 +366,7 @@ void MeshWithoutIndexDataTests::testCloneMesh()
 {
     String originalName = "toClone.mesh";
     createMeshWithMaterial(originalName);
-    MeshPtr mesh = mMeshMgr->getByName(originalName);
+    MeshPtr mesh = mMeshMgr->getByName(originalName).staticCast<Mesh>();
 
     String fileName = "clone.mesh";
     MeshPtr clone = mesh->clone(fileName);
@@ -413,7 +416,7 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
 {
     String fileName = "testGenerateExtremes.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName);
+    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
     const size_t NUM_EXTREMES = 4;
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
@@ -439,7 +442,7 @@ void MeshWithoutIndexDataTests::testBuildTangentVectors()
 {
     String fileName = "testBuildTangentVectors.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName);
+    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
     try
     {
@@ -460,7 +463,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
-    MeshPtr mesh = mMeshMgr->getByName(fileName);
+    MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
 	LodConfig lodConfig(mesh);
 	lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);

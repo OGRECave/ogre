@@ -214,7 +214,7 @@ namespace Ogre {
         }
 
 		// The custom mipmaps in the image have priority over everything
-        size_t imageMips = images[0]->getNumMipmaps();
+        uint8 imageMips = images[0]->getNumMipmaps();
 
 		if(imageMips > 0)
 		{
@@ -254,7 +254,7 @@ namespace Ogre {
                 ")";
             if (!(mMipmapsHardwareGenerated && mNumMipmaps == 0))
             {
-                str << " with " << mNumMipmaps;
+                str << " with " << static_cast<int>(mNumMipmaps);
                 if(mUsage & TU_AUTOMIPMAP)
                 {
                     if (mMipmapsHardwareGenerated)
@@ -439,15 +439,24 @@ namespace Ogre {
 		void* currentPixData = pixData;
 		for (size_t face = 0; face < getNumFaces(); ++face)
 		{
+            uint32 width = getWidth();
+            uint32 height = getHeight();
+            uint32 depth = getDepth();
 			for (size_t mip = 0; mip < numMips; ++mip)
 			{
-				size_t mipDataSize = PixelUtil::getMemorySize(getWidth(), getHeight(), getDepth(), getFormat());
+				size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 
-				Ogre::PixelBox pixBox(getWidth(), getHeight(), getDepth(), getFormat(), currentPixData);
+				Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
 				getBuffer(face, mip)->blitToMemory(pixBox);
 
 				currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
+                if(width != 1)
+                    width /= 2;
+                if(height != 1)
+                    height /= 2;
+                if(depth != 1)
+                    depth /= 2;
 			}
 		}
 

@@ -70,6 +70,8 @@ if (OGRE_BUILD_TESTS)
 	if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
         set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
         set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
+		set_target_properties(Test_Ogre PROPERTIES
+			LINK_FLAGS "-framework Carbon -framework Cocoa")
         add_custom_command(TARGET Test_Ogre POST_BUILD
             COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
             COMMAND ditto 
@@ -86,12 +88,10 @@ if (OGRE_BUILD_TESTS)
             ${OGRE_TEST_CONTENTS_PATH}/Resources/
             COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
             ${OGRE_TEST_CONTENTS_PATH}/Resources/
-            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media/materials
-            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/materials
-            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media/models
-            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/models
-            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc
-            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/misc
+            COMMAND ditto 
+            ${OGRE_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
+            COMMAND ditto 
+            ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/misc/
             COMMAND ditto 
             ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
 		)

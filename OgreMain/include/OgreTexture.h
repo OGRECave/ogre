@@ -91,9 +91,6 @@ namespace Ogre {
 		MIP_DEFAULT = -1
 	};
 
-    // Forward declaration
-    class TexturePtr;
-
     /** Abstract class representing a Texture resource.
         @remarks
             The actual concrete subclass which will exist for a texture
@@ -121,13 +118,13 @@ namespace Ogre {
 
         /** Gets the number of mipmaps to be used for this texture.
         */
-        virtual size_t getNumMipmaps(void) const {return mNumMipmaps;}
+        virtual uint8 getNumMipmaps(void) const {return mNumMipmaps;}
 
 		/** Sets the number of mipmaps to be used for this texture.
             @note
                 Must be set before calling any 'load' method.
         */
-        virtual void setNumMipmaps(size_t num) {mNumRequestedMipmaps = mNumMipmaps = num;}
+        virtual void setNumMipmaps(uint8 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
 
 		/** Are mipmaps hardware generated?
 		@remarks
@@ -194,40 +191,40 @@ namespace Ogre {
 
 		/** Returns the height of the texture.
         */
-        virtual size_t getHeight(void) const { return mHeight; }
+        virtual uint32 getHeight(void) const { return mHeight; }
 
         /** Returns the width of the texture.
         */
-        virtual size_t getWidth(void) const { return mWidth; }
+        virtual uint32 getWidth(void) const { return mWidth; }
 
         /** Returns the depth of the texture (only applicable for 3D textures).
         */
-        virtual size_t getDepth(void) const { return mDepth; }
+        virtual uint32 getDepth(void) const { return mDepth; }
 
         /** Returns the height of the original input texture (may differ due to hardware requirements).
         */
-        virtual size_t getSrcHeight(void) const { return mSrcHeight; }
+        virtual uint32 getSrcHeight(void) const { return mSrcHeight; }
 
         /** Returns the width of the original input texture (may differ due to hardware requirements).
         */
-        virtual size_t getSrcWidth(void) const { return mSrcWidth; }
+        virtual uint32 getSrcWidth(void) const { return mSrcWidth; }
 
         /** Returns the original depth of the input texture (only applicable for 3D textures).
         */
-        virtual size_t getSrcDepth(void) const { return mSrcDepth; }
+        virtual uint32 getSrcDepth(void) const { return mSrcDepth; }
 
         /** Set the height of the texture; can only do this before load();
         */
-        virtual void setHeight(size_t h) { mHeight = mSrcHeight = h; }
+        virtual void setHeight(uint32 h) { mHeight = mSrcHeight = h; }
 
         /** Set the width of the texture; can only do this before load();
         */
-        virtual void setWidth(size_t w) { mWidth = mSrcWidth = w; }
+        virtual void setWidth(uint32 w) { mWidth = mSrcWidth = w; }
 
         /** Set the depth of the texture (only applicable for 3D textures);
             can only do this before load();
         */
-        virtual void setDepth(size_t d)  { mDepth = mSrcDepth = d; }
+        virtual void setDepth(uint32 d)  { mDepth = mSrcDepth = d; }
 
         /** Returns the TextureUsage identifier for this Texture
         */
@@ -390,12 +387,12 @@ namespace Ogre {
 
 
     protected:
-        size_t mHeight;
-        size_t mWidth;
-        size_t mDepth;
+        uint32 mHeight;
+        uint32 mWidth;
+        uint32 mDepth;
 
-        size_t mNumRequestedMipmaps;
-		size_t mNumMipmaps;
+        uint8 mNumRequestedMipmaps;
+		uint8 mNumMipmaps;
 		bool mMipmapsHardwareGenerated;
         float mGamma;
 		bool mHwGamma;
@@ -407,7 +404,7 @@ namespace Ogre {
         int mUsage; /// Bit field, so this can't be TextureUsage
 
         PixelFormat mSrcFormat;
-        size_t mSrcWidth, mSrcHeight, mSrcDepth;
+        uint32 mSrcWidth, mSrcHeight, mSrcDepth;
 
         PixelFormat mDesiredFormat;
         unsigned short mDesiredIntegerBitDepth;
@@ -436,62 +433,6 @@ namespace Ogre {
 		*/
 		String getSourceFileType() const;
 
-    };
-
-    /** Specialisation of SharedPtr to allow SharedPtr to be assigned to TexturePtr 
-    @note Has to be a subclass since we need operator=.
-    We could templatise this instead of repeating per Resource subclass, 
-    except to do so requires a form VC6 does not support i.e.
-    ResourceSubclassPtr<T> : public SharedPtr<T>
-    */
-    class _OgreExport TexturePtr : public SharedPtr<Texture> 
-    {
-    public:
-        TexturePtr() : SharedPtr<Texture>() {}
-        explicit TexturePtr(Texture* rep) : SharedPtr<Texture>(rep) {}
-        TexturePtr(const TexturePtr& r) : SharedPtr<Texture>(r) {} 
-        TexturePtr(const ResourcePtr& r) : SharedPtr<Texture>()
-        {
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<Texture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-        }
-
-        /// Operator used to convert a ResourcePtr to a TexturePtr
-        TexturePtr& operator=(const ResourcePtr& r)
-        {
-            if (pRep == static_cast<Texture*>(r.getPointer()))
-                return *this;
-            release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-                pRep = static_cast<Texture*>(r.getPointer());
-                pUseCount = r.useCountPointer();
-                if (pUseCount)
-                {
-                    ++(*pUseCount);
-                }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-            return *this;
-        }
     };
 	/** @} */
 	/** @} */

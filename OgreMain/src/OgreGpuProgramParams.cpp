@@ -536,6 +536,11 @@ namespace Ogre
 		setNamedConstant(name, vec.ptr(), 3);
 	}
 	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const Vector2& vec)
+	{
+		setNamedConstant(name, vec.ptr(), 2);
+	}
+	//---------------------------------------------------------------------
 	void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4& m)
 	{
 		setNamedConstant(name, m[0], 16);
@@ -916,6 +921,11 @@ namespace Ogre
 		setConstant(index, Vector4(vec.x, vec.y, vec.z, 1.0f));
 	}
 	//-----------------------------------------------------------------------------
+	void GpuProgramParameters::setConstant(size_t index, const Vector2& vec)
+	{
+		setConstant(index, Vector4(vec.x, vec.y, 1.0f, 1.0f));
+	}
+	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::setConstant(size_t index, const Matrix4& m)
 	{
 		// set as 4x 4-element floats
@@ -1025,6 +1035,11 @@ namespace Ogre
 	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector3& vec)
 	{
 		_writeRawConstants(physicalIndex, vec.ptr(), 3);		
+	}
+	//-----------------------------------------------------------------------------
+	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector2& vec)
+	{
+		_writeRawConstants(physicalIndex, vec.ptr(), 2);
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix4& m,size_t elementCount)
@@ -2570,6 +2585,15 @@ namespace Ogre
 		// look up, and throw an exception if we're not ignoring missing
 		const GpuConstantDefinition* def = 
 			_findNamedConstantDefinition(name, !mIgnoreMissingParams);
+		if (def)
+			_writeRawConstant(def->physicalIndex, vec);
+	}
+	//---------------------------------------------------------------------------
+	void GpuProgramParameters::setNamedConstant(const String& name, const Vector2& vec)
+	{
+		// look up, and throw an exception if we're not ignoring missing
+		const GpuConstantDefinition* def =
+        _findNamedConstantDefinition(name, !mIgnoreMissingParams);
 		if (def)
 			_writeRawConstant(def->physicalIndex, vec);
 	}

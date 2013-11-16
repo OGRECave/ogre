@@ -95,7 +95,7 @@ namespace Ogre {
         void setForceApplication(ForceApplication fa);
 
         /** Retrieves how the force vector is applied to a particle. 
-        @param fa A member of the ForceApplication enum.
+        @return A member of the ForceApplication enum.
         */
         ForceApplication getForceApplication(void) const;
 

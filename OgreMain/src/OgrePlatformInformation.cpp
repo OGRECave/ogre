@@ -46,6 +46,12 @@ THE SOFTWARE.
         #include <sys/sysctl.h>
         #if __MACH__
             #include <mach/machine.h>
+            #ifndef CPU_SUBTYPE_ARM64_V8
+                #define CPU_SUBTYPE_ARM64_V8 ((cpu_subtype_t) 1)
+            #endif
+            #ifndef CPU_SUBTYPE_ARM_V8
+                #define CPU_SUBTYPE_ARM_V8 ((cpu_subtype_t) 13)
+            #endif
         #endif
     #endif
 #endif
@@ -544,7 +550,7 @@ namespace Ogre {
         // Get the size of the CPU subtype struct
         size_t size;
         sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
-        
+
         // Get the ARM CPU subtype
         cpu_subtype_t cpusubtype = 0;
         sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
@@ -559,6 +565,15 @@ namespace Ogre {
                 break;
             case CPU_SUBTYPE_ARM_V7F:
                 cpuID = "ARM Cortex-A9";
+                break;
+            case CPU_SUBTYPE_ARM_V7S:
+                cpuID = "ARM Swift";
+                break;
+            case CPU_SUBTYPE_ARM_V8:
+                cpuID = "ARMv8";
+                break;
+            case CPU_SUBTYPE_ARM64_V8:
+                cpuID = "ARM64v8";
                 break;
             default:
                 cpuID = "Unknown ARM";

@@ -45,7 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	OSXPBuffer::OSXPBuffer( PixelComponentType format, size_t width, size_t height ) : GLPBuffer( format, width, height ), mContext( NULL )
+	OSXPBuffer::OSXPBuffer( PixelComponentType format, uint32 width, uint32 height ) : GLPBuffer( format, width, height ), mContext( NULL )
 	{
 		LogManager::getSingleton().logMessage( "OSXPBuffer::OSXPBuffer()" );
 		createPBuffer();

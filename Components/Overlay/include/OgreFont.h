@@ -416,61 +416,6 @@ namespace Ogre
 		*/
 		void loadResource(Resource* resource);
     };
-	/** Specialisation of SharedPtr to allow SharedPtr to be assigned to FontPtr 
-	@note Has to be a subclass since we need operator=.
-	We could templatise this instead of repeating per Resource subclass, 
-	except to do so requires a form VC6 does not support i.e.
-	ResourceSubclassPtr<T> : public SharedPtr<T>
-	*/
-	class _OgreOverlayExport FontPtr : public SharedPtr<Font> 
-	{
-	public:
-		FontPtr() : SharedPtr<Font>() {}
-		explicit FontPtr(Font* rep) : SharedPtr<Font>(rep) {}
-		FontPtr(const FontPtr& r) : SharedPtr<Font>(r) {} 
-		FontPtr(const ResourcePtr& r) : SharedPtr<Font>()
-		{
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-			    pRep = static_cast<Font*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-		}
-
-		/// Operator used to convert a ResourcePtr to a FontPtr
-		FontPtr& operator=(const ResourcePtr& r)
-		{
-			if (pRep == static_cast<Font*>(r.getPointer()))
-				return *this;
-			release();
-			// lock & copy other mutex pointer
-            OGRE_MUTEX_CONDITIONAL(r.OGRE_AUTO_MUTEX_NAME)
-            {
-                OGRE_LOCK_MUTEX(*r.OGRE_AUTO_MUTEX_NAME);
-                OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME);
-			    pRep = static_cast<Font*>(r.getPointer());
-			    pUseCount = r.useCountPointer();
-			    if (pUseCount)
-			    {
-				    ++(*pUseCount);
-			    }
-            }
-			else
-			{
-				// RHS must be a null pointer
-				assert(r.isNull() && "RHS must be null if it has no mutex!");
-				setNull();
-			}
-			return *this;
-		}
-	};
 	/** @} */
 	/** @} */
 }

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreString.h"
 #include "OgreHeaderPrefix.h"
+#include "Threading/OgreThreadHeaders.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
 namespace pp

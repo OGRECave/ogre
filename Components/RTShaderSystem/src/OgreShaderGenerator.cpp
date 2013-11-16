@@ -63,7 +63,6 @@ String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 //-----------------------------------------------------------------------
 ShaderGenerator* ShaderGenerator::getSingletonPtr()
 {
-	assert( msSingleton );  
 	return msSingleton;
 }
 
@@ -1035,7 +1034,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
  Technique* ShaderGenerator::findSourceTechnique(const String& materialName, 
 				const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable)
  {
-	 MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
+     MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	 Material::TechniqueIterator itMatTechniques = mat->getTechniqueIterator();
 	 
 

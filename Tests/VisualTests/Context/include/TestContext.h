@@ -46,9 +46,9 @@ extern char ***_NSGetArgv(void);
 class TestBatch;
 using namespace Ogre;
 
-typedef std::map<std::string, OgreBites::SamplePlugin *> PluginMap;
+typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 
 /** This class demonstrates basic usage of the RTShader system.
  It sub class the material manager listener class and when a target scheme callback
@@ -114,7 +114,7 @@ public:
 protected:
 	RTShader::ShaderGenerator*	mShaderGenerator;			// The shader generator instance.
 };
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
@@ -163,8 +163,8 @@ public:
 
     void createDummyScene();
     void destroyDummyScene();
-    bool initializeRTShaderSystem(SceneManager* sceneMgr);
-    void finalizeRTShaderSystem();
+    bool initialiseRTShaderSystem(SceneManager* sceneMgr);
+    void finaliseRTShaderSystem();
 
     /** Sets the timstep value
      *        @param timestep The time to simulate elapsed between each frame 
@@ -215,10 +215,10 @@ protected:
 
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
     RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
     ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 
     /// The current frame of a running test
     unsigned int mCurrentFrame;
@@ -236,6 +236,8 @@ protected:
     bool mGenerateHtml;
     // Force the config dialog
     bool mForceConfig;
+    // Do not confine mouse to window
+    bool mNoGrabMouse;
     // Show usage details
     bool mHelp;
     // Render system to use
@@ -284,9 +286,6 @@ protected:
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
 @end
-
-
-static id mAppDelegate;
 
 @implementation AppDelegate
 

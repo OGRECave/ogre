@@ -798,7 +798,7 @@ protected:
         // remove compositor first???
         CompositorManager::getSingleton().removeCompositor(mViewport, compositor);
         
-        (static_cast<MaterialPtr>(MaterialManager::getSingleton().getByName(material)))->getTechnique(0)->
+        MaterialManager::getSingleton().getByName(material)->getTechnique(0)->
         getPass(0)->getFragmentProgramParameters()->setNamedConstant(uniform, value);
         
         // adding again

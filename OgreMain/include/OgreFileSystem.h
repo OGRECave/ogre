@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -135,7 +136,7 @@ namespace Ogre {
             return OGRE_NEW FileSystemArchive(name, "FileSystem", readOnly);
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance(Archive* ptr) { delete ptr; }
+        void destroyInstance(Archive* ptr) { OGRE_DELETE ptr; }
     };
 
     /** @} */

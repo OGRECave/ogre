@@ -495,11 +495,11 @@ namespace Ogre {
 					mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 				}
 
-				if( mParametersMap.find(paramName) == mParametersMap.end())
+				if( mParametersMap.find(name) == mParametersMap.end())
 				{
-					mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+					mParametersMap.insert(GpuConstantDefinitionMap::value_type(name, def));
 					mParametersMapSizeAsBuffer += sizeof(size_t);
-					mParametersMapSizeAsBuffer += paramName.size();
+					mParametersMapSizeAsBuffer += name.size();
 					mParametersMapSizeAsBuffer += sizeof(GpuConstantDefinition);
 				}
                 

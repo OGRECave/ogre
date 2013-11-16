@@ -43,7 +43,7 @@ namespace Ogre {
 	/** \addtogroup LOD
 	*  @{
 	*/
-	/** Manager for lod strategies. */
+	/** Manager for LOD strategies. */
     class _OgreExport LodStrategyManager : public Singleton<LodStrategyManager>, public LodAlloc
     {
         /** Map of strategies. */

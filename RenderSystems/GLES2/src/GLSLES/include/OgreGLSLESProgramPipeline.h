@@ -85,9 +85,9 @@ namespace Ogre
 
 	protected:
         enum {
-            VERTEX_PROGRAM_LINKED = 0x01,
-            FRAGMENT_PROGRAM_LINKED = 0x10,
-            ALL_PROGRAMS_LINKED = 0x11
+            VERTEX_PROGRAM_LINKED = 1,
+            FRAGMENT_PROGRAM_LINKED = 2,
+            ALL_PROGRAMS_LINKED = 3
         };
 		/// GL handle for pipeline object
         GLuint mGLProgramPipelineHandle;

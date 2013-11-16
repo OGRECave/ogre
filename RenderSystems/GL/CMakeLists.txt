@@ -28,6 +28,27 @@ source_group(NVparse FILES ${NVPARSE_SOURCE} ${NVPARSE_HEADERS})
 source_group(ATIFS FILES ${ATIFS_SOURCE} ${ATIFS_HEADERS})
 source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
 
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLUniformCacheImp.cpp
+  )
+else()
+  list(APPEND HEADER_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLNullUniformCacheImp.h
+  )
+  list(APPEND SOURCE_FILES
+      src/StateCacheManager/OgreGLNullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLNullUniformCacheImp.cpp
+  )
+endif()
+
 # Add system specific settings
 if (WIN32)
   file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
@@ -63,8 +84,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
-  ${OPENGL_INCLUDE_DIR}
 )
+
+if(NOT APPLE)
+  include_directories(
+    ${OPENGL_INCLUDE_DIR}
+  )
+endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile

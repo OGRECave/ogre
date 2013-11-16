@@ -116,9 +116,7 @@ namespace Ogre {
         GLenum texTarget = getGL3PlusTextureTarget();
 
         // Calculate size for all mip levels of the texture
-        size_t width = mWidth;
-        size_t height = mHeight;
-        size_t depth = mDepth;
+        uint32 width, height, depth;
 
         if((mWidth * PixelUtil::getNumElemBytes(mFormat)) & 3) {
             // Standard alignment of 4 is not right for some formats
@@ -129,8 +127,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL,
-                                            (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
+
         // Set some misc default parameters, these can of course be changed later
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -176,11 +174,11 @@ namespace Ogre {
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
-            size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+            GLsizei size;
 
-            for (size_t mip = 0; mip <= mNumMipmaps; mip++)
+            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
             {
-                size = PixelUtil::getMemorySize(width, height, depth, mFormat);
+                size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
 //                std::stringstream str;
 //                str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
 //                << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
@@ -276,7 +274,7 @@ namespace Ogre {
             else
             {
                 // Run through this process to pregenerate mipmap pyramid
-                for(size_t mip = 0; mip <= mNumMipmaps; mip++)
+                for(uint8 mip = 0; mip <= mNumMipmaps; mip++)
                 {
 //                    std::stringstream str;
 //                    str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
@@ -483,9 +481,9 @@ namespace Ogre {
     {
         mSurfaceList.clear();
 
-        for (size_t face = 0; face < getNumFaces(); face++)
+        for (uint8 face = 0; face < getNumFaces(); face++)
         {
-            for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
+            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
                                                                             getGL3PlusTextureTarget(),
@@ -530,7 +528,7 @@ namespace Ogre {
                         "GL3PlusTexture::getBuffer");
         }
 
-        unsigned int idx = face * (mNumMipmaps + 1) + mipmap;
+        unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
