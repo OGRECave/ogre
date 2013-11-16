@@ -1712,9 +1712,10 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_render(const RenderOperation& op)
     {
-        // Call super class
+        // Call super class.
         RenderSystem::_render(op);
 
+        // Setup initial variables.
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
@@ -1733,6 +1734,7 @@ namespace Ogre {
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
+        // Bind VAO.
         bool updateVAO = true;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -1742,7 +1744,6 @@ namespace Ogre {
             {
                 updateVAO = !programPipeline->getVertexArrayObject()->isInitialised();
 
-                // Bind VAO
                 programPipeline->getVertexArrayObject()->bind();
             }
         }
@@ -1753,18 +1754,18 @@ namespace Ogre {
             {
                 updateVAO = !linkProgram->getVertexArrayObject()->isInitialised();
 
-                // Bind VAO
                 linkProgram->getVertexArrayObject()->bind();
             }
         }
 
+        // Bind vertex elements.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
             size_t source = elem.getSource();
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
+                continue; // Skip unbound elements.
 
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
@@ -1786,7 +1787,7 @@ namespace Ogre {
 
         activateGLTextureUnit(0);
 
-
+        // Setup compute shader job (if applicable).
         if (mCurrentComputeProgram) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
         {
             //FIXME give user control over when and what memory barriers are created
@@ -1805,9 +1806,9 @@ namespace Ogre {
         }
 
 
-        // Find the correct type to render
+        // Find the correct type to render.
         GLint primType;
-        // Use adjacency if there is a geometry program and it requested adjacency info
+        // Use adjacency if there is a geometry program and it requested adjacency info.
         bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryProgram && mCurrentGeometryProgram->isAdjacencyInfoRequired());
         switch (op.operationType)
         {
@@ -1832,11 +1833,6 @@ namespace Ogre {
             break;
         }
 
-        // if (mCurrentGeometryProgram) {
-        //     printf("useAdjacency: %.1u \n", useAdjacency);
-        //     printf("primType == GL_LINES_ADJACENCY: %.1u \n", primType == GL_LINES_ADJACENCY);
-        //     printf("primType == GL_TRIANGLES: %.1u \n", primType == GL_TRIANGLES);
-        // }
 
         // Bind atomic counter buffers.
         // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_ATOMIC_COUNTERS))
@@ -1852,9 +1848,12 @@ namespace Ogre {
         // }
         //TODO: Reset atomic counters somewhere
 
-        // Do tessellation rendering. Note: Only evaluation (domain) shaders are required.
+
+        // Render to screen!
         if (mCurrentDomainProgram)
         {
+            // Note: Only evaluation (domain) shaders are required.
+
             // GLuint primCount = 0;
             // // Useful primitives for tessellation
             // switch( op.operationType )
@@ -1888,7 +1887,6 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                //printf("YES INDEX\n");
                 OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                                                  static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
@@ -1901,7 +1899,6 @@ namespace Ogre {
             }
             else
             {
-                //printf("NO INDEX - primCount: %.4u \n", primCount);
                 OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, op.vertexData->vertexCount));
                 //OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
@@ -1920,7 +1917,7 @@ namespace Ogre {
 
             do
             {
-                // Update derived depth bias
+                // Update derived depth bias.
                 if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
                 {
                     _setDepthBias(mDerivedDepthBiasBase +
@@ -1979,6 +1976,7 @@ namespace Ogre {
             } while (updatePassIterationRenderState());
         }
 
+        // Unbind VAO (if updated).
         if (updateVAO)
         {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
@@ -1999,18 +1997,19 @@ namespace Ogre {
                 }
             }
 
-            // Unbind the vertex array object. Marks the end of what state will be included.
+            // Unbind the vertex array object. 
+            // Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
         }
 
-        // Set fences
+        // Set fences.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
             size_t source = elem.getSource();
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
+                continue; // Skip unbound elements.
 
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
@@ -2772,7 +2771,7 @@ namespace Ogre {
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
-        //        if (updateVAO)
+        // if (updateVAO)
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId()));
