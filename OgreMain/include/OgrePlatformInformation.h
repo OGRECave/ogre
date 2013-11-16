@@ -57,7 +57,7 @@ namespace Ogre {
 #	define OGRE_CPU OGRE_CPU_X86
 #elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(_aarch64_)
 #	define OGRE_CPU OGRE_CPU_ARM
-#elif defined(__mips64)) || defined(__mips64_) || defined(__arm64__)
+#elif defined(__mips64)) || defined(__mips64_)
 #	define OGRE_CPU OGRE_CPU_MIPS
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
