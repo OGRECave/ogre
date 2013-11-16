@@ -108,6 +108,9 @@ namespace Ogre {
 		// Determine endianness (must be the first thing we do!)
 		determineEndianness(stream);
 
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+		enableValidation();
+#endif
         // Check header
         readFileHeader(stream);
 		pushInnerChunk(stream);
@@ -2751,6 +2754,14 @@ namespace Ogre {
         OGRE_FREE(vert, MEMCATEGORY_GEOMETRY);
 	}
 
+	void MeshSerializerImpl::enableValidation()
+	{
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+		mReportChunkErrors = true;
+#endif
+	}
+
+
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -3198,6 +3209,14 @@ namespace Ogre {
 		popInnerChunk(stream);
 #endif
 	}
+
+	void MeshSerializerImpl_v1_8::enableValidation()
+	{
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+		mReportChunkErrors = false;
+#endif
+	}
+
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
     //---------------------------------------------------------------------

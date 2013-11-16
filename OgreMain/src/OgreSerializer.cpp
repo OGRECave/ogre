@@ -40,12 +40,15 @@ namespace Ogre {
     const uint16 HEADER_STREAM_ID = 0x1000;
     const uint16 OTHER_ENDIAN_HEADER_STREAM_ID = 0x0010;
     //---------------------------------------------------------------------
-    Serializer::Serializer()
-    {
-        // Version number
-        mVersion = "[Serializer_v1.00]";
-		mFlipEndian = false;
+    Serializer::Serializer() :
+		mVersion("[Serializer_v1.00]"), // Version number
+		mFlipEndian(false),
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+		mReportChunkErrors(true)
+#endif
+	{
     }
+
     //---------------------------------------------------------------------
     Serializer::~Serializer()
     {
@@ -127,7 +130,7 @@ namespace Ogre {
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
 		if (!mChunkSizeStack.empty()){
 			size_t pos = mStream->tell();
-			if (pos != mChunkSizeStack.back()){
+			if (pos != mChunkSizeStack.back() && mReportChunkErrors){
 				LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + mStream->getName()
 					+ "' Chunk id: " + StringConverter::toString(id));
 			}
@@ -287,7 +290,7 @@ namespace Ogre {
         readInts(stream, &mCurrentstreamLen, 1);
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
 		if (!mChunkSizeStack.empty() && !stream->eof()){
-            if (pos != mChunkSizeStack.back()){
+            if (pos != mChunkSizeStack.back() && mReportChunkErrors){
 				LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + stream->getName() + "' Chunk id: " + StringConverter::toString(id));
 			}
 			mChunkSizeStack.back() = pos + mCurrentstreamLen;
@@ -458,7 +461,7 @@ namespace Ogre {
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
 		if (!mChunkSizeStack.empty()){
 			size_t pos = stream->tell();
-            if (pos != mChunkSizeStack.back() && !stream->eof()){
+            if (pos != mChunkSizeStack.back() && !stream->eof() && mReportChunkErrors){
 				LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: " + stream->getName());
 			}
 

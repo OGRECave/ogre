@@ -184,6 +184,9 @@ namespace Ogre {
         /// pointer to locked or temporary memory 
         virtual void flipEndian(void* pData, size_t vertexCount, size_t vertexSize, const VertexDeclaration::VertexElementList& elems);
 		
+		/// This function can be overloaded to disable validation in debug builds.
+		virtual void enableValidation();
+
 		ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
 	};
 
@@ -215,6 +218,7 @@ namespace Ogre {
 		virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
 #endif
 		virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+		virtual void enableValidation();
 	};
 
     /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 

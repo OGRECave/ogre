@@ -121,6 +121,7 @@ namespace Ogre {
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
 		typedef vector<int>::type ChunkSizeStack;
 		ChunkSizeStack mChunkSizeStack;
+		bool mReportChunkErrors;
 #endif
 		virtual void pushInnerChunk(const DataStreamPtr& stream);
 		virtual void popInnerChunk(const DataStreamPtr& stream);
