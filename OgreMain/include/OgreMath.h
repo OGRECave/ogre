@@ -378,7 +378,7 @@ namespace Ogre
 		}
         
         /** Linear interpolation. Given 3 parameters a, b and wthe function returns the value
-			of (1 – w)* a + w * b. Where a and b are matching vector or scalar types and w can
+			of (1 â€“ w)* a + w * b. Where a and b are matching vector or scalar types and w can
 			be either a scalar or a vector of the same type as a and b.
 		@remarks
 			lerp( a, b, 0 ) = a

@@ -47,15 +47,6 @@ protected:
 
 	void setupContent()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		const IdString workspaceName( "Tesselation Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// set our camera
 		mTrayMgr->showCursor();
 		mCameraMan->setStyle(CS_ORBIT);

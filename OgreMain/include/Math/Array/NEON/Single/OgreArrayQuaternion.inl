@@ -171,7 +171,7 @@ namespace Ogre
 		// fCoeff1 = Sin( fT * fAngle ) * fInvSin
 		ArrayReal fCoeff0 = vmulq_f32( MathlibNEON::Sin4( vmulq_f32( oneSubT, fAngle ) ), fInvSin );
 		ArrayReal fCoeff1 = vmulq_f32( MathlibNEON::Sin4( vmulq_f32( fT, fAngle ) ), fInvSin );
-		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180°)
+		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180Â°)
 		fCoeff0 = MathlibNEON::CmovRobust( fCoeff0, oneSubT, mask );
 		fCoeff1 = MathlibNEON::CmovRobust( fCoeff1, fT, mask );
 

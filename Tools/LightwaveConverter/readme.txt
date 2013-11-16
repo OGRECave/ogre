@@ -1,5 +1,5 @@
 Lwo2Mesh v0.89 by Dennis Verbeek ( dennis.verbeek@chello.nl )
-Linux port by Magnus Møller Petersen ( magnus@moaner.dk )
+Linux port by Magnus MÃ¸ller Petersen ( magnus@moaner.dk )
 
 Lwo2Mesh is a commandline tool to convert lightwave objects into ogre-meshes. Use -? to get help. Use *.lwo to convert multiple objects in one run.
 

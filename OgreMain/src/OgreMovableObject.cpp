@@ -430,7 +430,7 @@ namespace Ogre {
 
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really donâ€™t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
@@ -573,7 +573,7 @@ namespace Ogre {
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really donâ€™t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;

@@ -30,16 +30,6 @@ protected:
 
 	void setupContent()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-
-		const IdString workspaceName( "Smoke Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		mSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");
 
 		// dim orange ambient and two bright orange lights to match the skybox

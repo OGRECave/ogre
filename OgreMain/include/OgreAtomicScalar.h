@@ -35,8 +35,8 @@ THE SOFTWARE.
 
 #if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
-// Atomics are not yet supported for the unsigned long long int(ResourceHandle) type on iOS as of Clang 5.0
-#if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473)) || ((OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(_LIBCPP_VERSION)) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+// Atomics are not yet supported for the unsigned long long int(ResourceHandle) type as of Clang 5.0. So only GCC for now.
+#if ((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 473))
     #define BUILTIN_FETCH_ADD(var, add) __atomic_fetch_add (var, add, __ATOMIC_SEQ_CST);
     #define BUILTIN_ADD_FETCH(var, add) __atomic_add_fetch (var, add, __ATOMIC_SEQ_CST);
     #define BUILTIN_SUB_FETCH(var, sub) __atomic_sub_fetch (var, sub, __ATOMIC_SEQ_CST);

@@ -89,6 +89,7 @@ Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN
 		"Different batch sizes give different results depending on CPU culling"
 		" and instance numbers on the scene.\n\n"
 		"If performance is too slow, try defragmenting batches once in a while";
+	mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
 }
 
 
@@ -156,15 +157,6 @@ void Sample_NewInstancing::setupContent()
 			passDef->mIncludeOverlays = false;
 		}
 	}
-
-	//Create the basic workspace def
-	const IdString workspaceName( "NewInstancingWorkspace" );
-	if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-	{
-		compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ),
-													"NewInstancing Shadows" );
-	}
-	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
 	mEntities.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
 	mSceneNodes.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
