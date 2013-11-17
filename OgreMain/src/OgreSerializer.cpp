@@ -42,9 +42,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Serializer::Serializer() :
 		mVersion("[Serializer_v1.00]"), // Version number
-		mFlipEndian(false),
+		mFlipEndian(false)
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
-		mReportChunkErrors(true)
+		, mReportChunkErrors(true)
 #endif
 	{
     }
