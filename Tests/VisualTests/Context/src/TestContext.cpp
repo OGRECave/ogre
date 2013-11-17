@@ -58,15 +58,15 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mBatch(0), mCurrentTest(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
 
     // prepopulate expected options
     unOpt["-r"] = false;        // generate reference set
-    unOpt["--no-html"] = false; // whether or not to generate html
-    unOpt["-d"] = false;        // force config dialogue
+    unOpt["--no-html"] = false; // whether or not to generate HTML
+    unOpt["-d"] = false;        // force config dialog
     unOpt["--nograb"] = false;  // do not grab mouse
     unOpt["-h"] = false;        // help, give usage details
     unOpt["--help"] = false;    // help, give usage details
@@ -195,7 +195,8 @@ void TestContext::setup()
     mBatch->comment = mComment;
 
     OgreBites::Sample* firstTest = loadTests(mTestSetName);
-    runSample(firstTest);
+    if (firstTest)
+        runSample(firstTest);
 }
 //-----------------------------------------------------------------------
 
@@ -242,7 +243,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
         Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
         OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
 
-        // if something's gone wrong return null
+        // if something has gone wrong return null
         if (!sp)
             return 0;
 
@@ -280,8 +281,13 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
     }
 
     // start with the first one on the list
-    startSample = mTests.front();
-    return startSample;
+    if (!mTests.empty())
+    {
+        startSample = mTests.front();
+        return startSample;
+    }
+    else
+        return 0;    
 }
 //-----------------------------------------------------------------------
 
@@ -526,6 +532,8 @@ void TestContext::finishedTests()
     if ((mGenerateHtml || mSummaryOutputDir != "NONE") && !mReferenceSet)
     {
         const TestBatch* compareTo = 0;
+        TestBatchSetPtr batches;
+        TestBatchSet::iterator i;
 
         Ogre::ConfigFile info;
         bool foundReference = true;
@@ -540,9 +548,8 @@ void TestContext::finishedTests()
         {
             // if no luck, just grab the most recent compatible set
             foundReference = false;
-            TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
-
-            TestBatchSet::iterator i;
+            batches = TestBatch::loadTestBatches(mOutputDir);
+            
             for (i = batches->begin(); i != batches->end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
