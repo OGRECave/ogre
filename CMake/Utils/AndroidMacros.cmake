@@ -41,6 +41,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	
 	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
+	set(DEPEND_STATIC_LIBS "")	
 	foreach(DEPENDENCY ${DEPENDENCIES})
 	    set(DEPEND_STATIC_LIBS "${DEPENDENCY}Static" ${DEPEND_STATIC_LIBS})
 	endforeach(DEPENDENCY ${DEPENDENCIES})
@@ -49,7 +50,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@"  "glsl_optimizer" "glcpp-library" "mesa")
 	endif()
 	
-	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "FreeImage" "zlib""zzip")
+	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "FreeImage" "zlib" "zzip")
 	
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
