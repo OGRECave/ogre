@@ -47,11 +47,13 @@ namespace Ogre {
         , mTriedToLinkAndFailed(false)
     {
         // init mCustomAttributesIndexes
-        for(size_t i = 0 ; i < VES_COUNT; i++)
-            for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
+        for (size_t i = 0 ; i < VES_COUNT; i++)
+        {
+            for (size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
             {
                 mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
             }
+        }
 
         // Initialize the attribute to semantic map
         mSemanticTypeMap.insert(SemanticToStringMap::value_type("vertex", VES_POSITION));
@@ -122,7 +124,7 @@ namespace Ogre {
     VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(String type)
     {
         VertexElementSemantic semantic = mSemanticTypeMap[type];
-        if(semantic > 0)
+        if (semantic > 0)
         {
             return semantic;
         }
@@ -138,7 +140,7 @@ namespace Ogre {
     {
         for (SemanticToStringMap::iterator i = mSemanticTypeMap.begin(); i != mSemanticTypeMap.end(); ++i)
         {
-            if((*i).second == semantic)
+            if ((*i).second == semantic)
                 return (*i).first.c_str();
         }
 
@@ -217,7 +219,7 @@ namespace Ogre {
         // Format is:
         //      layout(location = 0) attribute vec4 vertex;
 
-        if(mVertexProgram)
+        if (mVertexProgram)
         {
             String shaderSource = mVertexProgram->getGLSLProgram()->getSource();
             String::size_type currPos = shaderSource.find("layout");
@@ -229,20 +231,21 @@ namespace Ogre {
                 String::size_type endPos = shaderSource.find(";", currPos);
                 if (endPos == String::npos)
                 {
-                    // Problem, missing semicolon, abort
+                    // Problem, missing semicolon, abort.
                     break;
                 }
 
                 String line = shaderSource.substr(currPos, endPos - currPos);
 
-                // Skip over 'layout'
+                // Skip over 'layout'.
                 currPos += 6;
 
-                // Skip until '='
+                // Skip until '='.
                 String::size_type eqPos = line.find("=");
                 String::size_type parenPos = line.find(")");
 
-                // Skip past '=' up to a ')' which contains an integer(the position).  This could be a definition, does the preprocessor do replacement?
+                // Skip past '=' up to a ')' which contains an integer(the position).  
+                //TODO This could be a definition, does the preprocessor do replacement?
                 String attrLocation = line.substr(eqPos + 1, parenPos - eqPos - 1);
                 StringUtil::trim(attrLocation);
                 GLint attrib = StringConverter::parseInt(attrLocation);
@@ -253,24 +256,24 @@ namespace Ogre {
                 StringUtil::trim(line);
                 StringVector parts = StringUtil::split(line, " ");
 
-                if(parts.size() < 3)
+                if (parts.size() < 3)
                 {
-                    // This is a malformed attribute
-                    // It should contain 3 parts, i.e. "attribute vec4 vertex"
+                    // This is a malformed attribute.
+                    // It should contain 3 parts, i.e. "attribute vec4 vertex".
                     break;
                 }
 
                 String attrName = parts[2];
 
-                // Special case for attribute named position
-                if(attrName == "position")
+                // Special case for attribute named position.
+                if (attrName == "position")
                     semantic = getAttributeSemanticEnum("vertex");
                 else
                     semantic = getAttributeSemanticEnum(attrName);
 
-                // Find the texture unit index
+                // Find the texture unit index.
                 String::size_type uvPos = attrName.find("uv");
-                if(uvPos != String::npos)
+                if (uvPos != String::npos)
                 {
                     String uvIndex = attrName.substr(uvPos + 2, attrName.length() - 2);
                     index = StringConverter::parseInt(uvIndex);

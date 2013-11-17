@@ -91,7 +91,7 @@ namespace Ogre {
     {
         if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
         {
-            // From buffer to card, only upload if was locked for writing
+            // From buffer to card, only upload if was locked for writing.
             upload(mCurrentLock, mLockedBox);
         }
         freeBuffer();
@@ -113,15 +113,15 @@ namespace Ogre {
             src.getDepth() != dstBox.getDepth())
         {
             // Scale to destination size.
-            // This also does pixel format conversion if needed
+            // This also does pixel format conversion if needed.
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if(GL3PlusPixelUtil::getGLOriginFormat(src.format) == 0)
+        else if (GL3PlusPixelUtil::getGLOriginFormat(src.format) == 0)
         {
-            // Extents match, but format is not accepted as valid source format for GL
-            // do conversion in temporary buffer
+            // Extents match, but format is not accepted as valid
+            // source format for GL. Do conversion in temporary buffer.
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
             PixelUtil::bulkPixelConversion(src, scaled);
@@ -129,7 +129,7 @@ namespace Ogre {
         else
         {
             allocateBuffer();
-            // No scaling or conversion needed
+            // No scaling or conversion needed.
             scaled = src;
         }
         
@@ -306,7 +306,7 @@ namespace Ogre {
 
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
-        if(mTarget == GL_TEXTURE_2D_ARRAY)
+        if (mTarget == GL_TEXTURE_2D_ARRAY)
         {
             dataSize = PixelUtil::getMemorySize(dest.getWidth(), dest.getHeight(), dest.getDepth(), data.format);
         }
@@ -317,17 +317,17 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
 
-//        std::stringstream str;
-//        str << "GL3PlusHardwarePixelBuffer::upload: " << mTextureID
-//        << " pixel buffer: " << mBufferId
-//        << " bytes: " << mSizeInBytes
-//        << " dest depth: " << dest.getDepth()
-//        << " dest front: " << dest.front
-//        << " datasize: " << dataSize
-//        << " face: " << mFace << " level: " << mLevel
-//        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-//        << " format: " << PixelUtil::getFormatName(mFormat);
-//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+        // std::stringstream str;
+        // str << "GL3PlusHardwarePixelBuffer::upload: " << mTextureID
+        // << " pixel buffer: " << mBufferId
+        // << " bytes: " << mSizeInBytes
+        // << " dest depth: " << dest.getDepth()
+        // << " dest front: " << dest.front
+        // << " datasize: " << dataSize
+        // << " face: " << mFace << " level: " << mLevel
+        // << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
+        // << " format: " << PixelUtil::getFormatName(mFormat);
+        // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, dataSize, GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));

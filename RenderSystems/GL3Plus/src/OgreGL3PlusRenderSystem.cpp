@@ -546,10 +546,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::shutdown(void)
     {
-       
-        printf("SHUTDOWN GL3+ RenderSystem\n");
         RenderSystem::shutdown();
-        printf("SHUTDOWN GL3+ RenderSystem COMPLETE\n");
 
         // Deleting the GLSL program factory
         if (mGLSLProgramFactory)
@@ -562,19 +559,15 @@ namespace Ogre {
         }
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        printf("DELETE GL3+GpuProgramManager\n");
         OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;
 
-        printf("DELETE GL3+HardwareBufferManager\n");
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        printf("DELETE GL3+RTTManager\n");
         OGRE_DELETE mRTTManager;
         mRTTManager = 0;
 
-        printf("DELETE GL3+TextureManager\n");
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
 
@@ -586,7 +579,6 @@ namespace Ogre {
 
             pCurContext->releaseContext();
 
-            printf("DELETE GL3+CurContext\n");
             OGRE_DELETE pCurContext;
         }
         mBackgroundContextList.clear();
@@ -599,9 +591,7 @@ namespace Ogre {
 
         mGLInitialised = 0;
 
-        // printf("SHUTDOWN GL3+ RenderSystem\n");
         // RenderSystem::shutdown();
-        // printf("SHUTDOWN GL3+ RenderSystem COMPLETE\n");
     }
 
     bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
@@ -1715,7 +1705,7 @@ namespace Ogre {
         // Call super class.
         RenderSystem::_render(op);
 
-        // Setup initial variables.
+        // Create variables related to instancing.
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
@@ -1729,12 +1719,13 @@ namespace Ogre {
             numberOfInstances *= getGlobalNumberOfInstances();
         }
 
+        // Get vertex array organization.
         const VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
-        // Bind VAO.
+        // Bind VAO (set of per-vertex attributes: position, normal, etc.).
         bool updateVAO = true;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -1758,7 +1749,7 @@ namespace Ogre {
             }
         }
 
-        // Bind vertex elements.
+        // Bind the appropriate VBOs to the active attributes of the VAO.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
@@ -1787,7 +1778,7 @@ namespace Ogre {
 
         activateGLTextureUnit(0);
 
-        // Setup compute shader job (if applicable).
+        // Launch compute shader job(s).
         if (mCurrentComputeProgram) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
         {
             //FIXME give user control over when and what memory barriers are created
@@ -1806,7 +1797,7 @@ namespace Ogre {
         }
 
 
-        // Find the correct type to render.
+        // Determine the correct primitive type to render.
         GLint primType;
         // Use adjacency if there is a geometry program and it requested adjacency info.
         bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryProgram && mCurrentGeometryProgram->isAdjacencyInfoRequired());
@@ -1850,8 +1841,9 @@ namespace Ogre {
 
 
         // Render to screen!
-        if (mCurrentDomainProgram)
+        if (mCurrentDomainProgram) 
         {
+            // Tessellation shader special case.
             // Note: Only evaluation (domain) shaders are required.
 
             // GLuint primCount = 0;
@@ -1956,7 +1948,7 @@ namespace Ogre {
         {
             do
             {
-                // Update derived depth bias
+                // Update derived depth bias.
                 if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
                 {
                     _setDepthBias(mDerivedDepthBiasBase +
@@ -2002,7 +1994,10 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
         }
 
-        // Set fences.
+        // Set fences.  
+        // This ensures all GL operations called since last fence
+        // (e.g., this render) are completed by GPU before executing
+        // later GL operations.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;

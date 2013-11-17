@@ -41,7 +41,6 @@ namespace Ogre {
 
     GL3PlusGpuProgramManager::~GL3PlusGpuProgramManager()
     {
-        printf("UNREGISTER GL3PlusGpuProgramManager\n");
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
