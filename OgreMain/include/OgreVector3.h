@@ -54,8 +54,11 @@ namespace Ogre
 		Real x, y, z;
 
     public:
+        /** Default constructor.
+            @note
+                It does <b>NOT</b> initialize the vector for efficiency.
+        */
         inline Vector3()
-            : x( 0 ), y( 0 ), z( 0 )
         {
         }
 
