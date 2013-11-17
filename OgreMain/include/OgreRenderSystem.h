@@ -434,6 +434,22 @@ namespace Ogre
              <td>&nbsp;</td>
          </tr>
          <tr>
+             <td>externalSharegroup</td>
+             <td>EAGLSharegroup pointer as an integer</td>
+             <td>0</td>
+             <td>External sharegroup, used to shared GL resources between contexts</td>
+             <td>iOS Specific</td>
+             <td>&nbsp;</td>
+         </tr>
+         <tr>
+             <td>Full Screen</td>
+             <td>true, false</td>
+             <td>false</td>
+             <td>Specify whether to create the window in full screen mode</td>
+             <td>OS X Specific</td>
+             <td>&nbsp;</td>
+         </tr>
+         <tr>
 			<td>FSAA</td>
 			<td>Positive integer (usually 0, 2, 4, 8, 16)</td>
 			<td>0</td>
