@@ -25,12 +25,13 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, in sampler2D texFromX, in sampler2D texFromY, in sampler2D texFromZ, in vec3 parameters, out vec4 cOut)
-{
+void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, in sampler2D texFromX, in sampler2D texFromY, in sampler2D texFromZ, in vec3 parameters, out vec4 cOut) {
+
 	vec3 blendWeights = abs(normalize(normal));
-	blendWeights = blendWeights - parameters.y;
-	blendWeights = pow(max(blendWeights, vec3(0)), vec3(parameters.z));
-	blendWeights /= vec3(blendWeights.x + blendWeights.y + blendWeights.z);
+	blendWeights = blendWeights - vec3(parameters.yyy);
+	blendWeights = vec3(pow(max(blendWeights.x, 0), parameters.z), pow(max(blendWeights.y, 0), parameters.z), pow(max(blendWeights.z, 0), parameters.z));
+	float sum = blendWeights.x + blendWeights.y + blendWeights.z;
+	blendWeights =  blendWeights/vec3(sum, sum, sum);
 	// Move the planar mapping a bit according to the normal length to avoid bad looking skirts.
 	float nLength = length(normal - 1.0);
 	vec2 coord1 = (position.yz + nLength) * parameters.x;
