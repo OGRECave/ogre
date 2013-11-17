@@ -265,8 +265,7 @@ namespace Ogre
 		bool doubleSided, HardwareBuffer::Usage indexBufferUsage, bool indexShadowBuffer)
     {
         // The mesh is built, just make a list of indexes to spit out the triangles
-        unsigned short vInc, uInc, v, u, iterations;
-        unsigned short vCount, uCount;
+        unsigned short vInc, v, iterations;
 
         if (doubleSided)
         {
@@ -298,13 +297,13 @@ namespace Ogre
         while (iterations--)
         {
             // Make tris in a zigzag pattern (compatible with strips)
-            u = 0;
-            uInc = 1; // Start with moving +u
+            unsigned short u = 0;
+            unsigned short uInc = 1; // Start with moving +u
+            unsigned short vCount = meshHeight - 1;
 
-            vCount = meshHeight - 1;
             while (vCount--)
             {
-                uCount = meshWidth - 1;
+                unsigned short uCount = meshWidth - 1;
                 while (uCount--)
                 {
                     // First Tri in cell

@@ -50,6 +50,7 @@ namespace Ogre
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
+                mMatricesPerInstance(0),
 				mNumWorldMatrices( instancesPerBatch ),
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),

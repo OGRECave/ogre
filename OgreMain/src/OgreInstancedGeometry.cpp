@@ -66,7 +66,8 @@ namespace Ogre {
         mRenderQueueIDSet(false),
 		mObjectCount(0),
 		mInstancedGeometryInstance(0),
-		mSkeletonInstance(0)
+		mSkeletonInstance(0),
+        mAnimationState(0)
 	{
 		mBaseSkeleton.setNull();
 	}
@@ -439,12 +440,10 @@ namespace Ogre {
 		// and while we're at it, build the remap we can use later
 		bool use32bitIndexes =
 			id->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
-		uint16 *p16;
-		uint32 *p32;
 		IndexRemap indexRemap;
 		if (use32bitIndexes)
 		{
-			p32 = static_cast<uint32*>(id->indexBuffer->lock(
+			uint32 *p32 = static_cast<uint32*>(id->indexBuffer->lock(
 				id->indexStart, 
 				id->indexCount * id->indexBuffer->getIndexSize(), 
 				HardwareBuffer::HBL_READ_ONLY));
@@ -453,7 +452,7 @@ namespace Ogre {
 		}
 		else
 		{
-			p16 = static_cast<uint16*>(id->indexBuffer->lock(
+			uint16 *p16 = static_cast<uint16*>(id->indexBuffer->lock(
 				id->indexStart, 
 				id->indexCount * id->indexBuffer->getIndexSize(), 
 				HardwareBuffer::HBL_READ_ONLY));
@@ -665,7 +664,7 @@ namespace Ogre {
 		ret->mBoundingRadius = lastBatchInstance->mBoundingRadius ;
 		//now create  news instanced objects
 		BatchInstance::ObjectsMap::iterator objIt;
-		for(objIt=lastBatchInstance->getInstancesMap().begin();objIt!=lastBatchInstance->getInstancesMap().end();objIt++)
+		for(objIt=lastBatchInstance->getInstancesMap().begin();objIt!=lastBatchInstance->getInstancesMap().end();++objIt)
 		{
 			InstancedObject* instancedObject = ret->isInstancedObjectPresent(objIt->first);
 			if(instancedObject == NULL)
@@ -726,7 +725,7 @@ namespace Ogre {
 					geomBucket->getAABB()=geom->getAABB();
 					geomBucket->setBoundingBox(	geom->getBoundingBox());
 					//now setups the news InstancedObjects.
-					for(objIt=ret->getInstancesMap().begin();objIt!=ret->getInstancesMap().end();objIt++)
+					for(objIt=ret->getInstancesMap().begin();objIt!=ret->getInstancesMap().end();++objIt)
 					{
 						//get the destination IntanciedObject
 						InstancedObject*obj=objIt->second;
@@ -1136,8 +1135,7 @@ namespace Ogre {
 		SceneManager* mgr, uint32 BatchInstanceID)
 		: MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
 		mBatchInstanceID(BatchInstanceID), mBoundingRadius(0.0f),
-		mCurrentLod(0),
-        mLodStrategy(0)
+		mCurrentLod(0), mCamera(0), mLodStrategy(0)
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -1158,7 +1156,7 @@ namespace Ogre {
 		mLodBucketList.clear();
 		ObjectsMap::iterator o;
 
-		for(o=mInstancesMap.begin();o!=mInstancesMap.end();o++)
+		for(o=mInstancesMap.begin();o!=mInstancesMap.end();++o)
 		{
 			OGRE_DELETE o->second;
 		}
@@ -1273,7 +1271,7 @@ namespace Ogre {
 				vMax = objIt->second->getPosition() + aabb.getMaximum();
 			}
 
-			for( objIt=mInstancesMap.begin(); objIt!=mInstancesMap.end(); objIt++ )
+			for( objIt=mInstancesMap.begin(); objIt!=mInstancesMap.end(); ++objIt )
 			{
 				const Vector3 &position = objIt->second->getPosition();
 				const Vector3 &scale	= objIt->second->getScale();
@@ -1310,14 +1308,6 @@ namespace Ogre {
 			}
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::BatchInstance::addInstancedObject(unsigned short index,InstancedObject* object)
 	{

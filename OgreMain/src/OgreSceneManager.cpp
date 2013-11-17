@@ -365,7 +365,7 @@ void SceneManager::destroyAllCameras(void)
 		bool dontDelete = false;
 		 // dont destroy shadow texture cameras here. destroyAllCameras is public
 		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
-		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
+		for( ; camShadowTexIt != mShadowTextureCameras.end(); ++camShadowTexIt )
 		{
 			if( (*camShadowTexIt) == camIt->second )
 			{
@@ -375,7 +375,7 @@ void SceneManager::destroyAllCameras(void)
 		}
 
 		if( dontDelete )	// skip this camera
-			camIt++;
+			++camIt;
 		else 
 		{
 			destroyCamera(camIt->second);
@@ -7198,7 +7198,8 @@ void SceneManager::setViewMatrix(const Matrix4& m)
 	if (mDestRenderSystem->areFixedFunctionLightsInViewSpace())
 	{
 		// reset light hash if we've got lights already set
-		mLastLightHash = mLastLightHash ? 0 : mLastLightHash;
+        if(mLastLightHash)
+            mLastLightHash = 0;
 	}
 }
 //---------------------------------------------------------------------

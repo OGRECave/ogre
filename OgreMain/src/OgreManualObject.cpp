@@ -47,7 +47,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObject(const String& name)
 		: MovableObject(name),
-		  mDynamic(false), mCurrentSection(0), mFirstVertex(true),
+		  mDynamic(false), mCurrentSection(0), mCurrentUpdating(false), mFirstVertex(true),
 		  mTempVertexPending(false),
 		  mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
 		  mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),

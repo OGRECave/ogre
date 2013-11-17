@@ -591,7 +591,7 @@ namespace Ogre
         HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
 		/** Sets the global instance vertex buffer.
 		*/
-        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr val);
+        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr &val);
 		/** Gets vertex declaration for the global vertex buffer for the global instancing
 		*/
         VertexDeclaration* getGlobalInstanceVertexBufferVertexDeclaration() const;
