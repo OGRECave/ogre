@@ -140,6 +140,14 @@ if (APPLE)
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
 		)
 
+  add_custom_command(TARGET TestContext POST_BUILD
+		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/PlayPenTests.dylib 
+		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/VTests.dylib 
+		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
+	)
+
 	# now plugins
 	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
