@@ -55,6 +55,7 @@ namespace Ogre
 
     public:
         inline Vector3()
+            : x( 0 ), y( 0 ), z( 0 )
         {
         }
 

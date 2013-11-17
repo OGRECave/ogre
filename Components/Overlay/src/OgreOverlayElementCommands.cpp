@@ -217,9 +217,6 @@ namespace Ogre {
                 return "true";
             else
                 return "false";
-
-            // To keep compiler happy
-            return "true";
         }
         void CmdVisible::doSet(void* target, const String& val)
         {

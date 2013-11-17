@@ -486,9 +486,8 @@ namespace Ogre
 			monitorInfo.cbSize = sizeof(MONITORINFO);
 			GetMonitorInfo(hMonitor, &monitorInfo);
 
-			LONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-			LONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
-
+			ULONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+			ULONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 
 			int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
 			int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;

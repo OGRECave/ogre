@@ -181,6 +181,23 @@ namespace Ogre
 		, mLastViewportHeight(0)
 		, mCustomGpuBufferAllocator(0)
 		, mLodManager(0)
+        , mAlign(ALIGN_X_Z)
+        , mWorldSize(0)
+        , mSize(0)
+        , mMaxBatchSize(0)
+        , mMinBatchSize(0)
+        , mBase(0)
+        , mScale(0)
+        , mSkirtSize(0)
+        , mRenderQueueGroup(0)
+        , mVisibilityFlags(0)
+        , mQueryFlags(0)
+        , mLayerBlendMapSize(0)
+        , mLayerBlendMapSizeActual(0)
+        , mLightmapSize(0)
+        , mLightmapSizeActual(0)
+        , mCompositeMapSize(0)
+        , mCompositeMapSizeActual(0)
 
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();

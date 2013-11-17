@@ -95,10 +95,10 @@ namespace Volume {
         static const uint16 WORKQUEUE_LOAD_REQUEST;
 
         /// The workqueue.
-        WorkQueue* wq;
+        WorkQueue* mWQ;
 
         /// The workqueue channel.
-        uint16 workQueueChannel;
+        uint16 mWorkQueueChannel;
         
         /** Initializes the WorkQueue (once).
         */

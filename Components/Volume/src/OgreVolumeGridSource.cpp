@@ -79,7 +79,8 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     GridSource::GridSource(bool trilinearValue, bool trilinearGradient, bool sobelGradient) :
-        mTrilinearValue(trilinearValue), mTrilinearGradient(trilinearGradient), mSobelGradient(sobelGradient)
+        mTrilinearValue(trilinearValue), mTrilinearGradient(trilinearGradient), mSobelGradient(sobelGradient),
+        mWidth(0), mHeight(0), mDepth(0), mPosXScale(0), mPosYScale(0), mPosZScale(0), mVolumeSpaceToWorldSpaceFactor(0)
     {
     }
 
