@@ -53,14 +53,13 @@ namespace Ogre {
 		TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
 		TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
 		TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-		/// mipmaps will be automatically generated for this texture
-		TU_AUTOMIPMAP = 0x100,
-		/// this texture will be a render target, i.e. used as a target for render to texture
-		/// setting this flag will ignore all other texture usages except TU_AUTOMIPMAP
-		TU_RENDERTARGET = 0x200,
-		/// default to automatic mipmap generation static textures
+		/// Mipmaps will be automatically generated for this texture
+		TU_AUTOMIPMAP = 16,
+		/** This texture will be a render target, i.e. used as a target for render to texture
+		    setting this flag will ignore all other texture usages except TU_AUTOMIPMAP */
+		TU_RENDERTARGET = 32,
+		/// Default to automatic mipmap generation static textures
 		TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
-        
     };
 
     /** Enum identifying the texture type
