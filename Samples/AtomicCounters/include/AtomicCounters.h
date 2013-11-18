@@ -25,6 +25,12 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support atomic counters"
                         ", so you cannot run this sample. Sorry!", "Sample_AtomicCounters::testCapabilities");
         }
+        else 
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+                        "Sample currently out of order.  Try again soon!",
+                        "Sample_AtomicCounters::testCapabilities");
+        }
     }
 
  protected:
