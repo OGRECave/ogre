@@ -24,6 +24,13 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         mInfo["Category"] = "Animation";
     }
 
+    void testCapabilities(const RenderSystemCapabilities* caps)
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+                    "Sample currently out of order.  Try again soon!",
+                    "Sample_DualQuaternion::testCapabilities");
+    }
+
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         const Real start = 30;
@@ -37,7 +44,6 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
         return SdkSample::frameRenderingQueued(evt);
     }
-
 
  protected:
 	StringVector getRequiredPlugins()
