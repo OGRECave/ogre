@@ -216,7 +216,6 @@ namespace Ogre {
 
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
 									 unsigned short texCoordSetToDestroy, VertexData *vertexData );
-        void computeBoneBoundingRadius();
 
 
     public:
@@ -367,10 +366,16 @@ namespace Ogre {
 
         /** Manually set the bone bounding radius. 
         @remarks
-            This value is computed automatically when the mesh is loaded, however it can
-            be overriden with this method.
+            This value is normally computed automatically, however it can be overriden with this method.
         */
         void _setBoneBoundingRadius(Real radius);
+
+        /** Compute the bone bounding radius by looking at the vertices, vertex-bone-assignments, and skeleton bind pose.
+        @remarks
+            This is automatically called by Entity if necessary.  Only does something if the boneBoundingRadius is zero to
+            begin with.  Only works if vertex data is readable (i.e. not WRITE_ONLY).
+        */
+        void _computeBoneBoundingRadius();
 
 		/** Automatically update the bounding radius and bounding box for this Mesh.
 		@remarks

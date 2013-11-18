@@ -171,6 +171,11 @@ namespace Ogre {
 		{
 			mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
 			mSkeletonInstance->load();
+            // if mUpdateBoundingBoxFromSkeleton was turned on before the mesh was loaded, and mesh hasn't computed the boneBoundingRadius yet,
+            if ( mUpdateBoundingBoxFromSkeleton && mMesh->getBoneBoundingRadius() == Real(0))
+            {
+                mMesh->_computeBoneBoundingRadius();
+            }
 		}
 
 		// Build main subentity list
@@ -502,6 +507,15 @@ namespace Ogre {
         for( ; child_itr != child_itr_end; ++child_itr)
         {
             (*child_itr).second->_notifyCurrentCamera(cam);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
+    {
+        mUpdateBoundingBoxFromSkeleton = update;
+        if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
+        {
+            mMesh->_computeBoneBoundingRadius();
         }
     }
     //-----------------------------------------------------------------------

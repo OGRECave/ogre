@@ -872,9 +872,7 @@ namespace Ogre {
             Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoneBoundingRadius().
             The expansion amount can be changed on the mesh to achieve a better fitting bounding box.
         */
-        void setUpdateBoundingBoxFromSkeleton(bool update) {
-             mUpdateBoundingBoxFromSkeleton = update;
-        }
+        void setUpdateBoundingBoxFromSkeleton(bool update);
 
         /** If true, the skeleton of the entity will be used to update the bounding box for culling.
             Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the

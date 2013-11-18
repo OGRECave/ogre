@@ -561,7 +561,6 @@ namespace Ogre {
 			// Take the opportunity to update the compiled bone assignments
             _updateCompiledBoneAssignments();
 
-            computeBoneBoundingRadius();
         }
 
 		// Animation states for vertex animation
@@ -905,7 +904,7 @@ namespace Ogre {
         return pt.distance( onLine );
     }
     //---------------------------------------------------------------------
-    Real _computeBoneBoundingRadius( VertexData* vertexData,
+    Real _computeBoneBoundingRadiusHelper( VertexData* vertexData,
         const Mesh::VertexBoneAssignmentList& boneAssignments,
         const vector<Vector3>::type& bonePositions,
         const vector< vector<ushort>::type >::type& boneChildren
@@ -966,9 +965,9 @@ namespace Ogre {
         return maxRadius;
     }
     //---------------------------------------------------------------------
-    void Mesh::computeBoneBoundingRadius()
+    void Mesh::_computeBoneBoundingRadius()
     {
-        if (mBoneBoundingRadius == Real(0))
+        if (mBoneBoundingRadius == Real(0) && ! mSkeleton.isNull())
         {
             Real radius = Real(0);
             vector<Vector3>::type bonePositions;
@@ -996,7 +995,7 @@ namespace Ogre {
             if (sharedVertexData)
             {
                 // check shared vertices
-                radius = _computeBoneBoundingRadius(sharedVertexData, mBoneAssignments, bonePositions, boneChildren);
+                radius = _computeBoneBoundingRadiusHelper(sharedVertexData, mBoneAssignments, bonePositions, boneChildren);
             }
 
             // check submesh vertices
@@ -1008,7 +1007,7 @@ namespace Ogre {
                 SubMesh* submesh = *itor;
                 if (!submesh->useSharedVertices && submesh->vertexData)
                 {
-                    Real r = _computeBoneBoundingRadius(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
+                    Real r = _computeBoneBoundingRadiusHelper(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
                     radius = std::max( radius, r );
                 }
                 ++itor;
