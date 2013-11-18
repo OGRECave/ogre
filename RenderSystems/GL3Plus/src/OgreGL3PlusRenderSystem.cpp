@@ -179,7 +179,7 @@ namespace Ogre {
 
     const String& GL3PlusRenderSystem::getName(void) const
     {
-        static String strName("OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)");
+        static String strName("OpenGL 3+ Rendering Subsystem (ALPHA)");
         return strName;
     }
 
@@ -1319,6 +1319,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
+        //FIXME glPolygonOffset currently is buggy in GL3+ RS but not GL RS.
         if (constantBias != 0 || slopeScaleBias != 0)
         {
             OGRE_CHECK_GL_ERROR(glEnable(GL_POLYGON_OFFSET_FILL));
@@ -1785,11 +1786,9 @@ namespace Ogre {
             // if (mPreComputeMemoryBarrier)
             OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
             Vector3 workgroupDim = mCurrentComputeProgram->getComputeGroupDimensions();
-            //std::cout << "Compute Workgroup Dimensions: " << workgroupDim << std::endl;
             OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0], 
                                                   workgroupDim[1], 
                                                   workgroupDim[2]));
-            //OGRE_CHECK_GL_ERROR(glDispatchCompute(24, 1, 1)); 
             // if (mPostComputeMemoryBarrier)
             //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
             // if (compute_execution_cap > 0)
@@ -1904,8 +1903,8 @@ namespace Ogre {
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
-            //FIXME : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Latter breaks samples.
-            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT; 
+            //TODO : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Latter breaks samples.
+            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
             do
             {
@@ -1933,12 +1932,10 @@ namespace Ogre {
                 {
                     if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
                     {
-                        //OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                         OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                     }
                     else
                     {
-                        //OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                         OGRE_CHECK_GL_ERROR(glDrawRangeElements(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                     }
                 }
@@ -1955,14 +1952,13 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
+
                 if (hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(primType, 0, op.vertexData->vertexCount, numberOfInstances));
                 }
                 else
                 {
-                    // GLenum mode = (_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode();
-                    // OGRE_CHECK_GL_ERROR(glDrawArrays(mode, 0, op.vertexData->vertexCount));
                     OGRE_CHECK_GL_ERROR(glDrawArrays(primType, 0, op.vertexData->vertexCount));
                 }
             } while (updatePassIterationRenderState());
@@ -2294,7 +2290,6 @@ namespace Ogre {
 
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("***   OpenGL 3+ Renderer Started   ***");
-        LogManager::getSingleton().logMessage("***          EXPERIMENTAL          ***");
         LogManager::getSingleton().logMessage("**************************************");
     }
 

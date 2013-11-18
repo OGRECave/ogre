@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+  Copyright (c) 2000-2009 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreSDLWindow.h"
@@ -63,52 +63,52 @@ namespace Ogre {
         // according to http://www.libsdl.org/cgi/docwiki.cgi/SDL_5fSetVideoMode
         // never free the surface returned from SDL_SetVideoMode
         /*if (mScreen != NULL)
-            SDL_FreeSurface(mScreen);*/
+          SDL_FreeSurface(mScreen);*/
 
     }
 
-	void SDLWindow::create(const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams)
+    void SDLWindow::create(const String& name, unsigned int width, unsigned int height,
+                           bool fullScreen, const NameValuePairList *miscParams)
     {
-		int colourDepth = 32;
-		String title = name;
-		if(miscParams)
-		{
-			// Parse miscellenous parameters
-			NameValuePairList::const_iterator opt;
-			// Bit depth
-			opt = miscParams->find("colourDepth");
-			if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
-				colourDepth = StringConverter::parseUnsignedInt(opt->second);
-			// Full screen antialiasing
-			opt = miscParams->find("FSAA");
-			if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
-			{
-				size_t fsaa_x_samples = StringConverter::parseUnsignedInt(opt->second);
-				if(fsaa_x_samples>1) {
-					// If FSAA is enabled in the parameters, enable the MULTISAMPLEBUFFERS
-					// and set the number of samples before the render window is created.
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,fsaa_x_samples);
-				}
-			}
-			// Window title
-			opt = miscParams->find("title");
-			if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
-				title = opt->second;
-		}   
-	
+        int colourDepth = 32;
+        String title = name;
+        if(miscParams)
+        {
+            // Parse miscellenous parameters
+            NameValuePairList::const_iterator opt;
+            // Bit depth
+            opt = miscParams->find("colourDepth");
+            if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
+                colourDepth = StringConverter::parseUnsignedInt(opt->second);
+            // Full screen antialiasing
+            opt = miscParams->find("FSAA");
+            if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
+            {
+                size_t fsaa_x_samples = StringConverter::parseUnsignedInt(opt->second);
+                if(fsaa_x_samples>1) {
+                    // If FSAA is enabled in the parameters, enable the MULTISAMPLEBUFFERS
+                    // and set the number of samples before the render window is created.
+                    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+                    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,fsaa_x_samples);
+                }
+            }
+            // Window title
+            opt = miscParams->find("title");
+            if(opt != miscParams->end()) //check for FSAA parameter, if not ignore it...
+                title = opt->second;
+        }
+
         LogManager::getSingleton().logMessage("SDLWindow::create", LML_TRIVIAL);
         SDL_Surface* screen;
         int flags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE;
-		
+
         SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
         // request good stencil size if 32-bit colour
         if (colourDepth == 32)
         {
             SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 8);
         }
-		
+
         if (fullScreen)
             flags |= SDL_FULLSCREEN;
 
@@ -116,8 +116,8 @@ namespace Ogre {
         screen = SDL_SetVideoMode(width, height, colourDepth, flags);
         if (!screen)
         {
-            LogManager::getSingleton().logMessage(LML_CRITICAL, 
-                String("Could not make screen: ") + SDL_GetError());
+            LogManager::getSingleton().logMessage(LML_CRITICAL,
+                                                  String("Could not make screen: ") + SDL_GetError());
             exit(1);
         }
         LogManager::getSingleton().logMessage("screen is valid", LML_TRIVIAL);
@@ -167,13 +167,13 @@ namespace Ogre {
     {
         SDL_Surface* screen;
         int flags = SDL_OPENGL | SDL_HWPALETTE | SDL_RESIZABLE;
-		
+
         LogManager::getSingleton().logMessage("Updating window", LML_TRIVIAL);
         screen = SDL_SetVideoMode(width, height, mScreen->format->BitsPerPixel, flags);
         if (!screen)
         {
-            LogManager::getSingleton().logMessage(LML_CRITICAL, 
-                String("Could not make screen: ") + SDL_GetError());
+            LogManager::getSingleton().logMessage(LML_CRITICAL,
+                                                  String("Could not make screen: ") + SDL_GetError());
             exit(1);
         }
         LogManager::getSingleton().logMessage("screen is valid", LML_TRIVIAL);
@@ -191,14 +191,14 @@ namespace Ogre {
     }
 
     void SDLWindow::setVSyncEnabled(bool vsync)
-	{
+    {
         mVSync = vsync;
-	}
+    }
 
-	bool SDLWindow::isVSyncEnabled() const
-	{
+    bool SDLWindow::isVSyncEnabled() const
+    {
         return mVSync;
-	}
+    }
 
     void SDLWindow::swapBuffers()
     {
@@ -213,32 +213,32 @@ namespace Ogre {
         // XXX More?
     }
 
-	void SDLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
-	{
-		if ((dst.left < 0) || (dst.right > mWidth) ||
-			(dst.top < 0) || (dst.bottom > mHeight) ||
-			(dst.front != 0) || (dst.back != 1))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-						"Invalid box.",
-						"SDLWindow::copyContentsToMemory" );
-		}
-	
-		if (buffer == FB_AUTO)
-		{
-			buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-		}
-	
-		GLenum format = Ogre::GL3PlusPixelUtil::getGLOriginFormat(dst.format);
-		GLenum type = Ogre::GL3PlusPixelUtil::getGLOriginDataType(dst.format);
-	
-		if ((format == GL_NONE) || (type == 0))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-						"Unsupported format.",
-						"SDLWindow::copyContentsToMemory" );
-		}
-	
+    void SDLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    {
+        if ((dst.left < 0) || (dst.right > mWidth) ||
+            (dst.top < 0) || (dst.bottom > mHeight) ||
+            (dst.front != 0) || (dst.back != 1))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Invalid box.",
+                        "SDLWindow::copyContentsToMemory" );
+        }
+
+        if (buffer == FB_AUTO)
+        {
+            buffer = mIsFullScreen? FB_FRONT : FB_BACK;
+        }
+
+        GLenum format = Ogre::GL3PlusPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = Ogre::GL3PlusPixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Unsupported format.",
+                        "SDLWindow::copyContentsToMemory" );
+        }
+
         if(dst.getWidth() != dst.rowPitch)
         {
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
@@ -249,14 +249,14 @@ namespace Ogre {
             glPixelStorei(GL_PACK_ALIGNMENT, 1);
         }
 
-		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
         glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
-	
+
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-        
+
         PixelUtil::bulkPixelVerticalFlip(dst);
-	}
+    }
 }
