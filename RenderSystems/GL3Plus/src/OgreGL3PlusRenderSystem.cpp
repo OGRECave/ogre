@@ -427,6 +427,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
         rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 
+        //FIXME Why is this always zero? Add comment or fix.
         rsc->setGeometryProgramConstantBoolCount(0);
         rsc->setGeometryProgramConstantIntCount(0);
 
@@ -437,7 +438,6 @@ namespace Ogre {
             rsc->setCapability(RSC_TESSELATION_DOMAIN_PROGRAM);
 
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
-
             // 16 boolean params allowed
             rsc->setTesselationHullProgramConstantBoolCount(floatConstantCount);
             // 16 integer params allowed, 4D
@@ -454,14 +454,30 @@ namespace Ogre {
             rsc->setTesselationDomainProgramConstantFloatCount(floatConstantCount);
         }
 
+        // Compute Program Properties
+        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || gl3wIsSupported(4, 3)) 
+        {
+            rsc->setCapability(RSC_COMPUTE_PROGRAM);
+            
+            //FIXME Is this correct?
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &floatConstantCount));
+            rsc->setComputeProgramConstantFloatCount(floatConstantCount);
+            rsc->setComputeProgramConstantBoolCount(floatConstantCount);
+            rsc->setComputeProgramConstantIntCount(floatConstantCount);
+
+            //TODO we should also check max workgroup count & size
+            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));
+            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
+        }
+
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
-		{
+        {
             GLint formats;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
 
             if (formats > 0)
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
-		}
+        }
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
         {
