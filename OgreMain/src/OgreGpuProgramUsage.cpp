@@ -196,7 +196,7 @@ namespace Ogre
 			}
 
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				mProgram->getName() + "is a " + yourType + " program, but you are assigning it to a " 
+				mProgram->getName() + " is a " + yourType + " program, but you are assigning it to a " 
 				+ myType + " program slot. This is invalid.",
 				"GpuProgramUsage::setProgramName");
 
