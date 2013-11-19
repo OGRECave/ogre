@@ -344,7 +344,7 @@ namespace Ogre {
 
         // Check for non-power-of-2 texture support
         if (mGLSupport->checkExtension("GL_ARB_texture_rectangle") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") ||
-           gl3wIsSupported(3, 1))
+            gl3wIsSupported(3, 1))
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for atomic counter support
@@ -457,10 +457,10 @@ namespace Ogre {
         }
 
         // Compute Program Properties
-        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || gl3wIsSupported(4, 3)) 
+        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || gl3wIsSupported(4, 3))
         {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
-            
+
             //FIXME Is this correct?
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &floatConstantCount));
             rsc->setComputeProgramConstantFloatCount(floatConstantCount);
@@ -817,7 +817,7 @@ namespace Ogre {
                         GL3PlusContext *glContext = depthBuffer->getGLContext();
 
                         if ( glContext == windowContext &&
-                            (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
+                             (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
                         {
                             bFound = true;
 
@@ -1103,7 +1103,7 @@ namespace Ogre {
         GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
 
         if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
-           sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
         {
             OGRE_CHECK_GL_ERROR(glDisable(GL_BLEND));
         }
@@ -1804,8 +1804,8 @@ namespace Ogre {
             // if (mPreComputeMemoryBarrier)
             OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
             Vector3 workgroupDim = mCurrentComputeProgram->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0], 
-                                                  workgroupDim[1], 
+            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0],
+                                                  workgroupDim[1],
                                                   workgroupDim[2]));
             // if (mPostComputeMemoryBarrier)
             //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
@@ -1846,9 +1846,9 @@ namespace Ogre {
         // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_ATOMIC_COUNTERS))
         // {
         //     GLuint atomicsBuffer = 0;
-            
+
         //     glGenBuffers(1, &atomicsBuffer);
-        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 
+        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER,
         //                  static_cast<GL3PlusHardwareCounterBuffer*>(HardwareBufferManager::getSingleton().getCounterBuffer().getGLBufferId()));
         //                  //static_cast<GL3PlusHardwareCounterBuffer*>(op..getCounterBuffer().getGLBufferId()));
         //     // glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * 3, NULL, GL_DYNAMIC_DRAW);
@@ -1858,7 +1858,7 @@ namespace Ogre {
 
 
         // Render to screen!
-        if (mCurrentDomainProgram) 
+        if (mCurrentDomainProgram)
         {
             // Tessellation shader special case.
             // Note: Only evaluation (domain) shaders are required.
@@ -2003,12 +2003,12 @@ namespace Ogre {
                 }
             }
 
-            // Unbind the vertex array object. 
+            // Unbind the vertex array object.
             // Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
         }
 
-        // Set fences.  
+        // Set fences.
         // This ensures all GL operations called since last fence
         // (e.g., this render) are completed by GPU before executing
         // later GL operations.
@@ -2332,7 +2332,7 @@ namespace Ogre {
             GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
 
             if ( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                 (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
             {
                 // Depth is automatically managed and there is no depth buffer attached to this RT
                 // or the Current context doesn't match the one this Depth buffer was created with
@@ -2427,7 +2427,7 @@ namespace Ogre {
         //     not change during its use. If not, the following switch
         //     statement will confuse GL state completely, and we can't fix it
         //     here. To fix this case we must code the program implementation
-        //     itself: if type is changing (during load/unload, etc), and it's in 
+        //     itself: if type is changing (during load/unload, etc), and it's in
         //     use, unbind and notify render system to correct for its state.
         //
         switch (glprg->getType())
@@ -2491,7 +2491,7 @@ namespace Ogre {
         RenderSystem::bindGpuProgram(prg);
 
         // TextureManager::ResourceMapIterator resource = TextureManager::getSingletonPtr()->getResourceIterator();
-        
+
         // while(resource.hasMoreElements())
         // {
         //     TextureManager::ResourceMapPtr resource_map = resource.getNext();
@@ -2749,8 +2749,8 @@ namespace Ogre {
         {
             if (unit < getCapabilities()->getNumTextureUnits())
             {
-				OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<uint32>(GL_TEXTURE0 + unit)));
-				mActiveTextureUnit = static_cast<GLenum>(unit);
+                OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<uint32>(GL_TEXTURE0 + unit)));
+                mActiveTextureUnit = static_cast<GLenum>(unit);
                 return true;
             }
             else if (!unit)
