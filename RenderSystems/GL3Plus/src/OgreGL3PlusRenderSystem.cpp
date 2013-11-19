@@ -429,10 +429,12 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
         rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 
-        //FIXME Why is this always zero? Add comment or fix.
-        rsc->setGeometryProgramConstantBoolCount(0);
-        rsc->setGeometryProgramConstantIntCount(0);
-
+        //FIXME Is this correct?
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
+        rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+        rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
+        rsc->setGeometryProgramConstantIntCount(floatConstantCount);
+        
         // Tessellation Program Properties
         if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || gl3wIsSupported(4, 0))
         {
