@@ -530,18 +530,48 @@ namespace Ogre {
                 AxisAlignedBox bbox;
                 bbox.setNull();
                 Real maxScale = Real(0);
+                bool boneHasVerts[ OGRE_MAX_NUM_BONES ];
+                size_t numBones = mSkeletonInstance->getNumBones();
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    boneHasVerts[ iBone ] = false;
+                }
                 // for each bone that has vertices weighted to it,
                 for (size_t iBlend = 0; iBlend < mMesh->sharedBlendIndexToBoneIndexMap.size(); ++iBlend)
                 {
-                    size_t boneHandle = mMesh->sharedBlendIndexToBoneIndexMap[ iBlend ];
-                    const Bone* bone = mSkeletonInstance->getBone( boneHandle );
-                    Vector3 scaleVec = bone->_getDerivedScale();
-                    Real scale = std::max( std::max( Math::Abs(scaleVec.x), Math::Abs(scaleVec.y)), Math::Abs(scaleVec.z) );
-                    maxScale = std::max( maxScale, scale );
-                    // only include bones that aren't scaled to zero
-                    if (scale > Real(0))
+                    // record which bones have vertices assigned
+                    size_t iBone = mMesh->sharedBlendIndexToBoneIndexMap[ iBlend ];
+                    boneHasVerts[ iBone ] = true;
+                }
+                // for each submesh,
+                for (size_t iSubMesh = 0; iSubMesh < mMesh->getNumSubMeshes(); ++iSubMesh)
+                {
+                    SubMesh* submesh = mMesh->getSubMesh( iSubMesh );
+                    // if the submesh has own vertices,
+                    if ( ! submesh->useSharedVertices )
                     {
-                        bbox.merge( bone->_getDerivedPosition() );
+                        // record which bones have vertices assigned
+                        for (size_t iBlend = 0; iBlend < submesh->blendIndexToBoneIndexMap.size(); ++iBlend)
+                        {
+                            size_t iBone = submesh->blendIndexToBoneIndexMap[ iBlend ];
+                            boneHasVerts[ iBone ] = true;
+                        }
+                    }
+                }
+                // for each bone that has vertices weighted to it,
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    if ( boneHasVerts[ iBone ] )
+                    {
+                        const Bone* bone = mSkeletonInstance->getBone( iBone );
+                        Vector3 scaleVec = bone->_getDerivedScale();
+                        Real scale = std::max( std::max( Math::Abs(scaleVec.x), Math::Abs(scaleVec.y)), Math::Abs(scaleVec.z) );
+                        maxScale = std::max( maxScale, scale );
+                        // only include bones that aren't scaled to zero
+                        if (scale > Real(0))
+                        {
+                            bbox.merge( bone->_getDerivedPosition() );
+                        }
                     }
                 }
                 // unless all bones were scaled to zero,
@@ -566,7 +596,6 @@ namespace Ogre {
                 mFullBoundingBox = mMesh->getBounds();
                 mFullBoundingBox.merge(getChildObjectsBoundingBox());
             }
-
 			// Don't scale here, this is taken into account when world BBox calculation is done
 		}
 		else
