@@ -6,13 +6,14 @@
 // uniform vec4 origColor;
 // uniform vec4 cloneColor;
 
+uniform mat4 WorldViewProj;
+
 layout(triangles) in;
-layout(lines, max_vertices = 6) out;
+// layout(lines, max_vertices = 6) out;
+layout(triangle_strip, max_vertices = 6) out;
 
-void main()
+void main(void)
 {
-    int i = 0;
-
     /////////////////////////////////////////////////////////////
     //This example has two parts
     //  step a) draw the primitive pushed down the pipeline
@@ -26,9 +27,9 @@ void main()
 
     //Pass-thru!
     // for (int i = 0; i < gl_VerticesIn; i++) {
-    for (i = 0; i < 2; i++) {
+    for (int i = 0; i < gl_in.length(); i++) {
         // gl_Position = gl_PositionIn[i];
-        gl_Position = gl_in[i].gl_Position;
+        gl_Position = WorldViewProj * gl_in[i].gl_Position;
         //gl_FrontColor = origColor;
         EmitVertex();
     }
