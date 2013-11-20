@@ -560,19 +560,14 @@ namespace OgreBites
             {
                 bool reset = false;
 
-                printf("MADE IT THIS FAR\n");
-
                 Ogre::ConfigOptionMap& options =
                     mRoot->getRenderSystemByName(mRendererMenu->getSelectedItem())->getConfigOptions();
-
-                printf("STILL FURTHER\n");
 
                 Ogre::NameValuePairList newOptions;
 
                 // collect new settings and decide if a reset is needed
 
                 if (mRendererMenu->getSelectedItem() != mRoot->getRenderSystem()->getName()) {
-                    printf("RESET COURSE\n");
                     reset = true;
                 }
 
@@ -583,17 +578,11 @@ namespace OgreBites
                     newOptions[menu->getCaption()] = menu->getSelectedItem();
                 }
 
-                printf("AHOY\n");
-
                 // reset with new settings if necessary
                 if (reset) reconfigure(mRendererMenu->getSelectedItem(), newOptions);
-
-                printf("ARR\n");
             }
             else
             {
-                printf("AVAST WITH SCURVY\n");
-
                 mRoot->queueEndRendering();   // exit browser
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
