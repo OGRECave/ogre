@@ -31,10 +31,6 @@ THE SOFTWARE.
 
 #include "OgreGLSupport.h"
 
-#ifdef __OBJC__
-#include <Foundation/NSString.h>
-#endif
-
 namespace Ogre
 {
 
@@ -92,9 +88,9 @@ public:
 protected:
 	String mAPI;
 	String mContextType;
-#ifdef __OBJC__
-    NSString *mCurrentOSVersion;
-#endif
+
+    //Implement this in .mm and put all obj.c objects there
+    class OSXGLSupportImpl * mImpl;
 	
 }; // class OSXGLSupport
 
