@@ -12,7 +12,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Size of the sampling grid
-in VertexData {
+in VertexData 
+{
     vec3 N;
     vec2 Field;
 } VertexIn[];
@@ -21,15 +22,10 @@ out vec3 oNormal;
 
 uniform float IsoValue;
 
-// uniform sampler2D edge_table;
-
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-// TODO: Change this from outputting triangles to a triangle strip
-
-
-// Estimate where isosurface intersects grid edge with endpoints v0, v1
+// Estimate where isosurface intersects grid edge with endpoints v0, v1.
 void CalcIntersection(vec4 Pos0,
                       vec3 N0,
                       vec2 Field0,
@@ -55,13 +51,13 @@ void CalcIntersection(vec4 Pos0,
 void main()
 {
 
-    // construct index for this tetrahedron
+    // Construct index for this tetrahedron.
     uint index = uint((uint(VertexIn[0].Field.y) << 3) |
                       (uint(VertexIn[1].Field.y) << 2) |
                       (uint(VertexIn[2].Field.y) << 1) |
                       uint(VertexIn[3].Field.y));
 
-    // don't bother if all vertices out or all vertices inside isosurface
+    // Don't bother if all vertices out or all vertices inside isosurface.
     if (index > uint(0) && index < uint(15))
     {
         // Uber-compressed version of the edge table.
@@ -82,7 +78,7 @@ void main()
         CalcIntersection(gl_in[e1.x].gl_Position, VertexIn[e1.x].N, VertexIn[e1.x].Field,
                          gl_in[e1.y].gl_Position, VertexIn[e1.y].N, VertexIn[e1.y].Field);
 
-        // Emit additional triangle, if necessary
+        // Emit additional triangle, if necessary.
         if (e1.z != -1) {
              CalcIntersection(gl_in[e1.z].gl_Position, VertexIn[e1.z].N, VertexIn[e1.z].Field,
                               gl_in[e1.w].gl_Position, VertexIn[e1.w].N, VertexIn[e1.w].Field);

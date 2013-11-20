@@ -1,16 +1,8 @@
-#version 150
+#version 120
+#extension GL_EXT_geometry_shader4 : enable
 
-//#version 120
-//#extension GL_EXT_geometry_shader4 : enable
-
-// uniform vec4 origColor;
-// uniform vec4 cloneColor;
-
-uniform mat4 WorldViewProj;
-
-layout(triangles) in;
-// layout(lines, max_vertices = 6) out;
-layout(triangle_strip, max_vertices = 6) out;
+uniform vec4 origColour;
+uniform vec4 cloneColour;
 
 void main(void)
 {
@@ -26,22 +18,20 @@ void main(void)
     //  result => the line we want to draw, and the same line, but along the other axis
 
     //Pass-thru!
-    // for (int i = 0; i < gl_VerticesIn; i++) {
-    for (int i = 0; i < gl_in.length(); i++) {
-        // gl_Position = gl_PositionIn[i];
-        gl_Position = WorldViewProj * gl_in[i].gl_Position;
-        //gl_FrontColor = origColor;
+    for (i = 0; i < gl_VerticesIn; i++) {
+        gl_Position = gl_PositionIn[i];
+        gl_FrontColor = origColour;
         EmitVertex();
     }
     EndPrimitive();
 
     //New piece of geometry!  We just swizzle the x and y terms
-    // for (int i = 0; i < gl_VerticesIn; i++) {
-    //     // gl_Position = gl_PositionIn[i];
-    //     gl_Position = gl_PositionIn[i];
-    //     gl_Position.xy = gl_Position.yx;
-    //     //gl_FrontColor = cloneColor;
-    //     EmitVertex();
-    // }
-    // EndPrimitive();
+    for (i = 0; i < gl_VerticesIn; i++){
+        gl_Position = gl_PositionIn[i];
+        gl_Position.xy = gl_Position.yx;
+        gl_FrontColor = cloneColour;
+        EmitVertex();
+    }
+    EndPrimitive();
+
 }

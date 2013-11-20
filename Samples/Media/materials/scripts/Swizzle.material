@@ -1,26 +1,15 @@
 // asm
+//FIXME Replace with HLSL.
 // geometry_program Ogre/GPTest/Swizzle/GP_ASM asm
 // {
 // 	source Swizzle.gp
 // 	syntax nvgp4
 // }
 
-// material Ogre/GPTest/SwizzleASM
-// {
-// 	technique SwizzleTechnique
-// 	{
-// 		pass SwizzleASMPass
-// 		{
-// 			geometry_program_ref Ogre/GPTest/Swizzle/GP_ASM
-// 			{
-			
-// 			}
-// 		}
-// 	}
-// }
-
 
 // CG
+//TODO Finish me.
+
 // geometry_program Ogre/GPTest/Swizzle/GP_CG cg
 // {
 // 	source SwizzleGP.cg
@@ -28,86 +17,76 @@
 // 	profiles gp4gp gpu_gp
 // }
 
-// material Ogre/GPTest/SwizzleCG
-// {
-// 	technique
-// 	{
-// 		pass SwizzleCGPass
-// 		{
-// 			geometry_program_ref Ogre/GPTest/Swizzle/GP_CG
-// 			{
-			
-// 			}
-// 		}
-// 	}
-// }
+// GLSL 120
+vertex_program Ogre/GPTest/Swizzle/VP_GLSL120 glsl
+{
+	source PassthroughVP.glsl
+        syntax glsl
+}
 
-// GLSL
-vertex_program Ogre/GPTest/Swizzle/VP_GLSL glsl
+geometry_program Ogre/GPTest/Swizzle/GP_GLSL120 glsl
+{
+	source SwizzleGP.glsl
+        syntax glsl
+}
+
+fragment_program Ogre/GPTest/Swizzle/FP_GLSL120 glsl
+{
+	source PassthroughFP.glsl
+        syntax glsl
+}
+
+
+// GLSL 150
+vertex_program Ogre/GPTest/Swizzle/VP_GLSL_150 glsl
 {
 	source PassthroughVP.glsl
         syntax glsl150
 }
 
-geometry_program Ogre/GPTest/Swizzle/GP_GLSL glsl
+geometry_program Ogre/GPTest/Swizzle/GP_GLSL_150 glsl
 {
 	source SwizzleGP.glsl
         syntax glsl150
-
-	// input_operation_type triangle_list
-	// output_operation_type line_strip
-	// max_output_vertices 6
 }
 
-fragment_program Ogre/GPTest/Swizzle/FP_GLSL glsl
+fragment_program Ogre/GPTest/Swizzle/FP_GLSL_150 glsl
 {
 	source PassthroughFP.glsl
         syntax glsl150
 }
 
 
+// unified
 vertex_program Ogre/GPTest/Swizzle/VP unified
 {
-	delegate Ogre/GPTest/Swizzle/VP_GLSL
-	// delegate Ogre/GPTest/Swizzle/VP_ASM
-	// delegate Ogre/GPTest/Swizzle/VP_CG
-
-	// default_params
-	// {
-        //     param_named_auto WorldViewProj worldviewproj_matrix
-	// }
+	delegate Ogre/GPTest/Swizzle/VP_GLSL_150
+	delegate Ogre/GPTest/Swizzle/VP_GLSL_120
 }
 
 geometry_program Ogre/GPTest/Swizzle/GP unified
 {
-	delegate Ogre/GPTest/Swizzle/GP_GLSL
-	// delegate Ogre/GPTest/Swizzle/GP_ASM
-	// delegate Ogre/GPTest/Swizzle/GP_CG
+	delegate Ogre/GPTest/Swizzle/GP_GLSL_150
+	delegate Ogre/GPTest/Swizzle/GP_GLSL_120
 
-	default_params
+        default_params
 	{
-        //      param_named origColor float4 1 0 0 1    
-	// 	param_named cloneColor float4 1 1 1 0.3
-            param_named_auto WorldViewProj worldviewproj_matrix
+             param_named origColour float4 1 0 0 1    
+	     param_named cloneColour float4 1 1 1 0.3
+             param_named_auto WorldViewProj worldviewproj_matrix
 	}
 }
 
 fragment_program Ogre/GPTest/Swizzle/FP unified
 {
-	delegate Ogre/GPTest/Swizzle/FP_GLSL
-	// delegate Ogre/GPTest/Swizzle/FP_ASM
-	// delegate Ogre/GPTest/Swizzle/FP_CG
-
-	default_params
-	{
-
-	}
+	delegate Ogre/GPTest/Swizzle/FP_GLSL_150
+	delegate Ogre/GPTest/Swizzle/FP_GLSL_120
 }
 
 
 material Ogre/GPTest/Swizzle
 {
-	technique
+	technique glsl
 	{
 		pass
 		{
@@ -127,4 +106,33 @@ material Ogre/GPTest/Swizzle
                         }
 		}
 	}
+
+        //FIXME Appears broken.
+        // technique CG
+        // {
+        //         pass
+        //         {
+        //                 geometry_program Ogre/GPTest/Swizzle/GP_CG cg
+        //                 {
+        //                         source SwizzleGP.cg     
+        //                         entry_point gs_swizzle  
+        //                         profiles gp4gp gpu_gp
+        //                 }
+        //         }
+        // }
+        
+
+        //TODO Replace with HLSL.
+        // technique asm
+        // {
+        //         pass
+        //         {
+        //                 geometry_program Ogre/GPTest/Swizzle/GP_ASM asm
+        //                 {
+        //                         source Swizzle.gp
+        //                         syntax nvgp4
+        //                 }
+        //         }
+        
+        // }
 }
