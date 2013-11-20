@@ -178,6 +178,7 @@ endif()
 
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
+include_directories("include/Threading")
 
 if (OGRE_THREAD_PROVIDER EQUAL 0)
 	list(APPEND THREAD_HEADER_FILES
