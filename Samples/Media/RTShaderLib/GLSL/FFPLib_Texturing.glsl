@@ -194,7 +194,7 @@ void FFP_SampleTexture(in sampler1D s,
 				   in float f,
 				   out vec4 t)
 {
-	t = texture(s, f);
+	t = texture1D(s, f);
 }
 
 //-----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ void FFP_SampleTexture(in sampler3D s,
 				   in vec3 f,
 				   out vec4 t)
 {
-	t = texture(s, f);
+	t = texture3D(s, f);
 }
 
 //-----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void FFP_SampleTexture(in samplerCube s,
 				   in vec3 f,
 				   out vec4 t)
 {
-	t = texture(s, f);
+	t = textureCube(s, f);
 }
 
 
