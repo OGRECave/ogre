@@ -178,10 +178,6 @@ vertex_program Examples/BumpMapVPTangentParityGLSL glsl
 {
 	source BumpMapVPTangentParity.glsl
 	syntax glsl150
-	default_params
-	{
-        param_named_auto lightDiffuse light_diffuse_colour 0 
-    }
 }
 
 vertex_program Examples/BumpMapVPTangentParity unified
@@ -515,31 +511,21 @@ material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/Mul
 	// fragment programs, supports coloured lights
 	technique
 	{
-		// Overlay nothing new onto the old ambient pass
-		pass ambient
-		{
-		}
 		// Now do the lighting pass
 		// NB we don't do decal texture here because this is repeated per light
 		pass perlight
 		{
-
 			// Just change the vertex program
 			vertex_program_ref Examples/BumpMapVPTangentParity
 			{
 				param_named_auto lightPosition light_position_object_space 0
 				param_named_auto worldViewProj worldviewproj_matrix
 			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
-			
 		}
 		
 	}
 
 }
-
 
 
 //---------------------------
