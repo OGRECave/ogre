@@ -39,6 +39,25 @@ public:
         mBoneBoundingBoxesItemName = "Bone AABBs";
 	}
 
+    void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
+    {
+        mVisualiseBoundingBoxMode = mode;
+        for (unsigned int i = 0; i < NUM_MODELS; i++)
+        {
+            switch (mVisualiseBoundingBoxMode)
+            {
+            case kVisualiseNone:
+                mModelNodes[ i ]->showBoundingBox( false );
+                break;
+            case kVisualiseOne:
+                mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
+                break;
+            case kVisualiseAll:
+                mModelNodes[ i ]->showBoundingBox( true );
+                break;
+            }
+        }
+    }
     void enableBoneBoundingBoxMode( bool enable )
     {
         // update bone bounding box mode for all models
@@ -51,6 +70,7 @@ public:
                 if (Entity* ent = dynamic_cast<Entity*>( node->getAttachedObject( iObj ) ))
                 {
                     ent->setUpdateBoundingBoxFromSkeleton( mBoneBoundingBoxes );
+                    Node::queueNeedUpdate( node );  // when turning off bone bounding boxes, need to force an update
                 }
             }
         }
@@ -73,13 +93,13 @@ public:
                 switch (mVisualiseBoundingBoxMode)
                 {
                 case kVisualiseNone:
-                    mVisualiseBoundingBoxMode = kVisualiseOne;
+                    setVisualiseBoundingBoxMode( kVisualiseOne );
                     break;
                 case kVisualiseOne:
-                    mVisualiseBoundingBoxMode = kVisualiseAll;
+                    setVisualiseBoundingBoxMode( kVisualiseAll );
                     break;
                 case kVisualiseAll:
-                    mVisualiseBoundingBoxMode = kVisualiseNone;
+                    setVisualiseBoundingBoxMode( kVisualiseNone );
                     break;
                 }
                 return true;
@@ -99,7 +119,6 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-        mManualObjectDebugLines->clear();
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
 			// update sneaking animation based on speed
@@ -123,21 +142,6 @@ public:
 				mAnimStates[i]->setTimePosition(0);   // reset animation time
 			}
         }
-        switch (mVisualiseBoundingBoxMode)
-        {
-        case kVisualiseNone:
-            break;
-        case kVisualiseOne:
-            drawBox( mModelNodes[ mBoundingBoxModelIndex ]->_getWorldAABB(), ColourValue::White );
-            break;
-        case kVisualiseAll:
-            for (unsigned int i = 0; i < NUM_MODELS; i++)
-            {
-                drawBox( mModelNodes[i]->_getWorldAABB(), ColourValue::White );
-            }
-            break;
-        }
-        prepareDebugLines();
 
 		return SdkSample::frameRenderingQueued(evt);
     }
@@ -223,94 +227,7 @@ protected:
 		mCameraMan->setTopSpeed(50);
 
 		setupModels();
-        // create a ManualObject for drawing "debug lines" (used for bounding box visualisation)
-        mManualObjectDebugLines = mSceneMgr->createManualObject("manualDebugLines3d");
-        mSceneMgr->getRootSceneNode()->attachObject( mManualObjectDebugLines );
-        // Use infinite AAB to always stay visible
-        mManualObjectDebugLines->setBoundingBox( AxisAlignedBox::BOX_INFINITE );
-        mManualObjectDebugLines->setDynamic( true );
-        mManualObjectDebugLines->setCastShadows( false );
-        // draw debug lines just before overlays
-        mManualObjectDebugLines->setRenderQueueGroup(RENDER_QUEUE_OVERLAY - 1);  // no depth testing/writing, so this should draw late in the queue, otherwise lines will be overdrawn
-        // Create debug draw material
-        {
-            mDebugMaterial = MaterialManager::getSingleton().create( mDebugMaterialName, "General" );
-            MaterialPtr defaultMat = MaterialManager::getSingleton().getByName( "BaseWhiteNoLighting" );
-            defaultMat->copyDetailsTo( mDebugMaterial );
-            mDebugMaterial->setDepthCheckEnabled(false);
-            mDebugMaterial->setDepthWriteEnabled(false);
-            mDebugMaterial->setLightingEnabled(false);
-            mDebugMaterial->setCullingMode( CULL_NONE );
-            mDebugMaterial->setReceiveShadows( false );
-        }
 	}
-    void drawLine( const Vector3& pt0, const Vector3& pt1, const ColourValue& col )
-    {
-        ManualObject* o = mManualObjectDebugLines;
-        if (o->getNumSections() == 0)
-        {
-            o->begin( mDebugMaterialName, RenderOperation::OT_LINE_LIST );
-        }
-        o->position( pt0 );
-        o->colour( col );
-        o->position( pt1 );
-        o->colour( col );
-    }
-    void prepareDebugLines()
-    {
-        // call this once after all lines are drawn to prepare the manual object for rendering
-        if (mManualObjectDebugLines->getNumSections() > 0)
-        {
-            mManualObjectDebugLines->end();
-        }
-    }
-    void drawBox(
-        const Vector3& centerWs,
-        const Vector3& halfExtents,
-        const Quaternion& rotWs,
-        const ColourValue& color
-        )
-    {
-        Vector3 pts[8];
-        for (size_t i = 0; i < 8; ++i)
-        {
-            // start with 2x2x2 box centered on origin
-            Vector3 v = Vector3(
-                (i&1) ? -1 : 1,
-                (i&2) ? -1 : 1,
-                (i&4) ? -1 : 1
-                );
-            // apply scale
-            v.x *= halfExtents.x;
-            v.y *= halfExtents.y;
-            v.z *= halfExtents.z;
-            // apply rotation
-            v = rotWs * v;
-            // apply translation
-            v += centerWs;
-            pts[i] = v;
-        }
-        // draw the 12 edges
-        drawLine( pts[0], pts[1], color );
-        drawLine( pts[0], pts[2], color );
-        drawLine( pts[1], pts[3], color );
-        drawLine( pts[2], pts[3], color );
-        drawLine( pts[0], pts[4], color );
-        drawLine( pts[1], pts[5], color );
-        drawLine( pts[2], pts[6], color );
-        drawLine( pts[3], pts[7], color );
-        drawLine( pts[4], pts[5], color );
-        drawLine( pts[4], pts[6], color );
-        drawLine( pts[5], pts[7], color );
-        drawLine( pts[6], pts[7], color );
-    }
-    void drawBox( const AxisAlignedBox& box, const ColourValue& color )
-    {
-        if (box.isFinite())
-        {
-            drawBox( box.getCenter(), box.getHalfSize(), Quaternion::IDENTITY, color );
-        }
-    }
 
 	void setupModels()
 	{
@@ -467,9 +384,6 @@ protected:
 
 	const unsigned int NUM_MODELS;
 	const Real ANIM_CHOP;
-    ManualObject* mManualObjectDebugLines;
-    String mDebugMaterialName;
-    MaterialPtr mDebugMaterial;
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for
     bool mBoneBoundingBoxes;
