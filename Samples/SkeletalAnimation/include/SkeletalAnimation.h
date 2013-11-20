@@ -12,6 +12,12 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
+    enum VisualiseBoundingBoxMode
+    {
+        kVisualiseNone,
+        kVisualiseOne,
+        kVisualiseAll
+    };
 public:
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
@@ -22,10 +28,78 @@ public:
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
 		mInfo["Thumbnail"] = "thumb_skelanim.png";
 		mInfo["Category"] = "Animation";
+		mInfo["Help"] = "Controls:\n"
+            "WASD to move the camera.  Mouse to look around.\n"
+            "V toggle visualise bounding boxes.\n"
+            "B toggle bone-based bounding boxes on/off.";
+        mStatusPanel = NULL;
+        mVisualiseBoundingBoxMode = kVisualiseNone;
+        mBoundingBoxModelIndex = 0;
+        mBoneBoundingBoxes = false;
+        mBoneBoundingBoxesItemName = "Bone AABBs";
 	}
+
+    void enableBoneBoundingBoxMode( bool enable )
+    {
+        // update bone bounding box mode for all models
+        mBoneBoundingBoxes = enable;
+        for (unsigned int iModel = 0; iModel < NUM_MODELS; iModel++)
+        {
+            SceneNode* node = mModelNodes[iModel];
+            for (unsigned int iObj = 0; iObj < node->numAttachedObjects(); ++iObj)
+            {
+                if (Entity* ent = dynamic_cast<Entity*>( node->getAttachedObject( iObj ) ))
+                {
+                    ent->setUpdateBoundingBoxFromSkeleton( mBoneBoundingBoxes );
+                }
+            }
+        }
+        // update status panel
+        if ( mStatusPanel )
+        {
+            mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
+        }
+    }
+	bool keyPressed(const OIS::KeyEvent& evt)
+    {
+        // unless the help dialog is visible,
+        if ( !mTrayMgr->isDialogVisible() )
+        {
+            // handle keypresses
+            switch (evt.key)
+            {
+            case OIS::KC_V:
+                // toggle visualise bounding boxes
+                switch (mVisualiseBoundingBoxMode)
+                {
+                case kVisualiseNone:
+                    mVisualiseBoundingBoxMode = kVisualiseOne;
+                    break;
+                case kVisualiseOne:
+                    mVisualiseBoundingBoxMode = kVisualiseAll;
+                    break;
+                case kVisualiseAll:
+                    mVisualiseBoundingBoxMode = kVisualiseNone;
+                    break;
+                }
+                return true;
+                break;
+
+            case OIS::KC_B:
+                {
+                    // toggle bone based bounding boxes for all models
+                    enableBoneBoundingBoxMode( ! mBoneBoundingBoxes );
+                    return true;
+                }
+                break;
+            }
+        }
+        return SdkSample::keyPressed(evt);
+    }
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
+        mManualObjectDebugLines->clear();
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
 			// update sneaking animation based on speed
@@ -49,6 +123,21 @@ public:
 				mAnimStates[i]->setTimePosition(0);   // reset animation time
 			}
         }
+        switch (mVisualiseBoundingBoxMode)
+        {
+        case kVisualiseNone:
+            break;
+        case kVisualiseOne:
+            drawBox( mModelNodes[ mBoundingBoxModelIndex ]->_getWorldAABB(), ColourValue::White );
+            break;
+        case kVisualiseAll:
+            for (unsigned int i = 0; i < NUM_MODELS; i++)
+            {
+                drawBox( mModelNodes[i]->_getWorldAABB(), ColourValue::White );
+            }
+            break;
+        }
+        prepareDebugLines();
 
 		return SdkSample::frameRenderingQueued(evt);
     }
@@ -134,7 +223,94 @@ protected:
 		mCameraMan->setTopSpeed(50);
 
 		setupModels();
+        // create a ManualObject for drawing "debug lines" (used for bounding box visualisation)
+        mManualObjectDebugLines = mSceneMgr->createManualObject("manualDebugLines3d");
+        mSceneMgr->getRootSceneNode()->attachObject( mManualObjectDebugLines );
+        // Use infinite AAB to always stay visible
+        mManualObjectDebugLines->setBoundingBox( AxisAlignedBox::BOX_INFINITE );
+        mManualObjectDebugLines->setDynamic( true );
+        mManualObjectDebugLines->setCastShadows( false );
+        // draw debug lines just before overlays
+        mManualObjectDebugLines->setRenderQueueGroup(RENDER_QUEUE_OVERLAY - 1);  // no depth testing/writing, so this should draw late in the queue, otherwise lines will be overdrawn
+        // Create debug draw material
+        {
+            mDebugMaterial = MaterialManager::getSingleton().create( mDebugMaterialName, "General" );
+            MaterialPtr defaultMat = MaterialManager::getSingleton().getByName( "BaseWhiteNoLighting" );
+            defaultMat->copyDetailsTo( mDebugMaterial );
+            mDebugMaterial->setDepthCheckEnabled(false);
+            mDebugMaterial->setDepthWriteEnabled(false);
+            mDebugMaterial->setLightingEnabled(false);
+            mDebugMaterial->setCullingMode( CULL_NONE );
+            mDebugMaterial->setReceiveShadows( false );
+        }
 	}
+    void drawLine( const Vector3& pt0, const Vector3& pt1, const ColourValue& col )
+    {
+        ManualObject* o = mManualObjectDebugLines;
+        if (o->getNumSections() == 0)
+        {
+            o->begin( mDebugMaterialName, RenderOperation::OT_LINE_LIST );
+        }
+        o->position( pt0 );
+        o->colour( col );
+        o->position( pt1 );
+        o->colour( col );
+    }
+    void prepareDebugLines()
+    {
+        // call this once after all lines are drawn to prepare the manual object for rendering
+        if (mManualObjectDebugLines->getNumSections() > 0)
+        {
+            mManualObjectDebugLines->end();
+        }
+    }
+    void drawBox(
+        const Vector3& centerWs,
+        const Vector3& halfExtents,
+        const Quaternion& rotWs,
+        const ColourValue& color
+        )
+    {
+        Vector3 pts[8];
+        for (size_t i = 0; i < 8; ++i)
+        {
+            // start with 2x2x2 box centered on origin
+            Vector3 v = Vector3(
+                (i&1) ? -1 : 1,
+                (i&2) ? -1 : 1,
+                (i&4) ? -1 : 1
+                );
+            // apply scale
+            v.x *= halfExtents.x;
+            v.y *= halfExtents.y;
+            v.z *= halfExtents.z;
+            // apply rotation
+            v = rotWs * v;
+            // apply translation
+            v += centerWs;
+            pts[i] = v;
+        }
+        // draw the 12 edges
+        drawLine( pts[0], pts[1], color );
+        drawLine( pts[0], pts[2], color );
+        drawLine( pts[1], pts[3], color );
+        drawLine( pts[2], pts[3], color );
+        drawLine( pts[0], pts[4], color );
+        drawLine( pts[1], pts[5], color );
+        drawLine( pts[2], pts[6], color );
+        drawLine( pts[3], pts[7], color );
+        drawLine( pts[4], pts[5], color );
+        drawLine( pts[4], pts[6], color );
+        drawLine( pts[5], pts[7], color );
+        drawLine( pts[6], pts[7], color );
+    }
+    void drawBox( const AxisAlignedBox& box, const ColourValue& color )
+    {
+        if (box.isFinite())
+        {
+            drawBox( box.getCenter(), box.getHalfSize(), Quaternion::IDENTITY, color );
+        }
+    }
 
 	void setupModels()
 	{
@@ -194,10 +370,17 @@ protected:
 
 		// create name and value for skinning mode
 		StringVector names;
+        names.push_back("Help");
 		names.push_back("Skinning");
+        names.push_back(mBoneBoundingBoxesItemName);
+		
+		// create a params panel to display the help and skinning mode
+		mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
+        mStatusPanel->setParamValue("Help", "H / F1");
 		String value = "Software";
+        enableBoneBoundingBoxMode( false );  // update status panel entry
 
-		// change the value if hardware skinning is enabled
+        // change the value if hardware skinning is enabled
 		MaterialPtr entityMaterial = ent->getSubEntity(0)->getMaterial();
 		if(!entityMaterial.isNull())
 		{
@@ -211,9 +394,7 @@ protected:
 				}
 			}
 		}
-		
-		// create a params panel to display the skinning mode
-		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
+        mStatusPanel->setParamValue("Skinning", value);
 	}
 	
 	/*-----------------------------------------------------------------------------
@@ -286,8 +467,16 @@ protected:
 
 	const unsigned int NUM_MODELS;
 	const Real ANIM_CHOP;
+    ManualObject* mManualObjectDebugLines;
+    String mDebugMaterialName;
+    MaterialPtr mDebugMaterial;
+    VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
+    int mBoundingBoxModelIndex;  // which model to show the bounding box for
+    bool mBoneBoundingBoxes;
+    ParamsPanel* mStatusPanel;
+    String mBoneBoundingBoxesItemName;
 
-	std::vector<SceneNode*> mModelNodes;
+    std::vector<SceneNode*> mModelNodes;
 	std::vector<AnimationState*> mAnimStates;
 	std::vector<Real> mAnimSpeeds;
 
