@@ -43,24 +43,34 @@ THE SOFTWARE.
 
 #include <OpenGL/OpenGL.h>
 #include <AppKit/NSScreen.h>
-
+#include <Foundation/NSString.h>
 namespace Ogre {
 
+    class OSXGLSupportImpl
+    {
+    public:
+        OSXGLSupportImpl(){}
+        NSString * mCurrentOSVersion;
+    };
+    
 bool OSXGLSupport::OSVersionIsAtLeast(String newVersion)
 {
-    return [mCurrentOSVersion compare:[NSString stringWithCString:newVersion.c_str() encoding:NSASCIIStringEncoding]
+    return [mImpl->mCurrentOSVersion compare:[NSString stringWithCString:newVersion.c_str() encoding:NSASCIIStringEncoding]
                               options:NSNumericSearch] >= NSOrderedSame;
 }
 
 
 OSXGLSupport::OSXGLSupport() : mAPI(""), mContextType("")
 {
+    
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
-    mCurrentOSVersion = [dict objectForKey:@"ProductVersion"];
+    mImpl = new OSXGLSupportImpl();
+    mImpl->mCurrentOSVersion = [dict objectForKey:@"ProductVersion"];
 }
 
 OSXGLSupport::~OSXGLSupport()
 {
+    delete mImpl;
 }
 
 void OSXGLSupport::addConfig( void )
