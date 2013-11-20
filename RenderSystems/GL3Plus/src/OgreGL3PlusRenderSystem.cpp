@@ -749,8 +749,8 @@ namespace Ogre {
 
         if ( fbo )
         {
-            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
-            // Find best depth & stencil format suited for the RT's format
+            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast.
+            // Find best depth & stencil format suited for the RT's format.
             GLuint depthFormat, stencilFormat;
             static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
                                                                                &depthFormat, &stencilFormat );
@@ -788,7 +788,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::destroyRenderWindow(RenderWindow* pWin)
     {
-        // Find it to remove from list
+        // Find it to remove from list.
         RenderTargetMap::iterator i = mRenderTargets.begin();
 
         while (i != mRenderTargets.end())
@@ -798,7 +798,7 @@ namespace Ogre {
                 GL3PlusContext *windowContext;
                 pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
-                // 1 Window <-> 1 Context, should be always true
+                // 1 Window <-> 1 Context, should be always true.
                 assert( windowContext );
 
                 bool bFound = false;
@@ -814,7 +814,7 @@ namespace Ogre {
                     while( itor != end )
                     {
                         // A DepthBuffer with no depth & stencil pointers is a dummy one,
-                        // look for the one that matches the same GL context
+                        // look for the one that matches the same GL context.
                         GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(*itor);
                         GL3PlusContext *glContext = depthBuffer->getGLContext();
 
@@ -859,7 +859,7 @@ namespace Ogre {
     {
         mViewMatrix = m;
 
-        // Also mark clip planes dirty
+        // Also mark clip planes dirty.
         if (!mClipPlanes.empty())
         {
             mClipPlanesDirty = true;
@@ -868,7 +868,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setProjectionMatrix(const Matrix4 &m)
     {
-        // Nothing to do but mark clip planes dirty
+        // Nothing to do but mark clip planes dirty.
         if (!mClipPlanes.empty())
             mClipPlanesDirty = true;
     }
@@ -877,7 +877,7 @@ namespace Ogre {
                                                   bool attenuationEnabled, Real constant, Real linear, Real quadratic,
                                                   Real minSize, Real maxSize)
     {
-        float val[4] = {1, 0, 0, 1};
+        // float val[4] = {1, 0, 0, 1};
 
         if (attenuationEnabled)
         {
@@ -885,17 +885,17 @@ namespace Ogre {
             // enabled, which is pretty awkward, since you typically want a viewport
             // independent size if you're looking for attenuation.
             // So, scale the point size up by viewport size (this is equivalent to
-            // what D3D does as standard)
+            // what D3D does as standard).
             size = size * mActiveViewport->getActualHeight();
 
             // XXX: why do I need this for results to be consistent with D3D?
-            // Equations are supposedly the same once you factor in vp height
-            Real correction = 0.005;
-            // scaling required
-            val[0] = constant;
-            val[1] = linear * correction;
-            val[2] = quadratic * correction;
-            val[3] = 1;
+            // Equations are supposedly the same once you factor in vp height.
+            // Real correction = 0.005;
+            // Scaling required.
+            // val[0] = constant;
+            // val[1] = linear * correction;
+            // val[2] = quadratic * correction;
+            // val[3] = 1;
 
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
@@ -924,13 +924,16 @@ namespace Ogre {
             }
         }
 
-        // no scaling required
-        // GL has no disabled flag for this so just set to constant
-        OGRE_CHECK_GL_ERROR(glPointSize(size));
+        //FIXME Points do not seem affected by setting this.
+        // OGRE_CHECK_GL_ERROR(glPointSize(size));
+        OGRE_CHECK_GL_ERROR(glPointSize(30.0));
+
+        //OGRE_CHECK_GL_ERROR(glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 64.0));
     }
 
     void GL3PlusRenderSystem::_setPointSpritesEnabled(bool enabled)
     {
+        // Point sprites are always on in OpenGL 3.2 and up.
     }
 
     void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
@@ -948,11 +951,11 @@ namespace Ogre {
                 tex->touch();
                 mTextureTypes[stage] = tex->getGL3PlusTextureTarget();
 
-                // Store the number of mipmaps
+                // Store the number of mipmaps.
                 mTextureMipmapCount = tex->getNumMipmaps();
             }
             else
-                // Assume 2D
+                // Assume 2D.
                 mTextureTypes[stage] = GL_TEXTURE_2D;
 
             if (!tex.isNull())
@@ -966,7 +969,7 @@ namespace Ogre {
         }
         else
         {
-            // Bind zero texture
+            // Bind zero texture.
             OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
         }
 
@@ -1053,7 +1056,7 @@ namespace Ogre {
             return GL_ONE_MINUS_SRC_ALPHA;
         };
 
-        // To keep compiler happy
+        // To keep compiler happy.
         return GL_ONE;
     }
 
