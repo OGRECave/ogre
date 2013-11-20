@@ -637,12 +637,12 @@ fragment_program Examples/FresnelRefractReflectFPCg cg
 	profiles ps_4_0 ps_2_0 arbfp1
 }
 
-fragment_program Examples/FresnelRefractReflectPS asm
-{
-	source Example_FresnelPS.asm
-	// sorry, only for ps_1_4 :)
-	syntax ps_1_4
-}
+// fragment_program Examples/FresnelRefractReflectPS asm
+// {
+// 	source Example_FresnelPS.asm
+// 	// sorry, only for ps_1_4 :)
+// 	syntax ps_1_4
+// }
 
 fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 {
