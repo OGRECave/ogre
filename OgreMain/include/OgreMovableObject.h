@@ -106,8 +106,8 @@ namespace Ogre {
 		SceneManager* mManager;
 
 		//One for each submesh/material/Renderable
-        FastArray< FastArray<LodMerged> >	*mLodMerged;
-		FastArray<unsigned char>		mCurrentLod;
+		FastArray< FastArray<LodMerged> > const	*mLodMerged;
+		FastArray<unsigned char>				mCurrentLod;
 
 		// Minimum pixel size to still render
 		Real mMinPixelSize;
