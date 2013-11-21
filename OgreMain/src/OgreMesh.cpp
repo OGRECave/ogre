@@ -628,7 +628,7 @@ namespace Ogre {
                 "The lowest weighted assignments beyond this limit have been removed, so "
                 "your animation may look slightly different. To eliminate this, reduce "
                 "the number of bone assignments per vertex on your mesh to " +
-                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".");
+                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".", LML_CRITICAL);
             // we've adjusted them down to the max
             maxBones = OGRE_MAX_BLEND_WEIGHTS;
 
@@ -641,7 +641,7 @@ namespace Ogre {
                 "includes vertices without bone assignments. Those vertices will "
 				"transform to wrong position when skeletal animation enabled. "
 				"To eliminate this, assign at least one bone assignment per vertex "
-				"on your mesh.");
+				"on your mesh.", LML_CRITICAL);
 		}
 
         return maxBones;
@@ -1407,8 +1407,6 @@ namespace Ogre {
             // use getLodLevel to enforce loading of manual mesh lods
             MeshLodUsage& usage = const_cast<MeshLodUsage&>(getLodLevel(lodIndex));
 
-			bool atLeastOneIndexSet = false;
-
             if (mIsLodManual && lodIndex != 0)
             {
                 // Delegate edge building to manual mesh
@@ -1423,6 +1421,7 @@ namespace Ogre {
                 // Build
                 EdgeListBuilder eb;
                 size_t vertexSetCount = 0;
+                bool atLeastOneIndexSet = false;
 
                 if (sharedVertexData)
                 {

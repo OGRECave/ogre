@@ -83,6 +83,8 @@ namespace Ogre
 		, mPSSM(0)
 		, mDepthShadows(false)
 		, mLowLodShadows(false)
+        , mSM3Available(false)
+        , mSM4Available(false)
 	{
 		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
         if (hmgr.isLanguageSupported("cg"))
@@ -357,16 +359,12 @@ namespace Ogre
             {
 				mShaderGen = OGRE_NEW ShaderHelperGLSLES();
             }
-			else
-			{
-				// todo
-			}
-
+			
 			// check SM3 features
 			mSM3Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
 			mSM4Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
-
 		}
+
 		HighLevelGpuProgramPtr vprog = mShaderGen->generateVertexProgram(this, terrain, tt);
 		HighLevelGpuProgramPtr fprog = mShaderGen->generateFragmentProgram(this, terrain, tt);
 

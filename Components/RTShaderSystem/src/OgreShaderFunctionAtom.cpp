@@ -31,12 +31,8 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 //-----------------------------------------------------------------------------
-Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel)
+Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
 {
-	mParameter = parameter;
-	mSemantic = opSemantic;
-	mMask = opMask;
-	mIndirectionLevel = indirectionLevel;
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
@@ -180,22 +176,19 @@ String FunctionInvocation::Type = "FunctionInvocation";
 
 //-----------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const String& functionName, 
-									   int groupOrder, int internalOrder, String returnType)
+									   int groupOrder, int internalOrder, String returnType) :
+    mFunctionName(functionName), mReturnType(returnType)
 {
-	mFunctionName = functionName;
 	mGroupExecutionOrder = groupOrder;
 	mInternalExecutionOrder = internalOrder;
-	mReturnType = returnType;
 }
 
 //-----------------------------------------------------------------------------
-FunctionInvocation::FunctionInvocation(const FunctionInvocation& other)
+FunctionInvocation::FunctionInvocation(const FunctionInvocation& other) :
+    mFunctionName(other.mFunctionName), mReturnType(other.mReturnType)
 {
-    
-	mFunctionName = other.mFunctionName;
 	mGroupExecutionOrder = other.mGroupExecutionOrder;
 	mInternalExecutionOrder = other.mInternalExecutionOrder;
-	mReturnType = other.mReturnType;
     
     for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
         mOperands.push_back(Operand(*it));

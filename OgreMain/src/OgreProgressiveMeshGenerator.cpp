@@ -375,7 +375,7 @@ ProgressiveMeshGenerator::PMTriangle* ProgressiveMeshGenerator::isDuplicateTrian
 	// duplicate triangle detection (where all vertices has the same position)
 	VTriangles::iterator itEnd = triangle->vertex[0]->triangles.end();
 	VTriangles::iterator it = triangle->vertex[0]->triangles.begin();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		PMTriangle* t = *it;
 		if (isDuplicateTriangle(triangle, t)) {
 			return *it;
@@ -423,7 +423,7 @@ bool ProgressiveMeshGenerator::isBorderVertex(const PMVertex* vertex) const
 {
 	VEdges::const_iterator it = vertex->edges.begin();
 	VEdges::const_iterator itEnd = vertex->edges.end();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		if (it->refCount == 1) {
 			return true;
 		}
@@ -435,7 +435,7 @@ ProgressiveMeshGenerator::PMTriangle* ProgressiveMeshGenerator::findSideTriangle
 {
 	VTriangles::const_iterator it = v1->triangles.begin();
 	VTriangles::const_iterator itEnd = v1->triangles.end();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		PMTriangle* triangle = *it;
 		if (triangle->hasVertex(v2)) {
 			return triangle;
@@ -455,7 +455,7 @@ void ProgressiveMeshGenerator::computeCosts()
 	mCollapseCostHeap.clear();
 	VertexList::iterator it = mVertexList.begin();
 	VertexList::iterator itEnd = mVertexList.end();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		if (!it->edges.empty()) {
 
 			computeVertexCollapseCost(&*it);
@@ -477,7 +477,7 @@ void ProgressiveMeshGenerator::computeVertexCollapseCost(PMVertex* vertex)
 	Real collapseCost = UNINITIALIZED_COLLAPSE_COST;
 	OgreAssert(!vertex->edges.empty(), "");
 	VEdges::iterator it = vertex->edges.begin();
-	for (; it != vertex->edges.end(); it++) {
+	for (; it != vertex->edges.end(); ++it) {
 		it->collapseCost = computeEdgeCollapseCost(vertex, getPointer(it));
 		if (collapseCost > it->collapseCost) {
 			collapseCost = it->collapseCost;
@@ -506,7 +506,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 	{
 		VTriangles::iterator it = src->triangles.begin();
 		VTriangles::iterator itEnd = src->triangles.end();
-		for (; it != itEnd; it++) {
+		for (; it != itEnd; ++it) {
 			PMTriangle* triangle = *it;
 			// Ignore the deleted faces (those including src & dest)
 			if (!triangle->hasVertex(dst)) {
@@ -561,7 +561,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 			collapseEdge.normalise();
 			VEdges::iterator it = src->edges.begin();
 			VEdges::iterator itEnd = src->edges.end();
-			for (; it != itEnd; it++) {
+			for (; it != itEnd; ++it) {
 				PMVertex* neighbor = it->dst;
 				if (neighbor != dst && it->refCount == 1) {
 					Vector3 otherBorderEdge = src->position - neighbor->position;
@@ -585,11 +585,11 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 		cost = 1.0f;
 		VTriangles::iterator it = src->triangles.begin();
 		VTriangles::iterator itEnd = src->triangles.end();
-		for (; it != itEnd; it++) {
+		for (; it != itEnd; ++it) {
 			Real mincurv = -1.0f; // curve for face i and closer side to it
 			PMTriangle* triangle = *it;
 			VTriangles::iterator it2 = src->triangles.begin();
-			for (; it2 != itEnd; it2++) {
+			for (; it2 != itEnd; ++it2) {
 				PMTriangle* triangle2 = *it2;
 				if (triangle2->hasVertex(dst)) {
 
@@ -616,7 +616,7 @@ Real ProgressiveMeshGenerator::computeEdgeCollapseCost(PMVertex* src, PMEdge* ds
 			PMVertex* otherSeam;
 			VEdges::iterator it = src->edges.begin();
 			VEdges::iterator itEnd = src->edges.end();
-			for (; it != itEnd; it++) {
+			for (; it != itEnd; ++it) {
 				PMVertex* neighbor = it->dst;
 				if(neighbor->seam) {
 					seamNeighbors++;
@@ -669,7 +669,7 @@ void ProgressiveMeshGenerator::updateVertexCollapseCost(PMVertex* vertex)
 	PMVertex* collapseTo = 0;
 	VEdges::iterator it = vertex->edges.begin();
 	VEdges::iterator itEnd = vertex->edges.end();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		it->collapseCost = computeEdgeCollapseCost(vertex, getPointer(it));
 		if (collapseCost > it->collapseCost) {
 			collapseCost = it->collapseCost;
@@ -838,7 +838,7 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 	tmpCollapsedEdges.clear();
 	VTriangles::iterator it = src->triangles.begin();
 	VTriangles::iterator itEnd = src->triangles.end();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		PMTriangle* triangle = *it;
 		if (triangle->hasVertex(dst)) {
 			// Remove a triangle
@@ -871,7 +871,7 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 	OgreAssert(dst->edges.find(PMEdge(src)) == dst->edges.end(), "");
 
 	it = src->triangles.begin();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		PMTriangle* triangle = *it;
 		if (!triangle->hasVertex(dst)) {
 			// Replace a triangle
@@ -906,7 +906,7 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 #ifndef PM_BEST_QUALITY
 	VEdges::iterator it3 = src->edges.begin();
 	VEdges::iterator it3End = src->edges.end();
-	for (; it3 != it3End; it3++) {
+	for (; it3 != it3End; ++it3) {
 		updateVertexCollapseCost(it3->dst);
 	}
 #else
@@ -916,11 +916,11 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 	UpdatableList updatable;
 	VEdges::iterator it3 = src->edges.begin();
 	VEdges::iterator it3End = src->edges.end();
-	for (; it3 != it3End; it3++) {
+	for (; it3 != it3End; ++it3) {
 		updatable.push_back(it3->dst);
 		VEdges::iterator it4End = it3->dst->edges.end();
 		VEdges::iterator it4 = it3->dst->edges.begin();
-		for (; it4 != it4End; it4++) {
+		for (; it4 != it4End; ++it4) {
 			updatable.push_back(it4->dst);
 		}
 	}
@@ -931,18 +931,18 @@ void ProgressiveMeshGenerator::collapse(PMVertex* src)
 	std::sort(it5, it5End);
 	it5End = std::unique(it5, it5End);
 
-	for (; it5 != it5End; it5++) {
+	for (; it5 != it5End; ++it5) {
 		updateVertexCollapseCost(*it5);
 	}
 #if OGRE_DEBUG_MODE
 	it3 = src->edges.begin();
 	it3End = src->edges.end();
-	for (; it3 != it3End; it3++) {
+	for (; it3 != it3End; ++it3) {
 		assertOutdatedCollapseCost(it3->dst);
 	}
 	it3 = dst->edges.begin();
 	it3End = dst->edges.end();
-	for (; it3 != it3End; it3++) {
+	for (; it3 != it3End; ++it3) {
 		assertOutdatedCollapseCost(it3->dst);
 	}
 	assertOutdatedCollapseCost(dst);

@@ -127,10 +127,9 @@ namespace Ogre {
 		// Check header
         readFileHeader(stream);
 
-        unsigned short streamID;
         while(!stream->eof())
         {
-            streamID = readChunk(stream);
+            unsigned short streamID = readChunk(stream);
             switch (streamID)
             {
 			case SKELETON_BLENDMODE:
@@ -193,7 +192,7 @@ namespace Ogre {
         {
             Bone* pBone = pSkel->getBone(i);
             unsigned short handle = pBone->getHandle();
-            Bone* pParent = (Bone*)pBone->getParent(); 
+            Bone* pParent = static_cast<Bone*>(pBone->getParent());
             if (pParent != NULL) 
             {
                 writeBoneParent(pSkel, handle, pParent->getHandle());             
@@ -280,7 +279,7 @@ namespace Ogre {
         writeChunkHeader(SKELETON_ANIMATION_TRACK, calcAnimationTrackSize(pSkel, track));
 
         // unsigned short boneIndex     : Index of bone to apply to
-        Bone* bone = (Bone*)track->getAssociatedNode();
+        Bone* bone = static_cast<Bone*>(track->getAssociatedNode());
         unsigned short boneid = bone->getHandle();
         writeShorts(&boneid, 1);
 

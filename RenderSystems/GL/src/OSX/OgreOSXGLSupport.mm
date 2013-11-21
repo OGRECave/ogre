@@ -43,15 +43,34 @@ THE SOFTWARE.
 
 #include <OpenGL/OpenGL.h>
 #include <AppKit/NSScreen.h>
-
+#include <Foundation/NSString.h>
 namespace Ogre {
+
+    class OSXGLSupportImpl
+    {
+    public:
+        OSXGLSupportImpl(){}
+        NSString * mCurrentOSVersion;
+    };
+    
+bool OSXGLSupport::OSVersionIsAtLeast(String newVersion)
+{
+    return [mImpl->mCurrentOSVersion compare:[NSString stringWithCString:newVersion.c_str() encoding:NSASCIIStringEncoding]
+                              options:NSNumericSearch] >= NSOrderedSame;
+}
+
 
 OSXGLSupport::OSXGLSupport() : mAPI(""), mContextType("")
 {
+    
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+    mImpl = new OSXGLSupportImpl();
+    mImpl->mCurrentOSVersion = [dict objectForKey:@"ProductVersion"];
 }
 
 OSXGLSupport::~OSXGLSupport()
 {
+    delete mImpl;
 }
 
 void OSXGLSupport::addConfig( void )
@@ -114,14 +133,17 @@ void OSXGLSupport::addConfig( void )
     optContentScalingFactor.possibleValues.push_back( "1.33" );
     optContentScalingFactor.possibleValues.push_back( "1.5" );
     optContentScalingFactor.possibleValues.push_back( "2.0" );
-    optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
+    if(OSVersionIsAtLeast("10.7"))
+        optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
+    else
+        optContentScalingFactor.currentValue = "1.0";
     optContentScalingFactor.immutable = false;
 
-		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
-		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
-		optEnableFixedPipeline.possibleValues.push_back( "No" );
-		optEnableFixedPipeline.currentValue = "Yes";
-		optEnableFixedPipeline.immutable = false;
+    optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
+    optEnableFixedPipeline.possibleValues.push_back( "Yes" );
+    optEnableFixedPipeline.possibleValues.push_back( "No" );
+    optEnableFixedPipeline.currentValue = "Yes";
+    optEnableFixedPipeline.immutable = false;
 
 	CGLRendererInfoObj rend;
 

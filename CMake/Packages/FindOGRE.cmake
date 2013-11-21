@@ -219,8 +219,17 @@ else ()
   set(OGRE_INCOMPATIBLE FALSE)
 endif ()
 
-find_library(OGRE_LIBRARY_REL NAMES ${OGRE_LIBRARY_NAMES} HINTS ${OGRE_LIB_SEARCH_PATH} ${OGRE_PKGC_LIBRARY_DIRS} ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "Release" "RelWithDebInfo" "MinSizeRel")
-find_library(OGRE_LIBRARY_DBG NAMES ${OGRE_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIB_SEARCH_PATH} ${OGRE_PKGC_LIBRARY_DIRS} ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "Debug")
+if (NOT OGRE_SOURCE) # If using ogre sources, use the target names instead of library files to link.
+	find_library(OGRE_LIBRARY_REL NAMES ${OGRE_LIBRARY_NAMES} HINTS ${OGRE_LIB_SEARCH_PATH} ${OGRE_PKGC_LIBRARY_DIRS} ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "Release" "RelWithDebInfo" "MinSizeRel")
+	find_library(OGRE_LIBRARY_DBG NAMES ${OGRE_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIB_SEARCH_PATH} ${OGRE_PKGC_LIBRARY_DIRS} ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "Debug")
+else()
+	if( NOT OGRE_LIBRARIES OR OGRE_LIBRARIES STREQUAL "" )
+		message( FATAL_ERROR "When using Ogre from sources, please specify target names in OGRE_LIBRARIES!" )
+	else()
+		message( "Using Ogre source instead of binary libraries - skipping library files search." )
+	endif()
+endif()
+
 make_library_set(OGRE_LIBRARY)
 
 if(APPLE)

@@ -2806,7 +2806,8 @@ namespace Ogre {
 		/** Set the detailed configuration for a shadow texture.
 		@param shadowIndex The index of the texture to configure, must be < the
 			number of shadow textures setting
-		@param width, height The dimensions of the texture
+		@param width The width of the texture
+        @param height The height of the texture
 		@param format The pixel format of the texture
         @param fsaa The level of multisampling to use. Ignored if the device does not support it.
 		@param depthBufferPoolId The pool # it should query the depth buffers from
@@ -2871,9 +2872,8 @@ namespace Ogre {
 		{return mShadowTextureCountPerType[type]; }
 
         /** Sets the size and count of textures used in texture-based shadows. 
-        @remarks
-            @see setShadowTextureSize and setShadowTextureCount for details, this
-            method just allows you to change both at once, which can save on 
+        @see setShadowTextureSize and setShadowTextureCount for details, this
+            method just allows you to change both at once, which can save on
             reallocation if the textures have already been created.
 		@note This is the simple form, see setShadowTextureConfig for the more 
 			complex form.
@@ -3164,7 +3164,7 @@ namespace Ogre {
 		@param technique Technique to use, which may be shader based, or hardware based.
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
 		may end up being lower if the technique doesn't support having so many. It can't be zero
-		@param flags @see InstanceManagerFlags
+		@param flags Flags to pass to the InstanceManager @see InstanceManagerFlags
 		@param subMeshIdx InstanceManager only supports using one submesh from the base mesh. This parameter
 		says which submesh to pick (must be <= Mesh::getNumSubMeshes())
 		@return The new InstanceManager instance

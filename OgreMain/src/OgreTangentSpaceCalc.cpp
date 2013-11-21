@@ -199,16 +199,14 @@ namespace Ogre
 			IndexData* idata = mIDataList[i];
 			// Now do index data
 			// no new buffer required, same size but some triangles remapped
-			uint16* p16 = 0;
-			uint32* p32 = 0;
 			if (idata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
 			{
-				p32 = static_cast<uint32*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
+				uint32* p32 = static_cast<uint32*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
 				remapIndexes(p32, i, res);
 			}
 			else
 			{
-				p16 = static_cast<uint16*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
+				uint16* p16 = static_cast<uint16*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
 				remapIndexes(p16, i, res);
 			}
 			idata->indexBuffer->unlock();

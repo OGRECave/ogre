@@ -131,9 +131,8 @@ protected:
 class ShaderProgramWriterGLSLESFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterGLSLESFactory()
+	ShaderProgramWriterGLSLESFactory() : mLanguage("glsles")
 	{
-		mLanguage = "glsles";
 	}
 	virtual ~ShaderProgramWriterGLSLESFactory() {}
 

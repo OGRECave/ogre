@@ -60,7 +60,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderSystemCapabilitiesManager::~RenderSystemCapabilitiesManager()
     {
-        for (CapabilitiesMap::iterator it = mCapabilitiesMap.begin(), end = mCapabilitiesMap.end(); it != end; it++)
+        for (CapabilitiesMap::iterator it = mCapabilitiesMap.begin(), end = mCapabilitiesMap.end(); it != end; ++it)
         {
         // free memory in RenderSystemCapabilities*
             OGRE_DELETE it->second;
@@ -77,7 +77,7 @@ namespace Ogre {
         StringVectorPtr files = arch->find(mScriptPattern, recursive);
 
         // loop through .rendercaps files and load each one
-        for (StringVector::iterator it = files->begin(), end = files->end(); it != end; it++)
+        for (StringVector::iterator it = files->begin(), end = files->end(); it != end; ++it)
         {
             DataStreamPtr stream = arch->open(*it);
             mSerializer->parseScript(stream);

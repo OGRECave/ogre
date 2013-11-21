@@ -54,7 +54,7 @@ namespace Ogre
         {
             LogManager::getSingleton().logMessage(
                 "Error in material " + context.material->getName() +
-                " : " + error);
+                " : " + error, LML_CRITICAL);
         }
         else
         {
@@ -63,13 +63,13 @@ namespace Ogre
                 LogManager::getSingleton().logMessage(
                     "Error in material " + context.material->getName() +
                     " at line " + StringConverter::toString(context.lineNo) +
-                    " of " + context.filename + ": " + error);
+                    " of " + context.filename + ": " + error, LML_CRITICAL);
             }
             else
             {
                 LogManager::getSingleton().logMessage(
                     "Error at line " + StringConverter::toString(context.lineNo) +
-                    " of " + context.filename + ": " + error);
+                    " of " + context.filename + ": " + error, LML_CRITICAL);
             }
         }
     }
@@ -3229,6 +3229,7 @@ namespace Ogre
 		mScriptContext.techLev = -1;
 		mScriptContext.passLev = -1;
 		mScriptContext.stateLev = -1;
+        mDefaults = false;
 
         mBuffer.clear();
     }
@@ -4385,6 +4386,7 @@ namespace Ogre
         case TextureUnitState::TAM_MIRROR:
             return "mirror";
         case TextureUnitState::TAM_WRAP:
+        case TextureUnitState::TAM_UNKNOWN:
             return "wrap";
         }
 

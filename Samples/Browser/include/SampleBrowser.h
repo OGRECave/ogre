@@ -337,7 +337,7 @@ protected:
                 if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                 {
                     destroyDummyScene();
-                    finaliseRTShaderSystem();
+                    destroyRTShaderSystem();
                 }
 #endif
 
@@ -1770,8 +1770,8 @@ protected:
 			unloadSamples();
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-			// Finalize the RT Shader System.
-			finaliseRTShaderSystem();
+			// Destroy the RT Shader System.
+			destroyRTShaderSystem();
 #endif // INCLUDE_RTSHADER_SYSTEM
 
 		}
@@ -1815,7 +1815,7 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Extend to unnhide all of sample's temporarily hidden overlays.
+		| Extend to unhide all of sample's temporarily hidden overlays.
 		-----------------------------------------------------------------------------*/
 		virtual void unpauseCurrentSample()
 		{
@@ -1830,7 +1830,7 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Finalize the RT Shader system.	
+		| Get the name of the RTSS shader cache file
 		-----------------------------------------------------------------------------*/
 		virtual Ogre::String getShaderCacheFileName()
 		{
@@ -1912,9 +1912,9 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Finalize the RT Shader system.	
+		| Destroy the RT Shader system.
 		-----------------------------------------------------------------------------*/
-		virtual void finaliseRTShaderSystem()
+		virtual void destroyRTShaderSystem()
 		{
 			// Restore default scheme.
 			Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -1927,10 +1927,10 @@ protected:
 				mMaterialMgrListener = NULL;
 			}
 
-			// Finalize RTShader system.
+			// Destroy RTShader system.
 			if (mShaderGenerator != NULL)
 			{				
-				Ogre::RTShader::ShaderGenerator::finalize();
+				Ogre::RTShader::ShaderGenerator::destroy();
 				mShaderGenerator = NULL;
 			}
 		}

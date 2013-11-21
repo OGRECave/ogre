@@ -111,9 +111,8 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterCGFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterCGFactory()
+	ShaderProgramWriterCGFactory() : mLanguage("cg")
 	{
-		mLanguage = "cg";
 	}
 	virtual ~ShaderProgramWriterCGFactory() {}
 

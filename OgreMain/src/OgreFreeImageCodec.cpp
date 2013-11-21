@@ -348,11 +348,10 @@ namespace Ogre {
 
 
 		// Copy data, invert scanlines and respect FreeImage pitch
-		uchar* pSrc;
 		uchar* pDst = FreeImage_GetBits(ret);
 		for (size_t y = 0; y < pImgData->height; ++y)
 		{
-			pSrc = srcData + (pImgData->height - y - 1) * srcPitch;
+			uchar* pSrc = srcData + (pImgData->height - y - 1) * srcPitch;
 			memcpy(pDst, pSrc, srcPitch);
 			pDst += dstPitch;
 		}
@@ -558,11 +557,10 @@ namespace Ogre {
         // Bind output buffer
         output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
-		uchar* pSrc;
 		uchar* pDst = output->getPtr();
 		for (size_t y = 0; y < imgData->height; ++y)
 		{
-			pSrc = srcData + (imgData->height - y - 1) * srcPitch;
+			uchar* pSrc = srcData + (imgData->height - y - 1) * srcPitch;
 			memcpy(pDst, pSrc, dstPitch);
 			pDst += dstPitch;
 		}

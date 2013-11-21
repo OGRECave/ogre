@@ -269,7 +269,7 @@ namespace Ogre
     void FontManager::logBadAttrib(const String& line, FontPtr& pFont)
     {
         LogManager::getSingleton().logMessage("Bad attribute line: " + line +
-            " in font " + pFont->getName());
+            " in font " + pFont->getName(), LML_CRITICAL);
 
     }
 

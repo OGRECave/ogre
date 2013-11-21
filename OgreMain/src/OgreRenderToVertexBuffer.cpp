@@ -36,6 +36,7 @@ namespace Ogre {
 		mOperationType(RenderOperation::OT_TRIANGLE_LIST),
 		mResetsEveryUpdate(false),
 		mResetRequested(true),
+        mSourceRenderable(0),
         mMaxVertexCount(1000)
 	{
 		mVertexData = OGRE_NEW VertexData;

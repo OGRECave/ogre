@@ -26,40 +26,35 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLContext.h"
-#include "OgreSharedPtr.h"
-#include "OgreThreadHeaders.h"
+#include "OgreStableHeaders.h"
+#include "OgreAtomicScalar.h"
+
+#ifdef NEED_TO_INIT_INTERLOCKEDCOMPAREEXCHANGE64WRAPPER
 
 namespace Ogre {
-    // Empty base class
-    GLContext::GLContext():
-        initialized(false) {
-    }
-    
-    GLContext::~GLContext() {        
-    }
-    
-    void GLContext::endCurrent() {
-    }
-    
-}
 
-#if OGRE_THREAD_SUPPORT == 1
+InterlockedCompareExchange64Wrapper::func_InterlockedCompareExchange64 InterlockedCompareExchange64Wrapper::Ogre_InterlockedCompareExchange64;
 
-// declared in OgreGLPrerequisites.h 
-GLEWContext * glewGetContext()
+InterlockedCompareExchange64Wrapper::InterlockedCompareExchange64Wrapper()
 {
-	using namespace Ogre;
-	static OGRE_THREAD_POINTER_VAR(GLEWContext, GLEWContextsPtr);
+    Ogre_InterlockedCompareExchange64 = NULL;
 
-	GLEWContext * currentGLEWContextsPtr =  OGRE_THREAD_POINTER_GET(GLEWContextsPtr);
-	if (currentGLEWContextsPtr == NULL)
-	{
-		currentGLEWContextsPtr = new GLEWContext();
-		OGRE_THREAD_POINTER_SET(GLEWContextsPtr, currentGLEWContextsPtr);
-		memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
-		glewInit();
-	}
-	return currentGLEWContextsPtr;
+// In win32 we will get InterlockedCompareExchange64 function address, in XP we will get NULL - as the function doesn't exist there. 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+    HINSTANCE kernel32Dll = LoadLibrary("KERNEL32.DLL");
+    Ogre_InterlockedCompareExchange64 = (func_InterlockedCompareExchange64)GetProcAddress(kernel32Dll, "InterlockedCompareExchange64");
+#endif
+
+// In WinRT we can't LoadLibrary("KERNEL32.DLL") - but on the other hand we don't have the issue - as InterlockedCompareExchange64 exist on
+// all WinRT platforms (if not - add to the #if below)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+    Ogre_InterlockedCompareExchange64 = _InterlockedCompareExchange64;
+#endif    
 }
+
+// Here we call the InterlockedCompareExchange64Wrapper constructor so Ogre_InterlockedCompareExchange64 will be init once when the program loads.
+InterlockedCompareExchange64Wrapper interlockedCompareExchange64Wrapper;
+
+}
+
 #endif

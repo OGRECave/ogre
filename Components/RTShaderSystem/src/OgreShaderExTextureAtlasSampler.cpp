@@ -66,6 +66,7 @@ TextureAtlasSampler::TextureAtlasSampler() :
 	mIsTableDataUpdated(false),
 	mAutoAdjustPollPosition(true)
 {
+    mTextureAddressings->u = mTextureAddressings->v = mTextureAddressings->w = TextureUnitState::TAM_UNKNOWN;
 	memset(mIsAtlasTextureUnits, 0, sizeof(bool) * TAS_MAX_TEXTURES);
 }
 
@@ -233,7 +234,8 @@ const char* TextureAtlasSampler::getAdressingFunctionName(TextureUnitState::Text
 	switch (mode)
 	{
 	case TextureUnitState::TAM_WRAP: return SGX_FUNC_ATLAS_WRAP; 
-	case TextureUnitState::TAM_MIRROR: return SGX_FUNC_ATLAS_MIRROR; 
+    case TextureUnitState::TAM_UNKNOWN: return SGX_FUNC_ATLAS_WRAP;
+	case TextureUnitState::TAM_MIRROR: return SGX_FUNC_ATLAS_MIRROR;
 	case TextureUnitState::TAM_CLAMP: return SGX_FUNC_ATLAS_CLAMP; 
 	case TextureUnitState::TAM_BORDER: return SGX_FUNC_ATLAS_BORDER; 
 	}

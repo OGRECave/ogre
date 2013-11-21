@@ -237,7 +237,7 @@ static void DefaultError (void *iData, int iLine, const char *iError,
                   iLine, iError, int (iTokenLen), iToken);
     else
         snprintf (line, sizeof (line), "line %d: %s\n", iLine, iError);
-    LogManager::getSingleton ().logMessage (line);
+    LogManager::getSingleton ().logMessage (line, LML_CRITICAL);
 }
 
 //---------------------------------------------------------------------------//

@@ -35,7 +35,7 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	DefaultWorkQueue::DefaultWorkQueue(const String& name)
-	: DefaultWorkQueueBase(name)
+	: DefaultWorkQueueBase(name), mNumThreadsRegisteredWithRS(0)
 	{
 	}
 	//---------------------------------------------------------------------
