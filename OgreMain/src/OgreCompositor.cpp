@@ -349,7 +349,7 @@ void Compositor::freeGlobalTextures()
 	while (i != mGlobalTextures.end())
 	{
 		TextureManager::getSingleton().remove(i->second->getName());
-		i++;
+		++i;
 	}
 	mGlobalTextures.clear();
 
@@ -358,7 +358,7 @@ void Compositor::freeGlobalTextures()
 	{
 		// remove MRT
 		Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti->second->getName());
-		mrti++;
+		++mrti;
 	}
 	mGlobalMRTs.clear();
 

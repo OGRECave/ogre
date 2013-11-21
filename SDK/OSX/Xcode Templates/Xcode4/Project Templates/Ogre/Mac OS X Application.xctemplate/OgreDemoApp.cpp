@@ -13,7 +13,7 @@ DemoApp::~DemoApp()
 #ifdef INCLUDE_RTSHADER_SYSTEM
     mShaderGenerator->removeSceneManager(OgreFramework::getSingletonPtr()->m_pSceneMgr);
     
-    finaliseRTShaderSystem();
+    destroyRTShaderSystem();
 #endif
     
     delete OgreFramework::getSingletonPtr();
@@ -79,9 +79,9 @@ bool DemoApp::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 }
 
 /*-----------------------------------------------------------------------------
- | Finalize the RT Shader system.	
+ | Destroy the RT Shader system.
  -----------------------------------------------------------------------------*/
-void DemoApp::finaliseRTShaderSystem()
+void DemoApp::destroyRTShaderSystem()
 {
     // Restore default scheme.
     Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -94,10 +94,10 @@ void DemoApp::finaliseRTShaderSystem()
         mMaterialMgrListener = NULL;
     }
     
-    // Finalize RTShader system.
+    // Destroy RTShader system.
     if (mShaderGenerator != NULL)
     {				
-        Ogre::RTShader::ShaderGenerator::finalize();
+        Ogre::RTShader::ShaderGenerator::destroy();
         mShaderGenerator = NULL;
     }
 }

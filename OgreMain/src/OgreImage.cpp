@@ -123,10 +123,10 @@ namespace Ogre {
 		uchar	*pTempBuffer3 = NULL;
 		uint	*pTempBuffer4 = NULL;
 
-		uchar	*src1 = mBuffer, *dst1 = NULL;
-		ushort	*src2 = (ushort *)mBuffer, *dst2 = NULL;
-		uchar	*src3 = mBuffer, *dst3 = NULL;
-		uint	*src4 = (uint *)mBuffer, *dst4 = NULL;
+		uchar	*src1 = mBuffer;
+		ushort	*src2 = (ushort *)mBuffer;
+		uchar	*src3 = mBuffer;
+		uint	*src4 = (uint *)mBuffer;
 
 		ushort y;
 		switch (mPixelSize)
@@ -135,7 +135,7 @@ namespace Ogre {
 			pTempBuffer1 = OGRE_ALLOC_T(uchar, mWidth * mHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < mHeight; y++)
 			{
-				dst1 = (pTempBuffer1 + ((y * mWidth) + mWidth - 1));
+				uchar *dst1 = (pTempBuffer1 + ((y * mWidth) + mWidth - 1));
 				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst1--, src1++, sizeof(uchar));
 			}
@@ -148,7 +148,7 @@ namespace Ogre {
 			pTempBuffer2 = OGRE_ALLOC_T(ushort, mWidth * mHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < mHeight; y++)
 			{
-				dst2 = (pTempBuffer2 + ((y * mWidth) + mWidth - 1));
+				ushort *dst2 = (pTempBuffer2 + ((y * mWidth) + mWidth - 1));
 				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst2--, src2++, sizeof(ushort));
 			}
@@ -162,7 +162,7 @@ namespace Ogre {
 			for (y = 0; y < mHeight; y++)
 			{
 				size_t offset = ((y * mWidth) + (mWidth - 1)) * 3;
-				dst3 = pTempBuffer3;
+				uchar *dst3 = pTempBuffer3;
 				dst3 += offset;
 				for (size_t x = 0; x < mWidth; x++)
 				{
@@ -179,7 +179,7 @@ namespace Ogre {
 			pTempBuffer4 = OGRE_ALLOC_T(uint, mWidth * mHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < mHeight; y++)
 			{
-				dst4 = (pTempBuffer4 + ((y * mWidth) + mWidth - 1));
+				uint *dst4 = (pTempBuffer4 + ((y * mWidth) + mWidth - 1));
 				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst4--, src4++, sizeof(uint));
 			}

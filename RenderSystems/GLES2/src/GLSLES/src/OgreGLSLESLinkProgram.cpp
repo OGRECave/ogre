@@ -68,9 +68,12 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLSLESLinkProgram::notifyOnContextLost()
     {
+		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+		mGLProgramHandle = 0;
         mLinked = false;
         mTriedToLinkAndFailed = false;
         mUniformRefsBuilt = false;
+        mUniformCache->clearCache();
     }
     
     void GLSLESLinkProgram::notifyOnContextReset()

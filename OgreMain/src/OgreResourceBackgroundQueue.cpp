@@ -51,7 +51,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------	
 	//------------------------------------------------------------------------
-	ResourceBackgroundQueue::ResourceBackgroundQueue()
+	ResourceBackgroundQueue::ResourceBackgroundQueue() : mWorkQueueChannel(0)
 	{
 	}
 	//------------------------------------------------------------------------

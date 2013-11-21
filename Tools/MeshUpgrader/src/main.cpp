@@ -724,7 +724,7 @@ void buildLod(Mesh* mesh)
                 }
                 else
                 {
-                    lodLevel.reductionValue = opts.lodFixed;
+                    lodLevel.reductionValue = (Ogre::Real)opts.lodFixed;
                 }
 
 				currDist += opts.lodDist;

@@ -110,10 +110,9 @@ namespace Ogre {
         // Check header
         readFileHeader(stream);
 
-        unsigned short streamID;
         while(!stream->eof())
         {
-            streamID = readChunk(stream);
+            unsigned short streamID = readChunk(stream);
             switch (streamID)
             {
             case M_MESH:
@@ -343,7 +342,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshTextureAliases(const SubMesh* s)
     {
-        size_t chunkSize;
         AliasTextureNamePairList::const_iterator i;
 
 		LogManager::getSingleton().logMessage("Exporting submesh texture aliases...");
@@ -352,7 +350,7 @@ namespace Ogre {
         for (i = s->mTextureAliases.begin(); i != s->mTextureAliases.end(); ++i)
         {
             // calculate chunk size based on string length + 1.  Add 1 for the line feed.
-            chunkSize = MSTREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
+            size_t chunkSize = MSTREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
 			writeChunkHeader(M_SUBMESH_TEXTURE_ALIAS, chunkSize);
             // write out alias name
             writeString(i->first);
@@ -790,7 +788,7 @@ namespace Ogre {
 	{
 		// The map for
 		map<unsigned short, String>::type subMeshNames;
-		unsigned short streamID, subMeshIndex;
+		unsigned short subMeshIndex;
 
 		// Need something to store the index, and the objects name
 		// This table is a method that imported meshes can retain their naming
@@ -801,7 +799,7 @@ namespace Ogre {
         // Read in all the sub-streams. Each sub-stream should contain an index and Ogre::String for the name.
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() && (streamID == M_SUBMESH_NAME_TABLE_ELEMENT ))
 			{
 				// Read in the index of the submesh.
@@ -1375,7 +1373,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void MeshSerializerImpl::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
 	{
-		unsigned short streamID, i;
+		unsigned short i;
 
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
@@ -1406,7 +1404,7 @@ namespace Ogre {
 		// Loop from 1 rather than 0 (full detail index is not in file)
 		for (i = 1; i < pMesh->mNumLods; ++i)
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			if (streamID != M_MESH_LOD_USAGE)
 			{
 				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
@@ -1459,11 +1457,10 @@ namespace Ogre {
 
 		// Get one set of detail per SubMesh
 		unsigned short numSubs, i;
-		unsigned long streamID;
 		numSubs = pMesh->getNumSubMeshes();
 		for (i = 0; i < numSubs; ++i)
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			if (streamID != M_MESH_LOD_GENERATED)
 			{
 				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
@@ -2888,7 +2885,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_4::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
     {
-        unsigned short streamID, i;
+        unsigned short i;
 
         // Use the old strategy for this mesh
         LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
@@ -2913,7 +2910,7 @@ namespace Ogre {
         // Loop from 1 rather than 0 (full detail index is not in file)
         for (i = 1; i < pMesh->mNumLods; ++i)
         {
-            streamID = readChunk(stream);
+            unsigned short streamID = readChunk(stream);
             if (streamID != M_MESH_LOD_USAGE)
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,

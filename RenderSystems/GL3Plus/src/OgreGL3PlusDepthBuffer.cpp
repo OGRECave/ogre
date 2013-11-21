@@ -101,7 +101,7 @@ namespace Ogre
 
 		if( !fbo )
 		{
-			GL3PlusContext *windowContext;
+			GL3PlusContext *windowContext = 0;
 			renderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 
 			//Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same

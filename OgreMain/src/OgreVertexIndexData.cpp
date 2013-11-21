@@ -199,10 +199,11 @@ namespace Ogre {
             float* pDest2 = pDest + oldVertexCount * 3; 
 
             // Precalculate any dimensions of vertex areas outside the position
-            size_t prePosVertexSize = 0, postPosVertexSize, postPosVertexOffset;
+            size_t prePosVertexSize = 0;
             unsigned char *pBaseDestRem = 0;
             if (wasSharedBuffer)
             {
+                size_t postPosVertexSize, postPosVertexOffset;
                 pBaseDestRem = static_cast<unsigned char*>(
                     newRemainderBuffer->lock(HardwareBuffer::HBL_DISCARD));
                 prePosVertexSize = posElem->getOffset();
@@ -832,7 +833,6 @@ namespace Ogre {
 		void *buffer = indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
 
 		Triangle* triangles;
-		uint32 *dest;
 
 		size_t nIndexes = indexCount;
 		size_t nTriangles = nIndexes / 3;
@@ -843,11 +843,11 @@ namespace Ogre {
 		{
 			triangles = OGRE_ALLOC_T(Triangle, nTriangles, MEMCATEGORY_GEOMETRY);
 			source = (uint16 *)buffer;
-			dest = (uint32 *)triangles;
+			uint32 *dest = (uint32 *)triangles;
 			for (i = 0; i < nIndexes; ++i) dest[i] = source[i];
 		}
 		else
-			triangles = (Triangle*)buffer;
+			triangles = static_cast<Triangle*>(buffer);
 
 		// sort triangles based on shared edges
 		uint32 *destlist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);

@@ -42,7 +42,7 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 void FFP_TransformTexCoord(in mat4 m, in vec2 v, out vec2 vOut)
 {
-	vOut = (m * vec4(v, 1.0, 1.0)).xy;
+	vOut = (m * vec4(v, 0.0, 1.0)).xy;
 }
 //-----------------------------------------------------------------------------
 void FFP_TransformTexCoord(in mat4 m, in vec4 v, out vec2 vOut)
@@ -62,8 +62,8 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT,
 						   in vec3 vNormal,
 						   out vec3 vOut)
 {
-	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
+	vec3 vWorldNormal = (mat3(mWorldIT) * vNormal);
+	vec3 vViewNormal  = (mat3(mView) * vWorldNormal);
 
 	vOut = vViewNormal;
 }
@@ -75,41 +75,41 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT,
 						   in vec3 vNormal,
 						   out vec3 vOut)
 {
-	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
+	vec3 vWorldNormal = (mat3(mWorldIT) * vNormal);
+	vec3 vViewNormal  = (mat3(mView) * vWorldNormal);
 	
 	vOut = (mTexture * vec4(vViewNormal, 1.0)).xyz;
 }
-
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld, 
-						   in mat4 mView,
-						   in vec3 vNormal,
-						   out vec2 vOut)
-{	
-	vec3 vWorldNormal = (mWorld * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
-
-	vOut.x = vViewNormal.x/2.0 + 0.5;
-	vOut.y = -vViewNormal.y/2.0 + 0.5;
+void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
+										in 	mat4 mView,
+										in 	mat4 mWorldIT,
+										in 	vec4 vPos,
+										in 	vec3 vNormal,
+										in 	mat4 mTexture,
+										out vec2 vOut)
+{
+	mat4 worldview = mView * mWorld;
+	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
+	vec3 eyedir =  normalize(worldview * vPos).xyz;
+	vec3 r = reflect(eyedir, normal);
+	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = (mTexture * vec4(0.5 + r.x / two_p,0.5 - r.y / two_p,0,0)).xy;
 }
-
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld, 
-						   in mat4 mView,
-						   in mat4 mTexture,
-						   in vec3 vNormal,
-						   out vec2 vOut)
-{	
-	vec3 vWorldNormal = (mWorld* vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
-
-	vec2 vSphereCoords;
-
-	vSphereCoords.x = vViewNormal.x/2.0 + 0.5;
-	vSphereCoords.y = -vViewNormal.y/2.0 + 0.5;
-	
-	vOut = (mTexture * vec4(vSphereCoords, 0.0, 0.0)).xy;
+void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
+										in 	mat4 mView,
+										in 	mat4 mWorldIT,
+										in 	vec4 vPos,
+										in 	vec3 vNormal,
+										out vec2 vOut)
+{
+	mat4 worldview = mView * mWorld;
+	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
+	vec3 eyedir =  normalize(worldview * vPos).xyz;
+	vec3 r = reflect(eyedir, normal);
+	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
+	vOut = vec2(0.5 + r.x / two_p,0.5 - r.y / two_p);
 }
 
 //-----------------------------------------------------------------------------
@@ -127,18 +127,19 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	
 	mat4 matViewT = transpose(mView);
 
-	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 0.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 0.0)).xyz;
+	vec3 vWorldNormal = (mat3(mWorldIT) * vNormal);
+	vec3 vViewNormal  = (mat3(mView) * vWorldNormal);
 	vec4 vWorldPos    = mWorld * vPos;
 	vec3 vNormViewPos  = normalize((mView * vWorldPos).xyz);
 	
 	vec3 vReflect = reflect(vNormViewPos, vViewNormal);
-	
+
   	matViewT[0][2] = -matViewT[0][2];
  	matViewT[1][2] = -matViewT[1][2];
   	matViewT[2][2] = -matViewT[2][2];
- 	vReflect = (matViewT * vec4(vReflect, 1.0)).xyz;
-		
+ 	vReflect = (mat3(matViewT) * vReflect);
+	vReflect.z = -vReflect.z; // Hack for gl 
+
 	vOut = vReflect;
 }
 
@@ -158,8 +159,8 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	
 	mat4 matViewT = transpose(mView);
 
-	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 0.0)).xyz;
-	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 0.0)).xyz;
+	vec3 vWorldNormal = (mat3(mWorldIT) * vNormal);
+	vec3 vViewNormal  = (mat3(mView) * vWorldNormal);
 	vec4 vWorldPos    = mWorld * vPos;
 	vec3 vNormViewPos  = normalize((mView * vWorldPos).xyz);
 	
@@ -168,10 +169,11 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
   	matViewT[0][2] = -matViewT[0][2];
  	matViewT[1][2] = -matViewT[1][2];
   	matViewT[2][2] = -matViewT[2][2];
- 	vReflect = (matViewT * vec4(vReflect, 1.0)).xyz;
+ 	vReflect = (mat3(matViewT) * vReflect);
 
  	vReflect = (mTexture * vec4(vReflect, 1.0)).xyz;
- 	
+	vReflect.z = -vReflect.z; // Hack for gl 
+
 	vOut = vReflect;
 }
 

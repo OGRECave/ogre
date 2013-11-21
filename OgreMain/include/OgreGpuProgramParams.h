@@ -1126,7 +1126,7 @@ namespace Ogre {
              from a given shadow camera. Requires an index parameter which maps
              to a light index relative to the current light list.
              Passed as float4(minDepth, maxDepth, depthRange, 1 / depthRange)
-             */
+            */
 			ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY,
 
 			/** Provides the fixed shadow colour as configured via SceneManager::setShadowColour;
@@ -1164,7 +1164,9 @@ namespace Ogre {
 			*/
 			ACT_LOD_CAMERA_POSITION_OBJECT_SPACE, 
 			/** Binds custom per-light constants to the shaders. */
-			ACT_LIGHT_CUSTOM
+			ACT_LIGHT_CUSTOM,
+
+            ACT_UNKNOWN = 999
 		};
 
 		/** Defines the type of the extra data item used by the auto constant.

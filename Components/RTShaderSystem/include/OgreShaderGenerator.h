@@ -62,9 +62,9 @@ public:
 	static bool initialize();
 
 	/** 
-	Finalize the Shader Generator instance.
+	Destroy the Shader Generator instance.
 	*/
-	static void finalize();
+	static void destroy();
 
 
 	/** Override standard Singleton retrieval.
@@ -852,8 +852,8 @@ protected:
 	/** Initialize the shader generator instance. */
 	bool _initialize();
 	
-	/** Finalize the shader generator instance. */
-	void _finalize();
+	/** Destory the shader generator instance. */
+	void _destroy();
 
 	/** Find source technique to generate shader based technique based on it. */
 	Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);

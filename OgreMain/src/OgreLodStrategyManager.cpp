@@ -88,11 +88,13 @@ namespace Ogre {
         if (it == mStrategies.end())
             return 0;
 
+        LodStrategy *strat = it->second;
+
         // Otherwise, erase the strategy from the map
         mStrategies.erase(it);
 
         // Return the strategy that was removed
-        return it->second;
+        return strat;
     }
     //-----------------------------------------------------------------------
     void LodStrategyManager::removeAllStrategies()

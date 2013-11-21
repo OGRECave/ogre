@@ -541,12 +541,11 @@ namespace Ogre {
 
         mRootBones.clear();
 
-        Bone* currentBone;
         BoneList::const_iterator i;
         BoneList::const_iterator iend = mBoneList.end();
         for (i = mBoneList.begin(); i != iend; ++i)
         {
-            currentBone = *i;
+            Bone* currentBone = *i;
             if (currentBone->getParent() == 0)
             {
                 // This is a root
@@ -596,7 +595,7 @@ namespace Ogre {
             {
                 NodeAnimationTrack* track = anim->getNodeTrack(ti);
                 of << "  -- AnimationTrack " << ti << " --" << std::endl;
-                of << "  Affects bone: " << ((Bone*)track->getAssociatedNode())->getHandle() << std::endl;
+                of << "  Affects bone: " << static_cast<Bone*>(track->getAssociatedNode())->getHandle() << std::endl;
                 of << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
 
                 for (unsigned short ki = 0; ki < track->getNumKeyFrames(); ++ki)

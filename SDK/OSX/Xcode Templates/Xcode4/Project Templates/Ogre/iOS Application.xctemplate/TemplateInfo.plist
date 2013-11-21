@@ -101,7 +101,7 @@
 									<key>OTHER_CFLAGS</key>
 									<string>-DOGRE_USE_GLES2=1</string>
 									<key>OTHER_LDFLAGS</key>
-									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lmesaglsl2 -lboost_system -lboost_chrono -lboost_date_time -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
+									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lglsl_optimizer -lboost_system -lboost_chrono -lboost_date_time -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
 								</dict>
 							</dict>
 						</array>

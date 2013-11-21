@@ -37,7 +37,7 @@ namespace Ogre {
     /** Manages the locating and loading of BSP-based indoor levels.
     Like other ResourceManager specialisations it manages the location and loading
     of a specific type of resource, in this case files containing Binary
-    Space Partition (BSP) based level files e.g. Quake3 levels.</p>
+    Space Partition (BSP) based level files e.g. Quake3 levels.
     However, note that unlike other ResourceManager implementations,
     only 1 BspLevel resource is allowed to be loaded at one time. Loading
     another automatically unloads the currently loaded level if any.

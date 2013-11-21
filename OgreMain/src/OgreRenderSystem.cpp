@@ -59,6 +59,9 @@ namespace Ogre {
         // This makes it the same as OpenGL and other right-handed systems
         , mCullingMode(CULL_CLOCKWISE)
 		, mWBuffer(false)
+        , mBatchCount(0)
+        , mFaceCount(0)
+        , mVertexCount(0)
         , mInvertVertexWinding(false)
         , mDisabledTexUnitsFrom(0)
         , mCurrentPassIterationCount(0)
@@ -70,6 +73,7 @@ namespace Ogre {
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
 		, mEnableFixedPipeline(true)
+        , mVertexProgramBound(false)
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
 		, mTesselationHullProgramBound(false)
@@ -79,6 +83,7 @@ namespace Ogre {
 		, mRealCapabilities(0)
 		, mCurrentCapabilities(0)
 		, mUseCustomCapabilities(false)
+        , mNativeShadingLanguageVersion(0)
 		, mTexProjRelative(false)
 		, mTexProjRelativeOrigin(Vector3::ZERO)
     {
@@ -936,7 +941,7 @@ namespace Ogre {
         return mGlobalInstanceVertexBuffer;
     }
 	//---------------------------------------------------------------------
-    void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr val )
+    void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
     {
         if ( !val.isNull() && !val->isInstanceData() )
         {

@@ -90,10 +90,9 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
 	mCreateShaderOverProgrammablePass = false;
-    mIsFinalizing = false;
-
-
-	mShaderLanguage = "";
+    mIsFinalizing               = false;
+    mFSLayer                    = 0;
+	mShaderLanguage             = "";
 	
 	HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 
@@ -234,11 +233,11 @@ void ShaderGenerator::createSubRenderStateExFactories()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::finalize()
+void ShaderGenerator::destroy()
 {
 	if (msSingleton != NULL)
 	{
-		msSingleton->_finalize();
+		msSingleton->_destroy();
 
 		OGRE_DELETE msSingleton;
 		msSingleton = NULL;
@@ -246,7 +245,7 @@ void ShaderGenerator::finalize()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::_finalize()
+void ShaderGenerator::_destroy()
 {
     OGRE_LOCK_AUTO_MUTEX;
 	
@@ -280,7 +279,7 @@ void ShaderGenerator::_finalize()
 	// Delete FFP Emulator.
 	if (mFFPRenderStateBuilder != NULL)
 	{
-		mFFPRenderStateBuilder->finalize();
+		mFFPRenderStateBuilder->destroy();
 		OGRE_DELETE mFFPRenderStateBuilder;
 		mFFPRenderStateBuilder = NULL;
 	}

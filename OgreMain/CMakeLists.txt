@@ -178,6 +178,7 @@ endif()
 
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
+include_directories("include/Threading")
 
 if (OGRE_THREAD_PROVIDER EQUAL 0)
 	list(APPEND THREAD_HEADER_FILES
@@ -289,7 +290,7 @@ else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
-if(OGRE_GCC_VERSION VERSION_GREATER 4.7)
+if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
   list(APPEND LIBRARIES "-latomic")
 endif()
 
