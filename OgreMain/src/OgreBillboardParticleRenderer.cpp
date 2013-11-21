@@ -127,7 +127,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, Camera *camera,
-        list<Particle*>::type& currentParticles, bool cullIndividually)
+        const Camera *lodCamera, list<Particle*>::type& currentParticles, bool cullIndividually)
     {
         mBillboardSet->setCullIndividually(cullIndividually);
 
@@ -161,7 +161,7 @@ namespace Ogre {
         mBillboardSet->endBillboards();
 
         // Update the queue
-        mBillboardSet->_updateRenderQueue(queue, camera);
+        mBillboardSet->_updateRenderQueue(queue, camera, lodCamera);
     }
 	//---------------------------------------------------------------------
 	void BillboardParticleRenderer::visitRenderables(Renderable::Visitor* visitor, 

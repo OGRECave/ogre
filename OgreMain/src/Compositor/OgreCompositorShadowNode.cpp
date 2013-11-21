@@ -227,7 +227,7 @@ namespace Ogre
 		return newChannel;
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::buildClosestLightList( Camera *newCamera )
+	void CompositorShadowNode::buildClosestLightList( Camera *newCamera, const Camera *lodCamera )
 	{
 		const size_t currentFrameCount = mWorkspace->getFrameCount();
 		if( mLastCamera == newCamera && mLastFrame == currentFrameCount )
@@ -241,7 +241,7 @@ namespace Ogre
 
 		mLastCamera = newCamera;
 
-		mergeReceiversBoxes( newCamera );
+		mergeReceiversBoxes( newCamera, lodCamera );
 
 		const Viewport *viewport = newCamera->getLastViewport();
 		const SceneManager *sceneManager = newCamera->getSceneManager();
@@ -326,7 +326,7 @@ namespace Ogre
 																 mDefinition->mMaxRq );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::mergeReceiversBoxes( Camera* camera )
+	void CompositorShadowNode::mergeReceiversBoxes(Camera* camera , const Camera *lodCamera)
 	{
 		SceneManager *sceneManager = camera->getSceneManager();
 		const AxisAlignedBoxVec &boxesVec = camera->getReceiversBoxPerRenderQueue();
@@ -346,7 +346,7 @@ namespace Ogre
 				while( j<maxRq && camera->isRenderedRq( j ) )
 					++j;
 
-				sceneManager->_cullReceiversBox( camera, i, j );
+				sceneManager->_cullReceiversBox( camera, lodCamera, i, j );
 				i = j;
 			}
 		}
@@ -358,7 +358,7 @@ namespace Ogre
 			mReceiverBox.merge( *itor++ );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::_update( Camera* camera )
+	void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera )
 	{
 		ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
 		SceneManager *sceneManager	= camera->getSceneManager();
@@ -366,7 +366,7 @@ namespace Ogre
 
 		bool bDifferentCamera = mLastCamera != camera;
 
-		buildClosestLightList( camera );
+		buildClosestLightList( camera, lodCamera );
 
 		//Setup all the cameras
 		CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =

@@ -63,9 +63,10 @@ namespace Ogre {
 		unsigned char	meshLodIndex;
 		unsigned char	materialLodIndex;
 	};
-	bool operator < ( Real _left, const LodMerged &_right ) { return _left < _right.lodValue; }
-	bool operator < ( const LodMerged &_left, Real _right ) { return _left.lodValue < _right; }
-	bool operator < ( const LodMerged &_l, const LodMerged &_r ) { return _l.lodValue < _r.lodValue; }
+	inline bool operator < ( Real _left, const LodMerged &_right ) { return _left < _right.lodValue; }
+	inline bool operator < ( const LodMerged &_left, Real _right ) { return _left.lodValue < _right; }
+	inline bool operator < ( const LodMerged &_l, const LodMerged &_r )
+																	{ return _l.lodValue < _r.lodValue; }
 
 	/** Abstract class defining a movable object in a scene.
         @remarks
@@ -105,7 +106,7 @@ namespace Ogre {
 		SceneManager* mManager;
 
 		//One for each submesh/material/Renderable
-		FastArray<FastArray<LodMerged>>	*mLodMerged;
+        FastArray< FastArray<LodMerged> >	*mLodMerged;
 		FastArray<unsigned char>		mCurrentLod;
 
 		// Minimum pixel size to still render
@@ -241,7 +242,7 @@ namespace Ogre {
                 The engine will call this method when this object is to be rendered. The object must then create one or more
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) = 0;
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) = 0;
 
 		/** @See SceneManager::updateAllBounds
 		@remarks
@@ -727,7 +728,7 @@ namespace Ogre {
 		{
 			return msMovableType;
 		}
-		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) {}
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
 		virtual void visitRenderables(Renderable::Visitor* visitor, 
 			bool debugRenderables = false) {}
 	};

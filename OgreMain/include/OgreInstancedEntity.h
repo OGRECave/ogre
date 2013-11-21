@@ -229,7 +229,7 @@ namespace Ogre
 		virtual void _notifyAttached( Node* parent );
 
 		/// Do nothing, InstanceBatch takes care of this.
-		void _updateRenderQueue( RenderQueue* queue, Camera *camera )	{}
+        void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
 		/** @see Entity::hasSkeleton */

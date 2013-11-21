@@ -95,8 +95,9 @@ namespace Ogre {
 
         /** Instructs the viewport to updates its contents.
         */
-        void _updateCullPhase01( Camera* camera, uint8 firstRq, uint8 lastRq );
-		void _updateRenderPhase02( Camera* camera, uint8 firstRq, uint8 lastRq );
+		void _updateCullPhase01(Camera* camera, const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
+		void _updateRenderPhase02( Camera* camera, const Camera *lodCamera,
+								   uint8 firstRq, uint8 lastRq );
 		
 		/** Instructs the viewport to clear itself, without performing an update.
 		 @remarks

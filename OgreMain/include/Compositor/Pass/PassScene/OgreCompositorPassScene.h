@@ -63,6 +63,7 @@ namespace Ogre
 	protected:
 		CompositorShadowNode	*mShadowNode;
 		Camera					*mCamera;
+		Camera					*mLodCamera;
 		bool					mUpdateShadowNode;
 
 	public:

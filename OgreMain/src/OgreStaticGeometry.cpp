@@ -849,7 +849,7 @@ namespace Ogre {
 		return mAABB;
 	}
 	//--------------------------------------------------------------------------
-	void StaticGeometry::Region::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void StaticGeometry::Region::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
 	{
 		mLodBucketList[mCurrentLod]->addRenderables(queue, mRenderQueueID,
 			mLodValue);

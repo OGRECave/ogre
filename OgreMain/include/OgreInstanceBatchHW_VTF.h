@@ -161,7 +161,7 @@ namespace Ogre
 		/** Keeps filling the VTF with world matrix data. Overloaded to avoid culled objects
 			and update visible instances' animation
 		*/
-		size_t updateVertexTexture( Camera *currentCamera );
+        size_t updateVertexTexture(Camera *currentCamera , const Camera *lodCamera);
 
 		/// Overloaded to reserve enough space in mCulledInstances
 		virtual void createAllInstancedEntities(void);
@@ -180,12 +180,13 @@ namespace Ogre
 		void _boundsDirty(void);
 
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
-		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+        virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera );
 
 		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+                                                       const Camera *lodCamera,
 														uint32 combinedVisibilityFlags )
 		{
-			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+            instanceBatchCullFrustumThreadedImpl( frustum, lodCamera, combinedVisibilityFlags );
 		}
 	};
 

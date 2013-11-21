@@ -363,7 +363,7 @@ namespace Ogre {
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;

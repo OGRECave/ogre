@@ -162,10 +162,10 @@ namespace Ogre
 		@param newCamera
 			User camera to base our shadow map cameras from.
 		*/
-		void buildClosestLightList( Camera *newCamera );
+		void buildClosestLightList(Camera *newCamera , const Camera *lodCamera);
 
 		/// Caches mReceiverBox merging all the RQs we may have to include w/ the given camera
-		void mergeReceiversBoxes( Camera* camera );
+		void mergeReceiversBoxes( Camera* camera, const Camera *lodCamera );
 
 		CompositorChannel createShadowTexture( const ShadowTextureDefinition &textureDef,
 												const RenderTarget *finalTarget );
@@ -180,7 +180,7 @@ namespace Ogre
 		@param camera
 			Camera used to calculate our shadow camera (in case of directional lights).
 		*/
-		void _update( Camera* camera );
+		void _update(Camera* camera, const Camera *lodCamera);
 
 		/// We derive so we can override the camera with ours
 		virtual void postInitializePassScene( CompositorPassScene *pass );

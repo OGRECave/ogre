@@ -557,7 +557,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
 		_notifyCurrentCamera( camera );
 

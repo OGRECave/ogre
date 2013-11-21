@@ -127,8 +127,8 @@ namespace Ogre {
 	{
 		bool retVal = false;
 		if( mNodeMemoryManager->getTwin() &&
-			mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
-			mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+            ((mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic) ||
+             (mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic)) )
 		{
 			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
 			mNodeMemoryManager = mNodeMemoryManager->getTwin();

@@ -21,7 +21,8 @@ namespace Ogre
 		return ProceduralManualObjectFactory::FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	void ProceduralManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void ProceduralManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera,
+                                                    const Camera *lodCamera)
 	{
 		mR2vbObject->update(mParentSceneManager);
 		queue->addRenderable(this);

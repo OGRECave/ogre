@@ -46,6 +46,7 @@ namespace Ogre
 				mDefinition( definition ),
 				mShadowNode( 0 ),
 				mCamera( 0 ),
+				mLodCamera( 0 ),
 				mUpdateShadowNode( false )
 	{
 		if( mDefinition->mShadowNode != IdString() )
@@ -101,8 +102,8 @@ namespace Ogre
 
 		mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
 
-		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mDefinition->mFirstRQ,
-											 mDefinition->mLastRQ );
+		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mLodCamera,
+											 mDefinition->mFirstRQ, mDefinition->mLastRQ );
 
 		if( mShadowNode && mUpdateShadowNode )
 		{
@@ -110,7 +111,7 @@ namespace Ogre
 			mTarget->_endUpdate();
 
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
-			mShadowNode->_update( mCamera );
+			mShadowNode->_update( mCamera, mLodCamera );
 			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
 
 			//ShadowNode passes may've overriden this setting.
@@ -121,8 +122,8 @@ namespace Ogre
 		}
 
 		mTarget->setFsaaResolveDirty();
-		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mDefinition->mFirstRQ,
-												mDefinition->mLastRQ, true );
+		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mLodCamera,
+											   mDefinition->mFirstRQ, mDefinition->mLastRQ, true );
 
 		//Call endUpdate if we're the last pass in a row to use this RT
 		if( mDefinition->mEndRtUpdate )

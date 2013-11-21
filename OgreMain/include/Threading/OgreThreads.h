@@ -70,6 +70,8 @@ THE SOFTWARE.
 		{\
 		}\
 		delete threadHandle;\
+		\
+		return 0;\
 	}
 #endif
 

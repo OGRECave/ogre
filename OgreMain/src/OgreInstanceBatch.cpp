@@ -565,7 +565,8 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+    void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+                                                              const Camera *lodCamera,
 																uint32 combinedVisibilityFlags )
 	{
 		mCulledInstances.clear();
@@ -574,7 +575,7 @@ namespace Ogre
 		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
 		MovableObject::cullFrustum( numObjs, objData, frustum, combinedVisibilityFlags,
-									mCulledInstances, (AxisAlignedBox*)0 );
+                                    mCulledInstances, (AxisAlignedBox*)0, lodCamera );
 	}
 	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const
@@ -653,7 +654,7 @@ namespace Ogre
 		return mMaterial->getBestTechnique( mMaterialLodIndex, this );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateRenderQueue( RenderQueue* queue, Camera *camera )
+    void InstanceBatch::_updateRenderQueue(RenderQueue* queue, Camera *camera , const Camera *lodCamera)
 	{
 		queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 	}

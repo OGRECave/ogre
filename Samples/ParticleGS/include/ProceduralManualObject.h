@@ -37,7 +37,7 @@ namespace Ogre
 		ManualObject* getManualObject() const { return mManualObject; }
 
 		/** @copydoc SimpleRenderable::_updateRenderQueue. */
-		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 		/** @copydoc SimpleRenderable::getMovableType. */
 		const String& getMovableType(void) const;
 		/** @copydoc SimpleRenderable::getRenderOperation. */

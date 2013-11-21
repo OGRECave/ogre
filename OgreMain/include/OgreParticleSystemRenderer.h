@@ -63,7 +63,8 @@ namespace Ogre {
             instance(s) it wishes.
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera,
-            list<Particle*>::type& currentParticles, bool cullIndividually) = 0;
+            const Camera *lodCamera, list<Particle*>::type& currentParticles,
+            bool cullIndividually) = 0;
 
         /** Sets the material this renderer must use; called by ParticleSystem. */
         virtual void _setMaterial(MaterialPtr& mat) = 0;

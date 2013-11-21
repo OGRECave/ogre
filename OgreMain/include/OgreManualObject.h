@@ -373,7 +373,7 @@ namespace Ogre
 		/** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
 		/** @copydoc MovableObject::_updateRenderQueue. */
-		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 		/** Implement this method to enable stencil shadows. */
 		EdgeData* getEdgeList(void);
 		/** Overridden member from ShadowCaster. */

@@ -265,7 +265,7 @@ namespace Ogre {
 		const AxisAlignedBox& getBoundingBox(void) const;
 		const MaterialPtr& getMaterial(void) const;
 		const String& getMovableType(void) const;
-		void _updateRenderQueue(RenderQueue *, Camera *camera);
+        void _updateRenderQueue(RenderQueue *, Camera *camera, const Camera *lodCamera);
 		void getRenderOperation(RenderOperation &);
 		virtual bool preRender(SceneManager* sm, RenderSystem* rsys);
 		void getWorldTransforms(Matrix4 *) const;

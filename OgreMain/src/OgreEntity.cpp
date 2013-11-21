@@ -475,7 +475,7 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
 		// Do nothing if not initialised yet
 		if (!mInitialised)

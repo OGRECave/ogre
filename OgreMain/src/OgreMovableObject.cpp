@@ -178,8 +178,8 @@ namespace Ogre {
 	{
 		bool retVal = false;
 		if( mObjectMemoryManager->getTwin() &&
-			mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic ||
-			mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic )
+            ((mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic) ||
+             (mObjectMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic)) )
 		{
 			mObjectMemoryManager->migrateTo( mObjectData, mRenderQueueID,
 											 mObjectMemoryManager->getTwin() );
@@ -974,8 +974,8 @@ namespace Ogre {
 
 			//This may look like a lot of ugly indirections, but mLodMerged is a pointer that allows
 			//sharing with many MovableObjects (it should perfectly fit even in small caches).
-			FastArray<FastArray<LodMerged>>::const_iterator itor = owner->mLodMerged->begin();
-			FastArray<FastArray<LodMerged>>::const_iterator end  = owner->mLodMerged->end();
+            FastArray< FastArray<LodMerged> >::const_iterator itor = owner->mLodMerged->begin();
+            FastArray< FastArray<LodMerged> >::const_iterator end  = owner->mLodMerged->end();
 
 			FastArray<unsigned char>::iterator itLodLevel = owner->mCurrentLod.begin();
 

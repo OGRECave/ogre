@@ -180,7 +180,7 @@ namespace Ogre
 		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
 	}
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchHW::updateVertexBuffer( Camera *camera )
+    size_t InstanceBatchHW::updateVertexBuffer( Camera *camera, const Camera *lodCamera )
 	{
 		MovableObjectArray *visibleObjects = 0;
 		if( mManager->getInstancingThreadedCullingMethod() == INSTANCING_CULLING_SINGLETHREAD )
@@ -195,7 +195,7 @@ namespace Ogre
 			//TODO: Static batches aren't yet supported (camera ptr will be null and crash)
 			MovableObject::cullFrustum( numObjs, objData, camera,
 						camera->getLastViewport()->getVisibilityMask()|mManager->getVisibilityMask(),
-						*visibleObjects, (AxisAlignedBox*)0 );
+                        *visibleObjects, (AxisAlignedBox*)0, lodCamera );
 		}
 		else
 		{
@@ -257,13 +257,14 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue, Camera *camera )
+    void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue, Camera *camera,
+                                               const Camera *lodCamera )
 	{
 		//if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
-			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera )) )
+            if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera, lodCamera )) )
 				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		/*else

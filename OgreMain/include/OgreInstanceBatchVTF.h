@@ -155,7 +155,7 @@ namespace Ogre
 		unsigned short getNumWorldTransforms(void) const;
 
 		/** Overloaded to be able to updated the vertex texture */
-		void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
 		/** Sets the state of the usage of bone matrix lookup
 		

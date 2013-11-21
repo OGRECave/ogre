@@ -172,8 +172,8 @@ namespace Ogre
 		/** Used by HW Basic & HW VTF techniques to cull from multiple threads.
 			@see InstancingTheadedCullingMethod
 		*/
-		void instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
-													uint32 combinedVisibilityFlags );
+        void instanceBatchCullFrustumThreadedImpl(const Frustum *frustum, const Camera *lodCamera,
+                                                    uint32 combinedVisibilityFlags );
 
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
@@ -368,7 +368,7 @@ namespace Ogre
         /** @copydoc MovableObject::_notifyCurrentCamera. */
 		void _notifyCurrentCamera( Camera* cam );
 
-		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject

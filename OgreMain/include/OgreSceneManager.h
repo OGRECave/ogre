@@ -161,16 +161,19 @@ namespace Ogre {
 		ObjectMemoryManagerVec const	*objectMemManager;
 		/// Camera whose frustum we're to cull against. Must be const (read only for all threads).
 		Camera const					*camera;
+		/// Camera whose frustum we're to cull against. Must be const (read only for all threads).
+		Camera const					*lodCamera;
 
 		CullFrustumRequest() :
-			firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 )
+			firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
 		{
 		}
 		CullFrustumRequest( uint8 _firstRq, uint8 _lastRq,
 							const ObjectMemoryManagerVec *_objectMemManager,
-							const Camera *_camera ) :
+							const Camera *_camera, const Camera *_lodCamera ) :
 			firstRq( _firstRq ), lastRq( _lastRq ),
-			objectMemManager( _objectMemManager ), camera( _camera )
+			objectMemManager( _objectMemManager ), camera( _camera ),
+			lodCamera( _lodCamera )
 		{
 		}
 	};
@@ -1676,7 +1679,8 @@ namespace Ogre {
 		void _swapVisibleObjectsForShadowMapping();
 
 		/// @See _cullPhase01 and @see MovableObject::cullReceiversBox
-		virtual void _cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq );
+		virtual void _cullReceiversBox(Camera* camera, const Camera *lodCamera,
+									   uint8 firstRq, uint8 lastRq );
 
 		/** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
@@ -1687,7 +1691,8 @@ namespace Ogre {
 			@param firstRq first render queue ID to render (gets clamped if too big)
 			@param lastRq last render queue ID to render (gets clamped if too big)
         */
-		virtual void _cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq );
+		virtual void _cullPhase01(Camera* camera, const Camera *lodCamera,
+								  Viewport* vp, uint8 firstRq, uint8 lastRq );
 
 		/** Prompts the class to send its contents to the renderer.
             @remarks
@@ -1700,13 +1705,15 @@ namespace Ogre {
 				rendering loop.
             @param camera Pointer to a camera from whose viewpoint the scene is to
                 be rendered.
+			@param lodCamera Pointer to a camera from whose LOD calculations will be
+				based upon. Can't be null; can be equal to @camera.
             @param vp The target viewport
 			@param firstRq first render queue ID to render (gets clamped if too big)
 			@param lastRq last render queue ID to render (gets clamped if too big)
             @param includeOverlays Whether or not overlay objects should be rendered
         */
-		virtual void _renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
-									bool includeOverlays );
+		virtual void _renderPhase02( Camera* camera, const Camera* lodCamera, Viewport* vp,
+									 uint8 firstRq, uint8 lastRq, bool includeOverlays );
 
         /** Internal method for queueing the sky objects with the params as 
             previously set through setSkyBox, setSkyPlane and setSkyDome.

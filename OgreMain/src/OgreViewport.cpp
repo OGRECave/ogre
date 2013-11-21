@@ -152,7 +152,8 @@ namespace Ogre {
         _updateDimensions();
     }
 	//---------------------------------------------------------------------
-    void Viewport::_updateCullPhase01( Camera* camera, uint8 firstRq, uint8 lastRq )
+	void Viewport::_updateCullPhase01( Camera* camera, const Camera *lodCamera,
+									   uint8 firstRq, uint8 lastRq )
     {
 		// Automatic AR cameras are useful for cameras that draw into multiple viewports
 		const Real aspectRatio = (Real) mActWidth / (Real) mActHeight;
@@ -166,12 +167,13 @@ namespace Ogre {
         // Tell Camera to render into me
 		camera->_notifyViewport(this);
 
-        camera->_cullScenePhase01( this, firstRq, lastRq );
+		camera->_cullScenePhase01( lodCamera, this, firstRq, lastRq );
     }
     //---------------------------------------------------------------------
-    void Viewport::_updateRenderPhase02( Camera* camera, uint8 firstRq, uint8 lastRq )
+	void Viewport::_updateRenderPhase02( Camera* camera, const Camera *lodCamera,
+										 uint8 firstRq, uint8 lastRq )
     {
-        camera->_renderScenePhase02( this, firstRq, lastRq, mShowOverlays );
+		camera->_renderScenePhase02( lodCamera, this, firstRq, lastRq, mShowOverlays );
     }
     //---------------------------------------------------------------------
     void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)

@@ -201,7 +201,7 @@ namespace Ogre {
         /// @copydoc ParticleSystemRenderer::getType
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera,
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera,
             list<Particle*>::type& currentParticles, bool cullIndividually);
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
