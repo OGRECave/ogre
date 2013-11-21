@@ -8,7 +8,7 @@ in vec4 uv2; // pose1norm
 in vec4 uv3; // pose2pos
 in vec4 uv4; // pose2norm
 
-out vec2 oUv;
+// out vec2 oUv;
 out vec4 colour;
 
 uniform mat4 worldViewProj;
@@ -30,16 +30,16 @@ void main()
     // This depends on what the cumulative weighting left the normal at, if it's lacking or cancelled out
     //float remainder = 1.0 - min(anim_t.x + anim_t.y, 1.0);
     float remainder = 1.0 - min(length(ninterp), 1.0);
-    ninterp = ninterp + (normal * remainder);
+    ninterp = ninterp + (remainder * normal.xyz);
     ninterp = normalize(ninterp);
 
     gl_Position = worldViewProj * posinterp;
-    oUv = uv0.xy;
+    // oUv = uv0.xy;
 
     vec3 lightDir = normalize(
         objSpaceLightPos.xyz - (posinterp.xyz * objSpaceLightPos.w));
 
     // Colour it red to make it easy to identify
     float lit = clamp(dot(lightDir, ninterp), 0.0, 1.0);
-    colour = vec4((ambient.rgb + vec3(lit,lit,lit)) * vec3(1.0,0.0,0.0), 1.0);
+    colour = vec4((ambient.rgb + vec3(lit, lit, lit)) * vec3(1.0, 0.0, 0.0), 1.0);
 }
