@@ -267,6 +267,8 @@ namespace Ogre {
                                 // mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_out[gl_MaxPatchVertices];\n\n");
                                 // mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[gl_MaxPatchVertices];\n\n");
                                 break;
+                            default:
+                                break;
                             }
                         }
                     }

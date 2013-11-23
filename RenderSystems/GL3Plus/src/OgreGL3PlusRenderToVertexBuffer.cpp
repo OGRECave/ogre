@@ -242,7 +242,7 @@ namespace Ogre {
             GLSLProgramPipeline* programPipeline =
                 GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
             GLSLGpuProgram* glslGpuProgram = 0;
-            if (glslGpuProgram = programPipeline->getGeometryProgram())
+            if ((glslGpuProgram = programPipeline->getGeometryProgram()))
                 programId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
             //TODO include tessellation stages
             else // vertex program
@@ -267,14 +267,14 @@ namespace Ogre {
         reallocateBuffer(sourceBufferIndex);
         reallocateBuffer(mTargetBufferIndex);
         // GL3PlusHardwareVertexBuffer* sourceVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mSourceBufferIndex].getPointer());
-        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
+        // GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].getPointer());
 
         //TODO GL4+ glBindTransformFeedback
 
         // Dynamically deteremine shader output variable names.
         std::vector<String> nameStrings;
         std::vector<const GLchar*> names;
-        for (int e = 0; e < elemCount; e++)
+        for (uint e = 0; e < elemCount; e++)
         {
             const VertexElement* element = declaration->getElement(e);
             String name = getSemanticVaryingName(element->getSemantic(), element->getIndex());

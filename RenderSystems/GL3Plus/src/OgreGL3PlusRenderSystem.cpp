@@ -2760,7 +2760,11 @@ namespace Ogre {
             }
             else if (!unit)
             {
-                // always ok to use the first unit
+                //FIXME If the above case fails, should this case ever be taken?
+                // Also switch to (unit == number) unless not operation is actually
+                // faster on some architectures.
+                
+                // Always ok to use the first unit.
                 return true;
             }
             else

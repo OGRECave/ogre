@@ -544,7 +544,7 @@ namespace Ogre {
                                                  int mipmapLevel, int textureArrayIndex, 
                                                  PixelFormat* format)
     {
-        GLenum GlAccess;
+        GLenum GlAccess = 0;
 
         switch (access)
         {
