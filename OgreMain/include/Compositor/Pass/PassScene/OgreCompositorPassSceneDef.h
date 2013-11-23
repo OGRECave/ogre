@@ -60,6 +60,8 @@ namespace Ogre
 		IdString				mShadowNode;
 		ShadowNodeRecalculation mShadowNodeRecalculation; //Only valid if mShadowNode is not empty
 		IdString				mCameraName;
+		IdString				mLodCameraName;
+		bool					mUpdateLodLists;
 
 		/// First Render Queue ID to render. Inclusive
 		uint8			mFirstRQ;
@@ -71,7 +73,8 @@ namespace Ogre
 			mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
 			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),
-			mLastRQ( -1 )
+			mLastRQ( -1 ),
+			mUpdateLodLists( true )
 		{
 			//Change base defaults
 			mIncludeOverlays = true;

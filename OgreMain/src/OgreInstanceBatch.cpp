@@ -52,8 +52,6 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mCurrentCamera( 0 ),
-				mMaterialLodIndex( 0 ),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),
@@ -586,8 +584,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_notifyCurrentCamera( Camera* cam )
 	{
-		mCurrentCamera = cam;
-
 		//See DistanceLodStrategy::getValueImpl()
 		//We use our own because our SceneNode is just filled with zeroes, and updating it
 		//with real values is expensive, plus we would need to make sure it doesn't get to
@@ -616,10 +612,10 @@ namespace Ogre
         subEntEvt.newLodIndex = idx;
 
         //Notify LOD event listeners
-        cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
+		cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);
 
         //Change LOD index
-        mMaterialLodIndex = idx;
+		mMaterialLodIndex = idx;*/
 	}
 	//-----------------------------------------------------------------------
 	Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const
@@ -651,7 +647,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	Technique* InstanceBatch::getTechnique( void ) const
 	{
-		return mMaterial->getBestTechnique( mMaterialLodIndex, this );
+		return mMaterial->getBestTechnique( mCurrentMaterialLod[0], this );
 	}
 	//-----------------------------------------------------------------------
     void InstanceBatch::_updateRenderQueue(RenderQueue* queue, Camera *camera , const Camera *lodCamera)

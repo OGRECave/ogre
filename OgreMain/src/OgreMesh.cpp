@@ -79,6 +79,7 @@ namespace Ogre {
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
+		mLodValues.push_back( lod.value );
 
     }
     //-----------------------------------------------------------------------
@@ -339,8 +340,9 @@ namespace Ogre {
         newMesh->mLodStrategy = mLodStrategy;
 		newMesh->mIsLodManual = mIsLodManual;
 		newMesh->mNumLods = mNumLods;
-		newMesh->mMeshLodUsageList = mMeshLodUsageList;
-        newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
+		newMesh->mMeshLodUsageList	= mMeshLodUsageList;
+		newMesh->mLodValues			= mLodValues;
+		newMesh->mAutoBuildEdgeLists= mAutoBuildEdgeLists;
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
         MeshLodUsageList::iterator lodi;
         for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi) {
@@ -890,9 +892,11 @@ namespace Ogre {
 		lod.manualMesh.setNull();
         lod.edgeData = 0;
 		mMeshLodUsageList.push_back(lod);
+		mLodValues.push_back( lod.value );
 		++mNumLods;
 
         mLodStrategy->sort(mMeshLodUsageList);
+		std::sort( mLodValues.begin(), mLodValues.end() );
 	}
     //---------------------------------------------------------------------
 	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
@@ -943,6 +947,7 @@ namespace Ogre {
 		assert(level < mMeshLodUsageList.size() && "Index out of bounds");
 
 		mMeshLodUsageList[level] = usage;
+		mLodValues[level] = usage.userValue;
 	}
     //---------------------------------------------------------------------
 	void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
@@ -986,6 +991,7 @@ namespace Ogre {
 
         freeEdgeList();
         mMeshLodUsageList.clear();
+		mLodValues.clear();
 
         // Reinitialise
         mNumLods = 1;
@@ -996,6 +1002,7 @@ namespace Ogre {
         lod.edgeData = 0;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
+		mLodValues.push_back( mLodStrategy->getBaseValue() );
 		mIsLodManual = false;
 
 

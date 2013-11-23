@@ -3434,15 +3434,12 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 		mSkyDomeNode->_getDerivedPositionUpdated();
 	}
 
-	if (mSkyPlaneEnabled
-		&& mSkyPlaneEntity && mSkyPlaneEntity->isVisible()
-		&& mSkyPlaneEntity->getSubEntity(0) && mSkyPlaneEntity->getSubEntity(0)->isVisible())
+	if (mSkyPlaneEnabled && mSkyPlaneEntity && mSkyPlaneEntity->isVisible())
 	{
 		getRenderQueue()->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
 	}
 
-	if (mSkyBoxEnabled
-		&& mSkyBoxObj && mSkyBoxObj->isVisible())
+	if (mSkyBoxEnabled && mSkyBoxObj && mSkyBoxObj->isVisible())
 	{
 		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam, cam);
 	}
@@ -3451,8 +3448,7 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	{
 		for (uint plane = 0; plane < 5; ++plane)
 		{
-			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible()
-				&& mSkyDomeEntity[plane]->getSubEntity(0) && mSkyDomeEntity[plane]->getSubEntity(0)->isVisible())
+			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible())
 			{
 				getRenderQueue()->addRenderable(
 					mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);

@@ -64,6 +64,11 @@ namespace Ogre
 			mCamera = workspace->findCamera( mDefinition->mCameraName );
 		else
 			mCamera = defaultCamera;
+
+		if( mDefinition->mLodCameraName != IdString() )
+			mLodCamera = workspace->findCamera( mDefinition->mCameraName );
+		else
+			mLodCamera = mCamera;
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorPassScene::~CompositorPassScene()

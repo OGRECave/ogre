@@ -120,12 +120,7 @@ namespace Ogre
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
-        CustomParamsVec		mCustomParams;
-
-        /// This bbox contains all (visible) instanced entities
-        Camera              *mCurrentCamera;
-
-        unsigned short      mMaterialLodIndex;
+		CustomParamsVec		mCustomParams;
 
         /// False if a technique doesn't support skeletal animation
         bool                mTechnSupportsSkeletal;

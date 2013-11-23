@@ -387,7 +387,7 @@ namespace Ogre
 				texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
 
 				// Associate main view camera as LOD camera
-				texCamera->setLodCamera( camera );
+				texCamera->setLodCamera( lodCamera );
 
 				// set base
 				if( light->getType() != Light::LT_POINT )

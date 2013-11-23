@@ -57,17 +57,6 @@ namespace Ogre {
 	*  @{
 	*/
 
-	struct LodMerged
-	{
-		Real			lodValue;
-		unsigned char	meshLodIndex;
-		unsigned char	materialLodIndex;
-	};
-	inline bool operator < ( Real _left, const LodMerged &_right ) { return _left < _right.lodValue; }
-	inline bool operator < ( const LodMerged &_left, Real _right ) { return _left.lodValue < _right; }
-	inline bool operator < ( const LodMerged &_l, const LodMerged &_r )
-																	{ return _l.lodValue < _r.lodValue; }
-
 	/** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
@@ -106,8 +95,10 @@ namespace Ogre {
 		SceneManager* mManager;
 
 		//One for each submesh/material/Renderable
-		FastArray< FastArray<LodMerged> > const	*mLodMerged;
-		FastArray<unsigned char>				mCurrentLod;
+		FastArray<Real> const				*mLodMesh;
+		FastArray< FastArray<Real> > const	*mLodMaterial;
+		unsigned char						mCurrentMeshLod;
+		FastArray<unsigned char>			mCurrentMaterialLod;
 
 		// Minimum pixel size to still render
 		Real mMinPixelSize;

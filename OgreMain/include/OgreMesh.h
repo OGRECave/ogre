@@ -90,7 +90,7 @@ namespace Ogre {
         also that mesh sub-sections (when used in an instantiated object)
         share the same scene node as the parent.
     */
-    class _OgreExport Mesh: public Resource, public AnimationContainer
+	class _OgreExport Mesh: public Resource, public AnimationContainer
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
@@ -101,6 +101,7 @@ namespace Ogre {
     public:
         typedef vector<Real>::type LodValueList;
         typedef vector<MeshLodUsage>::type MeshLodUsageList;
+		typedef FastArray<Real> LodValueArray;
         /// Multimap of vertex bone assignments (orders by vertex index).
         typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
@@ -161,7 +162,8 @@ namespace Ogre {
         const LodStrategy *mLodStrategy;
         bool mIsLodManual;
         ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
+		MeshLodUsageList	mMeshLodUsageList;
+		LodValueArray		mLodValues;
 
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
@@ -939,6 +941,8 @@ namespace Ogre {
         const LodStrategy *getLodStrategy() const;
         /** Set the LOD strategy used by this mesh. */
         void setLodStrategy(LodStrategy *lodStrategy);
+
+		const LodValueArray* _getLodValueArray(void) const						{ return &mLodValues; }
 
     };
 

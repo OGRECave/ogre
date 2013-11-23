@@ -70,10 +70,12 @@ namespace Ogre {
         */
         SubEntity(Entity* parent, SubMesh* subMeshBasis);
 
-        /** Private destructor.
+	public:
+		/** Destructor.
         */
         virtual ~SubEntity();
 
+	protected:
         /// Pointer to parent.
         Entity* mParentEntity;
 
@@ -81,7 +83,9 @@ namespace Ogre {
         MaterialPtr mMaterialPtr;
 
         /// Pointer to the SubMesh defining geometry.
-        SubMesh* mSubMesh;
+		SubMesh* mSubMesh;
+
+		unsigned char mMaterialLodIndex;
 
 		/// override the start index for the RenderOperation
         size_t mIndexStart;
@@ -89,13 +93,7 @@ namespace Ogre {
         /// override the end index for the RenderOperation
         size_t mIndexEnd;
 
-        /// Is this SubEntity visible?
-        bool mVisible;
-
-		/// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
-		unsigned short mMaterialLodIndex;
-
-        /// Blend buffer details for dedicated geometry
+		/// Blend buffer details for dedicated geometry
         VertexData* mSkelAnimVertexData;
         /// Quick lookup of buffers
         TempBlendedBufferInfo mTempSkelAnimInfo;
@@ -111,10 +109,6 @@ namespace Ogre {
 		bool mVertexAnimationAppliedThisFrame;
 		/// Number of hardware blended poses supported by material
 		ushort mHardwarePoseCount;
-		/// Cached distance to last camera for getSquaredViewDepth
-		mutable Real mCachedCameraDist;
-		/// The camera for which the cached distance is valid
-		mutable const Camera *mCachedCamera;
 
         /** Internal method for preparing this Entity for use in animation. */
         void prepareTempBlendBuffers(void);
@@ -140,15 +134,9 @@ namespace Ogre {
 		*/
 		void setMaterial( const MaterialPtr& material );
 
-        /** Tells this SubEntity whether to be visible or not. */
-        virtual void setVisible(bool visible);
-
-        /** Returns whether or not this SubEntity is supposed to be visible. */
-        virtual bool isVisible(void) const;
-
-        /** Accessor method to read mesh data.
+		/** Accessor method to read mesh data.
         */
-        SubMesh* getSubMesh(void);
+		SubMesh* getSubMesh(void) const;
 
 		/** Accessor to get parent Entity */
 		Entity* getParent(void) const { return mParentEntity; }
@@ -195,9 +183,9 @@ namespace Ogre {
         void getWorldTransforms(Matrix4* xform) const;
         /** Overridden - see Renderable.
         */
-        unsigned short getNumWorldTransforms(void) const;
-        /** Overridden, see Renderable */
-        Real getSquaredViewDepth(const Camera* cam) const;
+		unsigned short getNumWorldTransforms(void) const;
+		/** Overridden, see Renderable */
+		Real getSquaredViewDepth(const Camera* cam) const;
         /** @copydoc Renderable::getLights */
         const LightList& getLights(void) const;
         /** @copydoc Renderable::getCastsShadows */
@@ -234,6 +222,7 @@ namespace Ogre {
 		morph animation.
 		*/
 		TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
+		const TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void) const;
 		/// Retrieve the VertexData which should be used for GPU binding
 		VertexData* getVertexDataForBinding(void);
 
@@ -254,11 +243,7 @@ namespace Ogre {
 		void _updateCustomGpuParameter(
 			const GpuProgramParameters::AutoConstantEntry& constantEntry,
 			GpuProgramParameters* params) const;
-
-		/** Invalidate the camera distance cache */
-		void _invalidateCameraCache ()
-		{ mCachedCamera = 0; }
-    };
+	};
 	/** @} */
 	/** @} */
 

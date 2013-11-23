@@ -58,8 +58,9 @@ namespace Ogre {
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)
-		, mLodMerged( 0 )
-		, mCurrentLod( 0 )
+		, mLodMesh( 0 )
+		, mLodMaterial( 0 )
+		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
         , mRenderQueueID(renderQueueId)
@@ -82,8 +83,9 @@ namespace Ogre {
         : IdObject( 0 )
 		, mCreator(0)
         , mManager(0)
-		, mLodMerged( 0 )
-		, mCurrentLod( 0 )
+		, mLodMesh( 0 )
+		, mLodMaterial( 0 )
+		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
@@ -974,18 +976,23 @@ namespace Ogre {
 
 			//This may look like a lot of ugly indirections, but mLodMerged is a pointer that allows
 			//sharing with many MovableObjects (it should perfectly fit even in small caches).
-            FastArray< FastArray<LodMerged> >::const_iterator itor = owner->mLodMerged->begin();
-            FastArray< FastArray<LodMerged> >::const_iterator end  = owner->mLodMerged->end();
+			{
+				FastArray<Real>::const_iterator it = std::lower_bound( owner->mLodMesh->begin(),
+																		owner->mLodMesh->end(),
+																		lodValues[j] );
+				owner->mCurrentMeshLod = it - owner->mLodMesh->begin();
+			}
 
-			FastArray<unsigned char>::iterator itLodLevel = owner->mCurrentLod.begin();
+			FastArray< FastArray<Real> >::const_iterator itor = owner->mLodMaterial->begin();
+			FastArray< FastArray<Real> >::const_iterator end  = owner->mLodMaterial->end();
+
+			FastArray<unsigned char>::iterator itMatLodLevel = owner->mCurrentMaterialLod.begin();
 
 			while( itor != end )
 			{
-				FastArray<LodMerged>::const_iterator it = std::lower_bound( itor->begin(),
-																			itor->end(),
-																			lodValues[j] );
-				*itLodLevel++ = (unsigned char)std::min<size_t>( (it - itor->begin()),
-																 itor->size() );
+				FastArray<Real>::const_iterator it = std::lower_bound( itor->begin(), itor->end(),
+																	   lodValues[j] );
+				*itMatLodLevel++ = (unsigned char)std::min<size_t>( (it - itor->begin()), itor->size() );
 				++itor;
 			}
 		}

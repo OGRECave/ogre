@@ -614,6 +614,8 @@ namespace Ogre {
         */
         void setLodLevels(const LodValueList& lodValues);
 
+		const LodValueList* _getUserLodValues(void) const					{ return &mUserLodValues; }
+
         /** Gets an iterator over the list of values transformed by the LodStrategy at which each LOD comes into effect. 
         @remarks
             Note that the iterator returned from this method is not totally analogous to 

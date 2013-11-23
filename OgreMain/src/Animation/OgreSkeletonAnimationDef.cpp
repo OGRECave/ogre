@@ -161,7 +161,7 @@ namespace Ogre
 					size_t trackDiff = std::distance( timestampsByBlock.begin(), itKeyframes );
 					mBoneToWeights[skeleton->getBone( boneIdx )->getName()] =
 										(boneToSlot[boneIdx] & 0xFF000000) |
-										(trackDiff * ARRAY_PACKED_REALS + slotIdx) & 0x00FFFFFF;
+										((trackDiff * ARRAY_PACKED_REALS + slotIdx) & 0x00FFFFFF);
 				}
 			}
 
