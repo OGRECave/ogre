@@ -42,7 +42,7 @@ namespace Ogre {
     class GL3PlusFBOManager;
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
-	class GL3PlusDepthBuffer;
+    class GL3PlusDepthBuffer;
 
     typedef SharedPtr<GL3PlusGpuProgram> GL3PlusGpuProgramPtr;
     typedef SharedPtr<GL3PlusTexture> GL3PlusTexturePtr;
@@ -106,6 +106,7 @@ namespace Ogre {
 
 #define ENABLE_GL_CHECK 1
 #if ENABLE_GL_CHECK
+#include "OgreStringVector.h"
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \
     glFunc; \
