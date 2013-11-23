@@ -64,6 +64,7 @@ namespace Ogre {
         String mWindowTitle;
         bool mUseNSView;
         float mContentScalingFactor;
+        bool mContentScalingSupported;
 
         void _setWindowParameters(void);
     public:
