@@ -475,10 +475,10 @@ namespace Ogre {
             BT_VERTEX = 1,			
 			/// Geometry processing unit		
 			BT_GEOMETRY = 2,
-			/// Tesselation control processing unit
-			BT_TESSELATION_HULL = 3,
-			/// Tesselation evaluation processing unit
-			BT_TESSELATION_DOMAIN = 4,
+			/// Tessellation control processing unit
+			BT_TESSELLATION_HULL = 3,
+			/// Tessellation evaluation processing unit
+			BT_TESSELLATION_DOMAIN = 4,
 			/// Compute processing unit
 			BT_COMPUTE = 5
         };

@@ -76,8 +76,8 @@ namespace Ogre {
         , mVertexProgramBound(false)
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
-		, mTesselationHullProgramBound(false)
-		, mTesselationDomainProgramBound(false)
+		, mTessellationHullProgramBound(false)
+		, mTessellationDomainProgramBound(false)
 		, mComputeProgramBound(false)
 		, mClipPlanesDirty(true)
 		, mRealCapabilities(0)
@@ -158,8 +158,8 @@ namespace Ogre {
         mVertexProgramBound = false;
 		mGeometryProgramBound = false;
         mFragmentProgramBound = false;
-		mTesselationHullProgramBound = false;
-		mTesselationDomainProgramBound = false;
+		mTessellationHullProgramBound = false;
+		mTessellationDomainProgramBound = false;
 		mComputeProgramBound = false;
 
         return 0;
@@ -774,14 +774,14 @@ namespace Ogre {
             mActiveFragmentGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_FRAGMENT_PROGRAM);
         }
-		if (!mActiveTesselationHullGpuProgramParameters.isNull())
+		if (!mActiveTessellationHullGpuProgramParameters.isNull())
         {
-            mActiveTesselationHullGpuProgramParameters->incPassIterationNumber();
+            mActiveTessellationHullGpuProgramParameters->incPassIterationNumber();
 			bindGpuProgramPassIterationParameters(GPT_HULL_PROGRAM);
         }
-		if (!mActiveTesselationDomainGpuProgramParameters.isNull())
+		if (!mActiveTessellationDomainGpuProgramParameters.isNull())
         {
-            mActiveTesselationDomainGpuProgramParameters->incPassIterationNumber();
+            mActiveTessellationDomainGpuProgramParameters->incPassIterationNumber();
 			bindGpuProgramPassIterationParameters(GPT_DOMAIN_PROGRAM);
         }
 		if (!mActiveComputeGpuProgramParameters.isNull())
@@ -841,10 +841,10 @@ namespace Ogre {
             mFragmentProgramBound = true;
 	        break;
 		case GPT_HULL_PROGRAM:
-			mTesselationHullProgramBound = true;
+			mTessellationHullProgramBound = true;
 	        break;
 		case GPT_DOMAIN_PROGRAM:
-			mTesselationDomainProgramBound = true;
+			mTessellationDomainProgramBound = true;
 	        break;
 		case GPT_COMPUTE_PROGRAM:
             mComputeProgramBound = true;
@@ -869,10 +869,10 @@ namespace Ogre {
             mFragmentProgramBound = false;
 	        break;
 		case GPT_HULL_PROGRAM:
-			mTesselationHullProgramBound = false;
+			mTessellationHullProgramBound = false;
 	        break;
 		case GPT_DOMAIN_PROGRAM:
-			mTesselationDomainProgramBound = false;
+			mTessellationDomainProgramBound = false;
 	        break;
 		case GPT_COMPUTE_PROGRAM:
             mComputeProgramBound = false;
@@ -891,9 +891,9 @@ namespace Ogre {
         case GPT_FRAGMENT_PROGRAM:
             return mFragmentProgramBound;
 		case GPT_HULL_PROGRAM:
-			return mTesselationHullProgramBound;
+			return mTessellationHullProgramBound;
 		case GPT_DOMAIN_PROGRAM:
-			return mTesselationDomainProgramBound;
+			return mTessellationDomainProgramBound;
 		case GPT_COMPUTE_PROGRAM:
             return mComputeProgramBound;
 	    }

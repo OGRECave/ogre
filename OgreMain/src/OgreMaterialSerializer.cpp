@@ -996,13 +996,13 @@ namespace Ogre
 		{
 			context.textureUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
 		}
-		else if (params == "tesselation_hull")
+		else if (params == "tessellation_hull")
 		{
-			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_HULL);
+			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELLATION_HULL);
 		}
-		else if (params == "tesselation_domain")
+		else if (params == "tessellation_domain")
 		{
-			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_DOMAIN);
+			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
 		}
 		else if (params == "compute")
 		{
@@ -4706,8 +4706,8 @@ namespace Ogre
 					writeValue("vertex");
 					break;
                 case TextureUnitState::BT_GEOMETRY:
-                case TextureUnitState::BT_TESSELATION_DOMAIN:
-                case TextureUnitState::BT_TESSELATION_HULL:
+                case TextureUnitState::BT_TESSELLATION_DOMAIN:
+                case TextureUnitState::BT_TESSELLATION_HULL:
                 case TextureUnitState::BT_COMPUTE:
                     break;
 				};

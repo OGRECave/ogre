@@ -53,7 +53,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)
   add_subdirectory(SSAO)
-  add_subdirectory(Tesselation)
+  add_subdirectory(Tessellation)
 endif ()
 
 if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)

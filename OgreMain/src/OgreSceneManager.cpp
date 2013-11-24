@@ -997,9 +997,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			// Set fixed-function vertex parameters
 		}
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
-			bindGpuProgram(pass->getTesselationHullProgram()->_getBindingDelegate());
+			bindGpuProgram(pass->getTessellationHullProgram()->_getBindingDelegate());
 			// bind parameters later
 		}
 		else
@@ -1009,12 +1009,12 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			{
 				mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
 			}
-			// Set fixed-function tesselation control parameters
+			// Set fixed-function tessellation control parameters
 		}
 
-		if (pass->hasTesselationDomainProgram())
+		if (pass->hasTessellationDomainProgram())
 		{
-			bindGpuProgram(pass->getTesselationDomainProgram()->_getBindingDelegate());
+			bindGpuProgram(pass->getTessellationDomainProgram()->_getBindingDelegate());
 			// bind parameters later
 		}
 		else
@@ -1024,7 +1024,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			{
 				mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
 			}
-			// Set fixed-function tesselation evaluation parameters
+			// Set fixed-function tessellation evaluation parameters
 		}
 
 
@@ -7273,16 +7273,16 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 				pass->getFragmentProgramParameters(), mGpuParamsDirty);
 		}
 
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_HULL_PROGRAM, 
-				pass->getTesselationHullProgramParameters(), mGpuParamsDirty);
+				pass->getTessellationHullProgramParameters(), mGpuParamsDirty);
 		}
 
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
-				pass->getTesselationDomainProgramParameters(), mGpuParamsDirty);
+				pass->getTessellationDomainProgramParameters(), mGpuParamsDirty);
 		}
 
 		mGpuParamsDirty = 0;

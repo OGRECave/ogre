@@ -364,7 +364,7 @@ namespace Ogre
 			// index 0 is vertex we're calculating, 1 and 2 are the others
 
 			// We want to re-weight these by the angle the face makes with the vertex
-			// in order to obtain tesselation-independent results
+			// in order to obtain tessellation-independent results
 			Real angleWeight = calculateAngleWeight(localVertInd[v], 
 				localVertInd[(v+1)%3], localVertInd[(v+2)%3]);
 

@@ -281,11 +281,11 @@ namespace Ogre {
 			}
 			else if (mType == GPT_DOMAIN_PROGRAM)
 			{
-				progType = "Tesselation Evaluation";
+				progType = "Tessellation Evaluation";
 			}
 			else if (mType == GPT_HULL_PROGRAM)
 			{
-				progType = "Tesselation Control";
+				progType = "Tessellation Control";
 			}
 			else if (mType == GPT_COMPUTE_PROGRAM)
 			{

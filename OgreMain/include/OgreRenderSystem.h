@@ -1521,8 +1521,8 @@ namespace Ogre
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
-		GpuProgramParametersSharedPtr mActiveTesselationHullGpuProgramParameters;
-		GpuProgramParametersSharedPtr mActiveTesselationDomainGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTessellationHullGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTessellationDomainGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveComputeGpuProgramParameters;
 
 		// Texture manager
@@ -1590,8 +1590,8 @@ namespace Ogre
 		bool mVertexProgramBound;
 		bool mGeometryProgramBound;
 		bool mFragmentProgramBound;
-		bool mTesselationHullProgramBound;
-		bool mTesselationDomainProgramBound;
+		bool mTessellationHullProgramBound;
+		bool mTessellationDomainProgramBound;
 		bool mComputeProgramBound;
 
 		// Recording user clip planes

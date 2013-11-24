@@ -1307,15 +1307,15 @@ bail:
 		{
 			rsc->addShaderProfile("hs_5_0");
 			
-			rsc->setCapability(RSC_TESSELATION_HULL_PROGRAM);
+			rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
 
 			// TODO: constant buffers have no limits but lower models do
 			// 16 boolean params allowed
-			rsc->setTesselationHullProgramConstantBoolCount(16);
+			rsc->setTessellationHullProgramConstantBoolCount(16);
 			// 16 integer params allowed, 4D
-			rsc->setTesselationHullProgramConstantIntCount(16);
+			rsc->setTessellationHullProgramConstantIntCount(16);
 			// float params, always 4D
-			rsc->setTesselationHullProgramConstantFloatCount(512);
+			rsc->setTessellationHullProgramConstantFloatCount(512);
 		}
 
     }
@@ -1327,16 +1327,16 @@ bail:
 		{
 			rsc->addShaderProfile("ds_5_0");
 
-			rsc->setCapability(RSC_TESSELATION_DOMAIN_PROGRAM);
+			rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
 
 
 			// TODO: constant buffers have no limits but lower models do
 			// 16 boolean params allowed
-			rsc->setTesselationDomainProgramConstantBoolCount(16);
+			rsc->setTessellationDomainProgramConstantBoolCount(16);
 			// 16 integer params allowed, 4D
-			rsc->setTesselationDomainProgramConstantIntCount(16);
+			rsc->setTessellationDomainProgramConstantIntCount(16);
 			// float params, always 4D
-			rsc->setTesselationDomainProgramConstantFloatCount(512);
+			rsc->setTessellationDomainProgramConstantFloatCount(512);
 		}
 
     }
@@ -2496,18 +2496,18 @@ bail:
 				"D3D11RenderSystem::_render");
 		}
 
-		// Check consistency of tesselation shaders
-		if( (mBoundTesselationHullProgram && !mBoundTesselationDomainProgram) ||
-			(!mBoundTesselationHullProgram && mBoundTesselationDomainProgram) )
+		// Check consistency of tessellation shaders
+		if( (mBoundTessellationHullProgram && !mBoundTessellationDomainProgram) ||
+			(!mBoundTessellationHullProgram && mBoundTessellationDomainProgram) )
 		{
-			if (mBoundTesselationHullProgram && !mBoundTesselationDomainProgram) {
+			if (mBoundTessellationHullProgram && !mBoundTessellationDomainProgram) {
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to use tesselation, but domain shader is missing",
+				"Attempted to use tessellation, but domain shader is missing",
 				"D3D11RenderSystem::_render");
 			}
 			else {
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to use tesselation, but hull shader is missing",
+				"Attempted to use tessellation, but hull shader is missing",
 				"D3D11RenderSystem::_render"); }
 		}
 
@@ -2562,9 +2562,9 @@ bail:
 					"D3D11RenderSystem::_render");
 			}
 		}
-		if (mBoundTesselationHullProgram)
+		if (mBoundTessellationHullProgram)
 		{
-			mDevice.GetImmediateContext()->HSSetShader(mBoundTesselationHullProgram->getHullShader(),
+			mDevice.GetImmediateContext()->HSSetShader(mBoundTessellationHullProgram->getHullShader(),
 													   mClassInstances[GPT_HULL_PROGRAM], 
 													   mNumClassInstances[GPT_HULL_PROGRAM]);
 			if (mDevice.isError())
@@ -2575,9 +2575,9 @@ bail:
 					"D3D11RenderSystem::_render");
 			}
 		}
-		if (mBoundTesselationDomainProgram)
+		if (mBoundTessellationDomainProgram)
 		{
-			mDevice.GetImmediateContext()->DSSetShader(mBoundTesselationDomainProgram->getDomainShader(),
+			mDevice.GetImmediateContext()->DSSetShader(mBoundTessellationDomainProgram->getDomainShader(),
 													   mClassInstances[GPT_DOMAIN_PROGRAM], 
 													   mNumClassInstances[GPT_DOMAIN_PROGRAM]);
 			if (mDevice.isError())
@@ -2625,7 +2625,7 @@ bail:
 
 			return;
 		}
-		else if(mBoundTesselationHullProgram && mBoundTesselationDomainProgram)
+		else if(mBoundTessellationHullProgram && mBoundTessellationDomainProgram)
 		{
 			// useful primitives for tessellation
 			switch( op.operationType )
@@ -2886,8 +2886,8 @@ bail:
 			break;
 		case GPT_HULL_PROGRAM:
 			{
-				mBoundTesselationHullProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*				ID3D11HullShader* gsShaderToSet = mBoundTesselationHullProgram->getHullShader();
+				mBoundTessellationHullProgram = static_cast<D3D11HLSLProgram*>(prg);
+/*				ID3D11HullShader* gsShaderToSet = mBoundTessellationHullProgram->getHullShader();
 
 				mDevice.GetImmediateContext()->HSSetShader(gsShaderToSet, NULL, 0);
 				if (mDevice.isError())
@@ -2902,8 +2902,8 @@ bail:
 			break;
 		case GPT_DOMAIN_PROGRAM:
 			{
-				mBoundTesselationDomainProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*				ID3D11DomainShader* gsShaderToSet = mBoundTesselationDomainProgram->getDomainShader();
+				mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(prg);
+/*				ID3D11DomainShader* gsShaderToSet = mBoundTessellationDomainProgram->getDomainShader();
 
 				mDevice.GetImmediateContext()->DSSetShader(gsShaderToSet, NULL, 0);
 				if (mDevice.isError())
@@ -2969,14 +2969,14 @@ bail:
 		case GPT_HULL_PROGRAM:
 			{
 				mActiveGeometryGpuProgramParameters.setNull();
-				mBoundTesselationHullProgram = NULL;
+				mBoundTessellationHullProgram = NULL;
 				mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
  			}
 			break;
 		case GPT_DOMAIN_PROGRAM:
 			{
 				mActiveGeometryGpuProgramParameters.setNull();
-				mBoundTesselationDomainProgram = NULL;
+				mBoundTessellationDomainProgram = NULL;
 				mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
  			}
 			break;
@@ -3065,9 +3065,9 @@ bail:
 			break;
 		case GPT_HULL_PROGRAM:
 			{
-				if (mBoundTesselationHullProgram)
+				if (mBoundTessellationHullProgram)
 				{
-					pBuffers[0] = mBoundTesselationHullProgram->getConstantBuffer(params, mask);
+					pBuffers[0] = mBoundTessellationHullProgram->getConstantBuffer(params, mask);
 					mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, 1, pBuffers );
 					if (mDevice.isError())
 					{
@@ -3082,9 +3082,9 @@ bail:
 			break;
 		case GPT_DOMAIN_PROGRAM:
 			{
-				if (mBoundTesselationDomainProgram)
+				if (mBoundTessellationDomainProgram)
 				{
-					pBuffers[0] = mBoundTesselationDomainProgram->getConstantBuffer(params, mask);
+					pBuffers[0] = mBoundTessellationDomainProgram->getConstantBuffer(params, mask);
 					mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
 					if (mDevice.isError())
 					{
@@ -3145,10 +3145,10 @@ bail:
 			bindGpuProgramParameters(gptype, mActiveGeometryGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 		case GPT_HULL_PROGRAM:
-			bindGpuProgramParameters(gptype, mActiveTesselationHullGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
+			bindGpuProgramParameters(gptype, mActiveTessellationHullGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 		case GPT_DOMAIN_PROGRAM:
-			bindGpuProgramParameters(gptype, mActiveTesselationDomainGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
+			bindGpuProgramParameters(gptype, mActiveTessellationDomainGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 		case GPT_COMPUTE_PROGRAM:
 			bindGpuProgramParameters(gptype, mActiveComputeGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
@@ -3221,17 +3221,17 @@ bail:
 			break;
 		case GPT_HULL_PROGRAM:
 			{
-				if (mBoundTesselationHullProgram)
+				if (mBoundTessellationHullProgram)
 				{
-					slotIdx = mBoundTesselationHullProgram->getSubroutineSlot(slotName);
+					slotIdx = mBoundTessellationHullProgram->getSubroutineSlot(slotName);
 				}
 			}
 			break;
 		case GPT_DOMAIN_PROGRAM:
 			{
-				if (mBoundTesselationDomainProgram)
+				if (mBoundTessellationDomainProgram)
 				{
-					slotIdx = mBoundTesselationDomainProgram->getSubroutineSlot(slotName);
+					slotIdx = mBoundTessellationDomainProgram->getSubroutineSlot(slotName);
 				}
 			}
 			break;
@@ -3635,8 +3635,8 @@ bail:
 		mBoundVertexProgram = NULL;
 		mBoundFragmentProgram = NULL;
 		mBoundGeometryProgram = NULL;
-		mBoundTesselationHullProgram = NULL;
-		mBoundTesselationDomainProgram = NULL;
+		mBoundTessellationHullProgram = NULL;
+		mBoundTessellationDomainProgram = NULL;
 		mBoundComputeProgram = NULL;
 
 		ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
@@ -3742,14 +3742,14 @@ bail:
 		return mBoundGeometryProgram;
 	}
 	//---------------------------------------------------------------------
-	D3D11HLSLProgram* D3D11RenderSystem::_getBoundTesselationHullProgram() const
+	D3D11HLSLProgram* D3D11RenderSystem::_getBoundTessellationHullProgram() const
 	{
-		return mBoundTesselationHullProgram;
+		return mBoundTessellationHullProgram;
 	}
 	//---------------------------------------------------------------------
-	D3D11HLSLProgram* D3D11RenderSystem::_getBoundTesselationDomainProgram() const
+	D3D11HLSLProgram* D3D11RenderSystem::_getBoundTessellationDomainProgram() const
 	{
-		return mBoundTesselationDomainProgram;
+		return mBoundTessellationDomainProgram;
 	}
 	//---------------------------------------------------------------------
 	D3D11HLSLProgram* D3D11RenderSystem::_getBoundComputeProgram() const

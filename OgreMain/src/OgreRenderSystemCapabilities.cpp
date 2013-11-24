@@ -144,29 +144,29 @@ namespace Ogre {
              " * Number of boolean constants for geometry programs: "
              + StringConverter::toString(mGeometryProgramConstantBoolCount));
 		pLog->logMessage(
-			" * Tesselation Hull programs: "
-			+ StringConverter::toString(hasCapability(RSC_TESSELATION_HULL_PROGRAM), true));
+			" * Tessellation Hull programs: "
+			+ StringConverter::toString(hasCapability(RSC_TESSELLATION_HULL_PROGRAM), true));
 		pLog->logMessage(
-             " * Number of floating-point constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantFloatCount));
+             " * Number of floating-point constants for tessellation hull programs: "
+             + StringConverter::toString(mTessellationHullProgramConstantFloatCount));
 		pLog->logMessage(
-             " * Number of integer constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantIntCount));
+             " * Number of integer constants for tessellation hull programs: "
+             + StringConverter::toString(mTessellationHullProgramConstantIntCount));
 		pLog->logMessage(
-             " * Number of boolean constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantBoolCount));
+             " * Number of boolean constants for tessellation hull programs: "
+             + StringConverter::toString(mTessellationHullProgramConstantBoolCount));
 		pLog->logMessage(
-			" * Tesselation Domain programs: "
-			+ StringConverter::toString(hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM), true));
+			" * Tessellation Domain programs: "
+			+ StringConverter::toString(hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM), true));
 		pLog->logMessage(
-             " * Number of floating-point constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantFloatCount));
+             " * Number of floating-point constants for tessellation domain programs: "
+             + StringConverter::toString(mTessellationDomainProgramConstantFloatCount));
 		pLog->logMessage(
-             " * Number of integer constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantIntCount));
+             " * Number of integer constants for tessellation domain programs: "
+             + StringConverter::toString(mTessellationDomainProgramConstantIntCount));
 		pLog->logMessage(
-             " * Number of boolean constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantBoolCount));
+             " * Number of boolean constants for tessellation domain programs: "
+             + StringConverter::toString(mTessellationDomainProgramConstantBoolCount));
 		pLog->logMessage(
 			" * Compute programs: "
 			+ StringConverter::toString(hasCapability(RSC_COMPUTE_PROGRAM), true));
