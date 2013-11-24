@@ -71,6 +71,7 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
 
@@ -96,6 +97,7 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mCurrentMaterialLod.resize( 0, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
@@ -1004,7 +1006,7 @@ namespace Ogre {
 		cameraPos.setAll( camera->getDerivedPosition() );
 
 		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() ) );
-		Real lodValues[ARRAY_PACKED_REALS];
+		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
@@ -1047,7 +1049,7 @@ namespace Ogre {
 		ArrayReal PiDotVpAreaDotProjMat00dot11(
 						Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] ) );
 
-		Real lodValues[ARRAY_PACKED_REALS];
+		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
@@ -1091,7 +1093,7 @@ namespace Ogre {
 		const Matrix4 &projMat = camera->getProjectionMatrix();
 		ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
 
-		Real lodValues[ARRAY_PACKED_REALS];
+		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{

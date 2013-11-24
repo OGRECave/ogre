@@ -80,7 +80,7 @@ namespace Ogre
 								CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
-		virtual void execute();
+		virtual void execute( const Camera *lodCamera );
 
 		CompositorShadowNode* getShadowNode() const				{ return mShadowNode; }
 		Camera* getCamera() const								{ return mCamera; }

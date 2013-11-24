@@ -346,6 +346,7 @@ namespace Ogre
 				while( j<maxRq && camera->isRenderedRq( j ) )
 					++j;
 
+				sceneManager->updateAllLods( lodCamera, i, j );
 				sceneManager->_cullReceiversBox( camera, lodCamera, i, j );
 				i = j;
 			}
@@ -427,7 +428,7 @@ namespace Ogre
 		sceneManager->_setCurrentRenderStage( SceneManager::IRS_RENDER_TO_TEXTURE );
 
 		//Now render all passes
-		CompositorNode::_update();
+		CompositorNode::_update( lodCamera );
 
 		sceneManager->_setCurrentRenderStage( previous );
 	}

@@ -61,12 +61,13 @@ namespace Ogre
 		ShadowNodeRecalculation mShadowNodeRecalculation; //Only valid if mShadowNode is not empty
 		IdString				mCameraName;
 		IdString				mLodCameraName;
-		bool					mUpdateLodLists;
 
 		/// First Render Queue ID to render. Inclusive
 		uint8			mFirstRQ;
 		/// Last Render Queue ID to render. Not inclusive
 		uint8			mLastRQ;
+
+		bool			mUpdateLodLists;
 
 		CompositorPassSceneDef() :
 			CompositorPassDef( PASS_SCENE ),

@@ -172,7 +172,7 @@ namespace Ogre {
 			}
 		}
 
-
+		mCurrentMaterialLod.resize( mMesh->getNumSubMeshes(), 0 );
 		mLodMesh = mMesh->_getLodValueArray();
 
 		// Initialise the AnimationState, if Mesh has animation

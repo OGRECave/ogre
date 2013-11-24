@@ -39,6 +39,13 @@ THE SOFTWARE.
 #include "OgreMesh.h"
 #include "OgreRenderable.h"
 #include "OgreResourceGroupManager.h"
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+	//Instantiating a template of an incomplete type is undefined behavior,
+	//but vector<SubEntity> is a damn good optimization over vector<SubEntity*>
+	#include "OgreSubEntity.h"
+#endif
+
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

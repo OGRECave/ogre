@@ -2063,6 +2063,56 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //-----------------------------------------------------------------------
+void SceneManager::updateAllLodsThread( const CullFrustumRequest &request, size_t threadIdx )
+{
+	const Camera *lodCamera	= request.lodCamera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			ObjectData objData;
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+			//TODO: Select LOD method here
+			MovableObject::lodDistance( numObjs, objData, lodCamera );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllLods( const Camera *lodCamera, uint8 firstRq, uint8 lastRq )
+{
+	mRequestType				= UPDATE_ALL_LODS;
+	mCurrentCullFrustumRequest	= CullFrustumRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
+													 lodCamera, lodCamera );
+
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
 void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
 													size_t threadIdx )
 {
@@ -5261,11 +5311,15 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 				break;
 			case UPDATE_ALL_ANIMATIONS:
 				updateAllAnimationsThread( threadIdx );
+				break;
 			case UPDATE_ALL_TRANSFORMS:
 				updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
 				break;
 			case UPDATE_ALL_BOUNDS:
 				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+				break;
+			case UPDATE_ALL_LODS:
+				updateAllLodsThread( mCurrentCullFrustumRequest, threadIdx );
 				break;
 			case UPDATE_INSTANCE_MANAGERS:
 				updateInstanceManagersThread( threadIdx );

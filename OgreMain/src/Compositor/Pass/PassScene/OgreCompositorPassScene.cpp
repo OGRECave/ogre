@@ -75,7 +75,7 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorPassScene::execute()
+	void CompositorPassScene::execute( const Camera *lodCamera )
 	{
 		//Execute a limited number of times?
 		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
@@ -97,17 +97,26 @@ namespace Ogre
 				mTarget->_beginUpdate();
 		}*/
 
+		Camera const *usedLodCamera = mLodCamera;
+		if( lodCamera && mCamera == mLodCamera )
+			usedLodCamera = lodCamera;
+
 		//Call beginUpdate if we're the first to use this RT
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
 
+		SceneManager *sceneManager = mCamera->getSceneManager();
+
+		if( mDefinition->mUpdateLodLists )
+			sceneManager->updateAllLods( usedLodCamera, mDefinition->mFirstRQ, mDefinition->mLastRQ );
+
 		//Passes belonging to a ShadowNode should not override their parent.
 		if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
-			mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
+			sceneManager->_setCurrentShadowNode( mShadowNode );
 
 		mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
 
-		mTarget->_updateViewportCullPhase01( mViewport, mCamera, mLodCamera,
+		mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
 											 mDefinition->mFirstRQ, mDefinition->mLastRQ );
 
 		if( mShadowNode && mUpdateShadowNode )
@@ -115,19 +124,19 @@ namespace Ogre
 			//We need to prepare for rendering another RT (we broke the contiguous chain)
 			mTarget->_endUpdate();
 
-			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
-			mShadowNode->_update( mCamera, mLodCamera );
-			mCamera->getSceneManager()->_swapVisibleObjectsForShadowMapping();
+			sceneManager->_swapVisibleObjectsForShadowMapping();
+			mShadowNode->_update( mCamera, usedLodCamera );
+			sceneManager->_swapVisibleObjectsForShadowMapping();
 
 			//ShadowNode passes may've overriden this setting.
-			mCamera->getSceneManager()->_setCurrentShadowNode( mShadowNode );
+			sceneManager->_setCurrentShadowNode( mShadowNode );
 
 			//We need to restore the previous RT's update
 			mTarget->_beginUpdate();
 		}
 
 		mTarget->setFsaaResolveDirty();
-		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, mLodCamera,
+		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, usedLodCamera,
 											   mDefinition->mFirstRQ, mDefinition->mLastRQ, true );
 
 		//Call endUpdate if we're the last pass in a row to use this RT

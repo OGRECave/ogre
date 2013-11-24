@@ -62,7 +62,7 @@ namespace Ogre
 		CompositorPassClear( const CompositorPassClearDef *definition, SceneManager *sceneManager,
 							 RenderTarget *target );
 
-		virtual void execute();
+		virtual void execute( const Camera *lodCamera );
 
 	private:
 		CompositorPassClearDef const *mDefinition;

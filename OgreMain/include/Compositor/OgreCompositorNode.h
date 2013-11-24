@@ -197,8 +197,13 @@ namespace Ogre
 
 		const CompositorPassVec& _getPasses() const					{ return mPasses; }
 
-		/// Calling this function every frame will cause us to execute all our passes (ie. render)
-		void _update(void);
+		/** Calling this function every frame will cause us to execute all our passes (ie. render)
+		@param lodCamera
+			LOD Camera to be used by our passes. Pointer can be null, and note however passes can
+			ignore this hint and use their own camera pointer for LOD (this parameter is mostly
+			used for syncing shadow mapping).
+		*/
+		void _update( const Camera *lodCamera );
 
 		/** Call this function when you're replacing the textures from oldChannel with the
 			ones in newChannel. Useful when recreating textures (i.e. resolution changed)

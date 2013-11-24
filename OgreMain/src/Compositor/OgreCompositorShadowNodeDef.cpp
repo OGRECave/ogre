@@ -129,6 +129,9 @@ namespace Ogre
 					mMinRq = std::min<size_t>( mMinRq, passScene->mFirstRQ );
 					mMaxRq = std::max<size_t>( mMaxRq, passScene->mLastRQ );
 
+					//Regular nodes calculate the LOD values, we just use them.
+					passScene->mUpdateLodLists = false;
+
 					//Set to only render casters
 					passScene->mVisibilityMask |= VisibilityFlags::LAYER_SHADOW_CASTER;
 

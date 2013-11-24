@@ -903,6 +903,7 @@ namespace Ogre {
 			UPDATE_ALL_ANIMATIONS,
 			UPDATE_ALL_TRANSFORMS,
 			UPDATE_ALL_BOUNDS,
+			UPDATE_ALL_LODS,
 			UPDATE_INSTANCE_MANAGERS,
 			CULL_FRUSTUM_INSTANCEDENTS,
 			USER_UNIFORM_SCALABLE_TASK,
@@ -1047,6 +1048,13 @@ namespace Ogre {
 			Must be unique for each worker thread
 		*/
 		void updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx );
+
+		/**
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void updateAllLodsThread( const CullFrustumRequest &request, size_t threadIdx );
 
 		/** Traverses mVisibleObjects[threadIdx] from each thread to call
 			MovableObject::instanceBatchCullFrustumThreaded (which is supposed to cull objects)
@@ -1660,6 +1668,10 @@ namespace Ogre {
 			could deadlock in the best of cases).
 		*/
 		void updateAllBounds( const ObjectMemoryManagerVec &objectMemManager );
+
+		/** Updates the Lod values of all objects relative to the given camera.
+		*/
+		void updateAllLods( const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
 
 		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
 		*/

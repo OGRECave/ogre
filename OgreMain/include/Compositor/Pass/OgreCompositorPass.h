@@ -68,7 +68,7 @@ namespace Ogre
 		CompositorPass( const CompositorPassDef *definition, RenderTarget *target );
 		virtual ~CompositorPass();
 
-		virtual void execute() = 0;
+		virtual void execute( const Camera *lodCameraconst ) = 0;
 
 		/// @See CompositorNode::notifyRecreated
 		virtual void notifyRecreated( const CompositorChannel &oldChannel,
