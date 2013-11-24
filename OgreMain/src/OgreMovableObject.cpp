@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	using namespace VisibilityFlags;
+	const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	const String NullEntity::msMovableType = "NullEntity";
@@ -58,7 +59,7 @@ namespace Ogre {
         : IdObject( id )
 		, mCreator(0)
         , mManager(0)
-		, mLodMesh( 0 )
+		, mLodMesh( &c_DefaultLodMesh )
 		, mLodMaterial( 0 )
 		, mCurrentMeshLod( 0 )
         , mParentNode(0)

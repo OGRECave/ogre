@@ -76,6 +76,8 @@ namespace Ogre
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 		}
 
+		mLodMesh = meshReference->_getLodValueArray();
+
 		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 
 		//We need some sort of node so that some MovableObject functions don't crash.
