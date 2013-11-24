@@ -20,6 +20,10 @@
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
+
 void MeshLodTests::setUp()
 {
 	OGRE_DELETE LogManager::getSingletonPtr();
