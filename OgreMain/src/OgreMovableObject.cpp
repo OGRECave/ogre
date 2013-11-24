@@ -43,6 +43,7 @@ THE SOFTWARE.
 namespace Ogre {
 	using namespace VisibilityFlags;
 	const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
+	const FastArray< FastArray<Real> > c_DefaultLodMaterial = FastArray< FastArray<Real> >( 1, FastArray<Real>( 1, std::numeric_limits<Real>::max() ) );
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	const String NullEntity::msMovableType = "NullEntity";
@@ -60,7 +61,7 @@ namespace Ogre {
 		, mCreator(0)
         , mManager(0)
 		, mLodMesh( &c_DefaultLodMesh )
-		, mLodMaterial( 0 )
+		, mLodMaterial( &c_DefaultLodMaterial )
 		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
@@ -85,8 +86,8 @@ namespace Ogre {
         : IdObject( 0 )
 		, mCreator(0)
         , mManager(0)
-		, mLodMesh( 0 )
-		, mLodMaterial( 0 )
+		, mLodMesh( &c_DefaultLodMesh )
+		, mLodMaterial( &c_DefaultLodMaterial )
 		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
@@ -98,7 +99,7 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
-		mCurrentMaterialLod.resize( 0, 0 );
+		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
