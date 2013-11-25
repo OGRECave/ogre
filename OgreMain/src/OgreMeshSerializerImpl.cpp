@@ -2864,7 +2864,7 @@ namespace Ogre {
 	//--------------------------------------------------------------------
 	void MeshSerializerImpl_v1_8::writeLodLevel(const Mesh* pMesh)
 	{
-		if(isLodMixed(pMesh)) {
+		if (isLodMixed(pMesh)) {
 			LogManager::getSingleton().logMessage("MeshSerializer_v1_8 older mesh format is incompatible with mixed manual/generated Lod levels. Lod levels will not be exported.");
 		} else {
 			
@@ -2874,8 +2874,15 @@ namespace Ogre {
 			writeChunkHeader(M_MESH_LOD_LEVEL, calcLodLevelSize(pMesh));
 
 			// Details
+			// Get backward compatible strategy name
+			String strategyName = pMesh->getLodStrategy()->getName();
+			if (strategyName == "distance_box" || strategyName == "distance_sphere") {
+				strategyName = "Distance";
+			} else if (strategyName == "pixel_count" || strategyName == "screen_ratio_pixel_count") {
+				strategyName = "PixelCount";
+			}
 			// string strategyName;
-			writeString(pMesh->getLodStrategy()->getName());
+			writeString(strategyName);
 			// unsigned short numLevels;
 			writeShorts(&exportedLodCount, 1);
 			// bool manual;  (true for manual alternate meshes, false for generated)
