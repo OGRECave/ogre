@@ -31,7 +31,19 @@ void MeshLodTests::setUp()
 	mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
 	mLogManager->setLogDetail(LL_LOW);
 
-	Root* root = OGRE_NEW Root;
+#if OGRE_STATIC
+        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+#endif
+
+#ifdef OGRE_STATIC_LIB
+	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
+	Root* root = OGRE_NEW Root();
+	
+#endif
+	CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
 	root->setRenderSystem(root->getAvailableRenderers().back());
 	root->initialise(false); // Needed for setting up HardwareBufferManager
 	root->createRenderWindow("", 320, 240, false, NULL)->setHidden(true);

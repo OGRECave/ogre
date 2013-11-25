@@ -44,7 +44,17 @@ void TerrainTests::setUp()
 	mLogManager->createLog("testTerrain.log", true, false);
 	mLogManager->setLogDetail(LL_LOW);
 
+#if OGRE_STATIC
+        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+#endif
+
+#ifdef OGRE_STATIC_LIB
+	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	mRoot = OGRE_NEW Root();
+#endif
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file

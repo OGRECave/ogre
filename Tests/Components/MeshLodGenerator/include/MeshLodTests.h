@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "OgreBuildSettings.h"
 #ifdef OGRE_STATIC_LIB
 #include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif

@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreResourceGroupManager.h"
 
+#include "OgreBuildSettings.h"
 #ifdef OGRE_STATIC_LIB
 #include "../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif
