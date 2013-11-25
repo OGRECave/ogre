@@ -172,10 +172,10 @@ namespace Ogre
 		RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 19),
 		/// Supports 1d textures
 		RSC_TEXTURE_1D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 20),
-		/// Supports hardware tesselation hull programs
-		RSC_TESSELATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 21),
-		/// Supports hardware tesselation domain programs
-		RSC_TESSELATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 22),
+		/// Supports hardware tessellation hull programs
+		RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 21),
+		/// Supports hardware tessellation domain programs
+		RSC_TESSELLATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 22),
 		/// Supports hardware compute programs
 		RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
 		/// Supports asynchronous hardware occlusion queries
@@ -348,18 +348,18 @@ namespace Ogre
 		ShaderProfiles mSupportedShaderProfiles;
 
 		// Support for new shader stages in shader model 5.0
-		/// The number of floating-point constants tesselation Hull programs support
-		ushort mTesselationHullProgramConstantFloatCount;           
-		/// The number of integer constants tesselation Hull programs support
-		ushort mTesselationHullProgramConstantIntCount;           
-		/// The number of boolean constants tesselation Hull programs support
-		ushort mTesselationHullProgramConstantBoolCount;
-		/// The number of floating-point constants tesselation Domain programs support
-		ushort mTesselationDomainProgramConstantFloatCount;           
-		/// The number of integer constants tesselation Domain programs support
-		ushort mTesselationDomainProgramConstantIntCount;           
-		/// The number of boolean constants tesselation Domain programs support
-		ushort mTesselationDomainProgramConstantBoolCount;
+		/// The number of floating-point constants tessellation Hull programs support
+		ushort mTessellationHullProgramConstantFloatCount;           
+		/// The number of integer constants tessellation Hull programs support
+		ushort mTessellationHullProgramConstantIntCount;           
+		/// The number of boolean constants tessellation Hull programs support
+		ushort mTessellationHullProgramConstantBoolCount;
+		/// The number of floating-point constants tessellation Domain programs support
+		ushort mTessellationDomainProgramConstantFloatCount;           
+		/// The number of integer constants tessellation Domain programs support
+		ushort mTessellationDomainProgramConstantIntCount;           
+		/// The number of boolean constants tessellation Domain programs support
+		ushort mTessellationDomainProgramConstantBoolCount;
 		/// The number of floating-point constants compute programs support
 		ushort mComputeProgramConstantFloatCount;           
 		/// The number of integer constants compute programs support
@@ -783,66 +783,66 @@ namespace Ogre
 		void log(Log* pLog);
 
 		// Support for new shader stages in shader model 5.0
-		/// The number of floating-point constants tesselation Hull programs support
-		void setTesselationHullProgramConstantFloatCount(ushort c)
+		/// The number of floating-point constants tessellation Hull programs support
+		void setTessellationHullProgramConstantFloatCount(ushort c)
 		{
-			mTesselationHullProgramConstantFloatCount = c;           
+			mTessellationHullProgramConstantFloatCount = c;           
 		}
-		/// The number of integer constants tesselation Domain programs support
-		void setTesselationHullProgramConstantIntCount(ushort c)
+		/// The number of integer constants tessellation Domain programs support
+		void setTessellationHullProgramConstantIntCount(ushort c)
 		{
-			mTesselationHullProgramConstantIntCount = c;           
+			mTessellationHullProgramConstantIntCount = c;           
 		}
-		/// The number of boolean constants tesselation Domain programs support
-		void setTesselationHullProgramConstantBoolCount(ushort c)
+		/// The number of boolean constants tessellation Domain programs support
+		void setTessellationHullProgramConstantBoolCount(ushort c)
 		{
-			mTesselationHullProgramConstantBoolCount = c;           
+			mTessellationHullProgramConstantBoolCount = c;           
 		}
 		/// The number of floating-point constants fragment programs support
-		ushort getTesselationHullProgramConstantFloatCount(void) const
+		ushort getTessellationHullProgramConstantFloatCount(void) const
 		{
-			return mTesselationHullProgramConstantFloatCount;           
+			return mTessellationHullProgramConstantFloatCount;           
 		}
 		/// The number of integer constants fragment programs support
-		ushort getTesselationHullProgramConstantIntCount(void) const
+		ushort getTessellationHullProgramConstantIntCount(void) const
 		{
-			return mTesselationHullProgramConstantIntCount;           
+			return mTessellationHullProgramConstantIntCount;           
 		}
 		/// The number of boolean constants fragment programs support
-		ushort getTesselationHullProgramConstantBoolCount(void) const
+		ushort getTessellationHullProgramConstantBoolCount(void) const
 		{
-			return mTesselationHullProgramConstantBoolCount;           
+			return mTessellationHullProgramConstantBoolCount;           
 		}
 
-		/// The number of floating-point constants tesselation Domain programs support
-		void setTesselationDomainProgramConstantFloatCount(ushort c)
+		/// The number of floating-point constants tessellation Domain programs support
+		void setTessellationDomainProgramConstantFloatCount(ushort c)
 		{
-			mTesselationDomainProgramConstantFloatCount = c;           
+			mTessellationDomainProgramConstantFloatCount = c;           
 		}
-		/// The number of integer constants tesselation Domain programs support
-		void setTesselationDomainProgramConstantIntCount(ushort c)
+		/// The number of integer constants tessellation Domain programs support
+		void setTessellationDomainProgramConstantIntCount(ushort c)
 		{
-			mTesselationDomainProgramConstantIntCount = c;           
+			mTessellationDomainProgramConstantIntCount = c;           
 		}
-		/// The number of boolean constants tesselation Domain programs support
-		void setTesselationDomainProgramConstantBoolCount(ushort c)
+		/// The number of boolean constants tessellation Domain programs support
+		void setTessellationDomainProgramConstantBoolCount(ushort c)
 		{
-			mTesselationDomainProgramConstantBoolCount = c;           
+			mTessellationDomainProgramConstantBoolCount = c;           
 		}
 		/// The number of floating-point constants fragment programs support
-		ushort getTesselationDomainProgramConstantFloatCount(void) const
+		ushort getTessellationDomainProgramConstantFloatCount(void) const
 		{
-			return mTesselationDomainProgramConstantFloatCount;           
+			return mTessellationDomainProgramConstantFloatCount;           
 		}
 		/// The number of integer constants fragment programs support
-		ushort getTesselationDomainProgramConstantIntCount(void) const
+		ushort getTessellationDomainProgramConstantIntCount(void) const
 		{
-			return mTesselationDomainProgramConstantIntCount;           
+			return mTessellationDomainProgramConstantIntCount;           
 		}
 		/// The number of boolean constants fragment programs support
-		ushort getTesselationDomainProgramConstantBoolCount(void) const
+		ushort getTessellationDomainProgramConstantBoolCount(void) const
 		{
-			return mTesselationDomainProgramConstantBoolCount;           
+			return mTessellationDomainProgramConstantBoolCount;           
 		}
 
 		/// The number of floating-point constants compute programs support

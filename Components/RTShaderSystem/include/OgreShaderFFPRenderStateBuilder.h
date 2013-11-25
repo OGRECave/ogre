@@ -96,9 +96,9 @@ public:
 	bool initialize();
 
 	/** 
-	Finalize the FFP builder instance.	
+	Destroy the FFP builder instance.
 	*/
-	void finalize();
+	void destroy();
 
 	/** 
 	Build render state from the given pass that emulates the fixed function pipeline behaviour.	
@@ -132,7 +132,7 @@ protected:
 // Attributes.
 protected:
 	// All factories needed by the FFP.
-	SubRenderStateFactoryList mFFPSubRenderStateFactoyList;
+	SubRenderStateFactoryList mFFPSubRenderStateFactoryList;
 	
 };
 

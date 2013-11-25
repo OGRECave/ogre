@@ -421,10 +421,9 @@ namespace Ogre {
     
     void Serializer::flipEndian(void * pData, size_t size)
     {
-        char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((size_t)pData + byteIndex);
+            char swapByte = *(char *)((size_t)pData + byteIndex);
             *(char *)((size_t)pData + byteIndex) = *(char *)((size_t)pData + size - byteIndex - 1);
             *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
         }

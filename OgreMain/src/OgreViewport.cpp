@@ -68,7 +68,7 @@ namespace Ogre {
 			<< ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
 			<< ", relative dimensions "	<< std::ios::fixed << std::setprecision(2) 
 			<< "L: " << left << " T: " << top << " W: " << width << " H: " << height
-			<< " ZOrder: " << ZOrder;
+			<< " Z-order: " << ZOrder;
 #endif
 
         // Set the default orientation mode

@@ -430,7 +430,7 @@ namespace Ogre {
 				{
 					ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
 					ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
-					for ( ; iter != iterE ; iter++ )
+					for ( ; iter != iterE ; ++iter )
 					{
 						ResourceMap::iterator resMapIt = iter->second.find(name);
 

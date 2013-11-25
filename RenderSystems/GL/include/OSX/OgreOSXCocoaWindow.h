@@ -43,6 +43,7 @@ THE SOFTWARE.
 @end
 
 namespace Ogre {
+
     class _OgreGLExport OSXCocoaWindow : public RenderWindow
     {
     private:

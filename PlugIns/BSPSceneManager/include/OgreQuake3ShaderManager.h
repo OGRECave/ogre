@@ -44,10 +44,10 @@ namespace Ogre {
         file, or it may refer to a custom shader if a shader with that name is included in one of the .shader
         files in the scripts/ folder. Because there are multiple shaders per file you have to parse all the
         .shader files available to know if there is a custom shader available. This class is designed to parse
-        all the .shader files available and save their settings for future use. </p>
+        all the .shader files available and save their settings for future use.
         I choose not to set up Material instances for shaders found since they may or may not be used by a level,
         so it would be very wasteful to set up Materials since they load texture images for each layer (apart from the
-        lightmap). Once the usage of a shader is confirmed, a full Material instance can be set up from it.</p>
+        lightmap). Once the usage of a shader is confirmed, a full Material instance can be set up from it.
         Because this is a subclass of ScriptLoader, any files mentioned will be searched for in any path or
         archive added to the ResourceGroupManager::WORLD_GROUP_NAME group. See ResourceGroupManager for details.
     */

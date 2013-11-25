@@ -844,7 +844,7 @@ void buildLod(MeshPtr& mesh)
 			if (opts.usePercent) {
 				lodLevel.reductionValue += opts.lodPercent * 0.01f;
 			} else {
-				lodLevel.reductionValue += opts.lodFixed;
+				lodLevel.reductionValue += (Ogre::Real)opts.lodFixed;
 			}
 
 			lodLevel.distance += opts.lodDist;

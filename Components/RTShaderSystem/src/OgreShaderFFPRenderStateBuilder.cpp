@@ -81,38 +81,38 @@ bool FFPRenderStateBuilder::initialize()
 
 	curFactory = OGRE_NEW FFPTransformFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoyList.push_back(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
 
 	curFactory = OGRE_NEW FFPColourFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoyList.push_back(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
 
 	curFactory = OGRE_NEW FFPLightingFactory;
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoyList.push_back(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
 
 	curFactory = OGRE_NEW FFPTexturingFactory;
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoyList.push_back(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
 
 	curFactory = OGRE_NEW FFPFogFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoyList.push_back(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::finalize()
+void FFPRenderStateBuilder::destroy()
 {
 	SubRenderStateFactoryIterator it;
 
-	for (it = mFFPSubRenderStateFactoyList.begin(); it != mFFPSubRenderStateFactoyList.end(); ++it)
+	for (it = mFFPSubRenderStateFactoryList.begin(); it != mFFPSubRenderStateFactoryList.end(); ++it)
 	{
 		ShaderGenerator::getSingleton().removeSubRenderStateFactory(*it);		
 		OGRE_DELETE *it;		
 	}
-	mFFPSubRenderStateFactoyList.clear();
+	mFFPSubRenderStateFactoryList.clear();
 }
 
 

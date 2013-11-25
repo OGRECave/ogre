@@ -503,7 +503,8 @@ namespace Ogre {
         void setCustomParameter(uint16 index, const Vector4& value);
 
         /** Gets the custom value associated with this Light at the given index.
-        @param index @see setCustomParameter for full details.
+        @param index Index of the parameter to retrieve
+        @see setCustomParameter for full details.
         */
         const Vector4& getCustomParameter(uint16 index) const;
 

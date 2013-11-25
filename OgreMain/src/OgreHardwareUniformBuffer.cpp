@@ -37,6 +37,7 @@ namespace Ogre {
 	HardwareUniformBuffer::HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
 									HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
 		: HardwareBuffer(usage, false, useShadowBuffer)
+        , mMgr(mgr)
 		, mName(name)
 	{
 		// Calculate the size of the vertices

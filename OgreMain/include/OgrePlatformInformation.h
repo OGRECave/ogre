@@ -41,6 +41,7 @@ namespace Ogre {
 #define OGRE_CPU_X86        1
 #define OGRE_CPU_PPC        2
 #define OGRE_CPU_ARM        3
+#define OGRE_CPU_MIPS       4
 
 /* Find CPU type
 */
@@ -54,8 +55,10 @@ namespace Ogre {
 #	define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #	define OGRE_CPU OGRE_CPU_X86
-#elif defined(__arm__) || defined(_M_ARM)
+#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(_aarch64_)
 #	define OGRE_CPU OGRE_CPU_ARM
+#elif defined(__mips64) || defined(__mips64_)
+#	define OGRE_CPU OGRE_CPU_MIPS
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
 #endif
@@ -95,16 +98,22 @@ namespace Ogre {
 #   define __OGRE_HAVE_SSE  1
 #endif
 
-/* Define whether or not Ogre compiled with VFP supports.
+/* Define whether or not Ogre compiled with VFP support.
  */
 #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
 #   define __OGRE_HAVE_VFP  1
 #endif
 
-/* Define whether or not Ogre compiled with NEON supports.
+/* Define whether or not Ogre compiled with NEON support.
  */
 #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
 #   define __OGRE_HAVE_NEON  1
+#endif
+
+/* Define whether or not Ogre compiled with MSA support.
+ */
+#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_MIPS && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__mips_msa)
+#   define __OGRE_HAVE_MSA  1
 #endif
 
 #ifndef __OGRE_HAVE_SSE
@@ -118,7 +127,11 @@ namespace Ogre {
 #ifndef __OGRE_HAVE_NEON
 #   define __OGRE_HAVE_NEON  0
 #endif
-    
+
+#ifndef __OGRE_HAVE_MSA
+#   define __OGRE_HAVE_MSA  0
+#endif
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -163,6 +176,8 @@ namespace Ogre {
 #elif OGRE_CPU == OGRE_CPU_ARM
             CPU_FEATURE_VFP         = 1 << 12,
             CPU_FEATURE_NEON        = 1 << 13,
+#elif OGRE_CPU == OGRE_CPU_MIPS
+            CPU_FEATURE_MSA         = 1 << 14,
 #endif
 
             CPU_FEATURE_NONE        = 0

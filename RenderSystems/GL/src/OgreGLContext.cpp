@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLContext.h"
 #include "OgreSharedPtr.h"
+#include "OgreThreadHeaders.h"
 
 namespace Ogre {
     // Empty base class

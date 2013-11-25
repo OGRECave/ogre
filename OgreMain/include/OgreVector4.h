@@ -48,12 +48,16 @@ namespace Ogre
         Real x, y, z, w;
 
     public:
+        /** Default constructor.
+            @note
+                It does <b>NOT</b> initialize the vector for efficiency.
+        */
         inline Vector4()
         {
         }
 
         inline Vector4( const Real fX, const Real fY, const Real fZ, const Real fW )
-            : x( fX ), y( fY ), z( fZ ), w( fW)
+            : x( fX ), y( fY ), z( fZ ), w( fW )
         {
         }
 

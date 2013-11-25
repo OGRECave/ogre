@@ -80,7 +80,6 @@ namespace Ogre
 	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar)
 	{
 		uint32 hash;
-		uint32 tmp;
 		int rem;
 
 		if (hashSoFar)
@@ -96,7 +95,7 @@ namespace Ogre
 		/* Main loop */
 		for (;len > 0; len--) {
 			hash  += OGRE_GET16BITS (data);
-			tmp    = (OGRE_GET16BITS (data+2) << 11) ^ hash;
+			uint32 tmp    = (OGRE_GET16BITS (data+2) << 11) ^ hash;
 			hash   = (hash << 16) ^ tmp;
 			data  += 2*sizeof (uint16);
 			hash  += hash >> 11;

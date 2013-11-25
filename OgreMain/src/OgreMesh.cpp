@@ -1463,8 +1463,6 @@ namespace Ogre {
             // use getLodLevel to enforce loading of manual mesh lods
             MeshLodUsage& usage = const_cast<MeshLodUsage&>(getLodLevel(lodIndex));
 
-			bool atLeastOneIndexSet = false;
-
             if (!usage.manualName.empty() && lodIndex != 0)
             {
                 // Delegate edge building to manual mesh
@@ -1479,6 +1477,7 @@ namespace Ogre {
                 // Build
                 EdgeListBuilder eb;
                 size_t vertexSetCount = 0;
+                bool atLeastOneIndexSet = false;
 
                 if (sharedVertexData)
                 {

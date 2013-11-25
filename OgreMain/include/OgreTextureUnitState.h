@@ -132,7 +132,9 @@ namespace Ogre {
             /// Texture clamps at 1.0.
             TAM_CLAMP,
             /// Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-            TAM_BORDER
+            TAM_BORDER,
+            /// Unknown
+            TAM_UNKNOWN = 99
         };
 
         /** Texture addressing mode for each texture coordinate. */
@@ -473,10 +475,10 @@ namespace Ogre {
             BT_VERTEX = 1,			
 			/// Geometry processing unit		
 			BT_GEOMETRY = 2,
-			/// Tesselation control processing unit
-			BT_TESSELATION_HULL = 3,
-			/// Tesselation evaluation processing unit
-			BT_TESSELATION_DOMAIN = 4,
+			/// Tessellation control processing unit
+			BT_TESSELLATION_HULL = 3,
+			/// Tessellation evaluation processing unit
+			BT_TESSELLATION_DOMAIN = 4,
 			/// Compute processing unit
 			BT_COMPUTE = 5
         };

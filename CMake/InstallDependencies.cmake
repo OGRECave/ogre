@@ -206,7 +206,6 @@ endif () # OGRE_INSTALL_DEPENDENCIES
       PATTERN "timer" EXCLUDE
       PATTERN "tr1" EXCLUDE
       PATTERN "units" EXCLUDE
-      PATTERN "unordered" EXCLUDE
       PATTERN "uuid" EXCLUDE
       PATTERN "variant" EXCLUDE
       PATTERN "wave" EXCLUDE

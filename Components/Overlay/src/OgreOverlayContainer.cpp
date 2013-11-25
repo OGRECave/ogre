@@ -79,7 +79,7 @@ namespace Ogre {
         }
 
         mChildren.insert(ChildMap::value_type(name, elem));
-        // tell child about parent & ZOrder
+        // tell child about parent & Z-order
         elem->_notifyParent(this, mOverlay);
 	    elem->_notifyZOrder(mZOrder + 1);
 	    elem->_notifyWorldTransforms(mXForm);
@@ -103,7 +103,7 @@ namespace Ogre {
         ChildIterator it = cont->getChildIterator();
         while (it.hasMoreElements())
         {
-            // Give children ZOrder 1 higher than this
+            // Give children Z-order 1 higher than this
             GuiElement* pElemChild = it.getNext();
 			pElemChild->_notifyParent(cont, mOverlay);
             pElemChild->_notifyZOrder(cont->getZOrder() + 1);
@@ -128,7 +128,7 @@ namespace Ogre {
         OverlayElement* element = i->second;
         mChildren.erase(i);
 
-            // remove from container list (if found)
+        // Remove from container list (if found)
         ChildContainerMap::iterator j = mChildContainers.find(name);
         if (j != mChildContainers.end())
             mChildContainers.erase(j);
@@ -160,7 +160,7 @@ namespace Ogre {
         OverlayElement* element = i->second;
         mChildren.erase(i);
 
-            // remove from container list (if found)
+        // Remove from container list (if found)
         ChildContainerMap::iterator j = mChildContainers.find(name);
         if (j != mChildContainers.end())
             mChildContainers.erase(j);
@@ -227,8 +227,6 @@ namespace Ogre {
         {
             it.getNext()->_update();
         }
-
-
     }
     //---------------------------------------------------------------------
     ushort OverlayContainer::_notifyZOrder(ushort newZOrder)
@@ -241,7 +239,7 @@ namespace Ogre {
         ChildIterator it = getChildIterator();
         while (it.hasMoreElements())
         {
-            // Children "consume" ZOrder values, so keep track of them
+            // Children "consume" Z-order values, so keep track of them
             newZOrder = it.getNext()->_notifyZOrder(newZOrder);
         }
 
@@ -297,7 +295,7 @@ namespace Ogre {
             ChildIterator it = getChildIterator();
             while (it.hasMoreElements())
             {
-                // Give children ZOrder 1 higher than this
+                // Give children Z-order 1 higher than this
                 it.getNext()->_updateRenderQueue(queue);
             }
         }

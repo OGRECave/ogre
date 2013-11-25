@@ -392,12 +392,10 @@ namespace Ogre {
 		// and while we're at it, build the remap we can use later
 		bool use32bitIndexes =
 			id->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
-		uint16 *p16;
-		uint32 *p32;
 		IndexRemap indexRemap;
 		if (use32bitIndexes)
 		{
-			p32 = static_cast<uint32*>(id->indexBuffer->lock(
+			uint32 *p32 = static_cast<uint32*>(id->indexBuffer->lock(
 				id->indexStart, 
 				id->indexCount * id->indexBuffer->getIndexSize(), 
 				HardwareBuffer::HBL_READ_ONLY));
@@ -406,7 +404,7 @@ namespace Ogre {
 		}
 		else
 		{
-			p16 = static_cast<uint16*>(id->indexBuffer->lock(
+			uint16 *p16 = static_cast<uint16*>(id->indexBuffer->lock(
 				id->indexStart, 
 				id->indexCount * id->indexBuffer->getIndexSize(), 
 				HardwareBuffer::HBL_READ_ONLY));

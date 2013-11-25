@@ -47,9 +47,11 @@ namespace Ogre {
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mVisible = true;
+        mRenderQueueID = 0;
         mRenderQueueIDSet = false;
         mRenderQueuePrioritySet = false;
         mSkelAnimVertexData = 0;
+        mVertexAnimationAppliedThisFrame = false;
 		mSoftwareVertexAnimVertexData = 0;
 		mHardwareVertexAnimVertexData = 0;
 		mHardwarePoseCount = 0;

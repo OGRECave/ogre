@@ -115,9 +115,8 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterGLSLFactory()
+	ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
 	{
-		mLanguage = "glsl";
 	}
 	virtual ~ShaderProgramWriterGLSLFactory() {}
 

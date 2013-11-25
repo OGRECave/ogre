@@ -40,6 +40,7 @@ namespace Ogre {
         : useSharedVertices(true)
         , operationType(RenderOperation::OT_TRIANGLE_LIST)
         , vertexData(0)
+        , parent(0)
         , mMatInitialised(false)
         , mBoneAssignmentsOutOfDate(false)
 		, mVertexAnimationType(VAT_NONE)

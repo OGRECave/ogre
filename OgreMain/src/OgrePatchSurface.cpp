@@ -393,12 +393,10 @@ namespace Ogre {
         size_t uStep = 1 << mULevel;
         size_t vStep = 1 << mVLevel;
 
-
         void* pSrc = mControlPointBuffer;
         size_t vertexSize = mDeclaration->getVertexSize(0);
         float *pSrcReal, *pDestReal;
         RGBA *pSrcRGBA, *pDestRGBA;
-        void* pDest;
         const VertexElement* elemPos = mDeclaration->findElementBySemantic(VES_POSITION);
         const VertexElement* elemNorm = mDeclaration->findElementBySemantic(VES_NORMAL);
         const VertexElement* elemTex0 = mDeclaration->findElementBySemantic(VES_TEXTURE_COORDINATES, 0);
@@ -407,7 +405,7 @@ namespace Ogre {
         for (size_t v = 0; v < mMeshHeight; v += vStep)
         {
             // set dest by v from base
-            pDest = static_cast<void*>(
+            void* pDest = static_cast<void*>(
                 static_cast<unsigned char*>(lockedBuffer) + (vertexSize * mMeshWidth * v));
             for (size_t u = 0; u < mMeshWidth; u += uStep)
             {
@@ -468,19 +466,19 @@ namespace Ogre {
     void PatchSurface::subdivideCurve(void* lockedBuffer, size_t startIdx, size_t stepSize, size_t numSteps, size_t iterations)
     {
         // Subdivides a curve within a sparsely populated buffer (gaps are already there to be interpolated into)
-        size_t leftIdx, rightIdx, destIdx, halfStep, maxIdx;
-        bool firstSegment;
+        size_t maxIdx;
 
         maxIdx = startIdx + (numSteps * stepSize);
         size_t step = stepSize;
 
         while(iterations--)
         {
+            size_t leftIdx, rightIdx, destIdx, halfStep;
             halfStep = step / 2;
             leftIdx = startIdx;
             destIdx = leftIdx + halfStep;
             rightIdx = leftIdx + step;
-            firstSegment = true;
+            bool firstSegment = true;
             while (leftIdx < maxIdx)
             {
                 // Interpolate
@@ -516,9 +514,9 @@ namespace Ogre {
         bool use32bitindexes = (mIndexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 
         // The mesh is built, just make a list of indexes to spit out the triangles
-        int vInc, uInc;
+        int vInc;
         
-        size_t vCount, uCount, v, u, iterations;
+        size_t uCount, v, iterations;
 
         if (mVSide == VS_BOTH)
         {
@@ -568,10 +566,10 @@ namespace Ogre {
         while (iterations--)
         {
             // Make tris in a zigzag pattern (compatible with strips)
-            u = 0;
-            uInc = uStep; // Start with moving +u
+            size_t u = 0;
+            int uInc = uStep; // Start with moving +u
 
-            vCount = currHeight - 1;
+            size_t vCount = currHeight - 1;
             while (vCount--)
             {
                 uCount = currWidth - 1;
