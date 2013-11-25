@@ -2,9 +2,9 @@
 
 namespace Ogre
 {
-
-const Real LodData::NEVER_COLLAPSE_COST = std::numeric_limits<Real>::max();
-const Real LodData::UNINITIALIZED_COLLAPSE_COST = std::numeric_limits<Real>::infinity();
+// Use float limits instead of Real limits, because LodConfigSerializer may convert them to float.
+const Real LodData::NEVER_COLLAPSE_COST = std::numeric_limits<float>::max();
+const Real LodData::UNINITIALIZED_COLLAPSE_COST = std::numeric_limits<float>::infinity();
 
 void LodData::Vertex::addEdge( const LodData::Edge& edge )
 {

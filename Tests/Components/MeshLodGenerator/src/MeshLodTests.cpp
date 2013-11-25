@@ -182,9 +182,9 @@ void MeshLodTests::testLodConfigSerializer()
 		CPPUNIT_ASSERT(isProfileSameSize);
 		if (isProfileSameSize) {
 			for (size_t i = 0; i < p1.size(); i++) {
-				CPPUNIT_ASSERT(p1[i].cost == p2[i].cost);
 				CPPUNIT_ASSERT(p1[i].src == p2[i].src);
 				CPPUNIT_ASSERT(p1[i].dst == p2[i].dst);
+				CPPUNIT_ASSERT(isEqual(p1[i].cost, p2[i].cost));
 			}
 		}
 	}
@@ -199,7 +199,7 @@ void MeshLodTests::testLodConfigSerializer()
 				CPPUNIT_ASSERT(l1[i].distance == l2[i].distance);
 				CPPUNIT_ASSERT(l1[i].manualMeshName == l2[i].manualMeshName);
 				CPPUNIT_ASSERT(l1[i].reductionMethod == l2[i].reductionMethod);
-				CPPUNIT_ASSERT(l1[i].reductionValue == l2[i].reductionValue);
+				CPPUNIT_ASSERT(isEqual(l1[i].reductionValue, l2[i].reductionValue));
 			}
 		}
 	}
@@ -233,4 +233,9 @@ void MeshLodTests::setTestLodConfig(LodConfig& config)
 	config.advanced.useCompression = true;
 	config.advanced.useVertexNormals = true;
 	config.advanced.useBackgroundQueue = false;
+}
+bool MeshLodTests::isEqual(Real a, Real b)
+{
+	Real absoluteError = std::abs(a * 0.05);
+	return ((a - absoluteError) <= b) && ((a + absoluteError) >= b);
 }

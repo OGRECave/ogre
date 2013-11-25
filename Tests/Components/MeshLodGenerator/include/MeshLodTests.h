@@ -61,4 +61,5 @@ void runMeshLodConfigTests(LodConfig::Advanced& advanced);
 void blockedWaitForLodGeneration(const MeshPtr& mesh);
 void addProfile(LodConfig& config);
 void setTestLodConfig(LodConfig& config);
+bool isEqual(Real a, Real b);
 };
