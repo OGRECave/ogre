@@ -68,31 +68,35 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("preprocessor_defines",
-                                            "Preprocessor defines use to compile the program.",
-                                            PT_STRING),&msCmdPreprocessorDefines);
-            dict->addParameter(ParameterDef("attach",
-                                            "name of another GLSL program needed by this program",
-                                            PT_STRING),&msCmdAttach);
-            dict->addParameter(ParameterDef("column_major_matrices",
-                                            "Whether matrix packing in column-major order.",
-                                            PT_BOOL),&msCmdColumnMajorMatrices);
+            dict->addParameter(ParameterDef(
+                "preprocessor_defines",
+                "Preprocessor defines use to compile the program.",
+                PT_STRING), &msCmdPreprocessorDefines);
+            dict->addParameter(ParameterDef(
+                "attach",
+                "name of another GLSL program needed by this program",
+                PT_STRING), &msCmdAttach);
+            dict->addParameter(ParameterDef(
+                "column_major_matrices",
+                "Whether matrix packing in column-major order.",
+                PT_BOOL), &msCmdColumnMajorMatrices);
             dict->addParameter(
-                ParameterDef("input_operation_type",
-                             "The input operation type for this geometry program. \
-                                Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', \
-                                'triangle_strip' or 'triangle_fan'", PT_STRING),
-                &msInputOperationTypeCmd);
+                ParameterDef(
+                    "input_operation_type",
+                    "The input operation type for this geometry program. "
+                    "Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', "
+                    "'triangle_strip' or 'triangle_fan'", 
+                    PT_STRING), &msInputOperationTypeCmd);
             dict->addParameter(
                 ParameterDef("output_operation_type",
-                             "The input operation type for this geometry program. \
-                                Can be 'point_list', 'line_strip' or 'triangle_strip'",
-                             PT_STRING),
-                &msOutputOperationTypeCmd);
+                             "The input operation type for this geometry program. "
+                             "Can be 'point_list', 'line_strip' or 'triangle_strip'",
+                             PT_STRING), &msOutputOperationTypeCmd);
             dict->addParameter(
                 ParameterDef("max_output_vertices",
-                             "The maximum number of vertices a single run of this geometry program can output",
-                             PT_INT),&msMaxOutputVerticesCmd);
+                             "The maximum number of vertices a single run "
+                             "of this geometry program can output",
+                             PT_INT), &msMaxOutputVerticesCmd);
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsl";
@@ -190,56 +194,39 @@ namespace Ogre {
             return true;
         }
 
-        // only create a shader object if glsl is supported
-        if (isSupported())
-        {
-            // create shader object
+        // Only create a shader object if GLSL is supported.
+        // if (isSupported())
+        // {
+            // Create shader object.
+            GLenum GLShaderType = getGLShaderType(mType);
+            OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(GLShaderType));
+            
+            //TODO GL 4.3 KHR_debug
 
-            GLenum shaderType = 0x0000;
-            switch (mType)
-            {
-            case GPT_VERTEX_PROGRAM:
-                shaderType = GL_VERTEX_SHADER;
-                break;
-            case GPT_FRAGMENT_PROGRAM:
-                shaderType = GL_FRAGMENT_SHADER;
-                break;
-            case GPT_GEOMETRY_PROGRAM:
-                shaderType = GL_GEOMETRY_SHADER;
-                break;
-            case GPT_DOMAIN_PROGRAM:
-                shaderType = GL_TESS_EVALUATION_SHADER;
-                break;
-            case GPT_HULL_PROGRAM:
-                shaderType = GL_TESS_CONTROL_SHADER;
-                break;
-            case GPT_COMPUTE_PROGRAM:
-                shaderType = GL_COMPUTE_SHADER;
-                break;
-            }
-            OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
+            // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+            //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
-            //            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-            //                glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
-
-            // if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             // {
             //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            //     //                if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-            //     //                    glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
+            //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+            //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
             // }
-        }
+        // }
 
-        // Add preprocessor extras and main source
+        // Add boiler plate code and preprocessor extras, then 
+        // submit shader source to GL.
         if (!mSource.empty())
         {
-            // Fix up the source in case someone forgot to redeclare gl_PerVertex
+            // Add standard shader input and output blocks, if missing.
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                // Check that it's missing and that this shader has a main function, ie. not a child shader.
+                // Assume blocks are missing if gl_Position is missing.
                 if (mSource.find("vec4 gl_Position") == String::npos)
                 {
                     size_t mainPos = mSource.find("void main");
+                    // Only add blocks if shader is not a child
+                    // shader, i.e. has a main function.
                     if (mainPos != String::npos)
                     {
                         size_t versionPos = mSource.find("#version");
@@ -259,21 +246,22 @@ namespace Ogre {
                             case GPT_DOMAIN_PROGRAM:
                                 mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n\n");
                                 mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[];\n\n");
-                                // mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[gl_MaxPatchVertices];\n\n");
                                 break;
                             case GPT_HULL_PROGRAM:
                                 mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_out[];\n\n");
                                 mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[];\n\n");
-                                // mSource.insert(belowVersionPos, "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_out[gl_MaxPatchVertices];\n\n");
-                                // mSource.insert(belowVersionPos, "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n} gl_in[gl_MaxPatchVertices];\n\n");
                                 break;
-                            default:
+                            case GPT_FRAGMENT_PROGRAM:
+                            case GPT_COMPUTE_PROGRAM:
+                                // Fragment and compute shaders do
+                                // not have standard blocks.
                                 break;
                             }
                         }
                     }
                 }
             }
+            // Submit shader source.
             const char *source = mSource.c_str();
             OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
         }
@@ -282,7 +270,7 @@ namespace Ogre {
 
         // Check for compile errors
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
-        if(!mCompiled && checkErrors)
+        if (!mCompiled && checkErrors)
         {
             String message = logObjectInfo("GLSL compile log: " + mName, mGLShaderHandle);
             checkAndFixInvalidDefaultPrecisionError(message);
@@ -292,31 +280,12 @@ namespace Ogre {
         if (mCompiled && checkErrors)
             logObjectInfo("GLSL compiled: " + mName, mGLShaderHandle);
 
-        if(!mCompiled)
+        if (!mCompiled)
         {
-            String progType = "Fragment";
-            if (mType == GPT_VERTEX_PROGRAM)
-            {
-                progType = "Vertex";
-            }
-            else if (mType == GPT_GEOMETRY_PROGRAM)
-            {
-                progType = "Geometry";
-            }
-            else if (mType == GPT_DOMAIN_PROGRAM)
-            {
-                progType = "Tesselation Evaluation";
-            }
-            else if (mType == GPT_HULL_PROGRAM)
-            {
-                progType = "Tesselation Control";
-            }
-            else if (mType == GPT_COMPUTE_PROGRAM)
-            {
-                progType = "Compute";
-            }
+            String shaderType = getShaderTypeLabel(mType);
+            StringUtil::toTitleCase(shaderType);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        progType + " Program " + mName +
+                        shaderType + " Program " + mName +
                         " failed to compile. See compile log above for details.",
                         "GLSLProgram::compile");
         }
@@ -345,11 +314,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLProgram::unloadHighLevelImpl(void)
     {
-        if (isSupported())
-        {
+        // if (isSupported())
+        // {
             OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
             {
                 OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
             }
@@ -357,7 +326,7 @@ namespace Ogre {
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mCompiled = 0;
-        }
+        // }
     }
 
     //-----------------------------------------------------------------------
@@ -375,7 +344,7 @@ namespace Ogre {
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLProgramPipelineManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
         }
@@ -390,7 +359,7 @@ namespace Ogre {
         {
             GLSLProgram* childShader = *i;
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 GLSLProgramPipelineManager::getSingleton().extractConstantDefs(childShader->getSource(),
                                                                                *mConstantDefs.get(), childShader->getName());
@@ -506,13 +475,13 @@ namespace Ogre {
                 // so don't worry about calling it several times.
                 GLSLProgram* childShader = static_cast<GLSLProgram*>(hlProgram.getPointer());
                 // Load the source and attach the child shader only if supported.
-                if (isSupported())
-                {
+                // if (isSupported())
+                // {
                     childShader->loadHighLevelImpl();
                     // Add to the container.
                     mAttachedGLSLPrograms.push_back(childShader);
                     mAttachedShaderNames += name + " ";
-                }
+                // }
             }
         }
     }
@@ -577,11 +546,11 @@ namespace Ogre {
             vector< String >::type errors = StringUtil::split(message, "\n");
 
             // going from the end so when we delete a line the numbers of the lines before will not change
-			for(int i = (int)errors.size() - 1 ; i != -1 ; i--)
+			for (int i = (int)errors.size() - 1 ; i != -1 ; i--)
             {
                 String & curError = errors[i];
                 size_t foundPos = curError.find(precisionQualifierErrorString);
-                if(foundPos != String::npos)
+                if (foundPos != String::npos)
                 {
                     String lineNumber = curError.substr(0, foundPos);
                     size_t posOfStartOfNumber = lineNumber.find_last_of(':');
@@ -598,7 +567,7 @@ namespace Ogre {
             }
             // rebuild source
 			StringStream newSource;
-            for(size_t i = 0; i < linesOfSource.size()  ; i++)
+            for (size_t i = 0; i < linesOfSource.size()  ; i++)
             {
                 newSource << linesOfSource[i] << "\n";
             }
@@ -670,6 +639,45 @@ namespace Ogre {
         default:
             return "triangle_list";
             break;
+        }
+    }
+
+    GLenum GLSLProgram::getGLShaderType(GpuProgramType programType)
+    {
+        //TODO Convert to map, or is speed different negligible?
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return GL_VERTEX_SHADER;
+        case GPT_GEOMETRY_PROGRAM:
+            return GL_GEOMETRY_SHADER;
+        case GPT_FRAGMENT_PROGRAM:
+            return GL_FRAGMENT_SHADER;
+        case GPT_HULL_PROGRAM:
+            return GL_TESS_CONTROL_SHADER;
+        case GPT_DOMAIN_PROGRAM:
+            return GL_TESS_EVALUATION_SHADER;
+        case GPT_COMPUTE_PROGRAM:
+            return GL_COMPUTE_SHADER;
+        }
+    }
+
+    String GLSLProgram::getShaderTypeLabel(GpuProgramType programType) 
+    {
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return "vertex";
+        case GPT_DOMAIN_PROGRAM:
+            return "tessellation evaluation";
+        case GPT_HULL_PROGRAM:
+            return "tessellation control";
+        case GPT_GEOMETRY_PROGRAM:
+            return "geometry";
+        case GPT_FRAGMENT_PROGRAM:
+            return "fragment";
+        case GPT_COMPUTE_PROGRAM:
+            return "compute";
         }
     }
 

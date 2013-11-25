@@ -62,6 +62,9 @@ namespace Ogre {
         GLuint getProgramID(void) const
         { return mProgramID; }
 
+        /// Get GPU program type.
+        GLenum getGLShaderType(GpuProgramType programType);
+
     protected:
         /** Overridden from GpuProgram, do nothing */
         void loadFromSource(void) {}

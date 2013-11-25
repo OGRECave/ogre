@@ -48,7 +48,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLGpuProgram : public GL3PlusGpuProgram
     {
     private:
-        /// GL Handle for the shader object
+        /// GL handle for the shader object
         GLSLProgram* mGLSLProgram;
 
         /// Keep track of the number of vertex shaders created

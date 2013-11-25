@@ -86,18 +86,6 @@ namespace Ogre {
             name += mVertexProgram->getName();
             name += "\n";
         }
-        if (mFragmentProgram)
-        {
-            name += "Fragment Program: ";
-            name += mFragmentProgram->getName();
-            name += "\n";
-        }
-        if (mGeometryProgram)
-        {
-            name += "Geometry Program: ";
-            name += mGeometryProgram->getName();
-            name += "\n";
-        }
         if (mHullProgram)
         {
             name += "Tessellation Control Program: ";
@@ -108,6 +96,18 @@ namespace Ogre {
         {
             name += "Tessellation Evaluation Program: ";
             name += mDomainProgram->getName();
+            name += "\n";
+        }
+        if (mGeometryProgram)
+        {
+            name += "Geometry Program: ";
+            name += mGeometryProgram->getName();
+            name += "\n";
+        }
+        if (mFragmentProgram)
+        {
+            name += "Fragment Program: ";
+            name += mFragmentProgram->getName();
             name += "\n";
         }
         if (mComputeProgram)

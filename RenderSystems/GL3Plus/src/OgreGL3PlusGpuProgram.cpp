@@ -32,28 +32,6 @@
 
 using namespace Ogre;
 
-GLenum getGLShaderType(GpuProgramType programType);
-
-GLenum getGLShaderType(GpuProgramType programType)
-{
-    switch (programType)
-    {
-    case GPT_VERTEX_PROGRAM:
-        //default:
-        return GL_VERTEX_SHADER;
-    case GPT_GEOMETRY_PROGRAM:
-        return GL_GEOMETRY_SHADER;
-    case GPT_FRAGMENT_PROGRAM:
-        return GL_FRAGMENT_SHADER;
-    case GPT_HULL_PROGRAM:
-        return GL_TESS_CONTROL_SHADER;
-    case GPT_DOMAIN_PROGRAM:
-        return GL_TESS_EVALUATION_SHADER;
-    case GPT_COMPUTE_PROGRAM:
-        return GL_COMPUTE_SHADER;
-    }
-}
-
 GL3PlusGpuProgram::GL3PlusGpuProgram(ResourceManager* creator, const String& name,
                                      ResourceHandle handle, const String& group, bool isManual,
                                      ManualResourceLoader* loader)

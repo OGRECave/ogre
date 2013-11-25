@@ -78,8 +78,9 @@ namespace Ogre {
     typedef vector<HardwareCounterBufferSharedPtr>::type GLCounterBufferList;
     typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
-    /** C++ encapsulation of GLSL Program Object
-
+    //TODO Rename me to something like GLSLProgramObject.
+    /** C++ encapsulation of GLSL program object.
+        
     */
     class _OgreGL3PlusExport GLSLProgramCommon
     {
