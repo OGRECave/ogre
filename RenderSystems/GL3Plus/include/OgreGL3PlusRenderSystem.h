@@ -41,8 +41,6 @@ namespace Ogre {
     class GL3PlusRTTManager;
     class GL3PlusGpuProgramManager;
     class GLSLShaderFactory;
-    class GLSLGpuProgram;
-    // class GLSLMonolithicProgram;
     class HardwareBufferManager;
 
     /**

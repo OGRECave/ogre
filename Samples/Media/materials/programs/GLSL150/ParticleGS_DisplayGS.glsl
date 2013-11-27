@@ -2,13 +2,13 @@
 
 in block {
     vec3 pos;
-    vec4 color;
+    vec4 colour;
     float radius;
-} ColoredFirework[];
+} ColouredFirework[];
 
 out block {
     vec4 pos;
-    vec4 color;
+    vec4 colour;
     vec2 texcoord;
 } Firework;
 
@@ -29,12 +29,12 @@ void main()
     //
     for (int i = 0; i < 4; i++)
     {
-        vec3 position = -g_positions[i] * ColoredFirework[0].radius;
-        position = mat3(inverseView) * position + ColoredFirework[0].pos;
+        vec3 position = -g_positions[i] * ColouredFirework[0].radius;
+        position = mat3(inverseView) * position + ColouredFirework[0].pos;
         gl_Position = worldViewProj * vec4(position, 1.0);
 
         Firework.pos = gl_Position;
-        Firework.color = ColoredFirework[0].color;
+        Firework.colour = ColouredFirework[0].colour;
         Firework.texcoord = g_texcoords[i];
         EmitVertex();
     }

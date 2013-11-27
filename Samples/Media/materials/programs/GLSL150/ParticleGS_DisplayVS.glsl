@@ -28,9 +28,9 @@ in vec3 uv2;
 
 out block {
     vec3 pos;
-    vec4 color;
+    vec4 colour;
     float radius;
-} ColoredFirework;
+} ColouredFirework;
 
 uniform mat4 worldViewProj;
 
@@ -43,39 +43,39 @@ void main()
     //
     // Pass the point through
     //
-    ColoredFirework.pos = position; // Multiply by world matrix?
-    ColoredFirework.radius = 1.5;
+    ColouredFirework.pos = position; // Multiply by world matrix?
+    ColouredFirework.radius = 1.5;
     
     //  
-    // calculate the color
+    // calculate the colour
     //
     if (inType == PT_LAUNCHER)
     {
         // red
-        ColoredFirework.color = vec4(1, 0.1, 0.1, 1);
-        ColoredFirework.radius = 1.0;
+        ColouredFirework.colour = vec4(1, 0.1, 0.1, 1);
+        ColouredFirework.radius = 1.0;
     }
     else if (inType == PT_SHELL)
     {
         // cyan
-        ColoredFirework.color = vec4(0.1, 1, 1, 1);
-        ColoredFirework.radius = 1.0;
+        ColouredFirework.colour = vec4(0.1, 1, 1, 1);
+        ColouredFirework.radius = 1.0;
     }
     else if (inType == PT_EMBER1)
     {
         // yellow
-        ColoredFirework.color = vec4(1, 1, 0.1, 1);
-        ColoredFirework.color *= (inTimer / P_EMBER1LIFE);
+        ColouredFirework.colour = vec4(1, 1, 0.1, 1);
+        ColouredFirework.colour *= (inTimer / P_EMBER1LIFE);
     }
     else if (inType == PT_EMBER2)
     {
         // fuschia
-        ColoredFirework.color = vec4(1, 0.1, 1, 1);
+        ColouredFirework.colour = vec4(1, 0.1, 1, 1);
     }
     else if (inType == PT_EMBER3)
     {
         // red
-        ColoredFirework.color = vec4(1, 0.1, 0.1, 1);
-        ColoredFirework.color *= (inTimer / P_EMBER3LIFE);
+        ColouredFirework.colour = vec4(1, 0.1, 0.1, 1);
+        ColouredFirework.colour *= (inTimer / P_EMBER3LIFE);
     }
 }
