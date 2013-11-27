@@ -124,7 +124,7 @@ namespace Ogre {
                                                 const String& syntaxCode)
     {
         ProgramMap::const_iterator iter = mProgramMap.find(syntaxCode);
-        if(iter == mProgramMap.end())
+        if (iter == mProgramMap.end())
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used

@@ -34,10 +34,10 @@
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLSLLinkProgramManager.h"
+#include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLSLGpuProgram.h"
-#include "OgreGLSLProgram.h"
-#include "OgreGLSLProgramPipelineManager.h"
+#include "OgreGLSLShader.h"
+#include "OgreGLSLSeparableProgramManager.h"
 #include "OgreStringConverter.h"
 
 namespace Ogre {
@@ -175,13 +175,13 @@ namespace Ogre {
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+            GLSLSeparableProgram* programPipeline =
+                GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
             programPipeline->getVertexArrayObject()->bind();
         }
         else
         {
-            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
             linkProgram->getVertexArrayObject()->bind();
         }
 
@@ -239,18 +239,18 @@ namespace Ogre {
         GLuint programId = 0;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
+            GLSLSeparableProgram* programPipeline =
+                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
             GLSLGpuProgram* glslGpuProgram = 0;
             if ((glslGpuProgram = programPipeline->getGeometryProgram()))
-                programId = glslGpuProgram->getGLSLProgram()->getGLProgramHandle();
+                programId = glslGpuProgram->getGLSLShader()->getGLProgramHandle();
             //TODO include tessellation stages
             else // vertex program
-                programId = programPipeline->getVertexProgram()->getGLSLProgram()->getGLProgramHandle();
+                programId = programPipeline->getVertexProgram()->getGLSLShader()->getGLProgramHandle();
         }
         else
         {
-            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
             programId = linkProgram->getGLProgramHandle();
         }
 
@@ -289,8 +289,8 @@ namespace Ogre {
 
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getCurrentProgramPipeline();
+            GLSLSeparableProgram* programPipeline =
+                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
             programPipeline->activate();
         }
         else

@@ -26,11 +26,11 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLProgramManagerCommon.h"
+#include "OgreGLSLProgramManager.h"
 #include "OgreGLSLGpuProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreGLSLProgram.h"
+#include "OgreGLSLShader.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreRoot.h"
@@ -39,7 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLProgramManagerCommon::GLSLProgramManagerCommon(void) :
+    GLSLProgramManager::GLSLProgramManager(void) :
         mActiveVertexGpuProgram(NULL),
         mActiveGeometryGpuProgram(NULL),
         mActiveFragmentGpuProgram(NULL),
@@ -182,11 +182,11 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLProgramManagerCommon::~GLSLProgramManagerCommon(void)
+    GLSLProgramManager::~GLSLProgramManager(void)
     {
     }
     //---------------------------------------------------------------------
-    void GLSLProgramManagerCommon::completeDefInfo(GLenum gltype,
+    void GLSLProgramManager::completeDefInfo(GLenum gltype,
                                                    GpuConstantDefinition& defToUpdate)
     {
         // Decode uniform size and type
@@ -360,7 +360,7 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    bool GLSLProgramManagerCommon::completeParamSource(
+    bool GLSLProgramManager::completeParamSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs,
         const GpuConstantDefinitionMap* geometryConstantDefs,
@@ -442,7 +442,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //FIXME This is code bloat...either template or unify UniformReference
     // and AtomicCounterReference
-    bool GLSLProgramManagerCommon::completeParamSource(
+    bool GLSLProgramManager::completeParamSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs,
         const GpuConstantDefinitionMap* geometryConstantDefs,
@@ -523,7 +523,7 @@ namespace Ogre {
 
 
     //---------------------------------------------------------------------
-    void GLSLProgramManagerCommon::extractUniforms(GLuint programObject,
+    void GLSLProgramManager::extractUniforms(GLuint programObject,
                                                    const GpuConstantDefinitionMap* vertexConstantDefs,
                                                    const GpuConstantDefinitionMap* geometryConstantDefs,
                                                    const GpuConstantDefinitionMap* fragmentConstantDefs,
@@ -859,12 +859,12 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLSLProgramManagerCommon::extractConstantDefs(const String& src,
+    void GLSLProgramManager::extractConstantDefs(const String& src,
                                                        GpuNamedConstants& defs, const String& filename)
     {
         // Parse the output string and collect all uniforms
         // NOTE this relies on the source already having been preprocessed
-        // which is done in GLSLProgram::loadFromSource
+        // which is done in GLSLShader::loadFromSource
         String line;
         String::size_type currPos = src.find("uniform");
         while (currPos != String::npos)
@@ -1000,7 +1000,7 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void GLSLProgramManagerCommon::parseIndividualConstant(const String& src, GpuNamedConstants& defs,
+    void GLSLProgramManager::parseIndividualConstant(const String& src, GpuNamedConstants& defs,
                                                            String::size_type currPos,
                                                            const String& filename, GpuSharedParametersPtr sharedParams)
     {

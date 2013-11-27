@@ -25,13 +25,13 @@
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GLSLProgramPipelineManager_H__
-#define __GLSLProgramPipelineManager_H__
+#ifndef __GLSLSeparableProgramManager_H__
+#define __GLSLSeparableProgramManager_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreGLSLProgramPipeline.h"
-#include "OgreGLSLProgramManagerCommon.h"
+#include "OgreGLSLSeparableProgram.h"
+#include "OgreGLSLProgramManager.h"
 
 namespace Ogre
 {
@@ -50,55 +50,55 @@ namespace Ogre
         unique key in a hash map for quick retrieval the next time the
         pipeline object is required.
     */
-    class _OgreGL3PlusExport GLSLProgramPipelineManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramPipelineManager>
+    class _OgreGL3PlusExport GLSLSeparableProgramManager : public GLSLProgramManager, public Singleton<GLSLSeparableProgramManager>
     {
     private:
 
-        typedef map<uint32, GLSLProgramPipeline*>::type ProgramPipelineMap;
-        typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
+        typedef map<uint32, GLSLSeparableProgram*>::type SeparableProgramMap;
+        typedef SeparableProgramMap::iterator SeparableProgramIterator;
 
         /// Container holding previously created program pipeline objects
-        ProgramPipelineMap mProgramPipelines;
+        SeparableProgramMap mSeparablePrograms;
 
         /// Active objects defining the active rendering gpu state
-        GLSLProgramPipeline* mActiveProgramPipeline;
+        GLSLSeparableProgram* mActiveSeparableProgram;
 
     public:
 
-        GLSLProgramPipelineManager(void);
-        ~GLSLProgramPipelineManager(void);
+        GLSLSeparableProgramManager(void);
+        ~GLSLSeparableProgramManager(void);
 
         /** Get the program pipeline that combines the current program
             objects.  If the program pipeline object was not already
             created a new one is created.  Note that this method does
             NOT link the program.
         */
-        GLSLProgramPipeline* getCurrentProgramPipeline(void);
+        GLSLSeparableProgram* getCurrentSeparableProgram(void);
 
         /** Get the program pipeline that combines the current program
             objects.  If the program pipeline object was not
             already created and linked a new one is created and
             linked.
         */
-        GLSLProgramPipeline* getActiveProgramPipeline(void);
+        GLSLSeparableProgram* getActiveSeparableProgram(void);
         //TODO Replace the above method with the one below, and rename
-        // mActiveProgramPipeline -> mCurrentProgramPipeline.
-        //void activateCurrentProgramPipeline(void);
+        // mActiveSeparableProgram -> mCurrentSeparableProgram.
+        //void activateCurrentSeparableProgram(void);
 
         /** Set the active link programs for the next rendering state.
             The active program pipeline object will be cleared.
             Normally called from the GLSLGpuProgram::bindProgram and
             unbindProgram methods.
         */
-        void setActiveVertexLinkProgram(GLSLGpuProgram* vertexGpuProgram);
-        void setActiveFragmentLinkProgram(GLSLGpuProgram* fragmentGpuProgram);
-        void setActiveGeometryLinkProgram(GLSLGpuProgram* geometryGpuProgram);
-        void setActiveTessDomainLinkProgram(GLSLGpuProgram* domainGpuProgram);
-        void setActiveTessHullLinkProgram(GLSLGpuProgram* hullGpuProgram);
-        void setActiveComputeLinkProgram(GLSLGpuProgram* computGpuProgram);
+        void setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram);
+        void setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram);
+        void setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram);
+        void setActiveTessDomainShader(GLSLGpuProgram* domainGpuProgram);
+        void setActiveTessHullShader(GLSLGpuProgram* hullGpuProgram);
+        void setActiveComputeShader(GLSLGpuProgram* computGpuProgram);
 
-        static GLSLProgramPipelineManager& getSingleton(void);
-        static GLSLProgramPipelineManager* getSingletonPtr(void);
+        static GLSLSeparableProgramManager& getSingleton(void);
+        static GLSLSeparableProgramManager* getSingletonPtr(void);
     };
 }
 

@@ -49,12 +49,12 @@ THE SOFTWARE.
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusContext.h"
-#include "OgreGLSLProgramFactory.h"
+#include "OgreGLSLShaderFactory.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGLSLProgramPipelineManager.h"
-#include "OgreGLSLProgramPipeline.h"
-#include "OgreGLSLLinkProgramManager.h"
+#include "OgreGLSLSeparableProgramManager.h"
+#include "OgreGLSLSeparableProgram.h"
+#include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
@@ -115,7 +115,7 @@ namespace Ogre {
         : mDepthWrite(true),
           mStencilWriteMask(0xFFFFFFFF),
           mGpuProgramManager(0),
-          mGLSLProgramFactory(0),
+          mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
           mRTTManager(0),
           mActiveTextureUnit(0)
@@ -525,8 +525,8 @@ namespace Ogre {
         mGpuProgramManager = OGRE_NEW GL3PlusGpuProgramManager();
 
         // Create GLSL program factory
-        mGLSLProgramFactory = new GLSLProgramFactory();
-        HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLProgramFactory);
+        mGLSLShaderFactory = new GLSLShaderFactory();
+        HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
 
         // Set texture the number of texture units
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
@@ -569,13 +569,13 @@ namespace Ogre {
         RenderSystem::shutdown();
 
         // Deleting the GLSL program factory
-        if (mGLSLProgramFactory)
+        if (mGLSLShaderFactory)
         {
             // Remove from manager safely
             if (HighLevelGpuProgramManager::getSingletonPtr())
-                HighLevelGpuProgramManager::getSingleton().removeFactory(mGLSLProgramFactory);
-            OGRE_DELETE mGLSLProgramFactory;
-            mGLSLProgramFactory = 0;
+                HighLevelGpuProgramManager::getSingleton().removeFactory(mGLSLShaderFactory);
+            OGRE_DELETE mGLSLShaderFactory;
+            mGLSLShaderFactory = 0;
         }
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
@@ -1753,8 +1753,8 @@ namespace Ogre {
         bool updateVAO = true;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLProgramPipeline* programPipeline =
-                GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+            GLSLSeparableProgram* programPipeline =
+                GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
             if (programPipeline)
             {
                 updateVAO = !programPipeline->getVertexArrayObject()->isInitialised();
@@ -1764,7 +1764,7 @@ namespace Ogre {
         }
         else
         {
-            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
             if (linkProgram)
             {
                 updateVAO = !linkProgram->getVertexArrayObject()->isInitialised();
@@ -1992,8 +1992,8 @@ namespace Ogre {
         {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLProgramPipeline* programPipeline =
-                    GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                GLSLSeparableProgram* programPipeline =
+                    GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
                 if (programPipeline)
                 {
                     programPipeline->getVertexArrayObject()->setInitialised(true);
@@ -2001,7 +2001,7 @@ namespace Ogre {
             }
             else
             {
-                GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 if (linkProgram)
                 {
                     linkProgram->getVertexArrayObject()->setInitialised(true);
@@ -2807,8 +2807,8 @@ namespace Ogre {
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLProgramPipeline* programPipeline =
-                    GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                GLSLSeparableProgram* programPipeline =
+                    GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
                 if (!programPipeline || !programPipeline->isAttributeValid(sem, elemIndex))
                 {
                     return;
@@ -2818,7 +2818,7 @@ namespace Ogre {
             }
             else
             {
-                GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 if (!linkProgram || !linkProgram->isAttributeValid(sem, elemIndex))
                 {
                     return;

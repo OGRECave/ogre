@@ -25,12 +25,12 @@
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GLSLProgramManagerCommon_H__
-#define __GLSLProgramManagerCommon_H__
+#ifndef __GLSLProgramManager_H__
+#define __GLSLProgramManager_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreGLSLProgramCommon.h"
+//#include "OgreGLSLProgramObject.h"
 #include "OgreGLSLExtSupport.h"
 
 namespace Ogre {
@@ -45,7 +45,7 @@ namespace Ogre {
         key in a hash_map for quick retrieval the next time the program object is required.
     */
 
-    class _OgreGL3PlusExport GLSLProgramManagerCommon
+    class _OgreGL3PlusExport GLSLProgramManager
     {
     protected:
         /// Active objects defining the active rendering GPU state.
@@ -85,8 +85,8 @@ namespace Ogre {
 
     public:
 
-        GLSLProgramManagerCommon(void);
-        ~GLSLProgramManagerCommon(void);
+        GLSLProgramManager(void);
+        ~GLSLProgramManager(void);
 
         /** Populate a list of uniforms based on a program object.
             @param programObject Handle to the program object to query
@@ -106,7 +106,7 @@ namespace Ogre {
                              const GpuConstantDefinitionMap* hullConstantDefs,
                              const GpuConstantDefinitionMap* domainConstantDefs,
                              const GpuConstantDefinitionMap* computeConstantDefs,
-                             GLUniformReferenceList& uniformList, 
+                             GLUniformReferenceList& uniformList,
                              GLAtomicCounterReferenceList& counterList,
                              GLUniformBufferList& uniformBufferList,
                              SharedParamsBufferMap& sharedParamsBufferMap,
@@ -124,4 +124,4 @@ namespace Ogre {
 
 }
 
-#endif // __GLSLProgramManagerCommon_H__
+#endif // __GLSLProgramManager_H__

@@ -26,64 +26,69 @@
   -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLProgramFactory.h"
-#include "OgreGLSLLinkProgramManager.h"
-#include "OgreGLSLProgramPipelineManager.h"
-#include "OgreGLSLProgram.h"
+#include "OgreGLSLShaderFactory.h"
+#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLSeparableProgramManager.h"
+#include "OgreGLSLShader.h"
 #include "OgreRoot.h"
 
-namespace Ogre {
-    GLSLLinkProgramManager* GLSLProgramFactory::mLinkProgramManager = NULL;
-    GLSLProgramPipelineManager* GLSLProgramFactory::mProgramPipelineManager = NULL;
+namespace Ogre 
+{
+
+    GLSLMonolithicProgramManager* GLSLShaderFactory::mMonolithicProgramManager = NULL;
+    GLSLSeparableProgramManager* GLSLShaderFactory::mSeparableProgramManager = NULL;
     //-----------------------------------------------------------------------
-    String GLSLProgramFactory::sLanguageName = "glsl";
+    String GLSLShaderFactory::mLanguageName = "glsl";
     //-----------------------------------------------------------------------
-    GLSLProgramFactory::GLSLProgramFactory(void)
+    GLSLShaderFactory::GLSLShaderFactory(void)// :
+        // mMonolithicProgramManager(NULL),
+        // mSeparableProgramManager(NULL),
+        // mLanguageName("glsl")
     {
-        if (mLinkProgramManager == NULL)
+        if (mMonolithicProgramManager == NULL)
         {
-            mLinkProgramManager = new GLSLLinkProgramManager();
+            mMonolithicProgramManager = new GLSLMonolithicProgramManager();
         }
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            if (mProgramPipelineManager == NULL)
+            if (mSeparableProgramManager == NULL)
             {
-                mProgramPipelineManager = new GLSLProgramPipelineManager();
+                mSeparableProgramManager = new GLSLSeparableProgramManager();
             }
         }
     }
     //-----------------------------------------------------------------------
-    GLSLProgramFactory::~GLSLProgramFactory(void)
+    GLSLShaderFactory::~GLSLShaderFactory(void)
     {
-        if (mLinkProgramManager)
+        if (mMonolithicProgramManager)
         {
-            delete mLinkProgramManager;
-            mLinkProgramManager = NULL;
+            delete mMonolithicProgramManager;
+            mMonolithicProgramManager = NULL;
         }
 
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            if (mProgramPipelineManager)
+            if (mSeparableProgramManager)
             {
-                delete mProgramPipelineManager;
-                mProgramPipelineManager = NULL;
+                delete mSeparableProgramManager;
+                mSeparableProgramManager = NULL;
             }
         }
     }
     //-----------------------------------------------------------------------
-    const String& GLSLProgramFactory::getLanguage(void) const
+    const String& GLSLShaderFactory::getLanguage(void) const
     {
-        return sLanguageName;
+        return mLanguageName;
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgram* GLSLProgramFactory::create(ResourceManager* creator,
+    HighLevelGpuProgram* GLSLShaderFactory::create(ResourceManager* creator,
                                                     const String& name, ResourceHandle handle,
                                                     const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        return OGRE_NEW GLSLProgram(creator, name, handle, group, isManual, loader);
+        return OGRE_NEW GLSLShader(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-    void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLShaderFactory::destroy(HighLevelGpuProgram* prog)
     {
         OGRE_DELETE prog;
     }

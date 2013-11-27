@@ -26,107 +26,107 @@
   -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLProgramPipelineManager.h"
+#include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLGpuProgram.h"
-#include "OgreGLSLProgram.h"
+#include "OgreGLSLShader.h"
 
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    template<> GLSLProgramPipelineManager* Singleton<GLSLProgramPipelineManager>::msSingleton = 0;
+    template<> GLSLSeparableProgramManager* Singleton<GLSLSeparableProgramManager>::msSingleton = 0;
 
     //-----------------------------------------------------------------------
-    GLSLProgramPipelineManager* GLSLProgramPipelineManager::getSingletonPtr(void)
+    GLSLSeparableProgramManager* GLSLSeparableProgramManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
 
     //-----------------------------------------------------------------------
-    GLSLProgramPipelineManager& GLSLProgramPipelineManager::getSingleton(void)
+    GLSLSeparableProgramManager& GLSLSeparableProgramManager::getSingleton(void)
     {
         assert( msSingleton );  return ( *msSingleton );
     }
 
-    GLSLProgramPipelineManager::GLSLProgramPipelineManager(void) :
-        GLSLProgramManagerCommon(), mActiveProgramPipeline(NULL) { }
+    GLSLSeparableProgramManager::GLSLSeparableProgramManager(void) :
+        GLSLProgramManager(), mActiveSeparableProgram(NULL) { }
 
-    GLSLProgramPipelineManager::~GLSLProgramPipelineManager(void)
+    GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void)
     {
         // Iterate through map container and delete program pipelines
-        for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
-             currentProgram != mProgramPipelines.end(); ++currentProgram)
+        for (SeparableProgramIterator currentProgram = mSeparablePrograms.begin();
+             currentProgram != mSeparablePrograms.end(); ++currentProgram)
         {
             delete currentProgram->second;
         }
     }
 
     //-----------------------------------------------------------------------
-    void GLSLProgramPipelineManager::setActiveFragmentLinkProgram(GLSLGpuProgram* fragmentGpuProgram)
+    void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
     {
         if (fragmentGpuProgram != mActiveFragmentGpuProgram)
         {
             mActiveFragmentGpuProgram = fragmentGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
     //-----------------------------------------------------------------------
-    void GLSLProgramPipelineManager::setActiveVertexLinkProgram(GLSLGpuProgram* vertexGpuProgram)
+    void GLSLSeparableProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
     {
         if (vertexGpuProgram != mActiveVertexGpuProgram)
         {
             mActiveVertexGpuProgram = vertexGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLProgramPipelineManager::setActiveGeometryLinkProgram(GLSLGpuProgram* geometryGpuProgram)
+    void GLSLSeparableProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
     {
         if (geometryGpuProgram != mActiveGeometryGpuProgram)
         {
             mActiveGeometryGpuProgram = geometryGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLProgramPipelineManager::setActiveTessDomainLinkProgram(GLSLGpuProgram* domainGpuProgram)
+    void GLSLSeparableProgramManager::setActiveTessDomainShader(GLSLGpuProgram* domainGpuProgram)
     {
         if (domainGpuProgram != mActiveDomainGpuProgram)
         {
             mActiveDomainGpuProgram = domainGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLProgramPipelineManager::setActiveTessHullLinkProgram(GLSLGpuProgram* hullGpuProgram)
+    void GLSLSeparableProgramManager::setActiveTessHullShader(GLSLGpuProgram* hullGpuProgram)
     {
         if (hullGpuProgram != mActiveHullGpuProgram)
         {
             mActiveHullGpuProgram = hullGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLProgramPipelineManager::setActiveComputeLinkProgram(GLSLGpuProgram* computeGpuProgram)
+    void GLSLSeparableProgramManager::setActiveComputeShader(GLSLGpuProgram* computeGpuProgram)
     {
         if (computeGpuProgram != mActiveComputeGpuProgram)
         {
             mActiveComputeGpuProgram = computeGpuProgram;
-            // ActiveProgramPipeline is no longer valid
-            mActiveProgramPipeline = NULL;
+            // ActiveSeparableProgram is no longer valid
+            mActiveSeparableProgram = NULL;
         }
     }
 
-    GLSLProgramPipeline* GLSLProgramPipelineManager::getCurrentProgramPipeline(void)
+    GLSLSeparableProgram* GLSLSeparableProgramManager::getCurrentSeparableProgram(void)
     {
         // If there is an active link program then return it
-        if (mActiveProgramPipeline)
-            return mActiveProgramPipeline;
+        if (mActiveSeparableProgram)
+            return mActiveSeparableProgram;
 
         // No active link program so find one or make a new one
         // Is there an active key?
@@ -167,34 +167,34 @@ namespace Ogre
         if (activeKey > 0)
         {
             // Find the key in the hash map
-            ProgramPipelineIterator programFound = mProgramPipelines.find(activeKey);
+            SeparableProgramIterator programFound = mSeparablePrograms.find(activeKey);
             // Program object not found for key so need to create it
-            if (programFound == mProgramPipelines.end())
+            if (programFound == mSeparablePrograms.end())
             {
-                mActiveProgramPipeline = new GLSLProgramPipeline(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
+                mActiveSeparableProgram = new GLSLSeparableProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
                                                                  mActiveFragmentGpuProgram, mActiveHullGpuProgram,
                                                                  mActiveDomainGpuProgram, mActiveComputeGpuProgram);
-                mProgramPipelines[activeKey] = mActiveProgramPipeline;
+                mSeparablePrograms[activeKey] = mActiveSeparableProgram;
             }
             else
             {
                 // Found a link program in map container so make it active
-                mActiveProgramPipeline = programFound->second;
+                mActiveSeparableProgram = programFound->second;
             }
         }
 
-        return mActiveProgramPipeline;
+        return mActiveSeparableProgram;
     }
     
-    GLSLProgramPipeline* GLSLProgramPipelineManager::getActiveProgramPipeline(void)
+    GLSLSeparableProgram* GLSLSeparableProgramManager::getActiveSeparableProgram(void)
     {
-        getCurrentProgramPipeline();
+        getCurrentSeparableProgram();
 
         // Make the program object active
-        if (mActiveProgramPipeline)
-            mActiveProgramPipeline->activate();
+        if (mActiveSeparableProgram)
+            mActiveSeparableProgram->activate();
 
-        return mActiveProgramPipeline;
+        return mActiveSeparableProgram;
     }
 
 }

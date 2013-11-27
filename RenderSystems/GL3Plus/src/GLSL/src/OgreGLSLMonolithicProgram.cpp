@@ -26,11 +26,11 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLLinkProgram.h"
+#include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLGpuProgram.h"
-#include "OgreGLSLProgram.h"
-#include "OgreGLSLLinkProgramManager.h"
+#include "OgreGLSLShader.h"
+#include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreStringVector.h"
@@ -79,23 +79,23 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Geometry shader output operation type can only be point list,"
                         "line strip or triangle strip",
-                        "GLSLLinkProgram::getGLGeometryOutputPrimitiveType");
+                        "GLSLMonolithicProgram::getGLGeometryOutputPrimitiveType");
         }
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgram::GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram)
-        : GLSLProgramCommon(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram)
+    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram)
+        : GLSLProgram(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram)
     {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgram::~GLSLLinkProgram(void)
+    GLSLMonolithicProgram::~GLSLMonolithicProgram(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
     }
 
-    void GLSLLinkProgram::_useProgram(void)
+    void GLSLMonolithicProgram::_useProgram(void)
     {
         if (mLinked)
         {
@@ -104,7 +104,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::activate(void)
+    void GLSLMonolithicProgram::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)
         {
@@ -128,7 +128,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::compileAndLink()
+    void GLSLMonolithicProgram::compileAndLink()
     {
         mVertexArrayObject = new GL3PlusVertexArrayObject();
         mVertexArrayObject->bind();
@@ -136,68 +136,68 @@ namespace Ogre {
         // Compile and attach Vertex Program
         if (mVertexProgram)
         {
-            if (!mVertexProgram->getGLSLProgram()->compile(true))
+            if (!mVertexProgram->getGLSLShader()->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mVertexProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
         }
 
         // Compile and attach Fragment Program
         if (mFragmentProgram)
         {
-            if (!mFragmentProgram->getGLSLProgram()->compile(true))
+            if (!mFragmentProgram->getGLSLShader()->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mFragmentProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Geometry Program
         if (mGeometryProgram)
         {
-            if (!mGeometryProgram->getGLSLProgram()->compile(true))
+            if (!mGeometryProgram->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mGeometryProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mGeometryProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Control Program
         if (mHullProgram)
         {
-            if (!mHullProgram->getGLSLProgram()->compile(true))
+            if (!mHullProgram->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mHullProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mHullProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Evaluation Program
         if (mDomainProgram)
         {
-            if (!mDomainProgram->getGLSLProgram()->compile(true))
+            if (!mDomainProgram->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mDomainProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mDomainProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Compute Program
         if (mComputeProgram)
         {
-            if (!mComputeProgram->getGLSLProgram()->compile(true))
+            if (!mComputeProgram->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mComputeProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+            mComputeProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // the link
@@ -240,7 +240,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::buildGLUniformReferences(void)
+    void GLSLMonolithicProgram::buildGLUniformReferences(void)
     {
         if (!mUniformRefsBuilt)
         {
@@ -252,31 +252,31 @@ namespace Ogre {
             const GpuConstantDefinitionMap* computeParams = 0;
             if (mVertexProgram)
             {
-                vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
+                vertParams = &(mVertexProgram->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mGeometryProgram)
             {
-                geomParams = &(mGeometryProgram->getGLSLProgram()->getConstantDefinitions().map);
+                geomParams = &(mGeometryProgram->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mFragmentProgram)
             {
-                fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
+                fragParams = &(mFragmentProgram->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mHullProgram)
             {
-                hullParams = &(mHullProgram->getGLSLProgram()->getConstantDefinitions().map);
+                hullParams = &(mHullProgram->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mDomainProgram)
             {
-                domainParams = &(mDomainProgram->getGLSLProgram()->getConstantDefinitions().map);
+                domainParams = &(mDomainProgram->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mComputeProgram)
             {
-                computeParams = &(mComputeProgram->getGLSLProgram()->getConstantDefinitions().map);
+                computeParams = &(mComputeProgram->getGLSLShader()->getConstantDefinitions().map);
             }
 
             // Do we know how many shared params there are yet? Or if there are any blocks defined?
-            GLSLLinkProgramManager::getSingleton().extractUniforms(
+            GLSLMonolithicProgramManager::getSingleton().extractUniforms(
                 mGLProgramHandle, vertParams, geomParams, fragParams, hullParams, domainParams, computeParams, 
                 mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
 
@@ -285,7 +285,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::updateUniforms(GpuProgramParametersSharedPtr params,
+    void GLSLMonolithicProgram::updateUniforms(GpuProgramParametersSharedPtr params,
                                          uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through uniform reference list and update uniform values
@@ -294,12 +294,12 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_HULL_PROGRAM && mHullProgram && (!mHullProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainProgram && (!mDomainProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeProgram && (!mComputeProgram->getGLSLProgram()->getColumnMajorMatrices())))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_HULL_PROGRAM && mHullProgram && (!mHullProgram->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainProgram && (!mDomainProgram->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeProgram && (!mComputeProgram->getGLSLShader()->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }
@@ -484,7 +484,7 @@ namespace Ogre {
         } // End for
     }
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
+    void GLSLMonolithicProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
                                               uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through the list of uniform buffers and update them as needed
@@ -511,7 +511,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
+    void GLSLMonolithicProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {
         if (params->hasPassIterationNumber())
         {

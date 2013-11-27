@@ -25,24 +25,24 @@
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GLSLProgram_H__
-#define __GLSLProgram_H__
+#ifndef __GLSLShader_H__
+#define __GLSLShader_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre {
-    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL
-        Shader Language (GLSL).
+    /** Specialisation of HighLevelGpuProgram to encapsulate shader objects 
+        obtained from linked shaders written in the OpenGL Shader Language (GLSL).
         @remarks
         GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
         Vertex and Fragment shaders only have one entry point called "main".
         When a shader is compiled, microcode is generated but can not be accessed by
         the application.
         GLSL also does not provide assembler low level output after compiling.  The GL Render
-        system assumes that the Gpu program is a GL Gpu program so GLSLProgram will create a
+        system assumes that the Gpu program is a GL Gpu program so GLSLShader will create a
         GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
-        The GLSLProgram class will create a shader object and compile the source but will
+        The GLSLShader class will create a shader object and compile the source but will
         not create a program object.  It's up to GLSLGpuProgram class to request a program object
         to link the shader object to.
 
@@ -51,9 +51,8 @@ namespace Ogre {
         object to form a single shader.  This is supported through the "attach" material script
         command.  All the modules to be attached are listed on the same line as the attach command
         separated by white space.
-
     */
-    class _OgreGL3PlusExport GLSLProgram : public HighLevelGpuProgram
+    class _OgreGL3PlusExport GLSLShader : public HighLevelGpuProgram
     {
     public:
         /// Command object for attaching another GLSL Program
@@ -127,10 +126,10 @@ namespace Ogre {
         virtual void setMaxOutputVertices(int maxOutputVertices)
         { mMaxOutputVertices = maxOutputVertices; }
 
-        GLSLProgram(ResourceManager* creator,
+        GLSLShader(ResourceManager* creator,
                     const String& name, ResourceHandle handle,
                     const String& group, bool isManual, ManualResourceLoader* loader);
-        ~GLSLProgram();
+        ~GLSLShader();
 
         GLuint getGLShaderHandle() const { return mGLShaderHandle; }
         GLuint getGLProgramHandle();
@@ -139,7 +138,8 @@ namespace Ogre {
         String getAttachedShaderNames() const { return mAttachedShaderNames; }
         /// Get OpenGL GLSL shader type from OGRE GPU program type.
         GLenum getGLShaderType(GpuProgramType programType);
-        /// Get OpenGL GLSL shader type from OGRE GPU program type.
+        /// Get a string containing the name of the GLSL shader type
+        /// correspondening to the OGRE GPU program type.
         String getShaderTypeLabel(GpuProgramType programType);
 
         /// Overridden
@@ -219,12 +219,12 @@ namespace Ogre {
         /// Preprocessor options
         String mPreprocessorDefines;
         /// Container of attached programs
-        typedef vector< GLSLProgram* >::type GLSLProgramContainer;
-        typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
-        GLSLProgramContainer mAttachedGLSLPrograms;
+        typedef vector< GLSLShader* >::type GLSLShaderContainer;
+        typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
+        GLSLShaderContainer mAttachedGLSLShaders;
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
     };
 }
 
-#endif // __GLSLProgram_H__
+#endif // __GLSLShader_H__

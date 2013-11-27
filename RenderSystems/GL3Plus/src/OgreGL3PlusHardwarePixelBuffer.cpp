@@ -33,10 +33,10 @@
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusGpuProgram.h"
 #include "OgreRoot.h"
-#include "OgreGLSLLinkProgramManager.h"
-#include "OgreGLSLLinkProgram.h"
-#include "OgreGLSLProgramPipelineManager.h"
-#include "OgreGLSLProgramPipeline.h"
+#include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGLSLMonolithicProgram.h"
+#include "OgreGLSLSeparableProgramManager.h"
+#include "OgreGLSLSeparableProgram.h"
 
 namespace Ogre {
     GL3PlusHardwarePixelBuffer::GL3PlusHardwarePixelBuffer(uint32 inWidth, uint32 inHeight,
@@ -765,13 +765,13 @@ namespace Ogre {
             GLuint texAttrIndex = 0;
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
                 posAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_POSITION, 0);
                 texAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
             }
             else
             {
-                GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 posAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_POSITION, 0);
                 texAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
             }

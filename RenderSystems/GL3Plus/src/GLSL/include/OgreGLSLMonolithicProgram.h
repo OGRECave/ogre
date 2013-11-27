@@ -25,24 +25,26 @@
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GLSLLinkProgram_H__
-#define __GLSLLinkProgram_H__
+#ifndef __GLSLMonolithicProgram_H__
+#define __GLSLMonolithicProgram_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
-#include "OgreGLSLProgramCommon.h"
+#include "OgreGLSLProgram.h"
 
 namespace Ogre {
 
     class GLSLGpuProgram;
 
-    /** C++ encapsulation of GLSL Program Object
+    /** C++ encapsulation of GLSL Program Object using the
+        glMonolithicProgram method of linking.  Linking this way is
+        supported by OpenGL 2.0 and up, but does not allow
+        hot-swapping separable shaders like GLSLSeparableProgram can.
+    */
 
-     */
-
-    class _OgreGL3PlusExport GLSLLinkProgram : public GLSLProgramCommon
+    class _OgreGL3PlusExport GLSLMonolithicProgram : public GLSLProgram
     {
     protected:
         /// Compiles and links the vertex and fragment programs
@@ -53,9 +55,9 @@ namespace Ogre {
         void buildGLUniformReferences(void);
 
     public:
-        /// Constructor should only be used by GLSLLinkProgramManager
-        GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
-        ~GLSLLinkProgram(void);
+        /// Constructor should only be used by GLSLMonolithicProgramManager
+        GLSLMonolithicProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
+        ~GLSLMonolithicProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
          */
@@ -77,4 +79,4 @@ namespace Ogre {
 
 }
 
-#endif // __GLSLLinkProgram_H__
+#endif // __GLSLMonolithicProgram_H__
