@@ -30,7 +30,7 @@
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreSingleton.h"
-//#include "OgreGLSLProgramObject.h"
+#include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
 namespace Ogre {
