@@ -58,7 +58,7 @@ namespace Ogre {
             OT_TRIANGLE_STRIP = 5,
 			/// A fan of triangles, 3 vertices for the first triangle, and 1 per triangle after that
             OT_TRIANGLE_FAN = 6,
-			/// Patch control point operations, used with tesselation stages
+			/// Patch control point operations, used with tessellation stages
 			OT_PATCH_1_CONTROL_POINT	= 7,
 			OT_PATCH_2_CONTROL_POINT	= 8,
 			OT_PATCH_3_CONTROL_POINT	= 9,

@@ -96,7 +96,7 @@
 #   include "SkyPlane.h"
 #   include "Smoke.h"
 #   include "SphereMapping.h"
-#	include "Tesselation.h"
+#	include "Tessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
@@ -337,7 +337,7 @@ protected:
                 if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                 {
                     destroyDummyScene();
-                    finaliseRTShaderSystem();
+                    destroyRTShaderSystem();
                 }
 #endif
 
@@ -1086,7 +1086,7 @@ protected:
  			mPluginNameMap["Sample_Instancing"]			= (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
-			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
+			mPluginNameMap["Sample_Tessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
 			mPluginNameMap["Sample_PNTriangles"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
 
 #                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
@@ -1104,7 +1104,7 @@ protected:
             mPluginNameMap["Sample_SkyDome"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyDome();
             mPluginNameMap["Sample_SkyPlane"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyPlane();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
-			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
+			mPluginNameMap["Sample_Tessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
 
@@ -1386,7 +1386,7 @@ protected:
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
 			sampleList.push_back("Sample_PNTriangles");
-			sampleList.push_back("Sample_Tesselation");
+			sampleList.push_back("Sample_Tessellation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
 #else
@@ -1770,8 +1770,8 @@ protected:
 			unloadSamples();
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-			// Finalize the RT Shader System.
-			finaliseRTShaderSystem();
+			// Destroy the RT Shader System.
+			destroyRTShaderSystem();
 #endif // INCLUDE_RTSHADER_SYSTEM
 
 		}
@@ -1815,7 +1815,7 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Extend to unnhide all of sample's temporarily hidden overlays.
+		| Extend to unhide all of sample's temporarily hidden overlays.
 		-----------------------------------------------------------------------------*/
 		virtual void unpauseCurrentSample()
 		{
@@ -1830,7 +1830,7 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Finalize the RT Shader system.	
+		| Get the name of the RTSS shader cache file
 		-----------------------------------------------------------------------------*/
 		virtual Ogre::String getShaderCacheFileName()
 		{
@@ -1912,9 +1912,9 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Finalize the RT Shader system.	
+		| Destroy the RT Shader system.
 		-----------------------------------------------------------------------------*/
-		virtual void finaliseRTShaderSystem()
+		virtual void destroyRTShaderSystem()
 		{
 			// Restore default scheme.
 			Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -1927,10 +1927,10 @@ protected:
 				mMaterialMgrListener = NULL;
 			}
 
-			// Finalize RTShader system.
+			// Destroy RTShader system.
 			if (mShaderGenerator != NULL)
 			{				
-				Ogre::RTShader::ShaderGenerator::finalize();
+				Ogre::RTShader::ShaderGenerator::destroy();
 				mShaderGenerator = NULL;
 			}
 		}

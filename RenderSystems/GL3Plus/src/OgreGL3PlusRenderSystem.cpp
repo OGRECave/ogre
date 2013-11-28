@@ -431,25 +431,25 @@ namespace Ogre {
         // Tessellation Program Properties
         if(mGLSupport->checkExtension("GL_ARB_tessellation_shader") || gl3wIsSupported(4, 0))
         {
-            rsc->setCapability(RSC_TESSELATION_HULL_PROGRAM);
-            rsc->setCapability(RSC_TESSELATION_DOMAIN_PROGRAM);
+            rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
+            rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
         
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
 
             // 16 boolean params allowed
-            rsc->setTesselationHullProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantBoolCount(floatConstantCount);
             // 16 integer params allowed, 4D
-            rsc->setTesselationHullProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantIntCount(floatConstantCount);
             // float params, always 4D
-            rsc->setTesselationHullProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantFloatCount(floatConstantCount);
 
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &floatConstantCount));
             // 16 boolean params allowed
-            rsc->setTesselationDomainProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantBoolCount(floatConstantCount);
             // 16 integer params allowed, 4D
-            rsc->setTesselationDomainProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantIntCount(floatConstantCount);
             // float params, always 4D
-            rsc->setTesselationDomainProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantFloatCount(floatConstantCount);
         }
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
@@ -694,7 +694,7 @@ namespace Ogre {
 		{
 			// Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			// Only Copy does, but Copy means only one depth buffer...
-			GL3PlusContext *windowContext;
+			GL3PlusContext *windowContext = 0;
 			win->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 			GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 															windowContext, 0, 0,
@@ -768,7 +768,7 @@ namespace Ogre {
         {
             if (i->second == pWin)
             {
-				GL3PlusContext *windowContext;
+				GL3PlusContext *windowContext = 0;
 				pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
 				// 1 Window <-> 1 Context, should be always true
@@ -2205,7 +2205,7 @@ namespace Ogre {
 
         // Initialise GL3W
         if (gl3wInit())
-            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
 
         // Make sure that OpenGL 3.0+ is supported in this context
         if (!gl3wIsSupported(3, 0))
@@ -2426,13 +2426,13 @@ namespace Ogre {
 		}
 		else if (gptype == GPT_HULL_PROGRAM && mCurrentHullProgram)
 		{
-			mActiveTesselationHullGpuProgramParameters.setNull();
+			mActiveTessellationHullGpuProgramParameters.setNull();
 			mCurrentHullProgram->unbindProgram();
 			mCurrentHullProgram = 0;
 		}
 		else if (gptype == GPT_DOMAIN_PROGRAM && mCurrentDomainProgram)
 		{
-			mActiveTesselationDomainGpuProgramParameters.setNull();
+			mActiveTessellationDomainGpuProgramParameters.setNull();
 			mCurrentDomainProgram->unbindProgram();
 			mCurrentDomainProgram = 0;
 		}
@@ -2470,11 +2470,11 @@ namespace Ogre {
                     mCurrentGeometryProgram->bindProgramSharedParameters(params, mask);
                     break;
                 case GPT_HULL_PROGRAM:
-                    mActiveTesselationHullGpuProgramParameters = params;
+                    mActiveTessellationHullGpuProgramParameters = params;
                     mCurrentHullProgram->bindProgramSharedParameters(params, mask);
                     break;
                 case GPT_DOMAIN_PROGRAM:
-                    mActiveTesselationDomainGpuProgramParameters = params;
+                    mActiveTessellationDomainGpuProgramParameters = params;
                     mCurrentDomainProgram->bindProgramSharedParameters(params, mask);
                     break;
                 case GPT_COMPUTE_PROGRAM:
@@ -2502,11 +2502,11 @@ namespace Ogre {
                     mCurrentGeometryProgram->bindProgramParameters(params, mask);
                     break;
                 case GPT_HULL_PROGRAM:
-                    mActiveTesselationHullGpuProgramParameters = params;
+                    mActiveTessellationHullGpuProgramParameters = params;
                     mCurrentHullProgram->bindProgramParameters(params, mask);
                     break;
                 case GPT_DOMAIN_PROGRAM:
-                    mActiveTesselationDomainGpuProgramParameters = params;
+                    mActiveTessellationDomainGpuProgramParameters = params;
                     mCurrentDomainProgram->bindProgramParameters(params, mask);
                     break;
                 case GPT_COMPUTE_PROGRAM:
@@ -2533,10 +2533,10 @@ namespace Ogre {
                 mCurrentGeometryProgram->bindProgramPassIterationParameters(mActiveGeometryGpuProgramParameters);
                 break;
             case GPT_HULL_PROGRAM:
-                mCurrentHullProgram->bindProgramPassIterationParameters(mActiveTesselationHullGpuProgramParameters);
+                mCurrentHullProgram->bindProgramPassIterationParameters(mActiveTessellationHullGpuProgramParameters);
                 break;
             case GPT_DOMAIN_PROGRAM:
-                mCurrentDomainProgram->bindProgramPassIterationParameters(mActiveTesselationDomainGpuProgramParameters);
+                mCurrentDomainProgram->bindProgramPassIterationParameters(mActiveTessellationDomainGpuProgramParameters);
                 break;
             case GPT_COMPUTE_PROGRAM:
                 mCurrentComputeProgram->bindProgramPassIterationParameters(mActiveComputeGpuProgramParameters);

@@ -695,7 +695,7 @@ void XMLToBinary(XmlOptions opts)
                 }
                 else
                 {
-                    lodLevel.reductionValue = opts.lodFixed;
+                    lodLevel.reductionValue = (Ogre::Real)opts.lodFixed;
                 }
                 Real currDist = 0;
                 for (unsigned short iLod = 0; iLod < numLod; ++iLod)

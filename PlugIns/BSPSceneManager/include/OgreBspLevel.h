@@ -47,11 +47,11 @@ namespace Ogre {
         are more likely to call SceneManager::setWorldGeometry which will
         automatically arrange the loading of the level. Note that this assumes
         that you have asked for an indoor-specialised SceneManager (specify
-        ST_INDOOR when calling Root::getSceneManager).</p>
+        ST_INDOOR when calling Root::getSceneManager).
         Ogre currently only supports loading from Quake3 Arena level files,
         although any source that can be converted into this classes structure
         could also be used. The Quake3 level load process is in a different
-        class called Quake3Level to keep the specifics separate.</p>
+        class called Quake3Level to keep the specifics separate.
     */
     class BspLevel : public Resource
     {
@@ -171,10 +171,10 @@ namespace Ogre {
             up to the nearest byte obviously, which uses far less space than 4-bytes per linked node per source
             node). Of course the limitation here is that you have to each leaf in turn to determine if it is visible
             rather than just following a list, but since this is only done once per frame this is not such a big
-            overhead.</p>
+            overhead.
             Each row in the table is a 'from' cluster, with each bit in the row corresponding to a 'to' cluster,
             both ordered based on cluster index. A 0 in the bit indicates the 'to' cluster is not visible from the
-            'from' cluster, whilst a 1 indicates it is.</p>
+            'from' cluster, whilst a 1 indicates it is.
             As many will notice, this is lifted directly from the Quake implementation of PVS.
         */
         struct VisData

@@ -86,7 +86,7 @@ namespace Ogre {
     void Overlay::setZOrder(ushort zorder)
     {
         // Limit to 650 since this is multiplied by 100 to pad out for containers
-        assert (zorder <= 650 && "Overlay ZOrder cannot be greater than 650!");
+        assert (zorder <= 650 && "Overlay Z-order cannot be greater than 650!");
 
         mZOrder = zorder;
 

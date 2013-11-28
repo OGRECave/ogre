@@ -444,7 +444,7 @@ namespace Ogre
 			WorldMap* pWorldMap;
 			CameraList* pCameraList;
 
-			EventRouter() {}
+			EventRouter() : pManager(0), pWorldMap(0), pCameraList(0) {}
 			~EventRouter() {}
 
 			void cameraPreRenderScene(Camera* cam);

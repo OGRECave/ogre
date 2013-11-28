@@ -91,6 +91,7 @@ mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
+mCameraInProgress(0),
 mCurrentViewport(0),
 mSceneRoot(0),
 mSkyPlaneEntity(0),
@@ -364,7 +365,7 @@ void SceneManager::destroyAllCameras(void)
 		bool dontDelete = false;
 		 // dont destroy shadow texture cameras here. destroyAllCameras is public
 		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
-		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
+		for( ; camShadowTexIt != mShadowTextureCameras.end(); ++camShadowTexIt )
 		{
 			if( (*camShadowTexIt) == camIt->second )
 			{
@@ -374,7 +375,7 @@ void SceneManager::destroyAllCameras(void)
 		}
 
 		if( dontDelete )	// skip this camera
-			camIt++;
+			++camIt;
 		else 
 		{
 			destroyCamera(camIt->second);
@@ -996,9 +997,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			// Set fixed-function vertex parameters
 		}
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
-			bindGpuProgram(pass->getTesselationHullProgram()->_getBindingDelegate());
+			bindGpuProgram(pass->getTessellationHullProgram()->_getBindingDelegate());
 			// bind parameters later
 		}
 		else
@@ -1008,12 +1009,12 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			{
 				mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
 			}
-			// Set fixed-function tesselation control parameters
+			// Set fixed-function tessellation control parameters
 		}
 
-		if (pass->hasTesselationDomainProgram())
+		if (pass->hasTessellationDomainProgram())
 		{
-			bindGpuProgram(pass->getTesselationDomainProgram()->_getBindingDelegate());
+			bindGpuProgram(pass->getTessellationDomainProgram()->_getBindingDelegate());
 			// bind parameters later
 		}
 		else
@@ -1023,7 +1024,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			{
 				mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
 			}
-			// Set fixed-function tesselation evaluation parameters
+			// Set fixed-function tessellation evaluation parameters
 		}
 
 
@@ -1778,7 +1779,7 @@ void SceneManager::_setSkyBox(
 			!m->getBestTechnique()->getNumPasses())
 		{
 			LogManager::getSingleton().logMessage(
-				"Warning, skybox material " + materialName + " is not supported, defaulting.");
+				"Warning, skybox material " + materialName + " is not supported, defaulting.", LML_CRITICAL);
 			m = MaterialManager::getSingleton().getDefaultSettings();
 		}
 
@@ -4261,7 +4262,7 @@ void SceneManager::setShadowTechnique(ShadowTechnique technique)
         {
             LogManager::getSingleton().logMessage(
                 "WARNING: Stencil shadows were requested, but this device does not "
-                "have a hardware stencil. Shadows disabled.");
+                "have a hardware stencil. Shadows disabled.", LML_CRITICAL);
             mShadowTechnique = SHADOWTYPE_NONE;
         }
         else if (mShadowIndexBuffer.isNull())
@@ -7197,7 +7198,8 @@ void SceneManager::setViewMatrix(const Matrix4& m)
 	if (mDestRenderSystem->areFixedFunctionLightsInViewSpace())
 	{
 		// reset light hash if we've got lights already set
-		mLastLightHash = mLastLightHash ? 0 : mLastLightHash;
+        if(mLastLightHash)
+            mLastLightHash = 0;
 	}
 }
 //---------------------------------------------------------------------
@@ -7271,16 +7273,16 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 				pass->getFragmentProgramParameters(), mGpuParamsDirty);
 		}
 
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_HULL_PROGRAM, 
-				pass->getTesselationHullProgramParameters(), mGpuParamsDirty);
+				pass->getTessellationHullProgramParameters(), mGpuParamsDirty);
 		}
 
-		if (pass->hasTesselationHullProgram())
+		if (pass->hasTessellationHullProgram())
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
-				pass->getTesselationDomainProgramParameters(), mGpuParamsDirty);
+				pass->getTessellationDomainProgramParameters(), mGpuParamsDirty);
 		}
 
 		mGpuParamsDirty = 0;

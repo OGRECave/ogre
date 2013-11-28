@@ -240,7 +240,7 @@ void Compositor::createGlobalTextures()
 			if (def->pooled) 
 			{
 				LogManager::getSingleton().logMessage(
-					"Pooling global compositor textures has no effect");
+					"Pooling global compositor textures has no effect", LML_CRITICAL);
 			}
 			globalTextureNames.insert(def->name);
 
@@ -349,7 +349,7 @@ void Compositor::freeGlobalTextures()
 	while (i != mGlobalTextures.end())
 	{
 		TextureManager::getSingleton().remove(i->second->getName());
-		i++;
+		++i;
 	}
 	mGlobalTextures.clear();
 
@@ -358,7 +358,7 @@ void Compositor::freeGlobalTextures()
 	{
 		// remove MRT
 		Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti->second->getName());
-		mrti++;
+		++mrti;
 	}
 	mGlobalMRTs.clear();
 

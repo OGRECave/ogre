@@ -68,8 +68,10 @@ namespace Ogre {
         mPixelTopBorderSize(0),
         mPixelBottomBorderSize(0),
         mBorderMaterial(),
-        mBorderRenderable(0)
+        mBorderRenderable(0)        
     {   
+        mBorderUV->u1 = mBorderUV->u2 = mBorderUV->v1 = mBorderUV->v2 = 0;
+
         if (createParamDictionary("BorderPanelOverlayElement"))
         {
             addBaseParameters();

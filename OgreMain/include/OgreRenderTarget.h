@@ -178,8 +178,8 @@ namespace Ogre {
                 cam The camera from which the viewport contents will be rendered (mandatory)
             @param
                 ZOrder The relative order of the viewport with others on the target (allows overlapping
-                viewports i.e. picture-in-picture). Higher ZOrders are on top of lower ones. The actual number
-                is irrelevant, only the relative ZOrder matters (you can leave gaps in the numbering)
+                viewports i.e. picture-in-picture). Higher Z-orders are on top of lower ones. The actual number
+                is irrelevant, only the relative Z-order matters (you can leave gaps in the numbering)
             @param
                 left The relative position of the left of the viewport on the target, as a value between 0 and 1.
             @param
@@ -198,15 +198,15 @@ namespace Ogre {
         /** Retrieves a pointer to the viewport with the given index. */
         virtual Viewport* getViewport(unsigned short index);
 
-		/** Retrieves a pointer to the viewport with the given zorder. 
+		/** Retrieves a pointer to the viewport with the given Z-order. 
 			@remarks throws if not found.
 		*/
         virtual Viewport* getViewportByZOrder(int ZOrder);
 
-		/** Returns true if and only if a viewport exists at the given ZOrder. */
+		/** Returns true if and only if a viewport exists at the given Z-order. */
 		virtual bool hasViewportWithZOrder(int ZOrder);
 
-        /** Removes a viewport at a given ZOrder.
+        /** Removes a viewport at a given Z-order.
         */
         virtual void removeViewport(int ZOrder);
 

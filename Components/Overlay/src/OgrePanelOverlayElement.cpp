@@ -191,7 +191,7 @@ namespace Ogre {
             ChildIterator it = getChildIterator();
             while (it.hasMoreElements())
             {
-                // Give children ZOrder 1 higher than this
+                // Give children Z-order 1 higher than this
                 it.getNext()->_updateRenderQueue(queue);
             }
         }

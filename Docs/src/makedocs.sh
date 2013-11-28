@@ -5,7 +5,8 @@
 # This script generates the manuals and APIs from source files in this folder
 # To run this script, you require:
 #   1. Doxygen
-#   2. texi2html
+#   2. Graphviz
+#   3. texi2html
 # Run from the Docs folder. For example:
 # ./src/makedocs.sh
 # ----------------------------------------------------------------------------

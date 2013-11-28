@@ -979,7 +979,7 @@ namespace Ogre {
                         // First, look for a return type
                         if(isBasicType(tokens[0]) && ((tokens.size() < 3) || (tokens[2] != "=")) )
                         {
-                            String functionSig = "";
+                            String functionSig;
                             String functionBody = "";
                             FunctionInvocation *functionInvoc = NULL;
 

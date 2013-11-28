@@ -105,6 +105,7 @@ namespace Ogre {
                 : mAvgTicks()
                 , mCount()
                 , mTotalTicks()
+                , mStartTick()
             {
             }
 

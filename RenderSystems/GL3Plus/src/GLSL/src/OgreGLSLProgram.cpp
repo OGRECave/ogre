@@ -281,11 +281,11 @@ namespace Ogre {
 			}
 			else if (mType == GPT_DOMAIN_PROGRAM)
 			{
-				progType = "Tesselation Evaluation";
+				progType = "Tessellation Evaluation";
 			}
 			else if (mType == GPT_HULL_PROGRAM)
 			{
-				progType = "Tesselation Control";
+				progType = "Tessellation Control";
 			}
 			else if (mType == GPT_COMPUTE_PROGRAM)
 			{
@@ -553,7 +553,7 @@ namespace Ogre {
 		vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
 		if( message.find(precisionQualifierErrorString) != String::npos )
 		{
-			LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
+			LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling", LML_CRITICAL);
 
 			// remove relevant lines from source
 			vector< String >::type errors = StringUtil::split(message, "\n");
@@ -591,11 +591,11 @@ namespace Ogre {
 			// Check for load errors
             if (compile(true))
             {
-                LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
+                LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.", LML_CRITICAL);
             }
             else
             {
-                LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
+                LogManager::getSingleton().logMessage("The removing of the lines didn't help.", LML_CRITICAL);
             }
 		}
 	}

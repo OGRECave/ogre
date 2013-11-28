@@ -221,7 +221,6 @@ namespace Ogre {
 		// Establish texture attributes
 		bool isVolume = (imgData->depth > 1);		
 		bool isFloat32r = (imgData->format == PF_FLOAT32_R);
-		bool hasAlpha = false;
 		bool notImplemented = false;
 		String notImplementedString = "";
 
@@ -280,7 +279,8 @@ namespace Ogre {
 			// Build header and write to disk
 
 			// Variables for some DDS header flags
-			uint32 ddsHeaderFlags = 0;			
+            bool hasAlpha = false;
+			uint32 ddsHeaderFlags = 0;
 			uint32 ddsHeaderRgbBits = 0;
 			uint32 ddsHeaderSizeOrPitch = 0;
 			uint32 ddsHeaderCaps1 = 0;
@@ -914,10 +914,9 @@ namespace Ogre {
     void DDSCodec::flipEndian(void * pData, size_t size) const
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((long)pData + byteIndex);
+            char swapByte = *(char *)((long)pData + byteIndex);
             *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
             *(char *)((long)pData + size - byteIndex - 1) = swapByte;
         }

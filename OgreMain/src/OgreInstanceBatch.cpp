@@ -53,6 +53,7 @@ namespace Ogre
 				mBoundsUpdated( false ),
 				mCurrentCamera( 0 ),
 				mMaterialLodIndex( 0 ),
+                mDirtyAnimation(true),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),

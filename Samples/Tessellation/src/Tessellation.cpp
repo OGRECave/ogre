@@ -1,5 +1,5 @@
 #include "SamplePlugin.h"
-#include "Tesselation.h"
+#include "Tessellation.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -11,7 +11,7 @@ Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-	s = new Sample_Tesselation;
+	s = new Sample_Tessellation;
 	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
 	sp->addSample(s);
 	Root::getSingleton().installPlugin(sp);

@@ -89,7 +89,7 @@ namespace Ogre {
 		~D3D9Device	();
 
 	protected:			
-		D3D9DeviceManager*				mDeviceManager;			// The manager of this device instance.
+		D3D9DeviceManager*				mDeviceManager;			    // The manager of this device instance.
 		IDirect3DDevice9*				mDevice;					// Will hold the device interface.				
 		UINT							mAdapterNumber;				// The adapter that this device belongs to.	
 		HMONITOR						mMonitor;					// The monitor that this device belongs to.

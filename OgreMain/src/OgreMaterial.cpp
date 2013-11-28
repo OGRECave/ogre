@@ -516,7 +516,7 @@ namespace Ogre {
         // Did we find any?
         if (mSupportedTechniques.empty())
         {
-			LogManager::getSingleton().stream()
+            LogManager::getSingleton().stream(LML_CRITICAL)
 				<< "WARNING: material " << mName << " has no supportable "
 				<< "Techniques and will be blank. Explanation: \n" << mUnsupportedReasons;
         }

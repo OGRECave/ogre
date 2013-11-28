@@ -736,7 +736,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material " + name +
 				" to BillboardChain " + mName + " because this "
 				"Material does not exist. Have you forgotten to define it in a "
-				".material script?");
+				".material script?", LML_CRITICAL);
 			mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
 			if (mMaterial.isNull())
 			{

@@ -106,17 +106,16 @@ struct LinearResampler {
 		uint64 stepy = ((uint64)src.getHeight() << 48) / dst.getHeight();
 		uint64 stepz = ((uint64)src.getDepth() << 48) / dst.getDepth();
 		
-		// temp is 16/16 bit fixed precision, used to adjust a source
-		// coordinate (x, y, or z) backwards by half a pixel so that the
-		// integer bits represent the first sample (eg, sx1) and the
-		// fractional bits are the blend weight of the second sample
-		unsigned int temp;
-
 		// note: ((stepz>>1) - 1) is an extra half-step increment to adjust
 		// for the center of the destination pixel, not the top-left corner
 		uint64 sz_48 = (stepz >> 1) - 1;
 		for (size_t z = dst.front; z < dst.back; z++, sz_48+=stepz) {
-			temp = static_cast<unsigned int>(sz_48 >> 32);
+            // temp is 16/16 bit fixed precision, used to adjust a source
+            // coordinate (x, y, or z) backwards by half a pixel so that the
+            // integer bits represent the first sample (eg, sx1) and the
+            // fractional bits are the blend weight of the second sample
+            unsigned int temp = static_cast<unsigned int>(sz_48 >> 32);
+
 			temp = (temp > 0x8000)? temp - 0x8000 : 0;
 			uint32 sz1 = temp >> 16;				 // src z, sample #1
 			uint32 sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
@@ -191,17 +190,16 @@ struct LinearResampler_Float32 {
 		uint64 stepy = ((uint64)src.getHeight() << 48) / dst.getHeight();
 		uint64 stepz = ((uint64)src.getDepth() << 48) / dst.getDepth();
 		
-		// temp is 16/16 bit fixed precision, used to adjust a source
-		// coordinate (x, y, or z) backwards by half a pixel so that the
-		// integer bits represent the first sample (eg, sx1) and the
-		// fractional bits are the blend weight of the second sample
-		unsigned int temp;
-
 		// note: ((stepz>>1) - 1) is an extra half-step increment to adjust
 		// for the center of the destination pixel, not the top-left corner
 		uint64 sz_48 = (stepz >> 1) - 1;
 		for (size_t z = dst.front; z < dst.back; z++, sz_48+=stepz) {
-			temp = static_cast<unsigned int>(sz_48 >> 32);
+            // temp is 16/16 bit fixed precision, used to adjust a source
+            // coordinate (x, y, or z) backwards by half a pixel so that the
+            // integer bits represent the first sample (eg, sx1) and the
+            // fractional bits are the blend weight of the second sample
+            unsigned int temp = static_cast<unsigned int>(sz_48 >> 32);
+
 			temp = (temp > 0x8000)? temp - 0x8000 : 0;
 			uint32 sz1 = temp >> 16;				 // src z, sample #1
 			uint32 sz2 = std::min(sz1+1,src.getDepth()-1);// src z, sample #2
@@ -301,15 +299,13 @@ template<unsigned int channels> struct LinearResampler_Byte {
 		uint64 stepx = ((uint64)src.getWidth() << 48) / dst.getWidth();
 		uint64 stepy = ((uint64)src.getHeight() << 48) / dst.getHeight();
 		
-		// bottom 28 bits of temp are 16/12 bit fixed precision, used to
-		// adjust a source coordinate backwards by half a pixel so that the
-		// integer bits represent the first sample (eg, sx1) and the
-		// fractional bits are the blend weight of the second sample
-		unsigned int temp;
-		
 		uint64 sy_48 = (stepy >> 1) - 1;
 		for (size_t y = dst.top; y < dst.bottom; y++, sy_48+=stepy) {
-			temp = static_cast<unsigned int>(sy_48 >> 36);
+            // bottom 28 bits of temp are 16/12 bit fixed precision, used to
+            // adjust a source coordinate backwards by half a pixel so that the
+            // integer bits represent the first sample (eg, sx1) and the
+            // fractional bits are the blend weight of the second sample
+            unsigned int temp = static_cast<unsigned int>(sy_48 >> 36);
 			temp = (temp > 0x800)? temp - 0x800: 0;
 			unsigned int syf = temp & 0xFFF;
 			uint32 sy1 = temp >> 12;

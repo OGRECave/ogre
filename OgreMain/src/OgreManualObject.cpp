@@ -47,7 +47,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObject(const String& name)
 		: MovableObject(name),
-		  mDynamic(false), mCurrentSection(0), mFirstVertex(true),
+		  mDynamic(false), mCurrentSection(0), mCurrentUpdating(false), mFirstVertex(true),
 		  mTempVertexPending(false),
 		  mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
 		  mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),
@@ -192,7 +192,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getByName("BaseWhite");
 

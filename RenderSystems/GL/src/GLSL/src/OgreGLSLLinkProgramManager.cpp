@@ -495,7 +495,7 @@ namespace Ogre {
 						{
 							LogManager::getSingleton().logMessage(
 								"Problem parsing the following GLSL Uniform: '"
-								+ line + "' in file " + filename);
+								+ line + "' in file " + filename, LML_CRITICAL);
 							// next uniform
 							break;
 						}

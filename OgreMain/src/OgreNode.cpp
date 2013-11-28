@@ -334,12 +334,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::removeChild(unsigned short index)
     {
-        Node* ret;
         if (index < mChildren.size())
         {
             ChildNodeMap::iterator i = mChildren.begin();
             while (index--) ++i;
-            ret = i->second;
+            Node* ret = i->second;
             // cancel any pending update
             cancelUpdate(ret);
 

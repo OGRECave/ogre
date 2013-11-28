@@ -33,9 +33,8 @@ namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
-ProgramSet::ProgramSet()
-{
-	
+ProgramSet::ProgramSet() : mVSCpuProgram(0), mPSCpuProgram(0)
+{	
 }
 
 //-----------------------------------------------------------------------------
