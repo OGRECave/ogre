@@ -26,12 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGL3PlusGpuProgramManager.h"
-#include "OgreGL3PlusGpuProgram.h"
+#include "OgreGL3PlusShaderManager.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreLogManager.h"
 
 namespace Ogre {
-    GL3PlusGpuProgramManager::GL3PlusGpuProgramManager()
+    GL3PlusShaderManager::GL3PlusShaderManager()
     {
         // Superclass sets up members
 
@@ -39,24 +39,24 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
 
-    GL3PlusGpuProgramManager::~GL3PlusGpuProgramManager()
+    GL3PlusShaderManager::~GL3PlusShaderManager()
     {
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
 
-    bool GL3PlusGpuProgramManager::registerProgramFactory(const String& syntaxCode,
+    bool GL3PlusShaderManager::registerShaderFactory(const String& syntaxCode,
                                                      CreateGpuProgramCallback createFn)
     {
-        return mProgramMap.insert(ProgramMap::value_type(syntaxCode, createFn)).second;
+        return mShaderMap.insert(ShaderMap::value_type(syntaxCode, createFn)).second;
     }
 
-    bool GL3PlusGpuProgramManager::unregisterProgramFactory(const String& syntaxCode)
+    bool GL3PlusShaderManager::unregisterShaderFactory(const String& syntaxCode)
     {
-        return mProgramMap.erase(syntaxCode) != 0;
+        return mShaderMap.erase(syntaxCode) != 0;
     }
 
-    Resource* GL3PlusGpuProgramManager::createImpl(const String& name,
+    Resource* GL3PlusShaderManager::createImpl(const String& name,
                                                 ResourceHandle handle,
                                                 const String& group, bool isManual,
                                                 ManualResourceLoader* loader,
@@ -69,15 +69,15 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "You must supply 'syntax' and 'type' parameters",
-                "GL3PlusGpuProgramManager::createImpl");
+                "GL3PlusShaderManager::createImpl");
         }
 
-        ProgramMap::const_iterator iter = mProgramMap.find(paramSyntax->second);
-        if(iter == mProgramMap.end())
+        ShaderMap::const_iterator iter = mShaderMap.find(paramSyntax->second);
+        if(iter == mShaderMap.end())
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GL3PlusGpuProgram(this, name, handle, group, isManual, loader);
+            return new GL3PlusShader(this, name, handle, group, isManual, loader);
         }
 
         GpuProgramType gpt;
@@ -109,26 +109,26 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Unknown or unimplemented program type " + paramType->second,
-                        "GL3PlusGpuProgramManager::createImpl");
+                        "GL3PlusShaderManager::createImpl");
         }
 
         return (iter->second)(this, name, handle, group, isManual,
                               loader, gpt, paramSyntax->second);
     }
 
-    Resource* GL3PlusGpuProgramManager::createImpl(const String& name,
+    Resource* GL3PlusShaderManager::createImpl(const String& name,
                                                 ResourceHandle handle,
                                                 const String& group, bool isManual,
                                                 ManualResourceLoader* loader,
                                                 GpuProgramType gptype,
                                                 const String& syntaxCode)
     {
-        ProgramMap::const_iterator iter = mProgramMap.find(syntaxCode);
-        if (iter == mProgramMap.end())
+        ShaderMap::const_iterator iter = mShaderMap.find(syntaxCode);
+        if (iter == mShaderMap.end())
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GL3PlusGpuProgram(this, name, handle, group, isManual, loader);
+            return new GL3PlusShader(this, name, handle, group, isManual, loader);
         }
         
         return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);

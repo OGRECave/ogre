@@ -36,7 +36,7 @@ namespace Ogre {
     class GL3PlusRenderSystem;
     class GL3PlusTexture;
     class GL3PlusTextureManager;
-    class GL3PlusGpuProgram;
+    class GL3PlusShader;
     class GL3PlusContext;
     class GL3PlusRTTManager;
     class GL3PlusFBOManager;
@@ -44,7 +44,7 @@ namespace Ogre {
     class GL3PlusRenderBuffer;
     class GL3PlusDepthBuffer;
 
-    typedef SharedPtr<GL3PlusGpuProgram> GL3PlusGpuProgramPtr;
+    typedef SharedPtr<GL3PlusShader> GL3PlusShaderPtr;
     typedef SharedPtr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 

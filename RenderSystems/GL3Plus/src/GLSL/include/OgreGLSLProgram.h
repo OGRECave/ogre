@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class GLSLGpuProgram;
+    class GLSLAssembly;
 
     /// Structure used to keep track of named uniforms in the linked program object
     struct GLUniformReference
@@ -96,17 +96,17 @@ namespace Ogre {
         GLCounterBufferList mGLCounterBufferReferences;
 
         /// Linked vertex program
-        GLSLGpuProgram* mVertexProgram;
+        GLSLAssembly* mVertexShader;
         /// Linked fragment program
-        GLSLGpuProgram* mFragmentProgram;
+        GLSLAssembly* mFragmentShader;
         /// Linked geometry program
-        GLSLGpuProgram* mGeometryProgram;
+        GLSLAssembly* mGeometryShader;
         /// Linked hull (control) program
-        GLSLGpuProgram* mHullProgram;
+        GLSLAssembly* mHullShader;
         /// Linked domain (evaluation) program
-        GLSLGpuProgram* mDomainProgram;
+        GLSLAssembly* mDomainShader;
         /// Linked compute program
-        GLSLGpuProgram* mComputeProgram;
+        GLSLAssembly* mComputeShader;
         /// GL handle for the vertex array object
         GL3PlusVertexArrayObject *mVertexArrayObject;
 
@@ -148,7 +148,7 @@ namespace Ogre {
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
-        GLSLProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
+        GLSLProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram);
         virtual ~GLSLProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
@@ -156,15 +156,15 @@ namespace Ogre {
         virtual void activate(void) = 0;
 
         /** Updates program object uniforms using data from GpuProgramParameters.
-            Normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+            Normally called by GLSLAssembly::bindParameters() just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
         /** Updates program object uniform blocks using data from GpuProgramParameters.
-            Normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+            Normally called by GLSLAssembly::bindParameters() just before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
         /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            Normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
+            Normally called by GLSLAssembly::bindMultiPassParameters() just before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
         /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
@@ -192,12 +192,12 @@ namespace Ogre {
         /// Is a non-standard attribute bound in the linked code?
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-        GLSLGpuProgram* getVertexProgram() const { return mVertexProgram; }
-        GLSLGpuProgram* getFragmentProgram() const { return mFragmentProgram; }
-        GLSLGpuProgram* getGeometryProgram() const { return mGeometryProgram; }
-        GLSLGpuProgram* getHullProgram() const { return mHullProgram; }
-        GLSLGpuProgram* getDomainProgram() const { return mDomainProgram; }
-        GLSLGpuProgram* getComputeProgram() const { return mComputeProgram; }
+        GLSLAssembly* getVertexShader() const { return mVertexShader; }
+        GLSLAssembly* getFragmentShader() const { return mFragmentShader; }
+        GLSLAssembly* getGeometryShader() const { return mGeometryShader; }
+        GLSLAssembly* getHullShader() const { return mHullShader; }
+        GLSLAssembly* getDomainShader() const { return mDomainShader; }
+        GLSLAssembly* getComputeShader() const { return mComputeShader; }
         GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
     };
 }

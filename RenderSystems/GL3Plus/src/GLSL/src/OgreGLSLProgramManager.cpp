@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLProgramManager.h"
-#include "OgreGLSLGpuProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLSLShader.h"
@@ -40,12 +39,12 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     GLSLProgramManager::GLSLProgramManager(void) :
-        mActiveVertexGpuProgram(NULL),
-        mActiveGeometryGpuProgram(NULL),
-        mActiveFragmentGpuProgram(NULL),
-        mActiveHullGpuProgram(NULL),
-        mActiveDomainGpuProgram(NULL),
-        mActiveComputeGpuProgram(NULL)
+        mActiveVertexShader(NULL),
+        mActiveGeometryShader(NULL),
+        mActiveFragmentShader(NULL),
+        mActiveHullShader(NULL),
+        mActiveDomainShader(NULL),
+        mActiveComputeShader(NULL)
     {
         // Fill in the relationship between type names and enums
         mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));

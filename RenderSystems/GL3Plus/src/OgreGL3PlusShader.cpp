@@ -26,31 +26,31 @@
   -----------------------------------------------------------------------------
 */
 
-#include "OgreGL3PlusGpuProgram.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
 using namespace Ogre;
 
-GL3PlusGpuProgram::GL3PlusGpuProgram(ResourceManager* creator, const String& name,
+GL3PlusShader::GL3PlusShader(ResourceManager* creator, const String& name,
                                      ResourceHandle handle, const String& group, bool isManual,
                                      ManualResourceLoader* loader)
     : GpuProgram(creator, name, handle, group, isManual, loader)
 {
-    if (createParamDictionary("GL3PlusGpuProgram"))
+    if (createParamDictionary("GL3PlusShader"))
     {
         setupBaseParamDictionary();
     }
 }
 
-GL3PlusGpuProgram::~GL3PlusGpuProgram()
+GL3PlusShader::~GL3PlusShader()
 {
     // Have to call this here rather than in Resource destructor
     // since calling virtual methods in base destructors causes crash
     unload();
 }
 
-size_t GL3PlusGpuProgram::calculateSize(void) const
+size_t GL3PlusShader::calculateSize(void) const
 {
     size_t memSize = 0;
 

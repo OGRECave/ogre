@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLExtSupport.h"
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
@@ -84,7 +84,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram)
+    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram)
         : GLSLProgram(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram)
     {
     }
@@ -134,70 +134,70 @@ namespace Ogre {
         mVertexArrayObject->bind();
 
         // Compile and attach Vertex Program
-        if (mVertexProgram)
+        if (mVertexShader)
         {
-            if (!mVertexProgram->getGLSLShader()->compile(true))
+            if (!mVertexShader->getGLSLShader()->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mVertexProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
-            setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+            mVertexShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
 
         // Compile and attach Fragment Program
-        if (mFragmentProgram)
+        if (mFragmentShader)
         {
-            if (!mFragmentProgram->getGLSLShader()->compile(true))
+            if (!mFragmentShader->getGLSLShader()->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mFragmentProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mFragmentShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Geometry Program
-        if (mGeometryProgram)
+        if (mGeometryShader)
         {
-            if (!mGeometryProgram->getGLSLShader()->compile(true))
+            if (!mGeometryShader->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mGeometryProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mGeometryShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Control Program
-        if (mHullProgram)
+        if (mHullShader)
         {
-            if (!mHullProgram->getGLSLShader()->compile(true))
+            if (!mHullShader->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mHullProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mHullShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Evaluation Program
-        if (mDomainProgram)
+        if (mDomainShader)
         {
-            if (!mDomainProgram->getGLSLShader()->compile(true))
+            if (!mDomainShader->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mDomainProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mDomainShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Compute Program
-        if (mComputeProgram)
+        if (mComputeShader)
         {
-            if (!mComputeProgram->getGLSLShader()->compile(true))
+            if (!mComputeShader->getGLSLShader()->compile(true))
             {
                 return;
             }
 
-            mComputeProgram->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mComputeShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
         }
 
         // the link
@@ -250,29 +250,29 @@ namespace Ogre {
             const GpuConstantDefinitionMap* hullParams = 0;
             const GpuConstantDefinitionMap* domainParams = 0;
             const GpuConstantDefinitionMap* computeParams = 0;
-            if (mVertexProgram)
+            if (mVertexShader)
             {
-                vertParams = &(mVertexProgram->getGLSLShader()->getConstantDefinitions().map);
+                vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
             }
-            if (mGeometryProgram)
+            if (mGeometryShader)
             {
-                geomParams = &(mGeometryProgram->getGLSLShader()->getConstantDefinitions().map);
+                geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
             }
-            if (mFragmentProgram)
+            if (mFragmentShader)
             {
-                fragParams = &(mFragmentProgram->getGLSLShader()->getConstantDefinitions().map);
+                fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
             }
-            if (mHullProgram)
+            if (mHullShader)
             {
-                hullParams = &(mHullProgram->getGLSLShader()->getConstantDefinitions().map);
+                hullParams = &(mHullShader->getGLSLShader()->getConstantDefinitions().map);
             }
-            if (mDomainProgram)
+            if (mDomainShader)
             {
-                domainParams = &(mDomainProgram->getGLSLShader()->getConstantDefinitions().map);
+                domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
             }
-            if (mComputeProgram)
+            if (mComputeShader)
             {
-                computeParams = &(mComputeProgram->getGLSLShader()->getConstantDefinitions().map);
+                computeParams = &(mComputeShader->getGLSLShader()->getConstantDefinitions().map);
             }
 
             // Do we know how many shared params there are yet? Or if there are any blocks defined?
@@ -294,12 +294,12 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_HULL_PROGRAM && mHullProgram && (!mHullProgram->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainProgram && (!mDomainProgram->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeProgram && (!mComputeProgram->getGLSLShader()->getColumnMajorMatrices())))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getGLSLShader()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getGLSLShader()->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }

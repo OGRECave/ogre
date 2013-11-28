@@ -27,7 +27,7 @@
 */
 
 #include "OgreGLSLSeparableProgramManager.h"
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreGLSLShader.h"
 
 namespace Ogre
@@ -61,62 +61,62 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
+    void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLAssembly* fragmentShader)
     {
-        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        if (fragmentShader != mActiveFragmentShader)
         {
-            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            mActiveFragmentShader = fragmentShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
     }
 
     //-----------------------------------------------------------------------
-    void GLSLSeparableProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
+    void GLSLSeparableProgramManager::setActiveVertexShader(GLSLAssembly* vertexShader)
     {
-        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        if (vertexShader != mActiveVertexShader)
         {
-            mActiveVertexGpuProgram = vertexGpuProgram;
+            mActiveVertexShader = vertexShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
+    void GLSLSeparableProgramManager::setActiveGeometryShader(GLSLAssembly* geometryShader)
     {
-        if (geometryGpuProgram != mActiveGeometryGpuProgram)
+        if (geometryShader != mActiveGeometryShader)
         {
-            mActiveGeometryGpuProgram = geometryGpuProgram;
+            mActiveGeometryShader = geometryShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveTessDomainShader(GLSLGpuProgram* domainGpuProgram)
+    void GLSLSeparableProgramManager::setActiveTessDomainShader(GLSLAssembly* domainShader)
     {
-        if (domainGpuProgram != mActiveDomainGpuProgram)
+        if (domainShader != mActiveDomainShader)
         {
-            mActiveDomainGpuProgram = domainGpuProgram;
+            mActiveDomainShader = domainShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveTessHullShader(GLSLGpuProgram* hullGpuProgram)
+    void GLSLSeparableProgramManager::setActiveTessHullShader(GLSLAssembly* hullShader)
     {
-        if (hullGpuProgram != mActiveHullGpuProgram)
+        if (hullShader != mActiveHullShader)
         {
-            mActiveHullGpuProgram = hullGpuProgram;
+            mActiveHullShader = hullShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveComputeShader(GLSLGpuProgram* computeGpuProgram)
+    void GLSLSeparableProgramManager::setActiveComputeShader(GLSLAssembly* computeShader)
     {
-        if (computeGpuProgram != mActiveComputeGpuProgram)
+        if (computeShader != mActiveComputeShader)
         {
-            mActiveComputeGpuProgram = computeGpuProgram;
+            mActiveComputeShader = computeShader;
             // ActiveSeparableProgram is no longer valid
             mActiveSeparableProgram = NULL;
         }
@@ -131,36 +131,36 @@ namespace Ogre
         // No active link program so find one or make a new one
         // Is there an active key?
         uint32 activeKey = 0;
-        GLuint progID = 0;
-        if (mActiveVertexGpuProgram)
+        GLuint shaderID = 0;
+        if (mActiveVertexShader)
         {
-            progID = mActiveVertexGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveVertexShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveFragmentGpuProgram)
+        if (mActiveFragmentShader)
         {
-            progID = mActiveFragmentGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveFragmentShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveGeometryGpuProgram)
+        if (mActiveGeometryShader)
         {
-            progID = mActiveGeometryGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveGeometryShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveDomainGpuProgram)
+        if (mActiveDomainShader)
         {
-            progID = mActiveDomainGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveDomainShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveHullGpuProgram)
+        if (mActiveHullShader)
         {
-            progID = mActiveHullGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveHullShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveComputeGpuProgram)
+        if (mActiveComputeShader)
         {
-            progID = mActiveComputeGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveComputeShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
 
         // Only return a program pipeline object if a vertex or fragment stage exist
@@ -171,9 +171,9 @@ namespace Ogre
             // Program object not found for key so need to create it
             if (programFound == mSeparablePrograms.end())
             {
-                mActiveSeparableProgram = new GLSLSeparableProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
-                                                                 mActiveFragmentGpuProgram, mActiveHullGpuProgram,
-                                                                 mActiveDomainGpuProgram, mActiveComputeGpuProgram);
+                mActiveSeparableProgram = new GLSLSeparableProgram(mActiveVertexShader, mActiveGeometryShader,
+                                                                 mActiveFragmentShader, mActiveHullShader,
+                                                                 mActiveDomainShader, mActiveComputeShader);
                 mSeparablePrograms[activeKey] = mActiveSeparableProgram;
             }
             else

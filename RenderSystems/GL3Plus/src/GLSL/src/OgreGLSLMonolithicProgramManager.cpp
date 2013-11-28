@@ -29,7 +29,7 @@
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreGLSLMonolithicProgramManager.h"
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLSLProgram.h"
@@ -81,37 +81,37 @@ namespace Ogre {
         // no active link program so find one or make a new one
         // is there an active key?
         uint32 activeKey = 0;
-        GLuint progID = 0;
+        GLuint shaderID = 0;
 
-        if (mActiveVertexGpuProgram)
+        if (mActiveVertexShader)
         {
-            progID = mActiveVertexGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveVertexShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveFragmentGpuProgram)
+        if (mActiveFragmentShader)
         {
-            progID = mActiveFragmentGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveFragmentShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveGeometryGpuProgram)
+        if (mActiveGeometryShader)
         {
-            progID = mActiveGeometryGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveGeometryShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveDomainGpuProgram)
+        if (mActiveDomainShader)
         {
-            progID = mActiveDomainGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveDomainShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveHullGpuProgram)
+        if (mActiveHullShader)
         {
-            progID = mActiveHullGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveHullShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        if (mActiveComputeGpuProgram)
+        if (mActiveComputeShader)
         {
-            progID = mActiveComputeGpuProgram->getProgramID();
-            activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
+            shaderID = mActiveComputeShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
 
         // only return a link program object if a program exists
@@ -122,9 +122,9 @@ namespace Ogre {
             // program object not found for key so need to create it
             if (programFound == mMonolithicPrograms.end())
             {
-                mActiveMonolithicProgram = new GLSLMonolithicProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
-                                                         mActiveFragmentGpuProgram, mActiveHullGpuProgram,
-                                                         mActiveDomainGpuProgram, mActiveComputeGpuProgram);
+                mActiveMonolithicProgram = new GLSLMonolithicProgram(mActiveVertexShader, mActiveGeometryShader,
+                                                         mActiveFragmentShader, mActiveHullShader,
+                                                         mActiveDomainShader, mActiveComputeShader);
                 mMonolithicPrograms[activeKey] = mActiveMonolithicProgram;
             }
             else
@@ -141,62 +141,62 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveFragmentShader(GLSLAssembly* fragmentShader)
     {
-        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        if (fragmentShader != mActiveFragmentShader)
         {
-            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            mActiveFragmentShader = fragmentShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }
     }
 
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveVertexShader(GLSLAssembly* vertexShader)
     {
-        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        if (vertexShader != mActiveVertexShader)
         {
-            mActiveVertexGpuProgram = vertexGpuProgram;
+            mActiveVertexShader = vertexShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveGeometryShader(GLSLAssembly* geometryShader)
     {
-        if (geometryGpuProgram != mActiveGeometryGpuProgram)
+        if (geometryShader != mActiveGeometryShader)
         {
-            mActiveGeometryGpuProgram = geometryGpuProgram;
+            mActiveGeometryShader = geometryShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveHullShader(GLSLGpuProgram* hullGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveHullShader(GLSLAssembly* hullShader)
     {
-        if (hullGpuProgram != mActiveHullGpuProgram)
+        if (hullShader != mActiveHullShader)
         {
-            mActiveHullGpuProgram = hullGpuProgram;
+            mActiveHullShader = hullShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveDomainShader(GLSLGpuProgram* domainGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveDomainShader(GLSLAssembly* domainShader)
     {
-        if (domainGpuProgram != mActiveDomainGpuProgram)
+        if (domainShader != mActiveDomainShader)
         {
-            mActiveDomainGpuProgram = domainGpuProgram;
+            mActiveDomainShader = domainShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveComputeShader(GLSLGpuProgram* computeGpuProgram)
+    void GLSLMonolithicProgramManager::setActiveComputeShader(GLSLAssembly* computeShader)
     {
-        if (computeGpuProgram != mActiveComputeGpuProgram)
+        if (computeShader != mActiveComputeShader)
         {
-            mActiveComputeGpuProgram = computeGpuProgram;
+            mActiveComputeShader = computeShader;
             // ActiveMonolithicProgram is no longer valid
             mActiveMonolithicProgram = NULL;
         }

@@ -26,8 +26,8 @@
   -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusGpuProgram_H__
-#define __GL3PlusGpuProgram_H__
+#ifndef __GL3PlusShader_H__
+#define __GL3PlusShader_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreGpuProgram.h"
@@ -35,35 +35,37 @@
 
 namespace Ogre {
 
-    /** Generalized GL shader program. Allows for the possibility of  */
-    class _OgreGL3PlusExport GL3PlusGpuProgram : public GpuProgram
+    /** Generalized OpenGL shader. Allows for the possibility of
+        OpenGL assembly languages and alternatives to GLSL. */
+    class _OgreGL3PlusExport GL3PlusShader : public GpuProgram
     {
     public:
-        GL3PlusGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+        GL3PlusShader(ResourceManager* creator, const String& name, ResourceHandle handle,
                           const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
-        virtual ~GL3PlusGpuProgram();
+        virtual ~GL3PlusShader();
 
-        /// Execute the binding functions for this program
-        virtual void bindProgram(void) {}
-        /// Execute the binding functions for this program
-        virtual void unbindProgram(void) {}
+        /// Execute the binding functions for this shader
+        virtual void bindShader(void) {}
+        /// Execute the binding functions for this shader
+        virtual void unbindShader(void) {}
 
-        /// Execute the param binding functions for this program
-        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        /// Execute the param binding functions for this shader
+        virtual void bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
         /// Bind just the pass iteration parameters
-        virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
-        /// Execute the shared param binding functions for this program
-        virtual void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        virtual void bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params) {}
+        /// Execute the shared param binding functions for this shader
+        virtual void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
 
-        /// Get the assigned GL program id
-        GLuint getProgramID(void) const
-        { return mProgramID; }
+        //TODO can these be removed?
+        /// Get the assigned GL shader ID
+        GLuint getShaderID(void) const
+        { return mShaderID; }
 
-        /// Get GPU program type.
-        GLenum getGLShaderType(GpuProgramType programType);
+        /// Get shader type
+        GLenum getShaderType(GpuProgramType shaderType);
 
     protected:
         /** Overridden from GpuProgram, do nothing */
@@ -71,10 +73,13 @@ namespace Ogre {
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
 
-        GLuint mProgramID;
-        GLenum mProgramType;
+        //TODO can these be removed?
+        /// 
+        GLuint mShaderID;
+        /// 
+        GLenum mShaderType;
     };
 
 } // namespace Ogre
 
-#endif // __GL3PlusGpuProgram_H__
+#endif // __GL3PlusShader_H__

@@ -36,7 +36,7 @@
 
 namespace Ogre {
 
-    class GLSLGpuProgram;
+    class GLSLAssembly;
 
     /** C++ encapsulation of GLSL Program Object using the
         glMonolithicProgram method of linking.  Linking this way is
@@ -56,7 +56,7 @@ namespace Ogre {
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager
-        GLSLMonolithicProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
+        GLSLMonolithicProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram);
         ~GLSLMonolithicProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
@@ -64,15 +64,15 @@ namespace Ogre {
         void activate(void);
 
         /** Updates program object uniforms using data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+            normally called by GLSLAssembly::bindParameters() just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniform blocks using data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+            normally called by GLSLAssembly::bindParameters() just before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
+            normally called by GLSLAssembly::bindMultiPassParameters() just before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
     };

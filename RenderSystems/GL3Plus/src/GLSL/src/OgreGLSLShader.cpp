@@ -32,7 +32,7 @@
 #include "OgreStringConverter.h"
 
 #include "OgreGLSLShader.h"
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLPreprocessor.h"
@@ -296,7 +296,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLShader::createLowLevelImpl(void)
     {
-        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram(this));
+        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLAssembly(this));
         // Shader params need to be forwarded to low level implementation
         mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
         mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());

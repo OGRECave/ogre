@@ -42,7 +42,7 @@ namespace Ogre
         the application.
         GLSL also does not provide assembler low level output after compiling.  The GL Render
         system assumes that the Gpu program is a GL Gpu program so GLSLSeparableProgram will create a
-        GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
+        GLSLAssembly that is subclassed from GLGpuProgram for the low level implementation.
         The GLProgram class will create a shader and program object and compile the source but will
         not create a pipeline object.  It's up to GLGpuProgram class to request a program pipeline object
         to link the program object to.
@@ -57,7 +57,7 @@ namespace Ogre
     {
     public:
         /// Constructor should only be used by GLSLSeparableProgramManager.
-        GLSLSeparableProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
+        GLSLSeparableProgram(GLSLAssembly* vertexShader, GLSLAssembly* geometryShader, GLSLAssembly* fragmentShader, GLSLAssembly* hullShader, GLSLAssembly* domainShader, GLSLAssembly* computeShader);
         virtual ~GLSLSeparableProgram();
 
         /// GL Program Pipeline Handle
@@ -65,25 +65,25 @@ namespace Ogre
 
         /** Updates program pipeline object uniforms using named and
             indexed parameter data from GpuProgramParameters.
-            normally called by GLSLGpuProgram::bindProgramParameters()
+            normally called by GLSLAssembly::bindProgramParameters()
             just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object atomic counter buffers using data
             from GpuProgramParameters.  Normally called by
-            GLSLGpuProgram::bindProgramAtomicCounterParameters() just
+            GLSLAssembly::bindProgramAtomicCounterParameters() just
             before rendering occurs.
         */
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniform blocks using shared
             parameter data from GpuProgramParameters.  Normally called
-            by GLSLGpuProgram::bindProgramSharedParameters() just
+            by GLSLAssembly::bindProgramSharedParameters() just
             before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program pipeline object uniforms using data from
             pass iteration GpuProgramParameters.  Normally called by
-            GLSLGpuProgram::bindProgramPassIterationParameters() just
+            GLSLAssembly::bindProgramPassIterationParameters() just
             before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
@@ -102,14 +102,14 @@ namespace Ogre
 
         /// Compiles and links the separate programs.
         virtual void compileAndLink(void);
-        void loadIndividualProgram(GLSLGpuProgram *program);
+        void loadIndividualProgram(GLSLAssembly *program);
         /// Put a program pipeline in use.
         virtual void _useProgram(void);
         /// Build uniform references from active named uniforms.
         virtual void buildGLUniformReferences(void);
 
         void getMicrocodeFromCache(void);
-        void getIndividualProgramMicrocodeFromCache(GLSLGpuProgram* program);
+        void getIndividualProgramMicrocodeFromCache(GLSLAssembly* program);
     };
 }
 

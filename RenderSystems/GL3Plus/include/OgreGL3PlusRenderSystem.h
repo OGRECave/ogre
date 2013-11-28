@@ -33,13 +33,13 @@
 
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
-#include "OgreGL3PlusGpuProgram.h"
+#include "OgreGL3PlusShader.h"
 
 namespace Ogre {
     class GL3PlusContext;
     class GL3PlusSupport;
     class GL3PlusRTTManager;
-    class GL3PlusGpuProgramManager;
+    class GL3PlusShaderManager;
     class GLSLShaderFactory;
     class HardwareBufferManager;
 
@@ -107,7 +107,7 @@ namespace Ogre {
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
 
-        GL3PlusGpuProgramManager *mGpuProgramManager;
+        GL3PlusShaderManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;
         HardwareBufferManager* mHardwareBufferManager;
 
@@ -140,12 +140,12 @@ namespace Ogre {
 
         GLint getCombinedMinMipFilter(void) const;
 
-        GL3PlusGpuProgram* mCurrentVertexProgram;
-        GL3PlusGpuProgram* mCurrentFragmentProgram;
-        GL3PlusGpuProgram* mCurrentGeometryProgram;
-        GL3PlusGpuProgram* mCurrentHullProgram;
-        GL3PlusGpuProgram* mCurrentDomainProgram;
-        GL3PlusGpuProgram* mCurrentComputeProgram;
+        GL3PlusShader* mCurrentVertexShader;
+        GL3PlusShader* mCurrentFragmentShader;
+        GL3PlusShader* mCurrentGeometryShader;
+        GL3PlusShader* mCurrentHullShader;
+        GL3PlusShader* mCurrentDomainShader;
+        GL3PlusShader* mCurrentComputeShader;
 
         GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;

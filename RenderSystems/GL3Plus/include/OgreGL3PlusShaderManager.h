@@ -26,15 +26,15 @@
   -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusGpuProgramManager_H__
-#define __GL3PlusGpuProgramManager_H__
+#ifndef __GL3PlusShaderManager_H__
+#define __GL3PlusShaderManager_H__
 
 #include "OgreGpuProgramManager.h"
 #include "OgreGL3PlusPrerequisites.h"
 
 namespace Ogre {
 
-    class _OgreGL3PlusExport GL3PlusGpuProgramManager : public GpuProgramManager
+    class _OgreGL3PlusExport GL3PlusShaderManager : public GpuProgramManager
     {
     public:
         typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator,
@@ -43,8 +43,8 @@ namespace Ogre {
                                                         GpuProgramType gptype, const String& syntaxCode);
 
     private:
-        typedef map<String, CreateGpuProgramCallback>::type ProgramMap;
-        ProgramMap mProgramMap;
+        typedef map<String, CreateGpuProgramCallback>::type ShaderMap;
+        ShaderMap mShaderMap;
 
     protected:
         /// @copydoc ResourceManager::createImpl
@@ -57,10 +57,10 @@ namespace Ogre {
                              GpuProgramType gptype, const String& syntaxCode);
 
     public:
-        GL3PlusGpuProgramManager();
-        virtual ~GL3PlusGpuProgramManager();
-        bool registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
-        bool unregisterProgramFactory(const String& syntaxCode);
+        GL3PlusShaderManager();
+        virtual ~GL3PlusShaderManager();
+        bool registerShaderFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
+        bool unregisterShaderFactory(const String& syntaxCode);
     };
 }
 

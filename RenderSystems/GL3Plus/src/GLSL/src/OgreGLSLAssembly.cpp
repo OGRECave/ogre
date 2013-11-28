@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLSLSeparableProgramManager.h"
@@ -34,45 +34,46 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    GLuint GLSLGpuProgram::mVertexShaderCount = 0;
-    GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
-    GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
-    GLuint GLSLGpuProgram::mHullShaderCount = 0;
-    GLuint GLSLGpuProgram::mDomainShaderCount = 0;
-    GLuint GLSLGpuProgram::mComputeShaderCount = 0;
+    GLuint GLSLAssembly::mVertexShaderCount = 0;
+    GLuint GLSLAssembly::mFragmentShaderCount = 0;
+    GLuint GLSLAssembly::mGeometryShaderCount = 0;
+    GLuint GLSLAssembly::mHullShaderCount = 0;
+    GLuint GLSLAssembly::mDomainShaderCount = 0;
+    GLuint GLSLAssembly::mComputeShaderCount = 0;
     //-----------------------------------------------------------------------------
-    GLSLGpuProgram::GLSLGpuProgram(GLSLShader* parent) :
-        GL3PlusGpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(),
-                          parent->getGroup(), false, 0), mGLSLShader(parent)
+    GLSLAssembly::GLSLAssembly(GLSLShader* parent) :
+        GL3PlusShader(parent->getCreator(), parent->getName(), parent->getHandle(),
+                      parent->getGroup(), false, 0), mGLSLShader(parent)
     {
         mType = parent->getType();
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
 
         mLinked = 0;
 
+        //FIXME This should be a GL call, not handled by OGRE?
         if (parent->getType() == GPT_VERTEX_PROGRAM)
         {
-            mProgramID = ++mVertexShaderCount;
+            mShaderID = ++mVertexShaderCount;
         }
         else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
         {
-            mProgramID = ++mFragmentShaderCount;
+            mShaderID = ++mFragmentShaderCount;
         }
         else if (parent->getType() == GPT_GEOMETRY_PROGRAM)
         {
-            mProgramID = ++mGeometryShaderCount;
+            mShaderID = ++mGeometryShaderCount;
         }
         else if (parent->getType() == GPT_HULL_PROGRAM)
         {
-            mProgramID = ++mHullShaderCount;
+            mShaderID = ++mHullShaderCount;
         }
         else if (parent->getType() == GPT_COMPUTE_PROGRAM)
         {
-            mProgramID = ++mComputeShaderCount;
+            mShaderID = ++mComputeShaderCount;
         }
         else
         {
-            mProgramID = ++mDomainShaderCount;
+            mShaderID = ++mDomainShaderCount;
         }
 
         // Transfer skeletal animation status from parent
@@ -81,32 +82,32 @@ namespace Ogre {
         mLoadFromFile = false;
     }
     //-----------------------------------------------------------------------
-    GLSLGpuProgram::~GLSLGpuProgram()
+    GLSLAssembly::~GLSLAssembly()
     {
         // Have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         unload();
     }
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::loadImpl(void)
+    void GLSLAssembly::loadImpl(void)
     {
         // nothing to load
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::unloadImpl(void)
+    void GLSLAssembly::unloadImpl(void)
     {
         // nothing to unload
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::loadFromSource(void)
+    void GLSLAssembly::loadFromSource(void)
     {
         // nothing to load
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::bindProgram(void)
+    void GLSLAssembly::bindShader(void)
     {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -166,7 +167,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::unbindProgram(void)
+    void GLSLAssembly::unbindShader(void)
     {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -227,7 +228,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    void GLSLAssembly::bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
     {
         // Link can throw exceptions, ignore them at this point
         try
@@ -252,7 +253,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    void GLSLAssembly::bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask)
     {
         // Link can throw exceptions, ignore them at this point
         try
@@ -279,7 +280,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
+    void GLSLAssembly::bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params)
     {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {

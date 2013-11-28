@@ -12,7 +12,7 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
+n
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
@@ -26,12 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLSLGpuProgram_H__
-#define __GLSLGpuProgram_H__
+#ifndef __GLSLAssembly_H__
+#define __GLSLAssembly_H__
 
 // Precompiler options
 #include "OgreGLSLExtSupport.h"
-#include "OgreGL3PlusGpuProgram.h"
+#include "OgreGL3PlusShader.h"
 
 
 namespace Ogre {
@@ -43,11 +43,11 @@ namespace Ogre {
         a dummy place holder.  GLSL uses a program object to represent
         the active shaders used but Ogre materials maintain separate
         instances of the active shaders which creates a small problem
-        for GLSL integration.  The GLSLGpuProgram class provides the
+        for GLSL integration.  The GLSLAssembly class provides the
         interface between the GLSLProgramManagers,
         GL3PlusRenderSystem, and the active GLSLShader instances.
     */
-    class _OgreGL3PlusExport GLSLGpuProgram : public GL3PlusGpuProgram
+    class _OgreGL3PlusExport GLSLAssembly : public GL3PlusShader
     {
     private:
         /// GL handle for the shader object
@@ -59,9 +59,9 @@ namespace Ogre {
         static GLuint mFragmentShaderCount;
         /// Keep track of the number of geometry shaders created
         static GLuint mGeometryShaderCount;
-        /// Keep track of the number of tesselation hull(control) shaders created
+        /// Keep track of the number of tesselation hull (control) shaders created
         static GLuint mHullShaderCount;
-        /// Keep track of the number of tesselation domain(evaluation) shaders created
+        /// Keep track of the number of tesselation domain (evaluation) shaders created
         static GLuint mDomainShaderCount;
         /// Keep track of the number of compute shaders created
         static GLuint mComputeShaderCount;
@@ -72,20 +72,19 @@ namespace Ogre {
         GLint mLinked;
 
     public:
-        GLSLGpuProgram(GLSLShader* parent);
-        ~GLSLGpuProgram();
-
+        GLSLAssembly(GLSLShader* parent);
+        ~GLSLAssembly();
 
         /// Execute the binding functions for this program
-        void bindProgram(void);
+        void bindShader(void);
         /// Execute the unbinding functions for this program
-        void unbindProgram(void);
+        void unbindShader(void);
         /// Execute the param binding functions for this program
-        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        void bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         /// Execute the pass iteration param binding functions for this program
-        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
+        void bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params);
         /// Execute the shared param binding functions for this program
-        void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
         /// Get the GLSLShader for the shader object
         GLSLShader* getGLSLShader(void) const { return mGLSLShader; }
@@ -110,4 +109,4 @@ namespace Ogre {
     };
 }
 
-#endif // __GLSLGpuProgram_H__
+#endif // __GLSLAssembly_H__

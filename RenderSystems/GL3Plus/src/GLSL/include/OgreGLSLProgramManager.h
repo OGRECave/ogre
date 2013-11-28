@@ -30,6 +30,7 @@
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreSingleton.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
@@ -49,12 +50,12 @@ namespace Ogre {
     {
     protected:
         /// Active objects defining the active rendering GPU state.
-        GLSLGpuProgram* mActiveVertexGpuProgram;
-        GLSLGpuProgram* mActiveGeometryGpuProgram;
-        GLSLGpuProgram* mActiveFragmentGpuProgram;
-        GLSLGpuProgram* mActiveHullGpuProgram;
-        GLSLGpuProgram* mActiveDomainGpuProgram;
-        GLSLGpuProgram* mActiveComputeGpuProgram;
+        GLSLAssembly* mActiveVertexShader;
+        GLSLAssembly* mActiveGeometryShader;
+        GLSLAssembly* mActiveFragmentShader;
+        GLSLAssembly* mActiveHullShader;
+        GLSLAssembly* mActiveDomainShader;
+        GLSLAssembly* mActiveComputeShader;
 
         typedef map<String, GLenum>::type StringToEnumMap;
         StringToEnumMap mTypeEnumMap;

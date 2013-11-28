@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLProgram.h"
-#include "OgreGLSLGpuProgram.h"
+#include "OgreGLSLAssembly.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLSLShader.h"
 #include "OgreRoot.h"
@@ -35,13 +35,13 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLProgram::GLSLProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram)
-        : mVertexProgram(vertexProgram)
-        , mFragmentProgram(fragmentProgram)
-        , mGeometryProgram(geometryProgram)
-        , mHullProgram(hullProgram)
-        , mDomainProgram(domainProgram)
-        , mComputeProgram(computeProgram)
+    GLSLProgram::GLSLProgram(GLSLAssembly* vertexShader, GLSLAssembly* geometryShader, GLSLAssembly* fragmentShader, GLSLAssembly* hullShader, GLSLAssembly* domainShader, GLSLAssembly* computeShader)
+        : mVertexShader(vertexShader)
+        , mFragmentShader(fragmentShader)
+        , mGeometryShader(geometryShader)
+        , mHullShader(hullShader)
+        , mDomainShader(domainShader)
+        , mComputeShader(computeShader)
         , mUniformRefsBuilt(false)
         , mLinked(false)
         , mTriedToLinkAndFailed(false)
@@ -80,40 +80,40 @@ namespace Ogre {
     Ogre::String GLSLProgram::getCombinedName()
     {
         String name;
-        if (mVertexProgram)
+        if (mVertexShader)
         {
-            name += "Vertex Program: ";
-            name += mVertexProgram->getName();
+            name += "Vertex Shader: ";
+            name += mVertexShader->getName();
             name += "\n";
         }
-        if (mHullProgram)
+        if (mHullShader)
         {
-            name += "Tessellation Control Program: ";
-            name += mHullProgram->getName();
+            name += "Tessellation Control Shader: ";
+            name += mHullShader->getName();
             name += "\n";
         }
-        if (mDomainProgram)
+        if (mDomainShader)
         {
-            name += "Tessellation Evaluation Program: ";
-            name += mDomainProgram->getName();
+            name += "Tessellation Evaluation Shader: ";
+            name += mDomainShader->getName();
             name += "\n";
         }
-        if (mGeometryProgram)
+        if (mGeometryShader)
         {
-            name += "Geometry Program: ";
-            name += mGeometryProgram->getName();
+            name += "Geometry Shader: ";
+            name += mGeometryShader->getName();
             name += "\n";
         }
-        if (mFragmentProgram)
+        if (mFragmentShader)
         {
-            name += "Fragment Program: ";
-            name += mFragmentProgram->getName();
+            name += "Fragment Shader: ";
+            name += mFragmentShader->getName();
             name += "\n";
         }
-        if (mComputeProgram)
+        if (mComputeShader)
         {
-            name += "Compute Program: ";
-            name += mComputeProgram->getName();
+            name += "Compute Shader: ";
+            name += mComputeShader->getName();
             name += "\n";
         }
 
@@ -219,9 +219,9 @@ namespace Ogre {
         // Format is:
         //      layout(location = 0) attribute vec4 vertex;
 
-        if (mVertexProgram)
+        if (mVertexShader)
         {
-            String shaderSource = mVertexProgram->getGLSLShader()->getSource();
+            String shaderSource = mVertexShader->getGLSLShader()->getSource();
             String::size_type currPos = shaderSource.find("layout");
             while (currPos != String::npos)
             {
