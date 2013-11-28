@@ -50,62 +50,75 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLAssembly : public GL3PlusShader
     {
     private:
-        /// GL handle for the shader object
+        /// Associated GLSL shader.
         GLSLShader* mGLSLShader;
 
-        /// Keep track of the number of vertex shaders created
+        /// Keep track of the number of vertex shaders created.
         static GLuint mVertexShaderCount;
-        /// Keep track of the number of fragment shaders created
+        /// Keep track of the number of fragment shaders created.
         static GLuint mFragmentShaderCount;
-        /// Keep track of the number of geometry shaders created
+        /// Keep track of the number of geometry shaders created.
         static GLuint mGeometryShaderCount;
-        /// Keep track of the number of tesselation hull (control) shaders created
+        /// Keep track of the number of tesselation hull (control) shaders created.
         static GLuint mHullShaderCount;
-        /// Keep track of the number of tesselation domain (evaluation) shaders created
+        /// Keep track of the number of tesselation domain (evaluation) shaders created.
         static GLuint mDomainShaderCount;
-        /// Keep track of the number of compute shaders created
+        /// Keep track of the number of compute shaders created.
         static GLuint mComputeShaderCount;
 
-        /** Flag indicating that the program object has been successfully linked.
-            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
-        */
+        /** Flag indicating that the shader has been successfully
+            linked. 
+            Only used for separable programs. */
         GLint mLinked;
 
     public:
         GLSLAssembly(GLSLShader* parent);
         ~GLSLAssembly();
 
-        /// Execute the binding functions for this program
+        /// Execute the binding functions for this program.
         void bindShader(void);
-        /// Execute the unbinding functions for this program
+        /// Execute the unbinding functions for this program.
         void unbindShader(void);
-        /// Execute the param binding functions for this program
+        /// Execute the param binding functions for this program.
         void bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-        /// Execute the pass iteration param binding functions for this program
+        /// Execute the pass iteration param binding functions for this program.
         void bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params);
-        /// Execute the shared param binding functions for this program
+        /// Execute the shared param binding functions for this program.
         void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
-        /// Get the GLSLShader for the shader object
+        /// Get the GLSLShader for the shader object.
         GLSLShader* getGLSLShader(void) const { return mGLSLShader; }
 
-        /** Return the programs link status
-            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
+        /** Return the shader link status.
+            Only used for separable programs.
         */
         GLint isLinked(void) { return mLinked; }
 
-        /** Set the programs link status
-            Only used when programs are linked separately with GL_ARB_separate_shader_objects.
+        /** Set the shader link status.
+            Only used for separable programs.
         */
         void setLinked(GLint flag) { mLinked = flag; }
 
+        /// @copydoc Resource::calculateSize
+        size_t calculateSize(void) const;
+
+        /// Get the OGRE assigned shader ID.
+        GLuint getShaderID(void) const
+        { return mShaderID; }
+
+        // /// Get shader type
+        // GLenum getShaderType(GpuProgramType shaderType);
+
     protected:
-        /// Overridden from GpuProgram
+        /// Overridden from GpuProgram.
         void loadFromSource(void);
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void);
         /// @copydoc Resource::loadImpl
         void loadImpl(void);
+
+        /// OGRE assigned shader ID.
+        GLuint mShaderID;
     };
 }
 

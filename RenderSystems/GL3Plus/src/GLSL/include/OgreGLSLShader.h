@@ -210,12 +210,13 @@ namespace Ogre {
         void checkAndFixInvalidDefaultPrecisionError( String &message );
 
     private:
-        /// GL handle for shader object
+        /// GL handle for shader object.
         GLuint mGLShaderHandle;
-        /// 
+
+        /// GL handle for program object the shader is bound to.
         GLuint mGLProgramHandle;
-        /// 
-        bool mGLProgramHandleIsSet;
+
+
         /// Flag indicating if shader object successfully compiled
         GLint mCompiled;
         /// The input operation type for this (geometry) program
@@ -228,12 +229,13 @@ namespace Ogre {
         String mAttachedShaderNames;
         /// Preprocessor options
         String mPreprocessorDefines;
-        /// Container of attached programs
-        typedef vector< GLSLShader* >::type GLSLShaderContainer;
-        typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
-        GLSLShaderContainer mAttachedGLSLShaders;
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
+
+        typedef vector< GLSLShader* >::type GLSLShaderContainer;
+        typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
+        /// Container of attached programs
+        GLSLShaderContainer mAttachedGLSLShaders;
     };
 }
 

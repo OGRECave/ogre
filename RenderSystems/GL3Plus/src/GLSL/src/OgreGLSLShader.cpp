@@ -59,7 +59,6 @@ namespace Ogre {
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
-        , mGLProgramHandleIsSet(false)
         , mCompiled(0)
         , mColumnMajorMatrices(true)
     {
@@ -194,28 +193,24 @@ namespace Ogre {
             return true;
         }
 
-        // Only create a shader object if GLSL is supported.
-        // if (isSupported())
-        // {
-            // Create shader object.
-            GLenum GLShaderType = getGLShaderType(mType);
-            OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(GLShaderType));
+        // Create shader object.
+        GLenum GLShaderType = getGLShaderType(mType);
+        OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(GLShaderType));
             
-            //TODO GL 4.3 KHR_debug
+        //TODO GL 4.3 KHR_debug
 
-            // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-            //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
+        // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
-            // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            // {
-            //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-            //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
-            // }
+        // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        // {
+        //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
         // }
 
         // Add boiler plate code and preprocessor extras, then 
-        // submit shader source to GL.
+        // submit shader source to OpenGL.
         if (!mSource.empty())
         {
             // Add standard shader input and output blocks, if missing.
@@ -314,19 +309,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLShader::unloadHighLevelImpl(void)
     {
-        // if (isSupported())
-        // {
-            OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
+        OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+        }
 
-            mGLShaderHandle = 0;
-            mGLProgramHandle = 0;
-            mCompiled = 0;
-        // }
+        mGLShaderHandle = 0;
+        mGLProgramHandle = 0;
+        mCompiled = 0;
     }
 
     //-----------------------------------------------------------------------
@@ -342,18 +334,18 @@ namespace Ogre {
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.
 
-        // Therefore instead, parse the source code manually and extract the uniforms
+        // Therefore instead parse the source code manually and extract the uniforms.
         createParameterMappingStructures(true);
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgramManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+            GLSLSeparableProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs.get(), mName);
         }
         else
         {
-            GLSLMonolithicProgramManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+            GLSLMonolithicProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs.get(), mName);
         }
 
-        // Also parse any attached sources
+        // Also parse any attached sources.
         for (GLSLShaderContainer::const_iterator i = mAttachedGLSLShaders.begin();
              i != mAttachedGLSLShaders.end(); ++i)
         {
@@ -361,13 +353,13 @@ namespace Ogre {
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLSeparableProgramManager::getSingleton().extractConstantDefs(childShader->getSource(),
-                                                                               *mConstantDefs.get(), childShader->getName());
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromGLSL(childShader->getSource(),
+                                                                                    *mConstantDefs.get(), childShader->getName());
             }
             else
             {
-                GLSLMonolithicProgramManager::getSingleton().extractConstantDefs(childShader->getSource(),
-                                                                           *mConstantDefs.get(), childShader->getName());
+                GLSLMonolithicProgramManager::getSingleton().extractUniformsFromGLSL(childShader->getSource(),
+                                                                                     *mConstantDefs.get(), childShader->getName());
             }
         }
     }
@@ -375,19 +367,19 @@ namespace Ogre {
     //---------------------------------------------------------------------
     inline bool GLSLShader::getPassSurfaceAndLightStates(void) const
     {
-        // Scenemanager should pass on light & material state to the rendersystem
+        // Scenemanager should pass on light & material state to the rendersystem.
         return true;
     }
     //---------------------------------------------------------------------
     inline bool GLSLShader::getPassTransformStates(void) const
     {
-        // Scenemanager should pass on transform state to the rendersystem
+        // Scenemanager should pass on transform state to the rendersystem.
         return true;
     }
     //---------------------------------------------------------------------
     inline bool GLSLShader::getPassFogStates(void) const
     {
-        // Scenemanager should pass on fog state to the rendersystem
+        // Scenemanager should pass on fog state to the rendersystem.
         return true;
     }
     //-----------------------------------------------------------------------
@@ -398,7 +390,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLShader::CmdAttach::doSet(void *target, const String& shaderNames)
     {
-        // Get all the shader program names: there could be more than one
+        // Get all the shader program names: there could be more than one.
         StringVector vecShaderNames = StringUtil::split(shaderNames, " \t", 0);
 
         size_t programNameCount = vecShaderNames.size();
@@ -474,14 +466,11 @@ namespace Ogre {
                 // loadHighLevelImpl will only load the source and compile once
                 // so don't worry about calling it several times.
                 GLSLShader* childShader = static_cast<GLSLShader*>(hlProgram.getPointer());
-                // Load the source and attach the child shader only if supported.
-                // if (isSupported())
-                // {
-                    childShader->loadHighLevelImpl();
-                    // Add to the container.
-                    mAttachedGLSLShaders.push_back(childShader);
-                    mAttachedShaderNames += name + " ";
-                // }
+                // Load the source and attach the child shader.
+                childShader->loadHighLevelImpl();
+                // Add to the container.
+                mAttachedGLSLShaders.push_back(childShader);
+                mAttachedShaderNames += name + " ";
             }
         }
     }
@@ -682,10 +671,16 @@ namespace Ogre {
     }
 
     GLuint GLSLShader::getGLProgramHandle() {
-        if (!mGLProgramHandleIsSet)
+        //TODO This should be removed and the compile() function
+        // should use glCreateShaderProgramv
+        // for separable programs which includes creating a program.
+        if (mGLProgramHandle == 0)
         {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            mGLProgramHandleIsSet = true;
+            if (mGLProgramHandle == 0) 
+            {
+                //TODO error handling
+            }                
         }
         return mGLProgramHandle;
     }

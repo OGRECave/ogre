@@ -74,12 +74,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLMonolithicProgram* GLSLMonolithicProgramManager::getActiveMonolithicProgram(void)
     {
-        // if there is an active link program then return it
+        // If there is an active link program then return it.
         if (mActiveMonolithicProgram)
             return mActiveMonolithicProgram;
 
-        // no active link program so find one or make a new one
-        // is there an active key?
+        // No active link program so find one or make a new one.
+        // Is there an active key?
         uint32 activeKey = 0;
         GLuint shaderID = 0;
 
@@ -114,12 +114,12 @@ namespace Ogre {
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
 
-        // only return a link program object if a program exists
+        // Only return a link program object if a program exists.
         if (activeKey > 0)
         {
-            // find the key in the hash map
+            // Find the key in the hash map.
             MonolithicProgramIterator programFound = mMonolithicPrograms.find(activeKey);
-            // program object not found for key so need to create it
+            // Program object not found for key so need to create it.
             if (programFound == mMonolithicPrograms.end())
             {
                 mActiveMonolithicProgram = new GLSLMonolithicProgram(mActiveVertexShader, mActiveGeometryShader,
@@ -129,11 +129,11 @@ namespace Ogre {
             }
             else
             {
-                // found a link program in map container so make it active
+                // Found a link program in map container so make it active.
                 mActiveMonolithicProgram = programFound->second;
             }
         }
-        // make the program object active
+        // Make the program object active.
         if (mActiveMonolithicProgram)
             mActiveMonolithicProgram->activate();
 

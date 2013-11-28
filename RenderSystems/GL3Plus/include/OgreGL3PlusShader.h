@@ -57,27 +57,15 @@ namespace Ogre {
         virtual void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 
         /// @copydoc Resource::calculateSize
-        virtual size_t calculateSize(void) const;
+        size_t calculateSize(void) const {};
 
-        //TODO can these be removed?
-        /// Get the assigned GL shader ID
-        GLuint getShaderID(void) const
-        { return mShaderID; }
-
-        /// Get shader type
-        GLenum getShaderType(GpuProgramType shaderType);
+        
 
     protected:
         /** Overridden from GpuProgram, do nothing */
         void loadFromSource(void) {}
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
-
-        //TODO can these be removed?
-        /// 
-        GLuint mShaderID;
-        /// 
-        GLenum mShaderType;
     };
 
 } // namespace Ogre

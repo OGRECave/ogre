@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGLSLProgramManager.h"
@@ -185,12 +185,11 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void GLSLProgramManager::completeDefInfo(GLenum gltype,
-                                                   GpuConstantDefinition& defToUpdate)
+    void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
+                                                        GpuConstantDefinition& defToUpdate)
     {
-        // Decode uniform size and type
-        // Note GLSL never packs rows into float4's(from an API perspective anyway)
-        // therefore all values are tight in the buffer
+        // Note GLSL never packs rows into float4's (from an API perspective anyway)
+        // therefore all values are tight in the buffer.
         //TODO Should the rest of the above enum types be included here?
         switch (gltype)
         {
@@ -359,13 +358,13 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    bool GLSLProgramManager::completeParamSource(
+    bool GLSLProgramManager::findUniformDataSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs,
-        const GpuConstantDefinitionMap* geometryConstantDefs,
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
         const GpuConstantDefinitionMap* hullConstantDefs,
         const GpuConstantDefinitionMap* domainConstantDefs,
+        const GpuConstantDefinitionMap* geometryConstantDefs,
+        const GpuConstantDefinitionMap* fragmentConstantDefs,
         const GpuConstantDefinitionMap* computeConstantDefs,
         GLUniformReference& refToUpdate)
     {
@@ -441,13 +440,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //FIXME This is code bloat...either template or unify UniformReference
     // and AtomicCounterReference
-    bool GLSLProgramManager::completeParamSource(
+    bool GLSLProgramManager::findAtomicCounterDataSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs,
-        const GpuConstantDefinitionMap* geometryConstantDefs,
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
         const GpuConstantDefinitionMap* hullConstantDefs,
         const GpuConstantDefinitionMap* domainConstantDefs,
+        const GpuConstantDefinitionMap* geometryConstantDefs,
+        const GpuConstantDefinitionMap* fragmentConstantDefs,
         const GpuConstantDefinitionMap* computeConstantDefs,
         GLAtomicCounterReference& refToUpdate)
     {
@@ -522,19 +521,20 @@ namespace Ogre {
 
 
     //---------------------------------------------------------------------
-    void GLSLProgramManager::extractUniforms(GLuint programObject,
-                                                   const GpuConstantDefinitionMap* vertexConstantDefs,
-                                                   const GpuConstantDefinitionMap* geometryConstantDefs,
-                                                   const GpuConstantDefinitionMap* fragmentConstantDefs,
-                                                   const GpuConstantDefinitionMap* hullConstantDefs,
-                                                   const GpuConstantDefinitionMap* domainConstantDefs,
-                                                   const GpuConstantDefinitionMap* computeConstantDefs,
-                                                   GLUniformReferenceList& uniformList,
-                                                   GLAtomicCounterReferenceList& counterList,
-                                                   GLUniformBufferList& uniformBufferList,
-                                                   SharedParamsBufferMap& sharedParamsBufferMap,
-                                                   //GLShaderStorageBufferList& shaderStorageBufferList,
-                                                   GLCounterBufferList& counterBufferList)
+    void GLSLProgramManager::extractUniformsFromProgram(
+        GLuint programObject,
+        const GpuConstantDefinitionMap* vertexConstantDefs,
+        const GpuConstantDefinitionMap* hullConstantDefs,
+        const GpuConstantDefinitionMap* domainConstantDefs,
+        const GpuConstantDefinitionMap* geometryConstantDefs,
+        const GpuConstantDefinitionMap* fragmentConstantDefs,
+        const GpuConstantDefinitionMap* computeConstantDefs,
+        GLUniformReferenceList& uniformList,
+        GLAtomicCounterReferenceList& counterList,
+        GLUniformBufferList& uniformBufferList,
+        SharedParamsBufferMap& sharedParamsBufferMap,
+        // GLShaderStorageBufferList& shaderStorageBufferList,
+        GLCounterBufferList& counterBufferList)
     {
         // Scan through the active uniforms and add them to the reference list.
         GLint uniformCount = 0;
@@ -550,8 +550,8 @@ namespace Ogre {
         // counters and uniforms contained in uniform blocks.
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
-        // Loop over each of the active uniforms, and add them to the reference container.
-        // Only do this for user defined uniforms, ignore built in GL state uniforms.
+        // Loop over each active uniform and add it to the reference
+        // container.
         for (GLuint index = 0; index < uniformCount; index++)
         {
             GLint arraySize;
@@ -586,7 +586,7 @@ namespace Ogre {
                 }
 
                 // Find out which params object this comes from
-                bool foundSource = completeParamSource(
+                bool foundSource = findUniformDataSource(
                     paramName,
                     vertexConstantDefs, geometryConstantDefs,
                     fragmentConstantDefs, hullConstantDefs,
@@ -619,7 +619,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_OFFSET, &offset));
 
                 newGLAtomicCounterReference.mBinding = binding;
-                newGLAtomicCounterReference.mOffset = offset;               
+                newGLAtomicCounterReference.mOffset = offset;
 
                 // increment the total number of atomic counters
                 // including size of array if applicable
@@ -639,7 +639,7 @@ namespace Ogre {
                 std::cout << "ATOMIC COUNTER FOUND: " << paramName  << " " << arraySize << std::endl;
 
                 // Find out which params object this comes from
-                bool foundSource = completeParamSource(
+                bool foundSource = findAtomicCounterDataSource(
                     paramName,
                     vertexConstantDefs, geometryConstantDefs,
                     fragmentConstantDefs, hullConstantDefs,
@@ -662,7 +662,7 @@ namespace Ogre {
                     // or feature?
                     // assert((size_t)arraySize == newGLAtomicCounterReference.mConstantDef->arraySize
                     //        && "GL doesn't agree with our array size!");
-                    
+
                     counterList.push_back(newGLAtomicCounterReference);
                     printf("ATOMIC COUNTER SOURCE FOUND\n");
                 }
@@ -679,7 +679,7 @@ namespace Ogre {
 
         //FIXME Ogre materials need a new shared param that is associated with an entity.
         // This could be impemented as a switch-like statement inside shared_params:
-        
+
         GLint blockCount = 0;
 
         // Now deal with uniform blocks
@@ -689,7 +689,7 @@ namespace Ogre {
         for (int index = 0; index < blockCount; index++)
         {
             OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
-            
+
             // Map uniform block to binding point of GL buffer of
             // shared param bearing the same name.
 
@@ -750,12 +750,12 @@ namespace Ogre {
             }
 
             GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
-            
+
             //OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
 
             OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, bufferBinding));
         }
-        
+
         // Now deal with shader storage blocks
 
         //TODO Need easier, more robust feature checking.
@@ -810,11 +810,11 @@ namespace Ogre {
                     // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
                     HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
                     hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
-                    
+
                     // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
                     // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
                     //FIXME check parameters
-                    
+
                     GLint bufferBinding = sharedParamsBufferMap.size();
                     hwGlBuffer->setGLBufferBinding(bufferBinding);
 
@@ -825,7 +825,7 @@ namespace Ogre {
                 }
 
                 GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
-                
+
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
             }
         }
@@ -840,11 +840,11 @@ namespace Ogre {
                 //TODO Is this necessary?
                 //GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
 
-                //TODO We could build list of atomic counters here or above, 
+                //TODO We could build list of atomic counters here or above,
                 // whichever is most efficient.
                 // GLint * active_indices;
                 // OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES, active_indices));
-                
+
                 GLint bufferSize, bufferBinding;
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
@@ -858,8 +858,8 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLSLProgramManager::extractConstantDefs(const String& src,
-                                                       GpuNamedConstants& defs, const String& filename)
+    void GLSLProgramManager::extractUniformsFromGLSL(
+        const String& src, GpuNamedConstants& defs, const String& filename)
     {
         // Parse the output string and collect all uniforms
         // NOTE this relies on the source already having been preprocessed
@@ -949,7 +949,7 @@ namespace Ogre {
                     //         StringUtil::trim(name);
                     //         if (!name.empty())
                     //             internalName = name;
-                    
+
                     //         String::size_type arrayEnd = i->find("]", arrayStart);
                     //         String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
                     //         StringUtil::trim(arrayDimTerm);
@@ -960,7 +960,7 @@ namespace Ogre {
                     //         internalName = *i;
                     //     }
                     // }
-                    
+
                     // // Ok, now rewind and parse the individual uniforms in this block
                     // currPos = openBracePos + 1;
                     // blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(externalName);
@@ -971,7 +971,7 @@ namespace Ogre {
                     //     lineEndPos = src.find_first_of("\n\r", currPos);
                     //     endPos = src.find(";", currPos);
                     //     line = src.substr(currPos, endPos - currPos);
-                    
+
                     //     // TODO: Give some sort of block id
                     //     // Parse the normally structured uniform
                     //     parseIndividualConstant(src, defs, currPos, filename, blockSharedParams);
@@ -988,7 +988,7 @@ namespace Ogre {
                         break;
                     }
 
-                    parseIndividualConstant(src, defs, currPos, filename, blockSharedParams);
+                    parseGLSLUniform(src, defs, currPos, filename, blockSharedParams);
                 }
                 line = src.substr(currPos, endPos - currPos);
             } // not commented or a larger symbol
@@ -999,9 +999,10 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void GLSLProgramManager::parseIndividualConstant(const String& src, GpuNamedConstants& defs,
-                                                           String::size_type currPos,
-                                                           const String& filename, GpuSharedParametersPtr sharedParams)
+    void GLSLProgramManager::parseGLSLUniform(
+        const String& src, GpuNamedConstants& defs,
+        String::size_type currPos,
+        const String& filename, GpuSharedParametersPtr sharedParams)
     {
         GpuConstantDefinition def;
         String paramName = "";
@@ -1011,7 +1012,7 @@ namespace Ogre {
         // Remove spaces before opening square braces, otherwise
         // the following split() can split the line at inappropriate
         // places (e.g. "vec3 something [3]" won't work).
-        //FIXME What are valid ways of including spaces in GLSL 
+        //FIXME What are valid ways of including spaces in GLSL
         // variable declarations?  May need regex.
         for (String::size_type sqp = line.find (" ["); sqp != String::npos;
              sqp = line.find (" ["))
@@ -1025,7 +1026,7 @@ namespace Ogre {
             StringToEnumMap::iterator typei = mTypeEnumMap.find(*i);
             if (typei != mTypeEnumMap.end())
             {
-                completeDefInfo(typei->second, def);
+                convertGLUniformtoOgreType(typei->second, def);
             }
             else
             {
@@ -1111,7 +1112,7 @@ namespace Ogre {
                     //     def.physicalIndex = defs.boolBufferSize;
                     //     defs.boolBufferSize += def.arraySize * def.elementSize;
                     // }
-                    else 
+                    else
                     {
                         LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
                                                               + line + "' in file " + filename);

@@ -293,42 +293,42 @@ namespace Ogre
             if (mVertexShader)
             {
                 vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mVertexShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mVertexShader->getGLSLShader()->getGLProgramHandle(),
                                                                            vertParams, NULL, NULL, NULL, NULL, NULL,
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mGeometryShader)
             {
                 geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mGeometryShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mGeometryShader->getGLSLShader()->getGLProgramHandle(),
                                                                            NULL, geomParams, NULL, NULL, NULL, NULL, 
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mFragmentShader)
             {
                 fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mFragmentShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mFragmentShader->getGLSLShader()->getGLProgramHandle(),
                                                                            NULL, NULL, fragParams, NULL, NULL, NULL, 
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mHullShader)
             {
                 hullParams = &(mHullShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mHullShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mHullShader->getGLSLShader()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, hullParams, NULL, NULL, 
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mDomainShader)
             {
                 domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mDomainShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mDomainShader->getGLSLShader()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, NULL, domainParams, NULL, 
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mComputeShader)
             {
                 computeParams = &(mComputeShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniforms(mComputeShader->getGLSLShader()->getGLProgramHandle(),
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mComputeShader->getGLSLShader()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, NULL, NULL, computeParams, 
                                                                            mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
