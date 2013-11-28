@@ -213,7 +213,7 @@ if (APPLE)
 endif (APPLE)
 
 if (OGRE_RTShaderSystem_FOUND)
-	add_definitions(-DUSE_RTSHADER_SYSTEM)
+	add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)
 		# Link to RT Shader System if enabled.
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
