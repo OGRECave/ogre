@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 #ifndef __GLSLProgram_H__
 #define __GLSLProgram_H__
@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class GLSLAssembly;
+    class GL3PlusShader;
 
     /// Structure used to keep track of named uniforms in the linked program object
     struct GLUniformReference
@@ -79,8 +79,7 @@ namespace Ogre {
     typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
     /** C++ encapsulation of GLSL program object.
-        
-    */
+     */
     class _OgreGL3PlusExport GLSLProgram
     {
     protected:
@@ -96,17 +95,17 @@ namespace Ogre {
         GLCounterBufferList mGLCounterBufferReferences;
 
         /// Linked vertex program
-        GLSLAssembly* mVertexShader;
+        GL3PlusShader* mVertexShader;
         /// Linked fragment program
-        GLSLAssembly* mFragmentShader;
+        GL3PlusShader* mFragmentShader;
         /// Linked geometry program
-        GLSLAssembly* mGeometryShader;
+        GL3PlusShader* mGeometryShader;
         /// Linked hull (control) program
-        GLSLAssembly* mHullShader;
+        GL3PlusShader* mHullShader;
         /// Linked domain (evaluation) program
-        GLSLAssembly* mDomainShader;
+        GL3PlusShader* mDomainShader;
         /// Linked compute program
-        GLSLAssembly* mComputeShader;
+        GL3PlusShader* mComputeShader;
         /// GL handle for the vertex array object
         GL3PlusVertexArrayObject *mVertexArrayObject;
 
@@ -148,7 +147,7 @@ namespace Ogre {
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
-        GLSLProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram);
+        GLSLProgram(GL3PlusShader* vertexProgram, GL3PlusShader* geometryProgram, GL3PlusShader* fragmentProgram, GL3PlusShader* hullProgram, GL3PlusShader* domainProgram, GL3PlusShader* computeProgram);
         virtual ~GLSLProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
@@ -156,15 +155,15 @@ namespace Ogre {
         virtual void activate(void) = 0;
 
         /** Updates program object uniforms using data from GpuProgramParameters.
-            Normally called by GLSLAssembly::bindParameters() just before rendering occurs.
+            Normally called by GL3PlusShader::bindParameters() just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
         /** Updates program object uniform blocks using data from GpuProgramParameters.
-            Normally called by GLSLAssembly::bindParameters() just before rendering occurs.
+            Normally called by GL3PlusShader::bindParameters() just before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
         /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            Normally called by GLSLAssembly::bindMultiPassParameters() just before multi pass rendering occurs.
+            Normally called by GL3PlusShader::bindMultiPassParameters() just before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
         /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
@@ -192,12 +191,12 @@ namespace Ogre {
         /// Is a non-standard attribute bound in the linked code?
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-        GLSLAssembly* getVertexShader() const { return mVertexShader; }
-        GLSLAssembly* getFragmentShader() const { return mFragmentShader; }
-        GLSLAssembly* getGeometryShader() const { return mGeometryShader; }
-        GLSLAssembly* getHullShader() const { return mHullShader; }
-        GLSLAssembly* getDomainShader() const { return mDomainShader; }
-        GLSLAssembly* getComputeShader() const { return mComputeShader; }
+        GL3PlusShader* getVertexShader() const { return mVertexShader; }
+        GL3PlusShader* getFragmentShader() const { return mFragmentShader; }
+        GL3PlusShader* getGeometryShader() const { return mGeometryShader; }
+        GL3PlusShader* getHullShader() const { return mHullShader; }
+        GL3PlusShader* getDomainShader() const { return mDomainShader; }
+        GL3PlusShader* getComputeShader() const { return mComputeShader; }
         GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
     };
 }

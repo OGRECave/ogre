@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLExtSupport.h"
-#include "OgreGLSLAssembly.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
@@ -84,8 +84,18 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram)
-        : GLSLProgram(vertexProgram, geometryProgram, fragmentProgram, hullProgram, domainProgram, computeProgram)
+    GLSLMonolithicProgram::GLSLMonolithicProgram(GL3PlusShader* vertexProgram, 
+                                                 GL3PlusShader* hullProgram, 
+                                                 GL3PlusShader* domainProgram, 
+                                                 GL3PlusShader* geometryProgram, 
+                                                 GL3PlusShader* fragmentProgram, 
+                                                 GL3PlusShader* computeProgram)
+        : GLSLProgram(vertexProgram, 
+                      hullProgram, 
+                      domainProgram, 
+                      geometryProgram, 
+                      fragmentProgram, 
+                      computeProgram)
     {
     }
 
@@ -245,22 +255,14 @@ namespace Ogre {
         if (!mUniformRefsBuilt)
         {
             const GpuConstantDefinitionMap* vertParams = 0;
-            const GpuConstantDefinitionMap* fragParams = 0;
-            const GpuConstantDefinitionMap* geomParams = 0;
             const GpuConstantDefinitionMap* hullParams = 0;
             const GpuConstantDefinitionMap* domainParams = 0;
+            const GpuConstantDefinitionMap* fragParams = 0;
+            const GpuConstantDefinitionMap* geomParams = 0;
             const GpuConstantDefinitionMap* computeParams = 0;
             if (mVertexShader)
             {
                 vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
-            }
-            if (mGeometryShader)
-            {
-                geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
-            }
-            if (mFragmentShader)
-            {
-                fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mHullShader)
             {
@@ -269,6 +271,14 @@ namespace Ogre {
             if (mDomainShader)
             {
                 domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
+            }
+            if (mGeometryShader)
+            {
+                geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
+            }
+            if (mFragmentShader)
+            {
+                fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
             }
             if (mComputeShader)
             {

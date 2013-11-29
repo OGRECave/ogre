@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreStringConverter.h"
-#include "OgreGLSLAssembly.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGpuProgramManager.h"
@@ -37,8 +37,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GLSLSeparableProgram::GLSLSeparableProgram(GLSLAssembly* vertexShader, GLSLAssembly* geometryShader, GLSLAssembly* fragmentShader, GLSLAssembly* hullShader, GLSLAssembly* domainShader, GLSLAssembly* computeShader) :
-        GLSLProgram(vertexShader, geometryShader, fragmentShader, hullShader, domainShader, computeShader) 
+    GLSLSeparableProgram::GLSLSeparableProgram(GL3PlusShader* vertexShader, 
+                                               GL3PlusShader* hullShader, 
+                                               GL3PlusShader* domainShader, 
+                                               GL3PlusShader* geometryShader, 
+                                               GL3PlusShader* fragmentShader, 
+                                               GL3PlusShader* computeShader) :
+        GLSLProgram(vertexShader, 
+                    hullShader, 
+                    domainShader, 
+                    geometryShader, 
+                    fragmentShader, 
+                    computeShader) 
     {
         mVertexArrayObject = new GL3PlusVertexArrayObject();
     }
@@ -124,7 +134,7 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgram::loadIndividualProgram(GLSLAssembly *program)
+    void GLSLSeparableProgram::loadIndividualProgram(GL3PlusShader *program)
     {
         if (program && !program->isLinked())
         {

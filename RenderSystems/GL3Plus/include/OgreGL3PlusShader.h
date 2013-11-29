@@ -33,6 +33,8 @@
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 
+#include "OgreGLSLExtSupport.h"
+
 namespace Ogre {
 
     /** Generalized OpenGL shader. Allows for the possibility of
@@ -40,32 +42,77 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusShader : public GpuProgram
     {
     public:
-        GL3PlusShader(ResourceManager* creator, const String& name, ResourceHandle handle,
-                          const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
-        virtual ~GL3PlusShader();
+        GL3PlusShader(
+            ResourceManager* creator, const String& name, 
+            ResourceHandle handle,
+            const String& group, bool isManual = false, 
+            ManualResourceLoader* loader = 0);
+        GL3PlusShader(GLSLShader* parent);
+        ~GL3PlusShader();
 
-        /// Execute the binding functions for this shader
-        virtual void bindShader(void) {}
-        /// Execute the binding functions for this shader
-        virtual void unbindShader(void) {}
+        /// Bind the shader in OpenGL.
+        void bindShader(void);
+        /// Unbind the shader in OpenGL.
+        void unbindShader(void);
+        /// Execute the param binding functions for this shader.
+        void bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the pass iteration param binding functions for this shader.
+        void bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params);
+        /// Execute the shared param binding functions for this shader.
+        void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
-        /// Execute the param binding functions for this shader
-        virtual void bindShaderParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
-        /// Bind just the pass iteration parameters
-        virtual void bindShaderPassIterationParameters(GpuProgramParametersSharedPtr params) {}
-        /// Execute the shared param binding functions for this shader
-        virtual void bindShaderSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        /// Get the GLSLShader for the shader object.
+        GLSLShader* getGLSLShader(void) const { return mGLSLShader; }
+
+        /** Return the shader link status.
+            Only used for separable programs.
+        */
+        GLint isLinked(void) { return mLinked; }
+
+        /** Set the shader link status.
+            Only used for separable programs.
+        */
+        void setLinked(GLint flag) { mLinked = flag; }
 
         /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const {};
+        size_t calculateSize(void) const;
 
-        
+        /// Get the OGRE assigned shader ID.
+        GLuint getShaderID(void) const
+        { return mShaderID; }
 
     protected:
-        /** Overridden from GpuProgram, do nothing */
+        /// Overridden from GpuProgram.
         void loadFromSource(void) {}
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
+        /// @copydoc Resource::loadImpl
+        void loadImpl(void) {}
+
+        /// OGRE assigned shader ID.
+        GLuint mShaderID;
+
+    private:
+        /// Associated GLSL shader.
+        GLSLShader* mGLSLShader;
+
+        /// Keep track of the number of vertex shaders created.
+        static GLuint mVertexShaderCount;
+        /// Keep track of the number of fragment shaders created.
+        static GLuint mFragmentShaderCount;
+        /// Keep track of the number of geometry shaders created.
+        static GLuint mGeometryShaderCount;
+        /// Keep track of the number of tesselation hull (control) shaders created.
+        static GLuint mHullShaderCount;
+        /// Keep track of the number of tesselation domain (evaluation) shaders created.
+        static GLuint mDomainShaderCount;
+        /// Keep track of the number of compute shaders created.
+        static GLuint mComputeShaderCount;
+
+        /** Flag indicating that the shader has been successfully
+            linked.
+            Only used for separable programs. */
+        GLint mLinked;
     };
 
 } // namespace Ogre

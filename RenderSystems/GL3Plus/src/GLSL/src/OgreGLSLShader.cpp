@@ -54,8 +54,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     GLSLShader::GLSLShader(ResourceManager* creator,
-                             const String& name, ResourceHandle handle,
-                             const String& group, bool isManual, ManualResourceLoader* loader)
+                           const String& name, ResourceHandle handle,
+                           const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
@@ -84,7 +84,7 @@ namespace Ogre {
                     "input_operation_type",
                     "The input operation type for this geometry program. "
                     "Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', "
-                    "'triangle_strip' or 'triangle_fan'", 
+                    "'triangle_strip' or 'triangle_fan'",
                     PT_STRING), &msInputOperationTypeCmd);
             dict->addParameter(
                 ParameterDef("output_operation_type",
@@ -196,7 +196,7 @@ namespace Ogre {
         // Create shader object.
         GLenum GLShaderType = getGLShaderType(mType);
         OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(GLShaderType));
-            
+
         //TODO GL 4.3 KHR_debug
 
         // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
@@ -209,7 +209,7 @@ namespace Ogre {
         //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
         // }
 
-        // Add boiler plate code and preprocessor extras, then 
+        // Add boiler plate code and preprocessor extras, then
         // submit shader source to OpenGL.
         if (!mSource.empty())
         {
@@ -291,7 +291,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLShader::createLowLevelImpl(void)
     {
-        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLAssembly(this));
+        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GL3PlusShader(this));
         // Shader params need to be forwarded to low level implementation
         mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
         mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
@@ -456,7 +456,7 @@ namespace Ogre {
     {
         // Is the name valid and already loaded?
         // Check with the high level program manager to see if it was loaded.
-		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
+        HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
         if (!hlProgram.isNull())
         {
             if (hlProgram->getSyntaxCode() == "glsl")
@@ -529,13 +529,13 @@ namespace Ogre {
         vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
         if (message.find(precisionQualifierErrorString) != String::npos)
         {
-			LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling", LML_CRITICAL);
+            LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling", LML_CRITICAL);
 
             // remove relevant lines from source
             vector< String >::type errors = StringUtil::split(message, "\n");
 
             // going from the end so when we delete a line the numbers of the lines before will not change
-			for (int i = (int)errors.size() - 1 ; i != -1 ; i--)
+            for (int i = (int)errors.size() - 1 ; i != -1 ; i--)
             {
                 String & curError = errors[i];
                 size_t foundPos = curError.find(precisionQualifierErrorString);
@@ -555,7 +555,7 @@ namespace Ogre {
                 }
             }
             // rebuild source
-			StringStream newSource;
+            StringStream newSource;
             for (size_t i = 0; i < linesOfSource.size()  ; i++)
             {
                 newSource << linesOfSource[i] << "\n";
@@ -638,20 +638,20 @@ namespace Ogre {
         {
         case GPT_VERTEX_PROGRAM:
             return GL_VERTEX_SHADER;
-        case GPT_GEOMETRY_PROGRAM:
-            return GL_GEOMETRY_SHADER;
-        case GPT_FRAGMENT_PROGRAM:
-            return GL_FRAGMENT_SHADER;
         case GPT_HULL_PROGRAM:
             return GL_TESS_CONTROL_SHADER;
         case GPT_DOMAIN_PROGRAM:
             return GL_TESS_EVALUATION_SHADER;
+        case GPT_GEOMETRY_PROGRAM:
+            return GL_GEOMETRY_SHADER;
+        case GPT_FRAGMENT_PROGRAM:
+            return GL_FRAGMENT_SHADER;
         case GPT_COMPUTE_PROGRAM:
             return GL_COMPUTE_SHADER;
         }
     }
 
-    String GLSLShader::getShaderTypeLabel(GpuProgramType programType) 
+    String GLSLShader::getShaderTypeLabel(GpuProgramType programType)
     {
         switch (programType)
         {
@@ -677,10 +677,10 @@ namespace Ogre {
         if (mGLProgramHandle == 0)
         {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            if (mGLProgramHandle == 0) 
+            if (mGLProgramHandle == 0)
             {
                 //TODO error handling
-            }                
+            }
         }
         return mGLProgramHandle;
     }

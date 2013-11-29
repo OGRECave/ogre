@@ -87,15 +87,15 @@ namespace Ogre
 
         /** Set the active link programs for the next rendering state.
             The active program pipeline object will be cleared.
-            Normally called from the GLSLAssembly::bindProgram and
+            Normally called from the GL3PlusShader::bindProgram and
             unbindProgram methods.
         */
-        void setActiveVertexShader(GLSLAssembly* vertexShader);
-        void setActiveFragmentShader(GLSLAssembly* fragmentShader);
-        void setActiveGeometryShader(GLSLAssembly* geometryShader);
-        void setActiveTessDomainShader(GLSLAssembly* domainShader);
-        void setActiveTessHullShader(GLSLAssembly* hullShader);
-        void setActiveComputeShader(GLSLAssembly* computShader);
+        void setActiveVertexShader(GL3PlusShader* vertexShader);
+        void setActiveFragmentShader(GL3PlusShader* fragmentShader);
+        void setActiveGeometryShader(GL3PlusShader* geometryShader);
+        void setActiveTessDomainShader(GL3PlusShader* domainShader);
+        void setActiveTessHullShader(GL3PlusShader* hullShader);
+        void setActiveComputeShader(GL3PlusShader* computShader);
 
         static GLSLSeparableProgramManager& getSingleton(void);
         static GLSLSeparableProgramManager* getSingletonPtr(void);

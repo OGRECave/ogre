@@ -83,40 +83,40 @@ namespace Ogre {
 
         /** Set the active vertex shader for the next rendering state.
             The active program object will be cleared.  Normally
-            called from the GLSLAssembly::bindProgram and
+            called from the GL3PlusShader::bindProgram and
             unbindProgram methods
         */
-        void setActiveVertexShader(GLSLAssembly* vertexGpuProgram);
+        void setActiveVertexShader(GL3PlusShader* vertexGpuProgram);
         /** Set the active hull(control) shader for the next rendering
             state.  The active program object will be cleared.
-            Normally called from the GLSLAssembly::bindProgram and
+            Normally called from the GL3PlusShader::bindProgram and
             unbindProgram methods
         */
-        void setActiveHullShader(GLSLAssembly* hullGpuProgram);
+        void setActiveHullShader(GL3PlusShader* hullGpuProgram);
         /** Set the active domain(evaluation) shader for the next
             rendering state.  The active program object will be
             cleared.  Normally called from the
-            GLSLAssembly::bindProgram and unbindProgram methods
+            GL3PlusShader::bindProgram and unbindProgram methods
         */
-        void setActiveDomainShader(GLSLAssembly* domainGpuProgram);
+        void setActiveDomainShader(GL3PlusShader* domainGpuProgram);
         /** Set the active geometry shader for the next rendering
             state.  The active program object will be cleared.
-            Normally called from the GLSLAssembly::bindProgram and
+            Normally called from the GL3PlusShader::bindProgram and
             unbindProgram methods
         */
-        void setActiveGeometryShader(GLSLAssembly* geometryGpuProgram);
+        void setActiveGeometryShader(GL3PlusShader* geometryGpuProgram);
         /** Set the active fragment shader for the next rendering
             state.  The active program object will be cleared.
-            Normally called from the GLSLAssembly::bindProgram and
+            Normally called from the GL3PlusShader::bindProgram and
             unbindProgram methods
         */
-        void setActiveFragmentShader(GLSLAssembly* fragmentGpuProgram);
+        void setActiveFragmentShader(GL3PlusShader* fragmentGpuProgram);
         /** Set the active compute shader for the next rendering
             state.  The active program object will be cleared.
-            Normally called from the GLSLAssembly::bindProgram and
+            Normally called from the GL3PlusShader::bindProgram and
             unbindProgram methods
         */
-        void setActiveComputeShader(GLSLAssembly* computeGpuProgram);
+        void setActiveComputeShader(GL3PlusShader* computeGpuProgram);
 
         static GLSLMonolithicProgramManager& getSingleton(void);
         static GLSLMonolithicProgramManager* getSingletonPtr(void);

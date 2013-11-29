@@ -27,28 +27,29 @@
 */
 
 #include "OgreGLSLSeparableProgramManager.h"
-#include "OgreGLSLAssembly.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 
 namespace Ogre
 {
-    //-----------------------------------------------------------------------
     template<> GLSLSeparableProgramManager* Singleton<GLSLSeparableProgramManager>::msSingleton = 0;
 
-    //-----------------------------------------------------------------------
+
     GLSLSeparableProgramManager* GLSLSeparableProgramManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLSeparableProgramManager& GLSLSeparableProgramManager::getSingleton(void)
     {
         assert( msSingleton );  return ( *msSingleton );
     }
 
+
     GLSLSeparableProgramManager::GLSLSeparableProgramManager(void) :
         GLSLProgramManager(), mActiveSeparableProgram(NULL) { }
+
 
     GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void)
     {
@@ -60,8 +61,8 @@ namespace Ogre
         }
     }
 
-    //-----------------------------------------------------------------------
-    void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLAssembly* fragmentShader)
+
+    void GLSLSeparableProgramManager::setActiveFragmentShader(GL3PlusShader* fragmentShader)
     {
         if (fragmentShader != mActiveFragmentShader)
         {
@@ -71,8 +72,8 @@ namespace Ogre
         }
     }
 
-    //-----------------------------------------------------------------------
-    void GLSLSeparableProgramManager::setActiveVertexShader(GLSLAssembly* vertexShader)
+
+    void GLSLSeparableProgramManager::setActiveVertexShader(GL3PlusShader* vertexShader)
     {
         if (vertexShader != mActiveVertexShader)
         {
@@ -82,7 +83,8 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveGeometryShader(GLSLAssembly* geometryShader)
+
+    void GLSLSeparableProgramManager::setActiveGeometryShader(GL3PlusShader* geometryShader)
     {
         if (geometryShader != mActiveGeometryShader)
         {
@@ -92,7 +94,8 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveTessDomainShader(GLSLAssembly* domainShader)
+
+    void GLSLSeparableProgramManager::setActiveTessDomainShader(GL3PlusShader* domainShader)
     {
         if (domainShader != mActiveDomainShader)
         {
@@ -102,7 +105,8 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveTessHullShader(GLSLAssembly* hullShader)
+
+    void GLSLSeparableProgramManager::setActiveTessHullShader(GL3PlusShader* hullShader)
     {
         if (hullShader != mActiveHullShader)
         {
@@ -112,7 +116,8 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgramManager::setActiveComputeShader(GLSLAssembly* computeShader)
+
+    void GLSLSeparableProgramManager::setActiveComputeShader(GL3PlusShader* computeShader)
     {
         if (computeShader != mActiveComputeShader)
         {
@@ -121,6 +126,7 @@ namespace Ogre
             mActiveSeparableProgram = NULL;
         }
     }
+
 
     GLSLSeparableProgram* GLSLSeparableProgramManager::getCurrentSeparableProgram(void)
     {
@@ -171,9 +177,13 @@ namespace Ogre
             // Program object not found for key so need to create it
             if (programFound == mSeparablePrograms.end())
             {
-                mActiveSeparableProgram = new GLSLSeparableProgram(mActiveVertexShader, mActiveGeometryShader,
-                                                                 mActiveFragmentShader, mActiveHullShader,
-                                                                 mActiveDomainShader, mActiveComputeShader);
+                mActiveSeparableProgram = new GLSLSeparableProgram(
+                    mActiveVertexShader, 
+                    mActiveHullShader,
+                    mActiveDomainShader, 
+                    mActiveGeometryShader,
+                    mActiveFragmentShader, 
+                    mActiveComputeShader);
                 mSeparablePrograms[activeKey] = mActiveSeparableProgram;
             }
             else
@@ -186,6 +196,7 @@ namespace Ogre
         return mActiveSeparableProgram;
     }
     
+
     GLSLSeparableProgram* GLSLSeparableProgramManager::getActiveSeparableProgram(void)
     {
         getCurrentSeparableProgram();
@@ -196,5 +207,4 @@ namespace Ogre
 
         return mActiveSeparableProgram;
     }
-
 }

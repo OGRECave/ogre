@@ -43,11 +43,11 @@ namespace Ogre {
         be accessed by the application.  GLSL also does not provide
         assembler low level output after compiling.  The GL Render
         system assumes that the Gpu program is a GL GPU program so
-        GLSLShader will create a GLSLAssembly that is subclassed
-        from GL3PlusShader for the low level implementation.  The
+        GLSLShader will create a GL3PlusShader
+        for the low level implementation.  The
         GLSLShader class will create a shader object and compile the
         source but will not create a program object.  It's up to
-        GLSLAssembly class to request a program object to link the
+        GL3PlusShader class to request a program object to link the
         shader object to.
 
         @note 

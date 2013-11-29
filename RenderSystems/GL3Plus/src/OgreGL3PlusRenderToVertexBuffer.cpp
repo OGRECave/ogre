@@ -35,7 +35,7 @@
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLSLMonolithicProgramManager.h"
-#include "OgreGLSLAssembly.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreStringConverter.h"
@@ -241,7 +241,7 @@ namespace Ogre {
         {
             GLSLSeparableProgram* programPipeline =
                 GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-            GLSLAssembly* glslGpuProgram = 0;
+            GL3PlusShader* glslGpuProgram = 0;
             if ((glslGpuProgram = programPipeline->getGeometryShader()))
                 programId = glslGpuProgram->getGLSLShader()->getGLProgramHandle();
             //TODO include tessellation stages

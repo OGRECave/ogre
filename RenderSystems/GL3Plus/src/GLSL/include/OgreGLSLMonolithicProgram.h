@@ -36,14 +36,13 @@
 
 namespace Ogre {
 
-    class GLSLAssembly;
+    class GL3PlusShader;
 
     /** C++ encapsulation of GLSL Program Object using the
         glMonolithicProgram method of linking.  Linking this way is
         supported by OpenGL 2.0 and up, but does not allow
         hot-swapping separable shaders like GLSLSeparableProgram can.
     */
-
     class _OgreGL3PlusExport GLSLMonolithicProgram : public GLSLProgram
     {
     protected:
@@ -56,7 +55,12 @@ namespace Ogre {
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager
-        GLSLMonolithicProgram(GLSLAssembly* vertexProgram, GLSLAssembly* geometryProgram, GLSLAssembly* fragmentProgram, GLSLAssembly* hullProgram, GLSLAssembly* domainProgram, GLSLAssembly* computeProgram);
+        GLSLMonolithicProgram(GL3PlusShader* vertexProgram, 
+                              GL3PlusShader* hullProgram, 
+                              GL3PlusShader* domainProgram, 
+                              GL3PlusShader* geometryProgram, 
+                              GL3PlusShader* fragmentProgram, 
+                              GL3PlusShader* computeProgram);
         ~GLSLMonolithicProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
@@ -64,15 +68,15 @@ namespace Ogre {
         void activate(void);
 
         /** Updates program object uniforms using data from GpuProgramParameters.
-            normally called by GLSLAssembly::bindParameters() just before rendering occurs.
+            normally called by GL3PlusShader::bindParameters() just before rendering occurs.
         */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniform blocks using data from GpuProgramParameters.
-            normally called by GLSLAssembly::bindParameters() just before rendering occurs.
+            normally called by GL3PlusShader::bindParameters() just before rendering occurs.
         */
         virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            normally called by GLSLAssembly::bindMultiPassParameters() just before multi pass rendering occurs.
+            normally called by GL3PlusShader::bindMultiPassParameters() just before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
     };

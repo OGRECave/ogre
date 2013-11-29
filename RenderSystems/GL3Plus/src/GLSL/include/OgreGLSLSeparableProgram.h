@@ -33,31 +33,42 @@
 
 namespace Ogre
 {
-    /** Specialisation of HighLevelGpuProgram to provide support for the OpenGL
-        Shader Language (GLSL).
-        @remarks
-        GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
-        Vertex and Fragment shaders only have one entry point called "main".
-        When a shader is compiled, microcode is generated but can not be accessed by
-        the application.
-        GLSL also does not provide assembler low level output after compiling.  The GL Render
-        system assumes that the Gpu program is a GL Gpu program so GLSLSeparableProgram will create a
-        GLSLAssembly that is subclassed from GLGpuProgram for the low level implementation.
-        The GLProgram class will create a shader and program object and compile the source but will
-        not create a pipeline object.  It's up to GLGpuProgram class to request a program pipeline object
-        to link the program object to.
+    /** Specialisation of HighLevelGpuProgram to provide support 
+        for the OpenGL Shader Language (GLSL).
 
-        @note
-        GLSL supports multiple modular shader objects that can be attached to one program
-        object to form a single shader.  This is supported through the "attach" material script
-        command.  All the modules to be attached are listed on the same line as the attach command
-        separated by white space.
+        @remarks 
+        GLSL has no target assembler or entry point
+        specification like DirectX 9 HLSL.  Vertex and Fragment
+        shaders only have one entry point called "main".  When a
+        shader is compiled, microcode is generated but can not be
+        accessed by the application.
+
+        GLSL also does not provide assembler low level output after
+        compiling.  The GL Render system assumes that the Gpu program
+        is a GL Gpu program so GLSLSeparableProgram will create a
+        GL3PlusShader for the low level implementation.  The GLProgram
+        class will create a shader and program object and compile the
+        source but will not create a pipeline object.  It's up to
+        GLGpuProgram class to request a program pipeline object to
+        link the program object to.
+
+        @note 
+        GLSL supports multiple modular shader objects that can
+        be attached to one program object to form a single shader.
+        This is supported through the "attach" material script
+        command.  All the modules to be attached are listed on the
+        same line as the attach command separated by white space.
     */
     class _OgreGL3PlusExport GLSLSeparableProgram : public GLSLProgram
     {
     public:
         /// Constructor should only be used by GLSLSeparableProgramManager.
-        GLSLSeparableProgram(GLSLAssembly* vertexShader, GLSLAssembly* geometryShader, GLSLAssembly* fragmentShader, GLSLAssembly* hullShader, GLSLAssembly* domainShader, GLSLAssembly* computeShader);
+        GLSLSeparableProgram(GL3PlusShader* vertexShader, 
+                             GL3PlusShader* hullShader, 
+                             GL3PlusShader* domainShader, 
+                             GL3PlusShader* geometryShader, 
+                             GL3PlusShader* fragmentShader, 
+                             GL3PlusShader* computeShader);
         virtual ~GLSLSeparableProgram();
 
         /// GL Program Pipeline Handle
@@ -65,25 +76,28 @@ namespace Ogre
 
         /** Updates program pipeline object uniforms using named and
             indexed parameter data from GpuProgramParameters.
-            normally called by GLSLAssembly::bindProgramParameters()
+            normally called by GL3PlusShader::bindProgramParameters()
             just before rendering occurs.
         */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        virtual void updateUniforms(GpuProgramParametersSharedPtr params, 
+                                    uint16 mask, GpuProgramType fromProgType);
         /** Updates program object atomic counter buffers using data
             from GpuProgramParameters.  Normally called by
-            GLSLAssembly::bindProgramAtomicCounterParameters() just
+            GL3PlusShader::bindProgramAtomicCounterParameters() just
             before rendering occurs.
         */
-        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, 
+                                          uint16 mask, GpuProgramType fromProgType);
         /** Updates program object uniform blocks using shared
             parameter data from GpuProgramParameters.  Normally called
-            by GLSLAssembly::bindProgramSharedParameters() just
-            before rendering occurs.
+            by GL3PlusShader::bindProgramSharedParameters() just before
+            rendering occurs.
         */
-        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, 
+                                         uint16 mask, GpuProgramType fromProgType);
         /** Updates program pipeline object uniforms using data from
             pass iteration GpuProgramParameters.  Normally called by
-            GLSLAssembly::bindProgramPassIterationParameters() just
+            GL3PlusShader::bindProgramPassIterationParameters() just
             before multi pass rendering occurs.
         */
         virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
@@ -93,7 +107,9 @@ namespace Ogre
         */
         void activate(void);
 
-        /// Get the index of a non-standard attribute bound in the linked code.
+        /** Get the index of a non-standard attribute bound in the
+            linked code. 
+        */
         virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
 
     protected:
@@ -102,14 +118,14 @@ namespace Ogre
 
         /// Compiles and links the separate programs.
         virtual void compileAndLink(void);
-        void loadIndividualProgram(GLSLAssembly *program);
+        void loadIndividualProgram(GL3PlusShader *program);
         /// Put a program pipeline in use.
         virtual void _useProgram(void);
         /// Build uniform references from active named uniforms.
         virtual void buildGLUniformReferences(void);
 
         void getMicrocodeFromCache(void);
-        void getIndividualProgramMicrocodeFromCache(GLSLAssembly* program);
+        void getIndividualProgramMicrocodeFromCache(GL3PlusShader* program);
     };
 }
 

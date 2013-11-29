@@ -29,7 +29,7 @@
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreGLSLMonolithicProgramManager.h"
-#include "OgreGLSLAssembly.h"
+#include "OgreGL3PlusShader.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLSLProgram.h"
@@ -122,9 +122,13 @@ namespace Ogre {
             // Program object not found for key so need to create it.
             if (programFound == mMonolithicPrograms.end())
             {
-                mActiveMonolithicProgram = new GLSLMonolithicProgram(mActiveVertexShader, mActiveGeometryShader,
-                                                         mActiveFragmentShader, mActiveHullShader,
-                                                         mActiveDomainShader, mActiveComputeShader);
+                mActiveMonolithicProgram = new GLSLMonolithicProgram(
+                    mActiveVertexShader, 
+                    mActiveHullShader,
+                    mActiveDomainShader, 
+                    mActiveGeometryShader,
+                    mActiveFragmentShader, 
+                    mActiveComputeShader);
                 mMonolithicPrograms[activeKey] = mActiveMonolithicProgram;
             }
             else
@@ -141,7 +145,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveFragmentShader(GLSLAssembly* fragmentShader)
+    void GLSLMonolithicProgramManager::setActiveFragmentShader(GL3PlusShader* fragmentShader)
     {
         if (fragmentShader != mActiveFragmentShader)
         {
@@ -152,7 +156,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveVertexShader(GLSLAssembly* vertexShader)
+    void GLSLMonolithicProgramManager::setActiveVertexShader(GL3PlusShader* vertexShader)
     {
         if (vertexShader != mActiveVertexShader)
         {
@@ -162,7 +166,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveGeometryShader(GLSLAssembly* geometryShader)
+    void GLSLMonolithicProgramManager::setActiveGeometryShader(GL3PlusShader* geometryShader)
     {
         if (geometryShader != mActiveGeometryShader)
         {
@@ -172,7 +176,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveHullShader(GLSLAssembly* hullShader)
+    void GLSLMonolithicProgramManager::setActiveHullShader(GL3PlusShader* hullShader)
     {
         if (hullShader != mActiveHullShader)
         {
@@ -182,7 +186,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveDomainShader(GLSLAssembly* domainShader)
+    void GLSLMonolithicProgramManager::setActiveDomainShader(GL3PlusShader* domainShader)
     {
         if (domainShader != mActiveDomainShader)
         {
@@ -192,7 +196,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLMonolithicProgramManager::setActiveComputeShader(GLSLAssembly* computeShader)
+    void GLSLMonolithicProgramManager::setActiveComputeShader(GL3PlusShader* computeShader)
     {
         if (computeShader != mActiveComputeShader)
         {
