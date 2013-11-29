@@ -77,6 +77,7 @@ namespace Ogre
 		}
 
 		mLodMesh = meshReference->_getLodValueArray();
+		mLodMaterial[0] = mMaterial->_getLodValues();
 
 		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 
@@ -580,42 +581,6 @@ namespace Ogre
 	{
 		static String sType = "InstanceBatch";
 		return sType;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_notifyCurrentCamera( Camera* cam )
-	{
-		//See DistanceLodStrategy::getValueImpl()
-		//We use our own because our SceneNode is just filled with zeroes, and updating it
-		//with real values is expensive, plus we would need to make sure it doesn't get to
-		//the shader
-		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
-					 mMeshReference->getBoundingSphereRadius();
-        depth = max( depth, Real(0) );
-        Real lodValue = depth * cam->_getLodBiasInverse();
-
-		//Now calculate Material LOD
-        /*const LodStrategy *materialStrategy = mMaterial->getLodStrategy();
-        
-        //Calculate LOD value for given strategy
-        Real lodValue = materialStrategy->getValue( this, cam );*/
-
-        //Get the index at this depth
-        unsigned short idx = mMaterial->getLodIndex( lodValue );
-
-		//TODO: Replace subEntity for MovableObject
-        // Construct event object
-        /*EntityMaterialLodChangedEvent subEntEvt;
-        subEntEvt.subEntity = this;
-        subEntEvt.camera = cam;
-        subEntEvt.lodValue = lodValue;
-        subEntEvt.previousLodIndex = mMaterialLodIndex;
-        subEntEvt.newLodIndex = idx;
-
-        //Notify LOD event listeners
-		cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);
-
-        //Change LOD index
-		mMaterialLodIndex = idx;*/
 	}
 	//-----------------------------------------------------------------------
 	Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const

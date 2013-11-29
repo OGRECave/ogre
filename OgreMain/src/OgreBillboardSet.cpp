@@ -286,6 +286,7 @@ namespace Ogre {
            already loaded anyway)
         */
         mMaterial->load();
+		mLodMaterial[0] = mMaterial->_getLodValues();
     }
 
     //-----------------------------------------------------------------------
@@ -616,6 +617,8 @@ namespace Ogre {
         
         // Ensure new material loaded (will not load again if already loaded)
         mMaterial->load();
+
+		mLodMaterial[0] = mMaterial->_getLodValues();
 	}
 
     //-----------------------------------------------------------------------

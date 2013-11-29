@@ -360,8 +360,6 @@ namespace Ogre
 
         /** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
-        /** @copydoc MovableObject::_notifyCurrentCamera. */
-		void _notifyCurrentCamera( Camera* cam );
 
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
