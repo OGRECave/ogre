@@ -17,17 +17,17 @@ file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/src/*.cpp")
 
 # Add system specific settings
 if (WIN32)
-  file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
-  file(GLOB PLATFORM_SOURCES "src/Win32/*.cpp")
+  file(GLOB PLATFORM_HEADERS "include/windowing/win32/*.h" "src/windowing/win32/*.h")
+  file(GLOB PLATFORM_SOURCES "src/windowing/win32/*.cpp")
 
-  include_directories(src/win32 include/win32)
+  include_directories(src/windowing/win32 include/windowing/win32)
   source_group(GLSL FILES ${GLSL_SOURCE} ${GLSL_HEADERS})
   set(PLATFORM_HEADER_INSTALL "")
 elseif (APPLE)
-  file(GLOB PLATFORM_HEADERS "include/OSX/*.h" "src/OSX/*.h")
-  file(GLOB PLATFORM_SOURCES "src/OSX/*.mm")
+  file(GLOB PLATFORM_HEADERS "include/windowing/OSX/*.h" "src/windowing/OSX/*.h")
+  file(GLOB PLATFORM_SOURCES "src/windowing/OSX/*.mm")
 
-  include_directories(src/OSX include/OSX "${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
+  include_directories(src/windowing/OSX include/windowing/OSX "${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
   set(PLATFORM_LIBS ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
