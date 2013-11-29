@@ -851,7 +851,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
-		assert( index < mMeshLodUsageList.size() - 1 );
+		assert( index < mMeshLodUsageList.size() );
         if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
