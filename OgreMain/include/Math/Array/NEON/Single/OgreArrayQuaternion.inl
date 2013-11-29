@@ -225,7 +225,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	inline ArrayQuaternion ArrayQuaternion::Cmov4( const ArrayQuaternion &arg1,
-													const ArrayQuaternion &arg2, ArrayReal mask )
+													const ArrayQuaternion &arg2, ArrayMaskR mask )
 	{
 		return ArrayQuaternion(
 				MathlibNEON::Cmov4( arg1.mChunkBase[0], arg2.mChunkBase[0], mask ),
@@ -518,7 +518,7 @@ namespace Ogre
 		return uv;
 	}
 	//-----------------------------------------------------------------------------------
-	inline void ArrayQuaternion::Cmov4( ArrayReal mask, const ArrayQuaternion &replacement )
+	inline void ArrayQuaternion::Cmov4( ArrayMaskR mask, const ArrayQuaternion &replacement )
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
