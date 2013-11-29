@@ -214,9 +214,14 @@ namespace Ogre {
         // The loading process accesses LOD usages directly, so
         // transformation of user values must occur after loading is complete.
 
+		assert( mLodValues.size() == mMeshLodUsageList.size()  );
+		LodValueArray::iterator lodValueIt = mLodValues.begin();
         // Transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+		{
             i->value = mLodStrategy->transformUserValue(i->userValue);
+			*lodValueIt++ = i->value;
+		}
 	}
 	//-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -930,6 +935,7 @@ namespace Ogre {
 
 		mNumLods = numLevels;
 		mMeshLodUsageList.resize(numLevels);
+		mLodValues.resize(numLevels);
 		// Resize submesh face data lists too
 		for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
 		{
@@ -945,6 +951,7 @@ namespace Ogre {
 		// Basic prerequisites
 		assert(level != 0 && "Can't modify first LOD level (full detail)");
 		assert(level < mMeshLodUsageList.size() && "Index out of bounds");
+		assert( mLodValues.size() == mMeshLodUsageList.size() );
 
 		mMeshLodUsageList[level] = usage;
 		mLodValues[level] = usage.userValue;
@@ -2211,11 +2218,16 @@ namespace Ogre {
         mLodStrategy = lodStrategy;
 
         assert(mMeshLodUsageList.size());
+		assert(mMeshLodUsageList.size() == mLodValues.size());
         mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 
+		LodValueArray::iterator lodValueIt = mLodValues.begin();
         // Re-transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+		{
             i->value = mLodStrategy->transformUserValue(i->userValue);
+			*lodValueIt++ = i->value;
+		}
 
     }
     //--------------------------------------------------------------------
@@ -2227,6 +2239,7 @@ namespace Ogre {
         SubMesh* submesh = getSubMesh(0);
         mNumLods = submesh->mLodFaceList.size() + 1;
         mMeshLodUsageList.resize(mNumLods);
+		mLodValues.resize(mNumLods);
         for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
             // Record usages. First LOD usage is the mesh itself.
 
@@ -2235,11 +2248,13 @@ namespace Ogre {
                 // Generated buffers are less then the reported by ProgressiveMesh.
                 // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before LOD generation completes.
                 assert(mMeshLodUsageList.size() > n + 1);
-                MeshLodUsage& lod = mMeshLodUsageList[++n];
+				++n;
+                MeshLodUsage& lod = mMeshLodUsageList[n];
                 lod.userValue = lodConfig.levels[i].distance;
                 lod.value = getLodStrategy()->transformUserValue(lod.userValue);
                 lod.edgeData = 0;
                 lod.manualMesh.setNull();
+				mLodValues[n] = lod.value;
             }
         }
 
@@ -2250,9 +2265,11 @@ namespace Ogre {
         if (lodConfig.strategy == AbsolutePixelCountLodStrategy::getSingletonPtr()) {
             mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
             mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
+			mLodValues[0] = std::numeric_limits<Real>::max();
         } else {
             mMeshLodUsageList[0].userValue = 0;
             mMeshLodUsageList[0].value = 0;
+			mLodValues[0] = 0;
         }
     }
     //---------------------------------------------------------------------

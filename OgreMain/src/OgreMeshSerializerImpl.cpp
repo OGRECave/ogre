@@ -1404,6 +1404,7 @@ namespace Ogre {
 		}
 
 		// Loop from 1 rather than 0 (full detail index is not in file)
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
 		for (i = 1; i < pMesh->mNumLods; ++i)
 		{
 			streamID = readChunk(stream);
@@ -2911,6 +2912,7 @@ namespace Ogre {
         }
 
         // Loop from 1 rather than 0 (full detail index is not in file)
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
         for (i = 1; i < pMesh->mNumLods; ++i)
         {
             streamID = readChunk(stream);
