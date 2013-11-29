@@ -35,10 +35,8 @@ THE SOFTWARE.
 	// Calling conventions are needed for x86 (32-bit ONLY) CPUs
     #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         #define OGRE_THREAD_CALL_CONVENTION __stdcall
-	#elif
-        #if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
-            #define __cdecl __attribute__((__cdecl__))
-        #endif
+	#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+        #define __cdecl __attribute__((__cdecl__))
         #define OGRE_THREAD_CALL_CONVENTION __cdecl
     #endif
 #else
