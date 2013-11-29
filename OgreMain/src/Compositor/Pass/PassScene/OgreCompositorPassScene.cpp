@@ -108,7 +108,10 @@ namespace Ogre
 		SceneManager *sceneManager = mCamera->getSceneManager();
 
 		if( mDefinition->mUpdateLodLists )
-			sceneManager->updateAllLods( usedLodCamera, mDefinition->mFirstRQ, mDefinition->mLastRQ );
+		{
+			sceneManager->updateAllLods( usedLodCamera, mDefinition->mFirstRQ, mDefinition->mLastRQ,
+										 mDefinition->mLodBias );
+		}
 
 		//Passes belonging to a ShadowNode should not override their parent.
 		if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )

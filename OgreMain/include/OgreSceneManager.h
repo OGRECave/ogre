@@ -178,6 +178,23 @@ namespace Ogre {
 		}
 	};
 
+	struct UpdateLodRequest : public CullFrustumRequest
+	{
+		Real	lodBias;
+
+		UpdateLodRequest() :
+			CullFrustumRequest(), lodBias( 0 )
+		{
+		}
+		UpdateLodRequest( uint8 _firstRq, uint8 _lastRq,
+							const ObjectMemoryManagerVec *_objectMemManager,
+							const Camera *_camera, const Camera *_lodCamera, Real _lodBias ) :
+			CullFrustumRequest( _firstRq, _lastRq, _objectMemManager, _camera, _lodCamera ),
+			lodBias( _lodBias )
+		{
+		}
+	};
+
 	struct UpdateTransformRequest
 	{
 		Transform t;
@@ -914,6 +931,7 @@ namespace Ogre {
 
 		volatile bool		mExitWorkerThreads;
 		CullFrustumRequest				mCurrentCullFrustumRequest;
+		UpdateLodRequest				mUpdateLodRequest;
 		UpdateTransformRequest			mUpdateTransformRequest;
 		ObjectMemoryManagerVec const	*mUpdateBoundsRequest;
 		InstancingTheadedCullingMethod	mInstancingThreadedCullingMethod;
@@ -1054,7 +1072,7 @@ namespace Ogre {
 			Thread index so we know at which point we should start at.
 			Must be unique for each worker thread
 		*/
-		void updateAllLodsThread( const CullFrustumRequest &request, size_t threadIdx );
+		void updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx );
 
 		/** Traverses mVisibleObjects[threadIdx] from each thread to call
 			MovableObject::instanceBatchCullFrustumThreaded (which is supposed to cull objects)
@@ -1671,7 +1689,7 @@ namespace Ogre {
 
 		/** Updates the Lod values of all objects relative to the given camera.
 		*/
-		void updateAllLods( const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
+		void updateAllLods( const Camera *lodCamera, Real lodBias, uint8 firstRq, uint8 lastRq );
 
 		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
 		*/

@@ -2063,7 +2063,7 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //-----------------------------------------------------------------------
-void SceneManager::updateAllLodsThread( const CullFrustumRequest &request, size_t threadIdx )
+void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx )
 {
 	const Camera *lodCamera	= request.lodCamera;
 	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
@@ -2096,18 +2096,18 @@ void SceneManager::updateAllLodsThread( const CullFrustumRequest &request, size_
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			//TODO: Select LOD method here
-			MovableObject::lodDistance( numObjs, objData, lodCamera );
+			MovableObject::lodDistance( numObjs, objData, lodCamera, request.lodBias );
 		}
 
 		++it;
 	}
 }
 //-----------------------------------------------------------------------
-void SceneManager::updateAllLods( const Camera *lodCamera, uint8 firstRq, uint8 lastRq )
+void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 firstRq, uint8 lastRq )
 {
-	mRequestType				= UPDATE_ALL_LODS;
-	mCurrentCullFrustumRequest	= CullFrustumRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
-													 lodCamera, lodCamera );
+	mRequestType		= UPDATE_ALL_LODS;
+	mUpdateLodRequest	= UpdateLodRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
+											 lodCamera, lodCamera, lodBias );
 
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
@@ -5318,7 +5318,7 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
 				break;
 			case UPDATE_ALL_LODS:
-				updateAllLodsThread( mCurrentCullFrustumRequest, threadIdx );
+				updateAllLodsThread( mUpdateLodRequest, threadIdx );
 				break;
 			case UPDATE_INSTANCE_MANAGERS:
 				updateInstanceManagersThread( threadIdx );

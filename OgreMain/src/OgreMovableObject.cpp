@@ -437,7 +437,7 @@ namespace Ogre {
 
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really donï¿½t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
@@ -591,7 +591,7 @@ namespace Ogre {
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really donï¿½t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
@@ -1004,12 +1004,13 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void MovableObject::lodDistance( const size_t numNodes, ObjectData objData, const Camera *camera )
+	void MovableObject::lodDistance( const size_t numNodes, ObjectData objData,
+									 const Camera *camera, Real bias )
 	{
 		ArrayVector3 cameraPos;
 		cameraPos.setAll( camera->getDerivedPosition() );
 
-		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() ) );
+		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() * bias ) );
 		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
@@ -1026,20 +1027,21 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void MovableObject::lodPixelCount( const size_t numNodes, ObjectData objData, const Camera *camera )
+	void MovableObject::lodPixelCount( const size_t numNodes, ObjectData objData,
+										const Camera *camera, Real bias )
 	{
 		if( camera->getProjectionType() == PT_PERSPECTIVE )
 		{
-			lodPixelCountPerspective( numNodes, objData, camera );
+			lodPixelCountPerspective( numNodes, objData, camera, bias );
 		}
 		else
 		{
-			lodPixelCountOrthographic( numNodes, objData, camera );
+			lodPixelCountOrthographic( numNodes, objData, camera, bias );
 		}
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::lodPixelCountPerspective( const size_t numNodes, ObjectData objData,
-													const Camera *camera )
+													const Camera *camera, Real bias )
 	{
 		const Viewport *viewport = camera->getLastViewport();
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
@@ -1053,6 +1055,7 @@ namespace Ogre {
 		ArrayReal PiDotVpAreaDotProjMat00dot11(
 						Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] ) );
 
+		ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
 		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
@@ -1069,7 +1072,7 @@ namespace Ogre {
 			//ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
 
 			ArrayReal sqRadius = (*worldRadius * *worldRadius);
-			ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
+			ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11 * lodBias) / sqDistance;
 
 			CastArrayToReal( lodValues, arrayLodValue );
 
@@ -1080,7 +1083,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::lodPixelCountOrthographic( const size_t numNodes, ObjectData objData,
-													const Camera *camera )
+													const Camera *camera, Real bias )
 	{
 		const Viewport *viewport = camera->getLastViewport();
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
@@ -1097,13 +1100,14 @@ namespace Ogre {
 		const Matrix4 &projMat = camera->getProjectionMatrix();
 		ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
 
+		ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
 		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
 																		(objData.mWorldRadius);
-			ArrayReal arrayLodValue = (*worldRadius * *worldRadius) * PiDotVpAreaDivOrhtoArea;
+			ArrayReal arrayLodValue = (*worldRadius * *worldRadius) * PiDotVpAreaDivOrhtoArea * lodBias;
 			CastArrayToReal( lodValues, arrayLodValue );
 
 			lodSet( objData, lodValues );

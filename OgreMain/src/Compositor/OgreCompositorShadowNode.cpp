@@ -346,7 +346,7 @@ namespace Ogre
 				while( j<maxRq && camera->isRenderedRq( j ) )
 					++j;
 
-				sceneManager->updateAllLods( lodCamera, i, j );
+				sceneManager->updateAllLods( lodCamera, 1.0f, i, j );
 				sceneManager->_cullReceiversBox( camera, lodCamera, i, j );
 				i = j;
 			}

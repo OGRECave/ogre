@@ -327,19 +327,20 @@ namespace Ogre {
 		@param camera
 			Camera used for our Lod calculations.
 		*/
-		static void lodDistance( const size_t numNodes, ObjectData t, const Camera *camera );
+		static void lodDistance( const size_t numNodes, ObjectData t, const Camera *camera, Real bias );
 
 		/** @See lodDistance
 		@remarks
 			Uses the visible pixel count method to calculate the Lod Value
 		*/
-		static void lodPixelCount( const size_t numNodes, ObjectData t, const Camera *camera );
+		static void lodPixelCount( const size_t numNodes, ObjectData t,
+									const Camera *camera, Real bias );
 
 	protected:
 		static void lodPixelCountPerspective( const size_t numNodes, ObjectData t,
-												const Camera *camera );
+												const Camera *camera, Real bias );
 		static void lodPixelCountOrthographic( const size_t numNodes, ObjectData t,
-												const Camera *camera );
+												const Camera *camera, Real bias );
 	public:
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 

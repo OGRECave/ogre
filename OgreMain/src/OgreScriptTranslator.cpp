@@ -6838,6 +6838,46 @@ namespace Ogre{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 				switch(prop->id)
 				{
+				case ID_LOD_BIAS:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						Real var;
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( getReal( *it0, &var ) )
+						{
+							passScene->mLodBias = var;
+						}
+						else
+						{
+							 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
+				case ID_LOD_UPDATE_LIST:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						bool var;
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( getBoolean( *it0, &var ) )
+						{
+							passScene->mUpdateLodLists = var;
+						}
+						else
+						{
+							 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
 				case ID_VISIBILITY_MASK:
 					{
 						if(prop->values.empty())
@@ -6921,6 +6961,21 @@ namespace Ogre{
 
 						AbstractNodeList::const_iterator it0 = prop->values.begin();
 						if( !getIdString( *it0, &passScene->mCameraName ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
+				case ID_LOD_CAMERA:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getIdString( *it0, &passScene->mLodCameraName ) )
 						{
 							 compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 						}
