@@ -63,12 +63,6 @@ namespace Ogre
 		return numInputChannels;
 	}
 	//-----------------------------------------------------------------------------------
-	uint32 TextureDefinitionBase::encodeTexSource( size_t index, TextureSource textureSource )
-	{
-		assert( index <= 0x3FFFFFFF && "Texture Source Index out of supported range" );
-		return (index & 0x3FFFFFFF)|(textureSource<<30);
-	}
-	//-----------------------------------------------------------------------------------
     void TextureDefinitionBase::decodeTexSource( uint32 encodedVal, size_t &outIdx,
                                                  TextureSource &outTexSource )
 	{
@@ -77,40 +71,6 @@ namespace Ogre
 
 		outIdx		 = encodedVal & 0x3FFFFFFF;
 		outTexSource = static_cast<TextureSource>( texSource );
-	}
-	//-----------------------------------------------------------------------------------
-	IdString TextureDefinitionBase::addTextureSourceName( const String &name, size_t index,
-															TextureSource textureSource )
-	{
-		String::size_type findResult = name.find( "global_" );
-		if( textureSource == TEXTURE_LOCAL && findResult == 0 )
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-						"Local textures can't start with global_ prefix! '" + name + "'",
-						"TextureDefinitionBase::addTextureSourceName" );
-		}
-		else if( textureSource == TEXTURE_GLOBAL && findResult != 0 )
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-						"Global textures must start with global_ prefix! '" + name + "'",
-						"TextureDefinitionBase::addTextureSourceName" );
-		}
-
-		const uint32 value = encodeTexSource( index, textureSource );
-
-		IdString hashedName( name );
-		NameToChannelMap::const_iterator itor = mNameToChannelMap.find( hashedName );
-		if( itor != mNameToChannelMap.end() && itor->second != value )
-		{
-			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
-						"Texture with same name '" + name +
-						"' in the same scope already exists",
-						"TextureDefinitionBase::addTextureSourceName" );
-		}
-
-		mNameToChannelMap[hashedName] = value;
-
-		return hashedName;
 	}
 	//-----------------------------------------------------------------------------------
 	void TextureDefinitionBase::getTextureSource( IdString name, size_t &index,
