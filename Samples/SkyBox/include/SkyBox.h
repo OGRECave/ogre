@@ -16,18 +16,13 @@ public:
 		mInfo["Description"] = "Shows how to use skyboxes (fixed-distance cubes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skybox.png";
 		mInfo["Category"] = "Environment";
+		mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
 	}
 
 protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "SkyBox Workspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ) );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
 		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

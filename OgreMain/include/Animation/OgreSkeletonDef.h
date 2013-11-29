@@ -105,7 +105,7 @@ namespace Ogre
 		const BoneDataVec& getBones(void) const							{ return mBones; }
 		const SkeletonAnimationDefVec& getAnimationDefs(void) const		{ return mAnimationDefs; }
 		const DepthLevelInfoVec& getDepthLevelInfo(void) const			{ return mDepthLevelInfoVec; }
-		const KfTransform * RESTRICT_ALIAS getBindPose(void) const		{ return mBindPose.get(); }
+		const KfTransform * getBindPose(void) const						{ return mBindPose.get(); }
 
 		/** Returns the total number of bone blocks to reach the given level. i.e On SSE2,
 			If the skeleton has 1 root node, 3 children, and 5 children of children;

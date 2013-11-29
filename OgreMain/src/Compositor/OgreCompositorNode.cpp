@@ -272,6 +272,8 @@ namespace Ogre
 		case TextureDefinitionBase::TEXTURE_GLOBAL:
 			channel = &mWorkspace->getGlobalTexture( textureName );
 			break;
+        default:
+            break;
 		}
 
 		TexturePtr retVal;
@@ -308,6 +310,8 @@ namespace Ogre
 			case TextureDefinitionBase::TEXTURE_GLOBAL:
 				channel = &mWorkspace->getGlobalTexture( itor->getRenderTargetName() );
 				break;
+            default:
+                continue;
 			}
 
 			const CompositorPassDefVec &passes = itor->getCompositorPasses();

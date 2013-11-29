@@ -178,8 +178,6 @@ namespace Ogre
 
 		for( size_t i=0; i<numObjs; i += ARRAY_PACKED_REALS )
 		{
-			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																		(objData.mWorldRadius);
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
 			ArrayMaskR inUse = CastIntToReal(Mathlib::TestFlags4( *visibilityFlags,
@@ -201,7 +199,7 @@ namespace Ogre
 		}
 
 		//We've been merging and processing in bulks, but we now need to join all simd results
-		//Real maxRadius = Mathlib::ColapseMax( maxWorldRadius );
+		//Real maxRadius = Mathlib::CollapseMax( maxWorldRadius );
 		Vector3 vMin = vMinBounds.collapseMin();
 		Vector3 vMax = vMaxBounds.collapseMax();
 

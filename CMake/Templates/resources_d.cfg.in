@@ -25,7 +25,6 @@ Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/dragon.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/fresneldemo.zip
-Zip=@OGRE_MEDIA_DIR_DBG@/packs/ogretestmap.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/ogredance.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/skybox.zip

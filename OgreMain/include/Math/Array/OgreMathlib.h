@@ -43,11 +43,11 @@ namespace Ogre
 	typedef MathlibSSE2 Mathlib;
 }
 #elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD == 1
-//    #if OGRE_DOUBLE_PRECISION == 1
-//        #include "NEON/Double/OgreMathlibSSE2.h"
-//    #else
+    #if OGRE_DOUBLE_PRECISION == 1
+        #error Double precision with SIMD on ARM is not supported
+    #else
         #include "NEON/Single/OgreMathlibNEON.h"
-//    #endif
+    #endif
 
 namespace Ogre
 {

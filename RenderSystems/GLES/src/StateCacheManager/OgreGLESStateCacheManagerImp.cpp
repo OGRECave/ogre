@@ -260,7 +260,7 @@ namespace Ogre {
         }
     }
     
-    bool GLESStateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
+    bool GLESStateCacheManagerImp::activateGLTextureUnit(size_t unit)
 	{
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)

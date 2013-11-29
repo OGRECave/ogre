@@ -309,7 +309,7 @@ namespace Ogre {
         {
             // Create render target for each slice
             mSliceTRT.reserve(mDepth);
-            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
@@ -709,7 +709,7 @@ namespace Ogre {
 
         // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
         // guaranteed to work on all platforms.
-        int sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
+        size_t sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
         PixelBox tempBox = PixelBox(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
         tempBox.data = new uint8[sizeInBytes];
 
@@ -1195,7 +1195,7 @@ namespace Ogre {
     
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
-    GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
+    GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
     GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;

@@ -72,6 +72,7 @@ namespace Ogre
 
 	public:
 		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( name ) {}
+        virtual ~CompositorNodeDef() {}
 
 		IdString getName() const							{ return mName; }
 

@@ -40,6 +40,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_ANDROID 5
 #define OGRE_PLATFORM_NACL 6
 #define OGRE_PLATFORM_WINRT 7
+#define OGRE_PLATFORM_FLASHCC 8
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -154,7 +155,7 @@ namespace Ogre {
 #endif
 
     /* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__)
+#if defined(__x86_64__) || defined(_M_X64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__)
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
 #else
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
@@ -166,6 +167,9 @@ namespace Ogre {
 #define OGRE_QUOTE_INPLACE(x) # x
 #define OGRE_QUOTE(x) OGRE_QUOTE_INPLACE(x)
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
+
+// Disable OGRE_WCHAR_T_STRINGS until we figure out what to do about it.
+#define OGRE_WCHAR_T_STRINGS 0
 
 //----------------------------------------------------------------------------
 // Windows Settings
@@ -223,7 +227,7 @@ namespace Ogre {
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
 //----------------------------------------------------------------------------
-// Linux/Apple/iOs/Android/NaCl Settings
+// Linux/Apple/iOS/Android/NaCl Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 
@@ -337,7 +341,11 @@ namespace Ogre {
 #   define OGRE_BUILD_SUFFIX ""
 #endif
 
-#if OGRE_FLEXIBILITY_LEVEL > 0
+#ifndef OGRE_FLEXIBILITY_LEVEL
+#   define OGRE_FLEXIBILITY_LEVEL 0
+#endif
+
+#if OGRE_FLEXIBILITY_LEVEL >= 0
 	#define virtual_l0 virtual
 #else
 	#define virtual_l0

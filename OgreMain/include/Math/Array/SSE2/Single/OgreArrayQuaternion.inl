@@ -171,7 +171,7 @@ namespace Ogre
 		// fCoeff1 = Sin( fT * fAngle ) * fInvSin
 		ArrayReal fCoeff0 = _mm_mul_ps( MathlibSSE2::Sin4( _mm_mul_ps( oneSubT, fAngle ) ), fInvSin );
 		ArrayReal fCoeff1 = _mm_mul_ps( MathlibSSE2::Sin4( _mm_mul_ps( fT, fAngle ) ), fInvSin );
-		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180°)
+		// fCoeff1 = mask ? fCoeff1 : fT; (switch to lerp when rkP & rkQ are too close->fSin=0, or 180Â°)
 		fCoeff0 = MathlibSSE2::CmovRobust( fCoeff0, oneSubT, mask );
 		fCoeff1 = MathlibSSE2::CmovRobust( fCoeff1, fT, mask );
 

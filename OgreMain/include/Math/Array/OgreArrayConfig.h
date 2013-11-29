@@ -83,19 +83,57 @@ THE SOFTWARE.
     #elif OGRE_CPU == OGRE_CPU_ARM
         // ARM - NEON
         #include <arm_neon.h>
-//        #if OGRE_DOUBLE_PRECISION == 1
-//            #define ARRAY_PACKED_REALS 2
-//            namespace Ogre {
-//                typedef __m128d ArrayReal;
-//            }
-//        #else
+        #if OGRE_DOUBLE_PRECISION == 1
+            #error Double precision with SIMD on ARM is not supported
+        #else
             #define ARRAY_PACKED_REALS 4
             namespace Ogre {
                 typedef float32x4_t ArrayReal;
+                typedef float32x4_t ArrayMaskR;
+
+                #define ARRAY_REAL_ZERO vdupq_n_f32( 0.0f )
+                #define ARRAY_INT_ZERO vdupq_n_s32( 0.0f )
 
                 class ArrayRadian;
             }
-//        #endif
+
+            // Make sure that we have the preload macro. Might not be available with some compilers.
+            #ifndef __pld
+            #define __pld(x) asm volatile ( "pld [%[addr]]\n" :: [addr] "r" (x) : "cc" );
+            #endif
+
+            #if defined(__arm64__)
+                #define OGRE_PREFETCH_T0( x ) asm volatile ( "prfm pldl1keep, [%[addr]]\n" :: [addr] "r" (x) : "cc" );
+                #define OGRE_PREFETCH_T1( x ) asm volatile ( "prfm pldl2keep, [%[addr]]\n" :: [addr] "r" (x) : "cc" );
+                #define OGRE_PREFETCH_T2( x ) asm volatile ( "prfm pldl3keep, [%[addr]]\n" :: [addr] "r" (x) : "cc" );
+                #define OGRE_PREFETCH_NTA( x ) asm volatile ( "prfm pldl1strm, [%[addr]]\n" :: [addr] "r" (x) : "cc" );
+            #else
+                #define OGRE_PREFETCH_T0( x ) __pld(x)
+                #define OGRE_PREFETCH_T1( x ) __pld(x)
+                #define OGRE_PREFETCH_T2( x ) __pld(x)
+                #define OGRE_PREFETCH_NTA( x ) __pld(x)
+            #endif
+
+            //Distance (in ArrayMemoryManager's slots) used to keep fetching data. This also
+            //means the memory manager needs to allocate extra memory for them.
+            #define OGRE_PREFETCH_SLOT_DISTANCE		4*ARRAY_PACKED_REALS //Must be multiple of ARRAY_PACKED_REALS
+        #endif
+
+        namespace Ogre {
+            typedef int32x4_t ArrayInt;
+            typedef int32x4_t ArrayMaskI;
+        }
+
+        ///r = (a * b) + c
+        #define _mm_madd_ps( a, b, c )		vaddq_f32( c, vmulq_f32( a, b ) )
+        ///r = -(a * b) + c
+        #define _mm_nmsub_ps( a, b, c )		vsubq_f32( c, vmulq_f32( a, b ) )
+
+        /// Does not convert, just cast ArrayReal to ArrayInt
+        #define CastRealToInt( x )			vreinterpretq_s32_f32( x )
+        #define CastIntToReal( x )			vreinterpretq_f32_s32( x )
+        /// Input must be 16-byte aligned
+        #define CastArrayToReal( outFloatPtr, arraySimd )		vst1q_f32( outFloatPtr, arraySimd )
 
 	#else
 		//Unsupported architecture, tell user to reconfigure. We could silently fallback to C,
@@ -113,8 +151,10 @@ THE SOFTWARE.
 		typedef bool ArrayMaskR;
 		typedef bool ArrayMaskI;
 
-		#define CastIntToReal( x ) static_cast<Ogre::Real>(x)
-		#define CastRealToInt( x ) static_cast<ArrayInt>(x)
+		//Do NOT I REPEAT DO NOT change these to static_cast<Ogre::Real>(x) and static_cast<int>(x)
+		//These are not conversions. They're reinterpretations!
+		#define CastIntToReal( x ) (x)
+		#define CastRealToInt( x ) (x)
 
 		#define ogre_madd( a, b, c )		( (c) + ( (a) * (b) ) )
 

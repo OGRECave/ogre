@@ -82,7 +82,7 @@ namespace Ogre
 
 	public:
 		ObjectMemoryManager();
-		~ObjectMemoryManager();
+		virtual ~ObjectMemoryManager();
 
 		/// @See mMemoryManagerType
 		void _setTwin( SceneMemoryMgrTypes memoryManagerType, ObjectMemoryManager *twinMemoryManager );

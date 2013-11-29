@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 
+#include "OgreSceneManager.h"
 #include "OgreViewport.h"
 #include "OgreSceneManager.h"
 

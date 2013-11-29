@@ -485,12 +485,12 @@ namespace Ogre {
 
         if (cascade)
         {
-			NodeVec::iterator itor = mChildren.begin();
-			NodeVec::iterator end  = mChildren.end();
-			while( itor != end )
+			NodeVec::iterator childItor = mChildren.begin();
+			NodeVec::iterator childItorEnd  = mChildren.end();
+			while( childItor != childItorEnd )
 			{
-				static_cast<SceneNode*>( *itor )->setVisible( visible, cascade );
-				++itor;
+				static_cast<SceneNode*>( *childItor )->setVisible( visible, cascade );
+				++childItor;
 			}
         }
     }
@@ -508,12 +508,12 @@ namespace Ogre {
 
 		if (cascade)
 		{
-			NodeVec::iterator itor = mChildren.begin();
-			NodeVec::iterator end  = mChildren.end();
-			while( itor != end )
+			NodeVec::iterator childItor = mChildren.begin();
+			NodeVec::iterator childItorEnd  = mChildren.end();
+			while( childItor != childItorEnd )
 			{
-				static_cast<SceneNode*>( *itor )->setDebugDisplayEnabled( enabled, cascade );
-				++itor;
+				static_cast<SceneNode*>( *childItor )->setDebugDisplayEnabled( enabled, cascade );
+				++childItor;
 			}
 		}
 	}
@@ -531,12 +531,12 @@ namespace Ogre {
 
         if (cascade)
         {
-			NodeVec::iterator itor = mChildren.begin();
-			NodeVec::iterator end  = mChildren.end();
-			while( itor != end )
+			NodeVec::iterator childItor = mChildren.begin();
+			NodeVec::iterator childItorEnd  = mChildren.end();
+			while( childItor != childItorEnd )
 			{
-				static_cast<SceneNode*>( *itor )->flipVisibility( cascade );
-				++itor;
+				static_cast<SceneNode*>( *childItor )->flipVisibility( cascade );
+				++childItor;
 			}
         }
     }

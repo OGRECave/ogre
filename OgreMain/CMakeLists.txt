@@ -86,20 +86,67 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
 )
 
-if (OGRE_SIMD)
+if (OGRE_SIMD_SSE2)
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
 	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
-else()
+
+	set (HEADER_FILES ${HEADER_FILES}
+	  include/Math/Array/SSE2/Single/OgreArrayAabb.h
+	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.h
+	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.h
+	  include/Math/Array/SSE2/Single/OgreArrayVector3.h
+	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.h
+	  include/Math/Array/SSE2/Single/OgreArrayAabb.inl
+	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.inl
+	  include/Math/Array/SSE2/Single/OgreArrayVector3.inl
+	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.inl)
+endif()
+
+if (OGRE_SIMD_NEON)
+	set (SOURCE_FILES ${SOURCE_FILES}
+	  src/Math/Array/NEON/Single/OgreArrayAabb.cpp
+      src/Math/Array/NEON/Single/OgreArrayMatrix4.cpp
+      src/Math/Array/NEON/Single/OgreArrayQuaternion.cpp
+	  src/Math/Array/NEON/Single/OgreArrayVector3.cpp
+	  src/Math/Array/NEON/Single/OgreMathlibNEON.cpp)
+
+	set (HEADER_FILES ${HEADER_FILES}
+	  include/Math/Array/NEON/Single/OgreArrayAabb.h
+      include/Math/Array/NEON/Single/OgreArrayMatrix4.h
+      include/Math/Array/NEON/Single/OgreArrayQuaternion.h
+	  include/Math/Array/NEON/Single/OgreArrayVector3.h
+	  include/Math/Array/NEON/Single/OgreMathlibNEON.h
+	  include/Math/Array/NEON/Single/OgreArrayAabb.inl
+      include/Math/Array/NEON/Single/OgreArrayMatrix4.inl
+      include/Math/Array/NEON/Single/OgreArrayQuaternion.inl
+	  include/Math/Array/NEON/Single/OgreArrayVector3.inl
+	  include/Math/Array/NEON/Single/OgreMathlibNEON.inl)
+endif()
+
+if (NOT(OGRE_SIMD_SSE2 OR OGRE_SIMD_NEON))
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/C/OgreArrayAabb.cpp
 	  src/Math/Array/C/OgreArrayMatrix4.cpp
 	  src/Math/Array/C/OgreArrayQuaternion.cpp
 	  src/Math/Array/C/OgreArrayVector3.cpp
 	  src/Math/Array/C/OgreMathlibC.cpp)
+
+	set (HEADER_FILES ${HEADER_FILES}
+	  include/Math/Array/C/OgreArrayAabb.h
+	  include/Math/Array/C/OgreArrayMatrix4.h
+	  include/Math/Array/C/OgreArrayQuaternion.h
+	  include/Math/Array/C/OgreArrayVector3.h
+	  include/Math/Array/C/OgreMathlibC.h
+	  include/Math/Array/C/OgreArrayAabb.inl
+	  include/Math/Array/C/OgreArrayMatrix4.inl
+	  include/Math/Array/C/OgreArrayQuaternion.inl
+	  include/Math/Array/C/OgreArrayVector3.inl
+	  include/Math/Array/C/OgreMathlibC.inl)
 endif ()
 
 

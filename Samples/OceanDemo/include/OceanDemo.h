@@ -134,6 +134,7 @@ Sample_Ocean::Sample_Ocean()
 	mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
 	mInfo["Thumbnail"] = "thumb_ocean.png";
 	mInfo["Category"] = "Environment";
+	mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
 }
 /*************************************************************************
 	                    Sample_Ocean Methods
@@ -195,12 +196,6 @@ void Sample_Ocean::setupContent(void)
 
 void Sample_Ocean::setupScene()
 {
-	const IdString workspaceName( "OceanDemoWorkspace" );
-	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-	if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ) );
-	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 	// Set ambient light
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
 	mSceneMgr->setSkyBox(true, "SkyBox", 1000);

@@ -43,10 +43,6 @@ namespace Ogre {
     extern OptimisedUtil* _getOptimisedUtilGeneral(void);
 #if __OGRE_HAVE_SSE
     extern OptimisedUtil* _getOptimisedUtilSSE(void);
-//#elif __OGRE_HAVE_NEON
-//    extern OptimisedUtil* _getOptimisedUtilNEON(void);
-//#elif __OGRE_HAVE_VFP
-//    extern OptimisedUtil* _getOptimisedUtilVFP(void);
 #endif
 #if __OGRE_HAVE_DIRECTXMATH
     extern OptimisedUtil* _getOptimisedUtilDirectXMath(void);
@@ -86,10 +82,6 @@ namespace Ogre {
             IMPL_DEFAULT,
 #if __OGRE_HAVE_SSE
             IMPL_SSE,
-//#elif __OGRE_HAVE_NEON
-//            IMPL_NEON,
-//#elif __OGRE_HAVE_VFP
-//            IMPL_VFP,
 #endif
             IMPL_COUNT
         };
@@ -136,16 +128,6 @@ namespace Ogre {
             {
                 mOptimisedUtils.push_back(_getOptimisedUtilSSE());
             }
-//#elif __OGRE_HAVE_VFP
-//            if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_VFP)
-//            {
-//                mOptimisedUtils.push_back(_getOptimisedUtilVFP());
-//            }
-//#elif __OGRE_HAVE_NEON
-//            if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_NEON)
-//            {
-//                mOptimisedUtils.push_back(_getOptimisedUtilNEON());
-//            }
 #endif
         }
 
@@ -406,18 +388,6 @@ namespace Ogre {
             return _getOptimisedUtilSSE();
         }
         else
-//#elif __OGRE_HAVE_VFP
-//        if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_VFP)
-//        {
-//            return _getOptimisedUtilVFP();
-//        }
-//        else
-//#elif __OGRE_HAVE_NEON
-//        if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_NEON)
-//        {
-//            return _getOptimisedUtilNEON();
-//        }
-//        else
 #endif  // __OGRE_HAVE_SSE
         {
 #if __OGRE_HAVE_DIRECTXMATH

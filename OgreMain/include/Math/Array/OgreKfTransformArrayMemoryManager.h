@@ -57,6 +57,8 @@ namespace Ogre
 								size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
 								RebaseListener *rebaseListener=0 );
 
+        virtual ~KfTransformArrayMemoryManager() {}
+
 		/** Requests memory for a new KfTransofrm (for the Array vectors & matrices)
 		@remarks
 			Uses all slots.

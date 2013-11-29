@@ -92,6 +92,8 @@ namespace Ogre
 								mDefinition->getNumberOfBoneBlocks( depthLevelInfo.size() ) );
 			Real *manualBones = reinterpret_cast<Real*>( mManualBones.get() );
 
+            // FIXME: manualBones could possibly be null. What to do?
+
 			mUnusedNodes.resize( mDefinition->mNumUnusedSlots, Bone( Transform() ) );
 
 			KfTransform const *reverseBindPose = mDefinition->mReverseBindPose.get();
@@ -253,7 +255,6 @@ namespace Ogre
 		assert( &mBones[bone->mGlobalIndex] == bone && "The bone doesn't belong to this instance!" );
 
 		uint32 depthLevel = bone->getDepthLevel();
-		size_t offset = mDefinition->getNumberOfBoneBlocks( depthLevel );
 		SceneNode &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
 		uintptr_t diff = bone->_getTransform().mParents - firstBone._getTransform().mParents;
@@ -266,7 +267,6 @@ namespace Ogre
 		assert( &mBones[bone->mGlobalIndex] == bone && "The bone doesn't belong to this instance!" );
 
 		uint32 depthLevel = bone->getDepthLevel();
-		size_t offset = mDefinition->getNumberOfBoneBlocks( depthLevel );
 		SceneNode &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
 		uintptr_t diff = bone->_getTransform().mParents - firstBone._getTransform().mParents;

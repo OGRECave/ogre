@@ -17,18 +17,13 @@ public:
 		mInfo["Thumbnail"] = "thumb_texfx.png";
 		mInfo["Category"] = "Unsorted";
 		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
+		mBackgroundColor = ColourValue::White;
 	}
 
 protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "TextureFX Workspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::White );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
 		// set our camera to orbit around the origin and show cursor

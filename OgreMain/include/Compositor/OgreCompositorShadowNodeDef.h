@@ -70,7 +70,7 @@ namespace Ogre
 
 		ShadowMapTechniques	shadowMapTechnique;
 
-		//Foccused params (+ LispSM + PSSM)
+		//Focused params (+ LispSM + PSSM)
 		bool				aggressiveFocusRegion;
 		//LispSM params (+ PSSM)
 		Real				optimalAdjustFactor;
@@ -78,7 +78,7 @@ namespace Ogre
 		//PSSM params
 		Real				pssmLambda;
 		Real				splitPadding;
-		size_t				numSplits;
+		uint				numSplits;
 
 	protected:
 		IdString	name;
@@ -129,6 +129,7 @@ namespace Ogre
 		CompositorShadowNodeDef( IdString name ) :
 				CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_UNIFORM ),
 				mNumLights( 0 ), mMinRq( ~0 ), mMaxRq( 0 ) {}
+        virtual ~CompositorShadowNodeDef() {}
 
 		/// Overloaded to prevent creating input channels.
 		virtual IdString addTextureSourceName( const String &name, size_t index,

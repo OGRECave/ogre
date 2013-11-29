@@ -1,7 +1,7 @@
 // Scintilla source code edit control
 /** @file LexCSS.cxx
  ** Lexer for Cascading Style Sheets
- ** Written by Jakub Vr·na
+ ** Written by Jakub Vr√°na
  ** Improved by Philippe Lhoste (CSS2)
  **/
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>

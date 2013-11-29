@@ -633,7 +633,6 @@ namespace Ogre {
 		if (!mInitialised)
 			return;
 
-		Root& root = Root::getSingleton();
 		bool hwAnimation = isHardwareAnimationEnabled();
 		bool isNeedUpdateHardwareAnim = hwAnimation && !mCurrentHWAnimationState;
 		bool forcedSwAnimation = getSoftwareAnimationRequests()>0;

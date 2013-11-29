@@ -32,10 +32,15 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-#if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+
+#if OGRE_CPU == OGRE_CPU_ARM
+#define __dmb() asm volatile ( "dmb sy\n" ::: "cc" );
+#endif
+
+#if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     typedef int pthread_barrierattr_t;
-	//-----------------------------------------------------------------------------------
-    int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
+    //-----------------------------------------------------------------------------------
+    int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, int count)
     {
         if(count == 0)
         {
@@ -56,14 +61,14 @@ namespace Ogre
         
         return 0;
     }
-	//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
     int pthread_barrier_destroy(pthread_barrier_t *barrier)
     {
         pthread_cond_destroy(&barrier->cond);
         pthread_mutex_destroy(&barrier->mutex);
         return 0;
     }
-	//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
     int pthread_barrier_wait(pthread_barrier_t *barrier)
     {
         pthread_mutex_lock(&barrier->mutex);
@@ -85,18 +90,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
 #endif
     
-	Barrier::Barrier( size_t threadCount )
-	{
-		pthread_barrier_init( &mBarrier, 0, threadCount );
-	}
-	//-----------------------------------------------------------------------------------
-	Barrier::~Barrier()
-	{
-		pthread_barrier_destroy( &mBarrier );
-	}
-	//-----------------------------------------------------------------------------------
-	void Barrier::sync(void)
-	{
-		pthread_barrier_wait( &mBarrier );
-	}
+    Barrier::Barrier( size_t threadCount )
+    {
+        pthread_barrier_init( &mBarrier, 0, static_cast<int>(threadCount) );
+    }
+    //-----------------------------------------------------------------------------------
+    Barrier::~Barrier()
+    {
+        pthread_barrier_destroy( &mBarrier );
+    }
+    //-----------------------------------------------------------------------------------
+    void Barrier::sync(void)
+    {
+        pthread_barrier_wait( &mBarrier );
+    }
 }

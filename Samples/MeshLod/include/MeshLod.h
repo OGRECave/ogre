@@ -30,12 +30,6 @@ protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "MeshLod Workspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		mCameraMan->setStyle(CS_ORBIT);
 
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light

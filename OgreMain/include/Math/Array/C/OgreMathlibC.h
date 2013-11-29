@@ -113,7 +113,7 @@ namespace Ogre
 				floating point to integer and back has a latency delay
 
 				For more information refer to Chapter 3.5.2.3
-				Bypass between Execution Domains, Intel® 64 and IA-32
+				Bypass between Execution Domains, IntelÂ® 64 and IA-32
 				Architectures Optimization Reference Manual Order
 				Number: 248966-026 April (and also Table 2-12)
 			@param
@@ -151,12 +151,12 @@ namespace Ogre
 
 		static inline ArrayMaskI And( ArrayMaskI a, ArrayInt b )
 		{
-			return (a ? 0xffffffff : 0) & b;
+			return ((a ? 0xffffffff : 0) & b) != 0;
 		}
 
 		static inline ArrayMaskI And( ArrayInt a, ArrayMaskI b )
 		{
-			return a & (b ? 0xffffffff : 0);
+			return (a & (b ? 0xffffffff : 0)) != 0;
 		}
 
 		static inline ArrayMaskI And( ArrayMaskI a, ArrayMaskI b )
@@ -194,12 +194,17 @@ namespace Ogre
 
 		static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayInt b )
 		{
-			return (a ? 0xffffffff : 0) & ~b;
+			return ((a ? 0xffffffff : 0) & ~b) != 0;
 		}
 
 		static inline ArrayMaskI AndNot( ArrayInt a, ArrayMaskI b )
 		{
-			return a & (b ? 0 : 0xffffffff);
+			return (a & (b ? 0 : 0xffffffff)) != 0;
+		}
+
+		static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayMaskI b )
+		{
+			return a & (!b);
 		}
 
 		/** Returns the result of "a | b"

@@ -437,7 +437,7 @@ protected:
         
         // sibenik
         mCamera->setPosition(27, 9, -2);
-        mCamera->lookAt(Vector3(-6, 2, 1));;
+        mCamera->lookAt(Vector3(-6, 2, 1));
         
         // setup all meshes
         for (unsigned int i = 0; i < mMeshNames.size(); i++) {

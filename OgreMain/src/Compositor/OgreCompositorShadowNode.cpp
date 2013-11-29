@@ -258,7 +258,7 @@ namespace Ogre
 
 		const Vector3 &camPos( newCamera->getDerivedPosition() );
 
-		size_t minIdx = -1;
+		int minIdx = -1;
 		Real minMaxDistance = -std::numeric_limits<Real>::infinity();
 
 		//O(N*M) Complexity. Not my brightest moment. Feel free to improve this snippet,
@@ -268,7 +268,7 @@ namespace Ogre
 			Real minDistance = std::numeric_limits<Real>::max();
 			uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
 			Sphere const * RESTRICT_ALIAS boundingSphere = globalLightList.boundingSphere;
-			for( size_t j=0; j<globalLightList.lights.size(); ++j )
+			for( int j=0; j<static_cast<int>(globalLightList.lights.size()); ++j )
 			{
 				if( *visibilityMask & combinedVisibilityFlags &&
 					*visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER )
@@ -364,8 +364,6 @@ namespace Ogre
 		ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
 		SceneManager *sceneManager	= camera->getSceneManager();
 		const Viewport *viewport	= camera->getLastViewport();
-
-		bool bDifferentCamera = mLastCamera != camera;
 
 		buildClosestLightList( camera, lodCamera );
 
@@ -519,11 +517,11 @@ namespace Ogre
 			CompositorManager2 *compoMgr = mWorkspace->getCompositorManager();
 
 			size_t shadowIdx=0;
-			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator itor =
+			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator shadowTexItor =
 														mDefinition->mShadowMapTexDefinitions.begin();
-			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator end  =
+			CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator shadowTexItorEnd  =
 														mDefinition->mShadowMapTexDefinitions.end();
-			while( itor != end && shadowIdx < pass->getNumShadowContentTextures() )
+			while( shadowTexItor != shadowTexItorEnd && shadowIdx < pass->getNumShadowContentTextures() )
 			{
 				size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
 													TextureUnitState::CONTENT_SHADOW, shadowIdx );
@@ -536,11 +534,9 @@ namespace Ogre
 				autoParamDataSource->setTextureProjector( mShadowMapCameras[shadowIdx].camera,
 															shadowIdx );
 
-				if( itor->light < mCurrentLightList.size() &&
-					mAffectedLights[mCurrentLightList[itor->light].globalIndex] )
+				if( shadowTexItor->light < mCurrentLightList.size() &&
+					mAffectedLights[mCurrentLightList[shadowTexItor->light].globalIndex] )
 				{
-                    //const LightClosest &light = mCurrentLightList[itor->light];
-
 					//TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
 					//changes need to be done so that UV calculations land on the right place
 					const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
@@ -549,11 +545,11 @@ namespace Ogre
 				else
 				{
 					//Use blank texture
-					texUnit->_setTexturePtr( compoMgr->getNullShadowTexture( itor->formatList[0] ) );
+					texUnit->_setTexturePtr( compoMgr->getNullShadowTexture( shadowTexItor->formatList[0] ) );
 					
 				}
 				++shadowIdx;
-				++itor;
+				++shadowTexItor;
 			}
 
 			for( ; shadowIdx<pass->getNumShadowContentTextures(); ++shadowIdx )

@@ -50,15 +50,6 @@ protected:
 
 	void setupContent()
 	{
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		const IdString workspaceName( "DualQuaternion Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black,
-														IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //Add the hardware skinning to the shader generator default render state
         mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);

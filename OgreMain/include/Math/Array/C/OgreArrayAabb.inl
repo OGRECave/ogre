@@ -156,9 +156,9 @@ namespace Ogre
 
 		//Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
 		//(which is ok since we need them to say 'false' to intersection tests)
-		x = MathlibC::CmovRobust( MathlibC::INFINITY, x, mHalfSize.mChunkBase[0] == MathlibC::INFINITY );
-		y = MathlibC::CmovRobust( MathlibC::INFINITY, y, mHalfSize.mChunkBase[1] == MathlibC::INFINITY );
-		z = MathlibC::CmovRobust( MathlibC::INFINITY, z, mHalfSize.mChunkBase[2] == MathlibC::INFINITY );
+		x = MathlibC::CmovRobust( MathlibC::INFINITEA, x, mHalfSize.mChunkBase[0] == MathlibC::INFINITEA );
+		y = MathlibC::CmovRobust( MathlibC::INFINITEA, y, mHalfSize.mChunkBase[1] == MathlibC::INFINITEA );
+		z = MathlibC::CmovRobust( MathlibC::INFINITEA, z, mHalfSize.mChunkBase[2] == MathlibC::INFINITEA );
 
 		mHalfSize = ArrayVector3( x, y, z );
 	}

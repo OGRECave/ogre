@@ -20,6 +20,7 @@ public:
 		mInfo["Description"] = "Demonstrates the use of transparent materials (or scene blending).";
 		mInfo["Thumbnail"] = "thumb_trans.png";
 		mInfo["Category"] = "Lighting";
+		mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
@@ -47,12 +48,6 @@ protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "TransparencyWorkspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ) );
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
 		mCamera->setPosition(0, 0, 300);   // set camera's starting position

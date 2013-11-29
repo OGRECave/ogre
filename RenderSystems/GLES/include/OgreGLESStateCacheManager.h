@@ -99,7 +99,7 @@ namespace Ogre
          @param offset The texture unit to activate.
          @return Whether or not the texture unit was successfully activated.
          */
-        bool activateGLTextureUnit(unsigned char unit);
+        bool activateGLTextureUnit(size_t unit);
         
         /** Gets the current blend equation setting.
          @return The blend equation.

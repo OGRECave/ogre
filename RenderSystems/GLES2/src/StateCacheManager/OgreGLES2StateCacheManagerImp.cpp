@@ -285,8 +285,8 @@ namespace Ogre {
 		{
 			if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
 			{
-				OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
-				mActiveTextureUnit = unit;
+				OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + unit)));
+				mActiveTextureUnit = static_cast<GLenum>(unit);
 				return true;
 			}
 			else if (!unit)

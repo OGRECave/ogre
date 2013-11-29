@@ -930,10 +930,7 @@ namespace Ogre {
 
 			if(!tex.isNull())
             {
-				bool isFsaa;
-				GLuint id = tex->getGLID( isFsaa );
-				OGRE_CHECK_GL_ERROR(glBindTexture( isFsaa ?
-											GL_TEXTURE_2D_MULTISAMPLE : mTextureTypes[stage], id ));
+				OGRE_CHECK_GL_ERROR(glBindTexture( mTextureTypes[stage], tex->getGLID() ));
             }
 			else
             {

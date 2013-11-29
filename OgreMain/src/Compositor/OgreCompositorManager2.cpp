@@ -108,9 +108,6 @@ namespace Ogre
 			}
 		}
 
-		CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( "Default RenderScene" );
-		workDef->connectOutput( 0, "Default Node RenderScene" );
-
 		//-------
 		/*CompositorShadowNodeDef *shadowNode = this->addShadowNodeDefinition( "Default Shadow Node" );
 		shadowNode->setNumShadowTextureDefinitions( 3 );

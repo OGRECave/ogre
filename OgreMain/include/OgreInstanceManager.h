@@ -105,8 +105,9 @@ namespace Ogre
         const IdString          mName;                  //Not the name of the mesh
         MeshPtr                 mMeshReference;
         InstanceBatchMap        mInstanceBatches;
+#ifndef NDEBUG
         size_t                  mIdCount;
-
+#endif
         InstanceBatchVec        mDynamicBatches;
 		InstanceBatchVec        mDirtyStaticBatches;
 

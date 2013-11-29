@@ -83,7 +83,7 @@ namespace Ogre {
         };
 
     protected:
-        /// node to which this object is attached
+        /// Node to which this object is attached
         Node* mParentNode;
 		/// The render queue to use when rendering this object
         uint8 mRenderQueueID;
@@ -100,7 +100,7 @@ namespace Ogre {
 		unsigned char						mCurrentMeshLod;
 		FastArray<unsigned char>			mCurrentMaterialLod;
 
-		// Minimum pixel size to still render
+		/// Minimum pixel size to still render
 		Real mMinPixelSize;
 		/// User objects binding.
 		UserObjectBindings mUserObjectBindings;

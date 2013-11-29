@@ -47,7 +47,9 @@ namespace Ogre
 										size_t instancesPerBatch, unsigned short subMeshIdx,
 										bool useBoneMatrixLookup ) :
 				mName( customName ),
+#ifndef NDEBUG
 				mIdCount( 0 ),
+#endif
 				mInstancesPerBatch( instancesPerBatch ),
 				mInstancingTechnique( instancingTechnique ),
 				mInstancingFlags( instancingFlags ),

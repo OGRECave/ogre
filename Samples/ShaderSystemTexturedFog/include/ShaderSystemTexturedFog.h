@@ -4,6 +4,7 @@
 #include "SdkSample.h"
 #include "RTShaderSRSTexturedFog.h"
 #include "OgreControllerManager.h"
+#include "OgreNameGenerator.h"
 
 using namespace Ogre;
 using namespace OgreBites;

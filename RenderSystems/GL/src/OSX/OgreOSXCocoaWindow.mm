@@ -32,7 +32,7 @@ THE SOFTWARE.
 #import "OgreStringConverter.h"
 #import "OgreWindowEventUtilities.h"
 #import "OgreGLPixelFormat.h"
-#include "OgrePixelBox.h"
+#import "OgrePixelBox.h"
 
 #import "OgreGLRenderSystem.h"
 #import <AppKit/NSScreen.h>

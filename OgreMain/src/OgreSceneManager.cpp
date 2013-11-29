@@ -91,9 +91,9 @@ uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_M
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
 						   InstancingTheadedCullingMethod threadedCullingMethod) :
-mName(name),
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
+mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
@@ -1114,7 +1114,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 
 		if (mFindVisibleObjects)
 		{
-			OgreProfileGroup("cullFrusum", OGREPROF_CULLING);
+			OgreProfileGroup("cullFrustum", OGREPROF_CULLING);
 
 			assert( !mEntitiesMemoryManagerCulledList.empty() );
 
@@ -2133,8 +2133,8 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 
 	AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
 	{
-		if( aabbInfo.size() < mCurrentCullFrustumRequest.lastRq )
-			aabbInfo.resize( mCurrentCullFrustumRequest.lastRq );
+		if( aabbInfo.size() < request.lastRq )
+			aabbInfo.resize( request.lastRq );
 
 		//Reset the aabb infos.
 		AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
@@ -2342,7 +2342,7 @@ void SceneManager::updateSceneGraph()
 
 	highLevelCull();
 	_applySceneAnimations();
-    updateAllAnimations();
+	updateAllAnimations();
 	updateAllTransforms();
 	updateInstanceManagerAnimations();
 	updateInstanceManagers();
@@ -2842,8 +2842,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					localLightList.resize(pass->getLightCountPerIteration());
 
 					LightList::iterator destit = localLightList.begin();
-					unsigned short numShadowTextureLights = 0;
-					for (; destit != localLightList.end() 
+					for (; destit != localLightList.end()
 							&& lightIndex < rendLightList.size(); 
 						++lightIndex, --lightsLeft)
 					{
@@ -5330,6 +5329,8 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 			case USER_UNIFORM_SCALABLE_TASK:
 				mUserTask->execute( threadIdx, mNumWorkerThreads );
 				break;
+            default:
+                break;
 			}
 			mWorkerThreadsBarrier->sync();
 		}

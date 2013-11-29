@@ -522,10 +522,6 @@ namespace Ogre {
             features |= PlatformInformation::CPU_FEATURE_NEON;
         }
         
-        if (cpufeatures & ANDROID_CPU_ARM_FEATURE_VFPv3) 
-        {
-            features |= PlatformInformation::CPU_FEATURE_VFP;
-        }
         return features;
     }
     //---------------------------------------------------------------------
@@ -570,18 +566,15 @@ namespace Ogre {
     {
         // Use preprocessor definitions to determine architecture and CPU features
         uint features = 0;
-#if defined(__ARM_NEON__)
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         int hasNEON;
-        size_t len = sizeof(size_t);;
+        size_t len = sizeof(size_t);
         sysctlbyname("hw.optional.neon", &hasNEON, &len, NULL, 0);
 
         if(hasNEON)
-#endif
             features |= PlatformInformation::CPU_FEATURE_NEON;
-#elif defined(__VFP_FP__)
-            features |= PlatformInformation::CPU_FEATURE_VFP;
 #endif
+
         return features;
     }
     //---------------------------------------------------------------------
@@ -627,8 +620,17 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	static uint32 _detectNumLogicalCores(void)
 	{
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // Get the ARM logical CPU count
+        size_t size = sizeof(size_t);
+        int logicalcpu = 0;
+        sysctlbyname("hw.logicalcpu", &logicalcpu, &size, NULL, 0);
+
+		return logicalcpu;
+#else
 		//TODO
 		return 0;
+#endif
 	}
     
 #else   // OGRE_CPU == OGRE_CPU_ARM
@@ -685,7 +687,7 @@ namespace Ogre {
 		pLog->logMessage(
 			" *   CPU ID: " + getCpuIdentifier());
 		pLog->logMessage(
-			" *   Number of logical cores (excluding hyperthreaded): " +
+			" *   Logical cores (excluding HyperThreaded): " +
 						StringConverter::toString( getNumLogicalCores() ) );
 #if OGRE_CPU == OGRE_CPU_X86
 		if(_isSupportCpuid())
@@ -716,8 +718,6 @@ namespace Ogre {
 				" *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
 		}
 #elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        pLog->logMessage(
-				" *      VFP: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_VFP), true));
         pLog->logMessage(
 				" *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
 #endif

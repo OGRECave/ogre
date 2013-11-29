@@ -51,12 +51,12 @@ namespace Ogre {
 		mDepthLevel( 0 ),
 		mParent( parent ),
 		mName( "" ),
-#ifndef NDEBUG
-		mCachedTransformOutOfDate( true ),
-#endif
 		mInitialPosition(Vector3::ZERO),
 		mInitialOrientation(Quaternion::IDENTITY),
 		mInitialScale(Vector3::UNIT_SCALE),
+#ifndef NDEBUG
+        mCachedTransformOutOfDate( true ),
+#endif
 		mListener( 0 ),
 		mNodeMemoryManager( nodeMemoryManager ),
 		mDebug( 0 ),
@@ -78,12 +78,12 @@ namespace Ogre {
 		mDepthLevel( 0 ),
 		mParent( 0 ),
 		mName( "Dummy Node" ),
-#ifndef NDEBUG
-		mCachedTransformOutOfDate( true ),
-#endif
 		mInitialPosition(Vector3::ZERO),
 		mInitialOrientation(Quaternion::IDENTITY),
 		mInitialScale(Vector3::UNIT_SCALE),
+#ifndef NDEBUG
+        mCachedTransformOutOfDate( true ),
+#endif
 		mListener( 0 ),
 		mNodeMemoryManager( 0 ),
 		mDebug( 0 ),
@@ -127,8 +127,8 @@ namespace Ogre {
 	{
 		bool retVal = false;
 		if( mNodeMemoryManager->getTwin() &&
-            ((mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic) ||
-             (mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic)) )
+           ((mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC && !bStatic) ||
+            (mNodeMemoryManager->getMemoryManagerType() == SCENE_DYNAMIC && bStatic)))
 		{
 			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
 			mNodeMemoryManager = mNodeMemoryManager->getTwin();

@@ -54,7 +54,7 @@ namespace Ogre {
 #	define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #	define OGRE_CPU OGRE_CPU_X86
-#elif defined(__arm__) || defined(_M_ARM)
+#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__)
 #	define OGRE_CPU OGRE_CPU_ARM
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
@@ -85,7 +85,7 @@ namespace Ogre {
 */
 #define OGRE_SIMD_ALIGNED_DECL(type, var)   OGRE_ALIGNED_DECL(type, var, OGRE_SIMD_ALIGNMENT)
 
-/* Define whether or not Ogre compiled with SSE supports.
+/* Define whether or not Ogre compiled with SSE support.
 */
 #if OGRE_USE_SIMD == 1
 	#if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
@@ -96,15 +96,9 @@ namespace Ogre {
 	#   define __OGRE_HAVE_SSE  1
 	#endif
 
-	/* Define whether or not Ogre compiled with VFP supports.
+	/* Define whether or not Ogre compiled with NEON support.
 	 */
-	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
-	#   define __OGRE_HAVE_VFP  1
-	#endif
-
-	/* Define whether or not Ogre compiled with NEON supports.
-	 */
-	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
+	#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_NEON__)
 	#   define __OGRE_HAVE_NEON  1
 	#endif
 #endif
@@ -113,14 +107,14 @@ namespace Ogre {
 #   define __OGRE_HAVE_SSE  0
 #endif
 
-#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_VFP)
-#   define __OGRE_HAVE_VFP  0
-#endif
-
 #if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_NEON)
 #   define __OGRE_HAVE_NEON  0
 #endif
-    
+
+#if !defined(__OGRE_HAVE_DIRECTXMATH)
+#   define __OGRE_HAVE_DIRECTXMATH  0
+#endif
+
 	/** \addtogroup Core
 	*  @{
 	*/

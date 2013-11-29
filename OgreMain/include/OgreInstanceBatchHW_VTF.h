@@ -117,9 +117,9 @@ namespace Ogre
 									size_t numLutEntries ) :
 					TransformsToTexture( dstPtr, floatsPerEntity,
 										 entitiesPerPadding, widthFloatsPadding ),
-					boneIdxStart( indexMap->begin() ),
-					boneIdxEnd( indexMap->end() ),
-					mWrittenPositions( numLutEntries, false ) {}
+                    mWrittenPositions( numLutEntries, false ),
+                    boneIdxStart( indexMap->begin() ),
+					boneIdxEnd( indexMap->end() ) {}
 			FORCEINLINE void operator () ( const MovableObject *mo );
 		};
 		struct SendAllDualQuatTexture : public TransformsToTexture

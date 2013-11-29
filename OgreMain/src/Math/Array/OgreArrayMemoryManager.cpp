@@ -30,7 +30,9 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreArrayConfig.h"
 #include "Math/Array/OgreArrayMemoryManager.h"
-
+#include "Math/Array/OgreArrayQuaternion.h"
+#include "Math/Array/OgreArrayAabb.h"
+#include "Math/Simple/OgreAabb.h"
 #include "Math/Array/OgreArrayAabb.h"
 #include "Math/Array/OgreArrayMatrix4.h"
 
@@ -324,7 +326,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
@@ -368,7 +369,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
@@ -412,7 +412,6 @@ namespace Ogre
 		}
 
 		++dst;
-		indexDst = 0;
 
 		//Keep default initializing, but now on bulk (faster)
 		size_t remainder = numTotalSlots - numSlots - scalarRemainder;

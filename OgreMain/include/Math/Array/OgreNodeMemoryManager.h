@@ -76,7 +76,7 @@ namespace Ogre
 
 	public:
 		NodeMemoryManager();
-		~NodeMemoryManager();
+		virtual ~NodeMemoryManager();
 
 		/// @See mMemoryManagerType
 		void _setTwin( SceneMemoryMgrTypes memoryManagerType, NodeMemoryManager *twinMemoryManager );

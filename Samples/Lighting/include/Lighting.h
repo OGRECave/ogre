@@ -88,14 +88,6 @@ protected:
 
 	void setupContent()
 	{
-		const IdString workspaceName( "LightingWorkspace" );
-		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue::Black );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-
 		// Set our camera to orbit around the origin at a suitable distance
 		mCameraMan->setStyle(CS_ORBIT);
 		mCameraMan->setYawPitchDist(Radian(0), Radian(0), 400);
