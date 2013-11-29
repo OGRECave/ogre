@@ -152,8 +152,15 @@ namespace Ogre {
 			mSkeletonInstance->load();
 		}
 
+		mCurrentMaterialLod.resize( mMesh->getNumSubMeshes(), 0 );
+		mLodMesh = mMesh->_getLodValueArray();
+		mLodMaterial.resize( mMesh->getNumSubMeshes(), 0 );
+
 		// Build main subentity list
 		buildSubEntityList(mMesh, &mSubEntityList);
+
+		for( size_t i=0; i<mSubEntityList.size(); ++i )
+			mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
 
 		// Check if mesh is using manual LOD
 		if (mMesh->isLodManual())
@@ -171,13 +178,6 @@ namespace Ogre {
 				mLodEntityList.push_back(lodEnt);
 			}
 		}
-
-		mCurrentMaterialLod.resize( mMesh->getNumSubMeshes(), 0 );
-		mLodMesh = mMesh->_getLodValueArray();
-
-		mLodMaterial.resize( mMesh->getNumSubMeshes(), 0 );
-		for( size_t i=0; i<mSubEntityList.size(); ++i )
-			mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
 
 		// Initialise the AnimationState, if Mesh has animation
 		if (hasSkeleton())
