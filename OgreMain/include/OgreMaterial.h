@@ -92,8 +92,8 @@ namespace Ogre {
 
     public:
         /// distance list used to specify LOD
-		typedef vector<Real>::type LodValueList;
-        typedef ConstVectorIterator<LodValueList> LodValueIterator;
+		typedef FastArray<Real> LodValueArray;
+        typedef ConstVectorIterator<LodValueArray> LodValueIterator;
     protected:
 
 
@@ -114,8 +114,8 @@ namespace Ogre {
 		*/
         BestTechniquesBySchemeList mBestTechniquesBySchemeList;
 
-        LodValueList mUserLodValues;
-        LodValueList mLodValues;
+        LodValueArray mUserLodValues;
+        LodValueArray mLodValues;
         const LodStrategy *mLodStrategy;
         bool mReceiveShadows;
 		bool mTransparencyCastsShadows;
@@ -612,9 +612,9 @@ namespace Ogre {
 			transformed by the strategy, so for the distance strategy this is an
 			unsquared distance for example.
         */
-        void setLodLevels(const LodValueList& lodValues);
+        void setLodLevels(const LodValueArray& lodValues);
 
-		const LodValueList* _getUserLodValues(void) const					{ return &mUserLodValues; }
+		const LodValueArray* _getLodValues(void) const						{ return &mLodValues; }
 
         /** Gets an iterator over the list of values transformed by the LodStrategy at which each LOD comes into effect. 
         @remarks

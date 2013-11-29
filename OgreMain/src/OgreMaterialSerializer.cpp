@@ -1790,7 +1790,7 @@ namespace Ogre
         StringVector vecparams = StringUtil::split(params, " \t");
 
         // iterate over the parameters and parse values out of them
-        Material::LodValueList lodList;
+        Material::LodValueArray lodList;
         StringVector::iterator i, iend;
         iend = vecparams.end();
         for (i = vecparams.begin(); i != iend; ++i)
@@ -3002,7 +3002,7 @@ namespace Ogre
         StringVector vecparams = StringUtil::split(params, " \t");
 
         // iterate over the parameters and parse values out of them
-        Material::LodValueList lodList;
+        Material::LodValueArray lodList;
         StringVector::iterator i, iend;
         iend = vecparams.end();
         for (i = vecparams.begin(); i != iend; ++i)

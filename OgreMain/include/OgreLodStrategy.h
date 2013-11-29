@@ -89,25 +89,25 @@ namespace Ogre {
         virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const = 0;
 
         /** Get the index of the LOD usage which applies to a given value. */
-        virtual ushort getIndex(Real value, const Material::LodValueList& materialLodValueList) const = 0;
+		virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const = 0;
 
         /** Sort mesh LOD usage list from greatest to least detail */
         virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const = 0;
 
         /** Determine if the LOD values are sorted from greatest detail to least detail. */
-        virtual bool isSorted(const Mesh::LodValueList& values) const = 0;
+        virtual bool isSorted(const Mesh::LodValueArray& values) const = 0;
 
         /** Assert that the LOD values are sorted from greatest detail to least detail. */
-        void assertSorted(const Mesh::LodValueList& values) const;
+        void assertSorted(const Mesh::LodValueArray& values) const;
 
         /** Get the name of this strategy. */
         const String& getName() const { return mName; }
 
     protected:
         /** Implementation of isSorted suitable for ascending values. */
-        static bool isSortedAscending(const Mesh::LodValueList& values);
+        static bool isSortedAscending(const Mesh::LodValueArray& values);
         /** Implementation of isSorted suitable for descending values. */
-        static bool isSortedDescending(const Mesh::LodValueList& values);
+        static bool isSortedDescending(const Mesh::LodValueArray& values);
 
         /** Implementation of sort suitable for ascending values. */
         static void sortAscending(Mesh::MeshLodUsageList& meshLodUsageList);
@@ -120,9 +120,9 @@ namespace Ogre {
         static ushort getIndexDescending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList);
 
         /** Implementation of getIndex suitable for ascending values. */
-        static ushort getIndexAscending(Real value, const Material::LodValueList& materialLodValueList);
+		static ushort getIndexAscending(Real value, const Material::LodValueArray& materialLodValueArray);
         /** Implementation of getIndex suitable for descending values. */
-        static ushort getIndexDescending(Real value, const Material::LodValueList& materialLodValueList);
+        static ushort getIndexDescending(Real value, const Material::LodValueArray& materialLodValueArray);
 
     };
 	/** @} */

@@ -783,10 +783,10 @@ namespace Ogre {
 			unload();
     }
     // --------------------------------------------------------------------
-    void Material::setLodLevels(const LodValueList& lodValues)
+    void Material::setLodLevels(const LodValueArray& lodValues)
     {
         // Square the distances for the internal list
-		LodValueList::const_iterator i, iend;
+		LodValueArray::const_iterator i, iend;
 		iend = lodValues.end();
 		// First, clear and add single zero entry
 		mLodValues.clear();

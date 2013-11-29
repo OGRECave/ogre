@@ -57,10 +57,10 @@ namespace Ogre {
         return getIndexDescending(value, meshLodUsageList);
     }
     //---------------------------------------------------------------------
-    ushort PixelCountLodStrategy::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
+    ushort PixelCountLodStrategy::getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const
     {
         // Values are descending
-        return getIndexDescending(value, materialLodValueList);
+        return getIndexDescending(value, materialLodValueArray);
     }
     //---------------------------------------------------------------------
     void PixelCountLodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
@@ -69,7 +69,7 @@ namespace Ogre {
         sortDescending(meshLodUsageList);
     }
     //---------------------------------------------------------------------
-    bool PixelCountLodStrategy::isSorted(const Mesh::LodValueList& values) const
+    bool PixelCountLodStrategy::isSorted(const Mesh::LodValueArray& values) const
     {
         // Check if values are sorted descending
         return isSortedDescending(values);

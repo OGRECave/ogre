@@ -207,7 +207,7 @@ namespace Ogre
 			@return
 				this[i] = mask[i] != 0 ? this[i] : replacement[i]
 		*/
-		inline void Cmov4( ArrayReal mask, const ArrayQuaternion &replacement );
+		inline void Cmov4( ArrayMaskR mask, const ArrayQuaternion &replacement );
 
 		/** Conditional move. @See MathlibSSE2::Cmov4
 			Selects between arg1 & arg2 according to mask
@@ -226,7 +226,7 @@ namespace Ogre
 			@return
 				this[i] = mask[i] != 0 ? arg1[i] : arg2[i]
 		*/
-		inline static ArrayQuaternion Cmov4( const ArrayQuaternion &arg1, const ArrayQuaternion &arg2, ArrayReal mask );
+		inline static ArrayQuaternion Cmov4( const ArrayQuaternion &arg1, const ArrayQuaternion &arg2, ArrayMaskR mask );
 
 		static const ArrayQuaternion ZERO;
         static const ArrayQuaternion IDENTITY;

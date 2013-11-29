@@ -96,13 +96,13 @@ namespace Ogre {
         return getIndexAscending(value, meshLodUsageList);
     }
     //-----------------------------------------------------------------------
-    ushort DistanceLodStrategy::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
+    ushort DistanceLodStrategy::getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const
     {
         // Get index assuming ascending values
-        return getIndexAscending(value, materialLodValueList);
+        return getIndexAscending(value, materialLodValueArray);
     }
     //---------------------------------------------------------------------
-    bool DistanceLodStrategy::isSorted(const Mesh::LodValueList& values) const
+    bool DistanceLodStrategy::isSorted(const Mesh::LodValueArray& values) const
     {
         // Determine if sorted ascending
         return isSortedAscending(values);

@@ -96,7 +96,7 @@ namespace Ogre {
 
 		//One for each submesh/material/Renderable
 		FastArray<Real> const				*mLodMesh;
-		FastArray< FastArray<Real> > const	*mLodMaterial;
+		FastArray< FastArray<Real> const * > mLodMaterial;
 		unsigned char						mCurrentMeshLod;
 		FastArray<unsigned char>			mCurrentMaterialLod;
 

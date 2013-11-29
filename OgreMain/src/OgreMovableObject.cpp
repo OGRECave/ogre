@@ -43,7 +43,6 @@ THE SOFTWARE.
 namespace Ogre {
 	using namespace VisibilityFlags;
 	const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
-	const FastArray< FastArray<Real> > c_DefaultLodMaterial = FastArray< FastArray<Real> >( 1, FastArray<Real>( 1, std::numeric_limits<Real>::max() ) );
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	const String NullEntity::msMovableType = "NullEntity";
@@ -61,7 +60,6 @@ namespace Ogre {
 		, mCreator(0)
         , mManager(0)
 		, mLodMesh( &c_DefaultLodMesh )
-		, mLodMaterial( &c_DefaultLodMaterial )
 		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
@@ -73,6 +71,7 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mLodMaterial.resize( 1, &c_DefaultLodMesh );
 		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
@@ -87,7 +86,6 @@ namespace Ogre {
 		, mCreator(0)
         , mManager(0)
 		, mLodMesh( &c_DefaultLodMesh )
-		, mLodMaterial( &c_DefaultLodMaterial )
 		, mCurrentMeshLod( 0 )
         , mParentNode(0)
 		, mMinPixelSize(0)
@@ -99,6 +97,7 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mLodMaterial.resize( 1, &c_DefaultLodMesh );
 		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
@@ -987,16 +986,18 @@ namespace Ogre {
 				owner->mCurrentMeshLod = it - owner->mLodMesh->begin();
 			}
 
-			FastArray< FastArray<Real> >::const_iterator itor = owner->mLodMaterial->begin();
-			FastArray< FastArray<Real> >::const_iterator end  = owner->mLodMaterial->end();
+			FastArray< FastArray<Real> const * >::const_iterator itor = owner->mLodMaterial.begin();
+			FastArray< FastArray<Real> const * >::const_iterator end  = owner->mLodMaterial.end();
 
 			FastArray<unsigned char>::iterator itMatLodLevel = owner->mCurrentMaterialLod.begin();
 
 			while( itor != end )
 			{
-				FastArray<Real>::const_iterator it = std::lower_bound( itor->begin(), itor->end(),
+				const FastArray<Real> *lodVec = *itor;
+				FastArray<Real>::const_iterator it = std::lower_bound( lodVec->begin(), lodVec->end(),
 																	   lodValues[j] );
-				*itMatLodLevel++ = (unsigned char)std::min<size_t>( (it - itor->begin()), itor->size() );
+				*itMatLodLevel++ = (unsigned char)std::min<size_t>( (it - lodVec->begin()),
+																	lodVec->size() );
 				++itor;
 			}
 		}

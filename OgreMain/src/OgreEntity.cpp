@@ -175,6 +175,10 @@ namespace Ogre {
 		mCurrentMaterialLod.resize( mMesh->getNumSubMeshes(), 0 );
 		mLodMesh = mMesh->_getLodValueArray();
 
+		mLodMaterial.resize( mMesh->getNumSubMeshes(), 0 );
+		for( size_t i=0; i<mSubEntityList.size(); ++i )
+			mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
+
 		// Initialise the AnimationState, if Mesh has animation
 		if (hasSkeleton())
 		{
@@ -1234,17 +1238,15 @@ namespace Ogre {
         // Create SubEntities
         unsigned short i, numSubMeshes;
         SubMesh* subMesh;
-        SubEntity* subEnt;
 
 		numSubMeshes = mesh->getNumSubMeshes();
 		sublist->reserve( numSubMeshes );
         for (i = 0; i < numSubMeshes; ++i)
         {
             subMesh = mesh->getSubMesh(i);
-            subEnt = OGRE_NEW SubEntity(this, subMesh);
-            if (subMesh->isMatInitialised())
-                subEnt->setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
 			sublist->push_back( SubEntity( this, subMesh ) );
+			if (subMesh->isMatInitialised())
+                sublist->back().setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
         }
     }
     //-----------------------------------------------------------------------

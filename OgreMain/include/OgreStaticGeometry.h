@@ -380,7 +380,7 @@ namespace Ogre {
 			/// Center of the region
 			Vector3 mCentre;
 			/// LOD values as built up - use the max at each level
-			Mesh::LodValueList mLodValues;
+			Mesh::LodValueArray mLodValues;
 			/// Local AABB relative to region centre
 			AxisAlignedBox mAABB;
 			/// Local bounding radius

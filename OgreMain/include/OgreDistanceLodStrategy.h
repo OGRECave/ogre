@@ -75,13 +75,13 @@ namespace Ogre {
         virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const;
 
         /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Material::LodValueList& materialLodValueList) const;
+        virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const;
 
         /// @copydoc LodStrategy::sort
         virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const;
 
         /// @copydoc LodStrategy::isSorted
-        virtual bool isSorted(const Mesh::LodValueList& values) const;
+        virtual bool isSorted(const Mesh::LodValueArray& values) const;
 
         /** Get the squared depth from camera to the LOD object */
         virtual Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const = 0;

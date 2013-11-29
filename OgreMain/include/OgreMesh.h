@@ -99,7 +99,7 @@ namespace Ogre {
         friend class MeshSerializerImpl_v1_1;
 
     public:
-        typedef vector<Real>::type LodValueList;
+        typedef FastArray<Real> LodValueArray;
         typedef vector<MeshLodUsage>::type MeshLodUsageList;
 		typedef FastArray<Real> LodValueArray;
         /// Multimap of vertex bone assignments (orders by vertex index).

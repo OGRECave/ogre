@@ -556,7 +556,7 @@ namespace Ogre{
 				{
 				case ID_LOD_VALUES:
 					{
-						Material::LodValueList lods;
+						Material::LodValueArray lods;
 						for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
 						{
 							Real v = 0;
@@ -578,7 +578,7 @@ namespace Ogre{
                         mMaterial->setLodStrategy(strategy);
 
                         // Read in LOD distances
-                        Material::LodValueList lods;
+                        Material::LodValueArray lods;
                         for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
                         {
                             Real v = 0;

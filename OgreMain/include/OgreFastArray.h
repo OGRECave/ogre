@@ -89,6 +89,8 @@ namespace Ogre
 		}
 
 	public:
+		typedef T value_type;
+
 		FastArray() :
 			mData( 0 ),
 			mSize( 0 ),

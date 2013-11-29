@@ -128,6 +128,9 @@ namespace Ogre {
         // Ensure new material loaded (will not load again if already loaded)
         mMaterialPtr->load();
 
+		size_t subEntityIndex = this - &(*mParentEntity->mSubEntityList.begin());
+		mParentEntity->mLodMaterial[subEntityIndex] = mMaterialPtr->_getLodValues();
+
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
 	}
