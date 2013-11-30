@@ -29,9 +29,13 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreDistanceLodStrategy.h"
 
+#include "OgreCamera.h"
+
 #include <limits>
 
 #include "OgreViewport.h"
+
+#include "OgreLodStrategyPrivate.inl"
 
 namespace Ogre {
     DistanceLodStrategy::DistanceLodStrategy(const String& name)
@@ -72,6 +76,29 @@ namespace Ogre {
         // Now adjust it by the camera bias and return the computed value
         return squaredDepth * camera->_getLodBiasInverse();
     }
+	//-----------------------------------------------------------------------
+	void DistanceLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
+											 const Camera *camera, Real bias ) const
+	{
+		ArrayVector3 cameraPos;
+		cameraPos.setAll( camera->getDerivedPosition() );
+
+		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() * bias ) );
+		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+
+		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+		{
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal arrayLodValue = objData.mWorldAabb->mCenter.distance( cameraPos ) - (*worldRadius);
+			arrayLodValue = arrayLodValue * lodInvBias;
+			CastArrayToReal( lodValues, arrayLodValue );
+
+			lodSet( objData, lodValues );
+
+			objData.advanceLodPack();
+		}
+	}
     //-----------------------------------------------------------------------
     Real DistanceLodStrategy::getBaseValue() const
     {
@@ -86,8 +113,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real DistanceLodStrategy::transformUserValue(Real userValue) const
     {
-        // Square user-supplied distance
-        return Math::Sqr(userValue);
+        return userValue;
     }
     //-----------------------------------------------------------------------
     ushort DistanceLodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const

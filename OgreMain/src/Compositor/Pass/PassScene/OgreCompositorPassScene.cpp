@@ -109,8 +109,8 @@ namespace Ogre
 
 		if( mDefinition->mUpdateLodLists )
 		{
-			sceneManager->updateAllLods( usedLodCamera, mDefinition->mFirstRQ, mDefinition->mLastRQ,
-										 mDefinition->mLodBias );
+			sceneManager->updateAllLods( usedLodCamera, mDefinition->mLodBias,
+										 mDefinition->mFirstRQ, mDefinition->mLastRQ );
 		}
 
 		//Passes belonging to a ShadowNode should not override their parent.

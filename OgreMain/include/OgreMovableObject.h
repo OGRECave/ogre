@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"
 #include "OgreVisibilityFlags.h"
+#include "OgreLodStrategy.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -315,6 +316,9 @@ namespace Ogre {
 	protected:
 		inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 	public:
+		friend void LodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData t,
+												const Camera *camera, Real bias ) const;
+		friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
 		/** @See SceneManager::lodDistance
 		@remarks

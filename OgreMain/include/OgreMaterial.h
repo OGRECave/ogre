@@ -38,10 +38,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
-	// Forward declaration
-    class LodStrategy;
-
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -116,7 +112,6 @@ namespace Ogre {
 
         LodValueArray mUserLodValues;
         LodValueArray mLodValues;
-        const LodStrategy *mLodStrategy;
         bool mReceiveShadows;
 		bool mTransparencyCastsShadows;
         /// Does this material require compilation?
@@ -633,18 +628,6 @@ namespace Ogre {
 			values returned are after being transformed by LodStrategy::transformUserValue.
         */
         LodValueIterator getUserLodValueIterator(void) const;
-
-        /** Gets the LOD index to use at the given value. 
-		@note The value passed in is the 'transformed' value. If you are dealing with
-		an original source value (e.g. distance), use LodStrategy::transformUserValue
-		to turn this into a lookup value.
-		*/
-        ushort getLodIndex(Real value) const;
-
-        /** Get LOD strategy used by this material. */
-        const LodStrategy *getLodStrategy() const;
-        /** Set the LOD strategy used by this material. */
-        void setLodStrategy(LodStrategy *lodStrategy);
 
         /** @copydoc Resource::touch
         */

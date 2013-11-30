@@ -710,7 +710,7 @@ namespace Ogre {
 		MovableObject( id, objectMemoryManager ),
 		mParent(parent), mSceneMgr(mgr), mNode(0),
 		mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
-		mCurrentLod(0), mLodStrategy(0)
+		mCurrentLod(0)
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -743,20 +743,9 @@ namespace Ogre {
 		mQueuedSubMeshes.push_back(qmesh);
 
         // Set/check LOD strategy
-        const LodStrategy *lodStrategy = qmesh->submesh->parent->getLodStrategy();
-        if (mLodStrategy == 0)
-        {
-            mLodStrategy = lodStrategy;
-
-            // First LOD mandatory, and always from base LOD value
-            mLodValues.push_back(mLodStrategy->getBaseValue());
-        }
-        else
-        {
-            if (mLodStrategy != lodStrategy)
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Lod strategies do not match",
-                    "StaticGeometry::Region::assign");
-        }
+		const LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+        // First LOD mandatory, and always from base LOD value
+        mLodValues.push_back(lodStrategy->getBaseValue());
 
 		// update LOD values
 		ushort lodLevels = qmesh->submesh->parent->getNumLodLevels();
@@ -827,21 +816,16 @@ namespace Ogre {
         // Cache squared view depth for use by GeometryBucket
         mSquaredViewDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
-        // No LOD strategy set yet, skip (this indicates that there are no submeshes)
-        if (mLodStrategy == 0)
-            return;
+		const LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
 
         // Sanity check
         assert(!mLodValues.empty());
 
         // Calculate LOD value
-        Real lodValue = mLodStrategy->getValue(this, cam);
+        Real lodValue = lodStrategy->getValue(this, cam);
 
         // Store LOD value for this strategy
         mLodValue = lodValue;
-
-        // Get LOD index
-        mCurrentLod = mLodStrategy->getIndex(lodValue, mLodValues);
 	}
 	//--------------------------------------------------------------------------
 	const AxisAlignedBox& StaticGeometry::Region::getBoundingBox(void) const
@@ -1192,16 +1176,10 @@ namespace Ogre {
         // Get region
         Region *region = mParent->getParent();
 
-        // Get material LOD strategy
-        const LodStrategy *materialLodStrategy = mMaterial->getLodStrategy();
-
-        // If material strategy doesn't match, recompute LOD value with correct strategy
-        if (materialLodStrategy != region->mLodStrategy)
-            lodValue = materialLodStrategy->getValue(region, region->mCamera);
+		size_t regionIdx = 0; //TODO!!!!!!
 
 		// Determine the current material technique
-		mTechnique = mMaterial->getBestTechnique(
-			mMaterial->getLodIndex(lodValue));
+		mTechnique = mMaterial->getBestTechnique( region->mCurrentMaterialLod[regionIdx] );
 		GeometryBucketList::iterator i, iend;
 		iend =  mGeometryBucketList.end();
 		for (i = mGeometryBucketList.begin(); i != iend; ++i)

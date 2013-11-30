@@ -395,8 +395,6 @@ namespace Ogre {
 			mutable LightList mLightList;
 			/// The last frame that this light list was updated in
 			mutable ulong mLightListUpdated;
-            /// LOD strategy reference
-            const LodStrategy *mLodStrategy;
             /// Current camera
             Camera *mCamera;
             /// Cached squared view depth value to avoid recalculation by GeometryBucket

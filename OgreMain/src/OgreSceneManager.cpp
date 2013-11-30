@@ -2065,6 +2065,8 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 //-----------------------------------------------------------------------
 void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx )
 {
+	LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
 	const Camera *lodCamera	= request.lodCamera;
 	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
 	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
@@ -2096,7 +2098,7 @@ void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t 
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			//TODO: Select LOD method here
-			MovableObject::lodDistance( numObjs, objData, lodCamera, request.lodBias );
+			lodStrategy->lodUpdateImpl( numObjs, objData, lodCamera, request.lodBias );
 		}
 
 		++it;

@@ -86,6 +86,9 @@ namespace Ogre {
         /** Get the squared depth from camera to the LOD object */
         virtual Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const = 0;
 
+		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+									const Camera *camera, Real bias ) const;
+
         /** Sets the reference view upon which the distances were based.
         @note
             This automatically enables use of the reference view.

@@ -31,9 +31,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMesh.h"
-
-#include "OgreMovableObject.h"
-#include "OgreCamera.h"
+#include "OgreMaterial.h"
+#include "Math/Array/OgreArrayConfig.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -72,6 +71,12 @@ namespace Ogre {
 
         /** Transform LOD bias so it only needs to be multiplied by the LOD value. */
         virtual Real transformBias(Real factor) const = 0;
+
+		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+									const Camera *camera, Real bias ) const = 0;
+
+		//Include OgreLodStrategyPrivate.inl in the CPP files that use this function.
+		inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
         /** Transform user supplied value to internal value.
         @remarks

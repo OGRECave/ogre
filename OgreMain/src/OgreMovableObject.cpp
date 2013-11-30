@@ -1053,9 +1053,9 @@ namespace Ogre {
 		//order and use lower_bound (which wouldn't be the same as using upper_bound)
 		const Matrix4 &projMat = camera->getProjectionMatrix();
 		ArrayReal PiDotVpAreaDotProjMat00dot11(
-						Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] ) );
+						Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] *
+										 camera->getLodBias() * bias ) );
 
-		ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
 		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
@@ -1072,7 +1072,7 @@ namespace Ogre {
 			//ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
 
 			ArrayReal sqRadius = (*worldRadius * *worldRadius);
-			ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11 * lodBias) / sqDistance;
+			ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
 
 			CastArrayToReal( lodValues, arrayLodValue );
 

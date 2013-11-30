@@ -1437,10 +1437,9 @@ namespace Ogre {
         TiXmlElement* lodNode = 
             mMeshNode->InsertEndChild(TiXmlElement("levelofdetail"))->ToElement();
 
-        const LodStrategy *strategy = pMesh->getLodStrategy();
 		unsigned short numLvls = pMesh->getNumLodLevels();
 		bool manual = pMesh->isLodManual();
-        lodNode->SetAttribute("strategy", strategy->getName());
+		lodNode->SetAttribute("strategy", pMesh->getLodStrategyName());
 		lodNode->SetAttribute("numlevels", StringConverter::toString(numLvls));
 		lodNode->SetAttribute("manual", StringConverter::toString(manual));
 
@@ -1599,10 +1598,8 @@ namespace Ogre {
         const char* val = lodNode->Attribute("strategy");
         // This attribute is optional to maintain backwards compatibility
         if (val)
-        {
-            String strategyName = val;
-            LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-            mMesh->setLodStrategy(strategy);
+		{
+			mMesh->setLodStrategyName( val );
         }
 
 		val = lodNode->Attribute("numlevels");
@@ -1663,7 +1660,8 @@ namespace Ogre {
 		{
 			usage.userValue = StringConverter::parseReal(val);
 		}
-		usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
+		const LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getStrategy( mMesh->getLodStrategyName() );
+		usage.value = lodStrategy->transformUserValue(usage.userValue);
 		usage.manualName = manualNode->Attribute("meshname");
         usage.edgeData = NULL;
 
@@ -1688,7 +1686,8 @@ namespace Ogre {
 		{
 			usage.userValue = StringConverter::parseReal(val);
 		}
-		usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
+		const LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getStrategy( mMesh->getLodStrategyName() );
+		usage.value = lodStrategy->transformUserValue(usage.userValue);
 		usage.manualMesh.setNull();
 		usage.manualName = "";
         usage.edgeData = NULL;
