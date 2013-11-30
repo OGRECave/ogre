@@ -313,39 +313,9 @@ namespace Ogre {
 		static void calculateCastersBox( const size_t numNodes, ObjectData t,
 										 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox );
 
-	protected:
-		inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
-	public:
 		friend void LodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData t,
 												const Camera *camera, Real bias ) const;
 		friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
-
-		/** @See SceneManager::lodDistance
-		@remarks
-			Uses the distance to camera method to calculate the Lod value
-			(will be cached in ObjectData::mOwner::mCurrentLod). @See mCurrentLod
-		@param numNodes
-			Total number of MovableObjects in ObjectData
-		@param t
-			SoA pointers to MovableObjects.
-		@param camera
-			Camera used for our Lod calculations.
-		*/
-		static void lodDistance( const size_t numNodes, ObjectData t, const Camera *camera, Real bias );
-
-		/** @See lodDistance
-		@remarks
-			Uses the visible pixel count method to calculate the Lod Value
-		*/
-		static void lodPixelCount( const size_t numNodes, ObjectData t,
-									const Camera *camera, Real bias );
-
-	protected:
-		static void lodPixelCountPerspective( const size_t numNodes, ObjectData t,
-												const Camera *camera, Real bias );
-		static void lodPixelCountOrthographic( const size_t numNodes, ObjectData t,
-												const Camera *camera, Real bias );
-	public:
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it
