@@ -380,7 +380,7 @@ namespace Ogre {
 			/// Center of the region
 			Vector3 mCentre;
 			/// LOD values as built up - use the max at each level
-			Mesh::LodValueList mLodValues;
+			Mesh::LodValueArray mLodValues;
 			/// Local AABB relative to region centre
 			AxisAlignedBox mAABB;
 			/// Local bounding radius
@@ -395,8 +395,6 @@ namespace Ogre {
 			mutable LightList mLightList;
 			/// The last frame that this light list was updated in
 			mutable ulong mLightListUpdated;
-            /// LOD strategy reference
-            const LodStrategy *mLodStrategy;
             /// Current camera
             Camera *mCamera;
             /// Cached squared view depth value to avoid recalculation by GeometryBucket
@@ -419,7 +417,7 @@ namespace Ogre {
 			const String& getMovableType(void) const;
 			void _notifyCurrentCamera(Camera* cam);
 			const AxisAlignedBox& getBoundingBox(void) const;
-			void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+            void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 			/// @copydoc MovableObject::visitRenderables
 			void visitRenderables(Renderable::Visitor* visitor, 
 				bool debugRenderables = false);

@@ -273,7 +273,7 @@ namespace Ogre {
 		Real getPowerScale(void) const								{ return mPowerScale; }
 
         /** @copydoc MovableObject::_updateRenderQueue */
-		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) {}
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;

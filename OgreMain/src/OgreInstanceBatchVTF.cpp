@@ -462,9 +462,10 @@ namespace Ogre
 		return 1;
 	}
 	//-----------------------------------------------------------------------
-	void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue, Camera *camera,
+                                                  const Camera *lodCamera)
 	{
-		InstanceBatch::_updateRenderQueue( queue, camera );
+        InstanceBatch::_updateRenderQueue( queue, camera, lodCamera );
 	}
 	//-----------------------------------------------------------------------
 	// InstanceBatchVTF

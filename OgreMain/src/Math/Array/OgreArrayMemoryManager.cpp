@@ -33,6 +33,11 @@ THE SOFTWARE.
 #include "Math/Array/OgreArrayQuaternion.h"
 #include "Math/Array/OgreArrayAabb.h"
 #include "Math/Simple/OgreAabb.h"
+#include "Math/Array/OgreArrayAabb.h"
+#include "Math/Array/OgreArrayMatrix4.h"
+
+#include "OgreMatrix4.h"
+
 #include "OgreException.h"
 
 namespace Ogre

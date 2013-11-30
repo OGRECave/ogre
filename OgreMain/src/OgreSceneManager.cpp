@@ -1075,18 +1075,21 @@ void SceneManager::_swapVisibleObjectsForShadowMapping()
 	mVisibleObjects.swap( mVisibleObjectsBackup );
 }
 //-----------------------------------------------------------------------
-void SceneManager::_cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq )
+void SceneManager::_cullReceiversBox( Camera* camera, const Camera *lodCamera,
+									  uint8 firstRq, uint8 lastRq )
 {
 	camera->_setRenderedRqs( firstRq, lastRq );
 
-	CullFrustumRequest cullRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList, camera );
+	CullFrustumRequest cullRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
+									camera, lodCamera );
 	fireCullReceiversBoxThreads( cullRequest );
 
 	//Now merge the bounds from all threads into one
 	collectVisibleBoundsInfoFromThreads( camera, firstRq, lastRq );
 }
 //-----------------------------------------------------------------------
-void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq )
+void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
+								 uint8 firstRq, uint8 lastRq )
 {
 	OgreProfileGroup("_cullPhase01", OGREPROF_GENERAL);
 
@@ -1134,7 +1137,7 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 			camera->_setRenderedRqs( realFirstRq, realLastRq );
 
 			CullFrustumRequest cullRequest( realFirstRq, realLastRq,
-											&mEntitiesMemoryManagerCulledList, camera );
+											&mEntitiesMemoryManagerCulledList, camera, lodCamera );
 			fireCullFrustumThreads( cullRequest );
 
 			//Now merge the bounds from all threads into one
@@ -1143,8 +1146,8 @@ void SceneManager::_cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, ui
 	} // end lock on scene graph mutex
 }
 //-----------------------------------------------------------------------
-void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
-									bool includeOverlays )
+void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewport* vp,
+								  uint8 firstRq, uint8 lastRq, bool includeOverlays)
 {
 	OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
 
@@ -1230,7 +1233,7 @@ void SceneManager::_renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, 
 
 				while( itor != end )
 				{
-					(*itor)->_updateRenderQueue( getRenderQueue(), camera );
+					(*itor)->_updateRenderQueue( getRenderQueue(), camera, lodCamera );
 					++itor;
 				}
 				++it;
@@ -2060,6 +2063,58 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //-----------------------------------------------------------------------
+void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx )
+{
+	LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
+	const Camera *lodCamera	= request.lodCamera;
+	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
+	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
+
+	while( it != en )
+	{
+		ObjectMemoryManager *memoryManager = *it;
+		const size_t numRenderQueues = memoryManager->getNumRenderQueues();
+
+		size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
+		size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
+
+		for( size_t i=firstRq; i<lastRq; ++i )
+		{
+			ObjectData objData;
+			const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
+
+			//Distribute the work evenly across all threads (not perfect), taking into
+			//account we need to distribute in multiples of ARRAY_PACKED_REALS
+			size_t numObjs	= ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+			numObjs			= ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+								ARRAY_PACKED_REALS;
+
+			const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+			//Prevent going out of bounds (usually in the last threadIdx, or
+			//when there are less entities than ARRAY_PACKED_REALS
+			numObjs = std::min( numObjs, totalObjs - toAdvance );
+			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+			//TODO: Select LOD method here
+			lodStrategy->lodUpdateImpl( numObjs, objData, lodCamera, request.lodBias );
+		}
+
+		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 firstRq, uint8 lastRq )
+{
+	mRequestType		= UPDATE_ALL_LODS;
+	mUpdateLodRequest	= UpdateLodRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
+											 lodCamera, lodCamera, lodBias );
+
+	mWorkerThreadsBarrier->sync(); //Fire threads
+	mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
 void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
 													size_t threadIdx )
 {
@@ -2094,7 +2149,8 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 		}
 	}
 
-	const Camera *camera = request.camera;
+	const Camera *camera	= request.camera;
+	const Camera *lodCamera	= request.lodCamera;
 	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
 	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
 
@@ -2126,7 +2182,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 
 			MovableObject::cullFrustum( numObjs, objData, camera,
 					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
-					outVisibleObjects, &aabbInfo[i] );
+					outVisibleObjects, &aabbInfo[i], lodCamera );
 		}
 
 		++it;
@@ -2151,7 +2207,8 @@ void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t t
 		}
 	}
 
-	const Camera *camera = request.camera;
+	const Camera *camera	= request.camera;
+	const Camera *lodCamera	= request.lodCamera;
 	ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
 	ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
 
@@ -2182,7 +2239,8 @@ void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t t
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullReceiversBox( numObjs, objData, camera,
-					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(), &aabbInfo[i] );
+							camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
+							&aabbInfo[i], lodCamera );
 		}
 
 		++it;
@@ -3427,25 +3485,21 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 		mSkyDomeNode->_getDerivedPositionUpdated();
 	}
 
-	if (mSkyPlaneEnabled
-		&& mSkyPlaneEntity && mSkyPlaneEntity->isVisible()
-		&& mSkyPlaneEntity->getSubEntity(0) && mSkyPlaneEntity->getSubEntity(0)->isVisible())
+	if (mSkyPlaneEnabled && mSkyPlaneEntity && mSkyPlaneEntity->isVisible())
 	{
 		getRenderQueue()->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
 	}
 
-	if (mSkyBoxEnabled
-		&& mSkyBoxObj && mSkyBoxObj->isVisible())
+	if (mSkyBoxEnabled && mSkyBoxObj && mSkyBoxObj->isVisible())
 	{
-		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam);
+		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam, cam);
 	}
 
 	if (mSkyDomeEnabled)
 	{
 		for (uint plane = 0; plane < 5; ++plane)
 		{
-			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible()
-				&& mSkyDomeEntity[plane]->getSubEntity(0) && mSkyDomeEntity[plane]->getSubEntity(0)->isVisible())
+			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible())
 			{
 				getRenderQueue()->addRenderable(
 					mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
@@ -5170,6 +5224,7 @@ void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
 	//const function, silencing a race condition: Update the frustum planes now
 	//in case they weren't up to date.
 	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mCurrentCullFrustumRequest.lodCamera->getFrustumPlanes();
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
@@ -5182,6 +5237,7 @@ void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &reques
 	//const function, silencing a race condition: Update the frustum planes now
 	//in case they weren't up to date.
 	mCurrentCullFrustumRequest.camera->getFrustumPlanes();
+	mCurrentCullFrustumRequest.lodCamera->getFrustumPlanes();
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
@@ -5256,11 +5312,15 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 				break;
 			case UPDATE_ALL_ANIMATIONS:
 				updateAllAnimationsThread( threadIdx );
+				break;
 			case UPDATE_ALL_TRANSFORMS:
 				updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
 				break;
 			case UPDATE_ALL_BOUNDS:
 				updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+				break;
+			case UPDATE_ALL_LODS:
+				updateAllLodsThread( mUpdateLodRequest, threadIdx );
 				break;
 			case UPDATE_INSTANCE_MANAGERS:
 				updateInstanceManagersThread( threadIdx );

@@ -1790,7 +1790,7 @@ namespace Ogre
         StringVector vecparams = StringUtil::split(params, " \t");
 
         // iterate over the parameters and parse values out of them
-        Material::LodValueList lodList;
+        Material::LodValueArray lodList;
         StringVector::iterator i, iend;
         iend = vecparams.end();
         for (i = vecparams.begin(); i != iend; ++i)
@@ -2979,41 +2979,6 @@ namespace Ogre
 		return false;
 
 	}
-    //-----------------------------------------------------------------------
-    bool parseLodStrategy(String& params, MaterialScriptContext& context)
-    {
-        LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(params);
-        
-        if (strategy == 0)
-            logParseError(
-            "Bad lod_strategy attribute, available LOD strategy name expected.",
-            context);
-
-        context.material->setLodStrategy(strategy);
-
-        return false;
-    }
-    //-----------------------------------------------------------------------
-    bool parseLodDistances(String& params, MaterialScriptContext& context)
-    {
-        // Set to distance strategy
-        context.material->setLodStrategy(DistanceLodSphereStrategy::getSingletonPtr());
-
-        StringVector vecparams = StringUtil::split(params, " \t");
-
-        // iterate over the parameters and parse values out of them
-        Material::LodValueList lodList;
-        StringVector::iterator i, iend;
-        iend = vecparams.end();
-        for (i = vecparams.begin(); i != iend; ++i)
-        {
-            lodList.push_back(StringConverter::parseReal(*i));
-        }
-
-        context.material->setLodLevels(lodList);
-
-        return false;
-    }
 	//-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     MaterialSerializer::MaterialSerializer()
@@ -3026,8 +2991,6 @@ namespace Ogre
 
         // Set up material attribute parsers
         mMaterialAttribParsers.insert(AttribParserList::value_type("lod_values", (ATTRIBUTE_PARSER)parseLodValues));
-        mMaterialAttribParsers.insert(AttribParserList::value_type("lod_strategy", (ATTRIBUTE_PARSER)parseLodStrategy));
-        mMaterialAttribParsers.insert(AttribParserList::value_type("lod_distances", (ATTRIBUTE_PARSER)parseLodDistances));
         mMaterialAttribParsers.insert(AttribParserList::value_type("receive_shadows", (ATTRIBUTE_PARSER)parseReceiveShadows));
 		mMaterialAttribParsers.insert(AttribParserList::value_type("transparency_casts_shadows", (ATTRIBUTE_PARSER)parseTransparencyCastsShadows));
         mMaterialAttribParsers.insert(AttribParserList::value_type("technique", (ATTRIBUTE_PARSER)parseTechnique));

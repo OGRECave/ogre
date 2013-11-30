@@ -593,7 +593,8 @@ namespace Ogre {
 		vbuf->unlock();
     }
     //---------------------------------------------------------------------
-    void BorderPanelOverlayElement::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void BorderPanelOverlayElement::_updateRenderQueue(RenderQueue* queue, Camera *camera,
+                                                       const Camera *lodCamera)
     {
         // Add self twice to the queue
         // Have to do this to allow 2 materials
@@ -605,7 +606,7 @@ namespace Ogre {
 
 			// do inner last so the border artifacts don't overwrite the children
             // Add inner
-            PanelOverlayElement::_updateRenderQueue(queue, camera);
+            PanelOverlayElement::_updateRenderQueue(queue, camera, lodCamera);
         }
     }
 	//---------------------------------------------------------------------

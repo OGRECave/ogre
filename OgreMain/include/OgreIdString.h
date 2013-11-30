@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 #ifdef NDEBUG
 	#define OGRE_COPY_DEBUG_STRING( _Expression ) ((void)0)
+	#define OGRE_APPEND_DEBUG_STRING( _Expression ) ((void)0)
 #else
 	#include "assert.h"
 #endif
@@ -131,14 +132,55 @@ namespace Ogre
 			mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
 		}
 
+		void OGRE_APPEND_DEBUG_STRING( const char *string )
+		{
+			size_t strLen0 = strlen( mDebugString );
+			size_t strLen1 = strlen( string );
+
+			if( strLen0 + strLen1 < OGRE_DEBUG_STR_SIZE )
+			{
+				strcat( mDebugString, string );
+				mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+			}
+			else
+			{
+				size_t newStart0	= (strLen0 >> 1);
+				size_t newLen0		= strLen0 - newStart0;
+				memmove( mDebugString, mDebugString + newStart0, newLen0 );
+
+				size_t newStart1	= 0;
+				size_t newLen1		= strLen1;
+				if( newLen0 + strLen1 >= OGRE_DEBUG_STR_SIZE )
+				{
+					newLen1		= OGRE_DEBUG_STR_SIZE - newLen0 - 1;
+					newStart1	= strLen1 - newLen1;
+				}
+
+				memcpy( mDebugString + newLen0, string + newStart1, newLen1 );
+				mDebugString[OGRE_DEBUG_STR_SIZE-1] = '\0';
+			}
+		}
+
 		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
 			#pragma warning( pop )
 		#endif
 #endif
 
+		void operator += ( IdString idString )
+		{
+			uint32 doubleHash[2];
+			doubleHash[0] = mHash;
+			doubleHash[1] = idString.mHash;
+
+			OGRE_HASH_FUNC( &doubleHash, sizeof( doubleHash ), Seed, &mHash );
+			OGRE_APPEND_DEBUG_STRING( idString.mDebugString );
+		}
+
 		IdString operator + ( IdString idString ) const
 		{
-			return IdString( mHash + idString.mHash );
+			IdString retVal( *this );
+			retVal += idString;
+			return retVal;
 		}
 
 		bool operator < ( IdString idString ) const

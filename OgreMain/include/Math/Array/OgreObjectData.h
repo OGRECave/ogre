@@ -71,8 +71,8 @@ namespace Ogre
 		*/
 		Real		* RESTRICT_ALIAS	mWorldRadius;
 
-		/// Upper distance to still render. Ours is mSquaredUpperDistance[mIndex]
-		Real		* RESTRICT_ALIAS	mSquaredUpperDistance;
+		/// Upper distance to still render. Ours is mUpperDistance[mIndex]
+		Real		* RESTRICT_ALIAS	mUpperDistance;
 
 		/// Flags determining whether this object is visible (compared to SceneManager mask)
         uint32		* RESTRICT_ALIAS	mVisibilityFlags;
@@ -95,7 +95,7 @@ namespace Ogre
 			mLocalAabb( 0 ),
 			mWorldAabb( 0 ),
 			mWorldRadius( 0 ),
-			mSquaredUpperDistance( 0 ),
+			mUpperDistance( 0 ),
 			mVisibilityFlags( 0 ),
 			mQueryFlags( 0 ),
 			mLightMask( 0 )
@@ -115,12 +115,12 @@ namespace Ogre
 			copy.mWorldAabb->getAsAabb( tmp, copy.mIndex );
 			mWorldAabb->setFromAabb( tmp, mIndex );
 
-			mLocalRadius[mIndex]			= copy.mLocalRadius[copy.mIndex];
-			mWorldRadius[mIndex]			= copy.mWorldRadius[copy.mIndex];
-			mSquaredUpperDistance[mIndex]	= copy.mSquaredUpperDistance[copy.mIndex];
-			mVisibilityFlags[mIndex]		= copy.mVisibilityFlags[copy.mIndex];
-			mQueryFlags[mIndex]				= copy.mQueryFlags[copy.mIndex];
-			mLightMask[mIndex]				= copy.mLightMask[copy.mIndex];
+			mLocalRadius[mIndex]		= copy.mLocalRadius[copy.mIndex];
+			mWorldRadius[mIndex]		= copy.mWorldRadius[copy.mIndex];
+			mUpperDistance[mIndex]		= copy.mUpperDistance[copy.mIndex];
+			mVisibilityFlags[mIndex]	= copy.mVisibilityFlags[copy.mIndex];
+			mQueryFlags[mIndex]			= copy.mQueryFlags[copy.mIndex];
+			mLightMask[mIndex]			= copy.mLightMask[copy.mIndex];
 		}
 
 		/** Advances all pointers to the next pack, i.e. if we're processing 4
@@ -134,7 +134,7 @@ namespace Ogre
 			++mWorldAabb;
 			mLocalRadius		+= ARRAY_PACKED_REALS;
 			mWorldRadius		+= ARRAY_PACKED_REALS;
-			mSquaredUpperDistance+=ARRAY_PACKED_REALS;
+			mUpperDistance		+=ARRAY_PACKED_REALS;
 			mVisibilityFlags	+= ARRAY_PACKED_REALS;
 			mQueryFlags			+= ARRAY_PACKED_REALS;
 			mLightMask			+= ARRAY_PACKED_REALS;
@@ -148,7 +148,7 @@ namespace Ogre
 			mWorldAabb			+= numAdvance;
 			mLocalRadius		+= ARRAY_PACKED_REALS * numAdvance;
 			mWorldRadius		+= ARRAY_PACKED_REALS * numAdvance;
-			mSquaredUpperDistance+=ARRAY_PACKED_REALS * numAdvance;
+			mUpperDistance		+= ARRAY_PACKED_REALS * numAdvance;
 			mVisibilityFlags	+= ARRAY_PACKED_REALS * numAdvance;
 			mQueryFlags			+= ARRAY_PACKED_REALS * numAdvance;
 			mLightMask			+= ARRAY_PACKED_REALS * numAdvance;
@@ -209,6 +209,13 @@ namespace Ogre
 			++mWorldAabb;
 			mWorldRadius		+= ARRAY_PACKED_REALS;
 			mLightMask			+= ARRAY_PACKED_REALS;
+		}
+
+		void advanceLodPack()
+		{
+			mOwner				+= ARRAY_PACKED_REALS;
+			++mWorldAabb;
+			mWorldRadius		+= ARRAY_PACKED_REALS;
 		}
 	};
 }

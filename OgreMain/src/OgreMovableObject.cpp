@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	using namespace VisibilityFlags;
+	const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	const String NullEntity::msMovableType = "NullEntity";
@@ -60,7 +61,8 @@ namespace Ogre {
         , mRenderQueueID(renderQueueId)
         , mRenderQueuePriority(100)
         , mManager(0)
-		, mUpperDistance( std::numeric_limits<float>::max() )
+		, mLodMesh( &c_DefaultLodMesh )
+		, mCurrentMeshLod( 0 )
 		, mMinPixelSize(0)
         , mListener(0)
 		, mDebugDisplay(false)
@@ -69,6 +71,8 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mLodMaterial.resize( 1, &c_DefaultLodMesh );
+		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
 
@@ -83,7 +87,8 @@ namespace Ogre {
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueuePriority(100)
         , mManager(0)
-		, mUpperDistance( std::numeric_limits<float>::max() )
+		, mLodMesh( &c_DefaultLodMesh )
+		, mCurrentMeshLod( 0 )
 		, mMinPixelSize(0)
         , mListener(0)
 		, mDebugDisplay(false)
@@ -92,6 +97,8 @@ namespace Ogre {
 		, mGlobalIndex( -1 )
 		, mParentIndex( -1 )
     {
+		mLodMaterial.resize( 1, &c_DefaultLodMesh );
+		mCurrentMaterialLod.resize( 1, 0 );
 		if (Root::getSingletonPtr())
 			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
@@ -420,7 +427,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
 									 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-									 AxisAlignedBox *outReceiversBox )
+									 AxisAlignedBox *outReceiversBox, const Camera *lodCamera )
 	{
 		//On threaded environments, the internal variables from outCulledObjects cause
 		//a false cache sharing because they're too close to each other. Perfoming
@@ -430,7 +437,7 @@ namespace Ogre {
 
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really don�t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
@@ -440,6 +447,9 @@ namespace Ogre {
 			ArrayVector3	signFlip;
 			ArrayReal		planeNegD;
 		};
+
+		ArrayVector3 lodCameraPos;
+		lodCameraPos.setAll( lodCamera->getDerivedPosition() );
 
 		// Flip the bit from shadow caster, and leave only that in "includeNonCasters"
 		ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
@@ -468,6 +478,10 @@ namespace Ogre {
 		{
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mUpperDistance);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 			ArrayReal dotResult;
@@ -511,6 +525,10 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
+			ArrayReal distance = lodCameraPos.distance( objData.mWorldAabb->mCenter );
+			mask = Mathlib::And( Mathlib::Or( mask, tmpMask ),
+								 Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance ) );
+
 			//isVisible = isVisible() && (isCaster || includeNonCasters)
 			ArrayMaskI isVisible = Mathlib::And(
 								Mathlib::TestFlags4( *visibilityFlags,
@@ -522,7 +540,7 @@ namespace Ogre {
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
             finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
@@ -569,11 +587,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void MovableObject::cullReceiversBox( const size_t numNodes, ObjectData objData,
 											const Frustum *frustum, uint32 sceneVisibilityFlags,
-											AxisAlignedBox *outReceiversBox )
+											AxisAlignedBox *outReceiversBox, const Camera *lodCamera )
 	{
 		//Thanks to Fabian Giesen for summing up all known methods of frustum culling:
 		//http://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
-		// (we use method Method 5: "If you really don’t care whether a box is
+		// (we use method Method 5: "If you really don�t care whether a box is
 		// partially or fully inside"):
 		// vector4 signFlip = componentwise_and(plane, 0x80000000);
 		// return dot3(center + xor(extent, signFlip), plane) > -plane.w;
@@ -583,6 +601,9 @@ namespace Ogre {
 			ArrayVector3	signFlip;
 			ArrayReal		planeNegD;
 		};
+
+		ArrayVector3 lodCameraPos;
+		lodCameraPos.setAll( lodCamera->getDerivedPosition() );
 
 		sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
 
@@ -608,6 +629,10 @@ namespace Ogre {
 		{
 			ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
 																		(objData.mVisibilityFlags);
+			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mWorldRadius);
+			ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+																		(objData.mUpperDistance);
 
 			//Test all 6 planes and AND the dot product. If one is false, then we're not visible
 			ArrayReal dotResult;
@@ -651,6 +676,10 @@ namespace Ogre {
 			mask = Mathlib::Or( Mathlib::isInfinity( objData.mWorldAabb->mHalfSize.mChunkBase[2] ),
 								mask );
 
+			ArrayReal distance = lodCameraPos.distance( objData.mWorldAabb->mCenter );
+			mask = Mathlib::And( Mathlib::Or( mask, tmpMask ),
+								 Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance ) );
+
 			//No need to check for casters as in cullFrustum. See function documentation
 			ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
 														Mathlib::SetAll( LAYER_VISIBILITY ) );
@@ -659,7 +688,7 @@ namespace Ogre {
 
 			//Fuse result with visibility flag
 			// finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
-			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( Mathlib::Or( mask, tmpMask ) ),
+			ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
 														Mathlib::And( sceneFlags, *visibilityFlags ) );
             finalMask				= Mathlib::And( finalMask, isVisible );
 			ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );

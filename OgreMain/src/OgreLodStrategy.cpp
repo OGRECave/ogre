@@ -29,8 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreLodStrategy.h"
 
-#include "OgreMesh.h"
-#include "OgreMaterial.h"
+#include "OgreCamera.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -53,14 +52,14 @@ namespace Ogre {
         return getValueImpl(movableObject, camera->getLodCamera());
     }
     //-----------------------------------------------------------------------
-    void LodStrategy::assertSorted(const Mesh::LodValueList &values) const
+    void LodStrategy::assertSorted(const Mesh::LodValueArray &values) const
     {
         assert(isSorted(values) && "The LOD values must be sorted");
     }
     //---------------------------------------------------------------------
-    bool LodStrategy::isSortedAscending(const Mesh::LodValueList& values)
+    bool LodStrategy::isSortedAscending(const Mesh::LodValueArray& values)
     {
-        Mesh::LodValueList::const_iterator it = values.begin();
+        Mesh::LodValueArray::const_iterator it = values.begin();
         Real prev = (*it);
         for (++it; it != values.end(); ++it)
         {
@@ -73,9 +72,9 @@ namespace Ogre {
         return true;
     }
     //---------------------------------------------------------------------
-    bool LodStrategy::isSortedDescending(const Mesh::LodValueList& values)
+    bool LodStrategy::isSortedDescending(const Mesh::LodValueArray& values)
     {
-        Mesh::LodValueList::const_iterator it = values.begin();
+        Mesh::LodValueArray::const_iterator it = values.begin();
         Real prev = (*it);
         for (++it; it != values.end(); ++it)
         {
@@ -152,12 +151,12 @@ namespace Ogre {
         return static_cast<ushort>(meshLodUsageList.size() - 1);
     }
     //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexAscending(Real value, const Material::LodValueList& materialLodValueList)
+    ushort LodStrategy::getIndexAscending(Real value, const Material::LodValueArray& materialLodValueArray)
     {
-        Material::LodValueList::const_iterator i, iend;
-        iend = materialLodValueList.end();
+        Material::LodValueArray::const_iterator i, iend;
+        iend = materialLodValueArray.end();
         unsigned short index = 0;
-        for (i = materialLodValueList.begin(); i != iend; ++i, ++index)
+        for (i = materialLodValueArray.begin(); i != iend; ++i, ++index)
         {
             if (*i > value)
             {
@@ -166,15 +165,15 @@ namespace Ogre {
         }
 
         // If we fall all the way through, use the highest value
-        return static_cast<ushort>(materialLodValueList.size() - 1);
+        return static_cast<ushort>(materialLodValueArray.size() - 1);
     }
     //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexDescending(Real value, const Material::LodValueList& materialLodValueList)
+    ushort LodStrategy::getIndexDescending(Real value, const Material::LodValueArray& materialLodValueArray)
     {
-        Material::LodValueList::const_iterator i, iend;
-        iend = materialLodValueList.end();
+        Material::LodValueArray::const_iterator i, iend;
+        iend = materialLodValueArray.end();
         unsigned short index = 0;
-        for (i = materialLodValueList.begin(); i != iend; ++i, ++index)
+        for (i = materialLodValueArray.begin(); i != iend; ++i, ++index)
         {
             if (*i < value)
             {
@@ -183,7 +182,7 @@ namespace Ogre {
         }
 
         // If we fall all the way through, use the highest value
-        return static_cast<ushort>(materialLodValueList.size() - 1);
+        return static_cast<ushort>(materialLodValueArray.size() - 1);
     }
 
 } // namespace

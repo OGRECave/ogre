@@ -384,7 +384,7 @@ namespace Ogre
 			WorldAabb,
 			LocalRadius,
 			WorldRadius,
-			SquaredUpperDistance,
+			UpperDistance,
 			VisibilityFlags,
 			QueryFlags,
 			LightMask,

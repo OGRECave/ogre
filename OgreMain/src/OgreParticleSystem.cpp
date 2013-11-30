@@ -700,7 +700,7 @@ namespace Ogre {
         return p;
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+	void ParticleSystem::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
 		mLastVisibleFrame = Root::getSingleton().getNextFrameNumber();
 		mTimeSinceLastVisible = 0.0f;
@@ -713,7 +713,7 @@ namespace Ogre {
 			if (!mIsRendererConfigured)
 				configureRenderer();
 
-			mRenderer->_updateRenderQueue(queue, camera, mActiveParticles, mCullIndividual);
+			mRenderer->_updateRenderQueue(queue, camera, lodCamera, mActiveParticles, mCullIndividual);
 		}
     }
 	//---------------------------------------------------------------------

@@ -59,17 +59,24 @@ namespace Ogre {
         /// @copydoc LodStrategy::transformBias
         virtual Real transformBias(Real factor) const;
 
+		/** Transform user supplied value to internal value.
+        @remarks
+            Do not throw exceptions for invalid values here, as the LOD strategy
+            may be changed such that the values become valid.
+        */
+		virtual Real transformUserValue(Real userValue) const				{ return -userValue; }
+
         /// @copydoc LodStrategy::getIndex
         virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const;
 
         /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Material::LodValueList& materialLodValueList) const;
+        virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const;
 
         /// @copydoc LodStrategy::sort
         virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const;
 
         /// @copydoc LodStrategy::isSorted
-        virtual bool isSorted(const Mesh::LodValueList& values) const;
+        virtual bool isSorted(const Mesh::LodValueArray& values) const;
     };
 	/** @} */
 	/** @} */
@@ -82,6 +89,9 @@ namespace Ogre {
 
         /// @copydoc LodStrategy::getValueImpl
         Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const;
+
+		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+									const Camera *camera, Real bias ) const;
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -127,6 +137,9 @@ namespace Ogre {
 
         /// @copydoc LodStrategy::getValueImpl
         Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const;
+
+		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+									const Camera *camera, Real bias ) const;
 
         /** Override standard Singleton retrieval.
         @remarks

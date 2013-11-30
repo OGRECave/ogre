@@ -57,7 +57,7 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorPassStencil::execute()
+	void CompositorPassStencil::execute( const Camera *lodCamera )
 	{
 		//Execute a limited number of times?
 		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )

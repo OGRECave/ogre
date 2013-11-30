@@ -90,7 +90,7 @@ namespace Ogre {
         also that mesh sub-sections (when used in an instantiated object)
         share the same scene node as the parent.
     */
-    class _OgreExport Mesh: public Resource, public AnimationContainer
+	class _OgreExport Mesh: public Resource, public AnimationContainer
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
@@ -99,8 +99,8 @@ namespace Ogre {
         friend class MeshSerializerImpl_v1_1;
 
     public:
-        typedef vector<Real>::type LodValueList;
-        typedef vector<MeshLodUsage>::type MeshLodUsageList;
+        typedef FastArray<Real> LodValueArray;
+		typedef vector<MeshLodUsage>::type MeshLodUsageList;
         /// Multimap of vertex bone assignments (orders by vertex index).
         typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
@@ -158,10 +158,11 @@ namespace Ogre {
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
 
-        const LodStrategy *mLodStrategy;
+        String mLodStrategyName;
         bool mIsLodManual;
         ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
+		MeshLodUsageList	mMeshLodUsageList;
+		LodValueArray		mLodValues;
 
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
@@ -430,6 +431,10 @@ namespace Ogre {
         */
         const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
+		void setLodStrategyName( const String &name )				{ mLodStrategyName = name; }
+
+		/// Returns the name of the Lod strategy the user lod values have been calibrated for
+		const String& getLodStrategyName(void) const				{ return mLodStrategyName; }
 
         /** Returns the number of levels of detail that this mesh supports. 
         @remarks
@@ -465,14 +470,6 @@ namespace Ogre {
             The name of the mesh which will be the lower level detail version.
         */
         void updateManualLodLevel(ushort index, const String& meshName);
-
-        /** Retrieves the level of detail index for the given LOD value. 
-        @note
-            The value passed in is the 'transformed' value. If you are dealing with
-            an original source value (e.g. distance), use LodStrategy::transformUserValue
-            to turn this into a lookup value.
-        */
-        ushort getLodIndex(Real value) const;
 
         /** Returns true if this mesh is using manual LOD.
         @remarks
@@ -935,10 +932,7 @@ namespace Ogre {
         /** Get pose list. */
         const PoseList& getPoseList(void) const;
 
-        /** Get LOD strategy used by this mesh. */
-        const LodStrategy *getLodStrategy() const;
-        /** Set the LOD strategy used by this mesh. */
-        void setLodStrategy(LodStrategy *lodStrategy);
+		const LodValueArray* _getLodValueArray(void) const						{ return &mLodValues; }
 
     };
 

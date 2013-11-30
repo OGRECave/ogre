@@ -370,7 +370,7 @@ namespace Ogre {
             @see
                 MovableObject
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
 		/// @copydoc MovableObject::visitRenderables
 		void visitRenderables(Renderable::Visitor* visitor, 

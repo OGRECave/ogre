@@ -67,7 +67,7 @@ namespace Ogre
 		void removeBlendData();
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
-		size_t updateVertexBuffer( Camera *currentCamera );
+        size_t updateVertexBuffer( Camera *currentCamera , const Camera *lodCamera );
 
 		/// Overloaded to reserve enough space in mCulledInstances
 		virtual void createAllInstancedEntities(void);
@@ -90,12 +90,13 @@ namespace Ogre
 
 		/** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
 			per unit basis and finally updated the vertex buffer */
-		virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera );
+        virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera );
 
 		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+                                                       const Camera *lodCamera,
 														uint32 combinedVisibilityFlags )
 		{
-			instanceBatchCullFrustumThreadedImpl( frustum, combinedVisibilityFlags );
+            instanceBatchCullFrustumThreadedImpl( frustum, lodCamera, combinedVisibilityFlags );
 		}
 	};
 }

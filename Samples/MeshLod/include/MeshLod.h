@@ -148,12 +148,13 @@ protected:
 		}
 	}
 	void forceLodLevel(int index){
-		if(index == -1) {
+		//TODO: Lod bias is not supported in 2.0 (is this is even worthwhile?)
+		/*if(index == -1) {
 			// Clear forced Lod level
 			mHeadEntity->setMeshLodBias(1.0, 0, std::numeric_limits<unsigned short>::max());
 		} else {
 			mHeadEntity->setMeshLodBias(1.0, index, index);
-		}
+		}*/
 	}
 	
 	void loadUserLod(Ogre::MeshPtr& mesh, Real reductionValue)

@@ -708,7 +708,7 @@ void XMLToBinary(XmlOptions opts)
 
             }
 
-            newMesh->setLodStrategy(LodStrategyManager::getSingleton().getStrategy(opts.lodStrategy));
+			newMesh->setLodStrategyName( opts.lodStrategy );
             ProgressiveMeshGenerator pm;
             pm.generateLodLevels(lodConfig);
         }

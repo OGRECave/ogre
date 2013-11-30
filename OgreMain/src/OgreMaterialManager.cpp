@@ -127,9 +127,6 @@ namespace Ogre {
         // Add a single technique and pass, non-programmable
         mDefaultSettings->createTechnique()->createPass();
 
-        // Set the default LOD strategy
-        mDefaultSettings->setLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy());
-
 	    // Set up a lit base white material
 	    create("BaseWhite", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 	    // Set up an unlit base white material

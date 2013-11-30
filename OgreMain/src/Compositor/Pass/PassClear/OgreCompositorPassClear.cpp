@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {
@@ -43,7 +44,7 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorPassClear::execute()
+	void CompositorPassClear::execute( const Camera *lodCamera )
 	{
 		//Execute a limited number of times?
 		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )

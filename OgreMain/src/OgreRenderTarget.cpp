@@ -163,24 +163,25 @@ namespace Ogre {
 	}
 
 	void RenderTarget::_updateViewportCullPhase01( Viewport* viewport, Camera *camera,
-													uint8 firstRq, uint8 lastRq )
+												   const Camera *lodCamera, uint8 firstRq, uint8 lastRq )
 	{
 		assert( viewport->getTarget() == this &&
 				"RenderTarget::_updateViewportCullPhase the requested viewport is "
 				"not bound to the rendertarget!" );
 
 		fireViewportPreUpdate(viewport);
-		viewport->_updateCullPhase01( camera, firstRq, lastRq );
+		viewport->_updateCullPhase01( camera, lodCamera, firstRq, lastRq );
 	}
 	//-----------------------------------------------------------------------
-	void RenderTarget::_updateViewportRenderPhase02( Viewport* viewport, Camera *camera, uint8 firstRq,
+	void RenderTarget::_updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
+													 const Camera *lodCamera, uint8 firstRq,
 													 uint8 lastRq, bool updateStatistics )
 	{
 		assert( viewport->getTarget() == this &&
 				"RenderTarget::_updateViewport the requested viewport is "
 				"not bound to the rendertarget!" );
 
-		viewport->_updateRenderPhase02( camera, firstRq, lastRq );
+		viewport->_updateRenderPhase02( camera, lodCamera, firstRq, lastRq );
 		if(updateStatistics)
 		{
 			mStats.triangleCount += camera->_getNumRenderedFaces();

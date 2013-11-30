@@ -814,7 +814,9 @@ namespace Ogre
 					ID_IDENTIFIER,		//TODO
 
 					//Used by PASS_SCENE
-					ID_LOD_BIAS,		//TODO
+					ID_LOD_BIAS,
+					ID_LOD_UPDATE_LIST,
+					ID_LOD_CAMERA,
 					ID_MATERIAL_SCHEME,	//TODO
 					ID_VISIBILITY_MASK,
 					ID_SHADOWS_ENABLED,

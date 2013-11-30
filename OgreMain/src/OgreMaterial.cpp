@@ -58,10 +58,7 @@ namespace Ogre {
 				"for materials; the flag has been reset to false");
 		}
 
-		// Initialise to default strategy
-		mLodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-
-		mLodValues.push_back(0.0f);
+		mLodValues.push_back( LodStrategyManager::getSingleton().getDefaultStrategy()->getBaseValue() );
 
 		applyDefaults();
 
@@ -113,7 +110,6 @@ namespace Ogre {
 		// Also copy LOD information
         mUserLodValues = rhs.mUserLodValues;
 		mLodValues = rhs.mLodValues;
-        mLodStrategy = rhs.mLodStrategy;
         mCompilationRequired = rhs.mCompilationRequired;
         // illumination passes are not compiled right away so
         // mIsLoaded state should still be the same as the original material
@@ -783,28 +779,24 @@ namespace Ogre {
 			unload();
     }
     // --------------------------------------------------------------------
-    void Material::setLodLevels(const LodValueList& lodValues)
+    void Material::setLodLevels(const LodValueArray& lodValues)
     {
+		LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
         // Square the distances for the internal list
-		LodValueList::const_iterator i, iend;
+		LodValueArray::const_iterator i, iend;
 		iend = lodValues.end();
 		// First, clear and add single zero entry
 		mLodValues.clear();
         mUserLodValues.clear();
         mUserLodValues.push_back(0);
-		mLodValues.push_back(mLodStrategy->getBaseValue());
+		mLodValues.push_back(LodStrategyManager::getSingleton().getDefaultStrategy()->getBaseValue());
 		for (i = lodValues.begin(); i != iend; ++i)
 		{
 			mUserLodValues.push_back(*i);
-            if (mLodStrategy)
-                mLodValues.push_back(mLodStrategy->transformUserValue(*i));
+            mLodValues.push_back(lodStrategy->transformUserValue(*i));
 		}
 		
-    }
-    // --------------------------------------------------------------------
-    ushort Material::getLodIndex(Real value) const
-    {
-        return mLodStrategy->getIndex(value, mLodValues);
     }
     // --------------------------------------------------------------------
     Material::LodValueIterator Material::getLodValueIterator(void) const
@@ -832,23 +824,6 @@ namespace Ogre {
 		}
 
         return testResult;
-    }
-    //---------------------------------------------------------------------
-    const LodStrategy *Material::getLodStrategy() const
-    {
-        return mLodStrategy;
-    }
-    //---------------------------------------------------------------------
-    void Material::setLodStrategy(LodStrategy *lodStrategy)
-    {
-        mLodStrategy = lodStrategy;
-
-        assert(mLodValues.size());
-        mLodValues[0] = mLodStrategy->getBaseValue();
-
-        // Re-transform all user LOD values (starting at index 1, no need to transform base value)
-        for (size_t i = 1; i < mUserLodValues.size(); ++i)
-            mLodValues[i] = mLodStrategy->transformUserValue(mUserLodValues[i]);
     }
     //---------------------------------------------------------------------
 }

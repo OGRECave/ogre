@@ -120,12 +120,7 @@ namespace Ogre
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
-        CustomParamsVec		mCustomParams;
-
-        /// This bbox contains all (visible) instanced entities
-        Camera              *mCurrentCamera;
-
-        unsigned short      mMaterialLodIndex;
+		CustomParamsVec		mCustomParams;
 
         /// False if a technique doesn't support skeletal animation
         bool                mTechnSupportsSkeletal;
@@ -172,8 +167,8 @@ namespace Ogre
 		/** Used by HW Basic & HW VTF techniques to cull from multiple threads.
 			@see InstancingTheadedCullingMethod
 		*/
-		void instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
-													uint32 combinedVisibilityFlags );
+        void instanceBatchCullFrustumThreadedImpl(const Frustum *frustum, const Camera *lodCamera,
+                                                    uint32 combinedVisibilityFlags );
 
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
@@ -365,10 +360,8 @@ namespace Ogre
 
         /** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
-        /** @copydoc MovableObject::_notifyCurrentCamera. */
-		void _notifyCurrentCamera( Camera* cam );
 
-		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject

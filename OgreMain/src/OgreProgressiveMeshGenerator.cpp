@@ -703,7 +703,7 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	OgreAssert(lodConfig.levels.size() <= 0xffff, "");
 
 	// LOD distances needs to be sorted.
-	Mesh::LodValueList values;
+	Mesh::LodValueArray values;
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);
 	}

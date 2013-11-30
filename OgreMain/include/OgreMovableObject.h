@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"
 #include "OgreVisibilityFlags.h"
+#include "OgreLodStrategy.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -56,6 +57,7 @@ namespace Ogre {
 	/** \addtogroup Scene
 	*  @{
 	*/
+
 	/** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
@@ -92,8 +94,13 @@ namespace Ogre {
 		ObjectData mObjectData;
 		/// SceneManager holding this object (if applicable)
 		SceneManager* mManager;
-		/// Upper distance to still render. @See ObjectData::mSquaredUpperDistance
-		Real mUpperDistance;
+
+		//One for each submesh/material/Renderable
+		FastArray<Real> const				*mLodMesh;
+		FastArray< FastArray<Real> const * > mLodMaterial;
+		unsigned char						mCurrentMeshLod;
+		FastArray<unsigned char>			mCurrentMaterialLod;
+
 		/// Minimum pixel size to still render
 		Real mMinPixelSize;
 		/// User objects binding.
@@ -227,7 +234,7 @@ namespace Ogre {
                 The engine will call this method when this object is to be rendered. The object must then create one or more
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) = 0;
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) = 0;
 
 		/** @See SceneManager::updateAllBounds
 		@remarks
@@ -249,11 +256,15 @@ namespace Ogre {
 			should be rendered
 		@param outReceiversBox [out]
 			Bounds information from culled objects that are shadow receivers. Pointer can be null
+		@param lodCamera
+			Camera in which lod levels calculations are based (i.e. during shadow pass renders)
+			Note however, we only use this camera to calulate if should be visible according to
+			mUpperDistance
 		*/
 		typedef FastArray<MovableObject*> MovableObjectArray;
 		static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
 								 uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-								 AxisAlignedBox *outReceiversBox );
+								 AxisAlignedBox *outReceiversBox, const Camera *lodCamera );
 
 		/// @See InstancingTheadedCullingMethod, @see InstanceBatch::instanceBatchCullFrustumThreaded
 		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
@@ -272,7 +283,8 @@ namespace Ogre {
 			always included, since it's not meant to be called for casters-only (unlike cullFrustum).
 		*/
 		static void cullReceiversBox( const size_t numNodes, ObjectData t, const Frustum *frustum,
-										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox );
+										uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox,
+										const Camera *lodCamera );
 
 		/** @See SceneManager::cullLights & @see MovableObject::cullFrustum
 			Produces the global list of visible lights that is needed in buildLightList
@@ -300,6 +312,10 @@ namespace Ogre {
 
 		static void calculateCastersBox( const size_t numNodes, ObjectData t,
 										 uint32 sceneVisibilityFlags, AxisAlignedBox *outBox );
+
+		friend void LodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData t,
+												const Camera *camera, Real bias ) const;
+		friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
         /** Tells this object whether to be visible or not, if it has a renderable component. 
 		@note An alternative approach of making an object invisible is to detach it
@@ -338,7 +354,7 @@ namespace Ogre {
 		inline void setRenderingDistance(Real dist);
 
 		/** Gets the distance at which batches are no longer rendered. */
-		Real getRenderingDistance(void) const								{ return mUpperDistance; }
+		inline Real getRenderingDistance(void) const;
 
 		/** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
 		@note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.
@@ -678,7 +694,7 @@ namespace Ogre {
 		{
 			return msMovableType;
 		}
-		virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera) {}
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
 		virtual void visitRenderables(Renderable::Visitor* visitor, 
 			bool debugRenderables = false) {}
 	};

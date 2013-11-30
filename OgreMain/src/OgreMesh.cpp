@@ -53,6 +53,7 @@ namespace Ogre {
         : Resource(creator, name, handle, group, isManual, loader),
         mBoundRadius(0.0f),
         mBoneAssignmentsOutOfDate(false),
+		mLodStrategyName( LodStrategyManager::getSingleton().getDefaultStrategy()->getName() ),
         mIsLodManual(false),
         mNumLods(1),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
@@ -68,18 +69,14 @@ namespace Ogre {
 		mPosesIncludeNormals(false),
 		sharedVertexData(0)
     {
-
-        // Initialise to default strategy
-        mLodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-
 		// Init first (manual) lod
 		MeshLodUsage lod;
         lod.userValue = 0; // User value not used for base LOD level
-		lod.value = mLodStrategy->getBaseValue();
+		lod.value = LodStrategyManager::getSingleton().getDefaultStrategy()->getBaseValue();
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
-
+		mLodValues.push_back( lod.value );
     }
     //-----------------------------------------------------------------------
     Mesh::~Mesh()
@@ -213,9 +210,16 @@ namespace Ogre {
         // The loading process accesses LOD usages directly, so
         // transformation of user values must occur after loading is complete.
 
+		LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
+		assert( mLodValues.size() == mMeshLodUsageList.size()  );
+		LodValueArray::iterator lodValueIt = mLodValues.begin();
         // Transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
-            i->value = mLodStrategy->transformUserValue(i->userValue);
+		{
+            i->value = lodStrategy->transformUserValue(i->userValue);
+			*lodValueIt++ = i->value;
+		}
 	}
 	//-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -336,11 +340,12 @@ namespace Ogre {
         newMesh->mAABB = mAABB;
         newMesh->mBoundRadius = mBoundRadius;
 
-        newMesh->mLodStrategy = mLodStrategy;
+        newMesh->mLodStrategyName = mLodStrategyName;
 		newMesh->mIsLodManual = mIsLodManual;
 		newMesh->mNumLods = mNumLods;
-		newMesh->mMeshLodUsageList = mMeshLodUsageList;
-        newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
+		newMesh->mMeshLodUsageList	= mMeshLodUsageList;
+		newMesh->mLodValues			= mLodValues;
+		newMesh->mAutoBuildEdgeLists= mAutoBuildEdgeLists;
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
         MeshLodUsageList::iterator lodi;
         for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi) {
@@ -844,7 +849,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
-        index = std::min(index, (ushort)(mMeshLodUsageList.size() - 1));
+		assert( index < mMeshLodUsageList.size() );
         if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
@@ -877,6 +882,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Mesh::createManualLodLevel(Real lodValue, const String& meshName, const String& groupName)
 	{
+		LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
 
 		// Basic prerequisites
         assert((mIsLodManual || mNumLods == 1) && "Generated LODs already in use!");
@@ -884,15 +890,17 @@ namespace Ogre {
 		mIsLodManual = true;
 		MeshLodUsage lod;
 		lod.userValue = lodValue;
-        lod.value = mLodStrategy->transformUserValue(lod.userValue);
+        lod.value = lodStrategy->transformUserValue(lod.userValue);
 		lod.manualName = meshName;
 		lod.manualGroup = groupName.empty() ? mGroup : groupName;
 		lod.manualMesh.setNull();
         lod.edgeData = 0;
 		mMeshLodUsageList.push_back(lod);
+		mLodValues.push_back( lod.value );
 		++mNumLods;
 
-        mLodStrategy->sort(mMeshLodUsageList);
+        lodStrategy->sort(mMeshLodUsageList);
+		std::sort( mLodValues.begin(), mLodValues.end() );
 	}
     //---------------------------------------------------------------------
 	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
@@ -911,12 +919,6 @@ namespace Ogre {
         lod->edgeData = 0;
 	}
     //---------------------------------------------------------------------
-	ushort Mesh::getLodIndex(Real value) const
-	{
-        // Get index from strategy
-        return mLodStrategy->getIndex(value, mMeshLodUsageList);
-	}
-    //---------------------------------------------------------------------
 	void Mesh::_setLodInfo(unsigned short numLevels, bool isManual)
 	{
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
@@ -926,6 +928,7 @@ namespace Ogre {
 
 		mNumLods = numLevels;
 		mMeshLodUsageList.resize(numLevels);
+		mLodValues.resize(numLevels);
 		// Resize submesh face data lists too
 		for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
 		{
@@ -941,8 +944,10 @@ namespace Ogre {
 		// Basic prerequisites
 		assert(level != 0 && "Can't modify first LOD level (full detail)");
 		assert(level < mMeshLodUsageList.size() && "Index out of bounds");
+		assert( mLodValues.size() == mMeshLodUsageList.size() );
 
 		mMeshLodUsageList[level] = usage;
+		mLodValues[level] = usage.userValue;
 	}
     //---------------------------------------------------------------------
 	void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
@@ -986,16 +991,20 @@ namespace Ogre {
 
         freeEdgeList();
         mMeshLodUsageList.clear();
+		mLodValues.clear();
+
+		LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
 
         // Reinitialise
         mNumLods = 1;
 		// Init first (manual) lod
 		MeshLodUsage lod;
         lod.userValue = 0;
-		lod.value = mLodStrategy->getBaseValue();
+		lod.value = lodStrategy->getBaseValue();
         lod.edgeData = 0;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
+		mLodValues.push_back( lodStrategy->getBaseValue() );
 		mIsLodManual = false;
 
 
@@ -2193,33 +2202,16 @@ namespace Ogre {
         }
 
     }
-	//---------------------------------------------------------------------
-    const LodStrategy *Mesh::getLodStrategy() const
-    {
-        return mLodStrategy;
-    }
-    //---------------------------------------------------------------------
-    void Mesh::setLodStrategy(LodStrategy *lodStrategy)
-    {
-        mLodStrategy = lodStrategy;
-
-        assert(mMeshLodUsageList.size());
-        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
-
-        // Re-transform user LOD values (starting at index 1, no need to transform base value)
-		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
-            i->value = mLodStrategy->transformUserValue(i->userValue);
-
-    }
     //--------------------------------------------------------------------
     void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
     {
+		LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
         // In theory every mesh should have a submesh.
         assert(getNumSubMeshes() > 0);
-        setLodStrategy(lodConfig.strategy);
         SubMesh* submesh = getSubMesh(0);
         mNumLods = submesh->mLodFaceList.size() + 1;
         mMeshLodUsageList.resize(mNumLods);
+		mLodValues.resize(mNumLods);
         for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
             // Record usages. First LOD usage is the mesh itself.
 
@@ -2228,11 +2220,13 @@ namespace Ogre {
                 // Generated buffers are less then the reported by ProgressiveMesh.
                 // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before LOD generation completes.
                 assert(mMeshLodUsageList.size() > n + 1);
-                MeshLodUsage& lod = mMeshLodUsageList[++n];
+				++n;
+                MeshLodUsage& lod = mMeshLodUsageList[n];
                 lod.userValue = lodConfig.levels[i].distance;
-                lod.value = getLodStrategy()->transformUserValue(lod.userValue);
+                lod.value = lodStrategy->transformUserValue(lod.userValue);
                 lod.edgeData = 0;
                 lod.manualMesh.setNull();
+				mLodValues[n] = lod.value;
             }
         }
 
@@ -2243,9 +2237,11 @@ namespace Ogre {
         if (lodConfig.strategy == AbsolutePixelCountLodStrategy::getSingletonPtr()) {
             mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
             mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
+			mLodValues[0] = std::numeric_limits<Real>::max();
         } else {
             mMeshLodUsageList[0].userValue = 0;
             mMeshLodUsageList[0].value = 0;
+			mLodValues[0] = 0;
         }
     }
     //---------------------------------------------------------------------

@@ -411,9 +411,6 @@ namespace Ogre {
 			{
 				// sub entity vertex data (-1)
 				SubEntity* s = entity->getSubEntity(handle - 1);
-				// Skip this track if subentity is not visible
-				if (!s->isVisible())
-					continue;
 				swVertexData = s->_getSoftwareVertexAnimVertexData();
 				hwVertexData = s->_getHardwareVertexAnimVertexData();
 				s->_markBuffersUsedForAnimation();

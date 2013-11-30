@@ -553,7 +553,7 @@ namespace Ogre {
         @see
             MovableObject
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** Overridden from MovableObject
         @see

@@ -1245,6 +1245,8 @@ namespace Ogre
 		mIds["identifier"]		= ID_IDENTIFIER;
 
 		mIds["lod_bias"]		= ID_LOD_BIAS;
+		mIds["lod_update_list"]	= ID_LOD_UPDATE_LIST;
+		mIds["lod_camera"]		= ID_LOD_CAMERA;
 		mIds["material_scheme"] = ID_MATERIAL_SCHEME;
 		mIds["visibility_mask"]	= ID_VISIBILITY_MASK;
 		mIds["shadows"]			= ID_SHADOWS_ENABLED;

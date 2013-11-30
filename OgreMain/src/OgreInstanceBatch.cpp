@@ -52,8 +52,6 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mCurrentCamera( 0 ),
-				mMaterialLodIndex( 0 ),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),
@@ -77,6 +75,9 @@ namespace Ogre
 		{
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 		}
+
+		mLodMesh = meshReference->_getLodValueArray();
+		mLodMaterial[0] = mMaterial->_getLodValues();
 
 		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 
@@ -563,7 +564,8 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+    void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+                                                              const Camera *lodCamera,
 																uint32 combinedVisibilityFlags )
 	{
 		mCulledInstances.clear();
@@ -572,51 +574,13 @@ namespace Ogre
 		const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
 		MovableObject::cullFrustum( numObjs, objData, frustum, combinedVisibilityFlags,
-									mCulledInstances, (AxisAlignedBox*)0 );
+                                    mCulledInstances, (AxisAlignedBox*)0, lodCamera );
 	}
 	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const
 	{
 		static String sType = "InstanceBatch";
 		return sType;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_notifyCurrentCamera( Camera* cam )
-	{
-		mCurrentCamera = cam;
-
-		//See DistanceLodStrategy::getValueImpl()
-		//We use our own because our SceneNode is just filled with zeroes, and updating it
-		//with real values is expensive, plus we would need to make sure it doesn't get to
-		//the shader
-		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
-					 mMeshReference->getBoundingSphereRadius();
-        depth = max( depth, Real(0) );
-        Real lodValue = depth * cam->_getLodBiasInverse();
-
-		//Now calculate Material LOD
-        /*const LodStrategy *materialStrategy = mMaterial->getLodStrategy();
-        
-        //Calculate LOD value for given strategy
-        Real lodValue = materialStrategy->getValue( this, cam );*/
-
-        //Get the index at this depth
-        unsigned short idx = mMaterial->getLodIndex( lodValue );
-
-		//TODO: Replace subEntity for MovableObject
-        // Construct event object
-        /*EntityMaterialLodChangedEvent subEntEvt;
-        subEntEvt.subEntity = this;
-        subEntEvt.camera = cam;
-        subEntEvt.lodValue = lodValue;
-        subEntEvt.previousLodIndex = mMaterialLodIndex;
-        subEntEvt.newLodIndex = idx;
-
-        //Notify LOD event listeners
-        cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
-
-        //Change LOD index
-        mMaterialLodIndex = idx;
 	}
 	//-----------------------------------------------------------------------
 	Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const
@@ -648,10 +612,10 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	Technique* InstanceBatch::getTechnique( void ) const
 	{
-		return mMaterial->getBestTechnique( mMaterialLodIndex, this );
+		return mMaterial->getBestTechnique( mCurrentMaterialLod[0], this );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateRenderQueue( RenderQueue* queue, Camera *camera )
+    void InstanceBatch::_updateRenderQueue(RenderQueue* queue, Camera *camera , const Camera *lodCamera)
 	{
 		queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 	}

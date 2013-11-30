@@ -322,7 +322,8 @@ namespace Ogre {
         */
 		virtual void _beginUpdate();
 
-		void _updateViewportCullPhase01( Viewport* viewport, Camera *camera, uint8 firstRq, uint8 lastRq );
+		void _updateViewportCullPhase01(Viewport* viewport, Camera *camera, const Camera *lodCamera,
+										uint8 firstRq, uint8 lastRq );
 
 		/** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
 		@remarks
@@ -334,8 +335,9 @@ namespace Ogre {
 		@param updateStatistics
 			Whether you want to update statistics or not.
 		*/
-		virtual void _updateViewportRenderPhase02( Viewport* viewport, Camera *camera, uint8 firstRq,
-													uint8 lastRq, bool updateStatistics );
+		virtual void _updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
+												   const Camera *lodCamera,uint8 firstRq, uint8 lastRq,
+												   bool updateStatistics );
 		
 		/** Method for manual management of rendering - finishes statistics calculation 
 			and fires 'postRenderTargetUpdate'.

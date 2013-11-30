@@ -161,16 +161,36 @@ namespace Ogre {
 		ObjectMemoryManagerVec const	*objectMemManager;
 		/// Camera whose frustum we're to cull against. Must be const (read only for all threads).
 		Camera const					*camera;
+		/// Camera whose frustum we're to cull against. Must be const (read only for all threads).
+		Camera const					*lodCamera;
 
 		CullFrustumRequest() :
-			firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 )
+			firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
 		{
 		}
 		CullFrustumRequest( uint8 _firstRq, uint8 _lastRq,
 							const ObjectMemoryManagerVec *_objectMemManager,
-							const Camera *_camera ) :
+							const Camera *_camera, const Camera *_lodCamera ) :
 			firstRq( _firstRq ), lastRq( _lastRq ),
-			objectMemManager( _objectMemManager ), camera( _camera )
+			objectMemManager( _objectMemManager ), camera( _camera ),
+			lodCamera( _lodCamera )
+		{
+		}
+	};
+
+	struct UpdateLodRequest : public CullFrustumRequest
+	{
+		Real	lodBias;
+
+		UpdateLodRequest() :
+			CullFrustumRequest(), lodBias( 0 )
+		{
+		}
+		UpdateLodRequest( uint8 _firstRq, uint8 _lastRq,
+							const ObjectMemoryManagerVec *_objectMemManager,
+							const Camera *_camera, const Camera *_lodCamera, Real _lodBias ) :
+			CullFrustumRequest( _firstRq, _lastRq, _objectMemManager, _camera, _lodCamera ),
+			lodBias( _lodBias )
 		{
 		}
 	};
@@ -900,6 +920,7 @@ namespace Ogre {
 			UPDATE_ALL_ANIMATIONS,
 			UPDATE_ALL_TRANSFORMS,
 			UPDATE_ALL_BOUNDS,
+			UPDATE_ALL_LODS,
 			UPDATE_INSTANCE_MANAGERS,
 			CULL_FRUSTUM_INSTANCEDENTS,
 			USER_UNIFORM_SCALABLE_TASK,
@@ -910,6 +931,7 @@ namespace Ogre {
 
 		volatile bool		mExitWorkerThreads;
 		CullFrustumRequest				mCurrentCullFrustumRequest;
+		UpdateLodRequest				mUpdateLodRequest;
 		UpdateTransformRequest			mUpdateTransformRequest;
 		ObjectMemoryManagerVec const	*mUpdateBoundsRequest;
 		InstancingTheadedCullingMethod	mInstancingThreadedCullingMethod;
@@ -1044,6 +1066,13 @@ namespace Ogre {
 			Must be unique for each worker thread
 		*/
 		void updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx );
+
+		/**
+		@param threadIdx
+			Thread index so we know at which point we should start at.
+			Must be unique for each worker thread
+		*/
+		void updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx );
 
 		/** Traverses mVisibleObjects[threadIdx] from each thread to call
 			MovableObject::instanceBatchCullFrustumThreaded (which is supposed to cull objects)
@@ -1658,6 +1687,10 @@ namespace Ogre {
 		*/
 		void updateAllBounds( const ObjectMemoryManagerVec &objectMemManager );
 
+		/** Updates the Lod values of all objects relative to the given camera.
+		*/
+		void updateAllLods( const Camera *lodCamera, Real lodBias, uint8 firstRq, uint8 lastRq );
+
 		/** Updates the scene: Perform high level culling, Node transforms and entity animations.
 		*/
 		void updateSceneGraph();
@@ -1676,7 +1709,8 @@ namespace Ogre {
 		void _swapVisibleObjectsForShadowMapping();
 
 		/// @See _cullPhase01 and @see MovableObject::cullReceiversBox
-		virtual void _cullReceiversBox( Camera* camera, uint8 firstRq, uint8 lastRq );
+		virtual void _cullReceiversBox(Camera* camera, const Camera *lodCamera,
+									   uint8 firstRq, uint8 lastRq );
 
 		/** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
@@ -1687,7 +1721,8 @@ namespace Ogre {
 			@param firstRq first render queue ID to render (gets clamped if too big)
 			@param lastRq last render queue ID to render (gets clamped if too big)
         */
-		virtual void _cullPhase01( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq );
+		virtual void _cullPhase01(Camera* camera, const Camera *lodCamera,
+								  Viewport* vp, uint8 firstRq, uint8 lastRq );
 
 		/** Prompts the class to send its contents to the renderer.
             @remarks
@@ -1700,13 +1735,15 @@ namespace Ogre {
 				rendering loop.
             @param camera Pointer to a camera from whose viewpoint the scene is to
                 be rendered.
+			@param lodCamera Pointer to a camera from whose LOD calculations will be
+				based upon. Can't be null; can be equal to @camera.
             @param vp The target viewport
 			@param firstRq first render queue ID to render (gets clamped if too big)
 			@param lastRq last render queue ID to render (gets clamped if too big)
             @param includeOverlays Whether or not overlay objects should be rendered
         */
-		virtual void _renderPhase02( Camera* camera, Viewport* vp, uint8 firstRq, uint8 lastRq,
-									bool includeOverlays );
+		virtual void _renderPhase02( Camera* camera, const Camera* lodCamera, Viewport* vp,
+									 uint8 firstRq, uint8 lastRq, bool includeOverlays );
 
         /** Internal method for queueing the sky objects with the params as 
             previously set through setSkyBox, setSkyPlane and setSkyDome.

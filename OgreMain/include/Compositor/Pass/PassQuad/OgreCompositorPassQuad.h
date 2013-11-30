@@ -97,7 +97,7 @@ namespace Ogre
 							CompositorWorkspace *workspace, CompositorNode *parentNode,
 							RenderTarget *target, Real horizonalTexelOffset, Real verticalTexelOffset );
 
-		virtual void execute();
+		virtual void execute( const Camera *lodCamera );
 	};
 
 	/** @} */

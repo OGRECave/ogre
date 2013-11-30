@@ -63,6 +63,7 @@ namespace Ogre
 	protected:
 		CompositorShadowNode	*mShadowNode;
 		Camera					*mCamera;
+		Camera					*mLodCamera;
 		bool					mUpdateShadowNode;
 
 	public:
@@ -79,7 +80,7 @@ namespace Ogre
 								CompositorWorkspace *workspace, RenderTarget *target );
 		~CompositorPassScene();
 
-		virtual void execute();
+		virtual void execute( const Camera *lodCamera );
 
 		CompositorShadowNode* getShadowNode() const				{ return mShadowNode; }
 		Camera* getCamera() const								{ return mCamera; }

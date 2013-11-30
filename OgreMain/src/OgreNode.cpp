@@ -304,20 +304,18 @@ namespace Ogre {
 				parentScale.setFromVector3( scale, j );
 			}
 
-			parentRot.Cmov4( BooleanMask4::getMask( t.mInheritOrientation ),
-							 ArrayQuaternion::IDENTITY );
-			parentScale.Cmov4( BooleanMask4::getMask( t.mInheritScale ),
-								ArrayVector3::UNIT_SCALE );
+			// Change position vector based on parent's orientation & scale
+			*t.mDerivedPosition = parentRot * (parentScale * (*t.mPosition));
+
+			// Combine orientation with that of parent
+			*t.mDerivedOrientation = ArrayQuaternion::Cmov4( parentRot * (*t.mOrientation),
+															 *t.mOrientation,
+														BooleanMask4::getMask( t.mInheritOrientation ) );
 
 			// Scale own position by parent scale, NB just combine
             // as equivalent axes, no shearing
-            *t.mDerivedScale = parentScale * (*t.mScale);
-
-			// Combine orientation with that of parent
-			*t.mDerivedOrientation = parentRot * (*t.mOrientation);
-
-			// Change position vector based on parent's orientation & scale
-			*t.mDerivedPosition = parentRot * (parentScale * (*t.mPosition));
+			*t.mDerivedScale = ArrayVector3::Cmov4( parentScale * (*t.mScale), *t.mScale,
+													BooleanMask4::getMask( t.mInheritScale ) );
 
 			// Add altered position vector to parents
 			*t.mDerivedPosition += parentPos;

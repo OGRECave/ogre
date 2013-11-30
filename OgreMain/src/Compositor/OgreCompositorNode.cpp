@@ -363,7 +363,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorNode::_update(void)
+	void CompositorNode::_update( const Camera *lodCamera )
 	{
 		CompositorPassVec::const_iterator itor = mPasses.begin();
 		CompositorPassVec::const_iterator end  = mPasses.end();
@@ -371,7 +371,7 @@ namespace Ogre
 		while( itor != end )
 		{
 			CompositorPass *pass = *itor;
-			pass->execute();
+			pass->execute( lodCamera );
 			++itor;
 		}
 	}

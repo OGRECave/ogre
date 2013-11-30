@@ -39,6 +39,12 @@ THE SOFTWARE.
 #include "OgreMesh.h"
 #include "OgreRenderable.h"
 #include "OgreResourceGroupManager.h"
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+	//Instantiating a template of an incomplete type is undefined behavior.
+	//But it's supported in most compilers (but MSVC) and vector<SubEntity>
+	//is a damn good optimization over vector<SubEntity*>
+	#include "OgreSubEntity.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -104,7 +110,7 @@ namespace Ogre {
 
         /** List of SubEntities (point to SubMeshes).
         */
-        typedef vector<SubEntity*>::type SubEntityList;
+		typedef vector<SubEntity>::type SubEntityList;
         SubEntityList mSubEntityList;
 
 
@@ -226,26 +232,6 @@ namespace Ogre {
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
 
-
-        /// The LOD number of the mesh to use, calculated by _notifyCurrentCamera.
-        ushort mMeshLodIndex;
-
-        /// LOD bias factor, transformed for optimisation when calculating adjusted LOD value.
-        Real mMeshLodFactorTransformed;
-        /// Index of minimum detail LOD (NB higher index is lower detail).
-        ushort mMinMeshLodIndex;
-        /// Index of maximum detail LOD (NB lower index is higher detail).
-        ushort mMaxMeshLodIndex;
-
-        /// LOD bias factor, not transformed.
-        Real mMaterialLodFactor;
-        /// LOD bias factor, transformed for optimisation when calculating adjusted LOD value.
-        Real mMaterialLodFactorTransformed;
-        /// Index of minimum detail LOD (NB higher index is lower detail).
-        ushort mMinMaterialLodIndex;
-        /// Index of maximum detail LOD (NB lower index is higher detail).
-        ushort mMaxMaterialLodIndex;
-
         /** List of LOD Entity instances (for manual LODs).
             We don't know when the mesh is using manual LODs whether one LOD to the next will have the
             same number of SubMeshes, therefore we have to allow a separate Entity list
@@ -307,17 +293,19 @@ namespace Ogre {
 
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
         */
-        SubEntity* getSubEntity(unsigned int index) const;
+		SubEntity* getSubEntity(unsigned int index);
+		const SubEntity* getSubEntity(unsigned int index) const;
 
         /** Gets a pointer to a SubEntity by name
         @remarks 
             Names should be initialized during a Mesh creation.
         */
-        SubEntity* getSubEntity( const String& name ) const;
+		SubEntity* getSubEntity( const String& name );
+		const SubEntity* getSubEntity( const String& name ) const;
 
         /** Retrieves the number of SubEntity objects making up this entity.
         */
-        unsigned int getNumSubEntities(void) const;
+		size_t getNumSubEntities(void) const;
 
         /** Clones this entity and returns a pointer to the clone.
         @remarks
@@ -363,7 +351,7 @@ namespace Ogre {
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
@@ -404,78 +392,12 @@ namespace Ogre {
         */
         Entity* getManualLodLevel(size_t index) const;
 
-        /** Returns the number of manual levels of detail that this entity supports.
-        @remarks
-            This number never includes the original entity, it is difference
-            with Mesh::getNumLodLevels.
-        */
-        size_t getNumManualLodLevels(void) const;
-
-        /** Returns the current LOD used to render
-        */
-        ushort getCurrentLodIndex() { return mMeshLodIndex; }
-
-        /** Sets a level-of-detail bias for the mesh detail of this entity.
-        @remarks
-            Level of detail reduction is normally applied automatically based on the Mesh
-            settings. However, it is possible to influence this behaviour for this entity
-            by adjusting the LOD bias. This 'nudges' the mesh level of detail used for this
-            entity up or down depending on your requirements. You might want to use this
-            if there was a particularly important entity in your scene which you wanted to
-            detail better than the others, such as a player model.
-        @par
-            There are three parameters to this method; the first is a factor to apply; it
-            defaults to 1.0 (no change), by increasing this to say 2.0, this model would
-            take twice as long to reduce in detail, whilst at 0.5 this entity would use lower
-            detail versions twice as quickly. The other 2 parameters are hard limits which
-            let you set the maximum and minimum level-of-detail version to use, after all
-            other calculations have been made. This lets you say that this entity should
-            never be simplified, or that it can only use LODs below a certain level even
-            when right next to the camera.
-        @param factor
-            Proportional factor to apply to the distance at which LOD is changed.
-            Higher values increase the distance at which higher LODs are displayed (2.0 is
-            twice the normal distance, 0.5 is half).
-        @param maxDetailIndex
-            The index of the maximum LOD this entity is allowed to use (lower
-            indexes are higher detail: index 0 is the original full detail model).
-        @param minDetailIndex
-            The index of the minimum LOD this entity is allowed to use (higher
-            indexes are lower detail). Use something like 99 if you want unlimited LODs (the actual
-            LOD will be limited by the number in the Mesh).
-        */
-        void setMeshLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
-
-        /** Sets a level-of-detail bias for the material detail of this entity.
-        @remarks
-            Level of detail reduction is normally applied automatically based on the Material
-            settings. However, it is possible to influence this behaviour for this entity
-            by adjusting the LOD bias. This 'nudges' the material level of detail used for this
-            entity up or down depending on your requirements. You might want to use this
-            if there was a particularly important entity in your scene which you wanted to
-            detail better than the others, such as a player model.
-        @par
-            There are three parameters to this method; the first is a factor to apply; it
-            defaults to 1.0 (no change), by increasing this to say 2.0, this entity would
-            take twice as long to use a lower detail material, whilst at 0.5 this entity
-            would use lower detail versions twice as quickly. The other 2 parameters are
-            hard limits which let you set the maximum and minimum level-of-detail index
-            to use, after all other calculations have been made. This lets you say that
-            this entity should never be simplified, or that it can only use LODs below
-            a certain level even when right next to the camera.
-        @param factor
-            Proportional factor to apply to the distance at which LOD is changed.
-            Higher values increase the distance at which higher LODs are displayed (2.0 is
-            twice the normal distance, 0.5 is half).
-        @param maxDetailIndex
-            The index of the maximum LOD this entity is allowed to use (lower
-            indexes are higher detail: index 0 is the original full detail model).
-        @param minDetailIndex
-            The index of the minimum LOD this entity is allowed to use (higher
-            indexes are lower detail. Use something like 99 if you want unlimited LODs (the actual
-            LOD will be limited by the number of LOD indexes used in the Material).
-        */
-        void setMaterialLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
+		/** Returns the number of manual levels of detail that this entity supports.
+		@remarks
+			This number never includes the original entity, it is difference
+			with Mesh::getNumLodLevels.
+		*/
+		size_t getNumManualLodLevels(void) const;
 
         /** Sets whether the polygon mode of this entire entity may be
             overridden by the camera detail settings.
@@ -753,9 +675,6 @@ namespace Ogre {
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
-        /** Get the LOD strategy transformation of the mesh LOD factor. */
-        Real _getMeshLodFactorTransformed() const;
-        
         /** Entity's skeleton's AnimationState will not be automatically updated when set to true.
             Useful if you wish to handle AnimationState updates manually.
         */

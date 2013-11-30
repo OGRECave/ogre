@@ -734,7 +734,7 @@ namespace Ogre {
 		return BillboardChainFactory::FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------
-	void BillboardChain::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void BillboardChain::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
 	{
 		updateIndexBuffer();
 

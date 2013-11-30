@@ -59,19 +59,42 @@ namespace Ogre
 		uint32					mVisibilityMask;
 		IdString				mShadowNode;
 		ShadowNodeRecalculation mShadowNodeRecalculation; //Only valid if mShadowNode is not empty
+		/// When empty, uses the default camera.
 		IdString				mCameraName;
+		/** When empty, it implies mCameraName == mLodCameraName; except for shadow nodes.
+			For shadow nodes, when empty, it will use the receiver's lod camera.
+		*/
+		IdString				mLodCameraName;
 
 		/// First Render Queue ID to render. Inclusive
 		uint8			mFirstRQ;
 		/// Last Render Queue ID to render. Not inclusive
 		uint8			mLastRQ;
 
+		/** When true, which Lod index is current will be updated. Reasons to set this to false:
+			 1. You don't use LOD (i.e. you're GPU bottleneck). Setting to false helps CPU.
+			 2. LODs have been calculated in a previous pass. This happens if previous pass(es)
+				all used the same lod camera and all RenderQueue IDs this pass will use have
+				been rendered already and updated their lod lists.
+		@remarks
+			Automatically set to false for shadow nodes that leave mLodCameraName empty
+		*/
+		bool			mUpdateLodLists;
+
+		/** Multiplier to the Lod value. What it means depends on the technique.
+			You'll probably want to avoid setting it directly and rather use
+			@LodStrategy::transformBias
+		*/
+		Real			mLodBias;
+
 		CompositorPassSceneDef() :
 			CompositorPassDef( PASS_SCENE ),
 			mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
 			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),
-			mLastRQ( -1 )
+			mLastRQ( -1 ),
+			mUpdateLodLists( true ),
+			mLodBias( 1.0f )
 		{
 			//Change base defaults
 			mIncludeOverlays = true;

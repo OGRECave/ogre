@@ -26,52 +26,38 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorPassClear_H__
-#define __CompositorPassClear_H__
-
-#include "OgreHeaderPrefix.h"
-
-#include "Compositor/Pass/OgreCompositorPass.h"
-#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
-
 namespace Ogre
 {
-	class RenderTarget;
-
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-
-	/** Implementation of CompositorPass
-		This implementation will clear the RenderTarget using the parameters from definition
-		(rectangle area, which buffers, what values, etc)
-    @author
-		Matias N. Goldberg
-    @version
-        1.0
-    */
-	class _OgreExport CompositorPassClear : public CompositorPass
+	inline void LodStrategy::lodSet( ObjectData &objData, Real lodValues[ARRAY_PACKED_REALS] )
 	{
-	protected:
-		SceneManager	*mSceneManager;
+		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+		{
+			MovableObject *owner = objData.mOwner[j];
 
-	public:
-		CompositorPassClear( const CompositorPassClearDef *definition, SceneManager *sceneManager,
-							 RenderTarget *target );
+			//This may look like a lot of ugly indirections, but mLodMerged is a pointer that allows
+			//sharing with many MovableObjects (it should perfectly fit even in small caches).
+			{
+				FastArray<Real>::const_iterator it = std::lower_bound( owner->mLodMesh->begin(),
+																		owner->mLodMesh->end(),
+																		lodValues[j] );
+				owner->mCurrentMeshLod = std::min<size_t>( it - owner->mLodMesh->begin(),
+															owner->mLodMesh->size() - 1 );
+			}
 
-		virtual void execute( const Camera *lodCamera );
+			FastArray< FastArray<Real> const * >::const_iterator itor = owner->mLodMaterial.begin();
+			FastArray< FastArray<Real> const * >::const_iterator end  = owner->mLodMaterial.end();
 
-	private:
-		CompositorPassClearDef const *mDefinition;
-	};
+			FastArray<unsigned char>::iterator itMatLodLevel = owner->mCurrentMaterialLod.begin();
 
-	/** @} */
-	/** @} */
+			while( itor != end )
+			{
+				const FastArray<Real> *lodVec = *itor;
+				FastArray<Real>::const_iterator it = std::lower_bound( lodVec->begin(), lodVec->end(),
+																	   lodValues[j] );
+				*itMatLodLevel++ = (unsigned char)std::min<size_t>( it - lodVec->begin(),
+																	lodVec->size() - 1 );
+				++itor;
+			}
+		}
+	}
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif

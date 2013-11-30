@@ -411,7 +411,7 @@ namespace Ogre
 		while( itor != end )
 		{
 			CompositorNode *node = *itor;
-			node->_update();
+			node->_update( (Camera*)0 );
 			++itor;
 		}
 

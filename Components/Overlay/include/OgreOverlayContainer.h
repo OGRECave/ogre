@@ -119,7 +119,7 @@ namespace Ogre {
 	    virtual void _notifyParent(OverlayContainer* parent, Overlay* overlay);
 
         /** Overridden from OverlayElement. */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** Overridden from OverlayElement. */
 		inline bool isContainer() const

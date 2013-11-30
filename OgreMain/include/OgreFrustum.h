@@ -476,7 +476,7 @@ namespace Ogre
         const AxisAlignedBox& getBoundingBox(void) const;
 
         /** Overridden from MovableObject */
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** Overridden from MovableObject */
         const String& getMovableType(void) const;

@@ -1167,10 +1167,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeLodInfo(const Mesh* pMesh)
     {
-        const LodStrategy *strategy = pMesh->getLodStrategy();
         unsigned short numLods = pMesh->getNumLodLevels();
         bool manual = pMesh->isLodManual();
-        writeLodSummary(numLods, manual, strategy);
+		writeLodSummary(numLods, manual, pMesh->getLodStrategyName());
 
 		// Loop from LOD 1 (not 0, this is full detail)
         for (unsigned short i = 1; i < numLods; ++i)
@@ -1190,7 +1189,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy)
+    void MeshSerializerImpl::writeLodSummary(unsigned short numLevels, bool manual, const String &lodStrategyName)
     {
         // Header
         size_t size = MSTREAM_OVERHEAD_SIZE;
@@ -1202,7 +1201,7 @@ namespace Ogre {
 
         // Details
         // string strategyName;
-        writeString(strategy->getName());
+        writeString(lodStrategyName);
         // unsigned short numLevels;
         writeShorts(&numLevels, 1);
         // bool manual;  (true for manual alternate meshes, false for generated)
@@ -1377,6 +1376,8 @@ namespace Ogre {
 	{
 		unsigned short streamID, i;
 
+		LodStrategy *activeStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
         LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
@@ -1384,8 +1385,15 @@ namespace Ogre {
         // Check that valid strategy name was given, otherwise use default
         if (strategy == 0)
             strategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+		else if( activeStrategy->getName() != strategyName )
+		{
+			LogManager::getSingleton().logMessage("WARNING! Lod strategies don't match.\n"
+								"Active strategy (global):\t" + activeStrategy->getName() + "\n" +
+								"Mesh' strategy:\t" + strategyName + "\n" +
+								"in " + pMesh->getName() + ". Lod may pop in/out in unexpected ways." );
+		}
 
-        pMesh->setLodStrategy(strategy);
+		pMesh->setLodStrategyName(strategy->getName());
 
         // unsigned short numLevels;
 		readShorts(stream, &(pMesh->mNumLods), 1);
@@ -1404,6 +1412,7 @@ namespace Ogre {
 		}
 
 		// Loop from 1 rather than 0 (full detail index is not in file)
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
 		for (i = 1; i < pMesh->mNumLods; ++i)
 		{
 			streamID = readChunk(stream);
@@ -2746,7 +2755,7 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl_v1_4::writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy)
+    void MeshSerializerImpl_v1_4::writeLodSummary(unsigned short numLevels, bool manual, const String &lodStrategyName)
     {
         // Header
         size_t size = MSTREAM_OVERHEAD_SIZE;
@@ -2890,9 +2899,19 @@ namespace Ogre {
     {
         unsigned short streamID, i;
 
+		LodStrategy *activeStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+		if( activeStrategy != DistanceLodSphereStrategy::getSingletonPtr() )
+		{
+			LogManager::getSingleton().logMessage("WARNING! Lod strategies don't match.\n"
+								"Active strategy (global):\t" + activeStrategy->getName() + "\n" +
+								"Mesh' strategy:\t" +
+								DistanceLodSphereStrategy::getSingletonPtr()->getName() + "\n" +
+								"in " + pMesh->getName() + ". Lod may pop in/out in unexpected ways." );
+		}
+
         // Use the old strategy for this mesh
         LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
-        pMesh->setLodStrategy(strategy);
+		pMesh->setLodStrategyName(strategy->getName());
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
@@ -2911,6 +2930,7 @@ namespace Ogre {
         }
 
         // Loop from 1 rather than 0 (full detail index is not in file)
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
         for (i = 1; i < pMesh->mNumLods; ++i)
         {
             streamID = readChunk(stream);

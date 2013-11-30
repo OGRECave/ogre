@@ -887,7 +887,7 @@ namespace Ogre {
 		return ManualObjectFactory::FACTORY_TYPE_NAME;
 	}
 	//-----------------------------------------------------------------------------
-	void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera)
+    void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
 	{
 		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
 		{
