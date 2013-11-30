@@ -38,7 +38,7 @@
 
 namespace Ogre {
 
-    class GL3PlusShader;
+    class GLSLShader;
 
     /// Structure used to keep track of named uniforms in the linked program object
     struct GLUniformReference
@@ -82,6 +82,65 @@ namespace Ogre {
      */
     class _OgreGL3PlusExport GLSLProgram
     {
+    public:
+        /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
+        GLSLProgram(GLSLShader* vertexProgram,
+                    GLSLShader* hullProgram,
+                    GLSLShader* domainProgram,
+                    GLSLShader* geometryProgram,
+                    GLSLShader* fragmentProgram,
+                    GLSLShader* computeProgram);
+        virtual ~GLSLProgram(void);
+
+        /** Makes a program object active by making sure it is linked and then putting it in use.
+         */
+        virtual void activate(void) = 0;
+
+        /** Updates program object uniforms using data from GpuProgramParameters.
+            Normally called by GLSLShader::bindParameters() just before rendering occurs.
+        */
+        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+        /** Updates program object uniform blocks using data from GpuProgramParameters.
+            Normally called by GLSLShader::bindParameters() just before rendering occurs.
+        */
+        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
+            Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
+        */
+        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
+        /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
+        virtual void extractLayoutQualifiers(void);
+        /// Get the GL Handle for the program object
+        GLuint getGLProgramHandle(void) const { return mGLProgramHandle; }
+        /** Sets whether the linked program includes the required instructions
+            to perform skeletal animation.
+            @remarks
+            If this is set to true, OGRE will not blend the geometry according to
+            skeletal animation, it will expect the vertex program to do it.
+        */
+        void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
+
+        /** Returns whether the linked program includes the required instructions
+            to perform skeletal animation.
+            @remarks
+             If this returns true, OGRE will not blend the geometry according to
+             skeletal animation, it will expect the vertex program to do it.
+                                                                             */
+        bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
+
+        /// Get the index of a non-standard attribute bound in the linked code
+        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        /// Is a non-standard attribute bound in the linked code?
+        bool isAttributeValid(VertexElementSemantic semantic, uint index);
+
+        GLSLShader* getVertexShader() const { return mVertexShader; }
+        GLSLShader* getHullShader() const { return mHullShader; }
+        GLSLShader* getDomainShader() const { return mDomainShader; }
+        GLSLShader* getGeometryShader() const { return mGeometryShader; }
+        GLSLShader* getFragmentShader() const { return mFragmentShader; }
+        GLSLShader* getComputeShader() const { return mComputeShader; }
+        GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
+
     protected:
         /// Container of uniform references that are active in the program object
         GLUniformReferenceList mGLUniformReferences;
@@ -95,17 +154,17 @@ namespace Ogre {
         GLCounterBufferList mGLCounterBufferReferences;
 
         /// Linked vertex program
-        GL3PlusShader* mVertexShader;
+        GLSLShader* mVertexShader;
         /// Linked hull (control) program
-        GL3PlusShader* mHullShader;
+        GLSLShader* mHullShader;
         /// Linked domain (evaluation) program
-        GL3PlusShader* mDomainShader;
+        GLSLShader* mDomainShader;
         /// Linked geometry program
-        GL3PlusShader* mGeometryShader;
+        GLSLShader* mGeometryShader;
         /// Linked fragment program
-        GL3PlusShader* mFragmentShader;
+        GLSLShader* mFragmentShader;
         /// Linked compute program
-        GL3PlusShader* mComputeShader;
+        GLSLShader* mComputeShader;
         /// GL handle for the vertex array object
         GL3PlusVertexArrayObject *mVertexArrayObject;
 
@@ -144,61 +203,9 @@ namespace Ogre {
 
         VertexElementSemantic getAttributeSemanticEnum(String type);
         const char * getAttributeSemanticString(VertexElementSemantic semantic);
-
-    public:
-        /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
-        GLSLProgram(GL3PlusShader* vertexProgram, GL3PlusShader* geometryProgram, GL3PlusShader* fragmentProgram, GL3PlusShader* hullProgram, GL3PlusShader* domainProgram, GL3PlusShader* computeProgram);
-        virtual ~GLSLProgram(void);
-
-        /** Makes a program object active by making sure it is linked and then putting it in use.
-         */
-        virtual void activate(void) = 0;
-
-        /** Updates program object uniforms using data from GpuProgramParameters.
-            Normally called by GL3PlusShader::bindParameters() just before rendering occurs.
-        */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-        /** Updates program object uniform blocks using data from GpuProgramParameters.
-            Normally called by GL3PlusShader::bindParameters() just before rendering occurs.
-        */
-        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            Normally called by GL3PlusShader::bindMultiPassParameters() just before multi pass rendering occurs.
-        */
-        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
-        /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
-        virtual void extractLayoutQualifiers(void);
-        /// Get the GL Handle for the program object
-        GLuint getGLProgramHandle(void) const { return mGLProgramHandle; }
-        /** Sets whether the linked program includes the required instructions
-            to perform skeletal animation.
-            @remarks
-            If this is set to true, OGRE will not blend the geometry according to
-            skeletal animation, it will expect the vertex program to do it.
-        */
-        void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
-
-        /** Returns whether the linked program includes the required instructions
-            to perform skeletal animation.
-            @remarks
-            If this returns true, OGRE will not blend the geometry according to
-            skeletal animation, it will expect the vertex program to do it.
-        */
-        bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
-
-        /// Get the index of a non-standard attribute bound in the linked code
-        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
-        /// Is a non-standard attribute bound in the linked code?
-        bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
-        GL3PlusShader* getVertexShader() const { return mVertexShader; }
-        GL3PlusShader* getHullShader() const { return mHullShader; }
-        GL3PlusShader* getDomainShader() const { return mDomainShader; }
-        GL3PlusShader* getGeometryShader() const { return mGeometryShader; }
-        GL3PlusShader* getFragmentShader() const { return mFragmentShader; }
-        GL3PlusShader* getComputeShader() const { return mComputeShader; }
-        GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
     };
+
+
 }
 
 #endif // __GLSLProgram_H__

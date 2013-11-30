@@ -29,7 +29,7 @@
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreGLSLMonolithicProgramManager.h"
-#include "OgreGL3PlusShader.h"
+#include "OgreGLSLShader.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLSLProgram.h"
@@ -146,7 +146,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveFragmentShader(GL3PlusShader* fragmentShader)
+    void GLSLMonolithicProgramManager::setActiveFragmentShader(GLSLShader* fragmentShader)
     {
         if (fragmentShader != mActiveFragmentShader)
         {
@@ -157,7 +157,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveVertexShader(GL3PlusShader* vertexShader)
+    void GLSLMonolithicProgramManager::setActiveVertexShader(GLSLShader* vertexShader)
     {
         if (vertexShader != mActiveVertexShader)
         {
@@ -168,7 +168,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveGeometryShader(GL3PlusShader* geometryShader)
+    void GLSLMonolithicProgramManager::setActiveGeometryShader(GLSLShader* geometryShader)
     {
         if (geometryShader != mActiveGeometryShader)
         {
@@ -179,7 +179,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveHullShader(GL3PlusShader* hullShader)
+    void GLSLMonolithicProgramManager::setActiveHullShader(GLSLShader* hullShader)
     {
         if (hullShader != mActiveHullShader)
         {
@@ -190,7 +190,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveDomainShader(GL3PlusShader* domainShader)
+    void GLSLMonolithicProgramManager::setActiveDomainShader(GLSLShader* domainShader)
     {
         if (domainShader != mActiveDomainShader)
         {
@@ -201,7 +201,7 @@ namespace Ogre {
     }
 
 
-    void GLSLMonolithicProgramManager::setActiveComputeShader(GL3PlusShader* computeShader)
+    void GLSLMonolithicProgramManager::setActiveComputeShader(GLSLShader* computeShader)
     {
         if (computeShader != mActiveComputeShader)
         {

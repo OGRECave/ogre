@@ -38,6 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+        //TODO Add documentation and explain rationale of this class.
+
 	/** \addtogroup Core
 	*  @{
 	*/

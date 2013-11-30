@@ -26,15 +26,18 @@
   -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusShaderManager_H__
-#define __GL3PlusShaderManager_H__
+#ifndef __GLSLShaderManager_H__
+#define __GLSLShaderManager_H__
 
 #include "OgreGpuProgramManager.h"
 #include "OgreGL3PlusPrerequisites.h"
 
 namespace Ogre {
 
-    class _OgreGL3PlusExport GL3PlusShaderManager : public GpuProgramManager
+    //TODO A brief description of what purpose this class serves in GL3+.
+    // Seems to primarily serve the purpose of creating GpuProgram's based
+    // on material script programs. Also handles cache creation.
+    class _OgreGL3PlusExport GLSLShaderManager : public GpuProgramManager
     {
     public:
         typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator,
@@ -57,8 +60,8 @@ namespace Ogre {
                              GpuProgramType gptype, const String& syntaxCode);
 
     public:
-        GL3PlusShaderManager();
-        virtual ~GL3PlusShaderManager();
+        GLSLShaderManager();
+        virtual ~GLSLShaderManager();
         bool registerShaderFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
         bool unregisterShaderFactory(const String& syntaxCode);
     };

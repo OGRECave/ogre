@@ -27,19 +27,19 @@
 */
 
 #include "OgreGLSLProgram.h"
-#include "OgreGL3PlusShader.h"
+#include "OgreGLSLShader.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLSLShader.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
 
-    GLSLProgram::GLSLProgram(GL3PlusShader* vertexShader,
-                             GL3PlusShader* hullShader,
-                             GL3PlusShader* domainShader,
-                             GL3PlusShader* geometryShader,
-                             GL3PlusShader* fragmentShader,
-                             GL3PlusShader* computeShader)
+    GLSLProgram::GLSLProgram(GLSLShader* vertexShader,
+                             GLSLShader* hullShader,
+                             GLSLShader* domainShader,
+                             GLSLShader* geometryShader,
+                             GLSLShader* fragmentShader,
+                             GLSLShader* computeShader)
         : mVertexShader(vertexShader)
         , mHullShader(hullShader)
         , mDomainShader(domainShader)
@@ -228,7 +228,7 @@ namespace Ogre {
 
         if (mVertexShader)
         {
-            String shaderSource = mVertexShader->getGLSLShader()->getSource();
+            String shaderSource = mVertexShader->getSource();
             String::size_type currPos = shaderSource.find("layout");
             while (currPos != String::npos)
             {

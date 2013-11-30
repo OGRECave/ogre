@@ -41,7 +41,6 @@ namespace Ogre
     //TODO Get rid of any unneeded forward declarations.
     // forward declarations
     class GLSLShader;
-    class GL3PlusShader;
     class GLSLMonolithicProgram;
     class GLSLMonolithicProgramManager;
     class GLSLSeparableProgramManager;

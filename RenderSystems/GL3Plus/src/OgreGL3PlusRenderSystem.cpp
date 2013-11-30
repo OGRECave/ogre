@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
@@ -41,8 +40,8 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusDefaultHardwareBufferManager.h"
 #include "OgreGL3PlusUtil.h"
-#include "OgreGL3PlusShader.h"
-#include "OgreGL3PlusShaderManager.h"
+#include "OgreGLSLShader.h"
+#include "OgreGLSLShaderManager.h"
 #include "OgreException.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGL3PlusHardwareOcclusionQuery.h"
@@ -522,7 +521,7 @@ namespace Ogre {
                         "GL3PlusRenderSystem::initialiseFromRenderSystemCapabilities");
         }
 
-        mShaderManager = OGRE_NEW GL3PlusShaderManager();
+        mShaderManager = OGRE_NEW GLSLShaderManager();
 
         // Create GLSL shader factory
         mGLSLShaderFactory = new GLSLShaderFactory();
@@ -2173,17 +2172,17 @@ namespace Ogre {
         // scene manager treat render system as ONE 'context' ONLY, and it
         // cached the GPU programs using state.
         if (mCurrentVertexShader)
-            mCurrentVertexShader->unbindShader();
+            mCurrentVertexShader->unbind();
         if (mCurrentGeometryShader)
-            mCurrentGeometryShader->unbindShader();
+            mCurrentGeometryShader->unbind();
         if (mCurrentFragmentShader)
-            mCurrentFragmentShader->unbindShader();
+            mCurrentFragmentShader->unbind();
         if (mCurrentHullShader)
-            mCurrentHullShader->unbindShader();
+            mCurrentHullShader->unbind();
         if (mCurrentDomainShader)
-            mCurrentDomainShader->unbindShader();
+            mCurrentDomainShader->unbind();
         if (mCurrentComputeShader)
-            mCurrentComputeShader->unbindShader();
+            mCurrentComputeShader->unbind();
 
         // Disable textures
         _disableTextureUnitsFrom(0);
@@ -2203,17 +2202,17 @@ namespace Ogre {
 
         // Rebind GPU programs to new context
         if (mCurrentVertexShader)
-            mCurrentVertexShader->bindShader();
+            mCurrentVertexShader->bind();
         if (mCurrentGeometryShader)
-            mCurrentGeometryShader->bindShader();
+            mCurrentGeometryShader->bind();
         if (mCurrentFragmentShader)
-            mCurrentFragmentShader->bindShader();
+            mCurrentFragmentShader->bind();
         if (mCurrentHullShader)
-            mCurrentHullShader->bindShader();
+            mCurrentHullShader->bind();
         if (mCurrentDomainShader)
-            mCurrentDomainShader->bindShader();
+            mCurrentDomainShader->bind();
         if (mCurrentComputeShader)
-            mCurrentComputeShader->bindShader();
+            mCurrentComputeShader->bind();
 
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
@@ -2416,7 +2415,7 @@ namespace Ogre {
     
     void GL3PlusRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
-        GL3PlusShader* glprg = static_cast<GL3PlusShader*>(prg);
+        GLSLShader* glprg = static_cast<GLSLShader*>(prg);
 
         // Unbind previous shader first.
         //
@@ -2441,32 +2440,15 @@ namespace Ogre {
             if (mCurrentVertexShader != glprg)
             {
                 if (mCurrentVertexShader)
-                    mCurrentVertexShader->unbindShader();
+                    mCurrentVertexShader->unbind();
                 mCurrentVertexShader = glprg;
-            }
-            break;
-
-        case GPT_FRAGMENT_PROGRAM:
-            if (mCurrentFragmentShader != glprg)
-            {
-                if (mCurrentFragmentShader)
-                    mCurrentFragmentShader->unbindShader();
-                mCurrentFragmentShader = glprg;
-            }
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            if (mCurrentGeometryShader != glprg)
-            {
-                if (mCurrentGeometryShader)
-                    mCurrentGeometryShader->unbindShader();
-                mCurrentGeometryShader = glprg;
             }
             break;
         case GPT_HULL_PROGRAM:
             if (mCurrentHullShader != glprg)
             {
                 if (mCurrentHullShader)
-                    mCurrentHullShader->unbindShader();
+                    mCurrentHullShader->unbind();
                 mCurrentHullShader = glprg;
             }
             break;
@@ -2474,15 +2456,31 @@ namespace Ogre {
             if (mCurrentDomainShader != glprg)
             {
                 if (mCurrentDomainShader)
-                    mCurrentDomainShader->unbindShader();
+                    mCurrentDomainShader->unbind();
                 mCurrentDomainShader = glprg;
+            }
+            break;
+        case GPT_GEOMETRY_PROGRAM:
+            if (mCurrentGeometryShader != glprg)
+            {
+                if (mCurrentGeometryShader)
+                    mCurrentGeometryShader->unbind();
+                mCurrentGeometryShader = glprg;
+            }
+            break;
+        case GPT_FRAGMENT_PROGRAM:
+            if (mCurrentFragmentShader != glprg)
+            {
+                if (mCurrentFragmentShader)
+                    mCurrentFragmentShader->unbind();
+                mCurrentFragmentShader = glprg;
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             if (mCurrentComputeShader != glprg)
             {
                 if (mCurrentComputeShader )
-                    mCurrentComputeShader ->unbindShader();
+                    mCurrentComputeShader ->unbind();
                 mCurrentComputeShader  = glprg;
             }
             break;
@@ -2491,7 +2489,7 @@ namespace Ogre {
         }
 
         // Bind the program
-        glprg->bindShader();
+        glprg->bind();
 
         RenderSystem::bindGpuProgram(prg);
 
@@ -2517,37 +2515,37 @@ namespace Ogre {
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexShader)
         {
             mActiveVertexGpuProgramParameters.setNull();
-            mCurrentVertexShader->unbindShader();
+            mCurrentVertexShader->unbind();
             mCurrentVertexShader = 0;
         }
         else if (gptype == GPT_GEOMETRY_PROGRAM && mCurrentGeometryShader)
         {
             mActiveGeometryGpuProgramParameters.setNull();
-            mCurrentGeometryShader->unbindShader();
+            mCurrentGeometryShader->unbind();
             mCurrentGeometryShader = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentShader)
         {
             mActiveFragmentGpuProgramParameters.setNull();
-            mCurrentFragmentShader->unbindShader();
+            mCurrentFragmentShader->unbind();
             mCurrentFragmentShader = 0;
         }
         else if (gptype == GPT_HULL_PROGRAM && mCurrentHullShader)
         {
             mActiveTesselationHullGpuProgramParameters.setNull();
-            mCurrentHullShader->unbindShader();
+            mCurrentHullShader->unbind();
             mCurrentHullShader = 0;
         }
         else if (gptype == GPT_DOMAIN_PROGRAM && mCurrentDomainShader)
         {
             mActiveTesselationDomainGpuProgramParameters.setNull();
-            mCurrentDomainShader->unbindShader();
+            mCurrentDomainShader->unbind();
             mCurrentDomainShader = 0;
         }
         else if (gptype == GPT_COMPUTE_PROGRAM && mCurrentComputeShader)
         {
             mActiveComputeGpuProgramParameters.setNull();
-            mCurrentComputeShader->unbindShader();
+            mCurrentComputeShader->unbind();
             mCurrentComputeShader = 0;
         }
         RenderSystem::unbindGpuProgram(gptype);
@@ -2567,27 +2565,27 @@ namespace Ogre {
         {
         case GPT_VERTEX_PROGRAM:
             mActiveVertexGpuProgramParameters = params;
-            mCurrentVertexShader->bindShaderSharedParameters(params, mask);
+            mCurrentVertexShader->bindSharedParameters(params, mask);
             break;
         case GPT_FRAGMENT_PROGRAM:
             mActiveFragmentGpuProgramParameters = params;
-            mCurrentFragmentShader->bindShaderSharedParameters(params, mask);
+            mCurrentFragmentShader->bindSharedParameters(params, mask);
             break;
         case GPT_GEOMETRY_PROGRAM:
             mActiveGeometryGpuProgramParameters = params;
-            mCurrentGeometryShader->bindShaderSharedParameters(params, mask);
+            mCurrentGeometryShader->bindSharedParameters(params, mask);
             break;
         case GPT_HULL_PROGRAM:
             mActiveTesselationHullGpuProgramParameters = params;
-            mCurrentHullShader->bindShaderSharedParameters(params, mask);
+            mCurrentHullShader->bindSharedParameters(params, mask);
             break;
         case GPT_DOMAIN_PROGRAM:
             mActiveTesselationDomainGpuProgramParameters = params;
-            mCurrentDomainShader->bindShaderSharedParameters(params, mask);
+            mCurrentDomainShader->bindSharedParameters(params, mask);
             break;
         case GPT_COMPUTE_PROGRAM:
             mActiveComputeGpuProgramParameters = params;
-            mCurrentComputeShader->bindShaderSharedParameters(params, mask);
+            mCurrentComputeShader->bindSharedParameters(params, mask);
             break;
         default:
             break;
@@ -2599,27 +2597,27 @@ namespace Ogre {
         {
         case GPT_VERTEX_PROGRAM:
             mActiveVertexGpuProgramParameters = params;
-            mCurrentVertexShader->bindShaderParameters(params, mask);
+            mCurrentVertexShader->bindParameters(params, mask);
             break;
         case GPT_FRAGMENT_PROGRAM:
             mActiveFragmentGpuProgramParameters = params;
-            mCurrentFragmentShader->bindShaderParameters(params, mask);
+            mCurrentFragmentShader->bindParameters(params, mask);
             break;
         case GPT_GEOMETRY_PROGRAM:
             mActiveGeometryGpuProgramParameters = params;
-            mCurrentGeometryShader->bindShaderParameters(params, mask);
+            mCurrentGeometryShader->bindParameters(params, mask);
             break;
         case GPT_HULL_PROGRAM:
             mActiveTesselationHullGpuProgramParameters = params;
-            mCurrentHullShader->bindShaderParameters(params, mask);
+            mCurrentHullShader->bindParameters(params, mask);
             break;
         case GPT_DOMAIN_PROGRAM:
             mActiveTesselationDomainGpuProgramParameters = params;
-            mCurrentDomainShader->bindShaderParameters(params, mask);
+            mCurrentDomainShader->bindParameters(params, mask);
             break;
         case GPT_COMPUTE_PROGRAM:
             mActiveComputeGpuProgramParameters = params;
-            mCurrentComputeShader->bindShaderParameters(params, mask);
+            mCurrentComputeShader->bindParameters(params, mask);
             break;
         default:
             break;
@@ -2636,22 +2634,22 @@ namespace Ogre {
         switch (gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mCurrentVertexShader->bindShaderPassIterationParameters(mActiveVertexGpuProgramParameters);
+            mCurrentVertexShader->bindPassIterationParameters(mActiveVertexGpuProgramParameters);
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mCurrentFragmentShader->bindShaderPassIterationParameters(mActiveFragmentGpuProgramParameters);
+            mCurrentFragmentShader->bindPassIterationParameters(mActiveFragmentGpuProgramParameters);
             break;
         case GPT_GEOMETRY_PROGRAM:
-            mCurrentGeometryShader->bindShaderPassIterationParameters(mActiveGeometryGpuProgramParameters);
+            mCurrentGeometryShader->bindPassIterationParameters(mActiveGeometryGpuProgramParameters);
             break;
         case GPT_HULL_PROGRAM:
-            mCurrentHullShader->bindShaderPassIterationParameters(mActiveTesselationHullGpuProgramParameters);
+            mCurrentHullShader->bindPassIterationParameters(mActiveTesselationHullGpuProgramParameters);
             break;
         case GPT_DOMAIN_PROGRAM:
-            mCurrentDomainShader->bindShaderPassIterationParameters(mActiveTesselationDomainGpuProgramParameters);
+            mCurrentDomainShader->bindPassIterationParameters(mActiveTesselationDomainGpuProgramParameters);
             break;
         case GPT_COMPUTE_PROGRAM:
-            mCurrentComputeShader->bindShaderPassIterationParameters(mActiveComputeGpuProgramParameters);
+            mCurrentComputeShader->bindPassIterationParameters(mActiveComputeGpuProgramParameters);
             break;
         default:
             break;

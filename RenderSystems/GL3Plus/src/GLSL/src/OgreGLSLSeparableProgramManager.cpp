@@ -27,7 +27,7 @@
 */
 
 #include "OgreGLSLSeparableProgramManager.h"
-#include "OgreGL3PlusShader.h"
+#include "OgreGLSLShader.h"
 #include "OgreGLSLShader.h"
 
 namespace Ogre
@@ -62,7 +62,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveFragmentShader(GL3PlusShader* fragmentShader)
+    void GLSLSeparableProgramManager::setActiveFragmentShader(GLSLShader* fragmentShader)
     {
         if (fragmentShader != mActiveFragmentShader)
         {
@@ -73,7 +73,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveVertexShader(GL3PlusShader* vertexShader)
+    void GLSLSeparableProgramManager::setActiveVertexShader(GLSLShader* vertexShader)
     {
         if (vertexShader != mActiveVertexShader)
         {
@@ -84,7 +84,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveGeometryShader(GL3PlusShader* geometryShader)
+    void GLSLSeparableProgramManager::setActiveGeometryShader(GLSLShader* geometryShader)
     {
         if (geometryShader != mActiveGeometryShader)
         {
@@ -95,7 +95,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveTessDomainShader(GL3PlusShader* domainShader)
+    void GLSLSeparableProgramManager::setActiveTessDomainShader(GLSLShader* domainShader)
     {
         if (domainShader != mActiveDomainShader)
         {
@@ -106,7 +106,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveTessHullShader(GL3PlusShader* hullShader)
+    void GLSLSeparableProgramManager::setActiveTessHullShader(GLSLShader* hullShader)
     {
         if (hullShader != mActiveHullShader)
         {
@@ -117,7 +117,7 @@ namespace Ogre
     }
 
 
-    void GLSLSeparableProgramManager::setActiveComputeShader(GL3PlusShader* computeShader)
+    void GLSLSeparableProgramManager::setActiveComputeShader(GLSLShader* computeShader)
     {
         if (computeShader != mActiveComputeShader)
         {

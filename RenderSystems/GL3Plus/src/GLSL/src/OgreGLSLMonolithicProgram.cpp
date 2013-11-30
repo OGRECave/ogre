@@ -28,7 +28,6 @@
 
 #include "OgreGLSLMonolithicProgram.h"
 #include "OgreGLSLExtSupport.h"
-#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusRenderSystem.h"
@@ -85,12 +84,12 @@ namespace Ogre {
     }
 
 
-    GLSLMonolithicProgram::GLSLMonolithicProgram(GL3PlusShader* vertexProgram,
-                                                 GL3PlusShader* hullProgram,
-                                                 GL3PlusShader* domainProgram,
-                                                 GL3PlusShader* geometryProgram,
-                                                 GL3PlusShader* fragmentProgram,
-                                                 GL3PlusShader* computeProgram)
+    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLShader* vertexProgram,
+                                                 GLSLShader* hullProgram,
+                                                 GLSLShader* domainProgram,
+                                                 GLSLShader* geometryProgram,
+                                                 GLSLShader* fragmentProgram,
+                                                 GLSLShader* computeProgram)
         : GLSLProgram(vertexProgram,
                       hullProgram,
                       domainProgram,
@@ -148,68 +147,68 @@ namespace Ogre {
         // Compile and attach Vertex Program
         if (mVertexShader)
         {
-            if (!mVertexShader->getGLSLShader()->compile(true))
+            if (!mVertexShader->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mVertexShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mVertexShader->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
 
         // Compile and attach Fragment Program
         if (mFragmentShader)
         {
-            if (!mFragmentShader->getGLSLShader()->compile(true))
+            if (!mFragmentShader->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mFragmentShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mFragmentShader->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Geometry Program
         if (mGeometryShader)
         {
-            if (!mGeometryShader->getGLSLShader()->compile(true))
+            if (!mGeometryShader->compile(true))
             {
                 return;
             }
 
-            mGeometryShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mGeometryShader->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Control Program
         if (mHullShader)
         {
-            if (!mHullShader->getGLSLShader()->compile(true))
+            if (!mHullShader->compile(true))
             {
                 return;
             }
 
-            mHullShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mHullShader->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Tessellation Evaluation Program
         if (mDomainShader)
         {
-            if (!mDomainShader->getGLSLShader()->compile(true))
+            if (!mDomainShader->compile(true))
             {
                 return;
             }
 
-            mDomainShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mDomainShader->attachToProgramObject(mGLProgramHandle);
         }
 
         // Compile and attach Compute Program
         if (mComputeShader)
         {
-            if (!mComputeShader->getGLSLShader()->compile(true))
+            if (!mComputeShader->compile(true))
             {
                 return;
             }
 
-            mComputeShader->getGLSLShader()->attachToProgramObject(mGLProgramHandle);
+            mComputeShader->attachToProgramObject(mGLProgramHandle);
         }
 
         // the link
@@ -264,27 +263,27 @@ namespace Ogre {
             const GpuConstantDefinitionMap* computeParams = 0;
             if (mVertexShader)
             {
-                vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
+                vertParams = &(mVertexShader->getConstantDefinitions().map);
             }
             if (mHullShader)
             {
-                hullParams = &(mHullShader->getGLSLShader()->getConstantDefinitions().map);
+                hullParams = &(mHullShader->getConstantDefinitions().map);
             }
             if (mDomainShader)
             {
-                domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
+                domainParams = &(mDomainShader->getConstantDefinitions().map);
             }
             if (mGeometryShader)
             {
-                geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
+                geomParams = &(mGeometryShader->getConstantDefinitions().map);
             }
             if (mFragmentShader)
             {
-                fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
+                fragParams = &(mFragmentShader->getConstantDefinitions().map);
             }
             if (mComputeShader)
             {
-                computeParams = &(mComputeShader->getGLSLShader()->getConstantDefinitions().map);
+                computeParams = &(mComputeShader->getConstantDefinitions().map);
             }
 
             // Do we know how many shared params there are yet? Or if there are any blocks defined?
@@ -306,12 +305,12 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getGLSLShader()->getColumnMajorMatrices())))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }

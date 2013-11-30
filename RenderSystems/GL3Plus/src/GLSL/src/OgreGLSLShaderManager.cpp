@@ -26,13 +26,13 @@
   -----------------------------------------------------------------------------
 */
 
-#include "OgreGL3PlusShaderManager.h"
-#include "OgreGL3PlusShader.h"
+#include "OgreGLSLShaderManager.h"
+#include "OgreGLSLShader.h"
 #include "OgreLogManager.h"
 
 namespace Ogre {
 
-    GL3PlusShaderManager::GL3PlusShaderManager()
+    GLSLShaderManager::GLSLShaderManager()
     {
         // Superclass sets up members
 
@@ -41,27 +41,27 @@ namespace Ogre {
     }
 
 
-    GL3PlusShaderManager::~GL3PlusShaderManager()
+    GLSLShaderManager::~GLSLShaderManager()
     {
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
 
 
-    bool GL3PlusShaderManager::registerShaderFactory(const String& syntaxCode,
+    bool GLSLShaderManager::registerShaderFactory(const String& syntaxCode,
                                                      CreateGpuProgramCallback createFn)
     {
         return mShaderMap.insert(ShaderMap::value_type(syntaxCode, createFn)).second;
     }
 
 
-    bool GL3PlusShaderManager::unregisterShaderFactory(const String& syntaxCode)
+    bool GLSLShaderManager::unregisterShaderFactory(const String& syntaxCode)
     {
         return mShaderMap.erase(syntaxCode) != 0;
     }
 
 
-    Resource* GL3PlusShaderManager::createImpl(const String& name,
+    Resource* GLSLShaderManager::createImpl(const String& name,
                                                ResourceHandle handle,
                                                const String& group, bool isManual,
                                                ManualResourceLoader* loader,
@@ -75,7 +75,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "You must supply 'syntax' and 'type' parameters",
-                        "GL3PlusShaderManager::createImpl");
+                        "GLSLShaderManager::createImpl");
         }
 
         ShaderMap::const_iterator iter = mShaderMap.find(paramSyntax->second);
@@ -83,7 +83,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GL3PlusShader(this, name, handle, group, isManual, loader);
+            return new GLSLShader(this, name, handle, group, isManual, loader);
         }
 
         GpuProgramType gpt;
@@ -115,7 +115,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Unknown or unimplemented program type " + paramType->second,
-                        "GL3PlusShaderManager::createImpl");
+                        "GLSLShaderManager::createImpl");
         }
 
         return (iter->second)(this, name, handle, group, isManual,
@@ -123,7 +123,7 @@ namespace Ogre {
     }
 
 
-    Resource* GL3PlusShaderManager::createImpl(const String& name,
+    Resource* GLSLShaderManager::createImpl(const String& name,
                                                ResourceHandle handle,
                                                const String& group, bool isManual,
                                                ManualResourceLoader* loader,
@@ -135,7 +135,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new GL3PlusShader(this, name, handle, group, isManual, loader);
+            return new GLSLShader(this, name, handle, group, isManual, loader);
         }
 
         return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);

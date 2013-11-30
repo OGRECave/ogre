@@ -34,9 +34,9 @@
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to encapsulate shader
         objects obtained from compiled shaders written in the OpenGL
-        Shader Language (GLSL).  
-        @remarks 
-        GLSL has no target assembler or entry point specification 
+        Shader Language (GLSL).
+        @remarks
+        GLSL has no target assembler or entry point specification
         like DirectX 9 HLSL.  Vertex and
         Fragment shaders only have one entry point called "main".
         When a shader is compiled, microcode is generated but can not
@@ -50,7 +50,7 @@ namespace Ogre {
         GL3PlusShader class to request a program object to link the
         shader object to.
 
-        @note 
+        @note
         GLSL supports multiple modular shader objects that can
         be attached to one program object to form a single shader.
         This is supported through the "attach" material script
@@ -132,8 +132,13 @@ namespace Ogre {
         { mMaxOutputVertices = maxOutputVertices; }
 
         GLSLShader(ResourceManager* creator,
-                    const String& name, ResourceHandle handle,
-                    const String& group, bool isManual, ManualResourceLoader* loader);
+                   const String& name, ResourceHandle handle,
+                   const String& group, bool isManual, ManualResourceLoader* loader);
+        // GL3PlusShader(
+        //     ResourceManager* creator, const String& name, 
+        //     ResourceHandle handle,
+        //     const String& group, bool isManual = false, 
+        //     ManualResourceLoader* loader = 0);
         ~GLSLShader();
 
         GLuint getGLShaderHandle() const { return mGLShaderHandle; }
@@ -173,6 +178,38 @@ namespace Ogre {
         /// Compile source into shader object
         bool compile( const bool checkErrors = false);
 
+
+        /// Bind the shader in OpenGL.
+        void bind(void);
+        /// Unbind the shader in OpenGL.
+        void unbind(void);
+        /// Execute the param binding functions for this shader.
+        void bindParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the pass iteration param binding functions for this shader.
+        void bindPassIterationParameters(GpuProgramParametersSharedPtr params);
+        /// Execute the shared param binding functions for this shader.
+        void bindSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+
+
+        /** Return the shader link status.
+            Only used for separable programs.
+        */
+        GLint isLinked(void) { return mLinked; }
+
+        /** Set the shader link status.
+            Only used for separable programs.
+        */
+        void setLinked(GLint flag) { mLinked = flag; }
+
+        /// @copydoc Resource::calculateSize
+        size_t calculateSize(void) const;
+
+        /// Get the OGRE assigned shader ID.
+        GLuint getShaderID(void) const { return mShaderID; }
+
+        /// Since GLSL has no assembly, use this shader for binding.
+        GpuProgram* _getBindingDelegate(void) { return this; }
+
     protected:
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdAttach msCmdAttach;
@@ -209,6 +246,13 @@ namespace Ogre {
         */
         void checkAndFixInvalidDefaultPrecisionError( String &message );
 
+
+        // /// @copydoc Resource::loadImpl
+        // void loadImpl(void) {}
+
+        /// OGRE assigned shader ID.
+        GLuint mShaderID;
+
     private:
         /// GL handle for shader object.
         GLuint mGLShaderHandle;
@@ -236,6 +280,25 @@ namespace Ogre {
         typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
         /// Container of attached programs
         GLSLShaderContainer mAttachedGLSLShaders;
+
+
+        /// Keep track of the number of vertex shaders created.
+        static GLuint mVertexShaderCount;
+        /// Keep track of the number of fragment shaders created.
+        static GLuint mFragmentShaderCount;
+        /// Keep track of the number of geometry shaders created.
+        static GLuint mGeometryShaderCount;
+        /// Keep track of the number of tesselation hull (control) shaders created.
+        static GLuint mHullShaderCount;
+        /// Keep track of the number of tesselation domain (evaluation) shaders created.
+        static GLuint mDomainShaderCount;
+        /// Keep track of the number of compute shaders created.
+        static GLuint mComputeShaderCount;
+
+        /** Flag indicating that the shader has been successfully
+            linked.
+            Only used for separable programs. */
+        GLint mLinked;
     };
 }
 

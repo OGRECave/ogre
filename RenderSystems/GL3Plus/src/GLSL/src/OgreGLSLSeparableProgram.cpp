@@ -28,7 +28,6 @@
 
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreStringConverter.h"
-#include "OgreGL3PlusShader.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGpuProgramManager.h"
@@ -37,12 +36,12 @@
 
 namespace Ogre
 {
-    GLSLSeparableProgram::GLSLSeparableProgram(GL3PlusShader* vertexShader,
-                                               GL3PlusShader* hullShader,
-                                               GL3PlusShader* domainShader,
-                                               GL3PlusShader* geometryShader,
-                                               GL3PlusShader* fragmentShader,
-                                               GL3PlusShader* computeShader) :
+    GLSLSeparableProgram::GLSLSeparableProgram(GLSLShader* vertexShader,
+                                               GLSLShader* hullShader,
+                                               GLSLShader* domainShader,
+                                               GLSLShader* geometryShader,
+                                               GLSLShader* fragmentShader,
+                                               GLSLShader* computeShader) :
         GLSLProgram(vertexShader,
                     hullShader,
                     domainShader,
@@ -69,10 +68,10 @@ namespace Ogre
         mVertexArrayObject->bind();
 
         loadIndividualProgram(mVertexShader);
-        loadIndividualProgram(mFragmentShader);
-        loadIndividualProgram(mGeometryShader);
         loadIndividualProgram(mDomainShader);
         loadIndividualProgram(mHullShader);
+        loadIndividualProgram(mGeometryShader);
+        loadIndividualProgram(mFragmentShader);
         loadIndividualProgram(mComputeShader);
 
         if (mLinked)
@@ -102,27 +101,27 @@ namespace Ogre
             // }
             if (mVertexShader && mVertexShader->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, mVertexShader->getGLSLShader()->getGLProgramHandle()));
-            }
-            if (mFragmentShader && mFragmentShader->isLinked())
-            {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT, mFragmentShader->getGLSLShader()->getGLProgramHandle()));
-            }
-            if (mGeometryShader && mGeometryShader->isLinked())
-            {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_GEOMETRY_SHADER_BIT, mGeometryShader->getGLSLShader()->getGLProgramHandle()));
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, mVertexShader->getGLProgramHandle()));
             }
             if (mDomainShader && mDomainShader->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_EVALUATION_SHADER_BIT, mDomainShader->getGLSLShader()->getGLProgramHandle()));
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_EVALUATION_SHADER_BIT, mDomainShader->getGLProgramHandle()));
             }
             if (mHullShader && mHullShader->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_CONTROL_SHADER_BIT, mHullShader->getGLSLShader()->getGLProgramHandle()));
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_TESS_CONTROL_SHADER_BIT, mHullShader->getGLProgramHandle()));
+            }
+            if (mGeometryShader && mGeometryShader->isLinked())
+            {
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_GEOMETRY_SHADER_BIT, mGeometryShader->getGLProgramHandle()));
+            }
+            if (mFragmentShader && mFragmentShader->isLinked())
+            {
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT, mFragmentShader->getGLProgramHandle()));
             }
             if (mComputeShader && mComputeShader->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_COMPUTE_SHADER_BIT, mComputeShader->getGLSLShader()->getGLProgramHandle()));
+                OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_COMPUTE_SHADER_BIT, mComputeShader->getGLProgramHandle()));
             }
 
             // Validate pipeline
@@ -134,7 +133,7 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgram::loadIndividualProgram(GL3PlusShader *program)
+    void GLSLSeparableProgram::loadIndividualProgram(GLSLShader *program)
     {
         if (program && !program->isLinked())
         {
@@ -142,7 +141,7 @@ namespace Ogre
 
             String programName = program->getName();
 
-            GLuint programHandle = program->getGLSLShader()->getGLProgramHandle();
+            GLuint programHandle = program->getGLProgramHandle();
 
             OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
             //if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
@@ -177,7 +176,7 @@ namespace Ogre
             {
                 try
                 {
-                    program->getGLSLShader()->compile(true);
+                    program->compile(true);
                 }
                 catch (Exception& e)
                 {
@@ -186,7 +185,7 @@ namespace Ogre
                     return;
                 }
 
-                program->getGLSLShader()->attachToProgramObject(programHandle);
+                program->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
 
@@ -248,7 +247,7 @@ namespace Ogre
         GLint res = mCustomAttributesIndexes[semantic-1][index];
         if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
         {
-            GLuint handle = mVertexShader->getGLSLShader()->getGLProgramHandle();
+            GLuint handle = mVertexShader->getGLProgramHandle();
             const char * attString = getAttributeSemanticString(semantic);
             GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
@@ -295,50 +294,50 @@ namespace Ogre
         if (!mUniformRefsBuilt)
         {
             const GpuConstantDefinitionMap* vertParams = 0;
-            const GpuConstantDefinitionMap* fragParams = 0;
-            const GpuConstantDefinitionMap* geomParams = 0;
             const GpuConstantDefinitionMap* hullParams = 0;
             const GpuConstantDefinitionMap* domainParams = 0;
+            const GpuConstantDefinitionMap* geomParams = 0;
+            const GpuConstantDefinitionMap* fragParams = 0;
             const GpuConstantDefinitionMap* computeParams = 0;
             if (mVertexShader)
             {
-                vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mVertexShader->getGLSLShader()->getGLProgramHandle(),
+                vertParams = &(mVertexShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mVertexShader->getGLProgramHandle(),
                                                                                        vertParams, NULL, NULL, NULL, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mGeometryShader)
-            {
-                geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mGeometryShader->getGLSLShader()->getGLProgramHandle(),
-                                                                                       NULL, geomParams, NULL, NULL, NULL, NULL,
-                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
-            }
-            if (mFragmentShader)
-            {
-                fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mFragmentShader->getGLSLShader()->getGLProgramHandle(),
-                                                                                       NULL, NULL, fragParams, NULL, NULL, NULL,
                                                                                        mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mHullShader)
             {
-                hullParams = &(mHullShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mHullShader->getGLSLShader()->getGLProgramHandle(),
+                hullParams = &(mHullShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mHullShader->getGLProgramHandle(),
                                                                                        NULL, NULL, NULL, hullParams, NULL, NULL,
                                                                                        mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mDomainShader)
             {
-                domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mDomainShader->getGLSLShader()->getGLProgramHandle(),
+                domainParams = &(mDomainShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mDomainShader->getGLProgramHandle(),
                                                                                        NULL, NULL, NULL, NULL, domainParams, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+            }
+            if (mGeometryShader)
+            {
+                geomParams = &(mGeometryShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mGeometryShader->getGLProgramHandle(),
+                                                                                       NULL, geomParams, NULL, NULL, NULL, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+            }
+            if (mFragmentShader)
+            {
+                fragParams = &(mFragmentShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mFragmentShader->getGLProgramHandle(),
+                                                                                       NULL, NULL, fragParams, NULL, NULL, NULL,
                                                                                        mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mComputeShader)
             {
-                computeParams = &(mComputeShader->getGLSLShader()->getConstantDefinitions().map);
-                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mComputeShader->getGLSLShader()->getGLProgramHandle(),
+                computeParams = &(mComputeShader->getConstantDefinitions().map);
+                GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mComputeShader->getGLProgramHandle(),
                                                                                        NULL, NULL, NULL, NULL, NULL, computeParams,
                                                                                        mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
@@ -357,12 +356,12 @@ namespace Ogre
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getGLSLShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getGLSLShader()->getColumnMajorMatrices())))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }
@@ -370,27 +369,27 @@ namespace Ogre
         GLuint progID = 0;
         if (fromProgType == GPT_VERTEX_PROGRAM)
         {
-            progID = mVertexShader->getGLSLShader()->getGLProgramHandle();
+            progID = mVertexShader->getGLProgramHandle();
         }
         else if (fromProgType == GPT_FRAGMENT_PROGRAM)
         {
-            progID = mFragmentShader->getGLSLShader()->getGLProgramHandle();
+            progID = mFragmentShader->getGLProgramHandle();
         }
         else if (fromProgType == GPT_GEOMETRY_PROGRAM)
         {
-            progID = mGeometryShader->getGLSLShader()->getGLProgramHandle();
+            progID = mGeometryShader->getGLProgramHandle();
         }
         else if (fromProgType == GPT_HULL_PROGRAM)
         {
-            progID = mHullShader->getGLSLShader()->getGLProgramHandle();
+            progID = mHullShader->getGLProgramHandle();
         }
         else if (fromProgType == GPT_DOMAIN_PROGRAM)
         {
-            progID = mDomainShader->getGLSLShader()->getGLProgramHandle();
+            progID = mDomainShader->getGLProgramHandle();
         }
         else if (fromProgType == GPT_COMPUTE_PROGRAM)
         {
-            progID = mComputeShader->getGLSLShader()->getGLProgramHandle();
+            progID = mComputeShader->getGLProgramHandle();
         }
 
         for (; currentUniform != endUniform; ++currentUniform)
@@ -752,32 +751,32 @@ namespace Ogre
                     GLuint progID = 0;
                     if (mVertexShader && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
-                        progID = mVertexShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mVertexShader->getGLProgramHandle();
                     }
 
                     if (mFragmentShader && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
                     {
-                        progID = mFragmentShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mFragmentShader->getGLProgramHandle();
                     }
 
                     if (mGeometryShader && currentUniform->mSourceProgType == GPT_GEOMETRY_PROGRAM)
                     {
-                        progID = mGeometryShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mGeometryShader->getGLProgramHandle();
                     }
 
                     if (mDomainShader && currentUniform->mSourceProgType == GPT_DOMAIN_PROGRAM)
                     {
-                        progID = mDomainShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mDomainShader->getGLProgramHandle();
                     }
 
                     if (mHullShader && currentUniform->mSourceProgType == GPT_HULL_PROGRAM)
                     {
-                        progID = mHullShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mHullShader->getGLProgramHandle();
                     }
 
                     if (mComputeShader && currentUniform->mSourceProgType == GPT_COMPUTE_PROGRAM)
                     {
-                        progID = mComputeShader->getGLSLShader()->getGLProgramHandle();
+                        progID = mComputeShader->getGLProgramHandle();
                     }
 
                     OGRE_CHECK_GL_ERROR(glProgramUniform1fv(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));

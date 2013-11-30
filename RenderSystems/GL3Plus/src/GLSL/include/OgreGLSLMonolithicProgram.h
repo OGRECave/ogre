@@ -36,49 +36,59 @@
 
 namespace Ogre {
 
-    class GL3PlusShader;
+    class GLSLShader;
 
-    /** C++ encapsulation of GLSL Program Object using the
-        glMonolithicProgram method of linking.  Linking this way is
-        supported by OpenGL 2.0 and up, but does not allow
-        hot-swapping separable shaders like GLSLSeparableProgram can.
+    /** Model of OpenGL program object created using the glLinkProgram
+        method of linking.
+        
+        Linking using glLinkProgram is supported by OpenGL 2.0 and up,
+        but does not allow hot-swapping shaders without recompiling
+        the program object like GLSLSeparableProgram can. Hence the name
+        'monolithic'.
     */
     class _OgreGL3PlusExport GLSLMonolithicProgram : public GLSLProgram
     {
     protected:
         /// Compiles and links the vertex and fragment programs
-        virtual void compileAndLink(void);
+        void compileAndLink(void);
         /// Put a program in use
-        virtual void _useProgram(void);
+        void _useProgram(void);
 
         void buildGLUniformReferences(void);
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager
-        GLSLMonolithicProgram(GL3PlusShader* vertexProgram, 
-                              GL3PlusShader* hullProgram, 
-                              GL3PlusShader* domainProgram, 
-                              GL3PlusShader* geometryProgram, 
-                              GL3PlusShader* fragmentProgram, 
-                              GL3PlusShader* computeProgram);
+        GLSLMonolithicProgram(GLSLShader* vertexProgram,
+                              GLSLShader* hullProgram,
+                              GLSLShader* domainProgram,
+                              GLSLShader* geometryProgram,
+                              GLSLShader* fragmentProgram,
+                              GLSLShader* computeProgram);
         ~GLSLMonolithicProgram(void);
 
-        /** Makes a program object active by making sure it is linked and then putting it in use.
-         */
+        /** Makes a program object active by making sure it is linked
+            and then putting it in use.
+        */
         void activate(void);
 
-        /** Updates program object uniforms using data from GpuProgramParameters.
-            normally called by GL3PlusShader::bindParameters() just before rendering occurs.
+        /** Updates program object uniforms using data from
+            GpuProgramParameters.  normally called by
+            GLSLShader::bindParameters() just before rendering
+            occurs.
         */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object uniform blocks using data from GpuProgramParameters.
-            normally called by GL3PlusShader::bindParameters() just before rendering occurs.
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniform blocks using data from
+            GpuProgramParameters.  normally called by
+            GLSLShader::bindParameters() just before rendering
+            occurs.
         */
-        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            normally called by GL3PlusShader::bindMultiPassParameters() just before multi pass rendering occurs.
+        void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniforms using data from pass
+            iteration GpuProgramParameters.  normally called by
+            GLSLShader::bindMultiPassParameters() just before multi
+            pass rendering occurs.
         */
-        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
+        void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
     };
 
 }
