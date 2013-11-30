@@ -41,7 +41,7 @@
 #include "OgreStringConverter.h"
 
 namespace Ogre {
-    //-----------------------------------------------------------------------------
+
     GL3PlusRenderToVertexBuffer::GL3PlusRenderToVertexBuffer()
         : mTargetBufferIndex(0)
         , mFirstUpdate(true)
@@ -55,12 +55,12 @@ namespace Ogre {
         //TODO GL4+
         // glGenTransformFeedbacks(1, mFeedbackObject);
     }
-    //-----------------------------------------------------------------------------
+
     GL3PlusRenderToVertexBuffer::~GL3PlusRenderToVertexBuffer()
     {
         OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mPrimitivesDrawnQuery));
     }
-    //-----------------------------------------------------------------------------
+
     static GLint getR2VBPrimitiveType(RenderOperation::OperationType operationType)
     {
         switch (operationType)
@@ -71,14 +71,14 @@ namespace Ogre {
             return GL_LINES;
         case RenderOperation::OT_TRIANGLE_LIST:
             return GL_TRIANGLES;
-        //TODO Add other RenderOperation allowed when no GS present.
+            //TODO Add other RenderOperation allowed when no GS present.
         default:
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "GL RenderToVertexBuffer"
                         "can only output point lists, line lists, or triangle lists",
                         "OgreGL3PlusRenderToVertexBuffer::getR2VBPrimitiveType");
         }
     }
-    //-----------------------------------------------------------------------------
+
     static GLint getVertexCountPerPrimitive(RenderOperation::OperationType operationType)
     {
         // We can only get points, lines or triangles since they are the only
@@ -94,14 +94,14 @@ namespace Ogre {
             return 3;
         }
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusRenderToVertexBuffer::getRenderOperation(RenderOperation& op)
     {
         op.operationType = mOperationType;
         op.useIndexes = false;
         op.vertexData = mVertexData;
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusRenderToVertexBuffer::update(SceneManager* sceneMgr)
     {
         //     size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
@@ -202,7 +202,7 @@ namespace Ogre {
         }
         targetRenderSystem->_render(renderOp);
         // OGRE_CHECK_GL_ERROR(glDrawArrays(GL_POINTS, 0, 1));
-        
+
         //TODO GL4+
         //glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mFeedbackObject);
         //glDrawTransformFeedback(getR2VBPrimitiveType(mOperationType), mFeedbackObject);
@@ -226,7 +226,7 @@ namespace Ogre {
         // Clear the reset flag.
         mResetRequested = false;
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusRenderToVertexBuffer::bindVerticesOutput(Pass* pass)
     {
         VertexDeclaration* declaration = mVertexData->vertexDeclaration;
@@ -317,7 +317,7 @@ namespace Ogre {
         GLsizei Size(0);
         GLenum Type(0);
         // bool Validated = false;
-        for (size_t i = 0; i < elemCount; i++) 
+        for (size_t i = 0; i < elemCount; i++)
         {
             OGRE_CHECK_GL_ERROR(glGetTransformFeedbackVarying(
                 programId, i, 64, &Length, &Size, &Type, Name
@@ -328,7 +328,7 @@ namespace Ogre {
         }
 #endif
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusRenderToVertexBuffer::reallocateBuffer(size_t index)
     {
         assert(index == 0 || index == 1);
@@ -350,7 +350,7 @@ namespace Ogre {
 #endif
         );
     }
-    //-----------------------------------------------------------------------------
+
     String GL3PlusRenderToVertexBuffer::getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index)
     {
         switch (semantic)

@@ -96,14 +96,14 @@ namespace Ogre {
 
         /// Linked vertex program
         GL3PlusShader* mVertexShader;
-        /// Linked fragment program
-        GL3PlusShader* mFragmentShader;
-        /// Linked geometry program
-        GL3PlusShader* mGeometryShader;
         /// Linked hull (control) program
         GL3PlusShader* mHullShader;
         /// Linked domain (evaluation) program
         GL3PlusShader* mDomainShader;
+        /// Linked geometry program
+        GL3PlusShader* mGeometryShader;
+        /// Linked fragment program
+        GL3PlusShader* mFragmentShader;
         /// Linked compute program
         GL3PlusShader* mComputeShader;
         /// GL handle for the vertex array object
@@ -192,10 +192,10 @@ namespace Ogre {
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
         GL3PlusShader* getVertexShader() const { return mVertexShader; }
-        GL3PlusShader* getFragmentShader() const { return mFragmentShader; }
-        GL3PlusShader* getGeometryShader() const { return mGeometryShader; }
         GL3PlusShader* getHullShader() const { return mHullShader; }
         GL3PlusShader* getDomainShader() const { return mDomainShader; }
+        GL3PlusShader* getGeometryShader() const { return mGeometryShader; }
+        GL3PlusShader* getFragmentShader() const { return mFragmentShader; }
         GL3PlusShader* getComputeShader() const { return mComputeShader; }
         GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
     };

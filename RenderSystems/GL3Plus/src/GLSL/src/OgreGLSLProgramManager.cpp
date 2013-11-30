@@ -37,7 +37,7 @@
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------
+    
     GLSLProgramManager::GLSLProgramManager(void) :
         mActiveVertexShader(NULL),
         mActiveGeometryShader(NULL),
@@ -180,11 +180,11 @@ namespace Ogre {
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
     }
 
-    //-----------------------------------------------------------------------
+    
     GLSLProgramManager::~GLSLProgramManager(void)
     {
     }
-    //---------------------------------------------------------------------
+    
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
                                                         GpuConstantDefinition& defToUpdate)
     {
@@ -357,7 +357,7 @@ namespace Ogre {
         defToUpdate.elementSize = GpuConstantDefinition::getElementSize(defToUpdate.constType, false);
     }
 
-    //---------------------------------------------------------------------
+    
     bool GLSLProgramManager::findUniformDataSource(
         const String& paramName,
         const GpuConstantDefinitionMap* vertexConstantDefs,
@@ -437,7 +437,7 @@ namespace Ogre {
         return false;
     }
 
-    //---------------------------------------------------------------------
+    
     //FIXME This is code bloat...either template or unify UniformReference
     // and AtomicCounterReference
     bool GLSLProgramManager::findAtomicCounterDataSource(
@@ -520,7 +520,7 @@ namespace Ogre {
     }
 
 
-    //---------------------------------------------------------------------
+    
     void GLSLProgramManager::extractUniformsFromProgram(
         GLuint programObject,
         const GpuConstantDefinitionMap* vertexConstantDefs,
@@ -857,7 +857,7 @@ namespace Ogre {
             }
         }
     }
-    //---------------------------------------------------------------------
+    
     void GLSLProgramManager::extractUniformsFromGLSL(
         const String& src, GpuNamedConstants& defs, const String& filename)
     {
@@ -998,7 +998,7 @@ namespace Ogre {
         }
     }
 
-    //---------------------------------------------------------------------
+    
     void GLSLProgramManager::parseGLSLUniform(
         const String& src, GpuNamedConstants& defs,
         String::size_type currPos,

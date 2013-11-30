@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGLSLProgram.h"
@@ -34,18 +34,17 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------
-    GLSLProgram::GLSLProgram(GL3PlusShader* vertexShader, 
-                             GL3PlusShader* hullShader, 
-                             GL3PlusShader* domainShader, 
-                             GL3PlusShader* geometryShader, 
-                             GL3PlusShader* fragmentShader, 
+    GLSLProgram::GLSLProgram(GL3PlusShader* vertexShader,
+                             GL3PlusShader* hullShader,
+                             GL3PlusShader* domainShader,
+                             GL3PlusShader* geometryShader,
+                             GL3PlusShader* fragmentShader,
                              GL3PlusShader* computeShader)
         : mVertexShader(vertexShader)
-        , mFragmentShader(fragmentShader)
-        , mGeometryShader(geometryShader)
         , mHullShader(hullShader)
         , mDomainShader(domainShader)
+        , mGeometryShader(geometryShader)
+        , mFragmentShader(fragmentShader)
         , mComputeShader(computeShader)
         , mUniformRefsBuilt(false)
         , mLinked(false)
@@ -72,7 +71,7 @@ namespace Ogre {
         mSemanticTypeMap.insert(SemanticToStringMap::value_type("uv", VES_TEXTURE_COORDINATES));
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLProgram::~GLSLProgram(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
@@ -81,7 +80,7 @@ namespace Ogre {
         mVertexArrayObject = 0;
     }
 
-    //-----------------------------------------------------------------------
+
     Ogre::String GLSLProgram::getCombinedName()
     {
         String name;
@@ -125,7 +124,7 @@ namespace Ogre {
         return name;
     }
 
-    //-----------------------------------------------------------------------
+
     VertexElementSemantic GLSLProgram::getAttributeSemanticEnum(String type)
     {
         VertexElementSemantic semantic = mSemanticTypeMap[type];
@@ -140,7 +139,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     const char * GLSLProgram::getAttributeSemanticString(VertexElementSemantic semantic)
     {
         for (SemanticToStringMap::iterator i = mSemanticTypeMap.begin(); i != mSemanticTypeMap.end(); ++i)
@@ -153,7 +152,7 @@ namespace Ogre {
         return 0;
     }
 
-    //-----------------------------------------------------------------------
+
     GLint GLSLProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
     {
         GLint res = mCustomAttributesIndexes[semantic-1][index];
@@ -182,12 +181,14 @@ namespace Ogre {
         }
         return res;
     }
-    //-----------------------------------------------------------------------
+
+
     bool GLSLProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
     {
         return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLProgram::getMicrocodeFromCache(void)
     {
         GpuProgramManager::Microcode cacheMicrocode =
@@ -218,7 +219,8 @@ namespace Ogre {
             compileAndLink();
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLProgram::extractLayoutQualifiers(void)
     {
         // Format is:
@@ -249,7 +251,7 @@ namespace Ogre {
                 String::size_type eqPos = line.find("=");
                 String::size_type parenPos = line.find(")");
 
-                // Skip past '=' up to a ')' which contains an integer(the position).  
+                // Skip past '=' up to a ')' which contains an integer(the position).
                 //TODO This could be a definition, does the preprocessor do replacement?
                 String attrLocation = line.substr(eqPos + 1, parenPos - eqPos - 1);
                 StringUtil::trim(attrLocation);

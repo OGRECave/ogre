@@ -35,9 +35,10 @@
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------------
-    GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name,
-                                                     const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa):
+
+    GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
+        GL3PlusFBOManager *manager, const String &name,
+        const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa):
         GL3PlusRenderTexture(name, target, writeGamma, fsaa),
         mFB(manager, fsaa)
     {
@@ -65,11 +66,11 @@ namespace Ogre {
         }
     }
 
-	void GL3PlusFBORenderTexture::swapBuffers()
+    void GL3PlusFBORenderTexture::swapBuffers()
     {
         mFB.swapBuffers();
     }
-    //-----------------------------------------------------------------------------
+
     bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         bool result;
@@ -78,13 +79,13 @@ namespace Ogre {
 
         return result;
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusFBORenderTexture::detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
         GL3PlusRenderTexture::detachDepthBuffer();
     }
-    //-----------------------------------------------------------------------------
+
     void GL3PlusFBORenderTexture::_detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
@@ -130,7 +131,7 @@ namespace Ogre {
         detectFBOFormats();
 
         GLsizei numBuffers = 1;
-        
+
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(numBuffers, &mTempFBO));
     }
 
@@ -138,7 +139,7 @@ namespace Ogre {
     {
         if(!mRenderBufferMap.empty())
         {
-			LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
+            LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
         }
 
         GLsizei numBuffers = 1;
@@ -499,7 +500,7 @@ namespace Ogre {
         //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
         return retval;
     }
-    //-----------------------------------------------------------------------
+
     void GL3PlusFBOManager::requestRenderBuffer(const GL3PlusSurfaceDesc &surface)
     {
         if(surface.buffer == 0)
@@ -514,7 +515,7 @@ namespace Ogre {
             ++it->second.refcount;
         }
     }
-    //-----------------------------------------------------------------------
+
     void GL3PlusFBOManager::releaseRenderBuffer(const GL3PlusSurfaceDesc &surface)
     {
         if(surface.buffer == 0)

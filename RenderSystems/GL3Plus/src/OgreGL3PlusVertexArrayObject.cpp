@@ -30,7 +30,6 @@
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------
     GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() :
         mVAO(0),
         mInitialised(false)
@@ -45,7 +44,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
     {
         if (mVAO)
@@ -55,7 +54,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GL3PlusVertexArrayObject::bind(void)
     {
         if (mVAO)
@@ -63,4 +62,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindVertexArray(mVAO));
         }
     }
+
+
 }

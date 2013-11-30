@@ -32,10 +32,11 @@
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
-    GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer(HardwareBufferManagerBase* mgr,
-                                                                           size_t bufferSize,
-                                                                           HardwareBuffer::Usage usage,
-                                                                           bool useShadowBuffer, const String& name)
+    GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer(
+        HardwareBufferManagerBase* mgr,
+        size_t bufferSize,
+        HardwareBuffer::Usage usage,
+        bool useShadowBuffer, const String& name)
         : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));

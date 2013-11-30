@@ -41,7 +41,7 @@
 #define GL_RGBA16_SNORM                   0x8F9B
 
 namespace Ogre  {
-    //-----------------------------------------------------------------------------
+    
     GLenum GL3PlusPixelUtil::getGLOriginFormat(PixelFormat mFormat)
     {
         switch(mFormat)
@@ -189,7 +189,7 @@ namespace Ogre  {
             return 0;
         }
     }
-    //-----------------------------------------------------------------------------
+    
     GLenum GL3PlusPixelUtil::getGLOriginDataType(PixelFormat mFormat)
     {
         switch(mFormat)
@@ -583,7 +583,7 @@ namespace Ogre  {
         return (format == GL_NONE ? GL_RGBA8 : format);
     }
 
-    //-----------------------------------------------------------------------------
+    
     PixelFormat GL3PlusPixelUtil::getClosestOGREFormat(GLenum fmt)
     {
         switch(fmt)
@@ -746,7 +746,7 @@ namespace Ogre  {
             return PF_A8R8G8B8;
         };
     }
-    //-----------------------------------------------------------------------------
+    
 
     size_t GL3PlusPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format)
     {
@@ -768,4 +768,5 @@ namespace Ogre  {
 
         return count;
     }
+
 }

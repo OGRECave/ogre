@@ -43,7 +43,6 @@ namespace Ogre {
     String operationTypeToString(RenderOperation::OperationType val);
     RenderOperation::OperationType parseOperationType(const String& val);
 
-    //-----------------------------------------------------------------------
     GLSLShader::CmdPreprocessorDefines GLSLShader::msCmdPreprocessorDefines;
     GLSLShader::CmdAttach GLSLShader::msCmdAttach;
     GLSLShader::CmdColumnMajorMatrices GLSLShader::msCmdColumnMajorMatrices;
@@ -51,11 +50,10 @@ namespace Ogre {
     GLSLShader::CmdOutputOperationType GLSLShader::msOutputOperationTypeCmd;
     GLSLShader::CmdMaxOutputVertices GLSLShader::msMaxOutputVerticesCmd;
 
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    GLSLShader::GLSLShader(ResourceManager* creator,
-                           const String& name, ResourceHandle handle,
-                           const String& group, bool isManual, ManualResourceLoader* loader)
+    GLSLShader::GLSLShader(
+        ResourceManager* creator,
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
@@ -100,7 +98,8 @@ namespace Ogre {
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsl";
     }
-    //---------------------------------------------------------------------------
+
+
     GLSLShader::~GLSLShader()
     {
         // Have to call this here rather than in Resource destructor
@@ -114,7 +113,8 @@ namespace Ogre {
             unloadHighLevel();
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLShader::loadFromSource(void)
     {
         // Preprocess the GLSL shader in order to get a clean source
@@ -185,7 +185,7 @@ namespace Ogre {
             free (out);
     }
 
-    //---------------------------------------------------------------------------
+
     bool GLSLShader::compile(const bool checkErrors)
     {
         if (mCompiled == 1)
@@ -288,7 +288,7 @@ namespace Ogre {
         return (mCompiled == 1);
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLShader::createLowLevelImpl(void)
     {
         mAssemblerProgram = GpuProgramPtr(OGRE_NEW GL3PlusShader(this));
@@ -296,7 +296,8 @@ namespace Ogre {
         mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
         mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
     }
-    //---------------------------------------------------------------------------
+
+
     void GLSLShader::unloadImpl()
     {
         // We didn't create mAssemblerProgram through a manager, so override this
@@ -306,7 +307,8 @@ namespace Ogre {
 
         unloadHighLevel();
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLShader::unloadHighLevelImpl(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
@@ -321,14 +323,15 @@ namespace Ogre {
         mCompiled = 0;
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLShader::populateParameterNames(GpuProgramParametersSharedPtr params)
     {
         getConstantDefinitions();
         params->_setNamedConstants(mConstantDefs);
         // Don't set logical / physical maps here, as we can't access parameters by logical index in GLSL.
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLShader::buildConstantDefinitions() const
     {
         // We need an accurate list of all the uniforms in the shader, but we
@@ -364,30 +367,30 @@ namespace Ogre {
         }
     }
 
-    //---------------------------------------------------------------------
+
     inline bool GLSLShader::getPassSurfaceAndLightStates(void) const
     {
         // Scenemanager should pass on light & material state to the rendersystem.
         return true;
     }
-    //---------------------------------------------------------------------
+
     inline bool GLSLShader::getPassTransformStates(void) const
     {
         // Scenemanager should pass on transform state to the rendersystem.
         return true;
     }
-    //---------------------------------------------------------------------
+
     inline bool GLSLShader::getPassFogStates(void) const
     {
         // Scenemanager should pass on fog state to the rendersystem.
         return true;
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdAttach::doGet(const void *target) const
     {
         return (static_cast<const GLSLShader*>(target))->getAttachedShaderNames();
     }
-    //-----------------------------------------------------------------------
     void GLSLShader::CmdAttach::doSet(void *target, const String& shaderNames)
     {
         // Get all the shader program names: there could be more than one.
@@ -399,7 +402,8 @@ namespace Ogre {
             static_cast<GLSLShader*>(target)->attachChildShader(vecShaderNames[i]);
         }
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdColumnMajorMatrices::doGet(const void *target) const
     {
         return StringConverter::toString(static_cast<const GLSLShader*>(target)->getColumnMajorMatrices());
@@ -408,7 +412,8 @@ namespace Ogre {
     {
         static_cast<GLSLShader*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdPreprocessorDefines::doGet(const void *target) const
     {
         return static_cast<const GLSLShader*>(target)->getPreprocessorDefines();
@@ -417,7 +422,8 @@ namespace Ogre {
     {
         static_cast<GLSLShader*>(target)->setPreprocessorDefines(val);
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdInputOperationType::doGet(const void* target) const
     {
         const GLSLShader* t = static_cast<const GLSLShader*>(target);
@@ -428,7 +434,8 @@ namespace Ogre {
         GLSLShader* t = static_cast<GLSLShader*>(target);
         t->setInputOperationType(parseOperationType(val));
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdOutputOperationType::doGet(const void* target) const
     {
         const GLSLShader* t = static_cast<const GLSLShader*>(target);
@@ -439,7 +446,8 @@ namespace Ogre {
         GLSLShader* t = static_cast<GLSLShader*>(target);
         t->setOutputOperationType(parseOperationType(val));
     }
-    //-----------------------------------------------------------------------
+
+
     String GLSLShader::CmdMaxOutputVertices::doGet(const void* target) const
     {
         const GLSLShader* t = static_cast<const GLSLShader*>(target);
@@ -451,7 +459,7 @@ namespace Ogre {
         t->setMaxOutputVertices(StringConverter::parseInt(val));
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLShader::attachChildShader(const String& name)
     {
         // Is the name valid and already loaded?
@@ -475,7 +483,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLShader::attachToProgramObject(const GLuint programObject)
     {
         // attach child objects
@@ -492,7 +500,7 @@ namespace Ogre {
         logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject);
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLShader::detachFromProgramObject(const GLuint programObject)
     {
         OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
@@ -509,20 +517,22 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     const String& GLSLShader::getLanguage(void) const
     {
         static const String language = "glsl";
 
         return language;
     }
-    //-----------------------------------------------------------------------
+
+
     Ogre::GpuProgramParametersSharedPtr GLSLShader::createParameters(void)
     {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         return params;
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLShader::checkAndFixInvalidDefaultPrecisionError(String &message)
     {
         String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
@@ -575,7 +585,8 @@ namespace Ogre {
             }
         }
     }
-    //-----------------------------------------------------------------------
+
+
     RenderOperation::OperationType parseOperationType(const String& val)
     {
         if (val == "point_list")
@@ -604,7 +615,8 @@ namespace Ogre {
             return RenderOperation::OT_TRIANGLE_LIST;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     String operationTypeToString(RenderOperation::OperationType val)
     {
         switch (val)
@@ -630,6 +642,7 @@ namespace Ogre {
             break;
         }
     }
+
 
     GLenum GLSLShader::getGLShaderType(GpuProgramType programType)
     {
@@ -670,6 +683,7 @@ namespace Ogre {
         }
     }
 
+
     GLuint GLSLShader::getGLProgramHandle() {
         //TODO This should be removed and the compile() function
         // should use glCreateShaderProgramv
@@ -684,4 +698,6 @@ namespace Ogre {
         }
         return mGLProgramHandle;
     }
+
+
 }

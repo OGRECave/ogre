@@ -78,7 +78,7 @@ namespace Ogre {
     //     return texture;
     // }
 
-    //-----------------------------------------------------------------------------
+    
     void GL3PlusTextureManager::createWarningTexture()
     {
         // Generate warning texture

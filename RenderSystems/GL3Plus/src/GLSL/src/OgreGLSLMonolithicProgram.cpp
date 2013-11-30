@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGLSLMonolithicProgram.h"
@@ -64,7 +64,8 @@ namespace Ogre {
             return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
     {
         switch (operationType)
@@ -83,27 +84,28 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
-    GLSLMonolithicProgram::GLSLMonolithicProgram(GL3PlusShader* vertexProgram, 
-                                                 GL3PlusShader* hullProgram, 
-                                                 GL3PlusShader* domainProgram, 
-                                                 GL3PlusShader* geometryProgram, 
-                                                 GL3PlusShader* fragmentProgram, 
+
+    GLSLMonolithicProgram::GLSLMonolithicProgram(GL3PlusShader* vertexProgram,
+                                                 GL3PlusShader* hullProgram,
+                                                 GL3PlusShader* domainProgram,
+                                                 GL3PlusShader* geometryProgram,
+                                                 GL3PlusShader* fragmentProgram,
                                                  GL3PlusShader* computeProgram)
-        : GLSLProgram(vertexProgram, 
-                      hullProgram, 
-                      domainProgram, 
-                      geometryProgram, 
-                      fragmentProgram, 
+        : GLSLProgram(vertexProgram,
+                      hullProgram,
+                      domainProgram,
+                      geometryProgram,
+                      fragmentProgram,
                       computeProgram)
     {
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgram::~GLSLMonolithicProgram(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
     }
+
 
     void GLSLMonolithicProgram::_useProgram(void)
     {
@@ -113,7 +115,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgram::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)
@@ -137,7 +139,7 @@ namespace Ogre {
         _useProgram();
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgram::compileAndLink()
     {
         mVertexArrayObject = new GL3PlusVertexArrayObject();
@@ -249,7 +251,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgram::buildGLUniformReferences(void)
     {
         if (!mUniformRefsBuilt)
@@ -287,16 +289,16 @@ namespace Ogre {
 
             // Do we know how many shared params there are yet? Or if there are any blocks defined?
             GLSLMonolithicProgramManager::getSingleton().extractUniformsFromProgram(
-                mGLProgramHandle, vertParams, geomParams, fragParams, hullParams, domainParams, computeParams, 
+                mGLProgramHandle, vertParams, geomParams, fragParams, hullParams, domainParams, computeParams,
                 mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
 
             mUniformRefsBuilt = true;
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgram::updateUniforms(GpuProgramParametersSharedPtr params,
-                                         uint16 mask, GpuProgramType fromProgType)
+                                               uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through uniform reference list and update uniform values
         GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
@@ -452,22 +454,22 @@ namespace Ogre {
                     case GCT_UINT1:
                     case GCT_BOOL1:
                         OGRE_CHECK_GL_ERROR(glUniform1uiv(currentUniform->mLocation, glArraySize,
-                                                         (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                                                          (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
                         break;
                     case GCT_UINT2:
                     case GCT_BOOL2:
                         OGRE_CHECK_GL_ERROR(glUniform2uiv(currentUniform->mLocation, glArraySize,
-                                                         (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                                                          (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
                         break;
                     case GCT_UINT3:
                     case GCT_BOOL3:
                         OGRE_CHECK_GL_ERROR(glUniform3uiv(currentUniform->mLocation, glArraySize,
-                                                         (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                                                          (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
                         break;
                     case GCT_UINT4:
                     case GCT_BOOL4:
                         OGRE_CHECK_GL_ERROR(glUniform4uiv(currentUniform->mLocation, glArraySize,
-                                                         (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
+                                                          (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
                         break;
 
                     case GCT_SAMPLER1D:
@@ -493,9 +495,10 @@ namespace Ogre {
 
         } // End for
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                              uint16 mask, GpuProgramType fromProgType)
+                                                    uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through the list of uniform buffers and update them as needed
         GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
@@ -520,7 +523,8 @@ namespace Ogre {
             }
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {
         if (params->hasPassIterationNumber())

@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-//-----------------------------------------------------------------------------
+
     GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
@@ -291,7 +291,7 @@ namespace Ogre {
                                                           GL_RENDERBUFFER, 0));
 		}
 	}
-	//-----------------------------------------------------------------------------
+	
 	void GL3PlusFrameBufferObject::detachDepthBuffer()
 	{
 		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
@@ -319,5 +319,5 @@ namespace Ogre {
     {
         return mNumSamples;
     }
-//-----------------------------------------------------------------------------
+
 }

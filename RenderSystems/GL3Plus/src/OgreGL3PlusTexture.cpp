@@ -36,6 +36,7 @@
 #include "OgreBitwise.h"
 
 namespace Ogre {
+
     static inline void doImageIO(const String &name, const String &group,
                                  const String &ext,
                                  vector<Image>::type &images,
@@ -533,7 +534,8 @@ namespace Ogre {
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
-    //---------------------------------------------------------------------------------------------
+
+
     void GL3PlusTexture::getCustomAttribute(const String& name, void* pData)
     {
         if (name == "GLID")
@@ -607,5 +609,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
         }
     }
+
 
 }

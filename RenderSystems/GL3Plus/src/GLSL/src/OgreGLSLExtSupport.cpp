@@ -30,9 +30,8 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
-namespace Ogre
-{
-    //-----------------------------------------------------------------------------
+namespace Ogre {
+
     String logObjectInfo(const String& msg, const GLuint obj)
     {
         String logMessage = msg;
@@ -53,7 +52,7 @@ namespace Ogre
         {
             OGRE_CHECK_GL_ERROR(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
         }
-        else if (isProgramPipeline && 
+        else if (isProgramPipeline &&
                  Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             //FIXME Crashes on NVIDIA? See GL3+ GSoC forum
@@ -81,7 +80,7 @@ namespace Ogre
         {
             OGRE_CHECK_GL_ERROR(glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog));
         }
-        else if (isProgramPipeline && 
+        else if (isProgramPipeline &&
                  Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLog(obj, infologLength, &charsWritten, infoLog));
@@ -112,4 +111,4 @@ namespace Ogre
     }
 
 
-} // namespace Ogre
+}

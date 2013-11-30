@@ -37,13 +37,11 @@ namespace Ogre
 
     GLSLMonolithicProgramManager* GLSLShaderFactory::mMonolithicProgramManager = NULL;
     GLSLSeparableProgramManager* GLSLShaderFactory::mSeparableProgramManager = NULL;
-    //-----------------------------------------------------------------------
+    
     String GLSLShaderFactory::mLanguageName = "glsl";
-    //-----------------------------------------------------------------------
-    GLSLShaderFactory::GLSLShaderFactory(void)// :
-        // mMonolithicProgramManager(NULL),
-        // mSeparableProgramManager(NULL),
-        // mLanguageName("glsl")
+    
+
+    GLSLShaderFactory::GLSLShaderFactory(void)
     {
         if (mMonolithicProgramManager == NULL)
         {
@@ -57,7 +55,8 @@ namespace Ogre
             }
         }
     }
-    //-----------------------------------------------------------------------
+    
+
     GLSLShaderFactory::~GLSLShaderFactory(void)
     {
         if (mMonolithicProgramManager)
@@ -75,23 +74,27 @@ namespace Ogre
             }
         }
     }
-    //-----------------------------------------------------------------------
+    
+
     const String& GLSLShaderFactory::getLanguage(void) const
     {
         return mLanguageName;
     }
-    //-----------------------------------------------------------------------
-    HighLevelGpuProgram* GLSLShaderFactory::create(ResourceManager* creator,
-                                                    const String& name, ResourceHandle handle,
-                                                    const String& group, bool isManual, ManualResourceLoader* loader)
+    
+
+    HighLevelGpuProgram* GLSLShaderFactory::create(
+        ResourceManager* creator,
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
     {
         return OGRE_NEW GLSLShader(creator, name, handle, group, isManual, loader);
     }
-    //-----------------------------------------------------------------------
+    
+
     void GLSLShaderFactory::destroy(HighLevelGpuProgram* prog)
     {
         OGRE_DELETE prog;
     }
-    //-----------------------------------------------------------------------
+    
 
 }

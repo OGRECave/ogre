@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGLSLSeparableProgram.h"
@@ -37,18 +37,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GLSLSeparableProgram::GLSLSeparableProgram(GL3PlusShader* vertexShader, 
-                                               GL3PlusShader* hullShader, 
-                                               GL3PlusShader* domainShader, 
-                                               GL3PlusShader* geometryShader, 
-                                               GL3PlusShader* fragmentShader, 
+    GLSLSeparableProgram::GLSLSeparableProgram(GL3PlusShader* vertexShader,
+                                               GL3PlusShader* hullShader,
+                                               GL3PlusShader* domainShader,
+                                               GL3PlusShader* geometryShader,
+                                               GL3PlusShader* fragmentShader,
                                                GL3PlusShader* computeShader) :
-        GLSLProgram(vertexShader, 
-                    hullShader, 
-                    domainShader, 
-                    geometryShader, 
-                    fragmentShader, 
-                    computeShader) 
+        GLSLProgram(vertexShader,
+                    hullShader,
+                    domainShader,
+                    geometryShader,
+                    fragmentShader,
+                    computeShader)
     {
         mVertexArrayObject = new GL3PlusVertexArrayObject();
     }
@@ -146,7 +146,7 @@ namespace Ogre
 
             OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
             //if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
-                OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
+            OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
 
             // Use precompiled program if possible.
             bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
@@ -205,7 +205,7 @@ namespace Ogre
                 setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
 
             // Add the microcode to the cache.
-            if (!microcodeAvailableInCache && mLinked && 
+            if (!microcodeAvailableInCache && mLinked &&
                 GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
                 // Get buffer size.
@@ -242,7 +242,7 @@ namespace Ogre
         }
     }
 
-    //-----------------------------------------------------------------------
+
     GLint GLSLSeparableProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
     {
         GLint res = mCustomAttributesIndexes[semantic-1][index];
@@ -274,7 +274,7 @@ namespace Ogre
         return res;
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLSeparableProgram::activate(void)
     {
         if (!mLinked && !mTriedToLinkAndFailed)
@@ -285,11 +285,11 @@ namespace Ogre
 
             buildGLUniformReferences();
         }
-        
+
         _useProgram();
     }
 
-   //-----------------------------------------------------------------------
+
     void GLSLSeparableProgram::buildGLUniformReferences(void)
     {
         if (!mUniformRefsBuilt)
@@ -304,52 +304,52 @@ namespace Ogre
             {
                 vertParams = &(mVertexShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mVertexShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           vertParams, NULL, NULL, NULL, NULL, NULL,
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       vertParams, NULL, NULL, NULL, NULL, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mGeometryShader)
             {
                 geomParams = &(mGeometryShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mGeometryShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           NULL, geomParams, NULL, NULL, NULL, NULL, 
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       NULL, geomParams, NULL, NULL, NULL, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mFragmentShader)
             {
                 fragParams = &(mFragmentShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mFragmentShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           NULL, NULL, fragParams, NULL, NULL, NULL, 
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       NULL, NULL, fragParams, NULL, NULL, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mHullShader)
             {
                 hullParams = &(mHullShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mHullShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, hullParams, NULL, NULL, 
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       NULL, NULL, NULL, hullParams, NULL, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mDomainShader)
             {
                 domainParams = &(mDomainShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mDomainShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, NULL, domainParams, NULL, 
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       NULL, NULL, NULL, NULL, domainParams, NULL,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
             if (mComputeShader)
             {
                 computeParams = &(mComputeShader->getGLSLShader()->getConstantDefinitions().map);
                 GLSLSeparableProgramManager::getSingleton().extractUniformsFromProgram(mComputeShader->getGLSLShader()->getGLProgramHandle(),
-                                                                           NULL, NULL, NULL, NULL, NULL, computeParams, 
-                                                                           mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                                                                                       NULL, NULL, NULL, NULL, NULL, computeParams,
+                                                                                       mGLUniformReferences, mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
             }
 
             mUniformRefsBuilt = true;
         }
     }
-    
-    //-----------------------------------------------------------------------
+
+
     void GLSLSeparableProgram::updateUniforms(GpuProgramParametersSharedPtr params,
-                                             uint16 mask, GpuProgramType fromProgType)
+                                              uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through uniform reference list and update uniform values
         GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
@@ -530,7 +530,7 @@ namespace Ogre
                     case GCT_UINT1:
                     case GCT_BOOL1:
                         OGRE_CHECK_GL_ERROR(glProgramUniform1uiv(progID, currentUniform->mLocation, glArraySize,
-                                                                params->getUnsignedIntPointer(def->physicalIndex)));
+                                                                 params->getUnsignedIntPointer(def->physicalIndex)));
                         break;
                     case GCT_UINT2:
                     case GCT_BOOL2:
@@ -571,9 +571,9 @@ namespace Ogre
         } // End for
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLSeparableProgram::updateAtomicCounters(GpuProgramParametersSharedPtr params,
-                                                   uint16 mask, GpuProgramType fromProgType)
+                                                    uint16 mask, GpuProgramType fromProgType)
     {
         // Iterate through the list of atomic counter buffers and update them as needed
         // GLAtomicBufferIterator currentBuffer = mGLAtomicBufferReferences.begin();
@@ -625,7 +625,7 @@ namespace Ogre
         // }
     }
 
-    //-----------------------------------------------------------------------
+
     // void GLSLSeparableProgram::updateShaderStorageBlocks(GpuProgramParametersSharedPtr params,
     //                                                     uint16 mask, GpuProgramType fromProgType)
     // {
@@ -647,19 +647,19 @@ namespace Ogre
     //             GLint blockIndex;
     //             OGRE_CHECK_GL_ERROR(blockIndex = glGetProgramResourceIndex(mGLProgramHandle, GL_SHADER_STORAGE_BLOCK, it->getName().c_str()));
     //             OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(mGLProgramHandle, blockIndex, hwGlBuffer->getGLBufferBinding()));
-                
+
     //             //FIXME does not check if current progrtype, or if shared param is active
 
-    //             //FIXME This seems to only support copying float data. 
+    //             //FIXME This seems to only support copying float data.
     //             // What about int, uint, double, etc?
     //             hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
     //         }
     //     }
     // }
 
-    //-----------------------------------------------------------------------
+
     void GLSLSeparableProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                                  uint16 mask, GpuProgramType fromProgType)
+                                                   uint16 mask, GpuProgramType fromProgType)
     {
         //TODO Support uniform block arrays - need to figure how to do this via material.
 
@@ -668,7 +668,7 @@ namespace Ogre
         SharedParamsBufferMap::const_iterator endPair = mSharedParamsBufferMap.end();
 
         // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-        
+
         // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
         // GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
 
@@ -700,7 +700,7 @@ namespace Ogre
                 size_t index =  param->physicalIndex;
 
                 //TODO Maybe move to GpuSharedParams?  Otherwise create bool buffer.
-                switch (baseType) 
+                switch (baseType)
                 {
                 case BCT_FLOAT:
                     dataPtr = paramsPtr->getFloatPointer(index);
@@ -733,7 +733,7 @@ namespace Ogre
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLSeparableProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {
         if (params->hasPassIterationNumber())

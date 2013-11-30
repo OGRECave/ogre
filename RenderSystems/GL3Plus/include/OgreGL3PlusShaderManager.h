@@ -51,7 +51,7 @@ namespace Ogre {
         Resource* createImpl(const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader,
                              const NameValuePairList* params);
-        /// Specialised create method with specific parameters
+        /// Specialised create method with specific parameters.
         Resource* createImpl(const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader,
                              GpuProgramType gptype, const String& syntaxCode);
@@ -62,6 +62,7 @@ namespace Ogre {
         bool registerShaderFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
         bool unregisterShaderFactory(const String& syntaxCode);
     };
+
 }
 
 #endif

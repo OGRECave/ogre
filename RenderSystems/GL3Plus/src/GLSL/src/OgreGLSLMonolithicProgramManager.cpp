@@ -38,29 +38,30 @@
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------
+
     template<> GLSLMonolithicProgramManager* Singleton<GLSLMonolithicProgramManager>::msSingleton = 0;
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgramManager* GLSLMonolithicProgramManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgramManager& GLSLMonolithicProgramManager::getSingleton(void)
     {
-        assert( msSingleton );  return ( *msSingleton );
+        assert(msSingleton);  
+        return (*msSingleton);
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgramManager::GLSLMonolithicProgramManager(void) :
         GLSLProgramManager(),
         mActiveMonolithicProgram(NULL)
     {
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgramManager::~GLSLMonolithicProgramManager(void)
     {
         // iterate through map container and delete link programs
@@ -71,7 +72,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     GLSLMonolithicProgram* GLSLMonolithicProgramManager::getActiveMonolithicProgram(void)
     {
         // If there is an active link program then return it.
@@ -123,11 +124,11 @@ namespace Ogre {
             if (programFound == mMonolithicPrograms.end())
             {
                 mActiveMonolithicProgram = new GLSLMonolithicProgram(
-                    mActiveVertexShader, 
+                    mActiveVertexShader,
                     mActiveHullShader,
-                    mActiveDomainShader, 
+                    mActiveDomainShader,
                     mActiveGeometryShader,
-                    mActiveFragmentShader, 
+                    mActiveFragmentShader,
                     mActiveComputeShader);
                 mMonolithicPrograms[activeKey] = mActiveMonolithicProgram;
             }
@@ -144,7 +145,7 @@ namespace Ogre {
         return mActiveMonolithicProgram;
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgramManager::setActiveFragmentShader(GL3PlusShader* fragmentShader)
     {
         if (fragmentShader != mActiveFragmentShader)
@@ -155,7 +156,7 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
+
     void GLSLMonolithicProgramManager::setActiveVertexShader(GL3PlusShader* vertexShader)
     {
         if (vertexShader != mActiveVertexShader)
@@ -165,7 +166,8 @@ namespace Ogre {
             mActiveMonolithicProgram = NULL;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgramManager::setActiveGeometryShader(GL3PlusShader* geometryShader)
     {
         if (geometryShader != mActiveGeometryShader)
@@ -175,7 +177,8 @@ namespace Ogre {
             mActiveMonolithicProgram = NULL;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgramManager::setActiveHullShader(GL3PlusShader* hullShader)
     {
         if (hullShader != mActiveHullShader)
@@ -185,7 +188,8 @@ namespace Ogre {
             mActiveMonolithicProgram = NULL;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgramManager::setActiveDomainShader(GL3PlusShader* domainShader)
     {
         if (domainShader != mActiveDomainShader)
@@ -195,7 +199,8 @@ namespace Ogre {
             mActiveMonolithicProgram = NULL;
         }
     }
-    //-----------------------------------------------------------------------
+
+
     void GLSLMonolithicProgramManager::setActiveComputeShader(GL3PlusShader* computeShader)
     {
         if (computeShader != mActiveComputeShader)
@@ -205,4 +210,6 @@ namespace Ogre {
             mActiveMonolithicProgram = NULL;
         }
     }
+
+
 }

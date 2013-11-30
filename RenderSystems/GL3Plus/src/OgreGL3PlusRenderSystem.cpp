@@ -736,7 +736,7 @@ namespace Ogre {
         return win;
     }
 
-    //---------------------------------------------------------------------
+    
     DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
         GL3PlusDepthBuffer *retVal = 0;
@@ -772,7 +772,7 @@ namespace Ogre {
 
         return retVal;
     }
-    //---------------------------------------------------------------------
+    
     void GL3PlusRenderSystem::_getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
                                                          GLenum *stencilFormat )
     {
@@ -2413,7 +2413,7 @@ namespace Ogre {
         return SOP_KEEP;
     }
 
-    //---------------------------------------------------------------------
+    
     void GL3PlusRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         GL3PlusShader* glprg = static_cast<GL3PlusShader*>(prg);
@@ -2717,7 +2717,7 @@ namespace Ogre {
         return mGLSupport->getDisplayMonitorCount();
     }
 
-    //---------------------------------------------------------------------
+    
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         markProfileEvent("Begin Event: " + eventName);
@@ -2725,7 +2725,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
-    //---------------------------------------------------------------------
+    
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
         markProfileEvent("End Event");
@@ -2733,7 +2733,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
-    //---------------------------------------------------------------------
+    
     void GL3PlusRenderSystem::markProfileEvent( const String &eventName )
     {
         if ( eventName.empty() )
