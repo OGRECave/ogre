@@ -12,8 +12,8 @@
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-file(GLOB GLSL_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/*.h")
-file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/src/*.cpp")
+file(GLOB GLSL_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/*.h")
+file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/*.cpp")
 
 # Add system specific settings
 if (WIN32)
@@ -45,7 +45,7 @@ include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL
 )
 
 if(NOT APPLE)
@@ -82,4 +82,4 @@ ogre_config_plugin(RenderSystem_GL3Plus)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GL3Plus)
 install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GL3Plus/${PLATFORM_HEADER_INSTALL})
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION include/OGRE/RenderSystems/GL3Plus)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/ DESTINATION include/OGRE/RenderSystems/GL3Plus)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ DESTINATION include/OGRE/RenderSystems/GL3Plus)
