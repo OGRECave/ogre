@@ -187,10 +187,4 @@ WARNING: Disabling this will make the samples unusable.
 #define OGRE_NO_ZIP_ARCHIVE 0
 #endif
 
-/** Enables the use of the new script compilers when Ogre compiles resource scripts.
-*/
-#ifndef OGRE_USE_NEW_COMPILERS
-#define OGRE_USE_NEW_COMPILERS 1
-#endif
-
 #endif

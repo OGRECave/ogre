@@ -201,7 +201,6 @@ set(_features "${_features}STL containers use allocator:    ${_containers}\n")
 set(_features "${_features}Strings use allocator:           ${_string}\n")
 set(_features "${_features}Memory tracker (debug):          ${_memtrack_debug}\n")
 set(_features "${_features}Memory tracker (release):        ${_memtrack_release}\n")
-set(_features "${_features}Use new script compilers:        ${_compilers}\n")
 set(_features "${_features}Use Boost:                       ${_boost}\n")
 
 
