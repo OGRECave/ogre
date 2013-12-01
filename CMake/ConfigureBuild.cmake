@@ -68,6 +68,12 @@ if (OGRE_CONFIG_THREADS)
 	endif ()
 endif()
 
+set(OGRE_ASSERT_MODE 0 CACHE STRING 
+	"Enable Ogre asserts and exceptions. Possible values:
+	0 - Standard asserts in debug builds, nothing in release builds.
+	1 - Standard asserts in debug builds, exceptions in release builds.
+	2 - Exceptions in debug builds, exceptions in release builds."
+)
 
 # determine config values depending on build options
 set(OGRE_SET_DOUBLE 0)
@@ -76,6 +82,7 @@ set(OGRE_SET_CONTAINERS_USE_ALLOCATOR 0)
 set(OGRE_SET_STRING_USE_ALLOCATOR 0)
 set(OGRE_SET_MEMTRACK_DEBUG 0)
 set(OGRE_SET_MEMTRACK_RELEASE 0)
+set(OGRE_SET_ASSERT_MODE ${OGRE_ASSERT_MODE})
 set(OGRE_SET_THREADS ${OGRE_CONFIG_THREADS})
 set(OGRE_SET_THREAD_PROVIDER ${OGRE_THREAD_PROVIDER})
 set(OGRE_SET_DISABLE_MESHLOD 0)

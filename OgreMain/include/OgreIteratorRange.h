@@ -42,6 +42,7 @@ THE SOFTWARE.
 #       pragma GCC diagnostic ignored "-Wpadded"
 #       pragma GCC diagnostic ignored "-Wweak-vtables"
 #       pragma GCC diagnostic ignored "-Wall"
+#       pragma GCC diagnostic ignored "-Wundef"
 #   endif
 
 #   include <boost/range.hpp>

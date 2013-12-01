@@ -57,7 +57,7 @@ namespace Ogre {
         mChunk = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(stream));
         initialise();
 
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
         dumpContents();
 #endif
 

@@ -411,7 +411,7 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
 	ResourceGroupManager& resourceGroupMgr = ResourceGroupManager::getSingleton();
 	String group = mesh->getGroup();
 	String name = mesh->getName();
-	FileInfo* info = NULL;
+    Ogre::FileInfo* info = NULL;
 	FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
 	FileInfoList::iterator it, itEnd;
 	it = locPtr->begin();

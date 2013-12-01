@@ -13,7 +13,7 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_CFLAGS += -I@ANDROID_NDK@/sources/cpufeatures -I@CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include -I@CMAKE_SOURCE_DIR@/Components/Overlay/include -I@CMAKE_SOURCE_DIR@/Components/Volume/include -I@CMAKE_SOURCE_DIR@/Components/Terrain/include -I@CMAKE_SOURCE_DIR@/Components/Paging/include
     LOCAL_CFLAGS += -I@CMAKE_SOURCE_DIR@/PlugIns/ParticleFX/include -I@CMAKE_SOURCE_DIR@/PlugIns/OctreeSceneManager/include 
     LOCAL_CFLAGS += -I@OGRE_DEPENDENCIES_DIR@/include -I@OGRE_DEPENDENCIES_DIR@/include/OIS -I@OGRE_BINARY_DIR@/Samples/include
-    LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1 
+    LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DINCLUDE_RTSHADER_SYSTEM=1 
     
 	@JNI_SRC@        
     include $(BUILD_SHARED_LIBRARY) 

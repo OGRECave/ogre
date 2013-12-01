@@ -515,18 +515,20 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool PageManager::EventRouter::frameStarted(const FrameEvent& evt)
 	{
+        if(pWorldMap->empty())
+            return true;
 
 		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
 		{
-			i->second->frameStart(evt.timeSinceLastFrame);
-			// Notify of all active cameras
-			// Previously we did this in cameraPreRenderScene, but that had the effect
-			// of causing unnecessary unloading of pages if a camera was rendered
-			// intermittently, so we assume that all cameras we're told to watch are 'active'
-			for (CameraList::iterator c = pCameraList->begin(); c != pCameraList->end(); ++c)
-			{
-				i->second->notifyCamera(*c);
-			}
+            i->second->frameStart(evt.timeSinceLastFrame);
+            // Notify of all active cameras
+            // Previously we did this in cameraPreRenderScene, but that had the effect
+            // of causing unnecessary unloading of pages if a camera was rendered
+            // intermittently, so we assume that all cameras we're told to watch are 'active'
+            for (CameraList::iterator c = pCameraList->begin(); c != pCameraList->end(); ++c)
+            {
+                i->second->notifyCamera(*c);
+            }
 		}
 
 		return true;
@@ -534,6 +536,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool PageManager::EventRouter::frameEnded(const FrameEvent& evt)
 	{
+        if(pWorldMap->empty())
+            return true;
+
 		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
 			i->second->frameEnd(evt.timeSinceLastFrame);
 

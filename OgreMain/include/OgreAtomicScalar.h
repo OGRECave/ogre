@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <signal.h>
 #include "OgrePrerequisites.h"
 #include "OgreException.h"
+#include "OgrePlatformInformation.h"
 
 #if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 

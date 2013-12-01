@@ -90,8 +90,6 @@ private:
 	Vector3 mCentroid; /// Centroid of the convex hull.
 	Real mWalkAngle; /// Angle limit, when walking inside for marking vertices.
 
-	LodCollapseCostOutside* outsideManager;
-
 	LodData::Vertex* getVertex(OutsideData* d) {
 		return &mVertexListOrig[LodData::getVectorIDFromPointer(mOutsideData, d)];
 	}
