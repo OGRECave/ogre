@@ -692,7 +692,7 @@ namespace Ogre {
     void XMLMeshSerializer::readSubMeshes(TiXmlElement* mSubmeshesNode)
     {
         LogManager::getSingleton().logMessage("Reading submeshes...");
-
+		assert(mMesh->getNumSubMeshes() == 0);
         for (TiXmlElement* smElem = mSubmeshesNode->FirstChildElement();
             smElem != 0; smElem = smElem->NextSiblingElement())
         {
@@ -1439,7 +1439,7 @@ namespace Ogre {
 
         const LodStrategy *strategy = pMesh->getLodStrategy();
 		unsigned short numLvls = pMesh->getNumLodLevels();
-		bool manual = pMesh->isLodManual();
+		bool manual = pMesh->hasManualLodLevel();
         lodNode->SetAttribute("strategy", strategy->getName());
 		lodNode->SetAttribute("numlevels", StringConverter::toString(numLvls));
 		lodNode->SetAttribute("manual", StringConverter::toString(manual));
@@ -1448,7 +1448,7 @@ namespace Ogre {
 		for (unsigned short i = 1; i < numLvls; ++i)
 		{
 			const MeshLodUsage& usage = pMesh->getLodLevel(i);
-			if (manual)
+			if (pMesh->_isManualLodLevel(i))
 			{
 				writeLodUsageManual(lodNode, i, usage);
 			}
@@ -1529,11 +1529,13 @@ namespace Ogre {
 				{
 					pInt = static_cast<unsigned int*>(
 						ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+					pInt += facedata->indexStart;
 				}
 				else
 				{
 					pShort = static_cast<unsigned short*>(
 						ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+					pShort += facedata->indexStart;
 				}
 				
 				for (size_t f = 0; f < facedata->indexCount; f += 3)
@@ -1563,11 +1565,10 @@ namespace Ogre {
 	void XMLMeshSerializer::writeExtremes(TiXmlElement* mMeshNode, const Mesh* m)
 	{
 		TiXmlElement* extremesNode = NULL;
-		int idx = 0;
-		for (Mesh::SubMeshIterator i = ((Mesh &)*m).getSubMeshIterator ();
-			 i.hasMoreElements (); i.moveNext (), ++idx)
+		ushort submeshCount = m->getNumSubMeshes();
+		for (int idx = 0; idx < submeshCount; ++idx)
 		{
-			SubMesh *sm = i.peekNext ();
+			SubMesh *sm = m->getSubMesh(idx);
 			if (sm->extremityPoints.empty())
 				continue; // do nothing
 
@@ -1610,34 +1611,26 @@ namespace Ogre {
 			StringConverter::parseUnsignedInt(val));
 
 		val = lodNode->Attribute("manual");
-		bool manual = StringConverter::parseBool(val);
+		StringConverter::parseBool(val);
 
 		// Set up the basic structures
-		mMesh->_setLodInfo(numLevels, manual);
+		mMesh->_setLodInfo(numLevels);
 
 		// Parse the detail, start from 1 (the first sub-level of detail)
 		unsigned short i = 1;
-		TiXmlElement* usageElem;
-		if (manual)
-		{
-			usageElem = lodNode->FirstChildElement("lodmanual");
-		}
-		else
-		{
-			usageElem = lodNode->FirstChildElement("lodgenerated");
-		}
+		TiXmlElement* usageElem = lodNode->FirstChildElement();
 		while (usageElem)
 		{
-			if (manual)
+			if (usageElem->ValueStr() == "lodmanual")
 			{
 				readLodUsageManual(usageElem, i);
-				usageElem = usageElem->NextSiblingElement();
+				
 			}
-			else
+			else if (usageElem->ValueStr() == "lodgenerated")
 			{
 				readLodUsageGenerated(usageElem, i);
-				usageElem = usageElem->NextSiblingElement();
 			}
+			usageElem = usageElem->NextSiblingElement();
 			++i;
 		}
 		
@@ -1667,6 +1660,14 @@ namespace Ogre {
 		usage.manualName = manualNode->Attribute("meshname");
         usage.edgeData = NULL;
 
+		// Generate for mixed
+		ushort numSubs, i;
+		numSubs = mMesh->getNumSubMeshes();
+		for (i = 0; i < numSubs; ++i)
+		{
+			SubMesh* sm = mMesh->getSubMesh(i);
+			sm->mLodFaceList[index - 1] = OGRE_NEW IndexData();
+		}
 		mMesh->_setLodUsage(index, usage);
 	}
     //---------------------------------------------------------------------

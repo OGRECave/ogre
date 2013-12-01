@@ -54,7 +54,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "OgreStableHeaders.h"
 
 #include "OgreSmallVector.h"
 

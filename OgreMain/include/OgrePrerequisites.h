@@ -76,36 +76,52 @@ namespace Ogre {
     #endif
 
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
-	#   if OGRE_COMP_VER >= 430
-	#       define HashMap ::std::tr1::unordered_map
-	#        define HashSet ::std::tr1::unordered_set
-	#    else
-	#       define HashMap ::__gnu_cxx::hash_map
-	#       define HashSet ::__gnu_cxx::hash_set
-	#    endif
+    #   if OGRE_COMP_VER >= 430
+    #       define HashMap ::std::tr1::unordered_map
+    #       define HashMultiMap ::std::tr1::unordered_multimap
+    #       define HashSet ::std::tr1::unordered_set
+    #       define HashMultiSet ::std::tr1::unordered_multiset
+    #    else
+    #       define HashMap ::__gnu_cxx::hash_map
+    #       define HashMultiMap ::__gnu_cxx::hash_multimap
+    #       define HashSet ::__gnu_cxx::hash_set
+    #       define HashMultiSet ::__gnu_cxx::hash_multiset
+    #    endif
     #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
     #    if defined(_LIBCPP_VERSION)
     #       define HashMap ::std::unordered_map
+    #       define HashMultiMap ::std::unordered_multimap
     #       define HashSet ::std::unordered_set
+    #       define HashMultiSet ::std::unordered_multiset
     #    else
     #       define HashMap ::std::tr1::unordered_map
+    #       define HashMultiMap ::std::tr1::unordered_multimap
     #       define HashSet ::std::tr1::unordered_set
+    #       define HashMultiSet ::std::tr1::unordered_multiset
     #    endif
     #else
     #   if OGRE_COMPILER == OGRE_COMPILER_MSVC && !defined(_STLP_MSVC)
     #       if _MSC_FULL_VER >= 150030729 // VC++ 9.0 SP1+
     #           define HashMap ::std::tr1::unordered_map
+	#           define HashMultiMap ::std::tr1::unordered_multimap
     #           define HashSet ::std::tr1::unordered_set
+	#           define HashMultiSet ::std::tr1::unordered_multiset
     #       elif OGRE_THREAD_PROVIDER == 1
     #           define HashMap ::boost::unordered_map
+    #           define HashMultiMap ::boost::unordered_multimap
     #           define HashSet ::boost::unordered_set
+    #           define HashMultiSet ::boost::unordered_multiset
     #       else
     #           define HashMap ::std::unordered_map
+    #           define HashMultiMap ::std::unordered_multimap
     #           define HashSet ::std::unordered_set
+    #           define HashMultiSet ::std::unordered_multiset
     #       endif
     #   else
     #       define HashMap ::std::unordered_map
-	#       define HashSet ::std::unordered_set
+    #       define HashMultiMap ::std::unordered_multimap
+    #       define HashSet ::std::unordered_set
+    #       define HashMultiSet ::std::unordered_multiset
     #   endif
     #endif
 
@@ -221,10 +237,7 @@ namespace Ogre {
     class Plane;
     class PlaneBoundedVolume;
     class Plugin;
-    class PMWorker;
-    class PMInjector;
     class Pose;
-    class ProgressiveMeshGenerator;
     class Profile;
 	class Profiler;
     class Quaternion;

@@ -150,6 +150,7 @@ namespace Ogre {
         */
         void updateFaceNormals(size_t vertexSet, const HardwareVertexBufferSharedPtr& positionBuffer);
 
+		EdgeData* clone();
 
 
         /// Debugging method

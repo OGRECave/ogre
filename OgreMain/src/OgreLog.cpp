@@ -90,6 +90,7 @@ namespace Ogre
 						std::cerr << message << std::endl;
 					else
 						std::cout << message << std::endl;
+
 #	endif
 				}
 #endif

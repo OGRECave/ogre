@@ -38,18 +38,23 @@ CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 
 void TerrainTests::setUp()
 {
-    // set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+	// set up silent logging to not pollute output
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("testTerrain.log", true, false);
+	mLogManager->setLogDetail(LL_LOW);
 
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testTerrain.log", true, false);
-	}
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+#if OGRE_STATIC
+        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+#endif
 
+#ifdef OGRE_STATIC_LIB
+	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	mRoot = OGRE_NEW Root();
+#endif
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
@@ -57,7 +62,11 @@ void TerrainTests::setUp()
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	cf.load("bin/release/resources.cfg");
+#if OGRE_DEBUG_MODE
+	cf.load("resources_d.cfg");
+#else
+	cf.load("resources.cfg");
+#endif
 #else
 	cf.load("bin/resources.cfg");
 #endif
@@ -89,6 +98,7 @@ void TerrainTests::tearDown()
 {
 	OGRE_DELETE mTerrainOpts;
 	OGRE_DELETE mRoot;
+	OGRE_DELETE mLogManager;
 }
 
 void TerrainTests::testCreate()

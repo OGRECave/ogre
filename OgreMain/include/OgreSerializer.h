@@ -34,6 +34,10 @@ THE SOFTWARE.
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
+#ifndef OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+#define OGRE_SERIALIZER_VALIDATE_CHUNKSIZE OGRE_DEBUG_MODE
+#endif
+
 namespace Ogre {
 
 	/** \addtogroup Core
@@ -75,7 +79,9 @@ namespace Ogre {
         // Internal methods
         virtual void writeFileHeader(void);
         virtual void writeChunkHeader(uint16 id, size_t size);
-        
+        virtual size_t calcChunkHeaderSize();
+        size_t calcStringSize(const String& string);
+
         void writeFloats(const float* const pfloat, size_t count);
         void writeFloats(const double* const pfloat, size_t count);
         void writeShorts(const uint16* const pShort, size_t count);
@@ -111,6 +117,15 @@ namespace Ogre {
 		virtual void determineEndianness(DataStreamPtr& stream);
 		/// Determine the endianness to write with based on option
 		virtual void determineEndianness(Endian requestedEndian);
+
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+		typedef vector<int>::type ChunkSizeStack;
+		ChunkSizeStack mChunkSizeStack;
+		bool mReportChunkErrors;
+#endif
+		virtual void pushInnerChunk(const DataStreamPtr& stream);
+		virtual void popInnerChunk(const DataStreamPtr& stream);
+		virtual void backpedalChunkHeader(DataStreamPtr& stream);
     };
 	/** @} */
 	/** @} */

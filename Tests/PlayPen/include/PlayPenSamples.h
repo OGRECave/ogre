@@ -68,6 +68,7 @@ protected:
 	void track();
 
 };
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 //---------------------------------------------------------------------
 class _OgreSampleClassExport PlayPen_testManualLOD : public PlayPenBase
 {
@@ -85,7 +86,7 @@ public:
 protected:
 	String getLODMesh();
 };
-
+#endif
 //---------------------------------------------------------------------
 class _OgreSampleClassExport PlayPen_testFullScreenSwitch : public PlayPenBase
 {

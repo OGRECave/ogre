@@ -42,7 +42,7 @@ class EdgeBuilderTests : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 protected:
     HardwareBufferManager* mBufMgr;
-    LogManager* mLogMgr;
+    LogManager* mLogManager;
 public:
     void setUp();
     void tearDown();

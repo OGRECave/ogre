@@ -715,7 +715,14 @@ namespace OgreBites
 
 			setCaption(caption);
 		}
-
+		void copyItemsFrom(SelectMenu* other){
+			const Ogre::StringVector& items = other->getItems();
+			Ogre::StringVector::const_iterator it, itEnd;
+			itEnd = items.end();
+			for(it=items.begin(); it != itEnd; it++){
+				this->addItem(*it);
+			}
+		}
 		bool isExpanded()
 		{
 			return mExpanded;
@@ -783,58 +790,49 @@ namespace OgreBites
 			setItems(mItems);
 		}
 
+		void insertItem(int index, const Ogre::DisplayString& item)
+		{
+			mItems.insert(mItems.begin() + index, item);
+			setItems(mItems);
+		}
+
 		void removeItem(const Ogre::DisplayString& item)
 		{
-			Ogre::StringVector::iterator it;
-
-			for (it = mItems.begin(); it != mItems.end(); it++)
+			for (size_t i=0; i < mItems.size(); i++)
 			{
-				if (item == *it) break;
-			}
-
-			if (it != mItems.end())
-			{
-				mItems.erase(it);
-				if (mItems.size() < mItemsShown)
-				{
-					mItemsShown = (int)mItems.size();
-					nukeOverlayElement(mItemElements.back());
-					mItemElements.pop_back();
+				if (item == mItems[i]) {
+					removeItem(i);
+					i--; // check again same index
 				}
-			}
-			else 
-			{
-				Ogre::String desc = "Menu \"" + getName() + "\" contains no item \"" + item + "\".";
-				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::removeItem");
 			}
 		}
 
 		void removeItem(unsigned int index)
 		{
-			Ogre::StringVector::iterator it;
-			unsigned int i = 0;
-
-			for (it = mItems.begin(); it != mItems.end(); it++)
-			{
-				if (i == index) break;
-				i++;
-			}
-
-			if (it != mItems.end())
-			{
-				mItems.erase(it);
-				if (mItems.size() < mItemsShown)
-				{
-					mItemsShown = (int)mItems.size();
-					nukeOverlayElement(mItemElements.back());
-					mItemElements.pop_back();
-				}
-			}
-			else 
-			{
+			if(index >= mItems.size()){
 				Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
 					Ogre::StringConverter::toString(index) + ".";
 				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::removeItem");
+			}
+			mItems.erase(mItems.begin() + index);
+
+			if (mItems.size() < mItemsShown)
+			{
+				mItemsShown = mItems.size();
+				nukeOverlayElement(mItemElements.back());
+				mItemElements.pop_back();
+			}
+			if((size_t)mSelectionIndex == index){
+				if(index < mItems.size()) {
+					// update the text of the menu
+					selectItem(index);
+				} else if (!mItems.empty()){
+					// last item was selected and we removed it
+					selectItem(index - 1);
+				} else {
+					// we had only 1 item, but we removed it, so clear caption
+					mSmallTextArea->setCaption("");
+				}
 			}
 		}
 

@@ -55,7 +55,7 @@ namespace Ogre {
     will remain to load the latest version.
 
 	 @note
-		This mesh format was used from Ogre v1.8.
+		This mesh format was used from Ogre v1.10.
 
     */
     class _OgrePrivate MeshSerializerImpl : public Serializer
@@ -95,10 +95,12 @@ namespace Ogre {
         virtual void writeSkeletonLink(const String& skelName);
         virtual void writeMeshBoneAssignment(const VertexBoneAssignment& assign);
         virtual void writeSubMeshBoneAssignment(const VertexBoneAssignment& assign);
-        virtual void writeLodInfo(const Mesh* pMesh);
-        virtual void writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy);
+#if !OGRE_NO_MESHLOD
+        virtual void writeLodLevel(const Mesh* pMesh);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
         virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
+#endif
         virtual void writeBoundsInfo(const Mesh* pMesh);
         virtual void writeEdgeList(const Mesh* pMesh);
 		virtual void writeAnimations(const Mesh* pMesh);
@@ -119,6 +121,10 @@ namespace Ogre {
         virtual size_t calcBoneAssignmentSize(void);
         virtual size_t calcSubMeshOperationSize(const SubMesh* pSub);
         virtual size_t calcSubMeshNameTableSize(const Mesh* pMesh);
+		virtual size_t calcLodLevelSize(const Mesh* pMesh);
+		virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
+		virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
         virtual size_t calcEdgeListSize(const Mesh* pMesh);
         virtual size_t calcEdgeListLodSize(const EdgeData* data, bool isManual);
         virtual size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group);
@@ -132,7 +138,9 @@ namespace Ogre {
 		virtual size_t calcPoseKeyframePoseRefSize(void);
 		virtual size_t calcPoseVertexSize(const Pose* pose);
         virtual size_t calcSubMeshTextureAliasesSize(const SubMesh* pSub);
-
+		virtual size_t calcBoundsInfoSize(const Mesh* pMesh);
+		virtual size_t calcExtremesSize(const Mesh* pMesh);
+		virtual size_t calcSubMeshExtremesSize(unsigned short idx, const SubMesh* s);
 
         virtual void readTextureLayer(DataStreamPtr& stream, Mesh* pMesh, MaterialPtr& pMat);
         virtual void readSubMeshNameTable(DataStreamPtr& stream, Mesh* pMesh);
@@ -149,11 +157,11 @@ namespace Ogre {
         virtual void readMeshBoneAssignment(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readSubMeshBoneAssignment(DataStreamPtr& stream, Mesh* pMesh, 
             SubMesh* sub);
-        virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, 
-            unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
-            unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+#if !OGRE_NO_MESHLOD
+		virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+		virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+#endif
         virtual void readBoundsInfo(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readEdgeList(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readEdgeListLodInfo(DataStreamPtr& stream, EdgeData* edgeData);
@@ -175,15 +183,48 @@ namespace Ogre {
         /// Flip the endianness of an entire vertex buffer, passed in as a 
         /// pointer to locked or temporary memory 
         virtual void flipEndian(void* pData, size_t vertexCount, size_t vertexSize, const VertexDeclaration::VertexElementList& elems);
+		
+		/// This function can be overloaded to disable validation in debug builds.
+		virtual void enableValidation();
+
+		ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
+	};
 
 
+	/** Class for providing backwards-compatibility for loading version 1.8 of the .mesh format. 
+	 This mesh format was used from Ogre v1.8.
+	 */
+    class _OgrePrivate MeshSerializerImpl_v1_8 : public MeshSerializerImpl
+    {
+    public:
+        MeshSerializerImpl_v1_8();
+        ~MeshSerializerImpl_v1_8();
+    protected:
+		// In the past we could select to use manual or automatic generated Lod levels,
+		// but now we can mix them. If it is mixed, we can't export it to older mesh formats.
+		virtual bool isLodMixed(const Mesh* pMesh);
+		virtual size_t calcLodLevelSize(const Mesh* pMesh);
+		virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
+		virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
+#if !OGRE_NO_MESHLOD
+		virtual void writeLodLevel(const Mesh* pMesh);
+		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+		virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
+		virtual void writeLodUsageManual(const MeshLodUsage& usage);
 
-    };
+		virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
+			unsigned short lodNum, MeshLodUsage& usage);
+		virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+#endif
+		virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+		virtual void enableValidation();
+	};
 
     /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 
 	 This mesh format was used from Ogre v1.7.
 	 */
-    class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl
+    class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl_v1_8
     {
     public:
         MeshSerializerImpl_v1_41();
@@ -207,13 +248,13 @@ namespace Ogre {
         MeshSerializerImpl_v1_4();
         ~MeshSerializerImpl_v1_4();
     protected:
-        virtual void writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy);
-		virtual void writeLodUsageManual(const MeshLodUsage& usage);
-		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage,
-									unsigned short lodNum);
-
-        virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
-    };
+		virtual size_t calcLodLevelSize(const Mesh* pMesh);
+		virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+#if !OGRE_NO_MESHLOD
+		virtual void writeLodLevel(const Mesh* pMesh);
+		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+#endif
+	};
 
     /** Class for providing backwards-compatibility for loading version 1.3 of the .mesh format. 
 	 This mesh format was used from Ogre v1.0 (and some pre-releases)
@@ -230,6 +271,8 @@ namespace Ogre {
         virtual void reorganiseTriangles(EdgeData* edgeData);
 		
 		virtual void writeEdgeList(const Mesh* pMesh);
+		virtual size_t calcEdgeListLodSize(const EdgeData* edgeData, bool isManual);
+		virtual size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group);
     };
 
     /** Class for providing backwards-compatibility for loading version 1.2 of the .mesh format. 

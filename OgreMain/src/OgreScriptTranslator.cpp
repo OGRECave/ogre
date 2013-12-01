@@ -581,16 +581,6 @@ namespace Ogre{
                         bool result = getString(prop->values.front(), &strategyName);
                         if (result)
                         {
-                            // In Ogre <= 1.8, the strategy names used to start with a capital letter.
-                            // Starting with Ogre 1.9, all fixed values and keywords in material scripts
-                            // are lower case only. For legacy support, we convert to lower case here to be safe.
-                            StringUtil::toLowerCase(strategyName);
-
-                            // In Ogre <= 1.8, there was no distinction between distance strategies based on
-                            // bounding BOX or bounding SPHERE. For backwards-capability, we fallback
-                            // to SPHERE (which was the only potion back then).
-                            if(StringUtil::endsWith(strategyName, "distance"))
-                                strategyName = "distance_sphere";
 
                             LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
 
