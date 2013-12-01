@@ -522,7 +522,7 @@ void Sample_MeshLod::sliderMoved(Slider* slider)
 	
 }
 
-void Sample_MeshLod::buttonHit( Button* button )
+void Sample_MeshLod::buttonHit( OgreBites::Button* button )
 {
 	if(button->getName() == "btnReduceMore") {
 		mReductionSlider->setValue(mReductionSlider->getValue()+1);
