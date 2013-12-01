@@ -169,6 +169,7 @@ namespace Ogre {
         {
             mov     edi, result
             mov     eax, query
+			xor     ecx, ecx
             cpuid
             mov     [edi]._eax, eax
             mov     [edi]._ebx, ebx
@@ -181,12 +182,14 @@ namespace Ogre {
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
         __asm__
         (
+			"xor     %%rcx, %%rcx    \n\t"
             "cpuid": "=a" (result._eax), "=b" (result._ebx), "=c" (result._ecx), "=d" (result._edx) : "a" (query)
         );
         #else
         __asm__
         (
             "pushl  %%ebx           \n\t"
+			"xor    %%ecx, %%ecx    \n\t"
             "cpuid                  \n\t"
             "movl   %%ebx, %%edi    \n\t"
             "popl   %%ebx           \n\t"
