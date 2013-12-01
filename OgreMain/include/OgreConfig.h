@@ -45,7 +45,9 @@ THE SOFTWARE.
 1 - RELEASE_EXCEPTIONS - Standard asserts in debug builds, exceptions in release builds
 2 - EXCEPTIONS - Exceptions in debug builds, exceptions in release builds
 */
+#ifndef OGRE_ASSERT_MODE
 #define OGRE_ASSERT_MODE 0
+#endif
 
 /** If set to >0, OGRE will always 'think' that the graphics card only has the
     number of texture units specified. Very useful for testing multipass fallback.
@@ -76,11 +78,6 @@ THE SOFTWARE.
 /** Define max number of blending weights allowed per vertex.
 */
 #define OGRE_MAX_BLEND_WEIGHTS 4
-
-/** Define this if you want to link OGRE as a static lib (preferably as a project file)
-*/
-//#define OGRE_STATIC_LIB
-
 
 // define the memory allocator configuration to use
 #define OGRE_MEMORY_ALLOCATOR_STD 1
