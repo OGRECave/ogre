@@ -63,14 +63,18 @@ namespace Ogre
 
 		float getBestTime(void) const	{ return mBestFrameTime * 0.001f; }
 		float getWorstTime(void) const	{ return mWorstFrameTime * 0.001f; }
-		float getLastTime(void) const	{ return mFrameTimes[mCurrentFrame] * 0.001f; }
+		float getLastTime(void) const
+		{
+			return mFrameTimes[(mCurrentFrame + OGRE_FRAME_STATS_SAMPLES - 1) %
+								OGRE_FRAME_STATS_SAMPLES] * 0.001f;
+		}
 
 		float getAvgTime(void) const
 		{
 			if( !mFramesSampled )
 				return 0.0f;
 
-			unsigned long avg = mFrameTimes[mCurrentFrame];
+			unsigned long avg = 0;
 
 			for( size_t i=0; i<mFramesSampled; ++i )
 			{
