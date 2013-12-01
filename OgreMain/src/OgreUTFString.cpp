@@ -1650,11 +1650,7 @@ namespace Ogre {
 	//! implicit cast to Ogre::String
 	UTFString::operator Ogre::String() const 
 	{
-#if OGRE_WCHAR_T_STRINGS
-		return Ogre::String( asWStr() );
-#else
 		return Ogre::String( asUTF8().c_str() );
-#endif
 	}
 #endif
 

@@ -34,25 +34,18 @@ THE SOFTWARE.
 #include <exception>
 #include "OgreHeaderPrefix.h"
 
-// Backwards compatibility with old assert mode definitions
-#if OGRE_RELEASE_ASSERT == 1
-#   define OGRE_ASSERT_MODE 1
-#endif
-
 // Check for OGRE assert mode
 
 // RELEASE_EXCEPTIONS mode
 #if OGRE_ASSERT_MODE == 1
-#   ifdef _DEBUG
+#   if OGRE_DEBUG_MODE
 #       define OgreAssert( a, b ) assert( (a) && (b) )
-
 #   else
 #       if OGRE_COMP != OGRE_COMPILER_BORL
 #           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), "no function info")
 #       else
 #           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNC__ )
 #       endif
-
 #   endif
 
 // EXCEPTIONS mode
@@ -66,7 +59,6 @@ THE SOFTWARE.
 // STANDARD mode
 #else
 #   define OgreAssert( a, b ) assert( (a) && (b) )
-
 #endif
 
 namespace Ogre {

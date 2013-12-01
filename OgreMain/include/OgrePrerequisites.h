@@ -29,9 +29,7 @@ THE SOFTWARE
 // Platform-specific stuff
 #include "OgrePlatform.h"
 
-// Needed for OGRE_WCHAR_T_STRINGS below
 #include <string>
-
 
 // configure memory tracking
 #if OGRE_DEBUG_MODE 
@@ -47,9 +45,6 @@ THE SOFTWARE
 #        define OGRE_MEMORY_TRACKER 0
 #	endif
 #endif
-
-
-
 
 namespace Ogre {
     // Define ogre version
@@ -78,7 +73,7 @@ namespace Ogre {
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 	#   if OGRE_COMP_VER >= 430
 	#       define HashMap ::std::tr1::unordered_map
-	#        define HashSet ::std::tr1::unordered_set
+	#       define HashSet ::std::tr1::unordered_set
 	#    else
 	#       define HashMap ::__gnu_cxx::hash_map
 	#       define HashSet ::__gnu_cxx::hash_set
@@ -334,17 +329,8 @@ settings have been made.
 namespace Ogre
 {
 #if OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-	#if OGRE_WCHAR_T_STRINGS
-        typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, STLAllocator<wchar_t,GeneralAllocPolicy > >	_StringBase;
-	#else
-        typedef std::basic_string<char, std::char_traits<char>, STLAllocator<char,GeneralAllocPolicy > >	_StringBase;
-	#endif
-
-	#if OGRE_WCHAR_T_STRINGS
-        typedef std::basic_stringstream<wchar_t,std::char_traits<wchar_t>,STLAllocator<wchar_t,GeneralAllocPolicy >> _StringStreamBase;
-	#else
-        typedef std::basic_stringstream<char,std::char_traits<char>,STLAllocator<char,GeneralAllocPolicy > > _StringStreamBase;
-	#endif
+    typedef std::basic_string<char, std::char_traits<char>, STLAllocator<char,GeneralAllocPolicy > >        _StringBase;
+    typedef std::basic_stringstream<char,std::char_traits<char>,STLAllocator<char,GeneralAllocPolicy > >    _StringStreamBase;
 
 	#define StdStringT(T) std::basic_string<T, std::char_traits<T>, std::allocator<T> >	
 	#define CustomMemoryStringT(T) std::basic_string<T, std::char_traits<T>, STLAllocator<T,GeneralAllocPolicy> >	
@@ -445,17 +431,8 @@ namespace Ogre
 	#undef CustomMemoryStringT
 
 #else
-	#if OGRE_WCHAR_T_STRINGS
-        typedef std::wstring _StringBase;
-	#else
-        typedef std::string _StringBase;
-	#endif
-
-	#if OGRE_WCHAR_T_STRINGS
-        typedef std::basic_stringstream<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t> > _StringStreamBase;
-	#else
-        typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
-	#endif
+    typedef std::string _StringBase;
+    typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
 
 #endif
 

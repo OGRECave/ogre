@@ -679,8 +679,6 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("Creating external window");
 
-        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-
         NSRect viewBounds;
         if(mContentScalingSupported)
             viewBounds = [mView convertRectToBacking:[mView bounds]];

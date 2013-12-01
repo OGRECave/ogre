@@ -166,9 +166,6 @@ namespace Ogre {
 		{
 			wideMsgBuf[0] = 0;
 		}
-#if OGRE_WCHAR_T_STRINGS
-        String ret = wideMsgBuf;
-#else
 		char narrowMsgBuf[2048] = "";
 		if(0 == WideCharToMultiByte(
 			CP_ACP, 0,
@@ -179,7 +176,7 @@ namespace Ogre {
 			narrowMsgBuf[0] = 0;
 		}
         String ret = narrowMsgBuf;
-#endif
+
         return ret;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         return String(dlerror());

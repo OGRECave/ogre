@@ -40,6 +40,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_ANDROID 5
 #define OGRE_PLATFORM_NACL 6
 #define OGRE_PLATFORM_WINRT 7
+#define OGRE_PLATFORM_FLASHCC 8
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -131,6 +132,12 @@ namespace Ogre {
 #elif defined(__FLASHCC__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
+#   ifndef __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__
+#       define __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ 0
+#   endif
+#   ifndef __IPHONE_OS_VERSION_MIN_REQUIRED
+#       define __IPHONE_OS_VERSION_MIN_REQUIRED 0
+#   endif
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
@@ -238,7 +245,7 @@ namespace Ogre {
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
 //----------------------------------------------------------------------------
-// Linux/Apple/iOs/Android/NaCl Settings
+// Linux/Apple/iOS/Android/NaCl Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 
@@ -297,6 +304,10 @@ namespace Ogre {
 #   else
 #       define OGRE_DEBUG_MODE 0
 #   endif
+#endif
+
+#ifndef __OGRE_HAVE_DIRECTXMATH
+#   define __OGRE_HAVE_DIRECTXMATH 0
 #endif
 
 //----------------------------------------------------------------------------

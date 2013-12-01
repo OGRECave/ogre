@@ -40,6 +40,7 @@ THE SOFTWARE
 #   pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #   pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #   pragma GCC diagnostic ignored "-Wunused-variable"
+#   pragma GCC diagnostic ignored "-Wundef"
 #endif
 
 #include <boost/thread/tss.hpp>
