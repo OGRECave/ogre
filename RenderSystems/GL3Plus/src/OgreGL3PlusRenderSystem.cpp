@@ -2643,10 +2643,10 @@ namespace Ogre {
             mCurrentGeometryShader->bindPassIterationParameters(mActiveGeometryGpuProgramParameters);
             break;
         case GPT_HULL_PROGRAM:
-            mCurrentHullShader->bindPassIterationParameters(mActiveTesselationHullGpuProgramParameters);
+            mCurrentHullShader->bindPassIterationParameters(mActiveTessellationHullGpuProgramParameters);
             break;
         case GPT_DOMAIN_PROGRAM:
-            mCurrentDomainShader->bindPassIterationParameters(mActiveTesselationDomainGpuProgramParameters);
+            mCurrentDomainShader->bindPassIterationParameters(mActiveTessellationDomainGpuProgramParameters);
             break;
         case GPT_COMPUTE_PROGRAM:
             mCurrentComputeShader->bindPassIterationParameters(mActiveComputeGpuProgramParameters);
