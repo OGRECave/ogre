@@ -40,17 +40,10 @@ void MeshLodTests::setUp()
         
 	mStaticPluginLoader.load();
 #else
-	Root* root = OGRE_NEW Root();
+	Root* root = OGRE_NEW Root("plugins.cfg");
 
     // Try to load a Rendersystem
-    try
-	{
-        root->loadPlugin("RenderSystem_GL");
-	}
-	catch(std::exception&)
-    {
-        root->loadPlugin("RenderSystem_Direct3D9");
-    }
+    root->loadPlugin("RenderSystem_GL");
 
 #endif
 	CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
