@@ -30,7 +30,7 @@ endif ()
 # Build and install API documentation if doxygen is available
 if(DOXYGEN_FOUND)
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
-	add_custom_target(OgreDoc COMMAND 
+	add_custom_target(OgreDoc ALL COMMAND 
     ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg 
     WORKING_DIRECTORY ${OGRE_SOURCE_DIR}/Docs/src/ 
     COMMENT "Building documentation" VERBATIM
