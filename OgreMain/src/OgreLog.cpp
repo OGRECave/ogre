@@ -80,17 +80,10 @@ namespace Ogre
 #else
                 if (mDebugOut && !maskDebug)
                 {
-
-#	if OGRE_DEBUG_MODE && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-					String logMessageString(message);
-					logMessageString.append( "\n" );
-                    Ogre_OutputCString( logMessageString.c_str());
-#	else
 					if (lml == LML_CRITICAL)
 						std::cerr << message << std::endl;
 					else
 						std::cout << message << std::endl;
-#	endif
 				}
 #endif
 
