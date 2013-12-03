@@ -77,6 +77,7 @@ namespace Ogre {
 		  mSoftwareAnimationNormalsRequests(0),
           mSkipAnimStateUpdates(false),
 		  mAlwaysUpdateMainSkeleton(false),
+          mUpdateBoundingBoxFromSkeleton(false),
 		  mMeshLodIndex(0),
 		  mMeshLodFactorTransformed(1.0f),
 		  mMinMeshLodIndex(99),
@@ -115,6 +116,7 @@ namespace Ogre {
 		mSoftwareAnimationNormalsRequests(0),
         mSkipAnimStateUpdates(false),
 		mAlwaysUpdateMainSkeleton(false),
+        mUpdateBoundingBoxFromSkeleton(false),
 		mMeshLodIndex(0),
 		mMeshLodFactorTransformed(1.0f),
 		mMinMeshLodIndex(99),
@@ -169,6 +171,11 @@ namespace Ogre {
 		{
 			mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
 			mSkeletonInstance->load();
+            // if mUpdateBoundingBoxFromSkeleton was turned on before the mesh was loaded, and mesh hasn't computed the boneBoundingRadius yet,
+            if ( mUpdateBoundingBoxFromSkeleton && mMesh->getBoneBoundingRadius() == Real(0))
+            {
+                mMesh->_computeBoneBoundingRadius();
+            }
 		}
 
 		// Build main subentity list
@@ -503,18 +510,98 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
+    {
+        mUpdateBoundingBoxFromSkeleton = update;
+        if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
+        {
+            mMesh->_computeBoneBoundingRadius();
+        }
+    }
+    //-----------------------------------------------------------------------
     const AxisAlignedBox& Entity::getBoundingBox(void) const
     {
-		// Get from Mesh
 		if (mMesh->isLoaded())
 		{
-			mFullBoundingBox = mMesh->getBounds();
-			mFullBoundingBox.merge(getChildObjectsBoundingBox());
-
+            if ( mUpdateBoundingBoxFromSkeleton && hasSkeleton() )
+            {
+                // get from skeleton
+                // self bounding box without children
+                AxisAlignedBox bbox;
+                bbox.setNull();
+                Real maxScale = Real(0);
+                bool boneHasVerts[ OGRE_MAX_NUM_BONES ];
+                size_t numBones = mSkeletonInstance->getNumBones();
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    boneHasVerts[ iBone ] = false;
+                }
+                // for each bone that has vertices weighted to it,
+                for (size_t iBlend = 0; iBlend < mMesh->sharedBlendIndexToBoneIndexMap.size(); ++iBlend)
+                {
+                    // record which bones have vertices assigned
+                    size_t iBone = mMesh->sharedBlendIndexToBoneIndexMap[ iBlend ];
+                    boneHasVerts[ iBone ] = true;
+                }
+                // for each submesh,
+                for (size_t iSubMesh = 0; iSubMesh < mMesh->getNumSubMeshes(); ++iSubMesh)
+                {
+                    SubMesh* submesh = mMesh->getSubMesh( iSubMesh );
+                    // if the submesh has own vertices,
+                    if ( ! submesh->useSharedVertices )
+                    {
+                        // record which bones have vertices assigned
+                        for (size_t iBlend = 0; iBlend < submesh->blendIndexToBoneIndexMap.size(); ++iBlend)
+                        {
+                            size_t iBone = submesh->blendIndexToBoneIndexMap[ iBlend ];
+                            boneHasVerts[ iBone ] = true;
+                        }
+                    }
+                }
+                // for each bone that has vertices weighted to it,
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    if ( boneHasVerts[ iBone ] )
+                    {
+                        const Bone* bone = mSkeletonInstance->getBone( iBone );
+                        Vector3 scaleVec = bone->_getDerivedScale();
+                        Real scale = std::max( std::max( Math::Abs(scaleVec.x), Math::Abs(scaleVec.y)), Math::Abs(scaleVec.z) );
+                        maxScale = std::max( maxScale, scale );
+                        // only include bones that aren't scaled to zero
+                        if (scale > Real(0))
+                        {
+                            bbox.merge( bone->_getDerivedPosition() );
+                        }
+                    }
+                }
+                // unless all bones were scaled to zero,
+                if (! bbox.isNull())
+                {
+                    // inflate the bounding box
+                    float r = mMesh->getBoneBoundingRadius() * maxScale;  // adjust bone bounding radius by max scale of any bone
+                    Vector3 expansion(r, r, r);
+                    bbox.setExtents( bbox.getMinimum() - expansion, bbox.getMaximum() + expansion );
+                }
+                bbox.merge(getChildObjectsBoundingBox());
+                // if bounding box has changed,
+                if (bbox != mFullBoundingBox)
+                {
+                    mFullBoundingBox = bbox;
+                    Node::queueNeedUpdate( mParentNode );  // inform the parent node to update its AABB (without this, changes to the bbox won't propagate to the scene node)
+                }
+            }
+            else
+            {
+                // Get from Mesh
+                mFullBoundingBox = mMesh->getBounds();
+                mFullBoundingBox.merge(getChildObjectsBoundingBox());
+            }
 			// Don't scale here, this is taken into account when world BBox calculation is done
 		}
 		else
+        {
 			mFullBoundingBox.setNull();
+        }
 
         return mFullBoundingBox;
     }
