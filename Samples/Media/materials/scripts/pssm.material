@@ -217,7 +217,7 @@ vertex_program PSSM/shadow_receiver_vsGLSL glsl
 	}
 }
 
-fragment_program PSSM/shadow_receiver_psGLSLES glsl
+fragment_program PSSM/shadow_receiver_psGLSL glsl
 {
 	source pssmReceiverFp.glsl
 	syntax glsl150
