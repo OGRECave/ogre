@@ -11,11 +11,11 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
 {
  public:
 
-	Sample_Tessellation()
+    Sample_Tessellation()
     {
-		mInfo["Title"] = "Tessellation";
+        mInfo["Title"] = "Tessellation";
         mInfo["Description"] = "Sample for tessellation support (Hull, Domain shaders)";
-		mInfo["Thumbnail"] = "thumb_tessellation.png";
+        mInfo["Thumbnail"] = "thumb_tessellation.png";
         mInfo["Category"] = "Unsorted";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
@@ -27,10 +27,10 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_Tessellation::testCapabilities");
         }
-		if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
+        if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",
-				"Sample_Tessellation:testCapabilities");
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",
+                        "Sample_Tessellation:testCapabilities");
         }
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("hs_5_0") &&
@@ -39,11 +39,11 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
             !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model 5.0 needed for this sample, "
-						"so you cannot run this sample. Sorry!", "Sample_Tessellation::testCapabilities");
+                        "so you cannot run this sample. Sorry!", "Sample_Tessellation::testCapabilities");
         }
     }
 
-protected:
+ protected:
 
     void setupContent()
     {
@@ -61,8 +61,8 @@ protected:
 
         // create a plain with float3 tex cord
         ManualObject* tObject = mSceneMgr->createManualObject("TesselatedObject");
-        
-        // create a triangle that uses our material 
+
+        // create a triangle that uses our material
         tObject->begin(tMat->getName(), RenderOperation::OT_TRIANGLE_LIST);
         tObject->position(10, 10, 0);
         tObject->position(0, 10, 0);

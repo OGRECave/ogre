@@ -1,25 +1,25 @@
-vertex_program Ogre/Tesselation/VertexProgramHLSL hlsl
+vertex_program Ogre/Tessellation/VertexProgramHLSL hlsl
 {
-    source Tesselation.hlsl
+    source Tessellation.hlsl
     entry_point VS
     target vs_5_0
 }
 
-vertex_program Ogre/Tesselation/VertexProgramGLSL glsl
+vertex_program Ogre/Tessellation/VertexProgramGLSL glsl
 {
-    source TesselationVp.glsl
+    source TessellationVp.glsl
     syntax glsl400
 }
 
-vertex_program Ogre/Tesselation/VertexProgram unified
+vertex_program Ogre/Tessellation/VertexProgram unified
 {
-    delegate Ogre/Tesselation/VertexProgramHLSL
-    delegate Ogre/Tesselation/VertexProgramGLSL
+    delegate Ogre/Tessellation/VertexProgramHLSL
+    delegate Ogre/Tessellation/VertexProgramGLSL
 }
 
-tesselation_hull_program Ogre/Tesselation/TesselationHullProgramHLSL hlsl
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramHLSL hlsl
 {
-    source Tesselation.hlsl
+    source Tessellation.hlsl
     entry_point HS
     target hs_5_0
 
@@ -29,9 +29,9 @@ tesselation_hull_program Ogre/Tesselation/TesselationHullProgramHLSL hlsl
     }
 }
 
-tesselation_hull_program Ogre/Tesselation/TesselationHullProgramGLSL glsl
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramGLSL glsl
 {
-    source TesselationTh.glsl
+    source TessellationTh.glsl
     syntax glsl400
 
     default_params
@@ -40,15 +40,15 @@ tesselation_hull_program Ogre/Tesselation/TesselationHullProgramGLSL glsl
     }
 }
 
-tesselation_hull_program Ogre/Tesselation/TesselationHullProgram unified
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgram unified
 {
-    delegate Ogre/Tesselation/TesselationHullProgramHLSL
-    delegate Ogre/Tesselation/TesselationHullProgramGLSL
+    delegate Ogre/Tessellation/TessellationHullProgramHLSL
+    delegate Ogre/Tessellation/TessellationHullProgramGLSL
 }
 
-tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramHLSL hlsl
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramHLSL hlsl
 {
-    source Tesselation.hlsl
+    source Tessellation.hlsl
     entry_point DS
     target ds_5_0
 
@@ -58,9 +58,9 @@ tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramHLSL hlsl
     }
 }
 
-tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramGLSL glsl
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramGLSL glsl
 {
-    source TesselationTd.glsl
+    source TessellationTd.glsl
     syntax glsl400
 
     default_params
@@ -69,32 +69,32 @@ tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramGLSL glsl
     }
 }
 
-tesselation_domain_program Ogre/Tesselation/TesselationDomainProgram unified
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgram unified
 {
-    delegate Ogre/Tesselation/TesselationDomainProgramHLSL
-    delegate Ogre/Tesselation/TesselationDomainProgramGLSL
+    delegate Ogre/Tessellation/TessellationDomainProgramHLSL
+    delegate Ogre/Tessellation/TessellationDomainProgramGLSL
 }
 
-fragment_program Ogre/Tesselation/FragmentProgramHLSL hlsl
+fragment_program Ogre/Tessellation/FragmentProgramHLSL hlsl
 {
-    source Tesselation.hlsl
+    source Tessellation.hlsl
     entry_point SolidColorPS
     target ps_5_0
 }
 
-fragment_program Ogre/Tesselation/FragmentProgramGLSL glsl
+fragment_program Ogre/Tessellation/FragmentProgramGLSL glsl
 {
-    source TesselationFp.glsl
+    source TessellationFp.glsl
     syntax glsl400
 }
 
-fragment_program Ogre/Tesselation/FragmentProgram unified
+fragment_program Ogre/Tessellation/FragmentProgram unified
 {
-    delegate Ogre/Tesselation/FragmentProgramHLSL
-    delegate Ogre/Tesselation/FragmentProgramGLSL
+    delegate Ogre/Tessellation/FragmentProgramHLSL
+    delegate Ogre/Tessellation/FragmentProgramGLSL
 }
 
-material Ogre/TesselationExample
+material Ogre/TessellationExample
 {
     technique
     {
@@ -103,22 +103,22 @@ material Ogre/TesselationExample
             lighting off
             depth_write off
 
-            vertex_program_ref Ogre/Tesselation/VertexProgram
+            vertex_program_ref Ogre/Tessellation/VertexProgram
             {
 
             }
 
-            tesselation_hull_program_ref Ogre/Tesselation/TesselationHullProgram
+            tessellation_hull_program_ref Ogre/Tessellation/TessellationHullProgram
             {
 
             }
 
-            tesselation_domain_program_ref Ogre/Tesselation/TesselationDomainProgram
+            tessellation_domain_program_ref Ogre/Tessellation/TessellationDomainProgram
             {
 
             }
 
-            fragment_program_ref Ogre/Tesselation/FragmentProgram
+            fragment_program_ref Ogre/Tessellation/FragmentProgram
             {
 
             }

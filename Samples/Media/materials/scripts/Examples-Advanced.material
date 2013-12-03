@@ -925,7 +925,7 @@ fragment_program Examples/TextureArrayPSasm asm
 
 material Examples/TextureArray
 {
-	technique
+	technique asm
 	{
 		pass
 		{

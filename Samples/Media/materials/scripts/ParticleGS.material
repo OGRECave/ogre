@@ -167,11 +167,6 @@ material Ogre/ParticleGS/Generate
 			{
 				
 			}
-
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-				
-			}
 			
 			geometry_program_ref Ogre/ParticleGS/GenerateGSglsl
 			{

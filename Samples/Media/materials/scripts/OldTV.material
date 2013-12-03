@@ -62,7 +62,7 @@ material Ogre/Compositor/OldTV
                 param_named distortionFreq float 2.7
                 param_named distortionScale float 2.5
                 param_named distortionRoll float 0.93
-                param_named inerference float 0.5
+                param_named interference float 0.5
                 param_named frameLimit float 0.40
                 param_named frameShape float 0.26
                 param_named frameSharpness float 6.0
