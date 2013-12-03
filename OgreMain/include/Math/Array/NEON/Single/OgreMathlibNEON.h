@@ -380,6 +380,15 @@ namespace Ogre
 			return vcltq_f32( a, b );
 		}
 
+        /** Returns the result of "a <= b"
+         @return
+         r[i] = a[i] <= b[i] ? 0xffffffff : 0;
+         */
+		static inline ArrayReal CompareLessEqual( ArrayReal a, ArrayReal b )
+		{
+			return vcleq_f32( a, b );
+		}
+
 		/** Returns the result of "a > b"
 		@return
 			r[i] = a[i] > b[i] ? 0xffffffff : 0;
