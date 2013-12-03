@@ -196,6 +196,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
             COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Frameworks
             COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
             ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
+            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreMeshLodGenerator.framework
+            ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
             COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
             ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
             )
