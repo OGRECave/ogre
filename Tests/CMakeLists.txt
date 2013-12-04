@@ -267,12 +267,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
                 ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
                 )
         endif()
-        if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
-            add_custom_command(TARGET Test_Ogre POST_BUILD
-                COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreMeshLodGenerator.framework
-                ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
-                )
-        endif()
         if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
             add_custom_command(TARGET Test_Ogre POST_BUILD
                 COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/OgreRTShaderSystem.framework
