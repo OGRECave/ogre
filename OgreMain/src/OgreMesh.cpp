@@ -954,7 +954,7 @@ namespace Ogre {
                     // and therefore everything on a line segment between the bone origin and the child bone will be inside the bounding box as well
                     size_t iChildBone = boneChildren[ iBone ][ iChild ];
                     // compute distance from vertex to line segment between bones
-                    float distChild = distLineSegToPoint( bonePositions[ iBone ], bonePositions[ iChildBone ], v );
+                    Real distChild = distLineSegToPoint( bonePositions[ iBone ], bonePositions[ iChildBone ], v );
                     dist = std::min( dist, distChild );
                 }
                 // scale the distance by the weight, this prevents the radius from being over-inflated because of a vertex that is lightly influenced by a faraway bone
