@@ -40,6 +40,7 @@ endif()
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
+ogre_add_component_include_dir(MeshLodGenerator)
 ogre_add_component_include_dir(Overlay)
 ogre_add_component_include_dir(Volume)
 
