@@ -149,6 +149,21 @@ void TestContext::setup()
     testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+    if (mPluginDirectory.empty()) mPluginDirectory = ".";   // user didn't specify plugins folder, try current one
+#endif
+
+    // add slash or backslash based on platform
+    char lastChar = mPluginDirectory[mPluginDirectory.length() - 1];
+    if (lastChar != '/' && lastChar != '\\')
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+        mPluginDirectory += "\\";
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+        mPluginDirectory += "/";
+#endif
+    }
+
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
     // parse for the test sets and plugins that they're made up of
@@ -230,7 +245,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
                 mRoot->installPlugin(pluginInstance);
             }
 #else
-            mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
+            mRoot->loadPlugin(mPluginDirectory + plugin);
 #endif
         }
         // if it fails, just return right away
