@@ -897,6 +897,7 @@ namespace Ogre
 		rsc->setCapability(RSC_STENCIL_WRAP);
 		rsc->setCapability(RSC_HWOCCLUSION);		
 		rsc->setCapability(RSC_USER_CLIP_PLANES);			
+		rsc->setCapability(RSC_32BIT_INDEX);			
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);			
 		rsc->setCapability(RSC_TEXTURE_1D);			
 		rsc->setCapability(RSC_TEXTURE_3D);			
@@ -990,6 +991,10 @@ namespace Ogre
 			// User clip planes
 			if (rkCurCaps.MaxUserClipPlanes == 0)			
 				rsc->unsetCapability(RSC_USER_CLIP_PLANES);			
+
+			// D3DFMT_INDEX32 type?
+			if (rkCurCaps.MaxVertexIndex <= 0xFFFF)			
+				rsc->unsetCapability(RSC_32BIT_INDEX);	
 
 			// UBYTE4 type?
 			if ((rkCurCaps.DeclTypes & D3DDTCAPS_UBYTE4) == 0)			

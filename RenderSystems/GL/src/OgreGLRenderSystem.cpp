@@ -367,6 +367,7 @@ namespace Ogre {
 				rsc->setCapability(RSC_GL1_5_NOVBO);
 			}
 			rsc->setCapability(RSC_VBO);
+			rsc->setCapability(RSC_32BIT_INDEX);
 		}
 
 		if(GLEW_ARB_vertex_program)
