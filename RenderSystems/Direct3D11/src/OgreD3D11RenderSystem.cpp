@@ -1081,6 +1081,12 @@ bail:
 		rsc->setCapability(RSC_HWSTENCIL);
 		rsc->setStencilBufferBitDepth(8);
 
+		rsc->setCapability(RSC_VBO);
+		UINT formatSupport;
+		if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2
+		|| SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))
+			rsc->setCapability(RSC_32BIT_INDEX);
+
 		// Set number of texture units, always 16
 		rsc->setNumTextureUnits(16);
 		rsc->setCapability(RSC_ANISOTROPY);
@@ -1093,7 +1099,6 @@ bail:
 		// We always support compression, D3DX will decompress if device does not support
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-		rsc->setCapability(RSC_VBO);
 		rsc->setCapability(RSC_SCISSOR_TEST);
 		rsc->setCapability(RSC_TWO_SIDED_STENCIL);
 		rsc->setCapability(RSC_STENCIL_WRAP);
