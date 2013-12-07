@@ -862,7 +862,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
 
-            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            if(gleswIsSupported(3, 0))
                 getGLES2SupportRef()->getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
             // Allocate temporary texture of the size of the destination area
@@ -1060,7 +1060,7 @@ namespace Ogre {
         // Set texture type
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(target, id);
 
-        if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+        if(gleswIsSupported(3, 0))
             getGLES2SupportRef()->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
@@ -1178,8 +1178,7 @@ namespace Ogre {
                 height = height / 2;
             }
 
-            size_t sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
-                                                       data.format);
+            size_t sizeInBytes = PixelUtil::getMemorySize(width, height, 1, data.format);
             scaled = PixelBox(width, height, 1, data.format);
             scaled.data = new uint8[sizeInBytes];
             Image::scale(data, scaled, Image::FILTER_LINEAR);

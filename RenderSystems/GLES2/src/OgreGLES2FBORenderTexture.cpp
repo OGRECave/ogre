@@ -191,7 +191,7 @@ namespace Ogre {
             glBindTexture(GL_TEXTURE_2D, tid);
 
             // Set some default parameters
-            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            if(gleswIsSupported(3, 0))
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
