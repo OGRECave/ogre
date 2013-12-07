@@ -144,8 +144,8 @@ namespace Ogre
 		D3D11HLSLProgram* mBoundVertexProgram;
 		D3D11HLSLProgram* mBoundFragmentProgram;
 		D3D11HLSLProgram* mBoundGeometryProgram;
-		D3D11HLSLProgram* mBoundTesselationHullProgram;
-		D3D11HLSLProgram* mBoundTesselationDomainProgram;
+		D3D11HLSLProgram* mBoundTessellationHullProgram;
+		D3D11HLSLProgram* mBoundTessellationDomainProgram;
 		D3D11HLSLProgram* mBoundComputeProgram;
 
 		ID3D11BlendState * mBoundBlendState;
@@ -285,8 +285,8 @@ namespace Ogre
 		D3D11HLSLProgram* _getBoundVertexProgram() const;
 		D3D11HLSLProgram* _getBoundFragmentProgram() const;
 		D3D11HLSLProgram* _getBoundGeometryProgram() const;
-		D3D11HLSLProgram* _getBoundTesselationHullProgram() const;
-		D3D11HLSLProgram* _getBoundTesselationDomainProgram() const;
+		D3D11HLSLProgram* _getBoundTessellationHullProgram() const;
+		D3D11HLSLProgram* _getBoundTessellationDomainProgram() const;
 		D3D11HLSLProgram* _getBoundComputeProgram() const;
         void _useLights(const LightList& lights, unsigned short limit);
 		void _setWorldMatrix( const Matrix4 &m );

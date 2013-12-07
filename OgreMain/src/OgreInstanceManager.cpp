@@ -612,7 +612,7 @@ namespace Ogre
 
 			// Transfer bone assignments to the submesh
 			size_t offset = curVertexOffset + newVertexData->vertexCount;
-			for (; it != end; it++)
+			for (; it != end; ++it)
 			{
 				size_t vertexIdx = (*it).first;
 				if (vertexIdx > offset)

@@ -44,6 +44,8 @@ namespace Ogre {
 		/// Latest version available
 		MESH_VERSION_LATEST,
 		
+		/// OGRE version v1.10+
+		MESH_VERSION_1_10,
 		/// OGRE version v1.8+
 		MESH_VERSION_1_8,
 		/// OGRE version v1.7+

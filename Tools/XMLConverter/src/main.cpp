@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreSkeletonSerializer.h"
 #include "OgreXMLPrerequisites.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreProgressiveMeshGenerator.h"
+#include "OgreMeshLodGenerator.h"
 #include "OgreDistanceLodStrategy.h"
 #include <iostream>
 #include <sys/stat.h>
@@ -42,6 +42,9 @@ THE SOFTWARE.
 using namespace std;
 using namespace Ogre;
 
+// Some flags were deprecated, because they are provided in OgreMeshUpgrader too!
+// Same feature with different implementation! Don't make duplicates!
+// Also XMLConverter should only convert between XML format 1:1, while MeshUpgrader should modify it.
 struct XmlOptions
 {
     String source;
@@ -49,18 +52,18 @@ struct XmlOptions
     String sourceExt;
     String destExt;
     String logFile;
-    bool interactiveMode;
-    unsigned short numLods;
-    Real lodValue;
-    String lodStrategy;
-    Real lodPercent;
-    size_t lodFixed;
+    //bool interactiveMode; // Deprecated
+    //unsigned short numLods; // Deprecated
+    //Real lodValue; // Deprecated
+    //String lodStrategy; // Deprecated
+    //Real lodPercent; // Deprecated
+    //size_t lodFixed; // Deprecated
     size_t nuextremityPoints;
 	size_t mergeTexcoordResult;
 	size_t mergeTexcoordToDestroy;
     bool usePercent;
-    bool generateEdgeLists;
-    bool generateTangents;
+    //bool generateEdgeLists; // Deprecated
+    //bool generateTangents; // Deprecated
 	VertexElementSemantic tangentSemantic;
 	bool tangentUseParity;
 	bool tangentSplitMirrored;
@@ -80,25 +83,10 @@ void help(void)
     cout << "Provided for OGRE by Steve Streeting" << endl << endl;
     cout << "Usage: OgreXMLConverter [options] sourcefile [destfile] " << endl;
 	cout << endl << "Available options:" << endl;
-    cout << "-i             = interactive mode - prompt for options" << endl;
-    cout << "(The next 4 options are only applicable when converting XML to Mesh)" << endl;
-    cout << "-l lodlevels   = number of LOD levels" << endl;
-    cout << "-v lodvalue     = value increment to reduce LOD" << endl;
-    cout << "-s lodstrategy = LOD strategy to use for this mesh" << endl;
-    cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
-    cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
 	cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
 	cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
 	cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
 	cout << "                 to each other for the merge to work." << endl;
-    cout << "-e             = DON'T generate edge lists (for stencil shadows)" << endl;
-    cout << "-r             = DON'T reorganise vertex buffers to OGRE recommended format." << endl;
-    cout << "-t             = Generate tangents (for normal mapping)" << endl;
-	cout << "-td [uvw|tangent]" << endl;
-	cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
-	cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
-	cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
-	cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
     cout << "-o             = DON'T optimise out redundant tracks & keyframes" << endl;
 	cout << "-d3d           = Prefer D3D packed colour formats (default on Windows)" << endl;
 	cout << "-gl            = Prefer GL packed colour formats (default on non-Windows)" << endl;
@@ -121,22 +109,22 @@ XmlOptions parseArgs(int numArgs, char **args)
 {
     XmlOptions opts;
 
-    opts.interactiveMode = false;
-    opts.lodValue = 250000;
-    opts.lodFixed = 0;
-    opts.lodPercent = 20;
-    opts.numLods = 0;
+    //opts.interactiveMode = false;
+    //opts.lodValue = 250000;
+    //opts.lodFixed = 0;
+    //opts.lodPercent = 20;
+    //opts.numLods = 0;
     opts.nuextremityPoints = 0;
 	opts.mergeTexcoordResult = 0;
 	opts.mergeTexcoordToDestroy = 0;
     opts.usePercent = true;
-    opts.generateEdgeLists = true;
-    opts.generateTangents = false;
-	opts.tangentSemantic = VES_TANGENT;
-	opts.tangentUseParity = false;
-	opts.tangentSplitMirrored = false;
-	opts.tangentSplitRotated = false;
-    opts.reorganiseBuffers = true;
+    //opts.generateEdgeLists = true;
+    //opts.generateTangents = false;
+	//opts.tangentSemantic = VES_TANGENT;
+	//opts.tangentUseParity = false;
+	//opts.tangentSplitMirrored = false;
+	//opts.tangentSplitRotated = false;
+    //opts.reorganiseBuffers = true;
 	opts.optimiseAnimations = true;
     opts.quietMode = false;
 	opts.endian = Serializer::ENDIAN_NATIVE;
@@ -149,10 +137,10 @@ XmlOptions parseArgs(int numArgs, char **args)
     UnaryOptionList unOpt;
     BinaryOptionList binOpt;
 
-    unOpt["-i"] = false;
-    unOpt["-e"] = false;
+    //unOpt["-i"] = false;
+    //unOpt["-e"] = false;
     unOpt["-r"] = false;
-    unOpt["-t"] = false;
+    //unOpt["-t"] = false;
 	unOpt["-tm"] = false;
 	unOpt["-tr"] = false;
     unOpt["-o"] = false;
@@ -160,11 +148,11 @@ XmlOptions parseArgs(int numArgs, char **args)
 	unOpt["-d3d"] = false;
 	unOpt["-gl"] = false;
 	unOpt["-h"] = false;
-    binOpt["-l"] = "";
+    //binOpt["-l"] = "";
     binOpt["-v"] = "";
-    binOpt["-s"] = "Distance";
-    binOpt["-p"] = "";
-    binOpt["-f"] = "";
+    //binOpt["-s"] = "Distance";
+    //binOpt["-p"] = "";
+    //binOpt["-f"] = "";
     binOpt["-E"] = "";
     binOpt["-x"] = "";
     binOpt["-log"] = "OgreXMLConverter.log";
@@ -189,85 +177,10 @@ XmlOptions parseArgs(int numArgs, char **args)
 		opts.quietMode = true;
 	}
 
-	ui = unOpt.find("-i");
-    if (ui->second)
-    {
-        opts.interactiveMode = true;
-    }
-    else
-    {
-        ui = unOpt.find("-e");
-        if (ui->second)
-        {
-            opts.generateEdgeLists = false;
-        }
-    
-        ui = unOpt.find("-r");
-        if (ui->second)
-        {
-            opts.reorganiseBuffers = false;
-        }
-
-        ui = unOpt.find("-t");
-        if (ui->second)
-        {
-            opts.generateTangents = true;
-        }
-		ui = unOpt.find("-tm");
-		if (ui->second)
-		{
-			opts.tangentSplitMirrored = true;
-		}
-		ui = unOpt.find("-tr");
-		if (ui->second)
-		{
-			opts.tangentSplitRotated = true;
-		}
-
-		bi = binOpt.find("-td");
-		if (!bi->second.empty())
-		{
-			if (bi->second == "uvw")
-				opts.tangentSemantic = VES_TEXTURE_COORDINATES;
-			else
-				opts.tangentSemantic = VES_TANGENT;
-		}
-		bi = binOpt.find("-ts");
-		if (!bi->second.empty())
-		{
-			if (bi->second == "4")
-				opts.tangentUseParity = true;
-		}
-
         ui = unOpt.find("-o");
         if (ui->second)
         {
             opts.optimiseAnimations = false;
-        }
-
-		bi = binOpt.find("-l");
-        if (!bi->second.empty())
-        {
-            opts.numLods = StringConverter::parseInt(bi->second);
-        }
-
-        bi = binOpt.find("-v");
-        if (!bi->second.empty())
-        {
-            opts.lodValue = StringConverter::parseReal(bi->second);
-        }
-
-        bi = binOpt.find("-s");
-        if (!bi->second.empty())
-        {
-            opts.lodStrategy = bi->second;
-        }
-
-        bi = binOpt.find("-p");
-        if (!bi->second.empty())
-        {
-            opts.lodPercent = StringConverter::parseReal(bi->second);
-            opts.usePercent = true;
         }
 
 		bi = binOpt.find("-merge");
@@ -300,14 +213,6 @@ XmlOptions parseArgs(int numArgs, char **args)
 			opts.mergeTexcoordResult = 0;
 			opts.mergeTexcoordResult = 1;
 		}
-
-
-        bi = binOpt.find("-f");
-        if (!bi->second.empty())
-        {
-            opts.lodFixed = StringConverter::parseInt(bi->second);
-            opts.usePercent = false;
-        }
 
         bi = binOpt.find("-x");
         if (!bi->second.empty())
@@ -345,7 +250,6 @@ XmlOptions parseArgs(int numArgs, char **args)
 			opts.d3d = false;
 		}
 
-	}
     // Source / dest
     if (numArgs > startIndex)
         source = args[startIndex];
@@ -401,35 +305,12 @@ XmlOptions parseArgs(int numArgs, char **args)
         cout << "source file      = " << opts.source << endl;
         cout << "destination file = " << opts.dest << endl;
             cout << "log file         = " << opts.logFile << endl;
-        cout << "interactive mode = " << StringConverter::toString(opts.interactiveMode) << endl;
-        if (opts.numLods == 0)
-        {
-            cout << "lod levels       = none (or use existing)" << endl;
-        }
-        else
-        {
-            cout << "lod levels       = " << opts.numLods << endl;
-            cout << "lod value     = " << opts.lodValue << endl;
-            cout << "lod strategy     = " << opts.lodStrategy << endl;
-            if (opts.usePercent)
-            {
-                cout << "lod reduction    = " << opts.lodPercent << "%" << endl;
-            }
-            else
-            {
-                cout << "lod reduction    = " << opts.lodFixed << " verts" << endl;
-            }
-        }
         if (opts.nuextremityPoints)
             cout << "Generate extremes per submesh = " << opts.nuextremityPoints << endl;
-        cout << "Generate edge lists  = " << opts.generateEdgeLists << endl;
-        cout << "Generate tangents = " << opts.generateTangents << endl;
 		cout << " semantic = " << (opts.tangentSemantic == VES_TANGENT? "TANGENT" : "TEXCOORD") << endl;
 		cout << " parity = " << opts.tangentUseParity << endl;
 		cout << " split mirror = " << opts.tangentSplitMirrored << endl;
 		cout << " split rotated = " << opts.tangentSplitRotated << endl;
-        cout << "Reorganise vertex buffers = " << opts.reorganiseBuffers << endl;
-    	cout << "Optimise animations = " << opts.optimiseAnimations << endl;
     	
         cout << "-- END OPTIONS --" << endl;
         cout << endl;
@@ -554,268 +435,6 @@ void XMLToBinary(XmlOptions opts)
                 }
             }
 
-        }
-
-        // Prompt for LOD generation?
-        bool genLod = false;
-        bool askLodDtls = false;
-        if (!opts.interactiveMode) // derive from params if in batch mode
-        {
-            askLodDtls = false;
-            if (opts.numLods == 0)
-            {
-                genLod = false;
-            }
-            else
-            {
-                genLod = true;
-            }
-        }
-        else if(opts.numLods == 0) // otherwise only ask if not specified on command line
-        {
-            if (newMesh->getNumLodLevels() > 1)
-            {
-                std::cout << "\nXML already contains level-of detail information.\n"
-                    "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
-                while (response == "")
-                {
-                    cin >> response;
-					StringUtil::toLowerCase(response);
-                    if (response == "u")
-                    {
-                        // Do nothing
-                    }
-                    else if (response == "d")
-                    {
-                        newMesh->removeLodLevels();
-                    }
-                    else if (response == "r")
-                    {
-                        genLod = true;
-                        askLodDtls = true;
-
-                    }
-                    else
-                    {
-                        std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                        response = "";
-                    }
-                }// while response == ""
-            }
-            else // no existing LOD
-            {
-                std::cout << "\nWould you like to generate LOD information? (y/n) ";
-                while (response == "")
-                {
-                    cin >> response;
-					StringUtil::toLowerCase(response);
-                    if (response == "n")
-                    {
-                        // Do nothing
-                    }
-                    else if (response == "y")
-                    {
-                        genLod = true;
-                        askLodDtls = true;
-                    }
-                    else
-                    {
-                        std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                        response = "";
-                    }
-                }
-            }
-        }
-
-        if (genLod)
-        {
-            unsigned short numLod;
-            LodConfig lodConfig;
-            lodConfig.levels.clear();
-            lodConfig.mesh = newMesh->clone(newMesh->getName());
-            lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
-
-            LodLevel lodLevel;
-            lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-
-            if (askLodDtls)
-            {
-                cout << "\nHow many extra LOD levels would you like to generate? ";
-                cin >> numLod;
-
-                cout << "\nWhat LOD strategy should be used? ";
-                cin >> opts.lodStrategy;
-
-                cout << "\nWhat unit of reduction would you like to use:" <<
-                    "\n(f)ixed or (p)roportional? ";
-                response = "";
-                while (response == "") {
-                    cin >> response;
-                    StringUtil::toLowerCase(response);
-                    if (response == "f")
-                    {
-                        lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-                        cout << "\nHow many vertices should be removed at each LOD? ";
-                    }
-                    else if (response == "p")
-                    {
-                        lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-                        cout << "\nWhat percentage of remaining vertices should be removed "
-                            "\at each LOD (e.g. 50)? ";
-                    }
-                    else {
-                            std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                            response = "";
-                    }
-                }
-                cin >> lodLevel.reductionValue;
-                if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
-                {
-                    // Percentage -> parametric
-                    lodLevel.reductionValue *= 0.01f;
-                }
-
-                cout << "\nEnter the distance for each LOD to come into effect. ";
-
-                for (unsigned short iLod = 0; iLod < numLod; ++iLod)
-                {
-                    cout << "\nLOD Level " << (iLod+1) << ": ";
-                    cin >> lodLevel.distance;
-                    lodConfig.levels.push_back(lodLevel);
-                }
-            }
-            else
-            {
-                numLod = opts.numLods;
-                lodLevel.reductionMethod = opts.usePercent? 
-                    LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
-                if (opts.usePercent)
-                {
-                    lodLevel.reductionValue = opts.lodPercent * 0.01f;
-                }
-                else
-                {
-                    lodLevel.reductionValue = opts.lodFixed;
-                }
-                Real currDist = 0;
-                for (unsigned short iLod = 0; iLod < numLod; ++iLod)
-                {
-                    currDist += opts.lodValue;
-                    Real currDistSq = Ogre::Math::Sqr(currDist);
-                    lodLevel.distance = currDistSq;
-                    lodConfig.levels.push_back(lodLevel);
-                }
-
-            }
-
-            newMesh->setLodStrategy(LodStrategyManager::getSingleton().getStrategy(opts.lodStrategy));
-            ProgressiveMeshGenerator pm;
-            pm.generateLodLevels(lodConfig);
-        }
-
-        if (opts.interactiveMode)
-        {
-            std::cout << "\nWould you like to include edge lists to enable stencil shadows with this mesh? (y/n) ";
-            while (response == "")
-            {
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "y")
-                {
-                    // Do nothing
-                }
-                else if (response == "n")
-                {
-                    opts.generateEdgeLists = false;
-                }
-                else
-                {
-                    std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                    response = "";
-                }
-            }
-
-
-            std::cout << "\nWould you like to generate tangents to enable normal mapping with this mesh? (y/n) ";
-            while (response == "")
-            {
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "y")
-                {
-                    opts.generateTangents = true;
-                }
-                else if (response == "n")
-                {
-                    // Do nothing
-                }
-                else
-                {
-                    std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                    response = "";
-                }
-            }
-        }
-
-        if (opts.generateEdgeLists)
-        {
-            if (!opts.quietMode) 
-			{
-                std::cout << "Generating edge lists...." << std::endl;
-            }
-            newMesh->buildEdgeList();
-        }
-
-        if (opts.generateTangents)
-        {
-            unsigned short srcTex, destTex;
-            if (!opts.quietMode) 
-            {
-                std::cout << "Checking if we already have tangent vectors...." << std::endl;
-            }
-            bool existing;
-            try {
-                existing = newMesh->suggestTangentVectorBuildParams(opts.tangentSemantic, srcTex, destTex);
-            } catch (Exception &e) {
-                std::cerr << "WARNING: While checking for existing tangents: " << e.getFullDescription() << std::endl;
-                std::cerr << "NOTE: Tangents were NOT generated for this mesh!" << std::endl;
-                existing = false;
-                opts.generateTangents = false;
-            }
-            if (existing)
-            {
-                std::cout << "\nThis mesh appears to already have a set of 3D texture coordinates, " <<
-                    "which would suggest tangent vectors have already been calculated. Do you really " <<
-                    "want to generate new tangent vectors (may duplicate)? (y/n): ";
-                while (response == "")
-                {
-                    cin >> response;
-                    StringUtil::toLowerCase(response);
-                    if (response == "y")
-                    {
-                        // Do nothing
-                    }
-                    else if (response == "n")
-                    {
-                        opts.generateTangents = false;
-                    }
-                    else
-                    {
-                        std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
-                        response = "";
-                    }
-                }
-
-            }
-            if (opts.generateTangents)
-            {
-                if (!opts.quietMode) 
-				{
-                    std::cout << "Generating tangent vectors...." << std::endl;
-                }
-                newMesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex, 
-					opts.tangentSplitMirrored, opts.tangentSplitRotated, opts.tangentUseParity);
-            }
         }
 
 		if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )

@@ -1,13 +1,14 @@
 # Configure Mesh Lod demo build
 
 set(HEADER_FILES include/MeshLod.h)
-set(SOURCE_FILES src/MeshLod.cpp)
+set(SOURCE_FILES src/MeshLodPlugin.cpp src/MeshLod.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+ogre_add_component_include_dir(MeshLodGenerator)
 
 add_library(Sample_MeshLod ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_MeshLod ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_MeshLod ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
 ogre_config_sample_lib(Sample_MeshLod)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

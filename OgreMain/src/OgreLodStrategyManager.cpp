@@ -88,11 +88,13 @@ namespace Ogre {
         if (it == mStrategies.end())
             return 0;
 
+        LodStrategy *strat = it->second;
+
         // Otherwise, erase the strategy from the map
         mStrategies.erase(it);
 
         // Return the strategy that was removed
-        return it->second;
+        return strat;
     }
     //-----------------------------------------------------------------------
     void LodStrategyManager::removeAllStrategies()
@@ -108,9 +110,13 @@ namespace Ogre {
     LodStrategy *LodStrategyManager::getStrategy(const String& name)
     {
         // If name is "default", return the default strategy instead of performing a lookup
-        if (name == "default")
-            return getDefaultStrategy();
-
+        if (name == "default") {
+			return getDefaultStrategy();
+		} else if (name == "Distance") {
+			return getStrategy("distance_box"); // Backward compatibility for loading old meshes.
+		} else if (name == "PixelCount") {
+			return getStrategy("pixel_count"); // Backward compatibility for loading old meshes.
+		}
         // Find strategy with specified name
         StrategyMap::iterator it = mStrategies.find(name);
 

@@ -43,6 +43,7 @@ THE SOFTWARE.
 @end
 
 namespace Ogre {
+
     class _OgreGLExport OSXCocoaWindow : public RenderWindow
     {
     private:
@@ -63,6 +64,7 @@ namespace Ogre {
         String mWindowTitle;
         bool mUseNSView;
         float mContentScalingFactor;
+        bool mContentScalingSupported;
 
         void _setWindowParameters(void);
     public:

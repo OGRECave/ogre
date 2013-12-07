@@ -64,7 +64,6 @@ THE SOFTWARE.
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "Threading/OgreDefaultWorkQueue.h"
-#include "OgreQueuedProgressiveMeshGenerator.h"
 
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
@@ -206,12 +205,6 @@ namespace Ogre {
         // LOD strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
 
-        // Queued Progressive Mesh Generator Worker
-        mPMWorker = OGRE_NEW PMWorker();
-
-        // Queued Progressive Mesh Generator Injector
-        mPMInjector = OGRE_NEW PMInjector();
-
 #if OGRE_PROFILING
         // Profiler
         mProfiler = OGRE_NEW Profiler();
@@ -312,8 +305,6 @@ namespace Ogre {
 #endif
 
 		OGRE_DELETE mLodStrategyManager;
-		OGRE_DELETE mPMWorker;
-		OGRE_DELETE mPMInjector;
 
         OGRE_DELETE mArchiveManager;
 
@@ -790,87 +781,65 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::addFrameListener(FrameListener* newListener)
     {
-		// Check if the specified listener is scheduled for removal
-		set<FrameListener *>::type::iterator i = mRemovedFrameListeners.find(newListener);
-
-		// If yes, cancel the removal. Otherwise add it to other listeners.
-		if (i != mRemovedFrameListeners.end())
-			mRemovedFrameListeners.erase(*i);
-		else
-			mFrameListeners.insert(newListener); // Insert, unique only (set)
+        mRemovedFrameListeners.erase(newListener);
+        mAddedFrameListeners.insert(newListener);
     }
-
     //-----------------------------------------------------------------------
     void Root::removeFrameListener(FrameListener* oldListener)
     {
-		// Remove, 1 only (set), and only when this listener was added before.
-		if( mFrameListeners.find( oldListener ) != mFrameListeners.end() )
-			mRemovedFrameListeners.insert(oldListener);
+        mAddedFrameListeners.erase(oldListener);
+        mRemovedFrameListeners.insert(oldListener);
+    }
+    //-----------------------------------------------------------------------
+    void Root::_syncAddedRemovedFrameListeners()
+    {
+        for (set<FrameListener*>::type::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); i++)
+            mFrameListeners.erase(*i);
+        mRemovedFrameListeners.clear();
+
+        for (set<FrameListener*>::type::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); i++)
+            mFrameListeners.insert(*i);
+        mAddedFrameListeners.clear();
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
 		OgreProfileBeginGroup("Frame", OGREPROF_GENERAL);
-
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameStarted(evt))
                 return false;
         }
 
         return true;
-
     }
 	//-----------------------------------------------------------------------
     bool Root::_fireFrameRenderingQueued(FrameEvent& evt)
     {
 		// Increment next frame number
 		++mNextFrame;
-
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameRenderingQueued(evt))
                 return false;
         }
 
         return true;
-
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameEnded(FrameEvent& evt)
     {
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
 		bool ret = true;
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameEnded(evt))
 			{

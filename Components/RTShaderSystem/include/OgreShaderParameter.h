@@ -303,7 +303,7 @@ public:
 // Interface.
 public:
 	/** */
-	Parameter() {}
+	Parameter();
 
 	/** Class constructor.
 	@param type The type of this parameter.

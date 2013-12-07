@@ -27,24 +27,26 @@ THE SOFTWARE.
 */
 #include <stdio.h>
 #include "Ogre.h"
-#include "OgreProgressiveMeshGenerator.h"
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreMeshLodGenerator.h"
+#endif
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
-
+#include "OgreLogManager.h"
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 
 void MeshWithoutIndexDataTests::setUp()
 {
-    if(LogManager::getSingletonPtr() == 0)
-        mLogManager = OGRE_NEW LogManager();
+	OGRE_DELETE LogManager::getSingletonPtr();
+	mLogManager = OGRE_NEW LogManager();
+	mLogManager->createLog("MeshWithoutIndexDataTests.log", true);
+	mLogManager->setLogDetail(LL_LOW);
 
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
-    LogManager::getSingleton().setLogDetail(LL_LOW);
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
@@ -458,22 +460,15 @@ void MeshWithoutIndexDataTests::testBuildTangentVectors()
 
 void MeshWithoutIndexDataTests::testGenerateLodLevels()
 {
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-	LodConfig lodConfig;
-    lodConfig.levels.clear();
-    lodConfig.mesh = MeshPtr(mesh);
-    lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
-    LodLevel lodLevel;
-    lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-    lodLevel.distance = 600.0;
-    lodLevel.reductionValue = 2;
-    lodConfig.levels.push_back(lodLevel);
-    ProgressiveMeshGenerator pm;
-    pm.generateLodLevels(lodConfig);
-    // FAIL: Levels == 1
+	LodConfig lodConfig(mesh);
+	lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
+    MeshLodGenerator().generateLodLevels(lodConfig);
+    // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
@@ -482,6 +477,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
         {
             if (subMesh->indexData->indexCount > 0)
             {
+				// This may not be true for all meshes, but in this test we don't have reduced to 0.
                 CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount > 0);
             }
             else
@@ -498,4 +494,5 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     remove(fileName.c_str());
 
     mMeshMgr->remove( fileName );
+#endif
 }

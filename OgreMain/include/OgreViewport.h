@@ -183,13 +183,14 @@ namespace Ogre {
 
         /** Sets the dimensions (after creation).
             @param
-                left
+                left Left point of viewport.
             @param
-                top
+                top Top point of the viewport.
             @param
-                width
+                width Width of the viewport.
             @param
-                height Dimensions relative to the size of the target,
+                height Height of the viewport.
+            @note Dimensions relative to the size of the target,
                 represented as real values between 0 and 1. i.e. the full
                 target area is 0, 0, 1, 1.
         */
@@ -392,7 +393,7 @@ namespace Ogre {
         float mRelLeft, mRelTop, mRelWidth, mRelHeight;
         /// Actual dimensions, based on target dimensions
         int mActLeft, mActTop, mActWidth, mActHeight;
-        /// ZOrder
+        /// Z-order
         int mZOrder;
         /// Background options
         ColourValue mBackColour;

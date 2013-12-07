@@ -12,6 +12,12 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
+    enum VisualiseBoundingBoxMode
+    {
+        kVisualiseNone,
+        kVisualiseOne,
+        kVisualiseAll
+    };
 public:
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
@@ -22,7 +28,94 @@ public:
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
 		mInfo["Thumbnail"] = "thumb_skelanim.png";
 		mInfo["Category"] = "Animation";
+		mInfo["Help"] = "Controls:\n"
+            "WASD to move the camera.  Mouse to look around.\n"
+            "V toggle visualise bounding boxes.\n"
+            "B toggle bone-based bounding boxes on/off.";
+        mStatusPanel = NULL;
+        mVisualiseBoundingBoxMode = kVisualiseNone;
+        mBoundingBoxModelIndex = 0;
+        mBoneBoundingBoxes = false;
+        mBoneBoundingBoxesItemName = "Bone AABBs";
 	}
+
+    void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
+    {
+        mVisualiseBoundingBoxMode = mode;
+        for (unsigned int i = 0; i < NUM_MODELS; i++)
+        {
+            switch (mVisualiseBoundingBoxMode)
+            {
+            case kVisualiseNone:
+                mModelNodes[ i ]->showBoundingBox( false );
+                break;
+            case kVisualiseOne:
+                mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
+                break;
+            case kVisualiseAll:
+                mModelNodes[ i ]->showBoundingBox( true );
+                break;
+            }
+        }
+    }
+    void enableBoneBoundingBoxMode( bool enable )
+    {
+        // update bone bounding box mode for all models
+        mBoneBoundingBoxes = enable;
+        for (unsigned int iModel = 0; iModel < NUM_MODELS; iModel++)
+        {
+            SceneNode* node = mModelNodes[iModel];
+            for (unsigned int iObj = 0; iObj < node->numAttachedObjects(); ++iObj)
+            {
+                if (Entity* ent = dynamic_cast<Entity*>( node->getAttachedObject( iObj ) ))
+                {
+                    ent->setUpdateBoundingBoxFromSkeleton( mBoneBoundingBoxes );
+                    Node::queueNeedUpdate( node );  // when turning off bone bounding boxes, need to force an update
+                }
+            }
+        }
+        // update status panel
+        if ( mStatusPanel )
+        {
+            mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
+        }
+    }
+	bool keyPressed(const OIS::KeyEvent& evt)
+    {
+        // unless the help dialog is visible,
+        if ( !mTrayMgr->isDialogVisible() )
+        {
+            // handle keypresses
+            switch (evt.key)
+            {
+            case OIS::KC_V:
+                // toggle visualise bounding boxes
+                switch (mVisualiseBoundingBoxMode)
+                {
+                case kVisualiseNone:
+                    setVisualiseBoundingBoxMode( kVisualiseOne );
+                    break;
+                case kVisualiseOne:
+                    setVisualiseBoundingBoxMode( kVisualiseAll );
+                    break;
+                case kVisualiseAll:
+                    setVisualiseBoundingBoxMode( kVisualiseNone );
+                    break;
+                }
+                return true;
+                break;
+
+            case OIS::KC_B:
+                {
+                    // toggle bone based bounding boxes for all models
+                    enableBoneBoundingBoxMode( ! mBoneBoundingBoxes );
+                    return true;
+                }
+                break;
+            }
+        }
+        return SdkSample::keyPressed(evt);
+    }
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
@@ -194,10 +287,17 @@ protected:
 
 		// create name and value for skinning mode
 		StringVector names;
+        names.push_back("Help");
 		names.push_back("Skinning");
+        names.push_back(mBoneBoundingBoxesItemName);
+		
+		// create a params panel to display the help and skinning mode
+		mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
+        mStatusPanel->setParamValue("Help", "H / F1");
 		String value = "Software";
+        enableBoneBoundingBoxMode( false );  // update status panel entry
 
-		// change the value if hardware skinning is enabled
+        // change the value if hardware skinning is enabled
 		MaterialPtr entityMaterial = ent->getSubEntity(0)->getMaterial();
 		if(!entityMaterial.isNull())
 		{
@@ -211,9 +311,7 @@ protected:
 				}
 			}
 		}
-		
-		// create a params panel to display the skinning mode
-		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
+        mStatusPanel->setParamValue("Skinning", value);
 	}
 	
 	/*-----------------------------------------------------------------------------
@@ -286,8 +384,13 @@ protected:
 
 	const unsigned int NUM_MODELS;
 	const Real ANIM_CHOP;
+    VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
+    int mBoundingBoxModelIndex;  // which model to show the bounding box for
+    bool mBoneBoundingBoxes;
+    ParamsPanel* mStatusPanel;
+    String mBoneBoundingBoxesItemName;
 
-	std::vector<SceneNode*> mModelNodes;
+    std::vector<SceneNode*> mModelNodes;
 	std::vector<AnimationState*> mAnimStates;
 	std::vector<Real> mAnimSpeeds;
 

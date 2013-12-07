@@ -1300,12 +1300,11 @@ namespace Ogre {
 		// Run through mEmitters and add keys to the pool
 		ParticleEmitterList::iterator emitterIterator;
 		ParticleEmitterList::iterator emitterIteratorInner;
-		ParticleEmitter* emitter = 0;
 		ParticleEmitter* emitterInner = 0;
 		for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
 		{
 			// Determine the names of all emitters that are emitted
-			emitter = *emitterIterator ;
+			ParticleEmitter* emitter = *emitterIterator ;
 			if (emitter && emitter->getEmittedEmitter() != StringUtil::BLANK)
 			{
 				// This one will be emitted, register its name and leave the vector empty!
@@ -1344,7 +1343,6 @@ namespace Ogre {
 
 		EmittedEmitterPool::iterator emittedEmitterPoolIterator;
 		ParticleEmitterList::iterator emitterIterator;
-		ParticleEmitter* emitter = 0;
 		ParticleEmitter* clonedEmitter = 0;
 		String name = StringUtil::BLANK;
 		EmittedEmitterList* e = 0;
@@ -1358,7 +1356,7 @@ namespace Ogre {
 			e = &emittedEmitterPoolIterator->second;
 
 			// Search the correct emitter in the mEmitters vector
-			emitter = 0;
+			ParticleEmitter* emitter = 0;
 			for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
 			{
 				emitter = *emitterIterator;
@@ -1376,7 +1374,7 @@ namespace Ogre {
 
 						// Initially deactivate the emitted emitter if duration/repeat_delay are set
 						if (clonedEmitter->getDuration() > 0.0f && 
-							(clonedEmitter->getRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f))
+							(clonedEmitter->getRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f))
 							clonedEmitter->setEnabled(false);
 
 						// Add cloned emitters to the pool

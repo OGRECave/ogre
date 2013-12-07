@@ -51,7 +51,7 @@ namespace Ogre
 
 	//---------------------------------------------------------------------------------------//
 
-	ExternalTextureSource::ExternalTextureSource()
+	ExternalTextureSource::ExternalTextureSource() : mTechniqueLevel(0), mPassLevel(0), mStateLevel(0)
 	{
 		mInputFileName = "None";
 		mDictionaryName = "NotAssigned";

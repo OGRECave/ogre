@@ -37,7 +37,7 @@
 #include "SampleBrowser.h"
 #include "Android/OgreAndroidEGLWindow.h"
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif
 

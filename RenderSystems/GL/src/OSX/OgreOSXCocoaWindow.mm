@@ -32,8 +32,9 @@ THE SOFTWARE.
 #import "OgreStringConverter.h"
 #import "OgreWindowEventUtilities.h"
 #import "OgreGLPixelFormat.h"
-
+#import "OgreGLUtil.h"
 #import "OgreGLRenderSystem.h"
+
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
@@ -61,8 +62,10 @@ namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOrigin(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseNSView(false), mContentScalingFactor(1.0)
+        mUseNSView(false), mContentScalingFactor(1.0), mContentScalingSupported(false)
     {
+        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+        mContentScalingSupported = dynamic_cast<OSXGLSupport*>(rs->getGLSupportRef())->OSVersionIsAtLeast("10.7");
     }
 
     OSXCocoaWindow::~OSXCocoaWindow()
@@ -300,7 +303,7 @@ namespace Ogre {
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
-        if(mContentScalingFactor > 1.0)
+        if(mContentScalingSupported && mContentScalingFactor > 1.0)
             [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
@@ -311,7 +314,7 @@ namespace Ogre {
             [mGLContext setView:mView];
         [mGLContext makeCurrentContext];
 
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && defined(MAC_OS_X_VERSION_10_7)
         // Crash on functions that have been removed from the API
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCECrashOnRemovedFunctions);
 #endif
@@ -338,7 +341,7 @@ namespace Ogre {
     unsigned int OSXCocoaWindow::getWidth() const
     {
         NSRect winFrame;
-        if(mContentScalingFactor > 1.0)
+        if(mContentScalingSupported && mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
@@ -348,7 +351,7 @@ namespace Ogre {
     unsigned int OSXCocoaWindow::getHeight() const
     {
         NSRect winFrame;
-        if(mContentScalingFactor > 1.0)
+        if(mContentScalingSupported && mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
@@ -676,7 +679,11 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("Creating external window");
 
-        NSRect viewBounds = [mView convertRectToBacking:[mView bounds]];
+        NSRect viewBounds;
+        if(mContentScalingSupported)
+            viewBounds = [mView convertRectToBacking:[mView bounds]];
+        else
+            viewBounds = [mView bounds];
 
         mWindow = [viewRef window];
 
@@ -703,7 +710,8 @@ namespace Ogre {
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
                 NSRect backingRect = NSZeroRect;
-                if(mContentScalingFactor > 1.0)
+
+                if(mContentScalingSupported && mContentScalingFactor > 1.0)
                     backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
                 else
                     backingRect = mainDisplayRect;

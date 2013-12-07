@@ -199,16 +199,14 @@ namespace Ogre
 			IndexData* idata = mIDataList[i];
 			// Now do index data
 			// no new buffer required, same size but some triangles remapped
-			uint16* p16 = 0;
-			uint32* p32 = 0;
 			if (idata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
 			{
-				p32 = static_cast<uint32*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
+				uint32* p32 = static_cast<uint32*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
 				remapIndexes(p32, i, res);
 			}
 			else
 			{
-				p16 = static_cast<uint16*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
+				uint16* p16 = static_cast<uint16*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
 				remapIndexes(p16, i, res);
 			}
 			idata->indexBuffer->unlock();
@@ -366,7 +364,7 @@ namespace Ogre
 			// index 0 is vertex we're calculating, 1 and 2 are the others
 
 			// We want to re-weight these by the angle the face makes with the vertex
-			// in order to obtain tesselation-independent results
+			// in order to obtain tessellation-independent results
 			Real angleWeight = calculateAngleWeight(localVertInd[v], 
 				localVertInd[(v+1)%3], localVertInd[(v+2)%3]);
 

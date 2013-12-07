@@ -57,13 +57,11 @@ namespace Ogre {
 	#define UNICODE_ZERO 0x0030
     //---------------------------------------------------------------------
     TextAreaOverlayElement::TextAreaOverlayElement(const String& name)
-        : OverlayElement(name)
+        : OverlayElement(name), mColourBottom(ColourValue::White), mColourTop(ColourValue::White)
     {
         mTransparent = false;
         mAlignment = Left;
 
-        mColourTop = ColourValue::White;
-        mColourBottom = ColourValue::White;
         mColoursChanged = true;
 
         mAllocSize = 0;

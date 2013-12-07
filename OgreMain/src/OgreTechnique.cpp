@@ -179,16 +179,16 @@ namespace Ogre {
 					return false;
 				}
 			}
-			if (currPass->hasTesselationHullProgram())
+			if (currPass->hasTessellationHullProgram())
 			{
-				// Check tesselation control program version
-				if (!currPass->getTesselationHullProgram()->isSupported() )
+				// Check tessellation control program version
+				if (!currPass->getTessellationHullProgram()->isSupported() )
 				{
 					// Can't do this one
 					compileErrors << "Pass " << passNum << 
-						": Tesselation Hull program " << currPass->getTesselationHullProgram()->getName()
+						": Tessellation Hull program " << currPass->getTessellationHullProgram()->getName()
 						<< " cannot be used - ";
-					if (currPass->getTesselationHullProgram()->hasCompileError())
+					if (currPass->getTessellationHullProgram()->hasCompileError())
 						compileErrors << "compile error.";
 					else
 						compileErrors << "not supported.";
@@ -197,16 +197,16 @@ namespace Ogre {
 					return false;
 				}
 			}
-			if (currPass->hasTesselationDomainProgram())
+			if (currPass->hasTessellationDomainProgram())
 			{
-				// Check tesselation control program version
-				if (!currPass->getTesselationDomainProgram()->isSupported() )
+				// Check tessellation control program version
+				if (!currPass->getTessellationDomainProgram()->isSupported() )
 				{
 					// Can't do this one
 					compileErrors << "Pass " << passNum << 
-						": Tesselation Domain program " << currPass->getTesselationDomainProgram()->getName()
+						": Tessellation Domain program " << currPass->getTessellationDomainProgram()->getName()
 						<< " cannot be used - ";
-					if (currPass->getTesselationDomainProgram()->hasCompileError())
+					if (currPass->getTessellationDomainProgram()->hasCompileError())
 						compileErrors << "compile error.";
 					else
 						compileErrors << "not supported.";

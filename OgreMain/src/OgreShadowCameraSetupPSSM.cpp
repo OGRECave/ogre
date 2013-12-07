@@ -36,7 +36,7 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PSSMShadowCameraSetup::PSSMShadowCameraSetup()
-		: mSplitPadding(1.0f)
+		: mSplitPadding(1.0f), mCurrentIteration(0)
 	{
 		calculateSplitPoints(3, 100, 100000);
 		setOptimalAdjustFactor(0, 5);

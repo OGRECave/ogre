@@ -643,7 +643,7 @@ namespace Ogre {
 
     void GLESRenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
     {
-        GLESContext *windowContext;
+        GLESContext *windowContext = 0;
         pWin->getCustomAttribute("GLCONTEXT", &windowContext);
         
         //1 Window <-> 1 Context, should be always true

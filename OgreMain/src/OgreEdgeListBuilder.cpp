@@ -470,7 +470,18 @@ namespace Ogre {
         // unlock the buffer
         positionBuffer->unlock();
     }
-    //---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	EdgeData* EdgeData::clone()
+	{
+		EdgeData* newEdgeData = OGRE_NEW EdgeData();
+		newEdgeData->triangles = triangles;
+		newEdgeData->triangleFaceNormals = triangleFaceNormals;
+		newEdgeData->triangleLightFacings = triangleLightFacings;
+		newEdgeData->edgeGroups = edgeGroups;
+		newEdgeData->isClosed = isClosed;
+		return newEdgeData;
+	}
+	//---------------------------------------------------------------------
     void EdgeListBuilder::log(Log* l)
     {
         l->logMessage("EdgeListBuilder Log");

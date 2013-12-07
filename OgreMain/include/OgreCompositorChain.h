@@ -202,6 +202,8 @@ namespace Ogre {
         class _OgreExport RQListener: public RenderQueueListener
         {
         public:
+            RQListener() : mOperation(0), mSceneManager(0), mRenderSystem(0), mViewport(0) {}
+
             /** @copydoc RenderQueueListener::renderQueueStarted
             */
             virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);

@@ -100,6 +100,7 @@ namespace Volume {
         mPosZScale = (Real)1.0 / (Real)worldDimension.z * (Real)mDepth;
 
         mVolumeSpaceToWorldSpaceFactor = (Real)worldDimension.x * (Real)mWidth;
+        mMaxClampedAbsoluteDensity = 0;
 
         // Read data
         size_t elementCount = mWidth * mHeight * mDepth;

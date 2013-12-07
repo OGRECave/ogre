@@ -461,7 +461,7 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    DualGridGenerator::DualGridGenerator(): mDualGrid(0)
+    DualGridGenerator::DualGridGenerator(): mDualGrid(0), mRoot(0), mSaveDualCells(0), mIs(0), mMb(0), mMaxMSDistance(0)
     {
     }
     

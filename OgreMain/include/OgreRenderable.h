@@ -244,7 +244,7 @@ namespace Ogre {
         }
 
         /** Removes a custom value which is associated with this Renderable at the given index.
-        @param index
+        @param index Index of the parameter to remove.
             @see setCustomParameter for full details.
         */
         void removeCustomParameter(size_t index)
@@ -253,7 +253,7 @@ namespace Ogre {
         }
 
         /** Checks whether a custom value is associated with this Renderable at the given index.
-        @param index
+        @param index Index of the parameter to check for existence.
             @see setCustomParameter for full details.
         */
         bool hasCustomParameter(size_t index) const
@@ -262,7 +262,7 @@ namespace Ogre {
         }
 
         /** Gets the custom value associated with this Renderable at the given index.
-        @param index
+        @param index Index of the parameter to retrieve.
             @see setCustomParameter for full details.
         */
         const Vector4& getCustomParameter(size_t index) const
@@ -341,12 +341,12 @@ namespace Ogre {
             this Renderable. This can be a pointer back to one of your own
             classes for instance.
         */
-        virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
+        OGRE_DEPRECATED virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
         /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
             Retrieves the custom user value associated with this object.
         */
-        virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+        OGRE_DEPRECATED virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.
@@ -426,5 +426,4 @@ namespace Ogre {
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"
-
 #endif //__Renderable_H__

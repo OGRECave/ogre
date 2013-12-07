@@ -37,8 +37,10 @@ PlayPenPlugin::PlayPenPlugin()
 	addSample(new PlayPen_testManualBlend());
 	addSample(new PlayPen_testProjectSphere());
 	addSample(new PlayPen_testCameraSetDirection());
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 	addSample(new PlayPen_testManualLOD());
 	addSample(new PlayPen_testManualLODFromFile());
+#endif
 	addSample(new PlayPen_testFullScreenSwitch());
 	addSample(new PlayPen_testMorphAnimationWithNormals());
 	addSample(new PlayPen_testMorphAnimationWithoutNormals());

@@ -68,6 +68,12 @@ if (OGRE_CONFIG_THREADS)
 	endif ()
 endif()
 
+set(OGRE_ASSERT_MODE 0 CACHE STRING 
+	"Enable Ogre asserts and exceptions. Possible values:
+	0 - Standard asserts in debug builds, nothing in release builds.
+	1 - Standard asserts in debug builds, exceptions in release builds.
+	2 - Exceptions in debug builds, exceptions in release builds."
+)
 
 # determine config values depending on build options
 set(OGRE_SET_DOUBLE 0)
@@ -76,8 +82,10 @@ set(OGRE_SET_CONTAINERS_USE_ALLOCATOR 0)
 set(OGRE_SET_STRING_USE_ALLOCATOR 0)
 set(OGRE_SET_MEMTRACK_DEBUG 0)
 set(OGRE_SET_MEMTRACK_RELEASE 0)
+set(OGRE_SET_ASSERT_MODE ${OGRE_ASSERT_MODE})
 set(OGRE_SET_THREADS ${OGRE_CONFIG_THREADS})
 set(OGRE_SET_THREAD_PROVIDER ${OGRE_THREAD_PROVIDER})
+set(OGRE_SET_DISABLE_MESHLOD 0)
 set(OGRE_SET_DISABLE_FREEIMAGE 0)
 set(OGRE_SET_DISABLE_DDS 0)
 set(OGRE_SET_DISABLE_PVRTC 0)
@@ -109,6 +117,9 @@ if (OGRE_CONFIG_MEMTRACK_DEBUG)
 endif()
 if (OGRE_CONFIG_MEMTRACK_RELEASE)
   set(OGRE_SET_MEMTRACK_RELEASE 1)
+endif()
+if (NOT OGRE_CONFIG_ENABLE_MESHLOD)
+  set(OGRE_SET_DISABLE_MESHLOD 1)
 endif()
 if (NOT OGRE_CONFIG_ENABLE_FREEIMAGE)
   set(OGRE_SET_DISABLE_FREEIMAGE 1)
@@ -225,6 +236,11 @@ if (UNIX)
     install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Paging.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
 
+  if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-MeshLodGenerator.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-MeshLodGenerator.pc @ONLY)
+    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-MeshLodGenerator.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+  
   if (OGRE_BUILD_COMPONENT_TERRAIN)
     if (OGRE_BUILD_COMPONENT_PAGING)
       set(OGRE_PAGING_ADDITIONAL_PACKAGES ", OGRE-Paging = ${OGRE_VERSION}")

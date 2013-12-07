@@ -463,8 +463,8 @@ namespace Ogre {
     {
         mSurfaceList.clear();
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
+        mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
         mTextureID = 0;
-		mGLSupport.getStateCacheManager()->invalidateStateForTexture( mTextureID );
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
