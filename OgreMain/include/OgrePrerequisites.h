@@ -129,6 +129,7 @@ namespace Ogre {
     class AnimationStateSet;
     class AnimationTrack;
 	class ArrayMatrix4;
+	class ArrayMatrixAf4x3;
 	class ArrayQuaternion;
 	class ArrayVector3;
 	class ArrayMemoryManager;
@@ -143,6 +144,8 @@ namespace Ogre {
     class BillboardChain;
     class BillboardSet;
     class Bone;
+	class BoneMemoryManager;
+	struct BoneTransform;
     class Camera;
     class Codec;
     class ColourValue;
@@ -278,8 +281,9 @@ namespace Ogre {
 	class ScriptLoader;
     class Serializer;
 	class ShadowTextureManager;
+	struct SimpleMatrixAf4x3;
     class SimpleRenderable;
-    class SimpleSpline;
+	class SimpleSpline;
     class Skeleton;
 	class SkeletonInstance;
     class SkeletonManager;

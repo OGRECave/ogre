@@ -33,11 +33,22 @@ namespace Ogre
 		size_t idx = (size_t)x | ( (size_t)y << 1 ) | ( (size_t)z << 2 ) | ( (size_t)w << 3 );
 		return mMasks[idx];
 	}
-
+	//--------------------------------------------------------------------------------------
 	inline ArrayReal BooleanMask4::getMask( bool b[4] )
 	{
 		size_t idx = (size_t)b[0] | ( (size_t)b[1] << 1 ) | ( (size_t)b[2] << 2 ) | ( (size_t)b[3] << 3 );
 		return mMasks[idx];
+	}
+	//--------------------------------------------------------------------------------------
+	inline bool BooleanMask4::allBitsSet( bool mask0[4], bool mask1[4] )
+	{
+#if __cplusplus > 199711L //C++11
+		static_assert( sizeof(bool) == 1 && sizeof(uint32) == 4,
+					   "This code relies on correct casting!" );
+#else
+		assert( sizeof(bool) == 1 && sizeof(uint32) == 4 && "This code relies on correct casting!" );
+#endif
+		return ( *reinterpret_cast<uint32*>(mask0) & *reinterpret_cast<uint32*>(mask1) ) == 0x01010101;
 	}
 	//--------------------------------------------------------------------------------------
 	inline uint32 BooleanMask4::getScalarMask( ArrayReal mask )
@@ -54,6 +65,8 @@ namespace Ogre
 	#define IS_SET_MASK_Y( intMask ) ((intMask & MASK_Z) != 0)
 	#define IS_SET_MASK_Z( intMask ) ((intMask & MASK_Y) != 0)
 	#define IS_SET_MASK_W( intMask ) ((intMask & MASK_X) != 0)
+
+	#define MASK_ALL_BITS_SET 4
 
 	#define IS_BIT_SET( bit, intMask ) ( (intMask & (1 << bit) ) != 0)
 }

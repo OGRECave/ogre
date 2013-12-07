@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonAnimationDef.h"
 #include "Animation/OgreBone.h"
-#include "Math/Array/OgreNodeMemoryManager.h"
+#include "Math/Array/OgreBoneMemoryManager.h"
 #include "Math/Array/OgreKfTransformArrayMemoryManager.h"
 
 #include "OgreId.h"
@@ -102,8 +102,8 @@ namespace Ogre
 
 		//Create the bones (just like we would for SkeletonInstance)so we can
 		//get derived position/rotation/scale and then calculate its inverse
-		NodeMemoryManager nodeMemoryManager;
-		vector<Bone>::type boneNodes( mBones.size(), Bone( Transform() ) );
+		BoneMemoryManager boneMemoryManager;
+		vector<Bone>::type boneNodes( mBones.size(), Bone( BoneTransform() ) );
 		vector<list<size_t>::type>::type::const_iterator itDepth = mBonesPerDepth.begin();
 		vector<list<size_t>::type>::type::const_iterator enDepth = mBonesPerDepth.end();
 
@@ -122,8 +122,8 @@ namespace Ogre
 					parent = &boneNodes[parentIdx];
 
 				boneNodes[*bonesItor].~Bone();
-				new (&boneNodes[*bonesItor]) Bone( Id::generateNewId<Node>(), (SceneManager*)0,
-												&nodeMemoryManager, parent, 0 );
+				new (&boneNodes[*bonesItor]) Bone( Id::generateNewId<Bone>(), &boneMemoryManager,
+													parent, 0 );
 				Bone &newBone = boneNodes[*bonesItor];
 				newBone.setPosition( boneData.vPos );
 				newBone.setOrientation( boneData.qRot );
@@ -144,11 +144,11 @@ namespace Ogre
 
 		//Calculate in bulk. Calling getDerivedPositionUpdated & Co like
 		//we need would need, has O(N!) complexity.
-		for( size_t i=0; i<nodeMemoryManager.getNumDepths(); ++i )
+		for( size_t i=0; i<boneMemoryManager.getNumDepths(); ++i )
 		{
-			Transform t;
-			const size_t numNodes = nodeMemoryManager.getFirstNode( t, i );
-			Node::updateAllTransforms( numNodes, t );
+			BoneTransform t;
+			const size_t numNodes = boneMemoryManager.getFirstNode( t, i );
+			Bone::updateAllTransforms( numNodes, t, &ArrayMatrixAf4x3::IDENTITY, 1 );
 		}
 
 		{
@@ -156,12 +156,12 @@ namespace Ogre
 
 			//Create initial bind pose.
 			mBindPose = RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>( numBoneBlocks );
-			RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> derivedPosesPtr =
-						RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>( numBoneBlocks );
+			RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION> derivedPosesPtr =
+						RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION>( numBoneBlocks );
 
 			size_t bindPoseIndex = 0;
 			KfTransform *bindPose = mBindPose.get();
-			KfTransform *derivedPose = derivedPosesPtr.get();
+			SimpleMatrixAf4x3 *derivedPose = derivedPosesPtr.get();
 
 			size_t currentDepthLevel = 0;
 			DepthLevelInfoVec::const_iterator bonesItor = mDepthLevelInfoVec.begin();
@@ -179,19 +179,14 @@ namespace Ogre
 					bindPose->mScale.setFromVector3( boneData.vScale, bindPoseIndex );
 
 					const Bone &derivedBone = boneNodes[*itBoneIdx];
-					derivedPose->mPosition.setFromVector3(
-										derivedBone._getDerivedPosition(), bindPoseIndex );
-					derivedPose->mOrientation.setFromQuaternion(
-										derivedBone._getDerivedOrientation(), bindPoseIndex );
-					derivedPose->mScale.setFromVector3(
-										derivedBone._getDerivedScale(), bindPoseIndex );
+					derivedPose[bindPoseIndex] = derivedBone._getFullTransform();
 
 					++bindPoseIndex;
 					if( bindPoseIndex >= ARRAY_PACKED_REALS )
 					{
 						bindPoseIndex = 0;
 						++bindPose;
-						++derivedPose;
+						derivedPose += ARRAY_PACKED_REALS;
 					}
 
 					++itBoneIdx;
@@ -213,19 +208,14 @@ namespace Ogre
 						bindPose->mScale.getAsVector3( vTmp, k );
 						bindPose->mScale.setFromVector3( vTmp, j );
 
-						derivedPose->mPosition.getAsVector3( vTmp, k );
-						derivedPose->mPosition.setFromVector3( vTmp, j );
-						derivedPose->mOrientation.getAsQuaternion( qTmp, k );
-						derivedPose->mOrientation.setFromQuaternion( qTmp, j );
-						derivedPose->mScale.getAsVector3( vTmp, k );
-						derivedPose->mScale.setFromVector3( vTmp, j );
+						derivedPose[j] = derivedPose[k];
 
 						k = (k+1) % bonesItor->numBonesInLevel;
 					}
 
 					bindPoseIndex = 0;
 					++bindPose;
-					++derivedPose;
+					derivedPose += ARRAY_PACKED_REALS;
 				}
 				else if( bindPoseIndex != 0 )
 				{
@@ -238,15 +228,12 @@ namespace Ogre
 						bindPose->mOrientation.setFromQuaternion( Quaternion::IDENTITY, bindPoseIndex );
 						bindPose->mScale.setFromVector3( Vector3::UNIT_SCALE, bindPoseIndex );
 
-						derivedPose->mPosition.setFromVector3( Vector3::ZERO, bindPoseIndex );
-						derivedPose->mOrientation.setFromQuaternion( Quaternion::IDENTITY,
-																		 bindPoseIndex );
-						derivedPose->mScale.setFromVector3( Vector3::UNIT_SCALE, bindPoseIndex );
+						derivedPose[bindPoseIndex] = SimpleMatrixAf4x3::IDENTITY;
 					}
 
 					bindPoseIndex = 0;
 					++bindPose;
-					++derivedPose;
+					derivedPose += ARRAY_PACKED_REALS;
 				}
 
 				++currentDepthLevel;
@@ -255,15 +242,14 @@ namespace Ogre
 
 			//Now set the reverse of the binding pose (so we can pass the
 			//construct the derived transform matrices in the correct space)
-			mReverseBindPose = RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>( numBoneBlocks );
-			KfTransform *reverseBindPose = mReverseBindPose.get();
+			mReverseBindPose = RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>(numBoneBlocks);
+			ArrayMatrixAf4x3 *reverseBindPose = mReverseBindPose.get();
 			derivedPose = derivedPosesPtr.get();
 			for( size_t i=0; i<numBoneBlocks; ++i )
 			{
-				reverseBindPose[i].mPosition	= -derivedPose[i].mPosition;
-				reverseBindPose[i].mOrientation	= derivedPose[i].mOrientation.Inverse();
-				reverseBindPose[i].mScale		= derivedPose[i].mScale;
-				reverseBindPose[i].mScale.inverseLeaveZeroes();
+				reverseBindPose[i].loadFromAoS( derivedPose );
+				reverseBindPose[i].setToInverseDegeneratesAsIdentity();
+				derivedPose += ARRAY_PACKED_REALS;
 			}
 		}
 

@@ -426,13 +426,7 @@ namespace Ogre {
 #ifndef NDEBUG
 		mCachedTransformOutOfDate = true;
 #endif
-    }
-    //-----------------------------------------------------------------------
-    void Node::setPosition(Real x, Real y, Real z)
-    {
-        Vector3 v(x,y,z);
-        setPosition(v);
-    }
+	}
     //-----------------------------------------------------------------------
     Vector3 Node::getPosition(void) const
     {

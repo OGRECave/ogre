@@ -90,6 +90,7 @@ if (OGRE_SIMD_SSE2)
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
 	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
@@ -97,11 +98,13 @@ if (OGRE_SIMD_SSE2)
 	set (HEADER_FILES ${HEADER_FILES}
 	  include/Math/Array/SSE2/Single/OgreArrayAabb.h
 	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.h
+	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.h
 	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.h
 	  include/Math/Array/SSE2/Single/OgreArrayVector3.h
 	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.h
 	  include/Math/Array/SSE2/Single/OgreArrayAabb.inl
 	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.inl
 	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.inl
 	  include/Math/Array/SSE2/Single/OgreArrayVector3.inl
 	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.inl)

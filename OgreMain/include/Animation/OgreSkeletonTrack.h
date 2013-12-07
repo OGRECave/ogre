@@ -48,7 +48,7 @@ namespace Ogre
 
 	typedef vector<KeyFrameRig>::type KeyFrameRigVec;
 
-	typedef FastArray<Transform> TransformArray;
+	typedef FastArray<BoneTransform> TransformArray;
 
 	class SkeletonTrack : public AnimationAlloc
 	{

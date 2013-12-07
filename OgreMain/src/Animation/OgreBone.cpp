@@ -29,90 +29,160 @@ THE SOFTWARE.
 #include "Animation/OgreBone.h"
 #include "OgreLogManager.h"
 
+#include "Math/Array/OgreBoneMemoryManager.h"
 #include "Math/Array/OgreKfTransform.h"
 #include "Math/Array/OgreBooleanMask.h"
 
+#ifndef NDEBUG
+	#define CACHED_TRANSFORM_OUT_OF_DATE() this->setCachedTransformOutOfDate()
+#else
+	#define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
+#endif
+
 namespace Ogre {
-	Bone::Bone( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
-				SceneNode *parent, KfTransform const * RESTRICT_ALIAS reverseBind ) : 
-		SceneNode( id, creator, nodeMemoryManager, parent ),
-		mReverseBind( reverseBind )
+	Bone::Bone( IdType id, BoneMemoryManager *boneMemoryManager,
+				Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind ) :
+		IdObject( id ),
+		mReverseBind( reverseBind ),
+#ifndef NDEBUG
+		mCachedTransformOutOfDate( true ),
+#endif
+		mDepthLevel( 0 ),
+		mParent( parent ),
+		mName( "" ),
+		mBoneMemoryManager( boneMemoryManager ),
+		mGlobalIndex( -1 ),
+		mParentIndex( -1 )
 	{
+		if( mParent )
+			mDepthLevel = mParent->mDepthLevel + 1;
+
+		//Will initialize mTransform
+		mBoneMemoryManager->nodeCreated( mTransform, mDepthLevel );
+		mTransform.mOwner[mTransform.mIndex] = this;
+		if( mParent )
+		{
+			const BoneTransform parentTransform = mParent->mTransform;
+			mTransform.mParents[mTransform.mIndex] = mParent;
+			mTransform.mParentTransform[mTransform.mIndex] =
+								&parentTransform.mDerivedTransform[parentTransform.mIndex];
+		}
 	}
 	//-----------------------------------------------------------------------
-	Bone::Bone( const Transform &transformPtrs ) : SceneNode( transformPtrs )
+	Bone::Bone( const BoneTransform transformPtrs ) :
+		IdObject( 0 ),
+		mReverseBind( 0 ),
+#ifndef NDEBUG
+		mCachedTransformOutOfDate( true ),
+#endif
+		mDepthLevel( 0 ),
+		mParent( 0 ),
+		mName( "@Dummy Bone" ),
+		mBoneMemoryManager( 0 ),
+		mGlobalIndex( -1 ),
+		mParentIndex( -1 )
 	{
+		mTransform = transformPtrs;
 	}
 	//-----------------------------------------------------------------------
 	Bone::~Bone()
 	{
+		removeAllChildren();
+		if( mParent )
+			mParent->removeChild( this );
+
+		if( mBoneMemoryManager )
+			mBoneMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
+		mDepthLevel = 0;
+	}
+	//-----------------------------------------------------------------------
+	void Bone::setCachedTransformOutOfDate(void) const
+	{
+#ifndef NDEBUG
+		mCachedTransformOutOfDate = true;
+
+		BoneVec::const_iterator itor = mChildren.begin();
+		BoneVec::const_iterator end  = mChildren.end();
+
+		while( itor != end )
+		{
+			(*itor)->setCachedTransformOutOfDate();
+			++itor;
+		}
+#else
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+					"Do not call setCachedTransformOutOfDate in Release builds.\n"
+					"Use CACHED_TRANSFORM_OUT_OF_DATE macro instead!",
+					"Bone::setCachedTransformOutOfDate" );
+#endif
+	}
+	//-----------------------------------------------------------------------
+	void Bone::setInheritOrientation(bool inherit)
+	{
+		mTransform.mInheritOrientation[mTransform.mIndex] = inherit;
+		CACHED_TRANSFORM_OUT_OF_DATE();
+	}
+	//-----------------------------------------------------------------------
+	bool Bone::getInheritOrientation(void) const
+	{
+		return mTransform.mInheritOrientation[mTransform.mIndex];
+	}
+	//-----------------------------------------------------------------------
+	void Bone::setInheritScale(bool inherit)
+	{
+		mTransform.mInheritScale[mTransform.mIndex] = inherit;
+		CACHED_TRANSFORM_OUT_OF_DATE();
+	}
+	//-----------------------------------------------------------------------
+	bool Bone::getInheritScale(void) const
+	{
+		return mTransform.mInheritScale[mTransform.mIndex];
+	}
+	//-----------------------------------------------------------------------
+	const SimpleMatrixAf4x3& Bone::_getFullTransformUpdated(void)
+	{
+		_updateFromParent();
+		return mTransform.mDerivedTransform[mTransform.mIndex];
+	}
+	//-----------------------------------------------------------------------
+	void Bone::_updateFromParent(void)
+	{
+		if( mParent )
+			mParent->_updateFromParent();
+
+		updateFromParentImpl();
 	}
 	//-----------------------------------------------------------------------
 	void Bone::updateFromParentImpl(void)
 	{
 		//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
-		ArrayVector3 parentPos, parentScale;
-		ArrayQuaternion parentRot;
+		ArrayMatrixAf4x3 parentMat;
+		parentMat.loadFromAoS( mTransform.mParentTransform );
 
-		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+		//ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
+		//general case is to inherit both attributes. This branch is justified.
+		if( BooleanMask4::allBitsSet( mTransform.mInheritOrientation, mTransform.mInheritScale ) )
 		{
-			Vector3 pos, scale;
-			Quaternion qRot;
-			const Transform &parentTransform = mTransform.mParents[j]->mTransform;
-			parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
-			parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
-			parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
-
-			parentPos.setFromVector3( pos, j );
-			parentRot.setFromQuaternion( qRot, j );
-			parentScale.setFromVector3( scale, j );
+			ArrayMaskR inheritOrientation	= BooleanMask4::getMask( mTransform.mInheritOrientation );
+			ArrayMaskR inheritScale			= BooleanMask4::getMask( mTransform.mInheritScale );
+			parentMat.retain( inheritOrientation, inheritScale );
 		}
 
-		parentRot.Cmov4( BooleanMask4::getMask( mTransform.mInheritOrientation ),
-						 ArrayQuaternion::IDENTITY );
-		parentScale.Cmov4( BooleanMask4::getMask( mTransform.mInheritScale ),
-							ArrayVector3::UNIT_SCALE );
-
-		// Scale own position by parent scale, NB just combine
-        // as equivalent axes, no shearing
-        *mTransform.mDerivedScale = parentScale * (*mTransform.mScale);
-
-		// Combine orientation with that of parent
-		*mTransform.mDerivedOrientation = parentRot * (*mTransform.mOrientation);
-
-		// Change position vector based on parent's orientation & scale
-		*mTransform.mDerivedPosition = parentRot * (parentScale * (*mTransform.mPosition));
-
-		// Add altered position vector to parents
-		*mTransform.mDerivedPosition += parentPos;
+		ArrayMatrixAf4x3 mat;
+		mat.makeTransform( *mTransform.mPosition, *mTransform.mScale, *mTransform.mOrientation );
+		mat = (*mReverseBind) * parentMat * mat;
 
 		/*
-				Calculating the bone matrices
-				-----------------------------
-				Now that we have the derived scaling factors, orientations & positions in the
-				OldBone nodes, we have to compute the Matrix4 to apply to the vertices of a mesh.
-				Because any modification of a vertex has to be relative to the bone, we must
-				first reverse transform by the OldBone's original derived position/orientation/scale,
-				then transform by the new derived position/orientation/scale.
-				Also note we combine scale as equivalent axes, no shearing.
-			*/
+			Calculating the bone matrices
+			-----------------------------
+			Now that we have the derived scaling factors, orientations & positions matrices,
+			we have to compute the Matrix4x3 to apply to the vertices of a mesh.
+			Because any modification of a vertex has to be relative to the bone, we must
+			first reverse transform by the Bone's original derived position/orientation/scale,
+			then transform by the new derived position/orientation/scale.
+		*/
+		mat.storeToAoS( mTransform.mDerivedTransform );
 
-		ArrayVector3 locScale = *mTransform.mDerivedScale * mReverseBind->mScale;
-
-		// Combine orientation with binding pose inverse orientation
-		ArrayQuaternion locRotate = *mTransform.mDerivedOrientation * mReverseBind->mOrientation;
-
-		// Combine position with binding pose inverse position,
-		// Note that translation is relative to scale & rotation,
-		// so first reverse transform original derived position to
-		// binding pose bone space, and then transform to current
-		// derived bone space.
-		ArrayVector3 locPos = *mTransform.mDerivedPosition +
-								locRotate * (locScale * mReverseBind->mPosition);
-
-		ArrayMatrix4 derivedTransform;
-		derivedTransform.makeTransform( locPos, locScale, locRotate );
-		derivedTransform.storeToAoS( mTransform.mDerivedTransform );
 #ifndef NDEBUG
 		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 		{
@@ -122,81 +192,46 @@ namespace Ogre {
 #endif
 	}
 	//-----------------------------------------------------------------------
-	void Bone::updateAllTransforms( const size_t numNodes, Transform t,
-									KfTransform const * RESTRICT_ALIAS _reverseBind,
+	void Bone::updateAllTransforms( const size_t numNodes, BoneTransform t,
+									ArrayMatrixAf4x3 const * RESTRICT_ALIAS _reverseBind,
 									size_t numBinds )
 	{
 		size_t currentBind = 0;
 		numBinds = (numBinds + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS;
 
-		ArrayMatrix4 derivedTransform;
+		ArrayMatrixAf4x3 derivedTransform;
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
-			ArrayVector3 parentPos, parentScale;
-			ArrayQuaternion parentRot;
+			ArrayMatrixAf4x3 parentMat;
 
-			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			parentMat.loadFromAoS( t.mParentTransform );
+
+			//ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
+			//general case is to inherit both attributes. This branch is justified.
+			if( BooleanMask4::allBitsSet( t.mInheritOrientation, t.mInheritScale ) )
 			{
-				Vector3 pos, scale;
-				Quaternion qRot;
-				const Transform &parentTransform = t.mParents[j]->mTransform;
-				parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
-				parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
-				parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
-
-				parentPos.setFromVector3( pos, j );
-				parentRot.setFromQuaternion( qRot, j );
-				parentScale.setFromVector3( scale, j );
+				ArrayMaskR inheritOrientation	= BooleanMask4::getMask( t.mInheritOrientation );
+				ArrayMaskR inheritScale			= BooleanMask4::getMask( t.mInheritScale );
+				parentMat.retain( inheritOrientation, inheritScale );
 			}
 
-			parentRot.Cmov4( BooleanMask4::getMask( t.mInheritOrientation ),
-							 ArrayQuaternion::IDENTITY );
-			parentScale.Cmov4( BooleanMask4::getMask( t.mInheritScale ),
-								ArrayVector3::UNIT_SCALE );
+			const ArrayMatrixAf4x3 * RESTRICT_ALIAS reverseBind = _reverseBind + currentBind;
 
-			// Scale own position by parent scale, NB just combine
-            // as equivalent axes, no shearing
-            *t.mDerivedScale = parentScale * (*t.mScale);
-
-			// Combine orientation with that of parent
-			*t.mDerivedOrientation = parentRot * (*t.mOrientation);
-
-			// Change position vector based on parent's orientation & scale
-			*t.mDerivedPosition = parentRot * (parentScale * (*t.mPosition));
-
-			// Add altered position vector to parents
-			*t.mDerivedPosition += parentPos;
+			derivedTransform.makeTransform( *t.mPosition, *t.mScale, *t.mOrientation );
+			derivedTransform = (*reverseBind) * parentMat * derivedTransform;
 
 			/*
 				Calculating the bone matrices
 				-----------------------------
-				Now that we have the derived scaling factors, orientations & positions in the
-				OldBone nodes, we have to compute the Matrix4 to apply to the vertices of a mesh.
+				Now that we have the derived scaling factors, orientations & positions matrices,
+				we have to compute the Matrix4x3 to apply to the vertices of a mesh.
 				Because any modification of a vertex has to be relative to the bone, we must
-				first reverse transform by the OldBone's original derived position/orientation/scale,
+				first reverse transform by the Bone's original derived position/orientation/scale,
 				then transform by the new derived position/orientation/scale.
-				Also note we combine scale as equivalent axes, no shearing.
 			*/
-
-			const KfTransform * RESTRICT_ALIAS reverseBind = _reverseBind + currentBind;
-
-			// Combine scale with binding pose inverse scale,
-			// NB just combine as equivalent axes, no shearing
-			ArrayVector3 locScale = *t.mDerivedScale * reverseBind->mScale;
-
-			// Combine orientation with binding pose inverse orientation
-			ArrayQuaternion locRotate = *t.mDerivedOrientation * reverseBind->mOrientation;
-
-			// Combine position with binding pose inverse position,
-			// Note that translation is relative to scale & rotation,
-			// so first reverse transform original derived position to
-			// binding pose bone space, and then transform to current
-			// derived bone space.
-			ArrayVector3 locPos = *t.mDerivedPosition + locRotate * (locScale * reverseBind->mPosition);
-
-			derivedTransform.makeTransform( locPos, locScale, locRotate );
 			derivedTransform.storeToAoS( t.mDerivedTransform );
+
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 			{
@@ -210,37 +245,6 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	bool Bone::setStatic( bool bStatic )
-	{
-		static bool warned = false;
-		if( !warned )
-		{
-			LogManager::getSingleton().logMessage( "WARNING: Bones do not support being static" );
-			warned = true;
-		}
-
-		return false;
-	}
-	//-----------------------------------------------------------------------
-	void Bone::_notifyStaticDirty(void) const
-	{
-		assert( "Bone::_notifyStaticDirty shouldn't be called (no static for bones)" );
-	}
-	//-----------------------------------------------------------------------
-	void Bone::removeAndDestroyChild( SceneNode *sceneNode )
-	{
-		//TODO
-		OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Bones can't remove their children.",
-					"Bone::removeAndDestroyChild" );
-	}
-	//-----------------------------------------------------------------------
-	void Bone::removeAndDestroyAllChildren(void)
-	{
-		//TODO
-		OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Bones can't remove their children.",
-					"Bone::removeAndDestroyChild" );
-	}
-	//-----------------------------------------------------------------------
 	void Bone::_notifyOfChild( Bone *node )
 	{
 		mChildren.push_back( node );
@@ -248,3 +252,4 @@ namespace Ogre {
 	}
 }
 
+#undef CACHED_TRANSFORM_OUT_OF_DATE

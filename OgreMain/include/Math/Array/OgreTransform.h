@@ -109,7 +109,6 @@ namespace Ogre
 
 			Vector3 tmp;
 			Quaternion qTmp;
-			Matrix4 matTmp;
 
 			//Position
 			copy.mPosition->getAsVector3( tmp, copy.mIndex );

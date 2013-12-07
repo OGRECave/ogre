@@ -83,8 +83,8 @@ namespace Ogre
 		BoneNameMap				mBoneIndexByName;
 		SkeletonAnimationDefVec mAnimationDefs;
 
-		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> mBindPose;
-		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> mReverseBindPose;
+		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>		mBindPose;
+		RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>	mReverseBindPose;
 
 		DepthLevelInfoVec		mDepthLevelInfoVec;
 

@@ -92,7 +92,7 @@ namespace Ogre
 		BoneVec					mUnusedNodes;
 
 	public:
-		SkeletonInstance( const SkeletonDef *skeletonDef, NodeMemoryManager *nodeMemoryManager );
+		SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
 		~SkeletonInstance();
 
 		void update(void);
@@ -114,16 +114,16 @@ namespace Ogre
 		@param isManual
 			True to set to manual, false to restore it.
 		*/
-		void setManualBone( SceneNode *bone, bool isManual );
+		void setManualBone( Bone *bone, bool isManual );
 
 		/** Returns true if the bone is manually controlled. @See setManualBone
 		@param bone
 			Bone to query if manual. Must belong to this SkeletonInstance.
 		*/
-		bool isManualBone( SceneNode *bone );
+		bool isManualBone( Bone *bone );
 
 		/// Gets the bone with given name. Throws if not found.
-		SceneNode* getBone( IdString boneName );
+		Bone* getBone( IdString boneName );
 
 		bool hasAnimation( IdString name ) const;
 		/// Returns the requested animations. Throws if not found. O(N) Linear search
@@ -135,7 +135,7 @@ namespace Ogre
 		/// Internal use. Disables given animation. Input should belong to us and already being animated.
 		void _disableAnimation( SkeletonAnimation *animation );
 
-		void getTransforms( Matrix4 * RESTRICT_ALIAS outTransform,
+		void getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,
 							const FastArray<unsigned short> &usedBones ) const;
 	};
 

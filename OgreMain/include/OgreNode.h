@@ -62,12 +62,7 @@ namespace Ogre {
         e.g. SceneNode, Bone
     */
 	class _OgreExport Node : public NodeAlloc, public IdObject
-    {
-		/** Actually we just need Bone::updateAllTransforms and Bone::updateFromParentImpl
-			to be friends, but I don't see how to that without including OgreBone.h :(
-		*/
-		friend class Bone;
-
+	{
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -152,7 +147,7 @@ namespace Ogre {
             to update it's complete transformation based on it's parents
             derived transform.
         */
-        virtual void _updateFromParent(void);
+		void _updateFromParent(void);
 
         /** Class-specific implementation of _updateFromParent.
         @remarks

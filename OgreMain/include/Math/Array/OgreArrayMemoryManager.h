@@ -68,6 +68,7 @@ namespace Ogre
 		{
 			NodeType,
 			ObjectDataType,
+			BoneType,
 
 			// User defined types in case you may want to have more than
 			// one NodeArrayMemoryManager, or your own custom ones
