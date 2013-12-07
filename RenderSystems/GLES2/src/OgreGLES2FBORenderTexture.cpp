@@ -507,7 +507,7 @@ namespace Ogre {
 #endif
     }
     
-    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLES2SurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
@@ -526,7 +526,7 @@ namespace Ogre {
             else
             {
                 // New one
-                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, (GLint)fsaa);
+                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;

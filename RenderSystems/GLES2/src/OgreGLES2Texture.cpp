@@ -182,7 +182,7 @@ namespace Ogre {
             
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
-            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
+            for (GLint mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
@@ -271,7 +271,7 @@ namespace Ogre {
             GLenum datatype = GLES2PixelUtil::getGLOriginDataType(mFormat);
 
             // Run through this process to pregenerate mipmap pyramid
-            for(size_t mip = 0; mip <= mNumMipmaps; mip++)
+            for(GLint mip = 0; mip <= mNumMipmaps; mip++)
             {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +

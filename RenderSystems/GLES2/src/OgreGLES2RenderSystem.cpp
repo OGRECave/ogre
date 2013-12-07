@@ -1696,15 +1696,15 @@ namespace Ogre {
 
                 if(hasInstanceData && (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)))
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
                 else
                 {
 #if OGRE_NO_GLES3_SUPPORT == 0
                     GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
 #else
-                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
 #endif
                 }
 
@@ -1724,11 +1724,11 @@ namespace Ogre {
 
                 if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
 				{
-					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
+					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
 				}
 				else
 				{
-                    OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount));
+                    OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount)));
 				}
             } while (updatePassIterationRenderState());
         }
@@ -1784,7 +1784,7 @@ namespace Ogre {
         //  GL measures from the bottom, not the top
         size_t targetHeight = mActiveRenderTarget->getHeight();
         // Calculate the "lower-left" corner of the viewport
-        GLsizei w, h, x, y;
+        size_t w, h, x, y;
 
         if (enabled)
         {
@@ -1797,7 +1797,10 @@ namespace Ogre {
                 y = targetHeight - bottom;
             w = right - left;
             h = bottom - top;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
         else
         {
@@ -1810,7 +1813,10 @@ namespace Ogre {
                 y = mActiveViewport->getActualTop();
             else
                 y = targetHeight - mActiveViewport->getActualTop() - h;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
     }
 
@@ -2378,7 +2384,7 @@ namespace Ogre {
                 {
                     if (hwGlBuffer->isInstanceData())
                     {
-                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, hwGlBuffer->getInstanceDataStepRate()));
+                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
                         instanceAttribsBound.push_back(attrib);
                     }
                 }
