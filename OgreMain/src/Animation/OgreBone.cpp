@@ -117,6 +117,7 @@ namespace Ogre {
 				}
 			}
 
+			mParent = 0;
 			mDepthLevel = 0;
 		}
 	}

@@ -157,7 +157,8 @@ namespace Ogre
 			//Create initial bind pose.
 			mBindPose = RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>( numBoneBlocks );
 			RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION> derivedPosesPtr =
-						RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION>( numBoneBlocks );
+						RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION>(
+															numBoneBlocks * ARRAY_PACKED_REALS );
 
 			size_t bindPoseIndex = 0;
 			KfTransform *bindPose = mBindPose.get();

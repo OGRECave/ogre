@@ -388,10 +388,12 @@ namespace Ogre
 		ArrayVector3 row2( mChunkBase[8], mChunkBase[9], mChunkBase[10] );
 
 		ArrayVector3 vScale( row0.length(), row1.length(), row2.length() );
+		ArrayVector3 vInvScale( vScale );
+		vInvScale.inverseLeaveZeroes();
 
-		row0 *= MathlibSSE2::Inv4( vScale.mChunkBase[0] );
-		row1 *= MathlibSSE2::Inv4( vScale.mChunkBase[1] );
-		row2 *= MathlibSSE2::Inv4( vScale.mChunkBase[2] );
+		row0 *= vInvScale.mChunkBase[0];
+		row1 *= vInvScale.mChunkBase[1];
+		row2 *= vInvScale.mChunkBase[2];
 
 		vScale.Cmov4( scale, ArrayVector3::UNIT_SCALE );
 
@@ -493,17 +495,17 @@ namespace Ogre
 							this->mChunkBase[0], this->mChunkBase[1],
 							this->mChunkBase[2], this->mChunkBase[3],
 							dst[0].mChunkBase[0], dst[1].mChunkBase[0],
-							dst[1].mChunkBase[0], dst[2].mChunkBase[0] );
+							dst[2].mChunkBase[0], dst[3].mChunkBase[0] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							this->mChunkBase[4], this->mChunkBase[5],
 							this->mChunkBase[6], this->mChunkBase[7],
 							dst[0].mChunkBase[1], dst[1].mChunkBase[1],
-							dst[1].mChunkBase[1], dst[2].mChunkBase[1] );
+							dst[2].mChunkBase[1], dst[3].mChunkBase[1] );
 		_MM_TRANSPOSE4_SRC_DST_PS(
 							this->mChunkBase[8], this->mChunkBase[9],
 							this->mChunkBase[10], this->mChunkBase[11],
 							dst[0].mChunkBase[2], dst[1].mChunkBase[2],
-							dst[1].mChunkBase[2], dst[2].mChunkBase[2] );
+							dst[2].mChunkBase[2], dst[3].mChunkBase[2] );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS src )

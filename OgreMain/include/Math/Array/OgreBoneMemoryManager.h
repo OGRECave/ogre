@@ -49,7 +49,7 @@ namespace Ogre
 		Note that some SceneManager implementations (i.e. Octree like) may want to have more
 		than one BoneMemoryManager, for example one per octant.
 	*/
-	class BoneMemoryManager : ArrayMemoryManager::RebaseListener
+	class _OgreExport BoneMemoryManager : ArrayMemoryManager::RebaseListener
 	{
 		typedef vector<BoneArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth

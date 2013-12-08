@@ -51,7 +51,7 @@ namespace Ogre
 	*/
 
 	/// Represents the instance of a Skeletal animation based on its definition
-	class SkeletonAnimation : public MovableAlloc
+	class _OgreExport SkeletonAnimation : public MovableAlloc
 	{
 		SkeletonAnimationDef const	*mDefinition;
 	protected:
