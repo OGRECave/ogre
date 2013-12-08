@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGLES2Support.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
+#include "OgreBitwise.h"
 
 namespace Ogre {
     static inline void doImageIO(const String &name, const String &group,
@@ -120,7 +121,7 @@ namespace Ogre {
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
-        
+
 		// Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
            
@@ -129,10 +130,17 @@ namespace Ogre {
         
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
-        Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
 
-        if(gleswIsSupported(3, 0))
-            mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps);
+        if(!Bitwise::isPO2(mWidth) || !Bitwise::isPO2(mHeight))
+            mMipmapsHardwareGenerated = false;
+
+        // glGenerateMipmap require all mip levels to be prepared. So override how many this texture has.
+        if(mMipmapsHardwareGenerated && (maxMips > mNumMipmaps))
+           mNumMipmaps = maxMips;
+
+        if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
+            mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps + 1);
 
 		// Set some misc default parameters, these can of course be changed later
 		mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
@@ -233,7 +241,7 @@ namespace Ogre {
                 {
                     height = height / 2;
                 }
-				if(depth>1 && mTextureType != TEX_TYPE_2D_ARRAY)
+				if(depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 {
                     depth = depth / 2;
                 }
@@ -318,11 +326,11 @@ namespace Ogre {
                 
                 if (width > 1)
                 {
-                    width = width / 2;
+                    width = Bitwise::firstPO2From(width / 2);
                 }
                 if (height > 1)
                 {
-                    height = height / 2;
+                    height = Bitwise::firstPO2From(height / 2);
                 }
             }
 #endif
@@ -453,7 +461,8 @@ namespace Ogre {
 
         _loadImages(imagePtrs);
 
-        if (mUsage & TU_AUTOMIPMAP)
+        if((mUsage & TU_AUTOMIPMAP) &&
+           mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
             OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGLES2TextureTarget()));
         }
@@ -536,7 +545,7 @@ namespace Ogre {
                                                                             static_cast<GLint>(face),
                                                                             mip,
                                                                             static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                            doSoftware && mip==0, mHwGamma, mFSAA);
+                                                                            doSoftware && mip == 0, mHwGamma, mFSAA);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 
@@ -547,9 +556,9 @@ namespace Ogre {
                 {
                     OGRE_EXCEPT(
                         Exception::ERR_RENDERINGAPI_ERROR,
-                        "Zero sized texture surface on texture "+getName()+
-                            " face "+StringConverter::toString(face)+
-                            " mipmap "+StringConverter::toString(mip)+
+                        "Zero sized texture surface on texture " + getName() +
+                            " face " + StringConverter::toString(face) +
+                            " mipmap " + StringConverter::toString(mip) +
                             ". The GL driver probably refused to create the texture.",
                             "GLES2Texture::_createSurfaceList");
                 }

@@ -78,8 +78,6 @@ namespace Ogre {
         // Create GL resource
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
         OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, mWarningTextureID));
-        if(gleswIsSupported(3, 0))
-            mGLSupport.getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
         OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                                          GL_UNSIGNED_SHORT_5_6_5, (void*)data));

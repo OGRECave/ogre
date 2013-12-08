@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
+#include "OgreBitwise.h"
 
 static int computeLog(GLuint value)
 {
@@ -638,7 +639,12 @@ namespace Ogre {
                             "GLES2TextureBuffer::upload");
             }
 
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
+                // Standard alignment of 4 is not right
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+            }
+
             buildMipmaps(data);
         }
         else
@@ -657,7 +663,8 @@ namespace Ogre {
                             "GLES2TextureBuffer::upload");
             }
 
-            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3) {
+            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
@@ -862,7 +869,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(GL_TEXTURE_2D, tempTex);
 
-            if(gleswIsSupported(3, 0))
+            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
                 getGLES2SupportRef()->getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
             // Allocate temporary texture of the size of the destination area
@@ -1060,7 +1067,7 @@ namespace Ogre {
         // Set texture type
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(target, id);
 
-        if(gleswIsSupported(3, 0))
+        if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
             getGLES2SupportRef()->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
@@ -1105,9 +1112,6 @@ namespace Ogre {
         GLsizei width;
         GLsizei height;
         GLsizei depth;
-        int logW;
-        int logH;
-        int level;
         PixelBox scaled = data;
         scaled.data = data.data;
         scaled.left = data.left;
@@ -1121,74 +1125,40 @@ namespace Ogre {
         height = (GLsizei)data.getHeight();
         depth = (GLsizei)data.getDepth();
 
-        logW = computeLog(width);
-        logH = computeLog(height);
-        level = (logW > logH ? logW : logH);
+        GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
+        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
+        GLenum internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
 
-        for (int mip = 0; mip <= level; mip++)
-        {
-            GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
-            GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
-            GLenum internalFormat = glFormat;
 #if OGRE_NO_GLES3_SUPPORT == 0
-            // In GL ES 3, the internalformat and format parameters do not need to be identical
-            internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
+        // In GL ES 3, the internalformat and format parameters do not need to be identical
+        internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
 #endif
-            switch(mTarget)
-            {
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                                                     mip,
-                                                     internalFormat,
-                                                     width, height,
-                                                     0,
-                                                     glFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_3D:
-                case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                                     mip,
-                                                     internalFormat,
-                                                     width, height, depth,
-                                                     0,
-                                                     glFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-#endif
-            }
-
-            if (mip != 0)
-            {
-                OGRE_DELETE[] (uint8*) scaled.data;
-                scaled.data = 0;
-            }
-
-            if (width > 1)
-            {
-                width = width / 2;
-            }
-
-            if (height > 1)
-            {
-                height = height / 2;
-            }
-
-            size_t sizeInBytes = PixelUtil::getMemorySize(width, height, 1, data.format);
-            scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = new uint8[sizeInBytes];
-            Image::scale(data, scaled, Image::FILTER_LINEAR);
-        }
-
-        // Delete the scaled data for the last level
-        if (level > 0)
+        switch(mTarget)
         {
-            delete[] (uint8*) scaled.data;
-            scaled.data = 0;
+            case GL_TEXTURE_2D:
+            case GL_TEXTURE_CUBE_MAP:
+                OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
+                                                 mLevel,
+                                                 internalFormat,
+                                                 width, height,
+                                                 0,
+                                                 glFormat,
+                                                 dataType,
+                                                 scaled.data));
+                break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            case GL_TEXTURE_3D:
+            case GL_TEXTURE_2D_ARRAY:
+                OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
+                                                 mip,
+                                                 internalFormat,
+                                                 width, height, depth,
+                                                 0,
+                                                 glFormat,
+                                                 dataType,
+                                                 scaled.data));
+                break;
+#endif
         }
     }
     

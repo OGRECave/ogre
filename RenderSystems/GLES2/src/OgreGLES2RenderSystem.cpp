@@ -382,6 +382,9 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_3D);
 #endif
 
+        // ES 2 always supports NPOT textures
+        rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
+
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
