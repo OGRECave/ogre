@@ -281,7 +281,7 @@ namespace Ogre {
 	class ScriptLoader;
     class Serializer;
 	class ShadowTextureManager;
-	struct SimpleMatrixAf4x3;
+	class SimpleMatrixAf4x3;
     class SimpleRenderable;
 	class SimpleSpline;
     class Skeleton;

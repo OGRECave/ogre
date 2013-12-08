@@ -85,6 +85,11 @@ namespace Ogre {
 
 		void setCachedTransformOutOfDate(void) const;
 
+		/// Call when we're detaching from our parent. Does nothing if already detached
+		void unsetParent(void);
+		/// Notification from parent that we need to migrate to a different depth level
+		void parentDepthLevelChanged(void);
+
     public:
 		/** Index in the vector holding this node reference (could be our parent node, or a global array
 			tracking all created nodes to avoid memory leaks). Used for O(1) removals.
