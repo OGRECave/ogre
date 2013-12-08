@@ -68,7 +68,7 @@ namespace Ogre
 		history, go to:
 			https://bitbucket.org/dark_sylinc/ogreanimation
     */
-	class SkeletonInstance : public MovableAlloc
+	class _OgreExport SkeletonInstance : public MovableAlloc
 	{
 	public:
 		typedef vector<Bone>::type BoneVec;

@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class SkeletonAnimationDef : public AnimationAlloc
+	class _OgreExport SkeletonAnimationDef : public AnimationAlloc
 	{
 		friend class SkeletonAnimation;
 	protected:

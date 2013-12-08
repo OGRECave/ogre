@@ -50,7 +50,7 @@ namespace Ogre
 
 	typedef FastArray<BoneTransform> TransformArray;
 
-	class SkeletonTrack : public AnimationAlloc
+	class _OgreExport SkeletonTrack : public AnimationAlloc
 	{
 	protected:
 		/// There is one entry per each parent level

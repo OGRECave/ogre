@@ -133,8 +133,8 @@ namespace Ogre
 
 		inOutTransform.mOwner[inOutTransform.mIndex]			= 0;
 		inOutTransform.mParentTransform[inOutTransform.mIndex]	= &SimpleMatrixAf4x3::IDENTITY;
-		inOutTransform.mInheritOrientation[nextSlotIdx]			= true;
-		inOutTransform.mInheritScale[nextSlotIdx]				= true;
+		inOutTransform.mInheritOrientation[inOutTransform.mIndex]= true;
+		inOutTransform.mInheritScale[inOutTransform.mIndex]		= true;
 		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
 		//Zero out all pointers
 		inOutTransform = BoneTransform();
