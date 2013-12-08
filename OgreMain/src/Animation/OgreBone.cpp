@@ -250,7 +250,7 @@ namespace Ogre {
 
 			//ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
 			//general case is to inherit both attributes. This branch is justified.
-			if( BooleanMask4::allBitsSet( t.mInheritOrientation, t.mInheritScale ) )
+			if( !BooleanMask4::allBitsSet( t.mInheritOrientation, t.mInheritScale ) )
 			{
 				ArrayMaskR inheritOrientation	= BooleanMask4::getMask( t.mInheritOrientation );
 				ArrayMaskR inheritScale			= BooleanMask4::getMask( t.mInheritScale );
