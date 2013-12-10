@@ -540,7 +540,6 @@ void TestContext::setupDirectories(Ogre::String batchName)
 
     if(mSummaryOutputDir != "NONE")
     {
-        mSummaryOutputDir = mFSLayer->getWritablePath(mSummaryOutputDir);
         static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mSummaryOutputDir);
     }
 
