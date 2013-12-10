@@ -90,8 +90,9 @@ protected:
             {
                 if((*mResults)[j].passed)
                 {
-                    out << "    <Test id=\"" << i << "\">" << std::endl;
-                    out << "      <Name>" << test << "</Name>" << std::endl;
+                    // Start counting at 10000 to make sure that they are unique test id's.
+                    out << "    <Test id=\"" << i + 10000 << "\">" << std::endl;
+                    out << "      <Name>VisualTests::test" << test << "</Name>" << std::endl;
                     out << "    </Test>" << std::endl;
                 }
             }
