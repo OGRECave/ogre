@@ -66,7 +66,8 @@ protected:
                 {
                     numFailed++;
 
-                    out << "    <FailedTest id=\"" << i << "\">" << std::endl;
+                    // Start counting at 10000 to make sure that they are unique test id's.
+                    out << "    <FailedTest id=\"" << i + 10000 << "\">" << std::endl;
                     out << "      <Name>" << test << "</Name>" << std::endl;
                     out << "      <FailureType>Error</FailureType>" << std::endl;
                     out << "      <Message>Visual Test Image Mismatch</Message>" << std::endl;
