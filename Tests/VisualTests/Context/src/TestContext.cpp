@@ -72,6 +72,7 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(S
     unOpt["--help"] = false;    // help, give usage details
     binOpt["-m"] = "";          // optional comment
     binOpt["-rp"] = "";         // optional specified reference set location
+    binOpt["-od"] = "";         // directory to write output to
     binOpt["-ts"] = "VTests";   // name of the test set to use
     binOpt["-c"] = "Reference"; // name of batch to compare against
     binOpt["-n"] = "AUTO";      // name for this batch
@@ -89,6 +90,7 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(S
     mCompareWith = binOpt["-c"];
     mForceConfig = unOpt["-d"];
     mNoGrabMouse = unOpt["--nograb"];
+    mOutputDir = binOpt["-od"];
     mRenderSystemName = binOpt["-rs"];
     mReferenceSetPath = binOpt["-rp"];
     mSummaryOutputDir = binOpt["-o"];
@@ -189,22 +191,28 @@ void TestContext::setup()
     mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
 #endif
 
+    Ogre::String batchName = StringUtil::BLANK;
+    time_t raw = time(0);
+
     // timestamp for the filename
     char temp[25];
-    time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
-    Ogre::String filestamp = Ogre::String(temp);
-    // name for this batch (used for naming the directory, and uniquely identifying this batch)
-    Ogre::String batchName = mTestSetName + "_" + filestamp;
 
     // a nicer formatted version for display
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp);
 
-    if (mReferenceSet)
-        batchName = "Reference";
-    else if (mBatchName != "AUTO")
-        batchName = mBatchName;
+    if(mOutputDir == StringUtil::BLANK)
+    {
+        Ogre::String filestamp = Ogre::String(temp);
+        // name for this batch (used for naming the directory, and uniquely identifying this batch)
+        batchName = mTestSetName + "_" + filestamp;
+
+        if (mReferenceSet)
+            batchName = "Reference";
+        else if (mBatchName != "AUTO")
+            batchName = mBatchName;
+    }
 
     // set up output directories
     setupDirectories(batchName);
