@@ -213,6 +213,9 @@ protected:
     /// Path to the output directory for the running test
     String mOutputDir;
 
+    /// Path to the reference set location
+    String mReferenceSetPath;
+
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
 #ifdef INCLUDE_RTSHADER_SYSTEM

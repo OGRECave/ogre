@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
 #include "HTMLWriter.h"
-#include "SimpleResultWriter.h"
+#include "CppUnitResultWriter.h"
 #include "OgreConfigFile.h"
 #include "OgrePlatform.h"
 
@@ -58,7 +58,7 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mBatch(0), mCurrentTest(0)
+TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(StringUtil::BLANK), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -71,6 +71,7 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mBatch(0), m
     unOpt["-h"] = false;        // help, give usage details
     unOpt["--help"] = false;    // help, give usage details
     binOpt["-m"] = "";          // optional comment
+    binOpt["-rp"] = "";         // optional specified reference set location
     binOpt["-ts"] = "VTests";   // name of the test set to use
     binOpt["-c"] = "Reference"; // name of batch to compare against
     binOpt["-n"] = "AUTO";      // name for this batch
@@ -89,8 +90,12 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mBatch(0), m
     mForceConfig = unOpt["-d"];
     mNoGrabMouse = unOpt["--nograb"];
     mRenderSystemName = binOpt["-rs"];
+    mReferenceSetPath = binOpt["-rp"];
     mSummaryOutputDir = binOpt["-o"];
     mHelp = unOpt["-h"] || unOpt["--help"];
+
+    if(mReferenceSetPath == StringUtil::BLANK)
+        mReferenceSetPath = mOutputDir;
 }
 //-----------------------------------------------------------------------
 
@@ -514,21 +519,24 @@ bool TestContext::oneTimeConfig()
 void TestContext::setupDirectories(Ogre::String batchName)
 {
     // ensure there's a root directory for visual tests
-    mOutputDir = mFSLayer->getWritablePath("VisualTests/");
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    if(mOutputDir == StringUtil::BLANK)
+    {
+        mOutputDir = mFSLayer->getWritablePath("VisualTests/");
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
 
-    // make sure there's a directory for the test set
-    mOutputDir += mTestSetName + "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        // make sure there's a directory for the test set
+        mOutputDir += mTestSetName + "/";
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
 
-    // add a directory for the render system
-    Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
-    // strip spaces from render system name
-    for (unsigned int i = 0;i < rsysName.size(); ++i)
-        if (rsysName[i] != ' ')
-            mOutputDir += rsysName[i];
-    mOutputDir += "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        // add a directory for the render system
+        Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
+        // strip spaces from render system name
+        for (unsigned int i = 0;i < rsysName.size(); ++i)
+            if (rsysName[i] != ' ')
+                mOutputDir += rsysName[i];
+        mOutputDir += "/";
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    }
 
     if(mSummaryOutputDir != "NONE")
     {
@@ -557,7 +565,7 @@ void TestContext::finishedTests()
         // look for a reference set first (either "Reference" or a user-specified image set)
         try
         {
-            info.load(mOutputDir + mCompareWith + "/info.cfg");
+            info.load(mReferenceSetPath + mCompareWith + "/info.cfg");
         }
         catch (Ogre::FileNotFoundException e)
         {
@@ -577,7 +585,7 @@ void TestContext::finishedTests()
 
         if (foundReference)
         {
-            ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
+            ref = OGRE_NEW TestBatch(info, mReferenceSetPath + mCompareWith);
             if (mBatch->canCompareWith(*ref))
                 compareTo = ref;
         }
@@ -600,12 +608,12 @@ void TestContext::finishedTests()
             if(mSummaryOutputDir != "NONE")
             {
                 Ogre::String rs;
-                for(size_t i = 0; i < mRenderSystemName.size(); ++i)
-                    if(mRenderSystemName[i]!=' ')
-                        rs += mRenderSystemName[i];
+                for(size_t j = 0; j < mRenderSystemName.size(); ++j)
+                    if(mRenderSystemName[j]!=' ')
+                        rs += mRenderSystemName[j];
 
-                SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
-                simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
+                CppUnitResultWriter cppunitWriter(*compareTo, *mBatch, results);
+                cppunitWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".xml");
             }
         }
 
@@ -652,7 +660,7 @@ void TestContext::createDummyScene()
         //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         // creates shaders for base material BaseWhite using the RTSS
-        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
+        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         baseWhite->setLightingEnabled(false);
         mShaderGenerator->createShaderBasedTechnique(
             "BaseWhite",
@@ -675,7 +683,7 @@ void TestContext::createDummyScene()
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                                            "BaseWhiteNoLighting");
-        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME).staticCast<Material>();
+        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         if(baseWhite->getNumTechniques() > 1)
         {
             baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
