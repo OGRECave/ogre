@@ -30,6 +30,7 @@
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgrePixelFormat.h"
+
 namespace Ogre {
 
     /**
@@ -42,48 +43,48 @@ namespace Ogre {
             @return a GLenum describing the format, or 0 if there is no exactly matching
             one (and conversion is needed)
         */
-        static GLenum getGLOriginFormat(PixelFormat mFormat);
+        static GLenum getGLOriginFormat(PixelFormat format);
 
         /** Takes the OGRE pixel format and returns type that must be provided
             to GL as data type for reading it into the GPU
             @return a GLenum describing the data type, or 0 if there is no exactly matching
             one (and conversion is needed)
         */
-        static GLenum getGLOriginDataType(PixelFormat mFormat);
+        static GLenum getGLOriginDataType(PixelFormat format);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format. GL_NONE if no match exists.
             @param mFormat The pixel format
             @param hwGamma Whether a hardware gamma-corrected version is requested
         */
-        static GLenum getGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
+        static GLenum getGLInternalFormat(PixelFormat format, bool hwGamma = false);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format. If no match exists, returns the closest match.
             @param mFormat The pixel format
             @param hwGamma Whether a hardware gamma-corrected version is requested
         */
-        static GLenum getClosestGLInternalFormat(PixelFormat mFormat, bool hwGamma = false);
+        static GLenum getClosestGLInternalFormat(PixelFormat format, bool hwGamma = false);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format for image load/store. GL_NONE if no match exists.
             @param mFormat The pixel format
         */
-        static GLenum getGLImageInternalFormat(PixelFormat mFormat);
+        static GLenum getGLImageInternalFormat(PixelFormat format);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format for image load/store. If no match exists, 
             returns the closest match.
             @param mFormat The pixel format
         */
-        static GLenum getClosestGLImageInternalFormat(PixelFormat mFormat);
+        static GLenum getClosestGLImageInternalFormat(PixelFormat format);
 
         /** Function to get the closest matching OGRE format to an internal GL format. To be
             precise, the format will be chosen that is most efficient to transfer to the card
             without losing precision.
             @remarks It is valid for this function to always return PF_A8R8G8B8.
         */
-        static PixelFormat getClosestOGREFormat(GLenum fmt);
+        static PixelFormat getClosestOGREFormat(GLenum format);
 
         /** Returns the maximum number of Mipmaps that can be generated until we reach
             the mininum format possible. This does not count the base level.

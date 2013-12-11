@@ -41,98 +41,98 @@
 
 namespace Ogre {
 
-    GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
+GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
                                                GLint face, GLint level, Usage usage,
                                                bool writeGamma, uint fsaa)
-        : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-          mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
-    {
-        // devise mWidth, mHeight and mDepth and mFormat
-        GLint value = 0;
+    : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+      mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
+{
+// devise mWidth, mHeight and mDepth and mFormat
+GLint value = 0;
 
-        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
-        // Get face identifier
-        mFaceTarget = mTarget;
-        if (mTarget == GL_TEXTURE_CUBE_MAP)
-            mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
+// Get face identifier
+mFaceTarget = mTarget;
+if (mTarget == GL_TEXTURE_CUBE_MAP)
+    mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-        // Get width
-        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value));
-        mWidth = value;
+// Get width
+OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value));
+mWidth = value;
 
-        // Get height
-        if(mTarget == GL_TEXTURE_1D)
-            value = 1;  // Height always 1 for 1D textures
-        else
-            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
-        mHeight = value;
+// Get height
+if (mTarget == GL_TEXTURE_1D)
+    value = 1;  // Height always 1 for 1D textures
+ else
+     OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
+mHeight = value;
 
-        // Get depth
-        if(mTarget != GL_TEXTURE_3D && mTarget != GL_TEXTURE_2D_ARRAY)
-            value = 1; // Depth always 1 for non-3D textures
-        else
-            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value));
-        mDepth = value;
+// Get depth
+if (mTarget != GL_TEXTURE_3D && mTarget != GL_TEXTURE_2D_ARRAY)
+    value = 1; // Depth always 1 for non-3D textures
+ else
+     OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value));
+mDepth = value;
 
-        // Get format
-        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value));
-        mGLInternalFormat = value;
-        mFormat = GL3PlusPixelUtil::getClosestOGREFormat(value);
+// Get format
+OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value));
+mGLInternalFormat = value;
+mFormat = GL3PlusPixelUtil::getClosestOGREFormat(value);
 
-        // Default
-        mRowPitch = mWidth;
-        mSlicePitch = mHeight*mWidth;
-        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+// Default
+mRowPitch = mWidth;
+mSlicePitch = mHeight*mWidth;
+mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
-        // Log a message
-        //        std::stringstream str;
-        //        str << "GL3PlusHardwarePixelBuffer constructed for texture: " << mTextureID
-        //            << " bytes: " << mSizeInBytes
-        //            << " face: " << mFace << " level: " << mLevel
-        //            << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-        //            << " format: " << PixelUtil::getFormatName(mFormat)
-        //            << "(internal 0x" << std::hex << value << ")";
-        //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+// Log a message
+//        std::stringstream str;
+//        str << "GL3PlusHardwarePixelBuffer constructed for texture: " << mTextureID
+//            << " bytes: " << mSizeInBytes
+//            << " face: " << mFace << " level: " << mLevel
+//            << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
+//            << " format: " << PixelUtil::getFormatName(mFormat)
+//            << "(internal 0x" << std::hex << value << ")";
+//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-        // Set up a pixel box
-        mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
+// Set up a pixel box
+mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
 
-        if (mWidth==0 || mHeight==0 || mDepth==0)
-            // We are invalid, do not allocate a buffer
-            return;
+if (mWidth==0 || mHeight==0 || mDepth==0)
+    // We are invalid, do not allocate a buffer
+    return;
 
-        // Is this a render target?
-        if (mUsage & TU_RENDERTARGET)
-        {
-            // Create render target for each slice
-            mSliceTRT.reserve(mDepth);
-            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
-            {
-                String name;
-                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
-                GL3PlusSurfaceDesc surface;
-                surface.buffer = this;
-                surface.zoffset = zoffset;
-                RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
-                mSliceTRT.push_back(trt);
-                Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
-            }
-        }
-    }
+// Is this a render target?
+if (mUsage & TU_RENDERTARGET)
+ {
+// Create render target for each slice
+mSliceTRT.reserve(mDepth);
+for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
+ {
+String name;
+name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
+GL3PlusSurfaceDesc surface;
+surface.buffer = this;
+surface.zoffset = zoffset;
+RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
+mSliceTRT.push_back(trt);
+Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
+}
+}
+}
 
 
     GL3PlusTextureBuffer::~GL3PlusTextureBuffer()
     {
-        if (mUsage & TU_RENDERTARGET)
-        {
-            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
-            // was deleted by the user.
-            for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
-            {
-                Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
-            }
-        }
+if (mUsage & TU_RENDERTARGET)
+ {
+// Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
+// was deleted by the user.
+for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
+ {
+Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
+}
+ }
     }
 
 
@@ -142,7 +142,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
-        // Upload data to PBO.
+        // Use PBO as a texture buffer.
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBufferId));
 
         // Calculate size for all mip levels of the texture.
@@ -155,8 +155,10 @@ namespace Ogre {
         {
             dataSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), mDepth, data.format);
         }
-        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL,
-                                         GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
+
+        //TODO Is this the correct was to set buffer size in this case?
+        // Fill buffer with NULL values in order to set the buffer size.
+        OGRE_CHECK_GL_ERROR(glBufferData(GL_PIXEL_UNPACK_BUFFER, dataSize, NULL, GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
 
         // std::stringstream str;
         // str << "GL3PlusHardwarePixelBuffer::upload: " << mTextureID
@@ -171,20 +173,22 @@ namespace Ogre {
         // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         void* pBuffer = 0;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, dataSize, GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(
+            GL_PIXEL_UNPACK_BUFFER, 0, dataSize,
+            GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_RANGE_BIT));
 
-        if(pBuffer == 0)
+        if (pBuffer == 0)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Texture Buffer: Out of memory",
                         "GL3PlusTextureBuffer::upload");
         }
 
-        // Copy to destination buffer.
+        // Copy texture data to destination buffer.
         memcpy(pBuffer, data.data, dataSize);
         GLboolean mapped = false;
         OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
-        if(!mapped)
+        if (!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Buffer data corrupted, please reload",
@@ -193,74 +197,81 @@ namespace Ogre {
 
         if (PixelUtil::isCompressed(data.format))
         {
-            if(data.format != mFormat || !data.isConsecutive())
+            if (data.format != mFormat || !data.isConsecutive())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Compressed images must be consecutive, in the source format",
+                            "Compressed images must be consecutive and in the designated source format",
                             "GL3PlusTextureBuffer::upload");
 
             GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat);
-            // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
-            // for compressed formats
+            // Data must be consecutive and at beginning of buffer as
+            // PixelStorei not allowed for compressed formats.
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
-                // some systems (e.g. old Apple) don't like compressed subimage calls
-                // so prefer non-sub versions
-                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage1D(GL_TEXTURE_1D, mLevel,
-                                                              dest.left,
-                                                              dest.getWidth(),
-                                                              format, data.getConsecutiveSize(),
-                                                              NULL));
+                // Some systems (e.g. old Apple) don't like compressed
+                // subimage calls so prefer non-sub versions.
+                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage1D(
+                    GL_TEXTURE_1D, mLevel,
+                    dest.left,
+                    dest.getWidth(),
+                    format, data.getConsecutiveSize(),
+                    NULL));
                 break;
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
             case GL_TEXTURE_RECTANGLE:
-                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(mFaceTarget, mLevel,
-                                                              dest.left, dest.top,
-                                                              dest.getWidth(), dest.getHeight(),
-                                                              format, data.getConsecutiveSize(),
-                                                              NULL));
+                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(
+                    mFaceTarget, mLevel,
+                    dest.left, dest.top,
+                    dest.getWidth(), dest.getHeight(),
+                    format, data.getConsecutiveSize(),
+                    NULL));
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
-                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3D(mTarget, mLevel,
-                                                              dest.left, dest.top, dest.front,
-                                                              dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                                                              format, data.getConsecutiveSize(),
-                                                              NULL));
+                OGRE_CHECK_GL_ERROR(glCompressedTexSubImage3D(
+                    mTarget, mLevel,
+                    dest.left, dest.top, dest.front,
+                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
+                    format, data.getConsecutiveSize(),
+                    NULL));
                 break;
             }
 
         }
         else
         {
-            if(data.getWidth() != data.rowPitch)
+            if (data.getWidth() != data.rowPitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-            if(data.getHeight()*data.getWidth() != data.slicePitch)
+            if (data.getHeight() * data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if(data.left > 0 || data.top > 0 || data.front > 0)
+            if (data.left > 0 || data.top > 0 || data.front > 0)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
-                // Standard alignment of 4 is not right
+            if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
+                // Standard alignment of 4 is not right.
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
-            switch(mTarget) 
+            switch(mTarget)
             {
             case GL_TEXTURE_1D:
-                OGRE_CHECK_GL_ERROR(glTexSubImage1D(GL_TEXTURE_1D, mLevel,
-                                                    dest.left,
-                                                    dest.getWidth(),
-                                                    GL3PlusPixelUtil::getGLOriginFormat(data.format), GL3PlusPixelUtil::getGLOriginDataType(data.format),
-                                                    NULL));
+                OGRE_CHECK_GL_ERROR(glTexSubImage1D(
+                    GL_TEXTURE_1D, mLevel,
+                    dest.left,
+                    dest.getWidth(),
+                    GL3PlusPixelUtil::getGLOriginFormat(data.format),
+                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    NULL));
                 break;
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
             case GL_TEXTURE_RECTANGLE:
-                OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget, mLevel,
-                                                    dest.left, dest.top,
-                                                    dest.getWidth(), dest.getHeight(),
-                                                    GL3PlusPixelUtil::getGLOriginFormat(data.format), GL3PlusPixelUtil::getGLOriginDataType(data.format),
-                                                    NULL));
+                OGRE_CHECK_GL_ERROR(glTexSubImage2D(
+                    mFaceTarget, mLevel,
+                    dest.left, dest.top,
+                    dest.getWidth(), dest.getHeight(),
+                    GL3PlusPixelUtil::getGLOriginFormat(data.format),
+                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    NULL));
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
@@ -268,7 +279,8 @@ namespace Ogre {
                     mTarget, mLevel,
                     dest.left, dest.top, dest.front,
                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
-                    GL3PlusPixelUtil::getGLOriginFormat(data.format), GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    GL3PlusPixelUtil::getGLOriginFormat(data.format),
+                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
                     NULL));
                 break;
             }
@@ -278,12 +290,12 @@ namespace Ogre {
             }
         }
 
-        // Delete PBO
+        // Delete PBO.
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
         mBufferId = 0;
 
-        // Restore defaults
+        // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
@@ -293,9 +305,9 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::download(const PixelBox &data)
     {
-        if(data.getWidth() != getWidth() ||
-           data.getHeight() != getHeight() ||
-           data.getDepth() != getDepth())
+        if (data.getWidth() != getWidth() ||
+            data.getHeight() != getHeight() ||
+            data.getDepth() != getDepth())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
                         "GL3PlusTextureBuffer::download");
 
@@ -316,9 +328,9 @@ namespace Ogre {
         //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
-        if(PixelUtil::isCompressed(data.format))
+        if (PixelUtil::isCompressed(data.format))
         {
-            if(data.format != mFormat || !data.isConsecutive())
+            if (data.format != mFormat || !data.isConsecutive())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Compressed images must be consecutive, in the source format",
                             "GL3PlusTextureBuffer::download");
@@ -328,13 +340,13 @@ namespace Ogre {
         }
         else
         {
-            if(data.getWidth() != data.rowPitch)
+            if (data.getWidth() != data.rowPitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch));
-            if(data.getHeight()*data.getWidth() != data.slicePitch)
+            if (data.getHeight()*data.getWidth() != data.slicePitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if(data.left > 0 || data.top > 0 || data.front > 0)
+            if (data.left > 0 || data.top > 0 || data.front > 0)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
+            if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
             }
@@ -359,18 +371,18 @@ namespace Ogre {
         {
             offsetInBytes += PixelUtil::getMemorySize(width, height, depth, data.format);
 
-            if(width > 1)
+            if (width > 1)
                 width = width / 2;
-            if(height > 1)
+            if (height > 1)
                 height = height / 2;
-            if(depth > 1)
+            if (depth > 1)
                 depth = depth / 2;
         }
 
         void* pBuffer;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_PACK_BUFFER, offsetInBytes, mSizeInBytes, GL_MAP_READ_BIT));
 
-        if(pBuffer == 0)
+        if (pBuffer == 0)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Texture Buffer: Out of memory",
@@ -382,7 +394,7 @@ namespace Ogre {
 
         GLboolean mapped;
         OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_PACK_BUFFER));
-        if(!mapped)
+        if (!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Buffer data corrupted, please reload",
@@ -451,10 +463,10 @@ namespace Ogre {
 
         // This does not seem to work for RTTs after the first update
         // I have no idea why! For the moment, disable
-        if((src->getUsage() & TU_RENDERTARGET) == 0 &&
-           (srct->mTarget == GL_TEXTURE_1D || srct->mTarget == GL_TEXTURE_2D
-            || srct->mTarget == GL_TEXTURE_RECTANGLE || srct->mTarget == GL_TEXTURE_3D)
-           && mTarget != GL_TEXTURE_2D_ARRAY)
+        if ((src->getUsage() & TU_RENDERTARGET) == 0 &&
+            (srct->mTarget == GL_TEXTURE_1D || srct->mTarget == GL_TEXTURE_2D
+             || srct->mTarget == GL_TEXTURE_RECTANGLE || srct->mTarget == GL_TEXTURE_3D)
+            && mTarget != GL_TEXTURE_2D_ARRAY)
         {
             blitFromTexture(srct, srcBox, dstBox);
         }
@@ -495,9 +507,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(src->mTarget, src->mTextureID));
 
         // Set filtering modes depending on the dimensions and source
-        if(srcBox.getWidth()==dstBox.getWidth() &&
-           srcBox.getHeight()==dstBox.getHeight() &&
-           srcBox.getDepth()==dstBox.getDepth())
+        if (srcBox.getWidth()==dstBox.getWidth() &&
+            srcBox.getHeight()==dstBox.getHeight() &&
+            srcBox.getDepth()==dstBox.getDepth())
         {
             // Dimensions match -- use nearest filtering (fastest and pixel correct)
             OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -507,7 +519,7 @@ namespace Ogre {
         {
             // Dimensions don't match -- use bi or trilinear filtering depending on the
             // source texture.
-            if(src->mUsage & TU_AUTOMIPMAP)
+            if (src->mUsage & TU_AUTOMIPMAP)
             {
                 // Automatic mipmaps, we can safely use trilinear filter which
                 // brings greatly improved quality for minimisation.
@@ -539,7 +551,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fboMan->getTemporaryFBO()));
 
         GLuint tempTex = 0;
-        if(!fboMan->checkFormat(mFormat))
+        if (!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
             GLenum tempFormat = GL3PlusPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
@@ -569,10 +581,10 @@ namespace Ogre {
         // Process each destination slice
         for(uint32 slice = dstBox.front; slice < dstBox.back; ++slice)
         {
-            if(!tempTex)
+            if (!tempTex)
             {
                 // Bind directly
-                if(mFormat == PF_DEPTH)
+                if (mFormat == PF_DEPTH)
                     bindToFramebuffer(GL_DEPTH_ATTACHMENT, slice);
                 else
                     bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice);
@@ -609,7 +621,7 @@ namespace Ogre {
 
             GLuint posAttrIndex = 0;
             GLuint texAttrIndex = 0;
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
                 posAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_POSITION, 0);
@@ -642,7 +654,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glDisable(src->mTarget));
 
-            if(tempTex)
+            if (tempTex)
             {
                 // Copy temporary texture
                 OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
@@ -670,10 +682,10 @@ namespace Ogre {
             }
         }
         // Finish up
-        if(!tempTex)
+        if (!tempTex)
         {
             // Generate mipmaps
-            if(mUsage & TU_AUTOMIPMAP)
+            if (mUsage & TU_AUTOMIPMAP)
             {
                 OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
@@ -685,7 +697,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0));
 
         // Detach texture from temporary framebuffer
-        if(mFormat == PF_DEPTH)
+        if (mFormat == PF_DEPTH)
         {
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                                           GL_RENDERBUFFER, 0));
@@ -709,16 +721,16 @@ namespace Ogre {
         // - FBO is not supported
         // - Either source or target is luminance due doesn't looks like supported by hardware
         // - the source dimensions match the destination ones, in which case no scaling is needed
-        if(PixelUtil::isLuminance(src_orig.format) ||
-           PixelUtil::isLuminance(mFormat) ||
-           (src_orig.getWidth() == dstBox.getWidth() &&
-            src_orig.getHeight() == dstBox.getHeight() &&
-            src_orig.getDepth() == dstBox.getDepth()))
+        if (PixelUtil::isLuminance(src_orig.format) ||
+            PixelUtil::isLuminance(mFormat) ||
+            (src_orig.getWidth() == dstBox.getWidth() &&
+             src_orig.getHeight() == dstBox.getHeight() &&
+             src_orig.getDepth() == dstBox.getDepth()))
         {
             GL3PlusHardwarePixelBuffer::blitFromMemory(src_orig, dstBox);
             return;
         }
-        if(!mBuffer.contains(dstBox))
+        if (!mBuffer.contains(dstBox))
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range",
                         "GL3PlusTextureBuffer::blitFromMemory");
         // For scoped deletion of conversion buffer
@@ -726,7 +738,7 @@ namespace Ogre {
         PixelBox src;
 
         // First, convert the srcbox to a OpenGL compatible pixel format
-        if(GL3PlusPixelUtil::getGLOriginFormat(src_orig.format) == 0)
+        if (GL3PlusPixelUtil::getGLOriginFormat(src_orig.format) == 0)
         {
             // Convert to buffer internal format
             buf.bind(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(),
@@ -755,7 +767,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 ));
 
         // Allocate texture memory
-        if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
+        if (target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
         {
             OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, src.format, src.getWidth(), src.getHeight(), src.getDepth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
         }

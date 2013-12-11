@@ -31,6 +31,7 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
+#include "OgreGL3PlusTextureBuffer.h"
 #include "OgreGL3PlusUtil.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
@@ -165,14 +166,14 @@ namespace Ogre {
             }
         }
 
-        // Allocate internal buffer so that glTexSubImageXD can be used.
-        // Internal format
         GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         GLenum datatype = GL3PlusPixelUtil::getGLOriginDataType(mFormat);
         width = mWidth;
         height = mHeight;
         depth = mDepth;
 
+        // Allocate texture storage so that glTexSubImageXD can be
+        // used to upload the texture.
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
@@ -181,17 +182,17 @@ namespace Ogre {
             for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
-                //                std::stringstream str;
-                //                str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
-                //                << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
-                //                << " Mip: " + StringConverter::toString(mip)
-                //                << " Width: " << StringConverter::toString(width)
-                //                << " Height: " << StringConverter::toString(height)
-                //                << " Format " << PixelUtil::getFormatName(mFormat)
-                //                << " Internal Format: 0x" << std::hex << format
-                //                << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
-                //                << " Data type: 0x" << std::hex << datatype;
-                //                LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+                std::stringstream str;
+                // str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
+                // << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
+                // << " Mip: " + StringConverter::toString(mip)
+                // << " Width: " << StringConverter::toString(width)
+                // << " Height: " << StringConverter::toString(height)
+                // << " Format " << PixelUtil::getFormatName(mFormat)
+                // << " Internal Format: 0x" << std::hex << format
+                // << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
+                // << " Data type: 0x" << std::hex << datatype;
+                // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
                 switch(mTextureType)
                 {
@@ -361,7 +362,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
         }
 
-        // Get final internal format
+        // Get final internal format.
         mFormat = getBuffer(0,0)->getFormat();
     }
 

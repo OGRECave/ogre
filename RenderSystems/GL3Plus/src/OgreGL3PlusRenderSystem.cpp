@@ -1193,6 +1193,7 @@ namespace Ogre {
             mActiveViewport = NULL;
             _setRenderTarget(NULL);
         }
+
         else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
@@ -2762,7 +2763,7 @@ namespace Ogre {
                 // Also switch to (unit == number) unless not operation is actually
                 // faster on some architectures.
                 
-                // Always ok to use the first unit.
+                // Always OK to use the first unit.
                 return true;
             }
             else
