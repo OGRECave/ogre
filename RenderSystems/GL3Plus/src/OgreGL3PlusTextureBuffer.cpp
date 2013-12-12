@@ -41,98 +41,98 @@
 
 namespace Ogre {
 
-GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
+    GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
                                                GLint face, GLint level, Usage usage,
                                                bool writeGamma, uint fsaa)
-    : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-      mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
-{
-// devise mWidth, mHeight and mDepth and mFormat
-GLint value = 0;
+        : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+          mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
+    {
+        // devise mWidth, mHeight and mDepth and mFormat
+        GLint value = 0;
 
-OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
+        OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
-// Get face identifier
-mFaceTarget = mTarget;
-if (mTarget == GL_TEXTURE_CUBE_MAP)
-    mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
+        // Get face identifier
+        mFaceTarget = mTarget;
+        if (mTarget == GL_TEXTURE_CUBE_MAP)
+            mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-// Get width
-OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value));
-mWidth = value;
+        // Get width
+        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_WIDTH, &value));
+        mWidth = value;
 
-// Get height
-if (mTarget == GL_TEXTURE_1D)
-    value = 1;  // Height always 1 for 1D textures
- else
-     OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
-mHeight = value;
+        // Get height
+        if (mTarget == GL_TEXTURE_1D)
+            value = 1;  // Height always 1 for 1D textures
+        else
+            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
+        mHeight = value;
 
-// Get depth
-if (mTarget != GL_TEXTURE_3D && mTarget != GL_TEXTURE_2D_ARRAY)
-    value = 1; // Depth always 1 for non-3D textures
- else
-     OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value));
-mDepth = value;
+        // Get depth
+        if (mTarget != GL_TEXTURE_3D && mTarget != GL_TEXTURE_2D_ARRAY)
+            value = 1; // Depth always 1 for non-3D textures
+        else
+            OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_DEPTH, &value));
+        mDepth = value;
 
-// Get format
-OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value));
-mGLInternalFormat = value;
-mFormat = GL3PlusPixelUtil::getClosestOGREFormat(value);
+        // Get format
+        OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &value));
+        mGLInternalFormat = value;
+        mFormat = GL3PlusPixelUtil::getClosestOGREFormat(value);
 
-// Default
-mRowPitch = mWidth;
-mSlicePitch = mHeight*mWidth;
-mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+        // Default
+        mRowPitch = mWidth;
+        mSlicePitch = mHeight*mWidth;
+        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
-// Log a message
-//        std::stringstream str;
-//        str << "GL3PlusHardwarePixelBuffer constructed for texture: " << mTextureID
-//            << " bytes: " << mSizeInBytes
-//            << " face: " << mFace << " level: " << mLevel
-//            << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-//            << " format: " << PixelUtil::getFormatName(mFormat)
-//            << "(internal 0x" << std::hex << value << ")";
-//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+        // Log a message
+        //        std::stringstream str;
+        //        str << "GL3PlusHardwarePixelBuffer constructed for texture: " << mTextureID
+        //            << " bytes: " << mSizeInBytes
+        //            << " face: " << mFace << " level: " << mLevel
+        //            << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
+        //            << " format: " << PixelUtil::getFormatName(mFormat)
+        //            << "(internal 0x" << std::hex << value << ")";
+        //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-// Set up a pixel box
-mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
+        // Set up a pixel box
+        mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
 
-if (mWidth==0 || mHeight==0 || mDepth==0)
-    // We are invalid, do not allocate a buffer
-    return;
+        if (mWidth==0 || mHeight==0 || mDepth==0)
+            // We are invalid, do not allocate a buffer
+            return;
 
-// Is this a render target?
-if (mUsage & TU_RENDERTARGET)
- {
-// Create render target for each slice
-mSliceTRT.reserve(mDepth);
-for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
- {
-String name;
-name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
-GL3PlusSurfaceDesc surface;
-surface.buffer = this;
-surface.zoffset = zoffset;
-RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
-mSliceTRT.push_back(trt);
-Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
-}
-}
-}
+        // Is this a render target?
+        if (mUsage & TU_RENDERTARGET)
+        {
+            // Create render target for each slice
+            mSliceTRT.reserve(mDepth);
+            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
+            {
+                String name;
+                name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
+                GL3PlusSurfaceDesc surface;
+                surface.buffer = this;
+                surface.zoffset = zoffset;
+                RenderTexture *trt = GL3PlusRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
+                mSliceTRT.push_back(trt);
+                Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
+            }
+        }
+    }
 
 
     GL3PlusTextureBuffer::~GL3PlusTextureBuffer()
     {
-if (mUsage & TU_RENDERTARGET)
- {
-// Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
-// was deleted by the user.
-for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
- {
-Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
-}
- }
+        if (mUsage & TU_RENDERTARGET)
+        {
+            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
+            // was deleted by the user.
+            for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
+            {
+                Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
+            }
+        }
     }
 
 

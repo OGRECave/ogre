@@ -311,7 +311,7 @@ namespace Ogre  {
         case PF_L16:
             return GL_R16;
         case PF_BYTE_LA:
-            return GL_RG;
+            return GL_RG8;
         case PF_R3G3B2:
             return GL_R3_G3_B2;
         case PF_A1R5G5B5:
@@ -498,7 +498,7 @@ namespace Ogre  {
         case PF_L16:
             return GL_R16;
         case PF_BYTE_LA:
-            return GL_RG;
+            return GL_RG8;
         case PF_A8R8G8B8:
         case PF_B8G8R8A8:
         case PF_A8B8G8R8:
@@ -600,7 +600,7 @@ namespace Ogre  {
             return PF_L8;
         case GL_R16:
             return PF_L16;
-        case GL_RG:
+        case GL_RG: //TODO Is there a better OGRE format?
         case GL_RG8:
             return PF_BYTE_LA;
         case GL_R3_G3_B2:

@@ -182,7 +182,7 @@ namespace Ogre {
             for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
-                std::stringstream str;
+                // std::stringstream str;
                 // str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
                 // << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
                 // << " Mip: " + StringConverter::toString(mip)
