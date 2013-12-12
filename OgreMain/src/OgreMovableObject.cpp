@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	using namespace VisibilityFlags;
+	extern const FastArray<Real> c_DefaultLodMesh;
 	const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
