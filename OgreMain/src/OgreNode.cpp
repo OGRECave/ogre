@@ -140,20 +140,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setParent( Node* parent )
     {
-		bool different = (parent != mParent);
-
-        mParent = parent;
-
-		if( different )
+		if( mParent != parent )
 		{
+			mParent = parent;
+
 			// Call listener
 			if( mListener )
-			{
-				if (mParent)
-					mListener->nodeAttached(this);
-				else
-					mListener->nodeDetached(this);
-			}
+				mListener->nodeAttached(this);
 
 			size_t oldDepthLevel = mDepthLevel;
 
@@ -161,16 +154,9 @@ namespace Ogre {
 			//(as well as transfering the memory)
 			mNodeMemoryManager->nodeDettached( mTransform, mDepthLevel );
 
-			if( mParent )
-			{
-				mDepthLevel = mParent->mDepthLevel + 1;
-				mTransform.mParents[mTransform.mIndex] = parent;
-				mNodeMemoryManager->nodeAttached( mTransform, mDepthLevel );
-			}
-			else
-			{
-				mDepthLevel = 0;
-			}
+			mDepthLevel = mParent->mDepthLevel + 1;
+			mTransform.mParents[mTransform.mIndex] = parent;
+			mNodeMemoryManager->nodeAttached( mTransform, mDepthLevel );
 
 			if( oldDepthLevel != mDepthLevel )
 			{
@@ -184,6 +170,38 @@ namespace Ogre {
 					++itor;
 				}
 			}
+		}
+    }
+	//-----------------------------------------------------------------------
+    void Node::unsetParent(void)
+    {
+		if( mParent )
+		{
+			// Call listener
+			if( mListener )
+				mListener->nodeDetached(this);
+
+			size_t oldDepthLevel = mDepthLevel;
+
+			//NodeMemoryManager will set mTransform.mParents to a dummy parent node
+			//(as well as transfering the memory)
+			mNodeMemoryManager->nodeDettached( mTransform, mDepthLevel );
+
+			if( mDepthLevel != 0 )
+			{
+				//Propagate the change to our children
+				NodeVec::const_iterator itor = mChildren.begin();
+				NodeVec::const_iterator end  = mChildren.end();
+
+				while( itor != end )
+				{
+					(*itor)->parentDepthLevelChanged();
+					++itor;
+				}
+			}
+
+			mParent = 0;
+			mDepthLevel = 0;
 		}
     }
 	//-----------------------------------------------------------------------
@@ -381,7 +399,7 @@ namespace Ogre {
 			if( child == *itor )
 			{
 				itor = efficientVectorRemove( mChildren, itor );
-				child->setParent( 0 );
+				child->unsetParent();
 				child->mParentIndex = -1;
 
 				//The node that was at the end got swapped and has now a different index
@@ -670,7 +688,7 @@ namespace Ogre {
 		NodeVec::iterator end  = mChildren.end();
 		while( itor != end )
 		{
-			(*itor)->setParent( 0 );
+			(*itor)->unsetParent();
 			(*itor)->mParentIndex = -1;
 			++itor;
 		}

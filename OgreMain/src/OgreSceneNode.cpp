@@ -277,7 +277,7 @@ namespace Ogre {
 		{
 			SceneNode *sceneNode = static_cast<SceneNode*>( *itor );
 			sceneNode->removeAndDestroyAllChildren();
-			sceneNode->setParent( 0 );
+			sceneNode->unsetParent();
 			mCreator->destroySceneNode( sceneNode );
 			++itor;
 		}
