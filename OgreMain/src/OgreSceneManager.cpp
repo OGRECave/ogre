@@ -5013,7 +5013,9 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 		}
         
 		// handle the case where there is no fixed pipeline support
-		retPass->getParent()->getParent()->compile();
+		if( retPass->getParent()->getParent()->getCompilationRequired() )
+			retPass->getParent()->getParent()->compile();
+
         Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
         if( btech )
         {
@@ -5200,7 +5202,9 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 		retPass->_load();
 
 		// handle the case where there is no fixed pipeline support
-		retPass->getParent()->getParent()->compile();
+		if( retPass->getParent()->getParent()->getCompilationRequired() )
+			retPass->getParent()->getParent()->compile();
+
         Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
         if( btech )
         {
