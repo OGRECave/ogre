@@ -111,9 +111,6 @@ namespace Ogre {
 		if( mNodeMemoryManager )
 			mNodeMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
 		mDepthLevel = 0;
-
-		assert( mMemoryChangeListeners.empty() &&
-				"All memory change listeners should've been removed by now!" );
 	}
     //-----------------------------------------------------------------------
     Node* Node::getParent(void) const
@@ -810,44 +807,6 @@ namespace Ogre {
 
         // NB use squared length rather than real depth to avoid square root
         return diff.squaredLength();
-    }
-	//---------------------------------------------------------------------
-	void Node::addMemoryChangeListener( Node::MemoryChangelistener *listener )
-	{
-		if( std::find( mMemoryChangeListeners.begin(),
-					   mMemoryChangeListeners.end(), listener ) != mMemoryChangeListeners.end() )
-		{
-			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "Memory Listener was already added",
-						 "Node::addMemoryChangeListener" );
-		}
-		mMemoryChangeListeners.push_back( listener );
-	}
-	//---------------------------------------------------------------------
-	void Node::removeMemoryChangeListener( Node::MemoryChangelistener *listener )
-	{
-		vector<MemoryChangelistener*>::type::iterator itor = std::find( mMemoryChangeListeners.begin(),
-																		mMemoryChangeListeners.end(),
-																		listener );
-		if( itor == mMemoryChangeListeners.end() )
-		{
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-						 "Memory Listener was never added or already removed",
-						 "Node::removeMemoryChangeListener" );
-		}
-
-		efficientVectorRemove( mMemoryChangeListeners, itor );
-	}
-	//---------------------------------------------------------------------
-	void Node::_callMemoryChangeListeners(void)
-	{
-		vector<MemoryChangelistener*>::type::iterator itor = mMemoryChangeListeners.begin();
-		vector<MemoryChangelistener*>::type::iterator end  = mMemoryChangeListeners.end();
-
-		while( itor != end )
-		{
-			(*itor)->memoryChanged( this );
-			++itor;
-		}
 	}
 	//---------------------------------------------------------------------
 	Node::DebugRenderable* Node::getDebugRenderable(Real scaling)

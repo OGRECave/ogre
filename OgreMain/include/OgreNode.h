@@ -102,12 +102,6 @@ namespace Ogre {
             virtual void nodeDetached(const Node*) {}
         };
 
-		class _OgreExport MemoryChangelistener
-		{
-		public:
-			virtual void memoryChanged( Node *changedNode ) = 0;
-		};
-
         /** Inner class for displaying debug renderable for Node. */
         class DebugRenderable : public Renderable, public NodeAlloc
         {
@@ -139,16 +133,7 @@ namespace Ogre {
 		Transform mTransform;
 
 		/// Friendly name of this node, can be empty
-        String mName;
-
-		/** Listeners that get called when our Transform's memory layout changes
-			(i.e. during cleanups, change of depth, etc)
-		@todo
-			I (dark_sylinc) don't like the fact that we use ~12 bytes for
-			a listener vector on EVERY node, even though it's only needed
-			when sketally animated movable objects get attached.
-		*/
-		vector<MemoryChangelistener*>::type mMemoryChangeListeners;
+		String mName;
 
 		/// Only available internally - notification of parent. Can't be null
         void setParent( Node* parent );
@@ -783,16 +768,10 @@ namespace Ogre {
 		*/
 		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
 
-		/** Adds a memory listener, to monitor when the pointers to Transform change.
-			Throws if already registered. @See mMemoryChangeListeners
+		/** Internal use, notifies all attached objects that our memory pointers
+			(i.e. Transform) may have changed (e.g. during cleanups, change of parent, etc)
 		*/
-		void addMemoryChangeListener( MemoryChangelistener *listener );
-
-		/// Removes an existing listener. Throws if listener wasn't added.
-		void removeMemoryChangeListener( MemoryChangelistener *listener );
-
-		/// Internal use, causes all registered memory listeners to
-		void _callMemoryChangeListeners(void);
+		virtual void _callMemoryChangeListeners(void) = 0;
 
 #ifndef NDEBUG
 		bool isCachedTransformOutOfDate(void) const				{ return mCachedTransformOutOfDate; }
