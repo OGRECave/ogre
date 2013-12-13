@@ -41,28 +41,29 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+                    "Sample currently under construction.  Try again soon!",
+                    "Sample_Compute::testCapabilities");
+
         if (!caps->hasCapability(RSC_ATOMIC_COUNTERS))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support atomic counters, "
                         "so you cannot run this sample. Sorry!",
                         "Sample_Compute::testCapabilities");
         }
-
-        if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
+        else if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support compute programs, "
                         "so you cannot run this sample. Sorry!",
                         "Sample_Compute::testCapabilities");
         }
-
-        if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
+        else if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support tesselation programs, "
                         "so you cannot run this sample. Sorry!",
                         "Sample_Compute::testCapabilities");
         }
-
-        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
+        else if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
                         "so you cannot run this sample. Sorry!", 

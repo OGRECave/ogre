@@ -73,8 +73,6 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
         // attach it to a node and position appropriately
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->attachObject(tObject);
-
-        printf("Cam position: %.2f, %.2f, %.2f", cam->getPosition().x, cam->getPosition().y, cam->getPosition().z);
     }
 };
 
