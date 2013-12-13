@@ -1766,6 +1766,11 @@ namespace Ogre {
 
                 separableProgram->getVertexArrayObject()->bind();
             }
+            else
+            {
+                Ogre::LogManager::getSingleton().logMessage(
+                    "ERROR: Failed to create separable program.", LML_CRITICAL);
+            }
         }
         else
         {
@@ -1775,6 +1780,11 @@ namespace Ogre {
                 updateVAO = !monolithicProgram->getVertexArrayObject()->isInitialised();
 
                 monolithicProgram->getVertexArrayObject()->bind();
+            }
+            else
+            {
+                Ogre::LogManager::getSingleton().logMessage(
+                    "ERROR: Failed to create monolithic program.", LML_CRITICAL);
             }
         }
 
