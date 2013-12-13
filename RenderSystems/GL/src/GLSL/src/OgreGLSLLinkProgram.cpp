@@ -117,6 +117,7 @@ namespace Ogre {
 		, mUniformRefsBuilt(false)
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
+        , mSkeletalAnimation(false)
 	{
         // Initialise uniform cache
 		mUniformCache = new GLUniformCache();

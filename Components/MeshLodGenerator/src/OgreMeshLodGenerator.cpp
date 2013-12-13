@@ -256,7 +256,7 @@ void MeshLodGenerator::computeLods(LodConfig& lodConfig,
 			size_t vertexCountLimit;
 			Real collapseCostLimit;
 			calcLodVertexCount(lodConfig.levels[curLod], data->mVertexList.size(), vertexCountLimit, collapseCostLimit);
-			collapser->collapse(data, cost, output, vertexCountLimit, collapseCostLimit);
+			collapser->collapse(data, cost, output, static_cast<int>(vertexCountLimit), collapseCostLimit);
 			size_t vertexCount = data->mCollapseCostHeap.size();
 			lodConfig.levels[curLod].outUniqueVertexCount = vertexCount;
 			lodConfig.levels[curLod].outSkipped = (vertexCount == lastBakeVertexCount);

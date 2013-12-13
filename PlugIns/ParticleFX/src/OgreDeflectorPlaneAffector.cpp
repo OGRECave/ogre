@@ -40,14 +40,9 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     DeflectorPlaneAffector::DeflectorPlaneAffector(ParticleSystem* psys)
-        : ParticleAffector(psys)
+        : ParticleAffector(psys), mPlanePoint(Vector3::ZERO), mPlaneNormal(Vector3::UNIT_Y), mBounce(1.0)
     {
         mType = "DeflectorPlane";
-
-        // defaults
-        mPlanePoint = Vector3::ZERO;
-        mPlaneNormal = Vector3::UNIT_Y;
-        mBounce = 1.0;
 
         // Set up parameters
         if (createParamDictionary("DeflectorPlaneAffector"))
@@ -74,25 +69,24 @@ namespace Ogre {
 		Vector3 directionPart;
 
         ParticleIterator pi = pSystem->_getIterator();
-        Particle *p;
 
         while (!pi.end())
         {
-            p = pi.getNext();
+            Particle *p = pi.getNext();
 
-            Vector3 direction(p->direction * timeElapsed);
-            if (mPlaneNormal.dotProduct(p->position + direction) + planeDistance <= 0.0)
+            Vector3 direction(p->mDirection * timeElapsed);
+            if (mPlaneNormal.dotProduct(p->mPosition + direction) + planeDistance <= 0.0)
             {
-                Real a = mPlaneNormal.dotProduct(p->position) + planeDistance;
+                Real a = mPlaneNormal.dotProduct(p->mPosition) + planeDistance;
                 if (a > 0.0)
                 {
                     // for intersection point
 					directionPart = direction * (- a / direction.dotProduct( mPlaneNormal ));
                     // set new position
-					p->position = (p->position + ( directionPart )) + (((directionPart) - direction) * mBounce);
+					p->mPosition = (p->mPosition + ( directionPart )) + (((directionPart) - direction) * mBounce);
 
                     // reflect direction vector
-                    p->direction = (p->direction - (2.0 * p->direction.dotProduct( mPlaneNormal ) * mPlaneNormal)) * mBounce;
+                    p->mDirection = (p->mDirection - (2.0 * p->mDirection.dotProduct( mPlaneNormal ) * mPlaneNormal)) * mBounce;
                 }
             }
         }

@@ -36,7 +36,8 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     GLHardwareVertexBuffer::GLHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
         size_t numVertices, HardwareBuffer::Usage usage, bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer), mLockedToScratch(false),
+        mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         glGenBuffersARB( 1, &mBufferId );
 

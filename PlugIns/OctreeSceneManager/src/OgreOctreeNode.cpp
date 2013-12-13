@@ -169,7 +169,7 @@ bool OctreeNode::_isIn( AxisAlignedBox &box )
 
 }
 
-/** Addes the attached objects of this OctreeScene node into the queue. */
+/** Adds the attached objects of this OctreeScene node into the queue. */
 void OctreeNode::_addToRenderQueue( Camera* cam, RenderQueue *queue, 
 	bool onlyShadowCasters, VisibleObjectsBoundsInfo* visibleBounds )
 {

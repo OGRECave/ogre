@@ -486,7 +486,7 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
 	StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
 
 	// Finally write all function declarations to the shader file
-	for (StringVector::iterator it = forwardDecl.begin(); it != endIt; it++)
+	for (StringVector::iterator it = forwardDecl.begin(); it != endIt; ++it)
 	{
 		os << *it;
 	}

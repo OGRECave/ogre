@@ -56,6 +56,7 @@ namespace Ogre {
 		{
 			mValidBytes = 0;
 			mPos = 0;
+            memset(mBuffer, 0, cacheSize);
 		}
 		
 		/** Cache data pointed by 'buf'. If 'count' is greater than cache size, we cache only last bytes.

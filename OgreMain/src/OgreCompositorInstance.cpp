@@ -506,7 +506,6 @@ void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseText
 			// this will ensure they don't get destroyed as unreferenced
 			// so they're ready to use again later
 			CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
-			CompositorManager::UniqueTextureSet assignedTextures;
 			while(it.hasMoreElements())
 			{
 				CompositionTechnique::TextureDefinition *def = it.getNext();
@@ -878,7 +877,6 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
 	// required (saves some time & memory thrashing / fragmentation on resize)
 
 	CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
-	CompositorManager::UniqueTextureSet assignedTextures;
 	while(it.hasMoreElements())
 	{
 		CompositionTechnique::TextureDefinition *def = it.getNext();

@@ -896,7 +896,7 @@ namespace Ogre {
         public:
             ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
 				mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0), 
-                mCamera(0) {}
+                mCamera(0), mFarDistSquared(0) {}
             // Prepare the listener for use with a set of parameters  
             void prepare(bool lightInFrustum, 
                 const PlaneBoundedVolumeList* lightClipVolumes, 

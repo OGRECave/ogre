@@ -850,8 +850,6 @@ namespace Ogre {
                                               bool attenuationEnabled, Real constant, Real linear, Real quadratic,
                                               Real minSize, Real maxSize)
 	{
-		float val[4] = {1, 0, 0, 1};
-		
 		if(attenuationEnabled) 
 		{
 			// Point size is still calculated in pixels even when attenuation is
@@ -865,6 +863,7 @@ namespace Ogre {
 			// Equations are supposedly the same once you factor in vp height
 			Real correction = 0.005;
 			// scaling required
+            float val[4] = {1, 0, 0, 1};
 			val[0] = constant;
 			val[1] = linear * correction;
 			val[2] = quadratic * correction;
@@ -2668,7 +2667,6 @@ namespace Ogre {
                                                      vector<GLuint>::type &instanceAttribsBound,
                                                      bool updateVAO)
     {
-        void* pBufferData = 0;
         const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get()); 
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
@@ -2676,7 +2674,7 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER,
                                              hwGlBuffer->getGLBufferId()));
-            pBufferData = GL_BUFFER_OFFSET(elem.getOffset());
+            void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset());
 
             if (vertexStart)
             {

@@ -1906,7 +1906,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-	void processManualProgramParam(bool isNamed, const String commandname,
+	void processManualProgramParam(bool isNamed, const String &commandname,
 		StringVector& vecparams, MaterialScriptContext& context,
 		size_t index = 0, const String& paramName = StringUtil::BLANK)
     {

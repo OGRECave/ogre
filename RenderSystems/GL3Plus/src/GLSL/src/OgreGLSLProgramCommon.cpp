@@ -42,9 +42,11 @@ namespace Ogre {
     , mHullProgram(hullProgram)
     , mDomainProgram(domainProgram)
     , mComputeProgram(computeProgram)
+    , mVertexArrayObject(0)
     , mUniformRefsBuilt(false)
     , mLinked(false)
     , mTriedToLinkAndFailed(false)
+    , mSkeletalAnimation(false)
 	{
 		// init mCustomAttributesIndexes
 		for(size_t i = 0 ; i < VES_COUNT; i++)
@@ -185,10 +187,6 @@ namespace Ogre {
 	{
 		GpuProgramManager::Microcode cacheMicrocode = 
             GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
-
-		// add to the microcode to the cache
-		String name;
-		name = getCombinedName();
 
 		// turns out we need this param when loading
 		GLenum binaryFormat = 0;

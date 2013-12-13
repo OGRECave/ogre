@@ -98,7 +98,7 @@ namespace Ogre {
         }
     }
 
-    PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+    PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
     {
         allocateBuffer();
         if (options != HardwareBuffer::HBL_DISCARD)

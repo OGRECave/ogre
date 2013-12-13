@@ -295,7 +295,6 @@ namespace Ogre
 		// Decide on endian mode
 		determineEndianness(endianMode);
 
-		String msg;
 		mStream =stream;
 		if (!stream->isWriteable())
 		{
@@ -1289,7 +1288,7 @@ namespace Ogre
 		GpuLogicalIndexUse* indexUse = 0;
 		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
 
-			GpuLogicalIndexUseMap::iterator logi = mFloatLogicalToPhysical->map.find(logicalIndex);
+        GpuLogicalIndexUseMap::iterator logi = mFloatLogicalToPhysical->map.find(logicalIndex);
 		if (logi == mFloatLogicalToPhysical->map.end())
 		{
 			if (requestedSize)

@@ -381,9 +381,9 @@ namespace Ogre {
         void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
                                    Real &screenX, Real &screenY);
 
-		/// Add a listener to this camera
+		/// Add a listener to this viewport
 		void addListener(Listener* l);
-		/// Remove a listener to this camera
+		/// Remove a listener to this viewport
 		void removeListener(Listener* l);
 
     protected:

@@ -36,10 +36,12 @@ namespace Ogre
 
 	void LodCollapser::collapse( LodData* data, LodCollapseCost* cost, LodOutputProvider* output, int vertexCountLimit, Real collapseCostLimit )
 	{
-		int vertexCount = data->mCollapseCostHeap.size();
-		for (; vertexCountLimit < vertexCount; vertexCount--) {
+		size_t vertexCount = data->mCollapseCostHeap.size();
+		for (; static_cast<size_t>(vertexCountLimit) < vertexCount; vertexCount--)
+        {
 			LodData::CollapseCostHeap::iterator nextVertex = data->mCollapseCostHeap.begin();
-			if (nextVertex != data->mCollapseCostHeap.end() && nextVertex->first < collapseCostLimit) {
+			if (nextVertex != data->mCollapseCostHeap.end() && nextVertex->first < collapseCostLimit)
+            {
 				mLastReducedVertex = nextVertex->second;
 				collapseVertex(data, cost, output, mLastReducedVertex);
 			} else {
@@ -193,7 +195,7 @@ namespace Ogre
 		tmpCollapsedEdges.clear();
 		LodData::VTriangles::iterator it = src->triangles.begin();
 		LodData::VTriangles::iterator itEnd = src->triangles.end();
-		for (; it != itEnd; it++) {
+		for (; it != itEnd; ++it) {
 			LodData::Triangle* triangle = *it;
 			if (triangle->hasVertex(dst)) {
 				// Remove a triangle
@@ -223,7 +225,7 @@ namespace Ogre
 		OgreAssert(dst->edges.find(LodData::Edge(src)) == dst->edges.end(), "");
 
 		it = src->triangles.begin();
-		for (; it != itEnd; it++) {
+		for (; it != itEnd; ++it) {
 			LodData::Triangle* triangle = *it;
 			if (!triangle->hasVertex(dst)) {
 				// Replace a triangle
@@ -260,7 +262,7 @@ namespace Ogre
 #if MESHLOD_QUALITY <= 2
 		LodData::VEdges::iterator it3 = src->edges.begin();
 		LodData::VEdges::iterator it3End = src->edges.end();
-		for (; it3 != it3End; it3++) {
+		for (; it3 != it3End; ++it3) {
 			cost->updateVertexCollapseCost(data, it3->dst);
 		}
 #else

@@ -109,7 +109,7 @@ uint32 CompositionPass::getClearBuffers() const
     return mClearBuffers;
 }
 //-----------------------------------------------------------------------
-void CompositionPass::setClearColour(ColourValue val)
+void CompositionPass::setClearColour(const ColourValue &val)
 {
     mClearColour = val;
 }

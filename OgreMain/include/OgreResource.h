@@ -171,7 +171,7 @@ namespace Ogre {
 		*/
 		Resource() 
 			: mCreator(0), mHandle(0), mLoadingState(LOADSTATE_UNLOADED), 
-			mIsBackgroundLoaded(false),	mSize(0), mIsManual(0), mLoader(0)
+			mIsBackgroundLoaded(false),	mSize(0), mIsManual(0), mLoader(0), mStateCount(0)
 		{ 
 		}
 

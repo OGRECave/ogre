@@ -481,7 +481,7 @@ protected:
 	};
 
 	typedef vector<SGPass*>::type					SGPassList;
-	typedef SGPassList::iterator					SGPassIterator;
+	typedef SGPassList::iterator						SGPassIterator;
 	typedef SGPassList::const_iterator				SGPassConstIterator;
 
 	typedef vector<SGTechnique*>::type				SGTechniqueList;
@@ -489,17 +489,17 @@ protected:
 	typedef SGTechniqueList::const_iterator			SGTechniqueConstIterator;
 
 	typedef map<SGTechnique*, SGTechnique*>::type	SGTechniqueMap;
-	typedef SGTechniqueMap::iterator				SGTechniqueMapIterator;
+	typedef SGTechniqueMap::iterator					SGTechniqueMapIterator;
 	
 	typedef map<MatGroupPair, SGMaterial*, MatGroupPair_less>::type	SGMaterialMap;
 	typedef SGMaterialMap::iterator					SGMaterialIterator;
 	typedef SGMaterialMap::const_iterator			SGMaterialConstIterator;
 
-	typedef map<String, SGScheme*>::type			SGSchemeMap;
+	typedef map<String, SGScheme*>::type				SGSchemeMap;
 	typedef SGSchemeMap::iterator					SGSchemeIterator;
 	typedef SGSchemeMap::const_iterator				SGSchemeConstIterator;
 
-	typedef map<String, ScriptTranslator*>::type	SGScriptTranslatorMap;
+	typedef map<String, ScriptTranslator*>::type		SGScriptTranslatorMap;
 	typedef SGScriptTranslatorMap::iterator			SGScriptTranslatorIterator;
 	typedef SGScriptTranslatorMap::const_iterator	SGScriptTranslatorConstIterator;
 
@@ -540,7 +540,7 @@ protected:
 		/** Set the custom render state of this pass. */
 		void setCustomRenderState(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
 
-		// Key name for associating with a Pass instance.
+		/// Key name for associating with a Pass instance.
 		static String UserKey;
 	
 	protected:
@@ -555,7 +555,7 @@ protected:
 		Pass* mDstPass;
 		// Custom render state.
 		RenderState* mCustomRenderState;
-		// The compiled render state.		
+		// The compiled render state.
 		TargetRenderState* mTargetRenderState;
 	};
 
@@ -948,8 +948,8 @@ protected:
     /** Used to check if finalizing */
     bool getIsFinalizing() const;
 protected:	
-        // Auto mutex.
-        OGRE_AUTO_MUTEX;
+    // Auto mutex.
+    OGRE_AUTO_MUTEX;
 	// The active scene manager.
 	SceneManager* mActiveSceneMgr;
 	// A map of all scene managers this generator is bound to.
@@ -1004,7 +1004,7 @@ protected:
 	VSOutputCompactPolicy mVSOutputCompactPolicy;
 	// Tells whether shaders are created for passes with shaders
 	bool mCreateShaderOverProgrammablePass;
-    // a flag to indicate finalizing
+    // A flag to indicate finalizing
     bool mIsFinalizing;
 private:
 	friend class SGPass;

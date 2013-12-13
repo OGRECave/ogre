@@ -68,13 +68,13 @@ namespace Ogre
 			// Lock the buffer for reading.
 			unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 			unsigned char* vertex = vStart;
-			int vSize = vbuf->getVertexSize();
+			size_t vSize = vbuf->getVertexSize();
 
 			const VertexElement* elemNormal = 0;
 			HardwareVertexBufferSharedPtr vNormalBuf;
 			unsigned char* vNormal;
 			Vector3* pNormalOut = NULL;
-			int vNormalSize;
+			size_t vNormalSize;
 			bool useVertexNormals = true;
 			elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 			useVertexNormals = useVertexNormals && (elemNormal != 0);

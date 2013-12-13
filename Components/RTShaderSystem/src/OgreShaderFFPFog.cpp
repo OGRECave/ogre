@@ -95,20 +95,8 @@ void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoPar
 	// Set fog properties.
 	setFogProperties(fogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
 
-	// Per pixel fog.
-	if (mCalcMode == CM_PER_PIXEL)
-	{
-		mFogParams->setGpuParameter(mFogParamsValue);
-	}
-
-	// Per vertex fog.
-	else
-	{				
-		mFogParams->setGpuParameter(mFogParamsValue);	
-	}
-
+    mFogParams->setGpuParameter(mFogParamsValue);
 	mFogColour->setGpuParameter(mFogColourValue);
-
 }
 
 //-----------------------------------------------------------------------

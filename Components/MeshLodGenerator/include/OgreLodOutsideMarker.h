@@ -102,7 +102,7 @@ private:
 	Real getTetrahedronVolume(CHVertex* v0, CHVertex* v1, CHVertex* v2, CHVertex* v3);
 	Real getPointToLineSqraredDistance(CHVertex* x1, CHVertex* x2, CHVertex* vertex);
 	void generateHull(); /// Generates the hull.
-	int addVertex(CHVertex* vertex); /// Adds vertex to hull.
+	size_t addVertex(CHVertex* vertex); /// Adds vertex to hull.
 	void addEdge(CHEdgeList& edges, CHVertex* a, CHVertex* b); /// Add edge to the list of removable edges.
 	void cleanHull(); /// Removes Triangles, which are having CHTriangle::removed = true.
 	bool isVisible(CHTriangle* triangle, Vector3& vertex); /// Whether face is visible from point.

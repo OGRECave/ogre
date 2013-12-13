@@ -336,7 +336,7 @@ D3DBOX toD3DBOXExtent(const PixelBox &lockBox)
 	return pbox;
 }
 //-----------------------------------------------------------------------------  
-PixelBox D3D9HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+PixelBox D3D9HardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
 {	
 	D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 

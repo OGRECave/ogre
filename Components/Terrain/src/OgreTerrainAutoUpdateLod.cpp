@@ -97,10 +97,10 @@ namespace Ogre
 	{
 		if (!node->isLeaf())
 		{
-			int ret, tmp = -1;
+			int tmp = -1;
 			for (int i = 0; i < 4; ++i)
 			{
-				ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
+				int ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
 				if (ret != -1)
 				{
 					if (tmp == -1 || ret < tmp)

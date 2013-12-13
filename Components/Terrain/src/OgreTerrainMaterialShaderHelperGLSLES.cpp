@@ -252,7 +252,6 @@ namespace Ogre
 
         uint16 glslVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
         String inKeyword = "varying";
-        String outKeyword = "";
 
         outStream << "#version " << glslVersion;
 
@@ -261,7 +260,6 @@ namespace Ogre
         {
             outStream << " es";
             inKeyword = "in";
-            outKeyword = "out";
         }
 
         outStream << std::endl;

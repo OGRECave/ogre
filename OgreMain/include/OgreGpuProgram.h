@@ -390,9 +390,6 @@ namespace Ogre {
 		*/
 		virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
 
-		/// Get a read-only reference to the named constants registered for this program (manually or automatically)
-		virtual const GpuNamedConstants& getNamedConstants() const { return *mConstantDefs.get(); }
-
 		/** Specifies the name of a file from which to load named parameters mapping
 			for a program which would not be able to derive named parameters itself.
 		@remarks

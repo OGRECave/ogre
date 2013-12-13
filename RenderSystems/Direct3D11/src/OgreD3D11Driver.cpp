@@ -101,7 +101,7 @@ namespace Ogre
 		wcstombs(str, mAdapterIdentifier.Description,size);
 		str[size]='\0';
 		String Description=str;
-		delete str;
+		delete []str;
 		return String(Description );
 	}
 	//---------------------------------------------------------------------

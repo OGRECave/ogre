@@ -58,7 +58,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Entity::Entity ()
 		: mAnimationState(NULL),
+          mTempSkelAnimInfo(),
           mSkelAnimVertexData(0),
+          mTempVertexAnimInfo(),
 		  mSoftwareVertexAnimVertexData(0),
 		  mHardwareVertexAnimVertexData(0),
           mVertexAnimationAppliedThisFrame(false),

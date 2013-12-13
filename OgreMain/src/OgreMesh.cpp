@@ -476,7 +476,7 @@ namespace Ogre {
 			Vector3 basePos(pFloat[0], pFloat[1], pFloat[2]);
 			outAABB.setExtents(basePos, basePos);
 		}
-		int vSize = vbuf->getVertexSize();
+		size_t vSize = vbuf->getVertexSize();
 		unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
 		Real radiusSqr = outRadius * outRadius;
 		// Loop through all vertices.
@@ -1103,7 +1103,7 @@ namespace Ogre {
 
 		lod->manualName = meshName;
 		lod->manualMesh.setNull();
-        if (lod->edgeData) OGRE_DELETE lod->edgeData;
+        OGRE_DELETE lod->edgeData;
         lod->edgeData = 0;
 	}
     //---------------------------------------------------------------------

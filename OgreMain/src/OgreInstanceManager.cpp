@@ -117,7 +117,7 @@ namespace Ogre
 		mNumCustomParams = numCustomParams;
 	}
 	//----------------------------------------------------------------------
-	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize,
+	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize,
 																uint16 flags )
 	{
 		//Get the material
@@ -586,7 +586,7 @@ namespace Ogre
 
 				IndicesMap::iterator indIt = indicesMap.begin();
 				IndicesMap::iterator endIndIt = indicesMap.end();
-				for (; indIt != endIndIt; indIt++) 
+				for (; indIt != endIndIt; ++indIt)
 				{
 					memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
 				}

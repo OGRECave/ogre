@@ -76,7 +76,7 @@ namespace Ogre {
     {
     }
 
-    void Exception::operator = ( const Exception& rhs )
+    Exception & Exception::operator = ( const Exception& rhs )
     {
         description = rhs.description;
         number = rhs.number;
@@ -84,6 +84,8 @@ namespace Ogre {
         file = rhs.file;
         line = rhs.line;
 		typeName = rhs.typeName;
+
+        return *this;
     }
 
     const String& Exception::getFullDescription(void) const

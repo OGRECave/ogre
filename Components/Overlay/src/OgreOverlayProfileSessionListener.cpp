@@ -66,13 +66,11 @@ namespace Ogre
         // this panel will be the main container for our profile bars
         mProfileGui = createContainer();
 
-        OverlayElement* element;
-
         // we create an initial pool of 50 profile bars
         for (uint i = 0; i < mMaxDisplayProfiles; ++i) 
 		{
             // this is for the profile name and the number of times it was called in a frame
-            element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
+            OverlayElement* element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 

@@ -415,7 +415,7 @@ namespace Ogre
 		/// Convert a vendor enum to a string
 		static String vendorToString(GPUVendor v);
 
-		bool isDriverOlderThanVersion(DriverVersion v) const
+		bool isDriverOlderThanVersion(const DriverVersion &v) const
 		{
 			if (mDriverVersion.major < v.major)
 				return true;

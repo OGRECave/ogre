@@ -42,7 +42,7 @@ public:
     void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
     {
         mVisualiseBoundingBoxMode = mode;
-        for (unsigned int i = 0; i < NUM_MODELS; i++)
+        for (int i = 0; i < NUM_MODELS; i++)
         {
             switch (mVisualiseBoundingBoxMode)
             {
@@ -62,7 +62,7 @@ public:
     {
         // update bone bounding box mode for all models
         mBoneBoundingBoxes = enable;
-        for (unsigned int iModel = 0; iModel < NUM_MODELS; iModel++)
+        for (int iModel = 0; iModel < NUM_MODELS; iModel++)
         {
             SceneNode* node = mModelNodes[iModel];
             for (unsigned int iObj = 0; iObj < node->numAttachedObjects(); ++iObj)
@@ -112,6 +112,8 @@ public:
                     return true;
                 }
                 break;
+            default:
+                break;
             }
         }
         return SdkSample::keyPressed(evt);
@@ -119,7 +121,7 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-        for (unsigned int i = 0; i < NUM_MODELS; i++)
+        for (int i = 0; i < NUM_MODELS; i++)
         {
 			// update sneaking animation based on speed
 			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
@@ -237,7 +239,7 @@ protected:
 		Entity* ent = NULL;
 		AnimationState* as = NULL;
 
-		for (unsigned int i = 0; i < NUM_MODELS; i++)
+		for (int i = 0; i < NUM_MODELS; i++)
 		{
 			// create scene nodes for the models at regular angular intervals
 			sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -382,7 +384,7 @@ protected:
 #endif*/
 	}
 
-	const unsigned int NUM_MODELS;
+	const int NUM_MODELS;
 	const Real ANIM_CHOP;
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for

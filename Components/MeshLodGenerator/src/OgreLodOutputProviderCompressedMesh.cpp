@@ -36,7 +36,7 @@
 namespace Ogre
 {
 	LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh( MeshPtr mesh ) :
-		mMesh(mesh)
+		mFirstBufferPass(0), mMesh(mesh), mLastIndexBufferID(0)
 	{
 		fallback = new LodOutputProviderMesh(mesh);
 	}
@@ -95,10 +95,8 @@ namespace Ogre
 		assert(mTriangleCacheList.size() == data->mTriangleList.size());
 		mLastIndexBufferID =  lodIndex;
 
-		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			data->mIndexBufferInfoList[i].prevIndexCount = data->mIndexBufferInfoList[i].indexCount;
-			indexCount += data->mIndexBufferInfoList[i].indexCount;
 			data->mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
 		}
 
@@ -120,7 +118,7 @@ namespace Ogre
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
 			lods.reserve(lods.size() + 2);
-			int indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
+			size_t indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
 			assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);
 			assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].prevOnlyIndexCount);
 			
