@@ -450,6 +450,11 @@ namespace Ogre {
 		mCachedTransformOutOfDate = true;
 #endif
 	}
+	//-----------------------------------------------------------------------
+	void Node::setPosition(Real x, Real y, Real z)
+	{
+		setPosition( Vector3( x, y, z ) );
+	}
     //-----------------------------------------------------------------------
     Vector3 Node::getPosition(void) const
     {

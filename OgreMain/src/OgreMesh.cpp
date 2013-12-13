@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreLogManager.h"
 #include "OgreMeshSerializer.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
@@ -437,7 +437,7 @@ namespace Ogre {
 			{
 				// Load skeleton
 				try {
-					mSkeleton = SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
+					mSkeleton = OldSkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 				}
 				catch (...)
 				{

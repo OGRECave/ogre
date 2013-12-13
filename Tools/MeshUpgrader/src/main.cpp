@@ -108,7 +108,7 @@ LogManager* logMgr = 0;
 Math* mth = 0;
 LodStrategyManager* lodMgr = 0;
 MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
+OldSkeletonManager* skelMgr = 0;
 MeshSerializer* meshSerializer = 0;
 SkeletonSerializer* skeletonSerializer = 0;
 DefaultHardwareBufferManager *bufferManager = 0;
@@ -938,7 +938,7 @@ int main(int numargs, char** args)
 		lodMgr = new LodStrategyManager();
 		matMgr = new MaterialManager();
 		matMgr->initialise();
-		skelMgr = new SkeletonManager();
+		skelMgr = new OldSkeletonManager();
 		meshSerializer = new MeshSerializer();
 		skeletonSerializer = new SkeletonSerializer();
 		bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem

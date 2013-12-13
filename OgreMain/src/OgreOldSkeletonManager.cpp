@@ -26,24 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 
 #include "OgreSkeleton.h"
 
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    template<> SkeletonManager* Singleton<SkeletonManager>::msSingleton = 0;
-    SkeletonManager* SkeletonManager::getSingletonPtr(void)
+	template<> OldSkeletonManager* Singleton<OldSkeletonManager>::msSingleton = 0;
+	OldSkeletonManager* OldSkeletonManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
-    SkeletonManager& SkeletonManager::getSingleton(void)
+	OldSkeletonManager& OldSkeletonManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-    SkeletonManager::SkeletonManager()
+	OldSkeletonManager::OldSkeletonManager()
     {
         mLoadOrder = 300.0f;
         mResourceType = "Skeleton";
@@ -51,24 +51,24 @@ namespace Ogre
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
     //-----------------------------------------------------------------------
-    SkeletonPtr SkeletonManager::getByName(const String& name, const String& groupName)
+	SkeletonPtr OldSkeletonManager::getByName(const String& name, const String& groupName)
     {
         return getResourceByName(name, groupName).staticCast<Skeleton>();
     }
     //-----------------------------------------------------------------------
-    SkeletonPtr SkeletonManager::create (const String& name, const String& group,
+	SkeletonPtr OldSkeletonManager::create (const String& name, const String& group,
                                     bool isManual, ManualResourceLoader* loader,
                                     const NameValuePairList* createParams)
     {
         return createResource(name,group,isManual,loader,createParams).staticCast<Skeleton>();
     }
     //-----------------------------------------------------------------------
-    SkeletonManager::~SkeletonManager()
+	OldSkeletonManager::~OldSkeletonManager()
     {
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
-    Resource* SkeletonManager::createImpl(const String& name, ResourceHandle handle, 
+	Resource* OldSkeletonManager::createImpl(const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* createParams)
     {

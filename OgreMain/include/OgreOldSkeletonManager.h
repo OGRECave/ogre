@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __SkeletonManager_H__
-#define __SkeletonManager_H__
+#ifndef _OldSkeletonManager_H_
+#define _OldSkeletonManager_H_
 
 #include "OgrePrerequisites.h"
 
@@ -48,12 +48,12 @@ namespace Ogre {
             the creation of resources (in this case skeleton data),
             working within a fixed memory budget.
     */
-    class _OgreExport SkeletonManager: public ResourceManager, public Singleton<SkeletonManager>
+	class _OgreExport OldSkeletonManager: public ResourceManager, public Singleton<OldSkeletonManager>
     {
     public:
         /// Constructor
-        SkeletonManager();
-        ~SkeletonManager();
+		OldSkeletonManager();
+		~OldSkeletonManager();
 
 		/// Create a new skeleton
 		/// @see ResourceManager::createResource
@@ -80,7 +80,7 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-        static SkeletonManager& getSingleton(void);
+		static OldSkeletonManager& getSingleton(void);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -96,7 +96,7 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-        static SkeletonManager* getSingletonPtr(void);
+		static OldSkeletonManager* getSingletonPtr(void);
     protected:
 
         /// @copydoc ResourceManager::createImpl
