@@ -543,7 +543,9 @@ namespace Ogre {
             childShader->attachToProgramObject(programObject);
         }
         OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
-        logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject);
+        
+        //TODO Remove since GL driver errors should report this.
+        // logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject);         
     }
 
 

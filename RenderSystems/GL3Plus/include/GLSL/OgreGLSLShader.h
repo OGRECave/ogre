@@ -143,8 +143,8 @@ namespace Ogre {
 
         GLuint getGLShaderHandle() const { return mGLShaderHandle; }
         GLuint getGLProgramHandle();
-        void attachToProgramObject( const GLuint programObject );
-        void detachFromProgramObject( const GLuint programObject );
+        void attachToProgramObject(const GLuint programObject);
+        void detachFromProgramObject(const GLuint programObject);
         String getAttachedShaderNames() const { return mAttachedShaderNames; }
         /// Get OpenGL GLSL shader type from OGRE GPU program type.
         GLenum getGLShaderType(GpuProgramType programType);
@@ -261,24 +261,24 @@ namespace Ogre {
         GLuint mGLProgramHandle;
 
 
-        /// Flag indicating if shader object successfully compiled
+        /// Flag indicating if shader object successfully compiled.
         GLint mCompiled;
-        /// The input operation type for this (geometry) program
+        /// The input operation type for this (geometry) program.
         RenderOperation::OperationType mInputOperationType;
-        /// The output operation type for this (geometry) program
+        /// The output operation type for this (geometry) program.
         RenderOperation::OperationType mOutputOperationType;
-        /// The maximum amount of vertices that this (geometry) program can output
+        /// The maximum amount of vertices that this (geometry) program can output.
         int mMaxOutputVertices;
-        /// Attached Shader names
+        /// Attached shader names.
         String mAttachedShaderNames;
-        /// Preprocessor options
+        /// Preprocessor options.
         String mPreprocessorDefines;
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
 
         typedef vector< GLSLShader* >::type GLSLShaderContainer;
         typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
-        /// Container of attached programs
+        /// Container of attached shaders.
         GLSLShaderContainer mAttachedGLSLShaders;
 
 
