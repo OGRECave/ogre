@@ -125,6 +125,12 @@ namespace Ogre
 		*/
 		bool isManualBone( Bone *bone );
 
+		/// Gets full transform of a bone by its index.
+		FORCEINLINE const SimpleMatrixAf4x3& _getBoneFullTransform( size_t index ) const
+		{
+			return mBones[index]._getFullTransform();
+		}
+
 		/// Gets the bone with given name. Throws if not found.
 		Bone* getBone( IdString boneName );
 

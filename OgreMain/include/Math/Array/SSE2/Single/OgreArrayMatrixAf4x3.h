@@ -203,6 +203,53 @@ namespace Ogre
 			mChunkBase[2] = _mm_load_ps( src._m+8 );
 		}
 
+		/// Assumes dst is aligned
+		void store( Matrix4 *dst ) const
+		{
+			float * RESTRICT_ALIAS dstPtr = reinterpret_cast<float*>( dst );
+
+			_mm_store_ps( dstPtr, mChunkBase[0] );
+			_mm_store_ps( dstPtr + 4, mChunkBase[1] );
+			_mm_store_ps( dstPtr + 8, mChunkBase[2] );
+			dstPtr += 12;
+			*dstPtr++ = 0;
+			*dstPtr++ = 0;
+			*dstPtr++ = 0;
+			*dstPtr++ = 1;
+		}
+
+		/// Assumes dst is aligned
+		void store4x3( Matrix4 *dst ) const
+		{
+			float * RESTRICT_ALIAS dstPtr = reinterpret_cast<float*>( dst );
+
+			_mm_store_ps( dstPtr, mChunkBase[0] );
+			_mm_store_ps( dstPtr + 4, mChunkBase[1] );
+			_mm_store_ps( dstPtr + 8, mChunkBase[2] );
+		}
+
+		/// Assumes dst is aligned
+		void store4x3( float * RESTRICT_ALIAS dst ) const
+		{
+			_mm_store_ps( dst, mChunkBase[0] );
+			_mm_store_ps( dst + 4, mChunkBase[1] );
+			_mm_store_ps( dst + 8, mChunkBase[2] );
+		}
+
+		/// Copies our 4x3 contents using memory write combining when possible.
+		void streamTo4x3( float * RESTRICT_ALIAS dst ) const
+		{
+#ifndef OGRE_RENDERSYSTEM_API_ALIGN_COMPATIBILITY
+			_mm_stream_ps( dst,    mChunkBase[0] );
+			_mm_stream_ps( dst+4,  mChunkBase[1] );
+			_mm_stream_ps( dst+8,  mChunkBase[2] );
+#else
+			_mm_storeu_ps( dst,    mChunkBase[0] );
+			_mm_storeu_ps( dst+4,  mChunkBase[1] );
+			_mm_storeu_ps( dst+8,  mChunkBase[2] );
+#endif
+		}
+
 		static const SimpleMatrixAf4x3 IDENTITY;
 	};
 

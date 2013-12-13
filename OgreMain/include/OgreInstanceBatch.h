@@ -111,11 +111,13 @@ namespace Ogre
         InstancedEntityVec  mInstancedEntities;
         InstancedEntityVec  mUnusedEntities;
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** This variable may change after we refactor animations. In the meantime: some
 			techniques animate all entities, some techniques don't animate anything
 			(eg. HW Basic) and other techniques animate a few (eg. HW VTF LUT)
 		*/
 		InstancedEntityArray mAnimatedEntities;
+#endif
 
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
@@ -192,8 +194,10 @@ namespace Ogre
         */
         bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/// Updates animations from all our entities.
 		void _updateAnimations(void);
+#endif
 
 		/** Updates the bounds of only our entities from multiple threads. To be called before
 			_updateBounds (which is single threaded). @see InstanceManager::updateDirtyBatches
@@ -262,6 +266,7 @@ namespace Ogre
         */
 		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/// Schedules the given Instanced Entity to be updated every frame in @see _updateAnimations
 		void _addAnimatedInstance( InstancedEntity *instancedEntity );
 
@@ -270,6 +275,7 @@ namespace Ogre
 			Does nothing if the animation wasn't already added.
 		*/
 		void _removeAnimatedInstance( const InstancedEntity *instancedEntity );
+#endif
 
         /** @see InstanceManager::defragmentBatches
             This function takes InstancedEntities and pushes back all entities it can fit here

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreNode.h"
 #include "OgreDualQuaternion.h"
+#include "Animation/OgreSkeletonInstance.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -87,11 +88,16 @@ namespace Ogre
 		bool mInUse;
 		InstanceBatch *mBatchOwner;
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		AnimationStateSet *mAnimationState;
 		OldSkeletonInstance *mSkeletonInstance;
 		Matrix4 *mBoneMatrices;	 //Local space
 		Matrix4 *mBoneWorldMatrices; //World space
 		unsigned long mFrameAnimationLastUpdated;
+#else
+		SkeletonInstance	*mSkeletonInstance;
+		BoneMemoryManager	*mBoneMemoryManager;
+#endif
 
 		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
 												
@@ -178,7 +184,11 @@ namespace Ogre
 
 	public:
 		InstancedEntity( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceBatch *batchOwner,
-						 uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL );
+						 uint32 instanceID,
+				 #ifndef OGRE_LEGACY_ANIMATIONS
+						 BoneMemoryManager *boneMemoryManager,
+				 #endif
+						 InstancedEntity* sharedTransformEntity = NULL );
 		virtual ~InstancedEntity();
 
 		/** Shares the entire transformation with another InstancedEntity. This is useful when a mesh
@@ -234,9 +244,15 @@ namespace Ogre
 
 		/** @see Entity::hasSkeleton */
 		bool hasSkeleton(void) const { return mSkeletonInstance != 0; }
+
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** @see Entity::getSkeleton */
 		OldSkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
+#else
+		SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
+#endif
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** @see Entity::getAnimationState */
 		AnimationState* getAnimationState(const String& name) const;
 		/** @see Entity::getAllAnimationStates */
@@ -248,6 +264,7 @@ namespace Ogre
 			@return true if something was actually updated
 		*/
 		bool _updateAnimation(void);
+#endif
 
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}

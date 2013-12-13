@@ -256,6 +256,8 @@ namespace Ogre
 	typedef CategorisedAllocPolicy<Ogre::MEMCATEGORY_SCRIPTING> ScriptingAllocPolicy;
 	typedef CategorisedAllocPolicy<Ogre::MEMCATEGORY_RENDERSYS> RenderSysAllocPolicy;
 
+	typedef CategorisedAlignAllocPolicy<Ogre::MEMCATEGORY_SCENE_CONTROL> SceneCtlAlignPolicy;
+
 	// Now define all the base classes for each allocation
 	typedef AllocatedObject<GeneralAllocPolicy> GeneralAllocatedObject;
 	typedef AllocatedObject<GeometryAllocPolicy> GeometryAllocatedObject;
@@ -265,6 +267,8 @@ namespace Ogre
 	typedef AllocatedObject<ResourceAllocPolicy> ResourceAllocatedObject;
 	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
 	typedef AllocatedObject<RenderSysAllocPolicy> RenderSysAllocatedObject;
+
+	typedef AllocatedObject<SceneCtlAlignPolicy> SceneCtlAlignedObject;
 
 
 	// Per-class allocators defined here
@@ -303,6 +307,7 @@ namespace Ogre
 	typedef GeneralAllocatedObject		RootAlloc;
 	typedef ResourceAllocatedObject		ResourceAlloc;
 	typedef GeneralAllocatedObject		SerializerAlloc;
+	typedef SceneCtlAlignedObject		SceneMgtAlignedAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
 	typedef ScriptingAllocatedObject    ScriptCompilerAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
