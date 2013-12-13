@@ -766,6 +766,10 @@ namespace Ogre {
 			hard copies but only the destructor must release the mTransform only slots once.
 		*/
 		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
+
+#ifndef NDEBUG
+		bool isCachedTransformOutOfDate(void) const				{ return mCachedTransformOutOfDate; }
+#endif
     };
     /** @} */
     /** @} */

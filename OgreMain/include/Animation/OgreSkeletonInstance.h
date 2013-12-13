@@ -91,6 +91,9 @@ namespace Ogre
 		*/
 		BoneVec					mUnusedNodes;
 
+		/// Node this SkeletonInstance is attached to (so we can work in world space)
+		Node					*mParentNode;
+
 	public:
 		SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
 		~SkeletonInstance();
@@ -134,6 +137,14 @@ namespace Ogre
 
 		/// Internal use. Disables given animation. Input should belong to us and already being animated.
 		void _disableAnimation( SkeletonAnimation *animation );
+
+		/** Sets our parent node so that our bones are in World space.
+			Iterates through all our bones and sets the root bones
+		*/
+		void setParentNode( Node *parentNode );
+
+		/// Returns our parent node. May be null.
+		Node* getParentNode(void) const										{ return mParentNode; }
 
 		void getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,
 							const FastArray<unsigned short> &usedBones ) const;

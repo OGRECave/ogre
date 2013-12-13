@@ -36,8 +36,7 @@ namespace Ogre
 {
 	const size_t BoneArrayMemoryManager::ElementsMemSize[BoneArrayMemoryManager::NumMemoryTypes] =
 	{
-		sizeof( Node** ),				//ArrayMemoryManager::Parent
-		sizeof( Node** ),				//ArrayMemoryManager::Owner
+		sizeof( Bone** ),				//ArrayMemoryManager::Owner
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Position
 		4 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Orientation
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Scale
@@ -48,7 +47,6 @@ namespace Ogre
 	};
 	const CleanupRoutines BoneArrayMemoryManager::BoneCleanupRoutines[NumMemoryTypes] =
 	{
-		cleanerFlat,					//ArrayMemoryManager::Parent
 		cleanerFlat,					//ArrayMemoryManager::Owner
 		cleanerArrayVector3,			//ArrayMemoryManager::Position
 		cleanerArrayQuaternion,			//ArrayMemoryManager::Orientation
@@ -93,8 +91,6 @@ namespace Ogre
 
 		//Set memory ptrs
 		outTransform.mIndex = nextSlotIdx;
-		outTransform.mParents			= reinterpret_cast<Bone**>( mMemoryPools[Parent] +
-												nextSlotBase * mElementsMemSizes[Parent] );
 		outTransform.mOwner				= reinterpret_cast<Bone**>( mMemoryPools[Owner] +
 												nextSlotBase * mElementsMemSizes[Owner] );
 		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( mMemoryPools[Position] +
@@ -115,7 +111,6 @@ namespace Ogre
 												nextSlotBase * mElementsMemSizes[InheritScale] );
 
 		//Set default values
-		outTransform.mParents[nextSlotIdx]	= 0;
 		outTransform.mOwner[nextSlotIdx]	= 0;
 		outTransform.mPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
@@ -135,14 +130,13 @@ namespace Ogre
 		inOutTransform.mParentTransform[inOutTransform.mIndex]	= &SimpleMatrixAf4x3::IDENTITY;
 		inOutTransform.mInheritOrientation[inOutTransform.mIndex]= true;
 		inOutTransform.mInheritScale[inOutTransform.mIndex]		= true;
-		destroySlot( reinterpret_cast<char*>(inOutTransform.mParents), inOutTransform.mIndex );
+		destroySlot( reinterpret_cast<char*>(inOutTransform.mOwner), inOutTransform.mIndex );
 		//Zero out all pointers
 		inOutTransform = BoneTransform();
 	}
 	//-----------------------------------------------------------------------------------
 	size_t BoneArrayMemoryManager::getFirstNode( BoneTransform &outTransform )
 	{
-		outTransform.mParents			= reinterpret_cast<Bone**>( mMemoryPools[Parent] );
 		outTransform.mOwner				= reinterpret_cast<Bone**>( mMemoryPools[Owner] );
 		outTransform.mPosition			= reinterpret_cast<ArrayVector3*>( mMemoryPools[Position] );
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(

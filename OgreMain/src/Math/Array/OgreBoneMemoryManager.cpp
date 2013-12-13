@@ -93,7 +93,6 @@ namespace Ogre
 		mMemoryManagers[0].createNewNode( tmp );
 
 		tmp.copy( outTransform );
-		tmp.mParents[tmp.mIndex] = 0;
 		tmp.mParentTransform[tmp.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
 
 		BoneArrayMemoryManager &mgr = mMemoryManagers[depth];

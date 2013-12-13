@@ -54,8 +54,7 @@ namespace Ogre
 	public:
 		enum MemoryTypes
 		{
-			Parent = 0,
-			Owner,
+			Owner = 0,
 			Position,
 			Orientation,
 			Scale,

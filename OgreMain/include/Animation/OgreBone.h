@@ -33,6 +33,10 @@ THE SOFTWARE.
 #include "OgreId.h"
 #include "Math/Array/OgreBoneTransform.h"
 
+#ifndef NDEBUG
+	#include "OgreNode.h"
+#endif
+
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -63,6 +67,7 @@ namespace Ogre {
 
 #ifndef NDEBUG
 		mutable bool mCachedTransformOutOfDate;
+		Node		*mDebugParentNode;
 #endif
 
 		/// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
@@ -125,6 +130,19 @@ namespace Ogre {
 
 		/// Gets this Bones's parent (NULL if this is the root).
 		Bone* getParent(void) const									{ return mParent; }
+
+		/** Sets a regular Node to be parent of this Bone
+		@remarks
+			1. The Bone must be a root bone (have no parent bone)
+			2. Multiple calls to _setNodeParent with different arguments will
+			   silently override previous calls.
+			3. By the time we update, we assume the Node has already been updated.
+			   (even when calling _getDerivedPositionUpdated and Co)
+			4. Null pointers will "detach", causing derived updates to be in local space
+			5. Ogre must ensure that when a NodeMemoryManager performs a cleanup (or resizes),
+			   this function is called again (to update our pointers).
+		*/
+		void _setNodeParent( Node *nodeParent );
 
 		/** Sets a given orientation in local space (ie. relative to its parent)
 		@remarks
@@ -202,11 +220,18 @@ namespace Ogre {
 		@remarks
 			This method returns the full transformation matrix
 			for this node, including the effect of any parent Bone
-			transformations. Assumes the caches are already updated
+			transformations.
+		@par
+			Assumes the caches are already updated.
+		@par
+			The transform is in world space, unless our root parent called
+			_setNodeParent( nullptr ) in which case the transform will be in
+			local space.
 		*/
 		FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
 		{
-			assert( !mCachedTransformOutOfDate );
+			assert( !mCachedTransformOutOfDate &&
+					(!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
 			return mTransform.mDerivedTransform[mTransform.mIndex];
 		}
 

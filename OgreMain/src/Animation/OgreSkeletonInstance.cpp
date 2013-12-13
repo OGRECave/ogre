@@ -41,7 +41,8 @@ namespace Ogre
 {
 	SkeletonInstance::SkeletonInstance( const SkeletonDef *skeletonDef,
 										BoneMemoryManager *boneMemoryManager ) :
-			mDefinition( skeletonDef )
+			mDefinition( skeletonDef ),
+			mParentNode( 0 )
 	{
 		mBones.resize( mDefinition->getBones().size(), Bone( BoneTransform() ) );
 
@@ -254,7 +255,7 @@ namespace Ogre
 		uint32 depthLevel = bone->getDepthLevel();
 		Bone &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
-		uintptr_t diff = bone->_getTransform().mParents - firstBone._getTransform().mParents;
+		uintptr_t diff = bone->_getTransform().mOwner - firstBone._getTransform().mOwner;
 		Real *manualBones = reinterpret_cast<Real*>( mManualBones.get() );
 		manualBones[diff] = isManual ? 1.0f : 0.0f;
 	}
@@ -266,7 +267,7 @@ namespace Ogre
 		uint32 depthLevel = bone->getDepthLevel();
 		Bone &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
-		uintptr_t diff = bone->_getTransform().mParents - firstBone._getTransform().mParents;
+		uintptr_t diff = bone->_getTransform().mOwner - firstBone._getTransform().mOwner;
 		const Real *manualBones = reinterpret_cast<const Real*>( mManualBones.get() );
 		return manualBones[diff] != 0.0f;
 	}
@@ -325,6 +326,21 @@ namespace Ogre
 														animation );
 		if( it != mActiveAnimations.end() )
 			efficientVectorRemove( mActiveAnimations, it );
+	}
+	//-----------------------------------------------------------------------------------
+	void SkeletonInstance::setParentNode( Node *parentNode )
+	{
+		mParentNode = parentNode;
+
+		BoneVec::iterator itor = mBones.begin();
+		BoneVec::iterator end  = mBones.end();
+
+		while( itor != end )
+		{
+			if( !itor->getParent() )
+				itor->_setNodeParent( mParentNode );
+			++itor;
+		}
 	}
 	//-----------------------------------------------------------------------------------
 	void SkeletonInstance::getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,

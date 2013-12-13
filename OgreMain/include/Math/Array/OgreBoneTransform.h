@@ -39,9 +39,6 @@ namespace Ogre
 		/// Which of the packed values is ours. Value in range [0; 4) for SSE2
 		unsigned char	mIndex;
 
-		/// Holds the pointers to each parent. Ours is mParents[mIndex]
-		Bone			**mParents;
-
 		/// The Bone that owns this BoneTransform. Ours is mOwner[mIndex]
 		Bone			**mOwner;
 
@@ -70,7 +67,6 @@ namespace Ogre
 
 		BoneTransform() :
 			mIndex( 0 ),
-			mParents( 0 ),
 			mOwner( 0 ),
 			mPosition( 0 ),
 			mOrientation( 0 ),
@@ -96,7 +92,6 @@ namespace Ogre
 		*/
 		void copy( const BoneTransform &copy )
 		{
-			mParents[mIndex]	= copy.mParents[copy.mIndex];
 			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
 
 			Vector3 tmp;
@@ -126,7 +121,6 @@ namespace Ogre
 		*/
 		void advancePack()
 		{
-			mParents			+= ARRAY_PACKED_REALS;
 			mOwner				+= ARRAY_PACKED_REALS;
 			++mPosition;
 			++mOrientation;
@@ -139,7 +133,6 @@ namespace Ogre
 
 		void advancePack( size_t numAdvance )
 		{
-			mParents			+= ARRAY_PACKED_REALS * numAdvance;
 			mOwner				+= ARRAY_PACKED_REALS * numAdvance;
 			mPosition			+= numAdvance;
 			mOrientation		+= numAdvance;

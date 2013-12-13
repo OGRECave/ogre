@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "Animation/OgreBone.h"
+#include "OgreNode.h"
 #include "OgreLogManager.h"
 
 #include "Math/Array/OgreBoneMemoryManager.h"
@@ -46,6 +47,7 @@ namespace Ogre {
 		mReverseBind( reverseBind ),
 #ifndef NDEBUG
 		mCachedTransformOutOfDate( true ),
+		mDebugParentNode( 0 ),
 #endif
 		mDepthLevel( 0 ),
 		mParent( parent ),
@@ -63,7 +65,6 @@ namespace Ogre {
 		if( mParent )
 		{
 			const BoneTransform parentTransform = mParent->mTransform;
-			mTransform.mParents[mTransform.mIndex] = mParent;
 			mTransform.mParentTransform[mTransform.mIndex] =
 								&parentTransform.mDerivedTransform[parentTransform.mIndex];
 		}
@@ -74,6 +75,7 @@ namespace Ogre {
 		mReverseBind( 0 ),
 #ifndef NDEBUG
 		mCachedTransformOutOfDate( true ),
+		mDebugParentNode( 0 ),
 #endif
 		mDepthLevel( 0 ),
 		mParent( 0 ),
@@ -157,6 +159,30 @@ namespace Ogre {
 					"Use CACHED_TRANSFORM_OUT_OF_DATE macro instead!",
 					"Bone::setCachedTransformOutOfDate" );
 #endif
+	}
+	//-----------------------------------------------------------------------
+	void Bone::_setNodeParent( Node *nodeParent )
+	{
+		if( mParent )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Only Root bones call this function.",
+						 "Bone::_addNodeParent" );
+		}
+
+#ifndef NDEBUG
+		mDebugParentNode = nodeParent;
+#endif
+		if( nodeParent )
+		{
+			//This "Hack" just works. Don't ask. And it's fast!
+			//(we're responsible for ensuring the memory layout matches)
+			mTransform.mParentTransform[mTransform.mIndex] = reinterpret_cast<SimpleMatrixAf4x3*>(
+														nodeParent->_getTransform().mDerivedTransform );
+		}
+		else
+		{
+			mTransform.mParentTransform[mTransform.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
+		}
 	}
 	//-----------------------------------------------------------------------
 	void Bone::setInheritOrientation(bool inherit)
