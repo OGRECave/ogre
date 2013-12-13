@@ -153,20 +153,20 @@ namespace Ogre {
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
 
-        /// Linked vertex program
+        /// Linked vertex shader.
         GLSLShader* mVertexShader;
-        /// Linked hull (control) program
+        /// Linked hull (control) shader.
         GLSLShader* mHullShader;
-        /// Linked domain (evaluation) program
+        /// Linked domain (evaluation) shader.
         GLSLShader* mDomainShader;
-        /// Linked geometry program
+        /// Linked geometry shader.
         GLSLShader* mGeometryShader;
-        /// Linked fragment program
+        /// Linked fragment shader.
         GLSLShader* mFragmentShader;
-        /// Linked compute program
+        /// Linked compute shader.
         GLSLShader* mComputeShader;
         /// GL handle for the vertex array object
-        GL3PlusVertexArrayObject *mVertexArrayObject;
+        GL3PlusVertexArrayObject* mVertexArrayObject;
 
         /// Flag to indicate that uniform references have already been built
         bool mUniformRefsBuilt;
@@ -195,8 +195,8 @@ namespace Ogre {
         void getMicrocodeFromCache(void);
         /// Compiles and links the vertex and fragment programs
         virtual void compileAndLink(void) = 0;
-        /// Put a program in use
-        virtual void _useProgram(void) = 0;
+        // /// Put a program in use
+        // virtual void _useProgram(void) = 0;
 
         typedef map<String, VertexElementSemantic>::type SemanticToStringMap;
         SemanticToStringMap mSemanticTypeMap;

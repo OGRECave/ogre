@@ -53,7 +53,7 @@ namespace Ogre
 
     GLSLSeparableProgramManager::~GLSLSeparableProgramManager(void)
     {
-        // Iterate through map container and delete program pipelines
+        // Iterate through map container and delete program pipelines.
         for (SeparableProgramIterator currentProgram = mSeparablePrograms.begin();
              currentProgram != mSeparablePrograms.end(); ++currentProgram)
         {
@@ -67,7 +67,7 @@ namespace Ogre
         if (fragmentShader != mActiveFragmentShader)
         {
             mActiveFragmentShader = fragmentShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -78,7 +78,7 @@ namespace Ogre
         if (vertexShader != mActiveVertexShader)
         {
             mActiveVertexShader = vertexShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -89,7 +89,7 @@ namespace Ogre
         if (geometryShader != mActiveGeometryShader)
         {
             mActiveGeometryShader = geometryShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -100,7 +100,7 @@ namespace Ogre
         if (domainShader != mActiveDomainShader)
         {
             mActiveDomainShader = domainShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -111,7 +111,7 @@ namespace Ogre
         if (hullShader != mActiveHullShader)
         {
             mActiveHullShader = hullShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -122,7 +122,7 @@ namespace Ogre
         if (computeShader != mActiveComputeShader)
         {
             mActiveComputeShader = computeShader;
-            // ActiveSeparableProgram is no longer valid
+            // ActiveSeparableProgram is no longer valid.
             mActiveSeparableProgram = NULL;
         }
     }
@@ -130,27 +130,17 @@ namespace Ogre
 
     GLSLSeparableProgram* GLSLSeparableProgramManager::getCurrentSeparableProgram(void)
     {
-        // If there is an active link program then return it
+        // If there is an active link program then return it.
         if (mActiveSeparableProgram)
             return mActiveSeparableProgram;
 
-        // No active link program so find one or make a new one
+        // No active link program so find one or make a new one.
         // Is there an active key?
         uint32 activeKey = 0;
         GLuint shaderID = 0;
         if (mActiveVertexShader)
         {
             shaderID = mActiveVertexShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
-        }
-        if (mActiveFragmentShader)
-        {
-            shaderID = mActiveFragmentShader->getShaderID();
-            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
-        }
-        if (mActiveGeometryShader)
-        {
-            shaderID = mActiveGeometryShader->getShaderID();
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
         if (mActiveDomainShader)
@@ -163,47 +153,45 @@ namespace Ogre
             shaderID = mActiveHullShader->getShaderID();
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
+        if (mActiveGeometryShader)
+        {
+            shaderID = mActiveGeometryShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+        }
+        else if (mActiveFragmentShader)
+        {
+            shaderID = mActiveFragmentShader->getShaderID();
+            activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
+        }
         if (mActiveComputeShader)
         {
             shaderID = mActiveComputeShader->getShaderID();
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
 
-        // Only return a program pipeline object if a vertex or fragment stage exist
+        // Only return a program pipeline object if a vertex or fragment stage exist.
         if (activeKey > 0)
         {
-            // Find the key in the hash map
+            // Find the key in the hash map.
             SeparableProgramIterator programFound = mSeparablePrograms.find(activeKey);
-            // Program object not found for key so need to create it
+            // Program object not found for key so need to create it.
             if (programFound == mSeparablePrograms.end())
             {
                 mActiveSeparableProgram = new GLSLSeparableProgram(
-                    mActiveVertexShader, 
+                    mActiveVertexShader,
                     mActiveHullShader,
-                    mActiveDomainShader, 
+                    mActiveDomainShader,
                     mActiveGeometryShader,
-                    mActiveFragmentShader, 
+                    mActiveFragmentShader,
                     mActiveComputeShader);
                 mSeparablePrograms[activeKey] = mActiveSeparableProgram;
             }
             else
             {
-                // Found a link program in map container so make it active
+                // Found a link program in map container so make it active.
                 mActiveSeparableProgram = programFound->second;
             }
         }
-
-        return mActiveSeparableProgram;
-    }
-    
-
-    GLSLSeparableProgram* GLSLSeparableProgramManager::getActiveSeparableProgram(void)
-    {
-        getCurrentSeparableProgram();
-
-        // Make the program object active
-        if (mActiveSeparableProgram)
-            mActiveSeparableProgram->activate();
 
         return mActiveSeparableProgram;
     }

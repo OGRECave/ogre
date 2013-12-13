@@ -623,15 +623,16 @@ namespace Ogre {
             GLuint texAttrIndex = 0;
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
-                posAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_POSITION, 0);
-                texAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
+                GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+                separableProgram->activate();
+                posAttrIndex = (GLuint)separableProgram->getAttributeIndex(VES_POSITION, 0);
+                texAttrIndex = (GLuint)separableProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
             }
             else
             {
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                posAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_POSITION, 0);
-                texAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                posAttrIndex = (GLuint)monolithicProgram->getAttributeIndex(VES_POSITION, 0);
+                texAttrIndex = (GLuint)monolithicProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
             }
 
             // Draw the textured quad

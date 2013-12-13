@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGL3PlusRenderSystem.h"
@@ -433,7 +433,7 @@ namespace Ogre {
         rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
         rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
         rsc->setGeometryProgramConstantIntCount(floatConstantCount);
-        
+
         // Tessellation Program Properties
         if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || gl3wIsSupported(4, 0))
         {
@@ -720,7 +720,7 @@ namespace Ogre {
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             // Only Copy does, but Copy means only one depth buffer...
-			GL3PlusContext *windowContext = 0;
+            GL3PlusContext *windowContext = 0;
             win->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
             GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                                       windowContext, 0, 0,
@@ -735,7 +735,7 @@ namespace Ogre {
         return win;
     }
 
-    
+
     DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
         GL3PlusDepthBuffer *retVal = 0;
@@ -771,7 +771,7 @@ namespace Ogre {
 
         return retVal;
     }
-    
+
     void GL3PlusRenderSystem::_getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
                                                          GLenum *stencilFormat )
     {
@@ -794,7 +794,7 @@ namespace Ogre {
         {
             if (i->second == pWin)
             {
-				GL3PlusContext *windowContext = 0;
+                GL3PlusContext *windowContext = 0;
                 pWin->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
                 // 1 Window <-> 1 Context, should be always true.
@@ -1753,23 +1753,28 @@ namespace Ogre {
         bool updateVAO = true;
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
-            GLSLSeparableProgram* programPipeline =
-                GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
-            if (programPipeline)
+            GLSLSeparableProgram* separableProgram =
+                GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+            if (separableProgram)
             {
-                updateVAO = !programPipeline->getVertexArrayObject()->isInitialised();
+                if (!op.renderToVertexBuffer)
+                {
+                    separableProgram->activate();
+                }
 
-                programPipeline->getVertexArrayObject()->bind();
+                updateVAO = !separableProgram->getVertexArrayObject()->isInitialised();
+
+                separableProgram->getVertexArrayObject()->bind();
             }
         }
         else
         {
-            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-            if (linkProgram)
+            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            if (monolithicProgram)
             {
-                updateVAO = !linkProgram->getVertexArrayObject()->isInitialised();
+                updateVAO = !monolithicProgram->getVertexArrayObject()->isInitialised();
 
-                linkProgram->getVertexArrayObject()->bind();
+                monolithicProgram->getVertexArrayObject()->bind();
             }
         }
 
@@ -1992,19 +1997,19 @@ namespace Ogre {
         {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLSeparableProgram* programPipeline =
-                    GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
-                if (programPipeline)
+                GLSLSeparableProgram* separableProgram =
+                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+                if (separableProgram)
                 {
-                    programPipeline->getVertexArrayObject()->setInitialised(true);
+                    separableProgram->getVertexArrayObject()->setInitialised(true);
                 }
             }
             else
             {
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (linkProgram)
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                if (monolithicProgram)
                 {
-                    linkProgram->getVertexArrayObject()->setInitialised(true);
+                    monolithicProgram->getVertexArrayObject()->setInitialised(true);
                 }
             }
 
@@ -2413,7 +2418,7 @@ namespace Ogre {
         return SOP_KEEP;
     }
 
-    
+
     void GL3PlusRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         GLSLShader* glprg = static_cast<GLSLShader*>(prg);
@@ -2533,13 +2538,13 @@ namespace Ogre {
         }
         else if (gptype == GPT_HULL_PROGRAM && mCurrentHullShader)
         {
-			mActiveTessellationHullGpuProgramParameters.setNull();
+            mActiveTessellationHullGpuProgramParameters.setNull();
             mCurrentHullShader->unbind();
             mCurrentHullShader = 0;
         }
         else if (gptype == GPT_DOMAIN_PROGRAM && mCurrentDomainShader)
         {
-			mActiveTessellationDomainGpuProgramParameters.setNull();
+            mActiveTessellationDomainGpuProgramParameters.setNull();
             mCurrentDomainShader->unbind();
             mCurrentDomainShader = 0;
         }
@@ -2577,11 +2582,11 @@ namespace Ogre {
             mCurrentGeometryShader->bindSharedParameters(params, mask);
             break;
         case GPT_HULL_PROGRAM:
-                    mActiveTessellationHullGpuProgramParameters = params;
+            mActiveTessellationHullGpuProgramParameters = params;
             mCurrentHullShader->bindSharedParameters(params, mask);
             break;
         case GPT_DOMAIN_PROGRAM:
-                    mActiveTessellationDomainGpuProgramParameters = params;
+            mActiveTessellationDomainGpuProgramParameters = params;
             mCurrentDomainShader->bindSharedParameters(params, mask);
             break;
         case GPT_COMPUTE_PROGRAM:
@@ -2609,11 +2614,11 @@ namespace Ogre {
             mCurrentGeometryShader->bindParameters(params, mask);
             break;
         case GPT_HULL_PROGRAM:
-                    mActiveTessellationHullGpuProgramParameters = params;
+            mActiveTessellationHullGpuProgramParameters = params;
             mCurrentHullShader->bindParameters(params, mask);
             break;
         case GPT_DOMAIN_PROGRAM:
-                    mActiveTessellationDomainGpuProgramParameters = params;
+            mActiveTessellationDomainGpuProgramParameters = params;
             mCurrentDomainShader->bindParameters(params, mask);
             break;
         case GPT_COMPUTE_PROGRAM:
@@ -2716,7 +2721,7 @@ namespace Ogre {
         return mGLSupport->getDisplayMonitorCount();
     }
 
-    
+
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         markProfileEvent("Begin Event: " + eventName);
@@ -2724,7 +2729,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
-    
+
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
         markProfileEvent("End Event");
@@ -2732,7 +2737,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
-    
+
     void GL3PlusRenderSystem::markProfileEvent( const String &eventName )
     {
         if ( eventName.empty() )
@@ -2762,7 +2767,7 @@ namespace Ogre {
                 //FIXME If the above case fails, should this case ever be taken?
                 // Also switch to (unit == number) unless not operation is actually
                 // faster on some architectures.
-                
+
                 // Always OK to use the first unit.
                 return true;
             }
@@ -2806,24 +2811,24 @@ namespace Ogre {
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                GLSLSeparableProgram* programPipeline =
-                    GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
-                if (!programPipeline || !programPipeline->isAttributeValid(sem, elemIndex))
+                GLSLSeparableProgram* separableProgram =
+                    GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+                if (!separableProgram || !separableProgram->isAttributeValid(sem, elemIndex))
                 {
                     return;
                 }
 
-                attrib = (GLuint)programPipeline->getAttributeIndex(sem, elemIndex);
+                attrib = (GLuint)separableProgram->getAttributeIndex(sem, elemIndex);
             }
             else
             {
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
-                if (!linkProgram || !linkProgram->isAttributeValid(sem, elemIndex))
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                if (!monolithicProgram || !monolithicProgram->isAttributeValid(sem, elemIndex))
                 {
                     return;
                 }
 
-                attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
+                attrib = (GLuint)monolithicProgram->getAttributeIndex(sem, elemIndex);
             }
 
             if (mCurrentVertexShader)

@@ -130,8 +130,8 @@ namespace Ogre
         /// Compiles and links the separate programs.
         void compileAndLink(void);
         void loadIndividualProgram(GLSLShader *program);
-        /// Put a program pipeline in use.
-        void _useProgram(void);
+        // /// Put a program pipeline in use.
+        // void _useProgram(void);
         /// Build uniform references from active named uniforms.
         void buildGLUniformReferences(void);
 

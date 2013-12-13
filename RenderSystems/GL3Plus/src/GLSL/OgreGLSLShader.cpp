@@ -882,19 +882,19 @@ namespace Ogre {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object.
-                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+                GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
                 // Pass on parameters from params to program object uniforms.
-                programPipeline->updateUniforms(params, mask, mType);
-                programPipeline->updateAtomicCounters(params, mask, mType);
+                separableProgram->updateUniforms(params, mask, mType);
+                separableProgram->updateAtomicCounters(params, mask, mType);
             }
             else
             {
                 // Activate the link program object.
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 // Pass on parameters from params to program object uniforms.
-                linkProgram->updateUniforms(params, mask, mType);
+                monolithicProgram->updateUniforms(params, mask, mType);
                 //TODO add atomic counter support
-                //linkProgram->updateAtomicCounters(params, mask, mType);
+                //monolithicProgram->updateAtomicCounters(params, mask, mType);
             }
         }
         catch (Exception& e) {}
@@ -906,16 +906,16 @@ namespace Ogre {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Activate the program pipeline object.
-            GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+            GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
             // Pass on parameters from params to program object uniforms.
-            programPipeline->updatePassIterationUniforms(params);
+            separableProgram->updatePassIterationUniforms(params);
         }
         else
         {
             // Activate the link program object.
-            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
             // Pass on parameters from params to program object uniforms.
-            linkProgram->updatePassIterationUniforms(params);
+            monolithicProgram->updatePassIterationUniforms(params);
         }
     }
 
@@ -928,17 +928,17 @@ namespace Ogre {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object.
-                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+                GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
                 // Pass on parameters from params to program object uniforms.
-                programPipeline->updateUniformBlocks(params, mask, mType);
-                // programPipeline->updateShaderStorageBlock(params, mask, mType);
+                separableProgram->updateUniformBlocks(params, mask, mType);
+                // separableProgram->updateShaderStorageBlock(params, mask, mType);
             }
             else
             {
                 // Activate the link program object.
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 // Pass on parameters from params to program object uniforms.
-                linkProgram->updateUniformBlocks(params, mask, mType);
+                monolithicProgram->updateUniformBlocks(params, mask, mType);
             }
         }
         catch (Exception& e) {}

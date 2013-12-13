@@ -75,16 +75,6 @@ namespace Ogre
         */
         GLSLSeparableProgram* getCurrentSeparableProgram(void);
 
-        /** Get the program pipeline that combines the current program
-            objects.  If the program pipeline object was not
-            already created and linked a new one is created and
-            linked.
-        */
-        GLSLSeparableProgram* getActiveSeparableProgram(void);
-        //TODO Replace the above method with the one below, and rename
-        // mActiveSeparableProgram -> mCurrentSeparableProgram.
-        //void activateCurrentSeparableProgram(void);
-
         /** Set the active link programs for the next rendering state.
             The active program pipeline object will be cleared.
             Normally called from the GLSLShader::bindProgram and

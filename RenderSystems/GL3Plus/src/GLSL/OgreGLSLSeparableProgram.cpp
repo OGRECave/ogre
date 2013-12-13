@@ -234,13 +234,13 @@ namespace Ogre
         }
     }
 
-    void GLSLSeparableProgram::_useProgram(void)
-    {
-        if (mLinked)
-        {
-            OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
-        }
-    }
+    // void GLSLSeparableProgram::_useProgram(void)
+    // {
+    //     if (mLinked)
+    //     { 
+    //        OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
+    //     }
+    // }
 
 
     GLint GLSLSeparableProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
@@ -286,7 +286,13 @@ namespace Ogre
             buildGLUniformReferences();
         }
 
-        _useProgram();
+        // _useProgram();
+
+
+        if (mLinked)
+        { 
+            OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
+        }
     }
 
 
