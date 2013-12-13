@@ -79,7 +79,7 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
         // mCamera->setFarClipDistance(100);
         
         mOgreEnt = mSceneMgr->createEntity("PlainHead", "ogrehead.mesh");
-        mOgreEnt->setMaterialName("JAJ/Basic");
+        mOgreEnt->setMaterialName("Compute");
         //mOgreEnt->setMaterialName("BaseWhiteNoLighting");
         SceneNode* ogre = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ogre->setPosition(50, -50, 140);
