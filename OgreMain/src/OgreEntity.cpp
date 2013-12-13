@@ -55,6 +55,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
+	extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
     Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
 		: MovableObject( id, objectMemoryManager ),
@@ -160,7 +161,12 @@ namespace Ogre {
 		buildSubEntityList(mMesh, &mSubEntityList);
 
 		for( size_t i=0; i<mSubEntityList.size(); ++i )
-			mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
+		{
+			if( !mSubEntityList[i].getMaterial().isNull() )
+				mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
+			else
+				mLodMaterial[i] = &c_DefaultLodMesh;
+		}
 
 		// Check if mesh is using manual LOD
 		if (mMesh->isLodManual())

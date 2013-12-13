@@ -574,8 +574,12 @@ void SceneManager::clearScene(void)
 	destroyAllMovableObjects();
 
 	// Clear root node of all children
-	getRootSceneNode()->removeAllChildren();
-	getRootSceneNode()->detachAllObjects();
+	for( int i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+	{
+		SceneMemoryMgrTypes currentMgrType = static_cast<SceneMemoryMgrTypes>( i );
+		getRootSceneNode(currentMgrType)->removeAllChildren();
+		getRootSceneNode(currentMgrType)->detachAllObjects();
+	}
 
 	// Delete all SceneNodes, except root that is
 	for (SceneNodeList::iterator i = mSceneNodes.begin();

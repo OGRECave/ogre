@@ -125,9 +125,9 @@ THE SOFTWARE.
         }
 
         ///r = (a * b) + c
-        #define _mm_madd_ps( a, b, c )		vaddq_f32( c, vmulq_f32( a, b ) )
+        #define _mm_madd_ps( a, b, c )		vmlaq_f32( c, a, b )
         ///r = -(a * b) + c
-        #define _mm_nmsub_ps( a, b, c )		vsubq_f32( c, vmulq_f32( a, b ) )
+        #define _mm_nmsub_ps( a, b, c )		vmlsq_f32( c, a, b )
 
         /// Does not convert, just cast ArrayReal to ArrayInt
         #define CastRealToInt( x )			vreinterpretq_s32_f32( x )
