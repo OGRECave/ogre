@@ -20,7 +20,7 @@ using namespace OgreBites;
 SamplePlugin* sp;
 Sample* s;
 
-class _OgreSampleClassExport Sample_Basic : public SdkSample
+class _OgreSampleClassExport Sample_Compute : public SdkSample
 {
     Entity* mOgreEnt;
 
@@ -31,11 +31,11 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 
  public:
         
-    Sample_Basic() 
+    Sample_Compute() 
     { 
-        mInfo["Title"] = "Basic";
-        mInfo["Description"] = "A basic example using every available shader type.";
-        mInfo["Thumbnail"] = "thumb_basic.png";
+        mInfo["Title"] = "Compute";
+        mInfo["Description"] = "A basic example of the compute shader.";
+        mInfo["Thumbnail"] = "thumb_compute.png";
         mInfo["Category"] = "Tests";
     }
 
@@ -45,28 +45,28 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support atomic counters, "
                         "so you cannot run this sample. Sorry!",
-                        "Sample_Basic::testCapabilities");
+                        "Sample_Compute::testCapabilities");
         }
 
         if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support compute programs, "
                         "so you cannot run this sample. Sorry!",
-                        "Sample_Basic::testCapabilities");
+                        "Sample_Compute::testCapabilities");
         }
 
         if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support tesselation programs, "
                         "so you cannot run this sample. Sorry!",
-                        "Sample_Basic::testCapabilities");
+                        "Sample_Compute::testCapabilities");
         }
 
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
                         "so you cannot run this sample. Sorry!", 
-                        "Sample_Basic::testCapabilities");
+                        "Sample_Compute::testCapabilities");
         }
     }
 
@@ -196,7 +196,7 @@ class _OgreSampleClassExport Sample_Basic : public SdkSample
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-    s = new Sample_Basic;
+    s = new Sample_Compute;
     sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
     sp->addSample(s);
     Root::getSingleton().installPlugin(sp);
