@@ -40,7 +40,7 @@ VTestPlugin::VTestPlugin()
     // add the playpen tests
     addSample(new CubeMappingTest()); // no bg on Win
     addSample(new ParticleTest());
-    addSample(new StencilShadowTest()); // should show ogre head, barrel, taurus
+    // addSample(new StencilShadowTest()); // crashes on Windows; should show ogre head, barrel, taurus
     addSample(new TextureEffectsTest());
     addSample(new TransparencyTest());
 }
