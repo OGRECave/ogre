@@ -135,6 +135,7 @@ namespace Ogre {
 		{
 			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
 			mNodeMemoryManager = mNodeMemoryManager->getTwin();
+			_callMemoryChangeListeners();
 			retVal = true;
 		}
 
@@ -172,6 +173,8 @@ namespace Ogre {
 					(*itor)->parentDepthLevelChanged();
 					++itor;
 				}
+
+				_callMemoryChangeListeners();
 			}
 		}
     }
@@ -201,6 +204,8 @@ namespace Ogre {
 					(*itor)->parentDepthLevelChanged();
 					++itor;
 				}
+
+				_callMemoryChangeListeners();
 			}
 
 			mParent = 0;

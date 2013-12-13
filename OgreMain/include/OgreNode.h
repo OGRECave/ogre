@@ -150,8 +150,9 @@ namespace Ogre {
 		*/
 		vector<MemoryChangelistener*>::type mMemoryChangeListeners;
 
-        /// Only available internally - notification of parent.
+		/// Only available internally - notification of parent. Can't be null
         void setParent( Node* parent );
+		void unsetParent(void);
 
 		/// Notification from parent that we need to migrate to a different depth level
 		void parentDepthLevelChanged(void);
