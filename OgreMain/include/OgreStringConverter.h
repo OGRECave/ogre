@@ -275,7 +275,7 @@ namespace Ogre {
         static bool isNumber(const String& val);
 
         //-----------------------------------------------------------------------
-        static void setDefaultStringLocale(String loc)
+        static void setDefaultStringLocale(const String &loc)
         {
             msDefaultStringLocale = loc;
             msLocale = std::locale(msDefaultStringLocale.c_str());

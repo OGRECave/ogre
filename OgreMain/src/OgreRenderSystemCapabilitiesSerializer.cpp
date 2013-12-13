@@ -49,7 +49,7 @@ namespace Ogre
     }
 	
 	//-----------------------------------------------------------------------
-	static void write(const RenderSystemCapabilities* caps, String name, std::ostream &file)
+	static void write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file)
 	{
 		using namespace std;
 
@@ -165,7 +165,7 @@ namespace Ogre
 	}
 
     //-----------------------------------------------------------------------
-    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, String name, String filename)
+    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, const String &name, String filename)
     {
         using namespace std;
 
@@ -177,7 +177,7 @@ namespace Ogre
     }
 	
 	//-----------------------------------------------------------------------
-	String RenderSystemCapabilitiesSerializer::writeString(const RenderSystemCapabilities* caps, String name)
+	String RenderSystemCapabilitiesSerializer::writeString(const RenderSystemCapabilities* caps, const String &name)
 	{
 		using namespace std;
 		

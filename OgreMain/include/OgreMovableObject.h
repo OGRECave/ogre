@@ -379,7 +379,7 @@ namespace Ogre {
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         virtual uint8 getRenderQueueGroup(void) const;
 
-		/// return the full transformation of the parent sceneNode or the attachingPoint node
+		/// Return the full transformation of the parent sceneNode or the attachingPoint node
 		virtual const Matrix4& _getParentNodeFullTransform(void) const;
 
         /** Sets the query flags for this object.
@@ -490,9 +490,9 @@ namespace Ogre {
 		*/
 		virtual LightList* _getLightList() { return &mLightList; }
 
-		/// Define a default implementation of method from ShadowCaster which implements no shadows
+		/// Returns details of the edges which might be used to determine a silhouette
         EdgeData* getEdgeList(void) { return NULL; }
-		/// Define a default implementation of method from ShadowCaster which implements no shadows
+		/// Returns whether the object has a valid edge list.
 		bool hasEdgeList(void) { return false; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(

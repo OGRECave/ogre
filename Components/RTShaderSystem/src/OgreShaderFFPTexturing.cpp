@@ -113,7 +113,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
 		
-		hasError |= !(mWorldITMatrix.get())  || !(mViewMatrix.get()) || !(mWorldITMatrix.get());
+		hasError |= !(mWorldITMatrix.get())  || !(mViewMatrix.get()) || !(mWorldMatrix.get());
 		break;
 
 	case TEXCALC_ENVIRONMENT_MAP_REFLECTION:

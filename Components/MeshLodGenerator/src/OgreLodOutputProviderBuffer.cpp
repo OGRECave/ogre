@@ -72,7 +72,7 @@ namespace Ogre
 		// Create buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			vector<LodIndexBuffer>::type& lods = mBuffer.submesh[i].genIndexBuffers;
-			int indexCount = data->mIndexBufferInfoList[i].indexCount;
+			size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
 			lods.reserve(lods.size() + 1);
 			LodIndexBuffer& curLod = *lods.insert(lods.begin() + lodIndex, LodIndexBuffer());
 			if (indexCount == 0) {
@@ -121,10 +121,10 @@ void LodOutputProviderBuffer::inject()
 		typedef vector<LodIndexBuffer>::type GenBuffers;
 		GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 
-		int buffCount = buffers.size();
-		for (int n=0; n<buffCount;n++) {
+		size_t buffCount = buffers.size();
+		for (size_t n=0; n<buffCount;n++) {
 			LodIndexBuffer& buff = buffers[n];
-			int indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
+			size_t indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
 			OgreAssert((int)buff.indexCount >= 0, "");
 			lods.push_back(OGRE_NEW IndexData());
 			lods.back()->indexStart = buff.indexStart;
@@ -137,7 +137,7 @@ void LodOutputProviderBuffer::inject()
 						buff.indexSize == 2 ?
 						HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
 						indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-					int sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
+					size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
 					void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
 					memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);
 					lods.back()->indexBuffer->unlock();

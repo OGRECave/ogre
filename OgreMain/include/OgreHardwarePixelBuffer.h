@@ -66,7 +66,7 @@ namespace Ogre {
 
         
         /// Internal implementation of lock(), must be overridden in subclasses
-        virtual PixelBox lockImpl(const Image::Box lockBox,  LockOptions options) = 0;
+        virtual PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options) = 0;
 
         /** Internal implementation of lock(), do not OVERRIDE or CALL this
             for HardwarePixelBuffer implementations, but override the previous method */

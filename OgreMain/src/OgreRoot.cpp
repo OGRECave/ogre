@@ -318,10 +318,8 @@ namespace Ogre {
         OGRE_DELETE mMeshManager;
         OGRE_DELETE mParticleManager;
 
-        if( mControllerManager )
-            OGRE_DELETE mControllerManager;
-        if (mHighLevelGpuProgramManager)
-            OGRE_DELETE mHighLevelGpuProgramManager;
+        OGRE_DELETE mControllerManager;
+        OGRE_DELETE mHighLevelGpuProgramManager;
 
         unloadPlugins();
         OGRE_DELETE mMaterialManager;
@@ -793,11 +791,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::_syncAddedRemovedFrameListeners()
     {
-        for (set<FrameListener*>::type::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); i++)
+        for (set<FrameListener*>::type::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); ++i)
             mFrameListeners.erase(*i);
         mRemovedFrameListeners.clear();
 
-        for (set<FrameListener*>::type::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); i++)
+        for (set<FrameListener*>::type::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); ++i)
             mFrameListeners.insert(*i);
         mAddedFrameListeners.clear();
     }

@@ -133,16 +133,10 @@ namespace Ogre
 		mWorkers.clear();
 #endif
 
-		if (mWorkerFunc)
-		{
-			OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
-			mWorkerFunc = 0;
-		}
-
+        OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
+        mWorkerFunc = 0;
 
 		mIsRunning = false;
-
-
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueue::notifyWorkers()

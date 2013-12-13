@@ -117,7 +117,7 @@ namespace Ogre {
 
         for (; i < Length; i++)
         {
-            long c = long (String [i]);
+            int c = int (String [i]);
             if (isspace (c))
                 // Possible end of number
                 break;
@@ -179,7 +179,7 @@ namespace Ogre {
             return 0;
 
         const char *s = String;
-        int l = Length;
+        size_t l = Length;
         int c = 0;
         while (l > 0)
         {
@@ -771,7 +771,7 @@ namespace Ogre {
             }
         }
 
-        uint len = oArg.Length;
+        size_t len = oArg.Length;
         while (true)
         {
             Token t = GetToken (iExpand);

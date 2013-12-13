@@ -220,7 +220,7 @@ LodOutsideMarker::CHVertex* LodOutsideMarker::getFurthestVertex(CHTriangle* tri)
 	return furthestVertex;
 }
 
-int LodOutsideMarker::addVertex( CHVertex* vertex )
+size_t LodOutsideMarker::addVertex( CHVertex* vertex )
 {
 	getOutsideData(vertex)->isInsideHull = true;
 	// We use class members for triangles and edges only to prevent allocation.
@@ -286,13 +286,12 @@ bool LodOutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle
 	const Vector3& n = tri.normal;
 
 	bool b0, b1, b2;
-	Real d0, d1, d2;
 
 	// It should not contain malformed triangles!
 	assert(!isSamePosition(p0, p1) && !isSamePosition(p1, p2) && !isSamePosition(p2, p0));
 
 	{
-		d0 = pointToLineDir(ptarget, p0, p1, p2, n);
+		Real d0 = pointToLineDir(ptarget, p0, p1, p2, n);
 		if (std::abs(d0) <= mEpsilon){
 			//Vertex is on the edge, so we need to compare length.
 			return isInsideLine(ptarget, p0, p1);
@@ -301,7 +300,7 @@ bool LodOutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle
 	}
 
 	{
-		d1 = pointToLineDir(ptarget, p1, p2, p0, n);
+		Real d1 = pointToLineDir(ptarget, p1, p2, p0, n);
 		if (std::abs(d1) <= mEpsilon){
 			//Vertex is on the edge, so we need to compare length.
 			return isInsideLine(ptarget, p1, p2);
@@ -314,7 +313,7 @@ bool LodOutsideMarker::isInsideTriangle(const Vector3& ptarget, const CHTriangle
 	}
 
 	{
-		d2 = pointToLineDir(ptarget, p2, p0, p1, n);
+		Real d2 = pointToLineDir(ptarget, p2, p0, p1, n);
 		if (std::abs(d2) <= mEpsilon){
 			//Vertex is on the edge, so we need to compare length.
 			return isInsideLine(ptarget, p2, p0);
@@ -368,15 +367,15 @@ void LodOutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horiz
 	// inside edges are twice in the edge list, because it was added by 2 triangles.
 	assert(!horizon.empty());
 	std::sort(horizon.begin(), horizon.end());
-	int end = horizon.size();
-	int first = 0;
-	int last = 0;
-	int result = 0;
+	size_t end = horizon.size();
+	size_t first = 0;
+	size_t last = 0;
+	size_t result = 0;
 	// Removes edges, which are 2+ times in the sorted edge list.
 	while (++first != end) {
 		if (!(horizon[result] == horizon[first])) {
 			if (!(horizon[last] == horizon[first])) {
-				int dist = first - last;
+				size_t dist = first - last;
 				if (dist == 1) {
 					horizon[result++] = horizon[last];
 				}
@@ -419,8 +418,8 @@ void LodOutsideMarker::cleanHull()
 {
 	// cleanHull will remove triangles, which are marked as "removed"
 	// For fast performance, it will swap last item into the place of removed items.
-	int end = mHull.size() - 1;
-	int start = 0;
+	size_t end = mHull.size() - 1;
+	size_t start = 0;
 	while (start <= end) {
 		if (mHull[start].removed) {
 			// Replace removed item with last item

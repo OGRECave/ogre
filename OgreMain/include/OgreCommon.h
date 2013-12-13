@@ -416,7 +416,7 @@ namespace Ogre {
 
 		template <class InputIterator>
 		HashedVector(InputIterator a, InputIterator b)
-			: mList(a, b), mListHashDirty(false)
+			: mList(a, b), mListHash(0), mListHashDirty(false)
 		{
 			dirtyHash();
 		}

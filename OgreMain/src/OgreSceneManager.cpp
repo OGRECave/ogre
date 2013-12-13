@@ -1838,7 +1838,6 @@ void SceneManager::_setSkyBox(
         for (uint16 i = 0; i < 6; ++i)
         {
 			Plane plane;
-			String meshName;
 			Vector3 middle;
 			Vector3 up, right;
 
@@ -6414,10 +6413,7 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
 //---------------------------------------------------------------------
 void SceneManager::_resumeRendering(SceneManager::RenderContext* context) 
 {
-	if (mRenderQueue != 0) 
-	{
-		delete mRenderQueue;
-	}
+    delete mRenderQueue;
 	mRenderQueue = context->renderQueue;
 	_setActiveCompositorChain(context->activeChain);
 	Ogre::Viewport* vp = context->viewport;
@@ -7293,7 +7289,7 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 				pass->getTessellationHullProgramParameters(), mGpuParamsDirty);
 		}
 
-		if (pass->hasTessellationHullProgram())
+		if (pass->hasTessellationDomainProgram())
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
 				pass->getTessellationDomainProgramParameters(), mGpuParamsDirty);

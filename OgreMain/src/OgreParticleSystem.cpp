@@ -86,7 +86,6 @@ namespace Ogre {
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),
-        mWorldAABB(),
         mResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
         mIsRendererConfigured(false),
         mSpeedFactor(1.0f),
@@ -120,7 +119,6 @@ namespace Ogre {
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),
-        mWorldAABB(),
         mResourceGroupName(resourceGroup),
         mIsRendererConfigured(false),
         mSpeedFactor(1.0f),
@@ -447,13 +445,13 @@ namespace Ogre {
         for (i = mActiveParticles.begin(); i != itEnd; )
         {
             pParticle = static_cast<Particle*>(*i);
-            if (pParticle->timeToLive < timeElapsed)
+            if (pParticle->mTimeToLive < timeElapsed)
             {
                 // Notify renderer
                 mRenderer->_notifyParticleExpired(pParticle);
 
 				// Identify the particle type
-				if (pParticle->particleType == Particle::Visual)
+				if (pParticle->mParticleType == Particle::Visual)
 				{
 	                // Destroy this one
 		            mFreeParticles.splice(mFreeParticles.end(), mActiveParticles, i++);
@@ -475,7 +473,7 @@ namespace Ogre {
             else
             {
                 // Decrement TTL
-                pParticle->timeToLive -= timeElapsed;
+                pParticle->mTimeToLive -= timeElapsed;
 				++i;
             }
 
@@ -587,16 +585,16 @@ namespace Ogre {
 			// Translate position & direction into world space
 			if (!mLocalSpace)
 			{
-				p->position  = 
+				p->mPosition  =
 					(mParentNode->_getDerivedOrientation() *
-					(mParentNode->_getDerivedScale() * p->position))
+					(mParentNode->_getDerivedScale() * p->mPosition))
 					+ mParentNode->_getDerivedPosition();
-				p->direction = 
-					(mParentNode->_getDerivedOrientation() * p->direction);
+				p->mDirection =
+					(mParentNode->_getDerivedOrientation() * p->mDirection);
 			}
 
 			// apply partial frame motion to this particle
-            p->position += (p->direction * timePoint);
+            p->mPosition += (p->mDirection * timePoint);
 
 			// apply particle initialization by the affectors
 			itAffEnd = mAffectors.end();
@@ -606,13 +604,13 @@ namespace Ogre {
 			// Increment time fragment
 			timePoint += timeInc;
 
-			if (p->particleType == Particle::Emitter)
+			if (p->mParticleType == Particle::Emitter)
 			{
 				// If the particle is an emitter, the position on the emitter side must also be initialised
 				// Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
 				// to false (will this become a problem?)
 				ParticleEmitter* pParticleEmitter = static_cast<ParticleEmitter*>(p);
-				pParticleEmitter->setPosition(p->position);
+				pParticleEmitter->setPosition(p->mPosition);
 			}
 
             // Notify renderer
@@ -630,15 +628,15 @@ namespace Ogre {
         for (i = mActiveParticles.begin(); i != itEnd; ++i)
         {
             pParticle = static_cast<Particle*>(*i);
-            pParticle->position += (pParticle->direction * timeElapsed);
+            pParticle->mPosition += (pParticle->mDirection * timeElapsed);
 
-			if (pParticle->particleType == Particle::Emitter)
+			if (pParticle->mParticleType == Particle::Emitter)
 			{
 				// If it is an emitter, the emitter position must also be updated
 				// Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
 				// to false (will this become a problem?)
 				pParticleEmitter = static_cast<ParticleEmitter*>(*i);
-				pParticleEmitter->setPosition(pParticle->position);
+				pParticleEmitter->setPosition(pParticle->mPosition);
 			}
         }
 
@@ -717,7 +715,7 @@ namespace Ogre {
 		if (fee && !fee->empty())
 		{
 	        p = fee->front();
-			p->particleType = Particle::Emitter;
+			p->mParticleType = Particle::Emitter;
 			fee->pop_front();
 			mActiveParticles.push_back(p);
 
@@ -854,13 +852,13 @@ namespace Ogre {
                     {
                         Vector3 padding = 
                             halfScale * std::max((*p)->mWidth, (*p)->mHeight);
-                        min.makeFloor((*p)->position - padding);
-                        max.makeCeil((*p)->position + padding);
+                        min.makeFloor((*p)->mPosition - padding);
+                        max.makeCeil((*p)->mPosition + padding);
                     }
                     else
                     {
-                        min.makeFloor((*p)->position - defaultPadding);
-                        max.makeCeil((*p)->position + defaultPadding);
+                        min.makeFloor((*p)->mPosition - defaultPadding);
+                        max.makeCeil((*p)->mPosition + defaultPadding);
                     }
                 }
                 mWorldAABB.setExtents(min, max);
@@ -1238,7 +1236,7 @@ namespace Ogre {
     }
     float ParticleSystem::SortByDirectionFunctor::operator()(Particle* p) const
     {
-        return sortDir.dotProduct(p->position);
+        return sortDir.dotProduct(p->mPosition);
     }
     ParticleSystem::SortByDistanceFunctor::SortByDistanceFunctor(const Vector3& pos)
         : sortPos(pos)
@@ -1247,7 +1245,7 @@ namespace Ogre {
     float ParticleSystem::SortByDistanceFunctor::operator()(Particle* p) const
     {
         // Sort descending by squared distance
-        return - (sortPos - p->position).squaredLength();
+        return - (sortPos - p->mPosition).squaredLength();
     }
 	//-----------------------------------------------------------------------
 	uint32 ParticleSystem::getTypeFlags(void) const
@@ -1356,10 +1354,9 @@ namespace Ogre {
 			e = &emittedEmitterPoolIterator->second;
 
 			// Search the correct emitter in the mEmitters vector
-			ParticleEmitter* emitter = 0;
 			for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
 			{
-				emitter = *emitterIterator;
+				ParticleEmitter* emitter = *emitterIterator;
 				if (emitter && 
 					name != StringUtil::BLANK && 
 					name == emitter->getName())

@@ -664,9 +664,6 @@ namespace Ogre {
         Real mBoundsUpdateTime;
         Real mUpdateRemainTime;
 
-        /// World AABB, only used to compare world-space positions to calc bounds
-        AxisAlignedBox mWorldAABB;
-
         /// Name of the resource group to use to load materials
         String mResourceGroupName;
         /// Name of the material to use

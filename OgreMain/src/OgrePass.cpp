@@ -1435,14 +1435,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Pass::setVertexProgram(const String& name, bool resetParams)
 	{
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
 
 		if (getVertexProgramName() != name)
 		{
 			// Turn off vertex program if name blank
 			if (name.empty())
 			{
-				if (mVertexProgramUsage) OGRE_DELETE mVertexProgramUsage;
+				OGRE_DELETE mVertexProgramUsage;
 				mVertexProgramUsage = NULL;
 			}
 			else
@@ -1485,7 +1485,7 @@ namespace Ogre {
 			// Turn off fragment program if name blank
 			if (name.empty())
 			{
-				if (mFragmentProgramUsage) OGRE_DELETE mFragmentProgramUsage;
+				OGRE_DELETE mFragmentProgramUsage;
 				mFragmentProgramUsage = NULL;
 			}
 			else
@@ -1527,7 +1527,7 @@ namespace Ogre {
 			// Turn off geometry program if name blank
 			if (name.empty())
 			{
-				if (mGeometryProgramUsage) OGRE_DELETE mGeometryProgramUsage;
+				OGRE_DELETE mGeometryProgramUsage;
 				mGeometryProgramUsage = NULL;
 			}
 			else
@@ -1569,7 +1569,7 @@ namespace Ogre {
 			// Turn off tessellation Hull program if name blank
 			if (name.empty())
 			{
-				if (mTessellationHullProgramUsage) OGRE_DELETE mTessellationHullProgramUsage;
+				OGRE_DELETE mTessellationHullProgramUsage;
 				mTessellationHullProgramUsage = NULL;
 			}
 			else
@@ -1611,7 +1611,7 @@ namespace Ogre {
 			// Turn off tessellation Domain program if name blank
 			if (name.empty())
 			{
-				if (mTessellationDomainProgramUsage) OGRE_DELETE mTessellationDomainProgramUsage;
+				OGRE_DELETE mTessellationDomainProgramUsage;
 				mTessellationDomainProgramUsage = NULL;
 			}
 			else
@@ -1653,7 +1653,7 @@ namespace Ogre {
 			// Turn off compute program if name blank
 			if (name.empty())
 			{
-				if (mComputeProgramUsage) OGRE_DELETE mComputeProgramUsage;
+				OGRE_DELETE mComputeProgramUsage;
 				mComputeProgramUsage = NULL;
 			}
 			else
@@ -2039,7 +2039,7 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowCasterVertexProgramUsage) OGRE_DELETE mShadowCasterVertexProgramUsage;
+            OGRE_DELETE mShadowCasterVertexProgramUsage;
             mShadowCasterVertexProgramUsage = NULL;
         }
         else
@@ -2094,7 +2094,7 @@ namespace Ogre {
         // Turn off fragment program if name blank
         if (name.empty())
         {
-            if (mShadowCasterFragmentProgramUsage) OGRE_DELETE mShadowCasterFragmentProgramUsage;
+            OGRE_DELETE mShadowCasterFragmentProgramUsage;
             mShadowCasterFragmentProgramUsage = NULL;
         }
         else
@@ -2155,7 +2155,7 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowReceiverVertexProgramUsage) OGRE_DELETE mShadowReceiverVertexProgramUsage;
+            OGRE_DELETE mShadowReceiverVertexProgramUsage;
             mShadowReceiverVertexProgramUsage = NULL;
         }
         else
@@ -2210,7 +2210,7 @@ namespace Ogre {
 		// Turn off Fragment program if name blank
 		if (name.empty())
 		{
-			if (mShadowReceiverFragmentProgramUsage) OGRE_DELETE mShadowReceiverFragmentProgramUsage;
+			OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 			mShadowReceiverFragmentProgramUsage = NULL;
 		}
 		else

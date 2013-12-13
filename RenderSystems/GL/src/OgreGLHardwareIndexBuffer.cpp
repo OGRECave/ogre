@@ -35,7 +35,8 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     GLHardwareIndexBuffer::GLHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType,
         size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer), mLockedToScratch(false),
+        mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         glGenBuffersARB( 1, &mBufferId );
 

@@ -125,17 +125,17 @@ protected:
 
     void _removeNodeAndChildren( );
 
-    ///local bounding box
+    /// Local bounding box
     AxisAlignedBox mLocalAABB;
 
     ///Octree this node is attached to.
     Octree *mOctant;
 
-    ///preallocated corners for rendering
+    /// Preallocated corners for rendering
     Real mCorners[ 24 ];
-    ///shared colors for rendering
+    /// Shared colors for rendering
     static unsigned long mColors[ 8 ];
-    ///shared indexes for rendering
+    /// Shared indexes for rendering
     static unsigned short mIndexes[ 24 ];
 
 

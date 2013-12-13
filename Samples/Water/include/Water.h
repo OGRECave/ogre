@@ -453,10 +453,10 @@ protected:
 		ParticleIterator pit = particleSystem->_getIterator() ;
 		while(!pit.end()) {
 			Particle *particle = pit.getNext();
-			Vector3 ppos = particle->position;
-			if (ppos.y<=0 && particle->timeToLive>0) { // hits the water!
+			Vector3 ppos = particle->mPosition;
+			if (ppos.y<=0 && particle->mTimeToLive>0) { // hits the water!
 				// delete particle
-				particle->timeToLive = 0.0f;
+				particle->mTimeToLive = 0.0f;
 				// push the water
 				float x = ppos.x / PLANE_SIZE * COMPLEXITY ;
 				float y = ppos.z / PLANE_SIZE * COMPLEXITY ;

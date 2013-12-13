@@ -79,7 +79,7 @@ namespace Ogre {
 		OGRE_STATIC_MUTEX(msDeviceAccessMutex);
 	protected:
 		/// Lock a box
-		PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+		PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
 		PixelBox lockBuffer(BufferResources* bufferResources, const Image::Box &lockBox, DWORD flags);
 
 		/// Unlock a box

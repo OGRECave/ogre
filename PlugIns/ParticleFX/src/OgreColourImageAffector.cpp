@@ -59,7 +59,7 @@ namespace Ogre {
             _loadImage();
         }
 
-        pParticle->colour = mColourImage.getColourAt(0, 0, 0);
+        pParticle->mColour = mColourImage.getColourAt(0, 0, 0);
     
 	}
     //-----------------------------------------------------------------------
@@ -78,8 +78,8 @@ namespace Ogre {
 		while (!pi.end())
 		{
 			p = pi.getNext();
-			const Real		life_time		= p->totalTimeToLive;
-			Real			particle_time	= 1.0f - (p->timeToLive / life_time); 
+			const Real		life_time		= p->mTotalTimeToLive;
+			Real			particle_time	= 1.0f - (p->mTimeToLive / life_time);
 
 			if (particle_time > 1.0f)
 				particle_time = 1.0f;
@@ -91,11 +91,11 @@ namespace Ogre {
 
             if(index < 0)
             {
-				p->colour = mColourImage.getColourAt(0, 0, 0);
+				p->mColour = mColourImage.getColourAt(0, 0, 0);
             }
             else if(index >= width) 
             {
-                p->colour = mColourImage.getColourAt(width, 0, 0);
+                p->mColour = mColourImage.getColourAt(width, 0, 0);
             }
             else
             {
@@ -107,10 +107,10 @@ namespace Ogre {
                 ColourValue from=mColourImage.getColourAt(index, 0, 0),
 							to=mColourImage.getColourAt(index+1, 0, 0);
 
-				p->colour.r = from.r*from_colour + to.r*to_colour;
-                p->colour.g = from.g*from_colour + to.g*to_colour;
-                p->colour.b = from.b*from_colour + to.b*to_colour;
-                p->colour.a = from.a*from_colour + to.a*to_colour;
+				p->mColour.r = from.r*from_colour + to.r*to_colour;
+                p->mColour.g = from.g*from_colour + to.g*to_colour;
+                p->mColour.b = from.b*from_colour + to.b*to_colour;
+                p->mColour.a = from.a*from_colour + to.a*to_colour;
 			}
 		}
     }

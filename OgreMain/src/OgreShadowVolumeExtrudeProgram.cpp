@@ -829,7 +829,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     const String& ShadowVolumeExtrudeProgram::getProgramSource(
-        Light::LightTypes lightType, const String syntax, bool finite, bool debug)
+        Light::LightTypes lightType, const String &syntax, bool finite, bool debug)
     {
         if (lightType == Light::LT_DIRECTIONAL)
         {

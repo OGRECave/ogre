@@ -191,12 +191,11 @@ namespace Ogre {
 		}
 	    String line;
 	    Overlay* pOverlay = 0;
-		bool skipLine;
 
 	    while(!stream->eof())
 	    {
 			bool isATemplate = false;
-			skipLine = false;
+			bool skipLine = false;
 		    line = stream->getLine();
 		    // Ignore comments & blanks
 		    if (!(line.length() == 0 || line.substr(0,2) == "//"))

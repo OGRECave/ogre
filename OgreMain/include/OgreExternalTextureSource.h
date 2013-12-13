@@ -112,7 +112,7 @@ namespace Ogre
 		//manually to create video through code 
 
 		/// Sets an input file name - if needed by plugin
-		void setInputName( String sIN ) { mInputFileName = sIN; }
+		void setInputName( const String &sIN ) { mInputFileName = sIN; }
 		/// Gets currently set input file name
 		const String& getInputName( ) const	{ return mInputFileName; }
 		/// Sets the frames per second - plugin may or may not use this

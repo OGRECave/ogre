@@ -39,8 +39,8 @@ namespace Ogre {
         size_t numIndexes,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, 
-                              usage, false, false)//useShadowBuffer)
+    : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, false), mLockedToScratch(false),
+        mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 

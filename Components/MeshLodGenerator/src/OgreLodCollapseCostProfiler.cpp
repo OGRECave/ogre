@@ -41,7 +41,7 @@ namespace Ogre
 	{
 		LodData::VEdges::iterator it = vertex->edges.begin();
 		if(!mHasProfile[LodData::getVectorIDFromPointer(data->mVertexList, vertex)]){
-			for (; it != vertex->edges.end(); it++) {
+			for (; it != vertex->edges.end(); ++it) {
 				it->collapseCost = mCostCalculator->computeEdgeCollapseCost(data, vertex, &*it);
 				if (collapseCost > it->collapseCost) {
 					collapseCost = it->collapseCost;
@@ -50,9 +50,9 @@ namespace Ogre
 			}
 		} else {
 			std::pair<ProfileLookup::iterator, ProfileLookup::iterator> ret = mProfileLookup.equal_range(vertex);
-			for (; it != vertex->edges.end(); it++) {
+			for (; it != vertex->edges.end(); ++it) {
 				it->collapseCost = LodData::UNINITIALIZED_COLLAPSE_COST;
-				for(ProfileLookup::iterator it2 = ret.first; it2 != ret.second; it2++){
+				for(ProfileLookup::iterator it2 = ret.first; it2 != ret.second; ++it2){
 					if(it2->second.dst == it->dst ){
 						it->collapseCost = it2->second.cost;
 						break;

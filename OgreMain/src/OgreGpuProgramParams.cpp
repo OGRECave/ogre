@@ -295,7 +295,6 @@ namespace Ogre
         // Decide on endian mode
         determineEndianness(endianMode);
 
-        String msg;
         mStream =stream;
         if (!stream->isWriteable())
         {

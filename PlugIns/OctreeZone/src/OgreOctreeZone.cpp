@@ -1045,8 +1045,8 @@ namespace Ogre
 		mOctree = OGRE_NEW Octree( this, 0 );
 		// set the octree bounding box 
 		mOctree->mBox = box;
-		const Vector3 min = box.getMinimum();
-		const Vector3 max = box.getMaximum();
+		const Vector3 &min = box.getMinimum();
+		const Vector3 &max = box.getMaximum();
 		mOctree->mHalfSize = ( max - min ) * 0.5f;
 
 		OctreeZoneData * ozd;

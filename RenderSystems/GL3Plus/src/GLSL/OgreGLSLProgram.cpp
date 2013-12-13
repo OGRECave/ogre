@@ -46,9 +46,11 @@ namespace Ogre {
         , mGeometryShader(geometryShader)
         , mFragmentShader(fragmentShader)
         , mComputeShader(computeShader)
+        , mVertexArrayObject(0)
         , mUniformRefsBuilt(false)
         , mLinked(false)
         , mTriedToLinkAndFailed(false)
+        , mSkeletalAnimation(false)
     {
         // init mCustomAttributesIndexes
         for (size_t i = 0 ; i < VES_COUNT; i++)

@@ -77,9 +77,7 @@ namespace Ogre {
 		}
         mObjectsByName.clear();
 
-        if (mWireBoundingBox) {
-			OGRE_DELETE mWireBoundingBox;
-		}
+        OGRE_DELETE mWireBoundingBox;
     }
     //-----------------------------------------------------------------------
     void SceneNode::_update(bool updateChildren, bool parentHasChanged)

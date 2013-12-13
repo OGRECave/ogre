@@ -675,7 +675,7 @@ namespace OgreBites
                 mSampleMenu->setItems(sampleTitles);
                 if (mSampleMenu->getNumItems() != 0) itemSelected(mSampleMenu);
 
-                mSampleSlider->setRange(1, sampleTitles.size(), sampleTitles.size());
+				mSampleSlider->setRange(1, static_cast<Ogre::Real>(sampleTitles.size()), static_cast<Ogre::Real>(sampleTitles.size()));
             }
             else if (menu == mSampleMenu)    // sample changed, so update slider, label and description
             {

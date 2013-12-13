@@ -75,7 +75,7 @@ namespace Ogre {
         }
     }
 
-    PixelBox GL3PlusHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+    PixelBox GL3PlusHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
     {
         allocateBuffer();
         if(options != HardwareBuffer::HBL_DISCARD)

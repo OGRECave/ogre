@@ -68,7 +68,7 @@ struct _OgreLodExport LodData {
 	struct VertexHash {
 		LodData* mGen;
 
-		VertexHash() { assert(0); }
+		VertexHash() : mGen(0) { assert(0); }
 		VertexHash(LodData* gen) { mGen = gen; }
 		size_t operator() (const Vertex* v) const;
 	};

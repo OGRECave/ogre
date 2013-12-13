@@ -42,6 +42,7 @@ namespace Ogre
 	LodConfigSerializer::LodConfigSerializer()
 	{
 		mVersion = "[LodConfigSerializer_v1.0]";
+        mLodConfig = 0;
 	}
 
 	void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, const Ogre::String& filename)
@@ -69,10 +70,9 @@ namespace Ogre
 		readFileHeader(mStream);
 
 		pushInnerChunk(mStream);
-		unsigned short streamID;
 		while (!mStream->eof())
 		{
-			streamID = readChunk(mStream);
+			unsigned short streamID = readChunk(mStream);
 			switch (streamID)
 			{
 			case LCCID_LOD_CONFIG:

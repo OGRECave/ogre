@@ -75,7 +75,7 @@ void GLHardwarePixelBuffer::freeBuffer()
 	}
 }
 //-----------------------------------------------------------------------------  
-PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
 {
 	allocateBuffer();
 	if(options != HardwareBuffer::HBL_DISCARD) 

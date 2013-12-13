@@ -63,7 +63,7 @@ namespace Ogre
 		// Create buffers.
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-			int indexCount = data->mIndexBufferInfoList[i].indexCount;
+			size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
 			IndexData* curLod = OGRE_NEW IndexData();
 			curLod->indexStart = 0;
 			lods.insert(lods.begin() + lodIndex, curLod);
