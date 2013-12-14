@@ -150,7 +150,7 @@ namespace Ogre {
 
         //TODO GL4+ glBindTransformFeedback
 
-        // Dynamically deteremine shader output variable names.
+        // Dynamically determine shader output variable names.
         std::vector<String> nameStrings;
         std::vector<const GLchar*> names;
         for (uint e = 0; e < elemCount; e++)
@@ -158,6 +158,11 @@ namespace Ogre {
             const VertexElement* element = declaration->getElement(e);
             String name = getSemanticVaryingName(element->getSemantic(), element->getIndex());
             nameStrings.push_back(name);
+        }
+
+        // Convert to const char * for GL
+        for (uint e = 0; e < elemCount; e++)
+        {
             names.push_back(nameStrings[e].c_str());
         }
 
