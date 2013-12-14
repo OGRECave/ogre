@@ -691,7 +691,7 @@ namespace Ogre {
 					// This sprintf replaced a call to StringConverter::toString for performance reasons
 					char buff[9];
 					memset(buff, 0, 9);
-					sprintf(buff, "%x", idx);
+					sprintf(buff, "%lx", static_cast<long>(idx));
                     state->setName( buff );
                     
 					/** since the name was never set and a default one has been made, clear the alias name
