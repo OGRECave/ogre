@@ -12,8 +12,8 @@
   -----------------------------------------------------------------------------
 */
 
-#ifndef _CompositorDemo_H_
-#define _CompositorDemo_H_
+#ifndef __CompositorDemo_H__
+#define __CompositorDemo_H__
 
 #include "OgreConfigFile.h"
 #include "OgreStringConverter.h"
@@ -96,7 +96,8 @@ Sample_Compositor::Sample_Compositor()
     mInfo["Thumbnail"] = "thumb_comp.png";
     mInfo["Category"] = "Effects";
 }
-//--------------------------------------------------------------------------
+
+
 void Sample_Compositor::setupView()
 {
     SdkSample::setupView();
@@ -104,15 +105,16 @@ void Sample_Compositor::setupView()
     mCamera->lookAt(Ogre::Vector3(0,0,-300));
     mCamera->setNearClipDistance(1);
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::setupContent(void)
 {
     // Register the compositor logics
     // See comment in beginning of HelperLogics.h for explanation
     Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-    mCompositorLogics["GaussianBlur"]   = new GaussianBlurLogic;
-    mCompositorLogics["HDR"]                    = new HDRLogic;
-    mCompositorLogics["HeatVision"]             = new HeatVisionLogic;
+    mCompositorLogics["GaussianBlur"] = new GaussianBlurLogic;
+    mCompositorLogics["HDR"] = new HDRLogic;
+    mCompositorLogics["HeatVision"] = new HeatVisionLogic;
     compMgr.registerCompositorLogic("GaussianBlur", mCompositorLogics["GaussianBlur"]);
     compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
     compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);
@@ -132,6 +134,8 @@ void Sample_Compositor::setupContent(void)
     setDragLook(true);
 #endif
 }
+
+
 StringVector Sample_Compositor::getRequiredPlugins()
 {
     StringVector names;
@@ -139,7 +143,8 @@ StringVector Sample_Compositor::getRequiredPlugins()
         names.push_back("Cg Program Manager");
     return names;
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::registerCompositors(void)
 {
     Ogre::Viewport *vp = mViewport;
@@ -179,14 +184,15 @@ void Sample_Compositor::registerCompositors(void)
             Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
         } catch (...) {
             /// Warn user
-			LogManager::getSingleton().logMessage("Could not load compositor " + compositorName, LML_CRITICAL);
+            LogManager::getSingleton().logMessage("Could not load compositor " + compositorName, LML_CRITICAL);
         }
     }
 
     mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
         ((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::changePage(size_t pageNum)
 {
     assert(pageNum < mNumCompositorPages);
@@ -228,7 +234,8 @@ void Sample_Compositor::changePage(size_t pageNum)
     ss << "Compositors " << pageNum + 1 << "/" << mNumCompositorPages;
     pageButton->setCaption(ss.str());
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::cleanupContent(void)
 {
     mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
@@ -250,7 +257,8 @@ void Sample_Compositor::cleanupContent(void)
     mCompositorLogics.clear();
     MeshManager::getSingleton().remove("Myplane");
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::setupControls(void)
 {
     mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Compositors", 175);
@@ -283,7 +291,8 @@ void Sample_Compositor::setupControls(void)
     mTrayMgr->showLogo(TL_BOTTOMLEFT);
     mTrayMgr->toggleAdvancedFrameStats();
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 {
     if (Ogre::StringUtil::startsWith(box->getName(), "Compositor_", false))
@@ -349,13 +358,15 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
         }
     }
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::buttonHit(OgreBites::Button* button)
 {
     size_t nextPage = (mActiveCompositorPage + 1) % mNumCompositorPages;
     changePage(nextPage);
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 {
     if (menu->getSelectionIndex() == 0)
@@ -367,7 +378,7 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
     }
 
     mTrayMgr->getWidget("DebugRTTPanel")->show();
-	mTrayMgr->moveWidgetToTray("DebugRTTPanel", TL_TOPRIGHT, static_cast<unsigned int>(mTrayMgr->getNumWidgets(TL_TOPRIGHT) - 1));
+    mTrayMgr->moveWidgetToTray("DebugRTTPanel", TL_TOPRIGHT, static_cast<unsigned int>(mTrayMgr->getNumWidgets(TL_TOPRIGHT) - 1));
     StringVector parts = StringUtil::split(menu->getSelectedItem(), ";");
     mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
 
@@ -381,7 +392,8 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
                                                  StringConverter::parseUnsignedInt(parts[2]));
     }
 }
-//-----------------------------------------------------------------------------------
+
+
 void Sample_Compositor::setupScene(void)
 {
     mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
@@ -434,13 +446,15 @@ void Sample_Compositor::setupScene(void)
     mCamera->setPosition(-400, 50, 900);
     mCamera->lookAt(0,80,0);
 }
-//-----------------------------------------------------------------------------------
+
+
 bool Sample_Compositor::frameRenderingQueued(const FrameEvent& evt)
 {
     mSpinny->yaw(Ogre::Degree(10 * evt.timeSinceLastFrame));
     return SdkSample::frameRenderingQueued(evt);
 }
-//-----------------------------------------------------------------------------------
+
+
 /// Create the hard coded postfilter effects
 void Sample_Compositor::createEffects(void)
 {
@@ -526,7 +540,7 @@ void Sample_Compositor::createEffects(void)
     /// Motion blur effect
     Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
         "Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		);
+    );
     {
         Ogre::CompositionTechnique *t = comp3->createTechnique();
         {
@@ -597,7 +611,7 @@ void Sample_Compositor::createEffects(void)
     /// Heat vision effect
     Ogre::CompositorPtr comp4 = Ogre::CompositorManager::getSingleton().create(
         "Heat Vision", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		);
+    );
     {
         Ogre::CompositionTechnique *t = comp4->createTechnique();
         t->setCompositorLogicName("HeatVision");
@@ -645,7 +659,8 @@ void Sample_Compositor::createEffects(void)
         }
     }
 }
-//--------------------------------------------------------------------------
+
+
 void Sample_Compositor::createTextures(void)
 {
     using namespace Ogre;
