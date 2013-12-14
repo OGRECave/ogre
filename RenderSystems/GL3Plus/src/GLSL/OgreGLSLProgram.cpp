@@ -53,9 +53,9 @@ namespace Ogre {
         , mSkeletalAnimation(false)
     {
         // init mCustomAttributesIndexes
-        for (size_t i = 0 ; i < VES_COUNT; i++)
+        for (size_t i = 0; i < VES_COUNT; i++)
         {
-            for (size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
+            for (size_t j = 0; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
             {
                 mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
             }
