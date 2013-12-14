@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreTransform.h"
 
+#include "OgreNode.h"
+
 namespace Ogre
 {
 	const size_t NodeArrayMemoryManager::ElementsMemSize[NodeArrayMemoryManager::NumMemoryTypes] =

@@ -398,7 +398,7 @@ namespace Ogre
 				// 1. All entities sharing the same transformation will share the same unique number
 				// 2. "transform lookup number" will be numbered from 0 up to getMaxLookupTableInstances
 				size_t lookupCounter = 0;
-				typedef map<Matrix4*,size_t>::type MapTransformId;
+				typedef map<SkeletonInstance*,size_t>::type MapTransformId;
 				MapTransformId transformToId;
 				InstancedEntityVec::const_iterator itEnt = mInstancedEntities.begin(),
 					itEntEnd = mInstancedEntities.end();
@@ -406,7 +406,7 @@ namespace Ogre
 				{
 					if ((*itEnt)->isInScene())
 					{
-						Matrix4* transformUniqueId = (*itEnt)->mBoneMatrices;
+						SkeletonInstance* transformUniqueId = (*itEnt)->mSkeletonInstance;
 						MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
 						if (itLu == transformToId.end())
 						{
@@ -447,6 +447,9 @@ namespace Ogre
 		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
 										 &mLocalObjectMemoryManager,
 										 this, static_cast<uint32>(num),
+								 #ifndef OGRE_LEGACY_ANIMATIONS
+										 0,
+								 #endif
 										 sharedTransformEntity );
 	}
 
@@ -518,7 +521,7 @@ namespace Ogre
 
 		hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 
-		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getOldSkeleton().isNull() )
 		{
 			if(mWeightCount > 1)
 			{

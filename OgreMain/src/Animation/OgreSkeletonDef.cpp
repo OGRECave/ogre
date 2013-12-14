@@ -41,7 +41,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	SkeletonDef::SkeletonDef( const Skeleton *originalSkeleton, Real frameRate ) : mNumUnusedSlots( 0 )
+	SkeletonDef::SkeletonDef( const Skeleton *originalSkeleton, Real frameRate ) :
+		mNumUnusedSlots( 0 ),
+		mName( originalSkeleton->getName() )
 	{
 		mBones.reserve( originalSkeleton->getNumBones() );
 

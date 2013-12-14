@@ -127,7 +127,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchShader::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
 	{
-		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getOldSkeleton().isNull() )
 			mNumWorldMatrices = mInstancesPerBatch * baseSubMesh->blendIndexToBoneIndexMap.size();
 		InstanceBatch::buildFrom( baseSubMesh, renderOperation );
 	}
@@ -146,7 +146,7 @@ namespace Ogre
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration( thisVertexData->vertexDeclaration );
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
 
-		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getOldSkeleton().isNull() )
 		{
 			//Building hw skinned batches follow a different path
 			setupHardwareSkinned( baseSubMesh, thisVertexData, baseVertexData );

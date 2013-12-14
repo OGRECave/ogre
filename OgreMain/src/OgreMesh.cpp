@@ -46,6 +46,9 @@ THE SOFTWARE.
 #include "OgreLodConfig.h"
 #include "OgrePixelCountLodStrategy.h"
 
+#include "Animation/OgreSkeletonDef.h"
+#include "Animation/OgreSkeletonManager.h"
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     Mesh::Mesh(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -359,8 +362,9 @@ namespace Ogre {
 		newMesh->mVertexBufferShadowBuffer = mVertexBufferShadowBuffer;
 		newMesh->mIndexBufferShadowBuffer = mIndexBufferShadowBuffer;
 
-        newMesh->mSkeletonName = mSkeletonName;
-        newMesh->mSkeleton = mSkeleton;
+		newMesh->mSkeletonName = mSkeletonName;
+		newMesh->mOldSkeleton = mOldSkeleton;
+		newMesh->mSkeleton    = mSkeleton;
 
 		// Keep prepared shadow volume info (buffers may already be prepared)
 		newMesh->mPreparedForShadowVolumes = mPreparedForShadowVolumes;
@@ -431,16 +435,21 @@ namespace Ogre {
 			if (skelName.empty())
 			{
 				// No skeleton
+				mOldSkeleton.setNull();
 				mSkeleton.setNull();
 			}
 			else
 			{
 				// Load skeleton
 				try {
-					mSkeleton = OldSkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
+					mOldSkeleton = OldSkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
+
+					//TODO: put mOldSkeleton in legacy mode only.
+					mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( mOldSkeleton.get() );
 				}
 				catch (...)
 				{
+					mOldSkeleton.setNull();
 					mSkeleton.setNull();
 					// Log this error
 					String msg = "Unable to load skeleton ";
@@ -460,12 +469,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Mesh::hasSkeleton(void) const
     {
-        return !(mSkeletonName.empty());
+		return !(mSkeletonName.empty());
     }
     //-----------------------------------------------------------------------
-    const SkeletonPtr& Mesh::getSkeleton(void) const
+	const SkeletonPtr& Mesh::getOldSkeleton(void) const
     {
-        return mSkeleton;
+		return mOldSkeleton;
     }
     //-----------------------------------------------------------------------
     void Mesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
@@ -484,10 +493,10 @@ namespace Ogre {
     void Mesh::_initAnimationState(AnimationStateSet* animSet)
     {
 		// Animation states for skeletal animation
-		if (!mSkeleton.isNull())
+		if (!mOldSkeleton.isNull())
 		{
 			// Delegate to Skeleton
-			mSkeleton->_initAnimationState(animSet);
+			mOldSkeleton->_initAnimationState(animSet);
 
 			// Take the opportunity to update the compiled bone assignments
             _updateCompiledBoneAssignments();
@@ -513,9 +522,9 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void Mesh::_refreshAnimationState(AnimationStateSet* animSet)
 	{
-		if (!mSkeleton.isNull())
+		if (!mOldSkeleton.isNull())
 		{
-			mSkeleton->_refreshAnimationState(animSet);
+			mOldSkeleton->_refreshAnimationState(animSet);
 		}
 
 		// Merge in any new vertex animations
@@ -827,8 +836,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::_notifySkeleton(SkeletonPtr& pSkel)
     {
-        mSkeleton = pSkel;
-        mSkeletonName = pSkel->getName();
+		mOldSkeleton = pSkel;
+		mSkeletonName = pSkel->getName();
+
+		mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( mOldSkeleton.get() );
     }
     //---------------------------------------------------------------------
     Mesh::BoneAssignmentIterator Mesh::getBoneAssignmentIterator(void)
@@ -837,9 +848,9 @@ namespace Ogre {
             mBoneAssignments.end());
     }
     //---------------------------------------------------------------------
-    const String& Mesh::getSkeletonName(void) const
+	const String& Mesh::getSkeletonName(void) const
     {
-        return mSkeletonName;
+		return mSkeletonName;
     }
     //---------------------------------------------------------------------
     ushort Mesh::getNumLodLevels(void) const

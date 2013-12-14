@@ -91,7 +91,7 @@ namespace Ogre
 	bool InstancedEntity::shareTransformWith( InstancedEntity *slave )
 	{
 		if( !this->mBatchOwner->_getMeshRef()->hasSkeleton() ||
-			this->mBatchOwner->_getMeshRef()->getSkeleton().isNull() ||
+			this->mBatchOwner->_getMeshRef()->getOldSkeleton().isNull() ||
 			!this->mBatchOwner->_supportsSkeletalAnimation() )
 		{
 			return false;
@@ -106,8 +106,8 @@ namespace Ogre
 			return false;
 		}
 
-		if( this->mBatchOwner->_getMeshRef()->getSkeleton() !=
-			slave->mBatchOwner->_getMeshRef()->getSkeleton() )
+		if( this->mBatchOwner->_getMeshRef()->getOldSkeleton() !=
+			slave->mBatchOwner->_getMeshRef()->getOldSkeleton() )
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Sharing transforms requires both instanced"
 											" entities to have the same skeleton",
@@ -291,10 +291,11 @@ namespace Ogre
 	{
 		//Is mesh skeletally animated?
 		if( mBatchOwner->_getMeshRef()->hasSkeleton() &&
-			!mBatchOwner->_getMeshRef()->getSkeleton().isNull() &&
+			!mBatchOwner->_getMeshRef()->getOldSkeleton().isNull() &&
 			mBatchOwner->_supportsSkeletalAnimation() )
 		{
-			mSkeletonInstance = OGRE_NEW OldSkeletonInstance( mBatchOwner->_getMeshRef()->getSkeleton() );
+#ifdef OGRE_LEGACY_ANIMATIONS
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance( mBatchOwner->_getMeshRef()->getOldSkeleton() );
 			mSkeletonInstance->load();
 
 			mBoneMatrices		= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
@@ -312,6 +313,10 @@ namespace Ogre
 
 			if( mParentNode )
 				mBatchOwner->_addAnimatedInstance( this );
+#else
+			const SkeletonDef *skeletonDef = mBatchOwner->_getMeshRef()->getSkeleton().get();
+			mSkeletonInstance = OGRE_NEW SkeletonInstance( skeletonDef, 0 );
+#endif
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -328,14 +333,17 @@ namespace Ogre
 			mSharingPartners.clear();
 
 			OGRE_DELETE mSkeletonInstance;
+			mSkeletonInstance	= 0;
+
+#ifdef OGRE_LEGACY_ANIMATIONS
 			OGRE_DELETE mAnimationState;
 			OGRE_FREE_SIMD( mBoneMatrices, MEMCATEGORY_ANIMATION );
 			OGRE_FREE_SIMD( mBoneWorldMatrices, MEMCATEGORY_ANIMATION );
 
-			mSkeletonInstance	= 0;
 			mAnimationState		= 0;
 			mBoneMatrices		= 0;
 			mBoneWorldMatrices	= 0;
+#endif
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -355,9 +363,11 @@ namespace Ogre
 			mBatchOwner->_markTransformSharingDirty();
 
 			mSkeletonInstance	= 0;
+#ifdef OGRE_LEGACY_ANIMATIONS
 			mAnimationState		= 0;
 			mBoneMatrices		= 0;
 			mBoneWorldMatrices	= 0;
+#endif
 			mSharedTransformEntity = 0;
 		}
 	}
@@ -411,6 +421,7 @@ namespace Ogre
 
 		if( different )
 		{
+#ifdef OGRE_LEGACY_ANIMATIONS
 			if( parent )
 			{
 				//Check we're skeletally animated and actual owners of our transform
@@ -421,6 +432,7 @@ namespace Ogre
 			{
 				mBatchOwner->_removeAnimatedInstance( this );
 			}
+#endif
 
 			if( isStatic() )
 				_notifyStaticDirty();

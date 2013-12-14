@@ -93,6 +93,8 @@ namespace Ogre
 
 		vector<list<size_t>::type>::type mBonesPerDepth;
 
+		String					mName;
+
 	public:
 		/** Constructs this Skeleton based on the old format's Skeleton. The frameRate parameter
 			indicates at which framerate it was recorded (i.e. 15fps, 25fps) so that all keyframe
@@ -101,6 +103,8 @@ namespace Ogre
 			If the framerate information has been lost, set it to 1.
 		*/
 		SkeletonDef( const Skeleton *originalSkeleton, Real frameRate );
+
+		const String& getName(void) const								{ return mName; }
 
 		const BoneDataVec& getBones(void) const							{ return mBones; }
 		const SkeletonAnimationDefVec& getAnimationDefs(void) const		{ return mAnimationDefs; }

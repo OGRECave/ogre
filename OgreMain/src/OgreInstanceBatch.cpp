@@ -256,7 +256,11 @@ namespace Ogre
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
 		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
-										 &mLocalObjectMemoryManager, this, static_cast<uint32>(num) );
+										 &mLocalObjectMemoryManager, this, static_cast<uint32>(num)
+								 #ifndef OGRE_LEGACY_ANIMATIONS
+										 , 0
+								 #endif
+										 );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()

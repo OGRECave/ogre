@@ -46,7 +46,7 @@ namespace Ogre
 	OldSkeletonManager::OldSkeletonManager()
     {
         mLoadOrder = 300.0f;
-        mResourceType = "Skeleton";
+		mResourceType = "OldSkeleton";
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }

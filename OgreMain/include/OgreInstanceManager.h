@@ -311,8 +311,10 @@ namespace Ogre
         */
         void _addDirtyStaticBatch( InstanceBatch *dirtyBatch );
 
+#ifdef OGRE_USE_LEGACY_ANIMATIONS
 		/// Called by SceneManager every frame
 		void _updateAnimations(void);
+#endif
 
 		/** Called by SceneManager every frame from multiple threads */
         void _updateDirtyBatchesThread( size_t threadIdx );

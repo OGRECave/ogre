@@ -147,9 +147,9 @@ namespace Ogre {
 			return;
 
 		// Is mesh skeletally animated?
-		if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull())
+		if (mMesh->hasSkeleton() && !mMesh->getOldSkeleton().isNull())
 		{
-			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getOldSkeleton());
 			mSkeletonInstance->load();
 		}
 
@@ -650,7 +650,7 @@ namespace Ogre {
         // Animation dirty if animation state modified or manual bones modified
         bool animationDirty =
             (mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
-            (hasSkeleton() && getSkeleton()->getManualBonesDirty());
+			(hasSkeleton() && getSkeleton()->getManualBonesDirty());
 		
 		//update the current hardware animation state
 		mCurrentHWAnimationState = hwAnimation;
@@ -1162,13 +1162,13 @@ namespace Ogre {
     bool Entity::_isAnimated(void) const
     {
         return (mAnimationState && mAnimationState->hasEnabledAnimationState()) ||
-               (getSkeleton() && getSkeleton()->hasManualBones());
+			   (getSkeleton() && getSkeleton()->hasManualBones());
     }
 	//-----------------------------------------------------------------------
     bool Entity::_isSkeletonAnimated(void) const
     {
-        return getSkeleton() &&
-            (mAnimationState->hasEnabledAnimationState() || getSkeleton()->hasManualBones());
+		return getSkeleton() &&
+			(mAnimationState->hasEnabledAnimationState() || getSkeleton()->hasManualBones());
     }
 	//-----------------------------------------------------------------------
 	VertexData* Entity::_getSkelAnimVertexData(void) const
@@ -1773,7 +1773,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)
     {
-        if (entity->getMesh()->getSkeleton() != getMesh()->getSkeleton())
+		if (entity->getMesh()->getOldSkeleton() != getMesh()->getOldSkeleton())
         {
             OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
                 "The supplied entity has a different skeleton.",
@@ -1837,7 +1837,7 @@ namespace Ogre {
         }
         else
         {
-            mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getOldSkeleton());
             mSkeletonInstance->load();
             mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);

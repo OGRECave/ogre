@@ -843,8 +843,10 @@ namespace Ogre {
 		void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
 											const T *mo ) const;
 
+#ifdef OGRE_USE_LEGACY_ANIMATIONS
 		/// Updates all instance managers' animations
 		void updateInstanceManagerAnimations(void);
+#endif
 
 		/** Updates all instance managers with dirty instance batches from multiple threads.
 			@see updateInstanceManagers and @see InstanceBatch::_updateEntitiesBoundsThread */

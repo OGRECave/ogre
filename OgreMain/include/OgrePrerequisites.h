@@ -286,6 +286,7 @@ namespace Ogre {
     class SimpleRenderable;
 	class SimpleSpline;
     class Skeleton;
+	class SkeletonDef;
 	class SkeletonInstance;
     class Sphere;
     class SphereSceneQuery;
@@ -325,8 +326,9 @@ namespace Ogre {
     typedef SharedPtr<Material> MaterialPtr;
     typedef SharedPtr<Mesh> MeshPtr;
     typedef SharedPtr<PatchMesh> PatchMeshPtr;
-    typedef SharedPtr<Resource> ResourcePtr;
+	typedef SharedPtr<Resource> ResourcePtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
+	typedef SharedPtr<SkeletonDef> SkeletonDefPtr;
     typedef SharedPtr<Texture> TexturePtr;
 }
 
