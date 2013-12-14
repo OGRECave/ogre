@@ -4,9 +4,10 @@
   @section intro Introduction
   
   @subsection s1 What is this?
-  This is the complete API reference for OGRE; contained within are the 
-  specifications for each class and the methods on those classes which you can 
-  refer to when writing code which uses OGRE. 
+  This is the complete API reference for <a href="www.ogre3d.org"><b>OGRE</b></a> (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine) version <b>1.9.0</b> ("Ghadamon"). Contained within are the 
+  specifications for each class and the methods from those classes which you can refer to when writing code which uses OGRE. 
+  
+  The API references for previous OGRE versions can be found under the following link: <a href="www.ogre3d.org/docs/api/X.Y">www.ogre3d.org/docs/api/X.Y</a> (replace X.Y with the version number, for example 1.7 or 1.8).
   
   @subsection s2 It's so BIG!
   
@@ -16,21 +17,21 @@
   start learning. You will certainly want
   to refer to this documentation once you have found your feet, and pretty soon
   referring to it will become second nature. Until then, you should begin with 
-  more discussive documentation such as:
-  @li <a href="http://www.ogre3d.org/docs/manual/">The Manual</a> You should 
-    also have a local copy of this in your distribution; the OGRE manual is a
+  more "discussive" documentation such as:
+  @li <a href="http://www.ogre3d.org/docs/manual/"><b>The Manual</b></a>: The OGRE manual is a
 	general introduction to the OGRE principles and core components, and a 
 	reference to various important parts of the OGRE system, especially the
-	script syntax for materials, particle systems, and overlays. 
-  @li <a href="http://www.ogre3d.org/wiki">The OGRE Wiki</a> A Wiki is a 
+	script syntax for materials, particle systems, and overlays. You should 
+    find a local copy of this in your distribution.  
+  @li <a href="http://www.ogre3d.org/wiki"><b>The OGRE Wiki</b></a>: A Wiki is a 
   	collaborative web-based documentation system where people in the whole 
 	OGRE community can contribute tips, tutorials and sample code, among other 
 	things. This is a gold mine for new and experienced users alike.
 
   We make an effort to document our classes fully so we hope you can find what
   you need here. However, if you can't find it, or you're not sure where to 
-  start looking, visit the main OGRE website and dip into the community areas
-  like the wiki and the forums to get some assistance. 
+  start looking, visit the <a href="http://www.ogre3d.org">main OGRE website</a> and dip into the <a href="http://www.ogre3d.org/support">community areas</a>
+  like the <a href="http://www.ogre3d.org/wiki">wiki</a> and the <a href="http://www.ogre3d.org/forums/">forums</a> to get some assistance. 
   
 */
 
