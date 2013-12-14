@@ -124,8 +124,8 @@ namespace Ogre {
     RenderOperation() :
         vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
             indexData(0), srcRenderable(0), numberOfInstances(1),
-            useGlobalInstancingVertexBufferIsAvailable(true),
-            renderToVertexBuffer(false)
+            renderToVertexBuffer(false),
+            useGlobalInstancingVertexBufferIsAvailable(true)
             {}
 
 
