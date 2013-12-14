@@ -7,7 +7,7 @@
   This is the complete API reference for <a href="www.ogre3d.org"><b>OGRE</b></a> (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine) version <b>1.9.0</b> ("Ghadamon"). Contained within are the 
   specifications for each class and the methods from those classes which you can refer to when writing code which uses OGRE. 
   
-  The API references for previous OGRE versions can be found under the following link: <a href="www.ogre3d.org/docs/api/X.Y">www.ogre3d.org/docs/api/X.Y</a> (replace X.Y with the version number, for example 1.7 or 1.8).
+  The API references for previous OGRE versions can be found under the following link: <a href="http://www.ogre3d.org/docs/api/X.Y">www.ogre3d.org/docs/api/X.Y</a> (replace X.Y with the version number, for example 1.7 or 1.8).
   
   @subsection s2 It's so BIG!
   
