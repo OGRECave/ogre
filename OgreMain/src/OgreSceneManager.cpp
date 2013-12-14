@@ -1220,7 +1220,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
 			if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
 			{
-				fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera,
+				fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera, lodCamera,
 													 vp->getVisibilityMask()|getVisibilityMask() ) );
 			}
 
@@ -2115,6 +2115,9 @@ void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 f
 	mUpdateLodRequest	= UpdateLodRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
 											 lodCamera, lodCamera, lodBias );
 
+	mUpdateLodRequest.camera->getFrustumPlanes();
+	mUpdateLodRequest.lodCamera->getFrustumPlanes();
+
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
@@ -2127,7 +2130,8 @@ void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullReques
 
 	while( itor != end )
 	{
-		(*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.combinedVisibilityFlags );
+		(*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.lodCamera,
+												   request.combinedVisibilityFlags );
 		++itor;
 	}
 }
@@ -5251,6 +5255,7 @@ void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullR
 	mInstanceBatchCullRequest = request;
 	mRequestType = CULL_FRUSTUM_INSTANCEDENTS;
 	mInstanceBatchCullRequest.frustum->getFrustumPlanes(); // Ensure they're up to date.
+	mInstanceBatchCullRequest.lodCamera->getFrustumPlanes(); // Ensure they're up to date.
 	mWorkerThreadsBarrier->sync(); //Fire threads
 	mWorkerThreadsBarrier->sync(); //Wait them to complete
 }

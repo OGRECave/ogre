@@ -214,10 +214,13 @@ namespace Ogre {
 	struct InstanceBatchCullRequest
 	{
 		Frustum const	*frustum;
+		Camera const	*lodCamera;
 		uint32			combinedVisibilityFlags;
-		InstanceBatchCullRequest() : frustum( 0 ), combinedVisibilityFlags( 0 ) {}
-		InstanceBatchCullRequest( const Frustum *_frustum, uint32 _combinedVisibilityFlags ) :
-							frustum( _frustum ), combinedVisibilityFlags( _combinedVisibilityFlags )
+		InstanceBatchCullRequest() : frustum( 0 ), lodCamera( 0 ), combinedVisibilityFlags( 0 ) {}
+		InstanceBatchCullRequest( const Frustum *_frustum, const Camera *_lodCamera,
+								  uint32 _combinedVisibilityFlags ) :
+						frustum( _frustum ), lodCamera( _lodCamera ),
+						combinedVisibilityFlags( _combinedVisibilityFlags )
 		{
 		}
 	};

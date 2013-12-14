@@ -267,7 +267,7 @@ namespace Ogre {
 								 AxisAlignedBox *outReceiversBox, const Camera *lodCamera );
 
 		/// @See InstancingTheadedCullingMethod, @see InstanceBatch::instanceBatchCullFrustumThreaded
-		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum, const Camera *lodCamera,
 														uint32 combinedVisibilityFlags ) {}
 
 		/** Exactly the same as @see cullFrustum except that it doesn't produce outCulledObjects.
