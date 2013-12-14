@@ -47,7 +47,7 @@ namespace Ogre {
             skeleton data; like other resource managers it handles
 			the creation of resources (in this case skeleton data).
     */
-	class _OgreExport SkeletonManager : public Singleton<SkeletonManager>
+	class _OgreExport SkeletonManager : public Singleton<SkeletonManager>, public ResourceAlloc
 	{
 		typedef map<IdString, SkeletonDefPtr>::type SkeletonDefMap;
 		SkeletonDefMap mSkeletonDefs;
