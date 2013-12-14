@@ -13,7 +13,7 @@ void main()
     vec4 inPos = position;
     gl_Position = vec4(inPos.x, flipping * inPos.y, 0.0, 1.0);
     inPos.xy = sign(inPos.xy);
-    uv  = (vec2(inPos.x, -inPos.y) + 1.0)/2.0;
+    uv  = (vec2(inPos.x, -inPos.y) + 1.0) / 2.0;
 
     // gl_Position = worldViewProj * vertex;
     // uv  = uv0;
