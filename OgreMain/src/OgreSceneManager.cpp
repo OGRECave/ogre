@@ -482,7 +482,7 @@ void SceneManager::destroyAllEntities(void)
 	destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-SkeletonInstance* SceneManager::createSkeletonInstance( SkeletonDef *skeletonDef )
+SkeletonInstance* SceneManager::createSkeletonInstance( const SkeletonDef *skeletonDef )
 {
 	IdString defName( skeletonDef->getName() );
 	SkeletonAnimManager::BySkeletonDefList::iterator itor = std::find(
@@ -538,11 +538,12 @@ void SceneManager::destroySkeletonInstance( SkeletonInstance *skeletonInstance )
 
 	if( it == skeletonsArray.end() || *it != skeletonInstance )
 	{
-		OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 					 "Trying to remove a SkeletonInstance we don't have. Have you already removed it?",
 					 "SceneManager::destroySkeletonInstance" );
 	}
 
+	OGRE_DELETE *it;
 	skeletonsArray.erase( it );
 
 	//Update the thread starts, they have changed.

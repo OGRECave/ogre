@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgreStringConverter.h"
 #include "OgreCamera.h"
+#include "OgreSceneManager.h"
 #include "OgreException.h"
 
 #include "Math/Array/OgreBooleanMask.h"
@@ -315,7 +316,8 @@ namespace Ogre
 				mBatchOwner->_addAnimatedInstance( this );
 #else
 			const SkeletonDef *skeletonDef = mBatchOwner->_getMeshRef()->getSkeleton().get();
-			mSkeletonInstance = OGRE_NEW SkeletonInstance( skeletonDef, 0 );
+			SceneManager *sceneManager = mBatchOwner->_getManager();
+			mSkeletonInstance = sceneManager->createSkeletonInstance( skeletonDef );
 #endif
 		}
 	}
@@ -332,14 +334,16 @@ namespace Ogre
 			}
 			mSharingPartners.clear();
 
+#ifndef OGRE_LEGACY_ANIMATIONS
+			SceneManager *sceneManager = mBatchOwner->_getManager();
+			sceneManager->destroySkeletonInstance( mSkeletonInstance );
+#else
 			OGRE_DELETE mSkeletonInstance;
-			mSkeletonInstance	= 0;
-
-#ifdef OGRE_LEGACY_ANIMATIONS
 			OGRE_DELETE mAnimationState;
 			OGRE_FREE_SIMD( mBoneMatrices, MEMCATEGORY_ANIMATION );
 			OGRE_FREE_SIMD( mBoneWorldMatrices, MEMCATEGORY_ANIMATION );
 
+			mSkeletonInstance	= 0;
 			mAnimationState		= 0;
 			mBoneMatrices		= 0;
 			mBoneWorldMatrices	= 0;

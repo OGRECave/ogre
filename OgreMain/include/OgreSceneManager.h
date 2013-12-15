@@ -1402,7 +1402,7 @@ namespace Ogre {
         virtual void destroyAllEntities(void);
 
 		/// Creates an instance of a skeleton based on the given definition.
-		SkeletonInstance* createSkeletonInstance( SkeletonDef *skeletonDef );
+		SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );
 		void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
 
 		/// Destryos an instance of a skeleton created with @createSkeletonInstance.
