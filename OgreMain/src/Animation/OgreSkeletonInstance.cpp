@@ -355,4 +355,15 @@ namespace Ogre
 			++itor;
 		}
 	}
+	//-----------------------------------------------------------------------------------
+	const void* SkeletonInstance::_getMemoryBlock(void) const
+	{
+		return reinterpret_cast<const void*>( mBoneStartTransforms[0].mOwner );
+	}
+	//-----------------------------------------------------------------------------------
+	const void* SkeletonInstance::_getMemoryUniqueOffset(void) const
+	{
+		return reinterpret_cast<const void*>(
+						mBoneStartTransforms[0].mOwner + mBoneStartTransforms[0].mIndex );
+	}
 }

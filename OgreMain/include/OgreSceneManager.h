@@ -55,6 +55,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
+#include "Math/Array/OgreBoneMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
@@ -450,9 +451,10 @@ namespace Ogre {
 		{
 			struct BySkeletonDef
 			{
-				NodeMemoryManager				nodeMemoryManager;
+				IdString						skeletonDefName;
+				BoneMemoryManager				boneMemoryManager;
 
-				/** MUST be sorted by location in its NodeMemoryManager's slot
+				/** MUST be sorted by location in its BoneMemoryManager's slot
 					(in order to update in parallel without causing race conditions)
 					@See threadStarts
 				*/
@@ -463,7 +465,13 @@ namespace Ogre {
 					we need to account that instances that share the same memory block.
 				*/
 				FastArray<size_t>				threadStarts;
+
+				BySkeletonDef( IdString defName, size_t threadCount );
+				void updateThreadStarts(void);
+
+				bool operator == ( IdString name ) const { return skeletonDefName == name; }
 			};
+
 			typedef list<BySkeletonDef>::type BySkeletonDefList;
 			BySkeletonDefList bySkeletonDefs;
 		};
@@ -1364,6 +1372,13 @@ namespace Ogre {
                 SceneManager::clearScene
         */
         virtual void destroyAllEntities(void);
+
+		/// Creates an instance of a skeleton based on the given definition.
+		SkeletonInstance* createSkeletonInstance( SkeletonDef *skeletonDef );
+		void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
+
+		/// Destryos an instance of a skeleton created with @createSkeletonInstance.
+		void destryoSkeletonInstance( SkeletonInstance *instance );
 
         /** Create a ManualObject, an object which you populate with geometry
 			manually through a GL immediate-mode style interface.

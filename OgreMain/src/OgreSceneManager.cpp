@@ -69,6 +69,7 @@ THE SOFTWARE.
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
+#include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Threading/OgreBarrier.h"
@@ -478,11 +479,105 @@ void SceneManager::destroyEntity(Entity *e)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllEntities(void)
 {
-
 	destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
 }
-
 //-----------------------------------------------------------------------
+SkeletonInstance* SceneManager::createSkeletonInstance( SkeletonDef *skeletonDef )
+{
+	IdString defName( skeletonDef->getName() );
+	SkeletonAnimManager::BySkeletonDefList::iterator itor = std::find(
+										mSkeletonAnimationManager.bySkeletonDefs.begin(),
+										mSkeletonAnimationManager.bySkeletonDefs.end(), defName );
+	if( itor == mSkeletonAnimationManager.bySkeletonDefs.end() )
+	{
+		mSkeletonAnimationManager.bySkeletonDefs.push_front(
+								SkeletonAnimManager::BySkeletonDef( defName, mNumWorkerThreads ) );
+		itor = mSkeletonAnimationManager.bySkeletonDefs.begin();
+	}
+
+	SkeletonAnimManager::BySkeletonDef &bySkelDef = *itor;
+	FastArray<SkeletonInstance*> &skeletonsArray = bySkelDef.skeletons;
+	SkeletonInstance *newInstance = OGRE_NEW SkeletonInstance( skeletonDef,
+																&bySkelDef.boneMemoryManager );
+	FastArray<SkeletonInstance*>::iterator it = std::lower_bound(
+														skeletonsArray.begin(), skeletonsArray.end(),
+														OrderSkeletonInstanceByMemory( newInstance ) );
+
+	//If this assert triggers, two instances got the same memory slot. Most likely we forgot to
+	//remove a previous instance and the slot was reused. Otherwise something nasty happened.
+	assert( (*it)->_getMemoryUniqueOffset() != newInstance );
+
+	skeletonsArray.insert( it, newInstance );
+
+	//Update the thread starts, they have changed.
+	bySkelDef.updateThreadStarts();
+
+	return newInstance;
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroySkeletonInstance( SkeletonInstance *skeletonInstance )
+{
+	IdString defName( skeletonInstance->getDefinition()->getName() );
+	SkeletonAnimManager::BySkeletonDefList::iterator itor = std::find(
+										mSkeletonAnimationManager.bySkeletonDefs.begin(),
+										mSkeletonAnimationManager.bySkeletonDefs.end(), defName );
+
+	if( itor != mSkeletonAnimationManager.bySkeletonDefs.end() )
+	{
+		OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+					 "Trying to remove a SkeletonInstance for which we have no definition for!",
+					 "SceneManager::destroySkeletonInstance" );
+	}
+
+	SkeletonAnimManager::BySkeletonDef &bySkelDef = *itor;
+	FastArray<SkeletonInstance*> &skeletonsArray = bySkelDef.skeletons;
+
+	FastArray<SkeletonInstance*>::iterator it = std::lower_bound(
+													skeletonsArray.begin(), skeletonsArray.end(),
+													OrderSkeletonInstanceByMemory( skeletonInstance ) );
+
+	if( it == skeletonsArray.end() || *it != skeletonInstance )
+	{
+		OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+					 "Trying to remove a SkeletonInstance we don't have. Have you already removed it?",
+					 "SceneManager::destroySkeletonInstance" );
+	}
+
+	skeletonsArray.erase( it );
+
+	//Update the thread starts, they have changed.
+	bySkelDef.updateThreadStarts();
+}
+//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
+SceneManager::SkeletonAnimManager::BySkeletonDef::BySkeletonDef( IdString defName, size_t threadCount ) :
+	skeletonDefName( defName )
+{
+	threadStarts.resize( threadCount + 1, 0 );
+}
+//-----------------------------------------------------------------------
+void SceneManager::SkeletonAnimManager::BySkeletonDef::updateThreadStarts(void)
+{
+	size_t lastStart = 0;
+	size_t increments = std::min<size_t>( ARRAY_PACKED_REALS,
+										  skeletons.size() / (threadStarts.size() - 1) );
+	for( size_t i=0; i<threadStarts.size(); ++i )
+	{
+		threadStarts[i] = lastStart;
+		lastStart += increments;
+		lastStart = std::min( lastStart, skeletons.size() );
+
+		while( lastStart < skeletons.size() &&
+			   skeletons[lastStart]->_getMemoryBlock() ==
+			   skeletons[lastStart-1]->_getMemoryBlock() )
+		{
+			++lastStart;
+		}
+	}
+}
+//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
+
 void SceneManager::destroyAllBillboardSets(void)
 {
 	destroyAllMovableObjectsByType(BillboardSetFactory::FACTORY_TYPE_NAME);

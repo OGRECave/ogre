@@ -98,6 +98,8 @@ namespace Ogre
 		SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
 		~SkeletonInstance();
 
+		const SkeletonDef* getDefinition(void) const				{ return mDefinition; }
+
 		void update(void);
 
 		/// Resets the transform of all bones to the binding pose. Manual bones are not reset
@@ -154,7 +156,25 @@ namespace Ogre
 
 		void getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,
 							const FastArray<unsigned short> &usedBones ) const;
+
+		const void* _getMemoryBlock(void) const;
+		const void* _getMemoryUniqueOffset(void) const;
 	};
+
+	struct OrderSkeletonInstanceByMemory
+	{
+		const SkeletonInstance *ptr;
+		OrderSkeletonInstanceByMemory( const SkeletonInstance *_ptr ) : ptr( _ptr ) {}
+	};
+
+	inline bool operator < ( OrderSkeletonInstanceByMemory _left, const SkeletonInstance *_right )
+	{
+		return _left.ptr->_getMemoryUniqueOffset() < _right->_getMemoryUniqueOffset();
+	}
+	inline bool operator < ( const SkeletonInstance *_left, OrderSkeletonInstanceByMemory _right )
+	{
+		return _left->_getMemoryUniqueOffset() < _right.ptr->_getMemoryUniqueOffset();
+	}
 
 	/** @} */
 	/** @} */
