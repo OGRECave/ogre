@@ -81,7 +81,8 @@ protected:
 	int								mCurrentMesh;
 	std::vector<MovableObject*>		mEntities;
 	std::vector<SceneNode*>			mSceneNodes;
-	std::set<AnimationState*>		mAnimations;
+	std::vector<SkeletonAnimation*>	mAnimations;
+	std::vector<AnimationState*>	mAnimationsLegacy;
 	InstanceManager					*mCurrentManager;
 	bool							mSupportedTechniques[NUM_TECHNIQUES+1];
 	const char**						mCurrentMaterialSet;
