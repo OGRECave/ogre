@@ -92,6 +92,14 @@ namespace Ogre
         typedef vector<InstancedEntity*>::type  InstancedEntityVec;
         typedef vector<Vector4>::type           CustomParamsVec;
 		typedef FastArray<InstancedEntity*>		InstancedEntityArray;
+
+		enum SkeletalAnimationMode
+		{
+			SKELETONS_NOT_SUPPORTED,
+			SKELETONS_SUPPORTED,
+			SKELETONS_LUT
+		};
+
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
@@ -124,8 +132,7 @@ namespace Ogre
         ///the memory overhead. They default to Vector4::ZERO
 		CustomParamsVec		mCustomParams;
 
-        /// False if a technique doesn't support skeletal animation
-        bool                mTechnSupportsSkeletal;
+        SkeletalAnimationMode	mTechnSupportsSkeletal;
 
         /// Cached distance to last camera for getSquaredViewDepth
         mutable Real mCachedCameraDist;
@@ -192,7 +199,7 @@ namespace Ogre
             by the derived class is faster than virtual call overhead. And both are clean
             ways of implementing it.
         */
-        bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
+        SkeletalAnimationMode _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
 #ifdef OGRE_LEGACY_ANIMATIONS
 		/// Updates animations from all our entities.
@@ -337,10 +344,12 @@ namespace Ogre
         */
 		void removeInstancedEntity( InstancedEntity *instancedEntity );
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** Tells whether world bone matrices need to be calculated.
 			This does not include bone matrices which are calculated regardless
         */
-		virtual bool useBoneWorldMatrices() const { return true; }
+		bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal == SKELETONS_LUT; }
+#endif
 
 		/** Tells that the list of entity instances with shared transforms has changed */
 		void _markTransformSharingDirty() { mTransformSharingDirty = true; }

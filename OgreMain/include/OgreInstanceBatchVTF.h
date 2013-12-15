@@ -93,7 +93,6 @@ namespace Ogre
 		float* 					mTempTransformsArray3x4;
 
 		// The state of the usage of bone matrix lookup
-		bool mUseBoneMatrixLookup;
 		size_t mMaxLookupTableInstances;
 
 		bool mUseBoneDualQuaternions;
@@ -169,13 +168,17 @@ namespace Ogre
 		Note this feature only works in VTF_HW for now.
 		This value needs to be set before adding any instanced entities
 		*/
-		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances) { assert(mInstancedEntities.empty()); 
-			mUseBoneMatrixLookup = enable; mMaxLookupTableInstances = maxLookupTableInstances; }
+		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances)
+		{
+			assert(mInstancedEntities.empty()); 
+			mTechnSupportsSkeletal = enable ? SKELETONS_LUT : SKELETONS_SUPPORTED;
+			mMaxLookupTableInstances = maxLookupTableInstances;
+		}
 
 		/** Tells whether to use bone matrix lookup
 		@see setBoneMatrixLookup()
 		*/
-		bool useBoneMatrixLookup() const { return mUseBoneMatrixLookup; }
+		bool useBoneMatrixLookup() const { return mTechnSupportsSkeletal == SKELETONS_LUT; }
 
 		void setBoneDualQuaternions(bool enable) { assert(mInstancedEntities.empty());
 			mUseBoneDualQuaternions = enable; mRowLength = (mUseBoneDualQuaternions ? 2 : 3); }
@@ -191,9 +194,6 @@ namespace Ogre
 			mUseOneWeight = enable; }
 
 		bool useOneWeight() const { return mUseOneWeight; }
-
-		/** @see InstanceBatch::useBoneWorldMatrices()	*/
-		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
 
 		/** @return the maximum amount of shared transform entities when using lookup table*/
 		virtual size_t getMaxLookupTableInstances() const { return mMaxLookupTableInstances; }

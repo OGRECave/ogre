@@ -133,8 +133,6 @@ namespace Ogre
 		slave->mSharedTransformEntity = this;
 		//The sharing partners are kept in the parent entity 
 		this->mSharingPartners.push_back( slave );
-
-		this->mSkeletonInstance->setParentNode( (Node*)0 );
 		
 		slave->mBatchOwner->_markTransformSharingDirty();
 
@@ -157,7 +155,6 @@ namespace Ogre
 				(*itor)->stopSharingTransformAsSlave( false );
 				++itor;
 			}
-			mSkeletonInstance->setParentNode( mParentNode );
 			mSharingPartners.clear();
 		}
 	}
@@ -177,8 +174,7 @@ namespace Ogre
 		{
 			if( !mSkeletonInstance )
 			{
-				*xform = mBatchOwner->useBoneWorldMatrices() ? 
-						_getParentNodeFullTransform() : Matrix4::IDENTITY;
+				*xform = _getParentNodeFullTransform();
 			}
 			else
 			{
@@ -220,8 +216,7 @@ namespace Ogre
 		{
 			if( !mSkeletonInstance )
 			{
-				const Matrix4& mat = mBatchOwner->useBoneWorldMatrices() ? 
-					_getParentNodeFullTransform() : Matrix4::IDENTITY;
+				const Matrix4& mat = _getParentNodeFullTransform();
 				for( int i=0; i<3; ++i )
 				{
 					Real const *row = mat[i];
@@ -318,6 +313,9 @@ namespace Ogre
 			const SkeletonDef *skeletonDef = mBatchOwner->_getMeshRef()->getSkeleton().get();
 			SceneManager *sceneManager = mBatchOwner->_getManager();
 			mSkeletonInstance = sceneManager->createSkeletonInstance( skeletonDef );
+
+			if( mBatchOwner->_supportsSkeletalAnimation() != InstanceBatch::SKELETONS_LUT )
+				mSkeletonInstance->setParentNode( mParentNode );
 #endif
 		}
 	}
@@ -392,9 +390,6 @@ namespace Ogre
 
 			++itor;
 		}
-
-		if( mSharingPartners.empty() )
-			mSkeletonInstance->setParentNode( mParentNode );
 	}
 	//-----------------------------------------------------------------------
     const AxisAlignedBox& InstancedEntity::getBoundingBox(void) const
@@ -436,6 +431,13 @@ namespace Ogre
 			{
 				mBatchOwner->_removeAnimatedInstance( this );
 			}
+#else
+			//Don't notify our skeleton instance when sharing, as we have to work in local space.
+			if( mSkeletonInstance && !mSharedTransformEntity &&
+				mBatchOwner->_supportsSkeletalAnimation() != InstanceBatch::SKELETONS_LUT )
+			{
+				mSkeletonInstance->setParentNode( parent );
+			}
 #endif
 
 			if( isStatic() )
@@ -443,6 +445,15 @@ namespace Ogre
 		}
 
 		MovableObject::_notifyAttached( parent );
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyParentNodeMemoryChanged(void)
+	{
+		if( mSkeletonInstance && !mSharedTransformEntity &&
+			mBatchOwner->_supportsSkeletalAnimation() != InstanceBatch::SKELETONS_LUT )
+		{
+			mSkeletonInstance->setParentNode( mSkeletonInstance->getParentNode() );
+		}
 	}
 #ifdef OGRE_LEGACY_ANIMATIONS
 	//-----------------------------------------------------------------------

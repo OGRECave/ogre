@@ -25,11 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _BoneMemoryManager_H_
-#define _BoneMemoryManager_H_
+#ifndef _OgreBoneMemoryManager_H_
+#define _OgreBoneMemoryManager_H_
 
 #include "OgreBoneTransform.h"
 #include "OgreBoneArrayMemoryManager.h"
+
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -39,6 +41,8 @@ namespace Ogre
 	/** \addtogroup Memory
 	*  @{
 	*/
+
+	struct BySkeletonDef;
 
 	/** Wrap-around class that contains multiple ArrayMemoryManager, one per hierarchy depth
 	@remarks
@@ -54,6 +58,8 @@ namespace Ogre
 		typedef vector<BoneArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
 		ArrayMemoryManagerVec		mMemoryManagers;
+
+		BySkeletonDef				*mBoneRebaseListener;
 
 		/** Makes mMemoryManagers big enough to be able to fulfill mMemoryManagers[newDepth]
 		@param newDepth
@@ -148,6 +154,8 @@ namespace Ogre
 		*/
 		size_t getFirstNode( BoneTransform &outTransform, size_t depth );
 
+		void setBoneRebaseListener( BySkeletonDef *l )			{ mBoneRebaseListener = l; }
+
 		//Derived from ArrayMemoryManager::RebaseListener
 		virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
 									const MemoryPoolVec &basePtrs,
@@ -163,5 +171,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

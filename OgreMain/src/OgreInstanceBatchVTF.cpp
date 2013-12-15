@@ -57,7 +57,6 @@ namespace Ogre
 				mRowLength(3),
 				mWeightCount(1),
 				mTempTransformsArray3x4(0),
-				mUseBoneMatrixLookup(false),
 				mMaxLookupTableInstances(16),
 				mUseBoneDualQuaternions(false),
 				mForceOneWeight(false),

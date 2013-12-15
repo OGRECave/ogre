@@ -188,7 +188,7 @@ namespace Ogre
 
 		iterator insert( iterator where, const T& val )
 		{
-			size_t idx = mSize - (where - mData);
+			size_t idx = (where - mData);
 
 			growToFit( 1 );
 
@@ -202,7 +202,7 @@ namespace Ogre
 
 		iterator erase( iterator toErase )
 		{
-			size_t idx = mSize - (toErase - mData);
+			size_t idx = (toErase - mData);
 			toErase->~T();
 			memmove( mData + idx, mData + idx + 1, mSize - idx - 1 );
 			--mSize;

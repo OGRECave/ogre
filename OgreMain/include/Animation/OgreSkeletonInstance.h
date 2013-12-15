@@ -157,6 +157,11 @@ namespace Ogre
 		void getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,
 							const FastArray<unsigned short> &usedBones ) const;
 
+		/** Updates the contents of @mBoneStartTransforms. Needed when our
+			memory manager performs a cleanup or similar memory change.
+		*/
+		void _updateBoneStartTransforms(void);
+
 		const void* _getMemoryBlock(void) const;
 		const void* _getMemoryUniqueOffset(void) const;
 	};

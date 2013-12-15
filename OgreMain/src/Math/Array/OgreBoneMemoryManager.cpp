@@ -31,10 +31,11 @@ THE SOFTWARE.
 #include "Math/Array/OgreBoneMemoryManager.h"
 
 #include "Animation/OgreBone.h"
+#include "Animation/OgreSkeletonAnimManager.h"
 
 namespace Ogre
 {
-	BoneMemoryManager::BoneMemoryManager()
+	BoneMemoryManager::BoneMemoryManager() : mBoneRebaseListener( 0 )
 	{
 	}
 	//-----------------------------------------------------------------------------------
@@ -197,6 +198,9 @@ namespace Ogre
 
 			transform.advancePack();
 		}
+
+		if( mBoneRebaseListener )
+			mBoneRebaseListener->_updateBoneStartTransforms();
 	}
 	//---------------------------------------------------------------------
 	void BoneMemoryManager::performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
@@ -223,5 +227,8 @@ namespace Ogre
 
 			transform.advancePack();
 		}
+
+		if( mBoneRebaseListener )
+			mBoneRebaseListener->_updateBoneStartTransforms();
 	}
 }

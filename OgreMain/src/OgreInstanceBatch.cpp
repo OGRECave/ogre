@@ -52,7 +52,7 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mTechnSupportsSkeletal( true ),
+				mTechnSupportsSkeletal( SKELETONS_SUPPORTED ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),
 				mStaticDirty( false ),

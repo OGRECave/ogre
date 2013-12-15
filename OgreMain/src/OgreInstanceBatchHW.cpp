@@ -45,7 +45,7 @@ namespace Ogre
 								instancesPerBatch, indexToBoneMap )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance
-		mTechnSupportsSkeletal = false;
+		mTechnSupportsSkeletal = SKELETONS_NOT_SUPPORTED;
 	}
 
 	InstanceBatchHW::~InstanceBatchHW()

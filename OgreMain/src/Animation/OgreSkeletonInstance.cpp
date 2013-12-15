@@ -94,6 +94,7 @@ namespace Ogre
 
             // FIXME: manualBones could possibly be null. What to do?
 
+			size_t currentUnusedSlotIdx = 0;
 			mUnusedNodes.resize( mDefinition->mNumUnusedSlots, Bone( BoneTransform() ) );
 
 			ArrayMatrixAf4x3 const *reverseBindPose = mDefinition->mReverseBindPose.get();
@@ -128,17 +129,19 @@ namespace Ogre
 							//consume memory from the right depth level
 							Bone *parent = 0;
 							if( itor != depthLevelInfo.begin() )
-								parent = &mBones[itor->firstBoneIndex];
+								parent = &mBones[(itor-1)->firstBoneIndex];
 
-							mUnusedNodes[i].~Bone();
-							new (&mUnusedNodes[i]) Bone( Id::generateNewId<Node>(), boneMemoryManager,
-														 parent, 0 );
-							Bone &unused = mUnusedNodes[i];
+							mUnusedNodes[currentUnusedSlotIdx].~Bone();
+							new (&mUnusedNodes[currentUnusedSlotIdx]) Bone( Id::generateNewId<Node>(),
+																		 boneMemoryManager, parent, 0 );
+							Bone &unused = mUnusedNodes[currentUnusedSlotIdx];
 							unused.setName( "Unused" );
 							unused.mGlobalIndex = i;
 
 							if( parent )
 								parent->_notifyOfChild( &unused );
+
+							++currentUnusedSlotIdx;
 						}
 					}
 				}
@@ -352,6 +355,24 @@ namespace Ogre
 		while( itor != end )
 		{
 			*outTransform++ = mBones[*itor]._getFullTransform();
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void SkeletonInstance::_updateBoneStartTransforms(void)
+	{
+		const SkeletonDef::DepthLevelInfoVec &depthLevelInfo = mDefinition->getDepthLevelInfo();
+
+		assert( mBoneStartTransforms.size() == depthLevelInfo.size() );
+
+		TransformArray::iterator itBoneStartTr = mBoneStartTransforms.begin();
+
+		SkeletonDef::DepthLevelInfoVec::const_iterator itor = depthLevelInfo.begin();
+		SkeletonDef::DepthLevelInfoVec::const_iterator end  = depthLevelInfo.end();
+
+		while( itor != end )
+		{
+			*itBoneStartTr++ = mBones[itor->firstBoneIndex]._getTransform();
 			++itor;
 		}
 	}
