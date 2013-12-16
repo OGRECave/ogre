@@ -162,6 +162,8 @@ namespace Ogre
 		*/
 		void _updateBoneStartTransforms(void);
 
+		const TransformArray& _getTransformArray() const		{ return mBoneStartTransforms; }
+
 		const void* _getMemoryBlock(void) const;
 		const void* _getMemoryUniqueOffset(void) const;
 	};

@@ -161,6 +161,29 @@ namespace Ogre {
 #endif
 	}
 	//-----------------------------------------------------------------------
+	void Bone::resetParentTransformPtr(void)
+	{
+		if( mParent )
+		{
+			const BoneTransform parentTransform = mParent->mTransform;
+			mTransform.mParentTransform[mTransform.mIndex] =
+									&parentTransform.mDerivedTransform[parentTransform.mIndex];
+		}
+
+		_memoryRebased();
+	}
+	//-----------------------------------------------------------------------
+	void Bone::_memoryRebased(void)
+	{
+		BoneVec::iterator itor = mChildren.begin();
+		BoneVec::iterator end  = mChildren.end();
+		while( itor != end )
+		{
+			(*itor)->resetParentTransformPtr();
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
 	void Bone::_setNodeParent( Node *nodeParent )
 	{
 		if( mParent )

@@ -95,6 +95,8 @@ namespace Ogre {
 		/// Notification from parent that we need to migrate to a different depth level
 		void parentDepthLevelChanged(void);
 
+		void resetParentTransformPtr(void);
+
     public:
 		/** Index in the vector holding this node reference (could be our parent node, or a global array
 			tracking all created nodes to avoid memory leaks). Used for O(1) removals.
@@ -119,6 +121,9 @@ namespace Ogre {
 
 		/// Returns a direct access to the Transform state
 		BoneTransform& _getTransform()								{ return mTransform; }
+
+		/// Internal use. Called from BoneMemoryManager's rebases (i.e. cleanups, grows)
+		void _memoryRebased(void);
 
 		void _setReverseBindPtr( const ArrayMatrixAf4x3 *ptr )		{ mReverseBind = ptr; }
 

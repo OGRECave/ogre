@@ -110,6 +110,8 @@ namespace Ogre
 		const SkeletonAnimationDefVec& getAnimationDefs(void) const		{ return mAnimationDefs; }
 		const DepthLevelInfoVec& getDepthLevelInfo(void) const			{ return mDepthLevelInfoVec; }
 		const KfTransform * getBindPose(void) const						{ return mBindPose.get(); }
+		const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
+								getReverseBindPose(void) const			{ return mReverseBindPose; }
 
 		/** Returns the total number of bone blocks to reach the given level. i.e On SSE2,
 			If the skeleton has 1 root node, 3 children, and 5 children of children;

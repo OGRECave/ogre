@@ -1943,22 +1943,43 @@ void SceneManager::updateAllAnimationsThread( size_t threadIdx )
 
 	while( it != en )
 	{
-		SkeletonAnimManager::BySkeletonDefList::const_iterator itDef = (*it)->bySkeletonDefs.begin();
-		SkeletonAnimManager::BySkeletonDefList::const_iterator enDef = (*it)->bySkeletonDefs.end();
+		SkeletonAnimManager::BySkeletonDefList::iterator itByDef = (*it)->bySkeletonDefs.begin();
+		SkeletonAnimManager::BySkeletonDefList::iterator enByDef = (*it)->bySkeletonDefs.end();
 
-		while( itDef != enDef )
+		while( itByDef != enByDef )
 		{
-			FastArray<SkeletonInstance*>::const_iterator itor = itDef->skeletons.begin() +
-																	itDef->threadStarts[threadIdx];
-			FastArray<SkeletonInstance*>::const_iterator end  = itDef->skeletons.begin() +
-																	itDef->threadStarts[threadIdx+1];
+			FastArray<SkeletonInstance*>::iterator itor = itByDef->skeletons.begin() +
+																	itByDef->threadStarts[threadIdx];
+			FastArray<SkeletonInstance*>::iterator end  = itByDef->skeletons.begin() +
+																	itByDef->threadStarts[threadIdx+1];
+
+			const TransformArray &transformsArray = (*itor)->_getTransformArray();
+			const TransformArray &nextTransformsArray = (*(end - 1))->_getTransformArray();
+			
 			while( itor != end )
 			{
 				(*itor)->update();
 				++itor;
 			}
 
-			++itDef;
+			assert( itByDef->boneMemoryManager.getNumDepths() == transformsArray.size() );
+
+			const SkeletonDef *skeletonDef = itByDef->skeletonDef;
+			const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
+							reverseBindPose = skeletonDef->getReverseBindPose();
+			//itByDef->skeletons.begin() + itDef->threadStarts[threadIdx+1]
+
+			for( size_t i=0; i<transformsArray.size(); ++i )
+			{
+				size_t numNodes = nextTransformsArray[i].mOwner - transformsArray[i].mOwner +
+										nextTransformsArray[i].mIndex + transformsArray[i].mIndex +
+										skeletonDef->getDepthLevelInfo()[i].numBonesInLevel;
+				assert( numNodes <= itByDef->boneMemoryManager.getFirstNode( BoneTransform(), i ) );
+
+				Bone::updateAllTransforms( numNodes, transformsArray[i], reverseBindPose.get(), reverseBindPose.size() );
+			}
+
+			++itByDef;
 		}
 
 		++it;

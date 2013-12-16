@@ -33,8 +33,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	BySkeletonDef::BySkeletonDef( IdString defName, size_t threadCount ) :
-		skeletonDefName( defName )
+	BySkeletonDef::BySkeletonDef( const SkeletonDef *_skeletonDef, size_t threadCount ) :
+		skeletonDef( _skeletonDef ),
+		skeletonDefName( _skeletonDef->getName() )
 	{
 		threadStarts.resize( threadCount + 1, 0 );
 	}
@@ -42,7 +43,7 @@ namespace Ogre
 	void BySkeletonDef::updateThreadStarts(void)
 	{
 		size_t lastStart = 0;
-		size_t increments = std::min<size_t>( ARRAY_PACKED_REALS,
+		size_t increments = std::max<size_t>( ARRAY_PACKED_REALS,
 											  skeletons.size() / (threadStarts.size() - 1) );
 		for( size_t i=0; i<threadStarts.size(); ++i )
 		{
@@ -80,7 +81,7 @@ namespace Ogre
 														defName );
 		if( itor == bySkeletonDefs.end() )
 		{
-			bySkeletonDefs.push_front( BySkeletonDef( defName, numWorkerThreads ) );
+			bySkeletonDefs.push_front( BySkeletonDef( skeletonDef, numWorkerThreads ) );
 			bySkeletonDefs.front().boneMemoryManager.setBoneRebaseListener( &bySkeletonDefs.front() );
 			itor = bySkeletonDefs.begin();
 		}

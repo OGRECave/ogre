@@ -63,7 +63,7 @@ namespace Ogre {
     {
     protected:
 		const Light& getLight(size_t index) const;
-		OGRE_ALIGNED_DECL( mutable Matrix4, mWorldMatrix[256], OGRE_SIMD_ALIGNMENT );
+		OGRE_SIMD_ALIGNED_DECL( mutable Matrix4, mWorldMatrix[256] );
         mutable size_t mWorldMatrixCount;
         mutable const Matrix4* mWorldMatrixArray;
         mutable Matrix4 mWorldViewMatrix;

@@ -255,7 +255,7 @@ namespace Ogre {
 		dependent on the Camera, which will always call back the SceneManager
 		which created it to render the scene. 
      */
-	class _OgreExport SceneManager : public SceneMgtAlloc
+	class _OgreExport SceneManager : public SceneMgtAlignedAlloc
     {
     public:
         /// Query type mask which will be used for world geometry @see SceneQuery
@@ -585,7 +585,7 @@ namespace Ogre {
 		uint8 mWorldGeometryRenderQueue;
 		
 		unsigned long mLastFrameNumber;
-		Matrix4 mTempXform[256];
+		OGRE_SIMD_ALIGNED_DECL( Matrix4, mTempXform[256] );
 		bool mResetIdentityView;
 		bool mResetIdentityProj;
 

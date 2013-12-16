@@ -46,6 +46,7 @@ namespace Ogre
 
 	struct BySkeletonDef
 	{
+		SkeletonDef const				*skeletonDef;
 		IdString						skeletonDefName;
 		BoneMemoryManager				boneMemoryManager;
 
@@ -61,7 +62,7 @@ namespace Ogre
 		*/
 		FastArray<size_t>				threadStarts;
 
-		BySkeletonDef( IdString defName, size_t threadCount );
+		BySkeletonDef( const SkeletonDef *skeletonDef, size_t threadCount );
 		void updateThreadStarts(void);
 		void _updateBoneStartTransforms(void);
 
