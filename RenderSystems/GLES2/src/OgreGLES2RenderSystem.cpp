@@ -1747,20 +1747,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
 #endif
 
-        // Set fences
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            const VertexElement & elem = *elemIter;
-            size_t source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-            op.vertexData->vertexBufferBinding->getBuffer(source);
-            static_cast<GLES2HardwareVertexBuffer*>(vertexBuffer.get())->setFence();
-        }
-
         // Unbind all attributes
 		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{

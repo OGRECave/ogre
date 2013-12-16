@@ -1936,20 +1936,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
         }
 
-        // Set fences
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            const VertexElement & elem = *elemIter;
-            size_t source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-                op.vertexData->vertexBufferBinding->getBuffer(source);
-            static_cast<GL3PlusHardwareVertexBuffer*>(vertexBuffer.get())->setFence();
-        }
-
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
     }
