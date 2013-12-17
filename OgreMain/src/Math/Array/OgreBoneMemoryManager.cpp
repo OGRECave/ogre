@@ -58,7 +58,10 @@ namespace Ogre
 		//TODO: (dark_sylinc) give a specialized hint for each depth.
 		while( newDepth >= mMemoryManagers.size() )
 		{
-			mMemoryManagers.push_back( BoneArrayMemoryManager( mMemoryManagers.size(), 100, 100,
+			//For bones, cleanup threahold must be multiple of ARRAY_PACKED_REALS - 1.
+			size_t cleanupThreshold = 26 * ARRAY_PACKED_REALS - 1;
+			mMemoryManagers.push_back( BoneArrayMemoryManager( mMemoryManagers.size(), 100,
+																cleanupThreshold,
 																ArrayMemoryManager::MAX_MEMORY_SLOTS,
 																this ) );
 			mMemoryManagers.back().initialize();
@@ -81,6 +84,8 @@ namespace Ogre
 		mMemoryManagers[depth].createNewNode( tmp );
 
 		tmp.copy( outTransform );
+		tmp.mOwner[tmp.mIndex]			= 0;
+		tmp.mParentTransform[tmp.mIndex]= &SimpleMatrixAf4x3::IDENTITY;
 
 		BoneArrayMemoryManager &mgr = mMemoryManagers[0];
 		mgr.destroyNode( outTransform );
@@ -94,7 +99,8 @@ namespace Ogre
 		mMemoryManagers[0].createNewNode( tmp );
 
 		tmp.copy( outTransform );
-		tmp.mParentTransform[tmp.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
+		tmp.mOwner[tmp.mIndex]			= 0;
+		tmp.mParentTransform[tmp.mIndex]= &SimpleMatrixAf4x3::IDENTITY;
 
 		BoneArrayMemoryManager &mgr = mMemoryManagers[depth];
 		mgr.destroyNode( outTransform );

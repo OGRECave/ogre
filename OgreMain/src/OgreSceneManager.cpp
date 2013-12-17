@@ -1968,15 +1968,18 @@ void SceneManager::updateAllAnimationsThread( size_t threadIdx )
 			const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
 							reverseBindPose = skeletonDef->getReverseBindPose();
 			//itByDef->skeletons.begin() + itDef->threadStarts[threadIdx+1]
+			const SkeletonDef::DepthLevelInfoVec &depthLevelInfo = skeletonDef->getDepthLevelInfo();
+			ArrayMatrixAf4x3 const *reverseBindPtr = reverseBindPose.get();
 
 			for( size_t i=0; i<transformsArray.size(); ++i )
 			{
 				size_t numNodes = nextTransformsArray[i].mOwner - transformsArray[i].mOwner +
 										nextTransformsArray[i].mIndex + transformsArray[i].mIndex +
-										skeletonDef->getDepthLevelInfo()[i].numBonesInLevel;
+										depthLevelInfo[i].numBonesInLevel;
 				assert( numNodes <= itByDef->boneMemoryManager.getFirstNode( BoneTransform(), i ) );
 
-				Bone::updateAllTransforms( numNodes, transformsArray[i], reverseBindPose.get(), reverseBindPose.size() );
+				Bone::updateAllTransforms( numNodes, transformsArray[i], reverseBindPtr, depthLevelInfo[i].numBonesInLevel );
+				reverseBindPtr += (depthLevelInfo[i].numBonesInLevel - 1 + ARRAY_PACKED_REALS) / ARRAY_PACKED_REALS;
 			}
 
 			++itByDef;

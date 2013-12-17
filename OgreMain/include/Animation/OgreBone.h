@@ -68,6 +68,7 @@ namespace Ogre {
 #ifndef NDEBUG
 		mutable bool mCachedTransformOutOfDate;
 		Node		*mDebugParentNode;
+		bool		mInitialized;
 #endif
 
 		/// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
@@ -108,13 +109,12 @@ namespace Ogre {
 		/// @copydoc mGlobalIndex
 		size_t mParentIndex;
 
-        /** Constructor, only to be called by the creator SceneManager. */
-		Bone( IdType id, BoneMemoryManager *boneMemoryManager,
-				Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind );
-
-		Bone( const BoneTransform transformPtrs );
-
+		Bone();
         virtual ~Bone();
+
+		void _initialize( IdType id, BoneMemoryManager *boneMemoryManager,
+							Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind );
+		void _deinitialize(void);
 
 		/// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
 		uint16 getDepthLevel() const								{ return mDepthLevel; }
@@ -256,13 +256,6 @@ namespace Ogre {
 			this parent, potentially to be reattached elsewhere.
 		*/
 		void removeAllChildren(void);
-
-		/** Notifies the given node is a child of us, we just add it to mChildren
-			and set node->mParentIndex. <b>Internal Use.</b>
-		@param node
-			The bone/node that is a child of us.
-		*/
-		void _notifyOfChild( Bone *node );
 
         /** TODO
         */

@@ -105,7 +105,7 @@ namespace Ogre
 		//Create the bones (just like we would for SkeletonInstance)so we can
 		//get derived position/rotation/scale and then calculate its inverse
 		BoneMemoryManager boneMemoryManager;
-		vector<Bone>::type boneNodes( mBones.size(), Bone( BoneTransform() ) );
+		vector<Bone>::type boneNodes( mBones.size(), Bone() );
 		vector<list<size_t>::type>::type::const_iterator itDepth = mBonesPerDepth.begin();
 		vector<list<size_t>::type>::type::const_iterator enDepth = mBonesPerDepth.end();
 
@@ -123,10 +123,9 @@ namespace Ogre
 				if( parentIdx != std::numeric_limits<size_t>::max() )
 					parent = &boneNodes[parentIdx];
 
-				boneNodes[*bonesItor].~Bone();
-				new (&boneNodes[*bonesItor]) Bone( Id::generateNewId<Bone>(), &boneMemoryManager,
-													parent, 0 );
 				Bone &newBone = boneNodes[*bonesItor];
+				newBone._initialize( Id::generateNewId<Bone>(), &boneMemoryManager, parent, 0 );
+				
 				newBone.setPosition( boneData.vPos );
 				newBone.setOrientation( boneData.qRot );
 				newBone.setScale( boneData.vScale );
@@ -134,9 +133,6 @@ namespace Ogre
 				newBone.setInheritScale( boneData.bInheritScale );
 				newBone.setName( boneData.name );
 				newBone.mGlobalIndex = *bonesItor;
-				
-				if( parent )
-					parent->_notifyOfChild( &newBone );
 
 				++bonesItor;
 			}
@@ -270,6 +266,16 @@ namespace Ogre
 						mNumUnusedSlots += unusedSlots;
 				}
 				++depthLevelItor;
+			}
+		}
+
+		{
+			vector<Bone>::type::iterator itor = boneNodes.begin();
+			vector<Bone>::type::iterator end  = boneNodes.end();
+			while( itor != end )
+			{
+				itor->_deinitialize();
+				++itor;
 			}
 		}
 	}

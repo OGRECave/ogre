@@ -44,7 +44,7 @@ namespace Ogre
 	*/
 
 	typedef void (*CleanupRoutines)( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-									 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+									 size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
 
 	/** Abstract memory manager for managing large chunks of contiguous memory, optimized for SoA
 		(Structure of Arrays) implementations.
@@ -412,13 +412,13 @@ namespace Ogre
 	};
 
 	extern void cleanerFlat( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-							 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+							 size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
 	extern void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-									 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+									 size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
 	extern void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-										size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+										size_t numSlots, size_t numFreeSlots, size_t elementsMemSize );
 	extern void cleanerArrayAabb( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-									size_t numSlots, size_t numTotalSlots, size_t elementsMemSize );
+									size_t numSlots, size_t numFreeSlots, size_t elementsMemSize  );
 
 	/** @} */
 	/** @} */

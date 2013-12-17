@@ -41,21 +41,45 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-	Bone::Bone( IdType id, BoneMemoryManager *boneMemoryManager,
-				Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind ) :
-		IdObject( id ),
-		mReverseBind( reverseBind ),
+	//-----------------------------------------------------------------------
+	Bone::Bone() :
+		IdObject( 0 ),
+		mReverseBind( 0 ),
+		mTransform( BoneTransform() ),
 #ifndef NDEBUG
 		mCachedTransformOutOfDate( true ),
 		mDebugParentNode( 0 ),
+		mInitialized( false ),
 #endif
 		mDepthLevel( 0 ),
-		mParent( parent ),
-		mName( "" ),
-		mBoneMemoryManager( boneMemoryManager ),
+		mParent( 0 ),
+		mName( "@Dummy Bone" ),
+		mBoneMemoryManager( 0 ),
 		mGlobalIndex( -1 ),
 		mParentIndex( -1 )
 	{
+		
+	}
+	//-----------------------------------------------------------------------
+	Bone::~Bone()
+	{
+		assert( !mInitialized && "Must call _deinitialize() before destructor!" );
+	}
+	//-----------------------------------------------------------------------
+	void Bone::_initialize( IdType id, BoneMemoryManager *boneMemoryManager,
+							Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind )
+	{
+		assert( !mInitialized );
+
+#ifndef NDEBUG
+		mInitialized = true;
+#endif
+
+		this->_setId( id );
+		mReverseBind		= reverseBind;
+		mParent				= parent;
+		mBoneMemoryManager	= boneMemoryManager;
+
 		if( mParent )
 			mDepthLevel = mParent->mDepthLevel + 1;
 
@@ -67,27 +91,13 @@ namespace Ogre {
 			const BoneTransform parentTransform = mParent->mTransform;
 			mTransform.mParentTransform[mTransform.mIndex] =
 								&parentTransform.mDerivedTransform[parentTransform.mIndex];
+
+			mParent->mChildren.push_back( this );
+			this->mParentIndex = mParent->mChildren.size() - 1;
 		}
 	}
 	//-----------------------------------------------------------------------
-	Bone::Bone( const BoneTransform transformPtrs ) :
-		IdObject( 0 ),
-		mReverseBind( 0 ),
-#ifndef NDEBUG
-		mCachedTransformOutOfDate( true ),
-		mDebugParentNode( 0 ),
-#endif
-		mDepthLevel( 0 ),
-		mParent( 0 ),
-		mName( "@Dummy Bone" ),
-		mBoneMemoryManager( 0 ),
-		mGlobalIndex( -1 ),
-		mParentIndex( -1 )
-	{
-		mTransform = transformPtrs;
-	}
-	//-----------------------------------------------------------------------
-	Bone::~Bone()
+	void Bone::_deinitialize(void)
 	{
 		removeAllChildren();
 		if( mParent )
@@ -95,19 +105,31 @@ namespace Ogre {
 
 		if( mBoneMemoryManager )
 			mBoneMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
-		mDepthLevel = 0;
+
+		mReverseBind		= 0;
+		mBoneMemoryManager	= 0;
+
+#ifndef NDEBUG
+		mInitialized = false;
+#endif
 	}
 	//-----------------------------------------------------------------------
 	void Bone::unsetParent(void)
 	{
 		if( mParent )
 		{
+			mTransform.mParentTransform[mTransform.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
+			mParent = 0;//Needs to be set now, if nodeDetached triggers a cleanup,
+						//_memoryRebased will be called on us
+
 			//BoneMemoryManager will set mTransform.mParentTransform to a dummy
 			//transform (as well as transfering the memory)
 			mBoneMemoryManager->nodeDettached( mTransform, mDepthLevel );
 
 			if( mDepthLevel != 0 )
 			{
+				mDepthLevel = 0;
+
 				//Propagate the change to our children
 				BoneVec::const_iterator itor = mChildren.begin();
 				BoneVec::const_iterator end  = mChildren.end();
@@ -118,9 +140,6 @@ namespace Ogre {
 					++itor;
 				}
 			}
-
-			mParent = 0;
-			mDepthLevel = 0;
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -371,12 +390,6 @@ namespace Ogre {
 			++itor;
 		}
 		mChildren.clear();
-	}
-	//-----------------------------------------------------------------------
-	void Bone::_notifyOfChild( Bone *node )
-	{
-		mChildren.push_back( node );
-		node->mParentIndex = mChildren.size() - 1;
 	}
 }
 

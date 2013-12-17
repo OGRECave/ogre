@@ -184,7 +184,7 @@ namespace Ogre {
 			if( mListener )
 				mListener->nodeDetached(this);
 
-			size_t oldDepthLevel = mDepthLevel;
+			mParent = 0;
 
 			//NodeMemoryManager will set mTransform.mParents to a dummy parent node
 			//(as well as transfering the memory)
@@ -192,6 +192,8 @@ namespace Ogre {
 
 			if( mDepthLevel != 0 )
 			{
+				mDepthLevel = 0;
+
 				//Propagate the change to our children
 				NodeVec::const_iterator itor = mChildren.begin();
 				NodeVec::const_iterator end  = mChildren.end();
@@ -204,9 +206,6 @@ namespace Ogre {
 
 				_callMemoryChangeListeners();
 			}
-
-			mParent = 0;
-			mDepthLevel = 0;
 		}
     }
 	//-----------------------------------------------------------------------

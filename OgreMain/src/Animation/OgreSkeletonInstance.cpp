@@ -44,7 +44,7 @@ namespace Ogre
 			mDefinition( skeletonDef ),
 			mParentNode( 0 )
 	{
-		mBones.resize( mDefinition->getBones().size(), Bone( BoneTransform() ) );
+		mBones.resize( mDefinition->getBones().size(), Bone() );
 
 		vector<list<size_t>::type>::type::const_iterator itDepth = mDefinition->mBonesPerDepth.begin();
 		vector<list<size_t>::type>::type::const_iterator enDepth = mDefinition->mBonesPerDepth.end();
@@ -63,9 +63,8 @@ namespace Ogre
 				if( parentIdx != std::numeric_limits<size_t>::max() )
 					parent = &mBones[parentIdx];
 
-				mBones[*itor].~Bone();
-				new (&mBones[*itor]) Bone( Id::generateNewId<Node>(), boneMemoryManager, parent, 0 );
 				Bone &newBone = mBones[*itor];
+				newBone._initialize( Id::generateNewId<Node>(), boneMemoryManager, parent, 0 );
 				newBone.setPosition( boneData.vPos );
 				newBone.setOrientation( boneData.qRot );
 				newBone.setScale( boneData.vScale );
@@ -73,9 +72,6 @@ namespace Ogre
 				newBone.setInheritScale( boneData.bInheritScale );
 				newBone.setName( boneData.name );
 				newBone.mGlobalIndex = *itor;
-				
-				if( parent )
-					parent->_notifyOfChild( &newBone );
 
 				++itor;
 			}
@@ -95,7 +91,7 @@ namespace Ogre
             // FIXME: manualBones could possibly be null. What to do?
 
 			size_t currentUnusedSlotIdx = 0;
-			mUnusedNodes.resize( mDefinition->mNumUnusedSlots, Bone( BoneTransform() ) );
+			mUnusedNodes.resize( mDefinition->mNumUnusedSlots, Bone() );
 
 			ArrayMatrixAf4x3 const *reverseBindPose = mDefinition->mReverseBindPose.get();
 
@@ -131,15 +127,11 @@ namespace Ogre
 							if( itor != depthLevelInfo.begin() )
 								parent = &mBones[(itor-1)->firstBoneIndex];
 
-							mUnusedNodes[currentUnusedSlotIdx].~Bone();
-							new (&mUnusedNodes[currentUnusedSlotIdx]) Bone( Id::generateNewId<Node>(),
-																		 boneMemoryManager, parent, 0 );
 							Bone &unused = mUnusedNodes[currentUnusedSlotIdx];
+							unused._initialize( Id::generateNewId<Node>(), boneMemoryManager,
+												parent, 0 );
 							unused.setName( "Unused" );
 							unused.mGlobalIndex = i;
-
-							if( parent )
-								parent->_notifyOfChild( &unused );
 
 							++currentUnusedSlotIdx;
 						}
@@ -193,18 +185,37 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	SkeletonInstance::~SkeletonInstance()
 	{
-		BoneVec::iterator itor = mBones.begin();
-		BoneVec::iterator end  = mBones.end();
+		//Detach all bones in the reverse order they were attached (LIFO!!!)
+		size_t currentDepth = mDefinition->mBonesPerDepth.size() - 1;
+		vector<list<size_t>::type>::type::const_reverse_iterator ritDepth = mDefinition->mBonesPerDepth.rbegin();
+		vector<list<size_t>::type>::type::const_reverse_iterator renDepth = mDefinition->mBonesPerDepth.rend();
 
-		while( itor != end )
+		BoneVec::reverse_iterator ritUnusedNodes = mUnusedNodes.rbegin();
+		BoneVec::reverse_iterator renUnusedNodes = mUnusedNodes.rend();
+
+		while( ritDepth != renDepth )
 		{
-			itor->removeAllChildren();
-			++itor;
+			while( ritUnusedNodes != renUnusedNodes && ritUnusedNodes->getDepthLevel() == currentDepth )
+			{
+				ritUnusedNodes->_deinitialize();
+				++ritUnusedNodes;
+			}
+
+			list<size_t>::type::const_reverse_iterator ritor = ritDepth->rbegin();
+			list<size_t>::type::const_reverse_iterator rend  = ritDepth->rend();
+			while( ritor != rend )
+			{
+				mBones[*ritor]._deinitialize();
+				++ritor;
+			}
+
+			--currentDepth;
+			++ritDepth;
 		}
 
 		mAnimations.clear();
 
-		mUnusedNodes.clear(); //LIFO order: These were created last
+		mUnusedNodes.clear();
 		mBones.clear();
 	}
 	//-----------------------------------------------------------------------------------

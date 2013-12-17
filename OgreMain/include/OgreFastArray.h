@@ -192,7 +192,7 @@ namespace Ogre
 
 			growToFit( 1 );
 
-			memmove( mData + idx + 1, mData + idx, mSize - idx );
+			memmove( mData + idx + 1, mData + idx, (mSize - idx) *  sizeof(T) );
 			new (&mData[idx]) T();
 			mData[idx] = val;
 			++mSize;
@@ -204,7 +204,7 @@ namespace Ogre
 		{
 			size_t idx = (toErase - mData);
 			toErase->~T();
-			memmove( mData + idx, mData + idx + 1, mSize - idx - 1 );
+			memmove( mData + idx, mData + idx + 1, (mSize - idx - 1) * sizeof(T) );
 			--mSize;
 
 			return mData + idx;

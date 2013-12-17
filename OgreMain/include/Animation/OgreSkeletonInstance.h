@@ -168,19 +168,10 @@ namespace Ogre
 		const void* _getMemoryUniqueOffset(void) const;
 	};
 
-	struct OrderSkeletonInstanceByMemory
+	inline bool OrderSkeletonInstanceByMemory( const SkeletonInstance *_left,
+												const SkeletonInstance *_right )
 	{
-		const SkeletonInstance *ptr;
-		OrderSkeletonInstanceByMemory( const SkeletonInstance *_ptr ) : ptr( _ptr ) {}
-	};
-
-	inline bool operator < ( OrderSkeletonInstanceByMemory _left, const SkeletonInstance *_right )
-	{
-		return _left.ptr->_getMemoryUniqueOffset() < _right->_getMemoryUniqueOffset();
-	}
-	inline bool operator < ( const SkeletonInstance *_left, OrderSkeletonInstanceByMemory _right )
-	{
-		return _left->_getMemoryUniqueOffset() < _right.ptr->_getMemoryUniqueOffset();
+		return _left->_getMemoryUniqueOffset() < _right->_getMemoryUniqueOffset();
 	}
 
 	/** @} */

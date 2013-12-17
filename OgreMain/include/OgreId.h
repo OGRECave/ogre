@@ -55,6 +55,13 @@ namespace Ogre
 	private:
 		friend struct IdCmp; //Avoid calling getId()
 		IdType mId;
+
+	protected:
+		/**In the rare case our derived class wants to override our Id
+			(normally we don't want that, that's why it's private).
+		*/
+		void _setId( IdType newId )			{ mId = newId; }
+
 	public:
 		/** We don't call generateNewId() here, to prevent objects in the stack (i.e. local variables)
 			that don't need an Id from incrementing the count; which is very dangerous if the caller
@@ -64,7 +71,7 @@ namespace Ogre
 		IdObject( IdType id ) : mId( id ) {}
 
 		/// Get the unique id of this object
-		IdType getId() const	{ return mId; }
+		IdType getId() const				{ return mId; }
 
 		bool operator()( const IdObject *left, const IdObject *right )
 		{

@@ -1346,10 +1346,8 @@ namespace Ogre {
 
 		/// Creates an instance of a skeleton based on the given definition.
 		SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );
+		/// Destroys an instance of a skeleton created with @createSkeletonInstance.
 		void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
-
-		/// Destryos an instance of a skeleton created with @createSkeletonInstance.
-		void destryoSkeletonInstance( SkeletonInstance *instance );
 
         /** Create a ManualObject, an object which you populate with geometry
 			manually through a GL immediate-mode style interface.

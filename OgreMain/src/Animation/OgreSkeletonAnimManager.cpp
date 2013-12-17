@@ -92,7 +92,8 @@ namespace Ogre
 																	&bySkelDef.boneMemoryManager );
 		FastArray<SkeletonInstance*>::iterator it = std::lower_bound(
 															skeletonsArray.begin(), skeletonsArray.end(),
-															OrderSkeletonInstanceByMemory( newInstance ) );
+															newInstance,
+															OrderSkeletonInstanceByMemory );
 
 		//If this assert triggers, two instances got the same memory slot. Most likely we forgot to
 		//remove a previous instance and the slot was reused. Otherwise something nasty happened.
@@ -112,7 +113,7 @@ namespace Ogre
 		BySkeletonDefList::iterator itor = std::find( bySkeletonDefs.begin(), bySkeletonDefs.end(),
 														defName );
 
-		if( itor != bySkeletonDefs.end() )
+		if( itor == bySkeletonDefs.end() )
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
 						 "Trying to remove a SkeletonInstance for which we have no definition for!",
@@ -124,7 +125,8 @@ namespace Ogre
 
 		FastArray<SkeletonInstance*>::iterator it = std::lower_bound(
 														skeletonsArray.begin(), skeletonsArray.end(),
-														OrderSkeletonInstanceByMemory( skeletonInstance ) );
+														skeletonInstance,
+														OrderSkeletonInstanceByMemory );
 
 		if( it == skeletonsArray.end() || *it != skeletonInstance )
 		{

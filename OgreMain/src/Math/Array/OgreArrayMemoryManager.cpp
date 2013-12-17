@@ -254,12 +254,14 @@ namespace Ogre
 					//Shift everything N slots (N = lastRange)
 					while( itPools != enPools )
 					{
-						mCleanupRoutines[i]( *itPools + ( newEnd - lastRange ) * mElementsMemSizes[i],
-											( newEnd - lastRange ) % ARRAY_PACKED_REALS,
-											 *itPools + newEnd * mElementsMemSizes[i],
-											 newEnd % ARRAY_PACKED_REALS,
-											( mUsedMemory - newEnd ), mUsedMemory,
-											mElementsMemSizes[i] );
+						char *dstPtr	= *itPools + ( newEnd - lastRange ) * mElementsMemSizes[i];
+						size_t indexDst = ( newEnd - lastRange ) % ARRAY_PACKED_REALS;
+						char *srcPtr	= *itPools + newEnd * mElementsMemSizes[i];
+						size_t indexSrc	= newEnd % ARRAY_PACKED_REALS;
+						size_t numSlots	= ( mUsedMemory - newEnd );
+						size_t numFreeSlots	= lastRange;
+						mCleanupRoutines[i]( dstPtr, indexDst, srcPtr, indexSrc,
+											 numSlots, numFreeSlots, mElementsMemSizes[i] );
 						++i;
 						++itPools;
 					}
@@ -280,19 +282,17 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	void cleanerFlat( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-						size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+						size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
 	{
-		memcpy( dstPtr, srcPtr, numSlots * elementsMemSize );
+		memmove( dstPtr, srcPtr, numSlots * elementsMemSize );
 
 		//We need to default-initialize the garbage left after.
-		memset( dstPtr + numSlots * elementsMemSize, 0, (numTotalSlots - numSlots) * elementsMemSize );
+		memset( dstPtr + numSlots * elementsMemSize, 0, numFreeSlots * elementsMemSize );
 	}
 	//-----------------------------------------------------------------------------------
 	void cleanerArrayVector3( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-								size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+								size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
 	{
-		assert( numTotalSlots >= numSlots );
-
 		ArrayVector3 *dst = reinterpret_cast<ArrayVector3*>( dstPtr - indexDst * elementsMemSize );
 		ArrayVector3 *src = reinterpret_cast<ArrayVector3*>( srcPtr - indexSrc * elementsMemSize );
 
@@ -318,7 +318,7 @@ namespace Ogre
 		}
 
 		//We need to default-initialize the garbage left after.
-		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, numFreeSlots );
 		for( size_t i=0; i<scalarRemainder; ++i )
 		{
 			dst->setFromVector3( Vector3::ZERO, indexDst );
@@ -328,13 +328,13 @@ namespace Ogre
 		++dst;
 
 		//Keep default initializing, but now on bulk (faster)
-		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		size_t remainder = numFreeSlots - scalarRemainder;
 		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
 			*dst++ = ArrayVector3::ZERO;
 	}
 	//-----------------------------------------------------------------------------------
 	void cleanerArrayQuaternion( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-								 size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+								 size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
 	{
 		ArrayQuaternion *dst = reinterpret_cast<ArrayQuaternion*>( dstPtr - indexDst * elementsMemSize );
 		ArrayQuaternion *src = reinterpret_cast<ArrayQuaternion*>( srcPtr - indexSrc * elementsMemSize );
@@ -361,7 +361,7 @@ namespace Ogre
 		}
 
 		//We need to default-initialize the garbage left after.
-		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, numFreeSlots );
 		for( size_t i=0; i<scalarRemainder; ++i )
 		{
 			dst->setFromQuaternion( Quaternion::IDENTITY, indexDst );
@@ -371,13 +371,13 @@ namespace Ogre
 		++dst;
 
 		//Keep default initializing, but now on bulk (faster)
-		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		size_t remainder = numFreeSlots - scalarRemainder;
 		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
 			*dst++ = ArrayQuaternion::IDENTITY;
 	}
 	//-----------------------------------------------------------------------------------
 	void cleanerArrayAabb( char *dstPtr, size_t indexDst, char *srcPtr, size_t indexSrc,
-							size_t numSlots, size_t numTotalSlots, size_t elementsMemSize )
+							size_t numSlots, size_t numFreeSlots, size_t elementsMemSize )
 	{
 		ArrayAabb *dst = reinterpret_cast<ArrayAabb*>( dstPtr - indexDst * elementsMemSize );
 		ArrayAabb *src = reinterpret_cast<ArrayAabb*>( srcPtr - indexSrc * elementsMemSize );
@@ -404,7 +404,7 @@ namespace Ogre
 		}
 
 		//We need to default-initialize the garbage left after.
-		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, (numTotalSlots - numSlots) );
+		size_t scalarRemainder = std::min( ARRAY_PACKED_REALS - indexDst, numFreeSlots );
 		for( size_t i=0; i<scalarRemainder; ++i )
 		{
 			dst->setFromAabb( Aabb::BOX_ZERO, indexDst );
@@ -414,7 +414,7 @@ namespace Ogre
 		++dst;
 
 		//Keep default initializing, but now on bulk (faster)
-		size_t remainder = numTotalSlots - numSlots - scalarRemainder;
+		size_t remainder = numFreeSlots - scalarRemainder;
 		for( size_t i=0; i<remainder; i += ARRAY_PACKED_REALS )
 			*dst++ = ArrayAabb::BOX_ZERO;
 	}
