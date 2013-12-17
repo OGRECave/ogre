@@ -11,6 +11,7 @@ set(HEADER_FILES
     include/TestContext.h
 	../Common/include/ImageValidator.h
 	../Common/include/TestBatch.h
+	../Common/include/CppUnitResultWriter.h
 	../Common/include/TestResultWriter.h
 	../Common/include/SimpleResultWriter.h
 	../Common/include/HTMLWriter.h

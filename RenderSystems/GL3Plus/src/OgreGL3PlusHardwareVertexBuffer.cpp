@@ -52,21 +52,12 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
-        mFence = 0;
 //        std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }
 
     GL3PlusHardwareVertexBuffer::~GL3PlusHardwareVertexBuffer()
     {
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-    }
-
-    void GL3PlusHardwareVertexBuffer::setFence(void)
-    {
-        if(!mFence)
-        {
-            OGRE_CHECK_GL_ERROR(mFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
-        }
     }
 
     void* GL3PlusHardwareVertexBuffer::lockImpl(size_t offset,
@@ -114,18 +105,6 @@ namespace Ogre {
 					"Vertex Buffer: Out of memory",
                     "GL3PlusHardwareVertexBuffer::lock");
 			}
-
-            if(mFence)
-            {
-                GLenum result;
-                OGRE_CHECK_GL_ERROR(result = glClientWaitSync(mFence, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED));
-                if(result == GL_WAIT_FAILED)
-                {
-                    // Some error
-                }
-                OGRE_CHECK_GL_ERROR(glDeleteSync(mFence));
-                mFence = 0;
-            }
 
 			// return offsetted
 			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);

@@ -720,20 +720,7 @@ namespace Ogre {
 							vertexProgramLightTypes[v], syntax, 
 							vertexProgramFinite[v], vertexProgramDebug[v]));
 
-                        String targetSuffix = "s_4_0";
-                        if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") == false)
-                        {
-                            if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
-                            {
-                                targetSuffix = "s_4_0_level_9_3";
-                            }
-                            else
-                            {
-                                targetSuffix = "s_4_0_level_9_1";
-                            }
-                        }
-
-						vp->setParameter("target", "v" + targetSuffix);
+						vp->setParameter("target", "vs_4_0_level_9_1");	// shared subset, to be usable from microcode cache on all devices
 						vp->setParameter("entry_point", "vs_main");			
 						vp->load();
 
@@ -745,7 +732,7 @@ namespace Ogre {
 								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"hlsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_4_0);
-							fp->setParameter("target", "p" + targetSuffix);
+							fp->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
 							fp->setParameter("entry_point", "fs_main");			
 							fp->load();
 						}

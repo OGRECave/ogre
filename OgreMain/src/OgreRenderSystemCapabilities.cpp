@@ -106,6 +106,12 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Hardware vertex / index buffers: "
 			+ StringConverter::toString(hasCapability(RSC_VBO), true));
+		if(hasCapability(RSC_VBO))
+		{
+			pLog->logMessage(
+				" * 32-bit index buffers: "
+				+ StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
+		}
 		pLog->logMessage(
 			" * Vertex programs: "
 			+ StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));

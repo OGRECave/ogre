@@ -49,14 +49,6 @@ namespace Ogre {
         destroyBuffer();
     }
 
-    void GLES2HardwareVertexBuffer::setFence(void)
-    {
-        if(!mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
-        {
-            OGRE_CHECK_GL_ERROR(mFence = glFenceSyncAPPLE(GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE, 0));
-        }
-    }
-
     void GLES2HardwareVertexBuffer::createBuffer()
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -71,7 +63,6 @@ namespace Ogre {
 		static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
-        mFence = 0;
     }
 
     void GLES2HardwareVertexBuffer::destroyBuffer()
@@ -146,18 +137,6 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
-        }
-
-        if(mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
-        {
-            GLenum result;
-            OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
-            if(result == GL_WAIT_FAILED_APPLE)
-            {
-                // Some error
-            }
-            OGRE_CHECK_GL_ERROR(glDeleteSyncAPPLE(mFence));
-            mFence = 0;
         }
 
         // return offsetted

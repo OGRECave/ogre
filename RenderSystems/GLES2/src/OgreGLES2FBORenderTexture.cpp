@@ -111,17 +111,11 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
-#ifdef GL_OES_stencil4
-        GL_STENCIL_INDEX4_OES,
-#endif
         GL_STENCIL_INDEX8
     };
     static const size_t stencilBits[] =
     {
         0,
-#ifdef GL_OES_stencil4
-        4,
-#endif
         8
     };
     #define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
@@ -191,9 +185,6 @@ namespace Ogre {
             glBindTexture(GL_TEXTURE_2D, tid);
 
             // Set some default parameters
-            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -323,10 +314,10 @@ namespace Ogre {
             GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            if(internalFormat == GL_NONE)
+            if(internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE)
                 continue;
 #else
-            if((internalFormat == GL_NONE) && (x != 0))
+            if((internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE) && (x != 0))
                 continue;
 #endif
 			// No test for compressed formats
@@ -336,13 +327,10 @@ namespace Ogre {
             // Create and attach framebuffer
             _createTempFramebuffer((PixelFormat)x, internalFormat, fmt, type, fb, tid);
 
-            // Check status
-            GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
 			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
 			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
 			// might still be supported, so we must continue probing.
-            if(internalFormat == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
+            if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
             {
                 mProps[x].valid = true;
 				StringUtil::StrStreamType str;
@@ -507,7 +495,7 @@ namespace Ogre {
 #endif
     }
     
-    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLES2SurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
@@ -526,7 +514,7 @@ namespace Ogre {
             else
             {
                 // New one
-                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, (GLint)fsaa);
+                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;
