@@ -369,7 +369,7 @@ void Sample_NewInstancing::createInstancedEntities()
 			//HWInstancingBasic is the only technique without animation support
 			if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
 			{
-#ifndef OGRE_USE_LEGACY_ANIMATIONS
+#ifndef OGRE_LEGACY_ANIMATIONS
 				//Get the animation
 				SkeletonInstance *skeletonInstance = ent->getSkeleton();
 				SkeletonAnimation *anim = skeletonInstance->getAnimation( "Walk" );
@@ -445,7 +445,7 @@ void Sample_NewInstancing::clearScene()
 	mEntities.clear();
 	mSceneNodes.clear();
 	mAnimationsLegacy.clear();
-#ifndef OGRE_USE_LEGACY_ANIMATIONS
+#ifndef OGRE_LEGACY_ANIMATIONS
 	mAnimations.clear();
 #endif
 }
@@ -479,7 +479,7 @@ void Sample_NewInstancing::animateUnits( float timeSinceLast )
 		}
 	}
 
-#ifndef OGRE_USE_LEGACY_ANIMATIONS
+#ifndef OGRE_LEGACY_ANIMATIONS
 	{
 		std::vector<SkeletonAnimation*>::const_iterator itor = mAnimations.begin();
 		std::vector<SkeletonAnimation*>::const_iterator end  = mAnimations.end();

@@ -51,7 +51,7 @@ namespace Ogre
 				mInstanceId( instanceID ),
                 mInUse( false ),
 				mBatchOwner( batchOwner ),
-#if OGRE_LEGACY_ANIMATIONS
+#ifdef OGRE_LEGACY_ANIMATIONS
 				mAnimationState( 0 ),
 				mSkeletonInstance( 0 ),
 				mBoneMatrices(0),
@@ -446,6 +446,7 @@ namespace Ogre
 
 		MovableObject::_notifyAttached( parent );
 	}
+#ifndef OGRE_LEGACY_ANIMATIONS
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyParentNodeMemoryChanged(void)
 	{
@@ -455,7 +456,7 @@ namespace Ogre
 			mSkeletonInstance->setParentNode( mSkeletonInstance->getParentNode() );
 		}
 	}
-#ifdef OGRE_LEGACY_ANIMATIONS
+#else
 	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const
     {

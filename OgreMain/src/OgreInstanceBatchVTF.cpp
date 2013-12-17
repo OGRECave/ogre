@@ -397,7 +397,11 @@ namespace Ogre
 				// 1. All entities sharing the same transformation will share the same unique number
 				// 2. "transform lookup number" will be numbered from 0 up to getMaxLookupTableInstances
 				size_t lookupCounter = 0;
+#ifdef OGRE_LEGACY_ANIMATIONS
+				typedef map<OldSkeletonInstance*,size_t>::type MapTransformId;
+#else
 				typedef map<SkeletonInstance*,size_t>::type MapTransformId;
+#endif
 				MapTransformId transformToId;
 				InstancedEntityVec::const_iterator itEnt = mInstancedEntities.begin(),
 					itEntEnd = mInstancedEntities.end();
@@ -405,7 +409,11 @@ namespace Ogre
 				{
 					if ((*itEnt)->isInScene())
 					{
+#ifdef OGRE_LEGACY_ANIMATIONS
+						OldSkeletonInstance* transformUniqueId = (*itEnt)->mSkeletonInstance;
+#else
 						SkeletonInstance* transformUniqueId = (*itEnt)->mSkeletonInstance;
+#endif
 						MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
 						if (itLu == transformToId.end())
 						{

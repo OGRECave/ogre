@@ -530,7 +530,7 @@ namespace Ogre
 		mDirtyStaticBatches.push_back( dirtyBatch );
 	}
 	//-----------------------------------------------------------------------
-#ifdef OGRE_USE_LEGACY_ANIMATIONS
+#ifdef OGRE_LEGACY_ANIMATIONS
 	void InstanceManager::_updateAnimations(void)
 	{
 		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();

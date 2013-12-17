@@ -238,7 +238,9 @@ namespace Ogre
 		/// Overloaded so we can register ourselves for updating our animations
 		virtual void _notifyAttached( Node* parent );
 
+#ifndef OGRE_LEGACY_ANIMATIONS
 		virtual void _notifyParentNodeMemoryChanged(void);
+#endif
 
 		/// Do nothing, InstanceBatch takes care of this.
         void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera )	{}

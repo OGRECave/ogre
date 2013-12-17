@@ -2387,7 +2387,7 @@ void SceneManager::updateSceneGraph()
 	_applySceneAnimations();
 	updateAllTransforms();
 	updateAllAnimations();
-#ifdef OGRE_USE_LEGACY_ANIMATIONS
+#ifdef OGRE_LEGACY_ANIMATIONS
 	updateInstanceManagerAnimations();
 #endif
 	updateInstanceManagers();
@@ -4650,7 +4650,7 @@ void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }
 //---------------------------------------------------------------------
-#ifdef OGRE_USE_LEGACY_ANIMATIONS
+#ifdef OGRE_LEGACY_ANIMATIONS
 void SceneManager::updateInstanceManagerAnimations(void)
 {
 	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
