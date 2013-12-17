@@ -218,8 +218,9 @@ namespace Ogre {
 		{
 			//This "Hack" just works. Don't ask. And it's fast!
 			//(we're responsible for ensuring the memory layout matches)
+			Transform parentTransf = nodeParent->_getTransform();
 			mTransform.mParentTransform[mTransform.mIndex] = reinterpret_cast<SimpleMatrixAf4x3*>(
-														nodeParent->_getTransform().mDerivedTransform );
+												&parentTransf.mDerivedTransform[parentTransf.mIndex] );
 		}
 		else
 		{

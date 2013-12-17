@@ -2385,8 +2385,8 @@ void SceneManager::updateSceneGraph()
 
 	highLevelCull();
 	_applySceneAnimations();
-	updateAllAnimations();
 	updateAllTransforms();
+	updateAllAnimations();
 #ifdef OGRE_USE_LEGACY_ANIMATIONS
 	updateInstanceManagerAnimations();
 #endif
