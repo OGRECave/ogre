@@ -638,7 +638,7 @@ void buildLod(MeshPtr& mesh)
 	String response;
 
 	// Prompt for LOD generation?
-	bool genLod = (opts.numLods != 0 || opts.interactive);
+	bool genLod = (opts.numLods != 0 || opts.interactive || opts.lodAutoconfigure);
 	bool askLodDtls = opts.interactive;
 	if (genLod) { // otherwise only ask if not specified on command line
 		if (mesh->getNumLodLevels() > 1) {
