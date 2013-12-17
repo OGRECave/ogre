@@ -322,9 +322,12 @@ namespace Ogre {
         // Enable GL multithreading
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
 
+        // Fix garbage screen
+        glViewport(0, 0, mWidth, mHeight);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        
         [mGLContext update];
-
-//        rs->clearFrameBuffer(FBT_COLOUR);
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
