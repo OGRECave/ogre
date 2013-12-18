@@ -210,7 +210,7 @@ bool Sample_MeshLod::loadConfig()
 	// The mesh should already be set.
 	assert(mLodConfig.mesh.get());
 
-	std::string filename(mLodConfig.mesh->getName());
+	String filename(mLodConfig.mesh->getName());
 	filename += ".lodconfig";
 	LodConfigSerializer lcs;
 	lcs.importLodConfig(&mLodConfig, filename);
@@ -233,7 +233,7 @@ bool Sample_MeshLod::loadConfig()
 
 void Sample_MeshLod::saveConfig()
 {
-	std::string filename(mLodConfig.mesh->getName());
+	String filename(mLodConfig.mesh->getName());
 	filename += ".lodconfig";
 	LodConfigSerializer lcs;
 	lcs.exportLodConfig(mLodConfig, filename);

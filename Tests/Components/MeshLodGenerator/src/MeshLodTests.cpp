@@ -28,11 +28,11 @@ void MeshLodTests::setUp()
 {
 	OGRE_DELETE LogManager::getSingletonPtr();
 	mLogManager = OGRE_NEW LogManager();
-	mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
+	mLogManager->createLog("MeshLodTests.log", false);
 	mLogManager->setLogDetail(LL_LOW);
 
 #if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
 #endif
 
 #ifdef OGRE_STATIC_LIB
@@ -40,8 +40,11 @@ void MeshLodTests::setUp()
         
 	mStaticPluginLoader.load();
 #else
-	Root* root = OGRE_NEW Root();
-	
+	Root* root = OGRE_NEW Root("plugins.cfg");
+
+    // Try to load a Rendersystem
+    root->loadPlugin("RenderSystem_GL");
+
 #endif
 	CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
 	root->setRenderSystem(root->getAvailableRenderers().back());
