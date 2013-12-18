@@ -288,6 +288,7 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported
         rsc->setCapability(RSC_VBO);
+        rsc->setCapability(RSC_32BIT_INDEX);
 
         // Vertex Array Objects are supported in 3.0
         rsc->setCapability(RSC_VAO);
@@ -2027,22 +2028,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
         }
 
-        // Set fences.
-        // This ensures all GL operations called since last fence
-        // (e.g., this render) are completed by GPU before executing
-        // later GL operations.
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            const VertexElement & elem = *elemIter;
-            size_t source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // Skip unbound elements.
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-                op.vertexData->vertexBufferBinding->getBuffer(source);
-            static_cast<GL3PlusHardwareVertexBuffer*>(vertexBuffer.get())->setFence();
-        }
 
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();

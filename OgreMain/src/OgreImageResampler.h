@@ -56,8 +56,8 @@ template<unsigned int elemsize> struct NearestResampler {
 		// assert(src.format == dst.format);
 
 		// srcdata stays at beginning, pdst is a moving pointer
-		uchar* srcdata = (uchar*)src.data;
-		uchar* pdst = (uchar*)dst.data;
+		uchar* srcdata = (uchar*)src.getTopLeftFrontPixelPtr();
+		uchar* pdst = (uchar*)dst.getTopLeftFrontPixelPtr();
 
 		// sx_48,sy_48,sz_48 represent current position in source
 		// using 16/48-bit fixed precision, incremented by steps
@@ -97,8 +97,8 @@ struct LinearResampler {
 		size_t dstelemsize = PixelUtil::getNumElemBytes(dst.format);
 
 		// srcdata stays at beginning, pdst is a moving pointer
-		uchar* srcdata = (uchar*)src.data;
-		uchar* pdst = (uchar*)dst.data;
+		uchar* srcdata = (uchar*)src.getTopLeftFrontPixelPtr();
+		uchar* pdst = (uchar*)dst.getTopLeftFrontPixelPtr();
 		
 		// sx_48,sy_48,sz_48 represent current position in source
 		// using 16/48-bit fixed precision, incremented by steps
@@ -181,8 +181,8 @@ struct LinearResampler_Float32 {
 		// assert(dstchannels == 3 || dstchannels == 4);
 
 		// srcdata stays at beginning, pdst is a moving pointer
-		float* srcdata = (float*)src.data;
-		float* pdst = (float*)dst.data;
+		float* srcdata = (float*)src.getTopLeftFrontPixelPtr();
+		float* pdst = (float*)dst.getTopLeftFrontPixelPtr();
 		
 		// sx_48,sy_48,sz_48 represent current position in source
 		// using 16/48-bit fixed precision, incremented by steps
@@ -291,8 +291,8 @@ template<unsigned int channels> struct LinearResampler_Byte {
 		}
 
 		// srcdata stays at beginning of slice, pdst is a moving pointer
-		uchar* srcdata = (uchar*)src.data;
-		uchar* pdst = (uchar*)dst.data;
+		uchar* srcdata = (uchar*)src.getTopLeftFrontPixelPtr();
+		uchar* pdst = (uchar*)dst.getTopLeftFrontPixelPtr();
 
 		// sx_48,sy_48 represent current position in source
 		// using 16/48-bit fixed precision, incremented by steps

@@ -132,12 +132,6 @@ namespace Ogre {
 #elif defined(__FLASHCC__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
-#   ifndef __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__
-#       define __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ 0
-#   endif
-#   ifndef __IPHONE_OS_VERSION_MIN_REQUIRED
-#       define __IPHONE_OS_VERSION_MIN_REQUIRED 0
-#   endif
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000

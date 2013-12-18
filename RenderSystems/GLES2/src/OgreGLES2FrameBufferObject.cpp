@@ -149,15 +149,15 @@ namespace Ogre {
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
         /// Store basic stats
-        size_t width = mColour[0].buffer->getWidth();
-        size_t height = mColour[0].buffer->getHeight();
+        uint32 width = mColour[0].buffer->getWidth();
+        uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
 
 		// Bind simple buffer to add colour attachments
 		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
         /// Bind all attachment points to frame buffer
-        for(size_t x=0; x<maxSupportedMRTs; ++x)
+        for(size_t x = 0; x < maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
@@ -177,12 +177,12 @@ namespace Ogre {
                     ss << "Attachment " << x << " has incompatible format.";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLES2FrameBufferObject::initialise");
                 }
-	            mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0+x, mColour[x].zoffset);
+	            mColour[x].buffer->bindToFramebuffer(static_cast<GLenum>(GL_COLOR_ATTACHMENT0+x), mColour[x].zoffset);
             }
             else
             {
                 // Detach
-                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
+                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, static_cast<GLenum>(GL_COLOR_ATTACHMENT0+x), GL_RENDERBUFFER, 0));
             }
         }
 
@@ -209,15 +209,15 @@ namespace Ogre {
 		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		GLsizei n=0;
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		GLsizei n = 0;
+		for(size_t x = 0; x < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
 			{
-				bufs[x] = GL_COLOR_ATTACHMENT0 + x;
+				bufs[x] = static_cast<GLenum>(GL_COLOR_ATTACHMENT0 + x);
 				// Keep highest used buffer + 1
-				n = x+1;
+				n = static_cast<GLenum>(x+1);
 			}
 			else
 			{

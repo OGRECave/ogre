@@ -686,8 +686,15 @@ namespace Ogre {
                 {
                     // its the last entry in the container so its index is size - 1
                     size_t idx = mTextureUnitStates.size() - 1;
-                    state->setName( StringConverter::toString(idx) );
-                    /** since the name was never set and a default one has been made, clear the alias name
+                    
+					// allow 8 digit hex number. there should never be that many texture units.
+					// This sprintf replaced a call to StringConverter::toString for performance reasons
+					char buff[9];
+					memset(buff, 0, 9);
+					sprintf(buff, "%lx", static_cast<long>(idx));
+                    state->setName( buff );
+                    
+					/** since the name was never set and a default one has been made, clear the alias name
                      so that when the texture unit name is set by the user, the alias name will be set to
                      that name
                     */

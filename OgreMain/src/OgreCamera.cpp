@@ -614,7 +614,7 @@ namespace Ogre {
         // NB assumes that all scene nodes have been updated
         if (mAutoTrackTarget)
         {
-            lookAt(mAutoTrackTarget->_getDerivedPosition() + mAutoTrackOffset);
+            lookAt(mAutoTrackTarget->_getFullTransform().transformAffine(mAutoTrackOffset));
         }
     }
     //-----------------------------------------------------------------------

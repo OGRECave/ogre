@@ -76,6 +76,7 @@ namespace Ogre
         file << "\t" << "cubemapping " << StringConverter::toString(caps->hasCapability(RSC_CUBEMAPPING)) << endl;
         file << "\t" << "hwstencil " << StringConverter::toString(caps->hasCapability(RSC_HWSTENCIL)) << endl;
         file << "\t" << "vbo " << StringConverter::toString(caps->hasCapability(RSC_VBO)) << endl;
+        file << "\t" << "32bit_index " << StringConverter::toString(caps->hasCapability(RSC_32BIT_INDEX)) << endl;
         file << "\t" << "vertex_program " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_PROGRAM)) << endl;
         file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
         file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
@@ -477,6 +478,7 @@ namespace Ogre
         addCapabilitiesMapping("cubemapping", RSC_CUBEMAPPING);
         addCapabilitiesMapping("hwstencil", RSC_HWSTENCIL);
         addCapabilitiesMapping("vbo", RSC_VBO);
+        addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
 		addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);
         addCapabilitiesMapping("fragment_program", RSC_FRAGMENT_PROGRAM);

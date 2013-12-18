@@ -130,6 +130,9 @@ namespace Ogre {
     typedef unsigned int uint;
 	typedef unsigned long ulong;
 
+    #if __cplusplus >= 201103L
+    #define register
+    #endif
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
