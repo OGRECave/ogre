@@ -115,7 +115,7 @@ elseif (UNIX)
 endif ()
 
 # Add support for the RT Shader System
-add_definitions(-DUSE_RTSHADER_SYSTEM)
+add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
