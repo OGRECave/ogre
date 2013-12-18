@@ -1193,6 +1193,12 @@ namespace Ogre {
 	RenderWindow* Root::createRenderWindow(const String &name, unsigned int width, unsigned int height,
 			bool fullScreen, const NameValuePairList *miscParams)
 	{
+		if (!mIsInitialised)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+			"Cannot create window - Root has not been initialised! "
+			"Make sure to call Root::initialise before creating a window.", "Root::createRenderWindow");
+		}
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
@@ -1216,6 +1222,12 @@ namespace Ogre {
 	bool Root::createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
 		RenderWindowList& createdWindows)
 	{
+		if (!mIsInitialised)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+			"Cannot create window - Root has not been initialised! "
+			"Make sure to call Root::initialise before creating a window.", "Root::createRenderWindows");
+		}
 		if (!mActiveRenderer)
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,

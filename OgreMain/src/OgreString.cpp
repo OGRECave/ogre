@@ -214,6 +214,19 @@ namespace Ogre {
 			toupper);
     }
     //-----------------------------------------------------------------------
+    void StringUtil::toTitleCase(String& str) 
+    {
+        String::iterator it = str.begin();
+        *it = toupper(*it);
+        for (; it != str.end() - 1; it++)
+        {
+            if (*it == ' ') 
+            {
+                *(it + 1) = toupper(*(it + 1));
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
     bool StringUtil::startsWith(const String& str, const String& pattern, bool lowerCase)
     {
         size_t thisLen = str.length();
