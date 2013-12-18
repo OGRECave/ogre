@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2013 Torus Knot Software Ltd
@@ -36,35 +36,46 @@ namespace Ogre {
     /// Specialisation of HardwareUniformBuffer for OpenGL
     class _OgreGL3PlusExport GL3PlusHardwareUniformBuffer : public HardwareUniformBuffer
     {
-        private:
-            GLuint mBufferId;
-            GLint mBinding;
+        struct GL3PlusBufferParametersLayout 
+        {
+            //TODO should this be a name, property map?  Probably.
+            std::vector<GLuint> indices;
+            std::vector<GLint> offsets;
+            /* std::vector<GLint> arrayStrides; */
+            /* std::vector<GLint> matrixStrides; */
+        };
 
-        protected:
-            /** See HardwareBuffer. */
-            void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
-            void unlockImpl(void);
+    private:
+        GLuint mBufferId;
+        GLint mBinding;
 
-        public:
-            GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
-                                         bool useShadowBuffer, const String& name);
-            ~GL3PlusHardwareUniformBuffer();
+    protected:
+        /** See HardwareBuffer. */
+        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        /** See HardwareBuffer. */
+        void unlockImpl(void);
 
-            /** See HardwareBuffer. */
-            void readData(size_t offset, size_t length, void* pDest);
+    public:
+        GL3PlusBufferParametersLayout mBufferParamsLayout;
 
-            /** See HardwareBuffer. */
-            void writeData(size_t offset, size_t length, 
-                           const void* pSource, bool discardWholeBuffer = false);
+        GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
+                                     bool useShadowBuffer, const String& name);
+        ~GL3PlusHardwareUniformBuffer();
 
-            /** See HardwareBuffer. */
-            void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-                          size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+        /** See HardwareBuffer. */
+        void readData(size_t offset, size_t length, void* pDest);
 
-            inline GLuint getGLBufferId(void) const { return mBufferId; }
-            void setGLBufferBinding(GLint binding);
-            inline GLint getGLBufferBinding(void) const { return mBinding; }
+        /** See HardwareBuffer. */
+        void writeData(size_t offset, size_t length,
+                       const void* pSource, bool discardWholeBuffer = false);
+
+        /** See HardwareBuffer. */
+        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
+                      size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+
+        inline GLuint getGLBufferId(void) const { return mBufferId; }
+        void setGLBufferBinding(GLint binding);
+        inline GLint getGLBufferBinding(void) const { return mBinding; }
     };
 }
 #endif // __GL3PlusHARDWAREUNIFORMBUFFER_H__

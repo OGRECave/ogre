@@ -2391,3 +2391,17 @@ material Examples/TransparentBlue50
     }
   }
 }
+
+// material Examples/Passthrough
+// {
+//     technique
+//     {
+//         pass
+//         {
+//             diffuse vertexcolour
+//             specular vertexcolour
+//             ambient vertexcolour
+//             lighting off
+//         }
+//     }
+// }

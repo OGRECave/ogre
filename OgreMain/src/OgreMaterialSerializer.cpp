@@ -1904,19 +1904,50 @@ namespace Ogre
 
         return false;
     }
-
     //-----------------------------------------------------------------------
-	void processManualProgramParam(bool isNamed, const String commandname,
-		StringVector& vecparams, MaterialScriptContext& context,
-		size_t index = 0, const String& paramName = StringUtil::BLANK)
+    inline size_t parseParamDimensions(String& dimensions, size_t start)
+    {
+        // Assume 1 unless otherwise specified
+        size_t dims = 1;
+
+        if (start != String::npos)
+        {
+            size_t end = dimensions.find_first_of("[", start);
+
+            // int1, int2, etc.
+            if (end != start)
+            {
+                dims *= StringConverter::parseInt(
+                    dimensions.substr(start, end - start));
+                start = end;
+            }
+
+            // C-style array
+            while (start != String::npos)
+            {
+                end = dimensions.find_first_of("]", start);
+                dims *= StringConverter::parseInt(
+                    dimensions.substr(start + 1, end - start - 1));
+                start = dimensions.find_first_of("[", start);
+            }
+        }
+        
+        return dims;
+    }
+    //-----------------------------------------------------------------------
+    void processManualProgramParam(bool isNamed, const String commandname,
+                                   StringVector& vecparams, MaterialScriptContext& context,
+                                   size_t index = 0, const String& paramName = StringUtil::BLANK)
     {
         // NB we assume that the first element of vecparams is taken up with either
         // the index or the parameter name, which we ignore
 
         // Determine type
-        size_t start, dims, roundedDims, i;
+        size_t dims, roundedDims, i;
         bool isReal;
         bool isMatrix4x4 = false;
+        bool isInt = false;
+        bool isUnsignedInt = false;
 
         StringUtil::toLowerCase(vecparams[1]);
 
@@ -1926,84 +1957,71 @@ namespace Ogre
             isReal = true;
             isMatrix4x4 = true;
         }
-        else if ((start = vecparams[1].find("float")) != String::npos)
+        else if (vecparams[1].find("float") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("float");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("float"));
             isReal = true;
         }
-        else if ((start = vecparams[1].find("double")) != String::npos)
+        else if (vecparams[1].find("double") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("double");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("double"));
             isReal = true;
         }
-        else if ((start = vecparams[1].find("int")) != String::npos)
+        else if (vecparams[1].find("int") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("int");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("int"));
+            isReal = false;
+            isInt = true;
+        }
+        else if (vecparams[1].find("uint") != String::npos)
+        {
+            dims = parseParamDimensions(vecparams[1],
+                                        vecparams[1].find_first_not_of("uint"));
+            isReal = false;
+            isUnsignedInt = true;
+        }
+        else if (vecparams[1].find("bool") != String::npos)
+        {
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("bool"));
             isReal = false;
         }
         else
         {
             logParseError("Invalid " + commandname + " attribute - unrecognised "
-                "parameter type " + vecparams[1], context);
+                          "parameter type " + vecparams[1], context);
             return;
         }
 
         if (vecparams.size() != 2 + dims)
         {
             logParseError("Invalid " + commandname + " attribute - you need " +
-                StringConverter::toString(2 + dims) + " parameters for a parameter of "
-                "type " + vecparams[1], context);
+                          StringConverter::toString(2 + dims) + " parameters for a parameter of "
+                          "type " + vecparams[1], context);
         }
 
-		// clear any auto parameter bound to this constant, it would override this setting
-		// can cause problems overriding materials or changing default params
-		if (isNamed)
-			context.programParams->clearNamedAutoConstant(paramName);
-		else
-			context.programParams->clearAutoConstant(index);
+        // Clear any auto parameter bound to this constant, it would
+        // override this setting can cause problems overriding
+        // materials or changing default params
+        if (isNamed)
+            context.programParams->clearNamedAutoConstant(paramName);
+        else
+            context.programParams->clearAutoConstant(index);
 
+        // Round dims to multiple of 4
+        if (dims %4 != 0)
+        {
+            roundedDims = dims + 4 - (dims % 4);
+        }
+        else
+        {
+            roundedDims = dims;
+        }
 
-		// Round dims to multiple of 4
-		if (dims %4 != 0)
-		{
-			roundedDims = dims + 4 - (dims % 4);
-		}
-		else
-		{
-			roundedDims = dims;
-		}
-
-		// Now parse all the values
+        // Now parse all the values
         if (isReal)
         {
             Real* realBuffer = OGRE_ALLOC_T(Real, roundedDims, MEMCATEGORY_SCRIPTING);
@@ -2012,80 +2030,140 @@ namespace Ogre
             {
                 realBuffer[i] = StringConverter::parseReal(vecparams[i+2]);
             }
-			// Fill up to multiple of 4 with zero
-			for (; i < roundedDims; ++i)
-			{
-				realBuffer[i] = 0.0f;
+            // Fill up to multiple of 4 with zero
+            for (; i < roundedDims; ++i)
+            {
+                realBuffer[i] = 0.0f;
 
-			}
+            }
 
             if (isMatrix4x4)
             {
-                // its a Matrix4x4 so pass as a Matrix4
-                // use specialized setConstant that takes a matrix so matrix is transposed if required
+                // It's a Matrix4x4 so pass as a Matrix4. Use
+                // specialized setConstant that takes a matrix so
+                // matrix is transposed if required.
                 Matrix4 m4x4(
                     realBuffer[0],  realBuffer[1],  realBuffer[2],  realBuffer[3],
                     realBuffer[4],  realBuffer[5],  realBuffer[6],  realBuffer[7],
                     realBuffer[8],  realBuffer[9],  realBuffer[10], realBuffer[11],
                     realBuffer[12], realBuffer[13], realBuffer[14], realBuffer[15]
-                    );
-				if (isNamed)
-					context.programParams->setNamedConstant(paramName, m4x4);
-				else
-					context.programParams->setConstant(index, m4x4);
+                );
+                if (isNamed)
+                    context.programParams->setNamedConstant(paramName, m4x4);
+                else
+                    context.programParams->setConstant(index, m4x4);
             }
             else
             {
                 // Set
-				if (isNamed)
-				{
-					// For named, only set up to the precise number of elements
-					// (no rounding to 4 elements)
-					// GLSL can support sub-float4 elements and we support that
-					// in the buffer now. Note how we set the 'multiple' param to 1
-					context.programParams->setNamedConstant(paramName, realBuffer,
-						dims, 1);
-				}
-				else
-				{
-					context.programParams->setConstant(index, realBuffer,
-						static_cast<size_t>(roundedDims * 0.25));
-				}
+                if (isNamed)
+                {
+                    // For named, only set up to the precise number of elements
+                    // (no rounding to 4 elements)
+                    // GLSL can support sub-float4 elements and we support that
+                    // in the buffer now. Note how we set the 'multiple' param to 1
+                    context.programParams->setNamedConstant(paramName, realBuffer,
+                                                            dims, 1);
+                }
+                else
+                {
+                    context.programParams->setConstant(index, realBuffer,
+                                                       static_cast<size_t>(roundedDims * 0.25));
+                }
 
             }
-
 
             OGRE_FREE(realBuffer, MEMCATEGORY_SCRIPTING);
         }
-        else
+        else if (isInt)
         {
-            int* intBuffer = OGRE_ALLOC_T(int, roundedDims, MEMCATEGORY_SCRIPTING);
+            int* buffer = OGRE_ALLOC_T(int, roundedDims, MEMCATEGORY_SCRIPTING);
             // Do specified values
             for (i = 0; i < dims; ++i)
             {
-                intBuffer[i] = StringConverter::parseInt(vecparams[i+2]);
+                buffer[i] = StringConverter::parseInt(vecparams[i + 2]);
             }
-			// Fill to multiple of 4 with 0
-			for (; i < roundedDims; ++i)
-			{
-				intBuffer[i] = 0;
-			}
+            // Fill to multiple of 4 with 0
+            for (; i < roundedDims; ++i)
+            {
+                buffer[i] = 0;
+            }
             // Set
-			if (isNamed)
-			{
-				// For named, only set up to the precise number of elements
-				// (no rounding to 4 elements)
-				// GLSL can support sub-float4 elements and we support that
-				// in the buffer now. Note how we set the 'multiple' param to 1
-				context.programParams->setNamedConstant(paramName, intBuffer,
-					dims, 1);
-			}
-			else
-			{
-				context.programParams->setConstant(index, intBuffer,
-					static_cast<size_t>(roundedDims * 0.25));
-			}
-            OGRE_FREE(intBuffer, MEMCATEGORY_SCRIPTING);
+            if (isNamed)
+            {
+                // For named, only set up to the precise number of elements
+                // (no rounding to 4 elements)
+                // GLSL can support sub-float4 elements and we support that
+                // in the buffer now. Note how we set the 'multiple' param to 1
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
+            }
+            else
+            {
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
+            }
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
+        }
+        else if (isUnsignedInt)
+        {
+            uint* buffer = OGRE_ALLOC_T(uint, roundedDims, MEMCATEGORY_SCRIPTING);
+            // Do specified values
+            for (i = 0; i < dims; ++i)
+            {
+                buffer[i] = StringConverter::parseUnsignedInt(vecparams[i + 2]);
+            }
+            // Fill to multiple of 4 with 0
+            for (; i < roundedDims; ++i)
+            {
+                buffer[i] = 0;
+            }
+            // Set
+            if (isNamed)
+            {
+                // For named, only set up to the precise number of elements
+                // (no rounding to 4 elements)
+                // GLSL can support sub-float4 elements and we support that
+                // in the buffer now. Note how we set the 'multiple' param to 1
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
+            }
+            else
+            {
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
+            }
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
+        }
+        else // bool
+        {
+            uint* buffer = OGRE_ALLOC_T(uint, roundedDims, MEMCATEGORY_SCRIPTING);
+            // Do specified values
+            for (i = 0; i < dims; ++i)
+            {
+                buffer[i] = StringConverter::parseBool(vecparams[i + 2]) != 0;
+            }
+            // Fill to multiple of 4 with 0
+            for (; i < roundedDims; ++i)
+            {
+                buffer[i] = false;
+            }
+            // Set
+            if (isNamed)
+            {
+                // For named, only set up to the precise number of elements
+                // (no rounding to 4 elements)
+                // GLSL can support sub-float4 elements and we support that
+                // in the buffer now. Note how we set the 'multiple' param to 1
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
+            }
+            else
+            {
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
+            }
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
         }
     }
     //-----------------------------------------------------------------------
@@ -2276,13 +2354,13 @@ namespace Ogre
         if (vecparams.size() < 3)
         {
             logParseError("Invalid param_named attribute - expected at least 3 parameters.",
-                context);
+                          context);
             return false;
         }
 
         try {
-			const GpuConstantDefinition& def = 
-				context.programParams->getConstantDefinition(vecparams[0]);
+            const GpuConstantDefinition& def = 
+                context.programParams->getConstantDefinition(vecparams[0]);
             (void)def; // Silence warning
         }
         catch (Exception& e)
@@ -3207,9 +3285,9 @@ namespace Ogre
         mProgramAttribParsers.insert(AttribParserList::value_type("source", (ATTRIBUTE_PARSER)parseProgramSource));
         mProgramAttribParsers.insert(AttribParserList::value_type("syntax", (ATTRIBUTE_PARSER)parseProgramSyntax));
         mProgramAttribParsers.insert(AttribParserList::value_type("includes_skeletal_animation", (ATTRIBUTE_PARSER)parseProgramSkeletalAnimation));
-		mProgramAttribParsers.insert(AttribParserList::value_type("includes_morph_animation", (ATTRIBUTE_PARSER)parseProgramMorphAnimation));
-		mProgramAttribParsers.insert(AttribParserList::value_type("includes_pose_animation", (ATTRIBUTE_PARSER)parseProgramPoseAnimation));
-		mProgramAttribParsers.insert(AttribParserList::value_type("uses_vertex_texture_fetch", (ATTRIBUTE_PARSER)parseProgramVertexTextureFetch));
+        mProgramAttribParsers.insert(AttribParserList::value_type("includes_morph_animation", (ATTRIBUTE_PARSER)parseProgramMorphAnimation));
+        mProgramAttribParsers.insert(AttribParserList::value_type("includes_pose_animation", (ATTRIBUTE_PARSER)parseProgramPoseAnimation));
+        mProgramAttribParsers.insert(AttribParserList::value_type("uses_vertex_texture_fetch", (ATTRIBUTE_PARSER)parseProgramVertexTextureFetch));
         mProgramAttribParsers.insert(AttribParserList::value_type("default_params", (ATTRIBUTE_PARSER)parseDefaultParams));
 
         // Set up program default param attribute parsers
@@ -5051,14 +5129,14 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuProgramRef(const String& attrib,
-        const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params)
+                                                const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params)
     {		
-		bool skipWriting = false;
+        bool skipWriting = false;
 
-		// Fire pre-write event.
-		fireGpuProgramRefEvent(MSE_PRE_WRITE, skipWriting, attrib, program, params, NULL);
-		if (skipWriting)		
-			return;
+        // Fire pre-write event.
+        fireGpuProgramRefEvent(MSE_PRE_WRITE, skipWriting, attrib, program, params, NULL);
+        if (skipWriting)		
+            return;
 
         mBuffer += "\n";
         writeAttribute(3, attrib);
@@ -5066,319 +5144,421 @@ namespace Ogre
         beginSection(3);
         {
             // write out parameters
-            GpuProgramParameters* defaultParams= 0;
+            GpuProgramParameters* defaultParams = 0;
             // does the GPU program have default parameters?
             if (program->hasDefaultParameters())
                 defaultParams = program->getDefaultParameters().getPointer();
 
-			// Fire write begin event.
-			fireGpuProgramRefEvent(MSE_WRITE_BEGIN, skipWriting, attrib, program, params, defaultParams);
+            // Fire write begin event.
+            fireGpuProgramRefEvent(MSE_WRITE_BEGIN, skipWriting, attrib, program, params, defaultParams);
 
             writeGPUProgramParameters(params, defaultParams);
 
-			// Fire write end event.
-			fireGpuProgramRefEvent(MSE_WRITE_END, skipWriting, attrib, program, params, defaultParams);
+            // Fire write end event.
+            fireGpuProgramRefEvent(MSE_WRITE_END, skipWriting, attrib, program, params, defaultParams);
         }
         endSection(3);
 
         // add to GpuProgram contatiner
         mGpuProgramDefinitionContainer.insert(program->getName());
 
-		// Fire post section write event.
-		fireGpuProgramRefEvent(MSE_POST_WRITE, skipWriting, attrib, program, params, NULL);		
+        // Fire post section write event.
+        fireGpuProgramRefEvent(MSE_POST_WRITE, skipWriting, attrib, program, params, NULL);		
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGPUProgramParameters(
-		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, unsigned short level,
-		const bool useMainBuffer)
+        const GpuProgramParametersSharedPtr& params,
+        GpuProgramParameters* defaultParams, unsigned short level,
+        const bool useMainBuffer)
     {
         // iterate through the constant definitions
-		if (params->hasNamedParameters())
-		{
-			writeNamedGpuProgramParameters(params, defaultParams, level, useMainBuffer);
-		}
-		else
-		{
-			writeLowLevelGpuProgramParameters(params, defaultParams, level, useMainBuffer);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void MaterialSerializer::writeNamedGpuProgramParameters(
-		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, unsigned short level,
-		const bool useMainBuffer)
-	{
-		GpuConstantDefinitionIterator constIt = params->getConstantDefinitionIterator();
-		while(constIt.hasMoreElements())
-		{
+        if (params->hasNamedParameters())
+        {
+            writeNamedGpuProgramParameters(params, defaultParams, level, useMainBuffer);
+        }
+        else
+        {
+            writeLowLevelGpuProgramParameters(params, defaultParams, level, useMainBuffer);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeNamedGpuProgramParameters(
+        const GpuProgramParametersSharedPtr& params,
+        GpuProgramParameters* defaultParams, unsigned short level,
+        const bool useMainBuffer)
+    {
+        GpuConstantDefinitionIterator constIt = params->getConstantDefinitionIterator();
+        while(constIt.hasMoreElements())
+        {
             // get the constant definition
-			const String& paramName = constIt.peekNextKey();
-			const GpuConstantDefinition& def =
-				constIt.getNext();
+            const String& paramName = constIt.peekNextKey();
+            const GpuConstantDefinition& def =
+                constIt.getNext();
 
-			// get any auto-link
-			const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-				params->findAutoConstantEntry(paramName);
-			const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-			if (defaultParams)
-			{
-				defaultAutoEntry = 
-					defaultParams->findAutoConstantEntry(paramName);
-			}
+            // get any auto-link
+            const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+                params->findAutoConstantEntry(paramName);
+            const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+            if (defaultParams)
+            {
+                defaultAutoEntry = 
+                    defaultParams->findAutoConstantEntry(paramName);
+            }
 
-			writeGpuProgramParameter("param_named", 
-				paramName, autoEntry, defaultAutoEntry, def.isFloat(), def.isDouble(),
-				def.physicalIndex, def.elementSize * def.arraySize,
-				params, defaultParams, level, useMainBuffer);
-		}
+            writeGpuProgramParameter("param_named", 
+                                     paramName, autoEntry, defaultAutoEntry, 
+                                     def.isFloat(), def.isDouble(), def.isInt(), def.isUnsignedInt(),
+                                     def.physicalIndex, def.elementSize * def.arraySize,
+                                     params, defaultParams, level, useMainBuffer);
+        }
 
     }
-	//-----------------------------------------------------------------------
-	void MaterialSerializer::writeLowLevelGpuProgramParameters(
-		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, unsigned short level,
-		const bool useMainBuffer)
-	{
-		// Iterate over the logical->physical mappings
-		// This will represent the values which have been set
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeLowLevelGpuProgramParameters(
+        const GpuProgramParametersSharedPtr& params,
+        GpuProgramParameters* defaultParams, unsigned short level,
+        const bool useMainBuffer)
+    {
+        // Iterate over the logical->physical mappings
+        // This will represent the values which have been set
 
-		// float params
-		GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
+        // float params
+        GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
         if( !floatLogical.isNull() )
-		{
-                    OGRE_LOCK_MUTEX(floatLogical->mutex);
+        {
+            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
-			for(GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
-				i != floatLogical->map.end(); ++i)
-			{
-				size_t logicalIndex = i->first;
-				const GpuLogicalIndexUse& logicalUse = i->second;
+            for(GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
+                i != floatLogical->map.end(); ++i)
+            {
+                size_t logicalIndex = i->first;
+                const GpuLogicalIndexUse& logicalUse = i->second;
 
-				const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-					params->findFloatAutoConstantEntry(logicalIndex);
-				const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-				if (defaultParams)
-				{
-					defaultAutoEntry = defaultParams->findFloatAutoConstantEntry(logicalIndex);
-				}
+                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+                    params->findFloatAutoConstantEntry(logicalIndex);
+                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+                if (defaultParams)
+                {
+                    defaultAutoEntry = defaultParams->findFloatAutoConstantEntry(logicalIndex);
+                }
 
-				writeGpuProgramParameter("param_indexed", 
-					StringConverter::toString(logicalIndex), autoEntry, 
-					defaultAutoEntry, true, false, logicalUse.physicalIndex,
-					logicalUse.currentSize,
-					params, defaultParams, level, useMainBuffer);
-			}
-		}
+                writeGpuProgramParameter("param_indexed", 
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, true, false, false, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
+            }
+        }
 
         // double params
-		GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
+        GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
-		{
-                    OGRE_LOCK_MUTEX(floatLogical->mutex);
+        {
+            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
-			for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
-				i != doubleLogical->map.end(); ++i)
-			{
-				size_t logicalIndex = i->first;
-				const GpuLogicalIndexUse& logicalUse = i->second;
+            for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
+                i != doubleLogical->map.end(); ++i)
+            {
+                size_t logicalIndex = i->first;
+                const GpuLogicalIndexUse& logicalUse = i->second;
 
-				const GpuProgramParameters::AutoConstantEntry* autoEntry =
-                params->findDoubleAutoConstantEntry(logicalIndex);
-				const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-				if (defaultParams)
-				{
-					defaultAutoEntry = defaultParams->findDoubleAutoConstantEntry(logicalIndex);
-				}
+                const GpuProgramParameters::AutoConstantEntry* autoEntry =
+                    params->findDoubleAutoConstantEntry(logicalIndex);
+                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+                if (defaultParams)
+                {
+                    defaultAutoEntry = defaultParams->findDoubleAutoConstantEntry(logicalIndex);
+                }
 
-				writeGpuProgramParameter("param_indexed",
+                writeGpuProgramParameter("param_indexed",
                                          StringConverter::toString(logicalIndex), autoEntry,
-                                         defaultAutoEntry, false, true, logicalUse.physicalIndex,
-                                         logicalUse.currentSize,
+                                         defaultAutoEntry, false, true, false, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
                                          params, defaultParams, level, useMainBuffer);
-			}
-		}
+            }
+        }
 
-		// int params
-		GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
+        // int params
+        GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
         if( !intLogical.isNull() )
-		{
-                    OGRE_LOCK_MUTEX(intLogical->mutex);
+        {
+            OGRE_LOCK_MUTEX(intLogical->mutex);
 
-			for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
-				i != intLogical->map.end(); ++i)
-			{
-				size_t logicalIndex = i->first;
-				const GpuLogicalIndexUse& logicalUse = i->second;
+            for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
+                i != intLogical->map.end(); ++i)
+            {
+                size_t logicalIndex = i->first;
+                const GpuLogicalIndexUse& logicalUse = i->second;
 
-				const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-					params->findIntAutoConstantEntry(logicalIndex);
-				const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-				if (defaultParams)
-				{
-					defaultAutoEntry = defaultParams->findIntAutoConstantEntry(logicalIndex);
-				}
+                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+                    params->findIntAutoConstantEntry(logicalIndex);
+                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+                if (defaultParams)
+                {
+                    defaultAutoEntry = defaultParams->findIntAutoConstantEntry(logicalIndex);
+                }
 
-				writeGpuProgramParameter("param_indexed", 
-					StringConverter::toString(logicalIndex), autoEntry, 
-					defaultAutoEntry, false, false, logicalUse.physicalIndex,
-					logicalUse.currentSize,
-					params, defaultParams, level, useMainBuffer);
-			}
+                writeGpuProgramParameter("param_indexed", 
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, false, false, true, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
+            }
 
-		}
+        }
 
-	}
-	//-----------------------------------------------------------------------
-	void MaterialSerializer::writeGpuProgramParameter(
-		const String& commandName, const String& identifier, 
-		const GpuProgramParameters::AutoConstantEntry* autoEntry, 
-		const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-		bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
-		const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-		const ushort level, const bool useMainBuffer)
-	{
-		// Skip any params with array qualifiers
-		// These are only for convenience of setters, the full array will be
-		// written using the base, non-array identifier
-		if (identifier.find("[") != String::npos)
-		{
-			return;
-		}
+        // uint params
+        GpuLogicalBufferStructPtr uintLogical = params->getUnsignedIntLogicalBufferStruct();
+        if( !uintLogical.isNull() )
+        {
+            OGRE_LOCK_MUTEX(uintLogical->mutex);
 
-		// get any auto-link
-		// don't duplicate constants that are defined as a default parameter
-		bool different = false;
-		if (defaultParams)
-		{
-			// if default is auto but we're not or vice versa
-			if ((autoEntry == 0) != (defaultAutoEntry == 0))
-			{
-				different = true;
-			}
-			else if (autoEntry)
-			{
-				// both must be auto
-				// compare the auto values
-				different = (autoEntry->paramType != defaultAutoEntry->paramType
-					|| autoEntry->data != defaultAutoEntry->data);
-			}
-			else
-			{
-				// compare the non-auto (raw buffer) values
-				// param buffers are always initialised with all zeros
-				// so unset == unset
-				if (isFloat)
-				{
-					different = memcmp(
-						params->getFloatPointer(physicalIndex), 
-						defaultParams->getFloatPointer(physicalIndex),
-						sizeof(float) * physicalSize) != 0;
-				}
-				else if (isDouble)
-				{
-					different = memcmp(
-						params->getDoublePointer(physicalIndex),
-						defaultParams->getDoublePointer(physicalIndex),
-						sizeof(double) * physicalSize) != 0;
-				}
-				else
-				{
-					different = memcmp(
-						params->getIntPointer(physicalIndex), 
-						defaultParams->getIntPointer(physicalIndex),
-						sizeof(int) * physicalSize) != 0;
-				}
-			}
-		}
+            for(GpuLogicalIndexUseMap::const_iterator i = uintLogical->map.begin();
+                i != uintLogical->map.end(); ++i)
+            {
+                size_t logicalIndex = i->first;
+                const GpuLogicalIndexUse& logicalUse = i->second;
 
-		if (!defaultParams || different)
-		{
-			String label = commandName;
+                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+                    params->findUnsignedIntAutoConstantEntry(logicalIndex);
+                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+                if (defaultParams)
+                {
+                    defaultAutoEntry = defaultParams->findUnsignedIntAutoConstantEntry(logicalIndex);
+                }
 
-			// is it auto
-			if (autoEntry)
-				label += "_auto";
+                writeGpuProgramParameter("param_indexed", 
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, false, false, false, true,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
+            }
 
-			writeAttribute(level, label, useMainBuffer);
-			// output param index / name
-			writeValue(quoteWord(identifier), useMainBuffer);
+        }
 
-			// if auto output auto type name and data if needed
-			if (autoEntry)
-			{
-				const GpuProgramParameters::AutoConstantDefinition* autoConstDef =
-					GpuProgramParameters::getAutoConstantDefinition(autoEntry->paramType);
+        // // bool params
+        // GpuLogicalBufferStructPtr boolLogical = params->getBoolLogicalBufferStruct();
+        // if( !boolLogical.isNull() )
+        // {
+        //     OGRE_LOCK_MUTEX(boolLogical->mutex);
 
-				assert(autoConstDef && "Bad auto constant Definition Table");
-				// output auto constant name
-				writeValue(quoteWord(autoConstDef->name), useMainBuffer);
-				// output data if it uses it
-				switch(autoConstDef->dataType)
-				{
-				case GpuProgramParameters::ACDT_REAL:
-					writeValue(StringConverter::toString(autoEntry->fData), useMainBuffer);
-					break;
+        //     for(GpuLogicalIndexUseMap::const_iterator i = boolLogical->map.begin();
+        //         i != boolLogical->map.end(); ++i)
+        //     {
+        //         size_t logicalIndex = i->first;
+        //         const GpuLogicalIndexUse& logicalUse = i->second;
 
-				case GpuProgramParameters::ACDT_INT:
-					writeValue(StringConverter::toString(autoEntry->data), useMainBuffer);
-					break;
+        //         const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+        //             params->findBoolAutoConstantEntry(logicalIndex);
+        //         const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+        //         if (defaultParams)
+        //         {
+        //             defaultAutoEntry = defaultParams->findBoolAutoConstantEntry(logicalIndex);
+        //         }
 
-				default:
-					break;
-				}
-			}
-			else // not auto so output all the values used
-			{
-				String countLabel;
+        //         writeGpuProgramParameter("param_indexed", 
+        //                                  StringConverter::toString(logicalIndex), autoEntry, 
+        //                                  defaultAutoEntry, false, false, false, false,
+        //                                  logicalUse.physicalIndex, logicalUse.currentSize,
+        //                                  params, defaultParams, level, useMainBuffer);
+        //     }
 
-				// only write a number if > 1
-				if (physicalSize > 1)
-					countLabel = StringConverter::toString(physicalSize);
+        // }
 
-				if (isFloat)
-				{
-					// Get pointer to start of values
-					const float* pFloat = params->getFloatPointer(physicalIndex);
+    }
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeGpuProgramParameter(
+        const String& commandName, const String& identifier, 
+        const GpuProgramParameters::AutoConstantEntry* autoEntry, 
+        const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
+        bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt,
+        size_t physicalIndex, size_t physicalSize,
+        const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
+        const ushort level, const bool useMainBuffer)
+    {
+        // Skip any params with array qualifiers
+        // These are only for convenience of setters, the full array will be
+        // written using the base, non-array identifier
+        if (identifier.find("[") != String::npos)
+        {
+            return;
+        }
 
-					writeValue("float" + countLabel, useMainBuffer);
-					// iterate through real constants
-					for (size_t f = 0 ; f < physicalSize; ++f)
-					{
-						writeValue(StringConverter::toString(*pFloat++), useMainBuffer);
-					}
-				}
-				else if (isDouble)
-				{
-					// Get pointer to start of values
-					const double* pDouble = params->getDoublePointer(physicalIndex);
+        // get any auto-link
+        // don't duplicate constants that are defined as a default parameter
+        bool different = false;
+        if (defaultParams)
+        {
+            // if default is auto but we're not or vice versa
+            if ((autoEntry == 0) != (defaultAutoEntry == 0))
+            {
+                different = true;
+            }
+            else if (autoEntry)
+            {
+                // both must be auto
+                // compare the auto values
+                different = (autoEntry->paramType != defaultAutoEntry->paramType
+                             || autoEntry->data != defaultAutoEntry->data);
+            }
+            else
+            {
+                // compare the non-auto (raw buffer) values
+                // param buffers are always initialised with all zeros
+                // so unset == unset
+                if (isFloat)
+                {
+                    different = memcmp(
+                        params->getFloatPointer(physicalIndex), 
+                        defaultParams->getFloatPointer(physicalIndex),
+                        sizeof(float) * physicalSize) != 0;
+                }
+                else if (isDouble)
+                {
+                    different = memcmp(
+                        params->getDoublePointer(physicalIndex),
+                        defaultParams->getDoublePointer(physicalIndex),
+                        sizeof(double) * physicalSize) != 0;
+                }
+                else if (isInt)
+                {
+                    different = memcmp(
+                        params->getIntPointer(physicalIndex), 
+                        defaultParams->getIntPointer(physicalIndex),
+                        sizeof(int) * physicalSize) != 0;
+                }
+                else if (isUnsignedInt)
+                {
+                    different = memcmp(
+                        params->getUnsignedIntPointer(physicalIndex),
+                        defaultParams->getUnsignedIntPointer(physicalIndex),
+                        sizeof(uint) * physicalSize) != 0;
+                }
+                else //if (isBool)
+                {
+                    // different = memcmp(
+                    //     params->getBoolPointer(physicalIndex), 
+                    //     defaultParams->getBoolPointer(physicalIndex),
+                    //     sizeof(bool) * physicalSize) != 0;
+                    different = memcmp(
+                        params->getUnsignedIntPointer(physicalIndex), 
+                        defaultParams->getUnsignedIntPointer(physicalIndex),
+                        sizeof(uint) * physicalSize) != 0;
+                }
+            }
+        }
 
-					writeValue("double" + countLabel, useMainBuffer);
-					// iterate through real constants
-					for (size_t f = 0 ; f < physicalSize; ++f)
-					{
-						writeValue(StringConverter::toString(*pDouble++), useMainBuffer);
-					}
-				}
-				else
-				{
-					// Get pointer to start of values
-					const int* pInt = params->getIntPointer(physicalIndex);
+        if (!defaultParams || different)
+        {
+            String label = commandName;
 
-					writeValue("int" + countLabel, useMainBuffer);
-					// iterate through real constants
-					for (size_t f = 0 ; f < physicalSize; ++f)
-					{
-						writeValue(StringConverter::toString(*pInt++), useMainBuffer);
-					}
+            // is it auto
+            if (autoEntry)
+                label += "_auto";
 
-				} // end if (float/int)
+            writeAttribute(level, label, useMainBuffer);
+            // output param index / name
+            writeValue(quoteWord(identifier), useMainBuffer);
 
-			}
+            // if auto output auto type name and data if needed
+            if (autoEntry)
+            {
+                const GpuProgramParameters::AutoConstantDefinition* autoConstDef =
+                    GpuProgramParameters::getAutoConstantDefinition(autoEntry->paramType);
 
-		}
+                assert(autoConstDef && "Bad auto constant Definition Table");
+                // output auto constant name
+                writeValue(quoteWord(autoConstDef->name), useMainBuffer);
+                // output data if it uses it
+                switch(autoConstDef->dataType)
+                {
+                case GpuProgramParameters::ACDT_REAL:
+                    writeValue(StringConverter::toString(autoEntry->fData), useMainBuffer);
+                    break;
 
-	}
+                case GpuProgramParameters::ACDT_INT:
+                    writeValue(StringConverter::toString(autoEntry->data), useMainBuffer);
+                    break;
+
+                default:
+                    break;
+                }
+            }
+            else // not auto so output all the values used
+            {
+                String countLabel;
+
+                // only write a number if > 1
+                if (physicalSize > 1)
+                    countLabel = StringConverter::toString(physicalSize);
+
+                if (isFloat)
+                {
+                    // Get pointer to start of values
+                    const float* pFloat = params->getFloatPointer(physicalIndex);
+
+                    writeValue("float" + countLabel, useMainBuffer);
+                    // iterate through real constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pFloat++), useMainBuffer);
+                    }
+                }
+                else if (isDouble)
+                {
+                    // Get pointer to start of values
+                    const double* pDouble = params->getDoublePointer(physicalIndex);
+
+                    writeValue("double" + countLabel, useMainBuffer);
+                    // iterate through dobule constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pDouble++), useMainBuffer);
+                    }
+                }
+                else if (isInt)
+                {
+                    // Get pointer to start of values
+                    const int* pInt = params->getIntPointer(physicalIndex);
+
+                    writeValue("int" + countLabel, useMainBuffer);
+                    // iterate through int constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pInt++), useMainBuffer);
+                    }
+                }
+                else if (isUnsignedInt) 
+                {
+                    // Get pointer to start of values
+                    const uint* pUInt = params->getUnsignedIntPointer(physicalIndex);
+
+                    writeValue("uint" + countLabel, useMainBuffer);
+                    // iterate through uint constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pUInt++), useMainBuffer);
+                    }
+                }
+                else //if (isBool)
+                {
+                    // Get pointer to start of values
+                    // const bool* pBool = params->getBoolPointer(physicalIndex);
+                    const uint* pBool = params->getUnsignedIntPointer(physicalIndex);
+
+                    writeValue("bool" + countLabel, useMainBuffer);
+                    // iterate through bool constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pBool++), useMainBuffer);
+                    }
+                }//// end if (float/int)
+
+            }
+
+        }
+
+    }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuPrograms(void)
     {
@@ -5415,23 +5595,23 @@ namespace Ogre
                 while (currentParam != endParam)
                 {
                     if (currentParam->name != "type" &&
-						currentParam->name !="assemble_code" &&
-						currentParam->name !="micro_code" &&
-						currentParam->name !="external_micro_code")
+                        currentParam->name != "assemble_code" &&
+                        currentParam->name != "micro_code" &&
+                        currentParam->name != "external_micro_code")
                     {
                         String paramstr = program->getParameter(currentParam->name);
                         if ((currentParam->name == "includes_skeletal_animation")
                             && (paramstr == "false"))
                             paramstr.clear();
-						if ((currentParam->name == "includes_morph_animation")
-							&& (paramstr == "false"))
-							paramstr.clear();
-						if ((currentParam->name == "includes_pose_animation")
-							&& (paramstr == "0"))
-							paramstr.clear();
-						if ((currentParam->name == "uses_vertex_texture_fetch")
-							&& (paramstr == "false"))
-							paramstr.clear();
+                        if ((currentParam->name == "includes_morph_animation")
+                            && (paramstr == "false"))
+                            paramstr.clear();
+                        if ((currentParam->name == "includes_pose_animation")
+                            && (paramstr == "0"))
+                            paramstr.clear();
+                        if ((currentParam->name == "uses_vertex_texture_fetch")
+                            && (paramstr == "false"))
+                            paramstr.clear();
 
                         if ((language != "asm") && (currentParam->name == "syntax"))
                             paramstr.clear();

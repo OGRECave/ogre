@@ -19,12 +19,11 @@ fragment_program TriplanarReferenceHigh_PSCg cg
 	source triplanarReferencePS.cg
 	default_params 
 	{
-		
 		param_named_auto lightSpecular0 light_specular_colour 0
 		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
 		param_named_auto lightSpotlight0 spotlight_params 0
-        param_named_auto spotlightDir0 light_direction_object_space 0
+                param_named_auto spotlightDir0 light_direction_object_space 0
 		// Uncomment if the attenuation of light one is set
 		//param_named_auto lightAttenuation0 light_attenuation 0
 		
@@ -33,7 +32,7 @@ fragment_program TriplanarReferenceHigh_PSCg cg
 		//param_named_auto lightDiffuse1 light_diffuse_colour 1
 		//param_named_auto lightPosition1 light_position_object_space 1
 		//param_named_auto lightSpotlight1 spotlight_params 1
-        //param_named_auto spotlightDir1 light_direction_object_space 1
+                //param_named_auto spotlightDir1 light_direction_object_space 1
 		//param_named_auto lightAttenuation1 light_attenuation 1
 		
 		// Uncomment for third light
@@ -41,7 +40,7 @@ fragment_program TriplanarReferenceHigh_PSCg cg
 		//param_named_auto lightSpecular2 light_specular_colour 2
 		//param_named_auto lightPosition2 light_position_object_space 2
 		//param_named_auto lightSpotlight2 spotlight_params 2
-        //param_named_auto spotlightDir2 light_direction_object_space 2
+                //param_named_auto spotlightDir2 light_direction_object_space 2
 		//param_named_auto lightAttenuation2 light_attenuation 2
 		
 		param_named_auto world world_matrix
@@ -87,7 +86,7 @@ fragment_program TriplanarReferenceLow_PSCg cg
 		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
 		param_named_auto lightSpotlight0 spotlight_params 0
-        param_named_auto spotlightDir0 light_direction_object_space 0
+                param_named_auto spotlightDir0 light_direction_object_space 0
 		// Uncomment if the attenuation of light one is set
 		//param_named_auto lightAttenuation0 light_attenuation 0
 		
@@ -96,7 +95,7 @@ fragment_program TriplanarReferenceLow_PSCg cg
 		//param_named_auto lightDiffuse1 light_diffuse_colour 1
 		//param_named_auto lightPosition1 light_position_object_space 1
 		//param_named_auto lightSpotlight1 spotlight_params 1
-        //param_named_auto spotlightDir1 light_direction_object_space 1
+                //param_named_auto spotlightDir1 light_direction_object_space 1
 		//param_named_auto lightAttenuation1 light_attenuation 1
 		
 		// Uncomment for third light
@@ -104,7 +103,7 @@ fragment_program TriplanarReferenceLow_PSCg cg
 		//param_named_auto lightSpecular2 light_specular_colour 2
 		//param_named_auto lightPosition2 light_position_object_space 2
 		//param_named_auto lightSpotlight2 spotlight_params 2
-        //param_named_auto spotlightDir2 light_direction_object_space 2
+                //param_named_auto spotlightDir2 light_direction_object_space 2
 		//param_named_auto lightAttenuation2 light_attenuation 2
 		
 		param_named_auto world world_matrix
@@ -145,12 +144,11 @@ fragment_program TriplanarReferenceHigh_PSGLSL glsl
 	syntax glsl150
 	default_params 
 	{
-		
 		param_named_auto lightSpecular0 light_specular_colour 0
 		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
 		param_named_auto lightSpotlight0 spotlight_params 0
-        param_named_auto spotlightDir0 light_direction_object_space 0
+                param_named_auto spotlightDir0 light_direction_object_space 0
 		// Uncomment if the attenuation of light one is set
 		//param_named_auto lightAttenuation0 light_attenuation 0
 		
@@ -159,7 +157,7 @@ fragment_program TriplanarReferenceHigh_PSGLSL glsl
 		//param_named_auto lightDiffuse1 light_diffuse_colour 1
 		//param_named_auto lightPosition1 light_position_object_space 1
 		//param_named_auto lightSpotlight1 spotlight_params 1
-        //param_named_auto spotlightDir1 light_direction_object_space 1
+                //param_named_auto spotlightDir1 light_direction_object_space 1
 		//param_named_auto lightAttenuation1 light_attenuation 1
 		
 		// Uncomment for third light
@@ -167,7 +165,7 @@ fragment_program TriplanarReferenceHigh_PSGLSL glsl
 		//param_named_auto lightSpecular2 light_specular_colour 2
 		//param_named_auto lightPosition2 light_position_object_space 2
 		//param_named_auto lightSpotlight2 spotlight_params 2
-        //param_named_auto spotlightDir2 light_direction_object_space 2
+                //param_named_auto spotlightDir2 light_direction_object_space 2
 		//param_named_auto lightAttenuation2 light_attenuation 2
 		
 		param_named_auto world world_matrix
@@ -182,7 +180,7 @@ fragment_program TriplanarReferenceHigh_PSGLSL glsl
 		param_named ambient float4 0.41 0.41 0.41 1.0
 	}
 	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
-	preprocessor_defines LIGHTNORMALMAPPING=1,USESPECULARMAP-1,LIGHT0=1
+	preprocessor_defines LIGHTNORMALMAPPING=1,USESPECULARMAP=1,LIGHT0=1
 }
 
 // low quality triplanar mapping
@@ -211,7 +209,7 @@ fragment_program TriplanarReferenceLow_PSGLSL glsl
 		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
 		param_named_auto lightSpotlight0 spotlight_params 0
-        param_named_auto spotlightDir0 light_direction_object_space 0
+                param_named_auto spotlightDir0 light_direction_object_space 0
 		// Uncomment if the attenuation of light one is set
 		//param_named_auto lightAttenuation0 light_attenuation 0
 		
@@ -220,7 +218,7 @@ fragment_program TriplanarReferenceLow_PSGLSL glsl
 		//param_named_auto lightDiffuse1 light_diffuse_colour 1
 		//param_named_auto lightPosition1 light_position_object_space 1
 		//param_named_auto lightSpotlight1 spotlight_params 1
-        //param_named_auto spotlightDir1 light_direction_object_space 1
+                //param_named_auto spotlightDir1 light_direction_object_space 1
 		//param_named_auto lightAttenuation1 light_attenuation 1
 		
 		// Uncomment for third light
@@ -228,7 +226,7 @@ fragment_program TriplanarReferenceLow_PSGLSL glsl
 		//param_named_auto lightSpecular2 light_specular_colour 2
 		//param_named_auto lightPosition2 light_position_object_space 2
 		//param_named_auto lightSpotlight2 spotlight_params 2
-        //param_named_auto spotlightDir2 light_direction_object_space 2
+                //param_named_auto spotlightDir2 light_direction_object_space 2
 		//param_named_auto lightAttenuation2 light_attenuation 2
 		
 		param_named_auto world world_matrix

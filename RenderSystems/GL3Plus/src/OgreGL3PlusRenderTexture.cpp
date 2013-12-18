@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2013 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGL3PlusRenderTexture.h"
@@ -61,21 +61,21 @@ namespace Ogre {
 
         switch (pct)
         {
-            case PCT_BYTE:
-                format = PF_A8R8G8B8;
-                break;
-            case PCT_SHORT:
-                format = PF_SHORT_RGBA;
-                break;
-            case PCT_FLOAT16:
-                format = PF_FLOAT16_RGBA;
-                break;
-            case PCT_FLOAT32:
-                format = PF_FLOAT32_RGBA;
-                break;
-            case PCT_COUNT:
-            default:
-                break;
+        case PCT_BYTE:
+            format = PF_A8R8G8B8;
+            break;
+        case PCT_SHORT:
+            format = PF_SHORT_RGBA;
+            break;
+        case PCT_FLOAT16:
+            format = PF_FLOAT16_RGBA;
+            break;
+        case PCT_FLOAT32:
+            format = PF_FLOAT32_RGBA;
+            break;
+        case PCT_COUNT:
+        default:
+            break;
         }
 
         if (checkFormat(format))
@@ -86,9 +86,9 @@ namespace Ogre {
     }
 
     GL3PlusRenderTexture::GL3PlusRenderTexture(const String &name,
-                                         const GL3PlusSurfaceDesc &target,
-                                         bool writeGamma,
-                                         uint fsaa)
+                                               const GL3PlusSurfaceDesc &target,
+                                               bool writeGamma,
+                                               uint fsaa)
         : RenderTexture(target.buffer, target.zoffset)
     {
         mName = name;
@@ -99,4 +99,6 @@ namespace Ogre {
     GL3PlusRenderTexture::~GL3PlusRenderTexture()
     {
     }
+
+
 }

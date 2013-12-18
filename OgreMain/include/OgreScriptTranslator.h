@@ -70,6 +70,8 @@ namespace Ogre{
 		static bool getReal(const AbstractNodePtr &node, Real *result);
 		/// Converts the node to a float and returns true if successful
 		static bool getFloat(const AbstractNodePtr &node, float *result);
+		/// Converts the node to a float and returns true if successful
+		static bool getDouble(const AbstractNodePtr &node, double *result);
 		/// Converts the node to an integer and returns true if successful
 		static bool getInt(const AbstractNodePtr &node, int *result); 
 		/// Converts the node to an unsigned integer and returns true if successful
@@ -86,6 +88,12 @@ namespace Ogre{
 		static bool getInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, int *vals, int count);
 		/// Converts the range of nodes to an array of floats and returns true if successful
 		static bool getFloats(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, float *vals, int count);
+		/// Converts the range of nodes to an array of floats and returns true if successful
+		static bool getDoubles(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, double *vals, int count);
+		/// Converts the range of nodes to an array of floats and returns true if successful
+		static bool getUInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count);
+		/// Converts the range of nodes to an array of uint-stored boolean values and returns true if successful
+		static bool getBooleans(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count);
 		/// Converts the node to a StencilOperation enum and returns true if successful
 		static bool getStencilOp(const AbstractNodePtr &node, StencilOperation *op); 
 		/// Converts the node to a GpuConstantType enum and returns true if successful
@@ -186,6 +194,8 @@ namespace Ogre{
 	public:
 		SharedParamsTranslator();
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+                template <class T>
+                void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters *sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType);
 	protected:
 	};
 
