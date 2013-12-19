@@ -427,27 +427,30 @@ namespace Ogre {
         }
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
+#if OGRE_NO_GLES3_SUPPORT == 1
             OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
             OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
-#if OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
-#else
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
-#endif
+#else
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mContext->mFSAAFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mContext->mViewFramebuffer));
+			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, attachmentCount, attachments));
+#endif
         }
         else
         {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
-#if OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_FRAMEBUFFER, attachmentCount, attachments));
-#else
+#if OGRE_NO_GLES3_SUPPORT == 1
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments));
+#else
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_FRAMEBUFFER, attachmentCount, attachments));
 #endif
         }
-        
+
         OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
         {
