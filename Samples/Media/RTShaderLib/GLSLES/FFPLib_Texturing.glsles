@@ -96,8 +96,8 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
 	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
 	vec3 eyedir =  normalize(worldview * vPos).xyz;
 	vec3 r = reflect(eyedir, normal);
-	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1) *  (r.z + 1));
-	vOut = (mTexture * vec4(0.5 + r.x / two_p,0.5 - r.y / two_p,0,0)).xy;
+	float two_p = 2.0 * sqrt( r.x * r.x + r.y *  r.y + (r.z + 1.0) *  (r.z + 1.0));
+	vOut = (mTexture * vec4(0.5 + r.x / two_p, 0.5 - r.y / two_p, 0.0, 0.0)).xy;
 }
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld,
@@ -111,8 +111,8 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld,
 	vec3 normal = normalize( (mWorldIT * vec4(vNormal,0.0)).xyz); 
 	vec3 eyedir =  normalize(worldview * vPos).xyz;
 	vec3 r = reflect(eyedir, normal);
-	float two_p = 2.0 * sqrt( r.x *  r.x +  r.y *  r.y +  (r.z + 1.0) *  (r.z + 1.0));
-	vOut = vec2(0.5 + r.x / two_p,0.5 - r.y / two_p);
+	float two_p = 2.0 * sqrt( r.x * r.x + r.y * r.y + (r.z + 1.0) *  (r.z + 1.0));
+	vOut = vec2(0.5 + r.x / two_p, 0.5 - r.y / two_p);
 }
 
 //-----------------------------------------------------------------------------
