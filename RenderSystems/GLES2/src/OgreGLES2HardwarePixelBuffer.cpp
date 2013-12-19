@@ -41,28 +41,6 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreBitwise.h"
 
-static int computeLog(GLuint value)
-{
-    int i;
-
-    i = 0;
-
-    /* Error! */
-    if (value == 0) return -1;
-
-    for (;;)
-    {
-        if (value & 1)
-        {
-            /* Error! */
-            if (value != 1) return -1;
-                return i;
-        }
-        value = value >> 1;
-        i++;
-    }
-}
-
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
                                                      uint32 depth, PixelFormat format,
@@ -1150,7 +1128,7 @@ namespace Ogre {
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
                 OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                                 mip,
+                                                 mLevel,
                                                  internalFormat,
                                                  width, height, depth,
                                                  0,
