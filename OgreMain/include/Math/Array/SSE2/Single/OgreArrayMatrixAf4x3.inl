@@ -464,11 +464,10 @@ namespace Ogre
 		_mm_stream_ps( dst[2]._m+8, m2 );
 		_mm_stream_ps( dst[3]._m+8, m3 );
 
-		m0 = _mm_setzero_ps();
-		_mm_stream_ps( dst[0]._m+12, m0 );
-		_mm_stream_ps( dst[1]._m+12, m0 );
-		_mm_stream_ps( dst[2]._m+12, m0 );
-		_mm_stream_ps( dst[3]._m+12, MathlibSSE2::ONE );
+		_mm_stream_ps( dst[0]._m+12, MathlibSSE2::LAST_AFFINE_COLUMN );
+		_mm_stream_ps( dst[1]._m+12, MathlibSSE2::LAST_AFFINE_COLUMN );
+		_mm_stream_ps( dst[2]._m+12, MathlibSSE2::LAST_AFFINE_COLUMN );
+		_mm_stream_ps( dst[3]._m+12, MathlibSSE2::LAST_AFFINE_COLUMN );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrixAf4x3::storeToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS dst ) const

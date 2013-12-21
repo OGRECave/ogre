@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Animation/OgreSkeletonAnimManager.h"
 #include "Animation/OgreSkeletonDef.h"
+#include "Animation/OgreSkeletonInstance.h"
 
 namespace Ogre
 {

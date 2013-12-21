@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreRawPtr.h"
 
+#include "Math/Array/OgreArrayMatrixAf4x3.h"
+
 namespace Ogre
 {
 	class _OgreExport SkeletonDef : public MovableAlloc

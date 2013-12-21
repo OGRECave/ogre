@@ -98,6 +98,7 @@ namespace Ogre
 		static const ArrayReal INFINITEA;	//Inf, Inf, Inf, Inf
 		static const ArrayReal MAX_NEG;		//Max negative number (x4)
 		static const ArrayReal MAX_POS;		//Max negative number (x4)
+		static const ArrayReal LAST_AFFINE_COLUMN;//0, 0, 0, 1
 
 		/** Returns the absolute values of each 4 floats
 			@param

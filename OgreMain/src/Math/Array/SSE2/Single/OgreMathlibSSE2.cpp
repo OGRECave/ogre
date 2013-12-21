@@ -52,6 +52,7 @@ namespace Ogre
 	const ArrayReal MathlibSSE2::INFINITEA	= _mm_set_ps1( std::numeric_limits<Real>::infinity() );
 	const ArrayReal MathlibSSE2::MAX_NEG	= _mm_set_ps1( -std::numeric_limits<Real>::max() );
 	const ArrayReal MathlibSSE2::MAX_POS	= _mm_set_ps1( std::numeric_limits<Real>::max() );
+	const ArrayReal MathlibSSE2::LAST_AFFINE_COLUMN = _mm_setr_ps( 0, 0, 0, 1 );
 
 	static const Real _PI = Real( 4.0 * atan( 1.0 ) );
 	//We can't use Math::fDeg2Rad & Math::fRad2Deg directly because
