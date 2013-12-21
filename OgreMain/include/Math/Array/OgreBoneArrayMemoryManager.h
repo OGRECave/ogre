@@ -59,7 +59,9 @@ namespace Ogre
 			Orientation,
 			Scale,
 			ParentMat,
+			ParentNode,
 			WorldMat,
+			FinalMat,
 			InheritOrientation,
 			InheritScale,
 			NumMemoryTypes

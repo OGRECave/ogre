@@ -351,8 +351,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			if( !itor->getParent() )
-				itor->_setNodeParent( mParentNode );
+			itor->_setNodeParent( mParentNode );
 			++itor;
 		}
 	}

@@ -40,8 +40,10 @@ namespace Ogre
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Position
 		4 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Orientation
 		3 * sizeof( Ogre::Real ),		//ArrayMemoryManager::Scale
+		sizeof( SimpleMatrixAf4x3** ),	//ArrayMemoryManager::ParentNode
 		sizeof( SimpleMatrixAf4x3** ),	//ArrayMemoryManager::ParentMat
 		12 * sizeof( Ogre::Real ),		//ArrayMemoryManager::WorldMat
+		12 * sizeof( Ogre::Real ),		//ArrayMemoryManager::FinalMat
 		sizeof( bool ),					//ArrayMemoryManager::InheritOrientation
 		sizeof( bool )					//ArrayMemoryManager::InheritScale
 	};
@@ -51,8 +53,10 @@ namespace Ogre
 		cleanerArrayVector3,			//ArrayMemoryManager::Position
 		cleanerArrayQuaternion,			//ArrayMemoryManager::Orientation
 		cleanerArrayVector3,			//ArrayMemoryManager::Scale
+		cleanerFlat,					//ArrayMemoryManager::ParentNode
 		cleanerFlat,					//ArrayMemoryManager::ParentMat
 		cleanerFlat,					//ArrayMemoryManager::WorldMat
+		cleanerFlat,					//ArrayMemoryManager::FinalMat
 		cleanerFlat,					//ArrayMemoryManager::InheritOrientation
 		cleanerFlat						//ArrayMemoryManager::InheritScale
 	};
@@ -75,10 +79,13 @@ namespace Ogre
 		bool *inheritScale = reinterpret_cast<bool*>( mMemoryPools[InheritScale] ) + prevNumSlots;
 		SimpleMatrixAf4x3 const **parentMatPtr = reinterpret_cast<const SimpleMatrixAf4x3**>(
 													mMemoryPools[ParentMat] ) + prevNumSlots;
+		SimpleMatrixAf4x3 const **parentNodePtr= reinterpret_cast<const SimpleMatrixAf4x3**>(
+													mMemoryPools[ParentNode] ) + prevNumSlots;
 		for( size_t i=prevNumSlots; i<mMaxMemory; ++i )
 		{
 			*inheritOrientation++	= true;
 			*inheritScale++			= true;
+			*parentNodePtr++= &SimpleMatrixAf4x3::IDENTITY;
 			*parentMatPtr++	= &SimpleMatrixAf4x3::IDENTITY;
 		}
 	}
@@ -100,11 +107,16 @@ namespace Ogre
 												nextSlotBase * mElementsMemSizes[Orientation] );
 		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( mMemoryPools[Scale] +
 												nextSlotBase * mElementsMemSizes[Scale] );
+		outTransform.mParentNodeTransform=reinterpret_cast<const SimpleMatrixAf4x3**>(
+												mMemoryPools[ParentNode] +
+												nextSlotBase * mElementsMemSizes[ParentNode] );
 		outTransform.mParentTransform	= reinterpret_cast<const SimpleMatrixAf4x3**>(
 												mMemoryPools[ParentMat] +
 												nextSlotBase * mElementsMemSizes[ParentMat] );
 		outTransform.mDerivedTransform	= reinterpret_cast<SimpleMatrixAf4x3*>( mMemoryPools[WorldMat] +
 												nextSlotBase * mElementsMemSizes[WorldMat] );
+		outTransform.mFinalTransform	= reinterpret_cast<SimpleMatrixAf4x3*>( mMemoryPools[FinalMat] +
+												nextSlotBase * mElementsMemSizes[FinalMat] );
 		outTransform.mInheritOrientation= reinterpret_cast<bool*>( mMemoryPools[InheritOrientation] +
 												nextSlotBase * mElementsMemSizes[InheritOrientation] );
 		outTransform.mInheritScale		= reinterpret_cast<bool*>( mMemoryPools[InheritScale] +
@@ -115,8 +127,10 @@ namespace Ogre
 		outTransform.mPosition->setFromVector3( Vector3::ZERO, nextSlotIdx );
 		outTransform.mOrientation->setFromQuaternion( Quaternion::IDENTITY, nextSlotIdx );
 		outTransform.mScale->setFromVector3( Vector3::UNIT_SCALE, nextSlotIdx );
+		outTransform.mParentNodeTransform[nextSlotIdx]	= &SimpleMatrixAf4x3::IDENTITY;
 		outTransform.mParentTransform[nextSlotIdx]		= &SimpleMatrixAf4x3::IDENTITY;
 		outTransform.mDerivedTransform[nextSlotIdx]		= SimpleMatrixAf4x3::IDENTITY;
+		outTransform.mFinalTransform[nextSlotIdx]		= SimpleMatrixAf4x3::IDENTITY;
 		outTransform.mInheritOrientation[nextSlotIdx]	= true;
 		outTransform.mInheritScale[nextSlotIdx]			= true;
 	}
@@ -127,6 +141,7 @@ namespace Ogre
 		//there's one object in scene, 4 objects are still parsed simultaneously)
 
 		inOutTransform.mOwner[inOutTransform.mIndex]			= 0;
+		inOutTransform.mParentNodeTransform[inOutTransform.mIndex]=&SimpleMatrixAf4x3::IDENTITY;
 		inOutTransform.mParentTransform[inOutTransform.mIndex]	= &SimpleMatrixAf4x3::IDENTITY;
 		inOutTransform.mInheritOrientation[inOutTransform.mIndex]= true;
 		inOutTransform.mInheritScale[inOutTransform.mIndex]		= true;
@@ -142,9 +157,12 @@ namespace Ogre
 		outTransform.mOrientation		= reinterpret_cast<ArrayQuaternion*>(
 														mMemoryPools[Orientation] );
 		outTransform.mScale				= reinterpret_cast<ArrayVector3*>( mMemoryPools[Scale] );
+		outTransform.mParentNodeTransform=reinterpret_cast<const SimpleMatrixAf4x3**>(
+														mMemoryPools[ParentNode] );
 		outTransform.mParentTransform	= reinterpret_cast<const SimpleMatrixAf4x3**>(
 														mMemoryPools[ParentMat] );
 		outTransform.mDerivedTransform	= reinterpret_cast<SimpleMatrixAf4x3*>( mMemoryPools[WorldMat] );
+		outTransform.mFinalTransform	= reinterpret_cast<SimpleMatrixAf4x3*>( mMemoryPools[FinalMat] );
 		outTransform.mInheritOrientation= reinterpret_cast<bool*>( mMemoryPools[InheritOrientation] );
 		outTransform.mInheritScale		= reinterpret_cast<bool*>( mMemoryPools[InheritScale] );
 

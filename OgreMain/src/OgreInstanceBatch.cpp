@@ -265,15 +265,16 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
 	{
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+		//Destroy in the reverse order they were created (LIFO!)
+		InstancedEntityVec::const_reverse_iterator ritor = mInstancedEntities.rbegin();
+		InstancedEntityVec::const_reverse_iterator rend  = mInstancedEntities.rend();
 
-		while( itor != end )
+		while( ritor != rend )
 		{
-			if( (*itor)->getParentSceneNode() )
-				(*itor)->getParentSceneNode()->detachObject( (*itor) );
+			if( (*ritor)->getParentSceneNode() )
+				(*ritor)->getParentSceneNode()->detachObject( (*ritor) );
 
-			OGRE_DELETE *itor++;
+			OGRE_DELETE *ritor++;
 		}
 	}
 	//-----------------------------------------------------------------------

@@ -138,13 +138,12 @@ namespace Ogre {
 
 		/** Sets a regular Node to be parent of this Bone
 		@remarks
-			1. The Bone must be a root bone (have no parent bone)
-			2. Multiple calls to _setNodeParent with different arguments will
+			1. Multiple calls to _setNodeParent with different arguments will
 			   silently override previous calls.
-			3. By the time we update, we assume the Node has already been updated.
+			2. By the time we update, we assume the Node has already been updated.
 			   (even when calling _getDerivedPositionUpdated and Co)
-			4. Null pointers will "detach", causing derived updates to be in local space
-			5. Ogre must ensure that when a NodeMemoryManager performs a cleanup (or resizes),
+			3. Null pointers will "detach", causing derived updates to be in local space
+			4. Ogre must ensure that when a NodeMemoryManager performs a cleanup (or resizes),
 			   this function is called again (to update our pointers).
 		*/
 		void _setNodeParent( Node *nodeParent );
@@ -221,6 +220,21 @@ namespace Ogre {
 		*/
 		bool getInheritScale(void) const;
 
+		/** Gets the transformation matrix for this bone in local space (i.e. as if the
+			skeleton wasn't attached to a SceneNode).
+		@remarks
+			This method returns the full transformation matrix
+			for this node, including the effect of any parent Bone
+			transformations.
+		@par
+			Assumes the caches are already updated.
+		*/
+		FORCEINLINE const SimpleMatrixAf4x3& _getLocalSpaceTransform(void) const
+		{
+			assert( !mCachedTransformOutOfDate );
+			return mTransform.mDerivedTransform[mTransform.mIndex];
+		}
+
 		/** Gets the full transformation matrix for this node.
 		@remarks
 			This method returns the full transformation matrix
@@ -229,15 +243,15 @@ namespace Ogre {
 		@par
 			Assumes the caches are already updated.
 		@par
-			The transform is in world space, unless our root parent called
+			The transform is in "world bone" space, unless our root parent called
 			_setNodeParent( nullptr ) in which case the transform will be in
-			local space.
+			local bone space.
 		*/
 		FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
 		{
 			assert( !mCachedTransformOutOfDate &&
 					(!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
-			return mTransform.mDerivedTransform[mTransform.mIndex];
+			return mTransform.mFinalTransform[mTransform.mIndex];
 		}
 
 		/** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */

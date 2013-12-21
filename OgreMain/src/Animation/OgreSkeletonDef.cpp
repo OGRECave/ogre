@@ -154,13 +154,13 @@ namespace Ogre
 
 			//Create initial bind pose.
 			mBindPose = RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>( numBoneBlocks );
-			/*RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION> derivedPosesPtr =
+			RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION> derivedPosesPtr =
 						RawSimdUniquePtr<SimpleMatrixAf4x3, MEMCATEGORY_ANIMATION>(
-															numBoneBlocks * ARRAY_PACKED_REALS );*/
+															numBoneBlocks * ARRAY_PACKED_REALS );
 
 			size_t bindPoseIndex = 0;
 			KfTransform *bindPose = mBindPose.get();
-			//SimpleMatrixAf4x3 *derivedPose = derivedPosesPtr.get();
+			SimpleMatrixAf4x3 *derivedPose = derivedPosesPtr.get();
 
 			size_t currentDepthLevel = 0;
 			DepthLevelInfoVec::const_iterator bonesItor = mDepthLevelInfoVec.begin();
@@ -177,15 +177,15 @@ namespace Ogre
 					bindPose->mOrientation.setFromQuaternion( boneData.qRot, bindPoseIndex );
 					bindPose->mScale.setFromVector3( boneData.vScale, bindPoseIndex );
 
-					//const Bone &derivedBone = boneNodes[*itBoneIdx];
-					//derivedPose[bindPoseIndex] = derivedBone._getFullTransform();
+					const Bone &derivedBone = boneNodes[*itBoneIdx];
+					derivedPose[bindPoseIndex] = derivedBone._getLocalSpaceTransform();
 
 					++bindPoseIndex;
 					if( bindPoseIndex >= ARRAY_PACKED_REALS )
 					{
 						bindPoseIndex = 0;
 						++bindPose;
-						//derivedPose += ARRAY_PACKED_REALS;
+						derivedPose += ARRAY_PACKED_REALS;
 					}
 
 					++itBoneIdx;
@@ -207,14 +207,14 @@ namespace Ogre
 						bindPose->mScale.getAsVector3( vTmp, k );
 						bindPose->mScale.setFromVector3( vTmp, j );
 
-						//derivedPose[j] = derivedPose[k];
+						derivedPose[j] = derivedPose[k];
 
 						k = (k+1) % bonesItor->numBonesInLevel;
 					}
 
 					bindPoseIndex = 0;
 					++bindPose;
-					//derivedPose += ARRAY_PACKED_REALS;
+					derivedPose += ARRAY_PACKED_REALS;
 				}
 				else if( bindPoseIndex != 0 )
 				{
@@ -227,12 +227,12 @@ namespace Ogre
 						bindPose->mOrientation.setFromQuaternion( Quaternion::IDENTITY, bindPoseIndex );
 						bindPose->mScale.setFromVector3( Vector3::UNIT_SCALE, bindPoseIndex );
 
-						//derivedPose[bindPoseIndex] = SimpleMatrixAf4x3::IDENTITY;
+						derivedPose[bindPoseIndex] = SimpleMatrixAf4x3::IDENTITY;
 					}
 
 					bindPoseIndex = 0;
 					++bindPose;
-					//derivedPose += ARRAY_PACKED_REALS;
+					derivedPose += ARRAY_PACKED_REALS;
 				}
 
 				++currentDepthLevel;
@@ -243,15 +243,12 @@ namespace Ogre
 			//construct the derived transform matrices in the correct space)
 			mReverseBindPose = RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>(numBoneBlocks);
 			ArrayMatrixAf4x3 *reverseBindPose = mReverseBindPose.get();
-			//derivedPose = derivedPosesPtr.get();
-			bindPose = mBindPose.get();
+			derivedPose = derivedPosesPtr.get();
 			for( size_t i=0; i<numBoneBlocks; ++i )
 			{
-				//reverseBindPose[i].loadFromAoS( derivedPose );
-				reverseBindPose[i].makeTransform( bindPose[i].mPosition, bindPose[i].mScale,
-													bindPose[i].mOrientation );
+				reverseBindPose[i].loadFromAoS( derivedPose );
 				reverseBindPose[i].setToInverseDegeneratesAsIdentity();
-				//derivedPose += ARRAY_PACKED_REALS;
+				derivedPose += ARRAY_PACKED_REALS;
 			}
 		}
 

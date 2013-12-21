@@ -205,12 +205,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Bone::_setNodeParent( Node *nodeParent )
 	{
-		if( mParent )
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Only Root bones call this function.",
-						 "Bone::_addNodeParent" );
-		}
-
 #ifndef NDEBUG
 		mDebugParentNode = nodeParent;
 #endif
@@ -219,12 +213,12 @@ namespace Ogre {
 			//This "Hack" just works. Don't ask. And it's fast!
 			//(we're responsible for ensuring the memory layout matches)
 			Transform parentTransf = nodeParent->_getTransform();
-			mTransform.mParentTransform[mTransform.mIndex] = reinterpret_cast<SimpleMatrixAf4x3*>(
+			mTransform.mParentNodeTransform[mTransform.mIndex] = reinterpret_cast<SimpleMatrixAf4x3*>(
 												&parentTransf.mDerivedTransform[parentTransf.mIndex] );
 		}
 		else
 		{
-			mTransform.mParentTransform[mTransform.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
+			mTransform.mParentNodeTransform[mTransform.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -266,8 +260,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Bone::updateFromParentImpl(void)
 	{
-		//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+		//Retrieve from parents. Unfortunately we need to do AoS -> SoA -> AoS conversion
+		/*ArrayMatrixAf4x3 nodeMat;
 		ArrayMatrixAf4x3 parentMat;
+		nodeMat.loadFromAoS( mTransform.mParentNodeTransform );
 		parentMat.loadFromAoS( mTransform.mParentTransform );
 
 		//ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
@@ -279,10 +275,9 @@ namespace Ogre {
 			parentMat.retain( inheritOrientation, inheritScale );
 		}
 
-		//BIG TODO: When in local space, reverse bind can be applied before making the transforms.
 		ArrayMatrixAf4x3 mat;
 		mat.makeTransform( *mTransform.mPosition, *mTransform.mScale, *mTransform.mOrientation );
-		mat = ((*mReverseBind) * mat) * parentMat;
+		mat = parentMat * mat;
 
 		/*
 			Calculating the bone matrices
@@ -292,7 +287,7 @@ namespace Ogre {
 			Because any modification of a vertex has to be relative to the bone, we must
 			first reverse transform by the Bone's original derived position/orientation/scale,
 			then transform by the new derived position/orientation/scale.
-		*/
+		*//*
 		mat.storeToAoS( mTransform.mDerivedTransform );
 
 #ifndef NDEBUG
@@ -301,7 +296,7 @@ namespace Ogre {
 			if( mTransform.mOwner[j] )
 				mTransform.mOwner[j]->mCachedTransformOutOfDate = false;
 		}
-#endif
+#endif*/
 	}
 	//-----------------------------------------------------------------------
 	void Bone::updateAllTransforms( const size_t numNodes, BoneTransform t,
@@ -315,8 +310,10 @@ namespace Ogre {
 		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
 		{
 			//Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
+			ArrayMatrixAf4x3 nodeMat;
 			ArrayMatrixAf4x3 parentMat;
 
+			nodeMat.loadFromAoS( t.mParentNodeTransform );
 			parentMat.loadFromAoS( t.mParentTransform );
 
 			//ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
@@ -331,7 +328,8 @@ namespace Ogre {
 			const ArrayMatrixAf4x3 * RESTRICT_ALIAS reverseBind = _reverseBind + currentBind;
 
 			derivedTransform.makeTransform( *t.mPosition, *t.mScale, *t.mOrientation );
-			derivedTransform = ((*reverseBind) * derivedTransform) * parentMat;
+			derivedTransform = parentMat * derivedTransform;
+			derivedTransform.storeToAoS( t.mDerivedTransform );
 
 			/*
 				Calculating the bone matrices
@@ -342,7 +340,8 @@ namespace Ogre {
 				first reverse transform by the Bone's original derived position/orientation/scale,
 				then transform by the new derived position/orientation/scale.
 			*/
-			derivedTransform.storeToAoS( t.mDerivedTransform );
+			derivedTransform = nodeMat * ( derivedTransform * (*reverseBind) );
+			derivedTransform.storeToAoS( t.mFinalTransform );
 
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )

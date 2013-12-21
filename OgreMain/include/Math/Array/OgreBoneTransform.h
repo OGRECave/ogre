@@ -51,11 +51,17 @@ namespace Ogre
 		/// Stores the scaling factor applied to a node
 		ArrayVector3	* RESTRICT_ALIAS	mScale;
 
+		/// Points to the Node parent's pointer.
+		SimpleMatrixAf4x3 const * * RESTRICT_ALIAS mParentNodeTransform;
+
 		/// Points to the parent's pointer.
 		SimpleMatrixAf4x3 const * * RESTRICT_ALIAS mParentTransform;
 
 		/// Caches the full transform into an affine 4x4 matrix. Note it's not Array form! (It's AoS)
 		SimpleMatrixAf4x3 * RESTRICT_ALIAS	mDerivedTransform;
+
+		/// Caches mDerivedTransform in Bone space, used for rendering. It's not Array form! (It's AoS)
+		SimpleMatrixAf4x3 * RESTRICT_ALIAS	mFinalTransform;
 
 		/// Stores whether this node inherits orientation from it's parent.
 		/// Ours is mInheritOrientation[mIndex]
@@ -71,8 +77,10 @@ namespace Ogre
 			mPosition( 0 ),
 			mOrientation( 0 ),
 			mScale( 0 ),
+			mParentNodeTransform( 0 ),
 			mParentTransform( 0 ),
 			mDerivedTransform( 0 ),
+			mFinalTransform( 0 ),
 			mInheritOrientation( 0 ),
 			mInheritScale( 0 )
 		{
@@ -109,8 +117,10 @@ namespace Ogre
 			copy.mScale->getAsVector3( tmp, copy.mIndex );
 			mScale->setFromVector3( tmp, mIndex );
 
-			mParentTransform[mIndex]	= copy.mParentTransform[mIndex];
-			mDerivedTransform[mIndex]	= copy.mDerivedTransform[mIndex];
+			mParentNodeTransform[mIndex]= copy.mParentNodeTransform[copy.mIndex];
+			mParentTransform[mIndex]	= copy.mParentTransform[copy.mIndex];
+			mDerivedTransform[mIndex]	= copy.mDerivedTransform[copy.mIndex];
+			mFinalTransform[mIndex]		= copy.mFinalTransform[copy.mIndex];
 
 			mInheritOrientation[mIndex]	= copy.mInheritOrientation[copy.mIndex];
 			mInheritScale[mIndex]		= copy.mInheritScale[copy.mIndex];
@@ -125,8 +135,10 @@ namespace Ogre
 			++mPosition;
 			++mOrientation;
 			++mScale;
+			mParentNodeTransform+= ARRAY_PACKED_REALS;
 			mParentTransform	+= ARRAY_PACKED_REALS;
 			mDerivedTransform	+= ARRAY_PACKED_REALS;
+			mFinalTransform		+= ARRAY_PACKED_REALS;
 			mInheritOrientation	+= ARRAY_PACKED_REALS;
 			mInheritScale		+= ARRAY_PACKED_REALS;
 		}
@@ -137,8 +149,10 @@ namespace Ogre
 			mPosition			+= numAdvance;
 			mOrientation		+= numAdvance;
 			mScale				+= numAdvance;
+			mParentNodeTransform+= ARRAY_PACKED_REALS * numAdvance;
 			mParentTransform	+= ARRAY_PACKED_REALS * numAdvance;
 			mDerivedTransform	+= ARRAY_PACKED_REALS * numAdvance;
+			mFinalTransform		+= ARRAY_PACKED_REALS * numAdvance;
 			mInheritOrientation	+= ARRAY_PACKED_REALS * numAdvance;
 			mInheritScale		+= ARRAY_PACKED_REALS * numAdvance;
 		}
