@@ -282,7 +282,7 @@ namespace Ogre {
 		//BIG TODO: When in local space, reverse bind can be applied before making the transforms.
 		ArrayMatrixAf4x3 mat;
 		mat.makeTransform( *mTransform.mPosition, *mTransform.mScale, *mTransform.mOrientation );
-		mat = ((*reverseBind) * mat) * parentMat;
+		mat = ((*mReverseBind) * mat) * parentMat;
 
 		/*
 			Calculating the bone matrices
