@@ -1952,34 +1952,39 @@ void SceneManager::updateAllAnimationsThread( size_t threadIdx )
 																	itByDef->threadStarts[threadIdx];
 			FastArray<SkeletonInstance*>::iterator end  = itByDef->skeletons.begin() +
 																	itByDef->threadStarts[threadIdx+1];
-
-			const TransformArray &transformsArray = (*itor)->_getTransformArray();
-			const TransformArray &nextTransformsArray = (*(end - 1))->_getTransformArray();
-			
 			while( itor != end )
 			{
 				(*itor)->update();
 				++itor;
 			}
 
-			assert( itByDef->boneMemoryManager.getNumDepths() == transformsArray.size() );
-
-			const SkeletonDef *skeletonDef = itByDef->skeletonDef;
-			const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
-							reverseBindPose = skeletonDef->getReverseBindPose();
-			//itByDef->skeletons.begin() + itDef->threadStarts[threadIdx+1]
-			const SkeletonDef::DepthLevelInfoVec &depthLevelInfo = skeletonDef->getDepthLevelInfo();
-			ArrayMatrixAf4x3 const *reverseBindPtr = reverseBindPose.get();
-
-			for( size_t i=0; i<transformsArray.size(); ++i )
+			if( !itByDef->skeletons.empty() )
 			{
-				size_t numNodes = nextTransformsArray[i].mOwner - transformsArray[i].mOwner +
-										nextTransformsArray[i].mIndex + transformsArray[i].mIndex +
-										depthLevelInfo[i].numBonesInLevel;
-				assert( numNodes <= itByDef->boneMemoryManager.getFirstNode( BoneTransform(), i ) );
+				itor = itByDef->skeletons.begin() + itByDef->threadStarts[threadIdx];
+				const TransformArray &transformsArray = (*itor)->_getTransformArray();
+				const TransformArray &nextTransformsArray = (*(end - 1))->_getTransformArray();
 
-				Bone::updateAllTransforms( numNodes, transformsArray[i], reverseBindPtr, depthLevelInfo[i].numBonesInLevel );
-				reverseBindPtr += (depthLevelInfo[i].numBonesInLevel - 1 + ARRAY_PACKED_REALS) / ARRAY_PACKED_REALS;
+				assert( itByDef->boneMemoryManager.getNumDepths() == transformsArray.size() );
+
+				const SkeletonDef *skeletonDef = itByDef->skeletonDef;
+				const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
+								reverseBindPose = skeletonDef->getReverseBindPose();
+				//itByDef->skeletons.begin() + itDef->threadStarts[threadIdx+1]
+				const SkeletonDef::DepthLevelInfoVec &depthLevelInfo = skeletonDef->getDepthLevelInfo();
+				ArrayMatrixAf4x3 const *reverseBindPtr = reverseBindPose.get();
+
+				for( size_t i=0; i<transformsArray.size(); ++i )
+				{
+					size_t numNodes = nextTransformsArray[i].mOwner - transformsArray[i].mOwner +
+											nextTransformsArray[i].mIndex + transformsArray[i].mIndex +
+											depthLevelInfo[i].numBonesInLevel;
+					assert( numNodes <= itByDef->boneMemoryManager.getFirstNode( BoneTransform(), i ) );
+
+					Bone::updateAllTransforms( numNodes, transformsArray[i],
+												reverseBindPtr, depthLevelInfo[i].numBonesInLevel );
+					reverseBindPtr += (depthLevelInfo[i].numBonesInLevel - 1 + ARRAY_PACKED_REALS) /
+										ARRAY_PACKED_REALS;
+				}
 			}
 
 			++itByDef;

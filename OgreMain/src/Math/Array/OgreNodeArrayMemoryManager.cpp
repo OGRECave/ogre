@@ -89,6 +89,7 @@ namespace Ogre
 		{
 			if( *nodesPtr )
 				(*nodesPtr)->_callMemoryChangeListeners();
+			++nodesPtr;
 		}
 	}
 	//-----------------------------------------------------------------------------------
