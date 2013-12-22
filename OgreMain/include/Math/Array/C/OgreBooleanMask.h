@@ -48,6 +48,9 @@ namespace Ogre
 		inline static ArrayMaskR getMask( bool x );
 		inline static ArrayMaskR getMask( bool booleans[1] );
 
+		/// Returns true if alls bit in mask0[i] and mask1[i] are set.
+		inline static bool allBitsSet( bool mask0[1], bool mask1[1] );
+
 		/** Converts a SIMD mask into a mask that fits in 32-bit number
 		@remarks
 			@See IS_SET_MASK_X & co. to read the mask, since the result may need

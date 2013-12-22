@@ -26,27 +26,19 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <OgreStableHeaders.h>
+
+#include "Math/Array/OgreArrayMatrixAf4x3.h"
+
 namespace Ogre
 {
-	inline ArrayMaskR BooleanMask4::getMask( bool x )
-	{
-		return x;
-	}
-	//--------------------------------------------------------------------------------------
-	inline ArrayMaskR BooleanMask4::getMask( bool b[1] )
-	{
-		return b[0];
-	}
-	//--------------------------------------------------------------------------------------
-	inline bool BooleanMask4::allBitsSet( bool mask0[1], bool mask1[1] )
-	{
-		return ( *mask0 & *mask1 ) == true;
-	}
-	//--------------------------------------------------------------------------------------
-	inline uint32 BooleanMask4::getScalarMask( ArrayMaskR mask )
-	{
-		return static_cast<uint32>( mask );
-	}
+	const ArrayMatrixAf4x3 ArrayMatrixAf4x3::IDENTITY( ArrayMatrixAf4x3::createAllFromMatrix4(
+				Matrix4(	1, 0, 0, 0,
+							0, 1, 0, 0,
+							0, 0, 1, 0,
+							0, 0, 0, 1 ) ) );
 
-	#define IS_BIT_SET( bit, intMask ) ( (intMask & (1 << bit) ) != 0)
+	const SimpleMatrixAf4x3 SimpleMatrixAf4x3::IDENTITY( 1, 0, 0, 0,
+														 0, 1, 0, 0,
+														 0, 0, 1, 0 );
 }

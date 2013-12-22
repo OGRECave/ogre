@@ -238,6 +238,15 @@ namespace Ogre
 			return a < b;
 		}
 
+		/** Returns the result of "a <= b"
+		@return
+			r[i] = a[i] <= b[i] ? 0xffffffff : 0;
+		*/
+		static inline ArrayMaskR CompareLessEqual( ArrayReal a, ArrayReal b )
+		{
+			return a <= b;
+		}
+
 		/** Returns the result of "a > b"
 		@return
 			r[i] = a[i] > b[i] ? 0xffffffff : 0;

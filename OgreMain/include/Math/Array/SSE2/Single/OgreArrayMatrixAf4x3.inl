@@ -289,7 +289,7 @@ namespace Ogre
 
 		//r03 = (r00 * m03 + r01 * m13 + r02 * m23)
 		//r13 = (r10 * m03 + r11 * m13 + r12 * m23)
-		//r13 = (r20 * m03 + r21 * m13 + r22 * m23)
+		//r23 = (r20 * m03 + r21 * m13 + r22 * m23)
 		ArrayReal r03 = _mm_madd_ps( r00, m03, _mm_madd_ps( r01, m13, _mm_mul_ps( r02, m23 ) ) );
 		ArrayReal r13 = _mm_madd_ps( r10, m03, _mm_madd_ps( r11, m13, _mm_mul_ps( r12, m23 ) ) );
 		ArrayReal r23 = _mm_madd_ps( r20, m03, _mm_madd_ps( r21, m13, _mm_mul_ps( r22, m23 ) ) );
