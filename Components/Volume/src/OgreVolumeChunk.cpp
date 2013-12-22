@@ -166,7 +166,7 @@ namespace Volume {
         }
 
         // Set to invisible for now.
-        mVisible = false;
+        setVisible(false);
         mInvisible = true;
         
         // Don't generate this chunk if it doesn't contribute to the whole volume.
@@ -218,7 +218,7 @@ namespace Volume {
             mNode->attachObject(this);
         }
 
-        mVisible = false;
+        setVisible(false);
 
         if (mShared->parameters->createDualGridVisualization)
         {
@@ -241,7 +241,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Chunk::Chunk(void) : mNode(0), mDualGrid(0), mOctree(0), mChildren(0), isRoot(false)
+    Chunk::Chunk(void) : SimpleRenderable(0, new ObjectMemoryManager()), mNode(0), mDualGrid(0), mOctree(0), mChildren(0), isRoot(false)
     {
     }
     
@@ -485,17 +485,17 @@ namespace Volume {
             return true;
         }
 
-        if (!mCamera || !mCamera->getViewport())
+        Camera *currentCamera = mParentSceneManager->getCameraInProgress();
+        if (!currentCamera || !currentCamera->getLastViewport())
         {
             setChunkVisible(true, false);
             return true;
         }
     
-        Real k = ((Real)mCamera->getViewport()->getActualHeight() / ((Real)2.0 * tan(mCamera->getFOVy().valueRadians() / (Real)2.0)));
+        Real k = ((Real)currentCamera->getLastViewport()->getActualHeight() / ((Real)2.0 * tan(currentCamera->getFOVy().valueRadians() / (Real)2.0)));
 
-        
         // Get the distance to the center.
-        Vector3 camPos = mCamera->getRealPosition();
+        Vector3 camPos = currentCamera->getRealPosition();
         Real d = (mBox.getCenter() * mShared->parameters->scale).distance(camPos);
         if (d < 1.0)
         {
@@ -636,7 +636,7 @@ namespace Volume {
     void Chunk::setVolumeVisible(bool visible)
     {
         mShared->volumeVisible = visible;
-        mVisible = visible;
+        setVisible(visible);
         if (mChildren)
         {
             mChildren[0]->setVolumeVisible(visible);
