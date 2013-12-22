@@ -436,7 +436,7 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
 				ushort boneCount = 0,weightCount = 0;
 				bool isValid = extractSkeletonData(pCurEntity, indexSub, boneCount, weightCount);
 
-				SubEntity* pSubEntity = pCurEntity->getSubEntity(indexSub);
+				const SubEntity* pSubEntity = pCurEntity->getSubEntity(indexSub);
 				const MaterialPtr& pMat = pSubEntity->getMaterial();
 				imprintSkeletonData(pMat, isValid, boneCount, weightCount, skinningType, correctAntidpodalityHandling, shearScale);
 			}
