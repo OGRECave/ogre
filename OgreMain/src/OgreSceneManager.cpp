@@ -342,7 +342,7 @@ Camera* SceneManager::findCamera( IdString name ) const
 	{
 		OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
 					 "Camera with name '" + name.getFriendlyText() + "' not found",
-					 "SceneManager::getCamera" );
+					 "SceneManager::findCamera" );
 	}
 
     return itor->second;
@@ -4765,7 +4765,7 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 	MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
 
 	{
-            OGRE_LOCK_MUTEX(objectMap->mutex);
+        OGRE_LOCK_MUTEX(objectMap->mutex);
 
 		MovableObject* newObj = factory->createInstance( Id::generateNewId<MovableObject>(),
 														 objectMemMgr, this, params );
