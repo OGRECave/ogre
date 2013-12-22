@@ -147,7 +147,7 @@ namespace Ogre
 
 		if (mLocalNode)
 		{
-			mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode->getName());
+			mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode);
 			mLocalNode = 0;
 		}
 
@@ -269,7 +269,10 @@ namespace Ogre
 		createGpuVertexData();
 		createGpuIndexData();
 		if (!mLocalNode)
-			mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
+        {
+			mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode();
+            mLocalNode->setPosition(mLocalCentre);
+        }
 
 		if (!mMovable->isAttached())
 			mLocalNode->attachObject(mMovable);
@@ -568,12 +571,6 @@ namespace Ogre
 				}
 
 			}
-			// Make sure node knows to update
-			if (mMovable && mMovable->isAttached())
-				mMovable->getParentSceneNode()->needUpdate();
-
-
-
 		}
 
 	}
@@ -1266,11 +1263,11 @@ namespace Ogre
 
 			// Do material LOD
 			MaterialPtr material = getMaterial();
-			const LodStrategy *materialStrategy = material->getLodStrategy();
+			const LodStrategy *materialStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
 			Real lodValue = materialStrategy->getValue(mMovable, cam);
-			// Get the index at this biased depth
-			mMaterialLodIndex = material->getLodIndex(lodValue);
 
+			// Get the index at this biased depth
+            mMaterialLodIndex = materialStrategy->getIndex(lodValue, *material->_getLodValues());
 
 			// For each LOD, the distance at which the LOD will transition *downwards*
 			// is given by 
@@ -1485,7 +1482,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
-		: mParent(parent)
+		: MovableObject(0, new ObjectMemoryManager()), mParent(parent)
 	{
 	}
 	//---------------------------------------------------------------------
@@ -1523,18 +1520,18 @@ namespace Ogre
 	uint32 TerrainQuadTreeNode::Movable::getVisibilityFlags(void) const
 	{
 		// Combine own vis (in case anyone sets this) and terrain overall
-		return mVisibilityFlags & mParent->getTerrain()->getVisibilityFlags();
+		return getVisibilityFlags() & mParent->getTerrain()->getVisibilityFlags();
 	}
 	//---------------------------------------------------------------------
 	uint32 TerrainQuadTreeNode::Movable::getQueryFlags(void) const
 	{
 		// Combine own vis (in case anyone sets this) and terrain overall
-		return mQueryFlags & mParent->getTerrain()->getQueryFlags();
+		return getQueryFlags() & mParent->getTerrain()->getQueryFlags();
 	}
 	//------------------------------------------------------------------------
-	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
+	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
 	{
-		mParent->updateRenderQueue(queue);		
+		mParent->updateRenderQueue(queue);
 	}
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)

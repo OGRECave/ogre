@@ -71,10 +71,13 @@ namespace Ogre
 			return;
 
 		// calculate error terms
-		const Viewport* vp = terrain->getSceneManager()->getCurrentViewport();
+		const Camera* cam = terrain->getSceneManager()->getCameraInProgress()->getLodCamera();
+		if(!cam)
+			return;
+
+		const Viewport* vp = cam->getLastViewport();
 		if(!vp)
 			return;
-		const Camera* cam = vp->getCamera()->getLodCamera();
 
 		// W. de Boer 2000 calculation
 		// A = vp_near / abs(vp_top)

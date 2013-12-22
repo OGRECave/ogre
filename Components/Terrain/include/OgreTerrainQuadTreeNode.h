@@ -343,7 +343,7 @@ namespace Ogre
 			const String& getMovableType(void) const;
 			const AxisAlignedBox& getBoundingBox(void) const;
 			Real getBoundingRadius(void) const;
-			void _updateRenderQueue(RenderQueue* queue);
+            void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 			void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
 			bool isVisible(void) const;
 			uint32 getVisibilityFlags(void) const;

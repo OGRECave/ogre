@@ -88,8 +88,24 @@ namespace Ogre
 	{
 		if (!mCompositeMapSM)
 		{
+#if OGRE_DEBUG_MODE
+			// Debugging multithreaded code is a PITA, disable it.
+			const size_t numThreads = 1;
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+#else
+			//getNumLogicalCores() may return 0 if couldn't detect
+			const size_t numThreads = std::max<size_t>( 1, Ogre::PlatformInformation::getNumLogicalCores() );
+
+			Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+			//See doxygen documentation regarding culling methods.
+			//In some cases you may still want to use single thread.
+			if( numThreads > 1 )
+                threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+#endif
+
 			// dedicated SceneManager
-			mCompositeMapSM = Root::getSingleton().createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME);
+			mCompositeMapSM = Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 			float camDist = 100;
 			float halfCamDist = camDist * 0.5f;
 			mCompositeMapCam = mCompositeMapSM->createCamera("cam");
@@ -148,9 +164,8 @@ namespace Ogre
 				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, static_cast<uint>(size), static_cast<uint>(size), 0, PF_BYTE_RGBA,
 				TU_RENDERTARGET).get();
 			RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
-			// don't render all the time, only on demand
-			rtt->setAutoUpdated(false);
-			Viewport* vp = rtt->addViewport(mCompositeMapCam);
+            Viewport *camVp = mCompositeMapCam->getLastViewport();
+			Viewport* vp = rtt->addViewport(camVp->getLeft(), camVp->getTop(), camVp->getWidth(), camVp->getHeight());
 			// don't render overlays
 			vp->setOverlaysEnabled(false);
 
@@ -162,10 +177,7 @@ namespace Ogre
 		Real vpright = (Real)rect.right / (Real)size;
 		Real vpbottom = (Real)rect.bottom / (Real)size;
 
-		RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
 		mCompositeMapCam->setWindow(vpleft, vptop, vpright, vpbottom);
-
-		rtt->update();
 
 		// We have an RTT, we want to copy the results into a regular texture
 		// That's because in non-update scenarios we don't want to keep an RTT

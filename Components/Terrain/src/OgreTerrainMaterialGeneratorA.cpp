@@ -284,7 +284,7 @@ namespace Ogre
 		if(mCompositeMapEnabled)
 		{
 			addTechnique(mat, terrain, LOW_LOD);
-			Material::LodValueList lodValues;
+			Material::LodValueArray lodValues;
 			lodValues.push_back(TerrainGlobalOptions::getSingleton().getCompositeMapDistance());
 			mat->setLodLevels(lodValues);
 			Technique* lowLodTechnique = mat->getTechnique(1);
@@ -448,9 +448,7 @@ namespace Ogre
 	bool TerrainMaterialGeneratorA::SM2Profile::isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const
 	{
 		return getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && 
-			(tt != LOW_LOD || mLowLodShadows) &&
-			terrain->getSceneManager()->isShadowTechniqueTextureBased();
-
+        (tt != LOW_LOD || mLowLodShadows);
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::updateParams(const MaterialPtr& mat, const Terrain* terrain)
