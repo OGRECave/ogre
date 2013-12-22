@@ -5,6 +5,7 @@
 #include "SegmentedDynamicLightManager.h"
 #include "RTShaderSRSSegmentedLights.h"
 #include "OgreControllerManager.h"
+#include "OgreNameGenerator.h"
 
 /*
 Part of the original guidelines under which the RTSS was created was to emulate the fixed pipeline mechanism as close as possible.  
@@ -182,7 +183,7 @@ protected:
 		mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 		// Make this viewport work with shader generator scheme.
-		mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		mSceneMgr->getCurrentViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 	}
 
 
@@ -207,7 +208,8 @@ protected:
 		LightState state;
 		
 		// Create a light node
-		state.node = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(50, 30, 0));
+		state.node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        state.node->setPosition(Vector3(50, 30, 0));
 
 		String animName = mPathNameGen.generate();
 		// Create a 14 second animation with spline interpolation

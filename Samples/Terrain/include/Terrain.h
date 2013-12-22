@@ -590,9 +590,11 @@ protected:
 
 	void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
 	{
+        ShadowTextureList texList;
+        ShadowTextureManager::getSingleton().getAllShadowTextures(texList);
 		for (size_t i = 0; i < num; ++i)
 		{
-			TexturePtr shadowTex = mSceneMgr->getShadowTexture(i);
+			TexturePtr shadowTex = texList[i];
 			addTextureDebugOverlay(loc, shadowTex, i);
 
 		}

@@ -96,7 +96,9 @@ protected:
 
 		// setup some basic lighting for our scene
 		mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->setPosition(20, 80, 50);
+		lightNode->attachObject( mSceneMgr->createLight() );
 
 		// set initial camera position
 		mCameraMan->setStyle(CS_MANUAL);
@@ -126,18 +128,19 @@ protected:
 		mPenguinAnimState->setEnabled(true);
 
 		// create a snowstorm over the scene, and fast forward it a little
-        ParticleSystem* ps = mSceneMgr->createParticleSystem("Snow", "Examples/Snow");
+        ParticleSystem* ps = ParticleSystemManager::getSingleton().createTemplate("Snow", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        ps->setMaterialName("Examples/Snow");
         mSceneMgr->getRootSceneNode()->attachObject(ps);
         ps->fastForward(30);
 
 		// create a frosted screen in front of the camera, using our dynamic texture to "thaw" certain areas
-		Entity* ent = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+		Entity* ent = mSceneMgr->createEntity("Plane");
 		ent->setMaterialName("Examples/Frost");
 		SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		node->setPosition(0, 0, 50);
 		node->attachObject(ent);
 
-		mPlaneSize = ent->getBoundingBox().getSize().x;   // remember the size of the plane
+		mPlaneSize = ent->getWorldAabb().getSize().x;   // remember the size of the plane
 
 		mCursorQuery = mSceneMgr->createRayQuery(Ray());  // create a ray scene query for the cursor
 

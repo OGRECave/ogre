@@ -59,11 +59,13 @@ protected:
 	void createProceduralParticleSystem()
 	{
 		mParticleSystem = static_cast<ProceduralManualObject*>
-			(mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
+			(mSceneMgr->createMovableObject(ProceduralManualObjectFactory::FACTORY_TYPE_NAME, new ObjectMemoryManager()));
+        mParticleSystem->setName("ParticleGSEntity");
 		mParticleSystem->setMaterial("Ogre/ParticleGS/Display");
 
 		//Generate the geometry that will seed the particle system
-		ManualObject* particleSystemSeed = mSceneMgr->createManualObject("ParticleSeed");
+		ManualObject* particleSystemSeed = mSceneMgr->createManualObject();
+        particleSystemSeed->setName("ParticleSeed");
 		//This needs to be the initial launcher particle
 		particleSystemSeed->begin("Ogre/ParticleGS/Display", RenderOperation::OT_POINT_LIST);
 		particleSystemSeed->position(0,0,0); //Position
@@ -151,7 +153,9 @@ protected:
 		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 		pPlaneEnt->setMaterialName("Examples/Rockwall");
 		pPlaneEnt->setCastShadows(false);
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,95,0))->attachObject(pPlaneEnt);
+		SceneNode *snode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        snode->setPosition(Vector3(0,95,0));
+        snode->attachObject(pPlaneEnt);
     }
 
     void cleanupContent()

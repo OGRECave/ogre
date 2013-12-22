@@ -90,14 +90,18 @@ protected:
         //mRoot->getRenderSystem()->clearFrameBuffer(FBT_COLOUR, ColourValue(255,255,255,0));
 
         // Create a light
-        Light* l = mSceneMgr->createLight("MainLight");
+        Light* l = mSceneMgr->createLight();
+        l->setName("MainLight");
         l->setDiffuseColour(0.75, 0.75, 0.80);
 		l->setSpecularColour(0.9, 0.9, 1);
-        l->setPosition(-100,80,50);
-		mSceneMgr->getRootSceneNode()->attachObject(l);
-		
+
+		SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        lnode->setPosition(-100,80,50);
+        lnode->attachObject(l);
+
 		// Create volume renderable
-		snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));      
+		snode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        snode->setPosition(Vector3(0,0,0));
 		
         vrend = new VolumeRenderable(32, 750.0f, "DynaTex");
         snode->attachObject( vrend );
@@ -107,7 +111,8 @@ protected:
 		snode->attachObject(trend);
 		
 		// Ogre head node
-		fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));
+		fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        fnode->setPosition(Vector3(0,0,0));
 		// Load ogre head
 		Entity* head = mSceneMgr->createEntity("head", "ogrehead.mesh");
 		fnode->attachObject(head);

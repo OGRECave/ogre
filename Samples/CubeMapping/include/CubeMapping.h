@@ -61,7 +61,9 @@ protected:
 
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->setPosition(20, 80, 50);
+		lightNode->attachObject( mSceneMgr->createLight() );
 
 		createCubeMap();
 
@@ -77,7 +79,8 @@ protected:
 		mFishSwim->setEnabled(true);
 
 		// create a child node at an offset and attach a regular ogre head and a nimbus to it
-		SceneNode* node = mPivot->createChildSceneNode(Vector3(-60, 10, 0));
+		SceneNode* node = mPivot->createChildSceneNode();
+		node->setPosition(-60, 10, 0);
 		node->setScale(7, 7, 7);
 		node->yaw(Degree(90));
 		node->attachObject(fish);
@@ -109,11 +112,12 @@ protected:
 		TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_CUBE_MAP, 128, 128, 0, PF_R8G8B8, TU_RENDERTARGET);
 
+        Viewport *camVp = mCubeCamera->getLastViewport();
 		// assign our camera to all 6 render targets of the texture (1 for each direction)
 		for (unsigned int i = 0; i < 6; i++)
 		{
 			mTargets[i] = tex->getBuffer(i)->getRenderTarget();
-			mTargets[i]->addViewport(mCubeCamera)->setOverlaysEnabled(false);
+			mTargets[i]->addViewport(camVp->getLeft(), camVp->getTop(), camVp->getWidth(), camVp->getHeight())->setOverlaysEnabled(false);
 			mTargets[i]->addListener(this);
 		}
 	}

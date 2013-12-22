@@ -400,7 +400,8 @@ protected:
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
-		Light* l = mSceneMgr->createLight("tstLight");
+		Light* l = mSceneMgr->createLight();
+        l->setName("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
 		l->setDirection(lightdir);
 		l->setDiffuseColour(ColourValue::White);

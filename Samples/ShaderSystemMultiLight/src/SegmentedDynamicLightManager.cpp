@@ -62,7 +62,7 @@ void SegmentedDynamicLightManager::postFindVisibleObjects(SceneManager* source,
 {
 	if (irs == SceneManager::IRS_NONE)
 	{
-		updateLightList(v->getCamera(), source->_getLightsAffectingFrustum());
+		updateLightList(source->getCameraInProgress(), source->_getLightsAffectingFrustum());
 	}
 }
 
@@ -134,7 +134,7 @@ void SegmentedDynamicLightManager::regenerateActiveLightList(const LightList& i_
 		itLightEnd = i_LightList.end();
 	for(;itLight != itLightEnd ; ++itLight)
 	{
-		const Light* pLight = (*itLight);
+		const Light* pLight = (*itLight).light;
 		Light::LightTypes type = pLight->getType();
 		if (((type == Light::LT_SPOTLIGHT) || (type == Light::LT_POINT)) &&
 			(pLight->getAttenuationRange() > 0))
@@ -153,7 +153,7 @@ void SegmentedDynamicLightManager::regenerateActiveLightList(const LightList& i_
 void SegmentedDynamicLightManager::calculateLightBounds(const Light* i_Light, LightData& o_LightData)
 { 
 	Real lightRange = i_Light->getAttenuationRange();
-	const Vector3& lightPosition = i_Light->getDerivedPosition(true);
+	const Vector3& lightPosition = mManager->getSceneNode(i_Light->getId())->_getDerivedPosition();
 
 	AxisAlignedBox boundBox(lightPosition - lightRange, lightPosition + lightRange);
 
@@ -291,7 +291,7 @@ void SegmentedDynamicLightManager::updateTextureFromSegmentedLists(const Camera*
 			{
 				const Light* pLight = mSegmentedLightGrid[j][i];
 					
-				const Vector3& position = pLight->getDerivedPosition(true);
+				const Vector3& position = mManager->getSceneNode(pLight->getId())->_getDerivedPosition();
 				Vector3 direction = -pLight->getDerivedDirection();
 				direction.normalise();
 
@@ -372,7 +372,7 @@ bool SegmentedDynamicLightManager::getLightListRange(const Renderable* i_Rend,
 	LightList::const_iterator it = lights.begin(), itEnd = lights.end();
 	for(; it != itEnd ; ++it)
 	{
-		MapLightData::const_iterator itActive = mActiveLights.find(*it);
+		MapLightData::const_iterator itActive = mActiveLights.find(it->light);
 		if (itActive != mActiveLights.end())
 		{
 			o_IndexMin = (unsigned int)std::min<unsigned int>(o_IndexMin, itActive->second.getIndexMin());

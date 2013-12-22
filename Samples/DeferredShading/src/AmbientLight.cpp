@@ -21,7 +21,7 @@ same license as the rest of the engine.
 
 using namespace Ogre;
 
-AmbientLight::AmbientLight()
+AmbientLight::AmbientLight() : SimpleRenderable(0, new ObjectMemoryManager())
 {
 	setRenderQueueGroup(RENDER_QUEUE_2);
 

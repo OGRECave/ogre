@@ -55,6 +55,7 @@ public:
 	bool setDebugMode(bool i_IsDebugMode);
 	//Set the system to active mode
 	void setSceneManager(SceneManager* i_Manager);
+	SceneManager * getSceneManager(void) { return mManager; }
 	//Tells if the system is active
 	bool isActive() const { return mManager != NULL; }
 	//Get the name of the texture used to store the light information

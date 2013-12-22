@@ -103,7 +103,7 @@ protected:
 		// Create an ogre head and place it at the origin
 		Entity* head = mSceneMgr->createEntity(mEntityNameGen.generate(), "ogrehead.mesh");
 		head->setRenderQueueGroup(cPriorityMain);
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(pos)
+        mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::SCENE_DYNAMIC, pos)
 			->attachObject(head);
    }
 
@@ -128,7 +128,7 @@ protected:
 		mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 		// Make this viewport work with shader generator scheme.
-		mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		mCamera->getLastViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 	}
 
 

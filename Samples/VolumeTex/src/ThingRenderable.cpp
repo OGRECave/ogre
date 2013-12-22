@@ -16,9 +16,12 @@ same license as the rest of the engine.
 #include <OgreHardwareIndexBuffer.h>
 #include <OgreHardwareBufferManager.h>
 #include <OgreCamera.h>
+#include <Math/Array/OgreObjectMemoryManager.h>
+
 using namespace Ogre;
 
 ThingRenderable::ThingRenderable(float radius, size_t count, float qsize):
+    SimpleRenderable(0, new ObjectMemoryManager()),
 	mRadius(radius),
 	mCount(count),
 	mQSize(qsize)

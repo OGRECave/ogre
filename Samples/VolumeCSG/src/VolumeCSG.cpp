@@ -45,7 +45,8 @@ void Sample_VolumeCSG::setupContent(void)
     Vector3 to(size);
             
     // Light
-    Light* directionalLight0 = mSceneMgr->createLight("directionalLight0");
+    Light* directionalLight0 = mSceneMgr->createLight();
+    directionalLight0->setName("directionalLight0");
     directionalLight0->setType(Light::LT_DIRECTIONAL);
     directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));
     directionalLight0->setDiffuseColour((Real)1, (Real)0.98, (Real)0.73);
@@ -86,8 +87,8 @@ void Sample_VolumeCSG::setupContent(void)
     Source *src = &union6;
     
     mVolumeRoot = OGRE_NEW Chunk();
-    SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
-
+    SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    volumeRootNode->setName("VolumeParent");
     
     ChunkParameters parameters;
     parameters.sceneManager = mSceneMgr;
@@ -136,7 +137,7 @@ void Sample_VolumeCSG::setupShaderGenerator()
     mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
     // Make this viewport work with shader generator scheme.
-    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mSceneMgr->getCurrentViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
     
 //-----------------------------------------------------------------------

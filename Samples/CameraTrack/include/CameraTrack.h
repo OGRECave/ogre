@@ -31,8 +31,10 @@ protected:
 	{
 		// setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
-        
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->setPosition(20, 80, 50);
+		lightNode->attachObject( mSceneMgr->createLight() );
+
 		mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
 
 		// create an ogre head entity and attach it to a node

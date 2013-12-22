@@ -123,6 +123,8 @@ protected:
 
 	void setupWater()
 	{
+        Viewport *camVp = mCamera->getLastViewport();
+
 		// create our reflection & refraction render textures, and setup their render targets
 		for (unsigned int i = 0; i < 2; i++)
 		{
@@ -130,7 +132,7 @@ protected:
 				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 512, 512, 0, PF_R8G8B8, TU_RENDERTARGET);
 
 			RenderTarget* rtt = tex->getBuffer()->getRenderTarget();
-			rtt->addViewport(mCamera)->setOverlaysEnabled(false);
+			rtt->addViewport(camVp->getLeft(), camVp->getTop(), camVp->getWidth(), camVp->getHeight())->setOverlaysEnabled(false);
 			rtt->addListener(this);
 
 			if (i == 0) mRefractionTarget = rtt;
@@ -150,9 +152,9 @@ protected:
 
     void windowUpdate()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        mWindow->update();
-#endif
+//#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+//        mWindow->update();
+//#endif
     }
 
 	void setupProps()

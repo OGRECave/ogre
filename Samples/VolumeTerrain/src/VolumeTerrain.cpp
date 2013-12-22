@@ -46,7 +46,8 @@ void Sample_VolumeTerrain::setupContent(void)
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
     // Light
-    Light* directionalLight0 = mSceneMgr->createLight("directionalLight0");
+    Light* directionalLight0 = mSceneMgr->createLight();
+    directionalLight0->setName("directionalLight0");
     directionalLight0->setType(Light::LT_DIRECTIONAL);
     directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));
     directionalLight0->setDiffuseColour((Real)1, (Real)0.98, (Real)0.73);
@@ -54,7 +55,8 @@ void Sample_VolumeTerrain::setupContent(void)
    
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
-    mVolumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
+    mVolumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mVolumeRootNode->setName("VolumeParent");
     Timer t;
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
     LogManager::getSingleton().stream() << "Loaded volume terrain in " << t.getMillisecondsCPU() << " ms";

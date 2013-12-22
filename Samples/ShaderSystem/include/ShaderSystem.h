@@ -21,7 +21,7 @@ enum ShaderSystemLightingModel
 class _OgreSampleClassExport InfiniteFrustum : public Frustum
 {
 public:
-	InfiniteFrustum() : Frustum()
+	InfiniteFrustum() : Frustum(0, new ObjectMemoryManager())
 	{
 		mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal = Vector3::NEGATIVE_UNIT_X;
 		mFrustumPlanes[FRUSTUM_PLANE_LEFT].d = 9999999999999999999.0f;
@@ -241,6 +241,7 @@ protected:
 	String								mExportMaterialPath;	// The path of the export material.
 	CheckBox*							mInstancedViewportsCheckBox; // The instanced viewports check box.
 	CheckBox*							mAddLotsOfModels; // The "add lots of models" check box.				
+    Entity*                             mMainEntity;
 };
 
 #endif

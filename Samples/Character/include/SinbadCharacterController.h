@@ -161,7 +161,8 @@ private:
 	void setupBody(SceneManager* sceneMgr)
 	{
 		// create main model
-		mBodyNode = sceneMgr->getRootSceneNode()->createChildSceneNode(Vector3::UNIT_Y * CHAR_HEIGHT);
+		mBodyNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
+        mBodyNode->setPosition(Vector3::UNIT_Y * CHAR_HEIGHT);
 		mBodyEnt = sceneMgr->createEntity("SinbadBody", "Sinbad.mesh");
 		mBodyNode->attachObject(mBodyEnt);
 
@@ -177,7 +178,8 @@ private:
 		NameValuePairList params;
 		params["numberOfChains"] = "2";
 		params["maxElements"] = "80";
-		mSwordTrail = (RibbonTrail*)sceneMgr->createMovableObject("RibbonTrail", &params);
+		mSwordTrail = (RibbonTrail*)sceneMgr->createMovableObject(RibbonTrailFactory::FACTORY_TYPE_NAME, new ObjectMemoryManager(), &params);
+        mSwordTrail->setName("RibbonTrail");
 		mSwordTrail->setMaterialName("Examples/LightRibbonTrail");
 		mSwordTrail->setTrailLength(20);
 		mSwordTrail->setVisible(false);
@@ -229,7 +231,8 @@ private:
 		// create a pivot at roughly the character's shoulder
 		mCameraPivot = cam->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 		// this is where the camera should be soon, and it spins around the pivot
-		mCameraGoal = mCameraPivot->createChildSceneNode(Vector3(0, 0, 15));
+		mCameraGoal = mCameraPivot->createChildSceneNode();
+        mCameraGoal->setPosition(Vector3(0, 0, 15));
 		// this is where the camera actually is
 		mCameraNode = cam->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 		mCameraNode->setPosition(mCameraPivot->getPosition() + mCameraGoal->getPosition());
