@@ -310,13 +310,18 @@ namespace Ogre {
 		return mParentNode->_getFullTransform();
 	}
 	//-----------------------------------------------------------------------
-	const Aabb MovableObject::getWorldAabb() const
+	Aabb MovableObject::getLocalAabb() const
+	{
+		return mObjectData.mLocalAabb->getAsAabb( mObjectData.mIndex );
+	}
+	//-----------------------------------------------------------------------
+	Aabb MovableObject::getWorldAabb() const
 	{
 		assert( !mCachedAabbOutOfDate );
 		return mObjectData.mWorldAabb->getAsAabb( mObjectData.mIndex );
 	}
 	//-----------------------------------------------------------------------
-	const Aabb MovableObject::getWorldAabbUpdated()
+	Aabb MovableObject::getWorldAabbUpdated()
 	{
 		return updateSingleWorldAabb();
 	}

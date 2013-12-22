@@ -223,12 +223,6 @@ namespace Ogre {
 		/// Called by SceneManager when it is telling we're a static MovableObject being dirty
 		virtual void _notifyStaticDirty(void) const {}
 
-        /** Retrieves the local axis-aligned bounding box for this object.
-            @remarks
-                This bounding box is in local coordinates.
-        */
-		Aabb getBoundingBox(void) const;
-
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
             @remarks
                 The engine will call this method when this object is to be rendered. The object must then create one or more
@@ -422,13 +416,19 @@ namespace Ogre {
 		/// return the full transformation of the parent sceneNode or the attachingPoint node
 		const Matrix4& _getParentNodeFullTransform(void) const;
 
+		/** Retrieves the local axis-aligned bounding box for this object.
+            @remarks
+                This bounding box is in local coordinates.
+        */
+		Aabb getLocalAabb(void) const;
+
 		/** Gets the axis aligned box in world space.
 		@remarks
 			Assumes the caches are already updated. Will trigger an assert
 			otherwise. @See getWorldAabbUpdated if you need the update process
 			to be guaranteed
         */
-		const Aabb getWorldAabb() const;
+		Aabb getWorldAabb() const;
 
 		/** Gets the axis aligned box in world space.
 		@remarks
@@ -437,7 +437,7 @@ namespace Ogre {
 			number of MovableObject. Refactor your queries so that they happen
 			after SceneManager::updateAllBounds() has been called
 		*/
-		const Aabb getWorldAabbUpdated();
+		Aabb getWorldAabbUpdated();
 
 		/** Gets the bounding Radius scaled by max( scale.x, scale.y, scale.z ).
 		@remarks

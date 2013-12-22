@@ -56,6 +56,11 @@ namespace Ogre
 		return mCenter + mHalfSize;
 	}
 	//-----------------------------------------------------------------------------------
+	inline Vector3 Aabb::getSize() const
+	{
+		return mHalfSize * 2.0f;
+	}
+	//-----------------------------------------------------------------------------------
 	inline void Aabb::merge( const Aabb& rhs )
 	{
 		Vector3 max( mCenter + mHalfSize );
