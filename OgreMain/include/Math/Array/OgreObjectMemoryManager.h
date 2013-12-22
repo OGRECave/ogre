@@ -53,7 +53,7 @@ namespace Ogre
 		Note that some SceneManager implementations (i.e. Octree like) may want to have more
 		than one ObjectMemoryManager, for example one per octant.
 	*/
-	class ObjectMemoryManager : ArrayMemoryManager::RebaseListener
+	class _OgreExport ObjectMemoryManager : ArrayMemoryManager::RebaseListener
 	{
 		typedef vector<ObjectDataArrayMemoryManager>::type ArrayMemoryManagerVec;
 		/// ArrayMemoryManagers grouped by hierarchy depth
