@@ -1034,6 +1034,7 @@ namespace Ogre {
 			Must be unique for each worker thread
 		*/
 		void updateAllAnimationsThread( size_t threadIdx );
+		void updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size_t threadIdx );
 
 		/** Updates the Nodes from the given request inside a thread. @See updateAllTransforms
 		@param request
