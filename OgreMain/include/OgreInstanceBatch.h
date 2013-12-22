@@ -348,7 +348,7 @@ namespace Ogre
 		/** Tells whether world bone matrices need to be calculated.
 			This does not include bone matrices which are calculated regardless
         */
-		bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal == SKELETONS_LUT; }
+		bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal != SKELETONS_LUT; }
 #endif
 
 		/** Tells that the list of entity instances with shared transforms has changed */
