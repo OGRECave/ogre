@@ -2589,7 +2589,7 @@ bail:
 			}
 
 			/// Hull Shader binding
-			if (mBoundTesselationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_HULL)
+			if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_HULL)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
@@ -2619,7 +2619,7 @@ bail:
 			}
 			
 			/// Domain Shader binding
-			if (mBoundTesselationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_DOMAIN)
+			if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_DOMAIN)
 			{
 				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{

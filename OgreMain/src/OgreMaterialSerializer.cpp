@@ -4403,12 +4403,12 @@ namespace Ogre
                 writeFragmentProgramRef(pPass);
             }
 
-			if(pPass->hasTesselationHullProgram())
+			if(pPass->hasTessellationHullProgram())
 			{
 				writeTesselationHullProgramRef(pPass);
 			}
 
-			if(pPass->hasTesselationDomainProgram())
+			if(pPass->hasTessellationHullProgram())
 			{
 				writeTesselationDomainProgramRef(pPass);
 			}
@@ -4799,14 +4799,13 @@ namespace Ogre
 					writeValue("vertex");
 					break;
                 case TextureUnitState::BT_GEOMETRY:
-                case TextureUnitState::BT_GEOMETRY:
 					writeValue("geometry");
 					break;
-                case TextureUnitState::BT_TESSELATION_DOMAIN:
-					writeValue("tesselation_domain");
+                case TextureUnitState::BT_TESSELLATION_DOMAIN:
+					writeValue("tessellation_domain");
 					break;
-                case TextureUnitState::BT_TESSELATION_HULL:
-					writeValue("tesselation_hull");
+                case TextureUnitState::BT_TESSELLATION_HULL:
+					writeValue("tessellation_hull");
 					break;
                 case TextureUnitState::BT_COMPUTE:
 					writeValue("compute");
@@ -5124,13 +5123,13 @@ namespace Ogre
     void MaterialSerializer::writeTesselationHullProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("tesselation_hull_program_ref",
-			pPass->getTesselationHullProgram(), pPass->getTesselationHullProgramParameters());
+			pPass->getTessellationHullProgram(), pPass->getTessellationHullProgramParameters());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeTesselationDomainProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("tesselation_domain_program_ref",
-			pPass->getTesselationDomainProgram(), pPass->getTesselationDomainProgramParameters());
+			pPass->getTessellationDomainProgram(), pPass->getTessellationDomainProgramParameters());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeShadowCasterVertexProgramRef(const Pass* pPass)

@@ -382,10 +382,10 @@ namespace Ogre {
 			}
 		}
 
-		if (mCurrentCapabilities->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
+		if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
 		{
 			isValidBinding = true;
-			if (tl.getBindingType() == TextureUnitState::BT_TESSELATION_DOMAIN)
+			if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
 			{
 				// Bind vertex texture
 				_setTesselationDomainTexture(texUnit, tex);
@@ -401,10 +401,10 @@ namespace Ogre {
 			}
 		}
 
-		if (mCurrentCapabilities->hasCapability(RSC_TESSELATION_HULL_PROGRAM))
+		if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_HULL_PROGRAM))
 		{
 			isValidBinding = true;
-			if (tl.getBindingType() == TextureUnitState::BT_TESSELATION_HULL)
+			if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
 			{
 				// Bind vertex texture
 				_setTesselationHullTexture(texUnit, tex);

@@ -30,7 +30,7 @@ public:
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
 				" programs, so you cannot run this sample. Sorry!", "Sample_Island::testCapabilities");
 		}
-		if (!caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
+		if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
 				"Sample_Island:testCapabilities");
@@ -65,21 +65,21 @@ public:
 			g_UseDynamicLOD = !g_UseDynamicLOD;
 			
 			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_UseDynamicLOD", g_UseDynamicLOD );
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_UseDynamicLOD", g_UseDynamicLOD );
 		}
 		if (box->getName() == "FrustumCull")
 		{
 			g_FrustumCullInHS = !g_FrustumCullInHS;
 			
 			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_FrustumCullInHS", g_FrustumCullInHS );
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_FrustumCullInHS", g_FrustumCullInHS );
 		}
 		if (box->getName() == "RenderRefraction")
 		{
 			g_RenderCaustics = !g_RenderCaustics;
 			
 			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_RenderCaustics", g_RenderCaustics );
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_RenderCaustics", g_RenderCaustics );
 		}
 	}
 
@@ -88,12 +88,12 @@ public:
 		if (slider->getName() == "tessellationLOD")
 		{
 			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_DynamicTessFactor", slider->getValue() );
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_DynamicTessFactor", slider->getValue() );
 		}
 		if (slider->getName() == "tessellationFactor")
 		{
 			MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Island" ).staticCast<Material>();
-			lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_StaticTessFactor", slider->getValue() );		
+			lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_StaticTessFactor", slider->getValue() );		
 		}
 	}
 

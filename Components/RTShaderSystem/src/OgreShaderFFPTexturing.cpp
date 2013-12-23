@@ -883,14 +883,14 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 			"FFPTexturing::setTextureUnit");
 	}
 
-	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELATION_DOMAIN)
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
 	{
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"FFP Texture unit does not support domain texture fetch !!!",
 			"FFPTexturing::setTextureUnit");
 	}
 
-	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELATION_HULL)
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
 	{
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"FFP Texture unit does not support hull texture fetch !!!",
