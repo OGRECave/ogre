@@ -2,7 +2,7 @@ vertex_program Ogre/Compositor/StdQuad_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_vp
-    profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
+    profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -14,7 +14,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex2_vp
-	profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -26,7 +26,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2a_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex2a_vp
-	profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -38,7 +38,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex3_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex3_vp
-	profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -50,7 +50,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex4_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex4_vp
-	profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -156,7 +156,7 @@ vertex_program Ogre/Compositor/StdQuad_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -168,7 +168,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_Tex2_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -180,7 +180,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2a_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_Tex2a_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -192,7 +192,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex3_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_Tex3_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -204,7 +204,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex4_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_Tex4_vp
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{

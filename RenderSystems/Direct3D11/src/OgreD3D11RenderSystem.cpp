@@ -1035,7 +1035,7 @@ bail:
 		{
 			mPrimaryWindow = win;
 			win->getCustomAttribute( "D3DDEVICE", &mDevice );
-
+			
 			// Create the texture manager for use by others
 			mTextureManager = new D3D11TextureManager( mDevice );
             // Also create hardware buffer manager
@@ -1094,7 +1094,11 @@ bail:
 		rsc->setCapability(RSC_BLENDING);
 		rsc->setCapability(RSC_DOT3);
 		// Cube map
-		rsc->setCapability(RSC_CUBEMAPPING);
+		if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+		{
+			rsc->setCapability(RSC_CUBEMAPPING);
+			rsc->setCapability(RSC_READ_BACK_AS_TEXTURE);
+		}
 
 		// We always support compression, D3DX will decompress if device does not support
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
@@ -1177,6 +1181,8 @@ bail:
 			rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE_3D);
 			rsc->setCapability(RSC_TEXTURE_1D);
+			rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+			rsc->setCapability(RSC_COMPLETE_TEXTURE_BINDING);
 		}
 
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -1443,6 +1449,12 @@ bail:
 		descDepth.SampleDesc.Quality	= BBDesc.SampleDesc.Quality;
 		descDepth.Usage					= D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
+
+		// If we tell we want to use it as a Shader Resource when in MSAA, we will fail
+		// This is a recomandation from NVidia.
+		if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+			descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
 		descDepth.CPUAccessFlags		= 0;
 		descDepth.MiscFlags				= 0;
 
@@ -1459,6 +1471,28 @@ bail:
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Unable to create depth texture\nError Description:" + errorDescription,
 				"D3D11RenderSystem::_createDepthBufferFor");
+		}
+
+		//
+		// Create the View of the texture
+		// If MSAA is used, we cannot do this
+		//
+		if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+			viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+			viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+			viewDesc.Texture2D.MostDetailedMip = 0;
+			viewDesc.Texture2D.MipLevels = 1;
+			SAFE_RELEASE(mDSTResView);
+			HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
+			if( FAILED(hr) || mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Unable to create the view of the depth texture \nError Description:" + errorDescription,
+					"D3D11RenderSystem::_createDepthBufferFor");
+			}
 		}
 
 		// Create the depth stencil view
@@ -1757,7 +1791,44 @@ bail:
 		}
 	}
 	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
+	{
+		mBindingType = bindingType;
+	}
+	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
+	{
+		if (tex.isNull())
+			_setTexture(stage, false, tex);
+        else
+			_setTexture(stage, true, tex);	
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setGeometryTexture(size_t stage, const TexturePtr& tex)
+	{
+		if (tex.isNull())
+			_setTexture(stage, false, tex);
+        else
+			_setTexture(stage, true, tex);	
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
+	{
+		if (tex.isNull())
+			_setTexture(stage, false, tex);
+        else
+			_setTexture(stage, true, tex);	
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setTesselationHullTexture(size_t stage, const TexturePtr& tex)
+	{
+		if (tex.isNull())
+			_setTexture(stage, false, tex);
+        else
+			_setTexture(stage, true, tex);	
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_setTesselationDomainTexture(size_t stage, const TexturePtr& tex)
 	{
 		if (tex.isNull())
 			_setTexture(stage, false, tex);
@@ -1958,7 +2029,7 @@ bail:
     void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
         uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
         StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation)
+        bool twoSidedOperation, bool readBackAsTexture)
     {
 		bool flip = false; // TODO: determine from mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
 
@@ -1983,6 +2054,7 @@ bail:
 			mDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
 		}
 
+		mReadBackAsTexture = readBackAsTexture;
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
@@ -2375,8 +2447,7 @@ bail:
 					"D3D11 device cannot set blend state\nError Description:" + errorDescription,
 					"D3D11RenderSystem::_render");
 			}
-            // PPP: TO DO. Must bind only if the Geometry shader expects this
-			if (mBoundGeometryProgram)
+			if (mBoundGeometryProgram && mBindingType == TextureUnitState::BindingType::BT_GEOMETRY)
 			{
 				{
 					mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
@@ -2398,8 +2469,6 @@ bail:
 				}
 			}
 		}
-
-
 
 		//if (opState->mRasterizer != mBoundRasterizer)
 		{
@@ -2432,58 +2501,152 @@ bail:
 
 		if (opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
 		{
-			// Assaf: seem I have better performance without this check... TODO - remove?
-		   	// if ((mBoundSamplerStatesCount != opState->mSamplerStatesCount) || ( 0 != memcmp(opState->mSamplerStates, mBoundSamplerStates, mBoundSamplerStatesCount) ) )
+			/// Pixel Shader binding
 			{
-				//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-				//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-				mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+				// Assaf: seem I have better performance without this check... TODO - remove?
+		   		// if ((mBoundSamplerStatesCount != opState->mSamplerStatesCount) || ( 0 != memcmp(opState->mSamplerStates, mBoundSamplerStates, mBoundSamplerStatesCount) ) )
+				{
+					//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
+					//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
+					mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+
+				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
 				if (mDevice.isError())
 				{
 					String errorDescription = mDevice.getErrorDescription();
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+						"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
 						"D3D11RenderSystem::_render");
 				}
-
-
-			}
-			mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-			if (mDevice.isError())
-			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-					"D3D11RenderSystem::_render");
 			}
 			
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+			/// Vertex Shader binding
+			if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)
 			{
-				//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-				//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-				mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-				if (mDevice.isError())
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-						"D3D11RenderSystem::_render");
+					//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
+					//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
+					mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
 				}
 
-
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
 			}
 
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-			    if (mDevice.isError())
-			    {
-				    String errorDescription = mDevice.getErrorDescription();
-				    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					    "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-					    "D3D11RenderSystem::_render");
-			    }
-            }
+			/// Compute Shader binding
+			if (mBoundComputeProgram && mBindingType == TextureUnitState::BindingType::BT_COMPUTE)
+			{
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
+					//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
+					mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+				
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+			}
+
+			/// Hull Shader binding
+			if (mBoundTesselationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_HULL)
+			{
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
+					//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
+					mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set hull shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+				
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					mDevice.GetImmediateContext()->HSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set hull shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+			}
+			
+			/// Domain Shader binding
+			if (mBoundTesselationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELATION_DOMAIN)
+			{
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
+					//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
+					mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set domain shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+
+				if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+				{
+					mDevice.GetImmediateContext()->DSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set domain shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+			}
 		}
 
 		ID3D11Buffer* pSOTarget=0;
@@ -2824,6 +2987,116 @@ bail:
 			memset(mNumClassInstances, 0, sizeof(mNumClassInstances));		
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName, unsigned int StartSlot)
+	{
+		RenderTarget *target = mActiveRenderTarget;
+		switch (passNr)
+		{
+		case 1:
+			if (target)
+			{
+				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+				memset(pRTView, 0, sizeof(pRTView));
+
+				target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				//Retrieve depth buffer
+				D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+				// now switch to the new render target
+				mDevice.GetImmediateContext()->OMSetRenderTargets(
+					numberOfViews,
+					pRTView,
+					depthBuffer->getDepthStencilView());
+
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot set render target\nError Description:" + errorDescription,
+						"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+				}
+				
+				mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+				float ClearColor[4];
+				//D3D11Mappings::get(colour, ClearColor);
+				// Clear all views
+				mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
+				if( numberOfViews == 1 )
+					mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
+				else
+				{
+					for( uint i = 0; i < numberOfViews; ++i )
+						mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
+				}
+
+			}
+			break;
+		case 2:
+			if (target)
+			{
+				//
+				// We need to remove the the DST from the Render Targets if we want to use it as a texture :
+				//
+				ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+				memset(pRTView, 0, sizeof(pRTView));
+
+				target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				//Retrieve depth buffer
+				D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+				// now switch to the new render target
+				mDevice.GetImmediateContext()->OMSetRenderTargets(
+					numberOfViews,
+					pRTView,
+					NULL);
+				//mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(mDSTResView);	
+
+				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+						"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+				}
+
+			}
+			break;
+		case 3:
+			//
+			// We need to unbind mDSTResView from the given variable because this buffer
+			// will be used later as the typical depth buffer, again
+			// must call Apply(0) here : to flush SetResource(NULL)
+			//
+			
+			if (target)
+			{
+				uint numberOfViews;
+				target->getCustomAttribute( "numberOfViews", &numberOfViews );
+
+				mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), NULL);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_renderUsingReadBackAsTexture");
+					}			
+			}
+
+			break;
+		}
 	}
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setNormaliseNormals(bool normalise)
@@ -3644,6 +3917,8 @@ bail:
 		mBoundTessellationDomainProgram = NULL;
 		mBoundComputeProgram = NULL;
 
+		mBindingType = TextureUnitState::BT_FRAGMENT;
+
 		ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
 
 		ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
@@ -3713,6 +3988,7 @@ bail:
 		}
 
 		mLastVertexSourceCount = 0;
+		mReadBackAsTexture = false;
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::getCustomAttribute(const String& name, void* pData)

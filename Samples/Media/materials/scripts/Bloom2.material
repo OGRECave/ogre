@@ -125,41 +125,41 @@ fragment_program BrightBloom2_ps20_hlsl hlsl
 //------------------------
 //DirectX 11 HLSL Definitions
 //------------------------	
-//DirectX 11 HLSL Vertex Shader vs_4_0
+//DirectX 11 HLSL Vertex Shader vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 vertex_program Blur_vs40_hlsl hlsl
 {
 	source Blur_vs40.hlsl
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	entry_point main
 }
 
-//DirectX 11 HLSL Pixel Shader ps_4_0
+//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 fragment_program BlurV_ps40_hlsl hlsl
 {
 	source BlurV_ps40.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
 fragment_program BlurH_ps40_hlsl hlsl
 {
 	source BlurH_ps40.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
 
-//DirectX 11 HLSL Pixel Shader ps_4_0
+//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 fragment_program Bloom2_ps40_hlsl hlsl
 {
 	source Bloom2_ps40.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
 
-//DirectX 11 HLSL Pixel Shader ps_4_0
+//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 fragment_program BrightBloom2_ps40_hlsl hlsl
 {
 	source BrightBloom2_ps40.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
 

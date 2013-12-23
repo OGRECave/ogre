@@ -26,9 +26,9 @@ fragment_program SSAO/HemisphereMC_fp_glsl glsl
 
 fragment_program SSAO/HemisphereMC_fp unified
 {
-	delegate SSAO/HemisphereMC_fp_glsl 
+	//delegate SSAO/HemisphereMC_fp_glsl 
 	delegate SSAO/HemisphereMC_fp_hlsl 
-	delegate SSAO/HemisphereMC_fp_cg
+	//delegate SSAO/HemisphereMC_fp_cg
 }
 
 // Monte Carlo Integration of the hemisphere definded by the fragment normal

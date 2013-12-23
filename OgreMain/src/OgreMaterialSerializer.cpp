@@ -4403,6 +4403,21 @@ namespace Ogre
                 writeFragmentProgramRef(pPass);
             }
 
+			if(pPass->hasTesselationHullProgram())
+			{
+				writeTesselationHullProgramRef(pPass);
+			}
+
+			if(pPass->hasTesselationDomainProgram())
+			{
+				writeTesselationDomainProgramRef(pPass);
+			}
+			
+            if (pPass->hasGeometryProgram())
+            {
+                writeGeometryProgramRef(pPass);
+            }
+
             if (pPass->hasShadowCasterVertexProgram())
             {
                 writeShadowCasterVertexProgramRef(pPass);
@@ -4784,9 +4799,17 @@ namespace Ogre
 					writeValue("vertex");
 					break;
                 case TextureUnitState::BT_GEOMETRY:
-                case TextureUnitState::BT_TESSELLATION_DOMAIN:
-                case TextureUnitState::BT_TESSELLATION_HULL:
+                case TextureUnitState::BT_GEOMETRY:
+					writeValue("geometry");
+					break;
+                case TextureUnitState::BT_TESSELATION_DOMAIN:
+					writeValue("tesselation_domain");
+					break;
+                case TextureUnitState::BT_TESSELATION_HULL:
+					writeValue("tesselation_hull");
+					break;
                 case TextureUnitState::BT_COMPUTE:
+					writeValue("compute");
                     break;
 				};
 		
@@ -5098,6 +5121,18 @@ namespace Ogre
             pPass->getVertexProgram(), pPass->getVertexProgramParameters());
     }
     //-----------------------------------------------------------------------
+    void MaterialSerializer::writeTesselationHullProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("tesselation_hull_program_ref",
+			pPass->getTesselationHullProgram(), pPass->getTesselationHullProgramParameters());
+    }
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeTesselationDomainProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("tesselation_domain_program_ref",
+			pPass->getTesselationDomainProgram(), pPass->getTesselationDomainProgramParameters());
+    }
+    //-----------------------------------------------------------------------
     void MaterialSerializer::writeShadowCasterVertexProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("shadow_caster_vertex_program_ref",
@@ -5121,6 +5156,13 @@ namespace Ogre
         writeGpuProgramRef("shadow_receiver_fragment_program_ref",
             pPass->getShadowReceiverFragmentProgram(), pPass->getShadowReceiverFragmentProgramParameters());
     }
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeGeometryProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("geometry_program_ref",
+			pPass->getGeometryProgram(), pPass->getGeometryProgramParameters());
+    }
+    //--
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeFragmentProgramRef(const Pass* pPass)
     {

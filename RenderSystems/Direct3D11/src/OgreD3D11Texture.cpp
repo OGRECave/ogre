@@ -57,6 +57,10 @@ namespace Ogre
 		mp3DTex(NULL),
 		mDynamicTextures(false),
 		mAutoMipMapGeneration(false)
+//#ifdef USE_D3DX11_LIBRARY		
+//		, mEffect(NULL)
+//		, mEffectIndex(0)
+//#endif
 	{
 	}
 	//---------------------------------------------------------------------
@@ -151,6 +155,9 @@ namespace Ogre
 		SAFE_RELEASE(mp1DTex);
 		SAFE_RELEASE(mp2DTex);
 		SAFE_RELEASE(mp3DTex);
+//#ifdef USE_D3DX11_LIBRARY		
+//		SAFE_RELEASE(mEffect(NULL));
+//#endif
 	}
 	//---------------------------------------------------------------------
 	void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -215,6 +222,9 @@ namespace Ogre
 				loadImage(img);
 			}
 		}
+
+        _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
+
 	}
 	//---------------------------------------------------------------------
 #ifdef USE_D3DX11_LIBRARY		
@@ -223,14 +233,40 @@ namespace Ogre
 		HRESULT hr;
 
 		MemoryDataStreamPtr memoryptr=MemoryDataStreamPtr(new MemoryDataStream(dstream));
+
+        D3DX11_IMAGE_LOAD_INFO loadInfo;
+        loadInfo.Usage          = D3D11Mappings::_getUsage(mUsage);
+        loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+		if(mUsage & TU_DYNAMIC)
+        {
+            loadInfo.MipLevels = 1;
+        }
+
+		// TO DO: check cpu access flags and use loadInfo only when it is needed.
+		// this is the first try
+
 		// Load the Texture
-		hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
-			memoryptr->getPtr(),
-			memoryptr->size(),
-			NULL,
-			NULL, 
-			&mpTex, 
-			NULL );
+		if (loadInfo.CpuAccessFlags == D3D11_CPU_ACCESS_WRITE)
+		{
+			hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
+				memoryptr->getPtr(),
+				memoryptr->size(),
+				&loadInfo,
+				NULL, 
+				&mpTex, 
+				NULL );
+		}
+		else
+		{
+			hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
+				memoryptr->getPtr(),
+				memoryptr->size(),
+				NULL,
+				NULL, 
+				&mpTex, 
+				NULL );
+		}
+
 		if( FAILED( hr ) )
 		{
 			LogManager::getSingleton().logMessage("D3D11 : " + mName + " Could not be loaded");
@@ -409,6 +445,12 @@ namespace Ogre
 				"D3D11Texture::_create1DTex");
 		}
 
+//#ifdef USE_D3DX11_LIBRARY
+//		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+//		v->AsShaderResource()->SetResource(mpShaderResourceView);
+//#endif
+
+
 		this->_setFinalAttributes(desc.Width, 1, 1, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 
 	}
@@ -431,9 +473,10 @@ namespace Ogre
 			d3dPF == DXGI_FORMAT_BC4_TYPELESS || d3dPF == DXGI_FORMAT_BC4_UNORM || d3dPF == DXGI_FORMAT_BC4_SNORM ||
 			d3dPF == DXGI_FORMAT_BC5_TYPELESS || d3dPF == DXGI_FORMAT_BC5_UNORM || d3dPF == DXGI_FORMAT_BC5_SNORM ||
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#endif
 			d3dPF == DXGI_FORMAT_BC6H_TYPELESS || d3dPF == DXGI_FORMAT_BC6H_UF16 || d3dPF == DXGI_FORMAT_BC6H_SF16 || 
 			d3dPF == DXGI_FORMAT_BC7_TYPELESS || d3dPF == DXGI_FORMAT_BC7_UNORM || d3dPF == DXGI_FORMAT_BC7_UNORM_SRGB ||
-#endif
+
 			0;
 
 		// determine total number of mipmaps including main one (d3d11 convention)
@@ -581,6 +624,11 @@ namespace Ogre
 				"D3D11Texture::_create2DTex");
 		}
 
+//#ifdef USE_D3DX11_LIBRARY
+//		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+//		v->AsShaderResource()->SetResource(mpShaderResourceView);
+//#endif
+
 		this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 	}
 	//---------------------------------------------------------------------
@@ -659,6 +707,11 @@ namespace Ogre
 				"D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
 				"D3D11Texture::_create3DTex");
 		}
+
+//#ifdef USE_D3DX11_LIBRARY
+//		ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
+//		v->AsShaderResource()->SetResource(mpShaderResourceView);
+//#endif
 
 		this->_setFinalAttributes(desc.Width, desc.Height, desc.Depth, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
 	}

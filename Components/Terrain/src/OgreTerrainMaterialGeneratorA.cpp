@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreShadowCameraSetupPSSM.h"
+#include <fstream>
+#include <string>
 
 namespace Ogre
 {
@@ -87,11 +89,7 @@ namespace Ogre
         , mSM4Available(false)
 	{
 		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
-        if (hmgr.isLanguageSupported("cg"))
-        {
-            mShaderLanguage = "cg";
-        }
-        else if (hmgr.isLanguageSupported("hlsl"))
+		if (hmgr.isLanguageSupported("hlsl"))
         {
             mShaderLanguage = "hlsl";
         }
@@ -102,6 +100,10 @@ namespace Ogre
         else if (hmgr.isLanguageSupported("glsles"))
         {
             mShaderLanguage = "glsles";
+        }
+		else if (hmgr.isLanguageSupported("cg"))
+        {
+            mShaderLanguage = "cg";
         }
         else
         {
@@ -340,14 +342,8 @@ namespace Ogre
 		if (!mShaderGen)
 		{
 			bool check2x = mLayerNormalMappingEnabled || mLayerParallaxMappingEnabled;
-			if (hmgr.isLanguageSupported("cg"))
-            {
-				mShaderGen = OGRE_NEW ShaderHelperCg();
-            }
-			else if (hmgr.isLanguageSupported("hlsl") &&
-				((check2x && gmgr.isSyntaxSupported("ps_4_0")) ||
-				(check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
-				(!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
+			if (hmgr.isLanguageSupported("hlsl") &&
+				((check2x && gmgr.isSyntaxSupported("ps_4_0")) ))
             {
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
             }
@@ -358,6 +354,10 @@ namespace Ogre
 			else if (hmgr.isLanguageSupported("glsles"))
             {
 				mShaderGen = OGRE_NEW ShaderHelperGLSLES();
+            }
+			else if (hmgr.isLanguageSupported("cg"))
+            {
+				mShaderGen = OGRE_NEW ShaderHelperCg();
             }
 			
 			// check SM3 features
@@ -376,20 +376,21 @@ namespace Ogre
 			// global normal map
 			TextureUnitState* tu = pass->createTextureUnitState();
 			tu->setTextureName(terrain->getTerrainNormalMap()->getName());
-			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+			// Bugfix for D3D11 Render System
+			// tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 
 			// global colour map
 			if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
 			{
 				tu = pass->createTextureUnitState(terrain->getGlobalColourMap()->getName());
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// light map
 			if (isLightmapEnabled())
 			{
 				tu = pass->createTextureUnitState(terrain->getLightmap()->getName());
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// blend maps
@@ -399,7 +400,7 @@ namespace Ogre
 			for (uint i = 0; i < numBlendTextures; ++i)
 			{
 				tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
-				tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+				//tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 
 			// layer textures
@@ -471,14 +472,15 @@ namespace Ogre
 
 		StringUtil::StrStreamType sourceStr;
 		generateVertexProgramSource(prof, terrain, tt, sourceStr);
+
 		ret->setSource(sourceStr.str());
 		ret->load();
 		defaultVpParams(prof, terrain, tt, ret);
+
 #if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Vertex Program: " 
 			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
 #endif
-
 		return ret;
 
 	}
@@ -497,9 +499,8 @@ namespace Ogre
 
 #if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Fragment Program: " 
-			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
+			<< ret->getName() << " ***\n" << ret->getSource() << "\n*** ***";
 #endif
-
 		return ret;
 	}
 	//---------------------------------------------------------------------
@@ -754,7 +755,7 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
 	{
 		String progName = terrain->getMaterialName() + "/sm2/vp";
-
+		
 		switch(tt)
 		{
 		case HIGH_LOD:

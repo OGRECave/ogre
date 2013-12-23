@@ -385,6 +385,11 @@ protected:
 	{
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
+		// Bugfix for D3D11 Render System because of pixel format incompatibility when using
+		// vertex compression
+		if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
+			mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
+
 		setupControls();
 		mCameraMan->setTopSpeed(100);
 

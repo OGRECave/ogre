@@ -1,7 +1,5 @@
 struct PS_INPUT
 {
-    float4 oPosition : SV_POSITION;
-    float4 Colour : COLOR;
 #ifdef DEPTH_SHADOWCASTER
 	float3 unused	:	TEXCOORD0;
 	float depth		:	TEXCOORD1;
@@ -14,6 +12,12 @@ struct PS_INPUT
 		float4 lightSpacePos	:	TEXCOORD3;
 	#endif
 #endif
+};
+
+struct VS_OUTPUT
+{
+	float4 Position	:	SV_POSITION;
+	PS_INPUT	ps;
 };
 
 #define SHADOW_BIAS 0
@@ -30,7 +34,7 @@ SamplerState g_samLinear
 //---------------------------------------------
 //Main Pixel Shader
 //---------------------------------------------
-half4 main_ps( PS_INPUT input ,
+half4 main_ps( VS_OUTPUT input ,
 				uniform float4	lightPosition,
 				uniform float3	cameraPosition,
 				uniform half3 	lightAmbient,
@@ -50,15 +54,15 @@ half4 main_ps( PS_INPUT input ,
 {
 	float fShadow = 1.0f;
 #ifdef DEPTH_SHADOWRECEIVER
-	fShadow = calcDepthShadow( shadowMap, input.lightSpacePos, invShadowMapSize );
+	fShadow = calcDepthShadow( shadowMap, input.ps.lightSpacePos, invShadowMapSize );
 #endif
 
-	const half4 baseColour = diffuseMap.Sample(g_samLinear, input.uv0 );
+	const half4 baseColour = diffuseMap.Sample(g_samLinear, input.ps.uv0 );
 	
 	//Blinn-Phong lighting
-	const half3 normal		= normalize( input.Normal );
-	half3 lightDir			= lightPosition.xyz - input.vPos * lightPosition.w;
-	half3 eyeDir			= normalize( cameraPosition - input.vPos  );
+	const half3 normal		= normalize( input.ps.Normal );
+	half3 lightDir			= lightPosition.xyz - input.ps.vPos * lightPosition.w;
+	half3 eyeDir			= normalize( cameraPosition - input.ps.vPos  );
 
 	const half fLength		= length( lightDir );
 	lightDir				= normalize( lightDir );

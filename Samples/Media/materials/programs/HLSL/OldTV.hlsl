@@ -21,7 +21,7 @@ float4 OldTV_ps(float4 posIn: SV_POSITION, float2 img: TEXCOORD0,
     uniform float distortionFreq: register(c3),
     uniform float distortionScale: register(c4),
     uniform float distortionRoll: register(c5),
-    uniform float inerference: register(c7),
+    uniform float interference: register(c7),
     uniform float frameLimit: register(c8),
     uniform float frameShape: register(c0),
     uniform float frameSharpness: register(c1),
@@ -53,5 +53,5 @@ float4 OldTV_ps(float4 posIn: SV_POSITION, float2 img: TEXCOORD0,
    float4 image = Image.Sample(g_sam2D, img);
 
    // Combine frame, distorted image and interference
-   return frame * (inerference * rand.x + image);
+   return frame * (interference * rand.x + image);
 }

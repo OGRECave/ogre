@@ -1180,7 +1180,10 @@ namespace Ogre {
     void D3D11HLSLProgram::createLowLevelImpl(void)
     {
         // Create a low-level program, give it the same name as us
-        mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        if(mAssemblerProgram.get() != this)
+        {
+            mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        }
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
@@ -1512,7 +1515,25 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::setTarget(const String& target)
     {
-        mTarget = target;
+        mTarget = "";
+        vector<String>::type profiles = StringUtil::split(target, " ");
+        for(int i = 0 ; i < profiles.size() ; i++)
+        {
+            String & currentProfile = profiles[i];
+            if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
+            {
+                mTarget = currentProfile;
+                break;
+            }
+        }
+
+        if(mTarget == "")
+        {
+            LogManager::getSingleton().logMessage(
+                "Invalid target for D3D11 shader '" + mName + "' - '" + target + "'");
+        }
+
+
     }
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getCompatibleTarget(void) const

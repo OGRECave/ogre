@@ -145,10 +145,10 @@ class RSStencilOperation: public CompositorInstance::RenderSystemOperation
 public:
 	RSStencilOperation(bool inStencilCheck, CompareFunction inFunc, uint32 inRefValue, uint32 inMask,
 		StencilOperation inStencilFailOp, StencilOperation inDepthFailOp, StencilOperation inPassOp,
-		bool inTwoSidedOperation):
+		bool inTwoSidedOperation, bool inReadBackAsTexture):
 		stencilCheck(inStencilCheck), func(inFunc), refValue(inRefValue), mask(inMask),
 		stencilFailOp(inStencilFailOp), depthFailOp(inDepthFailOp), passOp(inPassOp),
-		twoSidedOperation(inTwoSidedOperation)
+		twoSidedOperation(inTwoSidedOperation), readBackAsTexture(inReadBackAsTexture)
 	{}
 	bool stencilCheck;
 	CompareFunction func; 
@@ -158,11 +158,12 @@ public:
     StencilOperation depthFailOp;
     StencilOperation passOp;
     bool twoSidedOperation;
+	bool readBackAsTexture;
 
 	virtual void execute(SceneManager *sm, RenderSystem *rs)
 	{
 		rs->setStencilCheckEnabled(stencilCheck);
-		rs->setStencilBufferParams(func, refValue, mask, 0xFFFFFFFF, stencilFailOp, depthFailOp, passOp, twoSidedOperation);
+		rs->setStencilBufferParams(func, refValue, mask, 0xFFFFFFFF, stencilFailOp, depthFailOp, passOp, twoSidedOperation, readBackAsTexture);
 	}
 };
 
@@ -322,7 +323,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 			queueRenderSystemOp(finalState, OGRE_NEW RSStencilOperation(
 				pass->getStencilCheck(),pass->getStencilFunc(), pass->getStencilRefValue(),
 				pass->getStencilMask(), pass->getStencilFailOp(), pass->getStencilDepthFailOp(),
-				pass->getStencilPassOp(), pass->getStencilTwoSidedOperation()
+				pass->getStencilPassOp(), pass->getStencilTwoSidedOperation(), pass->getStencilReadBackAsTextureOperation()
 				));
             break;
 		case CompositionPass::PT_RENDERSCENE: 

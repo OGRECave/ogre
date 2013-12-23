@@ -869,6 +869,33 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 			"FFPTexturing::setTextureUnit");
 	}
 	
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_GEOMETRY)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support geometry texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_COMPUTE)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support comput texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELATION_DOMAIN)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support domain texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELATION_HULL)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support hull texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
 
 	TextureUnitParams& curParams = mTextureUnitParamsList[index];
 

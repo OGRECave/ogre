@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/B&W_Cg_FP cg
 {
 	source GrayScale.cg
 	entry_point GrayScale_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
