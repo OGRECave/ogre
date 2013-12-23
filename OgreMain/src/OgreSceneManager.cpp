@@ -1972,6 +1972,10 @@ void SceneManager::updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size
 {
 	assert( !bySkeletonDef.skeletons.empty() );
 
+#ifndef NDEBUG
+	BoneTransform _hiddenTransform;
+#endif
+
 	//Unlike regular nodes, bones' number of parents and children is known before hand, thus
 	//when magicDistance = 25; we update the root bones of the first 25 skeletons, then the children
 	//of those bones, and so on; then we move to the next 25 skeletons. This behavior slightly
@@ -2000,7 +2004,7 @@ void SceneManager::updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size
 			size_t numNodes = lastTransforms[i].mOwner - firstTransforms[i].mOwner +
 								lastTransforms[i].mIndex + firstTransforms[i].mIndex +
 								depthLevelInfo[i].numBonesInLevel;
-			assert( numNodes <= bySkeletonDef.boneMemoryManager.getFirstNode( BoneTransform(), i ) );
+			assert( numNodes <= bySkeletonDef.boneMemoryManager.getFirstNode( _hiddenTransform, i ) );
 
 			Bone::updateAllTransforms( numNodes, firstTransforms[i], reverseBind,
 										depthLevelInfo[i].numBonesInLevel );

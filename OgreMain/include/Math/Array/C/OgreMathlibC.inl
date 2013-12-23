@@ -37,7 +37,7 @@ namespace Ogre
 		outIntegral = static_cast<ArrayReal>( _outIntegral );
 		return fractpart;
 #else
-		return modf( x, &outIntegral );
+		return modff( x, &outIntegral );
 #endif
 	}
 	//-----------------------------------------------------------------------------------
