@@ -452,7 +452,8 @@ void Sample_NewInstancing::clearScene()
 //-----------------------------------------------------------------------------------
 void Sample_NewInstancing::destroyManagers()
 {
-	mSceneMgr->destroyInstanceManager(mCurrentManager);
+	if( mCurrentManager )
+		mSceneMgr->destroyInstanceManager(mCurrentManager);
 }
 
 //------------------------------------------------------------------------------

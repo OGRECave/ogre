@@ -280,6 +280,21 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
+	void SkeletonDef::getBonesPerDepth( vector<size_t>::type &out ) const
+	{
+		out.clear();
+		out.reserve( mDepthLevelInfoVec.size() );
+
+		DepthLevelInfoVec::const_iterator itor = mDepthLevelInfoVec.begin();
+		DepthLevelInfoVec::const_iterator end  = mDepthLevelInfoVec.end();
+
+		while( itor != end )
+		{
+			out.push_back( itor->numBonesInLevel );
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	size_t SkeletonDef::getNumberOfBoneBlocks( size_t numLevels ) const
 	{
 		size_t numBlocks = 0;

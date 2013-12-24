@@ -248,6 +248,13 @@ namespace Ogre
 			BoneTransform t = *itor;
 			for( size_t i=0; i<itDepthLevelInfo->numBonesInLevel; i += ARRAY_PACKED_REALS )
 			{
+				OGRE_PREFETCH_T0( (const char*)(t.mPosition + 4) );
+				OGRE_PREFETCH_T0( (const char*)(t.mOrientation + 4) );
+				OGRE_PREFETCH_T0( (const char*)(t.mScale + 4) );
+				OGRE_PREFETCH_T0( (const char*)(t.mPosition + 8) );
+				OGRE_PREFETCH_T0( (const char*)(t.mOrientation + 8) );
+				OGRE_PREFETCH_T0( (const char*)(t.mScale + 8) );
+
 				*t.mPosition = Math::lerp( *t.mPosition, bindPose->mPosition, *manualBones );
 				*t.mOrientation = Math::lerp( *t.mOrientation, bindPose->mOrientation, *manualBones );
 				*t.mScale = Math::lerp( *t.mScale, bindPose->mScale, *manualBones );

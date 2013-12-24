@@ -71,6 +71,11 @@ namespace Ogre
 		BoneMemoryManager();
 		virtual ~BoneMemoryManager();
 
+		/** Since skeleton's hierarchy structure is known beforehand, we use this information for setting
+			a better optimal cleanup value, to avoid excessive stalls when destroying skeleton instances.
+		*/
+		void _growToDepth( const vector<size_t>::type &bonesPerDepth );
+
 		/** Requests memory for the given transform for the first, initializing values.
 		@param outTransform
 			Transform with filled pointers

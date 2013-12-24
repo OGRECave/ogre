@@ -41,6 +41,14 @@ namespace Ogre
 		threadStarts.resize( threadCount + 1, 0 );
 	}
 	//-----------------------------------------------------------------------
+	void BySkeletonDef::initializeMemoryManager(void)
+	{
+		vector<size_t>::type bonesPerDepth;
+		skeletonDef->getBonesPerDepth( bonesPerDepth );
+		boneMemoryManager._growToDepth( bonesPerDepth );
+		boneMemoryManager.setBoneRebaseListener( this );
+	}
+	//-----------------------------------------------------------------------
 	void BySkeletonDef::updateThreadStarts(void)
 	{
 		size_t lastStart = 0;
@@ -83,7 +91,7 @@ namespace Ogre
 		if( itor == bySkeletonDefs.end() )
 		{
 			bySkeletonDefs.push_front( BySkeletonDef( skeletonDef, numWorkerThreads ) );
-			bySkeletonDefs.front().boneMemoryManager.setBoneRebaseListener( &bySkeletonDefs.front() );
+			bySkeletonDefs.front().initializeMemoryManager();
 			itor = bySkeletonDefs.begin();
 		}
 

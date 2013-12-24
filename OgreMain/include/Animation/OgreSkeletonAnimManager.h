@@ -63,6 +63,9 @@ namespace Ogre
 		FastArray<size_t>				threadStarts;
 
 		BySkeletonDef( const SkeletonDef *skeletonDef, size_t threadCount );
+
+		void initializeMemoryManager(void);
+
 		void updateThreadStarts(void);
 		void _updateBoneStartTransforms(void);
 

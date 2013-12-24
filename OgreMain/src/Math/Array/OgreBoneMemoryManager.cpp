@@ -58,8 +58,31 @@ namespace Ogre
 		//TODO: (dark_sylinc) give a specialized hint for each depth.
 		while( newDepth >= mMemoryManagers.size() )
 		{
-			//For bones, cleanup threahold must be multiple of ARRAY_PACKED_REALS - 1.
-			size_t cleanupThreshold = 26 * ARRAY_PACKED_REALS - 1;
+			//Disable cleanups if we fall here (use _growToDepth instead)
+			mMemoryManagers.push_back( BoneArrayMemoryManager( mMemoryManagers.size(), 100,
+																-1, ArrayMemoryManager::MAX_MEMORY_SLOTS,
+																this ) );
+			mMemoryManagers.back().initialize();
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void BoneMemoryManager::_growToDepth( const vector<size_t>::type &bonesPerDepth )
+	{
+		mMemoryManagers.reserve( bonesPerDepth.size() );
+		//TODO: (dark_sylinc) give a specialized hint for each depth (number of skeletons).
+		while( bonesPerDepth.size() > mMemoryManagers.size() )
+		{
+			size_t depthIdx = mMemoryManagers.size();
+
+			size_t numSlots = bonesPerDepth[depthIdx];
+			if( numSlots > ARRAY_PACKED_REALS >> 1 )
+			{
+				//For bones, cleanup threshold must be multiple of ARRAY_PACKED_REALS - 1.
+				numSlots = (((bonesPerDepth[depthIdx] - 1) / ARRAY_PACKED_REALS) + 1) *
+																	ARRAY_PACKED_REALS;
+			}
+
+			size_t cleanupThreshold = 50 * numSlots - 1; //50 is arbitrary
 			mMemoryManagers.push_back( BoneArrayMemoryManager( mMemoryManagers.size(), 100,
 																cleanupThreshold,
 																ArrayMemoryManager::MAX_MEMORY_SLOTS,
