@@ -264,7 +264,7 @@ namespace Ogre
 		*/
 		static inline __m128 CompareLessEqual( __m128 a, __m128 b )
 		{
-			return _mm_cmplt_ps( a, b );
+			return _mm_cmple_ps( a, b );
 		}
 
 		/** Returns the result of "a > b"

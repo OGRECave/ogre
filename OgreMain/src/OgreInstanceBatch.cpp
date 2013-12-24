@@ -188,13 +188,13 @@ namespace Ogre
 
 			//Merge with bounds only if they're in use (and not explicitly hidden,
 			//but may be invisible for some cameras or out of frustum)
-			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
-			vMinBounds.CmovRobust( inUse, newVal );
+			ArrayVector3 oldVal( vMinBounds );
+			vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( inUse, oldVal );
 
-			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
-			vMaxBounds.CmovRobust( inUse, newVal );
+			oldVal = vMaxBounds;
+			vMaxBounds.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( inUse, oldVal );
 
 			//maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
 
