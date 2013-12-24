@@ -142,7 +142,7 @@ struct _OgreLodExport LodData {
 	/// Makes possible to get the vertices with the smallest collapse cost.
 	CollapseCostHeap mCollapseCostHeap;
 	IndexBufferInfoList mIndexBufferInfoList;
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
 	/**
 	 * @brief The name of the mesh being processed.
 	 *
