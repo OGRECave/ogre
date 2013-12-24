@@ -396,7 +396,8 @@ set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
   1 - Standard allocator
   2 - nedmalloc
   3 - User-provided allocator
-  4 - nedmalloc with pooling"
+  4 - nedmalloc with pooling
+  5 - Debug allocator that will assert on most forms of memory corruption and provides deterministic memory addressing (for easier debugging w/ data breakpoints). Not indended for release or deployment."
 )
 endif ()
 
