@@ -45,7 +45,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
  public:
 
  Sample_Terrain()
-     : mTerrainGroup(0)
+     : mTerrainGlobals(0)
+        , mTerrainGroup(0)
         , mTerrainPaging(0)
         , mPageManager(0)
         , mFly(false)
@@ -75,13 +76,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
                         "so you cannot run this sample. Sorry!", "Sample_Terrain::testCapabilities");
-        }
-        else if (Root::getSingleton().getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                        "Sample currently out of order in the OpenGL 3+ render system."
-                        "  Try again soon!",
-                        "Sample_Terrain::testCapabilities");
         }
     }
 
