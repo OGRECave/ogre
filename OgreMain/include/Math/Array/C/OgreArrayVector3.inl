@@ -433,18 +433,18 @@ namespace Ogre
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.mChunkBase[0];
-		aChunkBase[0] = MathlibC::Cmov4( bChunkBase[0], aChunkBase[0], mask );
-		aChunkBase[1] = MathlibC::Cmov4( bChunkBase[1], aChunkBase[1], mask );
-		aChunkBase[2] = MathlibC::Cmov4( bChunkBase[2], aChunkBase[2], mask );
+		aChunkBase[0] = MathlibC::Cmov4( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibC::Cmov4( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibC::Cmov4( aChunkBase[2], bChunkBase[2], mask );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::CmovRobust( ArrayMaskR mask, const ArrayVector3 &replacement )
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = &mChunkBase[0];
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = &replacement.mChunkBase[0];
-		aChunkBase[0] = MathlibC::CmovRobust( bChunkBase[0], aChunkBase[0], mask );
-		aChunkBase[1] = MathlibC::CmovRobust( bChunkBase[1], aChunkBase[1], mask );
-		aChunkBase[2] = MathlibC::CmovRobust( bChunkBase[2], aChunkBase[2], mask );
+		aChunkBase[0] = MathlibC::CmovRobust( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibC::CmovRobust( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibC::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
 	}
 	//-----------------------------------------------------------------------------------
 

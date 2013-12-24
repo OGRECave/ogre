@@ -601,18 +601,18 @@ namespace Ogre
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
-		aChunkBase[0] = MathlibNEON::Cmov4( bChunkBase[0], aChunkBase[0], mask );
-		aChunkBase[1] = MathlibNEON::Cmov4( bChunkBase[1], aChunkBase[1], mask );
-		aChunkBase[2] = MathlibNEON::Cmov4( bChunkBase[2], aChunkBase[2], mask );
+		aChunkBase[0] = MathlibNEON::Cmov4( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibNEON::Cmov4( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibNEON::Cmov4( aChunkBase[2], bChunkBase[2], mask );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayVector3::CmovRobust( ArrayReal mask, const ArrayVector3 &replacement )
 	{
 		ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
 		const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
-		aChunkBase[0] = MathlibNEON::CmovRobust( bChunkBase[0], aChunkBase[0], mask );
-		aChunkBase[1] = MathlibNEON::CmovRobust( bChunkBase[1], aChunkBase[1], mask );
-		aChunkBase[2] = MathlibNEON::CmovRobust( bChunkBase[2], aChunkBase[2], mask );
+		aChunkBase[0] = MathlibNEON::CmovRobust( aChunkBase[0], bChunkBase[0], mask );
+		aChunkBase[1] = MathlibNEON::CmovRobust( aChunkBase[1], bChunkBase[1], mask );
+		aChunkBase[2] = MathlibNEON::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
 	}
 	//-----------------------------------------------------------------------------------
 
