@@ -36,7 +36,7 @@ namespace Ogre
 	///		particularly of the update operations ( a *= b )
 	///		This function will assert if OGRE_RESTRICT_ALIASING is enabled and any of the
 	///		given pointers point to the same location
-	inline void concatArrayMatAf4x3 ( ArrayReal * RESTRICT_ALIAS outChunkBase,
+	FORCEINLINE void concatArrayMatAf4x3( ArrayReal * RESTRICT_ALIAS outChunkBase,
 										const ArrayReal * RESTRICT_ALIAS lhsChunkBase,
 										const ArrayReal * RESTRICT_ALIAS rhsChunkBase )
 	{
@@ -91,7 +91,7 @@ namespace Ogre
 	}
 
 	/// Update version
-	inline void concatArrayMatAf4x3( ArrayReal * RESTRICT_ALIAS lhsChunkBase,
+	FORCEINLINE void concatArrayMatAf4x3( ArrayReal * RESTRICT_ALIAS lhsChunkBase,
 										const ArrayReal * RESTRICT_ALIAS rhsChunkBase )
 	{
 #if OGRE_RESTRICT_ALIASING != 0
@@ -155,7 +155,7 @@ namespace Ogre
 											lhsChunkBase[11] ) ) );
 	}
 
-	inline ArrayMatrixAf4x3 operator * ( const ArrayMatrixAf4x3 &lhs, const ArrayMatrixAf4x3 &rhs )
+	FORCEINLINE ArrayMatrixAf4x3 operator * ( const ArrayMatrixAf4x3 &lhs, const ArrayMatrixAf4x3 &rhs )
 	{
 		ArrayMatrixAf4x3 retVal;
 		concatArrayMatAf4x3( retVal.mChunkBase, lhs.mChunkBase, rhs.mChunkBase );
@@ -194,7 +194,7 @@ namespace Ogre
 							mChunkBase[11] ) ) );
 	}
 	//-----------------------------------------------------------------------------------
-	inline void ArrayMatrixAf4x3::operator *= ( const ArrayMatrixAf4x3 &rhs )
+	FORCEINLINE void ArrayMatrixAf4x3::operator *= ( const ArrayMatrixAf4x3 &rhs )
 	{
 		concatArrayMatAf4x3( mChunkBase, rhs.mChunkBase );
 	}
@@ -505,6 +505,60 @@ namespace Ogre
 							this->mChunkBase[10], this->mChunkBase[11],
 							dst[0].mChunkBase[2], dst[1].mChunkBase[2],
 							dst[2].mChunkBase[2], dst[3].mChunkBase[2] );
+	}
+	//-----------------------------------------------------------------------------------
+	inline void ArrayMatrixAf4x3::streamToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS _dst ) const
+	{
+		//Do not use the unpack version, use the shuffle. Shuffle is faster in k10 processors
+		//("The conceptual shuffle" http://developer.amd.com/community/blog/the-conceptual-shuffle/)
+		//and the unpack version uses 64-bit moves, which can cause store forwarding issues when
+		//then loading them with 128-bit movaps
+#define _MM_TRANSPOSE4_SRC_DST_PS(row0, row1, row2, row3, dst0, dst1, dst2, dst3) { \
+			__m128 tmp3, tmp2, tmp1, tmp0;                          \
+																	\
+			tmp0   = _mm_shuffle_ps((row0), (row1), 0x44);          \
+			tmp2   = _mm_shuffle_ps((row0), (row1), 0xEE);          \
+			tmp1   = _mm_shuffle_ps((row2), (row3), 0x44);          \
+			tmp3   = _mm_shuffle_ps((row2), (row3), 0xEE);          \
+																	\
+			(dst0) = _mm_shuffle_ps(tmp0, tmp1, 0x88);              \
+			(dst1) = _mm_shuffle_ps(tmp0, tmp1, 0xDD);              \
+			(dst2) = _mm_shuffle_ps(tmp2, tmp3, 0x88);              \
+			(dst3) = _mm_shuffle_ps(tmp2, tmp3, 0xDD);              \
+		}
+
+		register __m128 dst0, dst1, dst2, dst3;
+		Real *dst = reinterpret_cast<Real*>( _dst );
+
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->mChunkBase[0], this->mChunkBase[1],
+							this->mChunkBase[2], this->mChunkBase[3],
+							dst0, dst1, dst2, dst3 );
+
+		_mm_stream_ps( &dst[0],  dst0 );
+		_mm_stream_ps( &dst[12], dst1 );
+		_mm_stream_ps( &dst[24], dst2 );
+		_mm_stream_ps( &dst[36], dst3 );
+
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->mChunkBase[4], this->mChunkBase[5],
+							this->mChunkBase[6], this->mChunkBase[7],
+							dst0, dst1, dst2, dst3 );
+
+		_mm_stream_ps( &dst[4],  dst0 );
+		_mm_stream_ps( &dst[16], dst1 );
+		_mm_stream_ps( &dst[28], dst2 );
+		_mm_stream_ps( &dst[40], dst3 );
+
+		_MM_TRANSPOSE4_SRC_DST_PS(
+							this->mChunkBase[8], this->mChunkBase[9],
+							this->mChunkBase[10], this->mChunkBase[11],
+							dst0, dst1, dst2, dst3 );
+
+		_mm_stream_ps( &dst[8],  dst0 );
+		_mm_stream_ps( &dst[20], dst1 );
+		_mm_stream_ps( &dst[32], dst2 );
+		_mm_stream_ps( &dst[44], dst3 );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS src )

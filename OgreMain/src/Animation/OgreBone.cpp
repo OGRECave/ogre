@@ -340,8 +340,10 @@ namespace Ogre {
 				first reverse transform by the Bone's original derived position/orientation/scale,
 				then transform by the new derived position/orientation/scale.
 			*/
-			derivedTransform = nodeMat * ( derivedTransform * (*reverseBind) );
-			derivedTransform.storeToAoS( t.mFinalTransform );
+			//derivedTransform = nodeMat * ( derivedTransform * (*reverseBind) );
+			derivedTransform *= *reverseBind;
+			derivedTransform = nodeMat * derivedTransform;
+			derivedTransform.streamToAoS( t.mFinalTransform );
 
 #ifndef NDEBUG
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )

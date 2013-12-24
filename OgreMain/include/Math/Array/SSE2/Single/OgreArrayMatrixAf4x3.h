@@ -112,13 +112,13 @@ namespace Ogre
 		}
 
 		// Concatenation
-		inline friend ArrayMatrixAf4x3 operator * ( const ArrayMatrixAf4x3 &lhs, const ArrayMatrixAf4x3 &rhs );
+		FORCEINLINE friend ArrayMatrixAf4x3 operator * ( const ArrayMatrixAf4x3 &lhs, const ArrayMatrixAf4x3 &rhs );
 
 		inline ArrayVector3 operator * ( const ArrayVector3 &rhs ) const;
 
 		/// Prefer the update version 'a *= b' A LOT over 'a = a * b'
 		///	(copying from an ArrayMatrix4 is 256 bytes!)
-		inline void operator *= ( const ArrayMatrixAf4x3 &rhs );
+		FORCEINLINE void operator *= ( const ArrayMatrixAf4x3 &rhs );
 
 		/**	Converts the given quaternion to a 3x3 matrix representation and fill our values
 			@remarks
@@ -166,6 +166,7 @@ namespace Ogre
 		*/
 		inline void streamToAoS( Matrix4 * RESTRICT_ALIAS dst ) const;
 		inline void storeToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS src ) const;
+		inline void streamToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS src ) const;
 
 		/** Converts ARRAY_PACKED_REALS matrices into this ArrayMatrix
 		@remarks
