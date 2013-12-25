@@ -124,6 +124,27 @@ namespace Ogre
 			}
 		}
 
+        /// Sets all packed matrices to the same value as the scalar input matrix
+		void setAll( const Matrix4 &m )
+		{
+			mChunkBase[0]  = vdupq_n_f32( m._m[0] );
+			mChunkBase[1]  = vdupq_n_f32( m._m[1] );
+			mChunkBase[2]  = vdupq_n_f32( m._m[2] );
+			mChunkBase[3]  = vdupq_n_f32( m._m[3] );
+			mChunkBase[4]  = vdupq_n_f32( m._m[4] );
+			mChunkBase[5]  = vdupq_n_f32( m._m[5] );
+			mChunkBase[6]  = vdupq_n_f32( m._m[6] );
+			mChunkBase[7]  = vdupq_n_f32( m._m[7] );
+			mChunkBase[8]  = vdupq_n_f32( m._m[8] );
+			mChunkBase[9]  = vdupq_n_f32( m._m[9] );
+			mChunkBase[10] = vdupq_n_f32( m._m[10] );
+			mChunkBase[11] = vdupq_n_f32( m._m[11] );
+			mChunkBase[12] = vdupq_n_f32( m._m[12] );
+			mChunkBase[13] = vdupq_n_f32( m._m[13] );
+			mChunkBase[14] = vdupq_n_f32( m._m[14] );
+			mChunkBase[15] = vdupq_n_f32( m._m[15] );
+		}
+
 		static ArrayMatrix4 createAllFromMatrix4( const Matrix4 &m )
 		{
 			ArrayMatrix4 retVal;

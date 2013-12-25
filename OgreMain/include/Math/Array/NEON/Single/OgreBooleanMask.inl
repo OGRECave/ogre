@@ -40,6 +40,17 @@ namespace Ogre
 		return mMasks[idx];
 	}
 	//--------------------------------------------------------------------------------------
+	inline bool BooleanMask4::allBitsSet( bool mask0[4], bool mask1[4] )
+	{
+#if __cplusplus > 199711L //C++11
+		static_assert( sizeof(bool) == 1 && sizeof(uint32) == 4,
+                      "This code relies on correct casting!" );
+#else
+		assert( sizeof(bool) == 1 && sizeof(uint32) == 4 && "This code relies on correct casting!" );
+#endif
+		return ( *reinterpret_cast<uint32*>(mask0) & *reinterpret_cast<uint32*>(mask1) ) == 0x01010101;
+	}
+	//--------------------------------------------------------------------------------------
 	inline uint32 BooleanMask4::getScalarMask( ArrayReal mask )
 	{
 		return static_cast<uint32>( vmovemaskq_u32( mask ) );

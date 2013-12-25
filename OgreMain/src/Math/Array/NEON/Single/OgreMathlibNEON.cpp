@@ -52,6 +52,7 @@ namespace Ogre
 	const ArrayReal MathlibNEON::INFINITEA	= vdupq_n_f32( std::numeric_limits<Real>::infinity() );
 	const ArrayReal MathlibNEON::MAX_NEG	= vdupq_n_f32( -std::numeric_limits<Real>::max() );
 	const ArrayReal MathlibNEON::MAX_POS	= vdupq_n_f32( std::numeric_limits<Real>::max() );
+	const ArrayReal MathlibNEON::LAST_AFFINE_COLUMN = (ArrayReal) { 1, 0, 0, 0 };
 
 	static const Real _PI = Real( 4.0 * atan( 1.0 ) );
 	//We can't use Math::fDeg2Rad & Math::fRad2Deg directly because
@@ -119,22 +120,22 @@ namespace Ogre
 
 	const ArrayReal BooleanMask4::mMasks[NUM_MASKS] =
 	{
-		(ArrayReal) uint32x4_t { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },//MASK_NONE
-		(ArrayReal) uint32x4_t { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },//MASK_X
-		(ArrayReal) uint32x4_t { 0x00000000, 0xffffffff, 0x00000000, 0x00000000 },//MASK_Y
-		(ArrayReal) uint32x4_t { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },//MASK_XY
-		(ArrayReal) uint32x4_t { 0x00000000, 0x00000000, 0xffffffff, 0x00000000 },//MASK_Z
-		(ArrayReal) uint32x4_t { 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 },//MASK_XZ
-		(ArrayReal) uint32x4_t { 0x00000000, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_YZ
-		(ArrayReal) uint32x4_t { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_XYZ
-		(ArrayReal) uint32x4_t { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },//MASK_W
-		(ArrayReal) uint32x4_t { 0xffffffff, 0x00000000, 0x00000000, 0xffffffff },//MASK_XW
-		(ArrayReal) uint32x4_t { 0x00000000, 0xffffffff, 0x00000000, 0xffffffff },//MASK_YW
-		(ArrayReal) uint32x4_t { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff },//MASK_XYW
-		(ArrayReal) uint32x4_t { 0x00000000, 0x00000000, 0xffffffff, 0xffffffff },//MASK_ZW
-		(ArrayReal) uint32x4_t { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff },//MASK_XZW
-		(ArrayReal) uint32x4_t { 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff },//MASK_YZW
-        (ArrayReal) uint32x4_t { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff } //MASK_XYZW
+		(ArrayReal) { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },//MASK_NONE
+		(ArrayReal) { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },//MASK_X
+		(ArrayReal) { 0x00000000, 0xffffffff, 0x00000000, 0x00000000 },//MASK_Y
+		(ArrayReal) { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },//MASK_XY
+		(ArrayReal) { 0x00000000, 0x00000000, 0xffffffff, 0x00000000 },//MASK_Z
+		(ArrayReal) { 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 },//MASK_XZ
+		(ArrayReal) { 0x00000000, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_YZ
+		(ArrayReal) { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_XYZ
+		(ArrayReal) { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },//MASK_W
+		(ArrayReal) { 0xffffffff, 0x00000000, 0x00000000, 0xffffffff },//MASK_XW
+		(ArrayReal) { 0x00000000, 0xffffffff, 0x00000000, 0xffffffff },//MASK_YW
+		(ArrayReal) { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff },//MASK_XYW
+		(ArrayReal) { 0x00000000, 0x00000000, 0xffffffff, 0xffffffff },//MASK_ZW
+		(ArrayReal) { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff },//MASK_XZW
+		(ArrayReal) { 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff },//MASK_YZW
+        (ArrayReal) { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff } //MASK_XYZW
 	};
 }
 #endif
