@@ -221,7 +221,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void SkeletonInstance::update(void)
 	{
-		resetToPose();
+		if( !mActiveAnimations.empty() )
+			resetToPose();
+
 		ActiveAnimationsVec::iterator itor = mActiveAnimations.begin();
 		ActiveAnimationsVec::iterator end  = mActiveAnimations.end();
 
