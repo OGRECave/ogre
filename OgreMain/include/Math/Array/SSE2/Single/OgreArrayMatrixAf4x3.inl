@@ -263,7 +263,7 @@ namespace Ogre
 
 		//det = m00 * t00 + m01 * t10 + m02 * t20
 		ArrayReal det	= _mm_madd_ps( m00, t00, _mm_madd_ps( m01, t10,  _mm_mul_ps( m02, t20 ) ) );
-		ArrayReal invDet= MathlibSSE2::Inv4( det );
+		ArrayReal invDet= _mm_div_ps( MathlibSSE2::ONE, det ); //High precision division
 
 		t00 = _mm_mul_ps( t00, invDet );
 		t10 = _mm_mul_ps( t10, invDet );
@@ -327,7 +327,7 @@ namespace Ogre
 
 		//det = m00 * t00 + m01 * t10 + m02 * t20
 		ArrayReal det	= _mm_madd_ps( m00, t00, _mm_madd_ps( m01, t10,  _mm_mul_ps( m02, t20 ) ) );
-		ArrayReal invDet= MathlibSSE2::Inv4( det );
+		ArrayReal invDet= _mm_div_ps( MathlibSSE2::ONE, det ); //High precision division
 
 		//degenerateMask = Abs( det ) < fEpsilon;
 		ArrayMaskR degenerateMask = _mm_cmplt_ps( MathlibSSE2::Abs4( det ), MathlibSSE2::fEpsilon );

@@ -236,7 +236,7 @@ namespace Ogre
 
 		//det = m00 * t00 + m01 * t10 + m02 * t20
 		ArrayReal det	= m00 * t00 + m01 * t10 + m02 * t20;
-		ArrayReal invDet= MathlibC::Inv4( det );
+		ArrayReal invDet= 1.0f / det; //High precision division
 
 		t00 = t00 * invDet;
 		t10 = t10 * invDet;
@@ -313,7 +313,7 @@ namespace Ogre
 		}
 		else
 		{
-			ArrayReal invDet = MathlibC::Inv4( det );
+			ArrayReal invDet = 1.0f / det; //High precision division
 
 			t00 = t00 * invDet;
 			t10 = t10 * invDet;
