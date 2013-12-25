@@ -199,6 +199,9 @@ namespace Ogre {
         */
         virtual void _notifyMoved(void);
 
+		/// @See Node::_callMemoryChangeListeners
+		virtual void _notifyParentNodeMemoryChanged(void) {}
+
 		/// Checks whether this MovableObject is static. @See setStatic
 		bool isStatic() const;
 

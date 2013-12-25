@@ -147,9 +147,9 @@ namespace Ogre {
 			return;
 
 		// Is mesh skeletally animated?
-		if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull())
+		if (mMesh->hasSkeleton() && !mMesh->getOldSkeleton().isNull())
 		{
-			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getOldSkeleton());
 			mSkeletonInstance->load();
 		}
 
@@ -294,7 +294,7 @@ namespace Ogre {
         return mMesh;
     }
 	//-----------------------------------------------------------------------
-	SubEntity* Entity::getSubEntity(unsigned int index)
+	SubEntity* Entity::getSubEntity(size_t index)
 	{
 		if (index >= mSubEntityList.size())
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -303,7 +303,7 @@ namespace Ogre {
 		return &mSubEntityList[index];
 	}
     //-----------------------------------------------------------------------
-	const SubEntity* Entity::getSubEntity(unsigned int index) const
+	const SubEntity* Entity::getSubEntity(size_t index) const
     {
         if (index >= mSubEntityList.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -314,13 +314,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	SubEntity* Entity::getSubEntity(const String& name)
     {
-        ushort index = mMesh->_getSubMeshIndex(name);
+        size_t index = mMesh->_getSubMeshIndex(name);
 		return getSubEntity(index);
 	}
 	//-----------------------------------------------------------------------
 	const SubEntity* Entity::getSubEntity(const String& name) const
 	{
-		ushort index = mMesh->_getSubMeshIndex(name);
+		size_t index = mMesh->_getSubMeshIndex(name);
 		return getSubEntity(index);
 	}
 	//-----------------------------------------------------------------------
@@ -650,7 +650,7 @@ namespace Ogre {
         // Animation dirty if animation state modified or manual bones modified
         bool animationDirty =
             (mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
-            (hasSkeleton() && getSkeleton()->getManualBonesDirty());
+			(hasSkeleton() && getSkeleton()->getManualBonesDirty());
 		
 		//update the current hardware animation state
 		mCurrentHWAnimationState = hwAnimation;
@@ -1162,13 +1162,13 @@ namespace Ogre {
     bool Entity::_isAnimated(void) const
     {
         return (mAnimationState && mAnimationState->hasEnabledAnimationState()) ||
-               (getSkeleton() && getSkeleton()->hasManualBones());
+			   (getSkeleton() && getSkeleton()->hasManualBones());
     }
 	//-----------------------------------------------------------------------
     bool Entity::_isSkeletonAnimated(void) const
     {
-        return getSkeleton() &&
-            (mAnimationState->hasEnabledAnimationState() || getSkeleton()->hasManualBones());
+		return getSkeleton() &&
+			(mAnimationState->hasEnabledAnimationState() || getSkeleton()->hasManualBones());
     }
 	//-----------------------------------------------------------------------
 	VertexData* Entity::_getSkelAnimVertexData(void) const
@@ -1773,7 +1773,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)
     {
-        if (entity->getMesh()->getSkeleton() != getMesh()->getSkeleton())
+		if (entity->getMesh()->getOldSkeleton() != getMesh()->getOldSkeleton())
         {
             OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
                 "The supplied entity has a different skeleton.",
@@ -1837,7 +1837,7 @@ namespace Ogre {
         }
         else
         {
-            mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getOldSkeleton());
             mSkeletonInstance->load();
             mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);
@@ -1938,8 +1938,8 @@ namespace Ogre {
 			e != mLodEntityList.end(); ++e, ++lodi)
 		{
 			
-			uint nsub = (*e)->getNumSubEntities();
-			for (uint s = 0; s < nsub; ++s)
+			size_t nsub = (*e)->getNumSubEntities();
+			for (size_t s = 0; s < nsub; ++s)
 			{
 				visitor->visit((*e)->getSubEntity(s), lodi, false);
 			}

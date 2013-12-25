@@ -51,7 +51,7 @@ namespace Ogre
 	*/
 
 	/// Represents the instance of a Skeletal animation based on its definition
-	class SkeletonAnimation : public MovableAlloc
+	class _OgreExport SkeletonAnimation : public MovableAlloc
 	{
 		SkeletonAnimationDef const	*mDefinition;
 	protected:
@@ -133,6 +133,10 @@ namespace Ogre
 
 		/** Gets a pointer current per-bone weight of a particular bone. Useful if you intend
 			to have read/write access to this value very often.
+		@remarks
+			If returnPtr is the return value to bone[0], do not assume that returnPtr+1
+			affects bone[1] or even any other bone. Doing so the behavior is underfined
+			and most likely you could be affecting the contents of other SkeletonInstances.
 		@param boneName
 			The name of the bone to get. If this animation doesn't affect that bone (or the
 			name is invalid) this function returns a null pointer.

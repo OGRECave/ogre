@@ -38,7 +38,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class ArrayInterQuaternion;
 
 	/** \addtogroup Core
 	*  @{

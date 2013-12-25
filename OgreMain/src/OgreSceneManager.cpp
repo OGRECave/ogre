@@ -69,6 +69,7 @@ THE SOFTWARE.
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
 #include "OgreOldNode.h"
+#include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Threading/OgreBarrier.h"
@@ -478,10 +479,18 @@ void SceneManager::destroyEntity(Entity *e)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllEntities(void)
 {
-
 	destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
 }
-
+//-----------------------------------------------------------------------
+SkeletonInstance* SceneManager::createSkeletonInstance( const SkeletonDef *skeletonDef )
+{
+	return mSkeletonAnimationManager.createSkeletonInstance( skeletonDef, mNumWorkerThreads );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroySkeletonInstance( SkeletonInstance *skeletonInstance )
+{
+	mSkeletonAnimationManager.destroySkeletonInstance( skeletonInstance );
+}
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllBillboardSets(void)
 {
@@ -1934,25 +1943,77 @@ void SceneManager::updateAllAnimationsThread( size_t threadIdx )
 
 	while( it != en )
 	{
-		SkeletonAnimManager::BySkeletonDefList::const_iterator itDef = (*it)->bySkeletonDefs.begin();
-		SkeletonAnimManager::BySkeletonDefList::const_iterator enDef = (*it)->bySkeletonDefs.end();
+		SkeletonAnimManager::BySkeletonDefList::iterator itByDef = (*it)->bySkeletonDefs.begin();
+		SkeletonAnimManager::BySkeletonDefList::iterator enByDef = (*it)->bySkeletonDefs.end();
 
-		while( itDef != enDef )
+		while( itByDef != enByDef )
 		{
-			FastArray<SkeletonInstance*>::const_iterator itor = itDef->skeletons.begin() +
-																	itDef->threadStarts[threadIdx];
-			FastArray<SkeletonInstance*>::const_iterator end  = itDef->skeletons.begin() +
-																	itDef->threadStarts[threadIdx+1];
+			FastArray<SkeletonInstance*>::iterator itor = itByDef->skeletons.begin() +
+																	itByDef->threadStarts[threadIdx];
+			FastArray<SkeletonInstance*>::iterator end  = itByDef->skeletons.begin() +
+																	itByDef->threadStarts[threadIdx+1];
 			while( itor != end )
 			{
 				(*itor)->update();
 				++itor;
 			}
 
-			++itDef;
+			if( !itByDef->skeletons.empty() )
+				updateAnimationTransforms( *itByDef, threadIdx );
+
+			++itByDef;
 		}
 
 		++it;
+	}
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size_t threadIdx )
+{
+	assert( !bySkeletonDef.skeletons.empty() );
+
+#ifndef NDEBUG
+	BoneTransform _hiddenTransform;
+#endif
+
+	//Unlike regular nodes, bones' number of parents and children is known before hand, thus
+	//when magicDistance = 25; we update the root bones of the first 25 skeletons, then the children
+	//of those bones, and so on; then we move to the next 25 skeletons. This behavior slightly
+	//improves performance since the parent data is still hot in the cache when updating its child.
+	//The value of 25 is arbitrary.
+	const size_t magicDistance = 25;
+
+	const SkeletonDef *skeletonDef							= bySkeletonDef.skeletonDef;
+	const SkeletonDef::DepthLevelInfoVec &depthLevelInfo	= skeletonDef->getDepthLevelInfo();
+
+	size_t firstIdx = bySkeletonDef.threadStarts[threadIdx];
+	size_t lastIdx  = std::min( firstIdx + magicDistance, bySkeletonDef.threadStarts[threadIdx+1] );
+	while( firstIdx != lastIdx )
+	{
+		SkeletonInstance *first	= *(bySkeletonDef.skeletons.begin() + firstIdx);
+		SkeletonInstance *last	= *(bySkeletonDef.skeletons.begin() + lastIdx - 1);
+
+		const TransformArray &firstTransforms	= first->_getTransformArray();
+		const TransformArray &lastTransforms	= last->_getTransformArray();
+		ArrayMatrixAf4x3 const *reverseBind		= skeletonDef->getReverseBindPose().get();
+
+		assert( bySkeletonDef.boneMemoryManager.getNumDepths() == firstTransforms.size() );
+
+		for( size_t i=0; i<firstTransforms.size(); ++i )
+		{
+			size_t numNodes = lastTransforms[i].mOwner - firstTransforms[i].mOwner +
+								lastTransforms[i].mIndex + firstTransforms[i].mIndex +
+								depthLevelInfo[i].numBonesInLevel;
+			assert( numNodes <= bySkeletonDef.boneMemoryManager.getFirstNode( _hiddenTransform, i ) );
+
+			Bone::updateAllTransforms( numNodes, firstTransforms[i], reverseBind,
+										depthLevelInfo[i].numBonesInLevel );
+			reverseBind += (depthLevelInfo[i].numBonesInLevel - 1 + ARRAY_PACKED_REALS) / ARRAY_PACKED_REALS;
+		}
+
+		firstIdx = lastIdx;
+		lastIdx += magicDistance;
+		lastIdx = std::min( lastIdx, bySkeletonDef.threadStarts[threadIdx+1] );
 	}
 }
 //-----------------------------------------------------------------------
@@ -2352,9 +2413,11 @@ void SceneManager::updateSceneGraph()
 
 	highLevelCull();
 	_applySceneAnimations();
-	updateAllAnimations();
 	updateAllTransforms();
+	updateAllAnimations();
+#ifdef OGRE_LEGACY_ANIMATIONS
 	updateInstanceManagerAnimations();
+#endif
 	updateInstanceManagers();
 	updateAllBounds( mEntitiesMemoryManagerUpdateList );
 	updateAllBounds( mLightsMemoryManagerCulledList );
@@ -4615,6 +4678,7 @@ void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }
 //---------------------------------------------------------------------
+#ifdef OGRE_LEGACY_ANIMATIONS
 void SceneManager::updateInstanceManagerAnimations(void)
 {
 	InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
@@ -4626,6 +4690,7 @@ void SceneManager::updateInstanceManagerAnimations(void)
 		++itor;
 	}
 }
+#endif
 //---------------------------------------------------------------------
 void SceneManager::updateInstanceManagersThread( size_t threadIdx )
 {

@@ -59,11 +59,11 @@ namespace Ogre {
         matrices when they are requested more than once when the underlying information has
         not altered.
     */
-	class _OgreExport AutoParamDataSource : public SceneMgtAlloc
+	class _OgreExport AutoParamDataSource : public SceneMgtAlignedAlloc
     {
     protected:
 		const Light& getLight(size_t index) const;
-        mutable Matrix4 mWorldMatrix[256];
+		OGRE_SIMD_ALIGNED_DECL( mutable Matrix4, mWorldMatrix[256] );
         mutable size_t mWorldMatrixCount;
         mutable const Matrix4* mWorldMatrixArray;
         mutable Matrix4 mWorldViewMatrix;

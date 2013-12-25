@@ -68,7 +68,7 @@ namespace Ogre
 		history, go to:
 			https://bitbucket.org/dark_sylinc/ogreanimation
     */
-	class SkeletonInstance : public MovableAlloc
+	class _OgreExport SkeletonInstance : public MovableAlloc
 	{
 	public:
 		typedef vector<Bone>::type BoneVec;
@@ -91,9 +91,14 @@ namespace Ogre
 		*/
 		BoneVec					mUnusedNodes;
 
+		/// Node this SkeletonInstance is attached to (so we can work in world space)
+		Node					*mParentNode;
+
 	public:
-		SkeletonInstance( const SkeletonDef *skeletonDef, NodeMemoryManager *nodeMemoryManager );
+		SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
 		~SkeletonInstance();
+
+		const SkeletonDef* getDefinition(void) const				{ return mDefinition; }
 
 		void update(void);
 
@@ -114,16 +119,22 @@ namespace Ogre
 		@param isManual
 			True to set to manual, false to restore it.
 		*/
-		void setManualBone( SceneNode *bone, bool isManual );
+		void setManualBone( Bone *bone, bool isManual );
 
 		/** Returns true if the bone is manually controlled. @See setManualBone
 		@param bone
 			Bone to query if manual. Must belong to this SkeletonInstance.
 		*/
-		bool isManualBone( SceneNode *bone );
+		bool isManualBone( Bone *bone );
+
+		/// Gets full transform of a bone by its index.
+		FORCEINLINE const SimpleMatrixAf4x3& _getBoneFullTransform( size_t index ) const
+		{
+			return mBones[index]._getFullTransform();
+		}
 
 		/// Gets the bone with given name. Throws if not found.
-		SceneNode* getBone( IdString boneName );
+		Bone* getBone( IdString boneName );
 
 		bool hasAnimation( IdString name ) const;
 		/// Returns the requested animations. Throws if not found. O(N) Linear search
@@ -135,9 +146,33 @@ namespace Ogre
 		/// Internal use. Disables given animation. Input should belong to us and already being animated.
 		void _disableAnimation( SkeletonAnimation *animation );
 
-		void getTransforms( Matrix4 * RESTRICT_ALIAS outTransform,
+		/** Sets our parent node so that our bones are in World space.
+			Iterates through all our bones and sets the root bones
+		*/
+		void setParentNode( Node *parentNode );
+
+		/// Returns our parent node. May be null.
+		Node* getParentNode(void) const										{ return mParentNode; }
+
+		void getTransforms( SimpleMatrixAf4x3 * RESTRICT_ALIAS outTransform,
 							const FastArray<unsigned short> &usedBones ) const;
+
+		/** Updates the contents of @mBoneStartTransforms. Needed when our
+			memory manager performs a cleanup or similar memory change.
+		*/
+		void _updateBoneStartTransforms(void);
+
+		const TransformArray& _getTransformArray() const		{ return mBoneStartTransforms; }
+
+		const void* _getMemoryBlock(void) const;
+		const void* _getMemoryUniqueOffset(void) const;
 	};
+
+	inline bool OrderSkeletonInstanceByMemory( const SkeletonInstance *_left,
+												const SkeletonInstance *_right )
+	{
+		return _left->_getMemoryUniqueOffset() < _right->_getMemoryUniqueOffset();
+	}
 
 	/** @} */
 	/** @} */

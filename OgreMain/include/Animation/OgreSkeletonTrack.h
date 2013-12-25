@@ -48,9 +48,9 @@ namespace Ogre
 
 	typedef vector<KeyFrameRig>::type KeyFrameRigVec;
 
-	typedef FastArray<Transform> TransformArray;
+	typedef FastArray<BoneTransform> TransformArray;
 
-	class SkeletonTrack : public AnimationAlloc
+	class _OgreExport SkeletonTrack : public AnimationAlloc
 	{
 	protected:
 		/// There is one entry per each parent level

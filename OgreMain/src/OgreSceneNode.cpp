@@ -219,6 +219,18 @@ namespace Ogre {
 			(*itr)->_notifyAttached( (SceneNode*)0 );
         mAttachments.clear();
     }
+	//-----------------------------------------------------------------------
+	void SceneNode::_callMemoryChangeListeners(void)
+	{
+		ObjectVec::iterator itor = mAttachments.begin();
+		ObjectVec::iterator end  = mAttachments.end();
+
+		while( itor != end )
+		{
+			(*itor)->_notifyParentNodeMemoryChanged();
+			++itor;
+		}
+	}
 	/*TODO
 	Node::DebugRenderable* SceneNode::getDebugRenderable()
 	{

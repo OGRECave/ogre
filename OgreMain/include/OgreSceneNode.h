@@ -140,6 +140,9 @@ namespace Ogre {
         */
         virtual void detachAllObjects(void);
 
+		/// @copydoc Node::_callMemoryChangeListeners
+		virtual void _callMemoryChangeListeners(void);
+
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
         @remarks

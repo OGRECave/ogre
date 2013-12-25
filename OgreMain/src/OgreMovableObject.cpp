@@ -553,13 +553,13 @@ namespace Ogre {
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
-			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
-			vMinBounds.CmovRobust( receiverMask, newVal );
+			ArrayVector3 oldVal( vMinBounds );
+			vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( receiverMask, oldVal );
 
-			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
-			vMaxBounds.CmovRobust( receiverMask, newVal );
+			oldVal = vMaxBounds;
+			vMaxBounds.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( receiverMask, oldVal );
 
 			const uint32 scalarMask = BooleanMask4::getScalarMask( finalMask );
 
@@ -701,13 +701,13 @@ namespace Ogre {
 
 			//Merge with bounds only if they're visible & are receivers. We first merge,
 			//then CMov its older value if the object isn't visible/receiver.
-			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
-			vMinBounds.CmovRobust( receiverMask, newVal );
+			ArrayVector3 oldVal( vMinBounds );
+			vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( receiverMask, oldVal );
 
-			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
-			vMaxBounds.CmovRobust( receiverMask, newVal );
+			oldVal = vMaxBounds;
+			vMaxBounds.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( receiverMask, oldVal );
 
 			objData.advanceFrustumPack();
 		}
@@ -957,13 +957,13 @@ namespace Ogre {
 
 			//Merge with bounds only if they're visible. We first merge, then CMov its older
 			//value if the object isn't visible. Also do the same with the receiver-only aabb
-			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
-			vMinBounds.CmovRobust( casterMask, newVal );
+			ArrayVector3 oldVal( vMinBounds );
+			vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( casterMask, oldVal );
 
-			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
-			vMaxBounds.CmovRobust( casterMask, newVal );
+			oldVal = vMaxBounds;
+			vMaxBounds.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( casterMask, oldVal );
 
 			objData.advanceFrustumPack();
 		}

@@ -81,7 +81,9 @@ namespace Ogre
     {
     protected:
 		friend class ArrayMatrix4;
+		friend class ArrayMatrixAf4x3;
 		friend class SimpleMatrix4;
+		friend class SimpleMatrixAf4x3;
         /// The matrix entries, indexed by [row][col].
         union {
             /*OGRE_ALIGNED_DECL( Real, m[4][4], OGRE_SIMD_ALIGNMENT );

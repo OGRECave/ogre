@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreAnimationState.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreStringConverter.h"
 // Just for logging
@@ -86,7 +86,7 @@ namespace Ogre {
 		for (i = mLinkedSkeletonAnimSourceList.begin(); 
 			i != mLinkedSkeletonAnimSourceList.end(); ++i)
 		{
-			i->pSkeleton = SkeletonManager::getSingleton().load(
+			i->pSkeleton = OldSkeletonManager::getSingleton().load(
 				i->skeletonName, mGroup).staticCast<Skeleton>();
 		}
 
@@ -711,7 +711,7 @@ namespace Ogre {
 		{
 			// Load immediately
 			SkeletonPtr skelPtr = 
-				SkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
+				OldSkeletonManager::getSingleton().load(skelName, mGroup).staticCast<Skeleton>();
 			mLinkedSkeletonAnimSourceList.push_back(
 				LinkedSkeletonAnimationSource(skelName, scale, skelPtr));
 

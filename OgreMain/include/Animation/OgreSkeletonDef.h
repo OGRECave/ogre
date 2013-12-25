@@ -34,9 +34,11 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreRawPtr.h"
 
+#include "Math/Array/OgreArrayMatrixAf4x3.h"
+
 namespace Ogre
 {
-	class SkeletonDef : public MovableAlloc
+	class _OgreExport SkeletonDef : public MovableAlloc
 	{
 		friend class SkeletonInstance;
 	public:
@@ -83,8 +85,8 @@ namespace Ogre
 		BoneNameMap				mBoneIndexByName;
 		SkeletonAnimationDefVec mAnimationDefs;
 
-		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> mBindPose;
-		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION> mReverseBindPose;
+		RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>		mBindPose;
+		RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>	mReverseBindPose;
 
 		DepthLevelInfoVec		mDepthLevelInfoVec;
 
@@ -92,6 +94,8 @@ namespace Ogre
 		size_t					mNumUnusedSlots;
 
 		vector<list<size_t>::type>::type mBonesPerDepth;
+
+		String					mName;
 
 	public:
 		/** Constructs this Skeleton based on the old format's Skeleton. The frameRate parameter
@@ -102,10 +106,15 @@ namespace Ogre
 		*/
 		SkeletonDef( const Skeleton *originalSkeleton, Real frameRate );
 
+		const String& getName(void) const								{ return mName; }
+
 		const BoneDataVec& getBones(void) const							{ return mBones; }
 		const SkeletonAnimationDefVec& getAnimationDefs(void) const		{ return mAnimationDefs; }
 		const DepthLevelInfoVec& getDepthLevelInfo(void) const			{ return mDepthLevelInfoVec; }
 		const KfTransform * getBindPose(void) const						{ return mBindPose.get(); }
+		const RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>&
+								getReverseBindPose(void) const			{ return mReverseBindPose; }
+		void getBonesPerDepth( vector<size_t>::type &out ) const;
 
 		/** Returns the total number of bone blocks to reach the given level. i.e On SSE2,
 			If the skeleton has 1 root node, 3 children, and 5 children of children;

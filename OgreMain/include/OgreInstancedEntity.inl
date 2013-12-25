@@ -48,6 +48,7 @@ namespace Ogre
 		}
 #endif
 	}
+#ifdef OGRE_LEGACY_ANIMATIONS
 	//-----------------------------------------------------------------------
 	FORCEINLINE void InstancedEntity::writeAnimatedTransform3x4( float * RESTRICT_ALIAS xform,
 															Mesh::IndexMap::const_iterator itor,
@@ -139,4 +140,59 @@ namespace Ogre
 				*xform++ = static_cast<float>( dQuat[i] );
 		}
 	}
+#else
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstancedEntity::writeAnimatedTransform3x4( float * RESTRICT_ALIAS xform,
+															Mesh::IndexMap::const_iterator itor,
+															Mesh::IndexMap::const_iterator end ) const
+	{
+		while( itor != end )
+		{
+			const SimpleMatrixAf4x3 &mat4x3 = mSkeletonInstance->_getBoneFullTransform( *itor++ );
+			mat4x3.streamTo4x3( xform );
+			xform += 12;
+		}
+	}
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstancedEntity::writeLutTransform3x4( float * RESTRICT_ALIAS xform,
+															Mesh::IndexMap::const_iterator itor,
+															Mesh::IndexMap::const_iterator end ) const
+	{
+		//It's the same as writeAnimatedTransform3x4 (but mSkeletonInstance is not
+		//attached to a node is it works in local space). On legacy, local and world
+		//space matrices were two different pointers
+		while( itor != end )
+		{
+			const SimpleMatrixAf4x3 &mat4x3 = mSkeletonInstance->_getBoneFullTransform( *itor++ );
+			mat4x3.streamTo4x3( xform );
+			xform += 12;
+		}
+	}
+	//-----------------------------------------------------------------------
+	FORCEINLINE void InstancedEntity::writeDualQuatTransform( float * RESTRICT_ALIAS xform,
+															Mesh::IndexMap::const_iterator itor,
+															Mesh::IndexMap::const_iterator end ) const
+	{
+		DualQuaternion dQuat;
+		Matrix4 matrix;
+
+		matrix[3][0] = 0;
+		matrix[3][1] = 0;
+		matrix[3][2] = 0;
+		matrix[3][3] = 1;
+
+		while( itor != end )
+		{
+			const SimpleMatrixAf4x3 &mat4x3 = mSkeletonInstance->_getBoneFullTransform( *itor++ );
+			mat4x3.store4x3( &matrix );
+
+			//Convert the matrix into a dual quaternion matrix
+			dQuat.fromTransformationMatrix( matrix );
+
+			//Copy the 2x4 matrix
+			for(int i = 0; i < 8; ++i)
+				*xform++ = static_cast<float>( dQuat[i] );
+		}
+	}
+#endif
 }

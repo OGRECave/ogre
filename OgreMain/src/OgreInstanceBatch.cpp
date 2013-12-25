@@ -52,7 +52,7 @@ namespace Ogre
 				mMaterial( material ),
 				mMeshReference( meshReference ),
 				mIndexToBoneMap( indexToBoneMap ),
-				mTechnSupportsSkeletal( true ),
+				mTechnSupportsSkeletal( SKELETONS_SUPPORTED ),
 				mCachedCamera( 0 ),
 				mTransformSharingDirty(true),
 				mStaticDirty( false ),
@@ -137,6 +137,7 @@ namespace Ogre
 		return true;
 	}
 	//-----------------------------------------------------------------------
+#ifdef OGRE_LEGACY_ANIMATIONS
 	void InstanceBatch::_updateAnimations(void)
 	{
 		InstancedEntityArray::const_iterator itor = mAnimatedEntities.begin();
@@ -148,6 +149,7 @@ namespace Ogre
 			++itor;
 		}
 	}
+#endif
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateEntitiesBoundsThread( size_t threadIdx )
 	{
@@ -186,13 +188,13 @@ namespace Ogre
 
 			//Merge with bounds only if they're in use (and not explicitly hidden,
 			//but may be invisible for some cameras or out of frustum)
-			ArrayVector3 newVal( vMinBounds );
-			newVal.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
-			vMinBounds.CmovRobust( inUse, newVal );
+			ArrayVector3 oldVal( vMinBounds );
+			vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
+			vMinBounds.CmovRobust( inUse, oldVal );
 
-			newVal = vMaxBounds;
-			newVal.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
-			vMaxBounds.CmovRobust( inUse, newVal );
+			oldVal = vMaxBounds;
+			vMaxBounds.makeCeil( objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize );
+			vMaxBounds.CmovRobust( inUse, oldVal );
 
 			//maxWorldRadius = Mathlib::Max( maxWorldRadius, *worldRadius );
 
@@ -239,7 +241,9 @@ namespace Ogre
 	{
 		mInstancedEntities.reserve( mInstancesPerBatch );
 		mUnusedEntities.reserve( mInstancesPerBatch );
+#ifdef OGRE_LEGACY_ANIMATIONS
 		mAnimatedEntities.reserve( mInstancesPerBatch );
+#endif
 
 		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
@@ -252,20 +256,25 @@ namespace Ogre
 	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
 	{
 		return OGRE_NEW InstancedEntity( Id::generateNewId<InstancedEntity>(),
-										 &mLocalObjectMemoryManager, this, static_cast<uint32>(num) );
+										 &mLocalObjectMemoryManager, this, static_cast<uint32>(num)
+								 #ifndef OGRE_LEGACY_ANIMATIONS
+										 , 0
+								 #endif
+										 );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
 	{
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+		//Destroy in the reverse order they were created (LIFO!)
+		InstancedEntityVec::const_reverse_iterator ritor = mInstancedEntities.rbegin();
+		InstancedEntityVec::const_reverse_iterator rend  = mInstancedEntities.rend();
 
-		while( itor != end )
+		while( ritor != rend )
 		{
-			if( (*itor)->getParentSceneNode() )
-				(*itor)->getParentSceneNode()->detachObject( (*itor) );
+			if( (*ritor)->getParentSceneNode() )
+				(*ritor)->getParentSceneNode()->detachObject( (*ritor) );
 
-			OGRE_DELETE *itor++;
+			OGRE_DELETE *ritor++;
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -350,6 +359,7 @@ namespace Ogre
 			mCreator->_removeFromDynamicBatchList( this );
 	}
 	//-----------------------------------------------------------------------
+#ifdef OGRE_LEGACY_ANIMATIONS
 	void InstanceBatch::_addAnimatedInstance( InstancedEntity *instancedEntity )
 	{
 		assert( std::find( mAnimatedEntities.begin(), mAnimatedEntities.end(), instancedEntity ) ==
@@ -367,6 +377,7 @@ namespace Ogre
 		if( itor != mAnimatedEntities.end() )
 			efficientVectorRemove( mAnimatedEntities, itor );
 	}
+#endif
 	//-----------------------------------------------------------------------
 	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
 													CustomParamsVec &outParams )
@@ -509,7 +520,9 @@ namespace Ogre
 		assert( (signed)(mInstancesPerBatch) - (signed)(mInstancedEntities.size()) >= 0 );
 		mInstancedEntities.reserve( mInstancesPerBatch );
 		mUnusedEntities.reserve( mInstancesPerBatch );
+#ifdef OGRE_LEGACY_ANIMATIONS
 		mAnimatedEntities.reserve( mInstancesPerBatch );
+#endif
 		mCustomParams.reserve( mCreator->getNumCustomParams() * mInstancesPerBatch );
 		for( size_t i=mInstancedEntities.size(); i<mInstancesPerBatch; ++i )
 		{

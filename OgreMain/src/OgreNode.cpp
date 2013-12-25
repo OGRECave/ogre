@@ -132,6 +132,7 @@ namespace Ogre {
 		{
 			mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mNodeMemoryManager->getTwin() );
 			mNodeMemoryManager = mNodeMemoryManager->getTwin();
+			_callMemoryChangeListeners();
 			retVal = true;
 		}
 
@@ -169,6 +170,8 @@ namespace Ogre {
 					(*itor)->parentDepthLevelChanged();
 					++itor;
 				}
+
+				_callMemoryChangeListeners();
 			}
 		}
     }
@@ -181,7 +184,7 @@ namespace Ogre {
 			if( mListener )
 				mListener->nodeDetached(this);
 
-			size_t oldDepthLevel = mDepthLevel;
+			mParent = 0;
 
 			//NodeMemoryManager will set mTransform.mParents to a dummy parent node
 			//(as well as transfering the memory)
@@ -189,6 +192,8 @@ namespace Ogre {
 
 			if( mDepthLevel != 0 )
 			{
+				mDepthLevel = 0;
+
 				//Propagate the change to our children
 				NodeVec::const_iterator itor = mChildren.begin();
 				NodeVec::const_iterator end  = mChildren.end();
@@ -198,10 +203,9 @@ namespace Ogre {
 					(*itor)->parentDepthLevelChanged();
 					++itor;
 				}
-			}
 
-			mParent = 0;
-			mDepthLevel = 0;
+				_callMemoryChangeListeners();
+			}
 		}
     }
 	//-----------------------------------------------------------------------
@@ -444,13 +448,12 @@ namespace Ogre {
 #ifndef NDEBUG
 		mCachedTransformOutOfDate = true;
 #endif
-    }
-    //-----------------------------------------------------------------------
-    void Node::setPosition(Real x, Real y, Real z)
-    {
-        Vector3 v(x,y,z);
-        setPosition(v);
-    }
+	}
+	//-----------------------------------------------------------------------
+	void Node::setPosition(Real x, Real y, Real z)
+	{
+		setPosition( Vector3( x, y, z ) );
+	}
     //-----------------------------------------------------------------------
     Vector3 Node::getPosition(void) const
     {
@@ -808,7 +811,7 @@ namespace Ogre {
 
         // NB use squared length rather than real depth to avoid square root
         return diff.squaredLength();
-    }
+	}
 	//---------------------------------------------------------------------
 	Node::DebugRenderable* Node::getDebugRenderable(Real scaling)
 	{

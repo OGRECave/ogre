@@ -113,7 +113,7 @@ if (MSVC)
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)
   endif ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast /arch:SSE2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
   if (CMAKE_CL_64)
@@ -121,6 +121,8 @@ if (MSVC)
 	# this flag is set...
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
+  else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
   endif ()
   if (OGRE_UNITY_BUILD)
     # object files can get large with Unity builds
@@ -395,7 +397,8 @@ set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
   1 - Standard allocator
   2 - nedmalloc
   3 - User-provided allocator
-  4 - nedmalloc with pooling"
+  4 - nedmalloc with pooling
+  5 - Debug allocator that will assert on most forms of memory corruption and provides deterministic memory addressing (for easier debugging w/ data breakpoints). Not indended for release or deployment."
 )
 endif ()
 
@@ -427,6 +430,7 @@ option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
 cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE "NOT WIN32" FALSE)
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
+option(OGRE_LEGACY_ANIMATIONS "Use the skeletal animation from 1.x. It's much slower, but the new system is still experimental" TRUE)
 option(OGRE_SIMD_SSE2 "Enable SIMD (Include SSE2 files)." TRUE)
 option(OGRE_SIMD_NEON "Enable SIMD (Include NEON files)." TRUE)
 option(OGRE_RESTRICT_ALIASING "Restrict aliasing." TRUE)

@@ -288,8 +288,8 @@ namespace Ogre {
 
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
         */
-		SubEntity* getSubEntity(unsigned int index);
-		const SubEntity* getSubEntity(unsigned int index) const;
+		SubEntity* getSubEntity(size_t index);
+		const SubEntity* getSubEntity(size_t index) const;
 
         /** Gets a pointer to a SubEntity by name
         @remarks 

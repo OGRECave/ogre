@@ -98,6 +98,7 @@ namespace Ogre
 		static const ArrayReal INFINITEA;	//Inf, Inf, Inf, Inf
 		static const ArrayReal MAX_NEG;		//Max negative number (x4)
 		static const ArrayReal MAX_POS;		//Max negative number (x4)
+		static const ArrayReal LAST_AFFINE_COLUMN;//0, 0, 0, 1
 
 		/** Returns the absolute values of each 4 floats
 			@param
@@ -263,7 +264,7 @@ namespace Ogre
 		*/
 		static inline __m128 CompareLessEqual( __m128 a, __m128 b )
 		{
-			return _mm_cmplt_ps( a, b );
+			return _mm_cmple_ps( a, b );
 		}
 
 		/** Returns the result of "a > b"

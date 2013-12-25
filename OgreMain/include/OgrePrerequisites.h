@@ -129,6 +129,7 @@ namespace Ogre {
     class AnimationStateSet;
     class AnimationTrack;
 	class ArrayMatrix4;
+	class ArrayMatrixAf4x3;
 	class ArrayQuaternion;
 	class ArrayVector3;
 	class ArrayMemoryManager;
@@ -143,6 +144,8 @@ namespace Ogre {
     class BillboardChain;
     class BillboardSet;
     class Bone;
+	class BoneMemoryManager;
+	struct BoneTransform;
     class Camera;
     class Codec;
     class ColourValue;
@@ -217,6 +220,7 @@ namespace Ogre {
 	class OldNode;
 	class OldBone;
 	class OldSkeletonInstance;
+	class OldSkeletonManager;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;
@@ -278,11 +282,13 @@ namespace Ogre {
 	class ScriptLoader;
     class Serializer;
 	class ShadowTextureManager;
+	class SimpleMatrixAf4x3;
     class SimpleRenderable;
-    class SimpleSpline;
+	class SimpleSpline;
     class Skeleton;
+	class SkeletonDef;
 	class SkeletonInstance;
-    class SkeletonManager;
+	class SkeletonManager;
     class Sphere;
     class SphereSceneQuery;
 	class StaticGeometry;
@@ -321,8 +327,9 @@ namespace Ogre {
     typedef SharedPtr<Material> MaterialPtr;
     typedef SharedPtr<Mesh> MeshPtr;
     typedef SharedPtr<PatchMesh> PatchMeshPtr;
-    typedef SharedPtr<Resource> ResourcePtr;
+	typedef SharedPtr<Resource> ResourcePtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
+	typedef SharedPtr<SkeletonDef> SkeletonDefPtr;
     typedef SharedPtr<Texture> TexturePtr;
 }
 

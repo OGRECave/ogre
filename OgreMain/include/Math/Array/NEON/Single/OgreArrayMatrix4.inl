@@ -552,4 +552,5 @@ namespace Ogre
 							this->mChunkBase[14], this->mChunkBase[15] );
 	}
 	//-----------------------------------------------------------------------------------
+    #undef _MM_TRANSPOSE4_SRC_DST_PS
 }

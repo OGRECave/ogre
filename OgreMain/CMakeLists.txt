@@ -90,6 +90,7 @@ if (OGRE_SIMD_SSE2)
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
+	  src/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
 	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
 	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
@@ -97,11 +98,15 @@ if (OGRE_SIMD_SSE2)
 	set (HEADER_FILES ${HEADER_FILES}
 	  include/Math/Array/SSE2/Single/OgreArrayAabb.h
 	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.h
+	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.h
 	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.h
 	  include/Math/Array/SSE2/Single/OgreArrayVector3.h
+	  include/Math/Array/SSE2/Single/OgreBooleanMask.h
+	  include/Math/Array/SSE2/Single/OgreBooleanMask.inl
 	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.h
 	  include/Math/Array/SSE2/Single/OgreArrayAabb.inl
 	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.inl
 	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.inl
 	  include/Math/Array/SSE2/Single/OgreArrayVector3.inl
 	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.inl)
@@ -111,6 +116,7 @@ if (OGRE_SIMD_NEON)
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/NEON/Single/OgreArrayAabb.cpp
       src/Math/Array/NEON/Single/OgreArrayMatrix4.cpp
+	  src/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.cpp
       src/Math/Array/NEON/Single/OgreArrayQuaternion.cpp
 	  src/Math/Array/NEON/Single/OgreArrayVector3.cpp
 	  src/Math/Array/NEON/Single/OgreMathlibNEON.cpp)
@@ -118,11 +124,15 @@ if (OGRE_SIMD_NEON)
 	set (HEADER_FILES ${HEADER_FILES}
 	  include/Math/Array/NEON/Single/OgreArrayAabb.h
       include/Math/Array/NEON/Single/OgreArrayMatrix4.h
+	  include/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.h
       include/Math/Array/NEON/Single/OgreArrayQuaternion.h
 	  include/Math/Array/NEON/Single/OgreArrayVector3.h
+	  include/Math/Array/NEON/Single/OgreBooleanMask.h
+	  include/Math/Array/NEON/Single/OgreBooleanMask.inl
 	  include/Math/Array/NEON/Single/OgreMathlibNEON.h
 	  include/Math/Array/NEON/Single/OgreArrayAabb.inl
       include/Math/Array/NEON/Single/OgreArrayMatrix4.inl
+	  include/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.inl
       include/Math/Array/NEON/Single/OgreArrayQuaternion.inl
 	  include/Math/Array/NEON/Single/OgreArrayVector3.inl
 	  include/Math/Array/NEON/Single/OgreMathlibNEON.inl)
@@ -132,6 +142,7 @@ if (NOT(OGRE_SIMD_SSE2 OR OGRE_SIMD_NEON))
 	set (SOURCE_FILES ${SOURCE_FILES}
 	  src/Math/Array/C/OgreArrayAabb.cpp
 	  src/Math/Array/C/OgreArrayMatrix4.cpp
+	  src/Math/Array/C/OgreArrayMatrixAf4x3.cpp
 	  src/Math/Array/C/OgreArrayQuaternion.cpp
 	  src/Math/Array/C/OgreArrayVector3.cpp
 	  src/Math/Array/C/OgreMathlibC.cpp)
@@ -139,11 +150,15 @@ if (NOT(OGRE_SIMD_SSE2 OR OGRE_SIMD_NEON))
 	set (HEADER_FILES ${HEADER_FILES}
 	  include/Math/Array/C/OgreArrayAabb.h
 	  include/Math/Array/C/OgreArrayMatrix4.h
+	  include/Math/Array/C/OgreArrayMatrixAf4x3.h
 	  include/Math/Array/C/OgreArrayQuaternion.h
 	  include/Math/Array/C/OgreArrayVector3.h
+	  include/Math/Array/C/OgreBooleanMask.h
+	  include/Math/Array/C/OgreBooleanMask.inl
 	  include/Math/Array/C/OgreMathlibC.h
 	  include/Math/Array/C/OgreArrayAabb.inl
 	  include/Math/Array/C/OgreArrayMatrix4.inl
+	  include/Math/Array/C/OgreArrayMatrixAf4x3.inl
 	  include/Math/Array/C/OgreArrayQuaternion.inl
 	  include/Math/Array/C/OgreArrayVector3.inl
 	  include/Math/Array/C/OgreMathlibC.inl)

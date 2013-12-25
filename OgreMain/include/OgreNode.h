@@ -62,12 +62,7 @@ namespace Ogre {
         e.g. SceneNode, Bone
     */
 	class _OgreExport Node : public NodeAlloc, public IdObject
-    {
-		/** Actually we just need Bone::updateAllTransforms and Bone::updateFromParentImpl
-			to be friends, but I don't see how to that without including OgreBone.h :(
-		*/
-		friend class Bone;
-
+	{
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -138,9 +133,9 @@ namespace Ogre {
 		Transform mTransform;
 
 		/// Friendly name of this node, can be empty
-        String mName;
+		String mName;
 
-        /// Only available internally - notification of parent. Can't be null
+		/// Only available internally - notification of parent. Can't be null
         void setParent( Node* parent );
 		void unsetParent(void);
 
@@ -153,7 +148,7 @@ namespace Ogre {
             to update it's complete transformation based on it's parents
             derived transform.
         */
-        virtual void _updateFromParent(void);
+		void _updateFromParent(void);
 
         /** Class-specific implementation of _updateFromParent.
         @remarks
@@ -772,6 +767,15 @@ namespace Ogre {
 			hard copies but only the destructor must release the mTransform only slots once.
 		*/
 		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
+
+		/** Internal use, notifies all attached objects that our memory pointers
+			(i.e. Transform) may have changed (e.g. during cleanups, change of parent, etc)
+		*/
+		virtual void _callMemoryChangeListeners(void) = 0;
+
+#ifndef NDEBUG
+		bool isCachedTransformOutOfDate(void) const				{ return mCachedTransformOutOfDate; }
+#endif
     };
     /** @} */
     /** @} */

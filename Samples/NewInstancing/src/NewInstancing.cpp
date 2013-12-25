@@ -348,11 +348,9 @@ void Sample_NewInstancing::createEntities()
 
 		//Get the animation
 		AnimationState *anim = ent->getAnimationState( "Walk" );
-		if (mAnimations.insert( anim ).second)
-		{
-			anim->setEnabled( true );
-			anim->addTime( randGenerator.nextFloat() * 10 ); //Random start offset
-		}
+		mAnimationsLegacy.push_back( anim );
+		anim->setEnabled( true );
+		anim->addTime( randGenerator.nextFloat() * 10 ); //Random start offset
 	}
 }
 //------------------------------------------------------------------------------
@@ -371,11 +369,26 @@ void Sample_NewInstancing::createInstancedEntities()
 			//HWInstancingBasic is the only technique without animation support
 			if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
 			{
+#ifndef OGRE_LEGACY_ANIMATIONS
+				//Get the animation
+				SkeletonInstance *skeletonInstance = ent->getSkeleton();
+				SkeletonAnimation *anim = skeletonInstance->getAnimation( "Walk" );
+
+				//Some techniques (i.e. LUT) may share the animations,
+				//so ensure we add the pointer only once
+				if( std::find( mAnimations.begin(), mAnimations.end(), anim ) == mAnimations.end() )
+				{
+					anim->setEnabled( true );
+					anim->addTime(randGenerator.nextFloat() * 10); //Random start offset
+					mAnimations.push_back( anim );
+				}
+#else
 				//Get the animation
 				AnimationState *anim = ent->getAnimationState( "Walk" );
 				anim->setEnabled( true );
 				anim->addTime( randGenerator.nextFloat() * 10); //Random start offset
-				mAnimations.insert( anim );
+				mAnimationsLegacy.push_back( anim );
+#endif
 			}
 		}
 	}
@@ -431,12 +444,16 @@ void Sample_NewInstancing::clearScene()
 
 	mEntities.clear();
 	mSceneNodes.clear();
+	mAnimationsLegacy.clear();
+#ifndef OGRE_LEGACY_ANIMATIONS
 	mAnimations.clear();
+#endif
 }
 //-----------------------------------------------------------------------------------
 void Sample_NewInstancing::destroyManagers()
 {
-	mSceneMgr->destroyInstanceManager(mCurrentManager);
+	if( mCurrentManager )
+		mSceneMgr->destroyInstanceManager(mCurrentManager);
 }
 
 //------------------------------------------------------------------------------
@@ -450,16 +467,31 @@ void Sample_NewInstancing::cleanupContent()
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::animateUnits( float timeSinceLast )
 {
-	//Iterates through all AnimationSets and updates the animation being played. Demonstrates the
-	//animation is unique and independent to each instance
-	std::set<AnimationState*>::const_iterator itor = mAnimations.begin();
-	std::set<AnimationState*>::const_iterator end  = mAnimations.end();
-
-	while( itor != end )
 	{
-		(*itor)->addTime( timeSinceLast );
-		++itor;
+		//Iterates through all AnimationSets and updates the animation being played. Demonstrates the
+		//animation is unique and independent to each instance
+		std::vector<AnimationState*>::const_iterator itor = mAnimationsLegacy.begin();
+		std::vector<AnimationState*>::const_iterator end  = mAnimationsLegacy.end();
+
+		while( itor != end )
+		{
+			(*itor)->addTime( timeSinceLast );
+			++itor;
+		}
 	}
+
+#ifndef OGRE_LEGACY_ANIMATIONS
+	{
+		std::vector<SkeletonAnimation*>::const_iterator itor = mAnimations.begin();
+		std::vector<SkeletonAnimation*>::const_iterator end  = mAnimations.end();
+
+		while( itor != end )
+		{
+			(*itor)->addTime( timeSinceLast );
+			++itor;
+		}
+	}
+#endif
 }
 
 //------------------------------------------------------------------------------

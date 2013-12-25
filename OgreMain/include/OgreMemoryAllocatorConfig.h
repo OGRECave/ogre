@@ -238,6 +238,21 @@ namespace Ogre
 	
 }
 
+#elif OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_TRACK
+
+#  include "OgreMemoryTrackAlloc.h"
+namespace Ogre
+{
+	// configure default allocators based on the options above
+	// notice how we're not using the memory categories here but still roughing them out
+	// in your allocators you might choose to create different policies per category
+
+	// configurable category, for general malloc
+	// notice how we ignore the category here, you could specialise
+	template <MemoryCategory Cat> class CategorisedAllocPolicy : public TrackAllocPolicy{};
+	template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public TrackAlignedAllocPolicy<align>{};
+}
+
 #else
 	
 // your allocators here?
@@ -256,6 +271,8 @@ namespace Ogre
 	typedef CategorisedAllocPolicy<Ogre::MEMCATEGORY_SCRIPTING> ScriptingAllocPolicy;
 	typedef CategorisedAllocPolicy<Ogre::MEMCATEGORY_RENDERSYS> RenderSysAllocPolicy;
 
+	typedef CategorisedAlignAllocPolicy<Ogre::MEMCATEGORY_SCENE_CONTROL> SceneCtlAlignPolicy;
+
 	// Now define all the base classes for each allocation
 	typedef AllocatedObject<GeneralAllocPolicy> GeneralAllocatedObject;
 	typedef AllocatedObject<GeometryAllocPolicy> GeometryAllocatedObject;
@@ -265,6 +282,8 @@ namespace Ogre
 	typedef AllocatedObject<ResourceAllocPolicy> ResourceAllocatedObject;
 	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
 	typedef AllocatedObject<RenderSysAllocPolicy> RenderSysAllocatedObject;
+
+	typedef AllocatedObject<SceneCtlAlignPolicy> SceneCtlAlignedObject;
 
 
 	// Per-class allocators defined here
@@ -303,6 +322,7 @@ namespace Ogre
 	typedef GeneralAllocatedObject		RootAlloc;
 	typedef ResourceAllocatedObject		ResourceAlloc;
 	typedef GeneralAllocatedObject		SerializerAlloc;
+	typedef SceneCtlAlignedObject		SceneMgtAlignedAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
 	typedef ScriptingAllocatedObject    ScriptCompilerAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;

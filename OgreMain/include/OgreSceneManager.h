@@ -56,6 +56,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
+#include "Animation/OgreSkeletonAnimManager.h"
 #include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
 
@@ -254,7 +255,7 @@ namespace Ogre {
 		dependent on the Camera, which will always call back the SceneManager
 		which created it to render the scene. 
      */
-	class _OgreExport SceneManager : public SceneMgtAlloc
+	class _OgreExport SceneManager : public SceneMgtAlignedAlloc
     {
     public:
         /// Query type mask which will be used for world geometry @see SceneQuery
@@ -446,28 +447,6 @@ namespace Ogre {
 		friend class SceneMgrQueuedRenderableVisitor;
 
     protected:
-		struct SkeletonAnimManager
-		{
-			struct BySkeletonDef
-			{
-				NodeMemoryManager				nodeMemoryManager;
-
-				/** MUST be sorted by location in its NodeMemoryManager's slot
-					(in order to update in parallel without causing race conditions)
-					@See threadStarts
-				*/
-				FastArray<SkeletonInstance*>	skeletons;
-
-				/** One per thread (plus one), tells where we should start from in each
-					thread. It's not exactly skeletons.size() / mNumWorkerThreads because
-					we need to account that instances that share the same memory block.
-				*/
-				FastArray<size_t>				threadStarts;
-			};
-			typedef list<BySkeletonDef>::type BySkeletonDefList;
-			BySkeletonDefList bySkeletonDefs;
-		};
-
         /// Subclasses can override this to ensure their specialised SceneNode is used.
         virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
@@ -606,7 +585,7 @@ namespace Ogre {
 		uint8 mWorldGeometryRenderQueue;
 		
 		unsigned long mLastFrameNumber;
-		Matrix4 mTempXform[256];
+		OGRE_SIMD_ALIGNED_DECL( Matrix4, mTempXform[256] );
 		bool mResetIdentityView;
 		bool mResetIdentityProj;
 
@@ -846,8 +825,10 @@ namespace Ogre {
 		void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
 											const T *mo ) const;
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/// Updates all instance managers' animations
 		void updateInstanceManagerAnimations(void);
+#endif
 
 		/** Updates all instance managers with dirty instance batches from multiple threads.
 			@see updateInstanceManagers and @see InstanceBatch::_updateEntitiesBoundsThread */
@@ -1053,6 +1034,7 @@ namespace Ogre {
 			Must be unique for each worker thread
 		*/
 		void updateAllAnimationsThread( size_t threadIdx );
+		void updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size_t threadIdx );
 
 		/** Updates the Nodes from the given request inside a thread. @See updateAllTransforms
 		@param request
@@ -1362,6 +1344,11 @@ namespace Ogre {
                 SceneManager::clearScene
         */
         virtual void destroyAllEntities(void);
+
+		/// Creates an instance of a skeleton based on the given definition.
+		SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );
+		/// Destroys an instance of a skeleton created with @createSkeletonInstance.
+		void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
 
         /** Create a ManualObject, an object which you populate with geometry
 			manually through a GL immediate-mode style interface.

@@ -98,7 +98,7 @@ THE SOFTWARE.
 #include "OgreSimpleRenderable.h"
 #include "OgreSkeleton.h"
 #include "OgreOldSkeletonInstance.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreStaticGeometry.h"
 #include "OgreString.h"

@@ -91,6 +91,9 @@ namespace Ogre
 	public:
 		typedef T value_type;
 
+		typedef T* iterator;
+		typedef const T* const_iterator;
+
 		FastArray() :
 			mData( 0 ),
 			mSize( 0 ),
@@ -179,7 +182,32 @@ namespace Ogre
 		void pop_back()
 		{
 			assert( mSize > 0 && "Can't pop a zero-sized array" );
+			mData[mSize].~T();
 			--mSize;
+		}
+
+		iterator insert( iterator where, const T& val )
+		{
+			size_t idx = (where - mData);
+
+			growToFit( 1 );
+
+			memmove( mData + idx + 1, mData + idx, (mSize - idx) *  sizeof(T) );
+			new (&mData[idx]) T();
+			mData[idx] = val;
+			++mSize;
+
+			return mData + idx;
+		}
+
+		iterator erase( iterator toErase )
+		{
+			size_t idx = (toErase - mData);
+			toErase->~T();
+			memmove( mData + idx, mData + idx + 1, (mSize - idx - 1) * sizeof(T) );
+			--mSize;
+
+			return mData + idx;
 		}
 
 		void clear()
@@ -255,9 +283,6 @@ namespace Ogre
 			assert( mSize > 0 && "Can't call front with no elements" );
 			return mData[0];
 		}
-
-		typedef T* iterator;
-		typedef const T* const_iterator;
 
 		iterator begin()						{ return mData; }
 		const_iterator begin() const			{ return mData; }

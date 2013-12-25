@@ -141,7 +141,8 @@ namespace Ogre {
 
         /// Optional linked skeleton.
         String mSkeletonName;
-        SkeletonPtr mSkeleton;
+		SkeletonPtr mOldSkeleton;
+		SkeletonDefPtr mSkeleton;
 
        
         VertexBoneAssignmentList mBoneAssignments;
@@ -378,10 +379,11 @@ namespace Ogre {
         @return
             Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
-        const SkeletonPtr& getSkeleton(void) const;
+		const SkeletonPtr& getOldSkeleton(void) const;
+		const SkeletonDefPtr& getSkeleton(void) const					{ return mSkeleton; }
 
         /** Gets the name of any linked Skeleton */
-        const String& getSkeletonName(void) const;
+		const String& getSkeletonName(void) const;
         /** Initialise an animation set suitable for use with this mesh. 
         @remarks
             Only recommended for use inside the engine, not by applications.

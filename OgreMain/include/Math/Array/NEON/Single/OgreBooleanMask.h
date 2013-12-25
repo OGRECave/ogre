@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __SSE2_BooleanMask_H__
-#define __SSE2_BooleanMask_H___
+#ifndef __NEON_BooleanMask_H__
+#define __NEON_BooleanMask_H___
 
 #ifndef __BooleanMask_H__
 	#error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
@@ -67,6 +67,9 @@ namespace Ogre
 	public:
 		inline static ArrayReal getMask( bool x, bool y, bool z, bool w );
 		inline static ArrayReal getMask( bool booleans[4] );
+
+        /// Returns true if alls bit in mask0[i] and mask1[i] are set.
+		inline static bool allBitsSet( bool mask0[4], bool mask1[4] );
 
 		/** Converts a SIMD mask into a mask that fits in 32-bit number
 		@remarks

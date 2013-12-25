@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __PlatformInformation_H__
-#define __PlatformInformation_H__
+#ifndef _OgrePlatformInformation_H_
+#define _OgrePlatformInformation_H_
 
 #include "OgrePrerequisites.h"
 
@@ -201,4 +201,4 @@ namespace Ogre {
 
 }
 
-#endif  // __PlatformInformation_H__
+#endif  // _OgrePlatformInformation_H_

@@ -92,6 +92,14 @@ namespace Ogre
         typedef vector<InstancedEntity*>::type  InstancedEntityVec;
         typedef vector<Vector4>::type           CustomParamsVec;
 		typedef FastArray<InstancedEntity*>		InstancedEntityArray;
+
+		enum SkeletalAnimationMode
+		{
+			SKELETONS_NOT_SUPPORTED,
+			SKELETONS_SUPPORTED,
+			SKELETONS_LUT
+		};
+
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
@@ -111,19 +119,20 @@ namespace Ogre
         InstancedEntityVec  mInstancedEntities;
         InstancedEntityVec  mUnusedEntities;
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** This variable may change after we refactor animations. In the meantime: some
 			techniques animate all entities, some techniques don't animate anything
 			(eg. HW Basic) and other techniques animate a few (eg. HW VTF LUT)
 		*/
 		InstancedEntityArray mAnimatedEntities;
+#endif
 
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
 		CustomParamsVec		mCustomParams;
 
-        /// False if a technique doesn't support skeletal animation
-        bool                mTechnSupportsSkeletal;
+        SkeletalAnimationMode	mTechnSupportsSkeletal;
 
         /// Cached distance to last camera for getSquaredViewDepth
         mutable Real mCachedCameraDist;
@@ -190,10 +199,12 @@ namespace Ogre
             by the derived class is faster than virtual call overhead. And both are clean
             ways of implementing it.
         */
-        bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
+        SkeletalAnimationMode _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/// Updates animations from all our entities.
 		void _updateAnimations(void);
+#endif
 
 		/** Updates the bounds of only our entities from multiple threads. To be called before
 			_updateBounds (which is single threaded). @see InstanceManager::updateDirtyBatches
@@ -262,6 +273,7 @@ namespace Ogre
         */
 		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/// Schedules the given Instanced Entity to be updated every frame in @see _updateAnimations
 		void _addAnimatedInstance( InstancedEntity *instancedEntity );
 
@@ -270,6 +282,7 @@ namespace Ogre
 			Does nothing if the animation wasn't already added.
 		*/
 		void _removeAnimatedInstance( const InstancedEntity *instancedEntity );
+#endif
 
         /** @see InstanceManager::defragmentBatches
             This function takes InstancedEntities and pushes back all entities it can fit here
@@ -331,10 +344,12 @@ namespace Ogre
         */
 		void removeInstancedEntity( InstancedEntity *instancedEntity );
 
+#ifdef OGRE_LEGACY_ANIMATIONS
 		/** Tells whether world bone matrices need to be calculated.
 			This does not include bone matrices which are calculated regardless
         */
-		virtual bool useBoneWorldMatrices() const { return true; }
+		bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal != SKELETONS_LUT; }
+#endif
 
 		/** Tells that the list of entity instances with shared transforms has changed */
 		void _markTransformSharingDirty() { mTransformSharingDirty = true; }

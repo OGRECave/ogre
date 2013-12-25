@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __BoneArrayMemoryManager_H__
-#define __BoneArrayMemoryManager_H__
+#ifndef _KfTransformArrayMemoryManager_H_
+#define _KfTransformArrayMemoryManager_H_
 
 #include "OgreArrayMemoryManager.h"
 

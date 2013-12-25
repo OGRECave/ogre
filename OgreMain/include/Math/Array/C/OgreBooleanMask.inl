@@ -32,10 +32,15 @@ namespace Ogre
 	{
 		return x;
 	}
-
+	//--------------------------------------------------------------------------------------
 	inline ArrayMaskR BooleanMask4::getMask( bool b[1] )
 	{
 		return b[0];
+	}
+	//--------------------------------------------------------------------------------------
+	inline bool BooleanMask4::allBitsSet( bool mask0[1], bool mask1[1] )
+	{
+		return ( *mask0 & *mask1 ) == true;
 	}
 	//--------------------------------------------------------------------------------------
 	inline uint32 BooleanMask4::getScalarMask( ArrayMaskR mask )

@@ -44,7 +44,7 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreTextureManager.h"
 #include "OgreParticleSystemManager.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 #include "OgreProfiler.h"
 #include "OgreErrorDialog.h"
 #include "OgreConfigDialog.h"
@@ -66,6 +66,7 @@ THE SOFTWARE.
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
 
+#include "Animation/OgreSkeletonManager.h"
 #include "Compositor/OgreCompositorManager2.h"
 
 #if OGRE_NO_FREEIMAGE == 0
@@ -196,7 +197,8 @@ namespace Ogre {
         mMeshManager = OGRE_NEW MeshManager();
 
         // Skeleton manager
-        mSkeletonManager = OGRE_NEW SkeletonManager();
+		mOldSkeletonManager	= OGRE_NEW OldSkeletonManager();
+		mSkeletonManager	= OGRE_NEW SkeletonManager();
 
         // ..particle system manager
         mParticleManager = OGRE_NEW ParticleSystemManager();
@@ -332,7 +334,8 @@ namespace Ogre {
 #   endif
         OGRE_DELETE mFileSystemArchiveFactory;
 
-        OGRE_DELETE mSkeletonManager;
+		OGRE_DELETE mOldSkeletonManager;
+		OGRE_DELETE mSkeletonManager;
         OGRE_DELETE mMeshManager;
         OGRE_DELETE mParticleManager;
 
