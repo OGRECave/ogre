@@ -34,6 +34,7 @@
 #include "OgreSmallVector.h"
 #include "OgreMesh.h"
 #include "OgreLodConfig.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -214,9 +215,44 @@ protected:
 	size_t calcLodVertexCount(const LodLevel& lodConfig);
 	void tuneContainerSize();
 	void addVertexData(VertexData* vertexData, bool useSharedVertexLookup);
-	template<typename IndexType>
-	void addIndexDataImpl(IndexType* iPos, const IndexType* iEnd, VertexLookupList& lookup, unsigned short submeshID);
 	void addIndexData(IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID);
+    template<typename IndexType>
+    void addIndexDataImpl(IndexType* iPos, const IndexType* iEnd,
+                                                    VertexLookupList& lookup,
+                                                    unsigned short submeshID)
+    {
+
+        // Loop through all triangles and connect them to the vertices.
+        for (; iPos < iEnd; iPos += 3) {
+            // It should never reallocate or every pointer will be invalid.
+            OgreAssert(mTriangleList.capacity() > mTriangleList.size(), "");
+            mTriangleList.push_back(PMTriangle());
+            PMTriangle* tri = &mTriangleList.back();
+            tri->isRemoved = false;
+            tri->submeshID = submeshID;
+            for (int i = 0; i < 3; i++) {
+                // Invalid index: Index is bigger then vertex buffer size.
+                OgreAssert(iPos[i] < lookup.size(), "");
+                tri->vertexID[i] = iPos[i];
+                tri->vertex[i] = lookup[iPos[i]];
+            }
+            if (tri->isMalformed()) {
+#if OGRE_DEBUG_MODE
+                stringstream str;
+                str << "In " << mMeshName << " malformed triangle found with ID: " << getTriangleID(tri) << ". " <<
+                std::endl;
+                printTriangle(tri, str);
+                str << "It will be excluded from LOD level calculations.";
+                LogManager::getSingleton().stream() << str.str();
+#endif
+                tri->isRemoved = true;
+                mIndexBufferInfoList[tri->submeshID].indexCount -= 3;
+                continue;
+            }
+            tri->computeNormal();
+            addTriangleToEdges(tri);
+        }
+    }
 
 	void computeCosts();
 	bool isBorderVertex(const PMVertex* vertex) const;
