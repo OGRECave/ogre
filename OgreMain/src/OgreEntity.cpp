@@ -294,7 +294,7 @@ namespace Ogre {
         return mMesh;
     }
 	//-----------------------------------------------------------------------
-	SubEntity* Entity::getSubEntity(unsigned int index)
+	SubEntity* Entity::getSubEntity(size_t index)
 	{
 		if (index >= mSubEntityList.size())
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -303,7 +303,7 @@ namespace Ogre {
 		return &mSubEntityList[index];
 	}
     //-----------------------------------------------------------------------
-	const SubEntity* Entity::getSubEntity(unsigned int index) const
+	const SubEntity* Entity::getSubEntity(size_t index) const
     {
         if (index >= mSubEntityList.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -314,13 +314,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	SubEntity* Entity::getSubEntity(const String& name)
     {
-        ushort index = mMesh->_getSubMeshIndex(name);
+        size_t index = mMesh->_getSubMeshIndex(name);
 		return getSubEntity(index);
 	}
 	//-----------------------------------------------------------------------
 	const SubEntity* Entity::getSubEntity(const String& name) const
 	{
-		ushort index = mMesh->_getSubMeshIndex(name);
+		size_t index = mMesh->_getSubMeshIndex(name);
 		return getSubEntity(index);
 	}
 	//-----------------------------------------------------------------------
@@ -1938,8 +1938,8 @@ namespace Ogre {
 			e != mLodEntityList.end(); ++e, ++lodi)
 		{
 			
-			uint nsub = (*e)->getNumSubEntities();
-			for (uint s = 0; s < nsub; ++s)
+			size_t nsub = (*e)->getNumSubEntities();
+			for (size_t s = 0; s < nsub; ++s)
 			{
 				visitor->visit((*e)->getSubEntity(s), lodi, false);
 			}

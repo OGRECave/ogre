@@ -197,7 +197,6 @@ namespace Ogre {
 
 			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
 			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			const Matrix4 &projMat = camera->getProjectionMatrix();
 			ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
 
 			ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
@@ -299,7 +298,6 @@ namespace Ogre {
 
 			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
 			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			const Matrix4 &projMat = camera->getProjectionMatrix();
 			ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI / orthoArea ) );
 
 			ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );

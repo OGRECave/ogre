@@ -278,7 +278,7 @@ namespace Ogre {
 		ArrayMatrixAf4x3 mat;
 		mat.makeTransform( *mTransform.mPosition, *mTransform.mScale, *mTransform.mOrientation );
 		mat = parentMat * mat;
-
+        */
 		/*
 			Calculating the bone matrices
 			-----------------------------
@@ -287,7 +287,8 @@ namespace Ogre {
 			Because any modification of a vertex has to be relative to the bone, we must
 			first reverse transform by the Bone's original derived position/orientation/scale,
 			then transform by the new derived position/orientation/scale.
-		*//*
+		*/
+        /*
 		mat.storeToAoS( mTransform.mDerivedTransform );
 
 #ifndef NDEBUG

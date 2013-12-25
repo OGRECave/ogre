@@ -270,12 +270,12 @@ namespace Ogre
 		}
 
 		{
-			vector<Bone>::type::iterator itor = boneNodes.begin();
+			vector<Bone>::type::iterator boneNodeItor = boneNodes.begin();
 			vector<Bone>::type::iterator end  = boneNodes.end();
-			while( itor != end )
+			while( boneNodeItor != end )
 			{
-				itor->_deinitialize();
-				++itor;
+				boneNodeItor->_deinitialize();
+				++boneNodeItor;
 			}
 		}
 	}
