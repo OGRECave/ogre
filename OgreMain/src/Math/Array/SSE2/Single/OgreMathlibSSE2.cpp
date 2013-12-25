@@ -30,9 +30,9 @@ THE SOFTWARE.
 
 #include "OgrePlatformInformation.h"
 
+#if __OGRE_HAVE_SSE
 #define __Mathlib_H__ //Neded to directly include OgreMathlibSSE2
 
-#if __OGRE_HAVE_SSE
 #include "Math/Array/OgreArrayConfig.h"
 #include "Math/Array/SSE2/Single/OgreMathlibSSE2.h"
 #include "Math/Array/SSE2/Single/sse_mathfun.h"
