@@ -154,6 +154,7 @@ namespace OgreBites
 
 			loadResources();
 			mResourcesLoaded = true;
+			setupCompositor();
 			setupContent();
 			mContentSetup = true;
 
@@ -279,6 +280,9 @@ namespace OgreBites
             if(mOverlaySystem)
                 mSceneMgr->addRenderQueueListener(mOverlaySystem);
 		}
+
+		/// Most likely the user wants to implement one. @See SdkSample::setupCompositor
+		virtual void setupCompositor() {}
 
 		/*-----------------------------------------------------------------------------
 		| Sets up viewport layout and camera.

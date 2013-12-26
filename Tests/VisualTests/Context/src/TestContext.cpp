@@ -610,11 +610,13 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 void TestContext::createDummyScene()
 {
-    mWindow->removeAllViewports();
-    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+	//Test multithreading which is prone to errors (regardless of number of cores the system has)
+    const size_t numThreads = 3;
+	Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+
+    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads,
+														threadedCullingMethod, "DummyScene");
     sm->addRenderQueueListener(mOverlaySystem);
-    Ogre::Camera* cam = sm->createCamera("DummyCamera");
-    mWindow->addViewport(cam);
 #ifdef INCLUDE_RTSHADER_SYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.

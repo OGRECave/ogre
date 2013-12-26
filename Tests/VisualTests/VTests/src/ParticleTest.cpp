@@ -42,7 +42,7 @@ ParticleTest::ParticleTest()
 void ParticleTest::setupContent()
 {
     // create a bunch of random particle systems
-    Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
+    Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Examples/Fireworks");
     mSceneMgr->getRootSceneNode()->attachObject(ps);
     
     // Multiple systems didn't seem to stay deterministic... (in gcc at least...)

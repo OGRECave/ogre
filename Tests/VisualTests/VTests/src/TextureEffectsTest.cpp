@@ -38,7 +38,7 @@ TextureEffectsTest::TextureEffectsTest()
 
 void TextureEffectsTest::setupContent()
 {
-    mViewport->setBackgroundColour(ColourValue(0.8,0.8,0.8));
+    mBackgroundColor = ColourValue(0.8,0.8,0.8);
 
     // the names of the four materials we will use
     String matNames[] = {"Examples/OgreDance", "Examples/OgreParade", "Examples/OgreSpin", "Examples/OgreWobble"};
@@ -46,10 +46,10 @@ void TextureEffectsTest::setupContent()
     for (unsigned int i = 0; i < 4; i++)
     {
         // create a standard plane entity
-        Entity* ent = mSceneMgr->createEntity("Plane" + StringConverter::toString(i + 1), SceneManager::PT_PLANE);
+        Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE, SCENE_STATIC);
 
         // attach it to a node, scale it, and position appropriately
-        SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_STATIC );
         node->setPosition(i % 2 ? 25 : -25, i / 2 ? -25 : 25, 0);
         node->setScale(0.25, 0.25, 0.25);
         node->attachObject(ent);

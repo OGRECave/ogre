@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "VTestPlugin.h"
-#include "StencilShadowTest.h"
 #include "ParticleTest.h"
 #include "TransparencyTest.h"
 #include "TextureEffectsTest.h"
@@ -39,7 +38,6 @@ VTestPlugin::VTestPlugin()
 {
     // add the playpen tests
     addSample(new ParticleTest());
-    addSample(new StencilShadowTest());
     addSample(new TransparencyTest());
     addSample(new CubeMappingTest());
     addSample(new TextureEffectsTest());

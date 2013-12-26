@@ -8,12 +8,10 @@
 #-------------------------------------------------------------------
 
 set(HEADER_FILES
-    include/StencilShadowTest.h
     include/ParticleTest.h
     include/VTestPlugin.h)
 
 set(SOURCE_FILES
-    src/StencilShadowTest.cpp
     src/TextureEffectsTest.cpp
     src/CubeMappingTest.cpp
     src/TransparencyTest.cpp
