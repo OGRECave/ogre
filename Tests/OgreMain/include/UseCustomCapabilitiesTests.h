@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreCompositorManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreResourceGroupManager.h"
 

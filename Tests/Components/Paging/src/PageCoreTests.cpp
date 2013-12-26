@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PageCoreTests.h"
 #include "OgrePaging.h"
+#include "OgreCompositorManager2.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
@@ -62,8 +63,28 @@ void PageCoreTests::setUp()
 	ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
 	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
-	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+    // getNumLogicalCores() may return 0 if couldn't detect
+    const size_t numThreads = std::max<Ogre::uint32>
+    ( 1, Ogre::PlatformInformation::getNumLogicalCores() );
 
+    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+    //See doxygen documentation regarding culling methods.
+    //In some cases you may still want to use single thread.
+    if( numThreads > 1 )
+        threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod, "DummyScene");
+
+//    Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+//
+//    const Ogre::IdString workspaceName( "PageCoreTests Workspace" );
+//    if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+//    {
+//        compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
+//                                                   Ogre::IdString() );
+//    }
+//    compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
 
 void PageCoreTests::tearDown()

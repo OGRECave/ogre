@@ -55,7 +55,7 @@ protected:
 		cam->setPolygonMode(PM_WIREFRAME);
 
 		// create material and set the texture unit to our texture
-        MaterialPtr tMat = MaterialManager::getSingleton().createOrRetrieve("Ogre/TesselationExample", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first.staticCast<Material>();
+        MaterialPtr tMat = MaterialManager::getSingleton().createOrRetrieve("Ogre/TesselationExample", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
         tMat->compile();
         tMat->getBestTechnique()->getPass(0);
 

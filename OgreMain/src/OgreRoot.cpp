@@ -203,9 +203,6 @@ namespace Ogre {
         // ..particle system manager
         mParticleManager = OGRE_NEW ParticleSystemManager();
 
-		// Compiler manager
-		//mCompilerManager = OGRE_NEW ScriptCompilerManager();
-
 		mFrameStats = OGRE_NEW FrameStats();
 
         mTimer = OGRE_NEW Timer();
