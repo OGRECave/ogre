@@ -259,16 +259,16 @@ namespace Ogre {
 
 		for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
 		{
-			Vector3 pos, scale;
+			Vector3 pos, nodeScale;
 			Quaternion qRot;
 			const Transform &parentTransform = mTransform.mParents[j]->mTransform;
 			parentTransform.mDerivedPosition->getAsVector3( pos, parentTransform.mIndex );
 			parentTransform.mDerivedOrientation->getAsQuaternion( qRot, parentTransform.mIndex );
-			parentTransform.mDerivedScale->getAsVector3( scale, parentTransform.mIndex );
+			parentTransform.mDerivedScale->getAsVector3( nodeScale, parentTransform.mIndex );
 
 			parentPos.setFromVector3( pos, j );
 			parentRot.setFromQuaternion( qRot, j );
-			parentScale.setFromVector3( scale, j );
+			parentScale.setFromVector3( nodeScale, j );
 		}
 
 		parentRot.Cmov4( BooleanMask4::getMask( mTransform.mInheritOrientation ),

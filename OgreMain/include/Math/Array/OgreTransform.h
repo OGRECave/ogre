@@ -102,42 +102,42 @@ namespace Ogre
 
 			Note that we do NOT copy the mIndex member.
 		*/
-		void copy( const Transform &copy )
+		void copy( const Transform &inCopy )
 		{
-			mParents[mIndex]	= copy.mParents[copy.mIndex];
-			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
+			mParents[mIndex]	= inCopy.mParents[inCopy.mIndex];
+			mOwner[mIndex]		= inCopy.mOwner[inCopy.mIndex];
 
 			Vector3 tmp;
 			Quaternion qTmp;
 
 			//Position
-			copy.mPosition->getAsVector3( tmp, copy.mIndex );
+			inCopy.mPosition->getAsVector3( tmp, inCopy.mIndex );
 			mPosition->setFromVector3( tmp, mIndex );
 
 			//Orientation
-			copy.mOrientation->getAsQuaternion( qTmp, copy.mIndex );
+			inCopy.mOrientation->getAsQuaternion( qTmp, inCopy.mIndex );
 			mOrientation->setFromQuaternion( qTmp, mIndex );
 
 			//Scale
-			copy.mScale->getAsVector3( tmp, copy.mIndex );
+			inCopy.mScale->getAsVector3( tmp, inCopy.mIndex );
 			mScale->setFromVector3( tmp, mIndex );
 
 			//Derived position
-			copy.mDerivedPosition->getAsVector3( tmp, copy.mIndex );
+			inCopy.mDerivedPosition->getAsVector3( tmp, inCopy.mIndex );
 			mDerivedPosition->setFromVector3( tmp, mIndex );
 
 			//Derived orientation
-			copy.mDerivedOrientation->getAsQuaternion( qTmp, copy.mIndex );
+			inCopy.mDerivedOrientation->getAsQuaternion( qTmp, inCopy.mIndex );
 			mDerivedOrientation->setFromQuaternion( qTmp, mIndex );
 
 			//Derived scale
-			copy.mDerivedScale->getAsVector3( tmp, copy.mIndex );
+			inCopy.mDerivedScale->getAsVector3( tmp, inCopy.mIndex );
 			mDerivedScale->setFromVector3( tmp, mIndex );
 
-			mDerivedTransform[mIndex] = copy.mDerivedTransform[mIndex];
+			mDerivedTransform[mIndex] = inCopy.mDerivedTransform[mIndex];
 
-			mInheritOrientation[mIndex]	= copy.mInheritOrientation[copy.mIndex];
-			mInheritScale[mIndex]		= copy.mInheritScale[copy.mIndex];
+			mInheritOrientation[mIndex]	= inCopy.mInheritOrientation[inCopy.mIndex];
+			mInheritScale[mIndex]		= inCopy.mInheritScale[inCopy.mIndex];
 		}
 
 		/** Rebases all the pointers from our SoA structs so that they point to a new location

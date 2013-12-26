@@ -62,8 +62,18 @@ void PageCoreTests::setUp()
 	ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
 	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
-	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+    // getNumLogicalCores() may return 0 if couldn't detect
+    const size_t numThreads = std::max<Ogre::uint32>
+    ( 1, Ogre::PlatformInformation::getNumLogicalCores() );
 
+    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+
+    //See doxygen documentation regarding culling methods.
+    //In some cases you may still want to use single thread.
+    if( numThreads > 1 )
+        threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod, "DummyScene");
 }
 
 void PageCoreTests::tearDown()

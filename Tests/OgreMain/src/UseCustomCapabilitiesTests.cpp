@@ -59,8 +59,6 @@ void UseCustomCapabilitiesTests::setUp()
 		OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
 	if(Ogre::GpuProgramManager::getSingletonPtr())
 		OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
 	if(Ogre::MaterialManager::getSingletonPtr())
 		OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
 	if(Ogre::ResourceGroupManager::getSingletonPtr())

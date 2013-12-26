@@ -97,16 +97,16 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::intersects( const Aabb& b2 ) const
 	{
-		Vector3 distance( mCenter - b2.mCenter );
+		Vector3 dist( mCenter - b2.mCenter );
 		Vector3 sumHalfSizes( mHalfSize + b2.mHalfSize );
 
 		// ( abs( center.x - center2.x ) <= halfSize.x + halfSize2.x &&
 		//   abs( center.y - center2.y ) <= halfSize.y + halfSize2.y &&
 		//   abs( center.z - center2.z ) <= halfSize.z + halfSize2.z )
 		//TODO: Profile whether '&&' or '&' is faster. Probably varies per architecture.
-		return ( Math::Abs( distance.x ) <= sumHalfSizes.x ) &
-				( Math::Abs( distance.y ) <= sumHalfSizes.y ) &
-				( Math::Abs( distance.z ) <= sumHalfSizes.z );
+		return ( Math::Abs( dist.x ) <= sumHalfSizes.x ) &
+				( Math::Abs( dist.y ) <= sumHalfSizes.y ) &
+				( Math::Abs( dist.z ) <= sumHalfSizes.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::volume(void) const
@@ -117,45 +117,45 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::contains( const Aabb &other ) const
 	{
-		Vector3 distance( mCenter - other.mCenter );
+		Vector3 dist( mCenter - other.mCenter );
 
-		// In theory, "abs( distance.x ) < mHalfSize - other.mHalfSize" should be more pipeline-
+		// In theory, "abs( dist.x ) < mHalfSize - other.mHalfSize" should be more pipeline-
 		// friendly because the processor can do the subtraction while the abs() is being performed,
 		// however that variation won't handle the case where both boxes are infinite (will produce
 		// nan instead and return false, when it should return true)
 
 		//TODO: Profile whether '&&' or '&' is faster. Probably varies per architecture.
-		return ( Math::Abs( distance.x ) + other.mHalfSize.x <= mHalfSize.x ) &
-				( Math::Abs( distance.y ) + other.mHalfSize.y <= mHalfSize.y ) &
-				( Math::Abs( distance.z ) + other.mHalfSize.z <= mHalfSize.z );
+		return ( Math::Abs( dist.x ) + other.mHalfSize.x <= mHalfSize.x ) &
+				( Math::Abs( dist.y ) + other.mHalfSize.y <= mHalfSize.y ) &
+				( Math::Abs( dist.z ) + other.mHalfSize.z <= mHalfSize.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline bool Aabb::contains( const Vector3 &v ) const
 	{
-		Vector3 distance( mCenter - v );
+		Vector3 dist( mCenter - v );
 
-		// ( abs( distance.x ) <= mHalfSize.x &&
-		//   abs( distance.y ) <= mHalfSize.y &&
-		//   abs( distance.z ) <= mHalfSize.z )
-		return ( Math::Abs( distance.x ) <= mHalfSize.x ) &
-				( Math::Abs( distance.y ) <= mHalfSize.y ) &
-				( Math::Abs( distance.z ) <= mHalfSize.z );
+		// ( abs( dist.x ) <= mHalfSize.x &&
+		//   abs( dist.y ) <= mHalfSize.y &&
+		//   abs( dist.z ) <= mHalfSize.z )
+		return ( Math::Abs( dist.x ) <= mHalfSize.x ) &
+				( Math::Abs( dist.y ) <= mHalfSize.y ) &
+				( Math::Abs( dist.z ) <= mHalfSize.z );
 	}
 	//-----------------------------------------------------------------------------------
 	inline Real Aabb::distance( const Vector3 &v ) const
 	{
-		Vector3 distance( mCenter - v );
+		Vector3 dist( mCenter - v );
 
-		// x = abs( distance.x ) - halfSize.x
-		// y = abs( distance.y ) - halfSize.y
-		// z = abs( distance.z ) - halfSize.z
+		// x = abs( dist.x ) - halfSize.x
+		// y = abs( dist.y ) - halfSize.y
+		// z = abs( dist.z ) - halfSize.z
 		// return max( min( x, y, z ), 0 ); //Return minimum between xyz, clamp to zero
 
-		distance.x = Math::Abs( distance.x ) - mHalfSize.x;
-		distance.y = Math::Abs( distance.y ) - mHalfSize.y;
-		distance.z = Math::Abs( distance.z ) - mHalfSize.z;
+		dist.x = Math::Abs( dist.x ) - mHalfSize.x;
+		dist.y = Math::Abs( dist.y ) - mHalfSize.y;
+		dist.z = Math::Abs( dist.z ) - mHalfSize.z;
 
-		return std::max( std::min( std::min( distance.x, distance.y ), distance.z ), 1.0f );
+		return std::max( std::min( std::min( dist.x, dist.y ), dist.z ), 1.0f );
 	}
 	//-----------------------------------------------------------------------------------
 	inline void Aabb::transformAffine( const Matrix4 &m )

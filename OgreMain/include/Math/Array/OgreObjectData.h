@@ -103,24 +103,24 @@ namespace Ogre
 		}
 
 		/// @copydoc Transform::copy
-		void copy( const ObjectData &copy )
+		void copy( const ObjectData &inCopy )
 		{
-			mParents[mIndex]	= copy.mParents[copy.mIndex];
-			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
+			mParents[mIndex]	= inCopy.mParents[inCopy.mIndex];
+			mOwner[mIndex]		= inCopy.mOwner[inCopy.mIndex];
 
 			Aabb tmp;
-			copy.mLocalAabb->getAsAabb( tmp, copy.mIndex );
+			inCopy.mLocalAabb->getAsAabb( tmp, inCopy.mIndex );
 			mLocalAabb->setFromAabb( tmp, mIndex );
 
-			copy.mWorldAabb->getAsAabb( tmp, copy.mIndex );
+			inCopy.mWorldAabb->getAsAabb( tmp, inCopy.mIndex );
 			mWorldAabb->setFromAabb( tmp, mIndex );
 
-			mLocalRadius[mIndex]		= copy.mLocalRadius[copy.mIndex];
-			mWorldRadius[mIndex]		= copy.mWorldRadius[copy.mIndex];
-			mUpperDistance[mIndex]		= copy.mUpperDistance[copy.mIndex];
-			mVisibilityFlags[mIndex]	= copy.mVisibilityFlags[copy.mIndex];
-			mQueryFlags[mIndex]			= copy.mQueryFlags[copy.mIndex];
-			mLightMask[mIndex]			= copy.mLightMask[copy.mIndex];
+			mLocalRadius[mIndex]		= inCopy.mLocalRadius[inCopy.mIndex];
+			mWorldRadius[mIndex]		= inCopy.mWorldRadius[inCopy.mIndex];
+			mUpperDistance[mIndex]		= inCopy.mUpperDistance[inCopy.mIndex];
+			mVisibilityFlags[mIndex]	= inCopy.mVisibilityFlags[inCopy.mIndex];
+			mQueryFlags[mIndex]			= inCopy.mQueryFlags[inCopy.mIndex];
+			mLightMask[mIndex]			= inCopy.mLightMask[inCopy.mIndex];
 		}
 
 		/** Advances all pointers to the next pack, i.e. if we're processing 4

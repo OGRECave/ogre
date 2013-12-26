@@ -191,7 +191,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
 	startWorkerThreads();
 
 	// Init shadow caster material for texture shadows
-    if (!mShadowCasterPlainBlackPass)
+    if (!mShadowCasterPlainBlackPass && mDestRenderSystem)
     {
         MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
             "Ogre/TextureShadowCaster");

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreMaterialManager.h"
-#include "OgreCompositorManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreLodStrategyManager.h"
@@ -49,8 +48,6 @@ void tearDownSuite()
 		delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
 	if(Ogre::GpuProgramManager::getSingletonPtr())
 		delete Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		delete Ogre::CompositorManager::getSingletonPtr();
 	if(Ogre::MaterialManager::getSingletonPtr())
 		delete Ogre::MaterialManager::getSingletonPtr();
 	if(Ogre::ResourceGroupManager::getSingletonPtr())

@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
+#include "OgreException.h"
+
 #include "Animation/OgreSkeletonAnimManager.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"

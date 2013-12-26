@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgrePixelFormat.h"
+#include "OgrePixelBox.h"
 
 using namespace Ogre;
 

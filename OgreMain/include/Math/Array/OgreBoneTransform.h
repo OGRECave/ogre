@@ -98,32 +98,32 @@ namespace Ogre
 
 			Note that we do NOT copy the mIndex member.
 		*/
-		void copy( const BoneTransform &copy )
+		void copy( const BoneTransform &inCopy )
 		{
-			mOwner[mIndex]		= copy.mOwner[copy.mIndex];
+			mOwner[mIndex]		= inCopy.mOwner[inCopy.mIndex];
 
 			Vector3 tmp;
 			Quaternion qTmp;
 
 			//Position
-			copy.mPosition->getAsVector3( tmp, copy.mIndex );
+			inCopy.mPosition->getAsVector3( tmp, inCopy.mIndex );
 			mPosition->setFromVector3( tmp, mIndex );
 
 			//Orientation
-			copy.mOrientation->getAsQuaternion( qTmp, copy.mIndex );
+			inCopy.mOrientation->getAsQuaternion( qTmp, inCopy.mIndex );
 			mOrientation->setFromQuaternion( qTmp, mIndex );
 
 			//Scale
-			copy.mScale->getAsVector3( tmp, copy.mIndex );
+			inCopy.mScale->getAsVector3( tmp, inCopy.mIndex );
 			mScale->setFromVector3( tmp, mIndex );
 
-			mParentNodeTransform[mIndex]= copy.mParentNodeTransform[copy.mIndex];
-			mParentTransform[mIndex]	= copy.mParentTransform[copy.mIndex];
-			mDerivedTransform[mIndex]	= copy.mDerivedTransform[copy.mIndex];
-			mFinalTransform[mIndex]		= copy.mFinalTransform[copy.mIndex];
+			mParentNodeTransform[mIndex]= inCopy.mParentNodeTransform[inCopy.mIndex];
+			mParentTransform[mIndex]	= inCopy.mParentTransform[inCopy.mIndex];
+			mDerivedTransform[mIndex]	= inCopy.mDerivedTransform[inCopy.mIndex];
+			mFinalTransform[mIndex]		= inCopy.mFinalTransform[inCopy.mIndex];
 
-			mInheritOrientation[mIndex]	= copy.mInheritOrientation[copy.mIndex];
-			mInheritScale[mIndex]		= copy.mInheritScale[copy.mIndex];
+			mInheritOrientation[mIndex]	= inCopy.mInheritOrientation[inCopy.mIndex];
+			mInheritScale[mIndex]		= inCopy.mInheritScale[inCopy.mIndex];
 		}
 
 		/** Advances all pointers to the next pack, i.e. if we're processing 4 elements at a time, move to
