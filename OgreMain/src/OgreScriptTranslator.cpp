@@ -5831,6 +5831,21 @@ namespace Ogre{
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 					}
 					break;
+				case ID_CUSTOM_ID:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getIdString( *it0, &mNodeDef->mCustomIdentifier ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
 						"token \"" + prop->name + "\" is not recognized");

@@ -218,7 +218,7 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorNodeDef* CompositorManager2::addNodeDefinition( IdString name )
+	CompositorNodeDef* CompositorManager2::addNodeDefinition( const String &name )
 	{
 		CompositorNodeDef *retVal = 0;
 
@@ -230,8 +230,7 @@ namespace Ogre
 		else
 		{
 			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A node definition with name '" +
-							name.getFriendlyText() + "' already exists",
-							"CompositorManager2::addNodeDefinition" );
+						 name + "' already exists", "CompositorManager2::addNodeDefinition" );
 		}
 
 		return retVal;
@@ -246,8 +245,8 @@ namespace Ogre
 		if( itor == mShadowNodeDefs.end() )
 		{
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "ShadowNode definition with name '" +
-							nodeDefName.getFriendlyText() + "' not found",
-							"CompositorManager2::getShadowNodeDefinition" );
+						 nodeDefName.getFriendlyText() + "' not found",
+						 "CompositorManager2::getShadowNodeDefinition" );
 		}
 		else
 		{
@@ -265,7 +264,7 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorShadowNodeDef* CompositorManager2::addShadowNodeDefinition( IdString name )
+	CompositorShadowNodeDef* CompositorManager2::addShadowNodeDefinition( const String &name )
 	{
 		CompositorShadowNodeDef *retVal = 0;
 
@@ -278,8 +277,7 @@ namespace Ogre
 		else
 		{
 			OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A shadow node definition with name '" +
-							name.getFriendlyText() + "' already exists",
-							"CompositorManager2::addShadowNodeDefinition" );
+						 name + "' already exists", "CompositorManager2::addShadowNodeDefinition" );
 		}
 
 		return retVal;
@@ -489,11 +487,11 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::createBasicWorkspaceDef( IdString workspaceDefName,
+	void CompositorManager2::createBasicWorkspaceDef( const String &workspaceDefName,
 														const ColourValue &backgroundColour,
 														IdString shadowNodeName )
 	{
-		CompositorNodeDef *nodeDef = this->addNodeDefinition( workspaceDefName + IdString( "/Node" ) );
+		CompositorNodeDef *nodeDef = this->addNodeDefinition( workspaceDefName + "/Node" );
 
 		//Input texture
 		nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );

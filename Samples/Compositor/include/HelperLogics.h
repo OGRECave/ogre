@@ -23,9 +23,9 @@ conditions of the standard open source license.
 //@see CompositorDemo::loadResources
 
 #include "OgrePrerequisites.h"
-#include "OgreCompositorLogic.h"
-#include "OgreCompositorInstance.h"
-
+//#include "OgreCompositorLogic.h"
+//#include "OgreCompositorInstance.h"
+#if 0
 //The simple types of compositor logics will all do the same thing -
 //Attach a listener to the created compositor
 class ListenerFactoryLogic : public Ogre::CompositorLogic
@@ -79,4 +79,5 @@ protected:
 	virtual Ogre::CompositorInstance::Listener* createListener(Ogre::CompositorInstance* instance);
 };
 
+#endif
 #endif

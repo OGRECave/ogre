@@ -515,11 +515,12 @@ namespace OgreBites
 		{
 			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-			const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
+			Ogre::String workspaceNameStr( mInfo["Title"] + " Workspace" );
+			const Ogre::IdString workspaceName( workspaceNameStr );
 			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
 			{
-				compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
-															Ogre::IdString() );
+				compositorManager->createBasicWorkspaceDef( workspaceNameStr,
+															mBackgroundColor, Ogre::IdString() );
 			}
 			compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 		}

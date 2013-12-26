@@ -93,7 +93,10 @@ namespace Ogre
 		*/
 	class _OgreExport CompositorManager2 : public ResourceAlloc
 	{
+	public:
 		typedef map<IdString, CompositorNodeDef*>::type			CompositorNodeDefMap;
+
+	protected:
 		CompositorNodeDefMap	mNodeDefinitions;
 
 		typedef map<IdString, CompositorShadowNodeDef*>::type	CompositorShadowNodeDefMap;
@@ -132,14 +135,17 @@ namespace Ogre
 		/// Returns the node definition with the given name. Throws if not found
 		const CompositorNodeDef* getNodeDefinition( IdString nodeDefName ) const;
 
+		/// Returns a const iterator to all existing definitions
+		const CompositorNodeDefMap& getNodeDefinitions(void) const	{ return mNodeDefinitions; }
+
 		/// Returns a new node definition. The name must be unique, throws otherwise.
-		CompositorNodeDef* addNodeDefinition( IdString name );
+		CompositorNodeDef* addNodeDefinition( const String &name );
 
 		/// Returns the node definition with the given name. Throws if not found
 		const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
 
 		/// Returns a new node definition. The name must be unique, throws otherwise.
-		CompositorShadowNodeDef* addShadowNodeDefinition( IdString name );
+		CompositorShadowNodeDef* addShadowNodeDefinition( const String &name );
 
 		/// Returns true if a workspace definition with the given name exists
 		bool hasWorkspaceDefinition( IdString name ) const;
@@ -234,7 +240,8 @@ namespace Ogre
 			Name of the shadow node. Leave blank if no shadows.
 			Caller is supposed to have set the shadow node correctly
 		*/
-		void createBasicWorkspaceDef( IdString workspaceDefName, const ColourValue &backgroundColour,
+		void createBasicWorkspaceDef( const String &workspaceDefName,
+										const ColourValue &backgroundColour,
 										IdString shadowNodeName=IdString() );
 	};
 

@@ -793,6 +793,7 @@ namespace Ogre
 		ID_COMPOSITOR_NODE,
 			ID_IN,
 			ID_OUT,
+			ID_CUSTOM_ID,
 		//	ID_TEXTURE,
 				ID_TARGET_WIDTH,
 				ID_TARGET_HEIGHT,

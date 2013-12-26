@@ -60,6 +60,7 @@ namespace Ogre
 		friend class CompositorNode;
 
 		IdString	mName;
+		String		mNameStr;
 
 		/** Tells where to grab the RenderTarget from for the output channel.
 			They can come either from an input channel, or from local textures.
@@ -71,10 +72,14 @@ namespace Ogre
 		CompositorTargetDefVec	mTargetPasses;
 
 	public:
-		CompositorNodeDef( IdString name ) : TextureDefinitionBase( TEXTURE_LOCAL ), mName( name ) {}
+		IdString	mCustomIdentifier;
+
+		CompositorNodeDef( const String &name ) :
+				TextureDefinitionBase( TEXTURE_LOCAL ), mName( name ), mNameStr( name ) {}
         virtual ~CompositorNodeDef() {}
 
-		IdString getName() const							{ return mName; }
+		IdString getName(void) const						{ return mName; }
+		String getNameStr(void) const						{ return mNameStr; }
 
 		/// See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
 		using TextureDefinitionBase::getTextureSource;

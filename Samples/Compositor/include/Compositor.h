@@ -22,6 +22,8 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "SamplePlugin.h"
 
+#include "Compositor/OgreCompositorNodeDef.h"
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -59,8 +61,8 @@ protected:
 	size_t mNumCompositorPages;	
 
 	//Used to unregister compositor logics and free memory
-	typedef map<String, CompositorLogic*>::type CompositorLogicMap;
-	CompositorLogicMap mCompositorLogics;
+	/*typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+	CompositorLogicMap mCompositorLogics;*/
 
 	String mDebugCompositorName;
 	SelectMenu* mDebugTextureSelectMenu;
@@ -109,13 +111,13 @@ void Sample_Compositor::setupContent(void)
 {
 	// Register the compositor logics
 	// See comment in beginning of HelperLogics.h for explanation
-	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+	/*Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
 	mCompositorLogics["GaussianBlur"]	= new GaussianBlurLogic;
 	mCompositorLogics["HDR"]			= new HDRLogic;
 	mCompositorLogics["HeatVision"]		= new HeatVisionLogic;
 	compMgr.registerCompositorLogic("GaussianBlur", mCompositorLogics["GaussianBlur"]);
 	compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
-	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);
+	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);*/
 	
 	createTextures();
     /// Create a couple of hard coded postfilter effects as an example of how to do it
@@ -142,45 +144,36 @@ StringVector Sample_Compositor::getRequiredPlugins()
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::registerCompositors(void)
 {
-	Ogre::Viewport *vp = mViewport;
-    
+	CompositorManager2 *compoManager = mRoot->getCompositorManager2();
+	CompositorManager2::CompositorNodeDefMap nodeDefs = compoManager->getNodeDefinitions();
+
     //iterate through Compositor Managers resources and add name keys to menu
-    Ogre::CompositorManager::ResourceMapIterator resourceIterator =
-        Ogre::CompositorManager::getSingleton().getResourceIterator();
+	CompositorManager2::CompositorNodeDefMap::const_iterator itor = nodeDefs.begin();
+	CompositorManager2::CompositorNodeDefMap::const_iterator end  = nodeDefs.end();
 
-    // add all compositor resources to the view container
-    while (resourceIterator.hasMoreElements())
+	IdString compositorId = "Ogre/Compositor";
+	IdString deferredShadingId	= "Ogre/DeferredShading";
+	IdString ssaoId				= "Ogre/SSAO";
+
+	// add all compositor resources to the view container
+	while( itor != end )
     {
-        Ogre::ResourcePtr resource = resourceIterator.getNext();
-        const Ogre::String& compositorName = resource->getName();
-        // Don't add base Ogre/Scene compositor to view
-        if (Ogre::StringUtil::startsWith(compositorName, "Ogre/Scene/", false))
-            continue;
-		// Don't add the deferred shading compositors, thats a different demo.
-		if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
-			continue;
-		// Don't add the SSAO compositors, thats a different demo.
-		if (Ogre::StringUtil::startsWith(compositorName, "SSAO", false))
-			continue;
-		// Don't add the TestMRT compositor, it needs extra scene setup so doesn't currently work.
-		if (Ogre::StringUtil::startsWith(compositorName, "TestMRT", false))
-			continue;
+		if( itor->second->mCustomIdentifier == compositorId )
+		{
+			mCompositorNames.push_back(itor->second->getNameStr());
+#if 0
+			try 
+			{
+				Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
+				Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
+			} catch (...) {
+				/// Warn user
+				LogManager::getSingleton().logMessage("Could not load compositor " + compositorName);
+			}
+#endif
+		}
 
-		mCompositorNames.push_back(compositorName);
-		int addPosition = -1;
-		if (compositorName == "HDR")
-		{
-			// HDR must be first in the chain
-			addPosition = 0;
-		}
-		try 
-		{
-			Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
-			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
-		} catch (...) {
-			/// Warn user
-			LogManager::getSingleton().logMessage("Could not load compositor " + compositorName);
-		}
+		++itor;
     }
 
 	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
@@ -523,7 +516,7 @@ void Sample_Compositor::createEffects(void)
 //				}
 //			}
 //		}
-		/// Motion blur effect
+/*		/// Motion blur effect
 	Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
 			"Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
 		);
@@ -643,7 +636,7 @@ void Sample_Compositor::createEffects(void)
 				pass->setInput(0, "temp");
 			}
 		}
-	}
+	}*/
 }
 //--------------------------------------------------------------------------
 void Sample_Compositor::createTextures(void)

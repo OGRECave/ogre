@@ -4,6 +4,8 @@ compositor_node Bloom
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	texture rt0 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
 	texture rt1 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
 
@@ -61,6 +63,8 @@ compositor_node Glass
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -78,6 +82,8 @@ compositor_node "Old TV"
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -100,6 +106,8 @@ compositor_node B&W
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -178,6 +186,8 @@ compositor_node Embossed
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		// Draw a fullscreen quad with the black and white image
@@ -198,6 +208,8 @@ compositor_node "Sharpen Edges"
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -220,6 +232,8 @@ compositor_node Invert
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -240,6 +254,8 @@ compositor_node Posterize
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -259,6 +275,8 @@ compositor_node Laplace
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -283,6 +301,8 @@ compositor_node Tiling
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -302,6 +322,8 @@ compositor_node "Old Movie"
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -481,7 +503,8 @@ compositor_node "Gaussian Blur"
 {
 	in 0 rt_inout
 	in 1 rt_tmp
-	
+
+	custom_id Compositor
 	compositor_logic GaussianBlur
 
 	target rt_tmp
@@ -561,6 +584,8 @@ compositor_node "Radial Blur"
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 	
 	target rt_output
 	{
@@ -583,6 +608,8 @@ compositor_node ASCII
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -603,6 +630,8 @@ compositor_node Halftone
 	in 0 rt_input
 	in 1 rt_output
 
+	custom_id Compositor
+
 	target rt_output
 	{
 		pass render_quad
@@ -622,6 +651,8 @@ compositor "Night Vision"
 {
 	in 0 rt_input
 	in 1 rt_output
+
+	custom_id Compositor
 	
 	target rt_output
 	{
@@ -643,6 +674,8 @@ compositor_node Dither
 {
 	in 0 rt_input
 	in 1 rt_output
+	
+	custom_id Compositor
 
 	target rt_output
 	{
@@ -662,7 +695,7 @@ compositor_node Dither
 compositor_node FinalComposition
 {
 	in 0 rtN		// Take input texture #0 and use the local name "rtN" for reference in this scope
-	in 1 rt_output	// Take input texture #1 and use the local name "rt_output" for reference in this scope
+	in 1 rt_output
 
 	target rt_output
 	{

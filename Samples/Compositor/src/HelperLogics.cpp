@@ -16,6 +16,7 @@ same license as the rest of the engine.
 
 #include "Ogre.h"
 
+#if 0
 //---------------------------------------------------------------------------
 class HeatVisionListener: public Ogre::CompositorInstance::Listener
 {
@@ -339,3 +340,4 @@ void GaussianListener::notifyMaterialRender(Ogre::uint32 pass_id, Ogre::Material
 {
 }
 //---------------------------------------------------------------------------
+#endif
