@@ -2162,7 +2162,6 @@ void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t 
 			numObjs = std::min( numObjs, totalObjs - toAdvance );
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
-			//TODO: Select LOD method here
 			lodStrategy->lodUpdateImpl( numObjs, objData, lodCamera, request.lodBias );
 		}
 
