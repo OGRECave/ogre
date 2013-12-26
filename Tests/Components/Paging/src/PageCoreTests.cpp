@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "PageCoreTests.h"
 #include "OgrePaging.h"
-#include "OgreCompositorManager2.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
@@ -75,16 +74,6 @@ void PageCoreTests::setUp()
         threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
 
 	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod, "DummyScene");
-
-//    Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-//
-//    const Ogre::IdString workspaceName( "PageCoreTests Workspace" );
-//    if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-//    {
-//        compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
-//                                                   Ogre::IdString() );
-//    }
-//    compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
 
 void PageCoreTests::tearDown()
