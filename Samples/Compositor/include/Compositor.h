@@ -185,6 +185,7 @@ void Sample_Compositor::changePage(size_t pageNum)
 	assert(pageNum < mNumCompositorPages);
 	
 	mActiveCompositorPage = pageNum;
+#if 0
 	size_t maxCompositorsInPage = mCompositorNames.size() - (pageNum * COMPOSITORS_PER_PAGE);
 	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
 	{
@@ -215,6 +216,7 @@ void Sample_Compositor::changePage(size_t pageNum)
 			cb->hide();
 		}
 	}
+#endif
 
 	OgreBites::Button* pageButton = static_cast<OgreBites::Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
 	Ogre::StringStream ss;
@@ -225,12 +227,12 @@ void Sample_Compositor::changePage(size_t pageNum)
 void Sample_Compositor::cleanupContent(void)
 {
 	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
-	CompositorManager::getSingleton().removeCompositorChain(mViewport);
 	mCompositorNames.clear();
 
     TextureManager::getSingleton().remove("DitherTex");
     TextureManager::getSingleton().remove("HalftoneVolume");
 
+#if 0
 	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
 	CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
 	CompositorLogicMap::const_iterator end  = mCompositorLogics.end();
@@ -241,6 +243,7 @@ void Sample_Compositor::cleanupContent(void)
 		++itor;
 	}
 	mCompositorLogics.clear();
+#endif
     MeshManager::getSingleton().remove("Myplane");
 }
 //-----------------------------------------------------------------------------------
@@ -309,11 +312,14 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 			}
 		}
 
+#if 0
 		CompositorManager::getSingleton().setCompositorEnabled(mViewport, compositorName, box->isChecked());
+#endif
 
 		
 		if (box->isChecked())
 		{
+#if 0
 			//Add the items to the selectable texture menu
 			CompositorInstance* instance = CompositorManager::getSingleton().getCompositorChain(mViewport)->getCompositor(compositorName);
 			if (instance)
@@ -339,6 +345,7 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 				}
 				mDebugTextureSelectMenu->selectItem(activeTex, false);
 			}
+#endif
 		}
 	}
 }
@@ -377,15 +384,13 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupScene(void)
 {
-	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-	mSceneMgr->setShadowFarDistance(1000);
-    
 	Ogre::MovableObject::setDefaultVisibilityFlags(0x00000001);
 
 	// Set ambient light
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.2));
 
-	Ogre::Light* l = mSceneMgr->createLight("Light2");
+	Ogre::Light* l = mSceneMgr->createLight();
+	mSceneMgr->createSceneNode()->attachObject( l );
 	Ogre::Vector3 dir(-1,-1,0);
 	dir.normalise();
 	l->setType(Ogre::Light::LT_DIRECTIONAL);
@@ -397,16 +402,16 @@ void Sample_Compositor::setupScene(void)
 	Ogre::Entity* pEnt;
 
 	// House
-	pEnt = mSceneMgr->createEntity( "1", "tudorhouse.mesh" );
-	Ogre::SceneNode* n1 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(350, 450, -200));
+	pEnt = mSceneMgr->createEntity( "tudorhouse.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, SCENE_STATIC );
+	Ogre::SceneNode* n1 = mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_STATIC, Ogre::Vector3(350, 450, -200));
 	n1->attachObject( pEnt );
 
-	pEnt = mSceneMgr->createEntity( "2", "tudorhouse.mesh" );
-	Ogre::SceneNode* n2 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-350, 450, -200));
+	pEnt = mSceneMgr->createEntity( "tudorhouse.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, SCENE_STATIC );
+	Ogre::SceneNode* n2 = mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_STATIC, Ogre::Vector3(-350, 450, -200));
 	n2->attachObject( pEnt );
 
-	pEnt = mSceneMgr->createEntity( "3", "knot.mesh" );
-	mSpinny = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0, 0, 300));
+	pEnt = mSceneMgr->createEntity( "knot.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+	mSpinny = mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_DYNAMIC, Ogre::Vector3(0, 0, 300));
 	mSpinny->attachObject( pEnt );
 	pEnt->setMaterialName("Examples/MorningCubeMap");
 
@@ -416,13 +421,13 @@ void Sample_Compositor::setupScene(void)
 	Ogre::Plane plane;
 	plane.normal = Ogre::Vector3::UNIT_Y;
 	plane.d = 100;
-	Ogre::MeshManager::getSingleton().createPlane("Myplane",
+	MeshPtr planMesh = Ogre::MeshManager::getSingleton().createPlane("Myplane",
 		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
 		1500, 1500, 10, 10, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-	Ogre::Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	Ogre::Entity* pPlaneEnt = mSceneMgr->createEntity( planMesh, SCENE_STATIC );
 	pPlaneEnt->setMaterialName("Examples/Rockwall");
 	pPlaneEnt->setCastShadows(false);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_STATIC )->attachObject(pPlaneEnt);
 
 	mCamera->setPosition(-400, 50, 900);
 	mCamera->lookAt(0,80,0);
