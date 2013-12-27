@@ -1826,9 +1826,6 @@ protected:
 #endif
 			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 			compositorManager->removeAllWorkspaces();
-			compositorManager->removeAllWorkspaceDefinitions();
-			compositorManager->removeAllNodeDefinitions();
-			compositorManager->removeAllShadowNodeDefinitions();
 
 			dummyScene->removeRenderQueueListener(mOverlaySystem);
 			mRoot->destroySceneManager(dummyScene);

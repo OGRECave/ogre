@@ -4,7 +4,7 @@ compositor_node Bloom
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	texture rt0 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
 	texture rt1 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
@@ -16,7 +16,7 @@ compositor_node Bloom
 		{
 			// Renders a fullscreen quad with a material
 			material Ogre/Compositor/BrightPass2
-			input 0 rt_input0
+			input 0 rt_input
 		}
 	}
 
@@ -63,7 +63,7 @@ compositor_node Glass
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -83,7 +83,7 @@ compositor_node "Old TV"
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -107,7 +107,7 @@ compositor_node B&W
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -186,7 +186,7 @@ compositor_node Embossed
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -209,7 +209,7 @@ compositor_node "Sharpen Edges"
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -232,7 +232,7 @@ compositor_node Invert
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -254,7 +254,7 @@ compositor_node Posterize
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -276,12 +276,10 @@ compositor_node Laplace
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
-		// Start with clear output
-		input none
 		// Draw a fullscreen quad with the black and white image
 		pass render_quad
 		{
@@ -301,7 +299,7 @@ compositor_node Tiling
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -323,7 +321,7 @@ compositor_node "Old Movie"
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -504,13 +502,11 @@ compositor_node "Gaussian Blur"
 	in 0 rt_inout
 	in 1 rt_tmp
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 	compositor_logic GaussianBlur
 
 	target rt_tmp
 	{
-		// Blur horizontally
-		input none
 		pass render_quad
 		{
 			material Ogre/Compositor/HDR/GaussianBloom
@@ -521,8 +517,6 @@ compositor_node "Gaussian Blur"
 
 	target rt_inout
 	{
-		// Start with clear output
-		input none
 		// Blur vertically
 		pass render_quad
 		{
@@ -585,7 +579,7 @@ compositor_node "Radial Blur"
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 	
 	target rt_output
 	{
@@ -608,7 +602,7 @@ compositor_node ASCII
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -630,7 +624,7 @@ compositor_node Halftone
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -652,7 +646,7 @@ compositor "Night Vision"
 	in 0 rt_input
 	in 1 rt_output
 
-	custom_id Compositor
+	custom_id Ogre/Compositor
 	
 	target rt_output
 	{
@@ -675,7 +669,7 @@ compositor_node Dither
 	in 0 rt_input
 	in 1 rt_output
 	
-	custom_id Compositor
+	custom_id Ogre/Compositor
 
 	target rt_output
 	{
@@ -694,7 +688,8 @@ compositor_node Dither
 //and copies it to the actual RenderWindow
 compositor_node FinalComposition
 {
-	in 0 rtN		// Take input texture #0 and use the local name "rtN" for reference in this scope
+	// Take input texture #0 and use the local name "rtN" for reference in this scope
+	in 0 rtN
 	in 1 rt_output
 
 	target rt_output
@@ -742,8 +737,11 @@ compositor_node CompositorSampleStdRenderer
 
 workspace CompositorSampleWorkspace
 {
-	connect CompositorSampleStdRenderer Bloom	//Connect all CompositorSampleStdRenderer outputs to Bloom's input
+	//Connect all CompositorSampleStdRenderer outputs to Bloom's input
+	connect CompositorSampleStdRenderer Bloom
 
-	connect_output 0 FinalComposition		//Connect RenderWindow to FinalComposition's input channel #0
-	connect 0 Bloom 1 FinalComposition		//Connect Bloom's output #0 to FinalComposition's input #1
+	//Connect RenderWindow to FinalComposition's input channel #0
+	connect_output 0 FinalComposition
+	//Connect Bloom's output #0 to FinalComposition's input #1
+	connect Bloom 0 FinalComposition 1
 }

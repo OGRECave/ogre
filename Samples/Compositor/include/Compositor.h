@@ -45,6 +45,7 @@ public:
 	void itemSelected(OgreBites::SelectMenu* menu);
 
 protected:
+	virtual void setupCompositor(void);
 	
 	void setupView(void);
 	void setupControls(void);
@@ -107,6 +108,14 @@ void Sample_Compositor::setupView()
     mCamera->setNearClipDistance(1);
 }
 //-----------------------------------------------------------------------------------
+void Sample_Compositor::setupCompositor(void)
+{
+	Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+	const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
+	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+}
+//-----------------------------------------------------------------------------------
 void Sample_Compositor::setupContent(void)
 {
 	// Register the compositor logics
@@ -119,7 +128,9 @@ void Sample_Compositor::setupContent(void)
 	compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
 	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);*/
 	
+#if 0
 	createTextures();
+#endif
     /// Create a couple of hard coded postfilter effects as an example of how to do it
 	/// but the preferred method is to use compositor scripts.
 	createEffects();

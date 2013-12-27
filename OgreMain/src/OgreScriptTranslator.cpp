@@ -5589,10 +5589,10 @@ namespace Ogre{
 					{
 						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 					}
-					else if(prop->values.size() < 4)
+					else if(prop->values.size() < 2)
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"connect needs at least 4 argument");
+							"connect needs at least 2 argument");
 					}
 					else if( prop->values.size() & 0x01 )
 					{
@@ -5657,6 +5657,10 @@ namespace Ogre{
 								++itor;
 								++inNodeStart;
 							}
+
+							//No explicit numeric channels provided.
+							if( prop->values.size() == 2 )
+								mWorkspaceDef->connect( outNode, inNode );
 						}
 					}
 					break;

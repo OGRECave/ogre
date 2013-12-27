@@ -57,6 +57,9 @@ namespace Ogre
 		//Create local textures
 		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mLocalTextures,
 												id, false, finalTarget, mRenderSystem );
+
+		//Local textures will be routed now.
+		routeOutputs();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorNode::~CompositorNode()
@@ -78,8 +81,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::routeOutputs()
 	{
-		assert( mNumConnectedInputs <= mInTextures.size() );
-
 		CompositorChannelVec::iterator itor = mOutTextures.begin();
 		CompositorChannelVec::iterator end  = mOutTextures.end();
 		CompositorChannelVec::iterator begin= mOutTextures.begin();

@@ -90,6 +90,18 @@ namespace Ogre
 		mChannelRoutes.push_back( ChannelRoute( outChannel, outNode, inChannel, inNode ) );
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::connect( IdString outNode, IdString inNode )
+	{
+		const CompositorNodeDef *outDef = mCompositorManager->getNodeDefinition( outNode );
+		const CompositorNodeDef *inDef  = mCompositorManager->getNodeDefinition( inNode );
+
+		size_t inputChannels  = inDef->getNumInputChannels();
+		size_t outputChannels = outDef->getNumOutputChannels();
+
+		for( size_t i=0; i<inputChannels && i<outputChannels; ++i )
+			connect( i, outNode, i, inNode );
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorWorkspaceDef::connectOutput( uint32 inChannel, IdString inNode )
 	{
 		createImplicitAlias( inNode );

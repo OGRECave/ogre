@@ -122,6 +122,9 @@ namespace Ogre
 		*/
 		void setNumOutputChannels( size_t numOuts )			{ mOutChannelMapping.reserve( numOuts ); }
 
+		/// Returns the number of output channels
+		size_t getNumOutputChannels(void) const				{ return mOutChannelMapping.size(); }
+
 		/** Maps the output channel to the given texture name, which can be either a
 			local texture or a reference to an input channel. Global textures can't
 			be used as output.

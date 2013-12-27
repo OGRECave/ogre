@@ -102,6 +102,12 @@ namespace Ogre
 		*/
 		void connect( uint32 outChannel, IdString outNode, uint32 inChannel, IdString inNode );
 
+		/** Connects all outputs channels from outNode to all input channels from inNode. If
+			the number of channels don't match, only the first N channels are set (where N is
+			the minimum between outNode's output channels and inNode's input channels).
+		*/
+		void connect( IdString outNode, IdString inNode );
+
 		/** Connects the (probably "final") node by passing the RenderWindow in the given input channel
 		@remarks
 			@See connect
