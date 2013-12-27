@@ -688,15 +688,15 @@ compositor_node Dither
 //and copies it to the actual RenderWindow
 compositor_node FinalComposition
 {
-	// Take input texture #0 and use the local name "rtN" for reference in this scope
-	in 0 rtN
-	in 1 rt_output
+	in 0 rt_output
+	// Take input texture #1 and use the local name "rtN" for reference in this scope
+	in 1 rtN
 
 	target rt_output
 	{
 	    pass render_quad
 	    {
-	    	material Ogre/Copy_4x8B
+	    	material Ogre/Copy/4xFP16
 	    	input 0 rtN
 	    }
 	}

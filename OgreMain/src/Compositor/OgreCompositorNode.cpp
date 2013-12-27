@@ -277,6 +277,8 @@ namespace Ogre
             break;
 		}
 
+		assert( !channel->textures.empty() && "Are you trying to use the RenderWindow as a texture???" );
+
 		TexturePtr retVal;
 		if( channel )
 		{

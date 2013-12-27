@@ -1,0 +1,46 @@
+fragment_program Ogre/Copy/4xFP16_ps2_HLSL hlsl
+{
+	source Copyback.hlsl
+	entry_point copy_4xFP16_ps
+	target ps_2_0
+}
+
+fragment_program Ogre/Copy/4xFP16_ps_GLSL glsl
+{
+	source Copyback.fs.glsl
+	default_params
+	{
+		param_named tex int 0
+	}
+}
+
+fragment_program Ogre/Copy/4xFP16_ps unified
+{
+	delegate Ogre/Copy/4xFP16_ps_GLSL
+	delegate Ogre/Copy/4xFP16_ps2_HLSL
+}
+
+material Ogre/Copy/4xFP16
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Copy/4xFP16_ps
+			{
+			}
+
+			texture_unit
+			{
+				tex_address_mode clamp
+			}
+		}
+	}
+}

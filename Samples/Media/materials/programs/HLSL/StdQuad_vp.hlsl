@@ -31,7 +31,8 @@ struct VS_OUTPUT4 {
 
 VS_OUTPUT StdQuad_vp
 (
-    float4 inPos : POSITION
+    float4 inPos : POSITION,
+	float2 inUv0 : TEXCOORD0
 )
 {
 	VS_OUTPUT Out;
@@ -39,18 +40,16 @@ VS_OUTPUT StdQuad_vp
 	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
-    // The input positions adjusted by texel offsets, so clean up inaccuracies
-    inPos.xy = sign(inPos.xy);
-
     // Convert to image-space
-    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord = inUv0;
 	
 	return Out;		
 }
 
 VS_OUTPUT2 StdQuad_Tex2_vp
 (
-    float4 inPos : POSITION
+    float4 inPos : POSITION,
+	float2 inUv0 : TEXCOORD0
 )
 {
 	VS_OUTPUT2 Out;
@@ -62,15 +61,16 @@ VS_OUTPUT2 StdQuad_Tex2_vp
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    Out.texCoord2 = Out.texCoord;
+    Out.texCoord = inUv0;
+    Out.texCoord2 = inUv0;
 	
 	return Out;		
 }
 
 VS_OUTPUT2 StdQuad_Tex2a_vp
 (
-    float4 inPos : POSITION
+    float4 inPos : POSITION,
+	float2 inUv0 : TEXCOORD0
 )
 {
 	VS_OUTPUT2 Out;
@@ -82,7 +82,7 @@ VS_OUTPUT2 StdQuad_Tex2a_vp
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord = inUv0;
     Out.texCoord2 = inPos.xy;
 	
 	return Out;	
@@ -90,7 +90,8 @@ VS_OUTPUT2 StdQuad_Tex2a_vp
 
 VS_OUTPUT3 StdQuad_Tex3_vp
 (
-    float4 inPos : POSITION
+    float4 inPos : POSITION,
+	float2 inUv0 : TEXCOORD0
 )
 {
 	VS_OUTPUT3 Out;
@@ -98,20 +99,18 @@ VS_OUTPUT3 StdQuad_Tex3_vp
 	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
-    // The input positions adjusted by texel offsets, so clean up inaccuracies
-    inPos.xy = sign(inPos.xy);
-
     // Convert to image-space
-    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    Out.texCoord2 = Out.texCoord;
-    Out.texCoord3 = Out.texCoord;
+    Out.texCoord = inUv0;
+    Out.texCoord2 = inUv0;
+    Out.texCoord3 = inUv0;
 	
 	return Out;	
 }
 
 VS_OUTPUT4 StdQuad_Tex4_vp
 (
-    float4 inPos : POSITION
+    float4 inPos : POSITION,
+	float2 inUv0 : TEXCOORD0
 )
 {
 	VS_OUTPUT4 Out;
@@ -119,14 +118,11 @@ VS_OUTPUT4 StdQuad_Tex4_vp
 	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
-    // The input positions adjusted by texel offsets, so clean up inaccuracies
-    inPos.xy = sign(inPos.xy);
-
     // Convert to image-space
-    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    Out.texCoord2 = Out.texCoord;
-    Out.texCoord3 = Out.texCoord;
-    Out.texCoord4 = Out.texCoord;
+    Out.texCoord = inUv0;
+    Out.texCoord2 = inUv0;
+    Out.texCoord3 = inUv0;
+    Out.texCoord4 = inUv0;
 	
 	return Out;	
 }
