@@ -317,7 +317,7 @@ namespace OgreBites
 				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			}	
-#endif // USE_RTSHADER_SYSTEM
+#endif // INCLUDE_RTSHADER_SYSTEM
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
             else if (evt.key == OIS::KC_P)
@@ -327,7 +327,6 @@ namespace OgreBites
                     prof->setEnabled(!prof->getEnabled());
             }
 #endif // OGRE_PROFILING
-#endif // INCLUDE_RTSHADER_SYSTEM
 
 			mCameraMan->injectKeyDown(evt);
 			return true;
