@@ -213,7 +213,7 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        uint n = sscanf(atom->value.c_str(), "%u", result);
+        int n = sscanf(atom->value.c_str(), "%u", result);
         if (n == 0 || n == EOF)
             return false; // Conversion failed
 

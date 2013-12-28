@@ -11,7 +11,6 @@ TexturePtr RandomTools::generateRandomVelocityTexture()
     // PPP: Temp workaround for DX 11 which does not seem to like usage dynamic
     // TextureUsage usage = (Root::getSingletonPtr()->getRenderSystem()->getName()=="Direct3D11 Rendering Subsystem") ?
     //     TU_DEFAULT : TU_DYNAMIC;
-    TextureUsage usage = TU_DYNAMIC; //TU_DEFAULT;// : TU_DYNAMIC;
     TexturePtr texPtr = TextureManager::getSingleton().createManual(
         "RandomVelocityTexture",
         // ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

@@ -43,8 +43,11 @@ void MeshLodTests::setUp()
 	Root* root = OGRE_NEW Root("plugins.cfg");
 
     // Try to load a Rendersystem
-    root->loadPlugin("RenderSystem_GL");
-
+#if OGRE_DEBUG_MODE
+	root->loadPlugin("RenderSystem_GL_d");
+#else
+	root->loadPlugin("RenderSystem_GL");
+#endif
 #endif
 	CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
 	root->setRenderSystem(root->getAvailableRenderers().back());
@@ -70,13 +73,8 @@ void MeshLodTests::setUp()
 	cf.load("resources.cfg");
 #endif
 #else
-#ifdef OGRE_STATIC_LIB
 	cf.load("bin/resources.cfg");
-#else
-	cf.load("resources.cfg");
 #endif
-#endif /* if OGRE_PLATFORM == OGRE_PLATFORM_APPLE */
-
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
 

@@ -38,17 +38,19 @@ CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 
 void TerrainTests::setUp()
 {
-	// set up silent logging to not pollute output
-	OGRE_DELETE LogManager::getSingletonPtr();
-	mLogManager = OGRE_NEW LogManager();
-	mLogManager->createLog("testTerrain.log", true, false);
-	mLogManager->setLogDetail(LL_LOW);
+    // set up silent logging to not pollute output
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
-#if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
-#endif
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("testTerrain.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
+    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
 	mRoot = OGRE_NEW Root(StringUtil::BLANK);
         
 	mStaticPluginLoader.load();
