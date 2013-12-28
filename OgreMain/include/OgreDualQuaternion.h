@@ -47,7 +47,7 @@ namespace Ogre {
 	class _OgreExport DualQuaternion
 	{
 	public:
-		/// Default constructor, initializes to identity rotation (aka 0°), and zero translation (0,0,0)
+		/// Default constructor, initializes to identity rotation (aka 0Â°), and zero translation (0,0,0)
 		inline DualQuaternion ()
 			: w(1), x(0), y(0), z(0), dw(1), dx(0), dy(0), dz(0)
 		{
