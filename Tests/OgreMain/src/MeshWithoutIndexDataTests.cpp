@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
-
+#include "OgreLogManager.h"
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );

@@ -49,7 +49,13 @@ void TerrainTests::setUp()
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
+#ifdef OGRE_STATIC_LIB
+	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
 	mRoot = OGRE_NEW Root();
+#endif
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
@@ -57,7 +63,11 @@ void TerrainTests::setUp()
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	cf.load("bin/release/resources.cfg");
+#if OGRE_DEBUG_MODE
+	cf.load("resources_d.cfg");
+#else
+	cf.load("resources.cfg");
+#endif
 #else
 	cf.load("bin/resources.cfg");
 #endif

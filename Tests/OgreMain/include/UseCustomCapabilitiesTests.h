@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreResourceGroupManager.h"
 
+#include "OgreBuildSettings.h"
 #ifdef OGRE_STATIC_LIB
 #include "../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif
@@ -57,6 +58,7 @@ class UseCustomCapabilitiesTests : public CppUnit::TestFixture
 #ifdef OGRE_STATIC_LIB
     Ogre::StaticPluginLoader mStaticPluginLoader;
 #endif
+	LogManager *mLogManager;
 
 public:
     void setUp();

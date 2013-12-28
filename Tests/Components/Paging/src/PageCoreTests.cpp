@@ -55,7 +55,6 @@ void PageCoreTests::setUp()
 	mRoot = OGRE_NEW Root();
 #endif
 
-    LogManager::getSingleton().setLogDetail(LL_LOW);
 	mPageManager = OGRE_NEW PageManager();
 
 	// make certain the resource location is NOT read-only
@@ -70,6 +69,7 @@ void PageCoreTests::tearDown()
 {
 	OGRE_DELETE mPageManager;
 	OGRE_DELETE mRoot;
+	OGRE_DELETE mLogManager;
 #if OGRE_STATIC
         OGRE_DELETE mStaticPluginLoader;
 #endif
