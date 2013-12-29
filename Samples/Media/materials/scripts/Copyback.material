@@ -28,6 +28,8 @@ material Ogre/Copy/4xFP16
 		{
 			depth_check off
 			depth_write off
+			
+			cull_hardware none
 
 			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
