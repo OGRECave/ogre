@@ -699,6 +699,14 @@ compositor_node FinalComposition
 	    	material Ogre/Copy/4xFP16
 	    	input 0 rtN
 	    }
+		
+		/*pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			rq_first			96
+		}*/
 	}
 }
 
@@ -728,6 +736,7 @@ compositor_node CompositorSampleStdRenderer
 			//shadows			myShadowNode		//Shadow node?
 			//rq_first			50					//Inclusive
 			//rq_last			51					//Not inclusive
+			rq_last			96
 		}
 	}
 	

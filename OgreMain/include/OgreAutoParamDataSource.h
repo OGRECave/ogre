@@ -142,8 +142,6 @@ namespace Ogre {
          void setCurrentLightList(const LightList* ll);
         /** Sets the current texture projector for a index */
          void setTextureProjector(const Frustum* frust, size_t index);
-        /** Sets the current render target */
-         void setCurrentRenderTarget(const RenderTarget* target);
         /** Sets the current viewport */
          void setCurrentViewport(const Viewport* viewport);
 		/** Sets the shadow extrusion distance to be used for point lights. */

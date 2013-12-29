@@ -1110,9 +1110,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 	mActiveQueuedRenderableVisitor->targetSceneMgr = this;
 	mAutoParamDataSource->setCurrentSceneManager(this);
 
-	// Also set the internal viewport pointer at this point, for calls that need it
-	// However don't call setViewport just yet (see below)
-	mCurrentViewport = vp;
+	setViewport( vp );
     mCameraInProgress = camera;
 
 	{
@@ -1164,19 +1162,15 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 {
 	OgreProfileGroup("_renderPhase02", OGREPROF_GENERAL);
 
-	// Also set the internal viewport pointer at this point, for calls that need it
-	// However don't call setViewport just yet (see below)
-	mCurrentViewport = vp;
-
 	// reset light hash so even if light list is the same, we refresh the content every frame
 	LightList emptyLightList;
 	useLights(emptyLightList, 0);
 
-    mCameraInProgress = camera;
-
 	{
 		// Lock scene graph mutex, no more changes until we're ready to render
 		OGRE_LOCK_MUTEX(sceneGraphMutex);
+
+		mCameraInProgress = camera;
 
 		// Invert vertex winding?
 		if (camera->isReflected())
@@ -1188,10 +1182,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 			mDestRenderSystem->setInvertVertexWinding(false);
 		}
 
-		// Tell params about viewport
-		mAutoParamDataSource->setCurrentViewport(vp);
-		// Set the viewport - this is deliberately after the shadow texture update
-		setViewport(vp);
+		setViewport( vp );
 
 		// Tell params about camera
 		mAutoParamDataSource->setCurrentCamera(camera);
@@ -1202,10 +1193,6 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 		mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
 		// Tell rendersystem
 		mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
-
-		// Tell params about render target
-		mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
-
 
 		// Set camera window clipping planes (if any)
 		if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
@@ -3419,7 +3406,6 @@ void SceneManager::manualRender(RenderOperation* rend,
 		if (vp)
 		{
 			mAutoParamDataSource->setCurrentViewport(vp);
-			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
@@ -3460,7 +3446,6 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 		if (vp)
 		{
 			mAutoParamDataSource->setCurrentViewport(vp);
-			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
 		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam);
@@ -3762,6 +3747,7 @@ void SceneManager::setViewport(Viewport* vp)
     mCurrentViewport = vp;
     // Set viewport in render system
     mDestRenderSystem->_setViewport(vp);
+	mAutoParamDataSource->setCurrentViewport(vp);
 	// Set the active material scheme for this viewport
 	MaterialManager::getSingleton().setActiveScheme(vp->getMaterialScheme());
 }
@@ -4469,8 +4455,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	Ogre::Camera* camera = context->camera;
 
 	// Tell params about viewport
-	mAutoParamDataSource->setCurrentViewport(vp);
-	// Set the viewport - this is deliberately after the shadow texture update
 	setViewport(vp);
 
 	// Tell params about camera
@@ -4482,10 +4466,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 	mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
 	// Tell rendersystem
 	mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
-
-	// Tell params about render target
-	mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
-
 
 	// Set camera window clipping planes (if any)
 	if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))

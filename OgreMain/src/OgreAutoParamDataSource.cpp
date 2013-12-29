@@ -772,11 +772,6 @@ namespace Ogre {
 		return *retVal;
 	}
     //-----------------------------------------------------------------------------
-    void AutoParamDataSource::setCurrentRenderTarget(const RenderTarget* target)
-    {
-        mCurrentRenderTarget = target;
-    }
-    //-----------------------------------------------------------------------------
     const RenderTarget* AutoParamDataSource::getCurrentRenderTarget(void) const
     {
         return mCurrentRenderTarget;
@@ -785,6 +780,7 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentViewport(const Viewport* viewport)
     {
         mCurrentViewport = viewport;
+		mCurrentRenderTarget = viewport->getTarget();
     }
     //-----------------------------------------------------------------------------
 	void AutoParamDataSource::setShadowDirLightExtrusionDistance(Real dist)
