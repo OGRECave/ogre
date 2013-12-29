@@ -100,7 +100,7 @@ namespace Ogre
 			existing node definition, an implicit alias is created automatically.
 			Else it throws.
 		*/
-		void connect( uint32 outChannel, IdString outNode, uint32 inChannel, IdString inNode );
+		void connect( IdString outNode, uint32 outChannel, IdString inNode, uint32 inChannel );
 
 		/** Connects all outputs channels from outNode to all input channels from inNode. If
 			the number of channels don't match, only the first N channels are set (where N is

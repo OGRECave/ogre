@@ -23,6 +23,7 @@ same license as the rest of the engine.
 #include "SamplePlugin.h"
 
 #include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -113,6 +114,10 @@ void Sample_Compositor::setupCompositor(void)
 	Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
 	const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
+	CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition( workspaceName );
+	workspaceDef->connect( "Bloom", "Glass" );
+	workspaceDef->connect( "Glass", 0, "FinalComposition", 1 );
+
 	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
 //-----------------------------------------------------------------------------------

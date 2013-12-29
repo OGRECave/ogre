@@ -752,5 +752,5 @@ workspace CompositorSampleWorkspace
 	//Connect RenderWindow to FinalComposition's input channel #0
 	connect_output 0 FinalComposition
 	//Connect Bloom's output #0 to FinalComposition's input #1
-	connect Bloom 0 FinalComposition 1
+	//connect Bloom 0 FinalComposition 1
 }

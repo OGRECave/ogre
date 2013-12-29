@@ -5653,7 +5653,7 @@ namespace Ogre{
 							{
 								getUInt( *itor, &outChannel );
 								getUInt( *inNodeStart, &inChannel );
-								mWorkspaceDef->connect( outChannel, outNode, inChannel, inNode );
+								mWorkspaceDef->connect( outNode, outChannel, inNode, inChannel );
 								++itor;
 								++inNodeStart;
 							}

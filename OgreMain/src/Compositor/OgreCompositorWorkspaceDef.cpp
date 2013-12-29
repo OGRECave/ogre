@@ -65,8 +65,8 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspaceDef::connect( uint32 outChannel, IdString outNode,
-											uint32 inChannel, IdString inNode )
+	void CompositorWorkspaceDef::connect( IdString outNode, uint32 outChannel,
+											IdString inNode, uint32 inChannel )
 	{
 		ChannelRouteList::const_iterator itor = mChannelRoutes.begin();
 		ChannelRouteList::const_iterator end  = mChannelRoutes.end();
@@ -100,7 +100,7 @@ namespace Ogre
 		size_t outputChannels = outDef->getNumOutputChannels();
 
 		for( size_t i=0; i<inputChannels && i<outputChannels; ++i )
-			connect( i, outNode, i, inNode );
+			connect( outNode, i, inNode, i );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspaceDef::connectOutput( uint32 inChannel, IdString inNode )

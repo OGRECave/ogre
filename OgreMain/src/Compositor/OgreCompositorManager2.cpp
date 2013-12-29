@@ -309,8 +309,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinition( IdString name ) const
 	{
-		CompositorWorkspaceDef *retVal = 0;
-		
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
 		if( itor == mWorkspaceDefs.end() )
 		{
@@ -319,7 +317,7 @@ namespace Ogre
 							"CompositorManager2::getWorkspaceDefinition" );
 		}
 
-		return retVal;
+		return itor->second;
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
