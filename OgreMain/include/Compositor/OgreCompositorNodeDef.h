@@ -60,7 +60,6 @@ namespace Ogre
 		friend class CompositorNode;
 
 		IdString	mName;
-		String		mNameStr;
 
 		/** Tells where to grab the RenderTarget from for the output channel.
 			They can come either from an input channel, or from local textures.
@@ -70,6 +69,8 @@ namespace Ogre
 		*/
 		ChannelMappings			mOutChannelMapping;
 		CompositorTargetDefVec	mTargetPasses;
+
+		String		mNameStr;
 
 	public:
 		IdString	mCustomIdentifier;

@@ -124,7 +124,7 @@ namespace Ogre
 	void CompositorNode::notifyRecreated( const CompositorChannel &oldChannel,
 											const CompositorChannel &newChannel )
 	{
-		//Clear out outputs
+		//Clear our inputs
 		CompositorChannelVec::iterator texIt = mInTextures.begin();
 		CompositorChannelVec::iterator texEn = mInTextures.end();
 
@@ -137,7 +137,7 @@ namespace Ogre
 			++texIt;
 		}
 
-		//Clear out outputs
+		//Clear our outputs
 		bool bFoundOuts = false;
 		texIt = mOutTextures.begin();
 		texEn = mOutTextures.end();
@@ -176,7 +176,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::notifyDestroyed( const CompositorChannel &channel )
 	{
-		//Clear out outputs
+		//Clear our inputs
 		CompositorChannelVec::iterator texIt = mInTextures.begin();
 		CompositorChannelVec::iterator texEn = mInTextures.end();
 
@@ -192,7 +192,7 @@ namespace Ogre
 			++texIt;
 		}
 
-		//Clear out outputs
+		//Clear our outputs
 		bool bFoundOuts = false;
 		texIt = mOutTextures.begin();
 		texEn = mOutTextures.end();
@@ -228,6 +228,33 @@ namespace Ogre
 			(*passIt)->notifyDestroyed( channel );
 			++passIt;
 		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorNode::_notifyCleared(void)
+	{
+		//Clear our inputs
+		CompositorChannelVec::iterator texIt = mInTextures.begin();
+		CompositorChannelVec::iterator texEn = mInTextures.end();
+
+		while( texIt != texEn )
+			*texIt++ = CompositorChannel();
+
+		mNumConnectedInputs = 0;
+
+		//Clear our outputs
+		texIt = mOutTextures.begin();
+		texEn = mOutTextures.end();
+
+		while( texIt != texEn )
+			*texIt++ = CompositorChannel();
+
+		CompositorPassVec::const_iterator passIt = mPasses.begin();
+		CompositorPassVec::const_iterator passEn = mPasses.end();
+		while( passIt != passEn )
+			OGRE_DELETE *passIt++;
+
+		mPasses.clear();
+		mConnectedNodes.clear();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )

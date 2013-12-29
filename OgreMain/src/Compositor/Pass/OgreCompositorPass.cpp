@@ -111,4 +111,9 @@ namespace Ogre
 		if( mTarget == channel.target )
 			mTarget = 0;
 	}
+	//-----------------------------------------------------------------------------------
+	void CompositorPass::notifyCleared(void)
+	{
+		mTarget = 0;
+	}
 }

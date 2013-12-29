@@ -92,6 +92,7 @@ namespace Ogre
 	protected:
 		/// Unique name across the same workspace
 		IdString				mName;
+		bool					mEnabled;
 
 		/// Must be <= mInTextures.size(). Tracks how many pointers are not null in mInTextures
 		size_t					mNumConnectedInputs;
@@ -143,6 +144,21 @@ namespace Ogre
 
 		IdString getName(void) const								{ return mName; }
 		const CompositorNodeDef* getDefinition() const				{ return mDefinition; }
+
+		/** Enables or disables all instances of this node
+		@remarks
+			Note that we just won't execute our passes. It's your job to change the
+			channel connections accordingly if you have to.
+			A disabled node won't complain when its connections are incomplete in
+			a workspace.
+		@par
+			This function is useful frequently toggling a compositor effect without having
+			to recreate any API resource (which often would involve stalls).
+		*/
+		void setEnabled( bool bEnabled )					{ mEnabled = bEnabled; }
+
+		/// Returns if this instance is enabled. @See setEnabled
+		bool getEnabled(void) const							{ return mEnabled; }
 
 		/** Connects this node (let's call it node 'A') to node 'B', mapping the output
 			channel from A into the input channel from B
@@ -220,6 +236,14 @@ namespace Ogre
 			Channel containing the pointer about to be destroyed (must still be valid)
 		*/
 		void notifyDestroyed( const CompositorChannel &channel );
+
+		/** Internal Use. Called when connections are all being zero'ed. We rely our
+			caller is doing this to all nodes, hence we do not notify our @mConnectedNodes
+			nodes. Failing to clear them too may leave dangling pointers or graphical glitches
+		@remarks
+			Destroys all of our passes.
+		*/
+		void _notifyCleared(void);
 
 		/** Called by CompositorManager2 when (i.e.) the RenderWindow was resized, thus our
 			RTs that depend on their resolution need to be recreated.

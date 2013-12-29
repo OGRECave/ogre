@@ -85,9 +85,10 @@ namespace Ogre
 	{
 		CompositorPassQuadDef const *mDefinition;
 	protected:
-		Rectangle2D	*mFsRect;
-		Pass		*mPass;
-		Camera		*mCamera;
+		Rectangle2D		*mFsRect;
+		Pass			*mPass;
+		CompositorNode	*mParentNode;
+		Camera			*mCamera;
 
 		Real		mHorizonalTexelOffset;
 		Real		mVerticalTexelOffset;

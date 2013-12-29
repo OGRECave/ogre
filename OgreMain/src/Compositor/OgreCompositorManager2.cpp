@@ -461,7 +461,7 @@ namespace Ogre
 				else
 				{
 					//TODO: We may end up recreating this every frame for invalid workspaces
-					workspace->revalidateAllNodes();
+					workspace->recreateAllNodes();
 					if( workspace->isValid() )
 						workspace->_update( swapFinalTargets );
 				}

@@ -87,6 +87,8 @@ namespace Ogre
 		void _setCustomCamera( Camera *camera )					{ mCamera = camera; }
 		void _setUpdateShadowNode( bool update )				{ mUpdateShadowNode = update; }
 
+		virtual void notifyCleared(void);
+
 		const CompositorPassSceneDef* getDefinition() const		{ return mDefinition; }
 	};
 

@@ -78,8 +78,13 @@ namespace Ogre
 			according to our definition. Then creates the passes from all nodes
 		@remarks
 			Call this function after createAllNodes
+		@param reconnect
+			When true, assumes the node's passes have already been created and
+			we're just connecting the channels again.
 		*/
 		void connectAllNodes(void);
+
+		void clearAllConnections(void);
 
 		/** Setup ShadowNodes in every pass from every node so that we recalculate them as
 			little as possible (when passes use SHADOW_NODE_FIRST_ONLY flag)
@@ -121,7 +126,15 @@ namespace Ogre
 			were invalidated, to avoid recreating so many D3D/GL resources (local textures)
 			which is important for GUI editors.
 		*/
-		void revalidateAllNodes(void);
+		void recreateAllNodes(void);
+
+		/**	Reconnects all nodes. Use this function if you only altered the channel connections
+			between nodes, but didn't add new ones or removed existing nodes.
+		@remarks
+			If there is a "loose node" (its inputs are not fully connected),
+			disable it (@see CompositorNode::setEnabled)
+		*/
+		void reconnectAllNodes(void);
 
 		void _update( bool swapFinalTargets );
 		void _swapFinalTarget(void);

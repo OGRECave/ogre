@@ -95,12 +95,23 @@ namespace Ogre
 	void CompositorWorkspace::destroyAllNodes(void)
 	{
 		mValid = false;
-		CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
-		CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+		{
+			CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+			CompositorNodeVec::const_iterator end  = mNodeSequence.end();
 
-		while( itor != end )
-			OGRE_DELETE *itor++;
-		mNodeSequence.clear();
+			while( itor != end )
+				OGRE_DELETE *itor++;
+			mNodeSequence.clear();
+		}
+
+		{
+			CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
+			CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
+
+			while( itor != end )
+				OGRE_DELETE *itor++;
+			mShadowNodes.clear();
+		}
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::connectAllNodes(void)
@@ -211,6 +222,29 @@ namespace Ogre
 			setupPassesShadowNodes();
 
 			mValid = true;
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::clearAllConnections(void)
+	{
+		{
+			CompositorNodeVec::iterator itor = mNodeSequence.begin();
+			CompositorNodeVec::iterator end  = mNodeSequence.end();
+
+			while( itor != end )
+			{
+				(*itor)->_notifyCleared();
+				++itor;
+			}
+		}
+
+		{
+			CompositorShadowNodeVec::const_iterator itor = mShadowNodes.begin();
+			CompositorShadowNodeVec::const_iterator end  = mShadowNodes.end();
+
+			while( itor != end )
+				OGRE_DELETE *itor++;
+			mShadowNodes.clear();
 		}
 	}
 	//-----------------------------------------------------------------------------------
@@ -330,9 +364,15 @@ namespace Ogre
 		return mGlobalTextures[index];
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspace::revalidateAllNodes(void)
+	void CompositorWorkspace::recreateAllNodes(void)
 	{
 		createAllNodes();
+		connectAllNodes();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::reconnectAllNodes(void)
+	{
+		clearAllConnections();
 		connectAllNodes();
 	}
 	//-----------------------------------------------------------------------------------

@@ -60,6 +60,7 @@ namespace Ogre
 				mDefinition( definition ),
 				mFsRect( 0 ),
 				mPass( 0 ),
+				mParentNode( parentNode ),
 				mCamera( 0 ),
 				mHorizonalTexelOffset( horizonalTexelOffset ),
 				mVerticalTexelOffset( verticalTexelOffset )
@@ -85,20 +86,6 @@ namespace Ogre
 		}
 
 		mPass = material->getBestTechnique()->getPass( 0 );
-
-		const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
-		CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
-		CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
-		while( itor != end )
-		{
-			if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
-			{
-				TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
-				tu->setTexture( parentNode->getDefinedTexture( itor->textureName, itor->mrtIndex ) );
-			}
-
-			++itor;
-		}
 
 		if( mDefinition->mUseQuad ||
 			mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
@@ -129,6 +116,21 @@ namespace Ogre
 		//Call beginUpdate if we're the first to use this RT
 		if( mDefinition->mBeginRtUpdate )
 			mTarget->_beginUpdate();
+
+		//Set the material textures every frame (we don't clone the material)
+		const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
+		CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
+		CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
+		while( itor != end )
+		{
+			if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
+			{
+				TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
+				tu->setTexture( mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex ) );
+			}
+
+			++itor;
+		}
 
 		const Real hOffset = mHorizonalTexelOffset / mTarget->getWidth();
 		const Real vOffset = mVerticalTexelOffset / mTarget->getHeight();

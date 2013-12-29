@@ -146,4 +146,10 @@ namespace Ogre
 		if( mDefinition->mEndRtUpdate )
 			mTarget->_endUpdate();
 	}
+	//-----------------------------------------------------------------------------------
+	void CompositorPassScene::notifyCleared(void)
+	{
+		mShadowNode = 0; //Allow changes to our shadow nodes too.
+		CompositorPass::notifyCleared();
+	}
 }
