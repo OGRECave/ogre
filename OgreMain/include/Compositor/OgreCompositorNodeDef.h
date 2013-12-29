@@ -46,13 +46,33 @@ namespace Ogre
 	typedef vector<CompositorTargetDef>::type	CompositorTargetDefVec;
 
 	/** Compositor nodes are the core subject of compositing.
-		TODO: Describe!!!
+	@par
+		They can define local textures and pass them to other nodes within the same
+		workspace through their output channels.
+		They can also receive textures through their input channels and send them through a
+		different output channel to the next node(s).
+		They can access global textures defined by the Workspace they belong to, but can't
+		pass them to the output channels.
+	@par
+		How nodes input and output channels are wired together depends on the Workspace (See
+		@CompositorWorkspace and @CompositorWorkspaceDef)
+		A node cannot receive input from two nodes in the same channel, but it can send output
+		to more than one node using the same output channel.
+	@par
+		A node whose workspace didn't connect all of its input channels cannot be executed,
+		and unless it is disabled, the Compositor will be unable to render.
+	@par
+		The other core feature of nodes (besides textures and channels) is that they perform
+		passes on RTs. A pass is the basic way to render: it can be a @PASS_SCENE, @PASS_QUAD,
+		@PASS_CLEAR, @PASS_STENCIL, @PASS_RESOLVE
+	@par
+		This is the definition. For the instantiation, @see CompositorNode
 	@remarks
 		We own the local textures, so it's our job to destroy them
 	@author
 		Matias N. Goldberg
     @version
-        1.0
+		1.1
     */
 	class _OgreExport CompositorNodeDef : public TextureDefinitionBase
 	{
@@ -70,17 +90,23 @@ namespace Ogre
 		ChannelMappings			mOutChannelMapping;
 		CompositorTargetDefVec	mTargetPasses;
 
+		bool		mStartEnabled;
 		String		mNameStr;
 
 	public:
 		IdString	mCustomIdentifier;
 
 		CompositorNodeDef( const String &name ) :
-				TextureDefinitionBase( TEXTURE_LOCAL ), mName( name ), mNameStr( name ) {}
+				TextureDefinitionBase( TEXTURE_LOCAL ),
+				mName( name ), mStartEnabled( true ), mNameStr( name ) {}
         virtual ~CompositorNodeDef() {}
 
 		IdString getName(void) const						{ return mName; }
 		String getNameStr(void) const						{ return mNameStr; }
+
+		/// Whether the node should be start as enabled when instantiated
+		void setStartEnabled( bool enabled )				{ mStartEnabled = enabled; }
+		bool getStartEnabled(void ) const					{ return mStartEnabled; }
 
 		/// See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
 		using TextureDefinitionBase::getTextureSource;

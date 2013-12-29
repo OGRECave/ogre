@@ -110,6 +110,24 @@ namespace Ogre
 		mFinalNode		= inNode;
 	}
 	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::clearAllInterNodeConnections(void)
+	{
+		mChannelRoutes.clear();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::clearOutputConnections(void)
+	{
+		mFinalInChannel = 0;
+		mFinalNode		= IdString();
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::clearAll(void)
+	{
+		clearAllInterNodeConnections();
+		clearOutputConnections();
+		mAliasedNodes.clear();
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorWorkspaceDef::addNodeAlias( IdString alias, IdString nodeName )
 	{
 		if( alias != nodeName && mCompositorManager->hasNodeDefinition( alias ) )

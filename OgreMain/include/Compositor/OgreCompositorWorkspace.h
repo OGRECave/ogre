@@ -42,11 +42,38 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** TODO: Describe!!!
+	/** A compositor workspace is the main interface to render into an RT, be it a RenderWindow or an
+		RTT (Render Texture Target). Whereas Ogre 1.x needed you to set a Viewport in order to render
+		to an RTT or RW and then call renderTarget->update, now you need to set a workspace definition
+		instead and call workspace->_update().
+	@par
+		<b>Compositors are not just a "fancy effects" system anymore, they tell Ogre how you want to
+		render the scene. You can't render to an RT without setting a compositor!</b>
+	@par
+		A workspace may be instantiated multiple times for different RTs, or using different cameras
+		(i.e. multiple monitors, stereo 3D, etc), while they all will share the same definition.
+		A workspace definition (@see CompositorWorkspaceDef) contains all the information needed
+		by this CompositorWorkspace to instantiate and know which nodes to create and how to connect
+		them. @See CompositorNodeDef
+		A workspace may define global textures that are visible to all of its Node instances.
+	@par
+		If you want to have (e.g.) two monitors rendering the same but with different compositor
+		effects, you will also have to create two different definitions (CompositorWorkspaceDefs)
+	@par
+		The intention of Ogre 2.0's compositor is to ideally have one Workspace per monitor (or per eye)
+		while handling all RTTs inside that workspace with compositor nodes, local and global textures
+		(including manually updated stuff like procedural textures, terrain's auto generated normal
+		maps, etc); but it is also possible to do things the 1.x way: use additional Workspaces for
+		manually rendering and controlling RTTs.
+	@par
+		Users with basic needs (no advanced effects) can @see CompositorManager2::createBasicWorkspaceDef
+		for quickly having a basic definition set for them.
+	@par
+		For more information about Compositors, consult the Ogre 2.0 Porting Manual in the Docs folder.
 	@author
 		Matias N. Goldberg
     @version
-        1.0
+		1.1
     */
 	class _OgreExport CompositorWorkspace : public CompositorInstAlloc, public IdObject
 	{
