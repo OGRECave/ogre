@@ -46,6 +46,7 @@ namespace Ogre
 									const RenderTarget *finalTarget ) :
 			IdObject( id ),
 			mName( name ),
+			mEnabled( true ),
 			mNumConnectedInputs( 0 ),
 			mWorkspace( workspace ),
 			mRenderSystem( renderSys ),
