@@ -50,7 +50,6 @@ void TerrainTests::setUp()
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
 	mRoot = OGRE_NEW Root(StringUtil::BLANK);
         
 	mStaticPluginLoader.load();
