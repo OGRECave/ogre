@@ -163,8 +163,6 @@ void Sample_Compositor::registerCompositors(void)
 	CompositorManager2::CompositorNodeDefMap::const_iterator end  = nodeDefs.end();
 
 	IdString compositorId = "Ogre/Compositor";
-	IdString deferredShadingId	= "Ogre/DeferredShading";
-	IdString ssaoId				= "Ogre/SSAO";
 
 	// add all compositor resources to the view container
 	while( itor != end )

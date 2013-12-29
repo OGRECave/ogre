@@ -51,7 +51,7 @@ THE SOFTWARE.
 		unsigned long retVal = 0;\
 		ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
 		try {\
-			unsigned long retVal = threadFunction( threadHandle );\
+			retVal = threadFunction( threadHandle );\
 		}\
 		catch( ... )\
 		{\
@@ -67,7 +67,7 @@ THE SOFTWARE.
 		unsigned long retVal = 0;\
 		ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
 		try {\
-			unsigned long retVal = threadFunction( threadHandle );\
+			retVal = threadFunction( threadHandle );\
 		}\
 		catch( ... )\
 		{\
