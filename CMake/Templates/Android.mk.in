@@ -13,7 +13,7 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1
     
     LOCAL_C_INCLUDES := @OGRE_BINARY_DIR@/include @CMAKE_SOURCE_DIR@/OgreMain/include @CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include @CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include/EGL
-    LOCAL_C_INCLUDES += @ANDROID_NDK@/sources/cpufeatures @CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include @CMAKE_SOURCE_DIR@/Components/Overlay/include @CMAKE_SOURCE_DIR@/Components/Volume/include @CMAKE_SOURCE_DIR@/Components/Terrain/include @CMAKE_SOURCE_DIR@/Components/Paging/include
+    LOCAL_C_INCLUDES += @ANDROID_NDK@/sources/cpufeatures @CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include @CMAKE_SOURCE_DIR@/Components/MeshLodGenerator/include @CMAKE_SOURCE_DIR@/Components/Overlay/include @CMAKE_SOURCE_DIR@/Components/Volume/include @CMAKE_SOURCE_DIR@/Components/Terrain/include @CMAKE_SOURCE_DIR@/Components/Paging/include
     LOCAL_C_INCLUDES += @CMAKE_SOURCE_DIR@/PlugIns/ParticleFX/include @CMAKE_SOURCE_DIR@/PlugIns/OctreeSceneManager/include 
     LOCAL_C_INCLUDES += @OGRE_DEPENDENCIES_DIR@/include @OGRE_DEPENDENCIES_DIR@/include/OIS @OGRE_BINARY_DIR@/Samples/include
     
