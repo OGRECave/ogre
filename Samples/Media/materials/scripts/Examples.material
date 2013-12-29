@@ -1762,12 +1762,21 @@ material Examples/Aureola
 
 			texture_unit
 			{
-				texture aureola.png PF_BYTE_LA
+                                // FreeImage reads texture as 32 bpp,
+                                // so either texture is 16-bit per
+                                // channel when it should be 8-bit or
+                                // FreeImage has a bug.  Either way
+                                // do not set texture type for now.
+
+                                //texture aureola.png PF_BYTE_LA
+				texture aureola.png
 				tex_address_mode clamp
 			}
 		}
 	}
 }
+
+
 
 // Test hardware morph animation (no normals)
 material Examples/HardwareMorphAnimation
@@ -2391,3 +2400,17 @@ material Examples/TransparentBlue50
     }
   }
 }
+
+// material Examples/Passthrough
+// {
+//     technique
+//     {
+//         pass
+//         {
+//             diffuse vertexcolour
+//             specular vertexcolour
+//             ambient vertexcolour
+//             lighting off
+//         }
+//     }
+// }

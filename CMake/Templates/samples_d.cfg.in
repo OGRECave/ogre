@@ -1,10 +1,12 @@
 SampleFolder=@OGRE_SAMPLES_DIR_DBG@
+SamplePlugin=Sample_AtomicCounters_d
 SamplePlugin=Sample_BezierPatch_d
 SamplePlugin=Sample_BSP_d
 SamplePlugin=Sample_CameraTrack_d
 SamplePlugin=Sample_CelShading_d
 SamplePlugin=Sample_Character_d
 SamplePlugin=Sample_Compositor_d
+SamplePlugin=Sample_Compute_d
 SamplePlugin=Sample_CubeMapping_d
 SamplePlugin=Sample_DeferredShading_d
 SamplePlugin=Sample_Dot3Bump_d

@@ -106,8 +106,8 @@ namespace Ogre
 		LodData::VTriangles::iterator tri, triEnd;
 		tri = vertex.triangles.begin();
 		triEnd = vertex.triangles.end();
-		for (;tri != triEnd; tri++) {
-			int id = LodData::getVectorIDFromPointer(data->mTriangleList, *tri);
+		for (;tri != triEnd; ++tri) {
+			size_t id = LodData::getVectorIDFromPointer(data->mTriangleList, *tri);
 			quadric = quadric + mTrianglePlaneQuadricList[id];
 		}
 	}

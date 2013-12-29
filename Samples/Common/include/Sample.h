@@ -88,6 +88,7 @@ namespace OgreBites
 			mContentSetup = false;
 
 			mFSLayer = 0;
+            mOverlaySystem = 0;
         }
 
 		virtual ~Sample() {}

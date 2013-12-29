@@ -71,10 +71,7 @@ namespace Ogre {
 			mMgr->_notifyIndexBufferDestroyed(this);
 		}
 
-        if (mShadowBuffer)
-        {
-            OGRE_DELETE mShadowBuffer;
-        }
+        OGRE_DELETE mShadowBuffer;
     }
     //-----------------------------------------------------------------------------
     HardwareIndexBufferSharedPtr::HardwareIndexBufferSharedPtr(HardwareIndexBuffer* buf)

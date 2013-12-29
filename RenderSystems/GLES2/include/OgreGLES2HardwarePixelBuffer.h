@@ -37,7 +37,7 @@ namespace Ogre {
     {
         protected:
             /// Lock a box
-            PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+            PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options);
 
             /// Unlock a box
             void unlockImpl(void);
@@ -147,7 +147,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer
     {
         public:
-            GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
+            GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
             virtual ~GLES2RenderBuffer();
 
             /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer

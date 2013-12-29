@@ -257,7 +257,7 @@ namespace Ogre {
 		/// Get extruder program source for debug directional lights, compatible with glsles
 		static const String& getDirectionalLightExtruderVs_glslesDebug(void) { return mDirVs_glslesDebug; }
         /// General purpose method to get any of the program sources
-        static const String& getProgramSource(Light::LightTypes lightType, const String syntax, 
+        static const String& getProgramSource(Light::LightTypes lightType, const String &syntax,
             bool finite, bool debug);
 
         static const String& getProgramName(Light::LightTypes lightType, bool finite, bool debug);

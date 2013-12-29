@@ -61,12 +61,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::~SubEntity()
     {
-        if (mSkelAnimVertexData)
-            OGRE_DELETE mSkelAnimVertexData;
-		if (mHardwareVertexAnimVertexData)
-			OGRE_DELETE mHardwareVertexAnimVertexData;
-		if (mSoftwareVertexAnimVertexData)
-			OGRE_DELETE mSoftwareVertexAnimVertexData;
+        OGRE_DELETE mSkelAnimVertexData;
+        OGRE_DELETE mHardwareVertexAnimVertexData;
+        OGRE_DELETE mSoftwareVertexAnimVertexData;
     }
     //-----------------------------------------------------------------------
     SubMesh* SubEntity::getSubMesh(void)

@@ -31,7 +31,7 @@ material Ogre/Compositor/BlackAndWhite
 		pass
 		{
 			depth_check off
-            polygon_mode_overrideable false
+                        polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
@@ -43,7 +43,6 @@ material Ogre/Compositor/BlackAndWhite
 
 			texture_unit
 			{
-				texture RT
 				tex_coord_set 0
 				tex_address_mode clamp
 				filtering linear linear linear

@@ -66,10 +66,7 @@ namespace Ogre {
 		{
 			mMgr->_notifyVertexBufferDestroyed(this);
 		}
-        if (mShadowBuffer)
-        {
-            OGRE_DELETE mShadowBuffer;
-        }
+        OGRE_DELETE mShadowBuffer;
     }
     //-----------------------------------------------------------------------------
     bool HardwareVertexBuffer::checkIfVertexInstanceDataIsSupported()

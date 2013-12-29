@@ -119,7 +119,7 @@ namespace Ogre {
 		virtual void determineEndianness(Endian requestedEndian);
 
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
-		typedef vector<int>::type ChunkSizeStack;
+		typedef vector<size_t>::type ChunkSizeStack;
 		ChunkSizeStack mChunkSizeStack;
 		bool mReportChunkErrors;
 #endif

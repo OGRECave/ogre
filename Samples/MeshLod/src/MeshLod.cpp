@@ -454,8 +454,8 @@ void Sample_MeshLod::addToProfile( Real cost )
 	if(collapser->_getLastVertexPos(data.get(), pv.src)){
 		collapser->_getLastVertexCollapseTo(data.get(), pv.dst);
 		// Prevent duplicates if you edit the same vertex twice.
-		int size = mLodConfig.advanced.profile.size();
-		for(int i=0;i<size;i++){
+		size_t size = mLodConfig.advanced.profile.size();
+		for(uint i=0;i<size;i++){
 			ProfiledEdge& v = mLodConfig.advanced.profile[i];
 			if(v.src == pv.src && v.dst == pv.dst){
 				v.cost = cost;

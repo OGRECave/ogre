@@ -44,12 +44,10 @@ namespace Ogre
 	void LodOutputProviderCompressedBuffer::bakeFirstPass(LodData* data, int lodIndex) {
 		unsigned short submeshCount = data->mIndexBufferInfoList.size();
 		assert(mTriangleCacheList.size() == data->mTriangleList.size());
-		mLastIndexBufferID =  lodIndex;
+		mLastIndexBufferID = lodIndex;
 
-		int indexCount = 0;
 		for (unsigned short i = 0; i < submeshCount; i++) {
 			data->mIndexBufferInfoList[i].prevIndexCount = data->mIndexBufferInfoList[i].indexCount;
-			indexCount += data->mIndexBufferInfoList[i].indexCount;
 			data->mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
 		}
 

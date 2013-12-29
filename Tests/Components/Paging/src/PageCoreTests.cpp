@@ -32,10 +32,16 @@ CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
 void PageCoreTests::setUp()
 {
-	OGRE_DELETE LogManager::getSingletonPtr();
-	mLogManager = OGRE_NEW LogManager();
-	mLogManager->createLog("testPageCore.log", true, false);
-	mLogManager->setLogDetail(LL_LOW);
+    // set up silent logging to not pollute output
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("testPageCore.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #if OGRE_STATIC
         mStaticPluginLoader = OGRE_NEW StaticPluginLoader();

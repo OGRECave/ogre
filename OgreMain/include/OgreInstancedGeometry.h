@@ -294,7 +294,7 @@ namespace Ogre {
 			InstancedObject(unsigned short index);
 			InstancedObject(unsigned short index,SkeletonInstance *skeleton,AnimationStateSet*animations);
 			~InstancedObject();
-			void setPosition( Vector3  position);
+			void setPosition( const Vector3 &position);
 			const Vector3& getPosition(void) const;
 			void yaw(const Radian& angle);
 			void pitch(const Radian& angle);
@@ -303,7 +303,7 @@ namespace Ogre {
 			void setScale(const Vector3& scale);
 			const Vector3& getScale() const;
 	        void setOrientation(const Quaternion& q);
-	        void setPositionAndOrientation(Vector3 p, const Quaternion& q);
+	        void setPositionAndOrientation(const Vector3 &p, const Quaternion& q);
             Quaternion & getOrientation(void);
 			void addBucketToList(GeometryBucket* bucket);
 			void needUpdate();

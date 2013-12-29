@@ -89,6 +89,8 @@ namespace Ogre
 		RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
 		/// Supports hardware vertex and index buffers
 		RSC_VBO                     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
+		/// Supports 32bit hardware index buffers
+		RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
 		/// Supports vertex programs (vertex shaders)
 		RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
 		/// Supports fragment programs (pixel shaders)
@@ -415,7 +417,7 @@ namespace Ogre
 		/// Convert a vendor enum to a string
 		static String vendorToString(GPUVendor v);
 
-		bool isDriverOlderThanVersion(DriverVersion v) const
+		bool isDriverOlderThanVersion(const DriverVersion &v) const
 		{
 			if (mDriverVersion.major < v.major)
 				return true;

@@ -97,12 +97,8 @@ void MeshSerializerTests::setUp()
 	cf.load("resources.cfg");
 #endif
 #else
-#ifdef OGRE_STATIC_LIB
 	cf.load("bin/resources.cfg");
-#else
-	cf.load("resources.cfg");
 #endif
-#endif /* if OGRE_PLATFORM == OGRE_PLATFORM_APPLE */
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();

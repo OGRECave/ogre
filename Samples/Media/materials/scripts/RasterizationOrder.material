@@ -5,7 +5,7 @@ fragment_program Ogre/RasterizationOrderFp glsl
 	
 	default_params
 	{
-	    param_named ac atomic_counter 0
+	    param_named ac uint 0
 	}
 }
 

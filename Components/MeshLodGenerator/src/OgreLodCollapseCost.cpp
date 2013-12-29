@@ -56,7 +56,7 @@ namespace Ogre
 	void LodCollapseCost::computeVertexCollapseCost( LodData* data, LodData::Vertex* vertex, Real& collapseCost, LodData::Vertex*& collapseTo )
 	{
 		LodData::VEdges::iterator it = vertex->edges.begin();
-		for (; it != vertex->edges.end(); it++) {
+		for (; it != vertex->edges.end(); ++it) {
 			it->collapseCost = computeEdgeCollapseCost(data, vertex, &*it);
 			if (collapseCost > it->collapseCost) {
 				collapseCost = it->collapseCost;
@@ -101,7 +101,7 @@ namespace Ogre
 	{
 		LodData::VEdges::const_iterator it = vertex->edges.begin();
 		LodData::VEdges::const_iterator itEnd = vertex->edges.end();
-		for (; it != itEnd; it++) {
+		for (; it != itEnd; ++it) {
 			if (it->refCount == 1) {
 				return true;
 			}

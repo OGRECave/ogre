@@ -62,7 +62,7 @@ LodData::Triangle* LodInputProvider::isDuplicateTriangle(LodData::Triangle* tria
 	// duplicate triangle detection (where all vertices has the same position)
 	LodData::VTriangles::iterator itEnd = triangle->vertex[0]->triangles.end();
 	LodData::VTriangles::iterator it = triangle->vertex[0]->triangles.begin();
-	for (; it != itEnd; it++) {
+	for (; it != itEnd; ++it) {
 		LodData::Triangle* t = *it;
 		if (isDuplicateTriangle(triangle, t)) {
 			return *it;

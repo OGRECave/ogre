@@ -144,7 +144,7 @@ If you have doxygen installed and CMake picked it up, then there will
 be an additional build target called doc which you can optionally build.
 This will freshly generate the API documentation for Ogre's classes from
 the header files. In Visual Studio, just select and build the target
-'DOC', on Linux type:
+'OgreDoc', on Linux type:
 > make OgreDoc
 
 

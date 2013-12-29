@@ -42,6 +42,7 @@ namespace Ogre
 	LodConfigSerializer::LodConfigSerializer()
 	{
 		mVersion = "[LodConfigSerializer_v1.0]";
+        mLodConfig = 0;
 	}
 
 	void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, const Ogre::String& filename)
@@ -69,10 +70,9 @@ namespace Ogre
 		readFileHeader(mStream);
 
 		pushInnerChunk(mStream);
-		unsigned short streamID;
 		while (!mStream->eof())
 		{
-			streamID = readChunk(mStream);
+			unsigned short streamID = readChunk(mStream);
 			switch (streamID)
 			{
 			case LCCID_LOD_CONFIG:
@@ -250,7 +250,7 @@ namespace Ogre
 	void LodConfigSerializer::writeLodLevels()
 	{
 		writeChunkHeader(LCCID_LOD_LEVELS, calcLodLevelsSize());
-		uint32 size = mLodConfig->levels.size();
+		uint32 size = static_cast<uint32>(mLodConfig->levels.size());
 		writeInts(&size, 1);
 
 		LodConfig::LodLevelList::iterator it = mLodConfig->levels.begin();
@@ -322,7 +322,7 @@ namespace Ogre
 			return;
 		}
 		writeChunkHeader(LCCID_PROFILE, calcLodProfileSize());
-		uint32 size = mLodConfig->advanced.profile.size();
+		uint32 size = static_cast<uint32>(mLodConfig->advanced.profile.size());
 		writeInts(&size, 1);
 		LodProfile::iterator it = mLodConfig->advanced.profile.begin();
 		LodProfile::iterator itEnd = mLodConfig->advanced.profile.end();

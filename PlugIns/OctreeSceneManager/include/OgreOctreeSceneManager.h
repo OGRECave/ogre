@@ -159,12 +159,6 @@ public:
         mShowBoxes = b;
     };
 
-    void setLooseOctree( bool b )
-    {
-        mLoose = b;
-    };
-
-
     /** Resizes the octree to the given size */
     void resize( const AxisAlignedBox &box );
 
@@ -215,9 +209,6 @@ protected:
 
     /// Boxes visibility flag
     bool mShowBoxes;
-
-
-    bool mLoose;
 
     Real mCorners[ 24 ];
     static unsigned long mColors[ 8 ];

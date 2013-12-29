@@ -1015,8 +1015,8 @@ void OctreeSceneManager::resize( const AxisAlignedBox &box )
     mOctree = OGRE_NEW Octree( 0 );
     mOctree->mBox = box;
 
-	const Vector3 min = box.getMinimum();
-	const Vector3 max = box.getMaximum();
+	const Vector3 &min = box.getMinimum();
+	const Vector3 &max = box.getMaximum();
 	mOctree->mHalfSize = ( max - min ) * 0.5f;
 
     it = nodes.begin();

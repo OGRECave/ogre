@@ -135,16 +135,16 @@ namespace Ogre {
             i != currentParticles.end(); ++i)
         {
             Particle* p = *i;
-            bb.mPosition = p->position;
+            bb.mPosition = p->mPosition;
 			if (mBillboardSet->getBillboardType() == BBT_ORIENTED_SELF ||
 				mBillboardSet->getBillboardType() == BBT_PERPENDICULAR_SELF)
 			{
 				// Normalise direction vector
-				bb.mDirection = p->direction;
+				bb.mDirection = p->mDirection;
 				bb.mDirection.normalise();
 			}
-            bb.mColour = p->colour;
-            bb.mRotation = p->rotation;
+            bb.mColour = p->mColour;
+            bb.mRotation = p->mRotation;
             // Assign and compare at the same time
             if ((bb.mOwnDimensions = p->mOwnDimensions) == true)
             {

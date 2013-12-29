@@ -1455,7 +1455,8 @@ namespace Ogre {
             if (i->second.subtype == ENV_REFLECTION)
                 return true;
         }
-        for(i = mEffects.find(ET_PROJECTIVE_TEXTURE); i != iend; ++i)
+
+        if(mEffects.find(ET_PROJECTIVE_TEXTURE) != iend)
         {
             return true;
         }

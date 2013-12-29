@@ -56,10 +56,7 @@ namespace Ogre {
 		{
 			mMgr->_notifyUniformBufferDestroyed(this);
 		}
-        if (mShadowBuffer)
-        {
-            OGRE_DELETE mShadowBuffer;
-        }
+        OGRE_DELETE mShadowBuffer;
 	}
 
 	/*

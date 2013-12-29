@@ -713,7 +713,7 @@ namespace Ogre {
 		SceneManager* mgr, uint32 regionID, const Vector3& centre)
 		: MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
 		mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
-		mCurrentLod(0), mLodStrategy(0)
+		mCurrentLod(0), mLodStrategy(0), mCamera(0), mSquaredViewDepth(0)
 	{
 	}
 	//--------------------------------------------------------------------------

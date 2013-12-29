@@ -191,11 +191,8 @@ namespace RTShader {
 
 		AutoShaderParameter(GpuProgramParameters::AutoConstantType _autoType, 
 							const String& _name, 
-							GpuConstantType _type)
+							GpuConstantType _type) : autoType(_autoType), name(_name), type(_type)
 		{
-			autoType = _autoType;
-			name	 = _name;
-			type	 = _type;
 		}
 	};
 
@@ -336,27 +333,16 @@ namespace RTShader {
 	};
 
 //-----------------------------------------------------------------------
-Parameter::Parameter()
+Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0)
 {
-    mName					= "";
-    mType					= GCT_UNKNOWN;
-    mSemantic				= SPS_UNKNOWN;
-    mIndex					= 0;
-    mContent				= SPC_UNKNOWN;
-    mSize					= 0;
 }
 
 //-----------------------------------------------------------------------
 Parameter::Parameter(GpuConstantType type, const String& name, 
 			const Semantic& semantic, int index, 
-			const Content& content, size_t size)
+            const Content& content, size_t size) :
+    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size)
 {
-	mName					= name;
-	mType					= type;
-	mSemantic				= semantic;
-	mIndex					= index;
-	mContent				= content;
-	mSize					= size;
 }
 
 //-----------------------------------------------------------------------

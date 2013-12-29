@@ -66,7 +66,7 @@ namespace Ogre {
 		and to back it with a system memory 'shadow' copy which can be read and updated arbitrarily.
 		Ogre handles synchronising this buffer with the real hardware buffer (which should still be
 		created with the HBU_DYNAMIC flag if you intend to update it very frequently). Whilst this
-		approach does have it's own costs, such as increased memory overhead, these costs can 
+		approach does have its own costs, such as increased memory overhead, these costs can 
 		often be outweighed by the performance benefits of using a more hardware efficient buffer.
 		You should look for the 'useShadowBuffer' parameter on the creation methods used to create
 		the buffer of the type you require (see HardwareBufferManager) to enable this feature.
@@ -159,7 +159,7 @@ namespace Ogre {
     public:
 		    /// Constructor, to be called by HardwareBufferManager only
             HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer) 
-				: mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory), 
+				: mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory),
                 mUseShadowBuffer(useShadowBuffer), mShadowBuffer(NULL), mShadowUpdated(false), 
                 mSuppressHardwareUpdate(false) 
             {

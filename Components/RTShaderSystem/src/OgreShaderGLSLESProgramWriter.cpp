@@ -180,7 +180,7 @@ namespace Ogre {
                 StringUtil::trim(body);
                 StringVector tokens = StringUtil::split(body, "(");
 
-                for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); it++)
+                for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     StringVector moreTokens = StringUtil::split(*it, " ");
 
@@ -381,9 +381,6 @@ namespace Ogre {
                     FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
                     FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
                     FunctionInvocation::OperandVector::const_iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-
-                    // Reset the iterator
-                    itOperand = pFuncInvoc->getOperandList().begin();
 
                     // Local string stream
                     StringStream localOs;
@@ -740,7 +737,6 @@ namespace Ogre {
 
             FunctionVector forwardDecl; // Holds all function declarations
             const ShaderFunctionList& functionList = program->getFunctions();
-            ShaderFunctionConstIterator itFunction;
 
             Function* curFunction = *(functionList.begin());
             FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();

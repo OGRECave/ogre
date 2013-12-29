@@ -42,7 +42,7 @@ namespace Ogre{
 
 		// Set up some constant characters of interest
 		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*', cr = '\r', lf = '\n';
-		char c = 0, lastc = 0;
+		char c = 0;
 
 		String lexeme;
 		uint32 line = 1, state = READY, lastQuote = 0;
@@ -52,7 +52,7 @@ namespace Ogre{
 		String::const_iterator i = str.begin(), end = str.end();
 		while(i != end)
 		{
-			lastc = c;
+			char lastc = c;
 			c = *i;
 
 			if(c == quote)

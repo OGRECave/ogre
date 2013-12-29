@@ -86,7 +86,7 @@ namespace Ogre {
         if (mImp == NULL)
         {
             // Therefore we add a "dummy" cache if none are left
-            if (!mCaches.size())
+            if (mCaches.empty())
                 mCaches[0] = OGRE_NEW GLStateCacheManagerImp();
             mImp = mCaches.begin()->second;
         }

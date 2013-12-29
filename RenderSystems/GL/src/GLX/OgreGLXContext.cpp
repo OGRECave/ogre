@@ -65,10 +65,10 @@ namespace Ogre
 	GLXContext::~GLXContext() 	
 	{
 		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-		
+
 		if (!mExternalContext)
-			glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
-		
+                    glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
+
 		rs->_unregisterContext(this);
 	}
 	

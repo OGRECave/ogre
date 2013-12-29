@@ -44,8 +44,9 @@ namespace Ogre {
 		, mNumMultiRenderTargets(1)
 		, mNonPOW2TexturesLimited(false)
 		, mMaxSupportedAnisotropy(0)
+        , mVertexTextureUnitsShared(0)
+        , mGeometryProgramNumOutputVertices(0)
 	{
-
 		for(int i = 0; i < CAPS_CATEGORY_COUNT; i++)
 		{
 			mCapabilities[i] = 0;
@@ -55,8 +56,6 @@ namespace Ogre {
 		// each rendersystem should enable these
 		mCategoryRelevant[CAPS_CATEGORY_D3D9] = false;
 		mCategoryRelevant[CAPS_CATEGORY_GL] = false;
-
-
 	}
 	//-----------------------------------------------------------------------
 	RenderSystemCapabilities::~RenderSystemCapabilities()
@@ -107,6 +106,12 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Hardware vertex / index buffers: "
 			+ StringConverter::toString(hasCapability(RSC_VBO), true));
+		if(hasCapability(RSC_VBO))
+		{
+			pLog->logMessage(
+				" * 32-bit index buffers: "
+				+ StringConverter::toString(hasCapability(RSC_32BIT_INDEX), true));
+		}
 		pLog->logMessage(
 			" * Vertex programs: "
 			+ StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));

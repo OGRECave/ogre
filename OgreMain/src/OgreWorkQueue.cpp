@@ -80,6 +80,7 @@ namespace Ogre {
 		, mPaused(false)
 		, mAcceptRequests(true)
         , mShuttingDown(false)
+        , mIdleThreadRunning(false)
         , mIdleProcessed(0)
 	{
 	}

@@ -126,7 +126,7 @@ namespace Ogre {
 
     bool GLSupport::checkExtension(const String& ext) const
     {
-		assert(extensionList.size() > 0 && "ExtensionList is empty!" );
+		assert(!extensionList.empty() && "ExtensionList is empty!" );
 
         if(extensionList.find(ext) == extensionList.end())
             return false; 

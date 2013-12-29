@@ -127,7 +127,7 @@ namespace Ogre {
 
         /** Assignment operator.
         */
-        void operator = (const Exception& rhs);
+        Exception & operator = (const Exception& rhs);
 
         /** Returns a string with the full description of this error.
             @remarks

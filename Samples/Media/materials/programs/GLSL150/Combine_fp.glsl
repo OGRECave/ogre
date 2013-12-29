@@ -9,8 +9,8 @@ out vec4 fragColour;
 
 void main()
 {
-   vec4 render = texture(RT, oUv0);
-   vec4 sum = texture(Sum, oUv0);
+    vec4 render = texture(RT, oUv0);
+    vec4 sum = texture(Sum, oUv0);
 
-   fragColour = mix(render, sum, blur);
+    fragColour = mix(render, sum, blur);
 }

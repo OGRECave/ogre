@@ -110,10 +110,7 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterHLSLFactory()
-	{
-		mLanguage = "hlsl";
-	}
+	ShaderProgramWriterHLSLFactory() : mLanguage("hlsl") {}
 	virtual ~ShaderProgramWriterHLSLFactory() {}
 
 	/** 

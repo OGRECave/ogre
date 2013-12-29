@@ -251,7 +251,8 @@ vertex_program Fury/HeatVision/LightToHeat_GLSL_vp glsl
 
     default_params
     {
-        param_named_auto worldViewProj worldviewproj_matrix
+        // param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto flipping render_target_flipping
     }
 }
 
@@ -287,12 +288,11 @@ material Fury/HeatVision/LightToHeat
 {
     technique
     {
-        // pass 1
         pass
         {
-			cull_hardware none
-			cull_software none
-			depth_func always_pass
+            cull_hardware none
+            cull_software none
+            depth_func always_pass
             polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/LightToHeat_vp
@@ -407,7 +407,8 @@ vertex_program Fury/HeatVision/Blur_GLSL_vp glsl
 
     default_params
     {
-        param_named_auto worldViewProj worldviewproj_matrix
+        // param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto flipping render_target_flipping
     }
 }
 
@@ -441,12 +442,11 @@ material Fury/HeatVision/Blur
 {
     technique
     {
-        // pass 1
         pass
         {
-			cull_hardware none
-			cull_software none
-			depth_func always_pass
+            cull_hardware none
+            cull_software none
+            depth_func always_pass
             polygon_mode_overrideable false
 
             vertex_program_ref Fury/HeatVision/Blur_vp
@@ -461,7 +461,6 @@ material Fury/HeatVision/Blur
             // INPUT (from previous)
             texture_unit
             {
-                texture Input
                 tex_coord_set 0
                 filtering linear linear none
                 tex_address_mode clamp

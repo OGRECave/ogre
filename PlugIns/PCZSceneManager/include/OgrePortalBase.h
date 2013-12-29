@@ -106,7 +106,7 @@ namespace Ogre
 		/** Calculate the local direction and radius of the portal */
 		void calcDirectionAndRadius() const;
 
-		/** get the type of portal */
+		/** Get the type of portal */
 		PORTAL_TYPE getType() const {return mType;}
 		/** Retrieve the radius of the portal (calculates if necessary for quad portals) */
 		Real getRadius() const;
@@ -155,7 +155,7 @@ namespace Ogre
 		/** enable the portal */
 		void setEnabled(bool value)
 		{ mEnabled = value; }
-		/** check if portal is enabled */
+		/** Check if portal is enabled */
 		bool getEnabled() const {return mEnabled;}
 		
 
@@ -166,26 +166,26 @@ namespace Ogre
 			INTERSECT_BACK_NO_CROSS,
 			INTERSECT_CROSS
 		};
-		/** check if portal intersects an aab */
+		/** Check if portal intersects an aab */
 		bool intersects(const AxisAlignedBox& aab);
 
-		/** check if portal intersects an sphere */
+		/** Check if portal intersects an sphere */
 		bool intersects(const Sphere& sphere);
 
-		/** check if portal intersects a plane bounded volume */
+		/** Check if portal intersects a plane bounded volume */
 		bool intersects(const PlaneBoundedVolume& pbv);
 
-		/** check if portal intersects a ray */
+		/** Check if portal intersects a ray */
 		bool intersects(const Ray& ray);
 
-		/** check for intersection between portal & scenenode (also determines
+		/** Check for intersection between portal & scenenode (also determines
 		 * if scenenode crosses over portal
 		 */
 		PortalIntersectResult intersects(PCZSceneNode* sn);
 
-		/** check if portal crossed over portal */
+		/** Check if portal crossed over portal */
 		bool crossedPortal(const PortalBase* otherPortal);
-		/** check if portal touches another portal */
+		/** Check if portal touches another portal */
 		bool closeTo(const PortalBase* otherPortal);
 
 		/** @copydoc MovableObject::getBoundingBox. */
@@ -231,7 +231,7 @@ namespace Ogre
 		PORTAL_TYPE mType;
 		/// Zone this portal is currently owned by (in)
 		PCZone * mCurrentHomeZone;
-		///zone to transfer this portal to
+		/// Zone to transfer this portal to
 		PCZone * mNewHomeZone;
 		/// Corners of the portal - coordinates are relative to the sceneNode
 		// NOTE: there are 4 corners if the portal is a quad type
@@ -247,7 +247,7 @@ namespace Ogre
 		/// Radius of the sphere enclosing the portal 
 		// NOTE: For aabb portals, this value is the distance from the center of the aab to a corner
 		mutable Real mRadius;
-		// Local Centerpoint of the portal
+		/// Local Centerpoint of the portal
 		mutable Vector3 mLocalCP;
 		/// Derived (world coordinates) Corners of the portal
 		// NOTE: there are 4 corners if the portal is a quad type
@@ -269,23 +269,23 @@ namespace Ogre
 		/// Previous frame derived plane 
 		// NOTE: Only applicable for a Quad portal
 		mutable Plane mPrevDerivedPlane;
-		/// flag indicating whether or not local values are up-to-date
+		/// Flag indicating whether or not local values are up-to-date
 		mutable bool mLocalsUpToDate;
-		/// flag indicating whether or not derived values are up-to-date
+		/// Flag indicating whether or not derived values are up-to-date
 		mutable bool mDerivedUpToDate;
-		// previous world transform
+		/// Previous world transform
 		mutable Matrix4 mPrevWorldTransform;
-		// flag defining if portal is enabled or disabled.
+		/// Flag defining if portal is enabled or disabled.
 		bool mEnabled;
-		// cache of portal's capsule.
+		/// Cache of portal's capsule.
 		mutable Capsule mPortalCapsule;
-		// cache of portal's AAB that contains the bound of portal movement.
+		/// Cache of portal's AAB that contains the bound of portal movement.
 		mutable AxisAlignedBox mPortalAAB;
-		// cache of portal's previous AAB.
+		/// Cache of portal's previous AAB.
 		mutable AxisAlignedBox mPrevPortalAAB;
-		// cache of portal's local AAB.
+		/// Cache of portal's local AAB.
 		mutable AxisAlignedBox mLocalPortalAAB;
-		// defined if portal was moved previously.
+		/// Defined if portal was moved previously.
 		mutable bool mWasMoved;
 	};
 
@@ -293,7 +293,7 @@ namespace Ogre
 	class _OgrePCZPluginExport PortalBaseFactory : public MovableObjectFactory
 	{
 	protected:
-		/** get the portal type from name value pair. */
+		/** Get the portal type from name value pair. */
 		PortalBase::PORTAL_TYPE getPortalType(const NameValuePairList* params);
 
 	};

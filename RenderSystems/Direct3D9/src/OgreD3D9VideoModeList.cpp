@@ -64,7 +64,7 @@ namespace Ogre
 			// Check to see if it is already in the list (to filter out refresh rates)
 			BOOL found = FALSE;
 			vector<D3D9VideoMode>::type::iterator it;
-			for( it = mModeList.begin(); it != mModeList.end(); it++ )
+			for( it = mModeList.begin(); it != mModeList.end(); ++it )
 			{
 				D3DDISPLAYMODE oldDisp = it->getDisplayMode();
 				if( oldDisp.Width == displayMode.Width &&
@@ -95,7 +95,7 @@ namespace Ogre
 			// Check to see if it is already in the list (to filter out refresh rates)
 			BOOL found = FALSE;
 			vector<D3D9VideoMode>::type::iterator it;
-			for( it = mModeList.begin(); it != mModeList.end(); it++ )
+			for( it = mModeList.begin(); it != mModeList.end(); ++it )
 			{
 				D3DDISPLAYMODE oldDisp = it->getDisplayMode();
 				if( oldDisp.Width == displayMode.Width &&

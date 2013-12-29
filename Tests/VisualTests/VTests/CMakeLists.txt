@@ -32,7 +32,7 @@ ogre_add_component_include_dir(RTShaderSystem)
 ogre_add_component_include_dir(Overlay)
 
 add_library(VTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
-target_link_libraries(VTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay)
+target_link_libraries(VTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay OgreRTShaderSystem)
 ogre_config_sample_lib(VTests)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

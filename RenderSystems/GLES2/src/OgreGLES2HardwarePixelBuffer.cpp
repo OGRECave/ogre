@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
+#include "OgreBitwise.h"
 
 static int computeLog(GLuint value)
 {
@@ -98,7 +99,7 @@ namespace Ogre {
         }
     }
 
-    PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+    PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
     {
         allocateBuffer();
         if (options != HardwareBuffer::HBL_DISCARD)
@@ -309,7 +310,7 @@ namespace Ogre {
         {
             // Create render target for each slice
             mSliceTRT.reserve(mDepth);
-            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
@@ -610,7 +611,7 @@ namespace Ogre {
                                        dest.getWidth(),
                                        dest.getHeight(),
                                        0,
-                                       data.getConsecutiveSize(),
+                                       static_cast<GLsizei>(data.getConsecutiveSize()),
                                        data.data));
             }
             else
@@ -618,7 +619,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glCompressedTexSubImage2D(mFaceTarget, mLevel,
                                           dest.left, dest.top,
                                           dest.getWidth(), dest.getHeight(),
-                                          format, data.getConsecutiveSize(),
+                                          format, static_cast<GLsizei>(data.getConsecutiveSize()),
                                           data.data));
             }
         }
@@ -638,7 +639,12 @@ namespace Ogre {
                             "GLES2TextureBuffer::upload");
             }
 
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
+                // Standard alignment of 4 is not right
+                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+            }
+
             buildMipmaps(data);
         }
         else
@@ -657,7 +663,8 @@ namespace Ogre {
                             "GLES2TextureBuffer::upload");
             }
 
-            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3) {
+            if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
@@ -709,7 +716,7 @@ namespace Ogre {
 
         // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
         // guaranteed to work on all platforms.
-        int sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
+        size_t sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
         PixelBox tempBox = PixelBox(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
         tempBox.data = new uint8[sizeInBytes];
 
@@ -1105,9 +1112,6 @@ namespace Ogre {
         GLsizei width;
         GLsizei height;
         GLsizei depth;
-        int logW;
-        int logH;
-        int level;
         PixelBox scaled = data;
         scaled.data = data.data;
         scaled.left = data.left;
@@ -1121,81 +1125,46 @@ namespace Ogre {
         height = (GLsizei)data.getHeight();
         depth = (GLsizei)data.getDepth();
 
-        logW = computeLog(width);
-        logH = computeLog(height);
-        level = (logW > logH ? logW : logH);
+        GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
+        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
+        GLenum internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
 
-        for (int mip = 0; mip <= level; mip++)
-        {
-            GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
-            GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
-            GLenum internalFormat = glFormat;
 #if OGRE_NO_GLES3_SUPPORT == 0
-            // In GL ES 3, the internalformat and format parameters do not need to be identical
-            internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
+        // In GL ES 3, the internalformat and format parameters do not need to be identical
+        internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
 #endif
-            switch(mTarget)
-            {
-                case GL_TEXTURE_2D:
-                case GL_TEXTURE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                                                     mip,
-                                                     internalFormat,
-                                                     width, height,
-                                                     0,
-                                                     glFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_3D:
-                case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                                     mip,
-                                                     internalFormat,
-                                                     width, height, depth,
-                                                     0,
-                                                     glFormat,
-                                                     dataType,
-                                                     scaled.data));
-                    break;
-#endif
-            }
-
-            if (mip != 0)
-            {
-                OGRE_DELETE[] (uint8*) scaled.data;
-                scaled.data = 0;
-            }
-
-            if (width > 1)
-            {
-                width = width / 2;
-            }
-
-            if (height > 1)
-            {
-                height = height / 2;
-            }
-
-            size_t sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
-                                                       data.format);
-            scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = new uint8[sizeInBytes];
-            Image::scale(data, scaled, Image::FILTER_LINEAR);
-        }
-
-        // Delete the scaled data for the last level
-        if (level > 0)
+        switch(mTarget)
         {
-            delete[] (uint8*) scaled.data;
-            scaled.data = 0;
+            case GL_TEXTURE_2D:
+            case GL_TEXTURE_CUBE_MAP:
+                OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
+                                                 mLevel,
+                                                 internalFormat,
+                                                 width, height,
+                                                 0,
+                                                 glFormat,
+                                                 dataType,
+                                                 scaled.data));
+                break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            case GL_TEXTURE_3D:
+            case GL_TEXTURE_2D_ARRAY:
+                OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
+                                                 mip,
+                                                 internalFormat,
+                                                 width, height, depth,
+                                                 0,
+                                                 glFormat,
+                                                 dataType,
+                                                 scaled.data));
+                break;
+#endif
         }
     }
     
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
-    GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
+    GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
     GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;

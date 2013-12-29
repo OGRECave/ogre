@@ -181,7 +181,6 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 			if((*i)->type == ANT_PROPERTY)
 			{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
-				SubRenderState* subRenderState;
 
 				// Handle light count property.
 				if (prop->name == "light_count")
@@ -213,7 +212,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 				// Handle the rest of the custom properties.
 				else
 				{
-					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass, this);
+					SubRenderState* subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass, this);
 					if (subRenderState)
 					{
 						addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), material->getGroup(), pass->getIndex());

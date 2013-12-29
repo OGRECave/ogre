@@ -68,7 +68,7 @@ struct _OgreLodExport LodData {
 	struct VertexHash {
 		LodData* mGen;
 
-		VertexHash() { assert(0); }
+		VertexHash() : mGen(0) { assert(0); }
 		VertexHash(LodData* gen) { mGen = gen; }
 		size_t operator() (const Vertex* v) const;
 	};
@@ -142,7 +142,7 @@ struct _OgreLodExport LodData {
 	/// Makes possible to get the vertices with the smallest collapse cost.
 	CollapseCostHeap mCollapseCostHeap;
 	IndexBufferInfoList mIndexBufferInfoList;
-#ifndef NDEBUG
+#if OGRE_DEBUG_MODE
 	/**
 	 * @brief The name of the mesh being processed.
 	 *

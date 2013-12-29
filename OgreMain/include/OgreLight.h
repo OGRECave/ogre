@@ -555,11 +555,6 @@ namespace Ogre {
         /// Internal method for synchronising with parent node (if any)
         virtual void update(void) const;
 
-        /// @copydoc AnimableObject::getAnimableDictionaryName
-        const String& getAnimableDictionaryName(void) const;
-        /// @copydoc AnimableObject::initialiseAnimableDictionary
-        void initialiseAnimableDictionary(StringVector& vec) const;
-
         LightTypes mLightType;
         Vector3 mPosition;
         ColourValue mDiffuse;

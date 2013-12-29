@@ -47,7 +47,7 @@ namespace Ogre
 		if(MESHLOD_QUALITY >= 2) { // 30% speedup if disabled.
 			LodData::VTriangles::iterator it = src->triangles.begin();
 			LodData::VTriangles::iterator itEnd = src->triangles.end();
-			for (; it != itEnd; it++) {
+			for (; it != itEnd; ++it) {
 				LodData::Triangle* triangle = *it;
 				// Ignore the deleted faces (those including src & dest)
 				if (!triangle->hasVertex(dst)) {
@@ -125,11 +125,11 @@ namespace Ogre
 			cost = 1.0f;
 			LodData::VTriangles::iterator it = src->triangles.begin();
 			LodData::VTriangles::iterator itEnd = src->triangles.end();
-			for (; it != itEnd; it++) {
+			for (; it != itEnd; ++it) {
 				Real mincurv = -1.0f; // curve for face i and closer side to it
 				LodData::Triangle* triangle = *it;
 				LodData::VTriangles::iterator it2 = src->triangles.begin();
-				for (; it2 != itEnd; it2++) {
+				for (; it2 != itEnd; ++it2) {
 					LodData::Triangle* triangle2 = *it2;
 					if (triangle2->hasVertex(dst)) {
 
@@ -188,7 +188,7 @@ namespace Ogre
 			Real normalCost = 0;
 			LodData::VEdges::iterator it = src->edges.begin();
 			LodData::VEdges::iterator itEnd = src->edges.end();
-			for (; it != itEnd; it++) {
+			for (; it != itEnd; ++it) {
 				LodData::Vertex* neighbor = it->dst;
 				Real beforeDist = neighbor->position.distance(src->position);
 				Real afterDist = neighbor->position.distance(dst->position);

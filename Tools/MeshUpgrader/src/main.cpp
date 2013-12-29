@@ -638,7 +638,7 @@ void buildLod(MeshPtr& mesh)
 	String response;
 
 	// Prompt for LOD generation?
-	bool genLod = (opts.numLods != 0 || opts.interactive);
+	bool genLod = (opts.numLods != 0 || opts.interactive || opts.lodAutoconfigure);
 	bool askLodDtls = opts.interactive;
 	if (genLod) { // otherwise only ask if not specified on command line
 		if (mesh->getNumLodLevels() > 1) {
@@ -1043,7 +1043,7 @@ int main(int numargs, char** args)
 		}
 		stat( source.c_str(), &tagStat );
 		MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-		size_t result = fread( (void*)memstream->getPtr(), tagStat.st_size, 1, pFile );
+		size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
 		if (result != tagStat.st_size)
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"Unexpected error while reading file " + source, "OgreMeshUpgrade");

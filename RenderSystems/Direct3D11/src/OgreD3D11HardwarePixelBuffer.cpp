@@ -202,7 +202,7 @@ namespace Ogre {
 		return box.data;
 	}
 	//-----------------------------------------------------------------------------  
-	PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+	PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options)
 	{
 		// Check for misuse
 		if(mUsage & TU_RENDERTARGET)

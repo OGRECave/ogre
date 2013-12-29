@@ -208,9 +208,6 @@ namespace Ogre
 		int mMaxDepth;
 		/// Size of the octree
 		AxisAlignedBox mBox;
-
-		bool mLoose;
-		
     };
 
 	class _OgreOctreeZonePluginExport OctreeZoneData : public ZoneData

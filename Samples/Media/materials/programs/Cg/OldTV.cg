@@ -15,7 +15,6 @@ float4 OldTV_ps(float4 posIn: POSITION, float2 img: TEXCOORD0,
 
 ) : COLOR {
 
-   float2 pos = abs((img - 0.5) * 2.0) ;
    // Define a frame shape
    float2 pos = abs((img - 0.5) * 2.0);
    float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);

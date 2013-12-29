@@ -686,8 +686,15 @@ namespace Ogre {
                 {
                     // its the last entry in the container so its index is size - 1
                     size_t idx = mTextureUnitStates.size() - 1;
-                    state->setName( StringConverter::toString(idx) );
-                    /** since the name was never set and a default one has been made, clear the alias name
+                    
+					// allow 8 digit hex number. there should never be that many texture units.
+					// This sprintf replaced a call to StringConverter::toString for performance reasons
+					char buff[9];
+					memset(buff, 0, 9);
+					sprintf(buff, "%lx", static_cast<long>(idx));
+                    state->setName( buff );
+                    
+					/** since the name was never set and a default one has been made, clear the alias name
                      so that when the texture unit name is set by the user, the alias name will be set to
                      that name
                     */
@@ -1435,14 +1442,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Pass::setVertexProgram(const String& name, bool resetParams)
 	{
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
 
 		if (getVertexProgramName() != name)
 		{
 			// Turn off vertex program if name blank
 			if (name.empty())
 			{
-				if (mVertexProgramUsage) OGRE_DELETE mVertexProgramUsage;
+				OGRE_DELETE mVertexProgramUsage;
 				mVertexProgramUsage = NULL;
 			}
 			else
@@ -1485,7 +1492,7 @@ namespace Ogre {
 			// Turn off fragment program if name blank
 			if (name.empty())
 			{
-				if (mFragmentProgramUsage) OGRE_DELETE mFragmentProgramUsage;
+				OGRE_DELETE mFragmentProgramUsage;
 				mFragmentProgramUsage = NULL;
 			}
 			else
@@ -1527,7 +1534,7 @@ namespace Ogre {
 			// Turn off geometry program if name blank
 			if (name.empty())
 			{
-				if (mGeometryProgramUsage) OGRE_DELETE mGeometryProgramUsage;
+				OGRE_DELETE mGeometryProgramUsage;
 				mGeometryProgramUsage = NULL;
 			}
 			else
@@ -1569,7 +1576,7 @@ namespace Ogre {
 			// Turn off tessellation Hull program if name blank
 			if (name.empty())
 			{
-				if (mTessellationHullProgramUsage) OGRE_DELETE mTessellationHullProgramUsage;
+				OGRE_DELETE mTessellationHullProgramUsage;
 				mTessellationHullProgramUsage = NULL;
 			}
 			else
@@ -1611,7 +1618,7 @@ namespace Ogre {
 			// Turn off tessellation Domain program if name blank
 			if (name.empty())
 			{
-				if (mTessellationDomainProgramUsage) OGRE_DELETE mTessellationDomainProgramUsage;
+				OGRE_DELETE mTessellationDomainProgramUsage;
 				mTessellationDomainProgramUsage = NULL;
 			}
 			else
@@ -1653,7 +1660,7 @@ namespace Ogre {
 			// Turn off compute program if name blank
 			if (name.empty())
 			{
-				if (mComputeProgramUsage) OGRE_DELETE mComputeProgramUsage;
+				OGRE_DELETE mComputeProgramUsage;
 				mComputeProgramUsage = NULL;
 			}
 			else
@@ -2039,7 +2046,7 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowCasterVertexProgramUsage) OGRE_DELETE mShadowCasterVertexProgramUsage;
+            OGRE_DELETE mShadowCasterVertexProgramUsage;
             mShadowCasterVertexProgramUsage = NULL;
         }
         else
@@ -2094,7 +2101,7 @@ namespace Ogre {
         // Turn off fragment program if name blank
         if (name.empty())
         {
-            if (mShadowCasterFragmentProgramUsage) OGRE_DELETE mShadowCasterFragmentProgramUsage;
+            OGRE_DELETE mShadowCasterFragmentProgramUsage;
             mShadowCasterFragmentProgramUsage = NULL;
         }
         else
@@ -2155,7 +2162,7 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowReceiverVertexProgramUsage) OGRE_DELETE mShadowReceiverVertexProgramUsage;
+            OGRE_DELETE mShadowReceiverVertexProgramUsage;
             mShadowReceiverVertexProgramUsage = NULL;
         }
         else
@@ -2210,7 +2217,7 @@ namespace Ogre {
 		// Turn off Fragment program if name blank
 		if (name.empty())
 		{
-			if (mShadowReceiverFragmentProgramUsage) OGRE_DELETE mShadowReceiverFragmentProgramUsage;
+			OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 			mShadowReceiverFragmentProgramUsage = NULL;
 		}
 		else

@@ -801,7 +801,7 @@ namespace OgreBites
 			for (size_t i=0; i < mItems.size(); i++)
 			{
 				if (item == mItems[i]) {
-					removeItem(i);
+					removeItem(static_cast<unsigned int>(i));
 					i--; // check again same index
 				}
 			}
@@ -818,7 +818,7 @@ namespace OgreBites
 
 			if (mItems.size() < mItemsShown)
 			{
-				mItemsShown = mItems.size();
+				mItemsShown = static_cast<unsigned int>(mItems.size());
 				nukeOverlayElement(mItemElements.back());
 				mItemElements.pop_back();
 			}
@@ -1047,13 +1047,11 @@ namespace OgreBites
 		{
 			index = std::min<int>(index, (int)(mItems.size() - mItemElements.size()));
 			mDisplayIndex = index;
-			Ogre::BorderPanelOverlayElement* ie;
-			Ogre::TextAreaOverlayElement* ta;
 
 			for (int i = 0; i < (int)mItemElements.size(); i++)
 			{
-				ie = mItemElements[i];
-				ta = (Ogre::TextAreaOverlayElement*)ie->getChild(ie->getName() + "/MenuItemText");
+				Ogre::BorderPanelOverlayElement *ie = mItemElements[i];
+				Ogre::TextAreaOverlayElement *ta = (Ogre::TextAreaOverlayElement*)ie->getChild(ie->getName() + "/MenuItemText");
 
 				fitCaptionToArea(mItems[mDisplayIndex + i], ta, ie->getWidth() - 2 * ta->getLeft());
 

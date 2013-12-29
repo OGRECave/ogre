@@ -133,7 +133,7 @@ namespace Ogre {
         /** Set the viewport clear colour (defaults to 0,0,0,0) 
 			@note applies when PassType is CLEAR
 		 */
-        void setClearColour(ColourValue val);
+        void setClearColour(const ColourValue &val);
         /** Get the viewport clear colour (defaults to 0,0,0,0)	
 			@note applies when PassType is CLEAR
 		 */

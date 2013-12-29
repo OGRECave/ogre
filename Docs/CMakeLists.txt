@@ -19,16 +19,16 @@ elseif (UNIX)
   set(OGRE_DOCS_PATH "share/OGRE/docs")
 endif ()
   
-if (OGRE_INSTALL_DOCS)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-    DESTINATION ${OGRE_DOCS_PATH}
-    PATTERN ".hg" EXCLUDE
-    PATTERN "src" EXCLUDE
-  )
-endif ()
-
 # Build and install API documentation if doxygen is available
 if(DOXYGEN_FOUND)
+    if (OGRE_INSTALL_DOCS)
+      install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+	DESTINATION ${OGRE_DOCS_PATH}
+	PATTERN ".hg" EXCLUDE
+	PATTERN "src" EXCLUDE
+      )
+    endif ()
+
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
 	add_custom_target(OgreDoc COMMAND 
     ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg 
