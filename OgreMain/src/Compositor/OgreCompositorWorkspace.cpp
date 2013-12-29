@@ -175,7 +175,20 @@ namespace Ogre
 			}
 		}
 
-		if( !unprocessedList.empty() )
+		//unprocessedList should be empty by now, or contain only disabled nodes.
+		bool incomplete = false;
+		{
+			CompositorNodeVec::const_iterator itor = unprocessedList.begin();
+			CompositorNodeVec::const_iterator end  = unprocessedList.end();
+
+			while( itor != end )
+			{
+				incomplete |= (*itor)->getEnabled();
+				++itor;
+			}
+		}
+
+		if( incomplete )
 		{
 			CompositorNodeVec::const_iterator itor = unprocessedList.begin();
 			CompositorNodeVec::const_iterator end  = unprocessedList.end();
@@ -451,7 +464,22 @@ namespace Ogre
 		while( itor != end )
 		{
 			CompositorNode *node = *itor;
-			node->_update( (Camera*)0 );
+			if( node->getEnabled() )
+			{
+				if( node->areAllInputsConnected() )
+				{
+					node->_update( (Camera*)0 );
+				}
+				else
+				{
+					//If we get here, this means a node didn't have all of its input channels connected,
+					//but we ignored it because the node was disabled. But now it is enabled again.
+					LogManager::getSingleton().logMessage(
+						"ERROR: Invalid Node '" + node->getName().getFriendlyText() +
+						"' was re-enabled without calling CompositorWorkspace::clearAllConnections" );
+					mValid = false;
+				}
+			}
 			++itor;
 		}
 
