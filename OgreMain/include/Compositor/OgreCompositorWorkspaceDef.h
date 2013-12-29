@@ -117,7 +117,7 @@ namespace Ogre
 			in more nodes, he can use a dummy node as splitter (gotta love Nodes' flexibility! :)).
 			inNode is not yet aliased, an implicit alias will be created.
 		*/
-		void connectOutput( uint32 inChannel, IdString inNode );
+		void connectOutput( IdString inNode, uint32 inChannel );
 
 		/** Clears all the connection between channels of the nodes (@see connect).
 		@remarks

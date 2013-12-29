@@ -5682,7 +5682,7 @@ namespace Ogre{
 						uint32 inChannel;
 						IdString inNode;
 						if( getUInt( *it0, &inChannel ) && getIdString( *it1, &inNode ) )
-							mWorkspaceDef->connectOutput( inChannel, inNode );
+							mWorkspaceDef->connectOutput( inNode, inChannel );
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 					}

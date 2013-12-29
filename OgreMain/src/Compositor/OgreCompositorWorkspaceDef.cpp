@@ -103,7 +103,7 @@ namespace Ogre
 			connect( outNode, i, inNode, i );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspaceDef::connectOutput( uint32 inChannel, IdString inNode )
+	void CompositorWorkspaceDef::connectOutput( IdString inNode, uint32 inChannel )
 	{
 		createImplicitAlias( inNode );
 		mFinalInChannel = inChannel;
@@ -138,5 +138,29 @@ namespace Ogre
 		}
 
 		mAliasedNodes[alias] = nodeName;
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspaceDef::removeNodeAlias( IdString alias )
+	{
+		NodeAliasMap::iterator it = mAliasedNodes.find( alias );
+		if( it != mAliasedNodes.end() )
+		{
+			mAliasedNodes.erase( it );
+
+			ChannelRouteList::iterator itor = mChannelRoutes.begin();
+			ChannelRouteList::iterator end  = mChannelRoutes.end();
+
+			while( itor != end )
+			{
+				if( itor->outNode == alias || itor->inNode == alias )
+				{
+					itor = mChannelRoutes.erase( itor );
+				}
+				else
+				{
+					++itor;
+				}
+			}
+		}
 	}
 }

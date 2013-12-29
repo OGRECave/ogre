@@ -746,11 +746,17 @@ compositor_node CompositorSampleStdRenderer
 
 workspace CompositorSampleWorkspace
 {
+	//This shows how to setup a workspace with Bloom and Glass from scripts.
+	//In C++ we're going to wipe this all out and recreate this workspace manually
+	//(with all the rest of compositors).
+	
 	//Connect all CompositorSampleStdRenderer outputs to Bloom's input
 	connect CompositorSampleStdRenderer Bloom
+	//Connect all Bloom outputs to Glass' input
+	connect Bloom Glass
 
 	//Connect RenderWindow to FinalComposition's input channel #0
 	connect_output 0 FinalComposition
-	//Connect Bloom's output #0 to FinalComposition's input #1
-	//connect Bloom 0 FinalComposition 1
+	//Connect Glass's output #0 to FinalComposition's input #1
+	connect Glass 0 FinalComposition 1
 }

@@ -111,12 +111,46 @@ void Sample_Compositor::setupView()
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupCompositor(void)
 {
-	Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+	/*Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
 	const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
 	CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition( workspaceName );
 	workspaceDef->connect( "Bloom", "Glass" );
-	workspaceDef->connect( "Glass", 0, "FinalComposition", 1 );
+	workspaceDef->connect( "Glass", 0, "FinalComposition", 1 );*/
+
+	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+	const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
+	CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition( workspaceName );
+
+	//Clear the definition made with scripts as example
+	workspaceDef->clearAll();
+
+	CompositorManager2::CompositorNodeDefMap nodeDefs = compositorManager->getNodeDefinitions();
+
+	//iterate through Compositor Managers resources and add name keys to menu
+	CompositorManager2::CompositorNodeDefMap::const_iterator itor = nodeDefs.begin();
+	CompositorManager2::CompositorNodeDefMap::const_iterator end  = nodeDefs.end();
+
+	IdString compositorId = "Ogre/Compositor";
+
+	// Add all compositor resources to the view container
+	while( itor != end )
+	{
+		if( itor->second->mCustomIdentifier == compositorId )
+		{
+			mCompositorNames.push_back(itor->second->getNameStr());
+
+			//Manually disable the node and add it to the workspace without any connection
+			itor->second->setStartEnabled( false );
+			workspaceDef->addNodeAlias( itor->first, itor->first );
+		}
+
+		++itor;
+	}
+
+	workspaceDef->connect( "CompositorSampleStdRenderer", 0, "FinalComposition", 1 );
+	workspaceDef->connectOutput( "FinalComposition", 0 );
 
 	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }

@@ -513,6 +513,6 @@ namespace Ogre
 		}
 
 		CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( workspaceDefName );
-		workDef->connectOutput( 0, nodeDef->getName() );
+		workDef->connectOutput( nodeDef->getName(), 0 );
 	}
 }
