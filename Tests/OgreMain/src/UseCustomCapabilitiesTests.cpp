@@ -207,7 +207,11 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
         
 	mStaticPluginLoader.load();
 #else
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+	Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
+#else
 	Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
 #endif
 
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
