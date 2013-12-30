@@ -348,7 +348,7 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 		//
 		//----------------------------------------------------------------------------------------------
 		/*CompositorWorkspaceDef::ChannelRouteList &channelRouteList = workspaceDef->_getChannelRoutes();
-		if(!box->isChecked() )
+		if( box->isChecked() )
 		{
 			//Enabling
 			if( channelRouteList.size() == 1 )
@@ -394,20 +394,20 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 				CompositorWorkspaceDef::ChannelRouteList::iterator it = channelRouteList.begin();
 				CompositorWorkspaceDef::ChannelRouteList::iterator en = channelRouteList.end();
 
-				IdString currentNode = node->getId();
+				IdString currentNode = node->getName();
 				IdString prevNode; //We assume all inputs are coming from the same node
 				IdString nextNode; //We assume our node doesn't output to more than one node simultaneously
 
 				while( it != en )
 				{
-					if( (*it)->inNode == currentNode )
+					if( it->inNode == currentNode )
 					{
-						prevNode = (*it)->outNode;
+						prevNode = it->outNode;
 						it = channelRouteList.erase( it );
 					}
-					else if( (*it)->outNode == currentNode )
+					else if( it->outNode == currentNode )
 					{
-						nextNode = (*it)->inNode;
+						nextNode = it->inNode;
 						it = channelRouteList.erase( it );
 					}
 					else
@@ -416,7 +416,10 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 					}
 				}
 
-				workspaceDef->connect( prevNode, nextNode );
+				if( nextNode == "FinalComposition" )
+					workspaceDef->connect( prevNode, 0, nextNode, 1 );
+				else
+					workspaceDef->connect( prevNode, nextNode );
 			}
 		}*/
 
