@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
+#include "OgrePixelBox.h"
 
 namespace Ogre
 {

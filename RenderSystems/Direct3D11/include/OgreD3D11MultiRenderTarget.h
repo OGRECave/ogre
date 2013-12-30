@@ -38,8 +38,6 @@ namespace Ogre {
 		D3D11MultiRenderTarget(const String &name);
 		~D3D11MultiRenderTarget();
 
-		virtual void update(void);
-
 		virtual void getCustomAttribute( const String& name, void *pData );
 
 		bool requiresTextureFlipping() const { return false; }
