@@ -57,8 +57,7 @@ namespace Ogre
 		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
 												id, true, mRenderWindow, mRenderSys );
 
-		createAllNodes();
-		connectAllNodes();
+		recreateAllNodes();
 
 		mCurrentWidth	= mRenderWindow->getWidth();
 		mCurrentHeight	= mRenderWindow->getHeight();
@@ -233,6 +232,9 @@ namespace Ogre
 			//Now manage automatic shadow nodes present PASS_SCENE passes
 			//(when using SHADOW_NODE_FIRST_ONLY)
 			setupPassesShadowNodes();
+
+			//unprocessedList may not be empty if they were incomplete but disabled.
+			mNodeSequence.insert( mNodeSequence.end(), unprocessedList.begin(), unprocessedList.end() );
 
 			mValid = true;
 		}
