@@ -325,9 +325,6 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 			}
 		}
 
-#if 0
-		CompositorManager::getSingleton().setCompositorEnabled(mViewport, nodeName, box->isChecked());
-#endif
 		const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
@@ -338,141 +335,168 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 		//The workspace instance can't return a non-const version of its definition.
 		CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition( workspaceName );
 
-		//----------------------------------------------------------------------------------------------
-		//
-		//	METHOD 1 (the masochist way, 'cos it's hard, prone to bugs, but very flexible):
-		//		When enabling: Interleave the node between the 1st and 2nd node.
-		//		When disabling: Manually disconnect the node in the middle, then fix broken connections.
-		//		Normally this method is not recommended, but if you're looking to make a GUI node
-		//		editor, the knowledge from this code is very useful.
-		//
-		//----------------------------------------------------------------------------------------------
-		/*CompositorWorkspaceDef::ChannelRouteList &channelRouteList = workspaceDef->_getChannelRoutes();
-		if( box->isChecked() )
+		//Try both methods alternating them, just for the sake of testing and demonstrating them.
+		//The 1st user 5 toggles will use method 1, the next 5 toggles will use method 2, and repeat
+		static int g_methodCount = 0;
+
+		if( g_methodCount < 5 )
 		{
-			//Enabling
-			if( channelRouteList.size() == 1 )
+			//-------------------------------------------------------------------------------------------
+			//
+			//	METHOD 1 (the masochist way, 'cos it's hard, prone to bugs, but very flexible):
+			//		When enabling: Interleave the node between the 1st and 2nd node.
+			//		When disabling: Manually disconnect the node in the middle, then fix broken
+			//		connections.
+			//		Normally this method is not recommended, but if you're looking to make a GUI node
+			//		editor, the knowledge from this code is very useful.
+			//
+			//-------------------------------------------------------------------------------------------
+			CompositorWorkspaceDef::ChannelRouteList &channelRouteList = workspaceDef->_getChannelRoutes();
+			if( box->isChecked() )
 			{
-				//No compositor node yet activated
-				channelRouteList.pop_back();
-				workspaceDef->connect( "CompositorSampleStdRenderer", node->getName() );
-				workspaceDef->connect( node->getName(), 0, "FinalComposition", 1 );
+				//Enabling
+				if( channelRouteList.size() == 1 )
+				{
+					//No compositor node yet activated
+					channelRouteList.pop_back();
+					workspaceDef->connect( "CompositorSampleStdRenderer", node->getName() );
+					workspaceDef->connect( node->getName(), 0, "FinalComposition", 1 );
+				}
+				else
+				{
+					//There is at least one compositor active already, interleave
+
+					const IdString firstNodeName( "CompositorSampleStdRenderer" );
+
+					//Find the first node "CompositorSampleStdRenderer", and put the new compo
+					//after that once (theoretically, we could put it anywhere we want in the chain)
+					CompositorWorkspaceDef::ChannelRouteList::iterator it = channelRouteList.begin();
+					CompositorWorkspaceDef::ChannelRouteList::iterator en = channelRouteList.end();
+
+					CompositorWorkspaceDef::ChannelRoute *firstNodeChannel0 = 0;
+					CompositorWorkspaceDef::ChannelRoute *firstNodeChannel1 = 0;
+
+					while( it != en )
+					{
+						if( it->outNode == firstNodeName )
+						{
+							if( it->inChannel == 0 )
+								firstNodeChannel0 = &(*it);
+							else
+								firstNodeChannel1 = &(*it);
+						}
+						++it;
+					}
+
+					IdString old2ndNode = firstNodeChannel0->inNode; //Will now become the 3rd node
+
+					firstNodeChannel0->inNode		= node->getName();
+					//firstNodeChannel0->inChannel= 0 //Channel stays the same
+					firstNodeChannel1->inNode		= node->getName();
+					//firstNodeChannel1->inChannel= 1 //Channel stays the same
+
+					workspaceDef->connect( node->getName(), old2ndNode );
+				}
 			}
 			else
 			{
-				//There is at least one compositor active already, interleave
+				//Disabling
+				if( channelRouteList.size() == 3 )
+				{
+					//After disabling us, there will be no more compositors active
+					channelRouteList.clear();
+					workspaceDef->connect( "CompositorSampleStdRenderer", 0, "FinalComposition", 1 );
+				}
+				else
+				{
+					//Find our channel route
+					CompositorWorkspaceDef::ChannelRouteList::iterator it = channelRouteList.begin();
+					CompositorWorkspaceDef::ChannelRouteList::iterator en = channelRouteList.end();
 
-				//We always define in advance "CompositorSampleStdRenderer" to be the first one,
-				//otherwise we would have to look for those entries with
-				//channelRouteList[n].outNode == CompositorSampleStdRenderer
-				CompositorWorkspaceDef::ChannelRouteList::iterator it = channelRouteList.begin();
-				CompositorWorkspaceDef::ChannelRoute &rendererChannel0 = *it++;
-				CompositorWorkspaceDef::ChannelRoute &rendererChannel1 = *it;
+					IdString currentNode = node->getName();
+					IdString prevNode; //We assume all inputs are coming from the same node
+					IdString nextNode; //We assume our node doesn't output to more than one node simultaneously
 
-				IdString old2ndNode = rendererChannel0.inNode; //Will now become the 3rd node
+					while( it != en )
+					{
+						if( it->inNode == currentNode )
+						{
+							prevNode = it->outNode;
+							it = channelRouteList.erase( it );
+						}
+						else if( it->outNode == currentNode )
+						{
+							nextNode = it->inNode;
+							it = channelRouteList.erase( it );
+						}
+						else
+						{
+							++it;
+						}
+					}
 
-				rendererChannel0.inNode		= node->getName();
-				//rendererChannel0.inChannel= 0 //Channel stays the same
-				rendererChannel1.inNode		= node->getName();
-				//rendererChannel1.inChannel= 1 //Channel stays the same
-
-				workspaceDef->connect( node->getName(), old2ndNode );
+					if( nextNode == "FinalComposition" )
+						workspaceDef->connect( prevNode, 0, nextNode, 1 );
+					else
+						workspaceDef->connect( prevNode, nextNode );
+				}
 			}
 		}
 		else
 		{
-			//Disabling
-			if( channelRouteList.size() == 3 )
-			{
-				//After disabling us, there will be no more compositors active
-				channelRouteList.clear();
-				workspaceDef->connect( "CompositorSampleStdRenderer", 0, "FinalComposition", 1 );
-			}
-			else
-			{
-				//Find our channel route
-				CompositorWorkspaceDef::ChannelRouteList::iterator it = channelRouteList.begin();
-				CompositorWorkspaceDef::ChannelRouteList::iterator en = channelRouteList.end();
+			//-------------------------------------------------------------------------------------------
+			//
+			//	METHOD 2 (the easy way):
+			//		Reconstruct the whole connection from scratch based on a copy (be it a cloned,
+			//		untouched workspace definition, a custom file, or the very own workspace instance)
+			//		but leaving the node we're disabling unplugged.
+			//		This method is much safer and easier, the **recommended** way for most usage
+			//		scenarios involving toggling compositors on and off frequently. With a few tweaks,
+			//		it can easily be adapted to complex compositors too.
+			//
+			//-------------------------------------------------------------------------------------------
+			workspaceDef->clearAllInterNodeConnections();
 
-				IdString currentNode = node->getName();
-				IdString prevNode; //We assume all inputs are coming from the same node
-				IdString nextNode; //We assume our node doesn't output to more than one node simultaneously
+			IdString finalCompositionId = "FinalComposition";
+			const CompositorNodeVec &nodes = mWorkspace->getNodeSequence();
 
-				while( it != en )
+			IdString lastInNode;
+			CompositorNodeVec::const_iterator it = nodes.begin();
+			CompositorNodeVec::const_iterator en = nodes.end();
+
+			while( it != en )
+			{
+				CompositorNode *outNode = *it;
+
+				if( outNode->getEnabled() && outNode->getName() != finalCompositionId )
 				{
-					if( it->inNode == currentNode )
+					//Look for the next enabled node we can connect to
+					CompositorNodeVec::const_iterator it2 = it + 1;
+					while( it2 != en && (!(*it2)->getEnabled() || (*it2)->getName() == finalCompositionId) )
+						++it2;
+
+					if( it2 != en )
 					{
-						prevNode = it->outNode;
-						it = channelRouteList.erase( it );
+						lastInNode = (*it2)->getName();
+						workspaceDef->connect( outNode->getName(), lastInNode );
 					}
-					else if( it->outNode == currentNode )
-					{
-						nextNode = it->inNode;
-						it = channelRouteList.erase( it );
-					}
-					else
-					{
-						++it;
-					}
+
+					it = it2 - 1;
 				}
 
-				if( nextNode == "FinalComposition" )
-					workspaceDef->connect( prevNode, 0, nextNode, 1 );
-				else
-					workspaceDef->connect( prevNode, nextNode );
-			}
-		}*/
-
-		//----------------------------------------------------------------------------------------------
-		//
-		//	METHOD 2 (the easy way):
-		//		Reconstruct the whole connection from scratch based on a copy (be it a cloned, untouched
-		//		workspace definition, a custom file, or the very own workspace instance) but leaving the
-		//		node we're disabling unplugged.
-		//		This method is much safer and easier, the **recommended** way for most usage scenarios
-		//		involving toggling compositors on and off frequently. With a few tweaks, it can easily
-		//		be adapted to complex compositors too.
-		//
-		//----------------------------------------------------------------------------------------------
-		workspaceDef->clearAllInterNodeConnections();
-
-		IdString finalCompositionId = "FinalComposition";
-		const CompositorNodeVec &nodes = mWorkspace->getNodeSequence();
-
-		IdString lastInNode;
-		CompositorNodeVec::const_iterator it = nodes.begin();
-		CompositorNodeVec::const_iterator en = nodes.end();
-
-		while( it != en )
-		{
-			CompositorNode *outNode = *it;
-
-			if( outNode->getEnabled() && outNode->getName() != finalCompositionId )
-			{
-				//Look for the next enabled node we can connect to
-				CompositorNodeVec::const_iterator it2 = it + 1;
-				while( it2 != en && (!(*it2)->getEnabled() || (*it2)->getName() == finalCompositionId) )
-					++it2;
-
-				if( it2 != en )
-				{
-					lastInNode = (*it2)->getName();
-					workspaceDef->connect( outNode->getName(), lastInNode );
-				}
-
-				it = it2 - 1;
+				++it;
 			}
 
-			++it;
+			if( lastInNode == IdString() )
+				lastInNode = "CompositorSampleStdRenderer";
+
+			workspaceDef->connect( lastInNode, 0, "FinalComposition", 1 );
+
+			//Not needed unless we'd called workspaceDef->clearOutputConnections
+			//workspaceDef->connectOutput( "FinalComposition", 0 );
 		}
 
-		if( lastInNode == IdString() )
-			lastInNode = "CompositorSampleStdRenderer";
-
-		workspaceDef->connect( lastInNode, 0, "FinalComposition", 1 );
-
-		//Not needed unless we'd called workspaceDef->clearOutputConnections
-		//workspaceDef->connectOutput( "FinalComposition", 0 );
+		g_methodCount = (g_methodCount + 1) % 10;
 
 		//Now that we're done, tell the instance to update itself.
 		mWorkspace->reconnectAllNodes();

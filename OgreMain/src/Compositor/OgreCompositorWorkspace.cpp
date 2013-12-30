@@ -193,22 +193,25 @@ namespace Ogre
 			CompositorNodeVec::const_iterator end  = unprocessedList.end();
 			while( itor != end )
 			{
-				LogManager::getSingleton().logMessage(
-					"WARNING: Node '" + (*itor)->getName().getFriendlyText() + "' has the following "
-					"channels in a disconnected state. Workspace won't work until they're solved:" );
-
-				const CompositorChannelVec& inputChannels = (*itor)->getInputChannel();
-				CompositorChannelVec::const_iterator itChannels = inputChannels.begin();
-				CompositorChannelVec::const_iterator enChannels = inputChannels.end();
-				while( itChannels != enChannels )
+				if( (*itor)->getEnabled() )
 				{
-					if( !itChannels->isValid() )
+					LogManager::getSingleton().logMessage(
+						"WARNING: Node '" + (*itor)->getName().getFriendlyText() + "' has the following "
+						"channels in a disconnected state. Workspace won't work until they're solved:" );
+
+					const CompositorChannelVec& inputChannels = (*itor)->getInputChannel();
+					CompositorChannelVec::const_iterator itChannels = inputChannels.begin();
+					CompositorChannelVec::const_iterator enChannels = inputChannels.end();
+					while( itChannels != enChannels )
 					{
-						const size_t channelIdx = itChannels - inputChannels.begin();
-						LogManager::getSingleton().logMessage( "\t\t\t Channel # " +
-											StringConverter::toString( channelIdx ) );
+						if( !itChannels->isValid() )
+						{
+							const size_t channelIdx = itChannels - inputChannels.begin();
+							LogManager::getSingleton().logMessage( "\t\t\t Channel # " +
+												StringConverter::toString( channelIdx ) );
+						}
+						++itChannels;
 					}
-					++itChannels;
 				}
 				
 				++itor;
