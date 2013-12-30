@@ -39,7 +39,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	endif()
 	
 	
-	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreMeshLodGeneratorStatic OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
+	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
 	set(DEPEND_STATIC_LIBS "")	
 	foreach(DEPENDENCY ${DEPENDENCIES})
