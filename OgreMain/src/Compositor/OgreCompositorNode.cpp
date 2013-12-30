@@ -242,12 +242,8 @@ namespace Ogre
 
 		mNumConnectedInputs = 0;
 
-		//Clear our outputs
-		texIt = mOutTextures.begin();
-		texEn = mOutTextures.end();
-
-		while( texIt != texEn )
-			*texIt++ = CompositorChannel();
+		//This call will clear only our outputs that come from input channels.
+		routeOutputs();
 
 		CompositorPassVec::const_iterator passIt = mPasses.begin();
 		CompositorPassVec::const_iterator passEn = mPasses.end();

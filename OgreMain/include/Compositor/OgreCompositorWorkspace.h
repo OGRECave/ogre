@@ -201,6 +201,8 @@ namespace Ogre
 		*/
 		CompositorShadowNode* findOrCreateShadowNode( IdString nodeDefName, bool &bCreated );
 
+		const CompositorNodeVec& getNodeSequence(void) const	{ return mNodeSequence; }
+
 		/// Finds a camera in the scene manager we have.
 		Camera* findCamera( IdString cameraName ) const;
 
