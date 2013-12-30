@@ -813,6 +813,7 @@ namespace Ogre
 					ID_VIEWPORT,
 					ID_NUM_INITIAL,
 					ID_IDENTIFIER,		//TODO
+					ID_OVERLAYS,
 
 					//Used by PASS_SCENE
 					ID_LOD_BIAS,

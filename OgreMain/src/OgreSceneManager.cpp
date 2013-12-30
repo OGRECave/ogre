@@ -1347,8 +1347,6 @@ void SceneManager::_setSkyPlane(
         // Ensure loaded
         m->load();
 
-        mSkyPlaneRenderQueue = renderQueue;
-
         // Set up the plane
         MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName);
         if (!planeMesh.isNull())
@@ -1396,6 +1394,7 @@ void SceneManager::_setSkyPlane(
 		mSkyPlaneEntity->setName( meshName );
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
+		mSkyPlaneEntity->setRenderQueueGroup( renderQueue );
 
         MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
 		objectMap->movableObjects.push_back( mSkyPlaneEntity );
@@ -1469,8 +1468,6 @@ void SceneManager::_setSkyBox(
 		if (pass->getNumTextureUnitStates() > 0 && pass->getTextureUnitState(0)->is3D())
 			t3d = true;
 
-        mSkyBoxRenderQueue = renderQueue;
-
         // Create node 
         if (!mSkyBoxNode)
         {
@@ -1484,6 +1481,7 @@ void SceneManager::_setSkyBox(
 			mSkyBoxObj = OGRE_NEW ManualObject( Id::generateNewId<MovableObject>(),
 												&mEntityMemoryManager[SCENE_DYNAMIC] );
 			mSkyBoxObj->setCastShadows(false);
+			mSkyBoxObj->setRenderQueueGroup( renderQueue );
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}
 		else
@@ -1495,7 +1493,7 @@ void SceneManager::_setSkyBox(
 			mSkyBoxObj->clear();
 		}
 		
-		mSkyBoxObj->setRenderQueueGroup(mSkyBoxRenderQueue);
+		mSkyBoxObj->setRenderQueueGroup(renderQueue);
 
 		if (t3d)
 		{
@@ -1687,9 +1685,6 @@ void SceneManager::_setSkyDome(
         // Ensure loaded
         m->load();
 
-        //mSkyDomeDrawFirst = drawFirst;
-        mSkyDomeRenderQueue = renderQueue;
-
         // Create node 
         if (!mSkyDomeNode)
         {
@@ -1729,6 +1724,7 @@ void SceneManager::_setSkyDome(
 			mSkyDomeEntity[i]->setName( entName );
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
+			mSkyDomeEntity[i]->setRenderQueueGroup( renderQueue );
 
             MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
 			objectMap->movableObjects.push_back( mSkyDomeEntity[i] );
@@ -3538,28 +3534,6 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
 	{
 		mSkyDomeNode->setPosition(cam->getDerivedPosition());
 		mSkyDomeNode->_getDerivedPositionUpdated();
-	}
-
-	if (mSkyPlaneEnabled && mSkyPlaneEntity && mSkyPlaneEntity->isVisible())
-	{
-		getRenderQueue()->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
-	}
-
-	if (mSkyBoxEnabled && mSkyBoxObj && mSkyBoxObj->isVisible())
-	{
-		mSkyBoxObj->_updateRenderQueue(getRenderQueue(), cam, cam);
-	}
-
-	if (mSkyDomeEnabled)
-	{
-		for (uint plane = 0; plane < 5; ++plane)
-		{
-			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible())
-			{
-				getRenderQueue()->addRenderable(
-					mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
-			}
-		}
 	}
 }
 //---------------------------------------------------------------------

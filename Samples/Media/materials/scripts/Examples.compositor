@@ -700,13 +700,13 @@ compositor_node FinalComposition
 	    	input 0 rtN
 	    }
 		
-		/*pass render_scene
+		pass render_scene
 		{
 			lod_update_list	off
 
 			//Render Overlays
 			rq_first			96
-		}*/
+		}
 	}
 }
 
@@ -736,7 +736,8 @@ compositor_node CompositorSampleStdRenderer
 			//shadows			myShadowNode		//Shadow node?
 			//rq_first			50					//Inclusive
 			//rq_last			51					//Not inclusive
-			rq_last			96
+			overlays			off
+			rq_last				96
 		}
 	}
 	

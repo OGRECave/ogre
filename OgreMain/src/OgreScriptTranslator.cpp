@@ -7194,6 +7194,26 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_OVERLAYS:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"overlays only supports 1 argument");
+					}
+					else
+					{
+						bool val = true;
+						if(!getBoolean(prop->values.front(), &mPassDef->mIncludeOverlays))
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"overlays argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+						}
+					}
+					break;
 				}
 			}
 		}

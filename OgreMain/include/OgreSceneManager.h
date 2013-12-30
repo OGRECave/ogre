@@ -558,17 +558,14 @@ namespace Ogre {
 
         // Sky plane
         bool mSkyPlaneEnabled;
-        uint8 mSkyPlaneRenderQueue;
         Plane mSkyPlane;
         SkyPlaneGenParameters mSkyPlaneGenParameters;
         // Sky box
         bool mSkyBoxEnabled;
-        uint8 mSkyBoxRenderQueue;
         Quaternion mSkyBoxOrientation;
         SkyBoxGenParameters mSkyBoxGenParameters;
         // Sky dome
         bool mSkyDomeEnabled;
-        uint8 mSkyDomeRenderQueue;
         Quaternion mSkyDomeOrientation;
         SkyDomeGenParameters mSkyDomeGenParameters;
 

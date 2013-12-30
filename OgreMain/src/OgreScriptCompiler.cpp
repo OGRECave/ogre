@@ -1244,6 +1244,7 @@ namespace Ogre
 		mIds["viewport"]		= ID_VIEWPORT;
 		mIds["num_initial"]		= ID_NUM_INITIAL;
 		mIds["identifier"]		= ID_IDENTIFIER;
+		mIds["overlays"]		= ID_OVERLAYS;
 
 		mIds["lod_bias"]		= ID_LOD_BIAS;
 		mIds["lod_update_list"]	= ID_LOD_UPDATE_LIST;
