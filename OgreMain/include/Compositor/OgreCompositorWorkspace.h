@@ -121,20 +121,6 @@ namespace Ogre
 		*/
 		void setupPassesShadowNodes(void);
 
-		/** Finds a node instance with the given aliased name
-		@remarks
-			Linear search O(N)
-		@param aliasName
-			Name of the node instance (they're unique)
-		@param includeShadowNodes
-			When true, also looks for ShadowNodes with that name, if the instance doesn't exists,
-			it will not be created (default: false). @See findShadowNode
-			When a Node has the same name of a Shadow Node, the Node takes precedence.
-		@return
-			Null if not found. Valid pointer otherwise.
-		*/
-		CompositorNode* findNode( IdString aliasName, bool includeShadowNodes=false ) const;
-
 	public:
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
 								RenderTarget *finalRenderTarget, SceneManager *sceneManager,
@@ -148,6 +134,20 @@ namespace Ogre
 
 		void setEnabled( bool bEnabled )					{ mEnabled = bEnabled; }
 		bool getEnabled() const								{ return mEnabled; }
+
+		/** Finds a node instance with the given aliased name
+		@remarks
+			Linear search O(N)
+		@param aliasName
+			Name of the node instance (they're unique)
+		@param includeShadowNodes
+			When true, also looks for ShadowNodes with that name, if the instance doesn't exists,
+			it will not be created (default: false). @See findShadowNode
+			When a Node has the same name of a Shadow Node, the Node takes precedence.
+		@return
+			Null if not found. Valid pointer otherwise.
+		*/
+		CompositorNode* findNode( IdString aliasName, bool includeShadowNodes=false ) const;
 
 		/** Destroys and recreates all nodes. TODO: Only revalidate nodes adjacent to those that
 			were invalidated, to avoid recreating so many D3D/GL resources (local textures)

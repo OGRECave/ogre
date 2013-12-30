@@ -69,7 +69,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	FocusedShadowCameraSetup::~FocusedShadowCameraSetup(void)
 	{
-		SceneNode *dummyNode = mTempFrustum->getParentSceneNode();
+		SceneNode *dummyNode = mLightFrustumCamera->getParentSceneNode();
 		dummyNode->detachAllObjects();
 		OGRE_DELETE dummyNode;
 

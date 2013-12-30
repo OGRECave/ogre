@@ -22,7 +22,9 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "SamplePlugin.h"
 
+#include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
 using namespace Ogre;
@@ -53,8 +55,6 @@ protected:
     void setupScene(void);
     void createEffects(void);
 	void createTextures(void);
-
-	void registerCompositors();
 	void changePage(size_t pageNum);
 	
 	SceneNode * mSpinny;
@@ -69,6 +69,8 @@ protected:
 	String mDebugCompositorName;
 	SelectMenu* mDebugTextureSelectMenu;
 	TextureUnitState* mDebugTextureTUS;
+
+	CompositorWorkspace *mWorkspace;
 
 };
 
@@ -152,7 +154,10 @@ void Sample_Compositor::setupCompositor(void)
 	workspaceDef->connect( "CompositorSampleStdRenderer", 0, "FinalComposition", 1 );
 	workspaceDef->connectOutput( "FinalComposition", 0 );
 
-	compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+	mWorkspace = compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+
+	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
+		((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupContent(void)
@@ -176,8 +181,6 @@ void Sample_Compositor::setupContent(void)
 
 	setupScene();
 
-	registerCompositors();
-
 	setupControls();
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -192,48 +195,12 @@ StringVector Sample_Compositor::getRequiredPlugins()
     return names;
 }
 //-----------------------------------------------------------------------------------
-void Sample_Compositor::registerCompositors(void)
-{
-	CompositorManager2 *compoManager = mRoot->getCompositorManager2();
-	CompositorManager2::CompositorNodeDefMap nodeDefs = compoManager->getNodeDefinitions();
-
-    //iterate through Compositor Managers resources and add name keys to menu
-	CompositorManager2::CompositorNodeDefMap::const_iterator itor = nodeDefs.begin();
-	CompositorManager2::CompositorNodeDefMap::const_iterator end  = nodeDefs.end();
-
-	IdString compositorId = "Ogre/Compositor";
-
-	// add all compositor resources to the view container
-	while( itor != end )
-    {
-		if( itor->second->mCustomIdentifier == compositorId )
-		{
-			mCompositorNames.push_back(itor->second->getNameStr());
-#if 0
-			try 
-			{
-				Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
-				Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
-			} catch (...) {
-				/// Warn user
-				LogManager::getSingleton().logMessage("Could not load compositor " + compositorName);
-			}
-#endif
-		}
-
-		++itor;
-    }
-
-	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
-		((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
-}
-//-----------------------------------------------------------------------------------
 void Sample_Compositor::changePage(size_t pageNum)
 {
 	assert(pageNum < mNumCompositorPages);
 	
 	mActiveCompositorPage = pageNum;
-#if 0
+
 	size_t maxCompositorsInPage = mCompositorNames.size() - (pageNum * COMPOSITORS_PER_PAGE);
 	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
 	{
@@ -242,14 +209,13 @@ void Sample_Compositor::changePage(size_t pageNum)
 		if (i < maxCompositorsInPage)
 		{
 			String compositorName = mCompositorNames[pageNum * COMPOSITORS_PER_PAGE + i];
-			CompositorInstance *tmpCompo = CompositorManager::getSingleton().getCompositorChain(mViewport)
-				->getCompositor(compositorName);
+			CompositorNode *node = mWorkspace->findNode( compositorName );
 
 			cb->setCaption(compositorName);
 
-			if( tmpCompo )
+			if( node ) //Shouldn't be null, but just in case...
 			{
-				cb->setChecked( tmpCompo->getEnabled(), false );
+				cb->setChecked( node->getEnabled(), false );
 				cb->show();
 			}
 			else
@@ -264,7 +230,6 @@ void Sample_Compositor::changePage(size_t pageNum)
 			cb->hide();
 		}
 	}
-#endif
 
 	OgreBites::Button* pageButton = static_cast<OgreBites::Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
 	Ogre::StringStream ss;
