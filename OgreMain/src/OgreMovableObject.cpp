@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -308,6 +308,12 @@ namespace Ogre {
 	const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
 	{
 		return mParentNode->_getFullTransform();
+	}
+	//-----------------------------------------------------------------------
+	void MovableObject::setLocalAabb(const Aabb box)
+	{
+		mObjectData.mLocalAabb->setFromAabb( box, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = box.getRadius();
 	}
 	//-----------------------------------------------------------------------
 	Aabb MovableObject::getLocalAabb() const

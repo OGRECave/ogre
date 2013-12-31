@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -16,6 +16,8 @@ same license as the rest of the engine.
 #define _AMBIENTLIGHT_H
 
 #include "OgreSimpleRenderable.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
+#include "OgreId.h"
 
 // Renderable for rendering Ambient component and also to
 // establish the depths
@@ -32,7 +34,7 @@ class AmbientLight : public Ogre::SimpleRenderable
 
 {
 public:
-	AmbientLight();
+	AmbientLight(Ogre::IdType id, Ogre::ObjectMemoryManager *memMgr);
 	~AmbientLight();
 
 	/** @copydoc MovableObject::getBoundingRadius */

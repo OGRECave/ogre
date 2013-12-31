@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -134,7 +134,7 @@ Sample_Ocean::Sample_Ocean()
 	mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
 	mInfo["Thumbnail"] = "thumb_ocean.png";
 	mInfo["Category"] = "Environment";
-	mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
+	mBackgroundColour = ColourValue( 0.6f, 0.0f, 0.6f );
 }
 /*************************************************************************
 	                    Sample_Ocean Methods

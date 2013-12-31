@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -17,6 +17,8 @@ same license as the rest of the engine.
 
 #include "OgreSimpleRenderable.h"
 #include "MaterialGenerator.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
+#include "OgreId.h"
 
 /** Deferred light geometry. Each instance matches a normal light.
 	Should not be created by the user.
@@ -25,7 +27,7 @@ same license as the rest of the engine.
 class DLight: public Ogre::SimpleRenderable
 {
 public:
-	DLight(MaterialGenerator *gen, Ogre::Light* parentLight);
+	DLight(Ogre::IdType id, Ogre::ObjectMemoryManager *memMgr, MaterialGenerator *gen, Ogre::Light* parentLight);
 	~DLight();
 
 	/** Update the information from the light that matches this one 
@@ -38,7 +40,7 @@ public:
 
 	/** Does this light cast shadows?
 	*/
-	virtual bool getCastChadows() const;
+	virtual bool getCastShadows() const;
 
 	/** @copydoc MovableObject::getBoundingRadius */
 	virtual Ogre::Real getBoundingRadius(void) const;

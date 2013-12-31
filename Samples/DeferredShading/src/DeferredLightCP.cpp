@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -35,14 +35,14 @@ DeferredLightRenderOperation::DeferredLightRenderOperation(
 	mLightMaterialGenerator = new LightMaterialGenerator();
 	
 	// Create the ambient light
-	mAmbientLight = new AmbientLight();
+	mAmbientLight = new AmbientLight(Id::generateNewId<MovableObject>(), SceneManager::_getEntityMemoryManager());
 	const MaterialPtr& mat = mAmbientLight->getMaterial();
 	mat->load();
 }
 //-----------------------------------------------------------------------
 DLight* DeferredLightRenderOperation::createDLight(Ogre::Light* light)
 {
-	DLight *rv = new DLight(mLightMaterialGenerator,light);
+	DLight *rv = new DLight(Id::generateNewId<MovableObject>(), SceneManager::_getEntityMemoryManager(), mLightMaterialGenerator,light);
 	mLights[light] = rv;
 	return rv;
 }
@@ -72,7 +72,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
     Technique* tech = mAmbientLight->getMaterial()->getBestTechnique();
 	injectTechnique(sm, tech, mAmbientLight, 0);
 
-	const LightList& lightList = sm->_getLightsAffectingFrustum();
+	const LightList& lightList = sm->getGlobalLightList().lights;
     for (LightList::const_iterator it = lightList.begin(); it != lightList.end(); it++) 
 	{
         Light* light = *it;

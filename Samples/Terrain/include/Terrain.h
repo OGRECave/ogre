@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -776,7 +776,8 @@ protected:
         ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
         ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
 
-		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
+		mEditMarker = mSceneMgr->createEntity("sphere.mesh");
+        mEditMarker->setName("editMarker");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
 		mEditNode->setScale(0.05, 0.05, 0.05);

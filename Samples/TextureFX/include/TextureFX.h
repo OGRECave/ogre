@@ -17,7 +17,7 @@ public:
 		mInfo["Thumbnail"] = "thumb_texfx.png";
 		mInfo["Category"] = "Unsorted";
 		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
-		mBackgroundColor = ColourValue::White;
+		mBackgroundColour = ColourValue::White;
 	}
 
 protected:

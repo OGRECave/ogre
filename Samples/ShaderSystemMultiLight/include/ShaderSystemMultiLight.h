@@ -145,12 +145,14 @@ protected:
 			Plane(Vector3::UNIT_Y, -30), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
 		// create a floor entity, give it a material, and place it at the origin
-        Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+        Entity* floor = mSceneMgr->createEntity("floor");
+        floor->setName("Floor");
         floor->setMaterialName("Examples/BumpyMetal");
         mSceneMgr->getRootSceneNode()->attachObject(floor);
 
 		// Create an ogre head and place it at the origin
-		Entity* head = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		Entity* head = mSceneMgr->createEntity("ogrehead.mesh");
+        head->setName("Head");
 		head->setRenderQueueGroup(cPriorityMain);
 		mSceneMgr->getRootSceneNode()->attachObject(head);
 

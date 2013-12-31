@@ -16,7 +16,7 @@ public:
 		mInfo["Description"] = "Shows how to use skydomes (fixed-distance domes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skydome.png";
 		mInfo["Category"] = "Environment";
-		mBackgroundColor = ColourValue::White;
+		mBackgroundColour = ColourValue::White;
 	}
 
 	void sliderMoved(Slider* slider)

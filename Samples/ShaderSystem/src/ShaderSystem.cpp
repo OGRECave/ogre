@@ -255,11 +255,11 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 
 	if (mPointLightNode != NULL)
 	{
-		static Real sToatalTime = 0.0;
+		static Real sTotalTime = 0.0;
 		
-		sToatalTime += evt.timeSinceLastFrame;
+		sTotalTime += evt.timeSinceLastFrame;
 		mPointLightNode->yaw(Degree(evt.timeSinceLastFrame * 15));
-		mPointLightNode->setPosition(0.0, Math::Sin(sToatalTime) * 30.0, 0.0);
+		mPointLightNode->setPosition(0.0, Math::Sin(sTotalTime) * 30.0, 0.0);
 	}
 
 	updateTargetObjInfo();
@@ -306,7 +306,8 @@ void Sample_ShaderSystem::setupContent()
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
 		1500,1500,25,25,true,1,60,60,Vector3::UNIT_Z);
 
-	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	Entity* pPlaneEnt = mSceneMgr->createEntity( "Myplane" );
+    pPlaneEnt->setName("plane");
 	pPlaneEnt->setMaterialName("Examples/Rockwall");
 	pPlaneEnt->setCastShadows(false);
 	SceneNode *planeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -337,7 +338,8 @@ void Sample_ShaderSystem::setupContent()
 	SceneNode* childNode;
 
 	// Create the main entity and mark it as the current target object.
-	mMainEntity = mSceneMgr->createEntity(MAIN_ENTITY_NAME, MAIN_ENTITY_MESH);
+	mMainEntity = mSceneMgr->createEntity(MAIN_ENTITY_MESH);
+    mMainEntity->setName(MAIN_ENTITY_NAME);
 	mTargetEntities.push_back(mMainEntity);
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();		
 	childNode->attachObject(mMainEntity);
@@ -347,14 +349,16 @@ void Sample_ShaderSystem::setupContent()
 	const String& mainExportedMaterial = mMainEntity->getSubEntity(0)->getMaterialName() + "_RTSS_Export";
 	MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainExportedMaterial, SAMPLE_MATERIAL_GROUP);
 
-	Entity *entity = mSceneMgr->createEntity("ExportedMaterialEntity", MAIN_ENTITY_MESH);
+	Entity *entity = mSceneMgr->createEntity(MAIN_ENTITY_MESH);
+    entity->setName("ExportedMaterialEntity");
 	entity->setMaterial(matMainEnt);
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(0.0, 200.0, -200.0);
 	childNode->attachObject(entity);
 
 	// Create texture layer blending demonstration entity.
-	mLayeredBlendingEntity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
+	mLayeredBlendingEntity = mSceneMgr->createEntity(MAIN_ENTITY_MESH);
+    mLayeredBlendingEntity->setName("LayeredBlendingMaterialEntity");
 	mLayeredBlendingEntity->setMaterialName("RTSS/LayeredBlending");
 	mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4::ZERO);
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -385,14 +389,16 @@ void Sample_ShaderSystem::setupContent()
 
 
 	// Create per pixel lighting demonstration entity.
-	Entity *knotEntity = mSceneMgr->createEntity("PerPixelEntity", "knot.mesh");
+	Entity *knotEntity = mSceneMgr->createEntity("knot.mesh");
+    knotEntity->setName("PerPixelEntity");
 	knotEntity->setMaterialName("RTSS/PerPixel_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 100.0, -100.0);
 	childNode->attachObject(knotEntity);
 
 	// Create normal map lighting demonstration entity.
-	knotEntity = mSceneMgr->createEntity("NormalMapEntity", "knot.mesh");
+	knotEntity = mSceneMgr->createEntity("knot.mesh");
+    knotEntity->setName("NormalMapEntity");
 	knotEntity->setMaterialName("RTSS/NormalMapping_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);

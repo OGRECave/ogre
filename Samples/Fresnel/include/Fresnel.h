@@ -145,7 +145,8 @@ protected:
             mWaterPlane, 700, 1300, 10, 10, true, 1, 3, 5, Vector3::UNIT_Z);
 
 		// create a water entity using our mesh, give it the shader material, and attach it to the origin
-        mWater = mSceneMgr->createEntity("Water", "water");
+        mWater = mSceneMgr->createEntity("water");
+        mWater->setName("Water");
         mWater->setMaterialName("Examples/FresnelReflectionRefraction");
         mSceneMgr->getRootSceneNode()->attachObject(mWater);
 	}
@@ -167,21 +168,24 @@ protected:
 
 		pb->setComment("Upper Bath");
 		windowUpdate();
-        ent = mSceneMgr->createEntity("UpperBath", "RomanBathUpper.mesh" );
+        ent = mSceneMgr->createEntity("RomanBathUpper.mesh" );
+        ent->setName("UpperBath");
 		mSceneMgr->getRootSceneNode()->attachObject(ent);        
         mSurfaceEnts.push_back(ent);
 		pb->setProgress(0.4);
 
 		pb->setComment("Columns");
 		windowUpdate();
-        ent = mSceneMgr->createEntity("Columns", "columns.mesh");
-		mSceneMgr->getRootSceneNode()->attachObject(ent);        
+        ent = mSceneMgr->createEntity("columns.mesh");
+        ent->setName("Columns");
+		mSceneMgr->getRootSceneNode()->attachObject(ent);
         mSurfaceEnts.push_back(ent);
 		pb->setProgress(0.5);
 
 		pb->setComment("Ogre Head");
 		windowUpdate();
-		ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		ent = mSceneMgr->createEntity("ogrehead.mesh");
+        ent->setName("Head");
 		ent->setMaterialName("RomanBath/OgreStone");
         mSurfaceEnts.push_back(ent);
 		pb->setProgress(0.6);
@@ -193,7 +197,8 @@ protected:
 
 		pb->setComment("Lower Bath");
 		windowUpdate();
-		ent = mSceneMgr->createEntity("LowerBath", "RomanBathLower.mesh");
+		ent = mSceneMgr->createEntity("RomanBathLower.mesh");
+        ent->setName("LowerBath");
         mSceneMgr->getRootSceneNode()->attachObject(ent);
         mSubmergedEnts.push_back(ent);
 		pb->setProgress(1);
@@ -212,7 +217,8 @@ protected:
 		for (unsigned int i = 0; i < NUM_FISH; i++)
         {
 			// create fish entity
-            Entity* ent = mSceneMgr->createEntity("Fish" + StringConverter::toString(i + 1), "fish.mesh");
+            Entity* ent = mSceneMgr->createEntity("fish.mesh");
+            ent->setName("Fish" + StringConverter::toString(i + 1));
             mSubmergedEnts.push_back(ent);
 
 			// create an appropriately scaled node and attach the entity

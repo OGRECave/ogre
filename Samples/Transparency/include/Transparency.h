@@ -20,7 +20,7 @@ public:
 		mInfo["Description"] = "Demonstrates the use of transparent materials (or scene blending).";
 		mInfo["Thumbnail"] = "thumb_trans.png";
 		mInfo["Category"] = "Lighting";
-		mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
+		mBackgroundColour = ColourValue( 0.6f, 0.0f, 0.6f );
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)

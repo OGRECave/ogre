@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -416,7 +416,7 @@ namespace Ogre {
 		/// Returns a direct access to the ObjectData state
 		ObjectData& _getObjectData()										{ return mObjectData; }
 
-		/// return the full transformation of the parent sceneNode or the attachingPoint node
+		/// Returns the full transformation of the parent sceneNode or the attachingPoint node
 		const Matrix4& _getParentNodeFullTransform(void) const;
 
 		/** Retrieves the local axis-aligned bounding box for this object.
@@ -424,6 +424,12 @@ namespace Ogre {
                 This bounding box is in local coordinates.
         */
 		Aabb getLocalAabb(void) const;
+
+		/** Sets the local axis-aligned bounding box for this object.
+         @remarks
+         This bounding box is in local coordinates.
+         */
+        void setLocalAabb(const Aabb box);
 
 		/** Gets the axis aligned box in world space.
 		@remarks

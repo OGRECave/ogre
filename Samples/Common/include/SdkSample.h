@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ namespace OgreBites
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
 			mDragLook = false;
-			mBackgroundColor = Ogre::ColourValue::Black;
+			mBackgroundColour = Ogre::ColourValue::Black;
 		}
 
 		virtual ~SdkSample() {}
@@ -509,7 +509,7 @@ namespace OgreBites
     protected:
 
 		/** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
-		 *  if setupCompositor() is overridden, be aware @mBackgroundColor will be ignored
+		 *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
 		 */
 		virtual void setupCompositor()
 		{
@@ -520,7 +520,7 @@ namespace OgreBites
 			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
 			{
 				compositorManager->createBasicWorkspaceDef( workspaceNameStr,
-															mBackgroundColor, Ogre::IdString() );
+															mBackgroundColour, Ogre::IdString() );
 			}
 			compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 		}
@@ -557,7 +557,7 @@ namespace OgreBites
 		ParamsPanel* mDetailsPanel;   		// sample details panel
 		bool mCursorWasVisible;				// was cursor visible before dialog appeared
 		bool mDragLook;                     // click and drag to free-look
-		Ogre::ColourValue mBackgroundColor;	// color value passed to createBasicWorkspaceDef
+		Ogre::ColourValue mBackgroundColour;	// color value passed to createBasicWorkspaceDef
     };
 }
 

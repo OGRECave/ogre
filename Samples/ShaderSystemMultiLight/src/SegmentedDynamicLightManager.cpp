@@ -62,7 +62,7 @@ void SegmentedDynamicLightManager::postFindVisibleObjects(SceneManager* source,
 {
 	if (irs == SceneManager::IRS_NONE)
 	{
-		updateLightList(source->getCameraInProgress(), source->_getLightsAffectingFrustum());
+		updateLightList(source->getCameraInProgress(), source->getGlobalLightList().lights);
 	}
 }
 
@@ -82,7 +82,7 @@ void SegmentedDynamicLightManager::setSceneManager(SceneManager* i_Manager)
 }
 		
 //------------------------------------------------------------------------------
-void SegmentedDynamicLightManager::updateLightList(const Camera* i_pCamera, const LightList& i_LightList)
+void SegmentedDynamicLightManager::updateLightList(const Camera* i_pCamera, const LightArray& i_LightList)
 {
 	if (isActive())
 	{
@@ -112,7 +112,7 @@ const String& SegmentedDynamicLightManager::getSDLTextureName()
 }
 
 //------------------------------------------------------------------------------
-void SegmentedDynamicLightManager::arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightList& i_LightList)
+void SegmentedDynamicLightManager::arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightArray& i_LightList)
 {
 	//Clear the previous buffers
 	for(int i = 0; i < SDL_SEGMENT_GRID_SIZE; ++i)
@@ -127,14 +127,14 @@ void SegmentedDynamicLightManager::arrangeLightsInSegmentedLists(const Camera* i
 }
 	
 //------------------------------------------------------------------------------
-void SegmentedDynamicLightManager::regenerateActiveLightList(const LightList& i_LightList)
+void SegmentedDynamicLightManager::regenerateActiveLightList(const LightArray& i_LightList)
 {
 	//add the buffers to the segmented lists
-	LightList::const_iterator itLight = i_LightList.begin(),
+	LightArray::const_iterator itLight = i_LightList.begin(),
 		itLightEnd = i_LightList.end();
 	for(;itLight != itLightEnd ; ++itLight)
 	{
-		const Light* pLight = (*itLight).light;
+		const Light* pLight = *itLight;
 		Light::LightTypes type = pLight->getType();
 		if (((type == Light::LT_SPOTLIGHT) || (type == Light::LT_POINT)) &&
 			(pLight->getAttenuationRange() > 0))

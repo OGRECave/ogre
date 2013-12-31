@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -111,13 +111,13 @@ private:
 
 private:
 	//Update the systems internal light lists
-	void updateLightList(const Camera* i_pCamera, const LightList& i_LightList);
+	void updateLightList(const Camera* i_pCamera, const LightArray& i_LightList);
 	//Initialize the texture to be used to store the light information
 	bool initTexture();
 	//Arrange the lights in the different lists
-	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightList& i_LightList);
+	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightArray& i_LightList);
 	//Repopulate the mActiveLights list which keeps track of all lights being rendered in the frame
-	void regenerateActiveLightList(const LightList& i_LightList);
+	void regenerateActiveLightList(const LightArray& i_LightList);
 	//Calculate the bounds of a single light
 	void calculateLightBounds(const Light* i_Light, LightData &o_LightData);
 	//Calculate the area which bounds area in which the lights exist

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -305,15 +305,16 @@ protected:
         
 		// Create water mesh and entity
 		waterMesh = new WaterMesh(MESH_NAME, PLANE_SIZE, COMPLEXITY);
-		waterEntity = mSceneMgr->createEntity(ENTITY_NAME,
-                                              MESH_NAME);
+		waterEntity = mSceneMgr->createEntity(MESH_NAME);
+        waterEntity->setName(ENTITY_NAME);
 		//~ waterEntity->setMaterialName(MATERIAL_NAME);
 		SceneNode *waterNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		waterNode->attachObject(waterEntity);
         
         // Add a head, give it it's own node
         headNode = waterNode->createChildSceneNode();
-        Entity *ent = mSceneMgr->createEntity("head", "ogrehead.mesh");
+        Entity *ent = mSceneMgr->createEntity("ogrehead.mesh");
+        ent->setName("head");
         headNode->attachObject(ent);
         
 		// Make sure the camera track this node
