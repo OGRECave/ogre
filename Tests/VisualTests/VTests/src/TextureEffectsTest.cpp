@@ -38,7 +38,7 @@ TextureEffectsTest::TextureEffectsTest()
 
 void TextureEffectsTest::setupContent()
 {
-    mBackgroundColor = ColourValue(0.8,0.8,0.8);
+    mBackgroundColour = ColourValue(0.8,0.8,0.8);
 
     // the names of the four materials we will use
     String matNames[] = {"Examples/OgreDance", "Examples/OgreParade", "Examples/OgreSpin", "Examples/OgreWobble"};

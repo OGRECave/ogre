@@ -47,7 +47,7 @@ public:
         mInfo["Thumbnail"] = "thumb_visual_tests.png";
         mInfo["Help"] = "";
 		//This bg colour is very hard to confuse with common mistakes (i.e. black triangle on black bg)
-		mBackgroundColor = Ogre::ColourValue( 0.79f, 0.2f, 0.75f );
+		mBackgroundColour = Ogre::ColourValue( 0.79f, 0.2f, 0.75f );
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
@@ -133,7 +133,7 @@ public:
 protected:
 
 	/** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
-	 *  if setupCompositor() is overridden, be aware @mBackgroundColor will be ignored
+	 *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
 	 */
 	virtual void setupCompositor()
 	{
@@ -142,7 +142,7 @@ protected:
 		const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
 		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
 		{
-			compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColor,
+			compositorManager->createBasicWorkspaceDef( mInfo["Title"] + " Workspace", mBackgroundColour,
 														Ogre::IdString() );
 		}
 		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
@@ -156,7 +156,7 @@ protected:
 
     // The camera for this sample
     Ogre::Camera* mCamera;
-	Ogre::ColourValue mBackgroundColor;	// color value passed to createBasicWorkspaceDef
+	Ogre::ColourValue mBackgroundColour;	// color value passed to createBasicWorkspaceDef
 };
 
 #endif

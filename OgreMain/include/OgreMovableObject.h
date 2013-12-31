@@ -416,7 +416,7 @@ namespace Ogre {
 		/// Returns a direct access to the ObjectData state
 		ObjectData& _getObjectData()										{ return mObjectData; }
 
-		/// return the full transformation of the parent sceneNode or the attachingPoint node
+		/// Returns the full transformation of the parent sceneNode or the attachingPoint node
 		const Matrix4& _getParentNodeFullTransform(void) const;
 
 		/** Retrieves the local axis-aligned bounding box for this object.
@@ -424,6 +424,12 @@ namespace Ogre {
                 This bounding box is in local coordinates.
         */
 		Aabb getLocalAabb(void) const;
+
+		/** Sets the local axis-aligned bounding box for this object.
+         @remarks
+         This bounding box is in local coordinates.
+         */
+        void setLocalAabb(const Aabb box);
 
 		/** Gets the axis aligned box in world space.
 		@remarks

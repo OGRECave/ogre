@@ -47,7 +47,8 @@ void PlayPen_testManualBlend::setupContent()
 	t->setColourOperationEx(LBX_BLEND_MANUAL, LBS_TEXTURE, LBS_CURRENT, 
 		ColourValue::White, ColourValue::White, 0.75);
 
-	Entity *planeEnt = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+	Entity *planeEnt = mSceneMgr->createEntity(SceneManager::PT_PLANE);
+    planeEnt->setName("Plane");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(planeEnt);
 	planeEnt->setMaterialName("TestMat");
 
@@ -79,7 +80,8 @@ void PlayPen_testProjectSphere::setupContent()
 
 	mProjectionSphere = new Sphere(Vector3(0, 2000, 0), 1500.0);
 
-	ManualObject* debugSphere = mSceneMgr->createManualObject("debugSphere");
+	ManualObject* debugSphere = mSceneMgr->createManualObject();
+    debugSphere->setName("debugSphere");
 	debugSphere->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
 	for (int i = 0; i <= 20; ++i)
 	{
@@ -99,7 +101,9 @@ void PlayPen_testProjectSphere::setupContent()
 	}
 	debugSphere->end();
 
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,2000,0))->attachObject(debugSphere);
+	SceneNode *sphereNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    sphereNode->setPosition(Vector3(0,2000,0));
+    sphereNode->attachObject(debugSphere);
 
 	MaterialPtr mat = MaterialManager::getSingleton().create("scissormat", 
 		TRANSIENT_RESOURCE_GROUP);
@@ -112,12 +116,11 @@ void PlayPen_testProjectSphere::setupContent()
 	t->setAlphaOperation(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, 0.5f);
 
 
-	mScissorRect = mSceneMgr->createManualObject("mScissorRect");
+	mScissorRect = mSceneMgr->createManualObject();
+    mScissorRect->setName("mScissorRect");
 	mScissorRect->setUseIdentityProjection(true);
 	mScissorRect->setUseIdentityView(true);
-	AxisAlignedBox aabb;
-	aabb.setInfinite();
-	mScissorRect->setBoundingBox(aabb);
+    mScissorRect->setLocalAabb(Aabb::BOX_INFINITE);
 	mScissorRect->begin(mat->getName());
 	mScissorRect->position(Vector3::ZERO);
 	mScissorRect->position(Vector3::ZERO);
@@ -163,7 +166,9 @@ void PlayPen_testCameraSetDirection::setupContent()
 	mSceneMgr->setAmbientLight(ColourValue::White);
 
 	Entity* e = mSceneMgr->createEntity("1", "knot.mesh");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(mFocus)->attachObject(e);
+	SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->setPosition(mFocus);
+    node->attachObject(e);
 
 
 	mCamera->setPosition(200,1000,1000);
@@ -176,7 +181,8 @@ void PlayPen_testCameraSetDirection::setupContent()
 	mTrayMgr->showCursor();
 	setDragLook(true);
 
-	mParentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(1000, 2000, -1000));
+	mParentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mParentNode->setPosition(Vector3(1000, 2000, -1000));
 
 }
 void PlayPen_testCameraSetDirection::buttonHit(OgreBites::Button* button)
@@ -233,8 +239,9 @@ void PlayPen_testManualLOD::setupContent()
 	{
 		ent = mSceneMgr->createEntity("robot" + StringConverter::toString(i), meshName);
 		// Add entity to the scene node
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(
-			Vector3(0,0,(i*50)-(5*50/2)))->attachObject(ent);
+		SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        node->setPosition(Vector3(0,0,(i*50)-(5*50/2)));
+        node->attachObject(ent);
 	}
 	AnimationState* anim = ent->getAnimationState("Walk");
 	anim->setEnabled(true);
@@ -242,13 +249,18 @@ void PlayPen_testManualLOD::setupContent()
 
 
 	// Give it a little ambience with lights
-	Light* l;
-	l = mSceneMgr->createLight("BlueLight");
-	l->setPosition(-200,-80,-100);
+    SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Light* l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("BlueLight");
+	lnode->setPosition(-200,-80,-100);
 	l->setDiffuseColour(0.5, 0.5, 1.0);
 
-	l = mSceneMgr->createLight("GreenLight");
-	l->setPosition(0,0,-100);
+    lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("GreenLight");
+	lnode->setPosition(0,0,-100);
 	l->setDiffuseColour(0.5, 1.0, 0.5);
 
 	// Position the camera
@@ -338,22 +350,16 @@ PlayPen_testMorphAnimationWithNormals::PlayPen_testMorphAnimationWithNormals()
 //---------------------------------------------------------------------
 void PlayPen_testMorphAnimationWithNormals::setupContent()
 {
-	// Cannot change this to true, not possible to use software morph animation + normals with stencil shadows
-	// because the former requires pos & normals to be in the same buffer, and the
-	// latter requires positions to be on their own.
-	bool testStencil = false;
-
-	if (testStencil)
-		mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
-
 	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 	Vector3 dir(-1, -1, 0.5);
 	dir.normalise();
-	Light* l = mSceneMgr->createLight("light1");
+    SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Light* l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("light1");
 	l->setType(Light::LT_DIRECTIONAL);
 	l->setDirection(dir);
 
-	
 	MeshPtr mesh = MeshManager::getSingleton().load("sphere.mesh", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 	
@@ -366,8 +372,6 @@ void PlayPen_testMorphAnimationWithNormals::setupContent()
 	VertexDeclaration* newDecl = 
 		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, true);
 	sm->vertexData->reorganiseBuffers(newDecl);
-	if (testStencil)
-		sm->vertexData->prepareForShadowVolume(); // need to re-prep since reorganised
 	// get the position buffer (which should now be separate);
 	const VertexElement* posElem = 
 		sm->vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
@@ -460,7 +464,9 @@ void PlayPen_testMorphAnimationWithNormals::setupContent()
 	mAnimStateList.push_back(animState);
 
 	e = mSceneMgr->createEntity("test2", morphName);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,0,0))->attachObject(e);
+	SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->setPosition(Vector3(200,0,0));
+    node->attachObject(e);
 	// test hardware morph
 	e->setMaterialName("Examples/HardwareMorphAnimationWithNormals");
 	animState = e->getAnimationState("testAnim");
@@ -495,15 +501,13 @@ PlayPen_testMorphAnimationWithoutNormals::PlayPen_testMorphAnimationWithoutNorma
 //---------------------------------------------------------------------
 void PlayPen_testMorphAnimationWithoutNormals::setupContent()
 {
-	bool testStencil = false;
-
-	if (testStencil)
-		mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
-
 	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 	Vector3 dir(-1, -1, 0.5);
 	dir.normalise();
-	Light* l = mSceneMgr->createLight("light1");
+    SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Light* l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("light1");
 	l->setType(Light::LT_DIRECTIONAL);
 	l->setDirection(dir);
 
@@ -520,8 +524,6 @@ void PlayPen_testMorphAnimationWithoutNormals::setupContent()
 	VertexDeclaration* newDecl = 
 		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, false);
 	sm->vertexData->reorganiseBuffers(newDecl);
-	if (testStencil)
-		sm->vertexData->prepareForShadowVolume(); // need to re-prep since reorganised
 	// get the position buffer (which should now be separate);
 	const VertexElement* posElem = 
 		sm->vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
@@ -601,7 +603,9 @@ void PlayPen_testMorphAnimationWithoutNormals::setupContent()
 	mAnimStateList.push_back(animState);
 
 	e = mSceneMgr->createEntity("test2", morphName);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,0,0))->attachObject(e);
+	SceneNode * node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->setPosition(Vector3(200,0,0));
+    node->attachObject(e);
 	// test hardware morph
 	e->setMaterialName("Examples/HardwareMorphAnimation");
 	animState = e->getAnimationState("testAnim");
@@ -639,7 +643,10 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 	Vector3 dir(-1, -1, 0.5);
 	dir.normalise();
-	Light* l = mSceneMgr->createLight("light1");
+    SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Light* l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("light1");
 	l->setType(Light::LT_DIRECTIONAL);
 	l->setDirection(dir);
 
@@ -725,7 +732,9 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	AnimationState* animState;
 	// software pose
 	e = mSceneMgr->createEntity("test2", newName);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150,0,0))->attachObject(e);
+	SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->setPosition(Vector3(150,0,0));
+    node->attachObject(e);
 	animState = e->getAnimationState("poseanim");
 	animState->setEnabled(true);
 	animState->setWeight(1.0f);
@@ -740,9 +749,7 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	animState->setWeight(1.0f);
 	mAnimStateList.push_back(animState);
 	
-
 	mCamera->setNearClipDistance(0.5);
-	mSceneMgr->setShowDebugShadows(true);
 
 	Plane plane;
 	plane.normal = Vector3::UNIT_Y;
@@ -757,7 +764,6 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 
 	mCamera->setPosition(0,-200,-300);
 	mCamera->lookAt(0,0,0);
-
 }
 
 //---------------------------------------------------------------------
@@ -765,7 +771,6 @@ PlayPen_testPoseAnimationWithoutNormals::PlayPen_testPoseAnimationWithoutNormals
 {
 	mInfo["Title"] = "PlayPen: Pose anim (-normals)";
 	mInfo["Description"] = "Testing pose animation without normals";
-
 }
 //---------------------------------------------------------------------
 void PlayPen_testPoseAnimationWithoutNormals::setupContent()
@@ -773,7 +778,10 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 	Vector3 dir(-1, -1, 0.5);
 	dir.normalise();
-	Light* l = mSceneMgr->createLight("light1");
+    SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Light* l = mSceneMgr->createLight();
+    lnode->attachObject(l);
+    lnode->setName("light1");
 	l->setType(Light::LT_DIRECTIONAL);
 	l->setDirection(dir);
 
@@ -782,7 +790,6 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 		
 	String newName = "testposenonormals.mesh";
 	mesh = mesh->clone(newName);
-
 
 	SubMesh* sm = mesh->getSubMesh(0);
 	// Re-organise geometry since this mesh has no animation and all 
@@ -858,7 +865,9 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 	AnimationState* animState;
 	// software pose
 	e = mSceneMgr->createEntity("test2", newName);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150,0,0))->attachObject(e);
+	SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->setPosition(Vector3(150,0,0));
+    node->attachObject(e);
 	animState = e->getAnimationState("poseanim");
 	animState->setEnabled(true);
 	animState->setWeight(1.0f);
@@ -889,7 +898,4 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 
 	mCamera->setPosition(0,-200,-300);
 	mCamera->lookAt(0,0,0);
-
 }
-
-

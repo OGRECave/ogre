@@ -776,7 +776,8 @@ protected:
         ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
         ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
 
-		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
+		mEditMarker = mSceneMgr->createEntity("sphere.mesh");
+        mEditMarker->setName("editMarker");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
 		mEditNode->setScale(0.05, 0.05, 0.05);

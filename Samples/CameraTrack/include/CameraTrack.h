@@ -38,7 +38,8 @@ protected:
 		mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
 
 		// create an ogre head entity and attach it to a node
-		Entity* head = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		Entity* head = mSceneMgr->createEntity("ogrehead.mesh");
+        head->setName("Head");
         SceneNode* headNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		headNode->attachObject(head);
 

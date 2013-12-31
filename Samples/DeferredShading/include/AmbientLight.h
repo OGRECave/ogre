@@ -16,6 +16,8 @@ same license as the rest of the engine.
 #define _AMBIENTLIGHT_H
 
 #include "OgreSimpleRenderable.h"
+#include "Math/Array/OgreObjectMemoryManager.h"
+#include "OgreId.h"
 
 // Renderable for rendering Ambient component and also to
 // establish the depths
@@ -32,7 +34,7 @@ class AmbientLight : public Ogre::SimpleRenderable
 
 {
 public:
-	AmbientLight();
+	AmbientLight(Ogre::IdType id, Ogre::ObjectMemoryManager *memMgr);
 	~AmbientLight();
 
 	/** @copydoc MovableObject::getBoundingRadius */

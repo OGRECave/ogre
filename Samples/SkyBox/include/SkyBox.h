@@ -16,7 +16,7 @@ public:
 		mInfo["Description"] = "Shows how to use skyboxes (fixed-distance cubes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skybox.png";
 		mInfo["Category"] = "Environment";
-		mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
+		mBackgroundColour = ColourValue( 0.6f, 0.0f, 0.6f );
 	}
 
 protected:

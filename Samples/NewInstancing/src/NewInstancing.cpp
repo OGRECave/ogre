@@ -89,7 +89,7 @@ Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN
 		"Different batch sizes give different results depending on CPU culling"
 		" and instance numbers on the scene.\n\n"
 		"If performance is too slow, try defragmenting batches once in a while";
-	mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
+	mBackgroundColour = ColourValue( 0.6f, 0.0f, 0.6f );
 }
 
 

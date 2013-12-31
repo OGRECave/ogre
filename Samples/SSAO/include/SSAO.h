@@ -144,22 +144,22 @@ public:
 		mGBufSchemeHandler = NULL;
         CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-        compositorManager->setCompositorEnabled(mCamera->getViewport(), mCurrentCompositor, false);
-        compositorManager->setCompositorEnabled(mCamera->getViewport(), mCurrentPost, false);
+        compositorManager->setCompositorEnabled(mCamera->getLastViewport(), mCurrentCompositor, false);
+        compositorManager->setCompositorEnabled(mCamera->getLastViewport(), mCurrentPost, false);
         
-        compositorManager->setCompositorEnabled(mCamera->getViewport(), "SSAO/GBuffer", false);
-        compositorManager->removeCompositor(mCamera->getViewport(), "SSAO/GBuffer");
+        compositorManager->setCompositorEnabled(mCamera->getLastViewport(), "SSAO/GBuffer", false);
+        compositorManager->removeCompositor(mCamera->getLastViewport(), "SSAO/GBuffer");
         
         for (unsigned int i = 0; i < mCompositorNames.size(); i++)
         {
-            compositorManager->setCompositorEnabled(mCamera->getViewport(), mCompositorNames[i], false);
-            compositorManager->removeCompositor(mCamera->getViewport(), mCompositorNames[i]);
+            compositorManager->setCompositorEnabled(mCamera->getLastViewport(), mCompositorNames[i], false);
+            compositorManager->removeCompositor(mCamera->getLastViewport(), mCompositorNames[i]);
         }
         
         for (unsigned int i = 0; i < mPostNames.size(); i++)
         {
-            compositorManager->setCompositorEnabled(mCamera->getViewport(), mPostNames[i], false);
-            compositorManager->removeCompositor(mCamera->getViewport(), mPostNames[i]);
+            compositorManager->setCompositorEnabled(mCamera->getLastViewport(), mPostNames[i], false);
+            compositorManager->removeCompositor(mCamera->getLastViewport(), mPostNames[i]);
         }
         
         MeshManager::getSingleton().remove("sibenik");
@@ -196,7 +196,7 @@ protected:
     {
         CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-        if (compositorManager->addCompositor(mCamera->getViewport(), "SSAO/GBuffer"))
+        if (compositorManager->addCompositor(mCamera->getLastViewport(), "SSAO/GBuffer"))
             compositorManager->setCompositorEnabled(mViewport, "SSAO/GBuffer", true);
         else
             LogManager::getSingleton().logMessage("Sample_SSAO: Failed to add GBuffer compositor\n");
@@ -443,7 +443,8 @@ protected:
         
         // setup all meshes
         for (unsigned int i = 0; i < mMeshNames.size(); i++) {
-            Entity* ent = mSceneMgr->createEntity(mMeshNames[i], mMeshNames[i] + ".mesh");
+            Entity* ent = mSceneMgr->createEntity(mMeshNames[i] + ".mesh");
+            ent->setName(mMeshNames[i]);
             ent->setVisible(false);
             
             mSceneMgr->getRootSceneNode()->attachObject(ent);

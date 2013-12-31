@@ -202,7 +202,7 @@ protected:
 	//		return false;
 	//	}
 	//}
-	
+
     // Just override the mandatory create scene method
     void setupContent(void)
     {
@@ -224,29 +224,37 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.0, 0.0, 0.0));
 
         // Fixed light, dim
-        mSunLight = mSceneMgr->createLight("SunLight");
+        SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mSunLight = mSceneMgr->createLight();
+        lnode->attachObject(mSunLight);
+        lnode->setName("SunLight");
+
         mSunLight->setType(Light::LT_SPOTLIGHT);
-        mSunLight->setPosition(1500,1750,1300);
+        lnode->setPosition(1500,1750,1300);
         mSunLight->setSpotlightRange(Degree(30), Degree(50));
         Vector3 dir;
-        dir = -mSunLight->getPosition();
+        dir = -Vector3(mSunLight->getAs4DVector().ptr());
         dir.normalise();
         mSunLight->setDirection(dir);
         mSunLight->setDiffuseColour(0.35, 0.35, 0.38);
         mSunLight->setSpecularColour(0.9, 0.9, 1);
 
         // Point light, movable, reddish
-        mLight = mSceneMgr->createLight("Light2");
+        lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mLight = mSceneMgr->createLight();
+        lnode->attachObject(mLight);
+        lnode->setName("Light2");
         mLight->setDiffuseColour(mMinLightColour);
         mLight->setSpecularColour(1, 1, 1);
         mLight->setAttenuation(8000,1,0.0005,0);
 
         // Create light node
-        mLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(
-            "MovingLightNode");
+        mLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mLightNode->setName("MovingLightNode");
         mLightNode->attachObject(mLight);
         // create billboard set
-        BillboardSet* bbs = mSceneMgr->createBillboardSet("lightbbs", 1);
+        BillboardSet* bbs = mSceneMgr->createBillboardSet(1);
+        bbs->setName("lightbbs");
         bbs->setMaterialName("Examples/Flare");
         Billboard* bb = bbs->createBillboard(0,0,0,mMinLightColour);
         // attach
@@ -313,7 +321,8 @@ protected:
 
         SceneNode* node;
         node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        mAthene = mSceneMgr->createEntity( "athene", "athene.mesh" );
+        mAthene = mSceneMgr->createEntity( "athene.mesh" );
+        mAthene->setName("athene");
         mAthene->setMaterialName(BASIC_ATHENE_MATERIAL);
         node->attachObject( mAthene );
         node->translate(0,-27, 0);
@@ -330,7 +339,8 @@ protected:
 					StringUtil::StrStreamType str;
 					str << "col" << x << "_" << z;
 					node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-					pEnt = mSceneMgr->createEntity( str.str(), "column.mesh" );
+					pEnt = mSceneMgr->createEntity( "column.mesh" );
+                    pEnt->setName(str.str());
 					pEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
 					pColumns.push_back(pEnt);
 					node->attachObject( pEnt );
@@ -346,13 +356,14 @@ protected:
         mSceneMgr->setSkyBox(true, "Examples/StormySkyBox");
 
         // Floor plane (use POSM plane def)
-		mPlane = new MovablePlane("*mPlane");
-        mPlane->normal = Vector3::UNIT_Y;
-        mPlane->d = 107;
+        ObjectMemoryManager dummy;
+        mPlane = new MovablePlane(Id::generateNewId<MovableObject>(), &dummy, Vector3::UNIT_Y, 107);
+		mPlane->setName("*mPlane");
         MeshManager::getSingleton().createPlane("Myplane",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *mPlane,
             1500,1500,50,50,true,1,5,5,Vector3::UNIT_Z);
-        pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+        pPlaneEnt = mSceneMgr->createEntity( "Myplane" );
+        pPlaneEnt->setName("plane");
         pPlaneEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
         pPlaneEnt->setCastShadows(false);
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);

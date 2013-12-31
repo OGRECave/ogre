@@ -123,6 +123,7 @@ void TestContext::setup()
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
+    mRoot->initialiseCompositor();
 
     // grab input, since moving the window seemed to change the results (in Linux anyways)
     setupInput(mNoGrabMouse);

@@ -19,7 +19,7 @@ public:
 		mInfo["Category"] = "Animation";
 		mInfo["Help"] = "Use the checkbox to enable/disable manual animation. "
 			"When manual animation is enabled, use the sliders to adjust each pose's influence.";
-		mBackgroundColor = ColourValue( 0.3f, 0.3f, 0.3f );
+		mBackgroundColour = ColourValue( 0.3f, 0.3f, 0.3f );
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)

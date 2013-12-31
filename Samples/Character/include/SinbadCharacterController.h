@@ -163,13 +163,16 @@ private:
 		// create main model
 		mBodyNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
         mBodyNode->setPosition(Vector3::UNIT_Y * CHAR_HEIGHT);
-		mBodyEnt = sceneMgr->createEntity("SinbadBody", "Sinbad.mesh");
+		mBodyEnt = sceneMgr->createEntity("Sinbad.mesh");
+        mBodyEnt->setName("SinbadBody");
 		mBodyNode->attachObject(mBodyEnt);
 
 		// create swords and attach to sheath
 		LogManager::getSingleton().logMessage("Creating swords");
-		mSword1 = sceneMgr->createEntity("SinbadSword1", "Sword.mesh");
-		mSword2 = sceneMgr->createEntity("SinbadSword2", "Sword.mesh");
+		mSword1 = sceneMgr->createEntity("Sword.mesh");
+        mSword1->setName("SinbadSword1");
+		mSword2 = sceneMgr->createEntity("Sword.mesh");
+        mSword2->setName("SinbadSword1");
 		mBodyEnt->attachObjectToBone("Sheath.L", mSword1);
 		mBodyEnt->attachObjectToBone("Sheath.R", mSword2);
 

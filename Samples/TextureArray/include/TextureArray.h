@@ -105,7 +105,7 @@ protected:
 
         // create material and set the texture unit to our texture
         MaterialManager& matMgr = MaterialManager::getSingleton();
-        MaterialPtr texArrayMat = matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+        MaterialPtr texArrayMat = matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first.staticCast<Material>();
         texArrayMat->compile();
         Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
         pass->setLightingEnabled(false);

@@ -111,13 +111,13 @@ private:
 
 private:
 	//Update the systems internal light lists
-	void updateLightList(const Camera* i_pCamera, const LightList& i_LightList);
+	void updateLightList(const Camera* i_pCamera, const LightArray& i_LightList);
 	//Initialize the texture to be used to store the light information
 	bool initTexture();
 	//Arrange the lights in the different lists
-	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightList& i_LightList);
+	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightArray& i_LightList);
 	//Repopulate the mActiveLights list which keeps track of all lights being rendered in the frame
-	void regenerateActiveLightList(const LightList& i_LightList);
+	void regenerateActiveLightList(const LightArray& i_LightList);
 	//Calculate the bounds of a single light
 	void calculateLightBounds(const Light* i_Light, LightData &o_LightData);
 	//Calculate the area which bounds area in which the lights exist
