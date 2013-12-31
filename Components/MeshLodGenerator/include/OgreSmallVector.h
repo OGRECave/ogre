@@ -113,7 +113,7 @@ namespace Ogre {
 
 	/// SmallVectorBase - This is all the non-templated stuff common to all
 	/// SmallVectors.
-	class _OgreExport SmallVectorBase {
+	class SmallVectorBase {
 	protected:
 		void *BeginX, *EndX, *CapacityX;
 		
@@ -714,7 +714,7 @@ namespace Ogre {
 	/// Note that this does not attempt to be exception safe.
 	///
 	template <typename T, unsigned N>
-	class _OgreExport SmallVector : public SmallVectorImpl<T> {
+	class SmallVector : public SmallVectorImpl<T> {
 		/// InlineElts - These are 'N-1' elements that are stored inline in the body
 		/// of the vector.  The extra '1' element is stored in SmallVectorImpl.
 		typedef typename SmallVectorImpl<T>::U U;
@@ -767,7 +767,7 @@ namespace Ogre {
 /// that it can be instantiated at an incomplete T if none of its
 /// members are required.
 template <typename T>
-class _OgreExport SmallVector<T,0> : public SmallVectorImpl<T> {
+class SmallVector<T,0> : public SmallVectorImpl<T> {
 public:
   SmallVector() : SmallVectorImpl<T>(0) {}
 
