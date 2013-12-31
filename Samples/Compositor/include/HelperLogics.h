@@ -15,6 +15,23 @@ conditions of the standard open source license.
 #ifndef _HelperLogics_H__
 #define _HelperLogics_H__
 
+#include "Compositor/OgreCompositorWorkspaceListener.h"
+
+class SamplePostprocessWorkspaceListener : public Ogre::CompositorWorkspaceListener
+{
+	//Heat vision's
+    float start, end, curr;
+    Ogre::Timer *timer;
+
+	void onHeatVision( Ogre::CompositorPass *pass );
+public:
+	SamplePostprocessWorkspaceListener();
+	~SamplePostprocessWorkspaceListener();
+
+	//Called when each pass is about to be executed.
+	virtual void passPreExecute( Ogre::CompositorPass *pass );
+};
+
 //Demo note :
 //This file contains three compositor logics for the HDR, Heat Vision and Gaussian Blur compositors.
 //If you wish to use these compositors in your application, make sure to add this code as well.

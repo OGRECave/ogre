@@ -185,18 +185,6 @@ material Fury/HeatVision/ColdCaster
 //  LIGHT TO HEAT CONVERSION PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/LightToHeat_Cg_vp cg
-{
-   source HeatVision.cg
-   entry_point LightToHeat_vp
-   profiles vs_4_0 vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto flipping render_target_flipping
-    }
-}
-
 fragment_program Fury/HeatVision/LightToHeat_Cg_fp cg
 {
    source HeatVision.cg
@@ -204,33 +192,11 @@ fragment_program Fury/HeatVision/LightToHeat_Cg_fp cg
    profiles ps_4_0 ps_2_0 arbfp1
 }
 
-vertex_program Fury/HeatVision/LightToHeat_HLSL_vp hlsl
-{
-   source HeatVision.hlsl
-   entry_point LightToHeat_vp
-   target vs_4_0
-
-    default_params
-    {
-        param_named_auto flipping render_target_flipping
-    }
-}
-
 fragment_program Fury/HeatVision/LightToHeat_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point LightToHeat_fp
    target ps_4_0
-}
-
-vertex_program Fury/HeatVision/LightToHeat_GLSLES_vp glsles
-{
-    source LightToHeatVp.glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-    }
 }
 
 fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
@@ -244,17 +210,6 @@ fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
    	}
 }
 
-vertex_program Fury/HeatVision/LightToHeat_GLSL_vp glsl
-{
-    source LightToHeatVp.glsl
-    syntax glsl150
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-    }
-}
-
 fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl
 {
    	source LightToHeatFp.glsl
@@ -265,14 +220,6 @@ fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl
    		param_named NoiseMap int 1
 	   	param_named HeatLookup int 2
    	}
-}
-
-vertex_program Fury/HeatVision/LightToHeat_vp unified
-{
-    delegate Fury/HeatVision/LightToHeat_GLSL_vp
-    delegate Fury/HeatVision/LightToHeat_GLSLES_vp
-	delegate Fury/HeatVision/LightToHeat_HLSL_vp
-    delegate Fury/HeatVision/LightToHeat_Cg_vp
 }
 
 fragment_program Fury/HeatVision/LightToHeat_fp unified
@@ -295,7 +242,7 @@ material Fury/HeatVision/LightToHeat
 			depth_func always_pass
             polygon_mode_overrideable false
 
-            vertex_program_ref Fury/HeatVision/LightToHeat_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_vp
             {
             }
 
@@ -343,18 +290,6 @@ material Fury/HeatVision/LightToHeat
 //			 BLUR PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/Blur_Cg_vp cg
-{
-   source HeatVision.cg
-   entry_point Blur_vp
-   profiles vs_4_0 vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto flipping render_target_flipping
-    }
-}
-
 fragment_program Fury/HeatVision/Blur_Cg_fp cg
 {
    source HeatVision.cg
@@ -362,33 +297,11 @@ fragment_program Fury/HeatVision/Blur_Cg_fp cg
    profiles ps_4_0 ps_2_0 arbfp1
 }
 
-vertex_program Fury/HeatVision/Blur_HLSL_vp hlsl
-{
-   source HeatVision.hlsl
-   entry_point Blur_vp
-   target vs_4_0
-
-    default_params
-    {
-        param_named_auto flipping render_target_flipping
-    }
-}
-
 fragment_program Fury/HeatVision/Blur_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point Blur_fp
    target ps_4_0
-}
-
-vertex_program Fury/HeatVision/Blur_GLSLES_vp glsles
-{
-    source HeatBlurVp.glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-    }
 }
 
 fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
@@ -400,17 +313,6 @@ fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
   	}
 }
 
-vertex_program Fury/HeatVision/Blur_GLSL_vp glsl
-{
-    source HeatBlurVp.glsl
-    syntax glsl150
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-    }
-}
-
 fragment_program Fury/HeatVision/Blur_GLSL_fp glsl
 {
   	source HeatBlurFp.glsl
@@ -419,14 +321,6 @@ fragment_program Fury/HeatVision/Blur_GLSL_fp glsl
   	{
   		param_named Input int 0
   	}
-}
-
-vertex_program Fury/HeatVision/Blur_vp unified
-{
-    delegate Fury/HeatVision/Blur_GLSL_vp
-    delegate Fury/HeatVision/Blur_GLSLES_vp
-	delegate Fury/HeatVision/Blur_HLSL_vp
-    delegate Fury/HeatVision/Blur_Cg_vp
 }
 
 fragment_program Fury/HeatVision/Blur_fp unified
@@ -449,7 +343,7 @@ material Fury/HeatVision/Blur
 			depth_func always_pass
             polygon_mode_overrideable false
 
-            vertex_program_ref Fury/HeatVision/Blur_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_vp
             {
             }
 

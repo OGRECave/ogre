@@ -90,7 +90,7 @@ namespace Ogre
 		Maps) for Global Illumination calculations.
 	@par
 		For more information @see CompositorNode & @see CompositorShadowNode
-		*/
+	*/
 	class _OgreExport CompositorManager2 : public ResourceAlloc
 	{
 	public:

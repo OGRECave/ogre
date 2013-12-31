@@ -256,6 +256,12 @@ namespace Ogre
 		*/
 		virtual void finalTargetResized( const RenderTarget *finalTarget );
 
+		/// Returns our parent workspace
+		CompositorWorkspace* getWorkspace(void)						{ return mWorkspace; }
+
+		/// Returns our parent workspace
+		const CompositorWorkspace* getWorkspace(void) const			{ return mWorkspace; }
+
 	private:
 		CompositorNodeDef const *mDefinition;
 	};

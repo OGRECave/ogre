@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreViewport.h"
@@ -39,16 +40,17 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
-												Camera *defaultCamera,
-												CompositorWorkspace *workspace,
-												RenderTarget *target ) :
-				CompositorPass( definition, target ),
+												Camera *defaultCamera, RenderTarget *target,
+												CompositorNode *parentNode ) :
+				CompositorPass( definition, target, parentNode ),
 				mDefinition( definition ),
 				mShadowNode( 0 ),
 				mCamera( 0 ),
 				mLodCamera( 0 ),
 				mUpdateShadowNode( false )
 	{
+		CompositorWorkspace *workspace = parentNode->getWorkspace();
+
 		if( mDefinition->mShadowNode != IdString() )
 		{
 			bool shadowNodeCreated;
@@ -118,6 +120,11 @@ namespace Ogre
 			sceneManager->_setCurrentShadowNode( mShadowNode );
 
 		mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
+
+		//Fire the listener in case it wants to change anything
+		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+		if( listener )
+			listener->passPreExecute( this );
 
 		mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
 											 mDefinition->mFirstRQ, mDefinition->mLastRQ );

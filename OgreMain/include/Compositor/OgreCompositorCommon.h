@@ -38,6 +38,7 @@ namespace Ogre
 	class CompositorPassScene;
 	class CompositorShadowNode;
 	class CompositorWorkspace;
+	class CompositorWorkspaceListener;
 	class RenderTarget;
 	struct CompositorChannel;
 

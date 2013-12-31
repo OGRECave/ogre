@@ -36,11 +36,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorPass::CompositorPass( const CompositorPassDef *definition, RenderTarget *target ) :
+	CompositorPass::CompositorPass( const CompositorPassDef *definition, RenderTarget *target,
+									CompositorNode *parentNode ) :
 			mDefinition( definition ),
 			mTarget( target ),
 			mViewport( 0 ),
-			mNumPassesLeft( definition->mNumInitialPasses )
+			mNumPassesLeft( definition->mNumInitialPasses ),
+			mParentNode( parentNode )
 	{
 		assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
 

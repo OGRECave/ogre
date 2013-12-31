@@ -69,19 +69,6 @@ float4 ColdCaster_fp(
 //	   PASS 1 - Light to heat conversion	//
 //////////////////////////////////////////////
 
-v2p LightToHeat_vp(
-                    // in
-                    float4 inPos: POSITION,
-                    uniform float flipping
-                   )
-{
-    v2p output;
-    output.position = float4(inPos.x, flipping * inPos.y, 0.0f, 1.0f);
-    inPos.xy = sign(inPos.xy);
-    output.texCoord = (float2(inPos.x, -inPos.y) + 1.0f)/2.0f;
-	return output;
-}
-
 SamplerState g_samLinear
 {
     Filter = MIN_MAG_LINEAR_MIP_POINT;
@@ -142,19 +129,6 @@ float4 LightToHeat_fp(
 //////////////////////////////////////////////
 // PASS 2 - add simple blur (final pass)	//
 //////////////////////////////////////////////
-
-v2p Blur_vp(
-                    // in
-                    float4 inPos: POSITION,
-                    uniform float flipping
-                   )
-{
-    v2p output;
-    output.position = float4(inPos.x, flipping * inPos.y, 0.0f, 1.0f);
-    inPos.xy = sign(inPos.xy);
-    output.texCoord  = (float2(inPos.x, -inPos.y) + 1.0f)/2.0f;
-	return output;
-}
 
 // ps_2_0
 float4 Blur_fp(

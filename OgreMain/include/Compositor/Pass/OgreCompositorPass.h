@@ -37,6 +37,7 @@ namespace Ogre
 {
 	class RenderTarget;
 	struct CompositorChannel;
+	class CompositorNode;
 
 	/** \addtogroup Core
 	*  @{
@@ -64,8 +65,11 @@ namespace Ogre
 
 		uint32			mNumPassesLeft;
 
+		CompositorNode	*mParentNode;
+
 	public:
-		CompositorPass( const CompositorPassDef *definition, RenderTarget *target );
+		CompositorPass( const CompositorPassDef *definition, RenderTarget *target,
+						CompositorNode *parentNode );
 		virtual ~CompositorPass();
 
 		virtual void execute( const Camera *lodCameraconst ) = 0;
@@ -83,6 +87,8 @@ namespace Ogre
 		CompositorPassType getType() const	{ return mDefinition->getType(); }
 
 		Viewport* getViewport() const		{ return mViewport; }
+
+		const CompositorPassDef* getDefinition(void) const	{ return mDefinition; }
 	};
 
 	/** @} */

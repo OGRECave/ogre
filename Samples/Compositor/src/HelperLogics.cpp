@@ -16,6 +16,62 @@ same license as the rest of the engine.
 
 #include "Ogre.h"
 
+#include "Compositor/Pass/OgreCompositorPass.h"
+#include "Compositor/Pass/OgreCompositorPassDef.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
+
+
+SamplePostprocessWorkspaceListener::SamplePostprocessWorkspaceListener() :
+	start( 0 ),
+	end( 0 ),
+	curr( 0 ),
+	timer( new Ogre::Timer() )
+{
+}
+//---------------------------------------------------------------------------
+SamplePostprocessWorkspaceListener::~SamplePostprocessWorkspaceListener()
+{
+	delete timer;
+	timer = 0;
+}
+//---------------------------------------------------------------------------
+void SamplePostprocessWorkspaceListener::passPreExecute( Ogre::CompositorPass *pass )
+{
+	const Ogre::CompositorPassDef *passDef = pass->getDefinition();
+	switch( passDef->mIdentifier )
+	{
+	case 0xDEADBABE:
+		onHeatVision( pass );
+		break;
+	}
+}
+//---------------------------------------------------------------------------
+void SamplePostprocessWorkspaceListener::onHeatVision( Ogre::CompositorPass *_pass )
+{
+	assert( _pass->getType() == Ogre::PASS_QUAD );
+	Ogre::CompositorPassQuad *pass = static_cast<Ogre::CompositorPassQuad*>( _pass );
+	Ogre::Pass *matPass = pass->getPass();
+
+	Ogre::GpuProgramParametersSharedPtr fpParams = matPass->getFragmentProgramParameters();
+
+	// "random_fractions" parameter
+    fpParams->setNamedConstant("random_fractions", Ogre::Vector4(Ogre::Math::RangeRandom(0.0, 1.0), Ogre::Math::RangeRandom(0, 1.0), 0, 0));
+
+    // "depth_modulator" parameter
+    float inc = ((float)timer->getMilliseconds())/1000.0f;
+    if ( (fabs(curr-end) <= 0.001) ) {
+        // take a new value to reach
+        end = Ogre::Math::RangeRandom(0.95, 1.0);
+        start = curr;
+    } else {
+        if (curr > end) curr -= inc;
+        else curr += inc;
+    }
+    timer->reset();
+
+    fpParams->setNamedConstant("depth_modulator", Ogre::Vector4(curr, 0, 0, 0));
+}
+
 #if 0
 //---------------------------------------------------------------------------
 class HeatVisionListener: public Ogre::CompositorInstance::Listener

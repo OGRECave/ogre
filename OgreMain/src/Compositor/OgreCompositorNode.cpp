@@ -353,27 +353,25 @@ namespace Ogre
 				case PASS_CLEAR:
 					newPass = OGRE_NEW CompositorPassClear(
 											static_cast<CompositorPassClearDef*>(*itPass),
-											mWorkspace->getSceneManager(), channel->target );
+											mWorkspace->getSceneManager(), channel->target, this );
 					break;
 				case PASS_QUAD:
 					newPass = OGRE_NEW CompositorPassQuad(
 											static_cast<CompositorPassQuadDef*>(*itPass),
-											mWorkspace->getDefaultCamera(), mWorkspace,
-											this, channel->target,
+											mWorkspace->getDefaultCamera(), this, channel->target,
 											mRenderSystem->getHorizontalTexelOffset(),
 											mRenderSystem->getVerticalTexelOffset() );
 					break;
 				case PASS_SCENE:
 					newPass = OGRE_NEW CompositorPassScene(
 											static_cast<CompositorPassSceneDef*>(*itPass),
-											mWorkspace->getDefaultCamera(), mWorkspace,
-											channel->target );
+											mWorkspace->getDefaultCamera(), channel->target, this );
 					postInitializePassScene( static_cast<CompositorPassScene*>( newPass ) );
 					break;
 				case PASS_STENCIL:
 					newPass = OGRE_NEW CompositorPassStencil(
 											static_cast<CompositorPassStencilDef*>(*itPass),
-											channel->target, mRenderSystem );
+											channel->target, this, mRenderSystem );
 					break;
 				default:
 					OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,

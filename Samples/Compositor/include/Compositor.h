@@ -30,6 +30,8 @@ same license as the rest of the engine.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 
+#include "HelperLogics.h"
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -74,6 +76,7 @@ protected:
 	TextureUnitState* mDebugTextureTUS;
 
 	CompositorWorkspace *mWorkspace;
+	SamplePostprocessWorkspaceListener mWorkspaceListener;
 
 };
 
@@ -92,8 +95,6 @@ protected:
 */
 
 #include <Ogre.h>
-
-#include "HelperLogics.h"
 
 /*************************************************************************
 	                    Sample_Compositor Methods
@@ -156,6 +157,8 @@ void Sample_Compositor::setupCompositor(void)
 
 	mWorkspace = compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 
+	mWorkspace->setListener( &mWorkspaceListener );
+
 	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
 		((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
 }
@@ -172,9 +175,7 @@ void Sample_Compositor::setupContent(void)
 	compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
 	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);*/
 	
-#if 0
 	createTextures();
-#endif
 	setupScene();
 
 	setupControls();
@@ -622,87 +623,112 @@ bool Sample_Compositor::frameRenderingQueued(const FrameEvent& evt)
 /// Create the hard coded postfilter effects
 void Sample_Compositor::createEffects(void)
 {
-	    // Bloom compositor is loaded from script but here is the hard coded equivalent
-//		CompositorPtr comp = CompositorManager::getSingleton().create(
-//				"Bloom", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-//			);
-//		{
-//			CompositionTechnique *t = comp->createTechnique();
-//			{
-//				CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("rt0");
-//				def->width = 128;
-//				def->height = 128;
-//				def->format = PF_A8R8G8B8;
-//			}
-//			{
-//				CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("rt1");
-//				def->width = 128;
-//				def->height = 128;
-//				def->format = PF_A8R8G8B8;
-//			}
-//			{
-//				CompositionTargetPass *tp = t->createTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_PREVIOUS);
-//				tp->setOutputName("rt1");
-//			}
-//			{
-//				CompositionTargetPass *tp = t->createTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_NONE);
-//				tp->setOutputName("rt0");
-//				CompositionPass *pass = tp->createPass();
-//				pass->setType(CompositionPass::PT_RENDERQUAD);
-//				pass->setMaterialName("Ogre/Compositor/Blur0");
-//				pass->setInput(0, "rt1");
-//			}
-//			{
-//				CompositionTargetPass *tp = t->createTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_NONE);
-//				tp->setOutputName("rt1");
-//				CompositionPass *pass = tp->createPass();
-//				pass->setType(CompositionPass::PT_RENDERQUAD);
-//				pass->setMaterialName("Ogre/Compositor/Blur1");
-//				pass->setInput(0, "rt0");
-//			}
-//			{
-//				CompositionTargetPass *tp = t->getOutputTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_PREVIOUS);
-//				{ CompositionPass *pass = tp->createPass();
-//				pass->setType(CompositionPass::PT_RENDERQUAD);
-//				pass->setMaterialName("Ogre/Compositor/BloomBlend");
-//				pass->setInput(0, "rt1");
-//				}
-//			}
-//		}
-	    // Glass compositor is loaded from script but here is the hard coded equivalent
-		/// Glass effect
-//		CompositorPtr comp2 = CompositorManager::getSingleton().create(
-//				"Glass", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-//			);
-//		{
-//			CompositionTechnique *t = comp2->createTechnique();
-//			{
-//				CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("rt0");
-//				def->width = 0;
-//				def->height = 0;
-//				def->format = PF_R8G8B8;
-//			}
-//			{
-//				CompositionTargetPass *tp = t->createTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_PREVIOUS);
-//				tp->setOutputName("rt0");
-//			}
-//			{
-//				CompositionTargetPass *tp = t->getOutputTargetPass();
-//				tp->setInputMode(CompositionTargetPass::IM_NONE);
-//				{ CompositionPass *pass = tp->createPass();
-//				pass->setType(CompositionPass::PT_RENDERQUAD);
-//				pass->setMaterialName("Ogre/Compositor/GlassPass");
-//				pass->setInput(0, "rt0");
-//				}
-//			}
-//		}
-
 	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+    // Bloom compositor is loaded from script but here is the hard coded equivalent
+	if( !compositorManager->hasNodeDefinition( "Bloom" ) )
+	{
+		CompositorNodeDef *bloomDef = compositorManager->addNodeDefinition( "Bloom" );
+
+		//Input channels
+		bloomDef->addTextureSourceName( "rt_input", 0, TextureDefinitionBase::TEXTURE_INPUT );
+		bloomDef->addTextureSourceName( "rt_output", 1, TextureDefinitionBase::TEXTURE_INPUT );
+
+		bloomDef->mCustomIdentifier = "Ogre/Postprocess";
+
+		//Local textures
+		bloomDef->setNumLocalTextureDefinitions( 2 );
+		{
+			TextureDefinitionBase::TextureDefinition *texDef = bloomDef->addTextureDefinition( "rt0" );
+			texDef->widthFactor		= 0.25f;
+			texDef->heightFactor	= 0.25f;
+			texDef->formatList.push_back( Ogre::PF_R8G8B8 );
+
+			texDef = bloomDef->addTextureDefinition( "rt1" );
+			texDef->widthFactor		= 0.25f;
+			texDef->heightFactor	= 0.25f;
+			texDef->formatList.push_back( Ogre::PF_R8G8B8 );
+		}
+
+		bloomDef->setNumTargetPass( 4 );
+
+		{
+			CompositorTargetDef *targetDef = bloomDef->addTargetPass( "rt0" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/BrightPass2";
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
+			}
+		}
+		{
+			CompositorTargetDef *targetDef = bloomDef->addTargetPass( "rt1" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/BlurV";
+				passQuad->addQuadTextureSource( 0, "rt0", 0 );
+			}
+		}
+		{
+			CompositorTargetDef *targetDef = bloomDef->addTargetPass( "rt0" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/BluHV";
+				passQuad->addQuadTextureSource( 0, "rt1", 0 );
+			}
+		}
+		{
+			CompositorTargetDef *targetDef = bloomDef->addTargetPass( "rt_output" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/BloomBlend2";
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
+				passQuad->addQuadTextureSource( 0, "rt0", 0 );
+			}
+		}
+
+		//Output channels
+		bloomDef->setNumOutputChannels( 2 );
+		bloomDef->mapOutputChannel( 0, "rt_output" );
+		bloomDef->mapOutputChannel( 1, "rt_input" );
+	}
+
+	//Glass compositor is loaded from script but here is the hard coded equivalent
+	if( !compositorManager->hasNodeDefinition( "Glass" ) )
+	{
+		CompositorNodeDef *glassDef = compositorManager->addNodeDefinition( "Glass" );
+
+		//Input channels
+		glassDef->addTextureSourceName( "rt_input", 0, TextureDefinitionBase::TEXTURE_INPUT );
+		glassDef->addTextureSourceName( "rt_output", 1, TextureDefinitionBase::TEXTURE_INPUT );
+
+		glassDef->mCustomIdentifier = "Ogre/Postprocess";
+
+		glassDef->setNumTargetPass( 1 );
+
+		{
+			CompositorTargetDef *targetDef = glassDef->addTargetPass( "rt_output" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/GlassPass";
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
+			}
+		}
+
+		//Output channels
+		glassDef->setNumOutputChannels( 2 );
+		glassDef->mapOutputChannel( 0, "rt_output" );
+		glassDef->mapOutputChannel( 1, "rt_input" );
+	}
 
 	if( !compositorManager->hasNodeDefinition( "Motion Blur" ) )
 	{
@@ -767,127 +793,59 @@ void Sample_Compositor::createEffects(void)
 		motionBlurDef->mapOutputChannel( 0, "rt_output" );
 		motionBlurDef->mapOutputChannel( 1, "rt_input" );
 	}
-/*		/// Motion blur effect
-	Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
-			"Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		);
+
+	if( !compositorManager->hasNodeDefinition( "Heat Vision" ) )
 	{
-		Ogre::CompositionTechnique *t = comp3->createTechnique();
+		/// Motion blur effect
+		CompositorNodeDef *heatVisionDef = compositorManager->addNodeDefinition( "Heat Vision" );
+
+		//Input channels
+		heatVisionDef->addTextureSourceName( "rt_input", 0, TextureDefinitionBase::TEXTURE_INPUT );
+		heatVisionDef->addTextureSourceName( "rt_output", 1, TextureDefinitionBase::TEXTURE_INPUT );
+
+		heatVisionDef->mCustomIdentifier = "Ogre/Postprocess";
+
+		//Local textures
+		heatVisionDef->setNumLocalTextureDefinitions( 1 );
 		{
-			Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("scene");
-			def->width = 0;
-			def->height = 0;
-			def->formatList.push_back(Ogre::PF_R8G8B8);
+			TextureDefinitionBase::TextureDefinition *texDef =
+														heatVisionDef->addTextureDefinition( "tmp" );
+			texDef->width = 256;
+			texDef->height = 256;
+			texDef->formatList.push_back( Ogre::PF_R8G8B8 );
 		}
-		{
-			Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("sum");
-			def->width = 0;
-			def->height = 0;
-			def->formatList.push_back(Ogre::PF_R8G8B8);
-		}
-		{
-			Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("temp");
-			def->width = 0;
-			def->height = 0;
-			def->formatList.push_back(Ogre::PF_R8G8B8);
-		}
-		/// Render scene
-		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_PREVIOUS);
-			tp->setOutputName("scene");
-		}
-		/// Initialisation pass for sum texture
-		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_PREVIOUS);
-			tp->setOutputName("sum");
-			tp->setOnlyInitial(true);
-		}
-		/// Do the motion blur
-		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_NONE);
-			tp->setOutputName("temp");
-			{ Ogre::CompositionPass *pass = tp->createPass();
-			pass->setType(Ogre::CompositionPass::PT_RENDERQUAD);
-			pass->setMaterialName("Ogre/Compositor/Combine");
-			pass->setInput(0, "scene");
-			pass->setInput(1, "sum");
-			}
-		}
-		/// Copy back sum texture
-		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_NONE);
-			tp->setOutputName("sum");
-			{ Ogre::CompositionPass *pass = tp->createPass();
-			pass->setType(Ogre::CompositionPass::PT_RENDERQUAD);
-			pass->setMaterialName("Ogre/Compositor/Copyback");
-			pass->setInput(0, "temp");
-			}
-		}
-		/// Display result
-		{
-			Ogre::CompositionTargetPass *tp = t->getOutputTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_NONE);
-			{ Ogre::CompositionPass *pass = tp->createPass();
-			pass->setType(Ogre::CompositionPass::PT_RENDERQUAD);
-			pass->setMaterialName("Ogre/Compositor/MotionBlur");
-			pass->setInput(0, "sum");
-			}
-		}
-	}
-	/// Heat vision effect
-	Ogre::CompositorPtr comp4 = Ogre::CompositorManager::getSingleton().create(
-			"Heat Vision", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-		);
-	{
-		Ogre::CompositionTechnique *t = comp4->createTechnique();
-		t->setCompositorLogicName("HeatVision");
-		{
-			Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("scene");
-			def->width = 256;
-			def->height = 256;
-			def->formatList.push_back(Ogre::PF_R8G8B8);
-		}
-		{
-			Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("temp");
-			def->width = 256;
-			def->height = 256;
-			def->formatList.push_back(Ogre::PF_R8G8B8);
-		}
-		/// Render scene
-		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_PREVIOUS);
-			tp->setOutputName("scene");
-		}
+
+		heatVisionDef->setNumTargetPass( 3 );
+
 		/// Light to heat pass
 		{
-			Ogre::CompositionTargetPass *tp = t->createTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_NONE);
-			tp->setOutputName("temp");
+			CompositorTargetDef *targetDef = heatVisionDef->addTargetPass( "tmp" );
+
 			{
-				Ogre::CompositionPass *pass = tp->createPass();
-				pass->setType(Ogre::CompositionPass::PT_RENDERQUAD);
-				pass->setIdentifier(0xDEADBABE); /// Identify pass for use in listener
-				pass->setMaterialName("Fury/HeatVision/LightToHeat");
-				pass->setInput(0, "scene");
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Fury/HeatVision/LightToHeat";
+				passQuad->mIdentifier = 0xDEADBABE;
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
 			}
 		}
 		/// Display result
 		{
-			Ogre::CompositionTargetPass *tp = t->getOutputTargetPass();
-			tp->setInputMode(Ogre::CompositionTargetPass::IM_NONE);
+			CompositorTargetDef *targetDef = heatVisionDef->addTargetPass( "rt_output" );
+
 			{
-				Ogre::CompositionPass *pass = tp->createPass();
-				pass->setType(Ogre::CompositionPass::PT_RENDERQUAD);
-				pass->setMaterialName("Fury/HeatVision/Blur");
-				pass->setInput(0, "temp");
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Fury/HeatVision/Blur";
+				passQuad->addQuadTextureSource( 0, "tmp", 0 );
 			}
 		}
-	}*/
+
+		//Output channels
+		heatVisionDef->setNumOutputChannels( 2 );
+		heatVisionDef->mapOutputChannel( 0, "rt_output" );
+		heatVisionDef->mapOutputChannel( 1, "rt_input" );
+	}
 }
 //--------------------------------------------------------------------------
 void Sample_Compositor::createTextures(void)

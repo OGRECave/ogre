@@ -74,24 +74,6 @@ float4 ColdCaster_fp(
 //	   PASS 1 - Light to heat conversion	//
 //////////////////////////////////////////////
 
-// vs_1_1
-void LightToHeat_vp(
-                    // in
-                    float4 inPos: POSITION,
-                    
-                    uniform float flipping,
-
-                    // out
-                    out float4 Pos: POSITION,
-                    out float2 uv0: TEXCOORD0
-                   )
-{
-    Pos = float4(inPos.x, flipping * inPos.y, 0.0f, 1.0f);
-    inPos.xy = sign(inPos.xy);
-    uv0  = (float2(inPos.x, -inPos.y) + 1.0f)/2.0f;
-}
-
-
 // ps_2_0
 void LightToHeat_fp(
                         // input from vp
@@ -142,23 +124,6 @@ void LightToHeat_fp(
 //////////////////////////////////////////////
 // PASS 2 - add simple blur (final pass)	//
 //////////////////////////////////////////////
-
-// vs_1_1
-void Blur_vp(
-                    // in
-                    float4 inPos: POSITION,
-                    
-                    uniform float flipping,
-
-                    // out
-                    out float4 Pos: POSITION,
-                    out float2 uv0: TEXCOORD0
-                   )
-{
-    Pos = float4(inPos.x, flipping * inPos.y, 0.0f, 1.0f);
-    inPos.xy = sign(inPos.xy);
-    uv0  = (float2(inPos.x, -inPos.y) + 1.0f)/2.0f;
-}
 
 // ps_2_0
 void Blur_fp(

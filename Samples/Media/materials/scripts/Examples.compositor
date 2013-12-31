@@ -11,7 +11,7 @@ compositor_node Bloom
 
 	target rt0
 	{
-		// Horizontal blur pass
+		// "Bright" pass
 		pass render_quad
 		{
 			// Renders a fullscreen quad with a material
@@ -22,7 +22,7 @@ compositor_node Bloom
 
 	target rt1
 	{
-		// Horizontal blur pass
+		// Vertical blur pass
 		pass render_quad
 		{
 			// Renders a fullscreen quad with a material

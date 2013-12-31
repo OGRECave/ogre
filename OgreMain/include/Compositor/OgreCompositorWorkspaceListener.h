@@ -26,47 +26,35 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef _OgreCompositorWorkspaceListener_H_
+#define _OgreCompositorWorkspaceListener_H_
 
-#include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
-#include "Compositor/OgreCompositorNode.h"
-#include "Compositor/OgreCompositorWorkspace.h"
-#include "Compositor/OgreCompositorWorkspaceListener.h"
-
-#include "OgreSceneManager.h"
-#include "OgreViewport.h"
-#include "OgreSceneManager.h"
+#include "OgreHeaderPrefix.h"
+#include "Compositor/OgreCompositorCommon.h"
+#include "Compositor/Pass/OgreCompositorPassDef.h"
 
 namespace Ogre
 {
-	CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
-												SceneManager *sceneManager, RenderTarget *target,
-												CompositorNode *parentNode ) :
-				CompositorPass( definition, target, parentNode ),
-				mSceneManager( sceneManager ),
-				mDefinition( definition )
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+
+	class CompositorWorkspaceListener
 	{
-	}
-	//-----------------------------------------------------------------------------------
-	void CompositorPassClear::execute( const Camera *lodCamera )
-	{
-		//Execute a limited number of times?
-		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
-		{
-			if( !mNumPassesLeft )
-				return;
-			--mNumPassesLeft;
-		}
+	public:
+		/** Called when each pass is about to be executed.
+			Warning: calling pass->execute can result in recursive calls.
+		*/
+		virtual void passPreExecute( CompositorPass *pass ) = 0;
+	};
 
-		//TODO: Implement mDiscardOnly
-		mSceneManager->_setViewport( mViewport );
-
-		//Fire the listener in case it wants to change anything
-		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
-		if( listener )
-			listener->passPreExecute( this );
-
-		mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
-							mDefinition->mDepthValue, mDefinition->mStencilValue );
-	}
+	/** @} */
+	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
+#endif

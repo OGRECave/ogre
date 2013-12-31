@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorWorkspace_H__
-#define __CompositorWorkspace_H__
+#ifndef _OgreCompositorWorkspace_H_
+#define _OgreCompositorWorkspace_H_
 
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
@@ -83,6 +83,8 @@ namespace Ogre
 		bool					mValid;
 		bool					mEnabled;
 
+		CompositorWorkspaceListener *mListener;
+
 		/// Main sequence in the order they should be executed
 		CompositorNodeVec		mNodeSequence;
 		CompositorShadowNodeVec	mShadowNodes;
@@ -134,6 +136,9 @@ namespace Ogre
 
 		void setEnabled( bool bEnabled )					{ mEnabled = bEnabled; }
 		bool getEnabled() const								{ return mEnabled; }
+
+		void setListener( CompositorWorkspaceListener *listener )	{ mListener = listener; }
+		CompositorWorkspaceListener* getListener(void) const		{ return mListener; }
 
 		/** Finds a node instance with the given aliased name
 		@remarks

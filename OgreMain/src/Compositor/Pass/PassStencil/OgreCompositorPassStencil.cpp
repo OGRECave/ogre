@@ -30,6 +30,10 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
 
+#include "Compositor/OgreCompositorNode.h"
+#include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
+
 #include "OgreRenderSystem.h"
 
 namespace Ogre
@@ -50,8 +54,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	CompositorPassStencil::CompositorPassStencil( const CompositorPassStencilDef *definition,
-													RenderTarget *target, RenderSystem *renderSystem ) :
-				CompositorPass( definition, target ),
+													RenderTarget *target, CompositorNode *parentNode,
+													RenderSystem *renderSystem ) :
+				CompositorPass( definition, target, parentNode ),
 				mDefinition( definition ),
 				mRenderSystem( renderSystem )
 	{
@@ -66,6 +71,11 @@ namespace Ogre
 				return;
 			--mNumPassesLeft;
 		}
+
+		//Fire the listener in case it wants to change anything
+		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+		if( listener )
+			listener->passPreExecute( this );
 
 		mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
 		mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,

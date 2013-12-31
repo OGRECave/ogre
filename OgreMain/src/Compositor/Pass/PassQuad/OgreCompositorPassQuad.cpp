@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 
 #include "OgreRenderTarget.h"
 #include "OgreSceneManager.h"
@@ -52,15 +53,13 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	CompositorPassQuad::CompositorPassQuad( const CompositorPassQuadDef *definition,
-											Camera *defaultCamera,
-											CompositorWorkspace *workspace, CompositorNode *parentNode,
+											Camera *defaultCamera, CompositorNode *parentNode,
 											RenderTarget *target, Real horizonalTexelOffset,
 											Real verticalTexelOffset ) :
-				CompositorPass( definition, target ),
+				CompositorPass( definition, target, parentNode ),
 				mDefinition( definition ),
 				mFsRect( 0 ),
 				mPass( 0 ),
-				mParentNode( parentNode ),
 				mCamera( 0 ),
 				mHorizonalTexelOffset( horizonalTexelOffset ),
 				mVerticalTexelOffset( verticalTexelOffset )
@@ -86,6 +85,8 @@ namespace Ogre
 		}
 
 		mPass = material->getBestTechnique()->getPass( 0 );
+
+		const CompositorWorkspace *workspace = parentNode->getWorkspace();
 
 		if( mDefinition->mUseQuad ||
 			mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
@@ -155,6 +156,12 @@ namespace Ogre
 
 		SceneManager *sceneManager = mCamera->getSceneManager();
 		sceneManager->_setViewport( mViewport );
+
+		//Fire the listener in case it wants to change anything
+		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+		if( listener )
+			listener->passPreExecute( this );
+
 		sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
 
 		//Call endUpdate if we're the last pass in a row to use this RT

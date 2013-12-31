@@ -32,14 +32,12 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #include "Compositor/Pass/OgreCompositorPass.h"
-#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
+#include "Compositor/OgreCompositorCommon.h"
 
 namespace Ogre
 {
 	class Rectangle2D;
-	class RenderTarget;
-	class CompositorWorkspace;
-	class CompositorNode;
+	class CompositorPassQuadDef;
 
 	/** \addtogroup Core
 	*  @{
@@ -87,7 +85,6 @@ namespace Ogre
 	protected:
 		Rectangle2D		*mFsRect;
 		Pass			*mPass;
-		CompositorNode	*mParentNode;
 		Camera			*mCamera;
 
 		Real		mHorizonalTexelOffset;
@@ -95,10 +92,13 @@ namespace Ogre
 
 	public:
 		CompositorPassQuad( const CompositorPassQuadDef *definition, Camera *defaultCamera,
-							CompositorWorkspace *workspace, CompositorNode *parentNode,
-							RenderTarget *target, Real horizonalTexelOffset, Real verticalTexelOffset );
+							CompositorNode *parentNode, RenderTarget *target,
+							Real horizonalTexelOffset, Real verticalTexelOffset );
 
 		virtual void execute( const Camera *lodCamera );
+
+		/// Don't make this const (useful for compile-time multithreading errors)
+		Pass* getPass(void)										{ return mPass; }
 	};
 
 	/** @} */
