@@ -301,8 +301,8 @@ elseif (FLASHCC)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for FlashCC" FORCE)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
-  # Set 10.6 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
+  set(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT TRUE CACHE BOOL "Forcing libc++ support for OS X" FORCE)
   if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
     execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
     string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
@@ -329,9 +329,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   endif()
 
   # 10.7 is the minimum for libc++ support
-  if(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
-  endif()
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
