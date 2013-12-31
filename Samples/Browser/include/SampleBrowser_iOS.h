@@ -41,7 +41,7 @@
 
 // Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
 // 30 FPS is usually sufficient and results in lower power consumption.
-#define K_FRAME_INTERVAL    2
+#define DISPLAYLINK_FRAME_INTERVAL      2
 
 #ifdef __OBJC__
 
@@ -105,7 +105,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    mLastFrameTime = K_FRAME_INTERVAL;
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL;
     mDisplayLink = nil;
 
     [self go];
@@ -123,7 +123,7 @@
     // Reset event times and reallocate the date and displaylink objects
     Ogre::Root::getSingleton().clearEventTimes();
     mDate = [[NSDate alloc] init];
-    mLastFrameTime = K_FRAME_INTERVAL; // Reset the timer
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL; // Reset the timer
 
     mDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
     [mDisplayLink setFrameInterval:mLastFrameTime];
