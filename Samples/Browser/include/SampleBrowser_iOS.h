@@ -39,6 +39,10 @@
 #import <QuartzCore/QuartzCore.h>
 #import "SampleBrowser.h"
 
+// Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
+// 30 FPS is usually sufficient and results in lower power consumption.
+#define DISPLAYLINK_FRAME_INTERVAL      2
+
 #ifdef __OBJC__
 
 @interface AppDelegate : NSObject <UIApplicationDelegate>
@@ -101,9 +105,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
-    // 30 FPS is usually sufficient and results in lower power consumption.
-    mLastFrameTime = 2;
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL;
     mDisplayLink = nil;
 
     [self go];
@@ -121,7 +123,7 @@
     // Reset event times and reallocate the date and displaylink objects
     Ogre::Root::getSingleton().clearEventTimes();
     mDate = [[NSDate alloc] init];
-    mLastFrameTime = 2; // Reset the timer
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL; // Reset the timer
 
     mDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
     [mDisplayLink setFrameInterval:mLastFrameTime];
