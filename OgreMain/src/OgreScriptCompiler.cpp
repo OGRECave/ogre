@@ -1268,6 +1268,7 @@ namespace Ogre
 		mIds["colour_value"]	= ID_COLOUR_VALUE;
 		mIds["depth_value"]		= ID_DEPTH_VALUE;
 		mIds["stencil_value"]	= ID_STENCIL_VALUE;
+		mIds["discard_only"]	= ID_DISCARD_ONLY;
 
 		mIds["check"]			= ID_CHECK;
 		mIds["comp_func"]		= ID_COMP_FUNC;

@@ -841,6 +841,7 @@ namespace Ogre
 					ID_COLOUR_VALUE,
 					ID_DEPTH_VALUE,
 					ID_STENCIL_VALUE,
+					ID_DISCARD_ONLY,
 
 					ID_CHECK,
 					ID_COMP_FUNC,

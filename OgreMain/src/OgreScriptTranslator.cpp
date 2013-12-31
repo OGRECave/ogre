@@ -6620,6 +6620,22 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_DISCARD_ONLY:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &passClear->mDiscardOnly ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"discard_only argument must be 'true', 'false', 'yes', 'no', 'on', or 'off'");
+						}
+					}
+					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:

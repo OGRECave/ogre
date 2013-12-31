@@ -27,6 +27,9 @@ same license as the rest of the engine.
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
+#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -113,12 +116,9 @@ void Sample_Compositor::setupView()
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupCompositor(void)
 {
-	/*Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-
-	const Ogre::IdString workspaceName( "CompositorSampleWorkspace" );
-	CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition( workspaceName );
-	workspaceDef->connect( "Bloom", "Glass" );
-	workspaceDef->connect( "Glass", 0, "FinalComposition", 1 );*/
+	/// Create a couple of hard coded postfilter effects as an example of how to do it
+	/// but the preferred method is to use compositor scripts.
+	createEffects();
 
 	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
@@ -134,7 +134,7 @@ void Sample_Compositor::setupCompositor(void)
 	CompositorManager2::CompositorNodeDefMap::const_iterator itor = nodeDefs.begin();
 	CompositorManager2::CompositorNodeDefMap::const_iterator end  = nodeDefs.end();
 
-	IdString compositorId = "Ogre/Compositor";
+	IdString compositorId = "Ogre/Postprocess";
 
 	// Add all compositor resources to the view container
 	while( itor != end )
@@ -175,10 +175,6 @@ void Sample_Compositor::setupContent(void)
 #if 0
 	createTextures();
 #endif
-    /// Create a couple of hard coded postfilter effects as an example of how to do it
-	/// but the preferred method is to use compositor scripts.
-	createEffects();
-
 	setupScene();
 
 	setupControls();
@@ -705,6 +701,72 @@ void Sample_Compositor::createEffects(void)
 //				}
 //			}
 //		}
+
+	CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+
+	if( !compositorManager->hasNodeDefinition( "Motion Blur" ) )
+	{
+		/// Motion blur effect
+		CompositorNodeDef *motionBlurDef = compositorManager->addNodeDefinition( "Motion Blur" );
+
+		//Input channels
+		motionBlurDef->addTextureSourceName( "rt_input", 0, TextureDefinitionBase::TEXTURE_INPUT );
+		motionBlurDef->addTextureSourceName( "rt_output", 1, TextureDefinitionBase::TEXTURE_INPUT );
+
+		motionBlurDef->mCustomIdentifier = "Ogre/Postprocess";
+
+		//Local textures
+		motionBlurDef->setNumLocalTextureDefinitions( 1 );
+		{
+			TextureDefinitionBase::TextureDefinition *texDef =
+														motionBlurDef->addTextureDefinition( "sum" );
+			texDef->width	= 0;
+			texDef->height	= 0;
+			texDef->formatList.push_back( Ogre::PF_R8G8B8 );
+		}
+
+		motionBlurDef->setNumTargetPass( 3 );
+
+		/// Initialisation pass for sum texture
+		{
+			CompositorTargetDef *targetDef = motionBlurDef->addTargetPass( "sum" );
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mNumInitialPasses = 1;
+				passQuad->mMaterialName = "Ogre/Copy/4xFP16";
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
+			}
+		}
+		/// Do the motion blur
+		{
+			CompositorTargetDef *targetDef = motionBlurDef->addTargetPass( "rt_output" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Compositor/Combine";
+				passQuad->addQuadTextureSource( 0, "rt_input", 0 );
+				passQuad->addQuadTextureSource( 1, "sum", 0 );
+			}
+		}
+		/// Copy back sum texture for the next frame
+		{
+			CompositorTargetDef *targetDef = motionBlurDef->addTargetPass( "sum" );
+
+			{
+				CompositorPassQuadDef *passQuad;
+				passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
+				passQuad->mMaterialName = "Ogre/Copy/4xFP16";
+				passQuad->addQuadTextureSource( 0, "rt_output", 0 );
+			}
+		}
+
+		//Output channels
+		motionBlurDef->setNumOutputChannels( 2 );
+		motionBlurDef->mapOutputChannel( 0, "rt_output" );
+		motionBlurDef->mapOutputChannel( 1, "rt_input" );
+	}
 /*		/// Motion blur effect
 	Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
 			"Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
