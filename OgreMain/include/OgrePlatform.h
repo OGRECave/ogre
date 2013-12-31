@@ -332,11 +332,7 @@ namespace Ogre {
 //		http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
 #   	define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
 #	else
-#       if OGRE_NO_LIBCPP_SUPPORT == 0
-#           define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
-#       else
-#   	    define OGRE_DEFAULT_LOCALE "C"
-#       endif
+#       define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
 #	endif
 #endif
 
