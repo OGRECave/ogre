@@ -232,9 +232,6 @@ endif()
 
 make_library_set(OGRE_LIBRARY)
 
-if(APPLE)
-  set(OGRE_LIBRARY_DBG ${OGRE_LIB_SEARCH_PATH})
-endif()
 if (OGRE_INCOMPATIBLE)
   set(OGRE_LIBRARY "NOTFOUND")
 endif ()

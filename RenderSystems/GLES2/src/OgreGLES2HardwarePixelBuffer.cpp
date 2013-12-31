@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,28 +40,6 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreBitwise.h"
-
-static int computeLog(GLuint value)
-{
-    int i;
-
-    i = 0;
-
-    /* Error! */
-    if (value == 0) return -1;
-
-    for (;;)
-    {
-        if (value & 1)
-        {
-            /* Error! */
-            if (value != 1) return -1;
-                return i;
-        }
-        value = value >> 1;
-        i++;
-    }
-}
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
@@ -1150,7 +1128,7 @@ namespace Ogre {
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
                 OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                                 mip,
+                                                 mLevel,
                                                  internalFormat,
                                                  width, height, depth,
                                                  0,

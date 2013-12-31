@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -111,11 +111,19 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
+#if OGRE_NO_GLES3_SUPPORT == 1
+        GL_STENCIL_INDEX1_OES,
+        GL_STENCIL_INDEX4_OES,
+#endif
         GL_STENCIL_INDEX8
     };
     static const size_t stencilBits[] =
     {
         0,
+#if OGRE_NO_GLES3_SUPPORT == 1
+        1,
+        4,
+#endif
         8
     };
     #define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
@@ -433,6 +441,7 @@ namespace Ogre {
         // [best supported for internal format]
         size_t bestmode = 0;
         int bestscore = -1;
+        bool requestDepthOnly = internalFormat == PF_DEPTH;
         for(size_t mode = 0; mode < props.modes.size(); mode++)
         {
             int desirability = 0;
@@ -441,8 +450,8 @@ namespace Ogre {
             // desirability == 1000...2000  if no depth, stencil
             // desirability == 2000...3000  if depth, no stencil
             // desirability == 3000+        if depth and stencil
-            // beyond this, the total numer of bits (stencil+depth) is maximised
-            if(props.modes[mode].stencil)
+            // beyond this, the total number of bits (stencil+depth) is maximised
+            if(props.modes[mode].stencil && !requestDepthOnly)
                 desirability += 1000;
             if(props.modes[mode].depth)
                 desirability += 2000;
@@ -464,7 +473,10 @@ namespace Ogre {
             }
         }
         *depthFormat = depthFormats[props.modes[bestmode].depth];
-        *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
+        if(requestDepthOnly)
+            *stencilFormat = 0;
+        else
+            *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
     }
 
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
@@ -503,7 +515,7 @@ namespace Ogre {
         {
             RBFormat key(format, width, height, fsaa);
             RenderBufferMap::iterator it = mRenderBufferMap.find(key);
-            if(it != mRenderBufferMap.end())
+            if(it != mRenderBufferMap.end() && (it->second.refcount == 0))
             {
                 retval.buffer = it->second.buffer;
                 retval.zoffset = 0;
