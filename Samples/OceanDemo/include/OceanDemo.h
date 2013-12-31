@@ -134,7 +134,7 @@ Sample_Ocean::Sample_Ocean()
 	mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
 	mInfo["Thumbnail"] = "thumb_ocean.png";
 	mInfo["Category"] = "Environment";
-	mBackgroundColor = ColourValue( 0.6f, 0.0f, 0.6f );
+	mBackgroundColour = ColourValue( 0.6f, 0.0f, 0.6f );
 }
 /*************************************************************************
 	                    Sample_Ocean Methods

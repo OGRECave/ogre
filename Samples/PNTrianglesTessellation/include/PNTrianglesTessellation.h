@@ -24,7 +24,7 @@ public:
 		mInfo["Thumbnail"] = "thumb_tesselation.png";
 		mInfo["Category"] = "Unsorted";
 		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
-		mBackgroundColor = ColourValue(0.41f, 0.41f, 0.41f);
+		mBackgroundColour = ColourValue(0.41f, 0.41f, 0.41f);
 	}
 
 	void testCapabilities(const RenderSystemCapabilities* caps)

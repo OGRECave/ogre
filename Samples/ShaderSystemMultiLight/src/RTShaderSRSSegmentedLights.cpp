@@ -31,9 +31,9 @@ RTShaderSRSSegmentedLights::RTShaderSRSSegmentedLights()
 	mUseSegmentedLightTexture		= false;
 	mLightSamplerIndex = 0;
 
-	msBlankLight.setDiffuseColour(ColourValue::Black);
-	msBlankLight.setSpecularColour(ColourValue::Black);
-	msBlankLight.setAttenuation(0,1,0,0);
+	msBlankLight->setDiffuseColour(ColourValue::Black);
+	msBlankLight->setSpecularColour(ColourValue::Black);
+	msBlankLight->setAttenuation(0,1,0,0);
 }
 
 //-----------------------------------------------------------------------
@@ -91,7 +91,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass*
 		// No matching light found -> use a blank dummy light for parameter update.
 		if (srcLight == NULL)
 		{						
-			srcLight = &msBlankLight;
+			srcLight = msBlankLight;
 		}
 
 

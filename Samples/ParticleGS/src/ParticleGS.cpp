@@ -138,7 +138,8 @@ protected:
 		
 		//Add an ogre head to the scene
 		SceneNode* ogreHeadSN = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		Entity *ogreHead = mSceneMgr->createEntity("head", "ogrehead.mesh");        
+		Entity *ogreHead = mSceneMgr->createEntity("ogrehead.mesh");
+        ogreHead->setName("head");
 		ogreHeadSN->scale(0.1,0.1,0.1);
 		ogreHeadSN->yaw(Degree(180));
 		ogreHeadSN->attachObject(ogreHead);
@@ -150,7 +151,8 @@ protected:
 		MeshManager::getSingleton().createPlane("Myplane",
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
 			1500,1500,20,20,true,1,60,60,Vector3::UNIT_Z);
-		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		Entity* pPlaneEnt = mSceneMgr->createEntity( "Myplane" );
+        pPlaneEnt->setName("plane");
 		pPlaneEnt->setMaterialName("Examples/Rockwall");
 		pPlaneEnt->setCastShadows(false);
 		SceneNode *snode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

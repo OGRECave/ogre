@@ -119,7 +119,8 @@ protected:
 		mTexBuf->unlock();
 
 		// create a penguin and attach him to our penguin node
-		Entity* penguin = mSceneMgr->createEntity("Penguin", "penguin.mesh");
+		Entity* penguin = mSceneMgr->createEntity("penguin.mesh");
+        penguin->setName("Penguin");
 		mPenguinNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mPenguinNode->attachObject(penguin);
 

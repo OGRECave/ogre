@@ -68,13 +68,15 @@ protected:
 		createCubeMap();
 
 		// create an ogre head, give it the dynamic cube map material, and place it at the origin
-		mHead = mSceneMgr->createEntity("CubeMappedHead", "ogrehead.mesh");
+		mHead = mSceneMgr->createEntity("ogrehead.mesh");
+        mHead->setName("CubeMappedHead");
 		mHead->setMaterialName("Examples/DynamicCubeMap");
 		mSceneMgr->getRootSceneNode()->attachObject(mHead);
 
 		mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
 
-		Entity* fish = mSceneMgr->createEntity("Fish", "fish.mesh");
+		Entity* fish = mSceneMgr->createEntity("fish.mesh");
+        fish->setName("Fish");
 		mFishSwim = fish->getAnimationState("swim");
 		mFishSwim->setEnabled(true);
 
@@ -90,7 +92,8 @@ protected:
 			Plane(Vector3::UNIT_Y, -30), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
 		// create a floor entity, give it a material, and place it at the origin
-        Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+        Entity* floor = mSceneMgr->createEntity("floor");
+        floor->setName("Floor");
         floor->setMaterialName("Examples/BumpyMetal");
         mSceneMgr->getRootSceneNode()->attachObject(floor);
 

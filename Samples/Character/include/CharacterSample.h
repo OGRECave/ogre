@@ -108,7 +108,8 @@ protected:
 			Plane(Vector3::UNIT_Y, 0), 100, 100, 10, 10, true, 1, 10, 10, Vector3::UNIT_Z);
 
 		// create a floor entity, give it a material, and place it at the origin
-        Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+        Entity* floor = mSceneMgr->createEntity("floor");
+        floor->setName("Floor");
         floor->setMaterialName("Examples/Rockwall");
 		floor->setCastShadows(false);
         mSceneMgr->getRootSceneNode()->attachObject(floor);

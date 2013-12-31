@@ -99,7 +99,7 @@ namespace Ogre
 		size_t inputChannels  = inDef->getNumInputChannels();
 		size_t outputChannels = outDef->getNumOutputChannels();
 
-		for( size_t i=0; i<inputChannels && i<outputChannels; ++i )
+		for( uint32 i=0; i<inputChannels && i<outputChannels; ++i )
 			connect( outNode, i, inNode, i );
 	}
 	//-----------------------------------------------------------------------------------

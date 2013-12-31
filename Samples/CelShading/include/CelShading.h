@@ -16,7 +16,7 @@ public:
 		mInfo["Description"] = "A demo of cel-shaded graphics using vertex & fragment programs.";
 		mInfo["Thumbnail"] = "thumb_cel.png";
 		mInfo["Category"] = "Lighting";
-		mBackgroundColor = ColourValue::White;
+		mBackgroundColour = ColourValue::White;
 	}
 
 	StringVector getRequiredPlugins()

@@ -21,7 +21,7 @@ public:
 			"Sphere maps are not wrapped, and look the same from all directions.";
 		mInfo["Thumbnail"] = "thumb_spheremap.png";
 		mInfo["Category"] = "Unsorted";
-		mBackgroundColor = ColourValue::White;
+		mBackgroundColour = ColourValue::White;
 	}
 
 protected:

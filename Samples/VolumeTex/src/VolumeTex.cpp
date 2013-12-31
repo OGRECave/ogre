@@ -114,7 +114,8 @@ protected:
 		fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         fnode->setPosition(Vector3(0,0,0));
 		// Load ogre head
-		Entity* head = mSceneMgr->createEntity("head", "ogrehead.mesh");
+		Entity* head = mSceneMgr->createEntity("ogrehead.mesh");
+        head->setName("head");
 		fnode->attachObject(head);
 		
 		// Animation for ogre head

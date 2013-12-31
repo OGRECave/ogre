@@ -310,6 +310,12 @@ namespace Ogre {
 		return mParentNode->_getFullTransform();
 	}
 	//-----------------------------------------------------------------------
+	void MovableObject::setLocalAabb(const Aabb box)
+	{
+		mObjectData.mLocalAabb->setFromAabb( box, mObjectData.mIndex );
+		mObjectData.mLocalRadius[mObjectData.mIndex] = box.getRadius();
+	}
+	//-----------------------------------------------------------------------
 	Aabb MovableObject::getLocalAabb() const
 	{
 		return mObjectData.mLocalAabb->getAsAabb( mObjectData.mIndex );

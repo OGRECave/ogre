@@ -77,7 +77,7 @@ namespace Ogre {
         /// Overridden from MovableObject
         const AxisAlignedBox& getBoundingBox(void) const { return mNullBB; }
         /// Overridden from MovableObject
-        void _updateRenderQueue(RenderQueue*, Camera *camera) { /* do nothing */}
+        void _updateRenderQueue(RenderQueue*, Camera *camera, const Camera *lodCamera) { /* do nothing */}
         /// Overridden from MovableObject
         const String& getMovableType(void) const;
         /// Get the derived plane as transformed by its parent node. 
