@@ -52,6 +52,8 @@ public:
 	void buttonHit(OgreBites::Button* button);        
 	void itemSelected(OgreBites::SelectMenu* menu);
 
+	virtual void windowResized(Ogre::RenderWindow* rw);
+
 protected:
 	virtual void setupCompositor(void);
 	
@@ -176,6 +178,9 @@ void Sample_Compositor::setupContent(void)
 	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);*/
 	
 	createTextures();
+
+	mWorkspaceListener.windowResized( mWindow->getWidth(), mWindow->getHeight() );
+
 	setupScene();
 
 	setupControls();
@@ -561,6 +566,12 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 		mDebugTextureTUS->setCompositorReference(parts[0], parts[1], 
 			StringConverter::parseUnsignedInt(parts[2]));
 	}
+}
+//-----------------------------------------------------------------------------------
+void Sample_Compositor::windowResized(Ogre::RenderWindow* rw)
+{
+	mWorkspaceListener.windowResized( rw->getWidth(), rw->getHeight() );
+	SdkSample::windowResized(rw);
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupScene(void)

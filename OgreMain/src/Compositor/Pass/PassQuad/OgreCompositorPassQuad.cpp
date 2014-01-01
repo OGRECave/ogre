@@ -133,8 +133,8 @@ namespace Ogre
 			++itor;
 		}
 
-		const Real hOffset = mHorizonalTexelOffset / mTarget->getWidth();
-		const Real vOffset = mVerticalTexelOffset / mTarget->getHeight();
+		const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
+		const Real vOffset = 2.0f * mVerticalTexelOffset / mTarget->getHeight();
 
 		//The rectangle is shared, set the corners each time
 		mFsRect->setCorners( mDefinition->mVpLeft + hOffset, mDefinition->mVpTop - vOffset,

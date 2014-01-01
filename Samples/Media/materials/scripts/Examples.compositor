@@ -503,7 +503,6 @@ compositor_node "Gaussian Blur"
 	in 1 rt_tmp
 
 	custom_id Ogre/Postprocess
-	compositor_logic GaussianBlur
 
 	target rt_tmp
 	{

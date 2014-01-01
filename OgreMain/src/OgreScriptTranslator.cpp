@@ -6639,6 +6639,7 @@ namespace Ogre{
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:
+				case ID_OVERLAYS:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -6780,6 +6781,7 @@ namespace Ogre{
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:
+				case ID_OVERLAYS:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7001,6 +7003,7 @@ namespace Ogre{
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:
+				case ID_OVERLAYS:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7105,6 +7108,7 @@ namespace Ogre{
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:
+				case ID_OVERLAYS:
 					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 

@@ -3,10 +3,9 @@ uniform sampler2D inRTT;
 uniform vec4 sampleOffsets[15];
 uniform vec4 sampleWeights[15];
 
-varying vec2 uv;
-
 void main(void)
 {
+	vec2 uv = vec2( gl_TexCoord[0] );
     vec4 accum = vec4(0.0, 0.0, 0.0, 1.0);
 	vec2 sampleUV;
     
