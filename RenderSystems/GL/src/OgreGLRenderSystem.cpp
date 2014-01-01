@@ -2822,7 +2822,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 #if OGRE_DOUBLE_PRECISION
 		// Must convert to float*
-		float tmp[4] = {vec.x, vec.y, vec.z, vec.w};
+        float tmp[4] = {static_cast<float>(vec.x),
+                        static_cast<float>(vec.y),
+                        static_cast<float>(vec.z),
+                        static_cast<float>(vec.w)};
 		glLightfv(lightindex, GL_POSITION, tmp);
 #else
 		glLightfv(lightindex, GL_POSITION, vec.ptr());
@@ -2834,7 +2837,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			vec.w = 0.0; 
 #if OGRE_DOUBLE_PRECISION
 			// Must convert to float*
-			float tmp2[4] = {vec.x, vec.y, vec.z, vec.w};
+            float tmp2[4] = {static_cast<float>(vec.x),
+                            static_cast<float>(vec.y),
+                            static_cast<float>(vec.z),
+                            static_cast<float>(vec.w)};
 			glLightfv(lightindex, GL_SPOT_DIRECTION, tmp2);
 #else
 			glLightfv(lightindex, GL_SPOT_DIRECTION, vec.ptr());
