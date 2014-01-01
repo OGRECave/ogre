@@ -85,6 +85,8 @@ namespace Ogre
 
 			mNumPassesLeft = mDefinition->mNumInitialPasses;
 
+			mViewport = 0;
+
 			const unsigned short numViewports = mTarget->getNumViewports();
 			for( unsigned short i=0; i<numViewports && !mViewport; ++i )
 			{
