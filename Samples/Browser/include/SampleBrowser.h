@@ -641,7 +641,7 @@ protected:
 					mDescBox->setText("");
 				}
 
-				bool all = selectedCategory == "All";
+				bool all = selectedCategory == " All";
 				Ogre::StringVector sampleTitles;
 				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail");
 
@@ -1573,7 +1573,7 @@ protected:
 				}
 			}
 
-			if (!mLoadedSamples.empty()) mSampleCategories.insert("All");   // insert a category for all samples
+			if (!mLoadedSamples.empty()) mSampleCategories.insert(" All");   // insert a category for all samples
 
 			if (!unloadedSamplePlugins.empty())   // show error message summarising missing or invalid plugins
 			{
