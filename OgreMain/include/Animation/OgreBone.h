@@ -91,12 +91,12 @@ namespace Ogre {
 
 		void setCachedTransformOutOfDate(void) const;
 
-		/// Call when we're detaching from our parent. Does nothing if already detached
-		void unsetParent(void);
-		/// Notification from parent that we need to migrate to a different depth level
-		void parentDepthLevelChanged(void);
-
 		void resetParentTransformPtr(void);
+
+		/** For debug use ONLY. Bones don't support dynamically changing their hierarchy structure.
+			It can mess with the memory layout of neighbouring SkeletonInstances
+		*/
+		void removeChild( Bone* child );
 
     public:
 		/** Index in the vector holding this node reference (could be our parent node, or a global array
@@ -256,20 +256,6 @@ namespace Ogre {
 
 		/** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
 		const SimpleMatrixAf4x3& _getFullTransformUpdated(void);
-
-		/** Drops the specified child from this node.
-		@remarks
-			Does not delete the node, just detaches it from
-			this parent, potentially to be reattached elsewhere.
-		@par
-			Asserts if child is not one of our children.
-		*/
-		void removeChild( Bone* child );
-
-		/** Removes all child Nodes attached to this node. Does not delete the nodes, just detaches them from
-			this parent, potentially to be reattached elsewhere.
-		*/
-		void removeAllChildren(void);
 
         /** TODO
         */

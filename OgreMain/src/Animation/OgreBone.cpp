@@ -58,7 +58,6 @@ namespace Ogre {
 		mGlobalIndex( -1 ),
 		mParentIndex( -1 )
 	{
-		
 	}
 	//-----------------------------------------------------------------------
 	Bone::~Bone()
@@ -99,9 +98,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Bone::_deinitialize(void)
 	{
-		removeAllChildren();
+#ifdef NDEBUG
 		if( mParent )
 			mParent->removeChild( this );
+		assert( mChildren.empty() );
+#endif
 
 		if( mBoneMemoryManager )
 			mBoneMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
@@ -112,51 +113,6 @@ namespace Ogre {
 #ifndef NDEBUG
 		mInitialized = false;
 #endif
-	}
-	//-----------------------------------------------------------------------
-	void Bone::unsetParent(void)
-	{
-		if( mParent )
-		{
-			mTransform.mParentTransform[mTransform.mIndex] = &SimpleMatrixAf4x3::IDENTITY;
-			mParent = 0;//Needs to be set now, if nodeDetached triggers a cleanup,
-						//_memoryRebased will be called on us
-
-			//BoneMemoryManager will set mTransform.mParentTransform to a dummy
-			//transform (as well as transfering the memory)
-			mBoneMemoryManager->nodeDettached( mTransform, mDepthLevel );
-
-			if( mDepthLevel != 0 )
-			{
-				mDepthLevel = 0;
-
-				//Propagate the change to our children
-				BoneVec::const_iterator itor = mChildren.begin();
-				BoneVec::const_iterator end  = mChildren.end();
-
-				while( itor != end )
-				{
-					(*itor)->parentDepthLevelChanged();
-					++itor;
-				}
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	void Bone::parentDepthLevelChanged(void)
-	{
-		mBoneMemoryManager->nodeMoved( mTransform, mDepthLevel, mParent->mDepthLevel + 1 );
-		mDepthLevel = mParent->mDepthLevel + 1;
-
-		//Keep propagating changes to our children
-		BoneVec::const_iterator itor = mChildren.begin();
-		BoneVec::const_iterator end  = mChildren.end();
-
-		while( itor != end )
-		{
-			(*itor)->parentDepthLevelChanged();
-			++itor;
-		}
 	}
 	//-----------------------------------------------------------------------
 	void Bone::setCachedTransformOutOfDate(void) const
@@ -373,7 +329,6 @@ namespace Ogre {
 			if( child == *itor )
 			{
 				itor = efficientVectorRemove( mChildren, itor );
-				child->unsetParent();
 				child->mParentIndex = -1;
 
 				//The node that was at the end got swapped and has now a different index
@@ -381,19 +336,6 @@ namespace Ogre {
 					(*itor)->mParentIndex = itor - mChildren.begin();
 			}
 		}
-	}
-	//-----------------------------------------------------------------------
-	void Bone::removeAllChildren(void)
-	{
-		BoneVec::iterator itor = mChildren.begin();
-		BoneVec::iterator end  = mChildren.end();
-		while( itor != end )
-		{
-			(*itor)->unsetParent();
-			(*itor)->mParentIndex = -1;
-			++itor;
-		}
-		mChildren.clear();
 	}
 }
 

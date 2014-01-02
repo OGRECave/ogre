@@ -69,6 +69,9 @@ namespace Ogre
 				++lastStart;
 			}
 		}
+
+		assert( threadStarts.back() <= skeletons.size() );
+		threadStarts.back() = skeletons.size();
 	}
 	//-----------------------------------------------------------------------
 	void BySkeletonDef::_updateBoneStartTransforms(void)
@@ -111,6 +114,33 @@ namespace Ogre
 		assert( it == skeletonsArray.end() || (*it)->_getMemoryUniqueOffset() != newInstance );
 
 		skeletonsArray.insert( it, newInstance );
+
+#if OGRE_DEBUG_MODE
+		{
+			//Check all depth levels respect the same ordering
+			FastArray<SkeletonInstance*>::const_iterator itSkel = skeletonsArray.begin();
+			FastArray<SkeletonInstance*>::const_iterator enSkel = skeletonsArray.end();
+			while( itSkel != enSkel )
+			{
+				const TransformArray &transf1 = (*itSkel)-> _getTransformArray();
+				FastArray<SkeletonInstance*>::const_iterator itSkel2 = itSkel+1;
+				while( itSkel2 != enSkel )
+				{
+					const TransformArray &transf2 = (*itSkel2)-> _getTransformArray();
+					for( size_t i=0; i<transf1.size(); ++i )
+					{
+						Bone **owner1 = transf1[i].mOwner + transf1[i].mIndex;
+						Bone **owner2 = transf2[i].mOwner + transf2[i].mIndex;
+						assert( owner1 < owner2 );
+					}
+
+					++itSkel2;
+				}
+
+				++itSkel;
+			}
+		}
+#endif
 
 		//Update the thread starts, they have changed.
 		bySkelDef.updateThreadStarts();
