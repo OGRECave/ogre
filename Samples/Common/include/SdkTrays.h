@@ -454,6 +454,8 @@ namespace OgreBites
 			mLines.clear();
 
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName()).getPointer();
+			if( !font->isLoaded() ) //We need the font to be loaded for getGlyphAspectRatio to work
+				font->load();
             
 			Ogre::String current = DISPLAY_STRING_TO_STRING(text);
 			bool firstWord = true;
