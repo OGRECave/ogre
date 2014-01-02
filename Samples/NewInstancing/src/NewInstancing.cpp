@@ -76,13 +76,26 @@ static const char *c_meshNames[] =
 };
 
 //------------------------------------------------------------------------------
-Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0), mSkinningTechniques(NULL)
+Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(14), NUM_INST_COLUMN(50), mCurrentManager(0), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0), mSkinningTechniques(NULL)
 {
 	mInfo["Title"] = "New Instancing";
 	mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
-		" instances of the same mesh with much less performance impact";
+		" instances of the same mesh with much less performance impact\n"
+		"Press Space to switch Instancing Techniques.\n"
+		"Changes in the slider take effect after switching instancing technique\n\n"
+		"Instancing requires shader knowledge (it cannot work w/out shaders). Take a look at the materials"
+		" used in the samples (their names are stored in 'c_materialsTechniques').\n"
+		"The best gain is achieved when all instances use the same material (if each instance uses a "
+		"different material, there are no advantages, only its disadvantages).\n\n"
+		"This sample stresses many skeletally animated instances in different conditions, with different "
+		"instancing techniques. Refer to the 2.0 porting manual for the differences in each technique.\n"
+		"Shadow mapping often skyrockets the API draw calls per frame, and hence there is an option "
+		"to toggle shadows, showing the difference in scalability.\n\n"
+		"Different batch sizes give different results depending on CPU culling and instance numbers on "
+		"the scene (batch count is hard coded in C++ code).\n"
+		"If performance is too slow after, try defragmenting batches once in a while";
 	mInfo["Thumbnail"] = "thumb_newinstancing.png";
-	mInfo["Category"] = "Environment";
+	mInfo["Category"] = "Use Case";
 	mInfo["Help"] = "Press Space to switch Instancing Techniques.\n"
 		"Press B to toggle bounding boxes.\n\n"
 		"Changes in the slider take effect after switching instancing technique\n"

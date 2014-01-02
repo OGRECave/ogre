@@ -24,14 +24,14 @@ public:
 	{
 		mInfo["Title"] = "Fresnel";
 		mInfo["Description"] = "Shows how to create reflections and refractions using render-to-texture, "
-								"shaders and visibility mask.\n"
+								"shaders and visibility mask, completely controlled via the compositor.\n"
 								"See Fresnel.compositor and C++ code on how to setup the pipeline.\n\n"
 								"NOTE: This demo is a bit outdated. Typical AAA games use screen-space "
 								"refractions, which are bit less accurate but avoid an extra scene pass.\n"
 								"This other technique is explained in GPU Gems 2, Chapter 19 "
 								"'Generic Refraction Simulation'";
 		mInfo["Thumbnail"] = "thumb_fresnel.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "API Usage";
 
 		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
 		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
