@@ -108,6 +108,8 @@ namespace Ogre
         };
 
 	protected:
+		friend class CompositorNode;
+		friend class CompositorWorkspace;
 		typedef vector<TextureDefinition>::type		TextureDefinitionVec;
 		typedef map<IdString, uint32>::type			NameToChannelMap;
 

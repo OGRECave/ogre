@@ -33,11 +33,13 @@ THE SOFTWARE.
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
+#include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreRenderSystem.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {
