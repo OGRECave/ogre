@@ -3938,10 +3938,10 @@ namespace Ogre{
 					{
 						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 					}
-					else if(prop->values.size() > 4)
+					else if(prop->values.size() > 3)
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"content_type must have at most 4 arguments");
+							"content_type must have at most 3 arguments");
 					}
 					else
 					{
@@ -3958,22 +3958,20 @@ namespace Ogre{
 								break;
 							case ID_COMPOSITOR:
 								mUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
-								if (prop->values.size() >= 3)
+								if (prop->values.size() >= 2)
 								{
-									String compositorName;
-									getString(*getNodeAt(prop->values, 1), &compositorName);
 									String textureName;
-									getString(*getNodeAt(prop->values, 2), &textureName);
+									getString(*getNodeAt(prop->values, 1), &textureName);
 									
-									if (prop->values.size() == 4)
+									if (prop->values.size() == 3)
 									{
 										uint32 mrtIndex;
-										getUInt(*getNodeAt(prop->values, 3), (uint32*)&mrtIndex);
-										mUnit->setCompositorReference(compositorName, textureName, mrtIndex);
+										getUInt(*getNodeAt(prop->values, 2), (uint32*)&mrtIndex);
+										mUnit->setCompositorReference(textureName, mrtIndex);
 									}
 									else
 									{
-										mUnit->setCompositorReference(compositorName, textureName);
+										mUnit->setCompositorReference(textureName);
 									}
 								}
 								else
@@ -5681,7 +5679,7 @@ namespace Ogre{
 
 						uint32 inChannel;
 						IdString inNode;
-						if( getUInt( *it0, &inChannel ) && getIdString( *it1, &inNode ) )
+						if( getIdString( *it0, &inNode ) && getUInt( *it1, &inChannel ) )
 							mWorkspaceDef->connectOutput( inNode, inChannel );
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);

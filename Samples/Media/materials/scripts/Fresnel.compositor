@@ -1,0 +1,68 @@
+compositor_node FresnelLastPass
+{
+	//Make the reflection & refraction textures available so they can be used by materials
+	in 0 reflection
+	in 1 refraction
+	in 2 rt_renderwindow
+
+	target rt_renderwindow
+	{
+		pass clear { colour_value 0 1 1 1 }
+		pass render_scene { lod_update_list off }
+	}
+}
+
+compositor_node FresnelRef
+{
+	texture reflection 512 512 PF_R8G8B8
+	texture refraction 512 512 PF_R8G8B8
+
+	target reflection
+	{
+		pass clear { colour_value 0 1 1 1 }
+
+		pass render_scene
+		{
+			//Filter underwater objects (optimization) and other stuff that shouldn't be reflected (vampires?)
+			visibility_mask		0x00000004
+			
+			identifier			59645
+
+			overlays			off
+			rq_last				94
+
+			lod_update_list		on
+			//lod_bias			2.0
+		}
+	}
+	
+	target refraction
+	{
+		pass clear { colour_value 0 1 1 1 }
+
+		pass render_scene
+		{
+			//Render all sorts of non-refractive surfaces 0x00000001 | 0x00000004
+			visibility_mask		0x00000005
+
+			identifier			59646
+
+			overlays			off
+			rq_last				94
+
+			lod_update_list		off
+		}
+	}
+	
+	out 0 reflection
+	out 1 refraction
+}
+
+workspace FresnelSampleWorkspace
+{
+	//This shows how to setup a workspace with Refraction and Reflection from scripts.
+	//In C++ we're going to wipe this all out and recreate this workspace manually
+
+	connect FresnelRef FresnelLastPass
+	connect_output FresnelLastPass 2
+}

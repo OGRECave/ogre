@@ -715,15 +715,15 @@ material Examples/FresnelReflectionRefraction
 			// Reflection
 			texture_unit
 			{
-				// Will be filled in at runtime
-				texture reflection
+				// Will be filled in at runtime by the compositor
+				content_type compositor reflection
 				tex_address_mode clamp
 			}
 			// Refraction
 			texture_unit
 			{
-				// Will be filled in at runtime
-				texture refraction
+				// Will be filled in at runtime by the compositor
+				content_type compositor refraction
 				tex_address_mode clamp
 			}
 		}

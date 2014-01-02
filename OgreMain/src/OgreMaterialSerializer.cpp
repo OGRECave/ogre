@@ -1743,18 +1743,18 @@ namespace Ogre
 		else if (paramType == "compositor")
 		{
 			context.textureUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
-			if (vecparams.size() == 3)
+			if (vecparams.size() == 2)
 			{
-				context.textureUnit->setCompositorReference(vecparams[1], vecparams[2]);
+				context.textureUnit->setCompositorReference(vecparams[1]);
 			}
-			else if (vecparams.size() == 4)
+			else if (vecparams.size() == 3)
 			{
-				context.textureUnit->setCompositorReference(vecparams[1], vecparams[2], 
-					StringConverter::parseUnsignedInt(vecparams[3]));
+				context.textureUnit->setCompositorReference(vecparams[1],
+						StringConverter::parseUnsignedInt(vecparams[2]));
 			}
 			else
 			{
-				logParseError("compositor content_type requires 2 or 3 extra params", context);
+				logParseError("compositor content_type requires 1 or 2 extra params", context);
 			}
 		}
 		else
@@ -4588,8 +4588,7 @@ namespace Ogre
 					break;
 				case TextureUnitState::CONTENT_COMPOSITOR:
 					writeValue("compositor");
-					writeValue(quoteWord(pTex->getReferencedCompositorName()));
-					writeValue(quoteWord(pTex->getReferencedTextureName()));
+					writeValue(quoteWord(pTex->getTextureName()));
 					writeValue(StringConverter::toString(pTex->getReferencedMRTIndex()));
 					break;
 				};

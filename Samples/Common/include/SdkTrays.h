@@ -2382,7 +2382,7 @@ namespace OgreBites
 
 				mDialogShade->show();
 
-				mDialog = new TextBox(mName + "/DialogBox", caption, 300, 208);
+				mDialog = new TextBox(mName + "/DialogBox", caption, 400, 308);
 				mDialog->setText(message);
 				e = mDialog->getOverlayElement();
 				mDialogShade->addChild(e);

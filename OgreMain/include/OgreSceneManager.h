@@ -869,6 +869,22 @@ namespace Ogre {
 			RenderSystem::RenderSystemContext* rsContext;
 		};
 
+		typedef vector<TexturePtr>::type TextureVec;
+
+		struct CompositorTexture
+		{
+			IdString			name;
+			TextureVec const	*textures;
+
+			CompositorTexture( IdString	_name, const TextureVec *_textures ) :
+					name( _name ), textures( _textures ) {}
+
+			bool operator == ( IdString right ) const
+			{
+				return name == right;
+			}
+		};
+
 		/** Pause rendering of the frame. This has to be called when inside a renderScene call
 			(Usually using a listener of some sort)
 		*/
@@ -889,6 +905,9 @@ namespace Ogre {
 		String mShadowTextureCustomCasterFragmentProgram;
 		GpuProgramParametersSharedPtr mShadowTextureCustomCasterVPParams;
 		GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
+
+		typedef vector<CompositorTexture>::type CompositorTextureVec;
+		CompositorTextureVec		mCompositorTextures;
 
 		/// Visibility mask used to show / hide objects
 		uint32 mVisibilityMask;
@@ -1341,6 +1360,22 @@ namespace Ogre {
                 SceneManager::clearScene
         */
         virtual void destroyAllEntities(void);
+
+		/** Used by Compositor, tells of which compositor textures active,
+			so Materials can access them. If MRT, there could be more than one
+		@param name
+			Name of the texture(s) as referenced in the compositor
+			(may not be the texture's real name in case it's just one)
+		@param tex
+			The actual texture(s) associated with that name
+		*/
+		void _addCompositorTexture( IdString name, const TextureVec *texs );
+
+		/// Gets the number of currently active compositor textures
+		size_t getNumCompositorTextures(void) const			{ return mCompositorTextures.size(); }
+
+		/// Removes all compositor textures from 'from' to end.
+		void _removeCompositorTextures( size_t from );
 
 		/// Creates an instance of a skeleton based on the given definition.
 		SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );

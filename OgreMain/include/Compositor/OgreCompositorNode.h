@@ -219,7 +219,7 @@ namespace Ogre
 			ignore this hint and use their own camera pointer for LOD (this parameter is mostly
 			used for syncing shadow mapping).
 		*/
-		void _update( const Camera *lodCamera );
+		void _update( const Camera *lodCamera, SceneManager *sceneManager );
 
 		/** Call this function when you're replacing the textures from oldChannel with the
 			ones in newChannel. Useful when recreating textures (i.e. resolution changed)

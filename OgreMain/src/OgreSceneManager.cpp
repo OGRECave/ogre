@@ -482,6 +482,16 @@ void SceneManager::destroyAllEntities(void)
 	destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
+void SceneManager::_addCompositorTexture( IdString name, const TextureVec *texs )
+{
+	mCompositorTextures.push_back( CompositorTexture( name, texs ) );
+}
+//-----------------------------------------------------------------------
+void SceneManager::_removeCompositorTextures( size_t from )
+{
+	mCompositorTextures.erase( mCompositorTextures.begin() + from, mCompositorTextures.end() );
+}
+//-----------------------------------------------------------------------
 SkeletonInstance* SceneManager::createSkeletonInstance( const SkeletonDef *skeletonDef )
 {
 	return mSkeletonAnimationManager.createSkeletonInstance( skeletonDef, mNumWorkerThreads );
@@ -971,9 +981,18 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
 			{
-				//TODO: (dark_sylinc) Add CONTENT_COMPOSITOR back!
-				//(should be able to read from global tex. or local to current node)
-				//pTex->_setTexturePtr( compoTex );
+				CompositorTextureVec::const_iterator itor = std::find( mCompositorTextures.begin(),
+																	mCompositorTextures.end(),
+																	pTex->getReferencedTextureName() );
+				if( itor == mCompositorTextures.end() )
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+						"Invalid compositor content_type compositor name '" +
+						pTex->getReferencedTextureName().getFriendlyText() + "'",
+						"SceneManager::_setPass");
+				}
+
+				pTex->_setTexturePtr( (*itor->textures)[pTex->getReferencedMRTIndex()] );
 			}
 			mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
 			++unit;
@@ -1217,7 +1236,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 			if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
 			{
 				fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera, lodCamera,
-													 vp->getVisibilityMask()|getVisibilityMask() ) );
+													 vp->getVisibilityMask()&getVisibilityMask() ) );
 			}
 
 			//mVisibleObjects should be filled in phase 01
@@ -2232,7 +2251,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullFrustum( numObjs, objData, camera,
-					camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
+					camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
 					outVisibleObjects, &aabbInfo[i], lodCamera );
 		}
 
@@ -2290,7 +2309,7 @@ void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t t
 			objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
 			MovableObject::cullReceiversBox( numObjs, objData, camera,
-							camera->getLastViewport()->getVisibilityMask()|getVisibilityMask(),
+							camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
 							&aabbInfo[i], lodCamera );
 		}
 
@@ -4083,7 +4102,7 @@ AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibil
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
 			MovableObject::calculateCastersBox( numObjs, objData,
-												viewportVisibilityMask|getVisibilityMask(),
+												viewportVisibilityMask&getVisibilityMask(),
 												&tmpBox );
 			retVal.merge( tmpBox );
 		}

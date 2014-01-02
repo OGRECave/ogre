@@ -359,10 +359,10 @@ namespace Ogre
 			mReceiverBox.merge( *itor++ );
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera )
+	void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera,
+										SceneManager *sceneManager )
 	{
 		ShadowMapCameraVec::iterator itShadowCamera = mShadowMapCameras.begin();
-		SceneManager *sceneManager	= camera->getSceneManager();
 		const Viewport *viewport	= camera->getLastViewport();
 
 		buildClosestLightList( camera, lodCamera );
@@ -426,7 +426,7 @@ namespace Ogre
 		sceneManager->_setCurrentRenderStage( SceneManager::IRS_RENDER_TO_TEXTURE );
 
 		//Now render all passes
-		CompositorNode::_update( lodCamera );
+		CompositorNode::_update( lodCamera, sceneManager );
 
 		sceneManager->_setCurrentRenderStage( previous );
 	}

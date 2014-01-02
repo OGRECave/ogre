@@ -135,7 +135,7 @@ namespace Ogre
 			mTarget->_endUpdate();
 
 			sceneManager->_swapVisibleObjectsForShadowMapping();
-			mShadowNode->_update( mCamera, usedLodCamera );
+			mShadowNode->_update( mCamera, usedLodCamera, sceneManager );
 			sceneManager->_swapVisibleObjectsForShadowMapping();
 
 			//ShadowNode passes may've overriden this setting.

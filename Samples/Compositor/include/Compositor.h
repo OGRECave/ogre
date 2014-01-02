@@ -557,6 +557,7 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 	StringVector parts = StringUtil::split(menu->getSelectedItem(), ";");
 	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
 
+#if 0
 	if (parts.size() == 2)
 	{
 		mDebugTextureTUS->setCompositorReference(parts[0], parts[1]);
@@ -566,6 +567,7 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 		mDebugTextureTUS->setCompositorReference(parts[0], parts[1], 
 			StringConverter::parseUnsignedInt(parts[2]));
 	}
+#endif
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::windowResized(Ogre::RenderWindow* rw)

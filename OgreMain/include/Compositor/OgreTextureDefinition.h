@@ -118,7 +118,7 @@ namespace Ogre
 		TextureDefinitionVec	mLocalTextureDefs;
 
 		/** Similar to @see CompositorNodeDef::mOutChannelMapping,
-			associates a given name with the output.
+			associates a given name with the input, local or global textures.
 		*/
 		NameToChannelMap		mNameToChannelMap;
 

@@ -180,7 +180,7 @@ namespace Ogre
 		@param camera
 			Camera used to calculate our shadow camera (in case of directional lights).
 		*/
-		void _update(Camera* camera, const Camera *lodCamera);
+		void _update(Camera* camera, const Camera *lodCamera, SceneManager *sceneManager);
 
 		/// We derive so we can override the camera with ours
 		virtual void postInitializePassScene( CompositorPassScene *pass );

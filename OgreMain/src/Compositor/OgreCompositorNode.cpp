@@ -388,8 +388,29 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorNode::_update( const Camera *lodCamera )
+	void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )
 	{
+		//Add local & input textures to the SceneManager so they can be referenced by materials
+		size_t oldNumTextures = sceneManager->getNumCompositorTextures();
+		TextureDefinitionBase::NameToChannelMap::const_iterator it =
+																mDefinition->mNameToChannelMap.begin();
+		TextureDefinitionBase::NameToChannelMap::const_iterator en =
+																mDefinition->mNameToChannelMap.end();
+
+		while( it != en )
+		{
+			size_t index;
+			TextureDefinitionBase::TextureSource texSource;
+			mDefinition->decodeTexSource( it->second, index, texSource );
+			if( texSource == TextureDefinitionBase::TEXTURE_INPUT )
+				sceneManager->_addCompositorTexture( it->first, &mInTextures[index].textures );
+			else if( texSource == TextureDefinitionBase::TEXTURE_LOCAL )
+				sceneManager->_addCompositorTexture( it->first, &mLocalTextures[index].textures );
+
+			++it;
+		}
+
+		//Execute our passes
 		CompositorPassVec::const_iterator itor = mPasses.begin();
 		CompositorPassVec::const_iterator end  = mPasses.end();
 
@@ -399,6 +420,9 @@ namespace Ogre
 			pass->execute( lodCamera );
 			++itor;
 		}
+
+		//Remove our textures
+		sceneManager->_removeCompositorTextures( oldNumTextures );
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorNode::finalTargetResized( const RenderTarget *finalTarget )

@@ -770,7 +770,7 @@ workspace CompositorSampleWorkspace
 	connect Bloom Glass
 
 	//Connect RenderWindow to FinalComposition's input channel #0
-	connect_output 0 FinalComposition
+	connect_output FinalComposition 0
 	//Connect Glass's output #0 to FinalComposition's input #1
 	connect Glass 0 FinalComposition 1
 }

@@ -168,7 +168,6 @@ namespace Ogre {
         mEffects = oth.mEffects;
 
         mTextureNameAlias = oth.mTextureNameAlias;
-		mCompositorRefName = oth.mCompositorRefName;
 		mCompositorRefTexName = oth.mCompositorRefTexName;
         // Can't sharing controllers with other TUS, reset to null to avoid potential bug.
         for (EffectMap::iterator j = mEffects.begin(); j != mEffects.end(); ++j)
@@ -1548,9 +1547,11 @@ namespace Ogre {
 		mParent = parent;
 	}
 	//-----------------------------------------------------------------------------
-	void TextureUnitState::setCompositorReference(const String& compositorName, const String& textureName, size_t mrtIndex)
+	void TextureUnitState::setCompositorReference(const String& textureName, size_t mrtIndex)
 	{  
-		mCompositorRefName = compositorName; 
+		mFrames.resize(1);
+		mFramePtrs.resize(1);
+		mFrames[0] = textureName;
 		mCompositorRefTexName = textureName; 
 		mCompositorRefMrtIndex = mrtIndex; 
 	}
