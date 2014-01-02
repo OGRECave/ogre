@@ -84,7 +84,7 @@ namespace Ogre {
         OptimisedUtilSSE(void);
 
         /// @copydoc OptimisedUtil::softwareVertexSkinning
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE softwareVertexSkinning(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE softwareVertexSkinning(
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
@@ -96,7 +96,7 @@ namespace Ogre {
             size_t numVertices);
 
         /// @copydoc OptimisedUtil::softwareVertexMorph
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE softwareVertexMorph(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE softwareVertexMorph(
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
@@ -105,28 +105,28 @@ namespace Ogre {
 			bool morphNormals);
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE concatenateAffineMatrices(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE concatenateAffineMatrices(
             const Matrix4& baseMatrix,
             const Matrix4* srcMatrices,
             Matrix4* dstMatrices,
             size_t numMatrices);
 
         /// @copydoc OptimisedUtil::calculateFaceNormals
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE calculateFaceNormals(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE calculateFaceNormals(
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles);
 
         /// @copydoc OptimisedUtil::calculateLightFacing
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE calculateLightFacing(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE calculateLightFacing(
             const Vector4& lightPos,
             const Vector4* faceNormals,
             char* lightFacings,
             size_t numFaces);
 
         /// @copydoc OptimisedUtil::extrudeVertices
-        virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE extrudeVertices(
+        virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE extrudeVertices(
             const Vector4& lightPos,
             Real extrudeDist,
             const float* srcPositions,
