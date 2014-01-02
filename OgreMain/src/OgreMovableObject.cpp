@@ -876,7 +876,10 @@ namespace Ogre {
 																				(objData.mLightMask);
 
 			for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+			{
 				objData.mOwner[j]->mLightList.clear();
+				objData.mOwner[j]->mLightList.dirtyHash();
+			}
 
 			//Now iterate through all lights to find the influence on these 4 Objects at once
 			LightArray::const_iterator lightsIt				= globalLightList.lights.begin();
@@ -922,6 +925,7 @@ namespace Ogre {
 			{
 				std::stable_sort( objData.mOwner[j]->mLightList.begin(),
 									objData.mOwner[j]->mLightList.end() );
+				objData.mOwner[j]->mLightList.getHash();
 			}
 
 			objData.advanceLightPack();

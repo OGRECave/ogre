@@ -93,6 +93,11 @@ public:
 
 	virtual void passPreExecute( CompositorPass *pass )
 	{
+		//Demo Note: Be very careful when modifying the camera in a listener.
+		//Ogre 2.0 is more sensitive to changes mid-render than 1.x. For example,
+		//Ogre has already built the light list of all objects seen by all cameras.
+		//If we altered the camera's position, some entities would be incorrectly
+		//lit or shadowed.
 		if( pass->getDefinition()->mIdentifier == 59645 )
 		{
 			mCamera->setAutoAspectRatio( false );
