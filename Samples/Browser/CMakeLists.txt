@@ -75,9 +75,11 @@ if (OGRE_STATIC)
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 	${OGRE_BINARY_DIR}/Samples/include)
 
-  if (MINGW AND OGRE_STATIC)
+  # Fix for static build with MinGW
+  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
     include_directories(${DirectX9_INCLUDE_DIR})
-  endif()  	
+  endif() 
+  
 	ogre_add_component_include_dir(Paging)
 	ogre_add_component_include_dir(Terrain)
 	ogre_add_component_include_dir(Volume)
@@ -191,13 +193,15 @@ if (OGRE_BUILD_TESTS)
 	${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
 endif()
 
-if (MINGW AND OGRE_STATIC)
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
     link_directories(${DirectX9_LIBRARY_DIR})
 endif()
 
 ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-if (MINGW AND OGRE_STATIC)
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
    target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
 endif()
 
