@@ -30,6 +30,7 @@ void MeshLodTests::setUp()
 	mLogManager = OGRE_NEW LogManager();
 	mLogManager->createLog("MeshLodTests.log", false);
 	mLogManager->setLogDetail(LL_LOW);
+    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #if OGRE_STATIC
     mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
@@ -40,7 +41,8 @@ void MeshLodTests::setUp()
         
 	mStaticPluginLoader.load();
 #else
-	Root* root = OGRE_NEW Root("plugins.cfg");
+    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+	Root* root = OGRE_NEW Root(pluginsPath);
 
     // Try to load a Rendersystem
 #if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -64,17 +66,20 @@ void MeshLodTests::setUp()
 
 	// Load resource paths from config file
 	ConfigFile cf;
+    String resourcesPath;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #if OGRE_DEBUG_MODE
-	cf.load("resources_d.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("resources_d.cfg");
 #else
-	cf.load("resources.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #endif
 #else
-	cf.load("bin/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
 #endif
+
+    cf.load(resourcesPath);
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
@@ -108,6 +113,7 @@ void MeshLodTests::tearDown()
 	OGRE_DELETE MeshLodGenerator::getSingletonPtr();
 	OGRE_DELETE Root::getSingletonPtr();
 	OGRE_DELETE mLogManager;
+    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 
 void MeshLodTests::addProfile(LodConfig& config)

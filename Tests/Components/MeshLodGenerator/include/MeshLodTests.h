@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "OgreBuildSettings.h"
+#include "OgreFileSystemLayer.h"
 #ifdef OGRE_STATIC_LIB
 #include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif
@@ -39,28 +40,29 @@ using namespace Ogre;
 
 class MeshLodTests : public CppUnit::TestFixture
 {
-// CppUnit macros for setting up the test suite
-CPPUNIT_TEST_SUITE(MeshLodTests);
-CPPUNIT_TEST(testLodConfigSerializer);
-CPPUNIT_TEST(testMeshLodGenerator);
-CPPUNIT_TEST(testManualLodLevels);
-CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE(MeshLodTests);
+    CPPUNIT_TEST(testLodConfigSerializer);
+    CPPUNIT_TEST(testMeshLodGenerator);
+    CPPUNIT_TEST(testManualLodLevels);
+    CPPUNIT_TEST_SUITE_END();
 
 #ifdef OGRE_STATIC_LIB
-StaticPluginLoader mStaticPluginLoader;
+    StaticPluginLoader mStaticPluginLoader;
 #endif
-MeshPtr mMesh;
-LogManager* mLogManager;
+    MeshPtr mMesh;
+    LogManager* mLogManager;
+    FileSystemLayer* mFSLayer;
 public:
-void setUp();
-void tearDown();
-void testLodConfigSerializer();
-void testMeshLodGenerator();
-void testManualLodLevels();
-void testQuadricError();
-void runMeshLodConfigTests(LodConfig::Advanced& advanced);
-void blockedWaitForLodGeneration(const MeshPtr& mesh);
-void addProfile(LodConfig& config);
-void setTestLodConfig(LodConfig& config);
-bool isEqual(Real a, Real b);
+    void setUp();
+    void tearDown();
+    void testLodConfigSerializer();
+    void testMeshLodGenerator();
+    void testManualLodLevels();
+    void testQuadricError();
+    void runMeshLodConfigTests(LodConfig::Advanced& advanced);
+    void blockedWaitForLodGeneration(const MeshPtr& mesh);
+    void addProfile(LodConfig& config);
+    void setTestLodConfig(LodConfig& config);
+    bool isEqual(Real a, Real b);
 };
