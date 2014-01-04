@@ -43,7 +43,7 @@ void MeshLodTests::setUp()
 	Root* root = OGRE_NEW Root("plugins.cfg");
 
     // Try to load a Rendersystem
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	root->loadPlugin("RenderSystem_GL_d");
 #else
 	root->loadPlugin("RenderSystem_GL");
