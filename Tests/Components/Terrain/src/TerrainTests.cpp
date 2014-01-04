@@ -48,29 +48,34 @@ void TerrainTests::setUp()
 		logManager->createLog("testTerrain.log", true, false);
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
+    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
 	mRoot = OGRE_NEW Root(StringUtil::BLANK);
         
 	mStaticPluginLoader.load();
 #else
-	mRoot = OGRE_NEW Root();
+    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+	mRoot = OGRE_NEW Root(pluginsPath);
 #endif
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
 	ConfigFile cf;
+    String resourcesPath;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #if OGRE_DEBUG_MODE
-	cf.load("resources_d.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("resources_d.cfg");
 #else
-	cf.load("resources.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #endif
 #else
-	cf.load("bin/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
 #endif
+
+    cf.load(resourcesPath);
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -99,6 +104,7 @@ void TerrainTests::tearDown()
 {
 	OGRE_DELETE mTerrainOpts;
 	OGRE_DELETE mRoot;
+    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 
 void TerrainTests::testCreate()

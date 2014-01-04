@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgrePageManager.h"
 #include "OgreGrid2DPageStrategy.h"
+#include "OgreFileSystemLayer.h"
 
 #include "OgreBuildSettings.h"
 #ifdef OGRE_STATIC_LIB
@@ -49,7 +50,7 @@ class PageCoreTests : public CppUnit::TestFixture
 	Root* mRoot;
 	PageManager* mPageManager;
 	SceneManager* mSceneMgr;
-	LogManager* mLogManager;
+    FileSystemLayer* mFSLayer;
 #ifdef OGRE_STATIC_LIB
 	StaticPluginLoader mStaticPluginLoader;
 #endif

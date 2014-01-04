@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreTerrain.h"
+#include "OgreFileSystemLayer.h"
 
 #include "OgreBuildSettings.h"
 #ifdef OGRE_STATIC_LIB
@@ -52,7 +53,7 @@ StaticPluginLoader mStaticPluginLoader;
 	Root* mRoot;
 	SceneManager* mSceneMgr;
 	TerrainGlobalOptions* mTerrainOpts;
-	LogManager *mLogManager;
+    FileSystemLayer* mFSLayer;
 
 public:
 	void setUp();
