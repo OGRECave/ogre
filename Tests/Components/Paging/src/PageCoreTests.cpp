@@ -42,6 +42,7 @@ void PageCoreTests::setUp()
 		logManager->createLog("testPageCore.log", true, false);
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
+    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #if OGRE_STATIC
         mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
@@ -52,7 +53,8 @@ void PageCoreTests::setUp()
         
 	mStaticPluginLoader.load();
 #else
-	mRoot = OGRE_NEW Root();
+    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+	mRoot = OGRE_NEW Root(pluginsPath);
 #endif
 
 	mPageManager = OGRE_NEW PageManager();
@@ -62,16 +64,15 @@ void PageCoreTests::setUp()
 	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
 	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
-
 }
 
 void PageCoreTests::tearDown()
 {
 	OGRE_DELETE mPageManager;
 	OGRE_DELETE mRoot;
-	OGRE_DELETE mLogManager;
+    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 #if OGRE_STATIC
-        OGRE_DELETE mStaticPluginLoader;
+    OGRE_DELETE mStaticPluginLoader;
 #endif
 }
 
