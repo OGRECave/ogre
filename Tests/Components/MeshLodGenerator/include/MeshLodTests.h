@@ -51,7 +51,6 @@ class MeshLodTests : public CppUnit::TestFixture
     StaticPluginLoader mStaticPluginLoader;
 #endif
     MeshPtr mMesh;
-    LogManager* mLogManager;
     FileSystemLayer* mFSLayer;
 public:
     void setUp();

@@ -26,10 +26,15 @@ CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
 
 void MeshLodTests::setUp()
 {
-	OGRE_DELETE LogManager::getSingletonPtr();
-	mLogManager = OGRE_NEW LogManager();
-	mLogManager->createLog("MeshLodTests.log", false);
-	mLogManager->setLogDetail(LL_LOW);
+	if(LogManager::getSingletonPtr())
+		OGRE_DELETE LogManager::getSingletonPtr();
+
+	if(LogManager::getSingletonPtr() == 0)
+	{
+		LogManager* logManager = OGRE_NEW LogManager();
+		logManager->createLog("MeshLodTests.log", true, false);
+	}
+    LogManager::getSingleton().setLogDetail(LL_LOW);
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #if OGRE_STATIC
@@ -112,7 +117,6 @@ void MeshLodTests::tearDown()
 	}
 	OGRE_DELETE MeshLodGenerator::getSingletonPtr();
 	OGRE_DELETE Root::getSingletonPtr();
-	OGRE_DELETE mLogManager;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 
