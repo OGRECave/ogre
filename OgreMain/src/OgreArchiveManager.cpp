@@ -62,9 +62,11 @@ namespace Ogre {
             // Search factories
             ArchiveFactoryMap::iterator it = mArchFactories.find(archiveType);
             if (it == mArchFactories.end())
+			{
                 // Factory not found
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
                     "to deal with archive of type " + archiveType, "ArchiveManager::load");
+			}
 
             pArch = it->second->createInstance(filename, readOnly);
             pArch->load();
