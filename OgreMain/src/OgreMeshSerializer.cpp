@@ -47,8 +47,11 @@ namespace Ogre {
 		// String identifiers have not always been 100% unified with OGRE version
 		
 		// Note MUST be added in reverse order so latest is first in the list
+
+        // This one is a little ugly, 1.10 is used for version 1.1 legacy meshes.
+        // So bump up to 1.100
 		mVersionData.push_back(OGRE_NEW MeshVersionData(
-			MESH_VERSION_1_10, "[MeshSerializer_v1.10]", 
+			MESH_VERSION_1_10, "[MeshSerializer_v1.100]", 
 			OGRE_NEW MeshSerializerImpl()));
 
 		mVersionData.push_back(OGRE_NEW MeshVersionData(

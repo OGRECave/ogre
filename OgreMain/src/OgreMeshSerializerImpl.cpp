@@ -60,7 +60,7 @@ namespace Ogre {
     MeshSerializerImpl::MeshSerializerImpl()
     {
         // Version number
-        mVersion = "[MeshSerializer_v1.10]";
+        mVersion = "[MeshSerializer_v1.100]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
