@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreWorkQueue.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre {
 	//---------------------------------------------------------------------
