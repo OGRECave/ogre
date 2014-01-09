@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreColourValue.h"
 #include "OgreFrustum.h"
 #include "OgreHeaderPrefix.h"
 

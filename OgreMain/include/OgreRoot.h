@@ -31,7 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreSingleton.h"
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreWorkQueue.h"       

@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 #include "OgreException.h"
-#include "OgreStringVector.h"
 #include "OgreRoot.h"
 
 #include <zzip/zzip.h>
