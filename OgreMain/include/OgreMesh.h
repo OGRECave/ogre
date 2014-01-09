@@ -35,11 +35,8 @@ THE SOFTWARE.
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexBoneAssignment.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreHardwareVertexBuffer.h"
 #include "OgreSkeleton.h"
-#include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
-#include "OgrePose.h"
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 

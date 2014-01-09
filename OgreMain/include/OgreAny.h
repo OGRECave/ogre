@@ -38,8 +38,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreException.h"
-#include "OgreString.h"
-#include <algorithm>
 #include <typeinfo>
 #include "OgreHeaderPrefix.h"
 

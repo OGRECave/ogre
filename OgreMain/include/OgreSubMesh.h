@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreVertexIndexData.h"
 #include "OgreMaterial.h"
 #include "OgreRenderOperation.h"
 #include "OgreVertexBoneAssignment.h"

@@ -29,14 +29,13 @@ THE SOFTWARE.
 
 #include "OgreMaterial.h"
 
-#include "OgreSceneManagerEnumerator.h"
+#include "OgreSceneManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreTechnique.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreStringConverter.h"
-#include "OgreLodStrategy.h"
 #include "OgreLodStrategyManager.h"
 
 namespace Ogre {

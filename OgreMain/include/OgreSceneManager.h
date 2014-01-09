@@ -33,7 +33,6 @@ Torus Knot Software Ltd.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
 #include "OgreSceneNode.h"
 #include "OgrePlane.h"
 #include "OgreQuaternion.h"
@@ -45,12 +44,9 @@ Torus Knot Software Ltd.
 #include "OgreRenderQueue.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgreRectangle2D.h"
-#include "OgrePixelFormat.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreTexture.h"
 #include "OgreShadowCameraSetup.h"
 #include "OgreShadowTextureManager.h"
-#include "OgreCamera.h"
 #include "OgreInstancedGeometry.h"
 #include "OgreLodListener.h"
 #include "OgreInstanceManager.h"

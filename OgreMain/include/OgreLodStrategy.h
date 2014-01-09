@@ -31,9 +31,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMesh.h"
+#include "OgreMaterial.h"
 
-#include "OgreMovableObject.h"
-#include "OgreCamera.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

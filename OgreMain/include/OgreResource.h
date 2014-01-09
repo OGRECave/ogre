@@ -29,11 +29,8 @@ THE SOFTWARE.
 #define _Resource_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreSharedPtr.h"
 #include "OgreStringInterface.h"
-#include "OgreAtomicScalar.h"
-#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

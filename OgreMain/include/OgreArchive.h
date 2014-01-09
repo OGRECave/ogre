@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define _Archive_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreDataStream.h"
 #include "OgreSharedPtr.h"
 #include "OgreStringVector.h"

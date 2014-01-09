@@ -33,7 +33,8 @@ THE SOFTWARE.
 #include "OgreMaterial.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreCompositor.h"
-#include "OgreCompositionPass.h"
+#include "OgreSingleton.h"
+#include "OgreScriptLoader.h"
 #include "OgreAny.h"
 #include "OgreHeaderPrefix.h"
 

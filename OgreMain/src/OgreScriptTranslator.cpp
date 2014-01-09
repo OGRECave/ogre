@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreScriptTranslator.h"
-#include "OgreScriptCompiler.h"
 #include "OgreLogManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreTechnique.h"

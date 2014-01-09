@@ -32,11 +32,8 @@ THE SOFTWARE.
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
 #include "OgreMatrix4.h"
-#include "OgreMatrix3.h"
-#include "OgreVector3.h"
-#include "OgrePlane.h"
+#include "OgrePatchMesh.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgrePatchSurface.h"
 #include "OgreException.h"
 
 #include "OgrePrefabFactory.h"

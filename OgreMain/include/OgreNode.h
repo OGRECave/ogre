@@ -30,10 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreCommon.h"
-#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
 #include "OgreString.h"
 #include "OgreRenderable.h"
 #include "OgreIteratorWrappers.h"

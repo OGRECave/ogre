@@ -36,9 +36,7 @@ THE SOFTWARE.
 
 #include "OgreQuaternion.h"
 
-#include "OgreMath.h"
 #include "OgreMatrix3.h"
-#include "OgreVector3.h"
 
 namespace Ogre {
 

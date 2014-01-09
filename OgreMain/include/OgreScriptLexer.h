@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __ScriptLexer_H_
 
 #include "OgrePrerequisites.h"
-#include "OgreSharedPtr.h"
 #include "OgreDataStream.h"
 #include "OgreStringConverter.h"
 #include "OgreHeaderPrefix.h"

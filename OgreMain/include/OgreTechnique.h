@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreBlendMode.h"
 #include "OgreCommon.h"
 #include "OgrePass.h"
 #include "OgreIteratorWrappers.h"

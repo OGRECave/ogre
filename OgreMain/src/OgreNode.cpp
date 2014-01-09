@@ -34,11 +34,9 @@ THE SOFTWARE.
 // Dependencies on render-related types due to ability to render node
 #include "OgreMaterialManager.h"
 #include "OgreMeshManager.h"
-#include "OgreMesh.h"
 #include "OgreSubMesh.h"
 #include "OgreCamera.h"
 #include "OgreTechnique.h"
-#include "OgrePass.h"
 #include "OgreManualObject.h"
 #include "OgreNameGenerator.h"
 

@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
 #include "OgreAny.h"
-#include "OgreUserObjectBindings.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

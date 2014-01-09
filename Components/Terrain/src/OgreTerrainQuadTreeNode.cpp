@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreVertexIndexData.h"
 #include "OgreDefaultHardwareBufferManager.h"
+#include "OgreCamera.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"

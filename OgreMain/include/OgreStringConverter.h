@@ -32,13 +32,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreColourValue.h"
-#include "OgreMath.h"
-#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
 #include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
 
 namespace Ogre {
 

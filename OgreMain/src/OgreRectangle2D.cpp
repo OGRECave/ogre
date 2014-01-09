@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRectangle2D.h"
 
-#include "OgreSimpleRenderable.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreCamera.h"
 

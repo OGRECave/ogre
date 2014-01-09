@@ -31,7 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
 #include "OgreMatrix3.h"
 #include "OgreVector4.h"
 #include "OgrePlane.h"

@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreScriptCompiler.h"
+#include "OgreRenderSystem.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre{

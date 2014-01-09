@@ -31,8 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
-
 #include "OgreTextureUnitState.h"
 #include "OgreCommon.h"
 

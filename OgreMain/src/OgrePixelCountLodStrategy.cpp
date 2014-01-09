@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgrePixelCountLodStrategy.h"
 
 #include "OgreViewport.h"
+#include "OgreCamera.h"
 
 #include <limits>
 

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreMath.h"
+#include "OgreCamera.h"
 #include "OgreImage.h"
 #include "OgrePixelFormat.h"
 #include "OgreSceneManager.h"
