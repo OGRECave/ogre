@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreCommon.h"
 #include "OgreDataStream.h"
 #include "OgreResource.h"
 #include "OgreArchive.h"

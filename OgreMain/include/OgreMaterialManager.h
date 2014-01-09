@@ -33,11 +33,11 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreResourceManager.h"
 #include "OgreMaterial.h"
-#include "OgreStringVector.h"
-#include "OgreMaterialSerializer.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+	class MaterialSerializer;
 
 
 	/** \addtogroup Core

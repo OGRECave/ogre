@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 #include "OgreMaterial.h"
+#include "OgreMaterialSerializer.h"
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
 #include "OgreArchive.h"
@@ -39,7 +40,6 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreException.h"
 #include "OgreScriptCompiler.h"
-#include "OgreLodStrategyManager.h"
 #include "OgreLodStrategyManager.h"
 
 

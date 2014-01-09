@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreDataStream.h"
-#include "OgreSharedPtr.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
 #include <ctime>

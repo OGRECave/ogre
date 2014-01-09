@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreCompositionPass.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre {
 

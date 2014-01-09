@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreArchiveManager.h"
 
 #include "OgreArchiveFactory.h"
-#include "OgreArchive.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 

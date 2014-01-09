@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreResource.h"
 #include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 

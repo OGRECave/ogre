@@ -31,8 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBuffer.h"
-#include "OgreSharedPtr.h"
-#include "OgrePixelFormat.h"
 #include "OgreImage.h"
 #include "OgreHeaderPrefix.h"
 

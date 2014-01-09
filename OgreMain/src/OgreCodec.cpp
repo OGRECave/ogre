@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreCodec.h"
-#include "OgreException.h"
 #include "OgreStringConverter.h"
 
 
