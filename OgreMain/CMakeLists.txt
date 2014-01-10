@@ -34,11 +34,15 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.inl"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Array/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/*.h")
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/C/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/C/*.inl")
 
 add_filtered_h( "Header Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.h" )
+add_filtered_h( "Header Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.inl" )
 add_filtered_h( "Header Files\\Compositor" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h" )
 add_filtered_h( "Header Files\\Compositor\\Pass" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h" )
 add_filtered_h( "Header Files\\Compositor\\PassClear" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h" )
@@ -493,9 +497,12 @@ use_precompiled_header(OgreMain
 
 # install OgreMain
 ogre_config_lib(OgreMain TRUE)
-install(FILES ${HEADER_FILES}
-  DESTINATION include/OGRE
-)
+foreach(HEADER_FILE ${HEADER_FILES})
+	string(REGEX REPLACE "((${CMAKE_CURRENT_SOURCE_DIR}|${OGRE_BINARY_DIR})/)?(include|src)/" "" RELATIVE_HEADER_FILE ${HEADER_FILE})
+	string(REGEX MATCH "((.*)/)+" HEADER_SUBDIRECTORY ${RELATIVE_HEADER_FILE})
+	install(FILES ${HEADER_FILE} DESTINATION include/OGRE/${HEADER_SUBDIRECTORY})
+endforeach()
+
 install(FILES ${PLATFORM_HEADERS}
   DESTINATION include/OGRE/${PLATFORM_HEADER_INSTALL}
 )
