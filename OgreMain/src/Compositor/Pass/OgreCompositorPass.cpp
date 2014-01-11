@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreViewport.h"
 
+#include "OgreStringConverter.h"
+
 namespace Ogre
 {
 	CompositorPass::CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
@@ -91,8 +93,8 @@ namespace Ogre
 
 			if( rtIndex >= texturePtr->getDepth() && rtIndex >= texturePtr->getNumFaces() )
 			{
-				size_t maxRTs = std::max( source.textures[0]->getDepth(),
-											source.textures[0]->getNumFaces() );
+				size_t maxRTs = std::max<size_t>( source.textures[0]->getDepth(),
+													source.textures[0]->getNumFaces() );
 				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
 						"Compositor pass is asking for a 3D/Cubemap/2D_array texture with "
 						"more faces/depth/slices than what's been supplied (Asked for slice '" +

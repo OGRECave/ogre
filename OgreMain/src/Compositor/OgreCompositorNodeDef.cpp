@@ -40,7 +40,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName,
-															size_t rtIndex )
+															uint32 rtIndex )
 	{
 		assert( mTargetPasses.size() < mTargetPasses.capacity() &&
 				"setNumTargetPass called improperly!" );

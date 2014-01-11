@@ -6406,7 +6406,7 @@ namespace Ogre{
 		CompositorNodeDef *nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
 		if( !obj->name.empty() )
 		{
-			size_t rtIndex = 0;
+			uint32 rtIndex = 0;
 			if( !obj->values.empty() )
 			{
 				AbstractNodeList::const_iterator sliceIt = obj->values.begin();
