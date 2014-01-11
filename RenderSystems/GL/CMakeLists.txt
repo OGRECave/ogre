@@ -107,6 +107,10 @@ if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL ${OGRE_THREAD_LIBRARIES})
 endif ()
 
+if (OGRE_BUILD_PLUGIN_CG)
+  target_link_libraries(RenderSystem_GL ${Cg_LIBRARIES})
+endif()
+
 if (APPLE)
     set_target_properties(RenderSystem_GL PROPERTIES
         LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL")
