@@ -6,7 +6,7 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class _OgreSampleClassExport Sample_CubeMapping : public SdkSample, public RenderTargetListener
+class _OgreSampleClassExport Sample_CubeMapping : public SdkSample, public CompositorWorkspaceListener
 {
 public:
 
@@ -35,9 +35,9 @@ public:
 		return SdkSample::frameRenderingQueued(evt);      // don't forget the parent updates!
     }
 
-    void preRenderTargetUpdate(const RenderTargetEvent& evt)
-    {
-        mHead->setVisible(false);  // hide the head
+	virtual void workspacePreUpdate(void)
+	{
+		mHead->setVisible(false);  // hide the head
 
 		// point the camera in the right direction based on which face of the cubemap this is
 		mCubeCamera->setOrientation(Quaternion::IDENTITY);
@@ -46,12 +46,7 @@ public:
 		else if (evt.source == mTargets[2]) mCubeCamera->pitch(Degree(90));
 		else if (evt.source == mTargets[3]) mCubeCamera->pitch(Degree(-90));
 		else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));
-    }
-
-    void postRenderTargetUpdate(const RenderTargetEvent& evt)
-    {
-        mHead->setVisible(true);  // unhide the head
-    }
+	}
 
 protected:
 
@@ -113,13 +108,16 @@ protected:
 
 		// create our dynamic cube map texture
 		TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_CUBE_MAP, 128, 128, 0, PF_R8G8B8, TU_RENDERTARGET);
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_CUBE_MAP, 512, 512, 0, PF_R8G8B8, TU_RENDERTARGET);
+
+		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
         Viewport *camVp = mCubeCamera->getLastViewport();
 		// assign our camera to all 6 render targets of the texture (1 for each direction)
 		for (unsigned int i = 0; i < 6; i++)
 		{
 			mTargets[i] = tex->getBuffer(i)->getRenderTarget();
+			CompositorWorkspace *workspace = compositorManager->addWorkspace( mSceneMgr, , mCubeCamera, "", false );
 			mTargets[i]->addViewport(camVp->getLeft(), camVp->getTop(), camVp->getWidth(), camVp->getHeight())->setOverlaysEnabled(false);
 			mTargets[i]->addListener(this);
 		}

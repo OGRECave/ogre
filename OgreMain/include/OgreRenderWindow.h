@@ -193,6 +193,8 @@ namespace Ogre
           */
         void setDeactivateOnFocusChange(bool deactivate);
 
+		virtual bool isRenderWindow(void) const				{ return true; }
+
     protected:
         bool mIsFullScreen;
         bool mIsPrimary;

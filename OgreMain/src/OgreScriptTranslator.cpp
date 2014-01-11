@@ -6404,9 +6404,49 @@ namespace Ogre{
 
 		mTargetDef = 0;
 		CompositorNodeDef *nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
-		if( !obj->name.empty())
+		if( !obj->name.empty() )
 		{
-			mTargetDef = nodeDef->addTargetPass( obj->name );
+			size_t rtIndex = 0;
+			if( !obj->values.empty() )
+			{
+				AbstractNodeList::const_iterator sliceIt = obj->values.begin();
+
+				if( !getUInt( *sliceIt, &rtIndex ) )
+				{
+					String cubemapHint;
+					if( getString( *sliceIt, &cubemapHint ) )
+					{
+						StringUtil::toUpperCase( cubemapHint );
+
+						if( cubemapHint == "+X" || cubemapHint == "X" )
+						{
+							rtIndex = 0;
+						}
+						else if( cubemapHint == "-X" )
+						{
+							rtIndex = 1;
+						}
+						else if( cubemapHint == "+Y" || cubemapHint == "Y" )
+						{
+							rtIndex = 2;
+						}
+						else if( cubemapHint == "-Y" )
+						{
+							rtIndex = 3;
+						}
+						else if( cubemapHint == "+Z" || cubemapHint == "Z" )
+						{
+							rtIndex = 4;
+						}
+						else if( cubemapHint == "-Z" )
+						{
+							rtIndex = 5;
+						}
+					}
+				}
+			}
+
+			mTargetDef = nodeDef->addTargetPass( obj->name, rtIndex );
 		}
 		else
 		{

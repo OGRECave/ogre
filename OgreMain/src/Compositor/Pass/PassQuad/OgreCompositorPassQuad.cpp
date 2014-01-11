@@ -55,7 +55,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	CompositorPassQuad::CompositorPassQuad( const CompositorPassQuadDef *definition,
 											Camera *defaultCamera, CompositorNode *parentNode,
-											RenderTarget *target, Real horizonalTexelOffset,
+											const CompositorChannel &target, Real horizonalTexelOffset,
 											Real verticalTexelOffset ) :
 				CompositorPass( definition, target, parentNode ),
 				mDefinition( definition ),

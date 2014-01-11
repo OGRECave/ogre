@@ -431,7 +431,7 @@ namespace Ogre
 		mUnfinishedShadowNodes.clear();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::_update( bool swapFinalTargets )
+	void CompositorManager2::_update(void)
 	{
 		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
 		WorkspaceVec::const_iterator end  = mWorkspaces.end();
@@ -454,16 +454,37 @@ namespace Ogre
 			{
 				if( workspace->isValid() )
 				{
-					workspace->_update( swapFinalTargets );
+					workspace->_beginUpdate( false );
 				}
 				else
 				{
 					//TODO: We may end up recreating this every frame for invalid workspaces
 					workspace->recreateAllNodes();
 					if( workspace->isValid() )
-						workspace->_update( swapFinalTargets );
+						workspace->_beginUpdate( false );
 				}
 			}
+			++itor;
+		}
+
+		//The actual update
+		itor = mWorkspaces.begin();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() && workspace->isValid() )
+					workspace->_update();
+			++itor;
+		}
+
+		itor = mWorkspaces.begin();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() && workspace->isValid() )
+					workspace->_endUpdate( false );
 			++itor;
 		}
 

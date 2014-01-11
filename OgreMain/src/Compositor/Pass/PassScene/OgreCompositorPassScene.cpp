@@ -40,7 +40,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
-												Camera *defaultCamera, RenderTarget *target,
+												Camera *defaultCamera, const CompositorChannel &target,
 												CompositorNode *parentNode ) :
 				CompositorPass( definition, target, parentNode ),
 				mDefinition( definition ),

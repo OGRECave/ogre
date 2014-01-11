@@ -168,7 +168,34 @@ namespace Ogre
 		*/
 		void reconnectAllNodes(void);
 
-		void _update( bool swapFinalTargets );
+		/** Call before _update unless the final render target is not a render window
+		@param forceBeginFrame
+			Forces a beginFrame call to the D3D9 API, even if the final render target is not
+			a RenderWindow (not recommended). To avoid forcing extra begin/end frame pairs,
+			update your manual workspaces inside @CompositorWorkspaceListener::workspacePreUpdate
+			(performance optimization)
+		*/
+		void _beginUpdate( bool forceBeginFrame );
+
+		///	Updates the workspace's nodes.
+		void _update(void);
+
+		/** Call after _update unless the final render target is not a render window
+		@param forceEndFrame
+			@See _beginUpdate
+			!!!WARNING!!! Forcing an end frame can cause API issues w/ D3D9 if Ogre had already
+			issued a begin frame automatically (i.e. if you're calling from inside a RenderTarget
+			or CompositorWorkspace listener). These API issues may not manifest on all HW/Driver
+			combinations, making it hard to detect (if you're on D3D, use the Debug Runtimes)
+		*/
+		void _endUpdate( bool forceEndFrame );
+
+		/** In the case of RenderWindows, swaps/copies/flips the front with the back buffer.
+			In the case of RenderTextures, resolves FSAA (unless it's tagged as explicit
+			resolve, or its contents haven't changed since the last resolve)
+		@remarks
+			Call this after _endUpdate
+		*/
 		void _swapFinalTarget(void);
 
 		/** For compatibility with D3D9, forces a device lost check

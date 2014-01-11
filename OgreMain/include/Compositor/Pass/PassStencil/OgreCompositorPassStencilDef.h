@@ -58,7 +58,7 @@ namespace Ogre
 		uint32					mStencilMask;
 		uint32					mStencilRef;
 
-		CompositorPassStencilDef();
+		CompositorPassStencilDef( uint32 rtIndex );
 	};
 
 	/** @} */

@@ -338,6 +338,9 @@ namespace Ogre {
 		virtual void _updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
 												   const Camera *lodCamera,uint8 firstRq, uint8 lastRq,
 												   bool updateStatistics );
+
+		/// Whether our derived class is RenderWindow
+		virtual bool isRenderWindow(void) const				{ return false; }
 		
 		/** Method for manual management of rendering - finishes statistics calculation 
 			and fires 'postRenderTargetUpdate'.

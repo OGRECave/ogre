@@ -2070,7 +2070,7 @@ namespace Ogre
 	void D3D9RenderTexture::swapBuffers()
 	{
 		// Only needed if we have to blit from AA surface
-		if (mFSAA > 0)
+		if (mFSAA > 0 && mFsaaResolveDirty)
 		{
 			D3D9DeviceManager* deviceManager = D3D9RenderSystem::getDeviceManager();     					
 			D3D9HardwarePixelBuffer* buf = static_cast<D3D9HardwarePixelBuffer*>(mBuffer);

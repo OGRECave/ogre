@@ -75,8 +75,8 @@ namespace Ogre
 			on GPU architectures that don't separate the stencil from depth and the program requested
 			a Z Buffer with stencil (even if we never use it)
 		*/
-		CompositorPassClearDef() :
-			CompositorPassDef( PASS_CLEAR ),
+		CompositorPassClearDef( uint32 rtIndex ) :
+			CompositorPassDef( PASS_CLEAR, rtIndex ),
 			mClearBufferFlags( FBT_COLOUR|FBT_DEPTH|FBT_STENCIL ),
 			mColourValue( ColourValue::Black ),
 			mDepthValue( 1.0f ),

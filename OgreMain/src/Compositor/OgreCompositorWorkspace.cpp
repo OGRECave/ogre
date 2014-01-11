@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
@@ -415,14 +416,38 @@ namespace Ogre
 		return mDefinition->mCompositorManager->getFrameCount();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorWorkspace::_update( bool swapFinalTargets )
+	void CompositorWorkspace::_beginUpdate( bool forceBeginFrame )
 	{
 		//We need to do this so that D3D9 (and D3D11?) knows which device
 		//is active now, so that _beginFrame calls go to the right device.
 		mRenderSys->_setRenderTarget( mRenderWindow );
+		if( mRenderWindow->isRenderWindow() || forceBeginFrame )
+		{
+			// Begin the frame
+			mRenderSys->_beginFrame();
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::_endUpdate( bool forceEndFrame )
+	{
+		//We need to do this so that D3D9 (and D3D11?) knows which device
+		//is active now, so that _endFrame calls go to the right device.
+		mRenderSys->_setRenderTarget( mRenderWindow );
+		if( mRenderWindow->isRenderWindow() || forceEndFrame )
+		{
+			// End the frame
+			mRenderSys->_endFrame();
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void CompositorWorkspace::_update(void)
+	{
+		if( mListener )
+			mListener->workspacePreUpdate();
 
-		// Begin the frame
-		mRenderSys->_beginFrame();
+		//We need to do this so that D3D9 (and D3D11?) knows which device
+		//is active now, so that our calls go to the right device.
+		mRenderSys->_setRenderTarget( mRenderWindow );
 
 		if( mCurrentWidth != mRenderWindow->getWidth() || mCurrentHeight != mRenderWindow->getHeight() )
 		{
@@ -508,12 +533,6 @@ namespace Ogre
 
 		//Remove our textures
 		mSceneManager->_removeCompositorTextures( oldNumTextures );
-
-		// End frame
-		mRenderSys->_endFrame();
-
-		if( swapFinalTargets && mRenderWindow )
-			mRenderWindow->swapBuffers();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_swapFinalTarget(void)

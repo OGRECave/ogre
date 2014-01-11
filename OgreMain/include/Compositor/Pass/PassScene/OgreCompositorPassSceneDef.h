@@ -87,8 +87,8 @@ namespace Ogre
 		*/
 		Real			mLodBias;
 
-		CompositorPassSceneDef() :
-			CompositorPassDef( PASS_SCENE ),
+		CompositorPassSceneDef( uint32 rtIndex ) :
+			CompositorPassDef( PASS_SCENE, rtIndex ),
 			mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
 			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),

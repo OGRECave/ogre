@@ -56,16 +56,16 @@ namespace Ogre
 		switch( passType )
 		{
 		case PASS_CLEAR:
-			retVal = OGRE_NEW CompositorPassClearDef();
+			retVal = OGRE_NEW CompositorPassClearDef( mRtIndex );
 			break;
 		case PASS_QUAD:
-			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef );
+			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef, mRtIndex );
 			break;
 		case PASS_SCENE:
-			retVal = OGRE_NEW CompositorPassSceneDef();
+			retVal = OGRE_NEW CompositorPassSceneDef( mRtIndex );
 			break;
 		case PASS_STENCIL:
-			retVal = OGRE_NEW CompositorPassStencilDef();
+			retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
 			break;
         default:
             break;

@@ -31,20 +31,23 @@ THE SOFTWARE.
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/OgreCompositorChannel.h"
 
-#include "OgreRenderTarget.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 #include "OgreViewport.h"
 
 namespace Ogre
 {
-	CompositorPass::CompositorPass( const CompositorPassDef *definition, RenderTarget *target,
+	CompositorPass::CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
 									CompositorNode *parentNode ) :
 			mDefinition( definition ),
-			mTarget( target ),
+			mTarget( 0 ),
 			mViewport( 0 ),
 			mNumPassesLeft( definition->mNumInitialPasses ),
 			mParentNode( parentNode )
 	{
 		assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
+
+		mTarget = calculateRenderTarget( mDefinition->getRtIndex(), target );
 
 		const Real EPSILON = 1e-6f;
 
@@ -74,14 +77,55 @@ namespace Ogre
 	{
 	}
 	//-----------------------------------------------------------------------------------
+	RenderTarget* CompositorPass::calculateRenderTarget( size_t rtIndex,
+														 const CompositorChannel &source )
+	{
+		RenderTarget *retVal;
+
+		if( !source.isMrt() && !source.textures.empty() &&
+			source.textures[0]->getTextureType() > TEX_TYPE_2D )
+		{
+			//Who had the bright idea of handling Cubemaps differently
+			//than 3D textures is a mystery. Anyway, deal with it.
+			TexturePtr texturePtr = source.textures[0];
+
+			if( rtIndex >= texturePtr->getDepth() && rtIndex >= texturePtr->getNumFaces() )
+			{
+				size_t maxRTs = std::max( source.textures[0]->getDepth(),
+											source.textures[0]->getNumFaces() );
+				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+						"Compositor pass is asking for a 3D/Cubemap/2D_array texture with "
+						"more faces/depth/slices than what's been supplied (Asked for slice '" +
+						StringConverter::toString( rtIndex ) + "', RT has '" +
+						StringConverter::toString( maxRTs ) + "')",
+						"CompositorPass::calculateRenderTarget" );
+			}
+
+			/*//If goes out bounds, will reference the last slice/face
+			rtIndex = std::min( rtIndex, std::max( source.textures[0]->getDepth(),
+													source.textures[0]->getNumFaces() ) - 1 );*/
+
+			TextureType textureType = texturePtr->getTextureType();
+			size_t face = textureType == TEX_TYPE_CUBE_MAP ? rtIndex : 0;
+			size_t slice= textureType != TEX_TYPE_CUBE_MAP ? rtIndex : 0;
+			retVal = texturePtr->getBuffer( face )->getRenderTarget( slice );
+		}
+		else
+		{
+			retVal = source.target;
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------------------
 	void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,
 											const CompositorChannel &newChannel )
 	{
 		const Real EPSILON = 1e-6f;
 
-		if( mTarget == oldChannel.target )
+		if( mTarget == calculateRenderTarget( mDefinition->getRtIndex(), oldChannel ) )
 		{
-			mTarget = newChannel.target;
+			mTarget = calculateRenderTarget( mDefinition->getRtIndex(), newChannel );
 
 			mNumPassesLeft = mDefinition->mNumInitialPasses;
 
@@ -112,7 +156,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorPass::notifyDestroyed( const CompositorChannel &channel )
 	{
-		if( mTarget == channel.target )
+		if( mTarget == calculateRenderTarget( mDefinition->getRtIndex(), channel ) )
 			mTarget = 0;
 	}
 	//-----------------------------------------------------------------------------------
