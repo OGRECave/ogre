@@ -108,7 +108,7 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 if (OGRE_BUILD_PLUGIN_CG)
-  target_link_libraries(RenderSystem_GL ${Cg_LIBRARIES})
+  target_link_libraries(RenderSystem_GL ${CgGL_LIBRARY})
 endif()
 
 if (APPLE)

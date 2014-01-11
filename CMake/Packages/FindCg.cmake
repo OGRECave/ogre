@@ -39,6 +39,8 @@ clear_if_changed(Cg_PREFIX_PATH
 
 set(Cg_LIBRARY_NAMES Cg cg)
 get_debug_names(Cg_LIBRARY_NAMES)
+set(CgGL_LIBRARY_NAMES CgGL cgGL)
+get_debug_names(CgGL_LIBRARY_NAMES)
 
 use_pkgconfig(Cg_PKGC Cg)
 
@@ -57,6 +59,9 @@ endif()
 find_library(Cg_LIBRARY_REL NAMES ${Cg_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
 find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Debug)
 make_library_set(Cg_LIBRARY)
+find_library(CgGL_LIBRARY_REL NAMES ${CgGL_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Release RelWithDebInfo MinSizeRel)
+find_library(CgGL_LIBRARY_DBG NAMES ${CgGL_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" Debug)
+make_library_set(CgGL_LIBRARY)
 
 if (WIN32)
 	if (CMAKE_CL_64)
@@ -75,6 +80,10 @@ if (WIN32)
 	find_file(Cg_BINARY_REL NAMES "cg.dll" HINTS ${Cg_BIN_SEARCH_PATH}
 	  PATH_SUFFIXES "" release relwithdebinfo minsizerel)
 	find_file(Cg_BINARY_DBG NAMES "cg.dll" HINTS ${Cg_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" debug )
+	find_file(CgGL_BINARY_REL NAMES "cgGL.dll" HINTS ${Cg_BIN_SEARCH_PATH}
+	  PATH_SUFFIXES "" release relwithdebinfo minsizerel)
+	find_file(CgGL_BINARY_DBG NAMES "cgGL.dll" HINTS ${Cg_BIN_SEARCH_PATH}
 	  PATH_SUFFIXES "" debug )
 endif()
 mark_as_advanced(Cg_BINARY_REL Cg_BINARY_DBG)
