@@ -2,6 +2,8 @@
 #define __CubeMapping_H__
 
 #include "SdkSample.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
+#include "Compositor/OgreCompositorChannel.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -37,7 +39,7 @@ public:
 
 	virtual void workspacePreUpdate(void)
 	{
-		mHead->setVisible(false);  // hide the head
+		/*mHead->setVisible(false);  // hide the head
 
 		// point the camera in the right direction based on which face of the cubemap this is
 		mCubeCamera->setOrientation(Quaternion::IDENTITY);
@@ -45,7 +47,7 @@ public:
 		else if (evt.source == mTargets[1]) mCubeCamera->yaw(Degree(90));
 		else if (evt.source == mTargets[2]) mCubeCamera->pitch(Degree(90));
 		else if (evt.source == mTargets[3]) mCubeCamera->pitch(Degree(-90));
-		else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));
+		else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));*/
 	}
 
 protected:
@@ -112,15 +114,10 @@ protected:
 
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-        Viewport *camVp = mCubeCamera->getLastViewport();
-		// assign our camera to all 6 render targets of the texture (1 for each direction)
-		for (unsigned int i = 0; i < 6; i++)
-		{
-			mTargets[i] = tex->getBuffer(i)->getRenderTarget();
-			CompositorWorkspace *workspace = compositorManager->addWorkspace( mSceneMgr, , mCubeCamera, "", false );
-			mTargets[i]->addViewport(camVp->getLeft(), camVp->getTop(), camVp->getWidth(), camVp->getHeight())->setOverlaysEnabled(false);
-			mTargets[i]->addListener(this);
-		}
+		CompositorChannel channel;
+		channel.target = tex->getBuffer(0)->getRenderTarget();
+		channel.textures.push_back( tex );
+		mCubemapWorkspace = compositorManager->addWorkspace( mSceneMgr, channel, mCubeCamera, "", false );
 	}
 
 	void cleanupContent()
@@ -135,6 +132,8 @@ protected:
 	RenderTarget* mTargets[6];
 	SceneNode* mPivot;
 	AnimationState* mFishSwim;
+
+	CompositorWorkspace *mCubemapWorkspace;
 };
 
 #endif

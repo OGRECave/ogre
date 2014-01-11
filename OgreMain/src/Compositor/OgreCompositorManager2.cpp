@@ -324,6 +324,15 @@ namespace Ogre
 											 RenderTarget *finalRenderTarget, Camera *defaultCam,
 											 IdString definitionName, bool bEnabled )
 	{
+		CompositorChannel channel;
+		channel.target = finalRenderTarget;
+		return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled );
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
+											 const CompositorChannel &finalRenderTarget,
+											 Camera *defaultCam, IdString definitionName, bool bEnabled )
+	{
 		validateAllNodes();
 
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );

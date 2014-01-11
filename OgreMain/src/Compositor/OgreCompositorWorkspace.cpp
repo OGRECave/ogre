@@ -42,7 +42,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-												RenderTarget *finalRenderTarget,
+												const CompositorChannel &finalRenderTarget,
 												SceneManager *sceneManager, Camera *defaultCam,
 												RenderSystem *renderSys, bool bEnabled ) :
 			IdObject( id ),
@@ -57,12 +57,12 @@ namespace Ogre
 	{
 		//Create global textures
 		TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
-												id, true, mRenderWindow, mRenderSys );
+												id, true, mRenderWindow.target, mRenderSys );
 
 		recreateAllNodes();
 
-		mCurrentWidth	= mRenderWindow->getWidth();
-		mCurrentHeight	= mRenderWindow->getHeight();
+		mCurrentWidth	= mRenderWindow.target->getWidth();
+		mCurrentHeight	= mRenderWindow.target->getHeight();
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorWorkspace::~CompositorWorkspace()
@@ -87,7 +87,7 @@ namespace Ogre
 			const CompositorNodeDef *nodeDef = compoManager->getNodeDefinition( itor->second );
 			CompositorNode *newNode = OGRE_NEW CompositorNode( Id::generateNewId<CompositorNode>(),
 																itor->first, nodeDef, this, mRenderSys,
-																mRenderWindow );
+																mRenderWindow.target );
 			mNodeSequence.push_back( newNode );
 			++itor;
 		}
@@ -120,8 +120,8 @@ namespace Ogre
 		{
 			//First connect the RenderWindow, otherwise the node could end up not being processed
 			CompositorNode *finalNode = findNode( mDefinition->mFinalNode );
-			CompositorChannel::TextureVec emptyVec;
-			finalNode->connectFinalRT( mRenderWindow, emptyVec, mDefinition->mFinalInChannel );
+			finalNode->connectFinalRT( mRenderWindow.target, mRenderWindow.textures,
+									   mDefinition->mFinalInChannel );
 		}
 
 		CompositorNodeVec unprocessedList( mNodeSequence.begin(), mNodeSequence.end() );
@@ -420,8 +420,8 @@ namespace Ogre
 	{
 		//We need to do this so that D3D9 (and D3D11?) knows which device
 		//is active now, so that _beginFrame calls go to the right device.
-		mRenderSys->_setRenderTarget( mRenderWindow );
-		if( mRenderWindow->isRenderWindow() || forceBeginFrame )
+		mRenderSys->_setRenderTarget( mRenderWindow.target );
+		if( mRenderWindow.target->isRenderWindow() || forceBeginFrame )
 		{
 			// Begin the frame
 			mRenderSys->_beginFrame();
@@ -432,8 +432,8 @@ namespace Ogre
 	{
 		//We need to do this so that D3D9 (and D3D11?) knows which device
 		//is active now, so that _endFrame calls go to the right device.
-		mRenderSys->_setRenderTarget( mRenderWindow );
-		if( mRenderWindow->isRenderWindow() || forceEndFrame )
+		mRenderSys->_setRenderTarget( mRenderWindow.target );
+		if( mRenderWindow.target->isRenderWindow() || forceEndFrame )
 		{
 			// End the frame
 			mRenderSys->_endFrame();
@@ -447,14 +447,14 @@ namespace Ogre
 
 		//We need to do this so that D3D9 (and D3D11?) knows which device
 		//is active now, so that our calls go to the right device.
-		mRenderSys->_setRenderTarget( mRenderWindow );
+		mRenderSys->_setRenderTarget( mRenderWindow.target );
 
-		if( mCurrentWidth != mRenderWindow->getWidth() || mCurrentHeight != mRenderWindow->getHeight() )
+		if( mCurrentWidth != mRenderWindow.target->getWidth() || mCurrentHeight != mRenderWindow.target->getHeight() )
 		{
 			//Main RenderTarget reference changed resolution. Some nodes may need to rebuild
 			//their textures if they're based on mRenderWindow's resolution.
-			mCurrentWidth	= mRenderWindow->getWidth();
-			mCurrentHeight	= mRenderWindow->getHeight();
+			mCurrentWidth	= mRenderWindow.target->getWidth();
+			mCurrentHeight	= mRenderWindow.target->getHeight();
 
 			{
 				CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
@@ -463,7 +463,7 @@ namespace Ogre
 				while( itor != end )
 				{
 					CompositorNode *node = *itor;
-					node->finalTargetResized( mRenderWindow );
+					node->finalTargetResized( mRenderWindow.target );
 					++itor;
 				}
 			}
@@ -475,7 +475,7 @@ namespace Ogre
 				while( itor != end )
 				{
 					CompositorShadowNode *node = *itor;
-					node->finalTargetResized( mRenderWindow );
+					node->finalTargetResized( mRenderWindow.target );
 					++itor;
 				}
 			}
@@ -485,7 +485,7 @@ namespace Ogre
 			allNodes.insert( allNodes.end(), mNodeSequence.begin(), mNodeSequence.end() );
 			allNodes.insert( allNodes.end(), mShadowNodes.begin(), mShadowNodes.end() );
 			TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs,
-																mGlobalTextures, mRenderWindow,
+																mGlobalTextures, mRenderWindow.target,
 																mRenderSys, allNodes, 0 );
 		}
 
@@ -537,13 +537,13 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_swapFinalTarget(void)
 	{
-		if( mRenderWindow )
-			mRenderWindow->swapBuffers();
+		if( mRenderWindow.target )
+			mRenderWindow.target->swapBuffers();
 	}
 	//-----------------------------------------------------------------------------------
 	void CompositorWorkspace::_validateFinalTarget(void)
 	{
-		mRenderSys->_setRenderTarget( mRenderWindow );
+		mRenderSys->_setRenderTarget( mRenderWindow.target );
 	}
 	//-----------------------------------------------------------------------------------
 	CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const
@@ -574,7 +574,7 @@ namespace Ogre
 			const CompositorManager2 *compoManager = mDefinition->mCompositorManager;
 			const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
 			retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
-													def, this, mRenderSys, mRenderWindow );
+													def, this, mRenderSys, mRenderWindow.target );
 			mShadowNodes.push_back( retVal );
 			bCreated = true;
 		}

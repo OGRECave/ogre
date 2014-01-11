@@ -204,6 +204,9 @@ namespace Ogre
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
 
+		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
+											Camera *defaultCam, IdString definitionName, bool bEnabled );
+
 		/// Removes the given workspace. Pointer is no longer valid after this call
 		void removeWorkspace( CompositorWorkspace *workspace );
 

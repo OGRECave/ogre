@@ -93,7 +93,7 @@ namespace Ogre
 		SceneManager			*mSceneManager;
 		RenderSystem			*mRenderSys;
 
-		RenderTarget			*mRenderWindow;
+		CompositorChannel		mRenderWindow;
 		uint					mCurrentWidth;
 		uint					mCurrentHeight;
 
@@ -125,7 +125,7 @@ namespace Ogre
 
 	public:
 		CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-								RenderTarget *finalRenderTarget, SceneManager *sceneManager,
+								const CompositorChannel &finalRenderTarget, SceneManager *sceneManager,
 								Camera *defaultCam, RenderSystem *renderSys, bool bEnabled );
 		virtual ~CompositorWorkspace();
 
