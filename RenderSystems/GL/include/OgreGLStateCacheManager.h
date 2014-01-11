@@ -205,12 +205,7 @@ namespace Ogre
         /** Enables a piece of OpenGL functionality.
          @param flag The function to enable.
          */
-        void setEnabled(GLenum flag);
-
-        /** Disables a piece of OpenGL functionality.
-         @param flag The function to disable.
-         */
-        void setDisabled(GLenum flag);
+        void setEnabled(GLenum flag, bool enabled);
 
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.
