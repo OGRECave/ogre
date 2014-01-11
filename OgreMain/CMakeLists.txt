@@ -53,10 +53,10 @@ add_filtered_std("Compositor/PassClear")
 add_filtered_std("Compositor/PassQuad")
 add_filtered_std("Compositor/PassScene")
 add_filtered_std("Compositor/PassStencil")
-add_filtered_std("Compositor/Hash")
-add_filtered_std("Compositor/Math/Array")
-add_filtered_std("Compositor/Math/Simple")
-add_filtered_std("Compositor/Math/Simple/C")
+add_filtered_std("Hash")
+add_filtered_std("Math/Array")
+add_filtered_std("Math/Simple")
+add_filtered_std("Math/Simple/C")
 
 
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
