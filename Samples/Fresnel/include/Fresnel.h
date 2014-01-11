@@ -115,7 +115,7 @@ public:
 
 protected:
 
-	virtual void setupCompositor()
+	virtual CompositorWorkspace* setupCompositor()
 	{
 		// The compositor scripts are also part of this sample. Go to Fresnel.compositor
 		// to see the sample scripts on how to setup the rendering pipeline.
@@ -125,6 +125,8 @@ protected:
 		CompositorWorkspace *workspace = compositorManager->addWorkspace( mSceneMgr, mWindow,
 																	mCamera, workspaceName, true );
 		workspace->setListener( this );
+
+		return workspace;
 	}
 
 	void setupContent()
