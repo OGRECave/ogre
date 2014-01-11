@@ -25,6 +25,15 @@ function( add_filtered_src filterName fileString )
 	source_group(${filterName} FILES ${TMP_FILES})
 endfunction( add_filtered_src )
 
+function( add_filtered_std relativePath )
+	string(REPLACE "/" "\\" filterPart ${relativePath})
+	add_filtered_h("Header Files\\${filterPart}" "${CMAKE_CURRENT_SOURCE_DIR}/include/${relativePath}/*.h")
+	add_filtered_h("Header Files\\${filterPart}" "${CMAKE_CURRENT_SOURCE_DIR}/include/${relativePath}/*.inl")
+	set(HEADER_FILES ${HEADER_FILES} PARENT_SCOPE)
+	add_filtered_src("Source Files\\${filterPart}" "${CMAKE_CURRENT_SOURCE_DIR}/src/${relativePath}/*.cpp")
+	set(SOURCE_FILES ${SOURCE_FILES} PARENT_SCOPE)
+endfunction( add_filtered_std )
+
 function( add_filter_only filterName fileString )
 	file(GLOB TMP_FILES ${fileString})
 	source_group(${filterName} FILES ${TMP_FILES})
@@ -34,39 +43,26 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.inl"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Array/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/C/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/Math/Simple/C/*.inl")
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.inl")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_filtered_h( "Header Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.h" )
-add_filtered_h( "Header Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/include/Animation/*.inl" )
-add_filtered_h( "Header Files\\Compositor" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/*.h" )
-add_filtered_h( "Header Files\\Compositor\\Pass" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/*.h" )
-add_filtered_h( "Header Files\\Compositor\\PassClear" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassClear/*.h" )
-add_filtered_h( "Header Files\\Compositor\\PassQuad" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassQuad/*.h" )
-add_filtered_h( "Header Files\\Compositor\\PassScene" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassScene/*.h" )
-add_filtered_h( "Header Files\\Compositor\\PassStencil" "${CMAKE_CURRENT_SOURCE_DIR}/include/Compositor/Pass/PassStencil/*.h" )
+add_filtered_std("Animation")
+add_filtered_std("Compositor")
+add_filtered_std("Compositor/Pass")
+add_filtered_std("Compositor/PassClear")
+add_filtered_std("Compositor/PassQuad")
+add_filtered_std("Compositor/PassScene")
+add_filtered_std("Compositor/PassStencil")
+add_filtered_std("Compositor/Hash")
+add_filtered_std("Compositor/Math/Array")
+add_filtered_std("Compositor/Math/Simple")
+add_filtered_std("Compositor/Math/Simple/C")
+
 
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
-
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Array/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/Math/Simple/C/*.cpp")
-	
-add_filtered_src( "Source Files\\Animation" "${CMAKE_CURRENT_SOURCE_DIR}/src/Animation/*.cpp" )
-add_filtered_src( "Source Files\\Compositor" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/*.cpp" )
-add_filtered_src( "Source Files\\Compositor\\Pass" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/*.cpp" )
-add_filtered_src( "Source Files\\Compositor\\Pass\\PassClear" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassClear/*.cpp" )
-add_filtered_src( "Source Files\\Compositor\\Pass\\PassQuad" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassQuad/*.cpp" )
-add_filtered_src( "Source Files\\Compositor\\Pass\\PassScene" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassScene/*.cpp" )
-add_filtered_src( "Source Files\\Compositor\\Pass\\PassStencil" "${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor/Pass/PassStencil/*.cpp" )
 
 add_filter_only( "Header Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h" )
 add_filter_only( "Source Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/*.cpp" )
@@ -91,81 +87,15 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
 )
 
 if (OGRE_SIMD_SSE2)
-	set (SOURCE_FILES ${SOURCE_FILES}
-	  src/Math/Array/SSE2/Single/OgreArrayAabb.cpp
-	  src/Math/Array/SSE2/Single/OgreArrayMatrix4.cpp
-	  src/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.cpp
-	  src/Math/Array/SSE2/Single/OgreArrayQuaternion.cpp
-	  src/Math/Array/SSE2/Single/OgreArrayVector3.cpp
-	  src/Math/Array/SSE2/Single/OgreMathlibSSE2.cpp)
-
-	set (HEADER_FILES ${HEADER_FILES}
-	  include/Math/Array/SSE2/Single/OgreArrayAabb.h
-	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.h
-	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.h
-	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.h
-	  include/Math/Array/SSE2/Single/OgreArrayVector3.h
-	  include/Math/Array/SSE2/Single/OgreBooleanMask.h
-	  include/Math/Array/SSE2/Single/OgreBooleanMask.inl
-	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.h
-	  include/Math/Array/SSE2/Single/OgreArrayAabb.inl
-	  include/Math/Array/SSE2/Single/OgreArrayMatrix4.inl
-	  include/Math/Array/SSE2/Single/OgreArrayMatrixAf4x3.inl
-	  include/Math/Array/SSE2/Single/OgreArrayQuaternion.inl
-	  include/Math/Array/SSE2/Single/OgreArrayVector3.inl
-	  include/Math/Array/SSE2/Single/OgreMathlibSSE2.inl)
+	add_filtered_std( "Math/Array/SSE2/Single" )
 endif()
 
 if (OGRE_SIMD_NEON)
-	set (SOURCE_FILES ${SOURCE_FILES}
-	  src/Math/Array/NEON/Single/OgreArrayAabb.cpp
-      src/Math/Array/NEON/Single/OgreArrayMatrix4.cpp
-	  src/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.cpp
-      src/Math/Array/NEON/Single/OgreArrayQuaternion.cpp
-	  src/Math/Array/NEON/Single/OgreArrayVector3.cpp
-	  src/Math/Array/NEON/Single/OgreMathlibNEON.cpp)
-
-	set (HEADER_FILES ${HEADER_FILES}
-	  include/Math/Array/NEON/Single/OgreArrayAabb.h
-      include/Math/Array/NEON/Single/OgreArrayMatrix4.h
-	  include/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.h
-      include/Math/Array/NEON/Single/OgreArrayQuaternion.h
-	  include/Math/Array/NEON/Single/OgreArrayVector3.h
-	  include/Math/Array/NEON/Single/OgreBooleanMask.h
-	  include/Math/Array/NEON/Single/OgreBooleanMask.inl
-	  include/Math/Array/NEON/Single/OgreMathlibNEON.h
-	  include/Math/Array/NEON/Single/OgreArrayAabb.inl
-      include/Math/Array/NEON/Single/OgreArrayMatrix4.inl
-	  include/Math/Array/NEON/Single/OgreArrayMatrixAf4x3.inl
-      include/Math/Array/NEON/Single/OgreArrayQuaternion.inl
-	  include/Math/Array/NEON/Single/OgreArrayVector3.inl
-	  include/Math/Array/NEON/Single/OgreMathlibNEON.inl)
+	add_filtered_std( "Math/Array/NEON/Single" )
 endif()
 
 if (NOT(OGRE_SIMD_SSE2 OR OGRE_SIMD_NEON))
-	set (SOURCE_FILES ${SOURCE_FILES}
-	  src/Math/Array/C/OgreArrayAabb.cpp
-	  src/Math/Array/C/OgreArrayMatrix4.cpp
-	  src/Math/Array/C/OgreArrayMatrixAf4x3.cpp
-	  src/Math/Array/C/OgreArrayQuaternion.cpp
-	  src/Math/Array/C/OgreArrayVector3.cpp
-	  src/Math/Array/C/OgreMathlibC.cpp)
-
-	set (HEADER_FILES ${HEADER_FILES}
-	  include/Math/Array/C/OgreArrayAabb.h
-	  include/Math/Array/C/OgreArrayMatrix4.h
-	  include/Math/Array/C/OgreArrayMatrixAf4x3.h
-	  include/Math/Array/C/OgreArrayQuaternion.h
-	  include/Math/Array/C/OgreArrayVector3.h
-	  include/Math/Array/C/OgreBooleanMask.h
-	  include/Math/Array/C/OgreBooleanMask.inl
-	  include/Math/Array/C/OgreMathlibC.h
-	  include/Math/Array/C/OgreArrayAabb.inl
-	  include/Math/Array/C/OgreArrayMatrix4.inl
-	  include/Math/Array/C/OgreArrayMatrixAf4x3.inl
-	  include/Math/Array/C/OgreArrayQuaternion.inl
-	  include/Math/Array/C/OgreArrayVector3.inl
-	  include/Math/Array/C/OgreMathlibC.inl)
+	add_filtered_std( "Math/Array/C" )
 endif ()
 
 
