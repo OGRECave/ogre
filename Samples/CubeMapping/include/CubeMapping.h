@@ -22,8 +22,18 @@ public:
 	Sample_CubeMapping()
 	{
 		mInfo["Title"] = "Cube Mapping";
-		mInfo["Description"] = "Demonstrates the cube mapping feature where a wrap-around environment is reflected "
-			"off of an object. Uses render-to-texture to create dynamic cubemaps.";
+		mInfo["Description"] = "Demonstrates how to setup cube mapping with the compositor.\n"
+			"The textures are manually created, one Camera & one Workspace for each cubemap is "
+			"needed (i.e. useful for IBL probes - IBL = Image Based Lighting).\n\n"
+			"The compositor automatically rotates the camera for each cube map face. This "
+			"can be disabled setting camera_cubemap_reorient to false if the user wants to do it "
+			"manually with a listener.\n\n"
+			"Like in the Fresnel demo, visibility masks are used to prevent certain objects from "
+			"being rendered by the reflection passes"
+			"This sample creates a workspace using templates which can be located in the script "
+			"'Cubemapping.compositor' to ease the setup.\n\n"
+			"To understand how to fully create a Workspace definition without using scripts, refer to "
+			"the Compositor demo.";
 		mInfo["Thumbnail"] = "thumb_cubemap.png";
 		mInfo["Category"] = "API Usage";
 
@@ -48,16 +58,26 @@ public:
 
 	virtual void workspacePreUpdate(void)
 	{
-		/*mHead->setVisible(false);  // hide the head
+		/**	CompositorWorkspaceListener::workspacePreUpdate is the best place to update other (manual)
+			Workspaces for multiple reasons:
+				1. It happens after Ogre issued D3D9's beginScene. If you want to update a workspace
+					outside beginScene/endScene pair, you will have to call Workspace::_beginUpdate(true)
+				   and _endUpdate(true) yourself. This will add synchronization overhead in the API,
+				   lowering performance.
+				2. It happens before the whole scene is rendered, thus you can ensure your RTTs are
+				   up to date.
 
-		// point the camera in the right direction based on which face of the cubemap this is
-		mCubeCamera->setOrientation(Quaternion::IDENTITY);
-		if (evt.source == mTargets[0]) mCubeCamera->yaw(Degree(-90));
-		else if (evt.source == mTargets[1]) mCubeCamera->yaw(Degree(90));
-		else if (evt.source == mTargets[2]) mCubeCamera->pitch(Degree(90));
-		else if (evt.source == mTargets[3]) mCubeCamera->pitch(Degree(-90));
-		else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));*/
+			One alternative that allows you to forget about this listener is to use auto-updated
+			workspaces, but you will have to ensure this workspace is created before your main
+			workspace (the one that outputs to the RenderWindow).
+
+			Another alternative is the one presented in the Fresnel demo: The rendering is fully
+			handled inside one single workspace, and the textures are created by the Compositor
+			instead of being manually created.
+		*/
+		//mCubemapWorkspace->_beginUpdate( forceFrameBeginEnd );
 		mCubemapWorkspace->_update();
+		//mCubemapWorkspace->_endUpdate( forceFrameBeginEnd );
 	}
 
 protected:
@@ -80,11 +100,13 @@ protected:
 		createCubeMap();
 
 		// create an ogre head, give it the dynamic cube map material, and place it at the origin
-		mHead = mSceneMgr->createEntity("ogrehead.mesh");
+		mHead = mSceneMgr->createEntity("ogrehead.mesh",
+										 ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+										 SCENE_STATIC);
         mHead->setName("CubeMappedHead");
 		mHead->setMaterialName("Examples/DynamicCubeMap");
 		mHead->setVisibilityFlags( NonRefractiveSurfaces );
-		mSceneMgr->getRootSceneNode()->attachObject(mHead);
+		mSceneMgr->getRootSceneNode(SCENE_STATIC)->attachObject(mHead);
 
 		mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
 
@@ -105,10 +127,12 @@ protected:
 			Plane(Vector3::UNIT_Y, -30), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
 		// create a floor entity, give it a material, and place it at the origin
-        Entity* floor = mSceneMgr->createEntity("floor");
+		Entity* floor = mSceneMgr->createEntity("floor",
+												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC);
         floor->setName("Floor");
-        floor->setMaterialName("Examples/BumpyMetal");
-        mSceneMgr->getRootSceneNode()->attachObject(floor);
+		floor->setMaterialName("Examples/BumpyMetal");
+		mSceneMgr->getRootSceneNode(SCENE_STATIC)->attachObject(floor);
 
 		// set our camera to orbit around the head and show cursor
 		mCameraMan->setStyle(CS_ORBIT);

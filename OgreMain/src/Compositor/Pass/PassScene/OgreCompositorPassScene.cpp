@@ -112,8 +112,8 @@ namespace Ogre
 		//We have to do this first in case usedLodCamera == mCamera
 		if( mDefinition->mCameraCubemapReorient )
 		{
-			mCamera->setOrientation( oldCameraOrientation *
-									 CubemapRotations[mDefinition->getRtIndex()] );
+			uint32 sliceIdx = std::min<uint32>( mDefinition->getRtIndex(), 5 );
+			mCamera->setOrientation( oldCameraOrientation * CubemapRotations[sliceIdx] );
 		}
 
 		if( mDefinition->mUpdateLodLists )
