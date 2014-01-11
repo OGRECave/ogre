@@ -2,6 +2,8 @@
 #define __CubeMapping_H__
 
 #include "SdkSample.h"
+#include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorWorkspaceListener.h"
 #include "Compositor/OgreCompositorChannel.h"
 
@@ -48,6 +50,7 @@ public:
 		else if (evt.source == mTargets[2]) mCubeCamera->pitch(Degree(90));
 		else if (evt.source == mTargets[3]) mCubeCamera->pitch(Degree(-90));
 		else if (evt.source == mTargets[5]) mCubeCamera->yaw(Degree(180));*/
+		mCubemapWorkspace->_update();
 	}
 
 protected:
@@ -114,10 +117,16 @@ protected:
 
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
+		const Ogre::IdString workspaceName( "CompositorSampleCubemap_cubemap" );
+		CompositorWorkspaceDef *workspaceDef = compositorManager->addWorkspaceDefinition( workspaceName );
+		//"CubemapRendererNode" has been defined in scripts. Very handy (as it 99% the same for everything)
+		workspaceDef->connectOutput( "CubemapRendererNode", 0 );
+
 		CompositorChannel channel;
-		channel.target = tex->getBuffer(0)->getRenderTarget();
+		channel.target = tex->getBuffer(0)->getRenderTarget(); //Any of the render targets will do
 		channel.textures.push_back( tex );
-		mCubemapWorkspace = compositorManager->addWorkspace( mSceneMgr, channel, mCubeCamera, "", false );
+		mCubemapWorkspace = compositorManager->addWorkspace( mSceneMgr, channel, mCubeCamera,
+															 workspaceName, false );
 	}
 
 	void cleanupContent()
