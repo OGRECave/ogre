@@ -7038,6 +7038,22 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_CAMERA_CUBEMAP_REORIENT:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						bool var;
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &passScene->mCameraCubemapReorient ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+						}
+					}
+					break;
 				case ID_VIEWPORT:
 				case ID_IDENTIFIER:
 				case ID_NUM_INITIAL:

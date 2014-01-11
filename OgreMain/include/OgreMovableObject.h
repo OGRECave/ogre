@@ -518,7 +518,7 @@ namespace Ogre {
 
 		/** Set the default visibility flags for all future MovableObject instances.
 		*/
-		static void setDefaultVisibilityFlags(uint32 flags) { msDefaultVisibilityFlags = flags; }
+		inline static void setDefaultVisibilityFlags(uint32 flags);
 		
 		/** Get the default visibility flags for all future MovableObject instances.
 		*/

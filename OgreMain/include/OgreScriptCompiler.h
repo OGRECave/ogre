@@ -812,7 +812,7 @@ namespace Ogre
 				ID_RENDER_QUAD,
 					ID_VIEWPORT,
 					ID_NUM_INITIAL,
-					ID_IDENTIFIER,		//TODO
+					ID_IDENTIFIER,
 					ID_OVERLAYS,
 
 					//Used by PASS_SCENE
@@ -825,6 +825,7 @@ namespace Ogre
 					ID_CAMERA,
 					ID_FIRST_RENDER_QUEUE,
 					ID_LAST_RENDER_QUEUE,
+					ID_CAMERA_CUBEMAP_REORIENT,
 
 					//Used by PASS_QUAD
 					ID_USE_QUAD,

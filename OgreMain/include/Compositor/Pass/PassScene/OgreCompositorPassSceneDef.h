@@ -71,6 +71,11 @@ namespace Ogre
 		/// Last Render Queue ID to render. Not inclusive
 		uint8			mLastRQ;
 
+		/** When true, the camera will be rotated 90°, -90° or 180° depending on the value of
+			mRtIndex and then restored to its original rotation after we're done.
+		*/
+		bool			mCameraCubemapReorient;
+
 		/** When true, which Lod index is current will be updated. Reasons to set this to false:
 			 1. You don't use LOD (i.e. you're GPU bottleneck). Setting to false helps CPU.
 			 2. LODs have been calculated in a previous pass. This happens if previous pass(es)
@@ -93,6 +98,7 @@ namespace Ogre
 			mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
 			mFirstRQ( 0 ),
 			mLastRQ( -1 ),
+			mCameraCubemapReorient( false ),
 			mUpdateLodLists( true ),
 			mLodBias( 1.0f )
 		{

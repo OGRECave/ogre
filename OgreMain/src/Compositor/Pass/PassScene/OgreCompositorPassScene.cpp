@@ -39,6 +39,16 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	const Quaternion CubemapRotations[6] =
+	{
+		Quaternion( Degree(-90 ), Vector3::UNIT_Y ),		//+X
+		Quaternion( Degree( 90 ), Vector3::UNIT_Y ),		//-X
+		Quaternion( Degree( 90 ), Vector3::UNIT_X ),		//+Y
+		Quaternion( Degree(-90 ), Vector3::UNIT_X ),		//-Y
+		Quaternion::IDENTITY,								//+Z
+		Quaternion( Degree(180 ), Vector3::UNIT_Y )			//-Z
+	};
+
 	CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
 												Camera *defaultCamera, const CompositorChannel &target,
 												CompositorNode *parentNode ) :
@@ -86,18 +96,6 @@ namespace Ogre
 				return;
 			--mNumPassesLeft;
 		}
-		/*if( mShadowNode && mUpdateShadowNode )
-		{
-			//We need to prepare for rendering another RT (we broke the contiguous chain)
-			if( !mDefinition->mEndRtUpdate )
-				mTarget->_endUpdate();
-
-			//mShadowNode->_update();
-
-			//We need to restore the previous RT's update
-			if( !mDefinition->mBeginRtUpdate )
-				mTarget->_beginUpdate();
-		}*/
 
 		Camera const *usedLodCamera = mLodCamera;
 		if( lodCamera && mCamera == mLodCamera )
@@ -108,6 +106,15 @@ namespace Ogre
 			mTarget->_beginUpdate();
 
 		SceneManager *sceneManager = mCamera->getSceneManager();
+
+		const Quaternion oldCameraOrientation( mCamera->getOrientation() );
+
+		//We have to do this first in case usedLodCamera == mCamera
+		if( mDefinition->mCameraCubemapReorient )
+		{
+			mCamera->setOrientation( oldCameraOrientation *
+									 CubemapRotations[mDefinition->getRtIndex()] );
+		}
 
 		if( mDefinition->mUpdateLodLists )
 		{
@@ -148,6 +155,12 @@ namespace Ogre
 		mTarget->setFsaaResolveDirty();
 		mTarget->_updateViewportRenderPhase02( mViewport, mCamera, usedLodCamera,
 											   mDefinition->mFirstRQ, mDefinition->mLastRQ, true );
+
+		if( mDefinition->mCameraCubemapReorient )
+		{
+			//Restore orientation
+			mCamera->setOrientation( oldCameraOrientation );
+		}
 
 		//Call endUpdate if we're the last pass in a row to use this RT
 		if( mDefinition->mEndRtUpdate )

@@ -32,15 +32,10 @@ public:
 								"'Generic Refraction Simulation'";
 		mInfo["Thumbnail"] = "thumb_fresnel.png";
 		mInfo["Category"] = "API Usage";
-
-		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
-		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
 	}
 
 	~Sample_Fresnel()
 	{
-		//Restore global settings
-		MovableObject::setDefaultVisibilityFlags( mPreviousVisibilityFlags );
 	}
 
 	StringVector getRequiredPlugins()
@@ -134,6 +129,9 @@ protected:
 
 	void setupContent()
 	{
+		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
+		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
+
         mCamera->setPosition(-50, 125, 760);
 		mCameraMan->setTopSpeed(280);
 
@@ -271,6 +269,9 @@ protected:
 		mFishSplines.clear();
 
 		MeshManager::getSingleton().remove("water");
+
+		//Restore global settings
+		MovableObject::setDefaultVisibilityFlags( mPreviousVisibilityFlags );
 	}
 
 	const unsigned int NUM_FISH;

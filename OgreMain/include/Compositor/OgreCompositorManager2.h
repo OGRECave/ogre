@@ -204,6 +204,7 @@ namespace Ogre
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
 
+		/// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
 

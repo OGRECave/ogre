@@ -10,6 +10,11 @@
 using namespace Ogre;
 using namespace OgreBites;
 
+const uint32 NonRefractiveSurfaces	= 0x00000001;
+const uint32 RefractiveSurfaces		= 0x00000002; //Not used in this demo
+const uint32 ReflectedSurfaces		= 0x00000004;
+const uint32 RegularSurfaces		= NonRefractiveSurfaces|ReflectedSurfaces;
+
 class _OgreSampleClassExport Sample_CubeMapping : public SdkSample, public CompositorWorkspaceListener
 {
 public:
@@ -20,7 +25,9 @@ public:
 		mInfo["Description"] = "Demonstrates the cube mapping feature where a wrap-around environment is reflected "
 			"off of an object. Uses render-to-texture to create dynamic cubemaps.";
 		mInfo["Thumbnail"] = "thumb_cubemap.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "API Usage";
+
+		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
 	}
 
 	void testCapabilities(const RenderSystemCapabilities* caps)
@@ -57,6 +64,11 @@ protected:
 
 	void setupContent()
 	{
+		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
+		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
+
+		mWorkspace->setListener( this );
+
 		mSceneMgr->setSkyDome(true, "Examples/CloudySky");
 
 		// setup some basic lighting for our scene
@@ -71,6 +83,7 @@ protected:
 		mHead = mSceneMgr->createEntity("ogrehead.mesh");
         mHead->setName("CubeMappedHead");
 		mHead->setMaterialName("Examples/DynamicCubeMap");
+		mHead->setVisibilityFlags( NonRefractiveSurfaces );
 		mSceneMgr->getRootSceneNode()->attachObject(mHead);
 
 		mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
@@ -134,6 +147,9 @@ protected:
         mSceneMgr->destroyCamera(mCubeCamera);
 		MeshManager::getSingleton().remove("floor");
 		TextureManager::getSingleton().remove("dyncubemap");
+
+		//Restore global settings
+		MovableObject::setDefaultVisibilityFlags( mPreviousVisibilityFlags );
 	}
 
 	Entity* mHead;
@@ -143,6 +159,7 @@ protected:
 	AnimationState* mFishSwim;
 
 	CompositorWorkspace *mCubemapWorkspace;
+	uint32 mPreviousVisibilityFlags;
 };
 
 #endif

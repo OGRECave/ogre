@@ -1255,6 +1255,7 @@ namespace Ogre
 		mIds["camera"]			= ID_CAMERA;
 		mIds["rq_first"]		= ID_FIRST_RENDER_QUEUE;
 		mIds["rq_last"]			= ID_LAST_RENDER_QUEUE;
+		mIds["camera_cubemap_reorient"] = ID_CAMERA_CUBEMAP_REORIENT;
 
 		mIds["use_quad"]		= ID_USE_QUAD;
 		mIds["quad_normals"]	= ID_QUAD_NORMALS;
