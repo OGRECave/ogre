@@ -510,6 +510,7 @@ namespace Ogre {
         CameraList	mCameras;
 		CameraMap	mCamerasByName;
 		FrustumVec	mVisibleCameras;
+		FrustumVec	mCubeMapCameras;
 
 		typedef map<String, StaticGeometry* >::type StaticGeometryList;
 		StaticGeometryList mStaticGeometryList;
@@ -1166,8 +1167,11 @@ namespace Ogre {
 				True if this camera should be considered when creating the global light list
 				of culled lights against all cameras. For example, cameras used for
 				shadow mapping shouldn't be taken into account (set to false)
+			@param forCubemapping
+				True this camera will be used at least once in one of its passes as a cubemap
+				(thus having to change the orientation but not position mid-rendering)
         */
-        virtual Camera* createCamera(const String& name, bool notShadowCaster=true);
+		virtual Camera* createCamera(const String& name, bool notShadowCaster=true, bool forCubemapping=false);
 
 		/** Finds the camera with the given name. Throws if not found.
 		@param name

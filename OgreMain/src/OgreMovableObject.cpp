@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
+#include "OgreRawPtr.h"
 
 namespace Ogre {
 	using namespace VisibilityFlags;
@@ -728,7 +729,8 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	void MovableObject::cullLights( const size_t numNodes, ObjectData objData,
-									LightListInfo &outGlobalLightList, const FrustumVec &frustums )
+									LightListInfo &outGlobalLightList, const FrustumVec &frustums,
+									const FrustumVec &cubemapFrustums )
 	{
 		struct ArrayPlane
 		{
@@ -761,6 +763,24 @@ namespace Ogre {
 			}
 
 			++planesIt;
+			++itor;
+		}
+
+		const size_t numCubemapFrustums = cubemapFrustums.size();
+		RawSimdUniquePtr<ArrayAabb, MEMCATEGORY_SCENE_CONTROL> aabbsPtr =
+								RawSimdUniquePtr<ArrayAabb, MEMCATEGORY_SCENE_CONTROL>( numCubemapFrustums );
+		ArrayAabb * RESTRICT_ALIAS aabbs = aabbsPtr.get();
+
+		itor = cubemapFrustums.begin();
+		end  = cubemapFrustums.end();
+		ArrayAabb *aabbsIt = aabbs;
+
+		while( itor != end )
+		{
+			assert( dynamic_cast<const Camera*>(*itor) );
+			const Camera *c = static_cast<const Camera*>(*itor);
+			aabbsIt->setAll( Aabb( c->getDerivedPosition(), Vector3(c->getFarClipDistance() * 0.5f) ) );
+			++aabbsIt;
 			++itor;
 		}
 
@@ -817,6 +837,14 @@ namespace Ogre {
 				dotResult = planes[j].planes[5].planeNormal.dotProduct( centerPlusFlippedHS );
 				tmpMask = Mathlib::And( tmpMask, Mathlib::CompareGreater( dotResult,
 																planes[j].planes[5].planeNegD ) );
+
+				//Accumulate into mask. If one Frustum can see, then we need to include it.
+				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );
+			}
+
+			for( size_t j=0; j<numCubemapFrustums; ++j )
+			{
+				ArrayMaskR tmpMask = aabbs[j].contains( *objData.mWorldAabb );
 
 				//Accumulate into mask. If one Frustum can see, then we need to include it.
 				mask = Mathlib::Or( mask, CastRealToInt( tmpMask ) );

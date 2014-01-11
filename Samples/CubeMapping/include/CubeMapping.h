@@ -142,11 +142,16 @@ protected:
 	void createCubeMap()
 	{
 		// create the camera used to render to our cubemap
-		mCubeCamera = mSceneMgr->createCamera("CubeMapCamera");
+		mCubeCamera = mSceneMgr->createCamera("CubeMapCamera", true, true);
 		mCubeCamera->setFOVy(Degree(90));
 		mCubeCamera->setAspectRatio(1);
 		mCubeCamera->setFixedYawAxis(false);
 		mCubeCamera->setNearClipDistance(5);
+
+		//The default far clip distance is way too big for a cubemap-capable camara, which prevents
+		//Ogre from better culling and prioritizing lights in a forward renderer.
+		//TODO: Improve the Sky algorithm so that we don't need to use this absurd high number
+		mCubeCamera->setFarClipDistance( /*100*/10000 );
 
 		// create our dynamic cube map texture
 		TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
@@ -155,9 +160,14 @@ protected:
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
 		const Ogre::IdString workspaceName( "CompositorSampleCubemap_cubemap" );
-		CompositorWorkspaceDef *workspaceDef = compositorManager->addWorkspaceDefinition( workspaceName );
-		//"CubemapRendererNode" has been defined in scripts. Very handy (as it 99% the same for everything)
-		workspaceDef->connectOutput( "CubemapRendererNode", 0 );
+		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+		{
+			CompositorWorkspaceDef *workspaceDef = compositorManager->addWorkspaceDefinition(
+																					workspaceName );
+			//"CubemapRendererNode" has been defined in scripts.
+			//Very handy (as it 99% the same for everything)
+			workspaceDef->connectOutput( "CubemapRendererNode", 0 );
+		}
 
 		CompositorChannel channel;
 		channel.target = tex->getBuffer(0)->getRenderTarget(); //Any of the render targets will do
