@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreDepthBuffer.h"
+#include "OgrePixelBox.h"
 
 namespace Ogre {
 
