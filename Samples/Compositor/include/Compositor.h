@@ -55,7 +55,7 @@ public:
 	virtual void windowResized(Ogre::RenderWindow* rw);
 
 protected:
-	virtual void setupCompositor(void);
+	virtual CompositorWorkspace* setupCompositor(void);
 	
 	void setupView(void);
 	void setupControls(void);
@@ -77,9 +77,7 @@ protected:
 	SelectMenu* mDebugTextureSelectMenu;
 	TextureUnitState* mDebugTextureTUS;
 
-	CompositorWorkspace *mWorkspace;
 	SamplePostprocessWorkspaceListener mWorkspaceListener;
-
 };
 
 /**
@@ -117,7 +115,7 @@ void Sample_Compositor::setupView()
     mCamera->setNearClipDistance(1);
 }
 //-----------------------------------------------------------------------------------
-void Sample_Compositor::setupCompositor(void)
+CompositorWorkspace* Sample_Compositor::setupCompositor(void)
 {
 	/// Create a couple of hard coded postfilter effects as an example of how to do it
 	/// but the preferred method is to use compositor scripts.
@@ -163,6 +161,8 @@ void Sample_Compositor::setupCompositor(void)
 
 	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
 		((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
+
+	return mWorkspace;
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupContent(void)

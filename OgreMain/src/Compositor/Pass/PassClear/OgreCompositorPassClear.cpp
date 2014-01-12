@@ -40,7 +40,8 @@ THE SOFTWARE.
 namespace Ogre
 {
 	CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
-												SceneManager *sceneManager, RenderTarget *target,
+												SceneManager *sceneManager,
+												const CompositorChannel &target,
 												CompositorNode *parentNode ) :
 				CompositorPass( definition, target, parentNode ),
 				mSceneManager( sceneManager ),

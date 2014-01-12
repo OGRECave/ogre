@@ -33,6 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	inline void MovableObject::setDefaultVisibilityFlags(uint32 flags)
+	{
+		msDefaultVisibilityFlags = (flags & VisibilityFlags::RESERVED_VISIBILITY_FLAGS) |
+									( msDefaultVisibilityFlags &
+									  ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
+	}
+	//-----------------------------------------------------------------------------------
 	inline void MovableObject::setVisibilityFlags( uint32 flags )
 	{
 		mObjectData.mVisibilityFlags[mObjectData.mIndex] =

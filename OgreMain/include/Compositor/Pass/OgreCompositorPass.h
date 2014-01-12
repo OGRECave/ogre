@@ -67,8 +67,10 @@ namespace Ogre
 
 		CompositorNode	*mParentNode;
 
+		RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
+
 	public:
-		CompositorPass( const CompositorPassDef *definition, RenderTarget *target,
+		CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
 						CompositorNode *parentNode );
 		virtual ~CompositorPass();
 

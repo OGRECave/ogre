@@ -72,6 +72,10 @@ namespace Ogre
 	class _OgreExport CompositorPassDef : public CompositorInstAlloc
 	{
 		CompositorPassType	mPassType;
+
+		/// Used for cubemaps and 3D textures.
+		uint32				mRtIndex;
+
 	public:
 		/// Viewport's region to draw
 		float				mVpLeft;
@@ -100,14 +104,16 @@ namespace Ogre
 		bool				mIncludeOverlays;
 
 	public:
-		CompositorPassDef( CompositorPassType passType ) :
+		CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :
 			mPassType( passType ),
 			mVpLeft( 0 ), mVpTop( 0 ),
 			mVpWidth( 1 ), mVpHeight( 1 ), mShadowMapIdx( 0 ),
-			mNumInitialPasses( -1 ), mIdentifier( 0 ),
+			mNumInitialPasses( -1 ), mIdentifier( 0 ), mRtIndex( rtIndex ),
 			mBeginRtUpdate( true ), mEndRtUpdate( true ),
 			mIncludeOverlays( false ) {}
+
 		CompositorPassType getType() const				{ return mPassType; }
+		uint32 getRtIndex(void) const					{ return mRtIndex; }
 	};
 
 	typedef vector<CompositorPassDef*>::type CompositorPassDefVec;
@@ -118,11 +124,17 @@ namespace Ogre
 		IdString				mRenderTargetName;
 		CompositorPassDefVec	mCompositorPasses;
 
+		/// @copydoc CompositorPass::mRtIndex
+		uint32					mRtIndex;
+
 		CompositorNodeDef		*mParentNodeDef;
 
 	public:
-		CompositorTargetDef( IdString renderTargetName, CompositorNodeDef *parentNodeDef ) :
-				mRenderTargetName( renderTargetName ), mParentNodeDef( parentNodeDef ) {}
+		CompositorTargetDef( IdString renderTargetName, uint32 rtIndex,
+							 CompositorNodeDef *parentNodeDef ) :
+				mRenderTargetName( renderTargetName ),
+				mRtIndex( rtIndex ),
+				mParentNodeDef( parentNodeDef ) {}
 		~CompositorTargetDef();
 
 		IdString getRenderTargetName() const			{ return mRenderTargetName; }

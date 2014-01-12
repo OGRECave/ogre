@@ -32,15 +32,10 @@ public:
 								"'Generic Refraction Simulation'";
 		mInfo["Thumbnail"] = "thumb_fresnel.png";
 		mInfo["Category"] = "API Usage";
-
-		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
-		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
 	}
 
 	~Sample_Fresnel()
 	{
-		//Restore global settings
-		MovableObject::setDefaultVisibilityFlags( mPreviousVisibilityFlags );
 	}
 
 	StringVector getRequiredPlugins()
@@ -120,7 +115,7 @@ public:
 
 protected:
 
-	virtual void setupCompositor()
+	virtual CompositorWorkspace* setupCompositor()
 	{
 		// The compositor scripts are also part of this sample. Go to Fresnel.compositor
 		// to see the sample scripts on how to setup the rendering pipeline.
@@ -130,10 +125,15 @@ protected:
 		CompositorWorkspace *workspace = compositorManager->addWorkspace( mSceneMgr, mWindow,
 																	mCamera, workspaceName, true );
 		workspace->setListener( this );
+
+		return workspace;
 	}
 
 	void setupContent()
 	{
+		mPreviousVisibilityFlags = MovableObject::getDefaultVisibilityFlags();
+		MovableObject::setDefaultVisibilityFlags( RegularSurfaces );
+
         mCamera->setPosition(-50, 125, 760);
 		mCameraMan->setTopSpeed(280);
 
@@ -271,6 +271,9 @@ protected:
 		mFishSplines.clear();
 
 		MeshManager::getSingleton().remove("water");
+
+		//Restore global settings
+		MovableObject::setDefaultVisibilityFlags( mPreviousVisibilityFlags );
 	}
 
 	const unsigned int NUM_FISH;

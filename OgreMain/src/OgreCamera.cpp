@@ -257,7 +257,7 @@ namespace Ogre {
     void Camera::roll(const Radian& angle)
     {
         // Rotate around local Z axis
-        Vector3 zAxis = mOrientation * Vector3::UNIT_Z;
+		Vector3 zAxis = mOrientation.zAxis();
         rotate(zAxis, angle);
 
         invalidateView();
@@ -276,7 +276,7 @@ namespace Ogre {
         else
         {
             // Rotate around local Y axis
-            yAxis = mOrientation * Vector3::UNIT_Y;
+			yAxis = mOrientation.yAxis();
         }
 
         rotate(yAxis, angle);
@@ -288,7 +288,7 @@ namespace Ogre {
     void Camera::pitch(const Radian& angle)
     {
         // Rotate around local X axis
-        Vector3 xAxis = mOrientation * Vector3::UNIT_X;
+		Vector3 xAxis = mOrientation.xAxis();
         rotate(xAxis, angle);
 
         invalidateView();

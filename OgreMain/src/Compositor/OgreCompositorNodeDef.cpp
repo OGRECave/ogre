@@ -39,7 +39,8 @@ namespace Ogre
 		assert( textureSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
 	}
 	//-----------------------------------------------------------------------------------
-	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName )
+	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName,
+															uint32 rtIndex )
 	{
 		assert( mTargetPasses.size() < mTargetPasses.capacity() &&
 				"setNumTargetPass called improperly!" );
@@ -47,7 +48,7 @@ namespace Ogre
 		if( renderTargetName.find( "global_" ) == 0 )
 			addTextureSourceName( renderTargetName, 0, TEXTURE_GLOBAL );
 
-		mTargetPasses.push_back( CompositorTargetDef( renderTargetName, this ) );
+		mTargetPasses.push_back( CompositorTargetDef( renderTargetName, rtIndex, this ) );
 		return &mTargetPasses.back();
 	}
 	//-----------------------------------------------------------------------------------

@@ -6404,9 +6404,49 @@ namespace Ogre{
 
 		mTargetDef = 0;
 		CompositorNodeDef *nodeDef = any_cast<CompositorNodeDef*>(obj->parent->context);
-		if( !obj->name.empty())
+		if( !obj->name.empty() )
 		{
-			mTargetDef = nodeDef->addTargetPass( obj->name );
+			uint32 rtIndex = 0;
+			if( !obj->values.empty() )
+			{
+				AbstractNodeList::const_iterator sliceIt = obj->values.begin();
+
+				if( !getUInt( *sliceIt, &rtIndex ) )
+				{
+					String cubemapHint;
+					if( getString( *sliceIt, &cubemapHint ) )
+					{
+						StringUtil::toUpperCase( cubemapHint );
+
+						if( cubemapHint == "+X" || cubemapHint == "X" )
+						{
+							rtIndex = 0;
+						}
+						else if( cubemapHint == "-X" )
+						{
+							rtIndex = 1;
+						}
+						else if( cubemapHint == "+Y" || cubemapHint == "Y" )
+						{
+							rtIndex = 2;
+						}
+						else if( cubemapHint == "-Y" )
+						{
+							rtIndex = 3;
+						}
+						else if( cubemapHint == "+Z" || cubemapHint == "Z" )
+						{
+							rtIndex = 4;
+						}
+						else if( cubemapHint == "-Z" )
+						{
+							rtIndex = 5;
+						}
+					}
+				}
+			}
+
+			mTargetDef = nodeDef->addTargetPass( obj->name, rtIndex );
 		}
 		else
 		{
@@ -6995,6 +7035,22 @@ namespace Ogre{
 						{
 							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
 												"Expected a number between 0 & 255, or the word 'max'" );
+						}
+					}
+					break;
+				case ID_CAMERA_CUBEMAP_REORIENT:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+
+						bool var;
+						AbstractNodeList::const_iterator it0 = prop->values.begin();
+						if( !getBoolean( *it0, &passScene->mCameraCubemapReorient ) )
+						{
+							 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 						}
 					}
 					break;

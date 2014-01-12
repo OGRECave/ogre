@@ -204,6 +204,10 @@ namespace Ogre
 		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
 											Camera *defaultCam, IdString definitionName, bool bEnabled );
 
+		/// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
+		CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
+											Camera *defaultCam, IdString definitionName, bool bEnabled );
+
 		/// Removes the given workspace. Pointer is no longer valid after this call
 		void removeWorkspace( CompositorWorkspace *workspace );
 
@@ -226,7 +230,7 @@ namespace Ogre
 		/// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
 		void validateAllNodes();
 
-		void _update( bool swapFinalTargets );
+		void _update(void);
 		void _swapAllFinalTargets(void);
 
 		/** Utility helper to create a basic workspace to get you out of the rush. Advanced users will

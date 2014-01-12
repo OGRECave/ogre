@@ -324,6 +324,15 @@ namespace Ogre
 											 RenderTarget *finalRenderTarget, Camera *defaultCam,
 											 IdString definitionName, bool bEnabled )
 	{
+		CompositorChannel channel;
+		channel.target = finalRenderTarget;
+		return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled );
+	}
+	//-----------------------------------------------------------------------------------
+	CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
+											 const CompositorChannel &finalRenderTarget,
+											 Camera *defaultCam, IdString definitionName, bool bEnabled )
+	{
 		validateAllNodes();
 
 		CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
@@ -431,7 +440,7 @@ namespace Ogre
 		mUnfinishedShadowNodes.clear();
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::_update( bool swapFinalTargets )
+	void CompositorManager2::_update(void)
 	{
 		WorkspaceVec::const_iterator itor = mWorkspaces.begin();
 		WorkspaceVec::const_iterator end  = mWorkspaces.end();
@@ -454,16 +463,37 @@ namespace Ogre
 			{
 				if( workspace->isValid() )
 				{
-					workspace->_update( swapFinalTargets );
+					workspace->_beginUpdate( false );
 				}
 				else
 				{
 					//TODO: We may end up recreating this every frame for invalid workspaces
 					workspace->recreateAllNodes();
 					if( workspace->isValid() )
-						workspace->_update( swapFinalTargets );
+						workspace->_beginUpdate( false );
 				}
 			}
+			++itor;
+		}
+
+		//The actual update
+		itor = mWorkspaces.begin();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() && workspace->isValid() )
+					workspace->_update();
+			++itor;
+		}
+
+		itor = mWorkspaces.begin();
+
+		while( itor != end )
+		{
+			CompositorWorkspace *workspace = (*itor);
+			if( workspace->getEnabled() && workspace->isValid() )
+					workspace->_endUpdate( false );
 			++itor;
 		}
 

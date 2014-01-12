@@ -293,9 +293,12 @@ namespace Ogre {
 			Output, a list of lights, contiguously placed
 		@param frustums
 			An array of all frustums we need to check against
+		@param cubemapFrustums
+			An array of all frustums that are used at least once as cubemaps
+			(@See SceneManager::createCamera)
 		*/
 		static void cullLights( const size_t numNodes, ObjectData t, LightListInfo &outGlobalLightList,
-								const FrustumVec &frustums );
+								const FrustumVec &frustums , const FrustumVec &cubemapFrustums );
 
 		/** @See SceneManager::buildLightList
 		@remarks
@@ -518,7 +521,7 @@ namespace Ogre {
 
 		/** Set the default visibility flags for all future MovableObject instances.
 		*/
-		static void setDefaultVisibilityFlags(uint32 flags) { msDefaultVisibilityFlags = flags; }
+		inline static void setDefaultVisibilityFlags(uint32 flags);
 		
 		/** Get the default visibility flags for all future MovableObject instances.
 		*/

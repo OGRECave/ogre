@@ -314,7 +314,7 @@ uint8 SceneManager::getWorldGeometryRenderQueue(void)
 	return mWorldGeometryRenderQueue;
 }
 //-----------------------------------------------------------------------
-Camera* SceneManager::createCamera( const String &name, bool isVisible )
+Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
 {
 	if( mCamerasByName.find( name ) != mCamerasByName.end() )
 	{
@@ -330,7 +330,12 @@ Camera* SceneManager::createCamera( const String &name, bool isVisible )
 	mCamerasByName[name] = c;
 
 	if( isVisible )
-		mVisibleCameras.push_back( c );
+	{
+		if( !forCubemapping )
+			mVisibleCameras.push_back( c );
+		else
+			mCubeMapCameras.push_back( c );
+	}
 
 	mSceneRoot[SCENE_DYNAMIC]->attachObject( c );
     return c;
@@ -369,6 +374,10 @@ void SceneManager::destroyCamera(Camera *cam)
 		FrustumVec::iterator it = std::find( mVisibleCameras.begin(), mVisibleCameras.end(), cam );
 		if( it != mVisibleCameras.end() )
 			efficientVectorRemove( mVisibleCameras, it );
+
+		it = std::find( mCubeMapCameras.begin(), mCubeMapCameras.end(), cam );
+		if( it != mCubeMapCameras.end() )
+			efficientVectorRemove( mCubeMapCameras, it );
 	}
 
 	//The node that was at the end got swapped and has now a different index
@@ -2337,7 +2346,7 @@ void SceneManager::buildLightList()
 			ObjectData objData;
 			const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-			Light::cullLights( numObjs, objData, mGlobalLightList, mVisibleCameras );
+			Light::cullLights( numObjs, objData, mGlobalLightList, mVisibleCameras, mCubeMapCameras );
 		}
 
 		++it;

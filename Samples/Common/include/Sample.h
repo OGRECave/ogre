@@ -88,6 +88,7 @@ namespace OgreBites
 			mDone = true;
 			mResourcesLoaded = false;
 			mContentSetup = false;
+			mWorkspace = 0;
 
 			mFSLayer = 0;
         }
@@ -154,7 +155,7 @@ namespace OgreBites
 
 			loadResources();
 			mResourcesLoaded = true;
-			setupCompositor();
+			mWorkspace = setupCompositor();
 			setupContent();
 			mContentSetup = true;
 
@@ -181,6 +182,7 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
+				mWorkspace = 0;
 				Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 				compositorManager->removeAllWorkspaces();
 				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
@@ -279,7 +281,7 @@ namespace OgreBites
 		}
 
 		/// Most likely the user wants to implement one. @See SdkSample::setupCompositor
-		virtual void setupCompositor() {}
+		virtual Ogre::CompositorWorkspace* setupCompositor() { return 0; }
 
 		/*-----------------------------------------------------------------------------
 		| Sets up viewport layout and camera.
@@ -318,6 +320,7 @@ namespace OgreBites
 		Ogre::FileSystemLayer* mFSLayer; 		  // file system abstraction layer
 		Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
 		Ogre::NameValuePairList mInfo;    // custom sample info
+		Ogre::CompositorWorkspace *mWorkspace;
 		bool mDone;                       // flag to mark the end of the sample
 		bool mResourcesLoaded;    // whether or not resources have been loaded
 		bool mContentSetup;       // whether or not scene was created

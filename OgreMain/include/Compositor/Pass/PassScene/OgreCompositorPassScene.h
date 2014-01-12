@@ -77,7 +77,7 @@ namespace Ogre
 			The RenderTarget we're supposed to draw to. Can be RenderWindow, RenderTexture, MRT, etc
 		*/
 		CompositorPassScene( const CompositorPassSceneDef *definition, Camera *defaultCamera,
-								RenderTarget *target, CompositorNode *parentNode );
+								const CompositorChannel &target, CompositorNode *parentNode );
 		~CompositorPassScene();
 
 		virtual void execute( const Camera *lodCamera );
