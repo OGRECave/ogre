@@ -1,0 +1,28 @@
+
+abstract target cubemap_target
+{
+	pass clear
+	{
+		colour_value 0 0 1 1
+	}
+
+	pass render_scene
+	{
+		//Filter stuff that shouldn't be reflected (vampires?)
+		visibility_mask		0x00000004
+		overlays			off
+		camera_cubemap_reorient true
+	}
+}
+
+compositor_node CubemapRendererNode
+{
+	in 0 cubemap
+
+	target cubemap +X : cubemap_target { }
+	target cubemap -X : cubemap_target { }
+	target cubemap +Y : cubemap_target { }
+	target cubemap -Y : cubemap_target { }
+	target cubemap +Z : cubemap_target { }
+	target cubemap -Z : cubemap_target { }
+}

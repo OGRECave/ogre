@@ -65,7 +65,7 @@ THE SOFTWARE.
 #include "OgreFrameStats.h"
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreQueuedProgressiveMeshGenerator.h"
-
+#include "OgreNameGenerator.h"
 #include "Animation/OgreSkeletonManager.h"
 #include "Compositor/OgreCompositorManager2.h"
 
