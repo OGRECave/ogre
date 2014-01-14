@@ -1314,7 +1314,7 @@ namespace Ogre {
 		if (!lt)
 		{
 			// Disable in the scene
-			mStateCacheManager->setDisabled(gl_index);
+			mStateCacheManager->setEnabled(gl_index, false);
 		}
 		else
 		{
@@ -1357,7 +1357,7 @@ namespace Ogre {
 			glLightf(gl_index, GL_LINEAR_ATTENUATION, lt->getAttenuationLinear());
 			glLightf(gl_index, GL_QUADRATIC_ATTENUATION, lt->getAttenuationQuadric());
 			// Enable in the scene
-			mStateCacheManager->setEnabled(gl_index);
+			mStateCacheManager->setEnabled(gl_index, true);
 		}
 	}
 
@@ -1459,11 +1459,11 @@ namespace Ogre {
 			}
 			glColorMaterial(GL_FRONT_AND_BACK, gt);
 
-			mStateCacheManager->setEnabled(GL_COLOR_MATERIAL);
+			mStateCacheManager->setEnabled(GL_COLOR_MATERIAL, true);
 		} 
 		else 
 		{
-			mStateCacheManager->setDisabled(GL_COLOR_MATERIAL);
+			mStateCacheManager->setEnabled(GL_COLOR_MATERIAL, false);
 		}
 
 		mStateCacheManager->setMaterialDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
@@ -1502,14 +1502,14 @@ namespace Ogre {
 			val[2] = quadratic * correction;
 
 			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
-				mStateCacheManager->setEnabled(GL_VERTEX_PROGRAM_POINT_SIZE);
+				mStateCacheManager->setEnabled(GL_VERTEX_PROGRAM_POINT_SIZE, true);
 		} 
 		else 
 		{
 			if (maxSize == 0.0f)
 				maxSize = mCurrentCapabilities->getMaxPointSize();
 			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
-				mStateCacheManager->setDisabled(GL_VERTEX_PROGRAM_POINT_SIZE);
+				mStateCacheManager->setEnabled(GL_VERTEX_PROGRAM_POINT_SIZE, false);
 		}
 		
 		// no scaling required
@@ -1524,14 +1524,8 @@ namespace Ogre {
 		if (!getCapabilities()->hasCapability(RSC_POINT_SPRITES))
 			return;
 
-		if (enabled)
-		{
-			mStateCacheManager->setEnabled(GL_POINT_SPRITE);
-		}
-		else
-		{
-			mStateCacheManager->setDisabled(GL_POINT_SPRITE);
-		}
+
+        mStateCacheManager->setEnabled(GL_POINT_SPRITE, enabled);
 
 		// Set sprite texture coord generation
 		// Don't offer this as an option since D3D links it to sprite enabled
@@ -1872,11 +1866,11 @@ namespace Ogre {
 		GLint destBlend = getBlendMode(destFactor);
 		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
 		{
-			mStateCacheManager->setDisabled(GL_BLEND);
+			mStateCacheManager->setEnabled(GL_BLEND, false);
 		}
 		else
 		{
-			mStateCacheManager->setEnabled(GL_BLEND);
+			mStateCacheManager->setEnabled(GL_BLEND, true);
 			mStateCacheManager->setBlendFunc(sourceBlend, destBlend);
 		}
 
@@ -1916,11 +1910,11 @@ namespace Ogre {
 		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
 			sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
 		{
-			mStateCacheManager->setDisabled(GL_BLEND);
+			mStateCacheManager->setEnabled(GL_BLEND, false);
 		}
 		else
 		{
-			mStateCacheManager->setEnabled(GL_BLEND);
+			mStateCacheManager->setEnabled(GL_BLEND, true);
 			if(GLEW_VERSION_1_4)
 				glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
 			else if(GLEW_EXT_blend_func_separate)
@@ -1975,24 +1969,17 @@ namespace Ogre {
 		bool a2c = false;
 		static bool lasta2c = false;
 
-		if(func == CMPF_ALWAYS_PASS)
+        mStateCacheManager->setEnabled(GL_ALPHA_TEST, func == CMPF_ALWAYS_PASS);
+
+		if(func != CMPF_ALWAYS_PASS)
 		{
-			mStateCacheManager->setDisabled(GL_ALPHA_TEST);
-		}
-		else
-		{
-			mStateCacheManager->setEnabled(GL_ALPHA_TEST);
 			a2c = alphaToCoverage;
 			glAlphaFunc(convertCompareFunction(func), value / 255.0f);
 		}
 
 		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
 		{
-			if (a2c)
-				mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
-			else
-				mStateCacheManager->setDisabled(GL_SAMPLE_ALPHA_TO_COVERAGE);
-
+            mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, a2c);
 			lasta2c = a2c;
 		}
 
@@ -2059,14 +2046,14 @@ namespace Ogre {
 			"GLRenderSystem::_beginFrame");
 
 		// Activate the viewport clipping
-		mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+		mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
 	}
 
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_endFrame(void)
 	{
 		// Deactivate the viewport clipping.
-		mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+		mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
 		// unbind GPU programs at end of frame
 		// this is mostly to avoid holding bound programs that might get deleted
 		// outside via the resource manager
@@ -2089,7 +2076,7 @@ namespace Ogre {
 		switch( mode )
 		{
 		case CULL_NONE:
-			mStateCacheManager->setDisabled( GL_CULL_FACE );
+			mStateCacheManager->setEnabled( GL_CULL_FACE, false );
 			return;
 		default:
 		case CULL_CLOCKWISE:
@@ -2118,7 +2105,7 @@ namespace Ogre {
 			break;
 		}
 
-		mStateCacheManager->setEnabled( GL_CULL_FACE );
+		mStateCacheManager->setEnabled( GL_CULL_FACE, true );
 		mStateCacheManager->setCullFace( cullMode );
 	}
 	//-----------------------------------------------------------------------------
@@ -2131,15 +2118,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setDepthBufferCheckEnabled(bool enabled)
 	{
-		if (enabled)
-		{
-			mStateCacheManager->setClearDepth(1.0f);
-			mStateCacheManager->setEnabled(GL_DEPTH_TEST);
-		}
-		else
-		{
-			mStateCacheManager->setDisabled(GL_DEPTH_TEST);
-		}
+        mStateCacheManager->setClearDepth(1.0f);
+        mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setDepthBufferWriteEnabled(bool enabled)
@@ -2157,18 +2137,13 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
 	{
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, constantBias != 0 || slopeScaleBias != 0);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, constantBias != 0 || slopeScaleBias != 0);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, constantBias != 0 || slopeScaleBias != 0);
+
 		if (constantBias != 0 || slopeScaleBias != 0)
 		{
-			mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL);
-			mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT);
-			mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE);
 			glPolygonOffset(-slopeScaleBias, -constantBias);
-		}
-		else
-		{
-			mStateCacheManager->setDisabled(GL_POLYGON_OFFSET_FILL);
-			mStateCacheManager->setDisabled(GL_POLYGON_OFFSET_POINT);
-			mStateCacheManager->setDisabled(GL_POLYGON_OFFSET_LINE);
 		}
 	}
 	//-----------------------------------------------------------------------------
@@ -2190,14 +2165,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::setLightingEnabled(bool enabled)
     {
-        if (enabled) 
-        {      
-            mStateCacheManager->setEnabled(GL_LIGHTING);
-        } 
-        else 
-        {
-            mStateCacheManager->setDisabled(GL_LIGHTING);
-        }
+        mStateCacheManager->setEnabled(GL_LIGHTING, enabled);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end)
@@ -2217,11 +2185,11 @@ namespace Ogre {
             break;
         default:
             // Give up on it
-            mStateCacheManager->setDisabled(GL_FOG);
+            mStateCacheManager->setEnabled(GL_FOG, false);
             return;
         }
 
-        mStateCacheManager->setEnabled(GL_FOG);
+        mStateCacheManager->setEnabled(GL_FOG, true);
         glFogi(GL_FOG_MODE, fogMode);
         GLfloat fogColor[4] = {colour.r, colour.g, colour.b, colour.a};
         glFogfv(GL_FOG_COLOR, fogColor);
@@ -2333,14 +2301,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setStencilCheckEnabled(bool enabled)
 	{
-		if (enabled)
-		{
-			mStateCacheManager->setEnabled(GL_STENCIL_TEST);
-		}
-		else
-		{
-			mStateCacheManager->setDisabled(GL_STENCIL_TEST);
-		}
+        mStateCacheManager->setEnabled(GL_STENCIL_TEST, enabled);
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setStencilBufferParams(CompareFunction func, 
@@ -2380,7 +2341,7 @@ namespace Ogre {
 			}
 			else // EXT_stencil_two_side
 			{
-				mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT);
+				mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT, true);
 				// Back
 				glActiveStencilFaceEXT(GL_BACK);
 				mStateCacheManager->setStencilMask(writeMask);
@@ -2402,7 +2363,7 @@ namespace Ogre {
 		else
 		{
             if(!GLEW_VERSION_2_0)
-                mStateCacheManager->setDisabled(GL_STENCIL_TEST_TWO_SIDE_EXT);
+                mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT, false);
 
 			flip = false;
 			mStateCacheManager->setStencilMask(writeMask);
@@ -3055,11 +3016,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setNormaliseNormals(bool normalise)
 	{
-		if (normalise)
-			mStateCacheManager->setEnabled(GL_NORMALIZE);
-		else
-			mStateCacheManager->setDisabled(GL_NORMALIZE);
-
+        mStateCacheManager->setEnabled(GL_NORMALIZE, normalise);
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgram(GpuProgram* prg)
@@ -3245,13 +3202,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			clipPlane[3] = plane.d;
 
 			glClipPlane(clipPlaneId, clipPlane);
-			mStateCacheManager->setEnabled(clipPlaneId);
+			mStateCacheManager->setEnabled(clipPlaneId, true);
 		}
 
 		// disable remaining clip planes
 		for ( ; i < 6/*GL_MAX_CLIP_PLANES*/; ++i)
 		{
-			mStateCacheManager->setDisabled(static_cast<GLenum>(GL_CLIP_PLANE0 + i));
+			mStateCacheManager->setEnabled(static_cast<GLenum>(GL_CLIP_PLANE0 + i), false);
 		}
 
 		// restore matrices
@@ -3268,9 +3225,9 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Calculate the "lower-left" corner of the viewport
         GLsizei x = 0, y = 0, w = 0, h = 0;
 
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, enabled);
 		if (enabled)
 		{
-			mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
 			// NB GL uses width / height rather than right / bottom
 			x = left;
 			if (flipping)
@@ -3287,7 +3244,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 		else
 		{
-			mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
 			// GL requires you to reset the scissor when disabling
 			w = mActiveViewport->getActualWidth();
 			h = mActiveViewport->getActualHeight();
@@ -3342,7 +3298,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 		// Should be enable scissor test due the clear region is
 		// relied on scissor box bounds.
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
 
 		// Sets the scissor box as same as viewport
 		GLint viewport[4];
@@ -3365,7 +3321,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 
 		// Restore scissor test
-        mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
 
 		// Reset buffer write state
 		if (!mDepthWrite && (buffers & FBT_DEPTH))
@@ -3466,8 +3422,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 		if (GLEW_VERSION_1_4)
 		{
-			mStateCacheManager->setEnabled(GL_COLOR_SUM);
-			mStateCacheManager->setDisabled(GL_DITHER);
+			mStateCacheManager->setEnabled(GL_COLOR_SUM, true);
+			mStateCacheManager->setEnabled(GL_DITHER, false);
 		}
 
 		// Check for FSAA
@@ -3478,7 +3434,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			glGetIntegerv(GL_SAMPLE_BUFFERS_ARB,(GLint*)&fsaa_active);
 			if(fsaa_active)
 			{
-				mStateCacheManager->setEnabled(GL_MULTISAMPLE_ARB);
+				mStateCacheManager->setEnabled(GL_MULTISAMPLE_ARB, true);
 				LogManager::getSingleton().logMessage("Using FSAA from GL_ARB_multisample extension.");
 			}            
 		}
@@ -3575,18 +3531,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			if (GLEW_EXT_framebuffer_sRGB)
 			{
 				// Enable / disable sRGB states
-				if (target->isHardwareGammaEnabled())
-				{
-					mStateCacheManager->setEnabled(GL_FRAMEBUFFER_SRGB_EXT);
-					
-					// Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
-					// enabling, but GL spec says incapable surfaces ignore the setting
-					// anyway. We test the capability to enable isHardwareGammaEnabled.
-				}
-				else
-				{
-					mStateCacheManager->setDisabled(GL_FRAMEBUFFER_SRGB_EXT);
-				}
+                mStateCacheManager->setEnabled(GL_FRAMEBUFFER_SRGB_EXT, target->isHardwareGammaEnabled());
 			}
 		}
 	}
