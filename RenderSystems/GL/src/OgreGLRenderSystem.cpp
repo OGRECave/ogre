@@ -463,6 +463,13 @@ namespace Ogre {
 			GLEW_ARB_vertex_shader) )
 		{
 			rsc->addShaderProfile("glsl");
+
+            if(getNativeShadingLanguageVersion() >= 120)
+                rsc->addShaderProfile("glsl120");
+            if(getNativeShadingLanguageVersion() >= 110)
+                rsc->addShaderProfile("glsl110");
+            if(getNativeShadingLanguageVersion() >= 100)
+                rsc->addShaderProfile("glsl100");
 		}
 
 		// Check if geometry shaders are supported
