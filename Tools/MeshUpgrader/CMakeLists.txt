@@ -18,7 +18,7 @@ target_link_libraries(OgreMeshUpgrader ${OGRE_LIBRARIES})
 
 if (APPLE)
     set_target_properties(OgreMeshUpgrader PROPERTIES
-        LINK_FLAGS "-framework Cocoa")
+        LINK_FLAGS "-framework Carbon -framework Cocoa")
 endif ()
 
 ogre_config_tool(OgreMeshUpgrader)
