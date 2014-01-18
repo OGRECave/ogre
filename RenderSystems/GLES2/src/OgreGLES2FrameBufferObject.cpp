@@ -40,9 +40,15 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-        
+
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
+        }
+
         mNumSamples = 0;
         mMultisampleFB = 0;
 
@@ -61,6 +67,11 @@ namespace Ogre {
 		if (mNumSamples)
 		{
 			OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+            {
+                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
+            }
 		}
 		else
 		{
@@ -68,9 +79,9 @@ namespace Ogre {
 		}
 
         // Initialise state
-        mDepth.buffer=0;
-        mStencil.buffer=0;
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        mDepth.buffer = 0;
+        mStencil.buffer = 0;
+        for(size_t x = 0; x < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
         {
             mColour[x].buffer=0;
         }
@@ -103,7 +114,7 @@ namespace Ogre {
     
     void GLES2FrameBufferObject::notifyOnContextReset(const GLES2SurfaceDesc &target)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
@@ -211,8 +222,8 @@ namespace Ogre {
 			// depth & stencil will be dealt with below
 		}
 
-        /// Depth buffer is not handled here anymore.
-		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
+        // Depth buffer is not handled here anymore.
+		// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
@@ -250,7 +261,7 @@ namespace Ogre {
 			OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
 		}
 #endif
-        /// Check status
+        // Check status
         GLuint status;
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
