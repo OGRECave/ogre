@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
 #include "OgreAndroidResourceManager.h"
+#include "OgreViewport.h"
 
 #include <iostream>
 #include <algorithm>

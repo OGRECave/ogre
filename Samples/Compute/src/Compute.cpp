@@ -133,24 +133,24 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
     void cleanupContent()
     {
         // Read image load/store data.
-        mPixelBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-        const PixelBox &pb = mPixelBuffer->getCurrentLock();
-        uint *data = static_cast<uint*>(pb.data);
+//        mPixelBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+//        const PixelBox &pb = mPixelBuffer->getCurrentLock();
+//        uint *data = static_cast<uint*>(pb.data);
 //        size_t height = pb.getHeight();
 //        size_t width = pb.getWidth();
 //        size_t pitch = pb.rowPitch; // Skip between rows of image
-        printf("Buffer values.\n");
-        // for (size_t y = 0; y < height; ++y)
-        // {
-        //     for(size_t x = 0; x < width; ++x)
-        //     {
-        //         std::cout << " " << std::hex << data[pitch * y + x];
-        //     }
-        //     std::cout << std::endl;
-        // }
-        std::cout << std::hex << data[0];
-        std::cout << " " << data[1] << std::endl;
-        mPixelBuffer->unlock();
+//        printf("Buffer values.\n");
+//         for (size_t y = 0; y < height; ++y)
+//         {
+//             for(size_t x = 0; x < width; ++x)
+//             {
+//                 std::cout << " " << std::hex << data[pitch * y + x];
+//             }
+//             std::cout << std::endl;
+//         }
+//        std::cout << std::hex << data[0];
+//        std::cout << " " << data[1] << std::endl;
+//        mPixelBuffer->unlock();
 
         //MeshManager::getSingleton().remove(mTetrahedraMesh->getName());
     }

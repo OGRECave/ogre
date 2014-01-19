@@ -157,6 +157,7 @@ namespace Ogre
 	{
 		ConfigOption optFullScreen;
 		ConfigOption optVideoMode;
+		ConfigOption optColourDepth;
 		ConfigOption optDisplayFrequency;
 		ConfigOption optVSync;
 		ConfigOption optFSAA;
@@ -172,7 +173,11 @@ namespace Ogre
 		
 		optDisplayFrequency.name = "Display Frequency";
 		optDisplayFrequency.immutable = false;
-		
+
+		optColourDepth.name = "Colour Depth";
+		optColourDepth.immutable = false;
+		optColourDepth.currentValue.clear();
+
 		optVSync.name = "VSync";
 		optVSync.immutable = false;
 		
@@ -255,6 +260,7 @@ namespace Ogre
 
 		mOptions[optFullScreen.name] = optFullScreen;
 		mOptions[optVideoMode.name] = optVideoMode;
+		mOptions[optColourDepth.name] = optColourDepth;
 		mOptions[optDisplayFrequency.name] = optDisplayFrequency;
 		mOptions[optVSync.name] = optVSync;
 		mOptions[optRTTMode.name] = optRTTMode;
