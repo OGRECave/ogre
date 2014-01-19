@@ -250,8 +250,14 @@ namespace Volume {
     Chunk::~Chunk(void)
     {
         OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-        Root::getSingleton().removeFrameListener(this);
+		OGRE_DELETE mRenderOp.vertexData;
+
+		// Root might already be shutdown.
+		if (Root::getSingletonPtr())
+		{
+			Root::getSingleton().removeFrameListener(this);
+		}
+
         if (mChildren)
         {
             OGRE_DELETE mChildren[0];
