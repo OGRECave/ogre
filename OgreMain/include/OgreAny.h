@@ -203,7 +203,7 @@ namespace Ogre
 			}
 			else
 			{
-				StringUtil::StrStreamType str;
+				StringStream str;
 				str << "Bad cast from type '" << getType().name() << "' "
 					<< "to '" << typeid(ValueType).name() << "'";
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -227,7 +227,7 @@ namespace Ogre
 			}
 			else
 			{
-				StringUtil::StrStreamType str;
+				StringStream str;
 				str << "Bad cast from type '" << getType().name() << "' "
 					<< "to '" << typeid(ValueType).name() << "'";
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -419,7 +419,7 @@ namespace Ogre
         const ValueType * result = any_cast<ValueType>(&operand);
         if(!result)
 		{
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << "Bad cast from type '" << operand.getType().name() << "' "
 				<< "to '" << typeid(ValueType).name() << "'";
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,

@@ -15,7 +15,7 @@ same license as the rest of the engine.
 #ifndef _NULLSCHEMEHANDLER_H
 #define _NULLSCHEMEHANDLER_H
 
-#include <OgreMaterialManager.h>
+#include "OgreMaterialManager.h"
 
 /** Class for skipping materials which do not have the scheme defined
  */

@@ -30,10 +30,11 @@ THE SOFTWARE.
 #define __SkeletonSerializer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreSkeleton.h"
 #include "OgreSerializer.h"
 
 namespace Ogre {
+
+    struct LinkedSkeletonAnimationSource;
 
 	/// Skeleton compatibility versions
 	enum SkeletonVersion 

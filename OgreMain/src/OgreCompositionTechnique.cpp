@@ -28,9 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
-#include "OgreCompositorInstance.h"
-#include "OgreCompositorChain.h"
-#include "OgreCompositionPass.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
 

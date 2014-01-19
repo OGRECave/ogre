@@ -34,10 +34,12 @@ THE SOFTWARE.
 #import "OgreGLPixelFormat.h"
 #import "OgreGLUtil.h"
 #import "OgreGLRenderSystem.h"
+#import "OgreViewport.h"
 
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
+#import <iomanip>
 
 @implementation OgreWindow
 

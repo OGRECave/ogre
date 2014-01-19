@@ -33,8 +33,9 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreHardwarePixelBuffer.h"
 #include "OgreShadowCameraSetupPSSM.h"
+#include "OgreLogManager.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre
 {
@@ -469,7 +470,7 @@ namespace Ogre
 	{
 		HighLevelGpuProgramPtr ret = createVertexProgram(prof, terrain, tt);
 
-		StringUtil::StrStreamType sourceStr;
+		StringStream sourceStr;
 		generateVertexProgramSource(prof, terrain, tt, sourceStr);
 		ret->setSource(sourceStr.str());
 		ret->load();
@@ -489,7 +490,7 @@ namespace Ogre
 	{
 		HighLevelGpuProgramPtr ret = createFragmentProgram(prof, terrain, tt);
 
-		StringUtil::StrStreamType sourceStr;
+		StringStream sourceStr;
 		generateFragmentProgramSource(prof, terrain, tt, sourceStr);
 		ret->setSource(sourceStr.str());
 		ret->load();
@@ -504,7 +505,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateVertexProgramSource(
-		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
 	{
 		generateVpHeader(prof, terrain, tt, outStream);
 
@@ -522,7 +523,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateFragmentProgramSource(
-		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
 	{
 		generateFpHeader(prof, terrain, tt, outStream);
 

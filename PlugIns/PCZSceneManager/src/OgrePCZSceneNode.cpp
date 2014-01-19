@@ -41,13 +41,9 @@ TODO				 : None known
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
 #include "OgrePCZSceneNode.h"
 #include "OgreSceneNode.h"
-#include "OgrePCZSceneManager.h"
-#include "OgrePortal.h"
 #include "OgrePCZone.h"
-#include "OgrePCZCamera.h"
 
 namespace Ogre
 {

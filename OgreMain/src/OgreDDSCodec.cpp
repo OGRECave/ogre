@@ -33,10 +33,7 @@ THE SOFTWARE.
 #include "OgreDDSCodec.h"
 #include "OgreImage.h"
 #include "OgreException.h"
-
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-
 
 namespace Ogre {
 	// Internal DDS structure definitions
@@ -939,7 +936,7 @@ namespace Ogre {
 			}
 		}
 
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 
 	}
 	

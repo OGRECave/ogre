@@ -53,13 +53,13 @@ Code Style Update	 :
 #ifndef PCZ_FRUSTUM_H
 #define PCZ_FRUSTUM_H
 
-#include "OgrePCPlane.h"
 #include "OgrePCZPrerequisites.h"
 #include "OgreFrustum.h"
 
 namespace Ogre
 {
     class PortalBase;
+    class PCPlane;
 
     typedef list< PCPlane * >::type PCPlaneList;
 

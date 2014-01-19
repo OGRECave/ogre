@@ -136,9 +136,9 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
         mPixelBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
         const PixelBox &pb = mPixelBuffer->getCurrentLock();
         uint *data = static_cast<uint*>(pb.data);
-        size_t height = pb.getHeight();
-        size_t width = pb.getWidth();
-        size_t pitch = pb.rowPitch; // Skip between rows of image
+//        size_t height = pb.getHeight();
+//        size_t width = pb.getWidth();
+//        size_t pitch = pb.rowPitch; // Skip between rows of image
         printf("Buffer values.\n");
         // for (size_t y = 0; y < height; ++y)
         // {

@@ -28,11 +28,14 @@ THE SOFTWARE.
 #define _ShaderProgramManager_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderProgramWriter.h"
+#include "OgreSingleton.h"
+#include "OgreGpuProgram.h"
+#include "OgreStringVector.h"
 
-namespace Ogre {	
+namespace Ogre {
 namespace RTShader {
+
+    class ProgramWriter;
 
 /** \addtogroup Core
 *  @{

@@ -25,7 +25,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderGenerator.h"
-#include "OgreShaderProgram.h"
 #include "OgreShaderProgramManager.h"
 #include "OgreShaderFFPRenderStateBuilder.h"
 #include "OgreShaderRenderState.h"

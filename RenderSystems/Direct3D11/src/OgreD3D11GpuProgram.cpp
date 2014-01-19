@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreD3D11GpuProgram.h"
 #include "OgreD3D11Mappings.h"
 #include "OgreD3D11Device.h"
+#include "OgreLogManager.h"
 #include "OgreException.h"
 
 namespace Ogre {

@@ -52,19 +52,19 @@ Code Style Update	 :
 #define PCZONE_H
 
 #include "OgrePCZPrerequisites.h"
-#include "OgrePCZSceneNode.h"
-#include "OgrePCZCamera.h"
-#include "OgrePCZFrustum.h"
+#include "OgrePortalBase.h"
 
 namespace Ogre
 {
-
-    class PCZone;
     class Portal;
     class AntiPortal;
 	class PCZSceneNode;
 	class PCZSceneManager;
     class PCZLight;
+    class PCZone;
+    class PCZCamera;
+    class PCZFrustum;
+    struct VisibleObjectsBoundsInfo;
 
     typedef map<String, PCZone*>::type ZoneMap;
 	typedef list<PCZone*>::type PCZoneList;

@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinningTechnique.h"
-#include "OgreShaderParameter.h"
-#include "OgreRenderSystem.h"
-#include "OgreShaderFunctionAtom.h"
 
 namespace Ogre {
 namespace RTShader {

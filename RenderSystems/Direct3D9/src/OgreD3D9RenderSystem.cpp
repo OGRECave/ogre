@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLight.h"
 #include "OgreMath.h"
+#include "OgreViewport.h"
 #include "OgreD3D9HardwareBufferManager.h"
 #include "OgreD3D9HardwareIndexBuffer.h"
 #include "OgreD3D9HardwareVertexBuffer.h"
@@ -392,7 +393,7 @@ namespace Ogre
 			it->second.currentValue = value;
 		else
 		{
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << "Option named '" << name << "' does not exist.";
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "D3D9RenderSystem::setConfigOption" );
 		}
@@ -583,7 +584,7 @@ namespace Ogre
 				"the 'Rendering Device' has been changed.";
 		}
 
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 	}
 	//---------------------------------------------------------------------
 	ConfigOptionMap& D3D9RenderSystem::getConfigOptions()

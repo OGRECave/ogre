@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreControllerManager.h"
 #include "OgreLogManager.h"
-#include "OgreMath.h"
 #include "OgreDynLibManager.h"
 #include "OgreDynLib.h"
 #include "OgreConfigFile.h"
@@ -46,9 +45,7 @@ THE SOFTWARE.
 #include "OgreParticleSystemManager.h"
 #include "OgreSkeletonManager.h"
 #include "OgreProfiler.h"
-#include "OgreErrorDialog.h"
 #include "OgreConfigDialog.h"
-#include "OgreStringConverter.h"
 #include "OgreArchiveManager.h"
 #include "OgrePlugin.h"
 #include "OgreFileSystem.h"
@@ -63,6 +60,9 @@ THE SOFTWARE.
 #include "OgreRenderQueueInvocation.h"
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
+#include "OgreTimer.h"
+#include "OgreFrameListener.h"
+#include "OgreLodStrategyManager.h"
 #include "Threading/OgreDefaultWorkQueue.h"
 
 #if OGRE_NO_FREEIMAGE == 0
@@ -644,7 +644,7 @@ namespace Ogre {
         // .rendercaps manager
         RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
         // caller wants to load custom RenderSystemCapabilities form a config file
-        if(customCapabilitiesConfig != StringUtil::BLANK)
+        if(customCapabilitiesConfig != BLANKSTRING)
         {
             ConfigFile cfg;
             cfg.load(customCapabilitiesConfig, "\t:=", false);

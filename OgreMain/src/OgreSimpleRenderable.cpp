@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSimpleRenderable.h"
 #include "OgreException.h"
-#include "OgreSceneNode.h"
-
+#include "OgreRenderQueue.h"
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
@@ -46,7 +45,7 @@ namespace Ogre {
 
     {
         // Generate name
-		StringUtil::StrStreamType name;
+		StringStream name;
 		name << "SimpleRenderable" << msGenNameCount++;
 		mName = name.str();
     }

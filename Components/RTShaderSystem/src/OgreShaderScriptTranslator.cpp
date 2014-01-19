@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include "OgreShaderScriptTranslator.h"
 #include "OgrePass.h"
 #include "OgreTechnique.h"
-#include "OgreMaterial.h"
 #include "OgreShaderGenerator.h"
 
 

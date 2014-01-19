@@ -31,6 +31,7 @@ THE SOFTWARE.
 #endif
 #include "OgreWin32Window.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreImageCodec.h"

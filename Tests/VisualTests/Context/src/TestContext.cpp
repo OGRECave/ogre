@@ -51,7 +51,7 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(StringUtil::BLANK), mCurrentTest(0), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -89,7 +89,7 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(S
     mSummaryOutputDir = binOpt["-o"];
     mHelp = unOpt["-h"] || unOpt["--help"];
 
-    if(mReferenceSetPath == StringUtil::BLANK)
+    if(mReferenceSetPath == BLANKSTRING)
         mReferenceSetPath = mOutputDir;
     
 #ifdef INCLUDE_RTSHADER_SYSTEM
@@ -190,7 +190,7 @@ void TestContext::setup()
     mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
 #endif
 
-    Ogre::String batchName = StringUtil::BLANK;
+    Ogre::String batchName = BLANKSTRING;
     time_t raw = time(0);
 
     // timestamp for the filename
@@ -201,7 +201,7 @@ void TestContext::setup()
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp);
 
-    if(mOutputDir == StringUtil::BLANK)
+    if(mOutputDir == BLANKSTRING)
     {
         Ogre::String filestamp = Ogre::String(temp);
         // name for this batch (used for naming the directory, and uniquely identifying this batch)
@@ -448,7 +448,7 @@ void TestContext::createRoot()
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     mRoot = Ogre::Root::getSingletonPtr();
 #else
-    Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
+    Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #ifndef OGRE_STATIC_LIB
     pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
 #endif
@@ -525,7 +525,7 @@ bool TestContext::oneTimeConfig()
 void TestContext::setupDirectories(Ogre::String batchName)
 {
     // ensure there's a root directory for visual tests
-    if(mOutputDir == StringUtil::BLANK)
+    if(mOutputDir == BLANKSTRING)
     {
         mOutputDir = mFSLayer->getWritablePath("VisualTests/");
         static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);

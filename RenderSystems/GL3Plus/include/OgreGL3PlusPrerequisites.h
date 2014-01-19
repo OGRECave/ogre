@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreLogManager.h"
+
 namespace Ogre {
     // Forward declarations
     class GL3PlusSupport;

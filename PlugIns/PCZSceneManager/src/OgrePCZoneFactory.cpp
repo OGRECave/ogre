@@ -35,7 +35,6 @@ Code Style Update	 :
 */
 
 #include "OgrePCZoneFactory.h"
-#include "OgrePCZSceneManager.h"
 #include "OgreDefaultZone.h"
 #include "OgreLogManager.h"
 

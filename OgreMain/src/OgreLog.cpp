@@ -28,8 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreLog.h"
-#include "OgreLogManager.h"
-#include "OgreString.h"
+#include <iomanip>
+#include <iostream>
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #   include "ppapi/cpp/var.h"
 #   include "ppapi/cpp/instance.h"

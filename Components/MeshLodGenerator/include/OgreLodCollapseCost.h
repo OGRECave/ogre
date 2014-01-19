@@ -54,8 +54,6 @@ protected:
 	bool isBorderVertex(const LodData::Vertex* vertex) const;
 };
 
-typedef SharedPtr<LodCollapseCost> LodCollapseCostPtr;
-
 }
 #endif
 

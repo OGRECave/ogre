@@ -27,12 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgram.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreLight.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"

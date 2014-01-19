@@ -40,6 +40,9 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreEdgeListBuilder.h"
+#include "OgreTechnique.h"
+#include "OgreLodStrategy.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre {
 
@@ -163,7 +166,7 @@ namespace Ogre {
 		if (!ret && autoCreate)
 		{
 			// Make a name
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << mName << ":" << index;
 			// Calculate the region centre
 			Vector3 centre = getRegionCentre(x, y, z);
@@ -1358,7 +1361,7 @@ namespace Ogre {
 		//   source
 		//   semantic
 		//   type
-		StringUtil::StrStreamType str;
+		StringStream str;
 
 		str << geom->indexData->indexBuffer->getType() << "|";
 		const VertexDeclaration::VertexElementList& elemList =

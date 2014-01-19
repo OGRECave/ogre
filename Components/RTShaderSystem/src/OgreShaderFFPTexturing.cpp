@@ -31,8 +31,9 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreTextureUnitState.h"
-#include "OgreFrustum.h"
 #include "OgrePass.h"
+#include "OgreFrustum.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {

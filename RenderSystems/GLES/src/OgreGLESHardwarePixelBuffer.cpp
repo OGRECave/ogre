@@ -722,7 +722,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
 
         // GL texture buffer
-        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format, src.format,
+        GLESTextureBuffer tex(BLANKSTRING, target, id, width, height, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture

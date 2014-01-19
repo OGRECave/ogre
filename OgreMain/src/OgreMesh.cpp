@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonManager.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreStringConverter.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreException.h"
 #include "OgreMeshManager.h"
 #include "OgreEdgeListBuilder.h"
@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreBone.h"
 #include "OgreOptimisedUtil.h"
+#include "OgreSkeleton.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
@@ -292,7 +293,7 @@ namespace Ogre {
         mBoneAssignmentsOutOfDate = false;
 
         // Removes reference to skeleton
-        setSkeletonName(StringUtil::BLANK);
+        setSkeletonName(BLANKSTRING);
     }
 
     //-----------------------------------------------------------------------
@@ -303,7 +304,7 @@ namespace Ogre {
 
         // New Mesh is assumed to be manually defined rather than loaded since you're cloning it for a reason
         String theGroup;
-        if (newGroup == StringUtil::BLANK)
+        if (newGroup == BLANKSTRING)
         {
             theGroup = this->getGroup();
         }
@@ -1392,7 +1393,7 @@ namespace Ogre {
 					tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
 				// If any vertex splitting happened, we have to give them bone assignments
-				if (getSkeletonName() != StringUtil::BLANK)
+				if (getSkeletonName() != BLANKSTRING)
 				{
 					for (TangentSpaceCalc::IndexRemapList::iterator r = res.indexesRemapped.begin(); 
 						r != res.indexesRemapped.end(); ++r)
@@ -1452,7 +1453,7 @@ namespace Ogre {
 					tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
 				// If any vertex splitting happened, we have to give them bone assignments
-				if (getSkeletonName() != StringUtil::BLANK)
+				if (getSkeletonName() != BLANKSTRING)
 				{
 					for (TangentSpaceCalc::IndexRemapList::iterator r = res.indexesRemapped.begin(); 
 						r != res.indexesRemapped.end(); ++r)
@@ -2376,7 +2377,7 @@ namespace Ogre {
 			if ((*i)->getName() == name)
 				return *i;
 		}
-		StringUtil::StrStreamType str;
+		StringStream str;
 		str << "No pose called " << name << " found in Mesh " << mName;
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
 			str.str(),
@@ -2410,7 +2411,7 @@ namespace Ogre {
 				return;
 			}
 		}
-		StringUtil::StrStreamType str;
+		StringStream str;
 		str << "No pose called " << name << " found in Mesh " << mName;
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
 			str.str(),

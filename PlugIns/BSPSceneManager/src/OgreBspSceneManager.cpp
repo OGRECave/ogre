@@ -129,7 +129,7 @@ namespace Ogre {
 		}
 		else
 		{
-			setSkyDome(false, StringUtil::BLANK);
+			setSkyDome(false, BLANKSTRING);
 		}
 
         // Init static render operation
@@ -171,7 +171,7 @@ namespace Ogre {
 		}
 		else
 		{
-			setSkyDome(false, StringUtil::BLANK);
+			setSkyDome(false, BLANKSTRING);
 		}
 
         // Init static render operation

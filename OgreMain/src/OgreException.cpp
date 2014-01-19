@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreException.h"
-
-#include "OgreRoot.h"
 #include "OgreLogManager.h"
 
 #ifdef __BORLANDC__
@@ -93,7 +91,7 @@ namespace Ogre {
 		if (fullDesc.empty())
 		{
 
-			StringUtil::StrStreamType desc;
+			StringStream desc;
 
 			desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
 				<< description 

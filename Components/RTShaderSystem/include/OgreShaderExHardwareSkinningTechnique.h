@@ -30,15 +30,10 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderSubRenderState.h"
-#include "OgreShaderParameter.h"
-#include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
 
 namespace Ogre {
 namespace RTShader {
-
-class HardwareSkinningFactory;
 
 /** \addtogroup Core
 *  @{

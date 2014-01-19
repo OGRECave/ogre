@@ -30,6 +30,7 @@
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to encapsulate shader

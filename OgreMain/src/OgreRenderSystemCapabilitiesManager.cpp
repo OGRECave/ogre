@@ -28,12 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreStringVector.h"
-#include "OgreLogManager.h"
 #include "OgreArchiveManager.h"
 #include "OgreArchive.h"
-#include "OgreStringConverter.h"
-
-#include "OgreException.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 

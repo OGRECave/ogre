@@ -137,6 +137,7 @@ namespace Ogre {
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
     class Angle;
+    class AnimableValue;
     class Animation;
     class AnimationState;
     class AnimationStateSet;
@@ -159,6 +160,7 @@ namespace Ogre {
     template <typename T> class ControllerFunction;
     class ControllerManager;
     template <typename T> class ControllerValue;
+	class DataStream;
 	class DefaultWorkQueue;
     class Degree;
 	class DepthBuffer;
@@ -173,6 +175,10 @@ namespace Ogre {
     struct FrameEvent;
     class FrameListener;
     class Frustum;
+    struct GpuLogicalBufferStruct;
+    struct GpuNamedConstants;
+    class GpuProgramParameters;
+    class GpuSharedParameters;
     class GpuProgram;
     class GpuProgramManager;
 	class GpuProgramUsage;
@@ -200,6 +206,7 @@ namespace Ogre {
     class Log;
     class LogManager;
 	class LodStrategy;
+	class LodStrategyManager;
 	class ManualResourceLoader;
 	class ManualObject;
     class Material;
@@ -207,6 +214,7 @@ namespace Ogre {
     class Math;
     class Matrix3;
     class Matrix4;
+    class MemoryDataStream;
     class MemoryManager;
     class Mesh;
     class MeshSerializer;
@@ -258,6 +266,7 @@ namespace Ogre {
     class RenderTarget;
     class RenderTargetListener;
     class RenderTexture;
+    class RenderToVertexBuffer;
 	class MultiRenderTarget;
     class RenderWindow;
     class RenderOperation;
@@ -276,6 +285,7 @@ namespace Ogre {
 	class ScriptCompilerManager;
 	class ScriptLoader;
     class Serializer;
+    class ShadowCameraSetup;
     class ShadowCaster;
     class ShadowRenderable;
 	class ShadowTextureManager;
@@ -324,13 +334,22 @@ namespace Ogre {
 	class CustomCompositionPass;
 
     template<typename T> class SharedPtr;
+	typedef SharedPtr<AnimableValue> AnimableValuePtr;
     typedef SharedPtr<Compositor> CompositorPtr;
+	typedef SharedPtr<DataStream> DataStreamPtr;
     typedef SharedPtr<GpuProgram> GpuProgramPtr;
+    typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
+    typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
+    typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
+    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersSharedPtr;
     typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
     typedef SharedPtr<Material> MaterialPtr;
+    typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
     typedef SharedPtr<Mesh> MeshPtr;
     typedef SharedPtr<PatchMesh> PatchMeshPtr;
+    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
     typedef SharedPtr<Resource> ResourcePtr;
+	typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
     typedef SharedPtr<Texture> TexturePtr;
 }

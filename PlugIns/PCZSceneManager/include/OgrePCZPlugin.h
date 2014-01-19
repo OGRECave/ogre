@@ -37,13 +37,15 @@ Code Style Update	 :
 #ifndef PCZPLUGIN_H
 #define PCZPLUGIN_H
 
-#include <OgrePlugin.h>
-#include "OgrePCZSceneManager.h"
-#include "OgrePCZoneFactory.h"
-#include "OgrePCZLight.h"
+#include "OgrePlugin.h"
 
 namespace Ogre
 {
+    class PCZSceneManagerFactory;
+    class PCZoneFactoryManager;
+    class PCZLightFactory;
+    class PortalFactory;
+    class AntiPortalFactory;
 
 	/** Plugin instance for PCZ Manager */
 	class PCZPlugin : public Plugin

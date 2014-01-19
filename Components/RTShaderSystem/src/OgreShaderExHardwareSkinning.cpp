@@ -27,17 +27,17 @@ THE SOFTWARE.
 #include "OgreShaderExHardwareSkinning.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#include "OgreShaderFFPRenderState.h"
 #include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderExLinearSkinning.h"
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderParameter.h"
-#include "OgreShaderProgramSet.h"
+#include "OgreMesh.h"
+#include "OgreShaderGenerator.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
 #include "OgreMaterial.h"
 #include "OgreSubMesh.h"
-#include "OgreShaderGenerator.h"
+#include "OgreTechnique.h"
+#include "OgreMaterialSerializer.h"
 
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"
 

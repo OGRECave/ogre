@@ -29,11 +29,9 @@ THE SOFTWARE.
 
 #include "OgreSerializer.h"
 #include "OgreLogManager.h"
-#include "OgreDataStream.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"
-#include "OgreStringConverter.h"
 
 
 namespace Ogre {

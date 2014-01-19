@@ -38,6 +38,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLShader.h"
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 

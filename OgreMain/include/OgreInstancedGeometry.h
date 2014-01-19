@@ -31,15 +31,12 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreMovableObject.h"
 #include "OgreSimpleRenderable.h"
-#include "OgreSkeleton.h"
-#include "OgreSkeletonInstance.h"
-#include "OgreAnimationTrack.h"
-#include "OgreBone.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreMesh.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    class SkeletonInstance;
 
 	/** \addtogroup Core
 	*  @{
@@ -170,7 +167,6 @@ namespace Ogre {
 		class LODBucket;
 		class MaterialBucket;
 		class BatchInstance;
-		class InstancedObject;
 
 		/** A GeometryBucket is a the lowest level bucket where geometry with 
 			the same vertex & index format is stored. It also acts as the 

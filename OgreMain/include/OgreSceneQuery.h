@@ -31,13 +31,9 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSphere.h"
 #include "OgreRay.h"
-#include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
-    // forward declaration
-    class SceneQueryListener;
 	/** \addtogroup Core
 	*  @{
 	*/

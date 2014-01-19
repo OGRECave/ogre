@@ -28,7 +28,6 @@
 
 #include "OgreLodCollapseCostOutside.h"
 #include "OgreLodOutsideMarker.h"
-#include "OgreLodInputProviderMesh.h"
 
 namespace Ogre
 {

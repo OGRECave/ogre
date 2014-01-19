@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreCompositionPass.h"
 #include "OgreMaterialManager.h"
+#include "OgreRenderQueue.h"
 
 namespace Ogre {
 
@@ -37,7 +38,7 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
 	mIdentifier(0),
 	mFirstRenderQueue(RENDER_QUEUE_BACKGROUND),
 	mLastRenderQueue(RENDER_QUEUE_SKIES_LATE),
-	mMaterialScheme(StringUtil::BLANK),
+	mMaterialScheme(BLANKSTRING),
     mClearBuffers(FBT_COLOUR|FBT_DEPTH),
     mClearColour(0.0,0.0,0.0,0.0),
 	mClearDepth(1.0f),

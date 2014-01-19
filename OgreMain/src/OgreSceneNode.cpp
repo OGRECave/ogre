@@ -29,9 +29,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 
 #include "OgreException.h"
-#include "OgreEntity.h"
 #include "OgreCamera.h"
-#include "OgreLight.h"
 #include "OgreMath.h"
 #include "OgreSceneManager.h"
 #include "OgreMovableObject.h"

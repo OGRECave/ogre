@@ -36,8 +36,9 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
-#include "OgreMeshSerializer.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreSceneNode.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -407,7 +408,7 @@ namespace Ogre
 	{
 		assert( id < NUM_SETTINGS );
 
-		if( materialName == StringUtil::BLANK )
+		if( materialName == BLANKSTRING )
 		{
 			//Setup all existing materials
 			InstanceBatchMap::iterator itor = mInstanceBatches.begin();

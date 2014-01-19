@@ -1,6 +1,6 @@
 #include "ProceduralTools.h"
 
-#include <Ogre.h>
+#include "Ogre.h"
 
 using namespace Ogre;
 

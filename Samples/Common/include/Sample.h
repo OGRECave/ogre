@@ -28,9 +28,9 @@
 #ifndef __Sample_H__
 #define __Sample_H__
 
-#include "Ogre.h"
+#include "OgreRoot.h"
 #include "OgreOverlaySystem.h"
-#include <iostream>
+#include "OgreResourceManager.h"
 
 #include "InputContext.h"
 #include "OgreFileSystemLayer.h"

@@ -37,11 +37,11 @@ Code Style Update	 :
 #ifndef OCTREEZONE_PLUGIN_H
 #define OCTREEZONE_PLUGIN_H
 
-#include <OgrePlugin.h>
-#include "OgreOctreeZone.h"
+#include "OgrePlugin.h"
 
 namespace Ogre
 {
+    class OctreeZoneFactory;
 
 	/** Plugin instance for OctreeZone */
 	class OctreeZonePlugin : public Plugin

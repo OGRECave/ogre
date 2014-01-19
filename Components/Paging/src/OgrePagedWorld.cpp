@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgrePagedWorld.h"
-#include "OgreResourceGroupManager.h"
-
 #include "OgrePageManager.h"
 #include "OgrePagedWorldSection.h"
 #include "OgreStreamSerialiser.h"
@@ -128,7 +126,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::createSection(SceneManager* sceneMgr,
 		const String& typeName,
-		const String& sectionName /*= StringUtil::BLANK*/)
+		const String& sectionName /*= BLANKSTRING*/)
 	{
 		String theName = sectionName;
 		if (theName.empty())

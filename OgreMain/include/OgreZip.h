@@ -32,9 +32,6 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
-#if OGRE_THREAD_SUPPORT
-#include "Threading/OgreThreadHeaders.h"
-#endif
 #include "OgreHeaderPrefix.h"
 
 // Forward declaration for zziplib to avoid header file dependency.

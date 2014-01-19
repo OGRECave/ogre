@@ -29,9 +29,15 @@ THE SOFTWARE.
 #define __ShaderProgramWriterHLSL_H__
 
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreShaderProgramWriter.h"
+#include "OgreShaderParameter.h"
 
 namespace Ogre {
 	namespace RTShader {
+
+        class Function;
+        class FunctionAtom;
+        class Program;
 
 /** \addtogroup Core
 *  @{

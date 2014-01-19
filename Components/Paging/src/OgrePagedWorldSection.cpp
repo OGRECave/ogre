@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgrePagedWorldSection.h"
 #include "OgrePageStrategy.h"
 #include "OgreStreamSerialiser.h"
-#include "OgreException.h"
 #include "OgrePagedWorld.h"
 #include "OgrePageManager.h"
 #include "OgrePage.h"

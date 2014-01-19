@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre {
     static inline void doImageIO(const String &name, const String &group,

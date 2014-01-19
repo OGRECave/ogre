@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreShadowCameraSetupPSSM.h"
-#include "OgreSceneManager.h"
 #include "OgreCamera.h"
 
 namespace Ogre

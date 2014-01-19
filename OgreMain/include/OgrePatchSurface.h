@@ -30,9 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
-#include "OgreString.h"
-#include "OgreRenderOperation.h"
+#include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreHeaderPrefix.h"
 

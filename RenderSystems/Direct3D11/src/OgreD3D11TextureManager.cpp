@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreD3D11TextureManager.h"
 #include "OgreD3D11Texture.h"
 #include "OgreRoot.h"
+#include "OgreLogManager.h"
 #include "OgreD3D11RenderSystem.h"
 #include "OgreD3D11Device.h"
 

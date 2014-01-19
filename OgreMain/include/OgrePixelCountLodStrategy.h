@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreLodStrategy.h"
 #include "OgreSingleton.h"
-#include "OgreNode.h"
 
 namespace Ogre {
 

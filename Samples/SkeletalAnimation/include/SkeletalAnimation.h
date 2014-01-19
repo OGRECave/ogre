@@ -6,6 +6,7 @@
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinning.h"
 #endif
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;

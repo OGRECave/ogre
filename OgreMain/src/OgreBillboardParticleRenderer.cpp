@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreBillboardParticleRenderer.h"
 #include "OgreParticle.h"
+#include "OgreBillboard.h"
 #include "OgreStringConverter.h"
 
 namespace Ogre {
@@ -384,7 +385,7 @@ namespace Ogre {
             return "bottom_right";
         }
         // Compiler nicety
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
     void BillboardParticleRenderer::CmdBillboardOrigin::doSet(void* target, const String& val)
     {
@@ -428,7 +429,7 @@ namespace Ogre {
             return "texcoord";
         }
         // Compiler nicety
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
     void BillboardParticleRenderer::CmdBillboardRotationType::doSet(void* target, const String& val)
     {

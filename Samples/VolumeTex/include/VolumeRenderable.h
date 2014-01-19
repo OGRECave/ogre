@@ -13,8 +13,8 @@ same license as the rest of the engine.
 */
 #ifndef OWL_VOLUMERENDERABLE
 #define OWL_VOLUMERENDERABLE
-#include <OgrePrerequisites.h>
-#include <OgreSimpleRenderable.h>
+#include "OgrePrerequisites.h"
+#include "OgreSimpleRenderable.h"
 
 /** Direct Volume Rendering.
  	TODO: LOD: reduce number of slices in distance

@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "FileSystemArchiveTests.h"
 #include "OgreFileSystem.h"
 #include "OgreException.h"
+#include "OgreCommon.h"
 
 // Register the suite
 //CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
@@ -85,14 +86,14 @@ void FileSystemArchiveTests::testListFileInfoNonRecursive()
     //FileInfo& fi1 = vec->at(0);
     //CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
     //CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    //CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    //CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     //CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
     //CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     //FileInfo& fi2 = vec->at(1);
     //CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
     //CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    //CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    //CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     //CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
     //CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 }
@@ -106,14 +107,14 @@ void FileSystemArchiveTests::testListFileInfoRecursive()
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 
@@ -178,14 +179,14 @@ void FileSystemArchiveTests::testFindFileInfoNonRecursive()
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 }
@@ -237,7 +238,7 @@ void FileSystemArchiveTests::testFileRead()
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 1"), stream->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 1"), stream->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 1"), stream->getLine());
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, stream->getLine()); // blank at end of file
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream->eof());
 
 }
@@ -264,7 +265,7 @@ void FileSystemArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 1"), stream1->getLine());
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, stream1->getLine()); // blank at end of file
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream1->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream1->eof());
 
 
@@ -272,7 +273,7 @@ void FileSystemArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 6 in file 2"), stream2->getLine());
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, stream2->getLine()); // blank at end of file
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream2->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream2->eof());
 
 }

@@ -35,11 +35,14 @@ email                : ericc@xenopi.com
 
 #include "OgreOctreeZone.h"
 #include "OgreSceneNode.h"
+#include "OgreAntiPortal.h"
 #include "OgrePortal.h"
+#include "OgreEntity.h"
+#include "OgreOctreeZoneOctree.h"
+#include "OgrePCZCamera.h"
+#include "OgrePCZLight.h"
 #include "OgrePCZSceneNode.h"
 #include "OgrePCZSceneManager.h"
-#include "OgrePCZLight.h"
-#include "OgreEntity.h"
 
 namespace Ogre
 {

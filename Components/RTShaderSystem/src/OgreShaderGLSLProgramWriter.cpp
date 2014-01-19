@@ -26,23 +26,14 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderGLSLProgramWriter.h"
-#include "OgreStringConverter.h"
-#include "OgreShaderGenerator.h"
+#include "OgreShaderProgram.h"
 #include "OgreRoot.h"
+#include "OgreString.h"
 
 namespace Ogre {
 namespace RTShader {
 
 String GLSLProgramWriter::TargetLanguage = "glsl";
-
-// Uniform comparer
-struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
-{
-	bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
-	{
-        return uniform->getName() == name;
-	}
-};
 
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter()

@@ -28,17 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreMaterialManager.h"
 
-#include "OgreMaterial.h"
 #include "OgreMaterialSerializer.h"
-#include "OgreStringVector.h"
-#include "OgreLogManager.h"
-#include "OgreArchive.h"
-#include "OgreStringConverter.h"
-#include "OgreBlendMode.h"
 #include "OgreTechnique.h"
-#include "OgrePass.h"
-#include "OgreTextureUnitState.h"
-#include "OgreException.h"
 #include "OgreScriptCompiler.h"
 #include "OgreLodStrategyManager.h"
 
@@ -289,7 +280,7 @@ namespace Ogre {
 		}
 
 		//If no success, check generic listeners
-		it = mListenerMap.find(StringUtil::BLANK);
+		it = mListenerMap.find(BLANKSTRING);
 		if (it != mListenerMap.end()) 
 		{
 			ListenerList& listenerList = it->second;

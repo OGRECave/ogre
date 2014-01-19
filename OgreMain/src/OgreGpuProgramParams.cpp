@@ -27,19 +27,12 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramParams.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
 #include "OgreDualQuaternion.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreLight.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreRenderSystemCapabilities.h"
-#include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-
+#include "OgreRenderTarget.h"
 
 namespace Ogre
 {

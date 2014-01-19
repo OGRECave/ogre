@@ -31,13 +31,10 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreRenderQueue.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSphere.h"
 #include "OgreShadowCaster.h"
-#include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
-#include "OgreAny.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

@@ -26,6 +26,7 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderFunctionAtom.h"
+#include "OgreShaderParameter.h"
 #include "OgreRoot.h"
 
 namespace Ogre {

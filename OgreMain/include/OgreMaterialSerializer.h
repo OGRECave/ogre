@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __MaterialSerializer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMaterial.h"
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgram.h"
 #include "OgreStringVector.h"

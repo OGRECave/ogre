@@ -29,9 +29,9 @@ PortalBase.cpp  -
 */
 
 #include "OgrePortalBase.h"
-//#include "OgreSegment.h"
-//#include "OgreRay.h"
-#include "OgrePCZone.h"   // need access to real zone class 
+#include "OgreRay.h"
+#include "OgrePCZone.h"   // need access to real zone class
+#include "OgrePCZSceneNode.h"
 
 using namespace Ogre;
 

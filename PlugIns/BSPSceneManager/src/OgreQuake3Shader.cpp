@@ -62,7 +62,7 @@ namespace Ogre {
     MaterialPtr Quake3Shader::createAsMaterial(int lightmapNumber)
     {
 		String matName;
-		StringUtil::StrStreamType str;
+		StringStream str;
         String resourceGroup = ResourceGroupManager::getSingleton().getWorldResourceGroupName();
 
         str << mName << "#" << lightmapNumber;
@@ -79,7 +79,7 @@ namespace Ogre {
             // Create basic texture
             if (pass[p].textureName == "$lightmap")
             {
-                StringUtil::StrStreamType str2;
+                StringStream str2;
 				str2 << "@lightmap" << lightmapNumber;
                 t = ogrePass->createTextureUnitState(str2.str());
             }

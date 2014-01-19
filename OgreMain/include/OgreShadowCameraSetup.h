@@ -29,8 +29,6 @@ THE SOFTWARE.
 #define __ShadowCameraSetup_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMovablePlane.h"
-#include "OgreSharedPtr.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -96,9 +94,6 @@ namespace Ogre {
 									  const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
 	};
 
-
-
-	typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
 	/** @} */
 	/** @} */
 

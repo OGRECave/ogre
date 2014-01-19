@@ -57,6 +57,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
+#include "OgreViewport.h"
 
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
@@ -842,7 +843,7 @@ namespace Ogre {
 
     String GL3PlusRenderSystem::getErrorDescription(long errorNumber) const
     {
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
 
     VertexElementType GL3PlusRenderSystem::getColourVertexElementType(void) const

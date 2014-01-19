@@ -28,8 +28,9 @@
 #ifndef __SdkCameraMan_H__
 #define __SdkCameraMan_H__
 
-#include "Ogre.h"
-#include <limits>
+#include "OgreCamera.h"
+#include "OgreSceneNode.h"
+#include "OgreFrameListener.h"
 
 namespace OgreBites
 {

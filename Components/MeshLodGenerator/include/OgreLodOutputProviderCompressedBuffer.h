@@ -32,7 +32,6 @@
 
 #include "OgreLodPrerequisites.h"
 #include "OgreLodOutputProviderCompressedMesh.h"
-#include "OgreMesh.h"
 
 namespace Ogre
 {

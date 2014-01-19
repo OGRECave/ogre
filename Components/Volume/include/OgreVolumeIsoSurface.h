@@ -28,12 +28,13 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_IsoSurface_H__
 #define __Ogre_Volume_IsoSurface_H__
 
-#include "OgreVolumeMeshBuilder.h"
-#include "OgreVolumeSource.h"
 #include "OgreVolumePrerequisites.h"
 
 namespace Ogre {
 namespace Volume {
+
+    class Source;
+    class MeshBuilder;
 
     /** Abstract IsoSurface.
      */

@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderProgramManager.h"
-#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 namespace RTShader {

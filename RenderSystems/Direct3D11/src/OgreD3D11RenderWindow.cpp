@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreD3D11Driver.h"
 #include "OgreRoot.h"
+#include "OgreLogManager.h"
+#include "OgreViewport.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
 

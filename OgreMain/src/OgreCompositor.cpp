@@ -29,9 +29,11 @@ THE SOFTWARE.
 #include "OgreCompositor.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreTextureManager.h"
+#include "OgreLogManager.h"
+#include "OgreRenderTexture.h"
+#include "OgreRenderTarget.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre {
 
@@ -187,7 +189,7 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
 	// didn't find a matching one
 	for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
 	{
-		if ((*i)->getSchemeName() == StringUtil::BLANK)
+		if ((*i)->getSchemeName() == BLANKSTRING)
 		{
 			return *i;
 		}

@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreBspResourceManager.h"
+#include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgreBspLevel.h"
 #include "OgreQuake3ShaderManager.h"
 

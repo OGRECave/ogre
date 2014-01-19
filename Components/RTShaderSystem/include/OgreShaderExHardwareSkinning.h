@@ -31,21 +31,16 @@ THE SOFTWARE.
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
-#include "OgreShaderParameter.h"
-#include "OgreRenderSystem.h"
-#include "OgreShaderFunctionAtom.h"
-#include "OgreShaderExLinearSkinning.h"
-#include "OgreShaderExHardwareSkinningTechnique.h"
-#include "OgreShaderExDualQuaternionSkinning.h"
-#include "OgreShaderExLinearSkinning.h"
 
 #define HS_MAX_WEIGHT_COUNT 4
 
 namespace Ogre {
 namespace RTShader {
 
-
-class HardwareSkinningFactory;
+    class HardwareSkinningFactory;
+    class DualQuaternionSkinning;
+    class HardwareSkinningTechnique;
+    class LinearSkinning;
 
 /** \addtogroup Core
 *  @{

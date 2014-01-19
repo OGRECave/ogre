@@ -28,17 +28,16 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_OctreeNode_H__
 #define __Ogre_Volume_OctreeNode_H__
 
-#include "OgreMatrix3.h"
-#include "OgreEntity.h"
-#include "OgreSceneManager.h"
-#include "OgreManualObject.h"
-#include "OgreVolumeOctreeNodeSplitPolicy.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 
 namespace Ogre {
+
 namespace Volume {
 
     class OctreeNodeSplitPolicy;
+    class Source;
 
     /** A node in the volume octree.
     */

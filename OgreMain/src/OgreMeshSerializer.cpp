@@ -28,12 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMeshSerializer.h"
-#include "OgreMeshFileFormat.h"
 #include "OgreMesh.h"
-#include "OgreSubMesh.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreSkeleton.h"
 
 
 namespace Ogre {

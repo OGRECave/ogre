@@ -26,9 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreTerrainMaterialGeneratorA.h"
-#include "OgreTerrain.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreShadowCameraSetupPSSM.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre
 {

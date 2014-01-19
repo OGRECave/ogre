@@ -34,12 +34,11 @@ email                : janders@users.sf.net
   
 ***************************************************************************/
 
-#include <OgreOctreeSceneManager.h>
-#include <OgreOctreeSceneQuery.h>
-#include <OgreOctreeNode.h>
-#include <OgreOctreeCamera.h>
-#include <OgreRenderSystem.h>
-
+#include "OgreOctreeSceneManager.h"
+#include "OgreOctreeSceneQuery.h"
+#include "OgreOctreeNode.h"
+#include "OgreOctreeCamera.h"
+#include "OgreWireBoundingBox.h"
 
 extern "C"
 {

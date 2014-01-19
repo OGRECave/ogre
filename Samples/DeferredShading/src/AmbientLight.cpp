@@ -19,6 +19,7 @@ same license as the rest of the engine.
 #include "OgreCamera.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreTechnique.h"
 
 using namespace Ogre;
 

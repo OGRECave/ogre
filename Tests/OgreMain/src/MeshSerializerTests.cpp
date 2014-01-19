@@ -42,6 +42,9 @@ THE SOFTWARE.
 #include "OgreSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreMaterialManager.h"
+#include "OgreLodStrategyManager.h"
+#include "OgreSkeleton.h"
 
 //#define I_HAVE_LOT_OF_FREE_TIME
 

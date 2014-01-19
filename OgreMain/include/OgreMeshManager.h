@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreVector3.h"
 #include "OgreHardwareBuffer.h"
-#include "OgreMesh.h"
 #include "OgrePatchSurface.h"
 #include "OgreHeaderPrefix.h"
 

@@ -27,7 +27,11 @@ THE SOFTWARE.
 */
 #include "OgreShaderExLayeredBlending.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#include "OgreShaderFunctionAtom.h"
 #include "OgreShaderProgram.h"
+#include "OgreShaderProgramSet.h"
+#include "OgrePass.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {

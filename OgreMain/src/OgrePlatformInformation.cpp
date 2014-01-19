@@ -28,8 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgrePlatformInformation.h"
-#include "OgreLog.h"
-#include "OgreStringConverter.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #include <excpt.h>      // For SEH values
@@ -413,7 +411,7 @@ namespace Ogre {
 			char CPUString[0x20];
 			char CPUBrandString[0x40];
 
-			StringUtil::StrStreamType detailedIdentStr;
+			StringStream detailedIdentStr;
 
 
 			// Has standard feature ?

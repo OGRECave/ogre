@@ -34,6 +34,7 @@ THE SOFTWARE
 #include "OgreStringConverter.h"
 #include "OgreFont.h"
 #include "OgreFontManager.h"
+#include "OgreOverlayElement.h"
 
 namespace Ogre {
 

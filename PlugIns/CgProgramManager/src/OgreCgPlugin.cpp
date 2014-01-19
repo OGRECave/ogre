@@ -28,8 +28,11 @@ THE SOFTWARE.
 
 #include "OgreCgPlugin.h"
 #include "OgreRoot.h"
+#include "OgreHighLevelGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreCgFxScriptLoader.h"
+#include "OgreCgProgramFactory.h"
+#include "OgreLogManager.h"
 
 namespace Ogre 
 {

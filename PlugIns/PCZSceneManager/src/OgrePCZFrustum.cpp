@@ -50,6 +50,7 @@ email                : ericc@xenopi.com
 */
 
 #include "OgrePCZFrustum.h"
+#include "OgrePCPlane.h"
 #include "OgreAntiPortal.h"
 #include "OgrePortal.h"
 

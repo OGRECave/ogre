@@ -698,7 +698,7 @@ namespace Ogre {
                      so that when the texture unit name is set by the user, the alias name will be set to
                      that name
                     */
-                    state->setTextureNameAlias(StringUtil::BLANK);
+                    state->setTextureNameAlias(BLANKSTRING);
                 }
                 // Needs recompilation
                 mParent->_notifyNeedsRecompile();
@@ -1697,7 +1697,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mVertexProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
 		    return mVertexProgramUsage->getProgramName();
 	}
@@ -1724,7 +1724,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mFragmentProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
     		return mFragmentProgramUsage->getProgramName();
 	}
@@ -1745,7 +1745,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mGeometryProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
     		return mGeometryProgramUsage->getProgramName();
 	}
@@ -1766,7 +1766,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationHullProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
     		return mTessellationHullProgramUsage->getProgramName();
 	}
@@ -1787,7 +1787,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationDomainProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
     		return mTessellationDomainProgramUsage->getProgramName();
 	}
@@ -1808,7 +1808,7 @@ namespace Ogre {
 	{
             OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mComputeProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
     		return mComputeProgramUsage->getProgramName();
 	}
@@ -2075,7 +2075,7 @@ namespace Ogre {
     const String& Pass::getShadowCasterVertexProgramName(void) const
     {
         if (!mShadowCasterVertexProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
             return mShadowCasterVertexProgramUsage->getProgramName();
     }
@@ -2133,7 +2133,7 @@ namespace Ogre {
     const String& Pass::getShadowCasterFragmentProgramName(void) const
     {
         if (!mShadowCasterFragmentProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
             return mShadowCasterFragmentProgramUsage->getProgramName();
     }
@@ -2191,7 +2191,7 @@ namespace Ogre {
     const String& Pass::getShadowReceiverVertexProgramName(void) const
     {
         if (!mShadowReceiverVertexProgramUsage)
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         else
             return mShadowReceiverVertexProgramUsage->getProgramName();
     }
@@ -2246,7 +2246,7 @@ namespace Ogre {
 	const String& Pass::getShadowReceiverFragmentProgramName(void) const
 	{
 		if (!mShadowReceiverFragmentProgramUsage)
-			return StringUtil::BLANK;
+			return BLANKSTRING;
 		else
 			return mShadowReceiverFragmentProgramUsage->getProgramName();
 	}

@@ -29,11 +29,10 @@ THE SOFTWARE.
 
 #if OGRE_NO_ZIP_ARCHIVE == 0
 
-#include "OgreZip.h"
+//#include "OgreZip.h"
 
 #include "OgreLogManager.h"
 #include "OgreException.h"
-#include "OgreRoot.h"
 
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>

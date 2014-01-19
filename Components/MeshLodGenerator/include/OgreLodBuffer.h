@@ -30,7 +30,6 @@
 #define _LodBuffer_H__
 
 #include "OgreLodPrerequisites.h"
-#include "OgreMesh.h"
 #include "OgreSharedPtr.h"
 
 namespace Ogre

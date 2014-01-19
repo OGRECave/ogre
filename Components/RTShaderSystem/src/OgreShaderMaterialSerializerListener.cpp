@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderGenerator.h"
 #include "OgreMaterialManager.h"
-
+#include "OgreTechnique.h"
 
 namespace Ogre {
 namespace RTShader {

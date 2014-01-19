@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreSingleton.h"
 #include "OgreResourceManager.h"
-#include "OgreMaterial.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -268,13 +267,13 @@ namespace Ogre {
 		Add a listener to handle material events. 
 		If schemeName is supplied, the listener will only receive events for that certain scheme.
 		*/
-		virtual void addListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
+		virtual void addListener(Listener* l, const Ogre::String& schemeName = BLANKSTRING);
 
 		/** 
 		Remove a listener handling material events. 
 		If the listener was added with a custom scheme name, it needs to be supplied here as well.
 		*/
-		virtual void removeListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
+		virtual void removeListener(Listener* l, const Ogre::String& schemeName = BLANKSTRING);
 
 		/// Internal method for sorting out missing technique for a scheme
 		virtual Technique* _arbitrateMissingTechniqueForActiveScheme(

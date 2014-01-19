@@ -30,15 +30,13 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreMatrix4.h"
-#include "OgreVector4.h"
 #include "OgreLight.h"
-#include "OgreColourValue.h"
 
 namespace Ogre {
 
 	// forward decls
 	struct VisibleObjectsBoundsInfo;
+
 	/** \addtogroup Core
 	*  @{
 	*/

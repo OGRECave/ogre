@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreEdgeListBuilder.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
 #include "OgreVertexIndexData.h"
 #include "OgreException.h"
 #include "OgreOptimisedUtil.h"

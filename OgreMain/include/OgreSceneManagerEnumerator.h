@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreSceneManager.h"
 #include "OgreSingleton.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -150,7 +149,7 @@ namespace Ogre {
 			created. If you leave this blank, an auto name will be assigned.
 		*/
 		SceneManager* createSceneManager(const String& typeName, 
-			const String& instanceName = StringUtil::BLANK);
+			const String& instanceName = BLANKSTRING);
 
 		/** Create a SceneManager instance based on scene type support.
 		@remarks
@@ -165,7 +164,7 @@ namespace Ogre {
 			created. If you leave this blank, an auto name will be assigned.
 		*/
 		SceneManager* createSceneManager(SceneTypeMask typeMask, 
-			const String& instanceName = StringUtil::BLANK);
+			const String& instanceName = BLANKSTRING);
 
 		/** Destroy an instance of a SceneManager. */
 		void destroySceneManager(SceneManager* sm);

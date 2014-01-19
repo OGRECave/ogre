@@ -21,10 +21,10 @@ same license as the rest of the engine.
 
 #include "SdkSample.h"
 #include "SamplePlugin.h"
-#include <OgreTexture.h>
-#include <OgreHardwarePixelBuffer.h>
-#include <OgreTextureManager.h>
-#include <OgreLogManager.h>
+#include "OgreTexture.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreTextureManager.h"
+#include "OgreLogManager.h"
 #include <sstream>
 
 #include "VolumeRenderable.h"

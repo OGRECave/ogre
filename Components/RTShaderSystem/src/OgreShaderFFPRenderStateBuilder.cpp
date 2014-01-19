@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreShaderFFPTexturing.h"
 #include "OgreShaderFFPFog.h"
 #include "OgrePass.h"
-#include "OgreSceneManager.h"
 #include "OgreLogManager.h"
 #include "OgreShaderFFPRenderState.h"
 

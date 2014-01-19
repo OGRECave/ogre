@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
-#include "OgreString.h"
 #include "OgreException.h"
 #include "OgreGpuProgramManager.h"
 
@@ -381,7 +380,7 @@ namespace Ogre
 	String UnifiedHighLevelGpuProgram::CmdDelegate::doGet(const void* target) const
 	{
 		// Can't do this (not one delegate), shouldn't matter
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 	}
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgram::CmdDelegate::doSet(void* target, const String& val)

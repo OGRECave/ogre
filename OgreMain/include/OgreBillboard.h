@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"

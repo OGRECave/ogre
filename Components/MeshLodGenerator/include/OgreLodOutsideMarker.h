@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
 /// This class will mark vertices of a mesh, which are visible from far away (from outside).
 /// Triangle is visible if each vertex of it is visible.
 class _OgreLodExport LodOutsideMarker

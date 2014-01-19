@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreMovableObject.h"
 #include "OgrePlaneBoundedVolume.h"
-#include "OgreShadowCameraSetup.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

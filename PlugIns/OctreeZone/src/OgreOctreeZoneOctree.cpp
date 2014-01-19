@@ -35,9 +35,11 @@ Modified to use with PCZones 2007 by Eric Cha
 -----------------------------------------------------------------------------
 */
 
-#include <OgreOctreeZoneOctree.h>
-#include <OgrePCZSceneNode.h>
+#include "OgreOctreeZoneOctree.h"
+#include "OgrePCZSceneNode.h"
 #include "OgreOctreeZone.h"
+#include "OgreRay.h"
+#include "OgreWireBoundingBox.h"
 
 namespace Ogre
 {

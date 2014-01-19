@@ -37,7 +37,7 @@ email                : janders@users.sf.net
 #define OCTREESCENEQUERY_H
 
 #include "OgreOctreePrerequisites.h"
-#include <OgreSceneManager.h>
+#include "OgreSceneManager.h"
 
 
 namespace Ogre

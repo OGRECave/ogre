@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreBlendMode.h"
 #include "OgreMatrix4.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreString.h"
 #include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 

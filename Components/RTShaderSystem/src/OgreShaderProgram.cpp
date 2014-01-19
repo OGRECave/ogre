@@ -26,7 +26,6 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderProgram.h"
-#include "OgreStringConverter.h"
 
 namespace Ogre {
 namespace RTShader {

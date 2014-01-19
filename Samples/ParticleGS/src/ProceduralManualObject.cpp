@@ -13,6 +13,7 @@ Also see acknowledgements in Readme.html
 */
 
 #include "ProceduralManualObject.h"
+#include "OgreRenderQueue.h"
 
 namespace Ogre
 {

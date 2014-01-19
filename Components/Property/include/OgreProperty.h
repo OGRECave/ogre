@@ -33,16 +33,10 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreString.h"
 #include "OgreException.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreColourValue.h"
 #include "OgreQuaternion.h"
-#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
+
 /** \addtogroup Optional Components
 *  @{
 */
@@ -358,7 +352,7 @@ namespace Ogre
 			PropertyBase* baseProp = getProperty(name);
 			if (baseProp->getType() != typeCheck)
 			{
-				StringUtil::StrStreamType msg;
+				StringStream msg;
 				msg << "Property error: type passed in: '" << PropertyDef::getTypeName(typeCheck)
 					<< "', type of property: '" << PropertyDef::getTypeName(baseProp->getType()) << "'";
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, msg.str(), "PropertySet::setPropertyImpl");
@@ -373,7 +367,7 @@ namespace Ogre
 			PropertyBase* baseProp = getProperty(name);
 			if (baseProp->getType() != typeCheck)
 			{
-				StringUtil::StrStreamType msg;
+				StringStream msg;
 				msg << "Property error: type requested: '" << PropertyDef::getTypeName(typeCheck)
 					<< "', type of property: '" << PropertyDef::getTypeName(baseProp->getType()) << "'";
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, msg.str(), "PropertySet::getPropertyImpl");

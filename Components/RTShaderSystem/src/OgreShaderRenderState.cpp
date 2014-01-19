@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderProgramSet.h"
-#include "OgreStringConverter.h"
 #include "OgreShaderProgramManager.h"
 #include "OgreShaderFFPRenderState.h"
 

@@ -102,7 +102,7 @@ namespace Ogre {
 			if (DevMode.dmBitsPerPel < 16 || DevMode.dmPelsHeight < 480)
 				continue;
 			mDevModes.push_back(DevMode);
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << DevMode.dmPelsWidth << " x " << DevMode.dmPelsHeight;
 			optVideoMode.possibleValues.push_back(str.str());
 		}
@@ -225,7 +225,7 @@ namespace Ogre {
 			it->second.currentValue = value;
 		else
 		{
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "Option named '" << name << "' does not exist.";
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "Win32GLSupport::setConfigOption" );
 		}
@@ -253,7 +253,7 @@ namespace Ogre {
 	String Win32GLSupport::validateConfig()
 	{
 		// TODO, DX9
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 	}
 
 	RenderWindow* Win32GLSupport::createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle)

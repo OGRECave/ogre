@@ -82,8 +82,6 @@ class _OgreSampleClassExport Sample_Compositor : public SdkSample
    added gui framework to demo
 */
 
-#include <Ogre.h>
-
 #include "HelperLogics.h"
 
 /*************************************************************************

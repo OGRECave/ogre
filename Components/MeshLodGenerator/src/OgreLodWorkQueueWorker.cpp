@@ -28,6 +28,7 @@
 
 #include "OgreLodWorkQueueWorker.h"
 #include "OgreMeshLodGenerator.h"
+#include "OgreLodWorkQueueRequest.h"
 #include "OgreRoot.h"
 
 namespace Ogre

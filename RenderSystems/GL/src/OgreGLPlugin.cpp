@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLPlugin.h"
 #include "OgreRoot.h"
+#include "OgreGLRenderSystem.h"
 
 namespace Ogre 
 {

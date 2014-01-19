@@ -30,12 +30,11 @@ THE SOFTWARE.
 #define __SCRIPTCOMPILER_H_
 
 #include "OgreSharedPtr.h"
-#include "OgreMaterial.h"
-#include "OgreHighLevelGpuProgram.h"
-#include "OgreCompositor.h"
 #include "OgreSingleton.h"
 #include "OgreScriptLoader.h"
+#include "OgreGpuProgram.h"
 #include "OgreAny.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

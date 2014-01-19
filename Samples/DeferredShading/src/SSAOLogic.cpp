@@ -14,7 +14,7 @@ same license as the rest of the engine.
 
 #include "SSAOLogic.h"
 
-#include <Ogre.h>
+#include "Ogre.h"
 using namespace Ogre;
 
 class ssaoListener: public Ogre::CompositorInstance::Listener

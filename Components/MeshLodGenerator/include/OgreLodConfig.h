@@ -30,8 +30,6 @@
 #define __LogConfig_H_
 
 #include "OgreLodPrerequisites.h"
-#include "OgreMesh.h"
-#include "OgreLodStrategy.h"
 #include "OgreDistanceLodStrategy.h"
 
 namespace Ogre

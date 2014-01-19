@@ -37,7 +37,7 @@ Code Style Update	 :
 #ifndef OCTREEZONE_PREREQUISITES_H
 #define OCTREEZONE_PREREQUISITES_H
 
-#include <OgrePrerequisites.h>
+#include "OgrePrerequisites.h"
 
 //-----------------------------------------------------------------------
 // Forward declarations

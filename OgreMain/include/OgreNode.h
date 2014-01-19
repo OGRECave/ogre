@@ -31,10 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMatrix4.h"
-#include "OgreString.h"
 #include "OgreRenderable.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreMesh.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreHeaderPrefix.h"
 

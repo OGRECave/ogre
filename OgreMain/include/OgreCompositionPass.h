@@ -29,12 +29,11 @@ THE SOFTWARE.
 #define __CompositionPass_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMaterial.h"
-#include "OgreRenderSystem.h"
-#include "OgreRenderQueue.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre {
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -227,7 +226,7 @@ namespace Ogre {
 			String name;
 			/// MRT surface index if applicable
 			size_t mrtIndex;
-			InputTex() : name(StringUtil::BLANK), mrtIndex(0) {}
+			InputTex() : name(BLANKSTRING), mrtIndex(0) {}
 			InputTex(const String& _name, size_t _mrtIndex = 0)
 				: name(_name), mrtIndex(_mrtIndex) {}
 		};
@@ -238,7 +237,7 @@ namespace Ogre {
 			@param mrtIndex Which surface of an MRT to retrieve
 			@note applies when PassType is RENDERQUAD 
         */
-        void setInput(size_t id, const String &input=StringUtil::BLANK, size_t mrtIndex=0);
+        void setInput(size_t id, const String &input=BLANKSTRING, size_t mrtIndex=0);
         
         /** Get the value of an input.
             @param id    Input to get. Must be in 0..OGRE_MAX_TEXTURE_LAYERS-1.

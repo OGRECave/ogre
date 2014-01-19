@@ -28,9 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreControllerManager.h"
 
-#include "OgreLogManager.h"
-#include "OgreTextureUnitState.h"
 #include "OgreRoot.h"
+#include "OgrePredefinedControllers.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

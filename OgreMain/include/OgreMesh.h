@@ -31,13 +31,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreResource.h"
-#include "OgreVertexIndexData.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexBoneAssignment.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreSkeleton.h"
+#include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
-#include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
 
@@ -330,7 +327,7 @@ namespace Ogre {
             if you leave this blank, the clone will be assigned to the same
             group as this Mesh.
         */
-        MeshPtr clone(const String& newName, const String& newGroup = StringUtil::BLANK);
+        MeshPtr clone(const String& newName, const String& newGroup = BLANKSTRING);
 
         /** Get the axis-aligned bounding box for this mesh.
         */
@@ -926,7 +923,7 @@ namespace Ogre {
         @return
             A new Pose ready for population.
         */
-        Pose* createPose(ushort target, const String& name = StringUtil::BLANK);
+        Pose* createPose(ushort target, const String& name = BLANKSTRING);
         /** Get the number of poses.*/
         size_t getPoseCount(void) const { return mPoseList.size(); }
         /** Retrieve an existing Pose by index.*/

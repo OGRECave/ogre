@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
     namespace GLSL {

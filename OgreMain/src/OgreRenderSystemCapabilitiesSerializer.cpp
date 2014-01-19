@@ -29,9 +29,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-#include "OgreException.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 
 #include <fstream>

@@ -49,8 +49,6 @@ protected:
 	LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
 };
 
-typedef SharedPtr<LodInputProvider> LodInputProviderPtr;
-
 }
 #endif
 

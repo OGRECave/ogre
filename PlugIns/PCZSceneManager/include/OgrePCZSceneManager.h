@@ -37,26 +37,14 @@ Code Style Update	 :
 #ifndef PCZ_SCENEMANAGER_H
 #define PCZ_SCENEMANAGER_H
 
-#include <OgreSceneManager.h>
-#include <OgreSphere.h>
-
 #include "OgrePCZPrerequisites.h"
-#include "OgrePCZSceneNode.h"
+#include "OgreSceneManager.h"
 #include "OgrePCZone.h"
-#include "OgrePCZoneFactory.h"
-#include "OgrePortal.h"
-#include "OgreAntiPortal.h"
 
 namespace Ogre
 {
-
-    class PCZone;
-    class PCZCamera;
-    class PCZIntersectionSceneQuery;
-    class PCZRaySceneQuery;
-    class PCZSphereSceneQuery;
-    class PCZAxisAlignedBoxSceneQuery;
-    class PCZPlaneBoundedVolumeListSceneQuery;
+    class PCZoneFactoryManager;
+    class PortalBase;
 
 	typedef vector<SceneNode*>::type NodeList;
 	typedef list<WireBoundingBox*>::type BoxList;

@@ -30,9 +30,7 @@ THE SOFTWARE.
 
 #include "OgreMesh.h"
 #include "OgreException.h"
-#include "OgreMeshManager.h"
 #include "OgreMaterialManager.h"
-#include "OgreStringConverter.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreTechnique.h"
+#include "OgreLogManager.h"
 
 #define SGX_LIB_TEXTURE_ATLAS "SGXLib_TextureAtlas"
 

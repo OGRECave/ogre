@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PageCoreTests.h"
 #include "OgrePaging.h"
+#include "OgreLogManager.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
@@ -49,7 +50,7 @@ void PageCoreTests::setUp()
 #endif
 
 #ifdef OGRE_STATIC_LIB
-	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+	mRoot = OGRE_NEW Root(BLANKSTRING);
         
 	mStaticPluginLoader.load();
 #else

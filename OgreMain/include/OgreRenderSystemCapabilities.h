@@ -30,11 +30,8 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
-#include "OgreStringConverter.h"
 #include "OgreStringVector.h"
-#include "OgreResource.h"
-#include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 #include "OgreHeaderPrefix.h"
 
 // Because there are more than 32 possible Capabilities, more than 1 int is needed to store them all.
@@ -228,7 +225,7 @@ namespace Ogre
 
 		String toString() const 
 		{
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << major << "." << minor << "." << release << "." << build;
 			return str.str();
 		}

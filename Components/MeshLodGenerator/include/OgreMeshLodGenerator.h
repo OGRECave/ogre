@@ -30,15 +30,13 @@
 #define __MeshLodGenerator_H_
 
 #include "OgreLodPrerequisites.h"
-#include "OgreLodConfig.h"
 #include "OgreLodData.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodOutputProvider.h"
 #include "OgreLodCollapseCost.h"
 #include "OgreLodCollapser.h"
-
+#include "OgreSharedPtr.h"
 #include "OgreSingleton.h"
-#include "OgreMesh.h"
 
 namespace Ogre
 {

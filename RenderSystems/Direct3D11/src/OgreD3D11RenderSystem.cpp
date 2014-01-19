@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreD3D11RenderWindow.h"
 #include "OgreD3D11TextureManager.h"
 #include "OgreD3D11Texture.h"
+#include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareIndexBuffer.h"
@@ -420,7 +421,7 @@ bail:
 			it->second.currentValue = value;
 		else
 		{
-			StringUtil::StrStreamType str;
+			StringStream str;
             str << "Option named '" << name << "' does not exist.";
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "D3D11RenderSystem::setConfigOption" );
 		}
@@ -574,7 +575,7 @@ bail:
 				"the 'Rendering Device' has been changed.";
 		}
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
 	}
 	//---------------------------------------------------------------------
 	ConfigOptionMap& D3D11RenderSystem::getConfigOptions()

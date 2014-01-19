@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 		memset(separator, '+', 80);
 		separator[80] = '\n';
 		separator[81] = 0;
-		Ogre::StringUtil::StrStreamType str;
+		Ogre::StringStream str;
 		str << "\n" << separator << separator;
 		CPPUNIT_NS::CompilerOutputter txtOut(&result, str);
 		txtOut.write();

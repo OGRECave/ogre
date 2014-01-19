@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreCodec.h"
-#include "OgreStringConverter.h"
-
 
 namespace Ogre {
 

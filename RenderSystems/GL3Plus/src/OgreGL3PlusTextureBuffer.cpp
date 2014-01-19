@@ -779,7 +779,7 @@ namespace Ogre {
         }
 
         // GL texture buffer
-        GL3PlusTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
+        GL3PlusTextureBuffer tex(BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, 0);
 
         // Upload data to 0,0,0 in temporary texture
         Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());

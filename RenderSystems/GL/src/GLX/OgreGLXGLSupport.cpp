@@ -331,7 +331,7 @@ namespace Ogre
 	String GLXGLSupport::validateConfig(void) 
 	{
 		// TO DO
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 	}
 
 	//-------------------------------------------------------------------------------------------------//

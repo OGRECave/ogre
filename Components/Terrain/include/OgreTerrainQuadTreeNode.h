@@ -31,11 +31,8 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreHardwareIndexBuffer.h"
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
-
-
 
 namespace Ogre
 {

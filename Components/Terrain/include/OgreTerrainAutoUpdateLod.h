@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __Ogre_TerrainAutoUpdateLod_H__
 
 #include "OgreTerrainPrerequisites.h"
-#include "OgreTerrain.h"
 
 namespace Ogre
 {

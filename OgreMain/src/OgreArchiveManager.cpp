@@ -28,10 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreArchiveManager.h"
-
-#include "OgreArchiveFactory.h"
-#include "OgreException.h"
 #include "OgreLogManager.h"
+#include "OgreException.h"
 
 namespace Ogre {
     typedef void (*createFunc)( Archive**, const String& );

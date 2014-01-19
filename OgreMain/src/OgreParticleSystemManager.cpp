@@ -33,11 +33,10 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
-#include "OgreString.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardParticleRenderer.h"
-#include "OgreStringConverter.h"
 #include "OgreScriptCompiler.h"
+#include "OgreParticleSystem.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------

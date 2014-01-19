@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define __RenderQueue_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre {
 

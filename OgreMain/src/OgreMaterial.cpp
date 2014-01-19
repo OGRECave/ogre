@@ -29,14 +29,11 @@ THE SOFTWARE.
 
 #include "OgreMaterial.h"
 
-#include "OgreSceneManager.h"
 #include "OgreMaterialManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreTechnique.h"
 #include "OgreLogManager.h"
-#include "OgreException.h"
-#include "OgreStringConverter.h"
 #include "OgreLodStrategyManager.h"
+#include "OgreLodStrategy.h"
 
 namespace Ogre {
 
@@ -500,7 +497,7 @@ namespace Ogre {
 			else
 			{
 				// Log informational
-				StringUtil::StrStreamType str;
+				StringStream str;
 				str << "Material " << mName << " Technique " << techNo;
 				if (!(*i)->getName().empty())
 					str << "(" << (*i)->getName() << ")";

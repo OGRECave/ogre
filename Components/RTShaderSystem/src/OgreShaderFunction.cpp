@@ -26,7 +26,6 @@ THE SOFTWARE.
 */
 #include <algorithm> // for std::sort
 #include "OgreShaderFunction.h"
-#include "OgreShaderProgramManager.h"
 #include "OgreStringConverter.h"
 
 namespace Ogre {

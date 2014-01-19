@@ -30,10 +30,10 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -111,7 +111,7 @@ namespace Ogre {
 		@param schemeName The scheme name you are looking for. Blank means to 
 			look for techniques with no scheme associated
 		*/
-		CompositionTechnique *getSupportedTechnique(const String& schemeName = StringUtil::BLANK);
+		CompositionTechnique *getSupportedTechnique(const String& schemeName = BLANKSTRING);
 
 		/** Get the instance name for a global texture.
 		@param name The name of the texture in the original compositor definition

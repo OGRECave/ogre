@@ -32,10 +32,11 @@ THE SOFTWARE.
 
 #include "OgreVolumePrerequisites.h"
 #include "OgreVolumeSource.h"
-#include "OgreVolumeCSGSource.h"
 
 namespace Ogre {
 namespace Volume {
+
+    class CSGOperationSource;
 
     /** A volume source from a discrete 3d grid.
     */

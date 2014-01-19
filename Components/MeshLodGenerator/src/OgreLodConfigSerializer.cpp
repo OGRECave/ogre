@@ -29,9 +29,9 @@ THE SOFTWARE.
 #include "OgreLodConfigSerializer.h"
 #include "OgreLodConfig.h"
 
-#include "OgreDataStream.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreLogManager.h"
+#include "OgreHardwareIndexBuffer.h"
 #include "OgreMeshManager.h"
 
 #include <fstream>

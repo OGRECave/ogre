@@ -320,7 +320,7 @@ static const size_t depthBits[] =
             if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE_EXT)
             {
                 mProps[x].valid = true;
-				StringUtil::StrStreamType str;
+				StringStream str;
 				str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
 					<< " depth/stencil support: ";
 
@@ -333,7 +333,7 @@ static const size_t depthBits[] =
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
-                            //StringUtil::StrStreamType l;
+                            //StringStream l;
                             //l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
                             //	<< " D" << depthBits[depth] 
                             //	<< "S" << stencilBits[stencil];

@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include <vector>
 
-#include "OgreSceneManager.h"
-
 #include "OgreVolumeOctreeNode.h"
 #include "OgreVolumePrerequisites.h"
 #include "OgreVolumeIsoSurface.h"

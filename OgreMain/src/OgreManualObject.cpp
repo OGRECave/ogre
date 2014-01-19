@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreManualObject.h"
 #include "OgreException.h"
 #include "OgreMaterialManager.h"
-#include "OgreSceneNode.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreHardwareBufferManager.h"
@@ -37,6 +36,8 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
+#include "OgreLogManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 

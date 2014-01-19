@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 
 #include "OgreHardwareBufferManager.h"
-#include "OgreCamera.h"
 
 namespace Ogre {
 #define POSITION_BINDING 0

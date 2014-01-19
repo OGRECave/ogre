@@ -36,7 +36,7 @@ THE SOFTWARE.
 #	include <SDL.h>
 #endif
 
-#include <OgreGLPrerequisites.h>
+#include "OgreGLPrerequisites.h"
 
 
 namespace Ogre {

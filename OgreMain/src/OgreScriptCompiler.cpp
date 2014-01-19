@@ -28,9 +28,10 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreScriptCompiler.h"
-#include "OgreScriptLexer.h"
 #include "OgreScriptParser.h"
 #include "OgreScriptTranslator.h"
+#include "OgreLogManager.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre
 {

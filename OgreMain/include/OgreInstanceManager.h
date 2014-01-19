@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __InstanceManager_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMesh.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
@@ -272,7 +271,7 @@ namespace Ogre
         @param enabled Boolean value. It's meaning depends on the id.
         @param materialName When Blank, the setting is applied to all existing materials
         */
-        void setSetting( BatchSettingId id, bool enabled, const String &materialName = StringUtil::BLANK );
+        void setSetting( BatchSettingId id, bool enabled, const String &materialName = BLANKSTRING );
 
         /// If settings for the given material didn't exist, default value is returned
         bool getSetting( BatchSettingId id, const String &materialName ) const;

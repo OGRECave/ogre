@@ -28,11 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderWindow.h"
 
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreViewport.h"
-#include "OgreSceneManager.h"
-
 namespace Ogre {
 
     RenderWindow::RenderWindow()

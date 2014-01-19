@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreImage.h"
 #include "OgreTexture.h"
 #include "OgreException.h"
-#include "OgreResourceManager.h"
 #include "OgreTextureManager.h"
 
 namespace Ogre {
@@ -247,7 +246,7 @@ namespace Ogre {
 		
         if (TextureManager::getSingleton().getVerbose()) {
             // Say what we're doing
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "Texture: " << mName << ": Loading " << faces << " faces"
                 << "(" << PixelUtil::getFormatName(images[0]->getFormat()) << "," <<
                 images[0]->getWidth() << "x" << images[0]->getHeight() << "x" << images[0]->getDepth() <<
@@ -382,7 +381,7 @@ namespace Ogre {
 	String Texture::getSourceFileType() const
 	{
 		if (mName.empty())
-			return StringUtil::BLANK;
+			return BLANKSTRING;
 
 		String::size_type pos = mName.find_last_of(".");
 		if (pos != String::npos && pos < (mName.length() - 1))
@@ -422,7 +421,7 @@ namespace Ogre {
 			}
 		}
 
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 
 	}
 	//---------------------------------------------------------------------

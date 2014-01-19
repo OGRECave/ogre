@@ -30,7 +30,6 @@
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreLodWorkQueueWorker.h"
 #include "OgreLodWorkQueueInjector.h"
-#include "OgreLodWorkQueueInjectorListener.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodInputProviderMesh.h"
 #include "OgreLodInputProviderBuffer.h"
@@ -45,7 +44,6 @@
 #include "OgreLodCollapseCostOutside.h"
 #include "OgreLodData.h"
 #include "OgreLodCollapser.h"
-#include "OgreRoot.h"
 
 
 namespace Ogre

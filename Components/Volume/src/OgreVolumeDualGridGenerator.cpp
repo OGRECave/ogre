@@ -25,6 +25,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreVolumeDualGridGenerator.h"
+#include "OgreManualObject.h"
+#include "OgreSceneManager.h"
+#include "OgreVolumeMeshBuilder.h"
 
 namespace Ogre {
 namespace Volume {
@@ -532,10 +535,10 @@ namespace Volume {
 
             manual->end();
             mDualGridI++;
-            StringUtil::StrStreamType meshName;
+            StringStream meshName;
             meshName << "VolumeDualGridGridMesh" << mDualGridI;
             manual->convertToMesh(meshName.str());
-            StringUtil::StrStreamType entityName;
+            StringStream entityName;
             entityName << "VolumeDualGrid" << mDualGridI;
             mDualGrid = sceneManager->createEntity(entityName.str(), meshName.str());
         }

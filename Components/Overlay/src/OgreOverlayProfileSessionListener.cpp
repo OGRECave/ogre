@@ -29,9 +29,9 @@ THE SOFTWARE.
 #include "OgreOverlayProfileSessionListener.h"
 #include "OgreOverlayManager.h"
 #include "OgreOverlayContainer.h"
-#include "OgreStringConverter.h"
-#include "OgreString.h"
 #include "OgreOverlayElement.h"
+#include "OgreOverlay.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {

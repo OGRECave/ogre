@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreGrid3DPageStrategy.h"
 
 #include "OgreStreamSerialiser.h"
-#include "OgreException.h"
 #include "OgreCamera.h"
 #include "OgrePagedWorldSection.h"
 #include "OgrePage.h"
@@ -37,6 +36,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreManualObject.h"
 #include "OgrePageManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre
 {

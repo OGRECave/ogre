@@ -30,7 +30,6 @@
 #define _LodWorkQueueWorker_H__
 
 #include "OgreLodPrerequisites.h"
-#include "OgreLodWorkQueueRequest.h"
 #include "OgreWorkQueue.h"
 #include "OgreSingleton.h"
 

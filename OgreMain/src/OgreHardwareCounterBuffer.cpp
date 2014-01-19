@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreException.h"
 
 namespace Ogre {
 

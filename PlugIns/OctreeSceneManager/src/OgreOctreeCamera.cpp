@@ -33,11 +33,8 @@ copyright            : (C) 2002 by Jon Anderson
 email                : janders@users.sf.net
 
 ***************************************************************************/
-#include <OgreMath.h>
-#include <OgreAxisAlignedBox.h>
-#include <OgreRoot.h>
-
-#include <OgreOctreeCamera.h>
+#include "OgreAxisAlignedBox.h"
+#include "OgreOctreeCamera.h"
 
 namespace Ogre
 {

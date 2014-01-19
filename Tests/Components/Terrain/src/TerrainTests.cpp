@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreLogManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
@@ -51,7 +52,7 @@ void TerrainTests::setUp()
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
-	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+	mRoot = OGRE_NEW Root(BLANKSTRING);
         
 	mStaticPluginLoader.load();
 #else

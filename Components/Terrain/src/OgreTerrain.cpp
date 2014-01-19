@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgreException.h"
 #include "OgreBitwise.h"
-#include "OgreStringConverter.h"
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -45,10 +44,10 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreRay.h"
 #include "OgrePlane.h"
-#include "OgreTerrainMaterialGeneratorA.h"
-#include "OgreMaterialManager.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreDeflate.h"
+#include "OgreMaterialManager.h"
+#include "OgreTimer.h"
+#include "OgreTerrainMaterialGeneratorA.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -140,7 +139,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
-		, mResourceGroup(StringUtil::BLANK)
+		, mResourceGroup(BLANKSTRING)
 		, mIsLoaded(false)
 		, mModified(false)
 		, mHeightDataModified(false)
@@ -1811,7 +1810,7 @@ namespace Ogre
 		}
 		else
 		{
-			return StringUtil::BLANK;
+			return BLANKSTRING;
 		}
 
 	}
@@ -2567,7 +2566,7 @@ namespace Ogre
 			// If we're missing sampler entries compared to the declaration, initialise them
 			for (size_t i = layer.textureNames.size(); i < mLayerDecl.samplers.size(); ++i)
 			{
-				layer.textureNames.push_back(StringUtil::BLANK);
+				layer.textureNames.push_back(BLANKSTRING);
 			}
 
 			// if we have too many layers for the declaration, trim them

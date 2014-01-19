@@ -30,16 +30,15 @@ THE SOFTWARE.
 #define __MeshSerializerImpl_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreSerializer.h"
-#include "OgreMaterial.h"
-#include "OgreMesh.h"
 #include "OgreEdgeListBuilder.h"
+#include "OgreKeyFrame.h"
+#include "OgreVertexBoneAssignment.h"
 
 namespace Ogre {
 	
 	class MeshSerializerListener;
-    class LodStrategy;
+    struct MeshLodUsage;
 
 	/** \addtogroup Core
 	*  @{

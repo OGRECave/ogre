@@ -26,6 +26,8 @@ THE SOFTWARE.
 */
 #include "OgreVolumeOctreeNodeSplitPolicy.h"
 
+#include "OgreVolumeSource.h"
+#include "OgreVolumeOctreeNode.h"
 
 namespace Ogre {
 namespace Volume {

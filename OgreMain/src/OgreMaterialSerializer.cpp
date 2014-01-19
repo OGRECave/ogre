@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre
 {
@@ -1937,7 +1938,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
 	void processManualProgramParam(bool isNamed, const String &commandname,
                                    StringVector& vecparams, MaterialScriptContext& context,
-                                   size_t index = 0, const String& paramName = StringUtil::BLANK)
+                                   size_t index = 0, const String& paramName = BLANKSTRING)
     {
         // NB we assume that the first element of vecparams is taken up with either
         // the index or the parameter name, which we ignore
@@ -2169,7 +2170,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void processAutoProgramParam(bool isNamed, const String& commandname,
         StringVector& vecparams, MaterialScriptContext& context,
-		size_t index = 0, const String& paramName = StringUtil::BLANK)
+		size_t index = 0, const String& paramName = BLANKSTRING)
     {
         // NB we assume that the first element of vecparams is taken up with either
         // the index or the parameter name, which we ignore
@@ -3514,7 +3515,7 @@ namespace Ogre
 				}
 				else
 				{
-                    String cmd = splitCmd.size() >= 2? splitCmd[1]:StringUtil::BLANK;
+                    String cmd = splitCmd.size() >= 2? splitCmd[1]:BLANKSTRING;
 					// Use parser with remainder
                     return iparser->second(cmd, mScriptContext );
 				}
@@ -3639,7 +3640,7 @@ namespace Ogre
                     = mProgramDefaultParamAttribParsers.find(splitCmd[0]);
                 if (iparser != mProgramDefaultParamAttribParsers.end())
                 {
-                    String cmd = splitCmd.size() >= 2? splitCmd[1]:StringUtil::BLANK;
+                    String cmd = splitCmd.size() >= 2? splitCmd[1]:BLANKSTRING;
                     // Use parser with remainder
                     iparser->second(cmd, mScriptContext );
                 }

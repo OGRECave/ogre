@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
+#include "OgreSceneNode.h"
 #include "OgreLogManager.h"
 #include <algorithm>
 

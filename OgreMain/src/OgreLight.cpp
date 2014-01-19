@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreLight.h"
 
 #include "OgreException.h"
-#include "OgreSceneNode.h"
 #include "OgreCamera.h"
 #include "OgreSceneManager.h"
 

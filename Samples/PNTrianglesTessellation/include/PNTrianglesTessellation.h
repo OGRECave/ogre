@@ -8,6 +8,7 @@
 
 #include "SdkSample.h"
 #include "OgreImage.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;

@@ -17,6 +17,8 @@
 #include "OgreLodCollapseCostQuadric.h"
 #include "OgreRenderWindow.h"
 #include "OgreLodConfigSerializer.h"
+#include "OgreLogManager.h"
+#include "OgreWorkQueue.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
 
@@ -42,7 +44,7 @@ void MeshLodTests::setUp()
 #endif
 
 #ifdef OGRE_STATIC_LIB
-	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+	Root* root = OGRE_NEW Root(BLANKSTRING);
         
 	mStaticPluginLoader.load();
 #else

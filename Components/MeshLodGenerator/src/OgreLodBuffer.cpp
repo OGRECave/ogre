@@ -30,12 +30,10 @@
 #include "OgreHardwareBufferManager.h"
 #include "OgreVector3.h"
 #include "OgreSubMesh.h"
+#include "OgreMesh.h"
 
 namespace Ogre
 {
-
-
-
 	void LodIndexBuffer::fillBuffer( Ogre::IndexData* data )
 	{
 		indexCount = data->indexCount;

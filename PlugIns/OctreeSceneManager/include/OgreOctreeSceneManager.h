@@ -39,8 +39,6 @@ THE SOFTWARE.
 
 #include "OgreOctreePrerequisites.h"
 #include "OgreSceneManager.h"
-#include "OgreRenderOperation.h"
-#include "OgreSphere.h"
 
 #include <list>
 #include <algorithm>
@@ -52,13 +50,7 @@ namespace Ogre
 {
 
 class OctreeNode;
-
 class OctreeCamera;
-class OctreeIntersectionSceneQuery;
-class OctreeRaySceneQuery;
-class OctreeSphereSceneQuery;
-class OctreeAxisAlignedBoxSceneQuery;
-class OctreePlaneBoundedVolumeListSceneQuery;
 
 typedef list< WireBoundingBox * >::type BoxList;
 typedef list< unsigned long >::type ColorList;

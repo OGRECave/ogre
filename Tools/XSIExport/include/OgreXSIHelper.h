@@ -79,7 +79,7 @@ inline Ogre::String XSItoOgre(const XSI::CString& xsistr)
 
     if (xsistr.IsEmpty())
     {
-        return Ogre::StringUtil::BLANK;
+        return Ogre::BLANKSTRING;
     }
 
     // first find out the size required

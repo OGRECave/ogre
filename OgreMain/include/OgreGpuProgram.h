@@ -31,10 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreResource.h"
-#include "OgreSharedPtr.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreSerializer.h"
-#include "OgreRenderOperation.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreVector3.h"

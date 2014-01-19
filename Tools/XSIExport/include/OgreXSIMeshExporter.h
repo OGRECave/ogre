@@ -88,7 +88,7 @@ namespace Ogre {
         DeformerMap& buildMeshForExport(
             bool mergeSubMeshes, bool exportChildren, bool edgeLists, 
 			bool tangents, VertexElementSemantic tangentSemantic, bool tangentsSplitMirrored, bool tangentsSplitRotated, bool tangentsUseParity,
-			bool vertexAnimation, AnimationList& animList, Real fps, const String& materialPrefix = StringUtil::BLANK,
+			bool vertexAnimation, AnimationList& animList, Real fps, const String& materialPrefix = BLANKSTRING,
 			LodData* lod = 0, const String& skeletonName = "");
 
 		/** Perform final export of built mesh. 

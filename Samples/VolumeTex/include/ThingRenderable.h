@@ -14,10 +14,10 @@ same license as the rest of the engine.
 #ifndef H_THINGRENDERABLE
 #define H_THINGRENDERABLE
 
-#include <OgrePrerequisites.h>
-#include <OgreSimpleRenderable.h>
-#include <OgreQuaternion.h>
-#include <OgreVector3.h>
+#include "OgrePrerequisites.h"
+#include "OgreSimpleRenderable.h"
+#include "OgreQuaternion.h"
+#include "OgreVector3.h"
 
 /** Quad fragments that rotate around origin (0,0,0) in a random orbit, always oriented to 0,0,0.
 	@author W.J. van der Laan

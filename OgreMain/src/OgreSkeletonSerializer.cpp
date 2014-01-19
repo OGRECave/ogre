@@ -34,12 +34,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
 #include "OgreBone.h"
-#include "OgreString.h"
-#include "OgreDataStream.h"
 #include "OgreLogManager.h"
-
-
-
 
 namespace Ogre {
     /// stream overhead = ID + size

@@ -31,11 +31,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreInstancedEntity.h"
-#include "OgreMaterial.h"
-#include "OgreTechnique.h"
 #include "OgreCamera.h"
-#include "OgreMaterialManager.h"
-#include "OgreTextureManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre

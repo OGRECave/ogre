@@ -34,11 +34,6 @@ current TODO's       : none known
 */
 
 #include "OgrePortal.h"
-#include "OgrePCZSceneNode.h"
-#include "OgreSphere.h"
-#include "OgreSegment.h"
-#include "OgreRay.h"
-#include "OgrePCZone.h"   // need access to real zone class 
 
 using namespace Ogre;
 

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreAny.h"
 #include "OgreSharedPtr.h"
+#include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
@@ -131,7 +132,7 @@ namespace Ogre
 			Any mData;
 
 		public:
-			Response(const Request* rq, bool success, const Any& data, const String& msg = StringUtil::BLANK);
+			Response(const Request* rq, bool success, const Any& data, const String& msg = BLANKSTRING);
 			~Response();
 			/// Get the request that this is a response to (NB destruction destroys this)
 			const Request* getRequest() const { return mRequest; }
@@ -365,7 +366,7 @@ namespace Ogre
 			Call startup() to initialise.
 		@param name Optional name, just helps to identify logging output
 		*/
-		DefaultWorkQueueBase(const String& name = StringUtil::BLANK);
+		DefaultWorkQueueBase(const String& name = BLANKSTRING);
 		virtual ~DefaultWorkQueueBase();
 		/// Get the name of the work queue
 		const String& getName() const;

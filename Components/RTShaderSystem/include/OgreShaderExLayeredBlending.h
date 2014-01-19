@@ -31,9 +31,6 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPTexturing.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreShaderParameter.h"
-#include "OgreShaderFunction.h"
 #include "OgreShaderSubRenderState.h"
 
 namespace Ogre {

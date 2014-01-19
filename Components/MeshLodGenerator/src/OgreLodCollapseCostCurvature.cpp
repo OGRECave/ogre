@@ -33,6 +33,7 @@
  */
 
 #include "OgreLodCollapseCostCurvature.h"
+#include "OgreVector3.h"
 
 namespace Ogre
 {

@@ -33,7 +33,6 @@
 #include "OgreLodPrerequisites.h"
 #include "OgreLodOutputProvider.h"
 #include "OgreLodBuffer.h"
-#include "OgreMesh.h"
 
 namespace Ogre
 {

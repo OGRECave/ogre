@@ -23,6 +23,8 @@ same license as the rest of the engine.
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
 
+#include <iostream>
+
 using namespace Ogre;
 
 MaterialGenerator::MaterialGenerator():

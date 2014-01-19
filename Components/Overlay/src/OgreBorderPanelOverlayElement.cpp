@@ -28,14 +28,10 @@ THE SOFTWARE.
 
 #include "OgreBorderPanelOverlayElement.h"
 #include "OgreMaterialManager.h"
-#include "OgreMaterial.h"
-#include "OgreStringConverter.h"
 #include "OgreOverlayManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreHardwareIndexBuffer.h"
 #include "OgreException.h"
-#include "OgreRenderQueue.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 

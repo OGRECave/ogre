@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include <exception>
 #include "OgreHeaderPrefix.h"
 
@@ -62,6 +61,8 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    typedef _StringBase String;
+
 	/** \addtogroup Core
 	*  @{
 	*/

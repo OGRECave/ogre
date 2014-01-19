@@ -4,6 +4,7 @@
 #include "ShaderExReflectionMap.h"
 #include "OgreShaderExInstancedViewports.h"
 #include "OgreShaderExTextureAtlasSampler.h"
+#include "OgreBillboard.h"
 using namespace Ogre;
 using namespace OgreBites;
 

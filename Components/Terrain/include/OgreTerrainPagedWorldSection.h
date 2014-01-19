@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgrePagedWorldSection.h"
-#include "OgrePageManager.h"
 #include "OgreWorkQueue.h"
 #include "OgreTerrainGroup.h"
 
@@ -40,7 +39,6 @@ namespace Ogre
 {
 	class Grid2DPageStrategy;
 	class Grid2DPageStrategyData;
-	class TerrainGroup;
 
 	/** \addtogroup Optional Components
 	*  @{

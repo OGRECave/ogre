@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __Particle_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreBillboard.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

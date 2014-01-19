@@ -34,8 +34,9 @@ email                : janders@users.sf.net
 
 ***************************************************************************/
 
-#include <OgreOctree.h>
-#include <OgreOctreeNode.h>
+#include "OgreOctree.h"
+#include "OgreOctreeNode.h"
+#include "OgreWireBoundingBox.h"
 
 namespace Ogre
 {

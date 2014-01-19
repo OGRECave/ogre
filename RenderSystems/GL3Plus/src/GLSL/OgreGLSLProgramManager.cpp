@@ -35,6 +35,8 @@
 #include "OgreRoot.h"
 #include "OgreGL3PlusUtil.h"
 
+#include <iostream>
+
 namespace Ogre {
 
     
@@ -552,7 +554,7 @@ namespace Ogre {
 
         // Loop over each active uniform and add it to the reference
         // container.
-        for (GLuint index = 0; index < uniformCount; index++)
+        for (GLuint index = 0; index < (GLuint)uniformCount; index++)
         {
             GLint arraySize;
             GLenum glType;

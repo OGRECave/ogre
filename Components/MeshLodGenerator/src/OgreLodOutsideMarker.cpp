@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreLodOutsideMarker.h"
-#include "OgreMeshManager.h"
-#include "OgreRoot.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreMeshManager.h"
+#include "OgreMesh.h"
 #include "OgreSubMesh.h"
 
 namespace Ogre

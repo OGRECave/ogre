@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreNode.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreHeaderPrefix.h"
 

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {

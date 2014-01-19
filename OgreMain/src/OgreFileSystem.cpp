@@ -27,12 +27,9 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreFileSystem.h"
-#include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreStringVector.h"
-#include "OgreRoot.h"
 
-#include <sys/types.h>
 #include <sys/stat.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || \

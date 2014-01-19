@@ -36,13 +36,13 @@ Code Style Update	 :
 #ifndef PCZSCENEQUERY_H
 #define PCZSCENEQUERY_H
 
-#include <OgreSceneManager.h>
+#include "OgreSceneManager.h"
 #include "OgrePCZPrerequisites.h"
-#include "OgrePCZone.h"
-
 
 namespace Ogre
 {
+    class PCZone;
+
     /** PCZ implementation of IntersectionSceneQuery. */
     class _OgrePCZPluginExport PCZIntersectionSceneQuery :  public DefaultIntersectionSceneQuery
     {

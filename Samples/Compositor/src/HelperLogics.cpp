@@ -15,6 +15,7 @@ same license as the rest of the engine.
 #include "HelperLogics.h"
 
 #include "Ogre.h"
+#include "OgreTimer.h"
 
 //---------------------------------------------------------------------------
 class HeatVisionListener: public Ogre::CompositorInstance::Listener

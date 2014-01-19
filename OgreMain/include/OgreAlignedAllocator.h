@@ -28,10 +28,6 @@ THE SOFTWARE.
 #ifndef __AlignedAllocator_H__
 #define __AlignedAllocator_H__
 
-// Now we're only including this within OgreMemoryAllocatorConfig.h which is already in
-// the prerequisites header (circlar reference)
-//#include "OgrePrerequisites.h"
-
 namespace Ogre {
 
 	/** \addtogroup Core

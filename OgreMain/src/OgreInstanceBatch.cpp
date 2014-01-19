@@ -32,8 +32,8 @@ THE SOFTWARE.
 #include "OgreInstancedEntity.h"
 #include "OgreSceneNode.h"
 #include "OgreCamera.h"
-#include "OgreLodStrategy.h"
 #include "OgreException.h"
+#include "OgreRenderQueue.h"
 
 namespace Ogre
 {

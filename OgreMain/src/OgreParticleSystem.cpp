@@ -29,16 +29,12 @@ THE SOFTWARE.
 
 #include "OgreParticleSystem.h"
 #include "OgreParticleSystemManager.h"
-#include "OgreRenderQueue.h"
-#include "OgreBillboardSet.h"
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"
 #include "OgreParticle.h"
-#include "OgreSceneNode.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreCamera.h"
 #include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreMaterialManager.h"
@@ -571,7 +567,7 @@ namespace Ogre {
 			// The particle is a visual particle if the emit_emitter property of the emitter isn't set 
 			Particle* p = 0;
 			String	emitterName = emitter->getEmittedEmitter();
-			if (emitterName == StringUtil::BLANK)
+			if (emitterName == BLANKSTRING)
 				p = createParticle();
 			else
 				p = createEmitterParticle(emitterName);
@@ -1122,7 +1118,7 @@ namespace Ogre {
         }
         else
         {
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         }
     }
     //-----------------------------------------------------------------------
@@ -1303,7 +1299,7 @@ namespace Ogre {
 		{
 			// Determine the names of all emitters that are emitted
 			ParticleEmitter* emitter = *emitterIterator ;
-			if (emitter && emitter->getEmittedEmitter() != StringUtil::BLANK)
+			if (emitter && emitter->getEmittedEmitter() != BLANKSTRING)
 			{
 				// This one will be emitted, register its name and leave the vector empty!
 				EmittedEmitterList empty;
@@ -1316,7 +1312,7 @@ namespace Ogre {
 				emitterInner = *emitterIteratorInner;
 				if (emitter && 
 					emitterInner && 
-					emitter->getName() != StringUtil::BLANK && 
+					emitter->getName() != BLANKSTRING && 
 					emitter->getName() == emitterInner->getEmittedEmitter())
 				{
 					emitter->setEmitted(true);
@@ -1342,7 +1338,7 @@ namespace Ogre {
 		EmittedEmitterPool::iterator emittedEmitterPoolIterator;
 		ParticleEmitterList::iterator emitterIterator;
 		ParticleEmitter* clonedEmitter = 0;
-		String name = StringUtil::BLANK;
+		String name = BLANKSTRING;
 		EmittedEmitterList* e = 0;
 		size_t maxNumberOfEmitters = size / mEmittedEmitterPool.size(); // equally distribute the number for each emitted emitter list
 		size_t oldSize = 0;
@@ -1358,7 +1354,7 @@ namespace Ogre {
 			{
 				ParticleEmitter* emitter = *emitterIterator;
 				if (emitter && 
-					name != StringUtil::BLANK && 
+					name != BLANKSTRING && 
 					name == emitter->getName())
 				{		
 					// Found the right emitter, clone each emitter a number of times
@@ -1393,7 +1389,7 @@ namespace Ogre {
 		EmittedEmitterList::iterator emittedEmitterIterator;
 		EmittedEmitterList* emittedEmitters = 0;
 		list<ParticleEmitter*>::type* fee = 0;
-		String name = StringUtil::BLANK;
+		String name = BLANKSTRING;
 
 		// Run through the emittedEmitterPool map
 		for (emittedEmitterPoolIterator = mEmittedEmitterPool.begin(); emittedEmitterPoolIterator != mEmittedEmitterPool.end(); ++emittedEmitterPoolIterator)

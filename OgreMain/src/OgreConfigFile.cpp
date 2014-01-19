@@ -102,7 +102,7 @@ namespace Ogre {
         /* Clear current settings map */
         clear();
 
-        String currentSection = StringUtil::BLANK;
+        String currentSection = BLANKSTRING;
         SettingsMultiMap* currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
         mSettings[currentSection] = currentSettings;
 

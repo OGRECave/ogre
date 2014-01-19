@@ -15,6 +15,8 @@
 #define __Grass_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
+#include "OgrePredefinedControllers.h"
 
 using namespace Ogre;
 using namespace OgreBites;

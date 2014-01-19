@@ -42,7 +42,7 @@ Code Style Update	 :
 #ifndef PC_PLANE_H
 #define PC_PLANE_H
 
-#include <OgrePlane.h>
+#include "OgrePlane.h"
 #include "OgrePCZPrerequisites.h"
 
 namespace Ogre

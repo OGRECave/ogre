@@ -29,11 +29,8 @@
 #include "OgreLodWorkQueueInjector.h"
 #include "OgreLodWorkQueueInjectorListener.h"
 #include "OgreLodWorkQueueRequest.h"
-#include "OgreLodOutputProvider.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreRoot.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
 
 namespace Ogre
 {

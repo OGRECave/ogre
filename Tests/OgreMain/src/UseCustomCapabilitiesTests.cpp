@@ -203,7 +203,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+	Root* root = OGRE_NEW Root(BLANKSTRING);
         
 	mStaticPluginLoader.load();
 #else
@@ -275,7 +275,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-	Root* root = OGRE_NEW Root(StringUtil::BLANK);
+	Root* root = OGRE_NEW Root(BLANKSTRING);
         
 	mStaticPluginLoader.load();
 #else

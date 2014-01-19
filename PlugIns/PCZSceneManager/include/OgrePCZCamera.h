@@ -36,9 +36,7 @@ Code Style Update	 :
 #ifndef PCZCAMERA_H
 #define PCZCAMERA_H
 
-#include <OgreCamera.h>
-#include "OgrePCPlane.h"
-#include "OgrePortalBase.h"
+#include "OgreCamera.h"
 #include "OgrePCZFrustum.h"
 #include "OgrePCZPrerequisites.h"
 

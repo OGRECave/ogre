@@ -30,12 +30,10 @@ THE SOFTWARE.
 #define __OverlayElement_H__
 
 #include "OgreOverlayPrerequisites.h"
-#include "OgreString.h"
 #include "OgreRenderable.h"
 #include "OgreUTFString.h"
 #include "OgreStringInterface.h"
 #include "OgreOverlayElementCommands.h"
-
 #include "OgreColourValue.h"
 
 namespace Ogre {

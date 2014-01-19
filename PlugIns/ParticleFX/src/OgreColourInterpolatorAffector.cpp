@@ -61,7 +61,7 @@ namespace Ogre {
 				msColourCmd[i].mIndex	= i;
 				msTimeCmd[i].mIndex		= i;
 
-				StringUtil::StrStreamType stage;
+				StringStream stage;
 				stage << i;
 				String	colour_title	= String("colour") + stage.str();
 				String	time_title		= String("time") + stage.str();

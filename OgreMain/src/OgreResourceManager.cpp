@@ -29,10 +29,6 @@ THE SOFTWARE.
 #include "OgreResourceManager.h"
 
 #include "OgreException.h"
-#include "OgreArchive.h"
-#include "OgreArchiveManager.h"
-#include "OgreStringVector.h"
-#include "OgreStringConverter.h"
 #include "OgreResourceGroupManager.h"
 
 namespace Ogre {

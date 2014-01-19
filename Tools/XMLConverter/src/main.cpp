@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreLodStrategyManager.h"
 #include <iostream>
 #include <sys/stat.h>
 

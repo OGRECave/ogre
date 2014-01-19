@@ -28,7 +28,6 @@ THE SOFTWARE.
 #ifndef __AtomicScalar_H__
 #define __AtomicScalar_H__
 
-#include <signal.h>
 #include "OgrePrerequisites.h"
 #include "OgreException.h"
 #include "OgrePlatformInformation.h"

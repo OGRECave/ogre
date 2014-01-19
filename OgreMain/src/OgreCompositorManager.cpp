@@ -26,15 +26,16 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreCompositorManager.h"
 #include "OgreCompositor.h"
+#include "OgreCompositorManager.h"
 #include "OgreCompositorChain.h"
 #include "OgreCompositionPass.h"
-#include "OgreCustomCompositionPass.h"
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
 #include "OgreScriptCompiler.h"
+#include "OgreTextureManager.h"
+#include "OgreRectangle2D.h"
 
 namespace Ogre {
 

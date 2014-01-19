@@ -31,9 +31,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreDataStream.h"
-#include "OgreResource.h"
 #include "OgreArchive.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreCommon.h"
+#include "Threading/OgreThreadHeaders.h"
 #include <ctime>
 #include "OgreHeaderPrefix.h"
 
@@ -875,7 +876,7 @@ namespace Ogre {
 			will be considered candidates for creation.
 		*/
 		DataStreamPtr createResource(const String& filename, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
-			bool overwrite = false, const String& locationPattern = StringUtil::BLANK);
+			bool overwrite = false, const String& locationPattern = BLANKSTRING);
 
 		/** Delete a single resource file.
 		@param filename The name of the file to delete. 
@@ -887,7 +888,7 @@ namespace Ogre {
 			will be considered candidates for deletion.
 		*/
 		void deleteResource(const String& filename, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
-			const String& locationPattern = StringUtil::BLANK);
+			const String& locationPattern = BLANKSTRING);
 
 		/** Delete all matching resource files.
 		@param filePattern The pattern (see StringUtil::match) of the files to delete. 
@@ -899,7 +900,7 @@ namespace Ogre {
 			will be considered candidates for deletion.
 		*/
 		void deleteMatchingResources(const String& filePattern, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
-			const String& locationPattern = StringUtil::BLANK);
+			const String& locationPattern = BLANKSTRING);
 
 		/** Adds a ResourceGroupListener which will be called back during 
             resource loading events. 

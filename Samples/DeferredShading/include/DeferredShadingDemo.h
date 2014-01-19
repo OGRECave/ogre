@@ -32,7 +32,6 @@ The wiki article explaining this demo can be found here :
 #ifndef H_DeferredShadingDemo
 #define H_DeferredShadingDemo
 
-#include "Ogre.h"
 #include "SdkSample.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

@@ -29,22 +29,21 @@ THE SOFTWARE.
 #define __Ogre_Volume_Chunk_H__
 
 #include "OgreSimpleRenderable.h"
-#include "OgreSceneNode.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreFrameListener.h"
+#include "OgreEntity.h"
 
 #include "OgreVolumePrerequisites.h"
-#include "OgreVolumeChunkHandler.h"
-#include "OgreVolumeSource.h"
-#include "OgreVolumeOctreeNode.h"
-#include "OgreVolumeDualGridGenerator.h"
-#include "OgreVolumeMeshBuilder.h"
-
 
 namespace Ogre {
 namespace Volume {
 
+    class Source;
+    class MeshBuilderCallback;
     class ChunkHandler;
+    class MeshBuilder;
+    class DualGridGenerator;
+    class OctreeNode;
 
     /** Parameters for loading the volume.
     */

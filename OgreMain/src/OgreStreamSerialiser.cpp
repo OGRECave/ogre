@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"

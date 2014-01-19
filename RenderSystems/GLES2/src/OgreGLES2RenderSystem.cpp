@@ -40,6 +40,8 @@ THE SOFTWARE.
 #include "OgreGLES2VertexDeclaration.h"
 #include "OgreGLSLESProgramFactory.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
+#include "OgreFrustum.h"
 #if !OGRE_NO_GLES2_CG_SUPPORT
 #include "OgreGLSLESCgProgramFactory.h"
 #endif
@@ -738,9 +740,9 @@ namespace Ogre {
     {
         // TODO find a way to get error string
 //        const GLubyte *errString = gluErrorString (errCode);
-//        return (errString != 0) ? String((const char*) errString) : StringUtil::BLANK;
+//        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
 
     VertexElementType GLES2RenderSystem::getColourVertexElementType(void) const

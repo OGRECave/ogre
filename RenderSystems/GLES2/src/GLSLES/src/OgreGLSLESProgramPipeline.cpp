@@ -418,6 +418,7 @@ namespace Ogre
                         case GCT_MATRIX_DOUBLE_4X2:
                         case GCT_MATRIX_DOUBLE_4X3:
                         case GCT_MATRIX_DOUBLE_4X4:
+                        default:
                             break;
                             
 					} // End switch

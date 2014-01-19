@@ -30,9 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreTextureManager.h"
-#include "OgreViewport.h"
-#include "OgreTimer.h"
+#include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
 /* Define the number of priority groups for the render system's render targets. */

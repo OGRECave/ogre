@@ -31,6 +31,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
 
+#include <iostream>
+
 #ifndef GL_ATOMIC_COUNTER_BUFFER
 #define GL_ATOMIC_COUNTER_BUFFER 0x92C0
 #endif

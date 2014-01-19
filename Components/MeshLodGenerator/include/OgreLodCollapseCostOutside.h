@@ -32,8 +32,8 @@
 
 #include "OgreLodPrerequisites.h"
 #include "OgreLodCollapseCost.h"
-#include "OgreLodOutsideMarker.h"
 #include "OgreLodData.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre
 {

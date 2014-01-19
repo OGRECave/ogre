@@ -37,10 +37,10 @@ email                : janders@users.sf.net
 #ifndef OCTREENODE_H
 #define OCTREENODE_H
 
-#include <OgreSceneNode.h>
+#include "OgreSceneNode.h"
 
-#include "OgreOctreeSceneManager.h"
 #include "OgreOctreePrerequisites.h"
+#include "OgreOctree.h"
 
 namespace Ogre
 {

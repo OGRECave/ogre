@@ -33,7 +33,6 @@ email                : ericc@xenopi.com
 */
 
 #include "OgrePCPlane.h"
-#include "OgrePortal.h"
 
 namespace Ogre
 {

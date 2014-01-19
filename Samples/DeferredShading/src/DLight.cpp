@@ -22,6 +22,7 @@ same license as the rest of the engine.
 #include "LightMaterialGenerator.h"
 #include "OgreTechnique.h"
 #include "OgreSceneManager.h"
+#include "OgreShadowCameraSetup.h"
 
 #define ENABLE_BIT(mask, flag) (mask) |= (flag)
 #define DISABLE_BIT(mask, flag) (mask) &= ~(flag)

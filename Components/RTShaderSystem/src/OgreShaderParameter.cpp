@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 #include "OgreShaderParameter.h"
 #include "OgreStringConverter.h"
-#include "OgreMatrix4.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"

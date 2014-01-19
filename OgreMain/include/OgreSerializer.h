@@ -30,8 +30,6 @@ THE SOFTWARE.
 #define __Serializer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
-#include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
 #ifndef OGRE_SERIALIZER_VALIDATE_CHUNKSIZE

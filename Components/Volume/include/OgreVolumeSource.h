@@ -28,10 +28,8 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_Source_H__
 #define __Ogre_Volume_Source_H__
 
-#include <float.h>
 #include "OgreVector3.h"
 #include "OgreVolumePrerequisites.h"
-#include "OgreRay.h"
 
 namespace Ogre {
 namespace Volume {

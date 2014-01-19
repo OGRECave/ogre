@@ -28,8 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreProperty.h"
 
-#include "OgreStringConverter.h"
-
 #include <istream>
 
 namespace Ogre
@@ -190,7 +188,7 @@ namespace Ogre
 				// check type
 				if (j->second->getType() != i->second.propType)
 				{
-					StringUtil::StrStreamType msg;
+					StringStream msg;
 					msg << "Property " << i->first << " mismatched type; incoming type: '"
 						<< PropertyDef::getTypeName(i->second.propType) << "', property type: '"
 						<< PropertyDef::getTypeName(j->second->getType()) << "'";

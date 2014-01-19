@@ -32,8 +32,7 @@
 #include "OgreLodPrerequisites.h"
 #include "OgreVectorSet.h"
 #include "OgreVectorSetImpl.h"
-
-#include "OgreMesh.h"
+#include "OgreVector3.h"
 
 #ifndef MESHLOD_QUALITY
 /// MESHLOD_QUALITY=1 is fastest processing time.
@@ -168,6 +167,5 @@ struct _OgreLodExport LodData {
 	{}
 };
 
-typedef SharedPtr<LodData> LodDataPtr;
 }
 #endif

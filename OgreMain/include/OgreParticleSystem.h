@@ -31,12 +31,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreVector3.h"
-#include "OgreString.h"
 #include "OgreParticleIterator.h"
 #include "OgreStringInterface.h"
 #include "OgreMovableObject.h"
 #include "OgreRadixSort.h"
-#include "OgreController.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreHeaderPrefix.h"
 

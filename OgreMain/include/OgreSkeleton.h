@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreResource.h"
-#include "OgreQuaternion.h"
-#include "OgreVector3.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
 #include "OgreAnimation.h"
 #include "OgreHeaderPrefix.h"
@@ -460,8 +457,6 @@ namespace Ogre {
 		size_t calculateSize(void) const;
 
     };
-
-    typedef SharedPtr<Skeleton> SkeletonPtr;
 
 	/// Link to another skeleton to share animations
 	struct LinkedSkeletonAnimationSource

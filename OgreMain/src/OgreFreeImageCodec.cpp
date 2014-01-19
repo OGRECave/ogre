@@ -28,15 +28,9 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreFreeImageCodec.h"
-#include "OgreImage.h"
 #include "OgreException.h"
-
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-
 #include <FreeImage.h>
 
 // freeimage 3.9.1~3.11.0 interoperability fix
@@ -92,7 +86,7 @@ namespace Ogre {
 			FreeImage_GetCopyrightMessage());
 
 		// Register codecs
-		StringUtil::StrStreamType strExt;
+		StringStream strExt;
 		strExt << "Supported formats: ";
 		bool first = true;
 		for (int i = 0; i < FreeImage_GetFIFCount(); ++i)
@@ -598,7 +592,7 @@ namespace Ogre {
 		}
 		else
 		{
-			return StringUtil::BLANK;
+			return BLANKSTRING;
 		}
 	}
 }

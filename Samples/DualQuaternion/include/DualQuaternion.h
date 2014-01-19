@@ -2,6 +2,7 @@
 #define __DualQuaternion_Sample_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 #include "OgreShaderExHardwareSkinning.h"

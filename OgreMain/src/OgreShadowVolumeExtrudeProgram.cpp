@@ -28,10 +28,9 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
-#include "OgreString.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreGpuProgram.h"
+#include "OgreHighLevelGpuProgram.h"
 #include "OgreException.h"
 
 namespace Ogre {

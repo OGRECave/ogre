@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreCompositor.h"
 #include "OgreCompositorInstance.h"
 #include "OgreCompositorChain.h"
 #include "OgreCompositorManager.h"
@@ -33,16 +34,16 @@ THE SOFTWARE.
 #include "OgreCustomCompositionPass.h"
 #include "OgreTechnique.h"
 #include "OgreLogManager.h"
-#include "OgreMaterialManager.h"
 #include "OgreTextureManager.h"
 #include "OgreSceneManager.h"
-#include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreCompositorLogic.h"
+#include "OgreRenderTarget.h"
+#include "OgreRenderTexture.h"
+#include "OgreRectangle2D.h"
 
 namespace Ogre {
 CompositorInstance::CompositorInstance(CompositionTechnique *technique,
@@ -333,7 +334,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 			}
 
 			RSSetSchemeOperation* setSchemeOperation = 0;
-			if (pass->getMaterialScheme() != StringUtil::BLANK)
+			if (pass->getMaterialScheme() != BLANKSTRING)
 			{
 				//Add the triggers that will set the scheme and restore it each frame
 				finalState.currentQueueGroupID = pass->getFirstRenderQueue();
@@ -665,7 +666,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
             if (!def->fsaa)
             {
                 fsaa = 0;
-                fsaaHint = StringUtil::BLANK;
+                fsaaHint = BLANKSTRING;
             }
             hwGamma = hwGamma || def->hwGammaWrite;
             
@@ -853,7 +854,7 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
 	{
 		*hwGammaWrite = false;
 		*fsaa = 0;
-		*fsaaHint = StringUtil::BLANK;
+		*fsaaHint = BLANKSTRING;
 	}
 
 }

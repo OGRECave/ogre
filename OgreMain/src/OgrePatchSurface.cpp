@@ -28,14 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgrePatchSurface.h"
-
-#include "OgreMeshManager.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
 #include "OgreException.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreHardwareVertexBuffer.h"
-#include "OgreHardwareIndexBuffer.h"
 
 #define LEVEL_WIDTH(lvl) ((1 << (lvl+1)) + 1)
 

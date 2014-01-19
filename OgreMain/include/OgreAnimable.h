@@ -29,15 +29,18 @@ THE SOFTWARE.
 #define __ANIMABLE_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreCommon.h"
 #include "OgreVector2.h"
 #include "OgreVector4.h"
 #include "OgreColourValue.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
-#include "OgreAny.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    class Any;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -225,10 +228,6 @@ namespace Ogre {
 
 	};
 
-	typedef SharedPtr<AnimableValue> AnimableValuePtr;
-
-
-
 	/** Defines an interface to classes which have one or more AnimableValue
 		instances to expose.
 	*/
@@ -244,7 +243,7 @@ namespace Ogre {
 			their values.
 		*/
 		virtual const String& getAnimableDictionaryName(void) const 
-		{ return StringUtil::BLANK; }
+		{ return BLANKSTRING; }
         /** Internal method for creating a dictionary of animable value names 
 			for the class, if it does not already exist.
         */

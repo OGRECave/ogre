@@ -1064,7 +1064,7 @@ namespace Ogre {
 #endif
 
         // GL texture buffer
-        GLES2TextureBuffer tex(StringUtil::BLANK, target, id, width, height, depth, format, src.format,
+        GLES2TextureBuffer tex(BLANKSTRING, target, id, width, height, depth, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture

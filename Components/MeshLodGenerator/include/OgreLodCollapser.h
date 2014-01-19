@@ -90,8 +90,6 @@ protected:
 	void replaceVertexID(LodData::Triangle* triangle, unsigned int oldID, unsigned int newID, LodData::Vertex* dst);
 };
 
-typedef SharedPtr<LodCollapser> LodCollapserPtr;
-
 }
 #endif
 

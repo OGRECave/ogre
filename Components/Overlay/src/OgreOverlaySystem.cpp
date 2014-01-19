@@ -29,6 +29,10 @@ THE SOFTWARE.
 #include "OgreOverlaySystem.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
+#include "OgreOverlayManager.h"
+#include "OgreOverlayElementFactory.h"
+#include "OgreFontManager.h"
 
 namespace Ogre {
 	//---------------------------------------------------------------------

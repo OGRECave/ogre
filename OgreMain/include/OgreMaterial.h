@@ -278,7 +278,7 @@ namespace Ogre {
 		@param newGroup Only required if changeGroup is true; the new group to assign
         */
         MaterialPtr clone(const String& newName, bool changeGroup = false, 
-			const String& newGroup = StringUtil::BLANK) const;
+			const String& newGroup = BLANKSTRING) const;
 
         /** Copies the details of this material into another, preserving the target's handle and name
         (unlike operator=) but copying everything else.

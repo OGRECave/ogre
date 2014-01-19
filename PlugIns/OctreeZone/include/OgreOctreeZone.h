@@ -42,12 +42,12 @@ Code Style Update	 :
 #include "OgreOctreeZonePrerequisites.h"
 #include "OgrePCZone.h"
 #include "OgrePCZoneFactory.h"
-#include "OgreOctreeZoneOctree.h"
 
 namespace Ogre
 {
     /** Octree version of PCZone 
     */
+	class Octree;
 	class OctreeZoneData;
 
 	class _OgreOctreeZonePluginExport OctreeZone : public PCZone

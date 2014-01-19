@@ -28,6 +28,7 @@
 #ifndef __SampleBrowser_H__
 #define __SampleBrowser_H__
 
+#include "Ogre.h"
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 #include "SdkTrays.h"

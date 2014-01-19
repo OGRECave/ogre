@@ -384,6 +384,6 @@ namespace Ogre {
 			}
 		}
 
-		return StringUtil::BLANK;
+		return BLANKSTRING;
 	}
 }

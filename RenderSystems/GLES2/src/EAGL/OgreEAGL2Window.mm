@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
+#include "OgreViewport.h"
+#include <iomanip>
 
 #import <UIKit/UIWindow.h>
 #import <UIKit/UIGraphics.h>

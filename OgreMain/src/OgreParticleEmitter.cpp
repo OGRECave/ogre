@@ -82,8 +82,8 @@ namespace Ogre
         mColourRangeStart = mColourRangeEnd = ColourValue::White;
         mEnabled = true;
         mRemainder = 0;
-		mName = StringUtil::BLANK;
-		mEmittedEmitter = StringUtil::BLANK;
+		mName = BLANKSTRING;
+		mEmittedEmitter = BLANKSTRING;
 		mEmitted = false;
     }
     //-----------------------------------------------------------------------

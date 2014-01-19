@@ -35,6 +35,11 @@ THE SOFTWARE.
 #include "OgreMath.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreMatrix4.h"
+#include "OgreVector4.h"
+#include "OgreColourValue.h"
+#include "OgreSceneNode.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
     const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(

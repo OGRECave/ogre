@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PixelFormatTests.h"
 #include <cstdlib>
+#include <iomanip>
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( PixelFormatTests );
@@ -170,7 +171,7 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     s << " ";
 
     // Compare result
-	StringUtil::StrStreamType msg;
+	StringStream msg;
 	msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
 		"->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
     CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),

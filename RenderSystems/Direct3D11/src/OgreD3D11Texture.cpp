@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 #include "OgreD3D11RenderSystem.h"
 #include "OgreRoot.h"
+#include "OgreLogManager.h"
 #include "OgreException.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)

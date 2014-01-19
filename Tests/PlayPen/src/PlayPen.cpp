@@ -368,7 +368,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //			if (rayResult.first)
 //			{
 //				testNode->setPosition(rayResult.second);
-//				StringUtil::StrStreamType str;
+//				StringStream str;
 //				str << "HIT: " << rayResult.second;
 //
 //				
@@ -8637,13 +8637,13 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //		// only use plugins.cfg if not static
 //#ifdef OGRE_STATIC_LIB
 //    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-//        Ogre::String workDir = Ogre::StringUtil::BLANK;
+//        Ogre::String workDir = Ogre::BLANKSTRING;
 //        workDir = Ogre::macBundlePath() + "/";
 //
-//		mRoot = new Root(StringUtil::BLANK, 
+//		mRoot = new Root(BLANKSTRING, 
 //                         workDir + "ogre.cfg", mResourcePath + "Ogre.log");
 //    #else
-//		mRoot = new Root(StringUtil::BLANK, 
+//		mRoot = new Root(BLANKSTRING, 
 //                         mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
 //    #endif
 //        

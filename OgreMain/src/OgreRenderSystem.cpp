@@ -34,16 +34,13 @@ THE SOFTWARE.
 
 #include "OgreRenderSystem.h"
 
-#include "OgreRoot.h"
-#include "OgreViewport.h"
 #include "OgreException.h"
 #include "OgreRenderTarget.h"
-#include "OgreRenderWindow.h"
 #include "OgreDepthBuffer.h"
-#include "OgreMeshManager.h"
-#include "OgreMaterial.h"
-#include "OgreTimer.h"
-#include "OgreHardwarePixelBuffer.h"
+#include "OgreIteratorWrappers.h"
+#include "OgreLogManager.h"
+#include "OgreTextureManager.h"
+#include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
 
 namespace Ogre {

@@ -299,7 +299,7 @@ namespace Ogre {
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
 			int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK);
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = BLANKSTRING);
 			
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
@@ -348,7 +348,7 @@ namespace Ogre {
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int numMipmaps,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK)
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = BLANKSTRING)
 		{
 			return createManual(name, group, texType, width, height, 1, 
 				numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint);

@@ -26,12 +26,10 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderProgramProcessor.h"
-#include "OgreStringConverter.h"
 #include "OgreShaderFunctionAtom.h"
 #include "OgreShaderFunction.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderGenerator.h"
-#include "OgreShaderProgramSet.h"
 #include "OgreShaderProgram.h"
 
 namespace Ogre {

@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -38,6 +37,9 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+
+    class FileSystemLayer;
+
 namespace RTShader {
 
 /** \addtogroup Core

@@ -32,7 +32,6 @@ PortalBase.h  -  PortalBase is the base class for Portal and AntiPortal.
 #define PORTALBASE_H
 
 #include "OgrePCZPrerequisites.h"
-#include "OgrePCZSceneNode.h"
 #include "OgreMovableObject.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreCapsule.h"
@@ -41,6 +40,7 @@ PortalBase.h  -  PortalBase is the base class for Portal and AntiPortal.
 namespace Ogre
 {
 	class PCZSceneNode;
+    class PCZone;
 
 	/** PortalBase - Base class to Portal and AntiPortal classes. */
 	class _OgrePCZPluginExport PortalBase : public MovableObject

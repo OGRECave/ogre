@@ -29,10 +29,10 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreCamera.h"
+#include "OgreNode.h"
+#include "OgreViewport.h"
 
 #include <limits>
-
-#include "OgreViewport.h"
 
 namespace Ogre {
     DistanceLodStrategyBase::DistanceLodStrategyBase(const String& name)

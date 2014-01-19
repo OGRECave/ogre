@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "StencilShadowTest.h"
+#include "OgreMovablePlane.h"
 
 StencilShadowTest::StencilShadowTest()
 {

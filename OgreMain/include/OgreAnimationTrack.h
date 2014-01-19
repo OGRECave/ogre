@@ -30,15 +30,16 @@ THE SOFTWARE.
 #define __AnimationTrack_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 #include "OgreSimpleSpline.h"
 #include "OgreRotationalSpline.h"
-#include "OgreKeyFrame.h"
-#include "OgreAnimable.h"
 #include "OgrePose.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre 
 {
+    class VertexPoseKeyFrame;
+    class KeyFrame;
+
 	/** \addtogroup Core
 	*  @{
 	*/

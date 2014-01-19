@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgrePolygon.h"
-#if OGRE_THREAD_SUPPORT
-#include "Threading/OgreThreadHeaders.h"
-#endif
 #include "OgreHeaderPrefix.h"
 
 

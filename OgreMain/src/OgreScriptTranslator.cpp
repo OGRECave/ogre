@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreParticleSystemRenderer.h"
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"
+#include "OgreCompositor.h"
 #include "OgreCompositorManager.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
@@ -46,7 +47,9 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDepthBuffer.h"
+#include "OgreParticleSystem.h"
 #include "OgreRoot.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre{
 

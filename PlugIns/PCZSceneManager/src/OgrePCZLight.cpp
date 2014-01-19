@@ -36,11 +36,8 @@ Code Style Update	 :
 #include "OgreStableHeaders.h"
 #include "OgrePCZLight.h"
 #include "OgrePCZone.h" // need for testing affected zone 
-#include "OgreException.h"
 #include "OgrePCZSceneNode.h"
-#include "OgrePCZCamera.h"
 #include "OgrePCZFrustum.h"
-#include "OgrePCZSceneManager.h"
 
 namespace Ogre 
 {

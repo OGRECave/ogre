@@ -34,9 +34,9 @@ Code Style Update	 :
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
 #include "OgreOctreeZonePlugin.h"
-#include "OgrePCZSceneManager.h"
+#include "OgrePCZoneFactory.h"
+#include "OgreOctreeZone.h"
 
 namespace Ogre 
 {
@@ -57,7 +57,6 @@ namespace Ogre
 	{
 		// Create objects
 		mOctreeZoneFactory = OGRE_NEW OctreeZoneFactory();
-
 	}
 	//---------------------------------------------------------------------
 	void OctreeZonePlugin::initialise()

@@ -12,10 +12,10 @@ same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
 #include "ThingRenderable.h"
-#include <OgreHardwareVertexBuffer.h>
-#include <OgreHardwareIndexBuffer.h>
-#include <OgreHardwareBufferManager.h>
-#include <OgreCamera.h>
+#include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareBufferManager.h"
+#include "OgreCamera.h"
 using namespace Ogre;
 
 ThingRenderable::ThingRenderable(float radius, size_t count, float qsize):

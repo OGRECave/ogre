@@ -29,8 +29,6 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
-#include "OgreString.h"
-
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility push(default)
 #endif
@@ -42,6 +40,9 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    typedef _StringBase String;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -542,6 +543,8 @@ namespace Ogre {
 	typedef HashedVector<Light*> LightList;
 
 
+    /// Constant blank string, useful for returning by ref where local does not exist
+    const String BLANKSTRING;
 
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;

@@ -29,7 +29,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define __RenderToVertexBuffer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMaterial.h"
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
@@ -144,7 +143,6 @@ namespace Ogre {
         unsigned int mMaxVertexCount;
     };
 
-    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
     /** @} */
     /** @} */
 }

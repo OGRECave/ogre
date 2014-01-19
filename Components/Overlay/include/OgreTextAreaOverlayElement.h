@@ -28,7 +28,7 @@ THE SOFTWARE
 #define _TextAreaOverlayElement_H__
 
 #include "OgreOverlayElement.h"
-#include "OgreFont.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {

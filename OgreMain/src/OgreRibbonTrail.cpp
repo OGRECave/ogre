@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreMath.h"
 #include "OgreException.h"
 #include "OgreSceneNode.h"
-#include "OgreStringConverter.h"
+#include "OgreController.h"
 
 namespace Ogre
 {

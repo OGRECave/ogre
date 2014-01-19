@@ -30,12 +30,12 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreMaterialManager.h"
-#include "OgreTexture.h"
 #include "OgreRenderQueue.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
     /** \addtogroup Core
     *  @{
     */
@@ -268,7 +268,7 @@ namespace Ogre {
         void setScheme(const String& schemeName, bool reuseTextures = true);
 
         /// Returns the name of the scheme this compositor is using.
-        const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : StringUtil::BLANK; }
+        const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : BLANKSTRING; }
 
         /** Notify this instance that the primary surface has been resized. 
         @remarks

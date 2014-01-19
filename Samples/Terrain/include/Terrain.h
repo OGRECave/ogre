@@ -22,6 +22,7 @@ Also see acknowledgements in Readme.html
 #define TERRAIN_PAGE_MAX_Y 0
 
 #include "SdkSample.h"
+#include "OgrePageManager.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
@@ -697,7 +698,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
                 mSceneMgr->setShadowTextureSelfShadow(false);
                 mSceneMgr->setShadowCasterRenderBackFaces(false);
-                mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
+                mSceneMgr->setShadowTextureCasterMaterial(BLANKSTRING);
             }
 
             matProfile->setReceiveDynamicShadowsDepth(depthShadows);

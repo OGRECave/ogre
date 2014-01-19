@@ -2,6 +2,7 @@
 #define __Lighting_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;

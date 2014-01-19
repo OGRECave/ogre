@@ -32,11 +32,7 @@ email                : ericc@xenopi.com
 -----------------------------------------------------------------------------
 */
 
-#include <OgreMath.h>
-#include <OgreAxisAlignedBox.h>
-#include <OgreRoot.h>
-
-#include "OgreSceneNode.h"
+#include "OgreAxisAlignedBox.h"
 #include "OgrePCZCamera.h"
 #include "OgrePCZFrustum.h"
 #include "OgrePortal.h"

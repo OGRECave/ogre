@@ -242,7 +242,7 @@ namespace Ogre {
         unsigned char* pLightmap = mLightmaps;
         for (int i = 0; i < mNumLightmaps; ++i)
         {
-			StringUtil::StrStreamType name;
+			StringStream name;
             name << "@lightmap" << i;
 
             // Load, no mipmaps, brighten by factor 2.5

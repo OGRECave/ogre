@@ -32,14 +32,15 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 // Matrices & Vectors
-#include "OgreMatrix4.h"
 #include "OgreCommon.h"
 #include "OgreFrustum.h"
-#include "OgreRay.h"
 #include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
+
+    class Matrix4;
+    class Ray;
 
     /** \addtogroup Core
     *  @{

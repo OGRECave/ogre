@@ -30,17 +30,15 @@ THE SOFTWARE.
 
 #include "OgreMath.h"
 #include "OgreMatrix3.h"
-#include "OgreSceneNode.h"
 #include "OgreSphere.h"
-#include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreCamera.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreHardwareIndexBuffer.h"
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreMovablePlane.h"
 
 namespace Ogre {
 

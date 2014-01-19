@@ -54,6 +54,7 @@ THE SOFTWARE.
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLPBRenderTexture.h"
 #include "OgreConfig.h"
+#include "OgreViewport.h"
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -2190,7 +2191,7 @@ namespace Ogre {
     String GLRenderSystem::getErrorDescription(long errCode) const
     {
         const GLubyte *errString = gluErrorString (errCode);
-        return (errString != 0) ? String((const char*) errString) : StringUtil::BLANK;
+        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::setLightingEnabled(bool enabled)

@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreManualObject.h"
 #include "OgreNameGenerator.h"
+#include "OgreMesh.h"
 
 namespace Ogre {
 

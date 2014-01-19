@@ -36,12 +36,12 @@ Code Style Update	 :
 #ifndef PCZLIGHT_H
 #define PCZLIGHT_H
 
-#include <OgreLight.h>
+#include "OgreLight.h"
 #include "OgrePCZPrerequisites.h"
-#include "OgrePCZone.h"
 
 namespace Ogre
 {
+    class PCZone;
 
     typedef list<PCZone*>::type ZoneList;
 

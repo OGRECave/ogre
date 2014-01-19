@@ -30,11 +30,11 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 #include "OgreCamera.h"
-#include "OgreMath.h"
 #include "OgreRoot.h"
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
-#include "OgreRenderWindow.h"
+#include "OgreRenderTarget.h"
+#include <iomanip>
 
 namespace Ogre {
     OrientationMode Viewport::mDefaultOrientationMode = OR_DEGREE_0;

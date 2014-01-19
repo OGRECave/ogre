@@ -37,10 +37,8 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreMaterialManager.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreEdgeListBuilder.h"
-#include "OgreStringConverter.h"
+#include "OgreSkeletonInstance.h"
+#include "OgreLodStrategy.h"
 
 namespace Ogre {
 
@@ -84,7 +82,7 @@ namespace Ogre {
 		{
 			uint32 index = 0;
 			// Make a name
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << mName << ":" << index;
 
 			mInstancedGeometryInstance = OGRE_NEW BatchInstance(this, str.str(), mOwner, index);
@@ -194,7 +192,7 @@ namespace Ogre {
 		if (!ret && autoCreate)
 		{
 			// Make a name
-			StringUtil::StrStreamType str;
+			StringStream str;
 			str << mName << ":" << index;
 			// Calculate the BatchInstance centre
 			Vector3 centre(0,0,0);// = getBatchInstanceCentre(x, y, z);
@@ -1671,7 +1669,7 @@ namespace Ogre {
 		//   source
 		//   semantic
 		//   type
-		StringUtil::StrStreamType str;
+		StringStream str;
 
 		str << geom->indexData->indexBuffer->getType() << "|";
 		const VertexDeclaration::VertexElementList& elemList =

@@ -32,10 +32,6 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
-#include "OgreEntity.h"
-#include "OgreSubEntity.h"
-#include "OgreMaterial.h"
-#include "OgreSubMesh.h"
 #include "OgreShaderGenerator.h"
 
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"

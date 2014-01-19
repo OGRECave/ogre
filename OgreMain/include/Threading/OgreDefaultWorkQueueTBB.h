@@ -38,7 +38,7 @@ namespace Ogre
 	class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
 	{
 	public:
-		DefaultWorkQueue(const String& name = StringUtil::BLANK);
+		DefaultWorkQueue(const String& name = BLANKSTRING);
 		virtual ~DefaultWorkQueue();
 		/** Process the next request on the queue. 
 		@remarks

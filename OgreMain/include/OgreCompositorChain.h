@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderTargetListener.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreCompositorInstance.h"
-#include "OgreCompositor.h"
 #include "OgreViewport.h"
 #include "OgreHeaderPrefix.h"
 
@@ -71,7 +70,7 @@ namespace Ogre {
         @param scheme
             Scheme to use (blank means default).
         */
-        CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = StringUtil::BLANK);
+        CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = BLANKSTRING);
 
         /** Remove a compositor.
         @param position

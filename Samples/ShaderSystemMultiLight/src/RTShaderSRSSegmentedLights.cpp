@@ -8,6 +8,7 @@
 #include "OgreShaderGenerator.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgreMaterialSerializer.h"
 #include "SegmentedDynamicLightManager.h"
 
 #define SL_LIB_PERPIXELLIGHTING					"SegmentedPerPixelLighting"

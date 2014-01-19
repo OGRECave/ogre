@@ -30,8 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreResourceManager.h"
 #include "OgreSingleton.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

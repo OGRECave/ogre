@@ -28,7 +28,9 @@ same license as the rest of the engine.
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPagedWorldSection.h"
+#include "OgreTerrainAutoUpdateLod.h"
 #include "OgreTerrainPaging.h"
+#include "OgrePageManager.h"
 #include "PerlinNoiseTerrainGenerator.h"
 
 #define ENDLESS_TERRAIN_FILE_PREFIX String("EndlessWorldTerrain")

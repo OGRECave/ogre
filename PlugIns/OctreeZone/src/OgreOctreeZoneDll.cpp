@@ -32,7 +32,8 @@ email                : ericc@xenopi.com
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
+#include "OgreOctreeZonePrerequisites.h"
+#include "OgreRoot.h"
 #include "OgreOctreeZonePlugin.h"
 
 #ifndef OGRE_STATIC_LIB

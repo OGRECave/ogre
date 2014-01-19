@@ -27,12 +27,13 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreConfigFile.h"
 #include "OgreShaderRenderState.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreShaderProgram.h"
 #include "OgreShaderGenerator.h"
 #include "OgrePass.h"
 #include "OgreLogManager.h"
+#include "OgreHighLevelGpuProgram.h"
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderHLSLProgramWriter.h"
@@ -125,8 +126,8 @@ void ProgramManager::releasePrograms(Pass* pass, TargetRenderState* renderState)
 
 	if (programSet != NULL)
 	{
-		pass->setVertexProgram(StringUtil::BLANK);
-		pass->setFragmentProgram(StringUtil::BLANK);
+		pass->setVertexProgram(BLANKSTRING);
+		pass->setFragmentProgram(BLANKSTRING);
 
 		GpuProgramPtr vsProgram(programSet->getGpuVertexProgram());
 		GpuProgramPtr psProgram(programSet->getGpuFragmentProgram());

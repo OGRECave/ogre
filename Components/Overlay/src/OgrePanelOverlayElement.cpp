@@ -27,9 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgrePanelOverlayElement.h"
-#include "OgreMaterial.h"
 #include "OgreTechnique.h"
-#include "OgrePass.h"
 #include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"

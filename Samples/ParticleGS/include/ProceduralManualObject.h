@@ -15,9 +15,9 @@ Also see acknowledgements in Readme.html
 #ifndef __PROCEDURAL_MANUAL_OBJECT_H__
 #define __PROCEDURAL_MANUAL_OBJECT_H__
 
-#include <OgreManualObject.h>
-#include <OgreSimpleRenderable.h>
-#include <OgreRenderToVertexBuffer.h>
+#include "OgreManualObject.h"
+#include "OgreSimpleRenderable.h"
+#include "OgreRenderToVertexBuffer.h"
 
 namespace Ogre
 {

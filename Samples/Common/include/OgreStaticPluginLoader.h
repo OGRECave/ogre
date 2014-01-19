@@ -21,8 +21,10 @@ Description: Utility class to load plugins statically
 #ifndef __StaticPluginLoader_H__
 #define __StaticPluginLoader_H__
 
-#include "Ogre.h"
+#include "OgrePrerequisites.h"
+#include "OgreRoot.h"
 #include "OgreConfigFile.h"
+
 // Static plugin headers
 #ifdef OGRE_STATIC_CgProgramManager
 #  include "OgreCgPlugin.h"

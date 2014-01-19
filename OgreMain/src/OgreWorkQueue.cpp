@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreWorkQueue.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
+#include "OgreTimer.h"
 
 namespace Ogre {
 	//---------------------------------------------------------------------
@@ -628,7 +629,7 @@ namespace Ogre {
 
 		Response* response = 0;
 
-		StringUtil::StrStreamType dbgMsg;
+		StringStream dbgMsg;
 		dbgMsg <<
 #if OGRE_THREAD_SUPPORT
 			OGRE_THREAD_CURRENT_ID
@@ -665,7 +666,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::processResponse(Response* r)
 	{
-		StringUtil::StrStreamType dbgMsg;
+		StringStream dbgMsg;
 		dbgMsg << "thread:" <<
 #if OGRE_THREAD_SUPPORT
 			OGRE_THREAD_CURRENT_ID

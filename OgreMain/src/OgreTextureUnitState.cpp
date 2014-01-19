@@ -197,7 +197,7 @@ namespace Ogre {
         if (mCurrentFrame < mFrames.size())
             return mFrames[mCurrentFrame];
         else
-            return StringUtil::BLANK;
+            return BLANKSTRING;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureName( const String& name, TextureType texType)
@@ -498,7 +498,7 @@ namespace Ogre {
 
         for (unsigned int i = 0; i < mFrames.size(); ++i)
         {
-			StringUtil::StrStreamType str;
+			StringStream str;
             str << baseName << "_" << i << ext;
             mFrames[i] = str.str();
 			mFramePtrs[i].setNull();
@@ -869,7 +869,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setBlank(void)
     {
-		setTextureName(StringUtil::BLANK);
+		setTextureName(BLANKSTRING);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureTransform(const Matrix4& xform)

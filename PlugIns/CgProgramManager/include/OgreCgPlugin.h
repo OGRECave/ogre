@@ -29,10 +29,10 @@ THE SOFTWARE.
 #define __CgPlugin_H__
 
 #include "OgrePlugin.h"
-#include "OgreCgProgramFactory.h"
 
 namespace Ogre
 {
+    class CgProgramFactory;
 
 	/** Plugin instance for Cg Program Manager */
 	class CgPlugin : public Plugin

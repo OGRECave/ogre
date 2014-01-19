@@ -268,7 +268,7 @@ namespace Ogre {
             }
         }
 
-        StringUtil::StrStreamType str;
+        StringStream str;
         if (numFreed)
         {
             str << "HardwareBufferManager: Freed " << numFreed << " unused temporary vertex buffers.";

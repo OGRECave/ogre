@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
 #include "OgreLodStrategyManager.h"
+#include "OgreLodStrategy.h"
 #include <cstddef>
 
 namespace Ogre {
@@ -970,7 +971,7 @@ namespace Ogre {
                 {
                     // NB set is local to this buffer, but will be translated into a 
                     // global set number across all vertex buffers
-					StringUtil::StrStreamType str;
+					StringStream str;
 					str << "texture_coord_dimensions_" << tx;
                     attrib = vbElem->Attribute(str.str().c_str());
                     VertexElementType vtype = VET_FLOAT2; // Default

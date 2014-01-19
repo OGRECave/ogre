@@ -33,11 +33,12 @@ current TODO's       : none known
 -----------------------------------------------------------------------------
 */
 
-#include <OgreEntity.h>
-#include <OgreRoot.h>
+#include "OgreRoot.h"
 
 #include "OgrePCZSceneQuery.h"
 #include "OgrePCZSceneManager.h"
+#include "OgrePCZSceneNode.h"
+#include "OgreEntity.h"
 
 namespace Ogre
 {

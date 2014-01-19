@@ -31,9 +31,7 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgrePagedWorldSection.h"
-#include "OgrePageManager.h"
-
-
+#include "OgreCommon.h"
 
 namespace Ogre
 {
@@ -107,7 +105,7 @@ namespace Ogre
 		TerrainPagedWorldSection* createWorldSection(PagedWorld* world, TerrainGroup* terrainGroup, 
 			Real loadRadius, Real holdRadius, 
 			int32 minX = -10, int32 minY = -10, int32 maxX = 10, int32 maxY = 10, 
-			const String& sectionName = StringUtil::BLANK, uint32 loadingIntervalMs = 900);
+			const String& sectionName = BLANKSTRING, uint32 loadingIntervalMs = 900);
 
 	protected:
 		PageManager* mManager;

@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgreMesh.h"
 #include "OgreLodConfig.h"
+
 using namespace Ogre;
 
 class MeshLodTests : public CppUnit::TestFixture

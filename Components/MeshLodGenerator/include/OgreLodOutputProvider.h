@@ -47,9 +47,6 @@ public:
 	virtual void triangleChanged(LodData* data, LodData::Triangle* tri){}
 	virtual void inject(){}
 };
-
-typedef SharedPtr<LodOutputProvider> LodOutputProviderPtr;
-
 }
 #endif
 

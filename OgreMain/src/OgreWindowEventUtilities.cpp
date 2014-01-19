@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreRenderWindow.h"
 #include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreStringConverter.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
 void GLXProc( Ogre::RenderWindow *win, const XEvent &event );

@@ -32,6 +32,8 @@
 #include "SdkTrays.h"
 #include "SdkCameraMan.h"
 
+#include "Ogre.h"
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
 #endif

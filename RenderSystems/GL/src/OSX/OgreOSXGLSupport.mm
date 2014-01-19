@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreGLRenderSystem.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -44,6 +45,7 @@ THE SOFTWARE.
 #include <OpenGL/OpenGL.h>
 #include <AppKit/NSScreen.h>
 #include <Foundation/NSString.h>
+
 namespace Ogre {
 
     class OSXGLSupportImpl

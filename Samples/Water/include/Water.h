@@ -19,6 +19,7 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "OgreBillboardParticleRenderer.h"
 #include "WaterMesh.h"
+#include "OgreParticleSystem.h"
 
 #include <iostream>
 

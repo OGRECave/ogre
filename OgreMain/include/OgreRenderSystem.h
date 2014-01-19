@@ -34,16 +34,11 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreCommon.h"
 
-#include "OgreMaterialManager.h"
-#include "OgreRenderOperation.h"
 #include "OgreRenderSystemCapabilities.h"
-#include "OgreRenderTarget.h"
-#include "OgreRenderTexture.h"
-#include "OgreFrameListener.h"
 #include "OgreConfigOptionMap.h"
 #include "OgreGpuProgram.h"
 #include "OgrePlane.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

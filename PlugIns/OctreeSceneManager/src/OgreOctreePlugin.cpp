@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreOctreePlugin.h"
 #include "OgreRoot.h"
+#include "OgreOctreeSceneManager.h"
 
 namespace Ogre 
 {

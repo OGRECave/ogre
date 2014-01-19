@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "ZipArchiveTests.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreZip.h"
+#include "OgreCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
@@ -110,13 +111,13 @@ void ZipArchiveTests::testListFileInfoNonRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 
@@ -163,13 +164,13 @@ void ZipArchiveTests::testListFileInfoRecursive()
 
     FileInfo& fi1 = vec->at(4);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(5);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 
@@ -233,13 +234,13 @@ void ZipArchiveTests::testFindFileInfoNonRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 

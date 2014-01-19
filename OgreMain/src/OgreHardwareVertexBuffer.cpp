@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreColourValue.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreRoot.h"

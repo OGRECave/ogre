@@ -34,7 +34,12 @@ Code Style Update	 :
 */
 
 #include "OgrePCZPlugin.h"
-#include <OgreRoot.h>
+#include "OgrePCZSceneManager.h"
+#include "OgrePortal.h"
+#include "OgreAntiPortal.h"
+#include "OgrePCZLight.h"
+#include "OgrePCZoneFactory.h"
+#include "OgreRoot.h"
 
 namespace Ogre 
 {

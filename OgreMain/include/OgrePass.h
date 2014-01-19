@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __Pass_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreGpuProgram.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreLight.h"

@@ -30,13 +30,14 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreResourceManager.h"
-#include "OgreCompositor.h"
-#include "OgreRectangle2D.h"
 #include "OgreRenderSystem.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    class Rectangle2D;
+
 	/** \addtogroup Core
 	*  @{
 	*/

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreRoot.h"
+#include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D11Mappings.h"
 #include "OgreGpuProgramManager.h"

@@ -33,8 +33,10 @@ THE SOFTWARE.
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreLodStrategyManager.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreLodConfig.h"
 
 #include <iostream>
 #include <sys/stat.h>
@@ -499,7 +501,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
 		SubMesh* sm = smIt.getNext();
 		if (!sm->useSharedVertices) {
 			if (opts.interactive) {
-				StringUtil::StrStreamType str;
+				StringStream str;
 				str << "SubMesh " << idx++; 
 				reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData);
 			} else {

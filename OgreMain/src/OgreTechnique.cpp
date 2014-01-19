@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGpuProgramManager.h"
 #include "OgreMaterialManager.h"
 
 
@@ -78,7 +77,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     String Technique::_compile(bool autoManageTextureUnits)
     {
-		StringUtil::StrStreamType errors;
+		StringStream errors;
 
 		mIsSupported = checkGPURules(errors);
 		if (mIsSupported)
@@ -94,7 +93,7 @@ namespace Ogre {
 
     }
 	//---------------------------------------------------------------------
-	bool Technique::checkHardwareSupport(bool autoManageTextureUnits, StringUtil::StrStreamType& compileErrors)
+	bool Technique::checkHardwareSupport(bool autoManageTextureUnits, StringStream& compileErrors)
 	{
 		// Go through each pass, checking requirements
 		Passes::iterator i;
@@ -327,12 +326,12 @@ namespace Ogre {
 		return true;
 	}
 	//---------------------------------------------------------------------
-	bool Technique::checkGPURules(StringUtil::StrStreamType& errors)
+	bool Technique::checkGPURules(StringStream& errors)
 	{
 		const RenderSystemCapabilities* caps =
 			Root::getSingleton().getRenderSystem()->getCapabilities();
 
-		StringUtil::StrStreamType includeRules;
+		StringStream includeRules;
 		bool includeRulesPresent = false;
 		bool includeRuleMatched = false;
 
@@ -367,7 +366,7 @@ namespace Ogre {
 		}
 
 		// now check device names
-		includeRules.str(StringUtil::BLANK);
+		includeRules.str(BLANKSTRING);
 		includeRulesPresent = false;
 		includeRuleMatched = false;
 

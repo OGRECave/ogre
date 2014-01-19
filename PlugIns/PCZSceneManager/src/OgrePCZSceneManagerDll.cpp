@@ -32,7 +32,8 @@ email                : ericc@xenopi.com
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
+#include "OgrePCZPrerequisites.h"
+#include "OgreRoot.h"
 #include "OgrePCZPlugin.h"
 
 #ifndef OGRE_STATIC_LIB

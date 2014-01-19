@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreRenderSystemCapabilities.h"
-#include "OgreStringVector.h"
-#include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
 

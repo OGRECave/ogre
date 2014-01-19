@@ -43,8 +43,9 @@ Code Style Update	 :
 #ifndef PCZ_SCENE_NODE_H
 #define PCZ_SCENE_NODE_H
 
-#include <OgreSceneNode.h>
 #include "OgrePCZPrerequisites.h"
+#include "OgreSceneNode.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {

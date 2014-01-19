@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "PlayPenSamples.h"
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #include "OgreMeshLodGenerator.h"
+#include "OgreLodConfig.h"
 #endif
 
 //---------------------------------------------------------------------

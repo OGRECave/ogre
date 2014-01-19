@@ -42,6 +42,9 @@ Code Style Update	 :
 
 namespace Ogre
 {
+    class PCZFrustum;
+    struct VisibleObjectsBoundsInfo;
+
 	class _OgrePCZPluginExport DefaultZone : public PCZone
     {
     public:

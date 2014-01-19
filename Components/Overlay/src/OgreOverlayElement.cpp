@@ -30,12 +30,11 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreOverlayElement.h"
-#include "OgreMaterialManager.h"
 #include "OgreOverlay.h"
-#include "OgreOverlayContainer.h"
 #include "OgreOverlayManager.h"
 #include "OgreException.h"
-#include "OgreRenderQueue.h"
+#include "OgreMaterialManager.h"
+#include "OgreOverlayContainer.h"
 
 namespace Ogre {
 
@@ -322,7 +321,7 @@ namespace Ogre {
     void OverlayElement::setMaterialName(const String& matName)
     {
         mMaterialName = matName;
-		if (matName != StringUtil::BLANK)
+		if (matName != BLANKSTRING)
 		{
 			mMaterial = MaterialManager::getSingleton().getByName(matName);
 			if (mMaterial.isNull())

@@ -37,12 +37,14 @@ Code Style Update	 :
 #ifndef PCZONE_FACTORY_H
 #define PCZONE_FACTORY_H
 
-#include <OgreSingleton.h>
-#include "OgrePCZone.h"
+#include "OgrePCZPrerequisites.h"
+#include "OgreSingleton.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
 	class PCZSceneManager;
+    class PCZone;
 
 	/// Factory for PCZones
 	class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
