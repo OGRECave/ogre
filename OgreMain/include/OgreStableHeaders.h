@@ -37,7 +37,6 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(__MINGW32__)) || OGRE_PLATFORM == OGRE_PLATFORM_WINRT || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "OgreArchive.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreBitwise.h"
@@ -75,8 +74,6 @@ THE SOFTWARE.
 #include "OgreWireBoundingBox.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #	include "OgreZip.h"
-#endif
-
 #endif
 
 #endif 

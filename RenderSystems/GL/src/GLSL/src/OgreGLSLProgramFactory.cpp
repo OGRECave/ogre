@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreGLSLProgramFactory.h"
 #include "OgreGLSLLinkProgramManager.h"
 #include "OgreGLSLProgram.h"
-#include "OGreGLSLLinkProgramManager.h"
 
 namespace Ogre {
     namespace GLSL {

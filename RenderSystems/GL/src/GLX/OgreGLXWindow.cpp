@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreGLXGLSupport.h"
 #include "OgreGLPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include <iostream>
 #include <algorithm>

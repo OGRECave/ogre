@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreVolumeIsoSurface.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
+#include <float.h>
 
 namespace Ogre {
 namespace Volume {

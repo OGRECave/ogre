@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreVolumeSource.h"
 #include "OgreVolumeOctreeNode.h"
+#include <float.h>
 
 namespace Ogre {
 namespace Volume {
