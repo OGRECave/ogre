@@ -58,7 +58,6 @@ class UseCustomCapabilitiesTests : public CppUnit::TestFixture
 #ifdef OGRE_STATIC_LIB
     Ogre::StaticPluginLoader mStaticPluginLoader;
 #endif
-	LogManager *mLogManager;
 
 public:
     void setUp();
