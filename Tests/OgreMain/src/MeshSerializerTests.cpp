@@ -462,9 +462,9 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
 				HardwareVertexBufferSharedPtr bbuf = b->vertexBufferBinding->getBuffer(bElem.getSource());
 				unsigned char* avertex = static_cast<unsigned char*>(abuf->lock(HardwareBuffer::HBL_READ_ONLY));
 				unsigned char* bvertex = static_cast<unsigned char*>(bbuf->lock(HardwareBuffer::HBL_READ_ONLY));
-				int avSize = abuf->getVertexSize();
-				int bvSize = bbuf->getVertexSize();
-				int elemSize = VertexElement::getTypeSize(aElem.getType());
+				size_t avSize = abuf->getVertexSize();
+				size_t bvSize = bbuf->getVertexSize();
+				size_t elemSize = VertexElement::getTypeSize(aElem.getType());
 				unsigned char* avEnd = avertex + a->vertexCount * avSize;
 				bool error = false;
 				for (; avertex < avEnd; avertex += avSize, bvertex += bvSize) {

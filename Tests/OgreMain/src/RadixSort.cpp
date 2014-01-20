@@ -36,7 +36,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION( RadixSortTests );
 
 void RadixSortTests::setUp()
 {
-	srand(time(0));
+	srand(0);
 }
 void RadixSortTests::tearDown()
 {
