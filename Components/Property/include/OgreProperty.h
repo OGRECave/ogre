@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreQuaternion.h"
 #include "OgreMatrix4.h"
+#include <boost/bind.hpp>
 #include <boost/function.hpp>
 
 /** \addtogroup Optional Components
