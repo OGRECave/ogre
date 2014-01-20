@@ -60,6 +60,7 @@ StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
 #endif
 
 #include "SampleBrowser.h"
+#include <iostream>
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
