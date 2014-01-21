@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "CppUnitResultWriter.h"
 #include "OgreConfigFile.h"
 #include "OgrePlatform.h"
-
+#include <iostream>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
