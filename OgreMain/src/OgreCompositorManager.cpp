@@ -535,4 +535,22 @@ CustomCompositionPass* CompositorManager::getCustomCompositionPass(const String&
 	return it->second;
 }
 //-----------------------------------------------------------------------
+void CompositorManager::_relocateChain( Viewport* sourceVP, Viewport* destVP )
+{
+	if (sourceVP != destVP)
+	{
+		CompositorChain *chain = getCompositorChain(sourceVP);
+		Ogre::RenderTarget *srcTarget = sourceVP->getTarget();
+		Ogre::RenderTarget *dstTarget = destVP->getTarget();
+		if (srcTarget != dstTarget)
+		{
+			srcTarget->removeListener(chain);
+			dstTarget->addListener(chain);
+		}
+		chain->_notifyViewport(destVP);
+		mChains.erase(sourceVP);
+		mChains[destVP] = chain;
+	}
+}
+//-----------------------------------------------------------------------
 }
