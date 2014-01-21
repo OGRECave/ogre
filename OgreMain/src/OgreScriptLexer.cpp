@@ -41,8 +41,13 @@ namespace Ogre{
 		enum{ READY = 0, COMMENT, MULTICOMMENT, WORD, QUOTE, VAR, POSSIBLECOMMENT };
 
 		// Set up some constant characters of interest
+#if OGRE_WCHAR_T_STRINGS
+		const wchar_t varopener = L'$', quote = L'\"', slash = L'/', backslash = L'\\', openbrace = L'{', closebrace = L'}', colon = L':', star = L'*', cr = L'\r', lf = L'\n';
+		wchar_t c = 0, lastc = 0;
+#else
 		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*', cr = '\r', lf = '\n';
 		char c = 0, lastc = 0;
+#endif
 
 		String lexeme;
 		uint32 line = 1, state = READY, lastQuote = 0;
@@ -229,8 +234,13 @@ namespace Ogre{
 
 	void ScriptLexer::setToken(const Ogre::String &lexeme, Ogre::uint32 line, const String &source, Ogre::ScriptTokenList *tokens)
 	{
+#if OGRE_WCHAR_T_STRINGS
+		const wchar_t openBracket = L'{', closeBracket = L'}', colon = L':', 
+			quote = L'\"', var = L'$';
+#else
 		const char openBracket = '{', closeBracket = '}', colon = ':',
 			quote = '\"', var = '$';
+#endif
 
 		ScriptTokenPtr token(OGRE_NEW_T(ScriptToken, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 		token->lexeme = lexeme;
@@ -272,12 +282,20 @@ namespace Ogre{
 
 	bool ScriptLexer::isWhitespace(Ogre::String::value_type c) const
 	{
+#ifdef OGRE_WCHAR_T_STRINGS
+		return c == L' ' || c == L'\r' || c == L'\t';
+#else
 		return c == ' ' || c == '\r' || c == '\t';
+#endif
 	}
 
 	bool ScriptLexer::isNewline(Ogre::String::value_type c) const
 	{
+#ifdef OGRE_WCHAR_T_STRINGS
+		return c == L'\n' || c == L'\r';
+#else
 		return c == '\n' || c == '\r';
+#endif
 	}
 
 }
