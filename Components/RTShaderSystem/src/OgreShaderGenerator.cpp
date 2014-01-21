@@ -643,6 +643,12 @@ SceneManager* ShaderGenerator::getActiveSceneManager()
 {
 	return mActiveSceneMgr;
 }
+//-----------------------------------------------------------------------------
+void ShaderGenerator::_setActiveSceneManager(SceneManager* sceneManager)
+{
+	mActiveViewportValid &= (mActiveSceneMgr == sceneManager);
+	mActiveSceneMgr = sceneManager;
+}
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::setVertexShaderProfiles(const String& vertexShaderProfiles)

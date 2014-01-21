@@ -119,7 +119,15 @@ public:
 	This attribute will be update on the call to preFindVisibleObjects. 
 	*/
 	SceneManager* getActiveSceneManager();
-	
+
+	/** 
+	Set the active scene manager against which new render states are compiled.
+	Note that normally the setting of the active scene manager is updated through the
+	preFindVisibleObjects method.
+	*/
+
+	void _setActiveSceneManager(SceneManager* sceneManager);
+
 	/** 
 	Set the target shader language.
 	@param shaderLanguage The output shader language to use.	
