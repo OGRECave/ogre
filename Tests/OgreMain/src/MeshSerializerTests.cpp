@@ -78,6 +78,8 @@ void MeshSerializerTests::setUp()
 	mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
 	mLogManager->setLogDetail(LL_LOW);
 
+	mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
+
 	OGRE_NEW ResourceGroupManager();
 	OGRE_NEW LodStrategyManager();
 	OGRE_NEW DefaultHardwareBufferManager();
@@ -91,19 +93,15 @@ void MeshSerializerTests::setUp()
 
 	// Load resource paths from config file
 	ConfigFile cf;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if OGRE_DEBUG_MODE
-	cf.load("resources_d.cfg");
+	String resourcesPath;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+	resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #else
-	cf.load("resources.cfg");
-#endif
-#else
-	cf.load("bin/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
 #endif
 
 	// Go through all sections & settings in the file
+	cf.load(resourcesPath);
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
 	String secName, typeName, archName;
@@ -174,6 +172,7 @@ void MeshSerializerTests::tearDown()
 	OGRE_DELETE MaterialManager::getSingletonPtr();
 	OGRE_DELETE LodStrategyManager::getSingletonPtr();
 	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+	OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 	OGRE_DELETE mLogManager;
 }
 void MeshSerializerTests::testMesh_clone()

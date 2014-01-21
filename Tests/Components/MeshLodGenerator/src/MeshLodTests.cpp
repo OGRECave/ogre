@@ -67,14 +67,8 @@ void MeshLodTests::setUp()
     // Load resource paths from config file
     ConfigFile cf;
     String resourcesPath;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if OGRE_DEBUG_MODE
-    resourcesPath = mFSLayer->getConfigFilePath("resources_d.cfg");
-#else
-    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#endif
 #else
     resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
 #endif

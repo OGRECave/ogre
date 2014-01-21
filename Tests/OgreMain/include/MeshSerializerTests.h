@@ -3,6 +3,7 @@
 #include "OgreLogManager.h"
 #include "OgreMesh.h"
 #include "OgreMeshSerializer.h"
+#include "OgreFileSystemLayer.h"
 
 using namespace Ogre;
 
@@ -29,6 +30,7 @@ String mSkeletonFullPath;
 SkeletonPtr mSkeleton;
 Real errorFactor;
 LogManager* mLogManager;
+FileSystemLayer* mFSLayer;
 public:
 void setUp();
 void tearDown();
