@@ -46,8 +46,46 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** Hashed string
+	/** Hashed string.
+		An IdString is meant to be passed by value rather than by reference since in Release
+		mode it's just an encapsulated integer. The default implementation uses a 32-bit uint.
+		A hash = 0 is the default initialization, and assumed by Ogre to mean an IdString is
+		empty or unspecified.
+	@par
+		Note that IdString("") != IdString(0) != IdString()
+		The latter indicates mHash == 0 (the default initialization). While the first
+		one will hash the empty string "", and the second will attempt to hash the
+		number 0, producing up to three possible outputs.
+	@par
+		IdStrings convert regular String to hashes AND ARE DESTRUCTIVE.
+		This means that you may no longer recover the real string it was constructed from.
+		When the original data is not available getFriendlyText returns [Hash 0x0a0100ef]
+		(in the example that mHash = 0x0a0100ef)*
+		In non-release modes (NDEBUG is not defined), IdStrings try to maintain a copy of
+		the original string for two purposes:
+			1. Easy debugging: Reading "Texture/diffuse.png" is much nicer than "0x0a0100ef"
+			2. Hash collision: If Ogre finds two IdStrings are identical but their original
+			   strings are not, an assertion will trigger indicating a collision has been
+			   found. Note that this isn't foolproof.
+			* Note: When IdString( uint32 ) was used to hash an integer, getFriendlyText
+			  will return "[Value 0x1234567]"
+	@par
+		IdStrings can be concatenated: IdString( "Hello." ) + IdString( " How are you?" )
+		produc a new IdString, but please note that it may not be the same as doing
+		IdString( "Hello. How are you?" ) depending on the hashing function used
+		(by default, we use MurmurHash3, @see OGRE_HASH_FUNC)
+
 	@remarks
+		Hash collision detection isn't foolproof because we keep a fixed string copy of
+		the original string. If the original string is too long, it will be truncated
+		and there is an extremely low possibility that their truncation becomes
+		the same string, and their hashes also become equal, when the original strings
+		were not. i.e.
+		VeryLooooooong/String and UltraaaaaLoong/String could both become "/String"
+		and happen to also hash to the same number.
+	@par
+		In practice we truncate to 32 bytes. If your fear this is too little for you and
+		also fear about collisions, increase @OGRE_DEBUG_STR_SIZE
 	@author
         Matias N. Goldberg
     @version
