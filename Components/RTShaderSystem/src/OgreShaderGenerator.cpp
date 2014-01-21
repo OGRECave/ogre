@@ -1346,7 +1346,7 @@ size_t ShaderGenerator::getFragmentShaderCount() const
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
+void ShaderGenerator::setTargetLanguage(const String& shaderLanguage,const float version)
 {
 	// Make sure that the shader language is supported.
 	if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
@@ -1357,9 +1357,10 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 	}
 
 	// Case target language changed -> flush the shaders cache.
-	if (mShaderLanguage != shaderLanguage)
+	if (mShaderLanguage != shaderLanguage || mShaderLanguageVersion != version )
 	{
 		mShaderLanguage = shaderLanguage;
+		mShaderLanguageVersion = version;
 		flushShaderCache();
 	}
 }
