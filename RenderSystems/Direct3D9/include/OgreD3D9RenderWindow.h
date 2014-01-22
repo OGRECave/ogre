@@ -117,6 +117,9 @@ namespace Ogre
 		/** Return the target window style depending on the fullscreen parameter. */
 		DWORD getWindowStyle(bool fullScreen) const { if (fullScreen) return mFullscreenWinStyle; return mWindowedWinStyle; }
 
+		// Overridden see RenderTarget
+		virtual void updateStats(void);
+
 	protected:
 		HINSTANCE					mInstance;				// Process instance
 		D3D9Device* 				mDevice;				// D3D9 device wrapper class.

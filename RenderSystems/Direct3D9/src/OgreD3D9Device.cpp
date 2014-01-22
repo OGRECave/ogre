@@ -57,7 +57,10 @@ namespace Ogre
 		mPresentationParamsCount 	= 0;
 		mPresentationParams		 	= NULL;
 		memset(&mD3D9DeviceCaps, 0, sizeof(mD3D9DeviceCaps));
-		memset(&mCreationParams, 0, sizeof(mCreationParams));		
+		memset(&mCreationParams, 0, sizeof(mCreationParams));
+		memset(&mPreviousPresentStats, 0, sizeof(mPreviousPresentStats));
+		mPreviousPresentStatsIsValid				= false; 
+		mVBlankMissCount				= 0; 
 	}
 
 	//---------------------------------------------------------------------
@@ -682,6 +685,12 @@ namespace Ogre
 			mBehaviorFlags &= ~D3DCREATE_ADAPTERGROUP_DEVICE;
 		}
 
+		if(mPresentationParams->SwapEffect == D3DSWAPEFFECT_FLIPEX)
+		{
+			mBehaviorFlags |= D3DCREATE_ENABLE_PRESENTSTATS;
+		}
+
+
 		// Try to create the device with hardware vertex processing. 
 		mBehaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
@@ -815,6 +824,7 @@ namespace Ogre
 		SAFE_RELEASE(renderWindowResources->backBuffer);
 		SAFE_RELEASE(renderWindowResources->depthBuffer);
 		SAFE_RELEASE(renderWindowResources->swapChain);
+		SAFE_RELEASE(renderWindowResources->swapChain9Ex);
 		renderWindowResources->acquired = false;
 	}
 
@@ -1063,6 +1073,8 @@ namespace Ogre
 					"Unable to create an additional swap chain",
 					"D3D9RenderWindow::acquireRenderWindowResources");
 			}
+
+			renderWindowResources->swapChain9Ex = NULL;
 		}
 		else
 		{
@@ -1075,6 +1087,8 @@ namespace Ogre
 					"Unable to get the swap chain",
 					"D3D9RenderWindow::acquireRenderWindowResources");
 			}
+
+			renderWindowResources->swapChain9Ex = NULL;
 		}
 
 		// Store references to buffers for convenience		
@@ -1496,5 +1510,64 @@ namespace Ogre
 		SAFE_RELEASE(pSurf);
 
 
+	}
+
+	int D3D9Device::getVBlankMissCount(D3D9RenderWindow* renderWindow)
+	{
+		// the stat only works with no AA, VSync and 9Ex.
+		if(renderWindow->isAA() || 
+			renderWindow->isVSyncEnabled() == false || 
+			D3D9RenderSystem::isDirectX9Ex() == false)
+		{
+			return -1;
+		}
+
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowResources*	renderWindowResources = it->second;	
+
+		// The 9Ex swap chain is set to NULL when we create the RenderWindowResources, now we need it
+		// to get the stats - so we try to get it from the original d3d9 swap chain by using 
+		// COM's QueryInterface
+		if(renderWindowResources->swapChain9Ex == NULL)
+		{
+			if (FAILED(renderWindowResources->swapChain->QueryInterface(IID_IDirect3DSwapChain9Ex, (void**)&renderWindowResources->swapChain9Ex)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't get Direct3DSwapChain9Ex from Direct3DSwapChain.",
+					"D3D9Device::getVBlankMissCount");
+			}
+		}
+		
+		// Get Present Stats info for glitch detection 
+		D3DPRESENTSTATS currentPresentStats;
+		ZeroMemory(&currentPresentStats, sizeof(currentPresentStats));
+		// Obtain present statistics information for successfully displayed presents
+		HRESULT hr = renderWindowResources->swapChain9Ex->GetPresentStats(&currentPresentStats);
+
+		// check if the call to GetPresentStats got us the stats 
+		if(FAILED(hr) || currentPresentStats.PresentRefreshCount == 0)
+		{
+			mPreviousPresentStatsIsValid = false;
+		}
+		else
+		{
+			if(mPreviousPresentStatsIsValid == true)
+			{
+				// add the vblank misses since the last call to getVBlankMissCount 
+				int currentVBlankMissCount = (currentPresentStats.PresentRefreshCount - mPreviousPresentStats.PresentRefreshCount) 
+										   - (currentPresentStats.PresentCount - mPreviousPresentStats.PresentCount);
+
+				if(currentVBlankMissCount > 0)
+				{
+					mVBlankMissCount +=  currentVBlankMissCount;
+				}
+			}
+
+			// save the current to be the next time previous 
+			mPreviousPresentStats			= currentPresentStats;
+			mPreviousPresentStatsIsValid	= true;
+		}			
+
+		return mVBlankMissCount;
 	}
 }
