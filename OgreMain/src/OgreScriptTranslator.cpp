@@ -7046,7 +7046,6 @@ namespace Ogre{
 							return;
 						}
 
-						bool var;
 						AbstractNodeList::const_iterator it0 = prop->values.begin();
 						if( !getBoolean( *it0, &passScene->mCameraCubemapReorient ) )
 						{

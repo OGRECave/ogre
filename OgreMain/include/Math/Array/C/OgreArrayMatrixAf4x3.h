@@ -166,6 +166,7 @@ namespace Ogre
 		*/
 		inline void streamToAoS( Matrix4 * RESTRICT_ALIAS dst ) const;
 		inline void storeToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS src ) const;
+		inline void streamToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS src ) const;
 
 		/** Converts ARRAY_PACKED_REALS matrices into this ArrayMatrix
 		@remarks

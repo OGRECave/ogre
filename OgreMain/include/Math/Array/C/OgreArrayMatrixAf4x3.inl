@@ -422,6 +422,17 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
+	inline void ArrayMatrixAf4x3::streamToAoS( SimpleMatrixAf4x3 * RESTRICT_ALIAS dst ) const
+	{
+		for( int i=0; i<12; i+= 4 )
+		{
+			dst->mChunkBase[i  ] = mChunkBase[i  ];
+			dst->mChunkBase[i+1] = mChunkBase[i+1];
+			dst->mChunkBase[i+2] = mChunkBase[i+2];
+			dst->mChunkBase[i+3] = mChunkBase[i+3];
+		}
+	}
+	//-----------------------------------------------------------------------------------
 	inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS src )
 	{
 		for( int i=0; i<12; i+= 4 )
