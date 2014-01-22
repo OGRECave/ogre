@@ -261,6 +261,10 @@ void ProgramProcessor::buildTexcoordTable(const ShaderParameterList& paramList, 
             case GCT_INT2:
             case GCT_INT3:
             case GCT_INT4:
+			case GCT_UINT1:
+			case GCT_UINT2:
+			case GCT_UINT3:
+			case GCT_UINT4:
             case GCT_UNKNOWN:
             default:
                 break;
