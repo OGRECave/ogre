@@ -108,7 +108,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
 	if(mUsage & TU_RENDERTARGET)
 		updateRenderTexture(writeGamma, fsaa, srcName);
 
-	if (isNewBuffer && mOwnerTexture->isManuallyLoaded())
+	if (isNewBuffer && mOwnerTexture->isLoaded() && mOwnerTexture->isManuallyLoaded())
 	{
 		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
