@@ -6,14 +6,19 @@ SamplerState g_samLinear
 	AddressW = Wrap;
 };
 
-uniform Texture2D sMRT1; // fragment normals
-uniform Texture2D sMRT2; // view space position, remember that we are looking down the negative Z axis!!!
-uniform Texture2D sRand;
+struct v2p
+{
+	float4 position : SV_POSITION;
+    float2 uv : TEXCOORD0;
+};
+
+uniform Texture2D sMRT1 : register(s0); // fragment normals
+uniform Texture2D sMRT2 : register(s1); // view space position, remember that we are looking down the negative Z axis!!!
+uniform Texture2D sRand : register(s2);
 
 float4 Volumetric_fp
 (
-	float4 position : SV_POSITION,
-    in const float2 uv : TEXCOORD0,
+	v2p input,
     
     uniform const float4 cViewportSize, // (viewport_width, viewport_height, inverse_viewport_width, inverse_viewport_height)
     uniform const float cFov, // vertical field of view in radians
@@ -27,10 +32,10 @@ float4 Volumetric_fp
     const int n = 4;
     const int numSamples = m * n;    
 
-    const float2 interleaveOffset = uv * cViewportSize.xy / interleaved;
+    const float2 interleaveOffset = input.uv * cViewportSize.xy / interleaved;
     
-    const float3 fragmentPosition = sMRT2.Sample(g_samLinear, uv).xyz; // the current fragment in view space
-    const float3 fragmentNormal = sMRT1.Sample(g_samLinear, uv).xyz * float3(1, -1, 1); // the fragment normal
+    const float3 fragmentPosition = sMRT2.Sample(g_samLinear, input.uv).xyz; // the current fragment in view space
+    const float3 fragmentNormal = sMRT1.Sample(g_samLinear, input.uv).xyz * float3(1, -1, 1); // the fragment normal
 
     float rUV = 0; // radius of influence in screen space
     float r = 0; // radius of influence in world space
@@ -55,7 +60,7 @@ float4 Volumetric_fp
     const float rUV2 = rUV /2;
     
     const float3 center = fragmentPosition + fragmentNormal * (r2);
-    const float2 centerUV = uv + fragmentNormal.xy * (rUV2);
+    const float2 centerUV = input.uv + fragmentNormal.xy * (rUV2);
 
     float F = 0; // unoccluded Volume
     float V = 0; // occluded Volume

@@ -530,6 +530,26 @@ Viewport *CompositorChain::getViewport()
 {
     return mViewport;
 }
+//---------------------------------------------------------------------
+void CompositorChain::_notifyViewport(Viewport* vp)
+{
+	if (vp != mViewport)
+	{
+		if (mViewport != NULL) 
+			mViewport->removeListener(this);
+
+		if (vp != NULL) 
+			vp->addListener(this);
+		
+		if (vp->getTarget() != mViewport->getTarget())
+		{
+			mViewport->getTarget()->removeListener(this);
+			vp->getTarget()->addListener(this);
+		}
+		mOurListener.notifyViewport(vp);
+		mViewport = vp;
+	}	
+}
 //-----------------------------------------------------------------------
 void CompositorChain::RQListener::renderQueueStarted(uint8 id, 
 	const String& invocation, bool& skipThisQueue)

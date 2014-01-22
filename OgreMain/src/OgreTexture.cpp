@@ -459,11 +459,9 @@ namespace Ogre {
 			}
 		}
 
-
 		// load, and tell Image to delete the memory when it's done.
 		destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
 			getNumFaces(), numMips - 1);
-
 	}
 
 

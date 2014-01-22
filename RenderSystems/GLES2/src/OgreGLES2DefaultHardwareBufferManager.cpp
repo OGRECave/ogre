@@ -66,9 +66,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GLES2DefaultHardwareVertexBuffer::lock(size_t offset,
-                                              size_t length,
-                                              LockOptions options)
+    void* GLES2DefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -132,7 +130,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GLES2DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* GLES2DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -192,9 +190,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GLES2DefaultHardwareUniformBuffer::lock(size_t offset,
-                                                    size_t length,
-                                                    LockOptions options)
+    void* GLES2DefaultHardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -266,8 +262,12 @@ namespace Ogre {
     
 	Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
 	{
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                "Cannot create RenderToVertexBuffer in GLES2DefaultHardwareBufferManagerBase", 
-                "GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
+        if(!gleswIsSupported(3, 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "Cannot create RenderToVertexBuffer in GLES2DefaultHardwareBufferManagerBase", 
+                    "GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
+        }
+//        return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareRenderToVertexBuffer(this, sizeBytes, usage, useShadowBuffer, name));
 	}
 }

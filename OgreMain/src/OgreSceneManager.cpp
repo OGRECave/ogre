@@ -5813,7 +5813,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
             SOP_KEEP, // stencil test will never fail
             zfail ? incrOp : SOP_KEEP, // back face depth fail
             zfail ? SOP_KEEP : decrOp, // back face pass
-            twosided
+            twosided,
+			false
             );
     }
     else
@@ -5827,11 +5828,19 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
             SOP_KEEP, // stencil test will never fail
             zfail ? decrOp : SOP_KEEP, // front face depth fail
             zfail ? SOP_KEEP : incrOp, // front face pass
-            twosided
+            twosided,
+			false
             );
     }
 	mDestRenderSystem->_setCullingMode(mPassCullingMode);
 
+}
+//---------------------------------------------------------------------
+void SceneManager::renderUsingReadBackAsTexture(unsigned int secondPass, Ogre::String variableName, unsigned int StartSlot)
+{
+	if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_READ_BACK_AS_TEXTURE)) return;
+
+	mDestRenderSystem->_renderUsingReadBackAsTexture(secondPass,variableName,StartSlot);
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowColour(const ColourValue& colour)

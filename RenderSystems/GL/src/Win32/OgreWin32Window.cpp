@@ -876,6 +876,12 @@ namespace Ogre {
 			*pHwnd = getWindowHandle();
 			return;
 		} 
+		else if( name == "GLRC" )
+		{
+			HGLRC *pGlrc = (HGLRC*)pData;
+			*pGlrc = mContext->getGlrc();
+			return;
+		} 
 	}
 
 	void Win32Window::setActive( bool state )

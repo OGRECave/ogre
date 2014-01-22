@@ -67,7 +67,7 @@ fragment_program Ogre/Instancing_cg_ps cg
 {
 	source Instancing_ps.cg
 	entry_point main_ps
-	profiles ps_4_0 ps_3_0 ps_2_x fp40
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_3_0 ps_2_x fp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 }
@@ -75,7 +75,7 @@ fragment_program Ogre/Instancing_cg_ps cg
 fragment_program Ogre/Instancing/shadow_caster_cg_ps cg
 {
 	source depthshadowobject.cg
-	profiles ps_4_0 ps_3_0 ps_2_x fp40
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_3_0 ps_2_x fp40
 	entry_point main_fp
 	compile_arguments -DSHADOWCASTER=1 -DDEPTH_SHADOWCASTER=1 -DDEPTH_SHADOWRECEIVER=0
 
@@ -88,7 +88,7 @@ fragment_program Ogre/Instancing_hlsl_ps hlsl
 {
 	source Instancing_ps.hlsl
 	entry_point main_ps
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER
 	//default_params
@@ -100,7 +100,7 @@ fragment_program Ogre/Instancing_hlsl_ps hlsl
 fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
 {
 	source depthshadowobject.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point caster_fp
 	preprocessor_defines SHADOWCASTER=1;DEPTH_SHADOWCASTER=1;DEPTH_SHADOWRECEIVER=0
 
@@ -137,6 +137,6 @@ fragment_program Ogre/Instancing/shadow_caster_ps unified
 {
 	delegate Ogre/Instancing/shadow_caster_glsl_ps
 	delegate Ogre/Instancing/shadow_caster_glsles_ps
-	//delegate Ogre/Instancing/shadow_caster_hlsl_ps
+	delegate Ogre/Instancing/shadow_caster_hlsl_ps
 	delegate Ogre/Instancing/shadow_caster_cg_ps
 }

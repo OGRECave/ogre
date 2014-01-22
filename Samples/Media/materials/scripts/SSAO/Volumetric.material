@@ -26,9 +26,9 @@ fragment_program SSAO/Volumetric_fp_glsl glsl
 
 fragment_program SSAO/Volumetric_fp unified
 {
-	delegate SSAO/Volumetric_fp_glsl 
+	//delegate SSAO/Volumetric_fp_glsl 
 	delegate SSAO/Volumetric_fp_hlsl 
-	delegate SSAO/Volumetric_fp_cg
+	//delegate SSAO/Volumetric_fp_cg
 }
 
 

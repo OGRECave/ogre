@@ -641,6 +641,8 @@ namespace Ogre
 		unit, thus minimising render state changes.
 		*/
 		virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
+		/** Set texture unit binding type */
+		virtual void _setBindingType(TextureUnitState::BindingType bindigType);
 		/** Turns off a texture unit. */
 		virtual void _disableTextureUnit(size_t texUnit);
 		/** Disables all texture units from the given unit upwards */
@@ -733,7 +735,8 @@ namespace Ogre
 		*/
 		virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
-		/** Binds a texture to a vertex sampler.
+		/** Binds a texture to a vertex, geometry, compute, tesselation hull
+		or tessellation domain sampler.
 		@remarks
 		Not all rendersystems support separate vertex samplers. For those that
 		do, you can set a texture for them, separate to the regular texture
@@ -743,6 +746,10 @@ namespace Ogre
 		@see RenderSystemCapabilites::getVertexTextureUnitsShared
 		*/
 		virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
+		virtual void _setGeometryTexture(size_t unit, const TexturePtr& tex);
+		virtual void _setComputeTexture(size_t unit, const TexturePtr& tex);
+		virtual void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
+		virtual void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
 
 		/**
 		Sets the texture coordinate set to use for a texture unit.
@@ -1097,6 +1104,19 @@ namespace Ogre
 		/** Sets how to rasterise triangles, as points, wireframe or solid polys. */
 		virtual void _setPolygonMode(PolygonMode level) = 0;
 
+		/** Turns depth-stencil buffer checking on or off. 
+		@remarks
+		An inactive depth-stencil buffer can be read by a shader as a texture. An 
+		application that reads a depth-stencil buffer as a texture renders in two
+		passes, the first pass writes to the depth-stencil buffer and the second
+		pass reads from the buffer. This allows a shader to compare depth or
+		stencil values previously written to the buffer against the value for
+		the pixel currrently being rendered. The result of the comparison can
+		be used to create effects such as shadow mapping or soft particles
+		in a particle system.
+		*/
+		// virtual void setDepthCheckEnabled(bool enabled) = 0;
+
 		/** Turns stencil buffer checking on or off. 
 		@remarks
 		Stencilling (masking off areas of the rendering target based on the stencil 
@@ -1164,7 +1184,8 @@ namespace Ogre
 			StencilOperation stencilFailOp = SOP_KEEP, 
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
-			bool twoSidedOperation = false) = 0;
+			bool twoSidedOperation = false,
+            bool readBackAsTexture = false) {};
 
 
 
@@ -1198,6 +1219,8 @@ namespace Ogre
 		details of the operation to be performed.
 		*/
 		virtual void _render(const RenderOperation& op);
+
+		virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
 		/** Gets the capabilities of the render system. */
 		const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }

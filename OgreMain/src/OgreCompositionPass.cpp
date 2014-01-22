@@ -51,6 +51,7 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mStencilDepthFailOp(SOP_KEEP),
     mStencilPassOp(SOP_KEEP),
     mStencilTwoSidedOperation(false),
+	mStencilReadBackAsTexture(false),
     mQuadCornerModified(false),
     mQuadLeft(-1),
     mQuadTop(1),
@@ -267,6 +268,15 @@ bool CompositionPass::getStencilTwoSidedOperation() const
 {
 	return mStencilTwoSidedOperation;
 }
+void CompositionPass::setStencilReadBackAsTextureOperation(bool value)
+{
+	mStencilReadBackAsTexture = value;
+}
+bool CompositionPass::getStencilReadBackAsTextureOperation() const
+{
+	return mStencilReadBackAsTexture;
+}
+
 void CompositionPass::setQuadCorners(Real left,Real top,Real right,Real bottom)
 {
     mQuadCornerModified=true;

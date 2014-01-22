@@ -106,7 +106,7 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Could not create gpu programs from render state ", 
-			"ProgramManager::acquireGpuPrograms" );
+						"ProgramManager::acquireGpuPrograms" );
 	}	
 
 	// Bind the created GPU programs to the target pass.
@@ -487,7 +487,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 				}
 			}
 
-			pGpuProgram->setParameter("enable_backwards_compatibility", "true");
+			pGpuProgram->setParameter("enable_backwards_compatibility", "false");
 			pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
 		}
 		

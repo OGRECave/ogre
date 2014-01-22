@@ -9,7 +9,7 @@ fragment_program SSAO/GBuffer_fp_hlsl hlsl
 {
     source GBuffer.hlsl
     entry_point GBuffer_fp
-    target ps_4_0
+    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program SSAO/GBuffer_vp_cg cg
@@ -38,13 +38,13 @@ fragment_program SSAO/GBuffer_fp_glsl glsl
 
 vertex_program SSAO/GBuffer_vp unified
 {
-	delegate SSAO/GBuffer_vp_glsl 
+	//delegate SSAO/GBuffer_vp_glsl 
 	delegate SSAO/GBuffer_vp_hlsl 
-	delegate SSAO/GBuffer_vp_cg
+	//delegate SSAO/GBuffer_vp_cg
 }
 fragment_program SSAO/GBuffer_fp unified
 {
-	delegate SSAO/GBuffer_fp_glsl 
+	//delegate SSAO/GBuffer_fp_glsl 
 	delegate SSAO/GBuffer_fp_hlsl 
-	delegate SSAO/GBuffer_fp_cg
+	//delegate SSAO/GBuffer_fp_cg
 }
