@@ -64,6 +64,12 @@ namespace Ogre {
     {
         loadDirect(filename, separators, trimWhitespace);
     }
+    //-----------------------------------------------------------------------
+    void ConfigFile::load(const String& filename, const String& resourceGroup, 
+        const String& separators, bool trimWhitespace)
+    {
+		loadFromResourceSystem(filename, resourceGroup, separators, trimWhitespace);
+    }
 	//-----------------------------------------------------------------------
 	void ConfigFile::loadDirect(const String& filename, const String& separators, 
 		bool trimWhitespace)

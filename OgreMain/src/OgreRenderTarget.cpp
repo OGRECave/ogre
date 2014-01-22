@@ -336,6 +336,7 @@ namespace Ogre {
         mStats.batchCount = 0;
         mStats.bestFrameTime = 999999;
         mStats.worstFrameTime = 0;
+		mStats.vBlankMissCount = 0;
 
         mLastTime = mTimer->getMilliseconds();
         mLastSecond = mLastTime;

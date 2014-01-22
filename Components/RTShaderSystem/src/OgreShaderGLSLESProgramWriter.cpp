@@ -239,6 +239,10 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_INT2] = "int2";
             mGpuConstTypeMap[GCT_INT3] = "int3";
             mGpuConstTypeMap[GCT_INT4] = "int4";
+			mGpuConstTypeMap[GCT_UINT1] = "uint";
+			mGpuConstTypeMap[GCT_UINT2] = "uint2";
+			mGpuConstTypeMap[GCT_UINT3] = "uint3";
+			mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
             // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
             mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
@@ -975,7 +979,7 @@ namespace Ogre {
                         // First, look for a return type
                         if(isBasicType(tokens[0]) && ((tokens.size() < 3) || (tokens[2] != "=")) )
                         {
-                            String functionSig;
+                            String functionSig = "";
                             String functionBody = "";
                             FunctionInvocation *functionInvoc = NULL;
 

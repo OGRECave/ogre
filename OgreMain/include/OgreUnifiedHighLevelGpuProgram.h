@@ -59,6 +59,9 @@ namespace Ogre {
 	*/
 	class _OgreExport UnifiedHighLevelGpuProgram : public HighLevelGpuProgram
 	{
+	private:
+		static std::map<String,int> mLanguagePriorities;
+
 	public:
 		/// Command object for setting delegate (can set more than once)
 		class CmdDelegate : public ParamCommand
@@ -67,6 +70,9 @@ namespace Ogre {
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
+
+		static void setPrioriry(String shaderLanguage,int priority);
+		static int	getPriority(String shaderLanguage);
 
 	protected:
 		static CmdDelegate msCmdDelegate;

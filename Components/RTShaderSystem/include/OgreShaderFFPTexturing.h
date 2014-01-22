@@ -84,12 +84,18 @@ public:
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	
+	static void AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
+		GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter);
+
+	
+	static ParameterPtr GetSamplerWrapperParam(GpuConstantType samplerType,Function* function);
 
 	static String Type;
 
 // Protected types:
 protected:
-
+	
 	// Per texture unit parameters.
 	struct _OgreRTSSExport TextureUnitParams
 	{
@@ -113,6 +119,8 @@ protected:
 		UniformParameterPtr mTextureViewProjImageMatrix;
 		// Texture sampler parameter.
 		UniformParameterPtr mTextureSampler;
+	// Texture sampler state parameter.
+		UniformParameterPtr mTextureSamplerState;
 		// Vertex shader input texture coordinates parameter.
 		ParameterPtr mVSInputTexCoord;
 		// Vertex shader output texture coordinates parameter.

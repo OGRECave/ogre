@@ -799,13 +799,13 @@ namespace Ogre {
         mHighIndex = targetIndex;
     }
     //-----------------------------------------------------------------------------
-    bool VertexBufferBinding::hasInstanceData() const
+    bool VertexBufferBinding::getHasInstanceData() const
     {
 		VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
 		iend = mBindingMap.end();
 		for (i = mBindingMap.begin(); i != iend; ++i)
 		{
-			if ( i->second->isInstanceData() )
+			if ( i->second->getIsInstanceData() )
             {
                 return true;
             }

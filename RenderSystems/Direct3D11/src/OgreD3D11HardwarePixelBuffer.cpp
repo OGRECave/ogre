@@ -611,11 +611,21 @@ namespace Ogre {
  			{
 				sizeinbytes = converted.getHeight() * converted.getWidth() * PixelUtil::getNumElemBytes(converted.format);
  			}
- 
+			
 			const Ogre::PixelBox &locked = lock(dstBox, HBL_DISCARD);
 
-			memcpy(locked.data, converted.data, sizeinbytes);
+			int srcRowPitch = converted.rowPitch * PixelUtil::getNumElemBytes(converted.format);
+			int destRowPitch = locked.rowPitch;
 
+			byte *src = (byte*)converted.data;
+			byte *dst = (byte*)locked.data;
+
+			for (int row = 0 ; row < converted.getHeight() ; row ++ )
+			{
+				memcpy((void*)dst,(void*)src,srcRowPitch);
+				src += srcRowPitch;
+				dst += destRowPitch;
+			}
 			unlock();
  		}
  		else

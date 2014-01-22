@@ -86,6 +86,7 @@ namespace Ogre {
             unsigned long worstFrameTime;
             size_t triangleCount;
             size_t batchCount;
+			int vBlankMissCount; // -1 means that the value is not applicable
         };
 
 		enum FrameBuffer
@@ -488,7 +489,7 @@ namespace Ogre {
 		uint mFSAA;
 		String mFSAAHint;
 
-        void updateStats(void);
+        virtual void updateStats(void);
 
 		typedef map<int, Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order

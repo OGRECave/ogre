@@ -134,6 +134,9 @@ namespace Ogre {
         /** Get viewport that is the target of this chain
         */
         Viewport *getViewport();
+		/** Set viewport that is the target of this chain
+		*/
+		void _notifyViewport(Viewport* vp);
 
         /** Remove a compositor by pointer. This is internally used by CompositionTechnique to
             "weak" remove any instanced of a deleted technique.

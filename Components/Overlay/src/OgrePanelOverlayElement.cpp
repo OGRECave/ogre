@@ -223,7 +223,7 @@ namespace Ogre {
 		HardwareVertexBufferSharedPtr vbuf =
 			mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
 		float* pPos = static_cast<float*>(
-			vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+			vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
 
 		// Use the furthest away depth value, since materials should have depth-check off
 		// This initialised the depth buffer for any 3D objects in front

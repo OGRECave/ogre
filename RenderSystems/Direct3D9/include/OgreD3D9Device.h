@@ -79,6 +79,7 @@ namespace Ogre {
 		void					setAdapterOrdinalIndex  (D3D9RenderWindow* renderWindow, uint adapterOrdinalInGroupIndex);
 		void					copyContentsToMemory(D3D9RenderWindow* window, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
 		void					clearDeviceStreams		();
+		int						getVBlankMissCount		(D3D9RenderWindow* renderWindow);
 	
 	public:
 		D3D9Device	(D3D9DeviceManager* deviceManager,
@@ -105,10 +106,14 @@ namespace Ogre {
 		D3DDEVICE_CREATION_PARAMETERS	mCreationParams;			// Creation parameters.
 		uint							mLastPresentFrame;			// Last frame that this device present method called.
 		bool							mDeviceLost;				// True if device entered lost state.
+		D3DPRESENTSTATS					mPreviousPresentStats;			// We save the previous present stats - so we can detect a "vblank miss"
+		bool							mPreviousPresentStatsIsValid;	// Does mLastPresentStats data is valid (it isn't if when you start or resize the window)
+		uint							mVBlankMissCount;			// Number of times we missed the v sync blank
 	
 		struct RenderWindowResources
 		{
 			IDirect3DSwapChain9* 	swapChain;						// Swap chain interface.
+			IDirect3DSwapChain9Ex * swapChain9Ex;					// The 9Ex version of the chain is needed for the v synk blank stats
 			uint					adapterOrdinalInGroupIndex;		// Relative index of the render window in the group.
 			uint					presentParametersIndex;			// Index of present parameter in the shared array of the device.
 			IDirect3DSurface9*	 	backBuffer;						// The back buffer of the render window.

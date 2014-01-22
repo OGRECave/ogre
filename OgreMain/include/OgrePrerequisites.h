@@ -345,8 +345,17 @@ settings have been made.
 namespace Ogre
 {
 #if OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-    typedef std::basic_string<char, std::char_traits<char>, STLAllocator<char,GeneralAllocPolicy > >        _StringBase;
-    typedef std::basic_stringstream<char,std::char_traits<char>,STLAllocator<char,GeneralAllocPolicy > >    _StringStreamBase;
+	#if OGRE_WCHAR_T_STRINGS
+		typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, STLAllocator<wchar_t,GeneralAllocPolicy > >	_StringBase;
+	#else
+		typedef std::basic_string<char, std::char_traits<char>, STLAllocator<char,GeneralAllocPolicy > >	_StringBase;
+	#endif
+
+	#if OGRE_WCHAR_T_STRINGS
+		typedef std::basic_stringstream<wchar_t,std::char_traits<wchar_t>,STLAllocator<wchar_t,GeneralAllocPolicy >> _StringStreamBase;
+	#else
+		typedef std::basic_stringstream<char,std::char_traits<char>,STLAllocator<char,GeneralAllocPolicy > > _StringStreamBase;
+	#endif
 
 	#define StdStringT(T) std::basic_string<T, std::char_traits<T>, std::allocator<T> >	
 	#define CustomMemoryStringT(T) std::basic_string<T, std::char_traits<T>, STLAllocator<T,GeneralAllocPolicy> >	
@@ -447,8 +456,17 @@ namespace Ogre
 	#undef CustomMemoryStringT
 
 #else
-    typedef std::string _StringBase;
-    typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
+	#if OGRE_WCHAR_T_STRINGS
+		typedef std::wstring _StringBase;
+	#else
+		typedef std::string _StringBase;
+	#endif
+
+	#if OGRE_WCHAR_T_STRINGS
+		typedef std::basic_stringstream<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t> > _StringStreamBase;
+	#else
+		typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
+	#endif
 
 #endif
 
