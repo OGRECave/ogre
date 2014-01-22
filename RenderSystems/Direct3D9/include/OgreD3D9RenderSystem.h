@@ -357,6 +357,7 @@ namespace Ogre
 		static UINT	getResourceCreationDeviceCount();
 		static IDirect3DDevice9* getResourceCreationDevice(UINT index);
 		static IDirect3DDevice9* getActiveD3D9Device();
+		static IDirect3DDevice9* getActiveD3D9DeviceIfExists();
 
 		/** Check which depthStencil formats can be used with a certain pixel format,
 			and return the best suited.

@@ -4127,6 +4127,13 @@ namespace Ogre
 	}	
 
 	//---------------------------------------------------------------------
+	IDirect3DDevice9* D3D9RenderSystem::getActiveD3D9DeviceIfExists()
+	{	
+		D3D9Device* activeDevice = msD3D9RenderSystem->mDeviceManager->getActiveDevice();
+		return activeDevice ? activeDevice->getD3D9Device() : NULL;
+	}	
+
+	//---------------------------------------------------------------------
 	// Formats to try, in decreasing order of preference
 	D3DFORMAT ddDepthStencilFormats[]={
 		D3DFMT_D24FS8,
