@@ -320,6 +320,8 @@ namespace Ogre {
 #	define OGRE_DEFAULT_LOCALE ""
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #	define OGRE_DEFAULT_LOCALE "C"
+#elif defined(__MINGW32__)
+#	define OGRE_DEFAULT_LOCALE "C"
 #else
 #	if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #		if _MSC_VER >= 1700
