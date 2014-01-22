@@ -2313,45 +2313,51 @@ bail:
 			}
 
 			// samplers mapping
-			size_t numberOfSamplers = 0;
-			opState->mTexturesCount = 0;
+			size_t numberOfSamplers = OGRE_MAX_TEXTURE_LAYERS + 1;
+			
+			//find the maximum number of samplers
+			while (--numberOfSamplers >= 1 && mTexStageDesc[numberOfSamplers - 1].used == false) ;
 
-			for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
+			opState->mSamplerStatesCount = numberOfSamplers;
+			opState->mTexturesCount = numberOfSamplers;
+			
+			
+				
+			for (size_t n = 0; n < numberOfSamplers; n++)
 			{
+				ID3D11SamplerState * samplerState  = NULL;
+				ID3D11ShaderResourceView *texture = NULL;
 				sD3DTextureStageDesc & stage = mTexStageDesc[n];
 				if(!stage.used)
 				{
-					break;
+					samplerState	= NULL;
+					texture			= NULL;
 				}
-
-				numberOfSamplers++;
-
-				ID3D11ShaderResourceView * texture;
-				texture = stage.pTex;
-				opState->mTextures[opState->mTexturesCount] = texture;
-				opState->mTexturesCount++;
-
-				stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
-								FilterMips[n],false );
-				stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-				stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-				stage.samplerDesc.MinLOD = 0;
-				stage.samplerDesc.MipLODBias = 0.f;
-				stage.currentSamplerDesc = stage.samplerDesc;
-
-				ID3D11SamplerState * samplerState;
-
-				HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState) ;
-				if (FAILED(hr))
+				else
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-						"Failed to create sampler state\nError Description:" + errorDescription,
-						"D3D11RenderSystem::_render" );
+					texture = stage.pTex;
+
+					stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
+						FilterMips[n],false );
+					stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
+					stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+					stage.samplerDesc.MinLOD = 0;
+					stage.samplerDesc.MipLODBias = 0.f;
+					stage.currentSamplerDesc = stage.samplerDesc;
+
+					HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState) ;
+					if (FAILED(hr))
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+							"Failed to create sampler state\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render" );
+					}
+				
 				}
-				opState->mSamplerStates[n] = (samplerState);		
+				opState->mSamplerStates[n]	= samplerState;
+				opState->mTextures[n]		= texture;
 			}
-			opState->mSamplerStatesCount = numberOfSamplers;
 		}
 
 		for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
