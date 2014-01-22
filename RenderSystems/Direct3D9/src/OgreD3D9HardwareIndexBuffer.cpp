@@ -71,7 +71,7 @@ namespace Ogre {
 		{
 			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
 
-			createBuffer(d3d9Device, mBufferDesc.Pool);
+			createBuffer(d3d9Device, mBufferDesc.Pool, false);
 		}					
     }
 	//---------------------------------------------------------------------
@@ -141,7 +141,11 @@ namespace Ogre {
     {	
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
+		//check if we can delay the update of secondary buffer resources
+		//if the user requested it and we have a shadow buffer we can always recreate the buffer later
+		if ((mShadowBuffer == NULL) || ((mLockUploadOption & HBU_ON_DEMAND) == 0))
+		{
+			DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 		uint nextFrameNumber = Root::getSingleton().getNextFrameNumber();
 
 		while (it != mMapDeviceToBufferResources.end())
@@ -158,8 +162,9 @@ namespace Ogre {
 				}				
 			}
 
-			++it;
-		}	
+				++it;
+			}	
+		}
 
 		// Unlock the source buffer.
 		_unlockBuffer(mSourceBuffer);
@@ -194,7 +199,7 @@ namespace Ogre {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
 		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
-			createBuffer(d3d9Device, mBufferDesc.Pool);	
+			createBuffer(d3d9Device, mBufferDesc.Pool, true);	
 
 	}
 	//---------------------------------------------------------------------
@@ -249,11 +254,11 @@ namespace Ogre {
 
 		if (mBufferDesc.Pool == D3DPOOL_DEFAULT)
 		{
-			createBuffer(d3d9Device, mBufferDesc.Pool);		
+			createBuffer(d3d9Device, mBufferDesc.Pool, true);		
 		}
 	}
 	//---------------------------------------------------------------------
-	void D3D9HardwareIndexBuffer::createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool)
+	void D3D9HardwareIndexBuffer::createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool, bool updateNewBuffer)
 	{
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
@@ -316,7 +321,8 @@ namespace Ogre {
 
 		// This is a new buffer and source buffer exists we must update the content now 
 		// to prevent situation where the source buffer will be destroyed and we won't be able to restore its content.
-		else
+		// This is except for during the creation process of the class when there is no data yet to update.
+		else if (updateNewBuffer)
 		{			
 			updateBufferContent(bufferResources);			
 		}
@@ -333,7 +339,7 @@ namespace Ogre {
 		// Case index buffer was not found for the current device -> create it.		
 		if (it == mMapDeviceToBufferResources.end() || it->second->mBuffer == NULL)		
 		{						
-			createBuffer(d3d9Device, mBufferDesc.Pool);
+			createBuffer(d3d9Device, mBufferDesc.Pool, true);
 			it = mMapDeviceToBufferResources.find(d3d9Device);						
 		}
 
@@ -352,14 +358,14 @@ namespace Ogre {
 		{
 			if (mShadowBuffer != NULL)
 			{
-				const char* shadowData = (const char*)mShadowBuffer->lock(HBL_NORMAL);
+				const char* shadowData = (const char*)mShadowBuffer->lock(bufferResources->mLockOffset, bufferResources->mLockLength, HBL_NORMAL);
 				updateBufferResources(shadowData, bufferResources);
 				mShadowBuffer->unlock();
 			}
 			else if (mSourceBuffer != bufferResources && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
 			{				
 				mSourceBuffer->mLockOptions = HBL_READ_ONLY;
-				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
+				mSourceLockedBytes = _lockBuffer(mSourceBuffer, bufferResources->mLockOffset, bufferResources->mLockLength);
 				updateBufferResources(mSourceLockedBytes, bufferResources);
 				_unlockBuffer(mSourceBuffer);
 				mSourceLockedBytes = NULL;

@@ -49,7 +49,7 @@ namespace Ogre {
 		~D3D11HardwareUniformBuffer();
 
 		// override all data-gathering methods
-		void* lock(size_t offset, size_t length, LockOptions options);
+		void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
 		void unlock(void);
 		void readData(size_t offset, size_t length, void* pDest);
 		void writeData(size_t offset, size_t length, const void* pSource,

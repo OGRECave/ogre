@@ -97,7 +97,7 @@ namespace Ogre {
 		*/
 		virtual const PixelBox& lock(const Image::Box& lockBox, LockOptions options);
 		/// @copydoc HardwareBuffer::lock
-        virtual void* lock(size_t offset, size_t length, LockOptions options);
+        virtual void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
 
 		/** Get the current locked region. This is the same value as returned
 		    by lock(const Image::Box, LockOptions)

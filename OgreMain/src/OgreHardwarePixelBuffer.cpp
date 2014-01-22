@@ -53,7 +53,7 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------------    
-    void* HardwarePixelBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* HardwarePixelBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         assert(!isLocked() && "Cannot lock this buffer, it is already locked!");
         assert(offset == 0 && length == mSizeInBytes && "Cannot lock memory region, most lock box or entire buffer");

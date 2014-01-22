@@ -63,9 +63,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GLESDefaultHardwareVertexBuffer::lock(size_t offset,
-                                              size_t length,
-                                              LockOptions options)
+    void* GLESDefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -126,7 +124,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GLESDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* GLESDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;

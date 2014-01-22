@@ -122,6 +122,7 @@ namespace Ogre
 		Real mFrameSmoothingTime;
 		bool mRemoveQueueStructuresOnClear;
 		Real mDefaultMinPixelSize;
+		HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
 
 	public:
 		typedef vector<DynLib*>::type PluginLibList;
@@ -1085,6 +1086,17 @@ namespace Ogre
 		*/
 		Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
 	
+		/** Set the default upload option for buffers that frequently changed
+		Setting upload option to HBU_ON_DEMAND can increase the framerate in multi-device scenarios,
+		as it will upload frequently changing buffers to devices that require them.
+		However setting the HBU_ON_DEMAND may also introduce hiccups.
+		*/
+		void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
+		/** Get the default upload option for buffers that frequently changed
+		@note
+			To use this feature see Camera::setFreqUpdatedBuffersUploadOption()
+		*/
+		HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
 
     };
 	/** @} */
