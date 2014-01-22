@@ -943,7 +943,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
     {
-        if ( !val.isNull() && !val->isInstanceData() )
+        if ( !val.isNull() && !val->getIsInstanceData() )
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                         "A none instance data vertex buffer was set to be the global instance vertex buffer.",
