@@ -550,8 +550,8 @@ namespace Ogre {
         {
             p32 = static_cast<unsigned int*>(
                 mIndexBuffer->lock(
-                    mIndexOffset * sizeof(unsigned int), 
-                    mRequiredIndexCount * sizeof(unsigned int), 
+                    mIndexOffset * sizeof(uint32), 
+                    mRequiredIndexCount * sizeof(uint32), 
                     HardwareBuffer::HBL_NO_OVERWRITE));
         }
         else

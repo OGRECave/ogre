@@ -232,7 +232,7 @@ void PMWorker::addIndexBuffer(PMGenRequest::IndexBuffer& indexBuffer, bool useSh
 		addIndexDataImpl<unsigned short>((unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);
 	} else {
 		// Unsupported index size.
-		OgreAssert(isize == sizeof(unsigned int), "");
+		OgreAssert(isize == sizeof(uint32), "");
 		addIndexDataImpl<unsigned int>((unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID);
 	}
 }
