@@ -100,7 +100,8 @@ namespace Ogre {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 		
 		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
-
+		IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9DeviceIfExists();
+		
 		while (it != mMapDeviceToBufferResources.end())
 		{
 			BufferResources* bufferResources = it->second;
@@ -127,6 +128,10 @@ namespace Ogre {
 			}
 								
 			bufferResources->mLockOptions = options;					
+
+			//We will switch the source buffer to the active d3d9device as we may decide to only update it during unlock
+			if (it->first == d3d9Device)
+				mSourceBuffer = it->second;
 
 			++it;
 		}		
