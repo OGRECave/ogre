@@ -25,34 +25,6 @@ vertex_program InstancingShadowCasterCg cg
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 	}
 }
-vertex_program CrowdCg cg
-{
-	source instancing.cg
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
-	entry_point crowd_vp
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto numBones custom 0
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto lightPos light_position 0
-		param_named_auto lightDiffuseColour derived_light_diffuse_colour 0
-		param_named_auto ambient ambient_light_colour
-	}
-}
-vertex_program CrowdShadowCasterCg cg
-{
-	source instancing.cg
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0
-	entry_point crowdCaster_vp
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto numBones custom 0
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto ambient ambient_light_colour
-	}
-}
 
 vertex_program Instancinghlsl hlsl
 {
@@ -293,7 +265,6 @@ vertex_program Crowd unified
 	delegate CrowdGLSL
 	delegate CrowdGLSLES
 	delegate Crowdhlsl
-	delegate CrowdCg
 }
 vertex_program CrowdShadowCaster unified
 {
@@ -301,5 +272,4 @@ vertex_program CrowdShadowCaster unified
 	delegate CrowdShadowCasterGLSL
 	delegate CrowdShadowCasterGLSLES
 	delegate CrowdShadowCasterhlsl
-	delegate CrowdShadowCasterCg
 }

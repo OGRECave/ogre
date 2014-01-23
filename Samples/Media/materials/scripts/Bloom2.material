@@ -169,7 +169,7 @@ fragment_program BrightBloom2_ps40_hlsl hlsl
 //NV Cg Vertex Shader vs_1_1
 vertex_program Blur_vs11_cg cg
 {
-	source Blur_vs11.hlsl
+	source Blur_vs11.cg
 	profiles vs_1_1 arbvp1
 	entry_point main
 }
@@ -177,13 +177,13 @@ vertex_program Blur_vs11_cg cg
 //NV Cg HLSL Pixel Shader ps_2_0
 fragment_program BlurV_ps20_cg cg
 {
-	source BlurV_ps20.hlsl
+	source BlurV_ps20.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
 fragment_program BlurH_ps20_cg cg
 {
-	source BlurH_ps20.hlsl
+	source BlurH_ps20.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
@@ -191,7 +191,7 @@ fragment_program BlurH_ps20_cg cg
 //NV Cg Pixel Shader ps_2_0
 fragment_program Bloom2_ps20_cg cg
 {
-	source Bloom2_ps20.hlsl
+	source Bloom2_ps20.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
@@ -199,7 +199,7 @@ fragment_program Bloom2_ps20_cg cg
 //NV Cg Pixel Shader ps_2_0
 fragment_program BrightBloom2_ps20_cg cg
 {
-	source BrightBloom2_ps20.hlsl
+	source BrightBloom2_ps20.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }

@@ -2,7 +2,7 @@ vertex_program Ogre/ParticleGS/GenerateVScg cg
 {
 	source ParticleGS.cg
 	entry_point GenerateParticles_VS
-	profiles vs_1_1 arbvp1
+	profiles  arbvp1
 }
 
 geometry_program Ogre/ParticleGS/GenerateGScg cg
@@ -16,7 +16,7 @@ vertex_program Ogre/ParticleGS/DisplayVScg cg
 {
 	source ParticleGS.cg
 	entry_point DisplayParticles_VS
-	profiles vs_1_1 arbvp1
+	profiles  arbvp1
 }
 
 geometry_program Ogre/ParticleGS/DisplayGScg cg
@@ -30,7 +30,7 @@ fragment_program Ogre/ParticleGS/DisplayPScg cg
 {
 	source ParticleGS.cg
 	entry_point DisplayParticles_PS
-	profiles ps_2_0 arbfp1
+	profiles  arbfp1
 }
 
 vertex_program Ogre/ParticleGS/GenerateVShlsl4 hlsl
