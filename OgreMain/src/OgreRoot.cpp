@@ -122,7 +122,6 @@ namespace Ogre {
 	  , mNextMovableObjectTypeFlag(1)
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
-	  , mIsBlendWeightsGpuRedundant(true)
 	  , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
     {
         // superclass will do singleton checking
