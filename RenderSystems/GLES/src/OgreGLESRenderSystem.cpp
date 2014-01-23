@@ -2025,7 +2025,8 @@ namespace Ogre {
                                                 StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp,
                                                 StencilOperation passOp,
-                                                bool twoSidedOperation)
+                                                bool twoSidedOperation,
+												bool readBackAsTexture)
     {
         mStateCacheManager->setStencilMask(writeMask);
         glStencilFunc(convertCompareFunction(func), refValue, compareMask);

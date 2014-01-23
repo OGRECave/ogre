@@ -1395,7 +1395,8 @@ namespace Ogre {
                                                 StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp,
                                                 StencilOperation passOp,
-                                                bool twoSidedOperation)
+												bool twoSidedOperation,
+												bool readBackAsTexture)
     {
 		bool flip = false;
 
@@ -1593,7 +1594,7 @@ namespace Ogre {
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
             hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                 !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
-                                || op.vertexData->vertexBufferBinding->hasInstanceData();
+                                || op.vertexData->vertexBufferBinding->getHasInstanceData();
 
             numberOfInstances = op.numberOfInstances;
 
@@ -2373,7 +2374,7 @@ namespace Ogre {
             {
                 if (mCurrentVertexProgram)
                 {
-                    if (hwGlBuffer->isInstanceData())
+                    if (hwGlBuffer->getIsInstanceData())
                     {
                         OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
                         instanceAttribsBound.push_back(attrib);

@@ -2376,7 +2376,7 @@ namespace Ogre {
     void GLRenderSystem::setStencilBufferParams(CompareFunction func,
                                                 uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp, StencilOperation passOp,
-                                                bool twoSidedOperation)
+												bool twoSidedOperation, bool readBackAsTexture)
     {
         bool flip;
         mStencilWriteMask = writeMask;
