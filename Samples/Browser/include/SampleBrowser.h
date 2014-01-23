@@ -713,15 +713,12 @@ namespace OgreBites
                     optionMenu->setItems(it->second.possibleValues);
 
                     // if the current config value is not in the menu, add it
-                    try
+                    if(optionMenu->containsItem(it->second.currentValue) == false)
                     {
-                        optionMenu->selectItem(it->second.currentValue);
+						optionMenu->addItem(it->second.currentValue);
                     }
-                    catch (Ogre::Exception e)
-                    {
-                        optionMenu->addItem(it->second.currentValue);
-                        optionMenu->selectItem(it->second.currentValue);
-                    }
+
+					optionMenu->selectItem(it->second.currentValue);
                 }
 
                 windowResized(mWindow);
