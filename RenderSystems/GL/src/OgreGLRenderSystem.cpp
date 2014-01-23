@@ -1608,7 +1608,31 @@ namespace Ogre {
 
 		mStateCacheManager->activateGLTextureUnit(0);
     }
-
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
+	{
+		_setTexture(unit, true, tex);
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
+	{
+		_setTexture(unit, true, tex);
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
+	{
+		_setTexture(unit, true, tex);
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
+	{
+		_setTexture(unit, true, tex);
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
+	{
+		_setTexture(unit, true, tex);
+	}
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {

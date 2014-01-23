@@ -298,6 +298,26 @@ namespace Ogre {
           RenderSystem
          */
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+		/** See
+          RenderSystem
+         */
+        void _setVertexTexture(size_t unit, const TexturePtr &tex);		
+		/** See
+          RenderSystem
+         */
+        void _setGeometryTexture(size_t unit, const TexturePtr &tex);
+		/** See
+          RenderSystem
+         */
+        void _setComputeTexture(size_t unit, const TexturePtr &tex);
+		/** See
+          RenderSystem
+         */
+        void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
+		/** See
+          RenderSystem
+         */
+        void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
         /** See
           RenderSystem
          */
