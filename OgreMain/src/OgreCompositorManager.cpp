@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreScriptCompiler.h"
 #include "OgreTextureManager.h"
 #include "OgreRectangle2D.h"
+#include "OgreRenderTarget.h"
 
 namespace Ogre {
 

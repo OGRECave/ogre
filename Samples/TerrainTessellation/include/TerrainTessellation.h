@@ -27,6 +27,7 @@ same license as the rest of the engine.
 #include "TerrainTessellationMaterialGenerator.h"
 #include "OgreTerrainPaging.h"
 #include "OgreImage.h"
+#include "OgreTerrainAutoUpdateLod.h"
 
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
