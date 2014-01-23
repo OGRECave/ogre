@@ -51,6 +51,7 @@ namespace Ogre
 		bool				isVisible			() const;
 		bool 				isClosed			() const { return mClosed; }
 		bool				isVSync				() const { return mVSync; }
+		bool				isAA				() const { return mFSAA != 0; }
 		bool				isHidden			() const { return mHidden; }
 		void				setHidden			(bool hidden);
 		void				setVSyncEnabled		(bool vsync);
@@ -115,6 +116,9 @@ namespace Ogre
 
 		/** Return the target window style depending on the fullscreen parameter. */
 		DWORD getWindowStyle(bool fullScreen) const { if (fullScreen) return mFullscreenWinStyle; return mWindowedWinStyle; }
+
+		// Overridden see RenderTarget
+		virtual void updateStats(void);
 
 	protected:
 		HINSTANCE					mInstance;				// Process instance

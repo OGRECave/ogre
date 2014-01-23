@@ -382,7 +382,8 @@ namespace Ogre {
                     StencilOperation stencilFailOp = SOP_KEEP,
                     StencilOperation depthFailOp = SOP_KEEP,
                     StencilOperation passOp = SOP_KEEP,
-                    bool twoSidedOperation = false);
+					bool twoSidedOperation = false,
+					bool readBackAsTexture = false);
             /** See
              RenderSystem
              */

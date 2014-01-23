@@ -251,7 +251,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mHeightUpdateCountDown = 0;
 
             }
-
         }
 
         if (mTerrainGroup->isDerivedDataUpdateInProgress())
@@ -414,8 +413,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     typedef std::list<Entity*> EntityList;
     EntityList mHouseList;
 
-
-
     void defineTerrain(long x, long y, bool flat = false)
     {
         // if a file is available, use it
@@ -442,7 +439,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mTerrainGroup->defineTerrain(x, y, &img);
                 mTerrainsImported = true;
             }
-
         }
     }
 
@@ -453,7 +449,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             img.flipAroundY();
         if (flipY)
             img.flipAroundX();
-
     }
 
     void initBlendMaps(Terrain* terrain)
@@ -499,7 +494,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
           terrain->getGlobalColourMap()->loadImage(colourMap);
           }
         */
-
     }
 
     void configureTerrainDefaults(Light* l)
@@ -546,8 +540,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         defaultimp.layerList[2].worldSize = 200;
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-
-
     }
 
     void addTextureDebugOverlay(TrayLocation loc, TexturePtr tex, size_t i)
@@ -587,7 +579,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             w = mTrayMgr->createDecorWidget(loc, widgetName, "Ogre/DebugTexOverlay");
         }
         w->getOverlayElement()->setMaterialName(matName);
-
     }
 
     void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
@@ -596,9 +587,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         {
             TexturePtr shadowTex = mSceneMgr->getShadowTexture(i);
             addTextureDebugOverlay(loc, shadowTex, i);
-
         }
-
     }
 
     MaterialPtr buildDepthShadowMaterial(const String& textureName)
@@ -621,8 +610,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 splitPoints[i] = splitPointList[i];
             }
             p->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
-
-
         }
 
         return ret;
@@ -670,7 +657,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
                 mPSSMSetup.bind(pssmSetup);
-
             }
             mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 
@@ -688,7 +674,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 {
                     (*i)->setMaterial(houseMat);
                 }
-
             }
             else
             {
@@ -705,8 +690,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
 
             //addTextureShadowDebugOverlay(TL_RIGHT, 3);
-
-
         }
         else
         {
@@ -773,8 +756,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-        ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
-        ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
+		// Bugfix for D3D11 Render System because of pixel format incompatibility when using
+		// vertex compression
+		if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
+			mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
 
         mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
         mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -797,7 +782,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         Vector3 lightdir(0.55, -0.3, 0.75);
         lightdir.normalise();
 
-
         Light* l = mSceneMgr->createLight("tstLight");
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);
@@ -806,12 +790,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
-
         mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
         mTerrainGroup->setResourceGroup("Terrain");
-
+		
         configureTerrainDefaults(l);
 #ifdef PAGING
         // Paging setup
@@ -845,8 +828,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mTerrainGroup->freeTemporaryResources();
 
-
-
         // create a few entities on the terrain
         Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
         Vector3 entPos(mTerrainPos.x + 2043, 0, mTerrainPos.z + 1715);
@@ -876,7 +857,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         sn->attachObject(e);
         mHouseList.push_back(e);
 
-        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
 
 
     }

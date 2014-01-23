@@ -66,6 +66,8 @@ namespace Ogre {
         virtual ~ConfigFile();
         /// load from a filename (not using resource group locations)
         void load(const String& filename, const String& separators = "\t:=", bool trimWhitespace = true);
+        /// load from a filename (using resource group locations)
+        void load(const String& filename, const String& resourceGroup, const String& separators = "\t:=", bool trimWhitespace = true);
         /// load from a data stream
         void load(const DataStreamPtr& stream, const String& separators = "\t:=", bool trimWhitespace = true);
 		/// load from a filename (not using resource group locations)

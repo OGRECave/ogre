@@ -35,6 +35,21 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	UnifiedHighLevelGpuProgram::CmdDelegate UnifiedHighLevelGpuProgram::msCmdDelegate;
     static const String sLanguage = "unified";
+	std::map<String,int> UnifiedHighLevelGpuProgram::mLanguagePriorities;
+
+	int UnifiedHighLevelGpuProgram::getPriority(String shaderLanguage)
+	{
+		std::map<String,int>::iterator it = mLanguagePriorities.find(shaderLanguage);
+		if (it == mLanguagePriorities.end())
+			return -1;
+		else 
+			return (*it).second;
+	}
+
+	void UnifiedHighLevelGpuProgram::setPrioriry(String shaderLanguage,int priority)
+	{
+		mLanguagePriorities[shaderLanguage] = priority;
+	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	UnifiedHighLevelGpuProgram::UnifiedHighLevelGpuProgram(
@@ -62,26 +77,34 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgram::chooseDelegate() const
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
 		mChosenDelegate.setNull();
 
-		for (StringVector::const_iterator i = mDelegateNames.begin();
-			i != mDelegateNames.end(); ++i)
+		HighLevelGpuProgramPtr tmpDelegate;
+		tmpDelegate.setNull();
+		int tmpPriority = -1;
+
+		for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
 		{
 			HighLevelGpuProgramPtr deleg = 
 				HighLevelGpuProgramManager::getSingleton().getByName(*i);
 
 			// Silently ignore missing links
-			if(!deleg.isNull()
-				&& deleg->isSupported())
+			if(!deleg.isNull() && deleg->isSupported())
 			{
-				mChosenDelegate = deleg;
-				break;
+				int priority = getPriority(deleg->getLanguage());
+				//Find the delegate with the highest prioriry
+				if (priority >= tmpPriority)
+				{
+					tmpDelegate = deleg;
+					tmpPriority = priority;
+				}
 			}
 
 		}
 
+		mChosenDelegate = tmpDelegate;
 	}
 	//-----------------------------------------------------------------------
 	const HighLevelGpuProgramPtr& UnifiedHighLevelGpuProgram::_getDelegate() const

@@ -315,10 +315,16 @@ namespace Ogre {
         // The method _disableTextureUnit is called to turn a unit off
 
         const TexturePtr& tex = tl._getTexturePtr();
+		bool isValidBinding = false;
+		
+		if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
+			_setBindingType(tl.getBindingType());
+
 		// Vertex texture binding?
 		if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
 			!mCurrentCapabilities->getVertexTextureUnitsShared())
 		{
+			isValidBinding = true;
 			if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
 			{
 				// Bind vertex texture
@@ -334,7 +340,84 @@ namespace Ogre {
 				_setTexture(texUnit, true, tex);
 			}
 		}
-		else
+
+		if (mCurrentCapabilities->hasCapability(RSC_GEOMETRY_PROGRAM))
+		{
+			isValidBinding = true;
+			if (tl.getBindingType() == TextureUnitState::BT_GEOMETRY)
+			{
+				// Bind vertex texture
+				_setGeometryTexture(texUnit, tex);
+				// bind nothing to fragment unit (hardware isn't shared but fragment
+				// unit can't be using the same index
+				_setTexture(texUnit, true, sNullTexPtr);
+			}
+			else
+			{
+				// vice versa
+				_setGeometryTexture(texUnit, sNullTexPtr);
+				_setTexture(texUnit, true, tex);
+			}
+		}
+
+		if (mCurrentCapabilities->hasCapability(RSC_COMPUTE_PROGRAM))
+		{
+			isValidBinding = true;
+			if (tl.getBindingType() == TextureUnitState::BT_COMPUTE)
+			{
+				// Bind vertex texture
+				_setComputeTexture(texUnit, tex);
+				// bind nothing to fragment unit (hardware isn't shared but fragment
+				// unit can't be using the same index
+				_setTexture(texUnit, true, sNullTexPtr);
+			}
+			else
+			{
+				// vice versa
+				_setComputeTexture(texUnit, sNullTexPtr);
+				_setTexture(texUnit, true, tex);
+			}
+		}
+
+		if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
+		{
+			isValidBinding = true;
+			if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
+			{
+				// Bind vertex texture
+				_setTesselationDomainTexture(texUnit, tex);
+				// bind nothing to fragment unit (hardware isn't shared but fragment
+				// unit can't be using the same index
+				_setTexture(texUnit, true, sNullTexPtr);
+			}
+			else
+			{
+				// vice versa
+				_setTesselationDomainTexture(texUnit, sNullTexPtr);
+				_setTexture(texUnit, true, tex);
+			}
+		}
+
+		if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_HULL_PROGRAM))
+		{
+			isValidBinding = true;
+			if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
+			{
+				// Bind vertex texture
+				_setTesselationHullTexture(texUnit, tex);
+				// bind nothing to fragment unit (hardware isn't shared but fragment
+				// unit can't be using the same index
+				_setTexture(texUnit, true, sNullTexPtr);
+			}
+			else
+			{
+				// vice versa
+				_setTesselationHullTexture(texUnit, sNullTexPtr);
+				_setTexture(texUnit, true, tex);
+			}
+		}
+
+		if (!isValidBinding)
 		{
 			// Shared vertex / fragment textures or no vertex texture support
 			// Bind texture (may be blank)
@@ -369,6 +452,7 @@ namespace Ogre {
         // Texture addressing mode
         const TextureUnitState::UVWAddressingMode& uvw = tl.getTextureAddressingMode();
         _setTextureAddressingMode(texUnit, uvw);
+
         // Set texture border colour only if required
         if (uvw.u == TextureUnitState::TAM_BORDER ||
             uvw.v == TextureUnitState::TAM_BORDER ||
@@ -439,6 +523,13 @@ namespace Ogre {
 		_setTexture(unit, enabled, t);
 	}
 	//-----------------------------------------------------------------------
+	void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support binding texture to other shaders then fragment", 
+			"RenderSystem::_setBindingType");
+	}
+	//-----------------------------------------------------------------------
 	void RenderSystem::_setVertexTexture(size_t unit, const TexturePtr& tex)
 	{
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -447,7 +538,43 @@ namespace Ogre {
 			"the vertex and fragment units.", 
 			"RenderSystem::_setVertexTexture");
 	}
-    //-----------------------------------------------------------------------
+	//-----------------------------------------------------------------------
+	void RenderSystem::_setGeometryTexture(size_t unit, const TexturePtr& tex)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support separate geometry texture samplers, "
+			"you should use the regular texture samplers which are shared between "
+			"the vertex and fragment units.", 
+			"RenderSystem::_setGeometryTexture");
+	}
+	//-----------------------------------------------------------------------
+	void RenderSystem::_setComputeTexture(size_t unit, const TexturePtr& tex)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support separate compute texture samplers, "
+			"you should use the regular texture samplers which are shared between "
+			"the vertex and fragment units.", 
+			"RenderSystem::_setComputeTexture");
+	}
+	//-----------------------------------------------------------------------
+	void RenderSystem::_setTesselationHullTexture(size_t unit, const TexturePtr& tex)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support separate tesselation hull texture samplers, "
+			"you should use the regular texture samplers which are shared between "
+			"the vertex and fragment units.", 
+			"RenderSystem::_setTesselationHullTexture");
+	}
+	//-----------------------------------------------------------------------
+	void RenderSystem::_setTesselationDomainTexture(size_t unit, const TexturePtr& tex)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support separate tesselation domain texture samplers, "
+			"you should use the regular texture samplers which are shared between "
+			"the vertex and fragment units.", 
+			"RenderSystem::_setTesselationDomainTexture");
+	}
+	//-----------------------------------------------------------------------
     void RenderSystem::_disableTextureUnit(size_t texUnit)
     {
         _setTexture(texUnit, false, sNullTexPtr);
@@ -697,6 +824,13 @@ namespace Ogre {
 			mClipPlanesDirty = false;
 		}
     }
+	void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot)
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"This rendersystem does not support reading back the inactive depth/stencil",
+			"buffer as a texture. Only DirectX 11 Render System supports it.", 
+			"RenderSystem::_renderUsingReadBackAsTexture");	
+	}
     //-----------------------------------------------------------------------
     void RenderSystem::setInvertVertexWinding(bool invert)
     {
@@ -940,7 +1074,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
     {
-        if ( !val.isNull() && !val->isInstanceData() )
+        if ( !val.isNull() && !val->getIsInstanceData() )
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                         "A none instance data vertex buffer was set to be the global instance vertex buffer.",

@@ -104,6 +104,7 @@ namespace Ogre
         if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
 			return D3D11_TEXTURE_ADDRESS_WRAP;
 
+		//return D3D11_TEXTURE_ADDRESS_WRAP;
 		switch( tam )
 		{
 		case TextureUnitState::TAM_WRAP:
@@ -634,7 +635,7 @@ namespace Ogre
 		case DXGI_FORMAT_R16G16_UNORM:				return PF_SHORT_GR;
 		case DXGI_FORMAT_R16G16_UINT:				return PF_UNKNOWN;
 		case DXGI_FORMAT_R16G16_SNORM:				return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_SINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_SINT:				return PF_R16G16_SINT;
 		case DXGI_FORMAT_R32_TYPELESS:				return PF_UNKNOWN;
 		case DXGI_FORMAT_D32_FLOAT:					return PF_DEPTH;
 		case DXGI_FORMAT_R32_FLOAT:					return PF_FLOAT32_R;
@@ -685,6 +686,12 @@ namespace Ogre
 		case DXGI_FORMAT_B5G5R5A1_UNORM:			return PF_A1R5G5B5;
 		case DXGI_FORMAT_B8G8R8A8_UNORM:			return PF_A8R8G8B8;
 		case DXGI_FORMAT_B8G8R8X8_UNORM:			return PF_X8R8G8B8;
+		case DXGI_FORMAT_BC6H_TYPELESS:             return PF_BC6H_SF16;
+		case DXGI_FORMAT_BC6H_UF16:                 return PF_BC6H_UF16;
+		case DXGI_FORMAT_BC6H_SF16:                 return PF_BC6H_SF16;
+		case DXGI_FORMAT_BC7_TYPELESS:              return PF_BC7_UNORM;
+		case DXGI_FORMAT_BC7_UNORM:                 return PF_BC7_UNORM;
+		case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_BC7_UNORM_SRGB;
 
 #if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
 		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:return PF_UNKNOWN;
@@ -692,12 +699,6 @@ namespace Ogre
 		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:       return PF_A8R8G8B8;
 		case DXGI_FORMAT_B8G8R8X8_TYPELESS:         return PF_UNKNOWN;
 		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:       return PF_X8R8G8B8;
-		case DXGI_FORMAT_BC6H_TYPELESS:             return PF_UNKNOWN;
-		case DXGI_FORMAT_BC6H_UF16:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC6H_SF16:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_TYPELESS:              return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_UNORM:                 return PF_UNKNOWN;
-		case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_UNKNOWN;
 		case DXGI_FORMAT_AYUV:                      return PF_UNKNOWN;
 		case DXGI_FORMAT_Y410:                      return PF_UNKNOWN;
 		case DXGI_FORMAT_Y416:                      return PF_UNKNOWN;
@@ -750,7 +751,11 @@ namespace Ogre
 		case PF_DXT3:			return DXGI_FORMAT_BC3_UNORM;
 		case PF_DXT4:			return DXGI_FORMAT_BC4_UNORM;
 		case PF_DXT5:			return DXGI_FORMAT_BC5_UNORM;
-
+		case PF_BC6H_UF16:		return DXGI_FORMAT_BC6H_UF16;
+		case PF_BC6H_SF16:		return DXGI_FORMAT_BC6H_SF16;
+		case PF_BC7_UNORM:		return DXGI_FORMAT_BC7_UNORM;
+		case PF_BC7_UNORM_SRGB:	return DXGI_FORMAT_BC7_UNORM_SRGB;
+		case PF_R16G16_SINT:	return DXGI_FORMAT_R16G16_SINT;
 		case PF_UNKNOWN:
 		default:				return DXGI_FORMAT_UNKNOWN;
 		}
@@ -956,11 +961,11 @@ namespace Ogre
         D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 
 		if(bindflags & D3D11_BIND_RENDER_TARGET)
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
-#else
-            if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
-#endif
+//#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+//            if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+//#else
+//            if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
+//#endif
     			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 		if(textype == TEX_TYPE_CUBE_MAP)

@@ -252,7 +252,8 @@ namespace Ogre
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false);
+			bool twoSidedOperation = false,
+			bool readBackAsTexture = false);
         void setNormaliseNormals(bool normalise);
 
 		// Low-level overridden members, mainly for internal use
@@ -357,6 +358,7 @@ namespace Ogre
 		static UINT	getResourceCreationDeviceCount();
 		static IDirect3DDevice9* getResourceCreationDevice(UINT index);
 		static IDirect3DDevice9* getActiveD3D9Device();
+		static IDirect3DDevice9* getActiveD3D9DeviceIfExists();
 
 		/** Check which depthStencil formats can be used with a certain pixel format,
 			and return the best suited.

@@ -106,6 +106,9 @@ protected:
 protected:
 	// Map between GPU constant type to string value.
 	GpuConstTypeToStringMap mGpuConstTypeMap;
+	// Map between GPU constant type v4 to string value.
+	//TODO : add abstraction per version
+	GpuConstTypeToStringMap mGpuConstTypeMapV4;
 	// Map between parameter semantic to string value.
 	ParamSemanticToStringMap mParamSemanticMap;
 };

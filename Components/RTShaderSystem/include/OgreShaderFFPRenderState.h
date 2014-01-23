@@ -107,6 +107,8 @@ enum FFPShaderStage
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT		"FFP_GenerateTexCoord_EnvMap_Reflect"
 #define FFP_FUNC_GENERATE_TEXCOORD_PROJECTION		"FFP_GenerateTexCoord_Projection"
 #define FFP_FUNC_SAMPLE_TEXTURE						"FFP_SampleTexture"
+#define FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER			"FFP_Construct_Sampler_Wrapper" //only for hlsl
+
 #define FFP_FUNC_SAMPLE_TEXTURE_PROJ				"FFP_SampleTextureProj"
 #define FFP_FUNC_MODULATEX2							"FFP_ModulateX2"
 #define FFP_FUNC_MODULATEX4							"FFP_ModulateX4"

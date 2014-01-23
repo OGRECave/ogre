@@ -6704,6 +6704,20 @@ namespace Ogre{
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
                     break;
+				case ID_READ_BACK_AS_TEXTURE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						bool val;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setStencilReadBackAsTextureOperation(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
                 case ID_BUFFERS:
                     {
                         uint32 buffers = 0;

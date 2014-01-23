@@ -121,18 +121,35 @@ public:
 	This attribute will be update on the call to preFindVisibleObjects. 
 	*/
 	SceneManager* getActiveSceneManager();
-	
+
+	/** 
+	Set the active scene manager against which new render states are compiled.
+	Note that normally the setting of the active scene manager is updated through the
+	preFindVisibleObjects method.
+	*/
+
+	void _setActiveSceneManager(SceneManager* sceneManager);
+
 	/** 
 	Set the target shader language.
 	@param shaderLanguage The output shader language to use.	
 	@remarks The default shader language is cg.
 	*/
-	void setTargetLanguage(const String& shaderLanguage);
+	void setTargetLanguage(const String& shaderLanguage,const float version = 1.0);
 
+	/** 
+	Return if hlsl 4.0 shading language is currently in use.		
+	*/
+	const bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
 	/** 
 	Return the target shader language currently in use.		
 	*/
 	const String& getTargetLanguage() const { return mShaderLanguage; }
+
+	/** 
+	Return the target shader language version currently in use.		
+	*/
+	const float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
 
 	/** 
 	Set the output vertex shader target profiles.
@@ -970,6 +987,8 @@ protected:
 	SGScriptTranslator mCoreScriptTranslator;
 	// The target shader language (currently only cg supported).
 	String mShaderLanguage;
+	// The target shader language version.
+	float  mShaderLanguageVersion;
 	// The target vertex shader profile. Will be used as argument for program compilation.
 	String mVertexShaderProfiles;
 	// List of target vertex shader profiles.

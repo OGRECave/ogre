@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreStringConverter.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 //-----------------------------------------------------------------------------

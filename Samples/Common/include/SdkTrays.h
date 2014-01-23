@@ -846,6 +846,11 @@ namespace OgreBites
 			mSmallTextArea->setCaption("");
 		}
 
+		size_t getItemsCount()
+		{
+			return mItems.size();
+		}
+
 		void selectItem(unsigned int index, bool notifyListener = true)
 		{
 			if (index >= mItems.size())
@@ -859,6 +864,21 @@ namespace OgreBites
 			fitCaptionToArea(mItems[index], mSmallTextArea, mSmallBox->getWidth() - mSmallTextArea->getLeft() * 2);
 
 			if (mListener && notifyListener) mListener->itemSelected(this);
+		}
+
+		bool containsItem(const Ogre::DisplayString& item)
+		{
+			bool res = false;
+			for (unsigned int i = 0; i < mItems.size(); i++)
+			{
+				if (item == mItems[i])
+				{
+					res = true;
+					break;
+				}
+			}
+
+			return res;
 		}
 
 		void selectItem(const Ogre::DisplayString& item, bool notifyListener = true)

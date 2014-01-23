@@ -2,7 +2,7 @@ vertex_program Ogre/Dyn_Text_VS_CG cg
 {
 	source Dyn-Text.cg
 	entry_point main_vs
-	profiles vs_2_0 vs_1_1 arbvp1
+	profiles vs_3_0 vs_2_0 vs_1_1 arbvp1
 	
 	default_params
 	{
@@ -34,7 +34,7 @@ vertex_program Ogre/Dyn_Text_VS_HLSL hlsl
 {
 	source Dyn-Text.hlsl
 	entry_point main_vs
-	target vs_5_0
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -46,7 +46,7 @@ fragment_program Ogre/Dyn_Text_PS_CG cg
 {
 	source Dyn-Text.cg
 	entry_point main_fp
-	profiles ps_2_0 arbfp1
+	profiles ps_3_0 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Dyn_Text_PS_GLSL glsl
@@ -75,7 +75,7 @@ fragment_program Ogre/Dyn_Text_PS_HLSL hlsl
 {
 	source Dyn-Text.hlsl
 	entry_point main_ps
-	target ps_5_0
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program Ogre/Dyn_Text_VS unified

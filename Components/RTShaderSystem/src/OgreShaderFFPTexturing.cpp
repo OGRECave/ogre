@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgrePass.h"
 #include "OgreFrustum.h"
+#include "OgreShaderGenerator.h"
 #include "OgreMaterialSerializer.h"
 
 namespace Ogre {
@@ -91,7 +92,13 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	
 	// Resolve texture sampler parameter.		
 	textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
-	hasError |= !(textureUnitParams->mTextureSampler.get());
+
+	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
+	{
+		//Resolve texture sampler state parameter for  hlsl 4.0
+		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GpuConstantType::GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
+		hasError |= !(textureUnitParams->mTextureSamplerState.get());
+	}
 	
 	// Resolve texture matrix parameter.
 	if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
@@ -482,21 +489,81 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	return true;
 }
 
+
+ParameterPtr FFPTexturing::GetSamplerWrapperParam(GpuConstantType samplerType,Function* function)
+{
+	Ogre::String paramName = "lLocalSamplerWrapper_";
+	int samplerParamDim = samplerType - GpuConstantType::GCT_SAMPLER1D + 1;
+	if (samplerParamDim <= 3 )
+		paramName +=  StringConverter::toString(samplerParamDim) + "D";
+	else if (samplerParamDim == 4 )
+		paramName +=  "Cube";
+
+	GpuConstantType margin =  (GpuConstantType)(GpuConstantType::GCT_SAMPLER_WRAPPER1D -  GpuConstantType::GCT_SAMPLER1D);
+	GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
+
+	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::Semantic::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
+	return samplerWrapperParam;
+}
+
+void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
+	GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter)
+{
+
+	FunctionInvocation* curFuncInvocation = NULL;
+	
+	ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(samplerType,function);
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder, internalCounter++);
+	curFuncInvocation->pushOperand(textureSampler, Operand::OPS_IN);
+
+	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+		curFuncInvocation->pushOperand(textureSamplerState, Operand::OPS_IN);
+
+	curFuncInvocation->pushOperand(samplerWrapperParam, Operand::OPS_OUT);
+	function->addAtomInstance(curFuncInvocation);
+}
+
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
 											  const ParameterPtr& texel, int groupOrder, int& internalCounter)
 {
-	FunctionInvocation* curFuncInvocation = NULL;
 
-	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
-	else	
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+	Ogre::String targetLanguage =  RTShader::ShaderGenerator::getSingleton().getTargetLanguage();
 
-	curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-	psMain->addAtomInstance(curFuncInvocation);
+	if (targetLanguage == "hlsl")
+	{
+		FunctionInvocation* curFuncInvocation = NULL;
+		ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSamplerType,psMain);
+		AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder,internalCounter);
+
+			if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
+				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
+			else	
+				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+
+
+		curFuncInvocation->pushOperand(samplerWrapperParam, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+		psMain->addAtomInstance(curFuncInvocation);
+		
+		
+	}
+	else
+	{ // Old behaviour for CG and GLSL
+		FunctionInvocation* curFuncInvocation = NULL;
+
+		if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
+		else	
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+
+		curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+		psMain->addAtomInstance(curFuncInvocation);
+	}
+
 }
 
 
@@ -559,7 +626,7 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.a), Operand::OPS_IN);		
 		}
 		
-		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);
+		curFuncInvocation->pushOperand(arg, Operand::OPS_IN);	
 		psMain->addAtomInstance(curFuncInvocation);	
 		break;
 	}
@@ -870,6 +937,33 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 			"FFPTexturing::setTextureUnit");
 	}
 	
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_GEOMETRY)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support geometry texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_COMPUTE)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support comput texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support domain texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
+
+	if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"FFP Texture unit does not support hull texture fetch !!!",
+			"FFPTexturing::setTextureUnit");
+	}
 
 	TextureUnitParams& curParams = mTextureUnitParamsList[index];
 

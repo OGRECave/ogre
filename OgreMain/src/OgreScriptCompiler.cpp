@@ -1277,6 +1277,7 @@ namespace Ogre
 		mIds["depth_fail_op"] = ID_DEPTH_FAIL_OP;
 		mIds["pass_op"] = ID_PASS_OP;
 		mIds["two_sided"] = ID_TWO_SIDED;
+		mIds["read_back_as_texture"] = ID_READ_BACK_AS_TEXTURE;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
 #endif

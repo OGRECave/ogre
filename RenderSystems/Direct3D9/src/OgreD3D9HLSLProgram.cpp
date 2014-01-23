@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D9GpuProgram.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -720,7 +721,24 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::setTarget(const String& target)
     {
-        mTarget = target;
+		mTarget = "";
+		vector<String>::type profiles = StringUtil::split(target, " ");
+
+		for(int i = 0 ; i < profiles.size() ; i++)
+		{
+			String & currentProfile = profiles[i];
+			if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
+			{
+				mTarget = currentProfile;
+				break;
+			}
+		}
+
+		if(mTarget == "")
+		{
+			LogManager::getSingleton().logMessage(
+				"Invalid target for D3D11 shader '" + mName + "' - '" + target + "'");
+		}
     }
 
     //-----------------------------------------------------------------------

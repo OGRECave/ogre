@@ -174,6 +174,13 @@ namespace Ogre {
 		*/
 		CustomCompositionPass* getCustomCompositionPass(const String& name);
 
+		/**
+		Relocates a compositor chain from one viewport to another
+		@param sourceVP The viewport to take the chain from
+		@param destVP The viewport to connect the chain to
+		*/
+		void _relocateChain(Viewport* sourceVP, Viewport* destVP);
+
 		/** Override standard Singleton retrieval.
 		@remarks
 		Why do we do this? Well, it's because the Singleton

@@ -123,6 +123,7 @@ namespace Ogre {
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
 	  , mIsBlendWeightsGpuRedundant(true)
+	  , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
     {
         // superclass will do singleton checking
         String msg;

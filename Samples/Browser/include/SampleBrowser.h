@@ -86,6 +86,8 @@
 #   include "DynTex.h"
 #   include "FacialAnimation.h"
 #   include "Grass.h"
+#	include "Hair.h"
+#	include "Island.h"
 #   include "Lighting.h"
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
@@ -98,6 +100,7 @@
 #   include "Smoke.h"
 #   include "SphereMapping.h"
 #	include "Tessellation.h"
+#	include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
@@ -710,15 +713,12 @@ namespace OgreBites
                     optionMenu->setItems(it->second.possibleValues);
 
                     // if the current config value is not in the menu, add it
-                    try
+                    if(optionMenu->containsItem(it->second.currentValue) == false)
                     {
-                        optionMenu->selectItem(it->second.currentValue);
+						optionMenu->addItem(it->second.currentValue);
                     }
-                    catch (Ogre::Exception e)
-                    {
-                        optionMenu->addItem(it->second.currentValue);
-                        optionMenu->selectItem(it->second.currentValue);
-                    }
+
+					optionMenu->selectItem(it->second.currentValue);
                 }
 
                 windowResized(mWindow);
@@ -1094,7 +1094,9 @@ namespace OgreBites
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_PNTriangles"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
-
+			mPluginNameMap["Sample_Hair"]				= (OgreBites::SdkSample *) OGRE_NEW Sample_Hair();
+			mPluginNameMap["Sample_Island"]				= (OgreBites::SdkSample *) OGRE_NEW Sample_Island();
+			mPluginNameMap["Sample_TerrainTessellation"]= (OgreBites::SdkSample *) OGRE_NEW Sample_TerrainTessellation();
 #                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
@@ -1394,6 +1396,9 @@ namespace OgreBites
             sampleList.push_back("Sample_Water");
             sampleList.push_back("Sample_PNTriangles");
 			sampleList.push_back("Sample_Tessellation");
+			sampleList.push_back("Sample_Hair");
+			sampleList.push_back("Sample_Island");
+			sampleList.push_back("Sample_TerrainTessellation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
 #else

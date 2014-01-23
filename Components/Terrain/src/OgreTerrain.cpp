@@ -3255,14 +3255,6 @@ namespace Ogre
 	{
 		GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(res->getRequest()->getData());
 		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
-		// haven't reached the time
-		if(currentTime<gmreq.startTime)
-		{
-			Root::getSingleton().getWorkQueue()->addRequest(
-				mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-				Any(gmreq), 0, false);
-			return;
-		}
 
 		// process
 		switch(gmreq.stage)

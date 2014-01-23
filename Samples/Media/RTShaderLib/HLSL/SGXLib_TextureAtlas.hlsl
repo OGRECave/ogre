@@ -18,7 +18,7 @@ float mipmapLevel(float2 coords, float2 texSize)
 	
 
 //-----------------------------------------------------------------------------
-void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample, 
+void SGX_Atlas_Sample_Auto_Adjust(in  SamplerData2D sample, 
 		in float2 origTexcoord, 
 		in float2 atlasTexcoord, 
 		in float4 textureData, 
@@ -55,21 +55,25 @@ void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample,
 	float lod = clamp(mipmapLevel(origTexcoord, tileSize), 0, availableLODCount);
 	
 	float2 relativeTileSize = tileSize / imageSize;
+	
 	// get the width/height of the mip surface we've decided on
 	float2 mipSize = pow(float2(2.0,2.0), pwrs.xy - ceil(lod));
 	
 	// compute the inverse fraction size for the tile 
-	//float2 lodSize = mipSize * imageSize / tileSize;
 	float2 lodSizeInv = (relativeTileSize / mipSize);
 	//compute the new coordinates
-	//atlasTexcoord = atlasTexcoord * ((lodSize * (tileSize / imageSize) - 1.0) / lodSize) + (0.5 / lodSize) + startPos;
 	atlasTexcoord = atlasTexcoord * (relativeTileSize - lodSizeInv) + (0.5 * lodSizeInv) + startPos;
 	
 	//return the pixel from the correct mip surface of the atlas
-	texel = tex2Dlod(sample, float4(atlasTexcoord, 0, lod));
+	//texel = tex2Dlod(sample, float4(atlasTexcoord, 0, lod));
+	//return;
+	
+	float4 texel1 = FFP_SampleTextureLOD(sample, atlasTexcoord,floor(lod));
+	float4 texel2 = FFP_SampleTextureLOD(sample, atlasTexcoord, ceil(lod));
+	texel = lerp(texel1, texel2, pow(lod - floor(lod),3));
 }
 //-----------------------------------------------------------------------------
-void SGX_Atlas_Sample_Normal(in sampler2D sample, 
+void SGX_Atlas_Sample_Normal(in SamplerData2D sample, 
 		in float2 origTexcoord, 
 		in float2 atlasTexcoord, 
 		in float4 textureData, 
@@ -83,7 +87,7 @@ void SGX_Atlas_Sample_Normal(in sampler2D sample,
 	// w = derivative of original v
 	atlasTexcoord = textureData.xy + (atlasTexcoord * pow(float2(2.0,2.0),textureData.zw) / imageSize);
 	//texel = tex2Dlod(sample, float4(atlasTexcoord, 0,0));
-	texel = tex2D(sample, atlasTexcoord);
+	texel = FFP_SampleTexture(sample, atlasTexcoord);
 }
 
 //-----------------------------------------------------------------------------
