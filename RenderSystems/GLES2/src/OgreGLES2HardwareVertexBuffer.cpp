@@ -52,7 +52,12 @@ namespace Ogre {
     void GLES2HardwareVertexBuffer::createBuffer()
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Vertex Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
+
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,

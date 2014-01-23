@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
     GLES2HardwareUniformBuffer::GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, 
@@ -41,6 +42,12 @@ namespace Ogre {
     : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
+
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Uniform Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
 
         if (!mBufferId)
         {

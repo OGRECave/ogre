@@ -167,16 +167,11 @@ namespace Ogre {
         mImp->setStencilMask(mask);
     }
     
-    void GLStateCacheManager::setEnabled(GLenum flag)
+    void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
-        mImp->setEnabled(flag);
+        mImp->setEnabled(flag, enabled);
     }
-    
-    void GLStateCacheManager::setDisabled(GLenum flag)
-    {
-        mImp->setDisabled(flag);
-    }
-    
+
     void GLStateCacheManager::setCullFace(GLenum face)
     {
         mImp->setCullFace(face);

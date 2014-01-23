@@ -40,24 +40,28 @@ namespace Ogre {
     static inline void doImageIO(const String &name, const String &group,
                                  const String &ext,
                                  vector<Image>::type &images,
-                                 Resource *r)
+                                 Texture *tex)
     {
         size_t imgIdx = images.size();
         images.push_back(Image());
 
         DataStreamPtr dstream =
             ResourceGroupManager::getSingleton().openResource(
-                name, group, true, r);
+                name, group, true, tex);
 
         images[imgIdx].load(dstream, ext);
-        
-        size_t w = 0, h = 0;
-        
-        // Scale to nearest power of 2
-        w = GLES2PixelUtil::optionalPO2(images[imgIdx].getWidth());
-        h = GLES2PixelUtil::optionalPO2(images[imgIdx].getHeight());
-        if((images[imgIdx].getWidth() != w) || (images[imgIdx].getHeight() != h))
-            images[imgIdx].resize(w, h);
+
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
+           (Root::getSingleton().getRenderSystem()->getCapabilities()->getNonPOW2TexturesLimited() && tex->getNumMipmaps() > 0))
+        {
+            size_t w = 0, h = 0;
+            
+            // Scale to nearest power of 2
+            w = GLES2PixelUtil::optionalPO2(images[imgIdx].getWidth());
+            h = GLES2PixelUtil::optionalPO2(images[imgIdx].getHeight());
+            if((images[imgIdx].getWidth() != w) || (images[imgIdx].getHeight() != h))
+                images[imgIdx].resize(w, h);
+        }
     }
 
     GLES2Texture::GLES2Texture(ResourceManager* creator, const String& name,
@@ -104,11 +108,15 @@ namespace Ogre {
 
     void GLES2Texture::_createGLTexResource()
     {
-        // Convert to nearest power-of-two size if required
-        mWidth = GLES2PixelUtil::optionalPO2(mWidth);
-        mHeight = GLES2PixelUtil::optionalPO2(mHeight);
-        mDepth = GLES2PixelUtil::optionalPO2(mDepth);
-        
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
+           (Root::getSingleton().getRenderSystem()->getCapabilities()->getNonPOW2TexturesLimited() && mNumRequestedMipmaps > 0))
+        {
+            // Convert to nearest power-of-two size if required
+            mWidth = GLES2PixelUtil::optionalPO2(mWidth);
+            mHeight = GLES2PixelUtil::optionalPO2(mHeight);
+            mDepth = GLES2PixelUtil::optionalPO2(mDepth);
+        }
+
 		// Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
         GLenum texTarget = getGLES2TextureTarget();

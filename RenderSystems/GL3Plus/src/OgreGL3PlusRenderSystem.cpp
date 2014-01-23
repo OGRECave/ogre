@@ -377,6 +377,7 @@ namespace Ogre {
         rsc->setMaxPointSize(psRange[1]);
 
         // GLSL is always supported in GL
+        // TODO: Deprecate this profile name in favor of versioned names
         rsc->addShaderProfile("glsl");
 
         // Support for specific shader profiles
