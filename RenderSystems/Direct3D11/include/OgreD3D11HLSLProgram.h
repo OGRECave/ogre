@@ -234,8 +234,8 @@ namespace Ogre {
 
 		// Map to store interface slot position. 
 		// Number of interface slots is size of this map.
-		typedef std::map<std::string, unsigned int> SlotMap;
-		typedef std::map<std::string, unsigned int>::const_iterator SlotIterator;
+		typedef std::map<String, unsigned int> SlotMap;
+		typedef std::map<String, unsigned int>::const_iterator SlotIterator;
 		SlotMap mSlotMap;
 
         typedef vector<D3D11_SIGNATURE_PARAMETER_DESC>::type D3d11ShaderParameters;
