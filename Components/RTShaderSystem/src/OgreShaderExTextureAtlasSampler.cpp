@@ -220,13 +220,13 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 				bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 				
 				if (isHLSL)
-					FFPTexturing::AddTextureSampleWrapperInvocation(sampler,samplerState,GpuConstantType::GCT_SAMPLER2D,psMain,groupOrder,internalCounter);
+					FFPTexturing::AddTextureSampleWrapperInvocation(sampler,samplerState,GCT_SAMPLER2D,psMain,groupOrder,internalCounter);
 
 				//sample the texel color
 				curFuncInvocation = OGRE_NEW FunctionInvocation(
 					mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder, internalCounter++);
 				if (isHLSL)
-					curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(GpuConstantType::GCT_SAMPLER2D,psMain), Operand::OPS_IN);
+					curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(GCT_SAMPLER2D,psMain), Operand::OPS_IN);
 				else
 					curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
 				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_XY);

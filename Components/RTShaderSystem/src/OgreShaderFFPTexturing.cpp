@@ -96,7 +96,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
 	{
 		//Resolve texture sampler state parameter for  hlsl 4.0
-		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GpuConstantType::GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
+		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
 		hasError |= !(textureUnitParams->mTextureSamplerState.get());
 	}
 	
@@ -493,13 +493,13 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 ParameterPtr FFPTexturing::GetSamplerWrapperParam(GpuConstantType samplerType,Function* function)
 {
 	Ogre::String paramName = "lLocalSamplerWrapper_";
-	int samplerParamDim = samplerType - GpuConstantType::GCT_SAMPLER1D + 1;
+	int samplerParamDim = samplerType - GCT_SAMPLER1D + 1;
 	if (samplerParamDim <= 3 )
 		paramName +=  StringConverter::toString(samplerParamDim) + "D";
 	else if (samplerParamDim == 4 )
 		paramName +=  "Cube";
 
-	GpuConstantType margin =  (GpuConstantType)(GpuConstantType::GCT_SAMPLER_WRAPPER1D -  GpuConstantType::GCT_SAMPLER1D);
+	GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D - GCT_SAMPLER1D);
 	GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
 
 	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::Semantic::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
