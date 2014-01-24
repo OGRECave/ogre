@@ -502,7 +502,7 @@ ParameterPtr FFPTexturing::GetSamplerWrapperParam(GpuConstantType samplerType,Fu
 	GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D - GCT_SAMPLER1D);
 	GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
 
-	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::Semantic::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
+	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
 	return samplerWrapperParam;
 }
 
