@@ -773,7 +773,7 @@ bail:
 
 			if(FAILED(hr))         
  			{
-				std::stringstream error;
+				StringStream error;
 #ifdef USE_DXERR_LIBRARY
 				error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
 #else
@@ -3972,7 +3972,7 @@ bail:
 
 		if(FAILED(hr))
 		{
-			std::stringstream error;
+			StringStream error;
 #ifdef USE_DXERR_LIBRARY
 			error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
 #else
