@@ -140,7 +140,7 @@ public:
 	/** 
 	Return if hlsl 4.0 shading language is currently in use.		
 	*/
-	const bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
+	bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
 	/** 
 	Return the target shader language currently in use.		
 	*/
@@ -149,7 +149,7 @@ public:
 	/** 
 	Return the target shader language version currently in use.		
 	*/
-	const float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
+	float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
 
 	/** 
 	Set the output vertex shader target profiles.

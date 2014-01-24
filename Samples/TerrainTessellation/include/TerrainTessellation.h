@@ -26,6 +26,7 @@ same license as the rest of the engine.
 #include "OgreTerrainQuadTreeNode.h"
 #include "TerrainTessellationMaterialGenerator.h"
 #include "OgreTerrainPaging.h"
+#include "OgrePageManager.h"
 #include "OgreImage.h"
 #include "OgreTerrainAutoUpdateLod.h"
 
@@ -51,8 +52,8 @@ public:
 		//, mLayerEdit(1)
 		//, mBrushSizeTerrainSpace(0.02)
 		//, mHeightUpdateCountDown(0)
-		, mTerrainPos(1,1,1)
-		, mTerrainsImported(false)	
+		, mTerrainsImported(false)
+        , mTerrainPos(1,1,1)
 	{
 		mInfo["Title"] = "TerrainTessellation";
 		mInfo["Description"] = "Sample for terrain tessellation and the use of displacement mapping";

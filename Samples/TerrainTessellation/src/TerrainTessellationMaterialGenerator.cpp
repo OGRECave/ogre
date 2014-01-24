@@ -27,8 +27,8 @@ same license as the rest of the engine.
 using namespace Ogre;
 TerrainTessellationMaterialGenerator::TerrainTessellationMaterialGenerator(Ogre::String materialName, bool addNormalmap, bool cloneMaterial) 
 	: mMaterialName(materialName)
-	, mAddNormalMap(addNormalmap)
 	, mCloneMaterial(cloneMaterial)
+    , mAddNormalMap(addNormalmap)
 {
 	mProfiles.push_back(OGRE_NEW Profile(this, materialName, "Profile for rendering Ogre standard material"));
 	setActiveProfile(materialName);

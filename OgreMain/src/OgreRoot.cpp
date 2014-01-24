@@ -119,10 +119,11 @@ namespace Ogre {
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
 	  , mDefaultMinPixelSize(0)
+      , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
 	  , mNextMovableObjectTypeFlag(1)
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
-	  , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
+      , mIsBlendWeightsGpuRedundant(true)
     {
         // superclass will do singleton checking
         String msg;
