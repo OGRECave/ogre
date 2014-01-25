@@ -115,6 +115,7 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
+        mLastRenderTargetCount = 0;
 		
 		mCurrentLights.clear();
 
@@ -3103,16 +3104,31 @@ namespace Ogre
 
 			IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
 
-			// Bind render targets
-			uint count = mCurrentCapabilities->getNumMultiRenderTargets();
-			for(uint x=0; x<count; ++x)
+            // clear out any previously set render targets (after the first one--first one can't be cleared)
+            // Otherwise, we could end up trying to set the same render target in 2 different slots which will fail.
+			for (uint i = 1; i < mLastRenderTargetCount; ++i)
 			{
-				hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
+				hr = getActiveD3D9Device()->SetRenderTarget(i, NULL);
 				if (FAILED(hr))
 				{
 					String msg = DXGetErrorDescription(hr);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
 				}
+			}
+			uint count = mCurrentCapabilities->getNumMultiRenderTargets();
+			// Bind render targets
+			for (uint i = 0; i < count; ++i)
+			{
+                if ( pBack[i] )
+                {
+                    hr = getActiveD3D9Device()->SetRenderTarget(i, pBack[i]);
+                    if (FAILED(hr))
+                    {
+                        String msg = DXGetErrorDescription(hr);
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+                    }
+                    mLastRenderTargetCount = i + 1;  // remember the number of render targets that were set
+                }
 			}
 			hr = getActiveD3D9Device()->SetDepthStencilSurface( depthSurface );
 			if (FAILED(hr))
@@ -4289,6 +4305,7 @@ namespace Ogre
 		mVertexProgramBound = false;
 		mFragmentProgramBound = false;
 		mLastVertexSourceCount = 0;
+        mLastRenderTargetCount = 0;
 
 		
 		// Force all compositors to reconstruct their internal resources
