@@ -19,7 +19,7 @@ if(ANDROID)
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
     
-    SET(PKG_NAME "Org.Ogre.JNI")
+    SET(PKG_NAME "org.ogre.jni")
     
     # Set this variable to false if no java code will be present (google android:hasCode for more info)
     SET(HAS_CODE "true")

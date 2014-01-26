@@ -10,7 +10,6 @@
 
 macro(add_static_libs LIB_DIR)
     foreach(LIB_NAME ${ARGN})
-        
         SET(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB_DIR}/lib${LIB_NAME}.a\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
         SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
     endforeach(LIB_NAME ${ARGN})
@@ -37,7 +36,6 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	else()
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
-	
 	
 	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
