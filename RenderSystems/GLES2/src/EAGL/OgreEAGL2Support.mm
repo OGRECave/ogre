@@ -290,7 +290,7 @@ namespace Ogre {
         return window;
     }
 
-    EAGLES2Context * EAGL2Support::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
+    EAGLES2Context * EAGL2Support::createNewContext(CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
         EAGLES2Context *context = new EAGLES2Context(drawable, group);
         if (context == NULL)

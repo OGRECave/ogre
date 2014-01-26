@@ -163,12 +163,8 @@ namespace Ogre {
     {
         // Call the base class method first
         RenderTarget::_beginUpdate();
-        
-        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-        {
-            // Bind the FSAA buffer if we're doing multisampling
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer));
-        }
+
+        mContext->bindSampleFramebuffer();
     }
 
     void EAGL2Window::initNativeCreatedWindow(const NameValuePairList *miscParams)
@@ -247,7 +243,6 @@ namespace Ogre {
         if(mViewController.view != mView)
             mViewController.view = mView;
 
-        CFDictionaryRef dict;   // TODO: Dummy dictionary for now
         if(eaglLayer)
         {
             EAGLSharegroup *group = nil;
@@ -258,7 +253,7 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("iOS: Using an external EAGLSharegroup");
             }
             
-            mContext = mGLSupport->createNewContext(dict, eaglLayer, group);
+            mContext = mGLSupport->createNewContext(eaglLayer, group);
 
             mContext->mIsMultiSampleSupported = true;
             mContext->mNumSamples = mFSAA;
@@ -428,16 +423,14 @@ namespace Ogre {
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
 #if OGRE_NO_GLES3_SUPPORT == 1
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mSampleFramebuffer));
             OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
 #else
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mContext->mFSAAFramebuffer));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mContext->mSampleFramebuffer));
 			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
             OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, attachmentCount, attachments));
 #endif
         }
