@@ -115,7 +115,6 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-        mLastRenderTargetCount = 0;
 		
 		mCurrentLights.clear();
 
@@ -3082,10 +3081,11 @@ namespace Ogre
 			if (!pBack[0])
 				return;
 
+            IDirect3DDevice9* activeDevice = getActiveD3D9Device();
 			D3D9DepthBuffer *depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
 
 			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-				(!depthBuffer || depthBuffer->getDeviceCreator() != getActiveD3D9Device() ) )
+				(!depthBuffer || depthBuffer->getDeviceCreator() != activeDevice ) )
 			{
 				//Depth is automatically managed and there is no depth buffer attached to this RT
 				//or the Current D3D device doesn't match the one this Depth buffer was created
@@ -3095,7 +3095,7 @@ namespace Ogre
 				depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
 			}
 
-			if ((depthBuffer != NULL) && ( depthBuffer->getDeviceCreator() != getActiveD3D9Device()))
+			if ((depthBuffer != NULL) && ( depthBuffer->getDeviceCreator() != activeDevice))
 			{
 				OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
 					"Can't use a depth buffer from a different device!",
@@ -3104,37 +3104,73 @@ namespace Ogre
 
 			IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
 
-            // clear out any previously set render targets (after the first one--first one can't be cleared)
-            // Otherwise, we could end up trying to set the same render target in 2 different slots which will fail.
-			for (uint i = 1; i < mLastRenderTargetCount; ++i)
+            // create the list of old render targets.
+            // The list of old render targets is needed so that we can avoid trying to bind a render target
+            // to a slot while it is already bound to another slot from before.  Doing that would fail.
+            //
+            // NOTE:  pOldRenderTargets[0] is NEVER set!!!
+            // We don't need it, so we don't waste time looking it up.
+			IDirect3DSurface9* pOldRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+			memset(pOldRenderTargets, 0, sizeof(pOldRenderTargets));
+			uint maxRenderTargetCount = mCurrentCapabilities->getNumMultiRenderTargets();
+            uint oldRenderTargetCount = 1;
+			for (uint i = 1; i < maxRenderTargetCount; ++i)
 			{
-				hr = getActiveD3D9Device()->SetRenderTarget(i, NULL);
-				if (FAILED(hr))
+				hr = activeDevice->GetRenderTarget(i, &pOldRenderTargets[ i ]);
+                if (hr == D3D_OK)
+                {
+                    // GetRenderTarget bumps the reference count, so need to release to avoid a resource leak
+                    pOldRenderTargets[ i ]->Release();
+                    oldRenderTargetCount = i + 1;
+                }
+                else if (hr == D3DERR_NOTFOUND)
+                {
+                    // exit at the first "NOTFOUND"
+                    // assumption: render targets must be contiguous
+                    break;
+                }
+				else if (FAILED(hr))
 				{
 					String msg = DXGetErrorDescription(hr);
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to GetRenderTarget : " + msg, "D3D9RenderSystem::_setRenderTarget" );
 				}
 			}
-			uint count = mCurrentCapabilities->getNumMultiRenderTargets();
 			// Bind render targets
-			for (uint i = 0; i < count; ++i)
+			for (uint iRt = 0; iRt < maxRenderTargetCount; ++iRt)
 			{
-                if ( pBack[i] )
+                IDirect3DSurface9* rt = pBack[ iRt ];
+                // if new render target differs from what is already there,
+                if ( rt != pOldRenderTargets[ iRt ] )   // NOTE: always true when iRt == 0
                 {
-                    hr = getActiveD3D9Device()->SetRenderTarget(i, pBack[i]);
+                    // check that the new render target isn't occupying a slot from before, and if it is, clear out the previous slot.
+                    // Otherwise, we could end up trying to set the same render target in 2 different slots which will fail.
+                    for (uint iOldRt = iRt + 1; iOldRt < oldRenderTargetCount; ++iOldRt)
+                    {
+                        // if it is (rare case),
+                        if ( rt == pOldRenderTargets[ iOldRt ] )
+                        {
+                            // clear it out of the old slot, so that we can successfully put it in its new slot
+                            hr = activeDevice->SetRenderTarget( iOldRt, NULL );
+                            if (FAILED(hr))
+                            {
+                                String msg = DXGetErrorDescription(hr);
+                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to SetRenderTarget(NULL) : " + msg, "D3D9RenderSystem::_setRenderTarget" );
+                            }
+                        }
+                    }
+                    hr = activeDevice->SetRenderTarget( iRt, rt );
                     if (FAILED(hr))
                     {
                         String msg = DXGetErrorDescription(hr);
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to SetRenderTarget : " + msg, "D3D9RenderSystem::_setRenderTarget" );
                     }
-                    mLastRenderTargetCount = i + 1;  // remember the number of render targets that were set
                 }
 			}
-			hr = getActiveD3D9Device()->SetDepthStencilSurface( depthSurface );
+			hr = activeDevice->SetDepthStencilSurface( depthSurface );
 			if (FAILED(hr))
 			{
 				String msg = DXGetErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setRenderTarget" );
 			}
 		}
 	}
@@ -4305,7 +4341,6 @@ namespace Ogre
 		mVertexProgramBound = false;
 		mFragmentProgramBound = false;
 		mLastVertexSourceCount = 0;
-        mLastRenderTargetCount = 0;
 
 		
 		// Force all compositors to reconstruct their internal resources

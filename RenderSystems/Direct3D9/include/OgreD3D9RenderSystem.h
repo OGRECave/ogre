@@ -139,7 +139,6 @@ namespace Ogre
 		D3D9DeviceManager* mDeviceManager;
 
 		size_t mLastVertexSourceCount;
-        size_t mLastRenderTargetCount;
 
 
         /// Internal method for populating the capabilities structure
