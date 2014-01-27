@@ -483,8 +483,7 @@ namespace Ogre {
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1,
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
-                    case GCT_SUBROUTINE:
-                    case GCT_UNKNOWN:
+                    default:
                         break;
 
                     } // End switch

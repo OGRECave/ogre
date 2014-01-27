@@ -46,13 +46,13 @@ public:
 		: mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
-		, mFly(false)
 		//, mFallVelocity(0)
 		//, mMode(MODE_NORMAL)
 		//, mLayerEdit(1)
 		//, mBrushSizeTerrainSpace(0.02)
 		//, mHeightUpdateCountDown(0)
 		, mTerrainsImported(false)
+        , mFly(false)
         , mTerrainPos(1,1,1)
 	{
 		mInfo["Title"] = "TerrainTessellation";

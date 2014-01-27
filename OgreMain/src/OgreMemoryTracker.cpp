@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 #include "OgrePrerequisites.h"
 #include "OgreMemoryTracker.h"
+#include <iostream>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #   include <windows.h>

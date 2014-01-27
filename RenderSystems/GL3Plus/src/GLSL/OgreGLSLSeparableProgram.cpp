@@ -566,8 +566,7 @@ namespace Ogre
                         OGRE_CHECK_GL_ERROR(glProgramUniform1iv(progID, currentUniform->mLocation, 1,
                                                                 params->getIntPointer(def->physicalIndex)));
                         break;
-                    case GCT_UNKNOWN:
-                    case GCT_SUBROUTINE:
+                    default:
                         break;
 
                     } // End switch
