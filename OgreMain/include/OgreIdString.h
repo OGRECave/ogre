@@ -273,6 +273,24 @@ namespace Ogre
 		#endif
 #endif
 		}
+
+		/// Always returns "[Hash 0x0a0100ef]" strings in any mode
+		std::string getReleaseText() const
+		{
+		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+			#pragma warning( push )
+			#pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
+		#endif
+
+			char tmp[(OGRE_HASH_BITS >> 2)+10];
+			sprintf( tmp, "[Hash 0x%.8x]", mHash );
+			tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
+			return std::string( tmp );
+
+		#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+			#pragma warning( pop )
+		#endif
+		}
 	};
 }
 

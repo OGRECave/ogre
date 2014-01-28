@@ -244,7 +244,7 @@ namespace Ogre
 			Name of the shadow node. Leave blank if no shadows.
 			Caller is supposed to have set the shadow node correctly
 		*/
-		void createBasicWorkspaceDef( const String &workspaceDefName,
+		void createBasicWorkspaceDef( const IdString &workspaceDefName,
 										const ColourValue &backgroundColour,
 										IdString shadowNodeName=IdString() );
 	};

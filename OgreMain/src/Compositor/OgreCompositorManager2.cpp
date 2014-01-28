@@ -515,11 +515,12 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void CompositorManager2::createBasicWorkspaceDef( const String &workspaceDefName,
+	void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,
 														const ColourValue &backgroundColour,
 														IdString shadowNodeName )
 	{
-		CompositorNodeDef *nodeDef = this->addNodeDefinition( workspaceDefName + "/Node" );
+		CompositorNodeDef *nodeDef = this->addNodeDefinition( "AutoGen " + (workspaceDefName +
+																IdString("/Node")).getReleaseText() );
 
 		//Input texture
 		nodeDef->addTextureSourceName( "WindowRT", 0, TextureDefinitionBase::TEXTURE_INPUT );

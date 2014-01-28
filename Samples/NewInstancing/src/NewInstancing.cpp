@@ -661,13 +661,12 @@ void Sample_NewInstancing::checkBoxToggled( CheckBox* box )
 {
 	if( box == mEnableShadows )
 	{
-		const String workspaceNameStr( "NewInstancingWorkspace" );
-		const IdString workspaceName( workspaceNameStr );
+		const IdString workspaceName( "NewInstancingWorkspace" );
 		CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 		compositorManager->removeAllWorkspaces();
 		compositorManager->removeAllWorkspaceDefinitions();
 		compositorManager->removeAllNodeDefinitions();
-		compositorManager->createBasicWorkspaceDef( workspaceNameStr, ColourValue( 0.6f, 0.0f, 0.6f ),
+		compositorManager->createBasicWorkspaceDef( workspaceName, ColourValue( 0.6f, 0.0f, 0.6f ),
 													mEnableShadows->isChecked() ?
 														"NewInstancing Shadows" : IdString() );
 		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
