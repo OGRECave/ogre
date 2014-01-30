@@ -136,14 +136,12 @@ namespace Ogre
 			}
 
 			if (mDumpToStdOut)		
-				std::cout << os.str();
+                Ogre_OutputCString(os.str().c_str());
 
-				std::ofstream of;
+            std::ofstream of;
 			of.open(mLeakFileName.c_str());
 			of << os.str();
 			of.close();
-
-			Ogre_OutputCString(os.str().c_str());
 		}
 	}
 #endif // OGRE_DEBUG_MODE	

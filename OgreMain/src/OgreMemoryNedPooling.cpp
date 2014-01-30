@@ -35,6 +35,10 @@ THE SOFTWARE.
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NEDPOOLING
 
 // include ned implementation
+// don't abort() on asserts, behave as normal assert()
+#define ABORT_ON_ASSERT_FAILURE 0
+
+// include ned implementation
 #include <nedmalloc.c>
 
 namespace Ogre
