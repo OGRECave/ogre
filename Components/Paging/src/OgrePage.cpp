@@ -261,7 +261,9 @@ namespace Ogre
 		// final loading behaviour
 		if (res->succeeded())
 		{
-			std::swap(mContentCollections, pres.pageData->collectionsToAdd);
+            if(!pres.pageData->collectionsToAdd.empty())
+                std::swap(mContentCollections, pres.pageData->collectionsToAdd);
+
 			loadImpl();
 		}
 
