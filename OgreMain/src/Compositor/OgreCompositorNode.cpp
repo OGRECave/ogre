@@ -280,6 +280,9 @@ namespace Ogre
 			++mNumConnectedInputs;
 		mInTextures[inChannelA].target		= rt;
 		mInTextures[inChannelA].textures	= textures;
+
+		if( this->mNumConnectedInputs >= this->mInTextures.size() )
+			this->routeOutputs();
 	}
 	//-----------------------------------------------------------------------------------
 	TexturePtr CompositorNode::getDefinedTexture( IdString textureName, size_t mrtIndex ) const
