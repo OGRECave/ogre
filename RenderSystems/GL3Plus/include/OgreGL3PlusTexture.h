@@ -54,8 +54,46 @@ namespace Ogre {
             // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
             GLenum getGL3PlusTextureTarget(void) const;
 
-            GLuint getGLID() const
+			/** Returns the GL Id of the texture. When this texture is a render target
+				with FSAA enabled and explicit resolves, it may return the ID of the
+				Multisample texture version instead. When this happens, outIsFsaa
+				will be set to true.
+			@param outIsFsaa
+				True if the returned value belongs to a 2D multisample buffer. This
+				will happen if all of the following conditions are met:
+					* Texture is a RenderTarget that uses antialising
+					* Explicit resolves are turned on
+					* The texture hasn't been resolved yet.
+			@return
+				The GLuint handle/id of the texture.
+			*/
+            GLuint getGLID( bool &outIsFsaa ) const
             {
+				GLuint retVal = mTextureID;
+				bool isFsaa = false;
+
+				if( mFSAA > 0 )
+				{
+					RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+					if( !mFsaaExplicitResolve )
+					{
+						for( size_t face=0; face<getNumFaces(); ++face )
+						{
+							renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
+							if( renderTarget->isFsaaResolveDirty() )
+								renderTarget->swapBuffers( false );
+						}
+					}
+					else if( renderTarget->isFsaaResolveDirty() )
+					{
+						//GL 3.2+ supports explicit resolves. Only use the
+						//Fsaa texture before it has been resolved
+						renderTarget->getCustomAttribute( "GL_MULTISAMPLEFBOID", &retVal );
+						isFsaa = true;
+					}
+				}
+
+				outIsFsaa = isFsaa;
                 return mTextureID;
             }
 
