@@ -81,7 +81,7 @@ namespace Ogre {
 						{
 							renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
 							if( renderTarget->isFsaaResolveDirty() )
-								renderTarget->swapBuffers( false );
+								renderTarget->swapBuffers( );
 						}
 					}
 					else if( renderTarget->isFsaaResolveDirty() )

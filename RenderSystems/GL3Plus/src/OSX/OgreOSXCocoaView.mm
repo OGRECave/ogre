@@ -71,7 +71,7 @@ THE SOFTWARE.
 - (void)drawRect:(NSRect)r
 {
 	if(window)
-		window->update();
+		window->swapBuffers();
 }
 
 - (BOOL)acceptsFirstResponder
