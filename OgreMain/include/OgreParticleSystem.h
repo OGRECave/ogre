@@ -496,9 +496,9 @@ namespace Ogre {
                 all the particles in the set are the default size. It is possible to alter the size of individual
                 particles at the expense of extra calculation. See the Particle class for more info.
             @param width
-                The new default width for the particles in this set.
+                The new default width for the particles in this set. Must be non-negative!
             @param height
-                The new default height for the particles in this set.
+                The new default height for the particles in this set. Must be non-negative!
         */
         virtual void setDefaultDimensions(Real width, Real height);
 

@@ -176,11 +176,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ParticleEmitter::setTimeToLive(Real ttl)
     {
+        assert (ttl >= 0 && "Time to live can not be negative");
         mMinTTL = mMaxTTL = ttl;
     }
     //-----------------------------------------------------------------------
     void ParticleEmitter::setTimeToLive(Real minTtl, Real maxTtl)
     {
+        assert (minTtl >= 0 && "Time to live can not be negative");
+        assert (maxTtl >= 0 && "Time to live can not be negative");
         mMinTTL = minTtl;
         mMaxTTL = maxTtl;
     }
