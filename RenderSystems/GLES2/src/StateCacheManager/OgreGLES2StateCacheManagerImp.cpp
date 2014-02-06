@@ -101,7 +101,7 @@ namespace Ogre {
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
 
-        mEnableVector.reserve(64);
+        mEnabledVertexAttribs.reserve(64);
         mEnabledVertexAttribs.clear();
     }
     
