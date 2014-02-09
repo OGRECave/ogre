@@ -54,7 +54,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
-#include "OgreSpotShadowFadePng.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGpuProgram.h"
 #include "OgreDataStream.h"
@@ -126,7 +125,6 @@ mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
-mShadowMaterialInitDone(false),
 mShadowIndexBufferUsedSize(0),
 mFullScreenQuad(0),
 mShadowDirLightExtrudeDist(10000),
