@@ -45,7 +45,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 public:
 
 	Sample_Terrain()
-		: mTerrainGroup(0)
+        : mTerrainGlobals(0)
+		, mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
 		, mFly(false)
@@ -884,12 +885,24 @@ protected:
 		if (mTerrainPaging)
 		{
 			OGRE_DELETE mTerrainPaging;
+            mTerrainPaging = 0;
 			OGRE_DELETE mPageManager;
+            mPageManager = 0;
 		}
-		else
+		else if(mTerrainGroup)
+        {
 			OGRE_DELETE mTerrainGroup;
+            mTerrainGroup = 0;
+        }
 
-		OGRE_DELETE mTerrainGlobals;
+        if (mTerrainGlobals)
+        {
+            OGRE_DELETE mTerrainGlobals;
+            mTerrainGlobals = 0;
+        }
+
+        ResourceGroupManager::getSingleton().destroyResourceGroup("Terrain");
+
         mHouseList.clear();
 
 		SdkSample::_shutdown();

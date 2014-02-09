@@ -45,7 +45,8 @@ class _OgreSampleClassExport Sample_EndlessWorld : public SdkSample
 public:
 
 	Sample_EndlessWorld()
-		: mTerrainGroup(0)
+		: mTerrainGlobals(0)
+        , mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
 		, mPagedWorld(0)
@@ -56,6 +57,8 @@ public:
 		, mFly(true)
 		, mFallVelocity(0)
         , mTerrainPos(0,0,0)
+        , mLodInfoOverlay(0)
+        , mLodInfoOverlayContainer(0)
 
 	{
 		mInfo["Title"] = "Endless World";
@@ -456,17 +459,24 @@ protected:
 			mPageManager->destroyWorld( mPagedWorld );
 			OGRE_DELETE mPageManager;
 		}
-		OGRE_DELETE mTerrainGlobals;
-		
-		for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
-		{
-			mLodInfoOverlayContainer->_removeChild(*li);
-			OverlayManager::getSingleton().destroyOverlayElement(*li);
-		}
-		mLodStatusLabelList.clear();
 
-		OverlayManager::getSingleton().destroy(mLodInfoOverlay);
-		OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
+        if(mTerrainGlobals)
+            OGRE_DELETE mTerrainGlobals;
+
+        if(mLodInfoOverlay)
+            OverlayManager::getSingleton().destroy(mLodInfoOverlay);
+
+        if(mLodInfoOverlayContainer)
+        {
+            for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
+            {
+                mLodInfoOverlayContainer->_removeChild(*li);
+                OverlayManager::getSingleton().destroyOverlayElement(*li);
+            }
+            mLodStatusLabelList.clear();
+
+            OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
+        }
 
 		SdkSample::_shutdown();
 	}
