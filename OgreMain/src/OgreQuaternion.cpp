@@ -412,13 +412,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	bool Quaternion::equals(const Quaternion& rhs, const Radian& tolerance) const
 	{
-        Real fCos = Dot(rhs);
-        Radian angle = Math::ACos(fCos);
+        Real d = Dot(rhs);
+        Radian angle = Math::ACos(2 * d*d - 1.0);
 
 		return (Math::Abs(angle.valueRadians()) <= tolerance.valueRadians())
             || Math::RealEqual(angle.valueRadians(), Math::PI, tolerance.valueRadians());
-
-
 	}
     //-----------------------------------------------------------------------
     Quaternion Quaternion::Slerp (Real fT, const Quaternion& rkP,
