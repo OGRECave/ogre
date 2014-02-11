@@ -532,7 +532,7 @@ namespace Ogre
                 hitpoint = rayorig + raydir * t;
                 if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
                     hitpoint.z >= min.z && hitpoint.z <= max.z &&
-                    t < lowt)
+					(!hit || t < lowt))
                 {
                     hit = true;
                     lowt = t;
