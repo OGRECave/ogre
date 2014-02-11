@@ -86,7 +86,7 @@ namespace Ogre
         target->getCustomAttribute( "ID3D11RenderTargetView", &v );
         mRenderTargetViews[attachment] = *v;
 
-        if(mNumberOfViews >= OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+        if(mNumberOfViews < OGRE_MAX_MULTIPLE_RENDER_TARGETS)
             mNumberOfViews++;
 
         checkAndUpdate();
@@ -98,7 +98,7 @@ namespace Ogre
         targets[attachment] = 0;
         mRenderTargetViews[attachment] = 0;
 
-        if(mNumberOfViews <= 0)
+        if(mNumberOfViews > 0)
             mNumberOfViews--;
 
         checkAndUpdate();
